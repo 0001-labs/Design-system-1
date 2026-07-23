@@ -24,7 +24,29 @@ yarn add ds-one@alpha
 
 ## Quick Start
 
-### CDN Usage
+### CSS-only usage
+
+Load the stylesheet and use native HTML with DS one classes. No JavaScript is
+required.
+
+```html
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/ds-one@alpha/DS1/1-root/one.css"
+/>
+
+<article class="ds-card">
+  <h2 class="ds-text ds-text--heading">Welcome</h2>
+  <p class="ds-text">A native HTML interface styled by DS one.</p>
+  <input class="ds-input" type="email" placeholder="Email" />
+  <button class="ds-button ds-button--primary">Get started</button>
+</article>
+```
+
+This initial CSS-only subset includes text, buttons, inputs, and cards. The
+JavaScript bundle remains available for interactive Web Components.
+
+### Web Components via CDN
 
 ```html
 <!DOCTYPE html>

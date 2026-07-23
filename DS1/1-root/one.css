@@ -35,6 +35,9 @@ input {
 :root {
   /* DS one colors */
 
+  /* Default scale for CSS-only usage. The device helper can override this. */
+  --sf: 1;
+
   /* Base/[color]  */
 
   --white: rgb(255 255 255);
@@ -225,6 +228,106 @@ input {
 body {
   margin: 0;
   padding: 0;
+}
+
+/* ----------------------------------------------------------
+   CSS-ONLY COMPONENTS
+   Native HTML classes that do not require the JavaScript bundle.
+   ---------------------------------------------------------- */
+
+.ds-text {
+  margin: 0;
+  color: var(--text-color);
+  font-family: var(--typeface-regular);
+  font-size: var(--type-size-default);
+  font-weight: var(--type-weight-default);
+  line-height: var(--type-lineheight-default);
+}
+
+.ds-text--heading {
+  font-family: var(--typeface-medium);
+  font-size: var(--type-size-heading);
+  font-weight: var(--type-weight-heading);
+}
+
+.ds-text--small {
+  font-size: var(--type-size-small);
+}
+
+.ds-button {
+  appearance: none;
+  box-sizing: border-box;
+  min-height: calc(var(--08) * var(--sf));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  padding: 0 calc(var(--025) * var(--sf));
+  background: transparent;
+  color: var(--button-text-color);
+  cursor: pointer;
+  font-family: var(--typeface-regular);
+  font-size: var(--type-size-default);
+  line-height: var(--type-lineheight-default);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ds-button--primary {
+  background: var(--button-background-color-primary);
+  color: var(--button-text-color-on-light);
+}
+
+.ds-button--secondary {
+  background: var(--button-background-color-secondary);
+  color: var(--button-text-color-on-light);
+}
+
+.ds-button:hover:not(:disabled, [aria-disabled="true"]) {
+  filter: brightness(0.96);
+}
+
+.ds-button:active:not(:disabled, [aria-disabled="true"]) {
+  transform: translateY(1px);
+}
+
+.ds-button:focus-visible,
+.ds-input:focus-visible {
+  outline: 2px solid var(--sharp-blue);
+  outline-offset: 2px;
+}
+
+.ds-button:disabled,
+.ds-button[aria-disabled="true"],
+.ds-input:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.ds-input {
+  appearance: none;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: calc(var(--unit) * var(--sf));
+  border: 1px solid transparent;
+  padding: 0 calc(2px * var(--sf));
+  background: var(--button-background-color-secondary);
+  color: var(--button-text-color-on-light);
+  font-family: var(--typeface-regular);
+  font-size: var(--type-size-default);
+  line-height: var(--type-lineheight-default);
+}
+
+.ds-input::placeholder {
+  color: var(--base-darker-grey);
+}
+
+.ds-card {
+  box-sizing: border-box;
+  padding: calc(var(--half) * var(--sf));
+  border: var(--outline-stroke);
+  background: var(--background);
+  color: var(--text-color);
 }
 
 .matrix__board {
