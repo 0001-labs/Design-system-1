@@ -62,9 +62,9 @@
   --one-input-padding-block: 10px;
   --one-input-padding-inline: 12px;
   --one-input-gap: 8px;
-  --one-card-padding-block: 24px;
-  --one-card-padding-inline: 24px;
-  --one-card-gap: 12px;
+  --one-section-padding-block: 24px;
+  --one-section-padding-inline: 24px;
+  --one-section-gap: 12px;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -178,7 +178,12 @@ a:hover {
 /* Buttons
    A native button is the primary action. No component class is needed. */
 
-:where(button, input[type="button"], input[type="submit"], input[type="reset"]) {
+:where(
+  button,
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"]
+) {
   appearance: none;
   min-height: 40px;
   display: inline-flex;
@@ -196,15 +201,30 @@ a:hover {
   line-height: 1;
 }
 
-:where(button, input[type="button"], input[type="submit"], input[type="reset"]):hover:not(:disabled) {
+:where(
+    button,
+    input[type="button"],
+    input[type="submit"],
+    input[type="reset"]
+  ):hover:not(:disabled) {
   filter: brightness(0.96);
 }
 
-:where(button, input[type="button"], input[type="submit"], input[type="reset"]):active:not(:disabled) {
+:where(
+    button,
+    input[type="button"],
+    input[type="submit"],
+    input[type="reset"]
+  ):active:not(:disabled) {
   transform: translateY(1px);
 }
 
-:where(button, input[type="button"], input[type="submit"], input[type="reset"]):disabled {
+:where(
+  button,
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"]
+):disabled {
   cursor: not-allowed;
   opacity: 0.5;
 }
@@ -235,7 +255,17 @@ label {
   color: var(--one-text);
 }
 
-:where(input:not([type="button"], [type="submit"], [type="reset"], [type="checkbox"], [type="radio"]), select, textarea) {
+:where(
+  input:not(
+    [type="button"],
+    [type="submit"],
+    [type="reset"],
+    [type="checkbox"],
+    [type="radio"]
+  ),
+  select,
+  textarea
+) {
   appearance: none;
   width: 100%;
   min-height: 40px;
@@ -263,22 +293,22 @@ textarea {
   outline-offset: 2px;
 }
 
-/* Surfaces
-   Article is the default content surface or card. */
+/* Sections
+   A semantic section is the default content surface or card. */
 
-article {
+section {
   display: grid;
-  gap: var(--one-card-gap);
+  gap: var(--one-section-gap);
   border: 1px solid var(--one-border);
   border-radius: var(--one-radius);
-  padding-block: var(--one-card-padding-block);
-  padding-inline: var(--one-card-padding-inline);
+  padding-block: var(--one-section-padding-block);
+  padding-inline: var(--one-section-padding-inline);
   background: var(--one-background);
   color: var(--one-text);
 }
 
-article > header,
-article > footer {
+section > header,
+section > footer {
   padding: 0;
   background: transparent;
 }

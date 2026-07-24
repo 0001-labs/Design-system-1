@@ -293,7 +293,7 @@ button {
   background: #f0f0ee;
 }
 
-.icon-text::after {
+.icon-p::after {
   content: "T";
   position: absolute;
   inset: 0;
@@ -318,7 +318,7 @@ button {
   background: #fff;
 }
 
-.icon-card::after {
+.icon-section::after {
   content: "";
   position: absolute;
   inset: 4px;
@@ -547,7 +547,7 @@ button {
   display: grid;
 }
 
-.semantic-preview > article {
+.semantic-preview > section {
   width: min(360px, 52vw);
   display: grid;
 }
@@ -810,6 +810,47 @@ body.spacing-resize-y * {
   color: var(--workbench-muted);
   font-size: 8px;
   line-height: 1.45;
+}
+
+.copy-example-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--workbench-muted);
+  font-size: 8px;
+}
+
+.copy-example-status code {
+  color: var(--workbench-ink);
+  font:
+    8px var(--typeface-mono),
+    monospace;
+  text-transform: capitalize;
+}
+
+.copy-length-control {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.copy-length-control button {
+  min-height: 31px;
+  border: 1px solid var(--workbench-line);
+  border-radius: 3px;
+  background: #fff;
+  color: var(--workbench-ink);
+  cursor: pointer;
+  font-size: 9px;
+}
+
+.copy-length-control button:hover:not(:disabled) {
+  border-color: var(--workbench-ink);
+}
+
+.copy-length-control button:disabled {
+  color: #aaa;
+  cursor: not-allowed;
 }
 
 .color-input {
@@ -1089,7 +1130,7 @@ body.spacing-resize-y * {
     padding: 34px 24px;
   }
 
-  .semantic-preview > article,
+  .semantic-preview > section,
   .semantic-preview > label {
     width: min(100%, 280px);
     min-width: 0;

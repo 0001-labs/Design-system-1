@@ -27,7 +27,7 @@ yarn add ds-one@alpha
 ### Classless CSS usage
 
 Load the separate semantic stylesheet and write ordinary HTML. Elements such as
-`button`, `input`, `article`, headings, tables, and code blocks are styled
+`button`, `input`, `section`, headings, tables, and code blocks are styled
 directly, so no component classes or JavaScript are required.
 
 ```html
@@ -36,19 +36,17 @@ directly, so no component classes or JavaScript are required.
   href="https://cdn.jsdelivr.net/npm/ds-one@alpha/DS1/1-root/one.semantic.css"
 />
 
-<article>
-  <header>
-    <h2>Welcome</h2>
-  </header>
+<section>
+  <h2>Welcome</h2>
   <p>A native HTML interface styled by DS one.</p>
   <label for="email">Email</label>
   <input id="email" type="email" placeholder="you@example.com" />
   <button type="button">Get started</button>
-</article>
+</section>
 ```
 
 The complete file is organized with comments for Root, Reset, Layout,
-Typography, Buttons, Forms, Surfaces, Tables, Code, Feedback, and Motion. It is
+Typography, Buttons, Forms, Sections, Tables, Code, Feedback, and Motion. It is
 an additional distribution: the existing `one.css` stylesheet and Lit Web
 Components remain unchanged.
 

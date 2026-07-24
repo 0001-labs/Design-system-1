@@ -8,14 +8,14 @@ import {
 } from "react";
 import semanticCssTemplate from "../../DS1/1-root/one.semantic.css?raw";
 
-type ComponentKind = "text" | "button" | "input" | "card";
-type ComponentVariant = "default" | "heading" | "small";
+type ComponentKind = "p" | "button" | "input" | "section";
+type CopyLength = "short" | "default" | "long";
 
 type ComponentConfig = {
+  copyLength: CopyLength;
   text: string;
   detail: string;
   placeholder: string;
-  variant: ComponentVariant;
   paddingX: number;
   paddingY: number;
   gap: number;
@@ -30,64 +30,132 @@ const componentLibrary: Array<{
   stories: string[];
 }> = [
   {
-    kind: "text",
-    label: "Text",
-    description: "Typography and hierarchy",
-    stories: ["Default", "Heading", "Small"],
+    kind: "p",
+    label: "<p>",
+    description: "Paragraph text",
+    stories: ["Default"],
   },
   {
     kind: "button",
-    label: "Button",
-    description: "Actions and links",
+    label: "<button>",
+    description: "Native action",
     stories: ["Default"],
   },
   {
     kind: "input",
-    label: "Input",
+    label: "<input>",
     description: "Native form control",
     stories: ["Default"],
   },
   {
-    kind: "card",
-    label: "Card",
+    kind: "section",
+    label: "<section>",
     description: "Content surface",
     stories: ["Default"],
   },
 ];
 
+const copyExamples: Record<
+  ComponentKind,
+  Record<CopyLength, Pick<ComponentConfig, "text" | "detail" | "placeholder">>
+> = {
+  p: {
+    short: {
+      text: "Design with clarity.",
+      detail: "",
+      placeholder: "",
+    },
+    default: {
+      text: "A clear design system helps teams build consistent interfaces.",
+      detail: "",
+      placeholder: "",
+    },
+    long: {
+      text: "A clear design system helps teams build consistent interfaces while keeping typography, spacing, color, and interaction decisions easy to understand.",
+      detail: "",
+      placeholder: "",
+    },
+  },
+  button: {
+    short: {
+      text: "Save",
+      detail: "",
+      placeholder: "",
+    },
+    default: {
+      text: "Get started",
+      detail: "",
+      placeholder: "",
+    },
+    long: {
+      text: "Create your account",
+      detail: "",
+      placeholder: "",
+    },
+  },
+  input: {
+    short: {
+      text: "Email",
+      detail: "",
+      placeholder: "name@example.com",
+    },
+    default: {
+      text: "Email address",
+      detail: "",
+      placeholder: "you@example.com",
+    },
+    long: {
+      text: "Your preferred contact email",
+      detail: "",
+      placeholder: "your.name@example.com",
+    },
+  },
+  section: {
+    short: {
+      text: "WWF History",
+      detail: "WWF was founded in 1961.",
+      placeholder: "",
+    },
+    default: {
+      text: "WWF History",
+      detail:
+        "The World Wide Fund for Nature (WWF) is an international organization working on issues regarding the conservation, research and restoration of the environment, formerly named the World Wildlife Fund. WWF was founded in 1961.",
+      placeholder: "",
+    },
+    long: {
+      text: "WWF History",
+      detail:
+        "The World Wide Fund for Nature (WWF) is an international organization working on issues regarding the conservation, research and restoration of the environment, formerly named the World Wildlife Fund. WWF was founded in 1961. Its work connects local action with global conservation goals.",
+      placeholder: "",
+    },
+  },
+};
+
 const initialConfigs: ConfigByKind = {
-  text: {
-    text: "Build with DS one",
-    detail: "",
-    placeholder: "",
-    variant: "heading",
+  p: {
+    copyLength: "default",
+    ...copyExamples.p.default,
     paddingX: 0,
     paddingY: 0,
     gap: 0,
   },
   button: {
-    text: "Get started",
-    detail: "",
-    placeholder: "",
-    variant: "default",
+    copyLength: "default",
+    ...copyExamples.button.default,
     paddingX: 20,
     paddingY: 12,
     gap: 0,
   },
   input: {
-    text: "Email address",
-    detail: "",
-    placeholder: "you@example.com",
-    variant: "default",
+    copyLength: "default",
+    ...copyExamples.input.default,
     paddingX: 12,
     paddingY: 10,
     gap: 8,
   },
-  card: {
-    text: "A focused component",
-    detail: "Refine one primitive at a time, then compose it later.",
-    placeholder: "",
-    variant: "default",
+  section: {
+    copyLength: "default",
+    ...copyExamples.section.default,
     paddingX: 24,
     paddingY: 24,
     gap: 12,
@@ -113,14 +181,8 @@ function escapeHtml(value: string) {
     .replaceAll('"', "&quot;");
 }
 
-function semanticElement(kind: ComponentKind, variant: ComponentVariant) {
-  if (kind === "text") {
-    return variant === "heading" ? "h2" : variant === "small" ? "small" : "p";
-  }
-
-  if (kind === "button") return "button";
-  if (kind === "input") return "label + input";
-  return "article";
+function semanticElement(kind: ComponentKind) {
+  return kind;
 }
 
 function replaceCustomProperty(css: string, name: string, value: string) {
@@ -130,16 +192,22 @@ function replaceCustomProperty(css: string, name: string, value: string) {
 function buildSemanticCss(configs: ConfigByKind, accent: string) {
   const values: Array<[string, string]> = [
     ["--accent-color", accent],
-    ["--one-text-padding-block", `${Math.round(configs.text.paddingY)}px`],
-    ["--one-text-padding-inline", `${Math.round(configs.text.paddingX)}px`],
+    ["--one-text-padding-block", `${Math.round(configs.p.paddingY)}px`],
+    ["--one-text-padding-inline", `${Math.round(configs.p.paddingX)}px`],
     ["--one-button-padding-block", `${Math.round(configs.button.paddingY)}px`],
     ["--one-button-padding-inline", `${Math.round(configs.button.paddingX)}px`],
     ["--one-input-padding-block", `${Math.round(configs.input.paddingY)}px`],
     ["--one-input-padding-inline", `${Math.round(configs.input.paddingX)}px`],
     ["--one-input-gap", `${Math.round(configs.input.gap)}px`],
-    ["--one-card-padding-block", `${Math.round(configs.card.paddingY)}px`],
-    ["--one-card-padding-inline", `${Math.round(configs.card.paddingX)}px`],
-    ["--one-card-gap", `${Math.round(configs.card.gap)}px`],
+    [
+      "--one-section-padding-block",
+      `${Math.round(configs.section.paddingY)}px`,
+    ],
+    [
+      "--one-section-padding-inline",
+      `${Math.round(configs.section.paddingX)}px`,
+    ],
+    ["--one-section-gap", `${Math.round(configs.section.gap)}px`],
   ];
 
   return values.reduce(
@@ -170,14 +238,8 @@ function scopeSemanticCss(css: string) {
 function componentMarkup(kind: ComponentKind, config: ComponentConfig) {
   const text = escapeHtml(config.text);
 
-  if (kind === "text") {
-    const tag =
-      config.variant === "heading"
-        ? "h2"
-        : config.variant === "small"
-          ? "small"
-          : "p";
-    return `<${tag}>${text}</${tag}>`;
+  if (kind === "p") {
+    return `<p>${text}</p>`;
   }
 
   if (kind === "button") {
@@ -192,12 +254,10 @@ function componentMarkup(kind: ComponentKind, config: ComponentConfig) {
   }
 
   return [
-    `<article>`,
-    `  <header>`,
-    `    <h2>${text}</h2>`,
-    `  </header>`,
+    `<section>`,
+    `  <h2>${text}</h2>`,
     `  <p>${escapeHtml(config.detail)}</p>`,
-    `</article>`,
+    `</section>`,
   ].join("\n");
 }
 
@@ -224,16 +284,16 @@ function buildExport(
     <style>
       :root {
         --accent-color: ${accent};
-        --one-text-padding-block: ${Math.round(configs.text.paddingY)}px;
-        --one-text-padding-inline: ${Math.round(configs.text.paddingX)}px;
+        --one-text-padding-block: ${Math.round(configs.p.paddingY)}px;
+        --one-text-padding-inline: ${Math.round(configs.p.paddingX)}px;
         --one-button-padding-block: ${Math.round(configs.button.paddingY)}px;
         --one-button-padding-inline: ${Math.round(configs.button.paddingX)}px;
         --one-input-padding-block: ${Math.round(configs.input.paddingY)}px;
         --one-input-padding-inline: ${Math.round(configs.input.paddingX)}px;
         --one-input-gap: ${Math.round(configs.input.gap)}px;
-        --one-card-padding-block: ${Math.round(configs.card.paddingY)}px;
-        --one-card-padding-inline: ${Math.round(configs.card.paddingX)}px;
-        --one-card-gap: ${Math.round(configs.card.gap)}px;
+        --one-section-padding-block: ${Math.round(configs.section.paddingY)}px;
+        --one-section-padding-inline: ${Math.round(configs.section.paddingX)}px;
+        --one-section-gap: ${Math.round(configs.section.gap)}px;
       }
     </style>
     <title>DS one ${kind}</title>
@@ -374,14 +434,8 @@ function ComponentPreview({
   config: ComponentConfig;
   kind: ComponentKind;
 }) {
-  if (kind === "text") {
-    return config.variant === "heading" ? (
-      <h2 data-preview-component>{config.text}</h2>
-    ) : config.variant === "small" ? (
-      <small data-preview-component>{config.text}</small>
-    ) : (
-      <p data-preview-component>{config.text}</p>
-    );
+  if (kind === "p") {
+    return <p data-preview-component>{config.text}</p>;
   }
 
   if (kind === "button") {
@@ -407,12 +461,10 @@ function ComponentPreview({
   }
 
   return (
-    <article data-preview-component>
-      <header>
-        <h2>{config.text}</h2>
-      </header>
+    <section data-preview-component>
+      <h2>{config.text}</h2>
       <p>{config.detail}</p>
-    </article>
+    </section>
   );
 }
 
@@ -461,27 +513,22 @@ export function App() {
     }));
   };
 
-  const chooseStory = (story: string) => {
-    if (selectedKind === "text") {
-      updateConfig({
-        variant:
-          story === "Heading"
-            ? "heading"
-            : story === "Small"
-              ? "small"
-              : "default",
-      });
-    }
-  };
+  const chooseStory = (_story: string) => undefined;
+  const currentStory = "Default";
 
-  const currentStory =
-    selectedKind === "text"
-      ? config.variant === "heading"
-        ? "Heading"
-        : config.variant === "small"
-          ? "Small"
-          : "Default"
-      : "Default";
+  const changeCopyLength = (direction: -1 | 1) => {
+    const lengths: CopyLength[] = ["short", "default", "long"];
+    const currentIndex = lengths.indexOf(config.copyLength);
+    const nextLength =
+      lengths[
+        Math.min(lengths.length - 1, Math.max(0, currentIndex + direction))
+      ];
+
+    updateConfig({
+      copyLength: nextLength,
+      ...copyExamples[selectedKind][nextLength],
+    });
+  };
 
   const copyExport = async () => {
     await navigator.clipboard.writeText(exportedHtml);
@@ -671,7 +718,8 @@ export function App() {
                       />
                       <ComponentPreview config={config} kind={selectedKind} />
                     </div>
-                    {(selectedKind === "card" || selectedKind === "input") && (
+                    {(selectedKind === "section" ||
+                      selectedKind === "input") && (
                       <div className="gap-control">
                         <span>Content gap</span>
                         <input
@@ -694,7 +742,7 @@ export function App() {
                     Padding {Math.round(config.paddingY)} ×{" "}
                     {Math.round(config.paddingX)}
                   </span>
-                  <code>{`<${semanticElement(selectedKind, config.variant)}>`}</code>
+                  <code>{`<${semanticElement(selectedKind)}>`}</code>
                 </footer>
               </div>
             </div>
@@ -707,54 +755,34 @@ export function App() {
             </div>
             <div className="controls-scroll">
               <section className="controls-section">
-                <h2>Props</h2>
-                <ControlField
-                  label={selectedKind === "input" ? "Label" : "Text"}
+                <h2>Example copy</h2>
+                <div className="copy-example-status">
+                  <span>Fixed for this step</span>
+                  <code>{config.copyLength}</code>
+                </div>
+                <div
+                  aria-label="Example copy length"
+                  className="copy-length-control"
                 >
-                  <input
-                    onChange={(event) =>
-                      updateConfig({ text: event.target.value })
-                    }
-                    value={config.text}
-                  />
-                </ControlField>
-                {selectedKind === "card" && (
-                  <ControlField label="Description">
-                    <textarea
-                      onChange={(event) =>
-                        updateConfig({ detail: event.target.value })
-                      }
-                      rows={3}
-                      value={config.detail}
-                    />
-                  </ControlField>
-                )}
-                {selectedKind === "input" && (
-                  <ControlField label="Placeholder">
-                    <input
-                      onChange={(event) =>
-                        updateConfig({ placeholder: event.target.value })
-                      }
-                      value={config.placeholder}
-                    />
-                  </ControlField>
-                )}
-                {selectedKind === "text" && (
-                  <ControlField label="Element">
-                    <select
-                      onChange={(event) =>
-                        updateConfig({
-                          variant: event.target.value as ComponentVariant,
-                        })
-                      }
-                      value={config.variant}
-                    >
-                      <option value="default">Paragraph</option>
-                      <option value="heading">Heading</option>
-                      <option value="small">Small</option>
-                    </select>
-                  </ControlField>
-                )}
+                  <button
+                    disabled={config.copyLength === "short"}
+                    onClick={() => changeCopyLength(-1)}
+                    type="button"
+                  >
+                    Shorter
+                  </button>
+                  <button
+                    disabled={config.copyLength === "long"}
+                    onClick={() => changeCopyLength(1)}
+                    type="button"
+                  >
+                    Longer
+                  </button>
+                </div>
+                <p className="controls-note">
+                  Choose an example length now. Writing custom copy comes with
+                  compositions.
+                </p>
               </section>
 
               <section className="controls-section">
@@ -795,7 +823,7 @@ export function App() {
                     </div>
                   </ControlField>
                 </div>
-                {(selectedKind === "card" || selectedKind === "input") && (
+                {(selectedKind === "section" || selectedKind === "input") && (
                   <ControlField label="Content gap">
                     <div className="number-input">
                       <input
@@ -836,7 +864,7 @@ export function App() {
 
               <section className="controls-section controls-section--output">
                 <h2>Output</h2>
-                <code>{`<${semanticElement(selectedKind, config.variant)}>`}</code>
+                <code>{`<${semanticElement(selectedKind)}>`}</code>
                 <span>Native HTML · no component runtime</span>
               </section>
             </div>
