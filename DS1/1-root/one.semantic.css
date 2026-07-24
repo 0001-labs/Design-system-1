@@ -1,0 +1,390 @@
+/* DS one semantic CSS — version 0.3.0-alpha.9 */
+/* A classless stylesheet for native HTML. No JavaScript is required. */
+
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400&display=swap");
+
+@font-face {
+  font-family: GT-America-Standard-Regular;
+  src: url("./fonts/GT-America-Standard-Regular.woff2") format("woff2");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: GT-America-Standard-Medium;
+  src: url("./fonts/GT-America-Standard-Medium.woff2") format("woff2");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: GT-Canon-M-Standard-Medium;
+  src: url("./fonts/GT-Canon-M-Standard-Medium-Trial.woff2") format("woff2");
+  font-display: swap;
+}
+
+/* Root
+   Global color, type, spacing, and component tokens.
+   The workbench edits these values without changing semantic markup. */
+
+:root {
+  color-scheme: light dark;
+
+  --one-white: #ffffff;
+  --one-black: #2a2a2a;
+  --one-slate: #1e1e1e;
+  --one-slate-light: #e6e6e6;
+  --one-slate-dark: #3c3c3c;
+  --one-muted: #797979;
+  --one-focus: #594dff;
+  --accent-color: #99ff73;
+
+  --one-background: light-dark(var(--one-white), var(--one-black));
+  --one-surface: light-dark(#f4f4f2, var(--one-slate-dark));
+  --one-text: light-dark(var(--one-black), var(--one-white));
+  --one-text-muted: light-dark(var(--one-muted), var(--one-slate-light));
+  --one-border: light-dark(#d8d8d5, #555555);
+
+  --one-font: "GT-America-Standard-Regular", "Noto Sans JP", sans-serif;
+  --one-font-medium: "GT-America-Standard-Medium", var(--one-font);
+  --one-font-display: "GT-Canon-M-Standard-Medium", var(--one-font);
+  --one-font-mono: ui-monospace, "SFMono-Regular", monospace;
+
+  --one-font-size: 14px;
+  --one-font-size-small: 11px;
+  --one-line-height: 1.45;
+  --one-radius: 0;
+  --one-unit: 20px;
+  --one-page-width: 72rem;
+
+  --one-text-padding-block: 0px;
+  --one-text-padding-inline: 0px;
+  --one-button-padding-block: 12px;
+  --one-button-padding-inline: 20px;
+  --one-input-padding-block: 10px;
+  --one-input-padding-inline: 12px;
+  --one-input-gap: 8px;
+  --one-card-padding-block: 24px;
+  --one-card-padding-inline: 24px;
+  --one-card-gap: 12px;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Reset
+   Predictable sizing while keeping browser-native behavior. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--one-background);
+  color: var(--one-text);
+  font-family: var(--one-font);
+  font-size: var(--one-font-size);
+  line-height: var(--one-line-height);
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Layout
+   Header, main, and footer become centered semantic containers. */
+
+body > header,
+body > main,
+body > footer {
+  width: min(100% - 2rem, var(--one-page-width));
+  margin-inline: auto;
+}
+
+body > header,
+body > footer {
+  padding-block: var(--one-unit);
+}
+
+body > main {
+  padding-block: calc(var(--one-unit) * 2);
+}
+
+section + section {
+  margin-block-start: calc(var(--one-unit) * 2);
+}
+
+/* Typography
+   Headings and text work directly from their native elements. */
+
+:where(h1, h2, h3, h4, h5, h6, p, small) {
+  margin-block: 0;
+  padding-block: var(--one-text-padding-block);
+  padding-inline: var(--one-text-padding-inline);
+}
+
+:where(h1, h2, h3, h4, h5, h6) {
+  color: var(--one-text);
+  font-family: var(--one-font-medium);
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+h1 {
+  font-family: var(--one-font-display);
+  font-size: clamp(2rem, 5vw, 4.5rem);
+}
+
+h2 {
+  font-size: clamp(1.35rem, 3vw, 2.25rem);
+}
+
+h3 {
+  font-size: 1.125rem;
+}
+
+p + p {
+  margin-block-start: 1em;
+}
+
+small {
+  color: var(--one-text-muted);
+  font-size: var(--one-font-size-small);
+}
+
+:where(strong, b) {
+  font-family: var(--one-font-medium);
+  font-weight: 500;
+}
+
+a {
+  color: inherit;
+  text-decoration-color: var(--accent-color);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+}
+
+a:hover {
+  text-decoration-thickness: 4px;
+}
+
+/* Buttons
+   A native button is the primary action. No component class is needed. */
+
+:where(button, input[type="button"], input[type="submit"], input[type="reset"]) {
+  appearance: none;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--one-radius);
+  padding-block: var(--one-button-padding-block);
+  padding-inline: var(--one-button-padding-inline);
+  background: var(--accent-color);
+  color: var(--one-black);
+  cursor: pointer;
+  font-family: var(--one-font);
+  font-size: inherit;
+  line-height: 1;
+}
+
+:where(button, input[type="button"], input[type="submit"], input[type="reset"]):hover:not(:disabled) {
+  filter: brightness(0.96);
+}
+
+:where(button, input[type="button"], input[type="submit"], input[type="reset"]):active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+:where(button, input[type="button"], input[type="submit"], input[type="reset"]):disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Forms
+   Labels, inputs, selects, and textareas use their semantic relationship. */
+
+form {
+  display: grid;
+  gap: var(--one-unit);
+}
+
+fieldset {
+  display: grid;
+  gap: var(--one-unit);
+  border: 1px solid var(--one-border);
+  padding: var(--one-unit);
+}
+
+legend {
+  padding-inline: 0.5rem;
+  font-family: var(--one-font-medium);
+}
+
+label {
+  display: grid;
+  gap: var(--one-input-gap);
+  color: var(--one-text);
+}
+
+:where(input:not([type="button"], [type="submit"], [type="reset"], [type="checkbox"], [type="radio"]), select, textarea) {
+  appearance: none;
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid var(--one-border);
+  border-radius: var(--one-radius);
+  padding-block: var(--one-input-padding-block);
+  padding-inline: var(--one-input-padding-inline);
+  background: var(--one-surface);
+  color: var(--one-text);
+  font-family: var(--one-font);
+  font-size: inherit;
+}
+
+textarea {
+  min-height: 8rem;
+  resize: vertical;
+}
+
+::placeholder {
+  color: var(--one-text-muted);
+}
+
+:where(input, select, textarea, button):focus-visible {
+  outline: 2px solid var(--one-focus);
+  outline-offset: 2px;
+}
+
+/* Surfaces
+   Article is the default content surface or card. */
+
+article {
+  display: grid;
+  gap: var(--one-card-gap);
+  border: 1px solid var(--one-border);
+  border-radius: var(--one-radius);
+  padding-block: var(--one-card-padding-block);
+  padding-inline: var(--one-card-padding-inline);
+  background: var(--one-background);
+  color: var(--one-text);
+}
+
+article > header,
+article > footer {
+  padding: 0;
+  background: transparent;
+}
+
+blockquote {
+  margin-inline: 0;
+  border-inline-start: 4px solid var(--accent-color);
+  padding-inline-start: var(--one-unit);
+  color: var(--one-text-muted);
+}
+
+details {
+  border-block: 1px solid var(--one-border);
+  padding-block: 0.75rem;
+}
+
+summary {
+  cursor: pointer;
+  font-family: var(--one-font-medium);
+}
+
+dialog {
+  max-width: min(36rem, calc(100% - 2rem));
+  border: 1px solid var(--one-border);
+  border-radius: var(--one-radius);
+  padding: var(--one-unit);
+  background: var(--one-background);
+  color: var(--one-text);
+}
+
+dialog::backdrop {
+  background: rgb(0 0 0 / 50%);
+}
+
+/* Tables
+   Native table structure receives readable defaults. */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+:where(th, td) {
+  border-bottom: 1px solid var(--one-border);
+  padding: 0.75rem;
+  text-align: start;
+}
+
+th {
+  font-family: var(--one-font-medium);
+  font-weight: 500;
+}
+
+tbody tr:hover {
+  background: var(--one-surface);
+}
+
+/* Code
+   Inline and block code share the same monospace language. */
+
+:where(code, kbd, samp, pre) {
+  font-family: var(--one-font-mono);
+}
+
+:where(code, kbd) {
+  padding: 0.15em 0.35em;
+  background: var(--one-surface);
+  font-size: 0.9em;
+}
+
+pre {
+  overflow: auto;
+  padding: var(--one-unit);
+  background: var(--one-slate);
+  color: var(--one-white);
+}
+
+pre code {
+  padding: 0;
+  background: transparent;
+}
+
+/* Feedback
+   Native progress and horizontal rules inherit the theme. */
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--one-border);
+}
+
+progress {
+  width: 100%;
+  accent-color: var(--accent-color);
+}
+
+/* Motion
+   Respect reduced-motion preferences. */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

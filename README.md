@@ -24,27 +24,33 @@ yarn add ds-one@alpha
 
 ## Quick Start
 
-### CSS-only usage
+### Classless CSS usage
 
-Load the stylesheet and use native HTML with DS one classes. No JavaScript is
-required.
+Load the separate semantic stylesheet and write ordinary HTML. Elements such as
+`button`, `input`, `article`, headings, tables, and code blocks are styled
+directly, so no component classes or JavaScript are required.
 
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/ds-one@alpha/DS1/1-root/one.css"
+  href="https://cdn.jsdelivr.net/npm/ds-one@alpha/DS1/1-root/one.semantic.css"
 />
 
-<article class="ds-card">
-  <h2 class="ds-text ds-text--heading">Welcome</h2>
-  <p class="ds-text">A native HTML interface styled by DS one.</p>
-  <input class="ds-input" type="email" placeholder="Email" />
-  <button class="ds-button ds-button--primary">Get started</button>
+<article>
+  <header>
+    <h2>Welcome</h2>
+  </header>
+  <p>A native HTML interface styled by DS one.</p>
+  <label for="email">Email</label>
+  <input id="email" type="email" placeholder="you@example.com" />
+  <button type="button">Get started</button>
 </article>
 ```
 
-This initial CSS-only subset includes text, buttons, inputs, and cards. The
-JavaScript bundle remains available for interactive Web Components.
+The complete file is organized with comments for Root, Reset, Layout,
+Typography, Buttons, Forms, Surfaces, Tables, Code, Feedback, and Motion. It is
+an additional distribution: the existing `one.css` stylesheet and Lit Web
+Components remain unchanged.
 
 ### Web Components via CDN
 
@@ -76,15 +82,22 @@ import "ds-one/styles";
 import "ds-one";
 ```
 
+For the classless version, import only the semantic stylesheet:
+
+```ts
+import "ds-one/DS1/1-root/one.semantic.css";
+```
+
 ## Documentation
 
 See the full documentation for DS one at: [**dsone.dev**](https://dsone.dev/)
 
 ## DS one app
 
-The repository includes a React-based visual editor for composing DS one
-interfaces and exporting standalone HTML that uses `one.css` without a
-JavaScript runtime.
+The repository includes a React-based component workbench for refining semantic
+elements one at a time. The right panel always shows the complete
+`one.semantic.css` file and updates its root variables as spacing and theme
+controls change. Exports contain plain HTML and require no JavaScript runtime.
 
 ```bash
 bun run app:dev

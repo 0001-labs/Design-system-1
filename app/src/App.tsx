@@ -6,14 +6,13 @@ import {
   useRef,
   useState,
 } from "react";
+import semanticCssTemplate from "../../DS1/1-root/one.semantic.css?raw";
 
 type ComponentKind = "text" | "button" | "input" | "card";
 type ComponentVariant =
   | "default"
   | "heading"
-  | "small"
-  | "primary"
-  | "secondary";
+  | "small";
 
 type ComponentConfig = {
   text: string;
@@ -43,7 +42,7 @@ const componentLibrary: Array<{
     kind: "button",
     label: "Button",
     description: "Actions and links",
-    stories: ["Primary", "Secondary"],
+    stories: ["Default"],
   },
   {
     kind: "input",
@@ -73,7 +72,7 @@ const initialConfigs: ConfigByKind = {
     text: "Get started",
     detail: "",
     placeholder: "",
-    variant: "primary",
+    variant: "default",
     paddingX: 20,
     paddingY: 12,
     gap: 0,
@@ -117,104 +116,100 @@ function escapeHtml(value: string) {
     .replaceAll('"', "&quot;");
 }
 
-function componentClasses(kind: ComponentKind, variant: ComponentVariant) {
-  if (kind === "text") {
-    return `ds-text${
-      variant === "heading"
-        ? " ds-text--heading"
-        : variant === "small"
-          ? " ds-text--small"
-          : ""
-    }`;
-  }
-
-  if (kind === "button") {
-    return `ds-button ds-button--${
-      variant === "secondary" ? "secondary" : "primary"
-    }`;
-  }
-
-  return `ds-${kind}`;
-}
-
-function componentSelector(kind: ComponentKind, variant: ComponentVariant) {
+function semanticElement(kind: ComponentKind, variant: ComponentVariant) {
   if (kind === "text") {
     return variant === "heading"
-      ? ".ds-text--heading"
+      ? "h2"
       : variant === "small"
-        ? ".ds-text--small"
-        : ".ds-text";
+        ? "small"
+        : "p";
   }
 
-  if (kind === "button") {
-    return variant === "secondary"
-      ? ".ds-button--secondary"
-      : ".ds-button--primary";
-  }
-
-  return `.ds-${kind}`;
+  if (kind === "button") return "button";
+  if (kind === "input") return "label + input";
+  return "article";
 }
 
-function componentCss(
-  kind: ComponentKind,
-  config: ComponentConfig,
-  accent: string,
-) {
-  const selector = componentSelector(kind, config.variant);
-  const declarations = [
-    `  padding-block: ${Math.round(config.paddingY)}px;`,
-    `  padding-inline: ${Math.round(config.paddingX)}px;`,
+function replaceCustomProperty(css: string, name: string, value: string) {
+  return css.replace(
+    new RegExp(`(${name}:\\s*)[^;]+;`),
+    `$1${value};`,
+  );
+}
+
+function buildSemanticCss(configs: ConfigByKind, accent: string) {
+  const values: Array<[string, string]> = [
+    ["--accent-color", accent],
+    ["--one-text-padding-block", `${Math.round(configs.text.paddingY)}px`],
+    ["--one-text-padding-inline", `${Math.round(configs.text.paddingX)}px`],
+    ["--one-button-padding-block", `${Math.round(configs.button.paddingY)}px`],
+    [
+      "--one-button-padding-inline",
+      `${Math.round(configs.button.paddingX)}px`,
+    ],
+    ["--one-input-padding-block", `${Math.round(configs.input.paddingY)}px`],
+    ["--one-input-padding-inline", `${Math.round(configs.input.paddingX)}px`],
+    ["--one-input-gap", `${Math.round(configs.input.gap)}px`],
+    ["--one-card-padding-block", `${Math.round(configs.card.paddingY)}px`],
+    ["--one-card-padding-inline", `${Math.round(configs.card.paddingX)}px`],
+    ["--one-card-gap", `${Math.round(configs.card.gap)}px`],
   ];
 
-  if (kind === "card") {
-    declarations.push(`  gap: ${Math.round(config.gap)}px;`);
-  }
+  return values.reduce(
+    (css, [name, value]) => replaceCustomProperty(css, name, value),
+    semanticCssTemplate,
+  );
+}
 
-  const rules = [
-    `:root {`,
-    `  --accent-color: ${accent};`,
-    `}`,
-    ``,
-    `${selector} {`,
-    ...declarations,
-    `}`,
-  ];
+function scopeSemanticCss(css: string) {
+  const scoped = css
+    .replace(/^@import[^;]+;\s*/gm, "")
+    .replace(/@font-face\s*{[^}]*}\s*/gs, "")
+    .replace(":root {", ":scope {")
+    .replace(
+      /^body\s*{[^}]*}/m,
+      `:scope {
+  color: var(--one-text);
+  font-family: var(--one-font);
+  font-size: var(--one-font-size);
+  line-height: var(--one-line-height);
+}`,
+    )
+    .replaceAll("body > ", ":scope > ");
 
-  if (kind === "input") {
-    rules.push(
-      ``,
-      `.ds-text + .ds-input {`,
-      `  margin-block-start: ${Math.round(config.gap)}px;`,
-      `}`,
-    );
-  }
-
-  return rules.join("\n");
+  return `@scope (.semantic-preview) {\n${scoped}\n}`;
 }
 
 function componentMarkup(kind: ComponentKind, config: ComponentConfig) {
   const text = escapeHtml(config.text);
 
   if (kind === "text") {
-    const tag = config.variant === "heading" ? "h2" : "p";
-    return `<${tag} class="${componentClasses(kind, config.variant)}">${text}</${tag}>`;
+    const tag =
+      config.variant === "heading"
+        ? "h2"
+        : config.variant === "small"
+          ? "small"
+          : "p";
+    return `<${tag}>${text}</${tag}>`;
   }
 
   if (kind === "button") {
-    return `<button class="${componentClasses(kind, config.variant)}" type="button">${text}</button>`;
+    return `<button type="button">${text}</button>`;
   }
 
   if (kind === "input") {
     return [
-      `<label class="ds-text" for="example-input">${text}</label>`,
-      `<input class="ds-input" id="example-input" type="text" placeholder="${escapeHtml(config.placeholder)}" />`,
+      `<label for="example-input">${text}</label>`,
+      `<input id="example-input" type="email" placeholder="${escapeHtml(config.placeholder)}" />`,
     ].join("\n");
   }
 
   return [
-    `<article class="ds-card">`,
-    `  <h2 class="ds-text ds-text--heading">${text}</h2>`,
-    `  <p class="ds-text">${escapeHtml(config.detail)}</p>`,
+    `<article>`,
+    `  <header>`,
+    `    <h2>${text}</h2>`,
+    `  </header>`,
+    `  <p>${escapeHtml(config.detail)}</p>`,
     `</article>`,
   ].join("\n");
 }
@@ -222,12 +217,9 @@ function componentMarkup(kind: ComponentKind, config: ComponentConfig) {
 function buildExport(
   kind: ComponentKind,
   config: ComponentConfig,
+  configs: ConfigByKind,
   accent: string,
 ) {
-  const css = componentCss(kind, config, accent)
-    .split("\n")
-    .map((line) => `      ${line}`)
-    .join("\n");
   const markup = componentMarkup(kind, config)
     .split("\n")
     .map((line) => `      ${line}`)
@@ -240,10 +232,22 @@ function buildExport(
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/ds-one@alpha/DS1/1-root/one.css"
+      href="https://cdn.jsdelivr.net/npm/ds-one@alpha/DS1/1-root/one.semantic.css"
     />
     <style>
-${css}
+      :root {
+        --accent-color: ${accent};
+        --one-text-padding-block: ${Math.round(configs.text.paddingY)}px;
+        --one-text-padding-inline: ${Math.round(configs.text.paddingX)}px;
+        --one-button-padding-block: ${Math.round(configs.button.paddingY)}px;
+        --one-button-padding-inline: ${Math.round(configs.button.paddingX)}px;
+        --one-input-padding-block: ${Math.round(configs.input.paddingY)}px;
+        --one-input-padding-inline: ${Math.round(configs.input.paddingX)}px;
+        --one-input-gap: ${Math.round(configs.input.gap)}px;
+        --one-card-padding-block: ${Math.round(configs.card.paddingY)}px;
+        --one-card-padding-inline: ${Math.round(configs.card.paddingX)}px;
+        --one-card-gap: ${Math.round(configs.card.gap)}px;
+      }
     </style>
     <title>DS one ${kind}</title>
   </head>
@@ -384,31 +388,21 @@ function ComponentPreview({
   config: ComponentConfig;
   kind: ComponentKind;
 }) {
-  const style = {
-    padding: `${config.paddingY}px ${config.paddingX}px`,
-  };
-
   if (kind === "text") {
-    const className = componentClasses(kind, config.variant);
     return config.variant === "heading" ? (
-      <h2 className={className} data-preview-component style={style}>
+      <h2 data-preview-component>
         {config.text}
       </h2>
+    ) : config.variant === "small" ? (
+      <small data-preview-component>{config.text}</small>
     ) : (
-      <p className={className} data-preview-component style={style}>
-        {config.text}
-      </p>
+      <p data-preview-component>{config.text}</p>
     );
   }
 
   if (kind === "button") {
     return (
-      <button
-        className={componentClasses(kind, config.variant)}
-        data-preview-component
-        style={style}
-        type="button"
-      >
+      <button data-preview-component type="button">
         {config.text}
       </button>
     );
@@ -416,36 +410,24 @@ function ComponentPreview({
 
   if (kind === "input") {
     return (
-      <div
-        className="story-field"
-        data-preview-component
-        style={{ gap: `${config.gap}px` }}
-      >
-        <label className="ds-text" htmlFor="story-input">
-          {config.text}
-        </label>
+      <label data-preview-component htmlFor="story-input">
+        <span>{config.text}</span>
         <input
-          className="ds-input"
           id="story-input"
           placeholder={config.placeholder}
           readOnly
-          style={style}
+          type="email"
         />
-      </div>
+      </label>
     );
   }
 
   return (
-    <article
-      className="ds-card story-card"
-      data-preview-component
-      style={{
-        ...style,
-        gap: `${config.gap}px`,
-      }}
-    >
-      <h2 className="ds-text ds-text--heading">{config.text}</h2>
-      <p className="ds-text">{config.detail}</p>
+    <article data-preview-component>
+      <header>
+        <h2>{config.text}</h2>
+      </header>
+      <p>{config.detail}</p>
     </article>
   );
 }
@@ -472,19 +454,21 @@ export function App() {
   const [background, setBackground] = useState<"light" | "dark">("light");
   const [exportOpen, setExportOpen] = useState(false);
   const [copyLabel, setCopyLabel] = useState("Copy HTML");
+  const [copyCssLabel, setCopyCssLabel] = useState("Copy full CSS");
 
   const selectedMeta = componentLibrary.find(
     (item) => item.kind === selectedKind,
   )!;
   const config = configs[selectedKind];
   const exportedHtml = useMemo(
-    () => buildExport(selectedKind, config, accent),
-    [accent, config, selectedKind],
+    () => buildExport(selectedKind, config, configs, accent),
+    [accent, config, configs, selectedKind],
   );
   const cssSource = useMemo(
-    () => componentCss(selectedKind, config, accent),
-    [accent, config, selectedKind],
+    () => buildSemanticCss(configs, accent),
+    [accent, configs],
   );
+  const previewCss = useMemo(() => scopeSemanticCss(cssSource), [cssSource]);
 
   const updateConfig = (patch: Partial<ComponentConfig>) => {
     setConfigs((current) => ({
@@ -494,11 +478,6 @@ export function App() {
   };
 
   const chooseStory = (story: string) => {
-    if (selectedKind === "button") {
-      updateConfig({
-        variant: story === "Secondary" ? "secondary" : "primary",
-      });
-    }
     if (selectedKind === "text") {
       updateConfig({
         variant:
@@ -512,11 +491,7 @@ export function App() {
   };
 
   const currentStory =
-    selectedKind === "button"
-      ? config.variant === "secondary"
-        ? "Secondary"
-        : "Primary"
-      : selectedKind === "text"
+    selectedKind === "text"
         ? config.variant === "heading"
           ? "Heading"
           : config.variant === "small"
@@ -528,6 +503,12 @@ export function App() {
     await navigator.clipboard.writeText(exportedHtml);
     setCopyLabel("Copied");
     window.setTimeout(() => setCopyLabel("Copy HTML"), 1400);
+  };
+
+  const copyCss = async () => {
+    await navigator.clipboard.writeText(cssSource);
+    setCopyCssLabel("Copied");
+    window.setTimeout(() => setCopyCssLabel("Copy full CSS"), 1400);
   };
 
   const downloadExport = () => {
@@ -545,6 +526,7 @@ export function App() {
       className="workbench"
       style={{ "--workbench-accent": accent } as CSSProperties}
     >
+      <style>{previewCss}</style>
       <header className="workbench-header">
         <div className="workbench-brand">
           <span className="workbench-logo">DS</span>
@@ -553,7 +535,7 @@ export function App() {
         </div>
         <div className="workbench-header-actions">
           <span className="runtime-status">
-            <i /> CSS-only output
+            <i /> Classless CSS output
           </span>
           <button
             className="action-button action-button--primary"
@@ -663,7 +645,7 @@ export function App() {
             </div>
             <div className="story-preview-area">
               <div className="component-measure">
-                <div className="component-selection">
+                <div className="component-selection semantic-preview">
                   <SpacingHandle
                     axis="y"
                     label="Y"
@@ -721,7 +703,7 @@ export function App() {
                 Padding {Math.round(config.paddingY)} ×{" "}
                 {Math.round(config.paddingX)}
               </span>
-              <code>{componentClasses(selectedKind, config.variant)}</code>
+              <code>{`<${semanticElement(selectedKind, config.variant)}>`}</code>
             </footer>
           </div>
         </div>
@@ -762,9 +744,9 @@ export function App() {
                 />
               </ControlField>
             )}
-            {(selectedKind === "text" || selectedKind === "button") && (
+            {selectedKind === "text" && (
               <ControlField
-                label={selectedKind === "text" ? "Style" : "Variant"}
+                label="Element"
               >
                 <select
                   onChange={(event) =>
@@ -774,18 +756,9 @@ export function App() {
                   }
                   value={config.variant}
                 >
-                  {selectedKind === "text" ? (
-                    <>
-                      <option value="default">Default</option>
-                      <option value="heading">Heading</option>
-                      <option value="small">Small</option>
-                    </>
-                  ) : (
-                    <>
-                      <option value="primary">Primary</option>
-                      <option value="secondary">Secondary</option>
-                    </>
-                  )}
+                  <option value="default">Paragraph</option>
+                  <option value="heading">Heading</option>
+                  <option value="small">Small</option>
                 </select>
               </ControlField>
             )}
@@ -870,8 +843,8 @@ export function App() {
 
           <section className="controls-section controls-section--output">
             <h2>Output</h2>
-            <code>{componentClasses(selectedKind, config.variant)}</code>
-            <span>No component runtime</span>
+            <code>{`<${semanticElement(selectedKind, config.variant)}>`}</code>
+            <span>Native HTML · no component runtime</span>
           </section>
         </div>
 
@@ -879,10 +852,10 @@ export function App() {
           <header>
             <div>
               <span>CSS file</span>
-              <strong>DS1/1-root/one.css</strong>
+              <strong>DS1/1-root/one.semantic.css</strong>
             </div>
             <span className="file-status">
-              <i /> Live change
+              <i /> Full classless file
             </span>
           </header>
           <pre data-testid="live-css-source">
@@ -896,8 +869,10 @@ export function App() {
             </code>
           </pre>
           <footer>
-            <span>Previewing</span>
-            <code>{componentSelector(selectedKind, config.variant)}</code>
+            <span>{cssSource.split("\n").length} lines · all elements</span>
+            <button onClick={copyCss} type="button">
+              {copyCssLabel}
+            </button>
           </footer>
         </section>
       </aside>
@@ -935,7 +910,7 @@ export function App() {
                 <i /> Native HTML
               </span>
               <span>
-                <i /> one.css
+                <i /> one.semantic.css
               </span>
               <span>
                 <i /> No runtime JavaScript

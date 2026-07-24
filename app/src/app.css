@@ -38,7 +38,7 @@ button {
   grid-template:
     "header header header" 50px
     "library workspace controls" calc(100vh - 50px) /
-    232px minmax(500px, 1fr) 320px;
+    232px minmax(500px, 1fr) 400px;
 }
 
 .workbench-header {
@@ -145,7 +145,7 @@ button {
   min-width: 0;
   grid-area: controls;
   display: grid;
-  grid-template-rows: 42px minmax(180px, 1fr) 250px;
+  grid-template-rows: 42px minmax(220px, 0.75fr) minmax(360px, 1.25fr);
   overflow: hidden;
   border-left: 1px solid var(--workbench-line);
 }
@@ -517,16 +517,12 @@ button {
   margin: 0;
 }
 
-.story-field {
+.semantic-preview > label {
   min-width: 300px;
   display: grid;
 }
 
-.story-field .ds-input {
-  width: 100%;
-}
-
-.story-card {
+.semantic-preview > article {
   width: min(360px, 52vw);
   display: grid;
 }
@@ -913,9 +909,18 @@ body.spacing-resize-y * {
   border-top: 1px solid #383838;
 }
 
-.css-file-panel > footer code {
-  color: #d7a276;
+.css-file-panel > footer button {
+  border: 1px solid #4b4b4b;
+  border-radius: 2px;
+  padding: 4px 7px;
+  background: #333;
+  color: #e7e7e7;
+  cursor: pointer;
   font: 7px var(--typeface-mono), monospace;
+}
+
+.css-file-panel > footer button:hover {
+  border-color: #777;
 }
 
 .export-backdrop {
@@ -1013,7 +1018,7 @@ body.spacing-resize-y * {
     right: 10px;
     top: 60px;
     z-index: 12;
-    width: 300px;
+    width: 380px;
     max-height: calc(100vh - 70px);
     border: 1px solid var(--workbench-line);
     box-shadow: 0 14px 34px rgb(0 0 0 / 15%);
@@ -1058,7 +1063,7 @@ body.spacing-resize-y * {
     border: 0;
     border-left: 1px solid var(--workbench-line);
     box-shadow: none;
-    grid-template-rows: 42px minmax(160px, 1fr) 250px;
+    grid-template-rows: 42px minmax(180px, 0.7fr) minmax(320px, 1.3fr);
     overflow: hidden;
   }
 
@@ -1100,8 +1105,8 @@ body.spacing-resize-y * {
     padding: 45px 34px;
   }
 
-  .story-card,
-  .story-field {
+  .semantic-preview > article,
+  .semantic-preview > label {
     width: min(100%, 300px);
     min-width: 0;
   }
@@ -1146,7 +1151,7 @@ body.spacing-resize-y * {
     max-height: none;
     border: 0;
     border-top: 1px solid var(--workbench-line);
-    grid-template-rows: auto auto 260px;
+    grid-template-rows: auto auto 420px;
     overflow: visible;
   }
 
