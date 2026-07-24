@@ -1031,22 +1031,15 @@ body.spacing-resize-y * {
 @media (max-width: 760px) {
   body {
     min-width: 0;
-    overflow: auto;
+    overflow: hidden;
   }
 
   .workbench {
     min-height: 100vh;
     grid-template:
-      "header" 50px
-      "workspace" minmax(calc(100vh - 50px), auto)
-      "library" auto
-      "controls" auto /
-      minmax(0, 1fr);
-  }
-
-  .workbench-header {
-    position: sticky;
-    top: 0;
+      "header header" 50px
+      "workspace controls" calc(100vh - 50px) /
+      minmax(300px, 1fr) 280px;
   }
 
   .workbench-brand > span:last-child,
@@ -1054,23 +1047,23 @@ body.spacing-resize-y * {
     display: none;
   }
 
-  .library-panel,
-  .controls-panel {
-    max-height: none;
-    border: 0;
-    border-top: 1px solid var(--workbench-line);
+  .library-panel {
+    display: none;
   }
 
   .controls-panel {
     position: static;
     width: auto;
+    max-height: none;
+    border: 0;
+    border-left: 1px solid var(--workbench-line);
     box-shadow: none;
-    grid-template-rows: auto auto 260px;
-    overflow: visible;
+    grid-template-rows: 42px minmax(160px, 1fr) 250px;
+    overflow: hidden;
   }
 
   .controls-scroll {
-    overflow: visible;
+    overflow: auto;
   }
 
   .story-workspace {
@@ -1120,5 +1113,44 @@ body.spacing-resize-y * {
   .controls-section {
     padding-right: 14px;
     padding-left: 14px;
+  }
+}
+
+@media (max-width: 560px) {
+  body {
+    overflow: auto;
+  }
+
+  .workbench {
+    grid-template:
+      "header" 50px
+      "workspace" minmax(calc(100vh - 50px), auto)
+      "library" auto
+      "controls" auto /
+      minmax(0, 1fr);
+  }
+
+  .workbench-header {
+    position: sticky;
+    top: 0;
+  }
+
+  .library-panel {
+    display: block;
+    max-height: none;
+    border: 0;
+    border-top: 1px solid var(--workbench-line);
+  }
+
+  .controls-panel {
+    max-height: none;
+    border: 0;
+    border-top: 1px solid var(--workbench-line);
+    grid-template-rows: auto auto 260px;
+    overflow: visible;
+  }
+
+  .controls-scroll {
+    overflow: visible;
   }
 }
