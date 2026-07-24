@@ -1,0 +1,23 @@
+{
+  "name": "ds-one-app",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "deploy": "bun run build && wrangler pages deploy dist --project-name=ds-one-app"
+  },
+  "dependencies": {
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "typescript": "^5.0.0",
+    "vite": "^7.1.9",
+    "wrangler": "^4.26.1"
+  }
+}

@@ -80,6 +80,22 @@ import "ds-one";
 
 See the full documentation for DS one at: [**dsone.dev**](https://dsone.dev/)
 
+## DS one app
+
+The repository includes a React-based visual editor for composing DS one
+interfaces and exporting standalone HTML that uses `one.css` without a
+JavaScript runtime.
+
+```bash
+bun run app:dev
+```
+
+The app is configured for Cloudflare Pages:
+
+```bash
+bun run app:deploy
+```
+
 ## Features
 
 ### Internationalization

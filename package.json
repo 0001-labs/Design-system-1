@@ -52,7 +52,10 @@
     "docs:dev": "cd website && bun run dev",
     "docs:build": "cd website && bun run build",
     "docs:preview": "cd website && bun run preview",
-    "docs:deploy": "cd website && bun run deploy"
+    "docs:deploy": "cd website && bun run deploy",
+    "app:dev": "cd app && bun run dev",
+    "app:build": "cd app && bun run build",
+    "app:deploy": "cd app && bun run deploy"
   },
   "keywords": [
     "design-system",
