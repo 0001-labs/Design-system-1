@@ -137,28 +137,82 @@ function componentClasses(kind: ComponentKind, variant: ComponentVariant) {
   return `ds-${kind}`;
 }
 
-function componentMarkup(kind: ComponentKind, config: ComponentConfig) {
-  const text = escapeHtml(config.text);
-  const style = `padding: ${config.paddingY}px ${config.paddingX}px;`;
-
+function componentSelector(kind: ComponentKind, variant: ComponentVariant) {
   if (kind === "text") {
-    const tag = config.variant === "heading" ? "h2" : "p";
-    return `<${tag} class="${componentClasses(kind, config.variant)}" style="${style}">${text}</${tag}>`;
+    return variant === "heading"
+      ? ".ds-text--heading"
+      : variant === "small"
+        ? ".ds-text--small"
+        : ".ds-text";
   }
 
   if (kind === "button") {
-    return `<button class="${componentClasses(kind, config.variant)}" style="${style}" type="button">${text}</button>`;
+    return variant === "secondary"
+      ? ".ds-button--secondary"
+      : ".ds-button--primary";
+  }
+
+  return `.ds-${kind}`;
+}
+
+function componentCss(
+  kind: ComponentKind,
+  config: ComponentConfig,
+  accent: string,
+) {
+  const selector = componentSelector(kind, config.variant);
+  const declarations = [
+    `  padding-block: ${Math.round(config.paddingY)}px;`,
+    `  padding-inline: ${Math.round(config.paddingX)}px;`,
+  ];
+
+  if (kind === "card") {
+    declarations.push(`  gap: ${Math.round(config.gap)}px;`);
+  }
+
+  const rules = [
+    `:root {`,
+    `  --accent-color: ${accent};`,
+    `}`,
+    ``,
+    `${selector} {`,
+    ...declarations,
+    `}`,
+  ];
+
+  if (kind === "input") {
+    rules.push(
+      ``,
+      `.ds-text + .ds-input {`,
+      `  margin-block-start: ${Math.round(config.gap)}px;`,
+      `}`,
+    );
+  }
+
+  return rules.join("\n");
+}
+
+function componentMarkup(kind: ComponentKind, config: ComponentConfig) {
+  const text = escapeHtml(config.text);
+
+  if (kind === "text") {
+    const tag = config.variant === "heading" ? "h2" : "p";
+    return `<${tag} class="${componentClasses(kind, config.variant)}">${text}</${tag}>`;
+  }
+
+  if (kind === "button") {
+    return `<button class="${componentClasses(kind, config.variant)}" type="button">${text}</button>`;
   }
 
   if (kind === "input") {
     return [
       `<label class="ds-text" for="example-input">${text}</label>`,
-      `<input class="ds-input" id="example-input" style="${style}" type="text" placeholder="${escapeHtml(config.placeholder)}" />`,
+      `<input class="ds-input" id="example-input" type="text" placeholder="${escapeHtml(config.placeholder)}" />`,
     ].join("\n");
   }
 
   return [
-    `<article class="ds-card" style="${style} display: grid; gap: ${config.gap}px;">`,
+    `<article class="ds-card">`,
     `  <h2 class="ds-text ds-text--heading">${text}</h2>`,
     `  <p class="ds-text">${escapeHtml(config.detail)}</p>`,
     `</article>`,
@@ -170,6 +224,10 @@ function buildExport(
   config: ComponentConfig,
   accent: string,
 ) {
+  const css = componentCss(kind, config, accent)
+    .split("\n")
+    .map((line) => `      ${line}`)
+    .join("\n");
   const markup = componentMarkup(kind, config)
     .split("\n")
     .map((line) => `      ${line}`)
@@ -184,7 +242,9 @@ function buildExport(
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/ds-one@alpha/DS1/1-root/one.css"
     />
-    <style>:root { --accent-color: ${accent}; }</style>
+    <style>
+${css}
+    </style>
     <title>DS one ${kind}</title>
   </head>
   <body>
@@ -419,6 +479,10 @@ export function App() {
   const config = configs[selectedKind];
   const exportedHtml = useMemo(
     () => buildExport(selectedKind, config, accent),
+    [accent, config, selectedKind],
+  );
+  const cssSource = useMemo(
+    () => componentCss(selectedKind, config, accent),
     [accent, config, selectedKind],
   );
 
@@ -668,144 +732,173 @@ export function App() {
           <span>Controls</span>
           <small>{selectedMeta.label}</small>
         </div>
-        <section className="controls-section">
-          <h2>Props</h2>
-          <ControlField label={selectedKind === "input" ? "Label" : "Text"}>
-            <input
-              onChange={(event) => updateConfig({ text: event.target.value })}
-              value={config.text}
-            />
-          </ControlField>
-          {selectedKind === "card" && (
-            <ControlField label="Description">
-              <textarea
-                onChange={(event) =>
-                  updateConfig({ detail: event.target.value })
-                }
-                rows={3}
-                value={config.detail}
-              />
-            </ControlField>
-          )}
-          {selectedKind === "input" && (
-            <ControlField label="Placeholder">
+        <div className="controls-scroll">
+          <section className="controls-section">
+            <h2>Props</h2>
+            <ControlField label={selectedKind === "input" ? "Label" : "Text"}>
               <input
-                onChange={(event) =>
-                  updateConfig({ placeholder: event.target.value })
-                }
-                value={config.placeholder}
+                onChange={(event) => updateConfig({ text: event.target.value })}
+                value={config.text}
               />
             </ControlField>
-          )}
-          {(selectedKind === "text" || selectedKind === "button") && (
-            <ControlField
-              label={selectedKind === "text" ? "Style" : "Variant"}
-            >
-              <select
-                onChange={(event) =>
-                  updateConfig({
-                    variant: event.target.value as ComponentVariant,
-                  })
-                }
-                value={config.variant}
+            {selectedKind === "card" && (
+              <ControlField label="Description">
+                <textarea
+                  onChange={(event) =>
+                    updateConfig({ detail: event.target.value })
+                  }
+                  rows={3}
+                  value={config.detail}
+                />
+              </ControlField>
+            )}
+            {selectedKind === "input" && (
+              <ControlField label="Placeholder">
+                <input
+                  onChange={(event) =>
+                    updateConfig({ placeholder: event.target.value })
+                  }
+                  value={config.placeholder}
+                />
+              </ControlField>
+            )}
+            {(selectedKind === "text" || selectedKind === "button") && (
+              <ControlField
+                label={selectedKind === "text" ? "Style" : "Variant"}
               >
-                {selectedKind === "text" ? (
-                  <>
-                    <option value="default">Default</option>
-                    <option value="heading">Heading</option>
-                    <option value="small">Small</option>
-                  </>
-                ) : (
-                  <>
-                    <option value="primary">Primary</option>
-                    <option value="secondary">Secondary</option>
-                  </>
-                )}
-              </select>
-            </ControlField>
-          )}
-        </section>
+                <select
+                  onChange={(event) =>
+                    updateConfig({
+                      variant: event.target.value as ComponentVariant,
+                    })
+                  }
+                  value={config.variant}
+                >
+                  {selectedKind === "text" ? (
+                    <>
+                      <option value="default">Default</option>
+                      <option value="heading">Heading</option>
+                      <option value="small">Small</option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="primary">Primary</option>
+                      <option value="secondary">Secondary</option>
+                    </>
+                  )}
+                </select>
+              </ControlField>
+            )}
+          </section>
 
-        <section className="controls-section">
-          <h2>Spacing</h2>
-          <div className="spacing-inputs">
-            <ControlField label="Horizontal">
-              <div className="number-input">
-                <input
-                  max="96"
-                  min="0"
-                  onChange={(event) =>
-                    updateConfig({
-                      paddingX: clampSpacing(Number(event.target.value)),
-                    })
-                  }
-                  step="4"
-                  type="number"
-                  value={Math.round(config.paddingX)}
-                />
-                <span>px</span>
-              </div>
-            </ControlField>
-            <ControlField label="Vertical">
-              <div className="number-input">
-                <input
-                  max="96"
-                  min="0"
-                  onChange={(event) =>
-                    updateConfig({
-                      paddingY: clampSpacing(Number(event.target.value)),
-                    })
-                  }
-                  step="4"
-                  type="number"
-                  value={Math.round(config.paddingY)}
-                />
-                <span>px</span>
-              </div>
-            </ControlField>
-          </div>
-          {(selectedKind === "card" || selectedKind === "input") && (
-            <ControlField label="Content gap">
-              <div className="number-input">
-                <input
-                  max="48"
-                  min="0"
-                  onChange={(event) =>
-                    updateConfig({
-                      gap: clampSpacing(Number(event.target.value)),
-                    })
-                  }
-                  step="4"
-                  type="number"
-                  value={Math.round(config.gap)}
-                />
-                <span>px</span>
-              </div>
-            </ControlField>
-          )}
-          <p className="controls-note">
-            Handles preview freely and commit to the {SNAP_GRID}px spacing grid.
-          </p>
-        </section>
-
-        <section className="controls-section">
-          <h2>Theme</h2>
-          <ControlField label="Accent">
-            <div className="color-input">
-              <input
-                onChange={(event) => setAccent(event.target.value)}
-                type="color"
-                value={accent}
-              />
-              <code>{accent}</code>
+          <section className="controls-section">
+            <h2>Spacing</h2>
+            <div className="spacing-inputs">
+              <ControlField label="Horizontal">
+                <div className="number-input">
+                  <input
+                    max="96"
+                    min="0"
+                    onChange={(event) =>
+                      updateConfig({
+                        paddingX: clampSpacing(Number(event.target.value)),
+                      })
+                    }
+                    step="4"
+                    type="number"
+                    value={Math.round(config.paddingX)}
+                  />
+                  <span>px</span>
+                </div>
+              </ControlField>
+              <ControlField label="Vertical">
+                <div className="number-input">
+                  <input
+                    max="96"
+                    min="0"
+                    onChange={(event) =>
+                      updateConfig({
+                        paddingY: clampSpacing(Number(event.target.value)),
+                      })
+                    }
+                    step="4"
+                    type="number"
+                    value={Math.round(config.paddingY)}
+                  />
+                  <span>px</span>
+                </div>
+              </ControlField>
             </div>
-          </ControlField>
-        </section>
+            {(selectedKind === "card" || selectedKind === "input") && (
+              <ControlField label="Content gap">
+                <div className="number-input">
+                  <input
+                    max="48"
+                    min="0"
+                    onChange={(event) =>
+                      updateConfig({
+                        gap: clampSpacing(Number(event.target.value)),
+                      })
+                    }
+                    step="4"
+                    type="number"
+                    value={Math.round(config.gap)}
+                  />
+                  <span>px</span>
+                </div>
+              </ControlField>
+            )}
+            <p className="controls-note">
+              Handles preview freely and commit to the {SNAP_GRID}px spacing
+              grid.
+            </p>
+          </section>
 
-        <section className="controls-section controls-section--output">
-          <h2>Output</h2>
-          <code>{componentClasses(selectedKind, config.variant)}</code>
-          <span>No component runtime</span>
+          <section className="controls-section">
+            <h2>Theme</h2>
+            <ControlField label="Accent">
+              <div className="color-input">
+                <input
+                  onChange={(event) => setAccent(event.target.value)}
+                  type="color"
+                  value={accent}
+                />
+                <code>{accent}</code>
+              </div>
+            </ControlField>
+          </section>
+
+          <section className="controls-section controls-section--output">
+            <h2>Output</h2>
+            <code>{componentClasses(selectedKind, config.variant)}</code>
+            <span>No component runtime</span>
+          </section>
+        </div>
+
+        <section aria-label="Live CSS file" className="css-file-panel">
+          <header>
+            <div>
+              <span>CSS file</span>
+              <strong>DS1/1-root/one.css</strong>
+            </div>
+            <span className="file-status">
+              <i /> Live change
+            </span>
+          </header>
+          <pre data-testid="live-css-source">
+            <code>
+              {cssSource.split("\n").map((line, index) => (
+                <span className="css-source-line" key={`${index}-${line}`}>
+                  <b>{index + 1}</b>
+                  <span>{line || " "}</span>
+                </span>
+              ))}
+            </code>
+          </pre>
+          <footer>
+            <span>Previewing</span>
+            <code>{componentSelector(selectedKind, config.variant)}</code>
+          </footer>
         </section>
       </aside>
 

@@ -38,7 +38,7 @@ button {
   grid-template:
     "header header header" 50px
     "library workspace controls" calc(100vh - 50px) /
-    232px minmax(500px, 1fr) 272px;
+    232px minmax(500px, 1fr) 320px;
 }
 
 .workbench-header {
@@ -132,18 +132,27 @@ button {
 .library-panel,
 .controls-panel {
   min-height: 0;
-  overflow: auto;
   background: var(--workbench-panel);
 }
 
 .library-panel {
   grid-area: library;
+  overflow: auto;
   border-right: 1px solid var(--workbench-line);
 }
 
 .controls-panel {
+  min-width: 0;
   grid-area: controls;
+  display: grid;
+  grid-template-rows: 42px minmax(180px, 1fr) 250px;
+  overflow: hidden;
   border-left: 1px solid var(--workbench-line);
+}
+
+.controls-scroll {
+  min-height: 0;
+  overflow: auto;
 }
 
 .panel-title {
@@ -802,6 +811,113 @@ body.spacing-resize-y * {
   font-size: 8px;
 }
 
+.css-file-panel {
+  min-width: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  border-top: 1px solid #313131;
+  background: #202020;
+  color: #e9e9e9;
+}
+
+.css-file-panel > header,
+.css-file-panel > footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 10px;
+  background: #292929;
+}
+
+.css-file-panel > header {
+  border-bottom: 1px solid #383838;
+}
+
+.css-file-panel > header > div {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.css-file-panel > header > div span,
+.css-file-panel > footer > span {
+  color: #969696;
+  font-size: 7px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.css-file-panel > header strong {
+  overflow: hidden;
+  font: 8px var(--typeface-mono), monospace;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #bdbdbd;
+  font-size: 7px;
+  white-space: nowrap;
+}
+
+.file-status i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--workbench-handle);
+}
+
+.css-file-panel pre {
+  min-height: 0;
+  overflow: auto;
+  margin: 0;
+  padding: 7px 0;
+  background: #202020;
+  font: 8px/1.65 var(--typeface-mono), monospace;
+  tab-size: 2;
+}
+
+.css-file-panel pre > code {
+  display: grid;
+}
+
+.css-source-line {
+  min-width: max-content;
+  display: grid;
+  grid-template-columns: 27px 1fr;
+}
+
+.css-source-line b {
+  border-right: 1px solid #343434;
+  padding-right: 7px;
+  color: #606060;
+  font-weight: 400;
+  text-align: right;
+  user-select: none;
+}
+
+.css-source-line > span {
+  padding: 0 10px;
+  color: #d7d7d7;
+  white-space: pre;
+}
+
+.css-source-line:has(> span:not(:empty)):hover {
+  background: #272727;
+}
+
+.css-file-panel > footer {
+  border-top: 1px solid #383838;
+}
+
+.css-file-panel > footer code {
+  color: #d7a276;
+  font: 7px var(--typeface-mono), monospace;
+}
+
 .export-backdrop {
   position: fixed;
   inset: 0;
@@ -897,7 +1013,7 @@ body.spacing-resize-y * {
     right: 10px;
     top: 60px;
     z-index: 12;
-    width: 260px;
+    width: 300px;
     max-height: calc(100vh - 70px);
     border: 1px solid var(--workbench-line);
     box-shadow: 0 14px 34px rgb(0 0 0 / 15%);
@@ -949,6 +1065,12 @@ body.spacing-resize-y * {
     position: static;
     width: auto;
     box-shadow: none;
+    grid-template-rows: auto auto 260px;
+    overflow: visible;
+  }
+
+  .controls-scroll {
+    overflow: visible;
   }
 
   .story-workspace {
