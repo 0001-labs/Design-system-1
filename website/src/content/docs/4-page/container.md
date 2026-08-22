@@ -105,10 +105,10 @@ The container automatically adjusts on smaller screens:
 
 ```html
 <ds-container size="large">
-  <ds-grid columns="3">
+  <ds-row>
     <ds-card>Widget 1</ds-card>
     <ds-card>Widget 2</ds-card>
     <ds-card>Widget 3</ds-card>
-  </ds-grid>
+  </ds-row>
 </ds-container>
 ```
