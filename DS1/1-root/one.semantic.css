@@ -1,25 +1,7 @@
-/* DS one semantic CSS — version 0.3.0-alpha.9 */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap");
+
+/* DS1 — version 0.0.1-alpha.1 */
 /* A classless stylesheet for native HTML. No JavaScript is required. */
-
-@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400&display=swap");
-
-@font-face {
-  font-family: GT-America-Standard-Regular;
-  src: url("./fonts/GT-America-Standard-Regular.woff2") format("woff2");
-  font-display: swap;
-}
-
-@font-face {
-  font-family: GT-America-Standard-Medium;
-  src: url("./fonts/GT-America-Standard-Medium.woff2") format("woff2");
-  font-display: swap;
-}
-
-@font-face {
-  font-family: GT-Canon-M-Standard-Medium;
-  src: url("./fonts/GT-Canon-M-Standard-Medium-Trial.woff2") format("woff2");
-  font-display: swap;
-}
 
 /* Root
    Global color, type, spacing, and component tokens.
@@ -28,43 +10,94 @@
 :root {
   color-scheme: light dark;
 
-  --one-white: #ffffff;
-  --one-black: #2a2a2a;
-  --one-slate: #1e1e1e;
-  --one-slate-light: #e6e6e6;
-  --one-slate-dark: #3c3c3c;
-  --one-muted: #797979;
-  --one-focus: #594dff;
-  --accent-color: #99ff73;
+  --one-color-white:   #ffffff;
+  --one-color-black:   #2a2a2a;
+  --one-color-slate:   #1e1e1e;
+  --one-color-slate-light:   #e6e6e6;
+  --one-color-slate-dark:   #3c3c3c;
+  --one-color-muted:   #797979;
+  --one-color-focus:   #594dff;
+  --one-color-warning:   #d92d20;
+  --one-accent-color:   #0066ff;
+  --one-button-primary-background:   var(--one-accent-color);
+  --one-button-primary-background-hover:   color-mix(in srgb, var(--one-accent-color) 88%, black);
+  --one-button-primary-border:   var(--one-accent-color);
+  --one-button-primary-text:   #f5f5f5;
+  --one-button-neutral-background:   #e3e3e3;
+  --one-button-neutral-background-hover:   #cdcdcd;
+  --one-button-neutral-border:   #767676;
+  --one-button-neutral-text:   #1e1e1e;
+  --one-button-subtle-border-hover:   #d9d9d9;
+  --one-button-subtle-text:   #303030;
+  --one-button-subtle-text-hover:   #1e1e1e;
+  --one-button-danger-background:   #ec221f;
+  --one-button-danger-background-hover:   #c00f0c;
+  --one-button-danger-border:   #c00f0c;
+  --one-button-danger-border-hover:   #900b09;
+  --one-button-danger-text:   #fee9e7;
+  --one-button-danger-subtle-background-hover:   #fdd3d0;
+  --one-button-danger-subtle-text:   #900b09;
+  --one-button-disabled-background:   #d9d9d9;
+  --one-button-disabled-border:   #b3b3b3;
+  --one-button-disabled-text:   #b3b3b3;
+  --one-icon-button-size: 40px;
+  --one-icon-button-small-size: 32px;
+  --one-icon-button-icon-size: 20px;
+  --one-icon-button-neutral-background:   #f5f5f5;
+  --one-icon-button-neutral-background-hover:   #e6e6e6;
+  --one-icon-button-neutral-border:   #d9d9d9;
+  --one-icon-button-subtle-background-hover:   #f5f5f5;
+  --one-input-background:   #ffffff;
+  --one-input-border:   #d9d9d9;
+  --one-input-text:   #1e1e1e;
+  --one-input-placeholder:   #b3b3b3;
+  --one-input-disabled-background:   #d9d9d9;
+  --one-input-disabled-border:   #b3b3b3;
+  --one-input-disabled-text:   #b3b3b3;
+  --one-input-error-border:   #900b09;
+  --one-input-description:   #757575;
 
-  --one-background: light-dark(var(--one-white), var(--one-black));
-  --one-surface: light-dark(#f4f4f2, var(--one-slate-dark));
-  --one-text: light-dark(var(--one-black), var(--one-white));
-  --one-text-muted: light-dark(var(--one-muted), var(--one-slate-light));
+  --one-background: light-dark(var(--one-color-white), var(--one-color-black));
+  --one-surface: light-dark(#f4f4f2, var(--one-color-slate-dark));
+  --one-text: light-dark(var(--one-color-black), var(--one-color-white));
+  --one-text-muted: light-dark(var(--one-color-muted), var(--one-color-slate-light));
   --one-border: light-dark(#d8d8d5, #555555);
 
-  --one-font: "GT-America-Standard-Regular", "Noto Sans JP", sans-serif;
-  --one-font-medium: "GT-America-Standard-Medium", var(--one-font);
-  --one-font-display: "GT-Canon-M-Standard-Medium", var(--one-font);
-  --one-font-mono: ui-monospace, "SFMono-Regular", monospace;
+  --one-font: Arial, Helvetica, sans-serif;
+  --one-font-medium: Arial, Helvetica, sans-serif;
+  --one-font-display: Georgia, "Times New Roman", serif;
+  --one-font-mono: "Courier New", Courier, monospace;
 
-  --one-font-size: 14px;
+  --one-font-size: 16px;
   --one-font-size-small: 11px;
   --one-line-height: 1.45;
-  --one-radius: 0;
+  --one-radius: 8px;
   --one-unit: 20px;
   --one-page-width: 72rem;
 
   --one-text-padding-block: 0px;
   --one-text-padding-inline: 0px;
+  --one-link-padding-block: 0px;
+  --one-link-padding-inline: 0px;
   --one-button-padding-block: 12px;
-  --one-button-padding-inline: 20px;
-  --one-input-padding-block: 10px;
-  --one-input-padding-inline: 12px;
+  --one-button-padding-inline: 12px;
+  --one-button-small-min-height: 32px;
+  --one-button-small-padding-block: 8px;
+  --one-button-small-padding-inline: 8px;
+  --one-input-padding-block: 12px;
+  --one-input-padding-inline: 16px;
   --one-input-gap: 8px;
+  --one-blockquote-padding-block: 0px;
+  --one-blockquote-padding-inline: 20px;
+  --one-details-padding-block: 12px;
+  --one-details-padding-inline: 0px;
   --one-section-padding-block: 24px;
   --one-section-padding-inline: 24px;
   --one-section-gap: 12px;
+  --one-table-cell-padding-block: 12px;
+  --one-table-cell-padding-inline: 12px;
+  --one-code-padding-block: 2px;
+  --one-code-padding-inline: 5px;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -138,7 +171,6 @@ section + section {
 }
 
 h1 {
-  font-family: var(--one-font-display);
   font-size: clamp(2rem, 5vw, 4.5rem);
 }
 
@@ -165,8 +197,11 @@ small {
 }
 
 a {
+  display: inline-block;
+  padding-block: var(--one-link-padding-block);
+  padding-inline: var(--one-link-padding-inline);
   color: inherit;
-  text-decoration-color: var(--accent-color);
+  text-decoration-color: var(--one-accent-color);
   text-decoration-thickness: 2px;
   text-underline-offset: 0.2em;
 }
@@ -176,7 +211,9 @@ a:hover {
 }
 
 /* Buttons
-   A native button is the primary action. No component class is needed. */
+   A native button is the primary action. No component class is needed.
+   Neutral and other weights use the variant attribute, mirroring how
+   input uses type — variant="neutral" instead of a component class. */
 
 :where(
   button,
@@ -189,25 +226,167 @@ a:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 0;
+  border: 1px solid var(--one-button-primary-border);
   border-radius: var(--one-radius);
   padding-block: var(--one-button-padding-block);
   padding-inline: var(--one-button-padding-inline);
-  background: var(--accent-color);
-  color: var(--one-black);
+  background: var(--one-button-primary-background);
+  color: var(--one-button-primary-text);
   cursor: pointer;
-  font-family: var(--one-font);
-  font-size: inherit;
+  font-family: Inter, var(--one-font);
+  font-size: 16px;
+  font-weight: 400;
   line-height: 1;
+  letter-spacing: 0;
 }
 
 :where(
-    button,
-    input[type="button"],
-    input[type="submit"],
-    input[type="reset"]
+  button[variant="neutral"],
+  input[variant="neutral"]
+) {
+  border-color: var(--one-button-neutral-border);
+  background: var(--one-button-neutral-background);
+  color: var(--one-button-neutral-text);
+}
+
+:where(
+  button[small],
+  input[small][type="button"],
+  input[small][type="submit"],
+  input[small][type="reset"]
+) {
+  min-height: var(--one-button-small-min-height);
+  padding-block: var(--one-button-small-padding-block);
+  padding-inline: var(--one-button-small-padding-inline);
+}
+
+:where(
+  button[variant="subtle"],
+  input[variant="subtle"]
+) {
+  border-color: transparent;
+  background: transparent;
+  color: var(--one-button-subtle-text);
+}
+
+:where(
+  button[variant="warning"],
+  input[variant="warning"]
+) {
+  background: var(--one-color-warning);
+  color: var(--one-color-white);
+}
+
+:where(
+  button[variant="danger"],
+  input[variant="danger"]
+) {
+  border-color: var(--one-button-danger-border);
+  background: var(--one-button-danger-background);
+  color: var(--one-button-danger-text);
+}
+
+:where(
+  button[variant="danger-subtle"],
+  input[variant="danger-subtle"]
+) {
+  border-color: transparent;
+  background: transparent;
+  color: var(--one-button-danger-subtle-text);
+}
+
+:where(button:has(> ds-icon:only-child)) {
+  width: var(--one-icon-button-size);
+  min-width: var(--one-icon-button-size);
+  height: var(--one-icon-button-size);
+  min-height: var(--one-icon-button-size);
+  flex: none;
+  border-radius: 50%;
+  padding: 0;
+}
+
+:where(button[small]:has(> ds-icon:only-child)) {
+  width: var(--one-icon-button-small-size);
+  min-width: var(--one-icon-button-small-size);
+  height: var(--one-icon-button-small-size);
+  min-height: var(--one-icon-button-small-size);
+  padding: 0;
+}
+
+:where(button:has(> ds-icon:only-child) > ds-icon) {
+  --sf: 1.428571;
+
+  flex: none;
+}
+
+:where(button[variant="neutral"]:has(> ds-icon:only-child)) {
+  border-color: var(--one-icon-button-neutral-border);
+  background: var(--one-icon-button-neutral-background);
+}
+
+:where(button[variant="subtle"]:has(> ds-icon:only-child)) {
+  color: var(--one-button-neutral-text);
+}
+
+:where(
+    button:not([variant]),
+    input[type="button"]:not([variant]),
+    input[type="submit"]:not([variant]),
+    input[type="reset"]:not([variant])
   ):hover:not(:disabled) {
-  filter: brightness(0.96);
+  background: var(--one-button-primary-background-hover);
+}
+
+:where(
+    button[variant="neutral"],
+    input[variant="neutral"]
+  ):hover:not(:disabled) {
+  background: var(--one-button-neutral-background-hover);
+}
+
+:where(
+    button[variant="subtle"],
+    input[variant="subtle"]
+  ):hover:not(:disabled) {
+  border-color: var(--one-button-subtle-border-hover);
+  color: var(--one-button-subtle-text-hover);
+}
+
+:where(
+    button[variant="warning"],
+    input[variant="warning"]
+  ):hover:not(:disabled) {
+  filter: brightness(0.9);
+}
+
+:where(
+    button[variant="danger"],
+    input[variant="danger"]
+  ):hover:not(:disabled) {
+  border-color: var(--one-button-danger-border-hover);
+  background: var(--one-button-danger-background-hover);
+}
+
+:where(
+    button[variant="danger-subtle"],
+    input[variant="danger-subtle"]
+  ):hover:not(:disabled) {
+  border-color: var(--one-button-danger-border-hover);
+  background: var(--one-button-danger-subtle-background-hover);
+}
+
+:where(
+    button[variant="neutral"]:has(> ds-icon:only-child)
+  ):hover:not(:disabled) {
+  border-color: var(--one-icon-button-neutral-border);
+  background: var(--one-icon-button-neutral-background-hover);
+}
+
+:where(
+    button[variant="subtle"]:has(> ds-icon:only-child)
+  ):hover:not(:disabled) {
+  border-color: transparent;
+  background: var(--one-icon-button-subtle-background-hover);
 }
 
 :where(
@@ -225,8 +404,11 @@ a:hover {
   input[type="submit"],
   input[type="reset"]
 ):disabled {
+  border-color: var(--one-button-disabled-border);
+  background: var(--one-button-disabled-background);
+  color: var(--one-button-disabled-text);
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: 1;
 }
 
 /* Forms
@@ -253,6 +435,11 @@ label {
   display: grid;
   gap: var(--one-input-gap);
   color: var(--one-text);
+  font-family: Inter, var(--one-font);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0;
 }
 
 :where(
@@ -268,15 +455,35 @@ label {
 ) {
   appearance: none;
   width: 100%;
+  min-width: 120px;
   min-height: 40px;
-  border: 1px solid var(--one-border);
+  border: 1px solid var(--one-input-border);
   border-radius: var(--one-radius);
   padding-block: var(--one-input-padding-block);
   padding-inline: var(--one-input-padding-inline);
-  background: var(--one-surface);
-  color: var(--one-text);
-  font-family: var(--one-font);
-  font-size: inherit;
+  background: var(--one-input-background);
+  color: var(--one-input-text);
+  font-family: Inter, var(--one-font);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+input[aria-invalid="true"] {
+  border-color: var(--one-input-error-border);
+}
+
+input:disabled {
+  border-color: var(--one-input-disabled-border);
+  background: var(--one-input-disabled-background);
+  color: var(--one-input-disabled-text);
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+label:has(input:disabled) > span {
+  color: var(--one-input-disabled-text);
 }
 
 textarea {
@@ -285,11 +492,12 @@ textarea {
 }
 
 ::placeholder {
-  color: var(--one-text-muted);
+  color: var(--one-input-placeholder);
+  opacity: 1;
 }
 
 :where(input, select, textarea, button):focus-visible {
-  outline: 2px solid var(--one-focus);
+  outline: 2px solid var(--one-color-focus);
   outline-offset: 2px;
 }
 
@@ -315,14 +523,16 @@ section > footer {
 
 blockquote {
   margin-inline: 0;
-  border-inline-start: 4px solid var(--accent-color);
-  padding-inline-start: var(--one-unit);
+  border-inline-start: 4px solid var(--one-accent-color);
+  padding-block: var(--one-blockquote-padding-block);
+  padding-inline: var(--one-blockquote-padding-inline);
   color: var(--one-text-muted);
 }
 
 details {
   border-block: 1px solid var(--one-border);
-  padding-block: 0.75rem;
+  padding-block: var(--one-details-padding-block);
+  padding-inline: var(--one-details-padding-inline);
 }
 
 summary {
@@ -354,7 +564,8 @@ table {
 
 :where(th, td) {
   border-bottom: 1px solid var(--one-border);
-  padding: 0.75rem;
+  padding-block: var(--one-table-cell-padding-block);
+  padding-inline: var(--one-table-cell-padding-inline);
   text-align: start;
 }
 
@@ -375,7 +586,8 @@ tbody tr:hover {
 }
 
 :where(code, kbd) {
-  padding: 0.15em 0.35em;
+  padding-block: var(--one-code-padding-block);
+  padding-inline: var(--one-code-padding-inline);
   background: var(--one-surface);
   font-size: 0.9em;
 }
@@ -383,8 +595,8 @@ tbody tr:hover {
 pre {
   overflow: auto;
   padding: var(--one-unit);
-  background: var(--one-slate);
-  color: var(--one-white);
+  background: var(--one-color-slate);
+  color: var(--one-color-white);
 }
 
 pre code {
@@ -402,7 +614,7 @@ hr {
 
 progress {
   width: 100%;
-  accent-color: var(--accent-color);
+  accent-color: var(--one-accent-color);
 }
 
 /* Motion
