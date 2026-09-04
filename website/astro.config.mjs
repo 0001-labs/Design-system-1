@@ -107,10 +107,6 @@ export default defineConfig({
           items: [
             { label: "i18n", slug: "advanced/i18n" },
             { label: "Theming", slug: "advanced/theming" },
-            {
-              label: "UI Library Research",
-              slug: "advanced/ui-library-research",
-            },
           ],
         },
         {
