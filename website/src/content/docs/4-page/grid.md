@@ -1,37 +1,58 @@
 ---
 title: Grid
-description: Learn about grid components in DS one
+description: 19px overlay grid used to align page layouts
 ---
 
-# Grid
+`ds-grid` is a **fixed overlay**, not a content layout. Drop it on a page to see the 19px module that layouts, type, and components snap to.
 
-Grid components create structured layouts using CSS Grid and provide alignment utilities for organizing content.
+<ds-grid align="center"></ds-grid>
 
-## Flexible Content
+## What it is
 
-`ds-grid` is a **flexible layout component** that can hold any content. Each grid cell can contain:
-- **`ds-card`** - For card-based layouts
-- **`ds-container`** - For nested containers
-- Any other components or HTML elements
+The overlay is a 1440×1280 CSS grid:
 
-## Features
+- **19px** tracks
+- **1px** gaps
+- **20px** module, matching `--1`
+- Outline in `--sharp-blue` (light) / `--yellow` (dark)
+- `pointer-events: none`, so it never blocks the page
 
-The grid components include:
-
-- CSS Grid-based layouts
-- Column and row management
-- Responsive grid behavior
-- Gap and spacing utilities
-- Alignment and distribution options
-
-Grids are essential for creating responsive, multi-column layouts with precise control.
+On mobile it switches to **14 columns** and scales with `--sf`. That mobile track math is intentional — do not restyle it.
 
 ## Example
 
+The overlay sits next to `ds-layout`. Named layout areas (`title`, `header`, `projects`, …) are independent of the overlay tracks.
+
 ```html
-<ds-grid columns="3" gap="medium">
-  <ds-card>Card 1</ds-card>
-  <ds-card>Card 2</ds-card>
-  <ds-card>Card 3</ds-card>
-</ds-grid>
+<ds-grid align="center"></ds-grid>
+
+<ds-layout view mode="portfolio" align="center">
+  <ds-text style="grid-area: title" text="Grid"></ds-text>
+</ds-layout>
 ```
+
+Local playground (same idea as the old debug pages): run `bun run dev` and open `/examples/grid.html`.
+
+## Alignment
+
+| Attribute | Values                         | Default    | Description                          |
+| --------- | ------------------------------ | ---------- | ------------------------------------ |
+| `align`   | `'left' \| 'center' \| 'right'` | `'center'` | Horizontal placement of the overlay |
+
+```html
+<ds-grid align="left"></ds-grid>
+<ds-grid align="center"></ds-grid>
+<ds-grid align="right"></ds-grid>
+```
+
+## With layout labels
+
+Add `view` on `ds-layout` to label named areas on top of the overlay:
+
+```html
+<ds-layout view mode="portfolio" align="center"></ds-layout>
+<ds-layout view mode="company" align="center"></ds-layout>
+<ds-layout view mode="app" align="center"></ds-layout>
+```
+
+Modes: `portfolio`, `company`, `app`, `list`, `home`, `settings`.

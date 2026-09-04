@@ -5,41 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DS one - Examples</title>
 
-    <!-- Import CSS from local -->
     <link rel="stylesheet" href="/DS1/1-root/one.css" />
 
-    <!-- Import DS one bundle from local dist -->
-    <script type="module" src="/dist/ds-one.bundle.js"></script>
+    <script type="module">
+      import "/DS1/0-face/device";
+      import "/DS1/0-face/i18n";
+      import "/DS1/2-core/ds-text";
+      import "/DS1/2-core/ds-button";
+      import "/DS1/4-page/ds-grid";
+      import "/DS1/4-page/ds-layout";
+    </script>
   </head>
   <body>
     <ds-grid align="center"></ds-grid>
 
-    <ds-layout debug mode="company">
+    <ds-layout view mode="company" align="center">
       <ds-text style="grid-area: header" text="DS one Examples"></ds-text>
-      <!-- Content -->
+
       <ds-button
         style="grid-area: content"
         primary
-        href="/examples/unbundled/"
-      >
-        Open Unbundled Project
-      </ds-button>
+        href="/examples/grid.html"
+        text="Open Grid"
+      ></ds-button>
 
-      <ds-button
-        style="grid-area: footer"
-        primary
-        href="/examples/bundled/"
-      >
-        Open Bundled Project
-      </ds-button>
-
-      <ds-button
-        style="grid-area: sidebar"
-        secondary
-        href="/examples/cdn/"
-      >
-        Open CDN Project
-      </ds-button>
+      <div style="grid-area: footer">
+        <ds-button href="/examples/unbundled/" text="Unbundled"></ds-button>
+        <ds-button href="/examples/bundled/" text="Bundled"></ds-button>
+        <ds-button href="/examples/cdn/" text="CDN"></ds-button>
+      </div>
     </ds-layout>
   </body>
 </html>
