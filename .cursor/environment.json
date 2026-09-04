@@ -1,0 +1,18 @@
+{
+  "name": "DS one",
+  "user": "node",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "install": "bun install --frozen-lockfile && (cd website && bun install --frozen-lockfile) && bun run build",
+  "terminals": [
+    {
+      "name": "dev",
+      "command": "bun run dev"
+    },
+    {
+      "name": "docs",
+      "command": "cd website && bun run dev"
+    }
+  ]
+}
