@@ -1,0 +1,293 @@
+---
+title: Design system 1
+description: One design system, three ways in. Classless CSS for native HTML, Lit Web Components with theming and i18n built in, and a visual editor that ships CSS.
+template: splash
+hero:
+  title: Design system 1
+  tagline: One design system, three ways in. A classless stylesheet for native HTML, Web Components with theming and translation built in, and a visual editor that turns tokens into CSS you can ship.
+  actions:
+    - text: Get started
+      link: /start-here/installation/
+      icon: right-arrow
+    - text: Open the editor
+      link: /app/
+      variant: secondary
+    - text: GitHub
+      link: https://github.com/0001-labs/Design-system-1
+      variant: minimal
+      icon: external
+---
+
+import ClasslessDemo from "../../components/ClasslessDemo.astro";
+
+<section class="landing">
+  <p class="landing__eyebrow">Three ways in</p>
+  <h2 class="landing__title">Pick the entry point that fits the page</h2>
+  <p class="landing__lead">
+    Every path shares the same tokens, so a classless page, a component-driven app,
+    and a stylesheet exported from the editor all look like the same product.
+  </p>
+  <div class="landing__grid">
+    <div class="landing__card">
+      <h3>Classless CSS</h3>
+      <p>
+        Link <code>one.semantic.css</code> and write ordinary HTML. Headings, buttons,
+        forms, tables, details, dialogs and code blocks are styled by tag. No classes,
+        no JavaScript.
+      </p>
+      <p><a href="/1-root/styling/">CSS-only usage</a></p>
+    </div>
+    <div class="landing__card">
+      <h3>Web Components</h3>
+      <p>
+        Lit elements with behavior built in: translation, stored preferences, theme and
+        accent switching, dates, tooltips and forms. Load from npm or a single CDN tag.
+      </p>
+      <p><a href="/2-core/button/">Browse components</a></p>
+    </div>
+    <div class="landing__card">
+      <h3>Visual editor</h3>
+      <p>
+        Adjust tokens, spacing and box models on real components and export the CSS.
+        Design decisions leave the editor as a stylesheet, not a screenshot.
+      </p>
+      <p><a href="/app/">Open the editor</a></p>
+    </div>
+  </div>
+</section>
+
+<section class="landing">
+  <p class="landing__eyebrow">Classless</p>
+  <h2 class="landing__title">Native HTML, already styled</h2>
+  <p class="landing__lead">
+    This frame loads nothing but <code>one.semantic.css</code>. Switch the docs theme in
+    the header and the frame follows.
+  </p>
+  <ClasslessDemo />
+</section>
+
+<section class="landing">
+  <p class="landing__eyebrow">Components</p>
+  <h2 class="landing__title">Components that carry their own behavior</h2>
+  <p class="landing__lead">
+    Everything below is live. The same bundle powers this documentation site.
+  </p>
+  <div class="landing__grid landing__grid--wide">
+    <div class="landing__card">
+      <h3>Buttons</h3>
+      <p>Primary, secondary and text variants, with links, icons and disabled states.</p>
+      <div class="landing__demo">
+        <ds-button variant="primary">Primary</ds-button>
+        <ds-button variant="secondary">Secondary</ds-button>
+        <ds-button variant="text">Text</ds-button>
+        <ds-button variant="primary" disabled>Disabled</ds-button>
+      </div>
+    </div>
+    <div class="landing__card">
+      <h3>Translation</h3>
+      <p>
+        Pass a key in <code>text</code> and the component renders the active language.
+        Cycle it here and watch the whole site switch.
+      </p>
+      <div class="landing__demo">
+        <ds-cycle type="language" variant="secondary"></ds-cycle>
+        <ds-button variant="primary" text="Create account">Create account</ds-button>
+        <ds-text text="Continue with">Continue with</ds-text>
+      </div>
+    </div>
+    <div class="landing__card">
+      <h3>Theme and accent</h3>
+      <p>
+        Light, dark and system themes plus a cycling accent color, stored in the
+        visitor's preferences.
+      </p>
+      <div class="landing__demo">
+        <ds-cycle type="theme" variant="secondary"></ds-cycle>
+        <ds-cycle type="accent-color" variant="secondary"></ds-cycle>
+      </div>
+    </div>
+    <div class="landing__card">
+      <h3>Icons</h3>
+      <p>A built-in SVG icon set, colored by the current text color.</p>
+      <div class="landing__demo landing__demo--icons">
+        <ds-icon type="check"></ds-icon>
+        <ds-icon type="star"></ds-icon>
+        <ds-icon type="search"></ds-icon>
+        <ds-icon type="globe"></ds-icon>
+        <ds-icon type="lock"></ds-icon>
+        <ds-icon type="email"></ds-icon>
+        <ds-icon type="home"></ds-icon>
+        <ds-icon type="plus"></ds-icon>
+        <ds-icon type="avatar"></ds-icon>
+      </div>
+    </div>
+    <div class="landing__card">
+      <h3>Text</h3>
+      <p>Heading, body and small variants that share one type scale and translate through the same key system.</p>
+      <div class="landing__demo landing__demo--stack">
+        <ds-text variant="heading">A heading</ds-text>
+        <ds-text variant="body">Body copy that adapts to the theme.</ds-text>
+        <ds-text variant="small">Small text for captions.</ds-text>
+      </div>
+    </div>
+    <div class="landing__card">
+      <h3>Cards</h3>
+      <p>Default, outlined, elevated and filled containers with a padding scale.</p>
+      <div class="landing__demo">
+        <ds-card variant="outlined" padding="small">Outlined</ds-card>
+        <ds-card variant="elevated" padding="small">Elevated</ds-card>
+        <ds-card variant="filled" padding="small">Filled</ds-card>
+      </div>
+    </div>
+    <div class="landing__card">
+      <h3>Inputs and tooltips</h3>
+      <p>Native inputs wrapped with tokens, and tooltips on hover or focus.</p>
+      <div class="landing__demo">
+        <ds-input name="email" placeholder="Enter your email"></ds-input>
+        <ds-tooltip text="This is helpful information">
+          <ds-button variant="secondary">Hover me</ds-button>
+        </ds-tooltip>
+      </div>
+    </div>
+    <div class="landing__card">
+      <h3>Accordion</h3>
+      <p>Disclosure groups for FAQs and settings.</p>
+      <div class="landing__demo landing__demo--stack">
+        <ds-accordion summary="What is a unit?" details="A unit composes core components into lists, rows, tables and forms."></ds-accordion>
+        <ds-accordion summary="What is a page?" details="Page-level containers, grids and layouts that hold the units."></ds-accordion>
+      </div>
+    </div>
+    <div class="landing__card">
+      <h3>Banners, lists and tables</h3>
+      <p>
+        Page-level banners for info, success, warning and error states, plus list,
+        row and table units that share the spacing scale.
+      </p>
+      <p><a href="/2-core/banner/">Banner</a>, <a href="/3-unit/list/">List</a>, <a href="/3-unit/table/">Table</a></p>
+    </div>
+  </div>
+</section>
+
+<section class="landing">
+  <p class="landing__eyebrow">Built-ins</p>
+  <h2 class="landing__title">Behavior every component gets for free</h2>
+  <div class="landing__grid">
+    <div class="landing__card">
+      <h3>i18n</h3>
+      <p>Ten bundled languages, external translation files, and a language cycle component.</p>
+      <p><a href="/built-ins/i18n/">Internationalization</a></p>
+    </div>
+    <div class="landing__card">
+      <h3>Theming</h3>
+      <p>Light, dark and system modes with an accent color, all driven by CSS custom properties.</p>
+      <p><a href="/built-ins/theming/">Theming</a></p>
+    </div>
+    <div class="landing__card">
+      <h3>Device</h3>
+      <p>Mobile, tablet and desktop detection so components can adapt their layout.</p>
+      <p><a href="/built-ins/device/">Device</a></p>
+    </div>
+    <div class="landing__card">
+      <h3>Preferences</h3>
+      <p>Language, theme and accent persist in local storage across visits.</p>
+      <p><a href="/built-ins/preferences/">Preferences</a></p>
+    </div>
+    <div class="landing__card">
+      <h3>Pricing</h3>
+      <p>Currency-aware price formatting for product pages.</p>
+      <p><a href="/built-ins/pricing/">Pricing</a></p>
+    </div>
+  </div>
+</section>
+
+<section class="landing">
+  <p class="landing__eyebrow">Editor</p>
+  <h2 class="landing__title">Design in the browser, ship CSS</h2>
+  <div class="landing__editor">
+    <div>
+      <p class="landing__lead">
+        The editor puts every component variant on a workbench. Drag the box model,
+        change tokens, and watch the semantic stylesheet update live. Export it and
+        drop it into any project, classless or component-based.
+      </p>
+      <div class="landing__actions">
+        <ds-button variant="primary" href="/app/">Open the editor</ds-button>
+        <ds-button variant="secondary" href="/1-root/styling/">Read about the CSS</ds-button>
+      </div>
+    </div>
+    <div class="landing__editor-mock" aria-hidden="true">
+      <div class="box">
+        margin
+        <div class="box">
+          border
+          <div class="box">
+            padding
+            <div class="box">75 × 42</div>
+          </div>
+        </div>
+      </div>
+      <pre>{`:root {
+  --one-accent-color: #0066ff;
+  --one-button-primary-background:
+    var(--one-accent-color);
+  --one-button-primary-text: #f5f5f5;
+  --one-icon-button-size: 40px;
+  --one-input-background: #ffffff;
+}`}</pre>
+    </div>
+  </div>
+</section>
+
+<section class="landing">
+  <p class="landing__eyebrow">Structure</p>
+  <h2 class="landing__title">Six layers, one direction</h2>
+  <p class="landing__lead">
+    Each layer only depends on the layers below it, so you can stop at the depth your
+    project needs.
+  </p>
+  <ul class="landing__layers">
+    <li><strong>0-face</strong>Device, i18n, preferences, theme</li>
+    <li><strong>1-root</strong>Tokens, fonts, one.css, one.semantic.css</li>
+    <li><strong>2-core</strong>Banner, button, card, cycle, date, gap, icon, input, text, tooltip</li>
+    <li><strong>3-unit</strong>Accordion, form, list, row, table</li>
+    <li><strong>4-page</strong>Container, grid, layout</li>
+    <li><strong>x-icon</strong>The SVG icon library</li>
+  </ul>
+</section>
+
+<section class="landing">
+  <p class="landing__eyebrow">Install</p>
+  <h2 class="landing__title">Two tags or one package</h2>
+  <p class="landing__lead">
+    Load it from a CDN with no build step, or add the package and import what you use.
+    See <a href="/start-here/installation/">Installation</a> and{" "}
+    <a href="/start-here/quick-start/">Manual setup</a> for the details.
+  </p>
+</section>
+
+```html
+<!-- Classless: native HTML, no JavaScript -->
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/ds-one@alpha/DS1/1-root/one.semantic.css"
+/>
+
+<!-- Components: tokens plus the Web Component bundle -->
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/ds-one@alpha/DS1/1-root/one.css"
+/>
+<script
+  type="module"
+  src="https://cdn.jsdelivr.net/npm/ds-one@alpha/dist/ds-one.bundle.min.js"
+></script>
+```
+
+```bash
+bun add ds-one@alpha
+```
+
+```typescript
+import "ds-one";
+import "ds-one/styles";
+```

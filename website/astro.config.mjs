@@ -14,14 +14,14 @@ export default defineConfig({
   },
   integrations: [
     starlight({
-      title: "DS one",
+      title: "Design system 1",
       description:
         "A component-based design system built with TypeScript and LitElement that provides reusable UI components with built-in theming, internationalization, and accessibility features.",
       social: [
         {
           icon: "github",
           label: "GitHub",
-          href: "https://github.com/0001-labs/ds-one",
+          href: "https://github.com/0001-labs/Design-system-1",
         },
       ],
       components: {
@@ -39,6 +39,7 @@ export default defineConfig({
       customCss: [
         // Custom CSS file
         "./src/styles/custom.css",
+        "./src/styles/landing.css",
       ],
       sidebar: [
         {

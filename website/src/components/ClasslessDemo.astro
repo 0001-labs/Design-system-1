@@ -1,0 +1,152 @@
+---
+// Renders native HTML inside an isolated frame styled only by one.semantic.css,
+// so the classless stylesheet cannot leak into the docs chrome and the docs
+// chrome cannot leak into the demo. The stylesheet is inlined at build time.
+import semanticCss from "../../../DS1/1-root/one.semantic.css?raw";
+
+const doc = `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>${semanticCss}</style>
+    <style>
+      body { margin: 0; padding: 24px; }
+      main { display: grid; gap: 24px; }
+      .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+      .field { display: grid; gap: 6px; max-width: 320px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section>
+        <h2>Native HTML, no classes</h2>
+        <p>Every element on this canvas is a plain tag. The only stylesheet loaded is <code>one.semantic.css</code>.</p>
+        <div class="row">
+          <button type="button">Primary action</button>
+          <button type="button" disabled>Disabled</button>
+          <a href="#">A styled link</a>
+        </div>
+      </section>
+
+      <section>
+        <form onsubmit="return false">
+          <fieldset>
+            <legend>Sign up</legend>
+            <div class="field">
+              <label for="name">Name</label>
+              <input id="name" type="text" placeholder="Ada Lovelace" />
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" type="email" placeholder="ada@example.com" aria-invalid="true" />
+              <small>Enter a valid address.</small>
+            </div>
+            <div class="field">
+              <label for="notes">Notes</label>
+              <textarea id="notes" rows="2" placeholder="Anything else?"></textarea>
+            </div>
+            <div class="row">
+              <button type="submit">Create account</button>
+              <progress max="100" value="66"></progress>
+            </div>
+          </fieldset>
+        </form>
+      </section>
+
+      <section>
+        <table>
+          <thead>
+            <tr><th>Layer</th><th>Contains</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>0-face</td><td>Device, i18n, preferences, theme</td></tr>
+            <tr><td>1-root</td><td>Tokens, fonts, classless CSS</td></tr>
+            <tr><td>2-core</td><td>Buttons, text, inputs, icons</td></tr>
+            <tr><td>3-unit</td><td>Lists, rows, tables, forms</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <details>
+          <summary>Why classless?</summary>
+          <p>Server-rendered pages, CMS output, and static sites get the design system with a single link tag.</p>
+        </details>
+        <blockquote>The markup you already write is the API.</blockquote>
+        <pre><code>&lt;link rel="stylesheet" href="one.semantic.css" /&gt;</code></pre>
+      </section>
+    </main>
+  </body>
+</html>`;
+---
+
+<div class="classless-demo">
+  <iframe
+    class="classless-demo__frame"
+    title="Native HTML styled by one.semantic.css"
+    srcdoc={doc}
+    loading="lazy"
+  ></iframe>
+</div>
+
+<script is:inline>
+  // Keep the frame's color scheme in step with the docs theme toggle.
+  (function () {
+    const frame = document.querySelector(".classless-demo__frame");
+    if (!frame) return;
+    const root = document.documentElement;
+
+    function sync() {
+      const doc = frame.contentDocument;
+      if (!doc || !doc.documentElement) return;
+      const theme = root.getAttribute("data-theme");
+      doc.documentElement.style.colorScheme =
+        theme === "dark" ? "dark" : theme === "light" ? "light" : "";
+    }
+
+    // Size the frame to its content so nothing is cut off.
+    function fit() {
+      const doc = frame.contentDocument;
+      if (!doc || !doc.documentElement) return;
+      const height = doc.documentElement.scrollHeight;
+      if (height > 0) frame.style.height = height + "px";
+    }
+
+    frame.addEventListener("load", function () {
+      sync();
+      fit();
+      const doc = frame.contentDocument;
+      if (doc && doc.body && "ResizeObserver" in window) {
+        new ResizeObserver(fit).observe(doc.body);
+      }
+    });
+    new MutationObserver(sync).observe(root, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+  })();
+</script>
+
+<style>
+  .classless-demo {
+    border: 1px solid var(--ds1-docs-header-border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--ds1-docs-content-bg);
+  }
+
+  .classless-demo__frame {
+    display: block;
+    width: 100%;
+    height: 760px;
+    border: 0;
+    background: transparent;
+  }
+
+  @media (max-width: 768px) {
+    .classless-demo__frame {
+      height: 900px;
+    }
+  }
+</style>
