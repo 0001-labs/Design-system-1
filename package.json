@@ -1,6 +1,6 @@
 {
   "name": "ds-one",
-  "version": "0.3.0-alpha.9",
+  "version": "0.3.0-alpha.10",
   "description": "A component-based design system built with TypeScript and LitElement that provides reusable UI components with built-in theming, internationalization, and accessibility features.",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
