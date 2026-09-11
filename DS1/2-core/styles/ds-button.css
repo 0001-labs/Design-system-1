@@ -54,7 +54,7 @@ button[primary] {
 
 button[secondary] {
   background-color: var(--button-background-color-secondary);
-  color: var(--button-text-color-on-light, var(--black));
+  color: var(--button-text-color-secondary, var(--black));
   font-family: var(--typeface-regular);
   padding: 0 calc(0.5px * var(--sf));
 }

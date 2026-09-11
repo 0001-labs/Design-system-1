@@ -178,7 +178,7 @@ input {
 
   /* button */
   --button-background-color-primary: var(--accent-color);
-  --button-background-color-secondary: var(--slate-light);
+  --button-background-color-secondary: light-dark(var(--slate-light), var(--slate-dark));
   --button-text-color: light-dark(var(--black), var(--white));
   --button-text-color-on-light: var(--black);
   --button-text-color-secondary: light-dark(
@@ -280,7 +280,7 @@ body {
 
 .ds-button--secondary {
   background: var(--button-background-color-secondary);
-  color: var(--button-text-color-on-light);
+  color: var(--button-text-color-secondary);
 }
 
 .ds-button:hover:not(:disabled, [aria-disabled="true"]) {
@@ -312,7 +312,7 @@ body {
   border: 1px solid transparent;
   padding: 0 calc(2px * var(--sf));
   background: var(--button-background-color-secondary);
-  color: var(--button-text-color-on-light);
+  color: var(--button-text-color-secondary);
   font-family: var(--typeface-regular);
   font-size: var(--type-size-default);
   line-height: var(--type-lineheight-default);
