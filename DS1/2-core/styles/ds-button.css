@@ -24,6 +24,10 @@ button {
   padding: 0;
   color: var(--button-color, var(--button-text-color));
   font-family: var(--typeface-regular);
+  /* Slotted plain text must not fall back to the browser's default button size. */
+  font-size: var(--type-size-default);
+  line-height: calc(var(--type-lineheight-default) * var(--sf));
+  letter-spacing: calc(var(--type-letterspacing-default) * var(--sf));
   -webkit-tap-highlight-color: transparent;
   white-space: nowrap;
   overflow: hidden;
