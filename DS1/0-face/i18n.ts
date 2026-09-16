@@ -21,6 +21,7 @@ const LANGUAGE_PRIORITY_ORDER = [
   "fr",
   "it",
   "ja",
+  "ko",
   "pt",
   "sv",
   "zh",
@@ -46,6 +47,8 @@ const FALLBACK_LANGUAGE_NAMES: Record<string, string> = {
   "it-it": "Italian",
   ja: "Japanese",
   "ja-jp": "Japanese",
+  ko: "Korean",
+  "ko-kr": "Korean",
   pt: "Portuguese",
   "pt-pt": "Portuguese",
   sv: "Swedish",
@@ -180,14 +183,14 @@ async function fetchTranslationFile(
 
     if (!validateTranslationMap(translations)) {
       console.warn(
-        `[DS one] Invalid translation format in ${source}. Expected object with language codes as keys.`
+        `[Design system 1] Invalid translation format in ${source}. Expected object with language codes as keys.`
       );
       return null;
     }
 
     const languages = Object.keys(translations);
     if (languages.length === 0) {
-      console.warn(`[DS one] No languages found in ${source}`);
+      console.warn(`[Design system 1] No languages found in ${source}`);
       return null;
     }
 
@@ -218,7 +221,7 @@ async function loadExternalTranslations(): Promise<boolean> {
     Object.keys(window.DS_ONE_TRANSLATIONS).length > 0
   ) {
     console.log(
-      `[DS one] Translations already loaded (${Object.keys(window.DS_ONE_TRANSLATIONS).length} languages), skipping auto-load`
+      `[Design system 1] Translations already loaded (${Object.keys(window.DS_ONE_TRANSLATIONS).length} languages), skipping auto-load`
     );
     return true;
   }
@@ -235,7 +238,7 @@ async function loadExternalTranslations(): Promise<boolean> {
 
     const languages = Object.keys(translations);
     console.log(
-      `[DS one] External translations loaded from ${source}: ${languages.length} language(s) – ${languages.join(", ")}`
+      `[Design system 1] External translations loaded from ${source}: ${languages.length} language(s) – ${languages.join(", ")}`
     );
 
     window.dispatchEvent(new CustomEvent("translations-ready"));
@@ -243,7 +246,7 @@ async function loadExternalTranslations(): Promise<boolean> {
   }
 
   console.info(
-    `[DS one] No external translations found at ${sources[0] ?? DEFAULT_TRANSLATION_FILE}. Using bundled translations.`
+    `[Design system 1] No external translations found at ${sources[0] ?? DEFAULT_TRANSLATION_FILE}. Using bundled translations.`
   );
 
   return false;
@@ -332,7 +335,7 @@ function getDisplayNameForLocale(
     // Intl.DisplayNames may not be supported; fall back gracefully
     if (!displayNameFallbackWarningShown) {
       console.info(
-        "[DS one] Intl.DisplayNames is not available, using fallback language names."
+        "[Design system 1] Intl.DisplayNames is not available, using fallback language names."
       );
       displayNameFallbackWarningShown = true;
     }
@@ -420,6 +423,8 @@ const BROWSER_LANGUAGE_PREFERENCES: Record<string, LanguageCode> = {
   "it-it": "it",
   ja: "ja",
   "ja-jp": "ja",
+  ko: "ko",
+  "ko-kr": "ko",
   pt: "pt",
   "pt-pt": "pt",
   "pt-br": "pt",
@@ -572,7 +577,7 @@ export function translate(key: string): string {
   }
 
   console.warn(
-    `[DS one (Internationalization)] No translation found for key "${key}"`
+    `[Design system 1 (Internationalization)] No translation found for key "${key}"`
   );
   return key;
 }
