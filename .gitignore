@@ -90,13 +90,26 @@ dist
 
 # Gatsby files
 .cache/
-public
+# Anchored to the repo root on purpose: a bare `public` also swallowed
+# website/public and app/public, where Vite/Astro static assets live.
+/public
 
 # Storybook build outputs
 .out
 .storybook-out
 
+# Cloudflare Workers
+.dev.vars
+.dev.vars.*
+.wrangler/
+
+# Playwright
+test-results/
+playwright-report/
+
 # Temporary folders
 tmp/
 temp/
 CLAUDE.md
+
+.deployment-backups/
