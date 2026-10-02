@@ -21,7 +21,9 @@ build/
 *.swo
 *~
 .claude
-.cursor/
+.cursor/*
+!.cursor/environment.json
+!.cursor/Dockerfile
 
 # OS generated files
 .DS_Store

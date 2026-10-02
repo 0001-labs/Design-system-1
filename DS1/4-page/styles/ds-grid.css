@@ -54,3 +54,42 @@
   right: 0;
   transform: none;
 }
+
+/* Visible 19px tracks when CSS Gap Decorations (`row-rule`) is unavailable */
+@supports not (row-rule: 1px solid black) {
+  :host {
+    background-image:
+      repeating-linear-gradient(
+        to right,
+        transparent 0,
+        transparent 19px,
+        var(--grid-color) 19px,
+        var(--grid-color) 20px
+      ),
+      repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 19px,
+        var(--grid-color) 19px,
+        var(--grid-color) 20px
+      );
+  }
+
+  :host(.mobile) {
+    background-image:
+      repeating-linear-gradient(
+        to right,
+        transparent 0,
+        transparent calc(19px * var(--sf, 1)),
+        var(--grid-color) calc(19px * var(--sf, 1)),
+        var(--grid-color) calc(20px * var(--sf, 1))
+      ),
+      repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent calc(19px * var(--sf, 1)),
+        var(--grid-color) calc(19px * var(--sf, 1)),
+        var(--grid-color) calc(20px * var(--sf, 1))
+      );
+  }
+}

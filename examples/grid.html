@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DS one - Grid</title>
+
+    <link rel="stylesheet" href="/DS1/1-root/one.css" />
+
+    <script type="module">
+      import "/DS1/0-face/device";
+      import "/DS1/0-face/i18n";
+      import "/DS1/0-face/theme";
+      import "/DS1/2-core/ds-text";
+      import "/DS1/2-core/ds-button";
+      import "/DS1/2-core/ds-cycle";
+      import "/DS1/3-unit/ds-row";
+      import "/DS1/4-page/ds-grid";
+      import "/DS1/4-page/ds-layout";
+    </script>
+
+    <style>
+      .area {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: var(--025);
+        min-height: var(--1);
+        padding: var(--025);
+        box-sizing: border-box;
+        outline: 1px solid var(--grid-color);
+        background: color-mix(in srgb, var(--sharp-blue) 6%, transparent);
+      }
+    </style>
+  </head>
+  <body>
+    <ds-grid id="grid" align="center"></ds-grid>
+    <ds-layout id="layout" view mode="portfolio" align="center"></ds-layout>
+
+    <script>
+      const MODES = [
+        "portfolio",
+        "company",
+        "app",
+        "list",
+        "home",
+        "settings",
+      ];
+      const ALIGNS = ["left", "center", "right"];
+      const AREAS = {
+        portfolio: [
+          "square",
+          "title",
+          "header",
+          "projects",
+          "bio",
+          "nav",
+          "footer",
+        ],
+        company: ["header", "content", "footer"],
+        app: ["banner", "header", "main", "page-dots", "footer"],
+        list: ["banner", "header", "board"],
+        home: ["banner", "header", "message", "lists", "footer"],
+        settings: ["banner", "settings"],
+      };
+
+      const grid = document.getElementById("grid");
+      const layout = document.getElementById("layout");
+
+      const copy = {
+        title: "Grid",
+        square: "19px",
+        header: "Align the overlay and the layout on the 19px module.",
+        projects:
+          "ds-grid is a 1440×1280 overlay: 19px cells, 1px gaps. That 20px module is --1.",
+        content:
+          "ds-grid is a 1440×1280 overlay: 19px cells, 1px gaps. That 20px module is --1.",
+        main: "ds-grid is a 1440×1280 overlay: 19px cells, 1px gaps. That 20px module is --1.",
+        bio: "Resize the window to see the 14-column mobile overlay.",
+        board: "List mode sits on the same 19px overlay as every other layout.",
+        message: "Home mode sits on the same 19px overlay as every other layout.",
+        lists: "Named layout areas are independent of the overlay tracks.",
+        settings: "Settings mode still uses the same overlay.",
+        "page-dots": "page-dots",
+        banner: "banner",
+        nav: "Examples",
+        footer: "Theme / language",
+      };
+
+      function controls(kind) {
+        if (kind === "align") {
+          return ALIGNS.map(
+            (value) =>
+              `<ds-button data-align="${value}" text="${value}"></ds-button>`
+          ).join("");
+        }
+
+        if (kind === "mode") {
+          return MODES.map(
+            (value) =>
+              `<ds-button data-mode="${value}" text="${value}"></ds-button>`
+          ).join("");
+        }
+
+        if (kind === "view") {
+          return `<ds-button data-view text="View labels"></ds-button>`;
+        }
+
+        if (kind === "nav") {
+          return `<ds-button href="/examples/" text="Examples"></ds-button>`;
+        }
+
+        if (kind === "prefs") {
+          return `
+            <ds-row fill>
+              <ds-text text="Language"></ds-text>
+              <ds-cycle type="language"></ds-cycle>
+            </ds-row>
+            <ds-row fill>
+              <ds-text text="Theme"></ds-text>
+              <ds-cycle type="theme"></ds-cycle>
+            </ds-row>
+          `;
+        }
+
+        return "";
+      }
+
+      function extras(area) {
+        if (area === "header" || area === "banner") {
+          return `<ds-row>${controls("align")}</ds-row>`;
+        }
+        if (
+          area === "projects" ||
+          area === "content" ||
+          area === "main" ||
+          area === "board" ||
+          area === "lists" ||
+          area === "settings"
+        ) {
+          return `<ds-row>${controls("mode")}</ds-row>${controls("view")}`;
+        }
+        if (area === "nav") {
+          return controls("nav");
+        }
+        if (area === "footer") {
+          return controls("prefs");
+        }
+        return "";
+      }
+
+      function markActive() {
+        const mode = layout.getAttribute("mode") || "portfolio";
+        const align = grid.getAttribute("align") || "center";
+        const viewing = layout.hasAttribute("view");
+
+        document.querySelectorAll("ds-button[data-mode]").forEach((button) => {
+          const active = button.getAttribute("data-mode") === mode;
+          button.toggleAttribute("primary", active);
+          button.toggleAttribute("secondary", !active);
+        });
+
+        document.querySelectorAll("ds-button[data-align]").forEach((button) => {
+          const active = button.getAttribute("data-align") === align;
+          button.toggleAttribute("primary", active);
+          button.toggleAttribute("secondary", !active);
+        });
+
+        document.querySelectorAll("ds-button[data-view]").forEach((button) => {
+          button.toggleAttribute("primary", viewing);
+          button.toggleAttribute("secondary", !viewing);
+          button.setAttribute("text", viewing ? "Hide labels" : "View labels");
+        });
+      }
+
+      function render() {
+        const mode = layout.getAttribute("mode") || "portfolio";
+        const areas = AREAS[mode];
+
+        layout.innerHTML = areas
+          .map(
+            (area) => `
+              <div class="area" style="grid-area: ${area}">
+                <ds-text text="${copy[area] || area}"></ds-text>
+                ${extras(area)}
+              </div>
+            `
+          )
+          .join("");
+
+        markActive();
+      }
+
+      document.addEventListener("click", (event) => {
+        const button = event
+          .composedPath()
+          .find((node) => node.matches?.("ds-button"));
+        if (!button) {
+          return;
+        }
+
+        if (button.hasAttribute("data-align")) {
+          const align = button.getAttribute("data-align");
+          grid.setAttribute("align", align);
+          layout.setAttribute("align", align);
+          markActive();
+          return;
+        }
+
+        if (button.hasAttribute("data-mode")) {
+          layout.setAttribute("mode", button.getAttribute("data-mode"));
+          render();
+          return;
+        }
+
+        if (button.hasAttribute("data-view")) {
+          layout.toggleAttribute("view");
+          markActive();
+        }
+      });
+
+      render();
+    </script>
+  </body>
+</html>
