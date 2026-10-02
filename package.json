@@ -1,6 +1,6 @@
 {
   "name": "design-system-1",
-  "version": "0.3.0-alpha.9",
+  "version": "0.3.0-alpha.11",
   "description": "A component-based design system built with TypeScript and LitElement that provides reusable UI components with built-in theming, internationalization, and accessibility features.",
   "keywords": [
     "components",
@@ -58,7 +58,7 @@
     "build:core": "vp run build:component -- DS1/2-core",
     "build:units": "vp run build:component -- DS1/3-unit",
     "build:component": "vp exec tsx scripts/build-component.ts",
-    "prepublishOnly": "vp run build:bundle",
+    "prepublishOnly": "vp run check:versions && vp run build:bundle",
     "lint": "vp lint",
     "lint:fix": "vp lint --fix",
     "format": "vp fmt",
@@ -83,7 +83,8 @@
     "services:dryrun": "cd services && vp run dryrun",
     "site:build": "vp run docs:build && vp run app:build",
     "site:deploy": "vp run site:build && vp exec wrangler deploy",
-    "deploy": "vp run site:deploy"
+    "deploy": "vp run site:deploy",
+    "check:versions": "node scripts/versions.mjs"
   },
   "dependencies": {
     "@lit-labs/signals": "^0.1.3",

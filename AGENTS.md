@@ -11,7 +11,7 @@ Component-based design system with Lit Web Components.
 
 ## Version
 
-0.3.0-alpha.9
+0.3.0-alpha.11
 
 ## Scripts
 
