@@ -1,11 +1,13 @@
 ---
 // MyHeader component - custom header for docs
 import Search from '@astrojs/starlight/components/Search.astro';
+interface Props { landing?: boolean; }
+const { landing = false } = Astro.props;
 ---
 
-<header class="site-header">
+<header class:list={['site-header', { 'site-header--home': landing }]}>
   <!-- Mobile Menu Button -->
-  <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Toggle navigation menu">
+  {!landing && <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Toggle navigation menu">
     <svg class="hamburger-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <line x1="3" y1="6" x2="21" y2="6"></line>
       <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -15,31 +17,33 @@ import Search from '@astrojs/starlight/components/Search.astro';
       <line x1="18" y1="6" x2="6" y2="18"></line>
       <line x1="6" y1="6" x2="18" y2="18"></line>
     </svg>
-  </button>
+  </button>}
 
   <!-- Left: Logo -->
   <div class="header-logo">
     <a href="/" class="logo-link">
-      <span class="logo-text">DS one</span>
-      <span class="logo-dot"></span>
+      <span class="logo-text">Design system 1</span>
     </a>
   </div>
 
-  <div class="header-divider"></div>
+  {!landing && <div class="header-divider"></div>}
 
   <!-- Center: Search -->
-  <div class="header-search">
+  {!landing && <div class="header-search">
     <Search class="custom-search" />
-  </div>
+  </div>}
 
   <!-- Right: Actions -->
   <div class="header-actions">
-    <!-- Language Toggle using DS one cycle component -->
+    {landing && <a class="header-docs" href="/getting-started/installation/">Documentation</a>}
+    <a class="header-docs" href="/icons">Icons</a>
+    <a class="header-classless" href="/classless/editor/">CLASSless</a>
+    <!-- Language Toggle using Design system 1 cycle component -->
     <div class="action-item">
       <ds-cycle type="language" variant="secondary"></ds-cycle>
     </div>
 
-    <!-- Theme Toggle using DS one cycle component -->
+    <!-- Theme Toggle using Design system 1 cycle component -->
     <div class="action-item">
       <ds-cycle type="theme" variant="secondary"></ds-cycle>
     </div>
@@ -103,25 +107,17 @@ import Search from '@astrojs/starlight/components/Search.astro';
   .logo-link {
     display: flex;
     align-items: baseline;
-    gap: 11px;
+    gap: 8px;
     text-decoration: none;
     color: inherit;
   }
 
   .logo-text {
     font-family: 'GT-America-Standard-Regular', sans-serif;
-    font-size: 32px;
+    font-size: 20px;
     color: var(--ds1-docs-header-text);
     letter-spacing: -0.04em;
     white-space: nowrap;
-  }
-
-  .logo-dot {
-    display: flex;
-    width: 16px;
-    height: 16px;
-    background: var(--ds1-docs-accent-green);
-    flex-shrink: 0;
   }
 
   /* Header divider */
@@ -153,6 +149,30 @@ import Search from '@astrojs/starlight/components/Search.astro';
   .action-item {
     display: flex;
     align-items: center;
+  }
+
+  .header-classless {
+    color: var(--ds1-docs-header-text);
+    font-size: 13px;
+    text-decoration: none;
+    border-bottom: 1px solid var(--ds1-docs-accent-green);
+    padding-block: 4px;
+  }
+
+  .site-header--home { height: 80px; padding-inline: max(20px, calc((100% - 1360px) / 2)); gap: 20px; }
+  .site-header--home .header-logo { width: auto; padding: 0; border: 0; }
+  .site-header--home .header-actions { margin-left: auto; padding: 0; gap: 20px; }
+  .header-docs { color: var(--ds1-docs-header-text); font-size: 14px; text-decoration: none; }
+  .header-docs:hover { text-decoration: underline; }
+
+  @media (max-width: 600px) {
+    .site-header.site-header--home { height: auto; min-height: 80px; padding: 20px; flex-wrap: wrap; gap: 20px; }
+    .site-header--home .header-actions { flex-wrap: wrap; }
+    .site-header--home .action-item { display: none; }
+  }
+
+  @media (max-width: 600px) {
+    .header-classless { display: none; }
   }
 
   /* Style the search component */
@@ -235,12 +255,7 @@ import Search from '@astrojs/starlight/components/Search.astro';
     }
 
     .logo-text {
-      font-size: 24px;
-    }
-
-    .logo-dot {
-      width: 12px;
-      height: 12px;
+      font-size: 18px;
     }
 
     .header-divider {

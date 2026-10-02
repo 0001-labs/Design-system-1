@@ -1,17 +1,40 @@
 {
-  "name": "ds-one",
+  "name": "design-system-1",
   "version": "0.3.0-alpha.9",
   "description": "A component-based design system built with TypeScript and LitElement that provides reusable UI components with built-in theming, internationalization, and accessibility features.",
-  "main": "dist/index.js",
-  "module": "dist/index.esm.js",
-  "types": "dist/index.d.ts",
-  "type": "module",
+  "keywords": [
+    "components",
+    "design-system",
+    "i18n",
+    "lit-element",
+    "theming",
+    "typescript",
+    "ui-kit",
+    "web-components"
+  ],
+  "homepage": "https://designsystem1.com",
+  "bugs": {
+    "url": "https://github.com/0001-labs/ds-one/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/0001-labs/ds-one.git"
+  },
   "files": [
     "dist/",
     "DS1/",
     "README.md",
     "LICENSE"
   ],
+  "type": "module",
+  "sideEffects": [
+    "DS1/**/*.ts",
+    "dist/**/*.js"
+  ],
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -22,80 +45,85 @@
     "./styles": "./DS1/1-root/one.css",
     "./dist/*": "./dist/*"
   },
-  "sideEffects": [
-    "DS1/**/*.ts",
-    "dist/**/*.js"
-  ],
   "scripts": {
-    "dev": "vite --host",
-    "build": "bun run build:bundle",
-    "generate:icons": "bun run scripts/generate-icons.ts",
-    "build:bundle": "bun run generate:icons && bunx tsc && bun run build:vite && bun run build:vite:min",
-    "build:vite": "bunx vite build --config vite.config.lib.ts",
-    "build:vite:min": "MINIFY=true bunx vite build --config vite.config.lib.ts",
-    "build:types": "tsc --noEmit",
-    "build:components": "bun run build:core && bun run build:units",
-    "build:core": "bun run build:component -- DS1/2-core",
-    "build:units": "bun run build:component -- DS1/3-unit",
-    "build:component": "bun run scripts/build-component.ts",
-    "prepublishOnly": "bun run build:bundle",
-    "lint": "eslint . --ext .ts,.js",
-    "lint:fix": "eslint . --ext .ts,.js --fix",
-    "format": "prettier --write .",
-    "test": "bun test",
+    "dev": "vp dev --host",
+    "build": "vp run build:bundle",
+    "check": "vp check",
+    "generate:icons": "vp exec tsx scripts/generate-icons.ts",
+    "build:bundle": "vp run generate:icons && vp exec tsc && vp run build:vite && vp run build:vite:min",
+    "build:vite": "vp build --config vite.config.lib.ts",
+    "build:vite:min": "MINIFY=true vp build --config vite.config.lib.ts",
+    "build:types": "vp exec tsc --noEmit",
+    "build:components": "vp run build:core && vp run build:units",
+    "build:core": "vp run build:component -- DS1/2-core",
+    "build:units": "vp run build:component -- DS1/3-unit",
+    "build:component": "vp exec tsx scripts/build-component.ts",
+    "prepublishOnly": "vp run build:bundle",
+    "lint": "vp lint",
+    "lint:fix": "vp lint --fix",
+    "format": "vp fmt",
+    "test": "vp test --passWithNoTests",
     "clean": "rm -rf node_modules web/node_modules dist",
-    "release:patch": "bun run scripts/release.ts patch",
-    "release:minor": "bun run scripts/release.ts minor",
-    "release:major": "bun run scripts/release.ts major",
-    "release:pre:alpha": "bun run scripts/release.ts prerelease --preid=alpha",
-    "publish": "npm publish --tag alpha",
-    "docs:dev": "cd website && bun run dev",
-    "docs:build": "cd website && bun run build",
-    "docs:preview": "cd website && bun run preview",
-    "docs:deploy": "cd website && bun run deploy",
-    "app:dev": "cd app && bun run dev",
-    "app:build": "cd app && bun run build",
-    "app:deploy": "cd app && bun run deploy"
-  },
-  "keywords": [
-    "design-system",
-    "web-components",
-    "lit-element",
-    "typescript",
-    "ui-kit",
-    "components",
-    "theming",
-    "i18n"
-  ],
-  "license": "MIT",
-  "devDependencies": {
-    "@types/node": "^20.0.0",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
-    "esbuild": "^0.25.10",
-    "eslint": "^8.0.0",
-    "playwright": "^1.56.0",
-    "prettier": "^3.0.0",
-    "typescript": "^5.0.0",
-    "vite": "^7.1.9"
+    "release:patch": "vp exec tsx scripts/release.ts patch",
+    "release:minor": "vp exec tsx scripts/release.ts minor",
+    "release:major": "vp exec tsx scripts/release.ts major",
+    "release:pre:alpha": "vp exec tsx scripts/release.ts prerelease --preid=alpha",
+    "publish": "vp publish --tag alpha",
+    "docs:dev": "cd website && vp run dev",
+    "icons:build": "vp exec tsx scripts/build-icon-assets.ts",
+    "docs:build": "vp run icons:build && cd website && vp run build",
+    "docs:preview": "cd website && vp run preview",
+    "docs:deploy": "vp run site:deploy",
+    "app:dev": "cd app && vp run dev",
+    "app:build": "cd app && vp run build",
+    "app:deploy": "vp run site:deploy",
+    "test:unit": "vp test && (cd packages/css-validate && vp test) && (cd app && vp test) && (cd services && vp test)",
+    "test:e2e": "cd e2e && vp exec playwright test",
+    "typecheck:all": "cd packages/css-validate && vp exec tsc --noEmit && cd ../../app && vp exec tsc --noEmit && cd ../services && vp exec tsc --noEmit",
+    "services:dryrun": "cd services && vp run dryrun",
+    "site:build": "vp run docs:build && vp run app:build",
+    "site:deploy": "vp run site:build && vp exec wrangler deploy",
+    "deploy": "vp run site:deploy"
   },
   "dependencies": {
     "@lit-labs/signals": "^0.1.3",
     "lit": "^3.0.0"
   },
+  "devDependencies": {
+    "@convex-dev/auth": "^0.0.94",
+    "@convex-dev/rate-limiter": "^0.3.2",
+    "@ds-one/css-validate": "file:./packages/css-validate",
+    "@edge-runtime/vm": "^5.0.0",
+    "@playwright/test": "^1.56.0",
+    "@types/node": "^20.0.0",
+    "convex": "^1.42.3",
+    "convex-test": "^0.0.54",
+    "esbuild": "^0.27.0",
+    "playwright": "^1.56.0",
+    "typescript": "^5.0.0",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "tsx": "^4.21.0",
+    "vitest": "catalog:",
+    "@hono/node-server": "^2.1.0"
+  },
   "peerDependencies": {
     "lit": "^3.0.0"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/0001-labs/ds-one.git"
-  },
-  "bugs": {
-    "url": "https://github.com/0001-labs/ds-one/issues"
-  },
-  "homepage": "https://dsone.dev",
   "engines": {
-    "node": ">=18.0.0",
-    "bun": ">=1.0.0"
+    "node": ">=22.12.0"
+  },
+  "packageManager": "pnpm@11.7.0",
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "11.7.0",
+      "onFail": "error"
+    },
+    "runtime": {
+      "name": "node",
+      "version": ">=22.12.0",
+      "onFail": "error"
+    }
   }
 }

@@ -1,6 +1,6 @@
 ---
 title: Navigation
-description: Learn about navigation components in DS one
+description: Learn about navigation components in Design system 1
 ---
 
 # Navigation

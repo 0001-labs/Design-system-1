@@ -5,28 +5,34 @@ import Default from '@astrojs/starlight/components/Head.astro';
 
 <!-- Include default Starlight head elements -->
 <Default><slot /></Default>
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+<script is:inline src="/google-analytics.js" defer />
 
-<!-- Load DS one CSS from CDN -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ds-one@0.3.0-alpha.9/DS1/1-root/one.css" />
+<script>
+  import '../../../DS1/0-face/grid';
+</script>
 
-<!-- Pre-load translations and then load DS one bundle -->
+<!-- Load Design system 1 CSS from CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/design-system-1@0.3.0-alpha.9/DS1/1-root/one.css" />
+
+<!-- Pre-load translations and then load Design system 1 bundle -->
 <script is:inline>
-  // MUST load translations before DS one bundle initializes
+  // MUST load translations before Design system 1 bundle initializes
   (async function() {
     try {
       const response = await fetch('/translations.json');
       const translations = await response.json();
       
-      // Make translations available to DS one BEFORE loading bundle
+      // Make translations available to Design system 1 BEFORE loading bundle
       window.DS_ONE_TRANSLATIONS = translations;
 
       const availableLanguages = Object.keys(translations);
       console.log('[App] Translations pre-loaded:', availableLanguages.length, 'languages');
 
-      // NOW load DS one bundle after translations are ready
+      // NOW load Design system 1 bundle after translations are ready
       const script = document.createElement('script');
       script.type = 'module';
-      script.src = 'https://cdn.jsdelivr.net/npm/ds-one@0.3.0-alpha.9/dist/ds-one.bundle.min.js';
+      script.src = 'https://cdn.jsdelivr.net/npm/design-system-1@0.3.0-alpha.9/dist/design-system-1.bundle.min.js';
       script.addEventListener('load', () => {
         window.dispatchEvent(new CustomEvent('translations-ready', {
           detail: { languages: availableLanguages }
@@ -41,10 +47,10 @@ import Default from '@astrojs/starlight/components/Head.astro';
     } catch (error) {
       console.error('[App] Failed to pre-load translations:', error);
       
-      // Load DS one anyway even if translations fail
+      // Load Design system 1 anyway even if translations fail
       const script = document.createElement('script');
       script.type = 'module';
-      script.src = 'https://cdn.jsdelivr.net/npm/ds-one@alpha/dist/ds-one.bundle.js';
+      script.src = 'https://cdn.jsdelivr.net/npm/design-system-1@alpha/dist/design-system-1.bundle.js';
       script.addEventListener('load', () => {
         window.dispatchEvent(new CustomEvent('translations-ready', {
           detail: { languages: [] }
@@ -56,9 +62,9 @@ import Default from '@astrojs/starlight/components/Head.astro';
 </script>
 
 <style>
-  /* Ensure DS one components work well with Starlight */
+  /* Ensure Design system 1 components work well with Starlight */
   :root {
-    /* DS one accent color matches our theme */
+    /* Design system 1 accent color matches our theme */
     --accent-color: #72FF3D;
   }
 </style>

@@ -1,9 +1,9 @@
 ---
 title: Quick Start
-description: Get up and running with DS one in minutes
+description: Get up and running with Design system 1 in minutes
 ---
 
-Create a simple HTML page using DS one components:
+Create a simple HTML page using Design system 1 components:
 
 ```html
 <!DOCTYPE html>
@@ -11,15 +11,15 @@ Create a simple HTML page using DS one components:
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My DS one App</title>
+    <title>My Design system 1 App</title>
 
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/ds-one@alpha/DS1/1-root/one.css"
+      href="https://cdn.jsdelivr.net/npm/design-system-1@alpha/DS1/1-root/one.css"
     />
     <script
       type="module"
-      src="https://cdn.jsdelivr.net/npm/ds-one@alpha/dist/ds-one.bundle.js"
+      src="https://cdn.jsdelivr.net/npm/design-system-1@alpha/dist/design-system-1.bundle.js"
     ></script>
   </head>
   <body>
@@ -29,7 +29,7 @@ Create a simple HTML page using DS one components:
       </ds-header>
 
       <main>
-        <ds-text variant="heading">Welcome to DS one</ds-text>
+        <ds-text variant="heading">Welcome to Design system 1</ds-text>
         <ds-text variant="body">
           A modern design system built with TypeScript and Lit.
         </ds-text>
@@ -69,14 +69,14 @@ Create a simple HTML page using DS one components:
 
 ## With Translation Support
 
-DS one includes built-in internationalization. Use the `text` attribute (not `key`) to specify translation keys:
+Design system 1 includes built-in internationalization. Use the `text` attribute (not `key`) to specify translation keys:
 
 ```html
 <script type="module">
   import {
     setLanguage,
     loadTranslations,
-  } from "https://cdn.jsdelivr.net/npm/ds-one@alpha/dist/ds-one.bundle.js";
+  } from "https://cdn.jsdelivr.net/npm/design-system-1@alpha/dist/design-system-1.bundle.js";
 
   // Load translations
   await loadTranslations({

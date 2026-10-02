@@ -1,0 +1,434 @@
+[
+  {
+    "key": "pleft",
+    "name": "PLeft",
+    "node": "558:118",
+    "file": "pleft.svg"
+  },
+  {
+    "key": "panel",
+    "name": "Panel",
+    "node": "558:117",
+    "file": "panel.svg"
+  },
+  {
+    "key": "pright",
+    "name": "PRight",
+    "node": "558:116",
+    "file": "pright.svg"
+  },
+  {
+    "key": "play",
+    "name": "Play",
+    "node": "520:12",
+    "file": "play.svg"
+  },
+  {
+    "key": "undictate",
+    "name": "Undictate",
+    "node": "429:813",
+    "file": "undictate.svg"
+  },
+  {
+    "key": "dictate",
+    "name": "Dictate",
+    "node": "286:7212",
+    "file": "dictate.svg"
+  },
+  {
+    "key": "apple",
+    "name": "Apple",
+    "node": "283:7199",
+    "file": "apple.svg"
+  },
+  {
+    "key": "google",
+    "name": "Google",
+    "node": "283:7190",
+    "file": "google.svg"
+  },
+  {
+    "key": "4x4",
+    "name": "4x4",
+    "node": "119:266",
+    "file": "4x4.svg"
+  },
+  {
+    "key": "neutral",
+    "name": "Neutral",
+    "node": "117:1506",
+    "file": "neutral.svg"
+  },
+  {
+    "key": "more",
+    "name": "More",
+    "node": "116:247",
+    "file": "more.svg"
+  },
+  {
+    "key": "color",
+    "name": "Color",
+    "node": "116:254",
+    "file": "color.svg"
+  },
+  {
+    "key": "unlock",
+    "name": "Unlock",
+    "node": "116:360",
+    "file": "unlock.svg"
+  },
+  {
+    "key": "lock",
+    "name": "Lock",
+    "node": "116:212",
+    "file": "lock.svg"
+  },
+  {
+    "key": "exercise",
+    "name": "Exercise",
+    "node": "467:1318",
+    "file": "exercise.svg"
+  },
+  {
+    "key": "school",
+    "name": "School",
+    "node": "467:1253",
+    "file": "school.svg"
+  },
+  {
+    "key": "life",
+    "name": "Life",
+    "node": "467:1264",
+    "file": "life.svg"
+  },
+  {
+    "key": "work",
+    "name": "Work",
+    "node": "467:1319",
+    "file": "work.svg"
+  },
+  {
+    "key": "delete",
+    "name": "Delete",
+    "node": "116:114",
+    "file": "delete.svg"
+  },
+  {
+    "key": "search",
+    "name": "Search",
+    "node": "116:253",
+    "file": "search.svg"
+  },
+  {
+    "key": "globe",
+    "name": "Globe",
+    "node": "429:812",
+    "file": "globe.svg"
+  },
+  {
+    "key": "avatar",
+    "name": "Avatar",
+    "node": "116:524",
+    "file": "avatar.svg"
+  },
+  {
+    "key": "unicon",
+    "name": "Unicon",
+    "node": "116:249",
+    "file": "unicon.svg"
+  },
+  {
+    "key": "icon",
+    "name": "Icon",
+    "node": "116:248",
+    "file": "icon.svg"
+  },
+  {
+    "key": "rewind",
+    "name": "Rewind",
+    "node": "116:566",
+    "file": "rewind.svg"
+  },
+  {
+    "key": "plus",
+    "name": "Plus",
+    "node": "116:220",
+    "file": "plus.svg"
+  },
+  {
+    "key": "check",
+    "name": "Check",
+    "node": "116:553",
+    "file": "check.svg"
+  },
+  {
+    "key": "close",
+    "name": "Close",
+    "node": "116:544",
+    "file": "close.svg"
+  },
+  {
+    "key": "note",
+    "name": "Note",
+    "node": "116:250",
+    "file": "note.svg"
+  },
+  {
+    "key": "duplicate",
+    "name": "Duplicate",
+    "node": "116:516",
+    "file": "duplicate.svg"
+  },
+  {
+    "key": "2x",
+    "name": "2x",
+    "node": "116:499",
+    "file": "2x.svg"
+  },
+  {
+    "key": "1x",
+    "name": "1x",
+    "node": "116:507",
+    "file": "1x.svg"
+  },
+  {
+    "key": "loop",
+    "name": "Loop",
+    "node": "116:251",
+    "file": "loop.svg"
+  },
+  {
+    "key": "change",
+    "name": "Change",
+    "node": "551:5",
+    "file": "change.svg"
+  },
+  {
+    "key": "collapse",
+    "name": "Collapse",
+    "node": "116:244",
+    "file": "collapse.svg"
+  },
+  {
+    "key": "column",
+    "name": "Column",
+    "node": "116:239",
+    "file": "column.svg"
+  },
+  {
+    "key": "ship",
+    "name": "Ship",
+    "node": "116:252",
+    "file": "ship.svg"
+  },
+  {
+    "key": "blank",
+    "name": "Blank",
+    "node": "116:232",
+    "file": "blank.svg"
+  },
+  {
+    "key": "minimize",
+    "name": "Minimize",
+    "node": "116:237",
+    "file": "minimize.svg"
+  },
+  {
+    "key": "open",
+    "name": "Open",
+    "node": "116:238",
+    "file": "open.svg"
+  },
+  {
+    "key": "in",
+    "name": "In",
+    "node": "116:246",
+    "file": "in.svg"
+  },
+  {
+    "key": "row",
+    "name": "Row",
+    "node": "116:231",
+    "file": "row.svg"
+  },
+  {
+    "key": "up",
+    "name": "Up",
+    "node": "116:240",
+    "file": "up.svg"
+  },
+  {
+    "key": "down",
+    "name": "Down",
+    "node": "317:1717",
+    "file": "down.svg"
+  },
+  {
+    "key": "sup",
+    "name": "SUp",
+    "node": "117:1656",
+    "file": "sup.svg"
+  },
+  {
+    "key": "sdown",
+    "name": "SDown",
+    "node": "117:1648",
+    "file": "sdown.svg"
+  },
+  {
+    "key": "right",
+    "name": "Right",
+    "node": "116:243",
+    "file": "right.svg"
+  },
+  {
+    "key": "left",
+    "name": "Left",
+    "node": "116:242",
+    "file": "left.svg"
+  },
+  {
+    "key": "unmic",
+    "name": "Unmic",
+    "node": "116:222",
+    "file": "unmic.svg"
+  },
+  {
+    "key": "mic",
+    "name": "Mic",
+    "node": "116:221",
+    "file": "mic.svg"
+  },
+  {
+    "key": "status",
+    "name": "Status",
+    "node": "116:682",
+    "file": "status.svg"
+  },
+  {
+    "key": "unsee",
+    "name": "Unsee",
+    "node": "116:211",
+    "file": "unsee.svg"
+  },
+  {
+    "key": "see",
+    "name": "See",
+    "node": "116:210",
+    "file": "see.svg"
+  },
+  {
+    "key": "title",
+    "name": "Title",
+    "node": "117:106",
+    "file": "title.svg"
+  },
+  {
+    "key": "default",
+    "name": "Default",
+    "node": "117:60",
+    "file": "default.svg"
+  },
+  {
+    "key": "gallery",
+    "name": "Gallery",
+    "node": "117:116",
+    "file": "gallery.svg"
+  },
+  {
+    "key": "2xdots",
+    "name": "2xDots",
+    "node": "116:156",
+    "file": "2xdots.svg"
+  },
+  {
+    "key": "1xdots",
+    "name": "1xDots",
+    "node": "116:155",
+    "file": "1xdots.svg"
+  },
+  {
+    "key": "2xgrid",
+    "name": "2xGrid",
+    "node": "116:443",
+    "file": "2xgrid.svg"
+  },
+  {
+    "key": "1xgrid",
+    "name": "1xGrid",
+    "node": "116:434",
+    "file": "1xgrid.svg"
+  },
+  {
+    "key": "2xlines",
+    "name": "2xLines",
+    "node": "116:426",
+    "file": "2xlines.svg"
+  },
+  {
+    "key": "1xlines",
+    "name": "1xLines",
+    "node": "116:418",
+    "file": "1xlines.svg"
+  },
+  {
+    "key": "note-page",
+    "name": "Note \u00b7 page",
+    "node": "116:207",
+    "file": "note-page.svg"
+  },
+  {
+    "key": "page",
+    "name": "Page",
+    "node": "116:206",
+    "file": "page.svg"
+  },
+  {
+    "key": "unhead",
+    "name": "Unhead",
+    "node": "116:219",
+    "file": "unhead.svg"
+  },
+  {
+    "key": "head",
+    "name": "Head",
+    "node": "116:218",
+    "file": "head.svg"
+  },
+  {
+    "key": "untitle",
+    "name": "Untitle",
+    "node": "116:209",
+    "file": "untitle.svg"
+  },
+  {
+    "key": "title-text",
+    "name": "Title \u00b7 text",
+    "node": "116:208",
+    "file": "title-text.svg"
+  },
+  {
+    "key": "ungroup",
+    "name": "Ungroup",
+    "node": "116:70",
+    "file": "ungroup.svg"
+  },
+  {
+    "key": "group",
+    "name": "Group",
+    "node": "116:71",
+    "file": "group.svg"
+  },
+  {
+    "key": "unstar",
+    "name": "Unstar",
+    "node": "115:173",
+    "file": "unstar.svg"
+  },
+  {
+    "key": "star",
+    "name": "Star",
+    "node": "115:171",
+    "file": "star.svg"
+  }
+]

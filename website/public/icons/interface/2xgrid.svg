@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+<g id="Icons">
+<g id="2xGrid" clip-path="url(#clip0_403_3634)">
+<g id="Vector">
+<path d="M0 0.66194L16 0.661941V1.68194L0 1.68194V0.66194Z" fill="#1E1E1E" />
+<path d="M0 7.48194L16 7.48194V8.50194L0 8.50194V7.48194Z" fill="#1E1E1E" />
+<path d="M0 14.3019H16V15.3219L0 15.3219V14.3019Z" fill="#1E1E1E" />
+<path d="M1.69 15.9919L0.669999 15.9919L0.669998 -0.00803785L1.69 -0.00805664L1.69 15.9919Z" fill="#1E1E1E" />
+<path d="M8.51 15.9919L7.49 15.9919L7.49 -0.00803785L8.51 -0.00805664L8.51 15.9919Z" fill="#1E1E1E" />
+<path d="M15.33 15.9919L14.31 15.9919L14.31 -0.00803785L15.33 -0.00805664L15.33 15.9919Z" fill="#1E1E1E" />
+</g>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_403_3634">
+<rect width="16" height="16" fill="white" />
+</clipPath>
+</defs>
+</svg>

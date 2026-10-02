@@ -44,8 +44,9 @@ const entryTranslationKeys: Record<string, string> = {
   </button>
 
   <div class="sidebar-content">
-    {sidebar.map((group, groupIndex) => {
+    {sidebar.map((group) => {
       const groupKey = groupTranslationKeys[group.label];
+      const isIndented = ['Start Here', 'CLASSless Design System', 'Built-ins', '1 Root'].includes(group.label);
       return (
         <details open class="sidebar-group">
           <summary class="sidebar-group-summary">
@@ -60,9 +61,9 @@ const entryTranslationKeys: Record<string, string> = {
             </ds-button>
           </summary>
           
-          <ul class="sidebar-entries" data-first-three={groupIndex < 3}>
+          <ul class="sidebar-entries" data-first-three={isIndented}>
             {group.entries.map((entry) => {
-              const isFirstThree = groupIndex < 3;
+              const isFirstThree = isIndented;
               const entryKey = entryTranslationKeys[entry.label];
               return (
                 <li class={`sidebar-entry ${isFirstThree ? 'first-three' : ''}`}>
@@ -158,6 +159,7 @@ const entryTranslationKeys: Record<string, string> = {
 
   .sidebar-content {
     display: flex;
+    width: 100%;
     flex-direction: column;
     gap: 20px;
   }

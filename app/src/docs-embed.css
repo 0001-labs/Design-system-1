@@ -1,0 +1,78 @@
+/* Documentation chrome stays separate from the stylesheet being designed. */
+:root[data-docs-embed] {
+  --workbench-ink: light-dark(#2a2a2a, #f1f1f1);
+  --workbench-muted: light-dark(#666, #aaa);
+  --workbench-line: light-dark(#e0e0e0, #353535);
+  --workbench-panel: light-dark(#fafafa, #1f1f1f);
+  --workbench-canvas: light-dark(#fff, #171717);
+  --docs-control: light-dark(#fff, #292929);
+  --docs-hover: light-dark(#ececec, #333);
+  --docs-selected: light-dark(#e4e4e4, #3a3a3a);
+}
+
+[data-docs-embed] body { min-width: 0; }
+[data-docs-embed] .workbench { height: 100dvh; }
+[data-docs-embed] .design-pane { border-color: var(--workbench-line); }
+[data-docs-embed] .library-panel { background: var(--workbench-panel); }
+[data-docs-embed] .component-tree,
+[data-docs-embed] .component-tree__submenu { border-color: var(--workbench-line); }
+[data-docs-embed] .component-tree button:hover { background: var(--docs-hover); }
+[data-docs-embed] .component-tree button.is-selected {
+  background: var(--docs-selected);
+  border-left-color: #dfff00;
+}
+
+[data-docs-embed] .controls-panel,
+[data-docs-embed] .workbench-header,
+[data-docs-embed] .story-toolbar,
+[data-docs-embed] .library-card,
+[data-docs-embed] .publish-panel { background: var(--workbench-panel); }
+
+[data-docs-embed] .action-button:not(.action-button--primary),
+[data-docs-embed] .copy-length-control button,
+[data-docs-embed] .number-input,
+[data-docs-embed] .color-input,
+[data-docs-embed] .control-field > input,
+[data-docs-embed] .control-field > select,
+[data-docs-embed] .control-field > textarea,
+[data-docs-embed] .auth-screen input[type='email'] {
+  background: var(--docs-control);
+  color: var(--workbench-ink);
+}
+
+[data-docs-embed] .action-button.action-button--primary {
+  color: var(--workbench-canvas);
+}
+
+[data-docs-embed] .controls-section--output code { background: var(--docs-hover); }
+[data-docs-embed] .story-frame { width: 100%; min-height: 100%; }
+[data-docs-embed] .story-preview-area { min-width: max-content; padding: 60px 40px; }
+[data-docs-embed] .button-matrix__instance-label { color: var(--workbench-muted); }
+
+/* Keep both component navigation and the box model accessible in the narrower
+   documentation content area instead of inheriting the standalone hide rule. */
+@media (max-width: 1100px) {
+  [data-docs-embed] .workbench {
+    grid-template:
+      'header' auto
+      'design' minmax(0, 1fr)
+      'code' 30dvh / minmax(0, 1fr);
+  }
+
+  [data-docs-embed] .design-pane { grid-template-columns: 208px minmax(0, 1fr); }
+  [data-docs-embed] .library-panel { display: grid; }
+  [data-docs-embed] .controls-panel { max-height: 30dvh; }
+}
+
+@media (max-width: 540px) {
+  [data-docs-embed] body { overflow: auto; }
+  [data-docs-embed] .workbench {
+    height: auto;
+    grid-template: 'header' auto 'design' auto 'code' 360px / minmax(0, 1fr);
+  }
+  [data-docs-embed] .design-pane { grid-template-columns: minmax(0, 1fr); }
+  [data-docs-embed] .library-panel { grid-template-rows: 180px auto; }
+  [data-docs-embed] .controls-panel { max-height: none; }
+  [data-docs-embed] .design-stack { height: 480px; }
+  [data-docs-embed] .story-preview-area { padding: 40px 24px; }
+}

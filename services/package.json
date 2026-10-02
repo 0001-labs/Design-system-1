@@ -1,0 +1,31 @@
+{
+  "name": "@ds-one/services",
+  "version": "0.0.0",
+  "description": "The Design system 1 Cloudflare Worker: website, app, public stylesheets, and authenticated publishing.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vp test",
+    "typecheck": "vp exec tsc --noEmit",
+    "dev:assets": "vp exec wrangler dev --config ../wrangler.jsonc --port 8788",
+    "dev:publish": "vp exec wrangler dev --config ../wrangler.jsonc --port 8789",
+    "deploy:assets": "cd .. && vp run deploy",
+    "deploy:publish": "cd .. && vp run deploy",
+    "deploy": "cd .. && vp run deploy",
+    "smoke": "vp exec tsx scripts/smoke.ts",
+    "dryrun": "vp exec wrangler deploy --config ../wrangler.jsonc --dry-run"
+  },
+  "//": "Tests use the Vite+ runner with Miniflare and an esbuild-bundled Worker entry.",
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250109.0",
+    "miniflare": "^4.20250109.0",
+    "typescript": "^5.0.0",
+    "wrangler": "^4.26.1",
+    "vite-plus": "catalog:",
+    "vite": "catalog:",
+    "tsx": "^4.21.0",
+    "@types/node": "^24.0.0",
+    "vitest": "catalog:",
+    "esbuild": "^0.27.0"
+  }
+}

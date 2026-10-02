@@ -13,7 +13,7 @@ The `ds-icon` component provides access to a comprehensive set of SVG icons.
 
 ## Available Icons
 
-DS One includes 50+ icons:
+Design system 1 includes 50+ icons:
 
 - `check`, `close`, `open`
 - `up`, `down`, `left`, `right`

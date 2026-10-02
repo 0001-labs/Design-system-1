@@ -1,4 +1,4 @@
-/* Custom styles for DS one documentation */
+/* Custom styles for Design system 1 documentation */
 
 :root {
   /* Content layout */
@@ -16,7 +16,7 @@
   /* Spacing */
   --sl-nav-height: 4rem;
 
-  /* DS one Documentation Colors */
+  /* Design system 1 Documentation Colors */
   --ds1-docs-header-bg: light-dark(var(--white), var(--slate-dark));
   --ds1-docs-header-border: light-dark(#e0e0e0, #000000);
   --ds1-docs-header-text: light-dark(#2a2a2a, #f1f1f1);

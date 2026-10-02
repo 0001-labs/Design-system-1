@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+<g id="Icons">
+<g id="2xLines" clip-path="url(#clip0_403_3634)">
+<g id="Vector">
+<path d="M6.10352e-05 0.662018L16.0001 0.662018V1.68202L6.10352e-05 1.68202V0.662018Z" fill="#1E1E1E" />
+<path d="M6.10352e-05 7.48202L16.0001 7.48202V8.50202L6.10352e-05 8.50202V7.48202Z" fill="#1E1E1E" />
+<path d="M6.10352e-05 14.302H16.0001V15.322L6.10352e-05 15.322V14.302Z" fill="#1E1E1E" />
+</g>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_403_3634">
+<rect width="16" height="16" fill="white" />
+</clipPath>
+</defs>
+</svg>

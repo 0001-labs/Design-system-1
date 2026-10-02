@@ -1,0 +1,31 @@
+---
+import { scopedSvg } from '../lib/icons/svgView';
+import icons from '../lib/icons/interface-catalog.json';
+const star = icons.find(icon => icon.key === 'star') ?? icons[0];
+---
+<section id="interface-panel" role="tabpanel" aria-labelledby="interface-tab">
+  <div class="vector-workspace">
+    <section class="vector-library" aria-label="SVG icon collection">
+      <div class="vector-library-heading"><h2>The collection</h2><span id="vector-count">{icons.length} icons</span></div>
+      <label class="vector-search"><span aria-hidden="true">⌕</span><input id="vector-search" type="search" placeholder="Find an icon…" aria-label="Find an icon" /></label>
+      <div class="vector-filter" aria-label="Filter collection"><button data-vector-filter="all" aria-pressed="true">All</button><button data-vector-filter="Figma" aria-pressed="false">Figma · {icons.filter(i=>i.source==='Figma').length}</button><button data-vector-filter="Library" aria-pressed="false">Additions</button></div>
+      <div class="vector-tiles" id="vector-tiles">
+        {icons.map(icon => <button data-vector-key={icon.key} aria-pressed={icon.key === star.key} title={icon.name}><span class="vector-thumbnail" set:html={scopedSvg(icon.svg,'tile-'+icon.key)} /><span>{icon.name}</span></button>)}
+      </div>
+      <p id="vector-empty" hidden>No icons match that name.</p>
+      <p class="vector-collection-note"><a href="https://www.figma.com/design/XAnoaRoq9LxVAHUZgtdO0r/ds1?node-id=403-4105" target="_blank" rel="noreferrer">View the original Figma collection ↗</a></p>
+    </section>
+    <section class="vector-inspector" aria-label="SVG outline inspector">
+      <div class="vector-title-row"><h2 id="vector-name">{star.name}</h2><a id="vector-source" href="https://www.figma.com/design/XAnoaRoq9LxVAHUZgtdO0r/ds1?node-id=115-171" target="_blank" rel="noreferrer">Source ↗</a></div>
+      <div class="vector-view-toolbar"><div class="segmented" aria-label="SVG view"><button data-vector-view="original" aria-pressed="false">Original</button><button data-vector-view="outline" aria-pressed="true">Outlines</button><button data-vector-view="both" aria-pressed="false">Both</button></div><label><input id="vector-grid" type="checkbox" checked /> Grid</label></div>
+      <div class="vector-paper"><div class="vector-ruler" aria-hidden="true">{Array.from({length:17},(_,i)=><span>{i}</span>)}</div><div class="vector-stage" id="vector-stage" data-view="outline"><div id="vector-artwork" class="vector-artwork" set:html={scopedSvg(star.svg,'focus-original')} /><div id="vector-outlines" class="vector-artwork"></div><svg id="vector-grid-lines" viewBox="0 0 16 16" aria-hidden="true">{Array.from({length:17},(_,n)=><path d={`M${n} 0V16M0 ${n}H16`} class={n%4===0?'major':'minor'} />)}</svg></div><div class="vector-grid-caption"><span>16 × 16 units</span><span>Original vector geometry</span></div></div>
+      <div class="vector-facts"><span id="vector-shape-count">{star.shapes} shapes</span><span>SVG · scalable</span><label><input id="vector-shapes" type="checkbox" /> Show each shape</label></div>
+      <div class="vector-sizes"><span>Actual sizes</span>{[16,24,32,48].map(size=><div><span class="vector-size-preview" data-vector-size={size} style={`width:${size}px;height:${size}px;--icon-scale:${size/16}`} set:html={scopedSvg(star.svg,'size-'+size)} /><small>{size}</small></div>)}</div>
+      <div class="vector-downloads"><button id="vector-copy" class="primary">Copy SVG</button><a id="vector-download" href={star.url} download={`${star.key}.svg`}>Download SVG ↓</a><button id="vector-download-outlines">Outlines ↓</button></div>
+      <details class="vector-code"><summary>SVG source <span>viewBox="0 0 16 16"</span></summary><label class="sr-only" for="vector-code">SVG source</label><textarea id="vector-code" spellcheck="false" readonly>{star.svg}</textarea></details>
+      <details class="vector-request"><summary>Add another icon <span>＋</span></summary><p>Describe the icon you want in your coding assistant. New icons can join this collection on the same 16 × 16 canvas.</p><label for="vector-brief">What should it represent?</label><input id="vector-brief" placeholder="e.g. a calendar with a small checkmark" maxlength="300" /><button id="vector-copy-request">Copy request</button><p class="section-note">The request includes the collection location and drawing rules. Submit it in your conversation to have the icon added.</p></details>
+      <p id="vector-notice" class="vector-notice" role="status" aria-live="polite"></p>
+    </section>
+  </div>
+</section>
+<script>import '../lib/icons/interface';</script>

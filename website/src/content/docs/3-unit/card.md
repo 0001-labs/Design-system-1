@@ -1,6 +1,6 @@
 ---
 title: Card
-description: Learn about card components in DS one
+description: Learn about card components in Design system 1
 ---
 
 # Card

@@ -4,8 +4,13 @@ import starlight from "@astrojs/starlight";
 
 // https://astro.build/config
 export default defineConfig({
+  site: "https://designsystem1.com",
   vite: {
     server: {
+      // Keep the embedded app same-origin while the docs and editor run locally.
+      proxy: {
+        '/app': { target: process.env.DS1_APP_DEV_ORIGIN || 'http://127.0.0.1:5173', ws: true },
+      },
       fs: {
         // Allow serving files from parent directory
         allow: [".."],
@@ -14,7 +19,8 @@ export default defineConfig({
   },
   integrations: [
     starlight({
-      title: "DS one",
+      title: "Design system 1",
+      favicon: "/icons/design-system-1.svg",
       description:
         "A component-based design system built with TypeScript and LitElement that provides reusable UI components with built-in theming, internationalization, and accessibility features.",
       social: [
@@ -27,7 +33,7 @@ export default defineConfig({
       components: {
         // Override the default Sidebar component
         Sidebar: "./src/components/MySidebar.astro",
-        // Override the default Head component to load DS one from CDN
+        // Override the default Head component to load Design system 1 from CDN
         Head: "./src/components/MyHead.astro",
         // Override the default Header component
         Header: "./src/components/MyHeader.astro",
@@ -41,11 +47,20 @@ export default defineConfig({
         "./src/styles/custom.css",
       ],
       sidebar: [
+        { label: "Tools", items: [{ label: "Icon builder", link: "/icons" }] },
         {
           label: "Start Here",
           items: [
             { label: "Introduction", slug: "" },
             { label: "Manual Setup", slug: "start-here/quick-start" },
+          ],
+        },
+        {
+          label: "CLASSless Design System",
+          items: [
+            { label: "Overview", slug: "classless" },
+            { label: "Editor", slug: "classless/editor" },
+            { label: "My libraries", slug: "classless/libraries" },
           ],
         },
         {

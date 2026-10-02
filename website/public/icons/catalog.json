@@ -1,0 +1,613 @@
+[
+  {
+    "key": "1x",
+    "name": "1x",
+    "source": "Figma",
+    "node": "116:507",
+    "url": "/icons/interface/1x.svg",
+    "shapes": 2
+  },
+  {
+    "key": "1xdots",
+    "name": "1xDots",
+    "source": "Figma",
+    "node": "116:155",
+    "url": "/icons/interface/1xdots.svg",
+    "shapes": 9
+  },
+  {
+    "key": "1xgrid",
+    "name": "1xGrid",
+    "source": "Figma",
+    "node": "116:434",
+    "url": "/icons/interface/1xgrid.svg",
+    "shapes": 6
+  },
+  {
+    "key": "1xlines",
+    "name": "1xLines",
+    "source": "Figma",
+    "node": "116:418",
+    "url": "/icons/interface/1xlines.svg",
+    "shapes": 3
+  },
+  {
+    "key": "2x",
+    "name": "2x",
+    "source": "Figma",
+    "node": "116:499",
+    "url": "/icons/interface/2x.svg",
+    "shapes": 2
+  },
+  {
+    "key": "2xdots",
+    "name": "2xDots",
+    "source": "Figma",
+    "node": "116:156",
+    "url": "/icons/interface/2xdots.svg",
+    "shapes": 4
+  },
+  {
+    "key": "2xgrid",
+    "name": "2xGrid",
+    "source": "Figma",
+    "node": "116:443",
+    "url": "/icons/interface/2xgrid.svg",
+    "shapes": 6
+  },
+  {
+    "key": "2xlines",
+    "name": "2xLines",
+    "source": "Figma",
+    "node": "116:426",
+    "url": "/icons/interface/2xlines.svg",
+    "shapes": 3
+  },
+  {
+    "key": "4x4",
+    "name": "4x4",
+    "source": "Figma",
+    "node": "119:266",
+    "url": "/icons/interface/4x4.svg",
+    "shapes": 1
+  },
+  {
+    "key": "apple",
+    "name": "Apple",
+    "source": "Figma",
+    "node": "283:7199",
+    "url": "/icons/interface/apple.svg",
+    "shapes": 1
+  },
+  {
+    "key": "avatar",
+    "name": "Avatar",
+    "source": "Figma",
+    "node": "116:524",
+    "url": "/icons/interface/avatar.svg",
+    "shapes": 2
+  },
+  {
+    "key": "blank",
+    "name": "Blank",
+    "source": "Figma",
+    "node": "116:232",
+    "url": "/icons/interface/blank.svg",
+    "shapes": 1
+  },
+  {
+    "key": "change",
+    "name": "Change",
+    "source": "Figma",
+    "node": "551:5",
+    "url": "/icons/interface/change.svg",
+    "shapes": 2
+  },
+  {
+    "key": "check",
+    "name": "Check",
+    "source": "Figma",
+    "node": "116:553",
+    "url": "/icons/interface/check.svg",
+    "shapes": 1
+  },
+  {
+    "key": "close",
+    "name": "Close",
+    "source": "Figma",
+    "node": "116:544",
+    "url": "/icons/interface/close.svg",
+    "shapes": 1
+  },
+  {
+    "key": "collapse",
+    "name": "Collapse",
+    "source": "Figma",
+    "node": "116:244",
+    "url": "/icons/interface/collapse.svg",
+    "shapes": 2
+  },
+  {
+    "key": "color",
+    "name": "Color",
+    "source": "Figma",
+    "node": "116:254",
+    "url": "/icons/interface/color.svg",
+    "shapes": 2
+  },
+  {
+    "key": "column",
+    "name": "Column",
+    "source": "Figma",
+    "node": "116:239",
+    "url": "/icons/interface/column.svg",
+    "shapes": 1
+  },
+  {
+    "key": "default",
+    "name": "Default",
+    "source": "Figma",
+    "node": "117:60",
+    "url": "/icons/interface/default.svg",
+    "shapes": 2
+  },
+  {
+    "key": "delete",
+    "name": "Delete",
+    "source": "Figma",
+    "node": "116:114",
+    "url": "/icons/interface/delete.svg",
+    "shapes": 2
+  },
+  {
+    "key": "dictate",
+    "name": "Dictate",
+    "source": "Figma",
+    "node": "286:7212",
+    "url": "/icons/interface/dictate.svg",
+    "shapes": 3
+  },
+  {
+    "key": "down",
+    "name": "Down",
+    "source": "Figma",
+    "node": "317:1717",
+    "url": "/icons/interface/down.svg",
+    "shapes": 1
+  },
+  {
+    "key": "duplicate",
+    "name": "Duplicate",
+    "source": "Figma",
+    "node": "116:516",
+    "url": "/icons/interface/duplicate.svg",
+    "shapes": 2
+  },
+  {
+    "key": "email",
+    "name": "Email",
+    "source": "Library",
+    "url": "/icons/library/email.svg",
+    "shapes": 1
+  },
+  {
+    "key": "exercise",
+    "name": "Exercise",
+    "source": "Figma",
+    "node": "467:1318",
+    "url": "/icons/interface/exercise.svg",
+    "shapes": 1
+  },
+  {
+    "key": "expand",
+    "name": "Expand",
+    "source": "Library",
+    "url": "/icons/library/expand.svg",
+    "shapes": 1
+  },
+  {
+    "key": "gallery",
+    "name": "Gallery",
+    "source": "Figma",
+    "node": "117:116",
+    "url": "/icons/interface/gallery.svg",
+    "shapes": 1
+  },
+  {
+    "key": "globe",
+    "name": "Globe",
+    "source": "Figma",
+    "node": "429:812",
+    "url": "/icons/interface/globe.svg",
+    "shapes": 36
+  },
+  {
+    "key": "google",
+    "name": "Google",
+    "source": "Figma",
+    "node": "283:7190",
+    "url": "/icons/interface/google.svg",
+    "shapes": 4
+  },
+  {
+    "key": "group",
+    "name": "Group",
+    "source": "Figma",
+    "node": "116:71",
+    "url": "/icons/interface/group.svg",
+    "shapes": 1
+  },
+  {
+    "key": "head",
+    "name": "Head",
+    "source": "Figma",
+    "node": "116:218",
+    "url": "/icons/interface/head.svg",
+    "shapes": 1
+  },
+  {
+    "key": "home",
+    "name": "Home",
+    "source": "Library",
+    "url": "/icons/library/home.svg",
+    "shapes": 1
+  },
+  {
+    "key": "icon",
+    "name": "Icon",
+    "source": "Figma",
+    "node": "116:248",
+    "url": "/icons/interface/icon.svg",
+    "shapes": 1
+  },
+  {
+    "key": "in",
+    "name": "In",
+    "source": "Figma",
+    "node": "116:246",
+    "url": "/icons/interface/in.svg",
+    "shapes": 2
+  },
+  {
+    "key": "left",
+    "name": "Left",
+    "source": "Figma",
+    "node": "116:242",
+    "url": "/icons/interface/left.svg",
+    "shapes": 1
+  },
+  {
+    "key": "life",
+    "name": "Life",
+    "source": "Figma",
+    "node": "467:1264",
+    "url": "/icons/interface/life.svg",
+    "shapes": 6
+  },
+  {
+    "key": "lock",
+    "name": "Lock",
+    "source": "Figma",
+    "node": "116:212",
+    "url": "/icons/interface/lock.svg",
+    "shapes": 1
+  },
+  {
+    "key": "loop",
+    "name": "Loop",
+    "source": "Figma",
+    "node": "116:251",
+    "url": "/icons/interface/loop.svg",
+    "shapes": 4
+  },
+  {
+    "key": "mic",
+    "name": "Mic",
+    "source": "Figma",
+    "node": "116:221",
+    "url": "/icons/interface/mic.svg",
+    "shapes": 2
+  },
+  {
+    "key": "minimize",
+    "name": "Minimize",
+    "source": "Figma",
+    "node": "116:237",
+    "url": "/icons/interface/minimize.svg",
+    "shapes": 2
+  },
+  {
+    "key": "more",
+    "name": "More",
+    "source": "Figma",
+    "node": "116:247",
+    "url": "/icons/interface/more.svg",
+    "shapes": 3
+  },
+  {
+    "key": "neutral",
+    "name": "Neutral",
+    "source": "Figma",
+    "node": "117:1506",
+    "url": "/icons/interface/neutral.svg",
+    "shapes": 1
+  },
+  {
+    "key": "note",
+    "name": "Note",
+    "source": "Figma",
+    "node": "116:250",
+    "url": "/icons/interface/note.svg",
+    "shapes": 2
+  },
+  {
+    "key": "note-page",
+    "name": "Note · page",
+    "source": "Figma",
+    "node": "116:207",
+    "url": "/icons/interface/note-page.svg",
+    "shapes": 2
+  },
+  {
+    "key": "open",
+    "name": "Open",
+    "source": "Figma",
+    "node": "116:238",
+    "url": "/icons/interface/open.svg",
+    "shapes": 1
+  },
+  {
+    "key": "page",
+    "name": "Page",
+    "source": "Figma",
+    "node": "116:206",
+    "url": "/icons/interface/page.svg",
+    "shapes": 1
+  },
+  {
+    "key": "panel",
+    "name": "Panel",
+    "source": "Figma",
+    "node": "558:117",
+    "url": "/icons/interface/panel.svg",
+    "shapes": 2
+  },
+  {
+    "key": "play",
+    "name": "Play",
+    "source": "Figma",
+    "node": "520:12",
+    "url": "/icons/interface/play.svg",
+    "shapes": 4
+  },
+  {
+    "key": "pleft",
+    "name": "PLeft",
+    "source": "Figma",
+    "node": "558:118",
+    "url": "/icons/interface/pleft.svg",
+    "shapes": 2
+  },
+  {
+    "key": "plus",
+    "name": "Plus",
+    "source": "Figma",
+    "node": "116:220",
+    "url": "/icons/interface/plus.svg",
+    "shapes": 1
+  },
+  {
+    "key": "pright",
+    "name": "PRight",
+    "source": "Figma",
+    "node": "558:116",
+    "url": "/icons/interface/pright.svg",
+    "shapes": 2
+  },
+  {
+    "key": "rewind",
+    "name": "Rewind",
+    "source": "Figma",
+    "node": "116:566",
+    "url": "/icons/interface/rewind.svg",
+    "shapes": 3
+  },
+  {
+    "key": "right",
+    "name": "Right",
+    "source": "Figma",
+    "node": "116:243",
+    "url": "/icons/interface/right.svg",
+    "shapes": 1
+  },
+  {
+    "key": "row",
+    "name": "Row",
+    "source": "Figma",
+    "node": "116:231",
+    "url": "/icons/interface/row.svg",
+    "shapes": 1
+  },
+  {
+    "key": "school",
+    "name": "School",
+    "source": "Figma",
+    "node": "467:1253",
+    "url": "/icons/interface/school.svg",
+    "shapes": 2
+  },
+  {
+    "key": "sdown",
+    "name": "SDown",
+    "source": "Figma",
+    "node": "117:1648",
+    "url": "/icons/interface/sdown.svg",
+    "shapes": 1
+  },
+  {
+    "key": "search",
+    "name": "Search",
+    "source": "Figma",
+    "node": "116:253",
+    "url": "/icons/interface/search.svg",
+    "shapes": 1
+  },
+  {
+    "key": "see",
+    "name": "See",
+    "source": "Figma",
+    "node": "116:210",
+    "url": "/icons/interface/see.svg",
+    "shapes": 2
+  },
+  {
+    "key": "ship",
+    "name": "Ship",
+    "source": "Figma",
+    "node": "116:252",
+    "url": "/icons/interface/ship.svg",
+    "shapes": 3
+  },
+  {
+    "key": "star",
+    "name": "Star",
+    "source": "Figma",
+    "node": "115:171",
+    "url": "/icons/interface/star.svg",
+    "shapes": 1
+  },
+  {
+    "key": "status",
+    "name": "Status",
+    "source": "Figma",
+    "node": "116:682",
+    "url": "/icons/interface/status.svg",
+    "shapes": 8
+  },
+  {
+    "key": "sup",
+    "name": "SUp",
+    "source": "Figma",
+    "node": "117:1656",
+    "url": "/icons/interface/sup.svg",
+    "shapes": 1
+  },
+  {
+    "key": "title",
+    "name": "Title",
+    "source": "Figma",
+    "node": "117:106",
+    "url": "/icons/interface/title.svg",
+    "shapes": 2
+  },
+  {
+    "key": "title-text",
+    "name": "Title · text",
+    "source": "Figma",
+    "node": "116:208",
+    "url": "/icons/interface/title-text.svg",
+    "shapes": 1
+  },
+  {
+    "key": "titlestyle",
+    "name": "Titlestyle",
+    "source": "Library",
+    "url": "/icons/library/titlestyle.svg",
+    "shapes": 2
+  },
+  {
+    "key": "undictate",
+    "name": "Undictate",
+    "source": "Figma",
+    "node": "429:813",
+    "url": "/icons/interface/undictate.svg",
+    "shapes": 4
+  },
+  {
+    "key": "undo",
+    "name": "Undo",
+    "source": "Library",
+    "url": "/icons/library/undo.svg",
+    "shapes": 1
+  },
+  {
+    "key": "ungroup",
+    "name": "Ungroup",
+    "source": "Figma",
+    "node": "116:70",
+    "url": "/icons/interface/ungroup.svg",
+    "shapes": 2
+  },
+  {
+    "key": "unhead",
+    "name": "Unhead",
+    "source": "Figma",
+    "node": "116:219",
+    "url": "/icons/interface/unhead.svg",
+    "shapes": 5
+  },
+  {
+    "key": "unicon",
+    "name": "Unicon",
+    "source": "Figma",
+    "node": "116:249",
+    "url": "/icons/interface/unicon.svg",
+    "shapes": 4
+  },
+  {
+    "key": "unlock",
+    "name": "Unlock",
+    "source": "Figma",
+    "node": "116:360",
+    "url": "/icons/interface/unlock.svg",
+    "shapes": 1
+  },
+  {
+    "key": "unmic",
+    "name": "Unmic",
+    "source": "Figma",
+    "node": "116:222",
+    "url": "/icons/interface/unmic.svg",
+    "shapes": 3
+  },
+  {
+    "key": "unsee",
+    "name": "Unsee",
+    "source": "Figma",
+    "node": "116:211",
+    "url": "/icons/interface/unsee.svg",
+    "shapes": 3
+  },
+  {
+    "key": "unstar",
+    "name": "Unstar",
+    "source": "Figma",
+    "node": "115:173",
+    "url": "/icons/interface/unstar.svg",
+    "shapes": 3
+  },
+  {
+    "key": "untitle",
+    "name": "Untitle",
+    "source": "Figma",
+    "node": "116:209",
+    "url": "/icons/interface/untitle.svg",
+    "shapes": 5
+  },
+  {
+    "key": "up",
+    "name": "Up",
+    "source": "Figma",
+    "node": "116:240",
+    "url": "/icons/interface/up.svg",
+    "shapes": 1
+  },
+  {
+    "key": "work",
+    "name": "Work",
+    "source": "Figma",
+    "node": "467:1319",
+    "url": "/icons/interface/work.svg",
+    "shapes": 1
+  }
+]

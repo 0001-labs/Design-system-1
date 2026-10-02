@@ -1,9 +1,9 @@
 ---
 title: Fonts
-description: Learn about the fonts used in DS one
+description: Learn about the fonts used in Design system 1
 ---
 
-DS one uses carefully selected fonts to maintain consistency across the design system.
+Design system 1 uses carefully selected fonts to maintain consistency across the design system.
 
 ## Typography
 

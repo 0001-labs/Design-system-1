@@ -1,17 +1,17 @@
 ---
 title: CSS
-description: Learn about the CSS styling in DS one
+description: Learn about the CSS styling in Design system 1
 ---
 
 # CSS
 
-DS one can style native HTML without loading its JavaScript bundle. The
+Design system 1 can style native HTML without loading its JavaScript bundle. The
 CSS-only API is useful for static pages, server-rendered interfaces, and
 progressive enhancement.
 
 ## CDN usage
 
-Load `one.css`, then apply DS one classes to native elements:
+Load `one.css`, then apply Design system 1 classes to native elements:
 
 ```html
 <!doctype html>
@@ -21,14 +21,14 @@ Load `one.css`, then apply DS one classes to native elements:
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/ds-one@alpha/DS1/1-root/one.css"
+      href="https://cdn.jsdelivr.net/npm/design-system-1@alpha/DS1/1-root/one.css"
     />
-    <title>CSS-only DS one</title>
+    <title>CSS-only Design system 1</title>
   </head>
   <body>
     <main class="ds-card">
       <h1 class="ds-text ds-text--heading">Welcome</h1>
-      <p class="ds-text">This page uses DS one without JavaScript.</p>
+      <p class="ds-text">This page uses Design system 1 without JavaScript.</p>
       <label class="ds-text" for="email">Email</label>
       <input
         class="ds-input"
@@ -69,5 +69,5 @@ the color, typography, spacing, scaling, and theme tokens in `one.css`.
 ## Optional JavaScript
 
 The CSS-only classes do not replace the component bundle. Load the JavaScript
-bundle separately when you need DS one's Web Components, internationalization,
+bundle separately when you need Design system 1's Web Components, internationalization,
 stored preferences, or other scripted behavior.

@@ -5,7 +5,7 @@ description: "Research findings from analyzing Radix UI, Base UI, and Shadcn"
 
 # UI Library Research: Radix UI, Base UI & Shadcn
 
-This document summarizes research findings from analyzing three major UI component libraries that could inform improvements to DS One. Each library offers different patterns and approaches that may be valuable for enhancing our design system.
+This document summarizes research findings from analyzing three major UI component libraries that could inform improvements to Design system 1. Each library offers different patterns and approaches that may be valuable for enhancing our design system.
 
 ---
 
@@ -68,7 +68,7 @@ const [createAccordionContext, createAccordionScope] = createContextScope(
 - **Display:** Accordion, Collapsible, Avatar, Progress, Separator, ScrollArea
 - **Utilities:** Portal, Presence, VisuallyHidden, FocusScope, DismissableLayer
 
-### Patterns Applicable to DS One
+### Patterns Applicable to Design system 1
 
 1. **`asChild` Pattern for Polymorphism**
    - Allows rendering a component as a different element or another component
@@ -152,11 +152,11 @@ Components are split into semantic parts in separate files:
 - **Navigation:** NavigationMenu, Menubar
 - **Layout:** Slider, ScrollArea
 
-### Patterns Applicable to DS One
+### Patterns Applicable to Design system 1
 
 1. **Headless Hook Pattern**
    - Expose `useButton`, `useAccordion`, etc. hooks for custom implementations
-   - Users can build their own styled components using DS One logic
+   - Users can build their own styled components using Design system 1 logic
 
 2. **`render` Prop Pattern**
    - Base UI uses `render` prop for element customization
@@ -172,7 +172,7 @@ Components are split into semantic parts in separate files:
 
 5. **Direction Provider**
    - RTL/LTR support at the provider level
-   - Could enhance DS One's i18n capabilities
+   - Could enhance Design system 1's i18n capabilities
 
 ---
 
@@ -242,11 +242,11 @@ Uses semantic `data-slot` attributes and class prefixes (`cn-*`) for styling hoo
 - **Navigation:** Breadcrumb, Command, ContextMenu, DropdownMenu, Menubar, NavigationMenu, Pagination, Sidebar, Tabs
 - **Specialized:** Calendar, Chart, Combobox, DataTable, Resizable, Sonner (toasts), InputOTP
 
-### Patterns Applicable to DS One
+### Patterns Applicable to Design system 1
 
 1. **Variant System with CVA**
    - Class Variance Authority for type-safe variant props
-   - Could inform a more structured variant system for DS One
+   - Could inform a more structured variant system for Design system 1
 
 2. **`data-slot` Attributes**
    - Semantic slot identification for styling hooks
@@ -262,7 +262,7 @@ Uses semantic `data-slot` attributes and class prefixes (`cn-*`) for styling hoo
 
 ---
 
-## Recommendations for DS One
+## Recommendations for Design system 1
 
 ### High Priority
 
@@ -271,7 +271,7 @@ Uses semantic `data-slot` attributes and class prefixes (`cn-*`) for styling hoo
 Implement a unified pattern for controlled/uncontrolled components across all interactive elements.
 
 ```typescript
-// Proposed utility for DS One (Lit version)
+// Proposed utility for Design system 1 (Lit version)
 function useControllableState<T>(options: {
   value?: T;
   defaultValue: T;
@@ -391,7 +391,7 @@ export function setDirection(dir: "ltr" | "rtl"): void {
 
 ### Web Components vs React
 
-All three researched libraries are React-based. When adapting patterns to DS One's Lit-based web components:
+All three researched libraries are React-based. When adapting patterns to Design system 1's Lit-based web components:
 
 1. **Context → Events + Slots**
    - React Context becomes custom events and slot composition

@@ -2,12 +2,18 @@
 import MyHeader from '../components/MyHeader.astro';
 import MySidebar from '../components/MySidebar.astro';
 import MyHead from '../components/MyHead.astro';
+import ClasslessWorkspace from '../components/ClasslessWorkspace.astro';
+import LandingPage from '../components/LandingPage.astro';
 
 interface Props {
   title?: string;
 }
 
 const { title } = Astro.props;
+const pathname = Astro.url.pathname.replace(/\/$/, '');
+const isHome = pathname === '';
+const classlessMode = pathname === '/classless/editor' ? 'editor'
+  : pathname === '/classless/libraries' ? 'libraries' : null;
 ---
 
 <!DOCTYPE html>
@@ -15,31 +21,30 @@ const { title } = Astro.props;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title || 'DS One'}</title>
+    <title>{title || 'Design system 1'}</title>
     <MyHead />
+    <link rel="icon" type="image/svg+xml" href="/icons/design-system-1.svg" />
   </head>
   <body>
-    <ds-grid align="left"></ds-grid>
-    
     <!-- Header -->
-    <MyHeader />
+    {!isHome && <MyHeader />}
 
     <!-- Mobile Sidebar Overlay -->
-    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+    {!isHome && <div id="sidebar-overlay" class="sidebar-overlay"></div>}
 
     <!-- Main Container with Sidebar and Content -->
-    <div class="main-container">
+    <div class:list={['main-container', { 'main-container--home': isHome }]}>
       <!-- Sidebar -->
-      <aside id="sidebar" class="sidebar">
+      {!isHome && <aside id="sidebar" class="sidebar">
         <MySidebar />
-      </aside>
+      </aside>}
 
       <!-- Sidebar gap (desktop only) -->
-      <div class="sidebar-gap"></div>
+      {!isHome && <div class="sidebar-gap"></div>}
 
       <!-- Main Content -->
-      <main class="main-content">
-        <slot />
+      <main class:list={['main-content', { 'main-content--app': classlessMode, 'main-content--home': isHome }]}>
+        {isHome ? <LandingPage /> : classlessMode ? <ClasslessWorkspace mode={classlessMode} /> : <slot />}
       </main>
     </div>
 
@@ -89,7 +94,25 @@ const { title } = Astro.props;
       /* Main content */
       .main-content {
         flex: 1;
+        min-width: 0;
         overflow-y: auto;
+      }
+
+      .main-content--app {
+        padding: 0;
+        overflow: hidden;
+        background: var(--ds1-docs-content-bg);
+      }
+
+      .main-content--home {
+        background: var(--ds1-docs-content-bg);
+        overflow: visible;
+      }
+
+      .main-container.main-container--home {
+        display: block;
+        height: auto;
+        overflow: visible;
       }
 
       /* Sidebar overlay (mobile) */

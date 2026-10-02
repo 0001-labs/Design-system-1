@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig } from "vite-plus";
 import { resolve } from "path";
 
 const isMinified = process.env.MINIFY === "true";
@@ -13,8 +13,7 @@ export default defineConfig({
       entry: resolve(__dirname, "DS1/index.ts"),
       name: "DsOne",
       formats: ["es"],
-      fileName: () =>
-        isMinified ? "ds-one.bundle.min.js" : "ds-one.bundle.js",
+      fileName: () => (isMinified ? "design-system-1.bundle.min.js" : "design-system-1.bundle.js"),
     },
     minify: isMinified ? "esbuild" : false,
     sourcemap: true,
@@ -23,7 +22,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "ds-one": resolve(__dirname, "DS1"),
+      "design-system-1": resolve(__dirname, "DS1"),
     },
   },
 });

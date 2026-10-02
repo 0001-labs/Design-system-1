@@ -1,9 +1,9 @@
 ---
 title: Theming
-description: Customize the look and feel of DS One components
+description: Customize the look and feel of Design system 1 components
 ---
 
-DS One uses CSS custom properties (variables) for theming, making it easy to customize colors, spacing, and other design tokens.
+Design system 1 uses CSS custom properties (variables) for theming, making it easy to customize colors, spacing, and other design tokens.
 
 ## Color System
 
@@ -19,7 +19,7 @@ Change the primary accent color:
 
 ### Theme Modes
 
-DS One automatically detects and responds to system dark/light mode preferences.
+Design system 1 automatically detects and responds to system dark/light mode preferences.
 
 ## CSS Custom Properties
 
@@ -58,7 +58,7 @@ DS One automatically detects and responds to system dark/light mode preferences.
 
 ## Dark Mode
 
-DS One components automatically adapt to dark mode:
+Design system 1 components automatically adapt to dark mode:
 
 ```css
 @media (prefers-color-scheme: dark) {

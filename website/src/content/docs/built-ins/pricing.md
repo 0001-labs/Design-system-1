@@ -7,12 +7,12 @@ The pricing module provides utilities for formatting and displaying prices with 
 
 ## Overview
 
-DS One includes utilities for handling pricing display with support for multiple currencies and locales.
+Design system 1 includes utilities for handling pricing display with support for multiple currencies and locales.
 
 ## Basic Usage
 
 ```javascript
-import { formatPrice, getCurrencySymbol } from 'ds-one';
+import { formatPrice, getCurrencySymbol } from 'design-system-1';
 
 // Format a price
 const formatted = formatPrice(29.99, 'USD');
@@ -28,7 +28,7 @@ const symbol = getCurrencySymbol('EUR');
 ### By Locale
 
 ```javascript
-import { formatPrice } from 'ds-one';
+import { formatPrice } from 'design-system-1';
 
 // US Dollar
 formatPrice(1234.56, 'USD', 'en-US');
@@ -56,7 +56,7 @@ formatPrice(1234.56, 'EUR', 'fr-FR');
 
 ## Pricing Display Component
 
-Use with DS One components:
+Use with Design system 1 components:
 
 ```html
 <ds-text text="$29.99"></ds-text>
@@ -65,7 +65,7 @@ Use with DS One components:
 ## Configuration
 
 ```javascript
-import { setPricingConfig } from 'ds-one';
+import { setPricingConfig } from 'design-system-1';
 
 setPricingConfig({
   defaultCurrency: 'USD',
@@ -88,8 +88,8 @@ setPricingConfig({
 Pricing automatically uses the current language for locale:
 
 ```javascript
-import { setLanguage } from 'ds-one';
-import { formatPrice } from 'ds-one';
+import { setLanguage } from 'design-system-1';
+import { formatPrice } from 'design-system-1';
 
 setLanguage('ja');
 formatPrice(1000, 'JPY');

@@ -7,12 +7,12 @@ The preferences module provides utilities for storing and managing user preferen
 
 ## Overview
 
-DS One stores user preferences in localStorage to persist settings across sessions.
+Design system 1 stores user preferences in localStorage to persist settings across sessions.
 
 ## Basic Usage
 
 ```javascript
-import { savePreferences } from 'ds-one';
+import { savePreferences } from 'design-system-1';
 
 // Save user preferences
 savePreferences({
@@ -26,7 +26,7 @@ savePreferences({
 ### Language
 
 ```javascript
-import { savePreferences } from 'ds-one';
+import { savePreferences } from 'design-system-1';
 
 savePreferences({
   language: 'en-US' // or 'ja', 'zh-Hant', etc.
@@ -78,7 +78,7 @@ type Preferences = {
 The module handles storage errors gracefully:
 
 ```javascript
-import { savePreferences } from 'ds-one';
+import { savePreferences } from 'design-system-1';
 
 // Won't throw if localStorage is unavailable
 savePreferences({ theme: 'dark' });
@@ -87,12 +87,12 @@ savePreferences({ theme: 'dark' });
 
 ## Integration
 
-Preferences integrate with other DS One modules:
+Preferences integrate with other Design system 1 modules:
 
 ### With Theme
 
 ```javascript
-import { setTheme, savePreferences } from 'ds-one';
+import { setTheme, savePreferences } from 'design-system-1';
 
 function updateTheme(theme) {
   setTheme(theme);
@@ -103,7 +103,7 @@ function updateTheme(theme) {
 ### With i18n
 
 ```javascript
-import { setLanguage, savePreferences } from 'ds-one';
+import { setLanguage, savePreferences } from 'design-system-1';
 
 function updateLanguage(lang) {
   setLanguage(lang);

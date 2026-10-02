@@ -1,10 +1,17 @@
-#!/usr/bin/env bun
-// Simple Bun release helper: bumps version across all files and optionally commits/tags
-import { $ } from "bun";
+#!/usr/bin/env node
+// Release helper: bumps version across all files and optionally commits/tags.
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { spawnSync } from "node:child_process";
 
 type BumpType = "patch" | "minor" | "major" | "prerelease";
+
+function runGit(args: string[], allowFailure = false): void {
+  const result = spawnSync("git", args, { stdio: "inherit" });
+  if (!allowFailure && result.status !== 0) {
+    throw new Error(`git ${args[0]} failed with exit code ${result.status ?? 1}`);
+  }
+}
 
 function readJson(file: string) {
   return JSON.parse(fs.readFileSync(file, "utf8")) as Record<string, any>;
@@ -75,7 +82,7 @@ async function main() {
 
   if (!["patch", "minor", "major", "prerelease"].includes(type)) {
     console.error(
-      "Usage: bun run scripts/release.ts <patch|minor|major|prerelease> [--preid=alpha] [--no-git] [--push]"
+      "Usage: vp run release:patch|release:minor|release:major|release:pre:alpha [--no-git] [--push]"
     );
     process.exit(1);
   }
@@ -134,8 +141,8 @@ async function main() {
   if (fs.existsSync(docsPath)) {
     let docs = fs.readFileSync(docsPath, "utf8");
     docs = docs.replace(
-      /ds-one@[\d\.]+(-(?:alpha|beta|rc)\.[\d]+)?/g,
-      `ds-one@${next}`
+      /design-system-1@[\d\.]+(-(?:alpha|beta|rc)\.[\d]+)?/g,
+      `design-system-1@${next}`
     );
     fs.writeFileSync(docsPath, docs, "utf8");
     console.log(`✓ Updated docs/npm-publishing.md`);
@@ -144,13 +151,13 @@ async function main() {
   console.log(`\n🎉 All files updated to version ${next}`);
 
   if (!noGit) {
-    await $`git add package.json README.md docs/npm-publishing.md DS1/1-root/one.css`;
-    await $`git commit -m ${`release: v${next}`}`.nothrow();
-    await $`git tag -a v${next} -m ${`release: v${next}`}`.nothrow();
+    runGit(["add", "package.json", "README.md", "docs/npm-publishing.md", "DS1/1-root/one.css"]);
+    runGit(["commit", "-m", `release: v${next}`], true);
+    runGit(["tag", "-a", `v${next}`, "-m", `release: v${next}`], true);
     console.log(`\n✓ Git commit and tag created`);
     if (push) {
-      await $`git push`;
-      await $`git push --tags`;
+      runGit(["push"]);
+      runGit(["push", "--tags"]);
       console.log(`✓ Pushed to remote`);
     }
   }

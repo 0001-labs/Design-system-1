@@ -1,15 +1,15 @@
 ---
 title: Device
-description: Built-in device detection and responsive scaling in DS one
+description: Built-in device detection and responsive scaling in Design system 1
 ---
 
-Built-in device detection and responsive scaling in DS one.
+Built-in device detection and responsive scaling in Design system 1.
 
-DS one includes automatic mobile and device detection with integrated responsive scaling. The device module automatically detects device type, sets CSS classes, and configures the scaling factor.
+Design system 1 includes automatic mobile and device detection with integrated responsive scaling. The device module automatically detects device type, sets CSS classes, and configures the scaling factor.
 
 ## Auto-Initialization
 
-When DS one loads, it automatically:
+When Design system 1 loads, it automatically:
 
 1. Detects whether the device is mobile, tablet, or desktop
 2. Adds `.mobile` or `.desktop` class to the `<html>` element
@@ -23,7 +23,7 @@ When DS one loads, it automatically:
 Returns `true` if the current device is mobile (phone or tablet).
 
 ```javascript
-import { detectMobileDevice } from "ds-one";
+import { detectMobileDevice } from "design-system-1";
 
 if (detectMobileDevice()) {
   console.log("Mobile device");
@@ -43,7 +43,7 @@ Detection combines:
 Returns detailed device information.
 
 ```javascript
-import { getDeviceInfo } from "ds-one";
+import { getDeviceInfo } from "design-system-1";
 
 const info = getDeviceInfo();
 // {
@@ -63,7 +63,7 @@ const info = getDeviceInfo();
 Manually trigger device detection and scaling update.
 
 ```javascript
-import { initDeviceDetection } from "ds-one";
+import { initDeviceDetection } from "design-system-1";
 
 const deviceInfo = initDeviceDetection();
 ```
@@ -91,7 +91,7 @@ html.desktop .my-element {
 Disable browser zoom gestures for a native app feel.
 
 ```javascript
-import { applike } from "ds-one";
+import { applike } from "design-system-1";
 
 applike();
 ```

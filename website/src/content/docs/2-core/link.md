@@ -35,7 +35,7 @@ Internal links automatically preserve scroll position when navigating:
 
 ## Scroll Position Preservation
 
-DS One automatically preserves scroll position when navigating between pages using internal links. This provides a better user experience when users navigate back.
+Design system 1 automatically preserves scroll position when navigating between pages using internal links. This provides a better user experience when users navigate back.
 
 ```html
 <!-- Scroll position is preserved -->

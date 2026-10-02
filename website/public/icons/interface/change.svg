@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+<g id="Icons">
+<g id="Change" clip-path="url(#clip0_403_3634)">
+<g id="Vector">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M2.87515 4.99657L8.03175 4.99657L8.02942 6.00714L7.01328 6.00714L2.87551 6.00853L5.78274 8.91576L5.07591 9.60961L0.968163 5.50185L5.07938 1.39063L5.78673 2.09796L2.87515 4.99657Z" fill="#1E1E1E" />
+<path fill-rule="evenodd" clip-rule="evenodd" d="M13.1248 11.0037L7.96816 11.0037L7.97054 9.99311L8.98663 9.99311L13.1244 9.99171L10.2172 7.08449L10.924 6.39064L15.0317 10.4984L10.9205 14.6096L10.2132 13.9023L13.1248 11.0037Z" fill="#1E1E1E" />
+</g>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_403_3634">
+<rect width="16" height="16" fill="white" transform="translate(16) rotate(90)" />
+</clipPath>
+</defs>
+</svg>

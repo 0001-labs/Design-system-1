@@ -591,9 +591,9 @@ const initialConfigs: ConfigByKind = {
 
 const SNAP_GRID = 4;
 const DRAG_THRESHOLD = 3;
-const CSS_EDITOR_LINE_HEIGHT = 16;
-const CSS_EDITOR_CHAR_WIDTH = 6.1;
-const CSS_EDITOR_PADDING = 14;
+const CSS_EDITOR_LINE_HEIGHT = 20;
+const CSS_EDITOR_CHAR_WIDTH = 7.32;
+const CSS_EDITOR_PADDING = 20;
 const SPACING_KEYS = ["paddingX", "paddingY", "gap"] as const;
 
 const componentCssTargets: Record<ComponentKind, string> = {
@@ -1990,7 +1990,8 @@ export function App({ initialCss, initialConfig, onDirty, headerSlot }: AppProps
       {headerSlot}
       <div className="design-pane">
         <aside className="library-panel">
-          <div className="library-scroll">
+          <div className="library-scroll" data-ds-area="Components">
+            <h2 className="app-panel-label">Components</h2>
             <nav aria-label="Component library" className="component-tree">
               {componentLibrary.map((item) =>
                 item.kind === "button" ? (
@@ -2046,7 +2047,7 @@ export function App({ initialCss, initialConfig, onDirty, headerSlot }: AppProps
             </nav>
           </div>
 
-          <div className="controls-panel">
+          <div className="controls-panel" data-ds-area="Properties">
             <div className="controls-scroll">
               {supportsCopy && (
                 <section className="controls-section">
@@ -2129,7 +2130,8 @@ export function App({ initialCss, initialConfig, onDirty, headerSlot }: AppProps
         </aside>
 
         <div className="design-stack">
-          <main className="story-workspace">
+          <main className="story-workspace" data-ds-area="Preview">
+            <div className="app-panel-heading"><h1>{componentLibrary.find((item) => item.kind === selectedKind)?.label}</h1><span>Live preview</span></div>
             <div className="story-stage">
               <div className="story-frame">
                 <div
@@ -2371,7 +2373,8 @@ export function App({ initialCss, initialConfig, onDirty, headerSlot }: AppProps
         </div>
       </div>
 
-      <section aria-label="Live CSS file" className="css-file-panel">
+      <section aria-label="Live CSS file" className="css-file-panel" data-ds-area="Stylesheet">
+        <div className="app-panel-heading"><h2>Stylesheet</h2><span>Editable CSS</span></div>
         <div className="css-editor-shell">
           {cssHighlightStyle && (
             <span

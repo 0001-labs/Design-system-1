@@ -1,26 +1,26 @@
-# DS one (0.3.0-alpha.9)
+# Design system 1 (0.3.0-alpha.9)
 
 A plug and play design system
 
 > A component-based design system built with Lit that provides reusable UI components with built-in theming, internationalization, and accessibility features.
 
-**DS one** is a comprehensive modern design system that provides a set of reusable UI components built with Web Components via Lit. Available via CDN or npm.
+**Design system 1** is a comprehensive modern design system that provides a set of reusable UI components built with Web Components via Lit. Available via CDN or npm.
 
 ## Installation
 
 ```bash
-# Using bun (recommended)
-bun add ds-one@alpha
+# Using Vite+ (recommended)
+vp add design-system-1@alpha
 
 # Using npm
-npm install ds-one@alpha
+npm install design-system-1@alpha
 
 # Using yarn
-yarn add ds-one@alpha
+yarn add design-system-1@alpha
 
 ```
 
-**Note**: Currently published as alpha version `0.3.0-alpha.9`
+**Note**: The package is being renamed from `ds-one` to `design-system-1`. The installation commands and CDN URLs below target the new name and will work after its first npm publication.
 
 ## Quick Start
 
@@ -33,12 +33,12 @@ directly, so no component classes or JavaScript are required.
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/ds-one@alpha/DS1/1-root/one.semantic.css"
+  href="https://cdn.jsdelivr.net/npm/design-system-1@alpha/DS1/1-root/one.semantic.css"
 />
 
 <section>
   <h2>Welcome</h2>
-  <p>A native HTML interface styled by DS one.</p>
+  <p>A native HTML interface styled by Design system 1.</p>
   <label for="email">Email</label>
   <input id="email" type="email" placeholder="you@example.com" />
   <button type="button">Get started</button>
@@ -59,11 +59,11 @@ Components remain unchanged.
     <!-- CSS -->
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/ds-one@alpha/DS1/1-root/one.css"
+      href="https://cdn.jsdelivr.net/npm/design-system-1@alpha/DS1/1-root/one.css"
     />
     <!-- Bundle -->
     <script type="module">
-      import "https://cdn.jsdelivr.net/npm/ds-one@alpha/dist/ds-one.bundle.min.js";
+      import "https://cdn.jsdelivr.net/npm/design-system-1@alpha/dist/design-system-1.bundle.min.js";
     </script>
   </head>
   <body>
@@ -76,21 +76,27 @@ Components remain unchanged.
 ### NPM Usage
 
 ```tsx
-import "ds-one/styles";
-import "ds-one";
+import "design-system-1/styles";
+import "design-system-1";
 ```
 
 For the classless version, import only the semantic stylesheet:
 
 ```ts
-import "ds-one/DS1/1-root/one.semantic.css";
+import "design-system-1/DS1/1-root/one.semantic.css";
 ```
 
 ## Documentation
 
-See the full documentation for DS one at: [**dsone.dev**](https://dsone.dev/)
+See the full documentation for Design system 1 at: [**designsystem1.com**](https://designsystem1.com/)
 
-## DS one app
+The Astro + Starlight site lives in `website/`. Run `vp run docs:dev` locally;
+see the [documentation contributor guide](website/README.md) for build and authoring instructions.
+
+The site uses Astro and Starlight. Run `vp run docs:dev` locally; see the
+[documentation authoring guide](website/README.md) and [issue list](docs/issue-list.md).
+
+## Design system 1 app
 
 The repository includes a React-based component workbench for refining semantic
 elements one at a time. The right panel always shows the complete
@@ -98,14 +104,39 @@ elements one at a time. The right panel always shows the complete
 controls change. Exports contain plain HTML and require no JavaScript runtime.
 
 ```bash
-bun run app:dev
+vp run app:dev
 ```
 
-The app is configured for Cloudflare Pages:
+The app and documentation belong to this single project. The documentation lives
+at `/`, and the app lives at `/app/` on `designsystem1.com`. Both are built into
+`website/dist` and deployed together to the Cloudflare Worker named `designsystem1`.
+
+Build the complete website locally:
 
 ```bash
-bun run app:deploy
+vp run site:build
 ```
+
+Deploy the complete website from the repository root:
+
+```bash
+vp run deploy
+```
+
+The `app:deploy`, `docs:deploy`, and subproject `deploy` commands all use this same
+combined release. Cloudflare settings are defined in the root `wrangler.jsonc`.
+The same Worker serves published CSS at `/ds1/*` and authenticated publishing
+at `/api/artifacts/*`, using the existing R2 library bucket. Convex remains the
+backend for accounts and library metadata. All Cloudflare deployment commands
+release this single Worker. The legacy `dsone.dev/*` route also belongs to this
+Worker: documentation redirects to the new domain, while existing `/ds1/*`
+stylesheet URLs remain served directly. The public workbench is available at
+`/app/` and `/app/playground`.
+
+The existing Convex deployment is still `aromatic-lapwing-453` (development).
+Its publishing URLs point to `designsystem1.com`; development login-link capture
+is disabled. Account sign-in requires an email provider before it can be used
+on the public site. The workbench does not require an account.
 
 ## Features
 
@@ -131,13 +162,13 @@ bun run app:deploy
 
 ### In Progress
 
-- 🚧 Documentation site
+- 🚧 Starlight documentation coverage and manual review ([issue list](docs/issue-list.md))
 - 🚧 Additional component variants and states defined in Figma
 
 ## Architecture
 
 ```
-DS one/
+Design system 1/
 ├── dist/             # Built files for NPM
 ├── DS1/
 │   ├── 0-face/       # Utilities for device detection, internationalization,
@@ -149,18 +180,24 @@ DS one/
 │   ├── 3-unit/       # Composite components (list, row, table)
 │   ├── 4-page/       # Page-level components for layout (layout, grid)
 │   └── x-icon/       # SVG icon library
-├── examples/         # HTML examples
-└── docs/             # Documentation
+├── app/              # React workbench and account/library screens at /app/
+├── website/          # Documentation at /; combined site output in website/dist
+├── convex/           # Backend, authentication, libraries, and publishing actions
+├── services/         # Asset-serving and publishing routes
+├── packages/         # Shared CSS validation package
+├── e2e/              # End-to-end checks
+├── tests/            # Project checks
+└── wrangler.jsonc    # Shared website deployment configuration
 
 ```
 
 ## License
 
-MIT © [DS one](https://github.com/0001-labs/ds-one)
+MIT © [Design system 1](https://github.com/0001-labs/ds-one)
 
 ## 🔗 Links
 
-- [**Website**](https://dsone.dev/) - Official website
+- [**Website**](https://designsystem1.com/) - Official website
 - [**GitHub**](https://github.com/0001-labs/ds-one) - Source code and issues
-- [**NPM Package**](https://www.npmjs.com/package/ds-one) - Install with `@alpha` tag
-- [**CDN**](https://cdn.jsdelivr.net/npm/ds-one@alpha/) - Direct browser usage
+- [**NPM Package**](https://www.npmjs.com/package/design-system-1) - Install with `@alpha` tag
+- [**CDN**](https://cdn.jsdelivr.net/npm/design-system-1@alpha/) - Direct browser usage

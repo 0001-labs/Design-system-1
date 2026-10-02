@@ -1,0 +1,40 @@
+{
+  "name": "designsystem1",
+  "account_id": "ce6189d5ac975158991e207a3c4e1cd5",
+  "main": "./services/src/index.ts",
+  "compatibility_date": "2026-07-24",
+  "workers_dev": true,
+  "observability": {
+    "enabled": true
+  },
+  "assets": {
+    "directory": "./website/dist",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "run_worker_first": true
+  },
+  "r2_buckets": [
+    {
+      "binding": "LIBRARIES",
+      "bucket_name": "ds-one-libraries",
+      "preview_bucket_name": "ds-one-libraries-preview"
+    }
+  ],
+  "vars": {
+    "MAX_CSS_BYTES": "524288"
+  },
+  "routes": [
+    {
+      "pattern": "designsystem1.com",
+      "custom_domain": true
+    },
+    {
+      "pattern": "www.designsystem1.com",
+      "custom_domain": true
+    },
+    {
+      "pattern": "dsone.dev/*",
+      "zone_name": "dsone.dev"
+    }
+  ]
+}

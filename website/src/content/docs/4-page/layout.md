@@ -1,6 +1,6 @@
 ---
 title: Layout
-description: Learn about layout components in DS one
+description: Learn about layout components in Design system 1
 ---
 
 # Layout

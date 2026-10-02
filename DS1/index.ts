@@ -1,5 +1,5 @@
 /**
- * DS one - Main entry point for all components
+ * Design system 1 - Main entry point for all components
  *
  * This module initializes core utilities and exports all design system components
  * organized by layer: 0-face (foundation), 2-core (components), 3-unit (composites), 4-page (layouts)
@@ -20,6 +20,7 @@ import "./0-face/i18n";
 // ============================================================================
 
 export * from "./0-face/device";
+export * from "./0-face/grid";
 export * from "./0-face/i18n";
 export * from "./0-face/preferences";
 export * from "./0-face/pricing";

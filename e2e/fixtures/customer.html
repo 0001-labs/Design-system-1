@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Customer site</title>
+
+    <!--
+      This page stands in for a real customer's site and is served from a
+      different origin than the workbench.
+
+      Its head contains exactly one stylesheet link and nothing else: no
+      bundler, no application CSS, no script tag. That is the point. A computed
+      style assertion against this page can only pass if the hosted DS1 artifact
+      is doing the work, which is what the spec's headline requirement asks for.
+
+      The href is rewritten at test time by e2e/tests/*.spec.ts. Until then it
+      points at nothing, so an unmodified fixture renders unstyled on purpose.
+    -->
+    <link rel="stylesheet" data-ds1-install href="about:blank" />
+  </head>
+  <body>
+    <header>
+      <h1>Acme</h1>
+    </header>
+
+    <main>
+      <section>
+        <h2>Contact</h2>
+        <p>A native HTML interface with no classes and no JavaScript.</p>
+
+        <label for="email">Email</label>
+        <input id="email" type="email" placeholder="you@example.com" />
+
+        <button id="submit" type="button">Get started</button>
+      </section>
+
+      <section>
+        <h2>Plans</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Plan</th>
+              <th>Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Starter</td>
+              <td>Free</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+
+    <footer>
+      <small>© Acme</small>
+    </footer>
+  </body>
+</html>

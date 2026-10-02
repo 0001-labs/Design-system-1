@@ -2,6 +2,8 @@
 // Device detection, context utilities, and responsive scaling
 
 import { signal } from "@lit-labs/signals";
+import { calculateScalingFactor as calculateScale, defaultScalingConfig, type ScalingConfig } from "./scaling";
+export type { ScalingConfig, ScalingMode } from "./scaling";
 
 // ============================================================================
 // Types
@@ -19,26 +21,6 @@ export interface DeviceInfo {
   screenWidth: number;
   screenHeight: number;
 }
-
-export type ScalingMode = "auto" | "fixed" | "fluid";
-
-export interface ScalingConfig {
-  mode: ScalingMode;
-  baseWidth: number;
-  minScale: number;
-  maxScale: number;
-}
-
-// ============================================================================
-// Configuration & Signals
-// ============================================================================
-
-const defaultScalingConfig: ScalingConfig = {
-  mode: "auto",
-  baseWidth: 280,
-  minScale: 0.75,
-  maxScale: 2.0,
-};
 
 /** Reactive scaling factor signal */
 export const scalingFactor = signal<number>(1);
@@ -130,17 +112,7 @@ export function calculateScalingFactor(
   viewportWidth: number,
   config: ScalingConfig = scalingConfig.get()
 ): number {
-  if (config.mode === "fixed") {
-    return 1;
-  }
-
-  const rawScale = viewportWidth / config.baseWidth;
-  const clampedScale = Math.max(
-    config.minScale,
-    Math.min(config.maxScale, rawScale)
-  );
-
-  return Number(clampedScale.toFixed(3));
+  return calculateScale(viewportWidth, config);
 }
 
 /**
@@ -255,17 +227,17 @@ export function initDeviceDetection(): DeviceInfo {
   const factor = scalingFactor.get();
   if (deviceInfo.isMobile) {
     console.log(
-      `[DS one] Mobile device detected - ${deviceInfo.deviceType} (${deviceInfo.screenWidth}x${deviceInfo.screenHeight}), scaling factor: ${factor.toFixed(2)}`
+      `[Design system 1] Mobile device detected - ${deviceInfo.deviceType} (${deviceInfo.screenWidth}x${deviceInfo.screenHeight}), scaling factor: ${factor.toFixed(2)}`
     );
   } else {
     console.log(
-      `[DS one] Desktop device detected (${deviceInfo.screenWidth}x${deviceInfo.screenHeight})`
+      `[Design system 1] Desktop device detected (${deviceInfo.screenWidth}x${deviceInfo.screenHeight})`
     );
   }
 
   // Log additional details in development mode
   if (typeof window !== "undefined" && (window as any).DS_ONE_DEBUG) {
-    console.log("[DS one] Device Info:", {
+    console.log("[Design system 1] Device Info:", {
       type: deviceInfo.deviceType,
       isMobile: deviceInfo.isMobile,
       isTablet: deviceInfo.isTablet,

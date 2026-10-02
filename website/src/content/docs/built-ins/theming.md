@@ -1,9 +1,9 @@
 ---
 title: Theming
-description: Built-in theming system in DS one
+description: Built-in theming system in Design system 1
 ---
 
-DS one uses CSS custom properties for theming, allowing you to customize colors and styles without modifying component code.
+Design system 1 uses CSS custom properties for theming, allowing you to customize colors and styles without modifying component code.
 
 ## Quick Customization
 
@@ -19,7 +19,7 @@ DS one uses CSS custom properties for theming, allowing you to customize colors 
 
 ### Dark Mode Support
 
-DS one automatically adapts to system dark mode preferences:
+Design system 1 automatically adapts to system dark mode preferences:
 
 ```css
 @media (prefers-color-scheme: dark) {

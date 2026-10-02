@@ -1,6 +1,6 @@
 ---
 title: List
-description: Learn about list components in DS one
+description: Learn about list components in Design system 1
 ---
 
 # List

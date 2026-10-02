@@ -49,3 +49,7 @@ Foundation for Ezo, TAU, and all 0001 products.
 
 - Never write comments on GitHub — no PR comments, no issue comments, no code review comments, no replies. All project communication runs in Trello.
 - The PR description itself is the only allowed PR text, and it must stay minimal.
+
+## Icon collection
+
+For icon collection additions or SVG refinements, read `docs/icon-library.md`.

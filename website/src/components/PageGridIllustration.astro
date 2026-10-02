@@ -1,0 +1,266 @@
+---
+// Named areas and row sizes from ds-layout.ts and one.css.
+const presets = [
+  { id: 'company', name: 'Company', rowCount: 6, areas: [
+    { name: 'header', label: 'Header', rows: 1, color: '#eee3b7' },
+    { name: 'content', label: 'Content', rows: 6, color: '#bfe0cd' },
+    { name: 'footer', label: 'Footer', rows: 6, color: '#e6cbdc' },
+  ] },
+  { id: 'app', name: 'App', rowCount: 8, areas: [
+    { name: 'banner', label: 'Banner', rows: 1, color: '#efc9dc' },
+    { name: 'header', label: 'Header', rows: 1, color: '#eee3b7' },
+    { name: 'main', label: 'Main', rows: 12, color: '#bfe0cd' },
+    { name: 'page-dots', label: 'Page navigation', rows: 1, color: '#efcfb8' },
+    { name: 'footer', label: 'Footer', rows: 2, color: '#e6cbdc' },
+  ] },
+  { id: 'list', name: 'List', rowCount: 4, areas: [
+    { name: 'banner', label: 'Banner', rows: 1, color: '#efc9dc' },
+    { name: 'header', label: 'Header', rows: 1, color: '#eee3b7' },
+    { name: 'board', label: 'Board', rows: 20, color: '#c2d9eb' },
+  ] },
+  { id: 'home', name: 'Home', rowCount: 5, areas: [
+    { name: 'banner', label: 'Banner', rows: 1, color: '#efc9dc' },
+    { name: 'header', label: 'Header', rows: 1, color: '#eee3b7' },
+    { name: 'lists', label: 'Lists', rows: 8, color: '#bfe0cd' },
+  ] },
+  { id: 'settings', name: 'Settings', rowCount: 3, areas: [
+    { name: 'banner', label: 'Banner', rows: 1, color: '#efc9dc' },
+    { name: 'settings', label: 'Settings', rows: 22, color: '#d5c9ef' },
+  ] },
+];
+---
+
+<section class="layout-showcase" aria-label="Explore page layouts">
+  <div class="layout-switcher">
+    <span data-layout-name aria-live="polite" aria-atomic="true">Portfolio</span>
+    <div class="layout-arrows">
+      <button type="button" data-layout-direction="-1" aria-label="Previous layout" aria-controls="layout-stage">←</button>
+      <button type="button" data-layout-direction="1" aria-label="Next layout" aria-controls="layout-stage">→</button>
+    </div>
+  </div>
+  <div id="layout-stage" class="layout-stage">
+<div class="page-grid-illustration" data-layout-panel="Portfolio" role="img" aria-label="A page divided into pastel grid areas for a title, header, main content, supporting content, navigation, and footer">
+  <div class="page-area page-area--square"><span>Logo</span></div>
+  <div class="page-area page-area--title"><span>Title</span></div>
+  <div class="page-area page-area--header"><span>Header</span></div>
+  <div class="page-area page-area--body"><span>Body</span></div>
+  <div class="page-area page-area--supporting"><span>Supporting content</span></div>
+  <div class="page-area page-area--nav"><span>Navigation</span></div>
+  <div class="page-area page-area--footer"><span>Footer</span></div>
+  {Array.from({ length: 10 }, (_, index) => (
+    <div class="page-row-guide" style={`grid-row: ${index + 1}`} aria-hidden="true"></div>
+  ))}
+</div>
+
+    {presets.map((preset) => (
+      <div class={`preset-grid preset-grid--${preset.id}`} data-layout-panel={preset.name} role="img" aria-label={`${preset.name} layout: ${preset.areas.map((area) => area.label).join(', ')}`} hidden>
+        {preset.areas.map((area) => (
+          <div class="page-area" style={`grid-area: ${area.name}; --area-color: ${area.color}; --label-columns: ${area.name === 'page-dots' ? 6 : 4}; --label-rows: ${area.rows % 2 ? 1 : 2}`}>
+            <span>{area.label}</span>
+          </div>
+        ))}
+        {Array.from({ length: preset.rowCount }, (_, index) => (
+          <div class="page-row-guide" style={`grid-row: ${index + 1}`} aria-hidden="true"></div>
+        ))}
+      </div>
+    ))}
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.layout-showcase').forEach((showcase) => {
+    const panels = Array.from(showcase.querySelectorAll<HTMLElement>('[data-layout-panel]'));
+    const label = showcase.querySelector<HTMLElement>('[data-layout-name]');
+    let selected = 0;
+    showcase.querySelectorAll<HTMLButtonElement>('[data-layout-direction]').forEach((button) => {
+      button.addEventListener('click', () => {
+        selected = (selected + Number(button.dataset.layoutDirection) + panels.length) % panels.length;
+        panels.forEach((panel, index) => { panel.hidden = index !== selected; });
+        if (label) label.textContent = panels[selected].dataset.layoutPanel ?? '';
+      });
+    });
+  });
+</script>
+
+<style>
+  .layout-showcase {
+    --page-guide: light-dark(rgb(137 112 151 / 0.35), rgb(211 190 226 / 0.4));
+    width: 100%;
+    min-width: 0;
+    align-self: stretch;
+    margin-top: calc(3 * var(--landing-unit));
+    margin-bottom: calc(-4 * var(--landing-unit));
+    background: var(--ds1-docs-content-bg);
+  }
+  .layout-switcher {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--landing-unit);
+    margin-bottom: var(--landing-unit);
+    color: var(--ds1-docs-header-text);
+    font-family: var(--typeface-regular);
+    font-size: var(--landing-type);
+    line-height: var(--landing-unit);
+  }
+  .layout-arrows { display: flex; gap: var(--landing-unit); }
+  .layout-arrows button {
+    display: grid;
+    place-items: center;
+    width: var(--landing-unit);
+    height: var(--landing-unit);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-family: 'Inter Arrows', Inter, sans-serif;
+    font-size: var(--landing-type);
+    font-weight: 400;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .layout-arrows button:hover { background: var(--button-background-color-secondary); }
+  .layout-arrows button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+  [data-layout-panel][hidden] { display: none; }
+  [data-layout-panel] { width: 100%; }
+  .preset-grid {
+    display: grid;
+    position: relative;
+    grid-template-columns: 100%;
+    box-shadow: inset 0 0 0 1px var(--page-guide);
+  }
+  .preset-grid--company {
+    grid-template-rows: calc(4 * var(--landing-unit)) var(--landing-unit) var(--landing-unit) calc(6 * var(--landing-unit)) var(--landing-unit) calc(6 * var(--landing-unit));
+    grid-template-areas: '.' 'header' '.' 'content' '.' 'footer';
+  }
+  .preset-grid--app { grid-template-rows: var(--app-layout); grid-template-areas: var(--app-layout-areas); }
+  .preset-grid--list {
+    grid-template-rows: var(--landing-unit) var(--landing-unit) var(--landing-unit) calc(20 * var(--landing-unit));
+    grid-template-areas: 'banner' '.' 'header' 'board';
+  }
+  .preset-grid--home { grid-template-rows: var(--home-layout); grid-template-areas: var(--home-layout-areas); }
+  .preset-grid--settings {
+    height: calc(24 * var(--landing-unit));
+    grid-template-rows: var(--settings-layout);
+    grid-template-areas: var(--settings-layout-areas);
+  }
+  /* Portfolio layout proportions, measured in the same scaled units as the page. */
+  .page-grid-illustration {
+    --page-indent: calc(6 * var(--landing-unit));
+    --page-body: calc(24 * var(--landing-unit));
+    --page-end: calc(2 * var(--landing-unit));
+    --page-guide: light-dark(rgb(137 112 151 / 0.35), rgb(211 190 226 / 0.4));
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--page-indent) var(--page-body) var(--page-end);
+    grid-template-rows:
+      calc(6 * var(--landing-unit)) calc(6 * var(--landing-unit))
+      calc(3 * var(--landing-unit)) calc(9 * var(--landing-unit))
+      calc(3 * var(--landing-unit)) calc(6 * var(--landing-unit))
+      calc(3 * var(--landing-unit)) var(--landing-unit)
+      calc(6 * var(--landing-unit)) calc(6 * var(--landing-unit));
+    grid-template-areas:
+      'square . .' '. title .' '. header .' '. body .' '. . .'
+      '. supporting .' '. . .' '. nav .' '. . .' '. footer .';
+    align-self: start;
+    pointer-events: none;
+    box-shadow: inset 0 0 0 1px var(--page-guide);
+  }
+  .page-grid-illustration::before,
+  .page-grid-illustration::after {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    width: 1px;
+    background: var(--page-guide);
+  }
+  .page-grid-illustration::before { left: var(--page-indent); }
+  .page-grid-illustration::after { right: var(--page-end); }
+  .page-area {
+    --label-columns: 4;
+    --label-rows: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--area-color) 75%, #7f7188);
+    background: color-mix(in srgb, var(--area-color) 38%, transparent);
+  }
+  .page-area span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(var(--label-columns) * var(--landing-unit));
+    height: calc(var(--label-rows) * var(--landing-unit));
+    flex: none;
+    padding: 0;
+    text-align: center;
+    background: var(--ds1-docs-content-bg);
+    color: var(--ds1-docs-header-text);
+    font-family: var(--typeface-regular);
+    font-size: var(--landing-type);
+    font-weight: 400;
+    line-height: var(--landing-unit);
+  }
+  .page-area--square { grid-area: square; --area-color: #efc9dc; }
+  .page-area--title { grid-area: title; --area-color: #d5c9ef; }
+  .page-area--header { grid-area: header; --area-color: #eee3b7; }
+  .page-area--body { grid-area: body; --area-color: #bfe0cd; }
+  .page-area--supporting { grid-area: supporting; --area-color: #c2d9eb; }
+  .page-area--nav { grid-area: nav; --area-color: #efcfb8; }
+  .page-area--footer { grid-area: footer; --area-color: #e6cbdc; }
+  /* Match the area's odd/even cell count so centred label edges land on grid lines. */
+  .page-area--square { --label-columns: 2; }
+  .page-area--supporting { --label-columns: 8; }
+  .page-area--nav { --label-columns: 6; }
+  .page-area--header, .page-area--body, .page-area--nav { --label-rows: 1; }
+  .page-row-guide {
+    grid-column: 1 / -1;
+    align-self: start;
+    height: 0;
+    border-top: 1px dashed var(--page-guide);
+  }
+  @media (max-width: 1100px) {
+    .page-area--square { --label-columns: 3; }
+    .page-area--square, .page-area--title, .page-area--supporting, .page-area--footer { --label-rows: 1; }
+    .page-area--header, .page-area--body { --label-rows: 2; }
+    .page-grid-illustration {
+      --page-indent: calc(3 * var(--landing-unit));
+      --page-body: calc(12 * var(--landing-unit));
+      --page-end: var(--landing-unit);
+      grid-template-rows:
+        calc(3 * var(--landing-unit)) calc(3 * var(--landing-unit))
+        calc(2 * var(--landing-unit)) calc(4 * var(--landing-unit))
+        calc(2 * var(--landing-unit)) calc(3 * var(--landing-unit))
+        calc(2 * var(--landing-unit)) var(--landing-unit)
+        calc(3 * var(--landing-unit)) calc(3 * var(--landing-unit));
+    }
+  }
+  @media (max-width: 680px) {
+    .layout-showcase { margin-left: calc(3 * var(--landing-unit)); }
+    .page-area { --label-columns: 3; }
+    .page-area--square { --label-columns: 2; }
+    .page-area--supporting { --label-columns: 7; }
+    .page-area--nav { --label-columns: 5; }
+    .page-grid-illustration {
+      --page-indent: calc(2 * var(--landing-unit));
+      --page-body: calc(9 * var(--landing-unit));
+    }
+  }
+  :global(html.mobile) .page-grid-illustration {
+    --page-indent: calc(2 * var(--landing-unit));
+    --page-body: calc(9 * var(--landing-unit));
+    --page-end: var(--landing-unit);
+    grid-template-rows:
+      calc(2 * var(--landing-unit)) calc(3 * var(--landing-unit))
+      var(--landing-unit) calc(4 * var(--landing-unit))
+      var(--landing-unit) calc(3 * var(--landing-unit))
+      var(--landing-unit) var(--landing-unit)
+      calc(2 * var(--landing-unit)) calc(2 * var(--landing-unit));
+  }
+  :global(html.mobile) .layout-showcase { margin-left: calc(3 * var(--landing-unit)); }
+  :global(html.mobile) .page-area { --label-columns: 3; --label-rows: 1; }
+  :global(html.mobile) .page-area--square { --label-columns: 2; --label-rows: 2; }
+  :global(html.mobile) .page-area--body, :global(html.mobile) .page-area--footer { --label-rows: 2; }
+  :global(html.mobile) .page-area--supporting { --label-columns: 7; }
+  :global(html.mobile) .page-area--nav { --label-columns: 5; }
+</style>

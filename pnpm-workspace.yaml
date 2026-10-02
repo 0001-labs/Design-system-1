@@ -1,0 +1,26 @@
+allowBuilds:
+  esbuild: true
+  sharp: true
+  workerd: true
+  node-pty: true
+  unrs-resolver: true
+packages:
+  - "app"
+  - "packages/*"
+  - "services"
+  - "website"
+catalog:
+  vite: npm:@voidzero-dev/vite-plus-core@0.2.8
+  vitest: 4.1.10
+  vite-plus: 0.2.8
+overrides:
+  astro>vite: "^6.4.1"
+  vite: "catalog:"
+  vitest: "catalog:"
+peerDependencyRules:
+  allowAny:
+    - vite
+    - vitest
+  allowedVersions:
+    vite: "*"
+    vitest: "*"

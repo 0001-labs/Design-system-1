@@ -1,0 +1,20 @@
+# SVG icon collection
+
+The public collection is at https://designsystem1.com/icons. Interface icons use real vector geometry in a 16 × 16 coordinate space. They are separate from the gridded badge/favicon editor, which remains available in its own tab.
+
+## Add an icon from a request
+
+1. Inspect neighbouring icons in `DS1/x-icon/` and the Figma source collection before drawing. Match their optical weight, spacing, curves, and alignment; avoid rasterizing curves into cells.
+2. Add a descriptively named, kebab-case SVG to `DS1/x-icon/`. Use `width="16" height="16" viewBox="0 0 16 16"`, self-contained vector paths, and `currentColor` for monochrome artwork. Use explicit fills when colour is part of the design. Do not embed scripts, event attributes, images, fonts, external resources, or links.
+3. `vp run icons:build` automatically discovers the SVG, validates it and adds it to the public collection. No manual gallery list or frontend code change is needed for a new icon.
+4. Run `vp test --run tests/interfaceIcons.test.ts tests/iconGrid.test.ts tests/iconStudio.test.ts`, then `vp run site:build`. Publish through the existing site deployment workflow when requested, and verify the public SVG and page assets by HTTP. Respect the user's browser-testing preference.
+
+## Source collection
+
+The reference is Figma file `XAnoaRoq9LxVAHUZgtdO0r`, frame `403:4105`. Its 72 original SVGs are stored in `website/public/icons/interface/`; metadata is in `website/src/lib/icons/figma-interface.json`. These assets preserve the original Figma icon coordinates, transforms, and clipping in their 16-unit frames. The export renderer’s page background and purple component-set boundary were removed; the icon layers were not redrawn. Existing additions with smaller bounds are centred without changing their paths. `note-page` and `title-text` distinguish identically named Figma components.
+
+The catalog includes all reference icons plus additional names in `DS1/x-icon/`. Existing names are not silently replaced: a reference name takes precedence in the gallery. To refine a reference icon, update its source SVG deliberately and compare it with the linked Figma component; update the runtime counterpart in `DS1/x-icon/` only when the requested scope includes it.
+
+`scripts/build-interface-catalog.ts` produces the generated `interface-catalog.json`, public `/icons/catalog.json`, and public copies of added SVGs. Do not edit those generated files directly. The Original/Outlines/Both inspector changes the display only; copying or downloading the main SVG returns the untouched source. The separate outline download exports a stroked construction view.
+
+Prompted additions are performed through the development conversation, not an in-page AI service. The page's Copy request control packages the description and these repository conventions for that workflow.

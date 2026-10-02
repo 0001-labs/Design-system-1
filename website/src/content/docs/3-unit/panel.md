@@ -1,6 +1,6 @@
 ---
 title: Panel
-description: Learn about panel components in DS one
+description: Learn about panel components in Design system 1
 ---
 
 # Panel
