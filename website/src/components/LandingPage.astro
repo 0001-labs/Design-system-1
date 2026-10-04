@@ -1,6 +1,7 @@
 ---
 import PageGridIllustration from './PageGridIllustration.astro';
-import LandingBackdrop from './LandingBackdrop.astro';
+import LandingHero from './LandingHero.astro';
+import LayerDiagram from './LayerDiagram.astro';
 
 const example = `<link rel="stylesheet"
   href="/my-styles.css" />
@@ -11,19 +12,18 @@ const example = `<link rel="stylesheet"
 ---
 
 <article class="landing" aria-labelledby="landing-title" data-pagefind-body>
-  <LandingBackdrop />
+  <LandingHero />
+  <section id="learn-more" class="landing-layers" aria-labelledby="layers-title">
+    <div class="landing-content">
+      <h2 id="layers-title">Four layers, one unit</h2>
+      <p>Root sets the unit. Core components are single pieces sized by it. Units put those pieces together, and pages place the units on the grid.</p>
+    </div>
+    <LayerDiagram />
+    <a href="/components/">All components <span aria-hidden="true">→</span></a>
+  </section>
   <div class="landing-layout">
   <div class="landing-content">
-    <section class="landing-intro">
-      <h1 id="landing-title">Design system 1</h1>
-      <p>A shared unit for spacing, components, and page layouts. Everything scales together, keeping the same proportions across screens.</p>
-      <nav class="landing-actions" aria-label="Get started">
-        <a class="landing-button" href="/classless/editor/">Open the editor <span aria-hidden="true">↗</span></a>
-        <a href="/getting-started/installation/">Documentation <span aria-hidden="true">→</span></a>
-      </nav>
-    </section>
-
-    <section class="landing-section" aria-labelledby="concept-title">
+    <section class="landing-section landing-section--first" aria-labelledby="concept-title">
       <h2 id="concept-title">A shared foundation</h2>
       <p>Start with a square. Use it to size a button, place a heading, or give a panel room to breathe.</p>
       <p>The grid adapts to the screen. On mobile, the squares scale while the column count stays consistent. The elements follow the same scale, just as they do in Ezo.</p>
@@ -45,11 +45,12 @@ const example = `<link rel="stylesheet"
     <section class="landing-section" aria-labelledby="components-title">
       <h2 id="components-title">Components when you need them</h2>
       <p>For interactive controls, use the Web Components with their stylesheet and JavaScript bundle. Themes, translations, and preferences are part of the system too.</p>
-      <a href="/2-core/button/">Explore the components <span aria-hidden="true">→</span></a>
+      <a href="/components/">Explore the components <span aria-hidden="true">→</span></a>
     </section>
 
     <nav class="landing-footer" aria-label="Explore Design system 1">
       <a href="/classless/editor/">Editor <span aria-hidden="true">↗</span></a>
+      <a href="/components/">Components <span aria-hidden="true">→</span></a>
       <a href="/getting-started/installation/">Documentation <span aria-hidden="true">→</span></a>
     </nav>
   </div>
@@ -80,7 +81,7 @@ const example = `<link rel="stylesheet"
     min-height: 100vh;
     min-height: 100dvh;
     margin: 0;
-    padding-block: calc(4 * var(--landing-unit));
+    padding-block: 0 calc(4 * var(--landing-unit));
     color: var(--ds1-docs-header-text);
   }
 
@@ -91,7 +92,6 @@ const example = `<link rel="stylesheet"
     grid-template-columns: var(--landing-content-width) calc(32 * var(--landing-unit));
     gap: calc(7 * var(--landing-unit));
     width: max-content;
-    min-height: calc(100dvh - 8 * var(--landing-unit));
     margin-inline-start: calc(5 * var(--landing-unit));
     margin-inline-end: auto;
     align-items: start;
@@ -114,12 +114,19 @@ const example = `<link rel="stylesheet"
     letter-spacing: 0;
     line-height: var(--landing-unit);
   }
-  .landing h1 { font-size: var(--landing-unit); }
   .landing h2 { font-size: var(--landing-type); font-family: var(--typeface-medium); }
   .landing p { font-size: var(--landing-type); line-height: var(--landing-unit); }
-  .landing-intro > h1 + p { margin-top: calc(2 * var(--landing-unit)); }
   .landing :is(p + p, h2 + p) { margin-top: var(--landing-unit); }
   .landing-section { margin-top: calc(3 * var(--landing-unit)); }
+  .landing-section--first { margin-top: 0; }
+  .landing-layers {
+    display: grid;
+    gap: calc(2 * var(--landing-unit));
+    justify-items: start;
+    margin-inline-start: calc(5 * var(--landing-unit));
+    padding-block: calc(4 * var(--landing-unit));
+    scroll-margin-top: 0;
+  }
 
   .landing a {
     display: inline-flex;

@@ -1,0 +1,140 @@
+---
+// The front of the Design system 1 packaging: squares halving in size row by
+// row, the product's name standing down the fourth column.
+const C = {
+  blue: '#594dff', red: '#c50124', green: '#f2ffcf', apple: '#99ff73', stealth: '#554455',
+  soft: '#cdd3fe', sand: '#dbc88f', ochre: '#b69e55', blood: '#de0331', slate: '#1e1e1e',
+  egg: '#f9f6ef', sky: '#69d8fb', metal: '#026d5b', chartreuse: '#ccff4d', drip: '#fde70c',
+  tuned: '#ff5f5f', grey: '#797979', pink: '#f5aad1', zenith: '#ccccff', every: '#979441',
+  white: '#ffffff', yellow: '#eaff00', black: '#000000',
+} as const;
+type Color = keyof typeof C;
+
+// Each row is five big squares wide; a row of smaller squares fits more.
+const rows: { size: number; colors: Color[] }[] = [
+  { size: 80, colors: ['blue', 'red', 'green', 'red', 'green'] },
+  { size: 80, colors: ['blue', 'red', 'green', 'red', 'green'] },
+  { size: 40, colors: ['apple', 'stealth', 'soft', 'sand', 'ochre', 'stealth', 'red', 'blood', 'green', 'white'] },
+  { size: 40, colors: ['slate', 'egg', 'sky', 'blood', 'sky', 'blue', 'metal', 'sky', 'pink', 'apple'] },
+  { size: 20, colors: ['egg', 'chartreuse', 'drip', 'tuned', 'grey', 'pink', 'metal', 'blood', 'zenith', 'egg', 'blue', 'blood', 'metal', 'slate', 'blood', 'pink', 'green', 'sky', 'white', 'drip'] },
+  { size: 20, colors: ['tuned', 'every', 'sky', 'stealth', 'drip', 'metal', 'white', 'yellow', 'blue', 'every', 'red', 'black', 'blood', 'slate', 'metal', 'blood', 'apple', 'zenith', 'blue', 'egg'] },
+  { size: 20, colors: ['metal', 'pink', 'zenith', 'stealth', 'sand', 'every', 'white', 'stealth', 'egg', 'black', 'slate', 'blood', 'blood', 'blue', 'blood', 'blood', 'sky', 'chartreuse', 'pink', 'stealth'] },
+  { size: 20, colors: ['metal', 'blue', 'pink', 'stealth', 'blue', 'white', 'zenith', 'stealth', 'white', 'pink', 'sky', 'yellow', 'stealth', 'red', 'white', 'drip', 'blood', 'metal', 'egg', 'blue'] },
+];
+
+let y = 0;
+const tiles = rows.flatMap((row) => {
+  const top = y;
+  y += row.size;
+  return row.colors.map((color, index) => ({ x: index * row.size, y: top, size: row.size, fill: C[color] }));
+});
+---
+
+<section class="landing-hero" aria-labelledby="landing-title">
+  <svg class="landing-hero-blocks" viewBox="0 0 400 320" preserveAspectRatio="xMinYMin slice" shape-rendering="crispEdges" aria-hidden="true">
+    {tiles.map((tile) => <rect x={tile.x} y={tile.y} width={tile.size + 0.5} height={tile.size + 0.5} fill={tile.fill} />)}
+  </svg>
+  <h1 id="landing-title" class="landing-hero-title">Design system 1</h1>
+  <div class="landing-hero-panel">
+    <p>A shared unit for spacing, components, and page layouts. Everything fits in a grid.</p>
+    <nav class="landing-hero-actions" aria-label="Get started">
+      <a class="landing-hero-button landing-hero-button--primary" href="#learn-more">Learn more <span aria-hidden="true">↓</span></a>
+      <a class="landing-hero-button" href="/getting-started/installation/">Documentation <span aria-hidden="true">→</span></a>
+      <a class="landing-hero-button" href="/components/">Components <span aria-hidden="true">→</span></a>
+    </nav>
+  </div>
+</section>
+
+<style>
+  .landing-hero {
+    /* One unit of the artwork, which always covers the screen from its top left corner. */
+    --hero-scale: max(100vw / 400, 100vh / 320);
+    --hero-scale: max(100vw / 400, 100dvh / 320);
+    --hero-title-column: 280;
+    --hero-title-size: min(12.5vh, 56 * var(--hero-scale));
+    --hero-title-size: min(12.5dvh, 56 * var(--hero-scale));
+    --hero-edge: clamp(16px, 2.5vw, 40px);
+    position: relative;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 480px;
+    overflow: hidden;
+    background: #594dff;
+  }
+  .landing-hero-blocks {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* The name runs down the middle of a red column, as on the box. */
+  .landing-hero-title {
+    position: absolute;
+    top: var(--hero-edge);
+    left: calc(var(--hero-title-column) * var(--hero-scale));
+    margin: 0;
+    transform: translateX(-50%);
+    writing-mode: vertical-rl;
+    color: #fff;
+    font-family: var(--typeface-regular);
+    font-size: var(--hero-title-size);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .landing-hero-panel {
+    position: absolute;
+    left: var(--hero-edge);
+    bottom: var(--hero-edge);
+    display: grid;
+    gap: 8px;
+    justify-items: start;
+    max-width: min(720px, calc(100% - 2 * var(--hero-edge)));
+  }
+  .landing-hero-panel p {
+    margin: 0;
+    max-width: 34ch;
+    padding: 12px 16px;
+    background: #fff;
+    color: #1e1e1e;
+    font-family: var(--typeface-regular);
+    font-size: clamp(16px, 1.5vw, 22px);
+    line-height: 1.3;
+  }
+  .landing-hero-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .landing-hero-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    min-height: 56px;
+    padding: 0 22px;
+    background: #fff;
+    color: #1e1e1e;
+    font-family: var(--typeface-regular);
+    font-size: clamp(17px, 1.5vw, 22px);
+    line-height: 1;
+    text-decoration: none;
+    transition: background-color 120ms ease-out, color 120ms ease-out;
+  }
+  .landing-hero-button--primary { background: #1e1e1e; color: #fff; }
+  .landing-hero-button:hover { background: #99ff73; color: #1e1e1e; text-decoration: none; }
+  .landing-hero-button:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+
+  /* Upright, the screen shows the first two columns: the name moves to the red one there. */
+  @media (max-aspect-ratio: 1/1) {
+    /* The name stops above the words and buttons, which stack there. */
+    .landing-hero {
+      --hero-title-column: 120;
+      --hero-title-size: min(12.5dvh, 56 * var(--hero-scale), (100dvh - 310px) / 7.2);
+    }
+    .landing-hero-title { left: min(calc(var(--hero-title-column) * var(--hero-scale)), calc(100vw - var(--hero-title-size) * 0.5 - var(--hero-edge))); }
+    .landing-hero-actions { display: grid; justify-items: start; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .landing-hero-button { transition: none; }
+  }
+</style>
