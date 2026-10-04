@@ -11,7 +11,7 @@ The public collection is at https://designsystem1.com/icons. Interface icons use
 
 ## Source collection
 
-The reference is Figma file `XAnoaRoq9LxVAHUZgtdO0r`, frame `403:4105`. Its 72 original SVGs are stored in `website/public/icons/interface/`; metadata is in `website/src/lib/icons/figma-interface.json`. These assets preserve the original Figma icon coordinates, transforms, and clipping in their 16-unit frames. The export renderer’s page background and purple component-set boundary were removed; the icon layers were not redrawn. Existing additions with smaller bounds are centred without changing their paths. `note-page` and `title-text` distinguish identically named Figma components.
+The reference is Figma file `XAnoaRoq9LxVAHUZgtdO0r`, frame `403:4105`. Its 72 original SVGs, less the three panel icons since removed as unused (`panel`, `pleft`, `pright`), are stored in `website/public/icons/interface/`; metadata is in `website/src/lib/icons/figma-interface.json`. These assets preserve the original Figma icon coordinates, transforms, and clipping in their 16-unit frames. The export renderer’s page background and purple component-set boundary were removed; the icon layers were not redrawn. Existing additions with smaller bounds are centred without changing their paths. `note-page` and `title-text` distinguish identically named Figma components.
 
 The catalog includes all reference icons plus additional names in `DS1/x-icon/`. Existing names are not silently replaced: a reference name takes precedence in the gallery. To refine a reference icon, update its source SVG deliberately and compare it with the linked Figma component; update the runtime counterpart in `DS1/x-icon/` only when the requested scope includes it.
 

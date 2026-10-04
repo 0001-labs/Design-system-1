@@ -70,3 +70,10 @@ export const LAYERS: DirectoryLayer[] = [
     ],
   },
 ];
+
+/** Every drawing in DS1/x-icon, by file name: the name ds-icon takes. */
+const drawings = import.meta.glob<string>('../../../DS1/x-icon/*.svg', { query: '?raw', import: 'default', eager: true });
+export const ICONS = Object.entries(drawings)
+  .map(([path, svg]) => ({ name: path.split('/').pop()!.replace('.svg', ''), svg }))
+  .sort((a, b) => a.name.localeCompare(b.name, 'en', { numeric: true }));
+export const ICON_SUMMARY = 'The drawings ds-icon shows, each by its name.';

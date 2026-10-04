@@ -4,8 +4,8 @@ import icons from '../website/src/lib/icons/interface-catalog.json';
 import sources from '../website/src/lib/icons/figma-interface.json';
 import { scopedSvg } from '../website/src/lib/icons/svgView';
 
-test('the entire 72-icon Figma collection is present with its original vector geometry',()=>{
-  expect(sources).toHaveLength(72);
+test('the 69-icon Figma collection is present with its original vector geometry',()=>{
+  expect(sources).toHaveLength(69);
   expect(new Set(icons.map(icon=>icon.key)).size).toBe(icons.length);
   for(const source of sources){
     const icon=icons.find(icon=>icon.key===source.key)!;

@@ -1,23 +1,5 @@
 [
   {
-    "key": "pleft",
-    "name": "PLeft",
-    "node": "558:118",
-    "file": "pleft.svg"
-  },
-  {
-    "key": "panel",
-    "name": "Panel",
-    "node": "558:117",
-    "file": "panel.svg"
-  },
-  {
-    "key": "pright",
-    "name": "PRight",
-    "node": "558:116",
-    "file": "pright.svg"
-  },
-  {
     "key": "play",
     "name": "Play",
     "node": "520:12",

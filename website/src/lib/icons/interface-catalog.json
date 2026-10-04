@@ -411,15 +411,6 @@
     "shapes": 1
   },
   {
-    "key": "panel",
-    "name": "Panel",
-    "source": "Figma",
-    "node": "558:117",
-    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\">\n<g id=\"Icons\">\n<g id=\"Panel\">\n<g id=\"Vector\">\n<path d=\"M13.9653 3.31348V12.6865H2.03467V3.31348H13.9653ZM3.03467 11.6865H12.9653V4.31348H3.03467V11.6865Z\" fill=\"#1E1E1E\" />\n<path d=\"M12.9653 9.94276V8.94276H3.03467V9.94276H12.9653Z\" fill=\"#1E1E1E\" />\n</g>\n</g>\n</g>\n</svg>",
-    "url": "/icons/interface/panel.svg",
-    "shapes": 2
-  },
-  {
     "key": "play",
     "name": "Play",
     "source": "Figma",
@@ -429,15 +420,6 @@
     "shapes": 4
   },
   {
-    "key": "pleft",
-    "name": "PLeft",
-    "source": "Figma",
-    "node": "558:118",
-    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\">\n<g id=\"Icons\">\n<g id=\"PLeft\">\n<g id=\"Vector\">\n<path d=\"M13.9653 3.31348V12.6865H2.03467V3.31348H13.9653ZM3.03467 11.6865H12.9653V4.31348H3.03467V11.6865Z\" fill=\"#1E1E1E\" />\n<path d=\"M5.03467 11.6865H6.03467V4.31348H5.03467V11.6865Z\" fill=\"#1E1E1E\" />\n</g>\n</g>\n</g>\n</svg>",
-    "url": "/icons/interface/pleft.svg",
-    "shapes": 2
-  },
-  {
     "key": "plus",
     "name": "Plus",
     "source": "Figma",
@@ -445,15 +427,6 @@
     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\">\n<g id=\"Icons\">\n<g id=\"Plus\">\n<path id=\"Union\" d=\"M8.50235 2.6739L8.4996 7.5035L13.3334 7.51044L13.325 8.50193L8.49328 8.49569L8.49951 13.3274L7.49764 13.3268L7.50039 8.49717L2.66663 8.49024L2.67503 7.49875L7.50672 7.50499L7.50117 2.67261L8.50235 2.6739Z\" fill=\"#1E1E1E\" />\n</g>\n</g>\n</svg>",
     "url": "/icons/interface/plus.svg",
     "shapes": 1
-  },
-  {
-    "key": "pright",
-    "name": "PRight",
-    "source": "Figma",
-    "node": "558:116",
-    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\">\n<g id=\"Icons\">\n<g id=\"PRight\">\n<g id=\"Vector\">\n<path d=\"M2.03467 12.6865V3.31348H13.9653V12.6865H2.03467ZM12.9653 4.31348H3.03467V11.6865H12.9653V4.31348Z\" fill=\"#1E1E1E\" />\n<path d=\"M10.9653 4.31348H9.96533V11.6865H10.9653V4.31348Z\" fill=\"#1E1E1E\" />\n</g>\n</g>\n</g>\n</svg>",
-    "url": "/icons/interface/pright.svg",
-    "shapes": 2
   },
   {
     "key": "rewind",

@@ -365,14 +365,6 @@
     "shapes": 1
   },
   {
-    "key": "panel",
-    "name": "Panel",
-    "source": "Figma",
-    "node": "558:117",
-    "url": "/icons/interface/panel.svg",
-    "shapes": 2
-  },
-  {
     "key": "play",
     "name": "Play",
     "source": "Figma",
@@ -381,28 +373,12 @@
     "shapes": 4
   },
   {
-    "key": "pleft",
-    "name": "PLeft",
-    "source": "Figma",
-    "node": "558:118",
-    "url": "/icons/interface/pleft.svg",
-    "shapes": 2
-  },
-  {
     "key": "plus",
     "name": "Plus",
     "source": "Figma",
     "node": "116:220",
     "url": "/icons/interface/plus.svg",
     "shapes": 1
-  },
-  {
-    "key": "pright",
-    "name": "PRight",
-    "source": "Figma",
-    "node": "558:116",
-    "url": "/icons/interface/pright.svg",
-    "shapes": 2
   },
   {
     "key": "rewind",
