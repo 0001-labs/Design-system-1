@@ -7,7 +7,7 @@
 import { LAYERS } from '../lib/component-directory';
 
 const FILLS: Record<string, string> = {
-  white: '#e6e6e6',
+  white: '#ffffff',
   'light-green': '#99ff73',
   'light-blue': '#ccccff',
   pink: '#f5aad1',
@@ -36,14 +36,15 @@ const bricks = LAYERS.map((layer, index) => ({
 
 <style>
   .layer-bricks {
-    /* A brick is two of the page's squares tall and deep and eight long. */
-    --brick-unit: calc(2 * var(--landing-unit, 20px));
+    /* Link's measures: a brick thirty pixels (a square and a half) tall and
+       deep and four times that long, outlined in Link's ink. */
+    --brick-unit: calc(1.5 * var(--landing-unit, 20px));
     --brick-long: calc(4 * var(--brick-unit));
-    --brick-ink: #1e1e1e;
+    --brick-ink: #2c2c2b;
     display: grid;
     place-items: center;
     width: max-content;
-    height: calc(6 * var(--brick-unit));
+    height: calc(7 * var(--brick-unit));
     margin: 0;
     padding-inline: var(--brick-unit);
   }
@@ -84,7 +85,7 @@ const bricks = LAYERS.map((layer, index) => ({
     height: var(--brick-unit);
     display: flex;
     align-items: center;
-    padding-inline: calc(0.4 * var(--landing-unit, 20px));
+    padding-inline: 9px;
     background: var(--brick-fill);
     transform: rotateX(-90deg);
     transform-origin: center bottom;
@@ -101,7 +102,8 @@ const bricks = LAYERS.map((layer, index) => ({
   .layer-brick-label {
     color: var(--brick-ink);
     font-family: var(--typeface-regular);
-    font-size: calc(0.9 * var(--landing-unit, 20px));
+    font-size: calc(1.05 * var(--landing-unit, 20px));
+    letter-spacing: -0.02em;
     line-height: 1;
     white-space: nowrap;
   }
