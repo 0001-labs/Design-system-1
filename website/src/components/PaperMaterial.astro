@@ -1,0 +1,114 @@
+---
+// The slight material Ezo lays over its pictures (Ezo's client/lib/paperMaterial.ts,
+// after Visual's film material): a looser fibre and a fine grain in the paper,
+// darkening only the light; the same tooth in the ink, lightening only the
+// dark; and a soft light from above that falls off to the foot and the sides.
+// Put it inside a positioned picture, after the picture and before its words.
+---
+
+<span class="paper-material" aria-hidden="true">
+  <span class="paper-material-layer paper-material-fibre"></span>
+  <span class="paper-material-layer paper-material-grain"></span>
+  <span class="paper-material-layer paper-material-ink"></span>
+  <span class="paper-material-layer paper-material-light"></span>
+</span>
+
+<script>
+  // The three tiles are drawn once for the page from fixed seeds, so the
+  // material is the same on every visit and costs nothing once made.
+  function tile(seed: number, kind: 'paper' | 'ink' = 'paper', depth = 150, soft = 0): string | null {
+    const size = 128;
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = size;
+    const context = canvas.getContext('2d');
+    if (!context) return null;
+    let s = seed >>> 0;
+    const random = () => {
+      s = (s + 0x6d2b79f5) >>> 0;
+      let x = s;
+      x = Math.imul(x ^ (x >>> 15), x | 1);
+      x ^= x + Math.imul(x ^ (x >>> 7), x | 61);
+      return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+    };
+    let values = new Float32Array(size * size);
+    for (let i = 0; i < values.length; i++) values[i] = (random() + random() + random()) / 3 - 0.5;
+    if (soft) {
+      // A soft tile is blurred, wider than tall, into a looser fibre.
+      const out = new Float32Array(values.length);
+      for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+        let sum = 0;
+        let n = 0;
+        for (let dy = -soft; dy <= soft; dy++) for (let dx = -soft * 2; dx <= soft * 2; dx++) {
+          sum += values[((y + dy + size) % size) * size + ((x + dx + size) % size)];
+          n++;
+        }
+        out[y * size + x] = sum / Math.sqrt(n);
+      }
+      values = out;
+    }
+    const image = context.createImageData(size, size);
+    for (let i = 0; i < values.length; i++) {
+      const speck = Math.min(255, Math.abs(values[i]) * depth);
+      const v = Math.round(kind === 'paper' ? 255 - speck : speck);
+      image.data[i * 4] = image.data[i * 4 + 1] = image.data[i * 4 + 2] = v;
+      image.data[i * 4 + 3] = 255;
+    }
+    context.putImageData(image, 0, 0);
+    return `url("${canvas.toDataURL('image/png')}")`;
+  }
+
+  const root = document.documentElement;
+  if (!root.style.getPropertyValue('--paper-grain')) {
+    try {
+      const grain = tile(71);
+      const fibre = tile(1957, 'paper', 110, 2);
+      const ink = tile(4712, 'ink', 190);
+      if (grain && fibre && ink) {
+        root.style.setProperty('--paper-grain', grain);
+        root.style.setProperty('--paper-fibre', fibre);
+        root.style.setProperty('--paper-ink', ink);
+      }
+    } catch {
+      // No canvas: the pictures stay plain, with only their light.
+    }
+  }
+</script>
+
+<style>
+  .paper-material {
+    /* The tooth is measured in the page's unit, so it is the paper's whatever the screen. */
+    --paper-unit: var(--material-unit, calc(var(--unit, 20px) * var(--sf, 1)));
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .paper-material-layer {
+    position: absolute;
+    inset: 0;
+  }
+  .paper-material-fibre {
+    background-image: var(--paper-fibre, none);
+    background-size: calc(var(--paper-unit) * 6) calc(var(--paper-unit) * 6);
+    mix-blend-mode: multiply;
+    opacity: 0.07;
+  }
+  .paper-material-grain {
+    background-image: var(--paper-grain, none);
+    background-size: calc(var(--paper-unit) * 1.4) calc(var(--paper-unit) * 1.4);
+    mix-blend-mode: multiply;
+    opacity: 0.26;
+  }
+  .paper-material-ink {
+    background-image: var(--paper-ink, none);
+    background-size: calc(var(--paper-unit) * 1.4) calc(var(--paper-unit) * 1.4);
+    mix-blend-mode: screen;
+    opacity: 0.3;
+  }
+  .paper-material-light {
+    background:
+      radial-gradient(120% 70% at 50% 0%, rgb(255 255 255 / 0.5), rgb(255 255 255 / 0) 62%),
+      radial-gradient(150% 110% at 50% 40%, rgb(0 0 0 / 0) 60%, rgb(0 0 0 / 0.16) 100%);
+    mix-blend-mode: soft-light;
+    opacity: 0.7;
+  }
+</style>

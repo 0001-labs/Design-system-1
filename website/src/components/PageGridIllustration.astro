@@ -185,7 +185,24 @@ const presets = [
     box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--area-color) 75%, #7f7188);
     background: color-mix(in srgb, var(--area-color) 38%, transparent);
   }
+  /* Each pastel area wears Ezo's paper material, as its pictures do: the
+     grain darkening only the light, the ink's tooth lightening only the dark,
+     its tiles (made by PaperMaterial on the page) measured in the page's unit. */
+  .page-area { position: relative; }
+  .page-area::before,
+  .page-area::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-size: calc(1.4 * var(--landing-unit)) calc(1.4 * var(--landing-unit));
+  }
+  .page-area::before { background-image: var(--paper-grain, none); mix-blend-mode: multiply; opacity: 0.26; }
+  .page-area::after { background-image: var(--paper-ink, none); mix-blend-mode: screen; opacity: 0.3; }
+  :global([data-theme='dark']) .page-area::after { opacity: 0.12; }
   .page-area span {
+    position: relative;
+    z-index: 1;
     display: flex;
     align-items: center;
     justify-content: center;
