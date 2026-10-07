@@ -203,20 +203,28 @@ const presets = [
   .page-area span {
     position: relative;
     z-index: 1;
+    /* A label as Ezo writes one: a chip like a button that is not one, sixteen
+       pixels tall (eight tenths of a square) in the secondary grey, its words
+       a fifth of a square in, slightly rounded. A square holds it two pixels
+       from each line: centred in an area an odd number of squares tall it
+       sits so already, and in an even one (two label rows) it moves up half
+       a square to sit in the middle square's own. */
     display: flex;
     align-items: center;
     justify-content: center;
-    width: calc(var(--label-columns) * var(--landing-unit));
-    height: calc(var(--label-rows) * var(--landing-unit));
+    width: max-content;
+    height: calc(0.8 * var(--landing-unit));
     flex: none;
-    padding: 0;
+    padding: 0 calc(0.2 * var(--landing-unit));
+    border-radius: calc(0.2 * var(--landing-unit));
+    translate: 0 calc((var(--label-rows) - 1) * -0.5 * var(--landing-unit));
     text-align: center;
-    background: var(--ds1-docs-content-bg);
+    background: light-dark(#e6e6e6, #3c3c3c);
     color: var(--ds1-docs-header-text);
     font-family: var(--typeface-regular);
     font-size: var(--landing-type);
     font-weight: 400;
-    line-height: var(--landing-unit);
+    line-height: calc(0.8 * var(--landing-unit));
   }
   .page-area--square { grid-area: square; --area-color: #efc9dc; }
   .page-area--title { grid-area: title; --area-color: #d5c9ef; }
