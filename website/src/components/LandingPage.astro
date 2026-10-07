@@ -2,6 +2,7 @@
 import PageGridIllustration from './PageGridIllustration.astro';
 import LandingHero from './LandingHero.astro';
 import LayerDiagram from './LayerDiagram.astro';
+import LayerBricks from './LayerBricks.astro';
 
 const example = `<link rel="stylesheet"
   href="/my-styles.css" />
@@ -13,11 +14,15 @@ const example = `<link rel="stylesheet"
 
 <article class="landing" aria-labelledby="landing-title" data-pagefind-body>
   <LandingHero />
-  <section id="learn-more" class="landing-layers" aria-labelledby="layers-title">
+  <section id="learn-more" class="landing-layers" aria-labelledby="what-title">
     <div class="landing-content">
-      <h2 id="layers-title">Four layers, one unit</h2>
+      <h2 id="what-title">What Design system 1 is</h2>
+      <p>A system of Web Components. They are ordinary HTML elements, so they work everywhere your browser works: in plain pages and inside any framework, with nothing to compile.</p>
+      <p>One stylesheet and one script bring the whole system. Every size in it comes from a single unit, so spacing, type and layout stay in proportion on every screen.</p>
+      <h2 id="layers-title" class="landing-layers-title">Four layers, one unit</h2>
       <p>Root sets the unit. Core components are single pieces sized by it. Units put those pieces together, and pages place the units on the grid.</p>
     </div>
+    <LayerBricks />
     <LayerDiagram />
     <a href="/components/">All components <span aria-hidden="true">→</span></a>
   </section>
@@ -119,6 +124,7 @@ const example = `<link rel="stylesheet"
   .landing :is(p + p, h2 + p) { margin-top: var(--landing-unit); }
   .landing-section { margin-top: calc(3 * var(--landing-unit)); }
   .landing-section--first { margin-top: 0; }
+  .landing .landing-layers-title { margin-top: calc(2 * var(--landing-unit)); }
   .landing-layers {
     display: grid;
     gap: calc(2 * var(--landing-unit));

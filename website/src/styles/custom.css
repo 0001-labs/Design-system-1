@@ -2,7 +2,7 @@
 
 :root {
   /* Content layout */
-  --sl-content-width: 55rem;
+  --sl-content-width: 720px;
 
   /* Typography */
   --sl-text-5xl: 3.5rem;
@@ -14,7 +14,7 @@
   --sl-color-accent-high: #5568d3;
 
   /* Spacing */
-  --sl-nav-height: 4rem;
+  --sl-nav-height: 60px;
 
   /* Design system 1 Documentation Colors */
   --ds1-docs-header-bg: light-dark(var(--white), var(--slate-dark));
@@ -39,10 +39,6 @@
   width: 280px;
 }
 
-/* Code blocks */
-.expressive-code {
-  margin: 2rem 0;
-}
 
 /* Links */
 a {
@@ -72,7 +68,6 @@ h3,
 h4,
 h5,
 h6 {
-  font-size: 36px;
   color: var(--ds1-docs-header-text);
   font-family: var(--typeface-regular);
 }
@@ -135,13 +130,7 @@ h1#_top {
   align-items: center;
   height: 40px;
   max-height: 40px;
-  margin: 0 0 40px 0;
-}
-
-right-sidebar {
-  margin-top: 100px !important;
-  z-index: 100;
-  position: relative;
+  margin: 0 0 20px 0;
 }
 
 /* Header z-index */
@@ -166,9 +155,7 @@ table {
 /* Inline code */
 :not(pre) > code {
   background: rgba(102, 126, 234, 0.1);
-  padding: 0.2em 0.4em;
   border-radius: 0.25rem;
-  font-size: 0.9em;
 }
 
 /* Mobile responsive adjustments */
@@ -177,15 +164,6 @@ table {
     height: auto;
     max-height: none;
     margin: 0 0 20px 0;
-    font-size: 28px;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    font-size: 24px;
-  }
-
-  right-sidebar {
-    margin-top: 40px !important;
   }
 
   .sidebar-content {
@@ -220,3 +198,165 @@ body.sidebar-open {
     transition: none;
   }
 }
+
+/* ------------------------------------------------------------------------
+   The page on the grid. One square is 20px. Every panel is a whole number of
+   squares wide, every line of writing is one square tall, and every space
+   between two blocks is one or two squares. The sizes are Ezo's: writing 14,
+   a heading 15, a section's title 17 and the page's 20, small print 10.
+   A hairline is drawn as a shadow, so it takes no room from the squares.
+   ------------------------------------------------------------------------ */
+:root {
+  --grid: 20px;
+  --docs-type: 14px;
+  --docs-type-small: 10px;
+  --docs-type-heading: 15px;
+  --docs-type-title-2: 17px;
+  --docs-type-title-1: 20px;
+  --docs-tracking: -0.28px;
+  --sl-text-code: 13px;
+  --sl-line-height: 1.4286;
+}
+
+.main-pane,
+.right-sidebar-panel {
+  font-size: var(--docs-type);
+  line-height: var(--grid);
+  letter-spacing: var(--docs-tracking);
+}
+
+/* The page's title: Ezo's title, on two squares. */
+h1#_top {
+  font-family: var(--typeface-medium, var(--typeface-regular));
+  font-size: var(--docs-type-title-1);
+  font-weight: 400;
+  line-height: calc(2 * var(--grid));
+  letter-spacing: -0.4px;
+}
+
+.sl-markdown-content {
+  font-size: var(--docs-type);
+  line-height: var(--grid);
+}
+
+.sl-markdown-content :is(p, li, dt, dd, td, th, blockquote, summary) {
+  font-size: var(--docs-type);
+  line-height: var(--grid);
+}
+
+/* One square between two blocks, two before a heading. */
+.sl-markdown-content :not(a, strong, em, del, span, input, code, br) + :not(a, strong, em, del, span, input, code, br, :where(.not-content *)) {
+  margin-top: var(--grid);
+}
+.sl-markdown-content :not(h1, h2, h3, h4, h5, h6, .sl-heading-wrapper) + :is(h1, h2, h3, h4, h5, h6, .sl-heading-wrapper):not(:where(.not-content *)) {
+  margin-top: calc(2 * var(--grid));
+}
+.sl-markdown-content .sl-heading-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: var(--docs-type);
+  line-height: var(--grid);
+}
+.sl-markdown-content .sl-heading-wrapper > :is(h1, h2, h3, h4, h5, h6) { display: block; margin: 0; padding: 0; }
+.sl-markdown-content .sl-heading-wrapper .sl-anchor-link { position: static; display: flex; align-items: center; height: var(--grid); margin: 0; }
+.sl-markdown-content :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--typeface-medium, var(--typeface-regular));
+  font-weight: 400;
+  line-height: var(--grid);
+}
+.sl-markdown-content :is(h1, h2) { font-size: var(--docs-type-title-2); letter-spacing: -0.34px; }
+.sl-markdown-content h3 { font-size: var(--docs-type-heading); letter-spacing: -0.3px; }
+.sl-markdown-content :is(h4, h5, h6) { font-size: var(--docs-type); }
+
+.sl-markdown-content li + li:not(:where(.not-content *)),
+.sl-markdown-content li > :is(ul, ol):not(:where(.not-content *)) {
+  margin-top: 0;
+}
+.sl-markdown-content :is(ul, ol):not(:where(.not-content *)) {
+  padding-inline-start: var(--grid);
+}
+
+/* Code: thirteen on the same rows, a square of room around it, its frame a shadow. */
+.sl-markdown-content :not(pre) > code {
+  padding: 0 4px;
+  margin-block: 0;
+  font-size: 13px;
+  line-height: var(--grid);
+}
+.expressive-code {
+  --ec-brdRad: 4px;
+  margin: var(--grid) 0;
+  font-size: 13px;
+  line-height: var(--grid);
+}
+.expressive-code .frame { box-shadow: inset 0 0 0 1px var(--ds1-docs-divider); border-radius: 4px; }
+.expressive-code .frame pre { border: 0; background: transparent; }
+.expressive-code .frame pre > code { padding: var(--grid) 0; font-size: 13px; line-height: var(--grid); }
+.expressive-code .frame .ec-line { font-size: 13px; line-height: var(--grid); }
+.expressive-code .frame .ec-line .code { padding-inline: var(--grid); }
+.expressive-code .frame.is-terminal .header,
+.expressive-code .frame.has-title .header {
+  height: var(--grid);
+  min-height: var(--grid);
+  padding-block: 0;
+  border: 0;
+  box-shadow: inset 0 -1px var(--ds1-docs-divider);
+  font-size: var(--docs-type-small);
+  line-height: var(--grid);
+}
+.expressive-code .frame .copy button { width: var(--grid); height: var(--grid); }
+
+/* A table's row is two squares, ruled by a shadow under it. */
+.sl-markdown-content table:not(:where(.not-content *)) { border-radius: 0; }
+.sl-markdown-content :is(th, td):not(:where(.not-content *)) {
+  padding: 10px 10px;
+  border: 0;
+  box-shadow: inset 0 -1px var(--ds1-docs-divider);
+}
+.sl-markdown-content hr:not(:where(.not-content *)) {
+  height: 0;
+  border: 0;
+  box-shadow: 0 1px var(--ds1-docs-divider);
+}
+.sl-markdown-content blockquote:not(:where(.not-content *)) {
+  padding-inline-start: var(--grid);
+  border: 0;
+  box-shadow: inset 1px 0 var(--ds1-docs-header-text-secondary);
+}
+
+/* The page's foot: two squares under the writing. */
+.main-pane footer { margin-top: calc(2 * var(--grid)); gap: var(--grid); font-size: var(--docs-type); line-height: var(--grid); }
+.main-pane footer .meta { margin-top: 0; gap: var(--grid); font-size: var(--docs-type); line-height: var(--grid); }
+.main-pane footer .pagination-links { gap: var(--grid); }
+.main-pane footer .pagination-links a {
+  padding: var(--grid);
+  border: 0;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px var(--ds1-docs-divider);
+  font-size: var(--docs-type);
+  line-height: var(--grid);
+}
+.main-pane footer .pagination-links .link-title { font-size: var(--docs-type-heading); line-height: var(--grid); }
+
+/* On this page: twelve squares, its writing starting level with the page's. */
+.right-sidebar-container { width: 240px; flex: none; }
+.right-sidebar { width: 240px; box-shadow: inset 1px 0 var(--ds1-docs-header-border); border: 0; }
+.right-sidebar-panel { padding: calc(2 * var(--grid)) var(--grid); }
+.right-sidebar-panel .sl-container { width: 200px; max-width: 200px; }
+.right-sidebar-panel h2 {
+  margin: 0 0 var(--grid);
+  font-family: var(--typeface-medium, var(--typeface-regular));
+  font-size: var(--docs-type);
+  font-weight: 400;
+  line-height: calc(2 * var(--grid));
+  letter-spacing: var(--docs-tracking);
+}
+.right-sidebar-panel starlight-toc a {
+  padding: 0;
+  font-size: var(--docs-type);
+  line-height: var(--grid);
+  letter-spacing: var(--docs-tracking);
+}
+.right-sidebar-panel starlight-toc ul ul a { padding-inline-start: var(--grid); }
+.right-sidebar-panel starlight-toc ul ul ul a { padding-inline-start: calc(2 * var(--grid)); }

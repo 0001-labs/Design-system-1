@@ -53,3 +53,7 @@ Foundation for Ezo, TAU, and all 0001 products.
 ## Icon collection
 
 For icon collection additions or SVG refinements, read `docs/icon-library.md`.
+
+## App parity
+
+The App parity list in Ezo (`29iiBs`, in the 0001 folder) shows where Ezo, Consistency and Link stand, feature by feature, as Ezo diagrams. Before you build something those apps already have (sign-in, billing, languages, dark mode, the DS one port), read its row and follow the app that has it.

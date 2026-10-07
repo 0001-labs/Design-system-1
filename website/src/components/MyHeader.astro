@@ -36,7 +36,7 @@ const { landing = false } = Astro.props;
   <!-- Right: Actions -->
   <div class="header-actions">
     {landing && <a class="header-docs" href="/getting-started/installation/">Documentation</a>}
-    <a class="header-docs" href="/icons">Icons</a>
+    <a class="header-docs" href="/components/">Components</a>
     <a class="header-classless" href="/classless/editor/">CLASSless</a>
     <!-- Language Toggle using Design system 1 cycle component -->
     <div class="action-item">
@@ -53,7 +53,8 @@ const { landing = false } = Astro.props;
 <style>
   .site-header {
     background: var(--ds1-docs-header-bg);
-    border-bottom: 1px solid var(--ds1-docs-header-border);
+    /* The hairline is a shadow, so the header stays three squares. */
+    box-shadow: inset 0 -1px var(--ds1-docs-header-border);
     display: flex;
     align-items: center;
     height: 60px;
@@ -98,9 +99,9 @@ const { landing = false } = Astro.props;
     display: flex;
     align-items: center;
     height: 60px;
-    width: 280.5px;
+    width: 280px;
     padding: 0 40px;
-    border-right: 1px solid var(--ds1-docs-header-border);
+    box-shadow: inset -1px 0 var(--ds1-docs-header-border);
     flex-shrink: 0;
   }
 
@@ -115,6 +116,7 @@ const { landing = false } = Astro.props;
   .logo-text {
     font-family: 'GT-America-Standard-Regular', sans-serif;
     font-size: 20px;
+    line-height: 20px;
     color: var(--ds1-docs-header-text);
     letter-spacing: -0.04em;
     white-space: nowrap;
@@ -124,7 +126,7 @@ const { landing = false } = Astro.props;
   .header-divider {
     width: 20px;
     height: 60px;
-    border-right: 1px solid var(--ds1-docs-header-border);
+    box-shadow: inset -1px 0 var(--ds1-docs-header-border);
     flex-shrink: 0;
   }
 
@@ -134,6 +136,7 @@ const { landing = false } = Astro.props;
     display: flex;
     align-items: center;
     padding: 0 20px 0 40px;
+    height: 60px;
     min-width: 0;
   }
 
@@ -141,7 +144,7 @@ const { landing = false } = Astro.props;
   .header-actions {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 20px;
     padding-right: 40px;
     flex-shrink: 0;
   }
@@ -153,16 +156,17 @@ const { landing = false } = Astro.props;
 
   .header-classless {
     color: var(--ds1-docs-header-text);
-    font-size: 13px;
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: -0.28px;
     text-decoration: none;
-    border-bottom: 1px solid var(--ds1-docs-accent-green);
-    padding-block: 4px;
+    box-shadow: 0 1px var(--ds1-docs-accent-green);
   }
 
   .site-header--home { height: 80px; padding-inline: max(20px, calc((100% - 1360px) / 2)); gap: 20px; }
   .site-header--home .header-logo { width: auto; padding: 0; border: 0; }
   .site-header--home .header-actions { margin-left: auto; padding: 0; gap: 20px; }
-  .header-docs { color: var(--ds1-docs-header-text); font-size: 14px; text-decoration: none; }
+  .header-docs { color: var(--ds1-docs-header-text); font-size: 14px; line-height: 20px; letter-spacing: -0.28px; text-decoration: none; }
   .header-docs:hover { text-decoration: underline; }
 
   @media (max-width: 600px) {
@@ -186,13 +190,18 @@ const { landing = false } = Astro.props;
     max-width: 300px;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 4px;
+    /* An item's row: one square, on the header's middle one. */
+    height: 20px;
+    padding: 0 4px;
     background: var(--ds1-docs-search-bg);
     border: none;
     border-radius: 4px;
     color: var(--ds1-docs-header-text-secondary);
     cursor: pointer;
-    font-size: 0.875rem;
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: -0.28px;
     font-family: 'GT-America-Standard-Regular', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     transition: color 0.2s ease;
   }
@@ -217,21 +226,13 @@ const { landing = false } = Astro.props;
   /* Tablet Responsive Styles */
   @media (max-width: 1024px) {
     .header-logo {
-      width: auto;
-      padding: 0 20px;
-    }
-
-    .header-divider {
-      width: 15px;
-    }
-
-    .header-search {
-      padding: 0 15px;
+      width: 240px;
+      padding: 0 40px;
     }
 
     .header-actions {
       padding-right: 20px;
-      gap: 0.5rem;
+      gap: 20px;
     }
   }
 
@@ -250,7 +251,7 @@ const { landing = false } = Astro.props;
     .header-logo {
       width: auto;
       padding: 0;
-      border-right: none;
+      box-shadow: none;
       flex: 0 0 auto;
     }
 
@@ -276,7 +277,7 @@ const { landing = false } = Astro.props;
     :global(.custom-search button[data-open-modal]) {
       width: 100%;
       max-width: none;
-      padding: 8px 12px;
+      padding: 0 10px;
     }
 
     .header-actions {

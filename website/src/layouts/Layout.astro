@@ -74,9 +74,10 @@ const classlessMode = pathname === '/classless/editor' ? 'editor'
 
       /* Sidebar */
       .sidebar {
-        width: 280.5px;
-        min-width: 280.5px;
-        border-right: 1px solid var(--ds1-docs-header-border);
+        /* Fourteen squares, its hairline inside the last one. */
+        width: 280px;
+        min-width: 280px;
+        box-shadow: inset -1px 0 var(--ds1-docs-header-border);
         overflow-y: auto;
         background: var(--ds1-docs-sidebar-bg);
         z-index: 100;
@@ -88,7 +89,7 @@ const classlessMode = pathname === '/classless/editor' ? 'editor'
         min-width: 20px;
         height: 100%;
         background: var(--ds1-docs-sidebar-bg);
-        border-right: 1px solid var(--ds1-docs-header-border);
+        box-shadow: inset -1px 0 var(--ds1-docs-header-border);
       }
 
       /* Main content */
@@ -194,13 +195,8 @@ const classlessMode = pathname === '/classless/editor' ? 'editor'
       /* Tablet adjustments */
       @media (max-width: 1024px) and (min-width: 769px) {
         .sidebar {
-          width: 250px;
-          min-width: 250px;
-        }
-
-        .sidebar-gap {
-          width: 15px;
-          min-width: 15px;
+          width: 240px;
+          min-width: 240px;
         }
       }
     </style>

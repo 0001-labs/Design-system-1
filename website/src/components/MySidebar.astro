@@ -46,7 +46,7 @@ const entryTranslationKeys: Record<string, string> = {
   <div class="sidebar-content">
     {sidebar.map((group) => {
       const groupKey = groupTranslationKeys[group.label];
-      const isIndented = ['Start Here', 'CLASSless Design System', 'Built-ins', '1 Root'].includes(group.label);
+      const isIndented = ['Start Here', 'CLASSless', 'Built-ins', '1 Root'].includes(group.label);
       return (
         <details open class="sidebar-group">
           <summary class="sidebar-group-summary">
@@ -183,6 +183,10 @@ const entryTranslationKeys: Record<string, string> = {
     display: none;
   }
 
+  /* Ezo's writing size on one square a row. */
+  .sidebar-nav ds-button { font-size: 14px; line-height: 20px; letter-spacing: -0.28px; }
+  .sidebar-group-summary ds-button { height: 20px; }
+
   details[open] .sidebar-group-summary ds-button {
     color: var(--button-text-color) !important;
   }
@@ -206,9 +210,6 @@ const entryTranslationKeys: Record<string, string> = {
     align-items: center;
   }
 
-  .sidebar-entry.first-three {
-    padding-bottom: 6px;
-  }
 
   .sidebar-spacer {
     flex: 1;
@@ -243,7 +244,7 @@ const entryTranslationKeys: Record<string, string> = {
   /* Mobile Responsive Styles */
   @media (max-width: 768px) {
     .sidebar-nav {
-      padding: 60px 24px 24px 24px;
+      padding: 60px 20px 20px 20px;
       position: relative;
     }
 
@@ -252,20 +253,16 @@ const entryTranslationKeys: Record<string, string> = {
     }
 
     .sidebar-content {
-      gap: 16px;
-    }
-
-    .sidebar-entries {
-      gap: 4px;
+      gap: 20px;
     }
 
     .sidebar-entry {
-      height: 32px;
-      min-height: 32px;
+      height: 40px;
+      min-height: 40px;
     }
 
     .sidebar-entry.first-three {
-      padding-bottom: 4px;
+      padding-bottom: 0;
     }
 
     .sidebar-footer {
@@ -277,14 +274,9 @@ const entryTranslationKeys: Record<string, string> = {
 
   /* Touch-friendly tap targets on mobile */
   @media (max-width: 768px) and (pointer: coarse) {
-    .sidebar-entry {
-      height: 44px;
-      min-height: 44px;
-    }
-
     .sidebar-group-summary {
-      height: 44px;
-      min-height: 44px;
+      height: 40px;
+      min-height: 40px;
     }
   }
 </style>

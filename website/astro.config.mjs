@@ -47,7 +47,6 @@ export default defineConfig({
         "./src/styles/custom.css",
       ],
       sidebar: [
-        { label: "Tools", items: [{ label: "Icon builder", link: "/icons" }] },
         {
           label: "Start Here",
           items: [
@@ -56,7 +55,7 @@ export default defineConfig({
           ],
         },
         {
-          label: "CLASSless Design System",
+          label: "CLASSless",
           items: [
             { label: "Overview", slug: "classless" },
             { label: "Editor", slug: "classless/editor" },

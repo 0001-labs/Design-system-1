@@ -133,16 +133,24 @@ const presets = [
     grid-template-rows: calc(4 * var(--landing-unit)) var(--landing-unit) var(--landing-unit) calc(6 * var(--landing-unit)) var(--landing-unit) calc(6 * var(--landing-unit));
     grid-template-areas: '.' 'header' '.' 'content' '.' 'footer';
   }
-  .preset-grid--app { grid-template-rows: var(--app-layout); grid-template-areas: var(--app-layout-areas); }
+  /* App, Home and Settings as one.css lays them out (--app-layout and the rest),
+     written here in the page's unit so the picture never waits on that sheet. */
+  .preset-grid--app {
+    grid-template-rows: var(--landing-unit) var(--landing-unit) var(--landing-unit) calc(2 * var(--landing-unit)) calc(12 * var(--landing-unit)) var(--landing-unit) calc(4 * var(--landing-unit)) calc(2 * var(--landing-unit));
+    grid-template-areas: 'banner' '.' 'header' '.' 'main' 'page-dots' '.' 'footer';
+  }
   .preset-grid--list {
     grid-template-rows: var(--landing-unit) var(--landing-unit) var(--landing-unit) calc(20 * var(--landing-unit));
     grid-template-areas: 'banner' '.' 'header' 'board';
   }
-  .preset-grid--home { grid-template-rows: var(--home-layout); grid-template-areas: var(--home-layout-areas); }
+  .preset-grid--home {
+    grid-template-rows: var(--landing-unit) var(--landing-unit) var(--landing-unit) var(--landing-unit) calc(8 * var(--landing-unit));
+    grid-template-areas: 'banner' '.' 'header' '.' 'lists';
+  }
   .preset-grid--settings {
     height: calc(24 * var(--landing-unit));
-    grid-template-rows: var(--settings-layout);
-    grid-template-areas: var(--settings-layout-areas);
+    grid-template-rows: var(--landing-unit) var(--landing-unit) 1fr;
+    grid-template-areas: 'banner' '.' 'settings';
   }
   /* Portfolio layout proportions, measured in the same scaled units as the page. */
   .page-grid-illustration {

@@ -2,60 +2,49 @@
 // The four layers drawn the way Ezo draws a diagram: every box an item cell,
 // four squares by one (80 by 20), stacked edge to edge under its group's name and what it is, groups
 // two squares apart with an arrow from each to the next.
-import { ICONS, ICON_SUMMARY, LAYERS } from '../lib/component-directory';
+import { LAYERS } from '../lib/component-directory';
 
-// The icons fill columns of boxes side by side, five across and two on a
-// phone. Only the block's outer corners are round, so each layout names the
-// boxes that stand on one.
-const corners = (columns: number) => {
-  const rows = Math.ceil(ICONS.length / columns);
-  const last = ICONS.length - 1;
-  const lastTop = (columns - 1) * rows;
-  const names = new Map<number, string[]>();
-  const add = (index: number, corner: string) => names.set(index, [...(names.get(index) ?? []), corner]);
-  add(0, 'tl');
-  add(rows - 1, 'bl');
-  add(lastTop, 'tr');
-  add(last, 'br');
-  // A short last column leaves the foot of the one before it open.
-  if (last < columns * rows - 1) add(lastTop - 1, 'br');
-  return { rows, names };
-};
-const wide = corners(5);
-const narrow = corners(2);
-const cornerClasses = (index: number) => [
-  ...(wide.names.get(index) ?? []).map((corner) => `wide-${corner}`),
-  ...(narrow.names.get(index) ?? []).map((corner) => `narrow-${corner}`),
-];
+// What a box says under the pointer: the element as it is written in HTML.
+const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
 ---
 
 <div class="layer-diagram" role="group" aria-label="The four layers of Design system 1, each built from the one before, and its icons">
   {LAYERS.map((layer, index) => (
     <div class="layer-group" data-color={layer.color}>
-      <p class="layer-name">{layer.number} {layer.name}</p>
+      <p class="layer-name">
+        <span>{layer.number} {layer.name}</span>
+        <span class="layer-arrow" aria-hidden="true">
+          <svg class="layer-arrow-head" viewBox="-0.17 -0.12 0.17 0.24"><polyline points="-0.164,-0.115 0,0 -0.164,0.115" /></svg>
+        </span>
+      </p>
       <p class="layer-summary">{layer.summary}</p>
       <ul>
         {layer.entries.map((entry) => (
-          <li><a href={entry.href}>{entry.name}</a></li>
+          <li>
+            <a href={entry.href}>
+              <span class="layer-text">
+                <span class="layer-word">{entry.name}</span>
+                {entry.tag && <span class="layer-tag">{inCode(entry.tag)}</span>}
+              </span>
+            </a>
+          </li>
         ))}
       </ul>
-      {index < LAYERS.length - 1 && (
-        <svg class="layer-arrow" viewBox="0 0 2 1" aria-hidden="true">
-          <polyline points="0,0.5 2,0.5" vector-effect="non-scaling-stroke" />
-          <polyline points="1.836,0.385 2,0.5 1.836,0.615" vector-effect="non-scaling-stroke" />
-        </svg>
-      )}
     </div>
   ))}
-  <div class="layer-group layer-group--icons" data-color="yellow" style={`--wide-rows: ${wide.rows}; --narrow-rows: ${narrow.rows}`}>
+  {/* The icons are named once after the layers, joined to them by the last arrow: one grey chip leading to them all, not listed. */}
+  <div class="layer-group" data-color="grey">
     <p class="layer-name">x Icon</p>
-    <p class="layer-summary">{ICON_SUMMARY}</p>
+    <p class="layer-summary">The drawings ds-icon shows.</p>
     <ul>
-      {ICONS.map((icon, index) => (
-        <li class:list={cornerClasses(index)}>
-          <a href="/icons"><span class="layer-icon" aria-hidden="true" set:html={icon.svg} />{icon.name}</a>
-        </li>
-      ))}
+      <li>
+        <a href="/2-core/icon/">
+          <span class="layer-text">
+            <span class="layer-word">Icons</span>
+            <span class="layer-tag">{'<ds-icon>'}</span>
+          </span>
+        </a>
+      </li>
     </ul>
   </div>
 </div>
@@ -65,7 +54,7 @@ const cornerClasses = (index: number) => [
     --diagram-unit: var(--landing-unit);
     --diagram-ink: var(--ds1-docs-header-text);
     display: grid;
-    grid-template-columns: repeat(4, calc(4 * var(--diagram-unit)));
+    grid-template-columns: repeat(5, calc(4 * var(--diagram-unit)));
     column-gap: calc(2 * var(--diagram-unit));
     row-gap: calc(2 * var(--diagram-unit));
     align-items: start;
@@ -79,6 +68,7 @@ const cornerClasses = (index: number) => [
   .layer-group[data-color='light-blue'] { --box-fill: #ccccff; }
   .layer-group[data-color='pink'] { --box-fill: #f5aad1; }
   .layer-group[data-color='yellow'] { --box-fill: #eaff00; }
+  .layer-group[data-color='grey'] { --box-fill: light-dark(#e6e6e6, #bdbdbd); }
 
   .layer-name { margin: 0; font-family: var(--typeface-medium); }
   .layer-group ul { margin: 0; padding: 0; list-style: none; }
@@ -90,51 +80,69 @@ const cornerClasses = (index: number) => [
     display: block;
     height: var(--diagram-unit);
     padding: 0 calc(0.2 * var(--diagram-unit));
-    overflow: hidden;
     background: var(--box-fill);
     color: #2a2a2a;
     line-height: var(--diagram-unit);
     white-space: nowrap;
     text-decoration: none;
   }
-  .layer-group:not(.layer-group--icons) li:first-child a { border-start-start-radius: var(--box-radius); border-start-end-radius: var(--box-radius); }
-  .layer-group:not(.layer-group--icons) li:last-child a { border-end-start-radius: var(--box-radius); border-end-end-radius: var(--box-radius); }
-
-  /* The icons stand under the layers, their boxes in columns edge to edge. */
-  .layer-group--icons { grid-column: 1 / -1; --summary-rows: 1; --icon-rows: var(--wide-rows); }
-  .layer-group--icons .layer-summary { width: auto; }
-  .layer-group--icons ul {
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: calc(4 * var(--diagram-unit));
-    grid-template-rows: repeat(var(--icon-rows), var(--diagram-unit));
-  }
-  .layer-group--icons li a { display: flex; align-items: center; gap: calc(0.2 * var(--diagram-unit)); border-radius: 0; }
-  .layer-icon { display: block; flex: none; width: calc(0.8 * var(--diagram-unit)); height: calc(0.8 * var(--diagram-unit)); }
-  .layer-icon :global(svg) { display: block; width: 100%; height: 100%; }
-  .layer-group--icons li.wide-tl a { border-start-start-radius: var(--box-radius); }
-  .layer-group--icons li.wide-tr a { border-start-end-radius: var(--box-radius); }
-  .layer-group--icons li.wide-bl a { border-end-start-radius: var(--box-radius); }
-  .layer-group--icons li.wide-br a { border-end-end-radius: var(--box-radius); }
+  .layer-group li:first-child a { border-start-start-radius: var(--box-radius); border-start-end-radius: var(--box-radius); }
+  .layer-group li:last-child a { border-end-start-radius: var(--box-radius); border-end-end-radius: var(--box-radius); }
 
   @supports (corner-shape: squircle) {
     .layer-group li a { corner-shape: squircle; }
   }
-  .layer-group li a:hover { background: var(--diagram-ink); color: var(--ds1-docs-content-bg); text-decoration: none; }
+  /* A name too long for its box fades at the far edge rather than being cut. */
+  .layer-text {
+    display: block;
+    min-width: 0;
+    flex: 1;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 0.6 * var(--diagram-unit)), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 0.6 * var(--diagram-unit)), transparent);
+  }
+  .layer-tag { display: none; }
+  /* Under the pointer a box says its element, and widens to say all of it. */
+  .layer-group li { position: relative; }
+  .layer-group li a:is(:hover, :focus-visible) {
+    position: relative;
+    z-index: 2;
+    width: max-content;
+    min-width: 100%;
+    background: var(--diagram-ink);
+    color: var(--ds1-docs-content-bg);
+    text-decoration: none;
+  }
+  .layer-group li a:is(:hover, :focus-visible) .layer-text { -webkit-mask-image: none; mask-image: none; overflow: visible; }
+  .layer-group li a:is(:hover, :focus-visible) .layer-word:not(:only-child) { display: none; }
+  .layer-group li a:is(:hover, :focus-visible) .layer-tag { display: inline; }
 
   /* The arrow leaves the first box's edge and ends on the next group's. */
+  /* A layer leads to the next along the names' row: a line from a quarter
+     square after its name to a fifth of a square before the next, ending in
+     Ezo's arrow, two strokes a fifth of a square long at 35 degrees. */
+  .layer-name { display: flex; align-items: center; width: calc(6 * var(--diagram-unit)); }
   .layer-arrow {
+    position: relative;
+    flex: 1;
+    height: 1px;
+    margin-inline: calc(0.25 * var(--diagram-unit)) calc(0.2 * var(--diagram-unit));
+    background: currentColor;
+  }
+  .layer-arrow-head {
     position: absolute;
-    top: calc((2 + var(--summary-rows)) * var(--diagram-unit));
-    left: 100%;
-    width: calc(2 * var(--diagram-unit));
-    height: var(--diagram-unit);
+    right: 0;
+    top: 50%;
+    width: calc(0.17 * var(--diagram-unit));
+    height: calc(0.24 * var(--diagram-unit));
+    translate: 0 -50%;
     overflow: visible;
     fill: none;
     stroke: currentColor;
     stroke-width: 1px;
-    stroke-linejoin: miter;
+    vector-effect: non-scaling-stroke;
   }
+  .layer-arrow-head polyline { vector-effect: non-scaling-stroke; }
   /* Every explanation is written to fit three rows and keeps all three, so the boxes start on one line. */
   .layer-summary {
     /* Wider than a box: it runs on into the two squares before the next group. */
@@ -147,19 +155,7 @@ const cornerClasses = (index: number) => [
   @media (max-width: 680px) {
     .layer-diagram { grid-template-columns: repeat(2, calc(4 * var(--diagram-unit))); row-gap: calc(2 * var(--diagram-unit)); }
     .layer-group:nth-child(2n) .layer-arrow { display: none; }
-    .layer-group--icons { --icon-rows: var(--narrow-rows); }
-    .layer-group--icons li a { border-radius: 0; }
-    .layer-group--icons li.narrow-tl a { border-start-start-radius: var(--box-radius); }
-    .layer-group--icons li.narrow-tr a { border-start-end-radius: var(--box-radius); }
-    .layer-group--icons li.narrow-bl a { border-end-start-radius: var(--box-radius); }
-    .layer-group--icons li.narrow-br a { border-end-end-radius: var(--box-radius); }
   }
   :global(html.mobile) .layer-diagram { grid-template-columns: repeat(2, calc(4 * var(--diagram-unit))); row-gap: calc(2 * var(--diagram-unit)); }
   :global(html.mobile) .layer-group:nth-child(2n) .layer-arrow { display: none; }
-  :global(html.mobile) .layer-group--icons { --icon-rows: var(--narrow-rows); }
-  :global(html.mobile) .layer-group--icons li a { border-radius: 0; }
-  :global(html.mobile) .layer-group--icons li.narrow-tl a { border-start-start-radius: var(--box-radius); }
-  :global(html.mobile) .layer-group--icons li.narrow-tr a { border-start-end-radius: var(--box-radius); }
-  :global(html.mobile) .layer-group--icons li.narrow-bl a { border-end-start-radius: var(--box-radius); }
-  :global(html.mobile) .layer-group--icons li.narrow-br a { border-end-end-radius: var(--box-radius); }
 </style>
