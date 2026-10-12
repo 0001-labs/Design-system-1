@@ -357,6 +357,13 @@
     "shapes": 1
   },
   {
+    "key": "open-source",
+    "name": "Open Source",
+    "source": "Library",
+    "url": "/icons/library/open-source.svg",
+    "shapes": 1
+  },
+  {
     "key": "page",
     "name": "Page",
     "source": "Figma",
@@ -576,6 +583,13 @@
     "source": "Figma",
     "node": "116:240",
     "url": "/icons/interface/up.svg",
+    "shapes": 1
+  },
+  {
+    "key": "up-right",
+    "name": "Up Right",
+    "source": "Library",
+    "url": "/icons/library/up-right.svg",
     "shapes": 1
   },
   {

@@ -402,6 +402,14 @@
     "shapes": 1
   },
   {
+    "key": "open-source",
+    "name": "Open Source",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M2.75 3.5A1.75 1.75 0 1 0 6.25 3.5A1.75 1.75 0 1 0 2.75 3.5ZM3.75 3.5A0.75 0.75 0 1 1 5.25 3.5A0.75 0.75 0 1 1 3.75 3.5ZM9.75 3.5A1.75 1.75 0 1 0 13.25 3.5A1.75 1.75 0 1 0 9.75 3.5ZM10.75 3.5A0.75 0.75 0 1 1 12.25 3.5A0.75 0.75 0 1 1 10.75 3.5ZM6.25 12.5A1.75 1.75 0 1 0 9.75 12.5A1.75 1.75 0 1 0 6.25 12.5ZM7.25 12.5A0.75 0.75 0 1 1 8.75 12.5A0.75 0.75 0 1 1 7.25 12.5ZM4 5.25H5V8.5H4ZM11 5.25H12V8.5H11ZM4 7.5H12V8.5H4ZM7.5 8.5H8.5V10.75H7.5Z\" fill=\"#1E1E1E\"/>\n</svg>",
+    "url": "/icons/library/open-source.svg",
+    "shapes": 1
+  },
+  {
     "key": "page",
     "name": "Page",
     "source": "Figma",
@@ -649,6 +657,14 @@
     "node": "116:240",
     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\">\n<g id=\"Icons\">\n<g id=\"Up\">\n<path id=\"Vector\" d=\"M7.49645 3.48222V16H8.50702L8.50841 3.48259L11.4156 6.38982L12.1095 5.68299L8.00173 1.57524L3.8905 5.68647L4.59784 6.39381L7.49645 3.48222Z\" fill=\"#1E1E1E\" />\n</g>\n</g>\n</svg>",
     "url": "/icons/interface/up.svg",
+    "shapes": 1
+  },
+  {
+    "key": "up-right",
+    "name": "Up Right",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M11.5728 3.7126L2.7214 12.564L3.436 13.2786L12.2881 4.4284L12.2881 8.5398L13.2786 8.5307L13.2786 2.7214L7.4644 2.7214L7.4644 3.7218L11.5728 3.7126Z\" fill=\"#1E1E1E\"/>\n</svg>",
+    "url": "/icons/library/up-right.svg",
     "shapes": 1
   },
   {
