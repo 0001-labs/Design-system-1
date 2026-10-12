@@ -1,6 +1,6 @@
 ---
 name: design-system-1
-description: The exact rules of Design system 1, the 0001 design framework: the 20px square, item and row sizes (one square high), widths in whole squares, type sizes, lines, corners, colours and motion. Use whenever you design, build or review any interface, page, component, diagram or card in a 0001 product (Ezo, Link, Consistency, Peer, Ins, Visual, the 0001 site, System) or a 0001 design for a client, and before choosing any size, spacing, font size or radius.
+description: The exact rules of Design system 1, the 0001 design framework: the 20px square, item and row sizes (one square high), widths in whole squares, type sizes, lines, corners, colours and motion. Use whenever you design, build or review any interface, page, component, diagram or card in a 0001 product (Ezo, Link, Consistency, Peer, Ins, Visual, the 0001 site, System) or a 0001 design for a client, before choosing any size, spacing, font size or radius, and when a product adds languages, translations or a language picker.
 ---
 
 # Design system 1
@@ -119,6 +119,19 @@ Only three of these are Design system 1 colours (#99ff73, #ccff4d, #ccccff); the
 - The common ones: `up-right` for a link that goes somewhere (where ↗ would have been), `right`, `left`, `up`, `down` for direction, `open` to expand, `close`, `check`, `plus`, `search`, `more`, `star`.
 - A product carries the icons it uses as files (the 0001 site: `client/vendor/design-system-1/icons`, refreshed by `scripts/sync-design-system-1.mjs`) and draws one as a mask in `currentColor`, so it follows the text.
 - An icon that does not exist yet is added to the library first, by `docs/icon-library.md`: derived from its neighbours, 16 × 16, then `vp run icons:build` and the icon tests. Never draw a one-off icon inside a product.
+
+## Languages
+
+Design system 1 owns languages for every product: the list, choosing and remembering one, the shared words, language-aware addresses, the Convex check and the picker. A product brings only its own words. The full guide is the Languages page (`website/src/content/docs/built-ins/languages.md`, https://designsystem1.com/built-ins/languages/).
+
+1. **Import** from the `ds-one` package, or from the product's vendored copy of `DS1/` (Ezo's `client/design/0-face/i18n.ts`). Change the module in Design system 1 and sync the copy; a vendored copy is edited only by the sync.
+2. **Configure at startup**, straight after the import: `configureI18n({ languages: [...], sharedWords: true })`. `languages` is the product's subset of `LANGUAGES` (`DS1/0-face/languages.ts`); the picker, the browser's language and the address prefixes all follow it.
+3. **Words** live in the product's translations file, `{ "<language>": { "<key>": "<text>" } }`, keyed by the English sentence or by a dotted id with an `en` table. English is the fallback, then the key itself. Placeholders are `{name}` or `{{name}}`, filled by `translate(key, params)`. One file per language (`languageFile: "/translations/{language}.json"`) or a TypeScript module passed to `loadTranslations` work as well. Check a file with `validateTranslations`.
+4. **Shared words** (Save, Cancel, Sign in, Nothing here yet, Today, the language names) come from `DS1/0-face/translations/`; use their keys before writing a product's own, and add a word every product needs there.
+5. **The picker** is `<ds-language>`: one square high, eight wide (`compact`: four).
+6. **The backend** checks languages with `languageValidator` or `languageValidatorFor(subset)` from `ds-one/DS1/0-face/language-validator.ts`, imported by path in `convex/`.
+
+Every text is sentence case, in every language.
 
 ## Checking a design
 

@@ -65,7 +65,7 @@ export default defineConfig({
         {
           label: "Built-ins",
           items: [
-            { label: "i18n", slug: "built-ins/i18n" },
+            { label: "Languages", slug: "built-ins/languages" },
             { label: "Theming", slug: "built-ins/theming" },
             { label: "Device", slug: "built-ins/device" },
             { label: "Preferences", slug: "built-ins/preferences" },
@@ -120,7 +120,6 @@ export default defineConfig({
         {
           label: "Advanced",
           items: [
-            { label: "i18n", slug: "advanced/i18n" },
             { label: "Theming", slug: "advanced/theming" },
           ],
         },

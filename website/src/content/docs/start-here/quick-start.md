@@ -96,4 +96,4 @@ Design system 1 includes built-in internationalization. Use the `text` attribute
 
 - Explore [all components](/2-core/button/)
 - Learn about [theming](/advanced/theming/)
-- Set up [internationalization](/advanced/i18n/)
+- Set up [languages](/built-ins/languages/)
