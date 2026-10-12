@@ -96,6 +96,27 @@
     "shapes": 1
   },
   {
+    "key": "bold",
+    "name": "Bold",
+    "source": "Library",
+    "url": "/icons/library/bold.svg",
+    "shapes": 1
+  },
+  {
+    "key": "bullet",
+    "name": "Bullet",
+    "source": "Library",
+    "url": "/icons/library/bullet.svg",
+    "shapes": 3
+  },
+  {
+    "key": "callout",
+    "name": "Callout",
+    "source": "Library",
+    "url": "/icons/library/callout.svg",
+    "shapes": 3
+  },
+  {
     "key": "change",
     "name": "Change",
     "source": "Figma",
@@ -120,6 +141,20 @@
     "shapes": 1
   },
   {
+    "key": "code",
+    "name": "Code",
+    "source": "Library",
+    "url": "/icons/library/code.svg",
+    "shapes": 1
+  },
+  {
+    "key": "code-block",
+    "name": "Code Block",
+    "source": "Library",
+    "url": "/icons/library/code-block.svg",
+    "shapes": 2
+  },
+  {
     "key": "collapse",
     "name": "Collapse",
     "source": "Figma",
@@ -141,6 +176,13 @@
     "source": "Figma",
     "node": "116:239",
     "url": "/icons/interface/column.svg",
+    "shapes": 1
+  },
+  {
+    "key": "comment",
+    "name": "Comment",
+    "source": "Library",
+    "url": "/icons/library/comment.svg",
     "shapes": 1
   },
   {
@@ -168,6 +210,13 @@
     "shapes": 3
   },
   {
+    "key": "divider",
+    "name": "Divider",
+    "source": "Library",
+    "url": "/icons/library/divider.svg",
+    "shapes": 1
+  },
+  {
     "key": "down",
     "name": "Down",
     "source": "Figma",
@@ -188,6 +237,13 @@
     "name": "Email",
     "source": "Library",
     "url": "/icons/library/email.svg",
+    "shapes": 1
+  },
+  {
+    "key": "equation",
+    "name": "Equation",
+    "source": "Library",
+    "url": "/icons/library/equation.svg",
     "shapes": 1
   },
   {
@@ -238,6 +294,34 @@
     "shapes": 1
   },
   {
+    "key": "h1",
+    "name": "H1",
+    "source": "Library",
+    "url": "/icons/library/h1.svg",
+    "shapes": 1
+  },
+  {
+    "key": "h2",
+    "name": "H2",
+    "source": "Library",
+    "url": "/icons/library/h2.svg",
+    "shapes": 1
+  },
+  {
+    "key": "h3",
+    "name": "H3",
+    "source": "Library",
+    "url": "/icons/library/h3.svg",
+    "shapes": 1
+  },
+  {
+    "key": "handle",
+    "name": "Handle",
+    "source": "Library",
+    "url": "/icons/library/handle.svg",
+    "shapes": 6
+  },
+  {
     "key": "head",
     "name": "Head",
     "source": "Figma",
@@ -261,12 +345,33 @@
     "shapes": 1
   },
   {
+    "key": "image",
+    "name": "Image",
+    "source": "Library",
+    "url": "/icons/library/image.svg",
+    "shapes": 3
+  },
+  {
     "key": "in",
     "name": "In",
     "source": "Figma",
     "node": "116:246",
     "url": "/icons/interface/in.svg",
     "shapes": 2
+  },
+  {
+    "key": "indent",
+    "name": "Indent",
+    "source": "Library",
+    "url": "/icons/library/indent.svg",
+    "shapes": 2
+  },
+  {
+    "key": "italic",
+    "name": "Italic",
+    "source": "Library",
+    "url": "/icons/library/italic.svg",
+    "shapes": 1
   },
   {
     "key": "left",
@@ -285,6 +390,13 @@
     "shapes": 6
   },
   {
+    "key": "link",
+    "name": "Link",
+    "source": "Library",
+    "url": "/icons/library/link.svg",
+    "shapes": 1
+  },
+  {
     "key": "lock",
     "name": "Lock",
     "source": "Figma",
@@ -299,6 +411,13 @@
     "node": "116:251",
     "url": "/icons/interface/loop.svg",
     "shapes": 4
+  },
+  {
+    "key": "mention",
+    "name": "Mention",
+    "source": "Library",
+    "url": "/icons/library/mention.svg",
+    "shapes": 2
   },
   {
     "key": "mic",
@@ -349,6 +468,13 @@
     "shapes": 2
   },
   {
+    "key": "numbered",
+    "name": "Numbered",
+    "source": "Library",
+    "url": "/icons/library/numbered.svg",
+    "shapes": 2
+  },
+  {
     "key": "open",
     "name": "Open",
     "source": "Figma",
@@ -362,6 +488,13 @@
     "source": "Library",
     "url": "/icons/library/open-source.svg",
     "shapes": 1
+  },
+  {
+    "key": "outdent",
+    "name": "Outdent",
+    "source": "Library",
+    "url": "/icons/library/outdent.svg",
+    "shapes": 2
   },
   {
     "key": "page",
@@ -385,6 +518,20 @@
     "source": "Figma",
     "node": "116:220",
     "url": "/icons/interface/plus.svg",
+    "shapes": 1
+  },
+  {
+    "key": "quote",
+    "name": "Quote",
+    "source": "Library",
+    "url": "/icons/library/quote.svg",
+    "shapes": 1
+  },
+  {
+    "key": "redo",
+    "name": "Redo",
+    "source": "Library",
+    "url": "/icons/library/redo.svg",
     "shapes": 1
   },
   {
@@ -452,6 +599,13 @@
     "shapes": 3
   },
   {
+    "key": "slash",
+    "name": "Slash",
+    "source": "Library",
+    "url": "/icons/library/slash.svg",
+    "shapes": 1
+  },
+  {
     "key": "star",
     "name": "Star",
     "source": "Figma",
@@ -468,11 +622,32 @@
     "shapes": 8
   },
   {
+    "key": "strike",
+    "name": "Strike",
+    "source": "Library",
+    "url": "/icons/library/strike.svg",
+    "shapes": 1
+  },
+  {
     "key": "sup",
     "name": "SUp",
     "source": "Figma",
     "node": "117:1656",
     "url": "/icons/interface/sup.svg",
+    "shapes": 1
+  },
+  {
+    "key": "table",
+    "name": "Table",
+    "source": "Library",
+    "url": "/icons/library/table.svg",
+    "shapes": 2
+  },
+  {
+    "key": "text",
+    "name": "Text",
+    "source": "Library",
+    "url": "/icons/library/text.svg",
     "shapes": 1
   },
   {
@@ -497,6 +672,27 @@
     "source": "Library",
     "url": "/icons/library/titlestyle.svg",
     "shapes": 2
+  },
+  {
+    "key": "todo",
+    "name": "Todo",
+    "source": "Library",
+    "url": "/icons/library/todo.svg",
+    "shapes": 3
+  },
+  {
+    "key": "toggle",
+    "name": "Toggle",
+    "source": "Library",
+    "url": "/icons/library/toggle.svg",
+    "shapes": 2
+  },
+  {
+    "key": "underline",
+    "name": "Underline",
+    "source": "Library",
+    "url": "/icons/library/underline.svg",
+    "shapes": 1
   },
   {
     "key": "undictate",

@@ -117,6 +117,7 @@ Only three of these are Design system 1 colours (#99ff73, #ccff4d, #ccccff); the
 
 - Every icon comes from Design system 1's library, `DS1/x-icon/` (catalogue at https://designsystem1.com/icons): 16 × 16, drawn in the text colour. Never use a Unicode or emoji glyph as an icon: no ↗, →, ✓, ×, ⌕ or ★ in an interface.
 - The common ones: `up-right` for a link that goes somewhere (where ↗ would have been), `right`, `left`, `up`, `down` for direction, `open` to expand, `close`, `check`, `plus`, `search`, `more`, `star`.
+- The editing ones, for Aa's toolbar and menus: `bold`, `italic`, `underline`, `strike`, `code`, `link`, `equation`, `mention`, `comment`; the block kinds `text`, `h1`, `h2`, `h3`, `bullet`, `numbered`, `todo`, `toggle`, `quote`, `divider`, `code-block`, `callout`, `table`, `image`; and `handle` (the block's grip), `slash` (the `/` menu), `indent`, `outdent`, `undo`, `redo`, `duplicate`, `delete`, `change` (turn into).
 - A product carries the icons it uses as files (the 0001 site: `client/vendor/design-system-1/icons`, refreshed by `scripts/sync-design-system-1.mjs`) and draws one as a mask in `currentColor`, so it follows the text.
 - An icon that does not exist yet is added to the library first, by `docs/icon-library.md`: derived from its neighbours, 16 × 16, then `vp run icons:build` and the icon tests. Never draw a one-off icon inside a product.
 
