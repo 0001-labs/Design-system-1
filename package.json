@@ -109,7 +109,13 @@
     "@hono/node-server": "^2.1.0"
   },
   "peerDependencies": {
+    "convex": "^1.17.0",
     "lit": "^3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "convex": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=22.12.0"
