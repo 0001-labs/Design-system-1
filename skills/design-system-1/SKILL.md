@@ -35,7 +35,9 @@ Items stack edge to edge with no gap, as an Ezo list does; a header item wears t
 
 ## Colours
 
-Shown at https://designsystem1.com/colours (`website/src/pages/colours.astro`); change the page with this section.
+Shown at https://designsystem1.com/colours (`website/src/pages/colours.astro`) as one palette, named by colour and sorted by hue, and the inks (greys); change the page with this section.
+
+**Dark mode versions.** Each colour has one, derived as the ds1 Figma file derives Apple green (#99ff73 to #529d36): the same hue, the saturation times 0.49, at 41% lightness; a colour already at or below 41% keeps its saturation. An ink turns over: lightness 12% + (1 − L) × 76%. Write a token as `light-dark(light, dark)`; the page lists both hexes for every colour.
 
 Every colour is a token from `DS1/1-root/one.css` (Ezo's fork, `client/design/1-root/one.css`, holds the same values). Use the token, never the hex, and never invent a colour.
 
