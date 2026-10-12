@@ -337,3 +337,166 @@ describe("without a browser", () => {
     expect(i18n.translate("Missing")).toBe("Missing");
   });
 });
+
+describe("the language list", () => {
+  test("SUPPORTED_LANGUAGES is the whole list", async () => {
+    stubPage();
+    const i18n = await loadModule();
+    const { LANGUAGES } = await import("../DS1/0-face/languages");
+    expect(i18n.SUPPORTED_LANGUAGES).toEqual(LANGUAGES);
+  });
+
+  test("names languages from the list when Intl cannot", async () => {
+    stubPage();
+    vi.stubGlobal("Intl", {
+      DisplayNames: function () {
+        throw new Error("No Intl");
+      },
+    });
+    const i18n = await loadModule();
+    expect(i18n.getLanguageDisplayName("nb")).toBe("Norwegian Bokmål");
+    expect(i18n.getLanguageDisplayName("pt-BR")).toBe("Brazilian Portuguese");
+    expect(i18n.getLanguageDisplayName("xx")).toBe("XX");
+  });
+
+  test("maps the browser's Portuguese and Norwegian onto the list", async () => {
+    stubPage({ browser: ["pt-BR"] });
+    let i18n = await loadModule();
+    expect(i18n.getBrowserLanguage()).toBe("pt-BR");
+
+    vi.stubGlobal("navigator", { language: "nn-NO", languages: ["nn-NO"] });
+    i18n = await loadModule();
+    expect(i18n.getBrowserLanguage()).toBe("nn");
+  });
+
+  test("lands on a language the product speaks, a relative standing in", async () => {
+    stubPage({ browser: ["no-NO", "en"] });
+    const i18n = await loadModule();
+    i18n.configureI18n({ languages: ["en", "nb", "pt-BR"] });
+    expect(i18n.getBrowserLanguage()).toBe("nb");
+    expect(i18n.currentLanguage.value).toBe("nb");
+
+    vi.stubGlobal("navigator", { language: "nl-NL", languages: ["nl-NL", "fr"] });
+    expect(i18n.getBrowserLanguage()).toBe("en");
+  });
+
+  test("tries every browser language before keeping one it has no mapping for", async () => {
+    stubPage({ browser: ["nl-NL", "sv-SE"] });
+    const i18n = await loadModule();
+    expect(i18n.getBrowserLanguage()).toBe("sv");
+  });
+
+  test("reads a stored language as one the product speaks", async () => {
+    stubPage({ stored: { language: "pt" } });
+    const i18n = await loadModule();
+    expect(i18n.currentLanguage.value).toBe("pt");
+    i18n.configureI18n({ languages: ["en", "pt-BR"] });
+    expect(i18n.currentLanguage.value).toBe("pt-BR");
+  });
+
+  test("gives the product's languages an address prefix", async () => {
+    stubPage();
+    const i18n = await loadModule();
+    const routing = await import("../DS1/0-face/language-routing");
+    i18n.configureI18n({ languages: ["en", "da"], routing: { prefixDefaultLanguage: true } });
+    expect(routing.withLanguagePrefix("/a", "da")).toBe("/da/a");
+    expect(routing.withLanguagePrefix("/a", "ja")).toBe("/a");
+    expect(routing.withLanguagePrefix("/a", "en")).toBe("/en/a");
+  });
+});
+
+describe("placeholders and key shapes", () => {
+  test("fills {name} and {{name}} in translate, getText and textInLanguage", async () => {
+    stubPage({
+      stored: { language: "da" },
+      translations: {
+        en: { "auth.sentTo": "We sent a link to {{email}}." },
+        da: { "Hello {name}": "Hej {name}", "auth.sentTo": "Vi sendte et link til {{email}}." },
+      },
+    });
+    const i18n = await loadModule();
+    expect(i18n.translate("Hello {name}", { name: "Ada" })).toBe("Hej Ada");
+    expect(i18n.getText("auth.sentTo", { email: "a@b.c" })).toBe("Vi sendte et link til a@b.c.");
+    expect(i18n.textInLanguage("auth.sentTo", "sv", { email: "a@b.c" })).toBe("We sent a link to a@b.c.");
+    expect(i18n.translate("Bye {name}", { name: "Bo" })).toBe("Bye Bo");
+  });
+
+  test("reads a relative before English", async () => {
+    stubPage({ stored: { language: "nn" }, translations: { en: { Save: "Save" }, nb: { Save: "Lagre" } } });
+    const i18n = await loadModule();
+    expect(i18n.translate("Save")).toBe("Lagre");
+    expect(i18n.hasTranslation("Save", "no")).toBe(true);
+  });
+
+  test("loads a TypeScript module of words, a Partial table included", async () => {
+    stubPage({ stored: { language: "da" } });
+    const i18n = await loadModule();
+    const en = { "settings.language": "Language", "settings.theme": "Theme" };
+    const translations: Record<string, Partial<Record<keyof typeof en, string>>> = {
+      en,
+      da: { "settings.language": "Sprog", "settings.theme": undefined },
+    };
+    i18n.loadTranslations(translations);
+    expect(i18n.translate("settings.language")).toBe("Sprog");
+    expect(i18n.translate("settings.theme")).toBe("Theme");
+  });
+});
+
+describe("shared words", () => {
+  test("load beneath the product's words when the product opts in", async () => {
+    const win = stubPage({ stored: { language: "da" }, translations: { da: { Close: "Luk ned" } } });
+    const i18n = await loadModule();
+    expect(i18n.translate("Save")).toBe("Save");
+
+    let ready = 0;
+    win.addEventListener("translations-ready", () => ready++);
+    i18n.configureI18n({ sharedWords: true });
+    await i18n.loadSharedWords();
+
+    expect(ready).toBeGreaterThan(0);
+    expect(i18n.translate("Save")).toBe("Gem");
+    expect(i18n.translate("Close")).toBe("Luk ned");
+    expect(i18n.textInLanguage("Nothing here yet", "ja")).toBe("まだ何もありません");
+    expect(i18n.textInLanguage("Cancel", "nn")).toBe("Avbryt");
+    expect(i18n.textInLanguage("Japanese", "ja")).toBe("日本語");
+    expect(i18n.hasTranslation("Sign in")).toBe(true);
+    // The languages offered stay the product's
+    expect(i18n.getAvailableLanguagesSync()).toEqual(["da"]);
+  });
+
+  test("survive a product file arriving", async () => {
+    const win = stubPage({ stored: { language: "sv" } });
+    const fetcher = vi.fn(async (source: string) =>
+      source === "/translations/sv.json"
+        ? new Response(JSON.stringify({ Hello: "Hej" }))
+        : new Response("", { status: 404 })
+    );
+    vi.stubGlobal("fetch", fetcher);
+    const i18n = await loadModule();
+    i18n.configureI18n({
+      languages: ["en", "sv"],
+      languageFile: "/translations/{language}.json",
+      sharedWords: true,
+    });
+    await i18n.loadSharedWords();
+    // A bare per-language file is read as that language's table
+    await vi.waitFor(() => expect(win.DS_ONE_TRANSLATIONS?.sv).toEqual({ Hello: "Hej" }));
+    expect(i18n.translate("Hello")).toBe("Hej");
+    expect(i18n.translate("Search")).toBe("Sök");
+  });
+
+  test("every shared language file is in the format, in sentence case", async () => {
+    const { SHARED_WORDS } = await import("../DS1/0-face/shared-words");
+    const { validateTranslations } = await import("../DS1/0-face/translations-format");
+    const { isLanguage } = await import("../DS1/0-face/languages");
+    expect(validateTranslations(SHARED_WORDS)).toEqual({ valid: true, errors: [], warnings: [] });
+    const english = Object.keys(SHARED_WORDS.en ?? {});
+    for (const [language, table] of Object.entries(SHARED_WORDS)) {
+      expect(isLanguage(language), language).toBe(true);
+      for (const [key, text] of Object.entries(table ?? {})) {
+        expect(english, `${language}: ${key}`).toContain(key);
+        expect(text, `${language}: ${key}`).not.toMatch(/^[A-ZÆØÅÄÖÜ]{2,}( [A-ZÆØÅÄÖÜ]+)+$/);
+      }
+    }
+  });
+});

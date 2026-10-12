@@ -1,3 +1,21 @@
+import {
+  LANGUAGES,
+  LANGUAGE_METADATA,
+  fallbackLanguages,
+  isLanguage,
+  languageOrder,
+  normalizeLanguage,
+} from "./languages";
+import type { Language } from "./languages";
+import { configureLanguageRouting } from "./language-routing";
+import type { LanguageRoutingOptions } from "./language-routing";
+import { readLanguageFile, resolveText } from "./translations-format";
+import type {
+  TranslationParams,
+  TranslationTable,
+  TranslationsFile,
+} from "./translations-format";
+
 // Define the supported languages using ISO codes (extensible)
 export type LanguageCode = string;
 
@@ -49,66 +67,30 @@ export type I18nOptions = {
    * localStorage `ds-one:i18n-debug` set to `on` turn it on as well.
    */
   reportMissingKeys?: boolean | (() => boolean);
+  /**
+   * Load Design system 1's shared interface words (buttons, sign-in, empty
+   * states, dates, language names) beneath the product's own words, so the
+   * product's text wins where both have a key. Off by default.
+   */
+  sharedWords?: boolean;
+  /**
+   * Which languages get an address prefix (`/ja/…`) and whether the default
+   * language has one; see `configureLanguageRouting`. Without `languages`
+   * here, the product's `languages` get a prefix.
+   */
+  routing?: LanguageRoutingOptions;
 };
 
 // Bundled translations (keys.json may not exist - will use external translations if not available)
 // This is a fallback for when external translations aren't loaded
 let translationKeys: TranslationMap = {};
 
-// Primary language list – prioritise the 10 requested languages when cycling
-const LANGUAGE_PRIORITY_ORDER = [
-  "da",
-  "de",
-  "en",
-  "es",
-  "fr",
-  "it",
-  "ja",
-  "ko",
-  "pt",
-  "sv",
-  "zh",
-] as const;
-
 /**
- * The languages Design system 1 orders, names and maps browser languages to.
- * A product that speaks all of them can pass it as `languages`.
+ * Every language Design system 1 orders, names and maps browser languages to:
+ * the list in `./languages` (`LANGUAGES`). A product turns on the ones it
+ * translates with `configureI18n({ languages })`.
  */
-export const SUPPORTED_LANGUAGES: readonly LanguageCode[] =
-  LANGUAGE_PRIORITY_ORDER;
-
-const LANGUAGE_PRIORITY_LOOKUP = new Map<string, number>(
-  LANGUAGE_PRIORITY_ORDER.map((code, index) => [code, index])
-);
-
-// Fallback language names if Intl.DisplayNames is not available
-const FALLBACK_LANGUAGE_NAMES: Record<string, string> = {
-  da: "Danish",
-  "da-dk": "Danish",
-  de: "German",
-  "de-de": "German",
-  en: "English",
-  "en-us": "English",
-  es: "Spanish",
-  "es-es": "Spanish",
-  fr: "French",
-  "fr-fr": "French",
-  it: "Italian",
-  "it-it": "Italian",
-  ja: "Japanese",
-  "ja-jp": "Japanese",
-  ko: "Korean",
-  "ko-kr": "Korean",
-  pt: "Portuguese",
-  "pt-pt": "Portuguese",
-  sv: "Swedish",
-  "sv-se": "Swedish",
-  zh: "Chinese",
-  "zh-cn": "Chinese",
-  "zh-tw": "Chinese",
-  "zh-hans": "Chinese",
-  "zh-hant": "Chinese",
-};
+export const SUPPORTED_LANGUAGES: readonly Language[] = LANGUAGES;
 
 const DISPLAY_NAME_CACHE = new Map<string, Intl.DisplayNames>();
 let displayNameFallbackWarningShown = false;
@@ -133,6 +115,10 @@ let i18nOptions: I18nOptions =
   typeof window !== "undefined" && window.DS_ONE_I18N
     ? { ...window.DS_ONE_I18N }
     : {};
+
+// Design system 1's shared words, kept apart from the product's so a product's
+// file arriving never wipes them, and looked up beneath the product's words.
+let sharedWords: TranslationsFile | undefined;
 
 // ============================================================================
 // Storage
@@ -178,19 +164,6 @@ function extractPrimarySubtag(code: LanguageCode): string {
     return "";
   }
   return code.toLowerCase().split(/[-_]/)[0] ?? "";
-}
-
-/** The codes to look a language's words up under: as given, then its primary subtag. */
-function lookupCodes(language: LanguageCode): LanguageCode[] {
-  const codes: LanguageCode[] = [];
-  if (language) {
-    codes.push(language);
-  }
-  const primary = extractPrimarySubtag(language);
-  if (primary && !codes.includes(primary)) {
-    codes.push(primary);
-  }
-  return codes;
 }
 
 /**
@@ -328,6 +301,12 @@ function resolveTranslationSources(): string[] {
   return own ? [own, ...tables.filter((source) => source !== own)] : tables;
 }
 
+/** The language whose own file `source` is, when it is one. */
+function languageOfSource(source: string): LanguageCode | undefined {
+  const start = fileLanguage(currentLanguage.value) ?? defaultLanguage;
+  return languageFileFor(start) === source ? start : undefined;
+}
+
 function validateTranslationMap(
   candidate: unknown
 ): candidate is TranslationMap {
@@ -344,10 +323,13 @@ function validateTranslationMap(
 // that failed is forgotten, so a later attempt asks again.
 const translationFiles = new Map<string, Promise<TranslationMap | null>>();
 
-function fetchTranslationFile(source: string): Promise<TranslationMap | null> {
+function fetchTranslationFile(
+  source: string,
+  language?: LanguageCode
+): Promise<TranslationMap | null> {
   let pending = translationFiles.get(source);
   if (!pending) {
-    pending = readTranslationFile(source).then((translations) => {
+    pending = readTranslationFile(source, language).then((translations) => {
       if (!translations) {
         translationFiles.delete(source);
       }
@@ -359,7 +341,8 @@ function fetchTranslationFile(source: string): Promise<TranslationMap | null> {
 }
 
 async function readTranslationFile(
-  source: string
+  source: string,
+  language?: LanguageCode
 ): Promise<TranslationMap | null> {
   try {
     const response = await fetch(source);
@@ -369,7 +352,11 @@ async function readTranslationFile(
       return null;
     }
 
-    const translations = await response.json();
+    const json: unknown = await response.json();
+    // A language's own file may hold its table bare ({ "Save": "Gem" })
+    const translations = language
+      ? (readLanguageFile(language, json) ?? json)
+      : json;
 
     if (!validateTranslationMap(translations)) {
       console.warn(
@@ -431,7 +418,10 @@ async function loadExternalTranslations(): Promise<boolean> {
   const sources = resolveTranslationSources();
 
   for (const source of sources) {
-    const translations = await fetchTranslationFile(source);
+    const translations = await fetchTranslationFile(
+      source,
+      languageOfSource(source)
+    );
     if (!translations) {
       continue;
     }
@@ -476,7 +466,7 @@ export function loadLanguage(language: LanguageCode): Promise<void> {
   if (!pending) {
     pending = (async () => {
       const own = languageFileFor(code);
-      let translations = own ? await fetchTranslationFile(own) : null;
+      let translations = own ? await fetchTranslationFile(own, code) : null;
       for (const source of resolveTableSources()) {
         if (translations) {
           break;
@@ -509,21 +499,10 @@ function getTranslationData(): TranslationMap {
 // Language names and ordering
 // ============================================================================
 
-function getLanguagePriority(code: LanguageCode): number {
-  const primary = extractPrimarySubtag(code);
-  const priority = LANGUAGE_PRIORITY_LOOKUP.get(primary);
-
-  if (typeof priority === "number") {
-    return priority;
-  }
-
-  return LANGUAGE_PRIORITY_ORDER.length;
-}
-
 function sortLanguageCodes(codes: LanguageCode[]): LanguageCode[] {
   return [...codes].sort((a, b) => {
-    const priorityA = getLanguagePriority(a);
-    const priorityB = getLanguagePriority(b);
+    const priorityA = languageOrder(a);
+    const priorityB = languageOrder(b);
 
     if (priorityA !== priorityB) {
       return priorityA - priorityB;
@@ -578,16 +557,10 @@ function getDisplayNameForLocale(
   return undefined;
 }
 
+// English names from the language list, for when Intl.DisplayNames is missing
 function getFallbackDisplayName(code: LanguageCode): string | undefined {
-  const normalized = code.toLowerCase().replace("_", "-");
-  const direct = FALLBACK_LANGUAGE_NAMES[normalized];
-
-  if (direct) {
-    return direct;
-  }
-
-  const primary = extractPrimarySubtag(normalized);
-  return FALLBACK_LANGUAGE_NAMES[primary];
+  const language = normalizeLanguage(code, null);
+  return language ? LANGUAGE_METADATA[language].label : undefined;
 }
 
 export function getLanguageDisplayName(
@@ -644,82 +617,63 @@ export function getLanguageDisplayName(
 // Browser language
 // ============================================================================
 
-const BROWSER_LANGUAGE_PREFERENCES: Record<string, LanguageCode> = {
-  da: "da",
-  "da-dk": "da",
-  de: "de",
-  "de-de": "de",
-  en: "en",
-  "en-us": "en",
-  "en-gb": "en",
-  es: "es",
-  "es-es": "es",
-  "es-mx": "es",
-  fr: "fr",
-  "fr-fr": "fr",
-  it: "it",
-  "it-it": "it",
-  ja: "ja",
-  "ja-jp": "ja",
-  ko: "ko",
-  "ko-kr": "ko",
-  pt: "pt",
-  "pt-pt": "pt",
-  "pt-br": "pt",
-  sv: "sv",
-  "sv-se": "sv",
-  zh: "zh",
-  "zh-cn": "zh",
-  "zh-hans": "zh",
-  "zh-tw": "zh",
-  "zh-hant": "zh",
-};
+/** The languages a browser's language may become: the product's, else the list. */
+function configuredLanguages(): readonly LanguageCode[] | null {
+  return i18nOptions.languages?.length ? i18nOptions.languages : null;
+}
 
+/**
+ * A browser language tag as one the product speaks: within the configured
+ * languages when they are set (a relative standing in, so `no` reads `nb` for
+ * a product that speaks `nb`), else within the whole list. Null when none fits.
+ */
 function resolvePreferredLanguage(languageTag: string): LanguageCode | null {
   if (!languageTag) {
     return null;
   }
 
-  const normalized = languageTag.toLowerCase().replace("_", "-");
+  const configured = configuredLanguages();
+  const members = configured
+    ? configured.filter(isLanguage)
+    : (LANGUAGES as readonly Language[]);
 
-  const directMatch = BROWSER_LANGUAGE_PREFERENCES[normalized];
-  if (directMatch) {
-    return directMatch;
+  const match = members.length
+    ? normalizeLanguage(languageTag, null, members)
+    : null;
+  if (match) {
+    return match;
   }
 
-  const primary = extractPrimarySubtag(normalized);
-  const primaryMatch = BROWSER_LANGUAGE_PREFERENCES[primary];
-  if (primaryMatch) {
-    return primaryMatch;
-  }
-
-  return languageTag as LanguageCode;
+  // A configured language outside the list (`nl`), by its primary subtag
+  return configured ? fileLanguage(languageTag) : null;
 }
 
-// Helper function to get browser language
+/**
+ * The browser's language, as one the product speaks: the first of the
+ * browser's languages that fits. When none does, a product that configured
+ * its languages gets English; one that configured nothing gets the browser's
+ * own tag, since its words may still be loaded under it.
+ */
 export function getBrowserLanguage(): LanguageCode {
-  if (typeof navigator === "undefined") {
+  if (typeof navigator === "undefined" || !navigator) {
     return defaultLanguage;
   }
 
-  const browserLang = navigator.language;
+  const candidates = [
+    navigator.language,
+    ...(Array.isArray(navigator.languages) ? navigator.languages : []),
+  ].filter((tag): tag is string => Boolean(tag));
 
-  if (browserLang) {
-    const resolved = resolvePreferredLanguage(browserLang);
+  for (const candidate of candidates) {
+    const resolved = resolvePreferredLanguage(candidate);
     if (resolved) {
       return resolved;
     }
   }
 
-  if (Array.isArray(navigator.languages)) {
-    for (const candidate of navigator.languages) {
-      const resolved = resolvePreferredLanguage(candidate);
-      if (resolved) {
-        return resolved;
-      }
-    }
+  if (!configuredLanguages() && candidates[0]) {
+    return candidates[0];
   }
-
   return defaultLanguage;
 }
 
@@ -764,19 +718,70 @@ export const currentLanguage = {
  */
 export function configureI18n(next: I18nOptions): void {
   const previousKey = storageKey();
+  const previousLanguages = i18nOptions.languages;
   i18nOptions = { ...i18nOptions, ...next };
 
-  if (storageKey() !== previousKey) {
+  applyRouting();
+
+  if (
+    storageKey() !== previousKey ||
+    i18nOptions.languages !== previousLanguages
+  ) {
+    // The stored choice under the new key, or the browser's language, as one
+    // the product speaks
     const stored = readStoredLanguage();
-    if (stored && stored !== currentLanguage.value) {
-      currentLanguage.value = stored;
-      dispatchLanguageChanged(stored);
+    let language: LanguageCode = stored || getBrowserLanguage();
+    if (stored && configuredLanguages()) {
+      language = resolvePreferredLanguage(stored) ?? defaultLanguage;
     }
+    if (language !== currentLanguage.value) {
+      currentLanguage.value = language;
+      dispatchLanguageChanged(language);
+    }
+  }
+
+  if (next.sharedWords) {
+    void loadSharedWords();
   }
 
   if (loadAttempted && i18nOptions.languageFile) {
     void loadLanguage(currentLanguage.value);
   }
+}
+
+/** Address prefixes follow the product's languages unless routing names its own. */
+function applyRouting(): void {
+  if (!i18nOptions.routing && !i18nOptions.languages) {
+    return;
+  }
+  configureLanguageRouting({
+    ...(i18nOptions.languages ? { languages: i18nOptions.languages } : {}),
+    ...i18nOptions.routing,
+  });
+}
+
+let sharedWordsLoad: Promise<void> | null = null;
+
+/**
+ * Load Design system 1's shared interface words beneath the product's own
+ * (what `configureI18n({ sharedWords: true })` does). They arrive in a chunk
+ * of their own, so products that do not use them do not carry them.
+ */
+export function loadSharedWords(): Promise<void> {
+  if (!sharedWordsLoad) {
+    sharedWordsLoad = import("./shared-words").then(({ SHARED_WORDS }) => {
+      sharedWords = SHARED_WORDS;
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("translations-ready"));
+      }
+    });
+  }
+  return sharedWordsLoad;
+}
+
+applyRouting();
+if (i18nOptions.sharedWords) {
+  void loadSharedWords();
 }
 
 // Auto-load translations when this module is imported (for CDN bundle).
@@ -864,43 +869,44 @@ function reportMissingKey(key: string, language: LanguageCode): void {
   );
 }
 
-// Get translation by key
-export function translate(key: string): string {
-  return textInLanguage(key, currentLanguage.value);
+/**
+ * A key's text in the current language, with its placeholders (`{name}` and
+ * `{{name}}` alike) filled from `params`.
+ */
+export function translate(key: string, params?: TranslationParams): string {
+  return textInLanguage(key, currentLanguage.value, params);
 }
 
 /**
  * A key's text in a given language, whatever the page's own language is (a
- * drawing made for one language, say). Region subtags fall back to the
- * primary language (`ja-JP` reads `ja`), and every language falls back to
- * English, then to the key itself.
+ * drawing made for one language, say). The fallback order: the language, its
+ * primary subtag (`ja-JP` reads `ja`), its relatives (`nn` reads `nb`,
+ * `pt-BR` reads `pt`), English, then the key itself. In each, the product's
+ * words come before the shared words.
  */
-export function textInLanguage(key: string, language: LanguageCode): string {
+export function textInLanguage(
+  key: string,
+  language: LanguageCode,
+  params?: TranslationParams
+): string {
   const data = getTranslationData();
-  const codes = lookupCodes(language);
-
-  for (const code of codes) {
-    const text = data?.[code]?.[key];
-    if (text) {
-      return text;
-    }
+  const resolved = resolveText(key, language, [data, sharedWords], params);
+  if (resolved.language !== null) {
+    return resolved.text;
   }
 
-  // Try fallback to English
-  if (!codes.includes(defaultLanguage)) {
-    const text = data?.[defaultLanguage]?.[key];
-    if (text) {
-      return text;
-    }
-
-    // Loaded a language at a time, English may not have arrived yet
-    if (!data?.[defaultLanguage] && codes.some((code) => data?.[code])) {
-      void loadLanguage(defaultLanguage);
-    }
+  // Loaded a language at a time, English may not have arrived yet
+  const codes = fallbackLanguages(language);
+  if (
+    !codes.includes(defaultLanguage) &&
+    !data?.[defaultLanguage] &&
+    codes.some((code) => data?.[code])
+  ) {
+    void loadLanguage(defaultLanguage);
   }
 
   reportMissingKey(key, codes[codes.length - 1] ?? language);
-  return key;
+  return resolved.text;
 }
 
 export function hasTranslation(
@@ -911,23 +917,24 @@ export function hasTranslation(
     return false;
   }
 
-  const data = getTranslationData();
-  const codes = lookupCodes(language);
+  const codes = fallbackLanguages(language);
   if (!codes.includes(defaultLanguage)) {
     codes.push(defaultLanguage);
   }
 
-  return codes.some((code) => {
-    const langData = data?.[code];
-    return Boolean(
-      langData && Object.prototype.hasOwnProperty.call(langData, key)
-    );
-  });
+  return [getTranslationData(), sharedWords].some((source) =>
+    codes.some((code) => {
+      const langData = source?.[code];
+      return Boolean(
+        langData && Object.prototype.hasOwnProperty.call(langData, key)
+      );
+    })
+  );
 }
 
 // Get text - synchronous version for components
-export function getText(key: string): string {
-  return translate(key);
+export function getText(key: string, params?: TranslationParams): string {
+  return translate(key, params);
 }
 
 // Get available languages: the configured ones, else the ones in the loaded words
@@ -951,19 +958,20 @@ export function getAvailableLanguagesSync(): LanguageCode[] {
 
 /**
  * Add words to what is loaded: one language's (`loadTranslations("da", {…})`)
- * or several at once (`loadTranslations({ en: {…}, da: {…} })`). Components
- * update as they do when a translation file arrives.
+ * or several at once (`loadTranslations({ en: {…}, da: {…} })`), from a JSON
+ * file or a TypeScript module of the same shape (a `Partial` table is fine).
+ * Components update as they do when a translation file arrives.
  */
 export function loadTranslations(
   language: LanguageCode,
-  translations: TranslationData
+  translations: TranslationTable
 ): void;
-export function loadTranslations(translations: TranslationMap): void;
+export function loadTranslations(translations: TranslationsFile): void;
 export function loadTranslations(
-  languageOrMap: LanguageCode | TranslationMap,
-  translations?: TranslationData
+  languageOrMap: LanguageCode | TranslationsFile,
+  translations?: TranslationTable
 ): void {
-  const map: TranslationMap =
+  const map: TranslationsFile =
     typeof languageOrMap === "string"
       ? { [languageOrMap]: translations ?? {} }
       : languageOrMap;
@@ -978,7 +986,13 @@ export function loadTranslations(
   const data = getTranslationData();
   const merged: TranslationMap = {};
   for (const [code, words] of Object.entries(map)) {
-    merged[code] = { ...data[code], ...words };
+    const defined: TranslationData = {};
+    for (const [key, text] of Object.entries(words ?? {})) {
+      if (typeof text === "string") {
+        defined[key] = text;
+      }
+    }
+    merged[code] = { ...data[code], ...defined };
   }
   mergeTranslations(merged);
 
