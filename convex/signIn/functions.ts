@@ -7,13 +7,18 @@ import { appleSecretReminder, normalizeEmail, passwordAllowed, signInAvailabilit
  * `convex/auth.ts`, so their names stay the product's:
  * `export const { providers, passwordSignIn, remindAppleSecret } = signInFunctions({ … })`.
  */
-export function signInFunctions({ product, owner }: { product: string; owner: string | undefined }) {
+export function signInFunctions({ product, owner, codeReady }: {
+  product: string
+  owner: string | undefined
+  /** Whether the code can be sent, for a product with its own sender; by default the Resend values decide. */
+  codeReady?: () => boolean
+}) {
   return {
     /** Public configuration only; never provider credentials. */
     providers: query({
       args: {},
       returns: v.object({ google: v.boolean(), apple: v.boolean(), newAccounts: v.boolean(), code: v.boolean() }),
-      handler: () => signInAvailability(process.env, Date.now()),
+      handler: () => ({ ...signInAvailability(process.env, Date.now()), ...(codeReady ? { code: codeReady() } : {}) }),
     }),
     /** Whether this address signs in with a password instead of a code: the screen asks after the email is typed. Listed addresses, and accounts that already have one. */
     passwordSignIn: query({
