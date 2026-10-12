@@ -1,12 +1,55 @@
 // Define the supported languages using ISO codes (extensible)
 export type LanguageCode = string;
 
-// Define the structure of our translation data
-type TranslationData = {
+// One language's words, key to text
+export type TranslationData = {
   [key: string]: string;
 };
 
-type TranslationMap = Record<string, TranslationData>;
+// Every language's words, keyed by language code
+export type TranslationMap = Record<string, TranslationData>;
+
+/**
+ * How a product sets up the language module. Every field is optional: without
+ * any, the module behaves as it always has (the whole table from
+ * `./translations.json`, the languages offered are the ones in the words).
+ *
+ * Pass it to `configureI18n()` straight after importing the module, or put it
+ * on `window.DS_ONE_I18N` before the module loads.
+ */
+export type I18nOptions = {
+  /**
+   * Every language the product speaks. When set, the picker offers these
+   * whether or not their words have arrived yet, which matters when a page
+   * loads only its own language (`languageFile`). Without it, the languages
+   * offered are the ones found in the loaded words.
+   */
+  languages?: readonly LanguageCode[];
+  /**
+   * Where one language's words are published, so a page loads its own
+   * language rather than the whole table: a pattern with `{language}` in it
+   * (`"/translations/{language}.json"`) or a function. Each file holds
+   * `{ "<language>": { …words } }`. When a language's file is missing, the
+   * whole table is the fallback. Without it, only the whole table is loaded.
+   */
+  languageFile?: string | ((language: LanguageCode) => string) | null;
+  /**
+   * Where the whole table is published. Defaults to `./translations.json`.
+   * `window.DS_ONE_TRANSLATIONS_FILE` and the `data-ds-one-translations`,
+   * `ds-one:translations` and `ds-one-translations` markers in the page win
+   * over it.
+   */
+  translationsFile?: string;
+  /** The localStorage key that keeps the chosen language. Defaults to `language`. */
+  storageKey?: string;
+  /**
+   * Report keys with no translation on the console, each once. Off by
+   * default, since components also show what people write themselves, and
+   * that is not a key anyone forgot. `window.DS_ONE_I18N_DEBUG = true` or
+   * localStorage `ds-one:i18n-debug` set to `on` turn it on as well.
+   */
+  reportMissingKeys?: boolean | (() => boolean);
+};
 
 // Bundled translations (keys.json may not exist - will use external translations if not available)
 // This is a fallback for when external translations aren't loaded
@@ -26,6 +69,13 @@ const LANGUAGE_PRIORITY_ORDER = [
   "sv",
   "zh",
 ] as const;
+
+/**
+ * The languages Design system 1 orders, names and maps browser languages to.
+ * A product that speaks all of them can pass it as `languages`.
+ */
+export const SUPPORTED_LANGUAGES: readonly LanguageCode[] =
+  LANGUAGE_PRIORITY_ORDER;
 
 const LANGUAGE_PRIORITY_LOOKUP = new Map<string, number>(
   LANGUAGE_PRIORITY_ORDER.map((code, index) => [code, index])
@@ -68,13 +118,121 @@ declare global {
   interface Window {
     DS_ONE_TRANSLATIONS?: Record<string, TranslationData>;
     DS_ONE_TRANSLATIONS_FILE?: string;
+    DS_ONE_I18N?: I18nOptions;
+    DS_ONE_I18N_DEBUG?: boolean;
   }
 }
+
+const DEFAULT_TRANSLATION_FILE = "./translations.json";
+const DEFAULT_STORAGE_KEY = "language";
+const DEBUG_STORAGE_KEY = "ds-one:i18n-debug";
+
+const defaultLanguage: LanguageCode = "en";
+
+let i18nOptions: I18nOptions =
+  typeof window !== "undefined" && window.DS_ONE_I18N
+    ? { ...window.DS_ONE_I18N }
+    : {};
+
+// ============================================================================
+// Storage
+// ============================================================================
+
+function storage(): Storage | undefined {
+  try {
+    return typeof window !== "undefined"
+      ? (window.localStorage ?? undefined)
+      : undefined;
+  } catch {
+    // Storage can be blocked (private windows, cleared site data)
+    return undefined;
+  }
+}
+
+function storageKey(): string {
+  return i18nOptions.storageKey || DEFAULT_STORAGE_KEY;
+}
+
+function readStoredLanguage(): LanguageCode | null {
+  try {
+    return (storage()?.getItem(storageKey()) as LanguageCode | null) || null;
+  } catch {
+    return null;
+  }
+}
+
+function storeLanguage(language: LanguageCode): void {
+  try {
+    storage()?.setItem(storageKey(), language);
+  } catch {
+    // The choice still holds for this page
+  }
+}
+
+// ============================================================================
+// Language codes
+// ============================================================================
+
+function extractPrimarySubtag(code: LanguageCode): string {
+  if (!code) {
+    return "";
+  }
+  return code.toLowerCase().split(/[-_]/)[0] ?? "";
+}
+
+/** The codes to look a language's words up under: as given, then its primary subtag. */
+function lookupCodes(language: LanguageCode): LanguageCode[] {
+  const codes: LanguageCode[] = [];
+  if (language) {
+    codes.push(language);
+  }
+  const primary = extractPrimarySubtag(language);
+  if (primary && !codes.includes(primary)) {
+    codes.push(primary);
+  }
+  return codes;
+}
+
+/**
+ * The language whose file a page loads for `language`: one of the configured
+ * languages when a list is set (null when it speaks none of them), otherwise
+ * the primary subtag.
+ */
+function fileLanguage(language: LanguageCode): LanguageCode | null {
+  const configured = i18nOptions.languages;
+  if (!configured || configured.length === 0) {
+    return extractPrimarySubtag(language) || null;
+  }
+
+  const normalized = (language || "").toLowerCase().replace("_", "-");
+  const exact = configured.find((code) => code.toLowerCase() === normalized);
+  if (exact) {
+    return exact;
+  }
+
+  const primary = extractPrimarySubtag(language);
+  return configured.find((code) => code.toLowerCase() === primary) ?? null;
+}
+
+function languageFileFor(language: LanguageCode): string | null {
+  const pattern = i18nOptions.languageFile;
+  if (!pattern) {
+    return null;
+  }
+  const path =
+    typeof pattern === "function"
+      ? pattern(language)
+      : pattern.split("{language}").join(language);
+  return normalizeCandidate(path);
+}
+
+// ============================================================================
+// Loading translations
+// ============================================================================
 
 // CDN Loader: Automatically detects and loads translation JSON files
 // for CDN users who want to use external translations
 
-const DEFAULT_TRANSLATION_FILE = "./translations.json";
 let loadAttempted = false;
 
 function normalizeCandidate(path: string): string | null {
@@ -99,7 +257,7 @@ function normalizeCandidate(path: string): string | null {
 }
 
 function findAttributeCandidate(): string | null {
-  if (typeof document === "undefined") {
+  if (typeof document === "undefined" || !document.querySelector) {
     return null;
   }
 
@@ -130,7 +288,8 @@ function findAttributeCandidate(): string | null {
   return null;
 }
 
-function resolveTranslationSources(): string[] {
+/** Where the whole table is: what the page names, else the option, else the default. */
+function resolveTableSources(): string[] {
   const candidates: string[] = [];
 
   const windowCandidate =
@@ -148,12 +307,25 @@ function resolveTranslationSources(): string[] {
     candidates.push(attrNormalized);
   }
 
-  // Only try default if no explicit path was configured
+  // Only try the default if no explicit path was configured
   if (candidates.length === 0) {
-    candidates.push(DEFAULT_TRANSLATION_FILE);
+    candidates.push(
+      normalizeCandidate(i18nOptions.translationsFile ?? "") ??
+        DEFAULT_TRANSLATION_FILE
+    );
   }
 
   return candidates;
+}
+
+function resolveTranslationSources(): string[] {
+  const tables = resolveTableSources();
+  // With one file per language, the page's own language first, then the
+  // whole table.
+  const startLanguage =
+    fileLanguage(currentLanguage.value) ?? defaultLanguage;
+  const own = languageFileFor(startLanguage);
+  return own ? [own, ...tables.filter((source) => source !== own)] : tables;
 }
 
 function validateTranslationMap(
@@ -168,7 +340,25 @@ function validateTranslationMap(
   );
 }
 
-async function fetchTranslationFile(
+// One request per file, shared by startup and a language switch alike. A file
+// that failed is forgotten, so a later attempt asks again.
+const translationFiles = new Map<string, Promise<TranslationMap | null>>();
+
+function fetchTranslationFile(source: string): Promise<TranslationMap | null> {
+  let pending = translationFiles.get(source);
+  if (!pending) {
+    pending = readTranslationFile(source).then((translations) => {
+      if (!translations) {
+        translationFiles.delete(source);
+      }
+      return translations;
+    });
+    translationFiles.set(source, pending);
+  }
+  return pending;
+}
+
+async function readTranslationFile(
   source: string
 ): Promise<TranslationMap | null> {
   try {
@@ -199,6 +389,18 @@ async function fetchTranslationFile(
     // Silently fail - file likely doesn't exist or isn't valid JSON
     return null;
   }
+}
+
+/** Add words to what is loaded, keeping the languages already there. */
+function mergeTranslations(translations: TranslationMap): void {
+  if (typeof window === "undefined") {
+    translationKeys = { ...translationKeys, ...translations };
+    return;
+  }
+  window.DS_ONE_TRANSLATIONS = {
+    ...window.DS_ONE_TRANSLATIONS,
+    ...translations,
+  };
 }
 
 /**
@@ -234,7 +436,7 @@ async function loadExternalTranslations(): Promise<boolean> {
       continue;
     }
 
-    window.DS_ONE_TRANSLATIONS = translations;
+    mergeTranslations(translations);
 
     const languages = Object.keys(translations);
     console.log(
@@ -252,6 +454,46 @@ async function loadExternalTranslations(): Promise<boolean> {
   return false;
 }
 
+const languageLoads = new Map<string, Promise<void>>();
+
+/**
+ * Fetch a language's words when the page needs one it has not got: its own
+ * file, or the whole table when that file is missing. Does nothing unless
+ * `languageFile` is configured, since otherwise the whole table, with every
+ * language in it, is what the page loads at startup.
+ */
+export function loadLanguage(language: LanguageCode): Promise<void> {
+  if (typeof window === "undefined" || !i18nOptions.languageFile) {
+    return Promise.resolve();
+  }
+
+  const code = fileLanguage(language) ?? defaultLanguage;
+  if (getTranslationData()[code]) {
+    return Promise.resolve();
+  }
+
+  let pending = languageLoads.get(code);
+  if (!pending) {
+    pending = (async () => {
+      const own = languageFileFor(code);
+      let translations = own ? await fetchTranslationFile(own) : null;
+      for (const source of resolveTableSources()) {
+        if (translations) {
+          break;
+        }
+        translations = await fetchTranslationFile(source);
+      }
+      if (!translations) {
+        return;
+      }
+      mergeTranslations(translations);
+      window.dispatchEvent(new CustomEvent("translations-ready"));
+    })();
+    languageLoads.set(code, pending);
+  }
+  return pending;
+}
+
 // Get translation data - prioritize external, fall back to bundled
 function getTranslationData(): TranslationMap {
   // Check for externally loaded translations first (CDN usage)
@@ -260,20 +502,12 @@ function getTranslationData(): TranslationMap {
   }
 
   // Fall back to bundled translations
-  return translationKeys as TranslationMap;
+  return translationKeys;
 }
 
-// Cached translation data - use getter to always get fresh data
-let translationData = getTranslationData();
-
-const defaultLanguage: LanguageCode = "en";
-
-function extractPrimarySubtag(code: LanguageCode): string {
-  if (!code) {
-    return "";
-  }
-  return code.toLowerCase().split(/[-_]/)[0] ?? "";
-}
+// ============================================================================
+// Language names and ordering
+// ============================================================================
 
 function getLanguagePriority(code: LanguageCode): number {
   const primary = extractPrimarySubtag(code);
@@ -331,7 +565,7 @@ function getDisplayNameForLocale(
     if (baseMatch) {
       return baseMatch;
     }
-  } catch (error) {
+  } catch {
     // Intl.DisplayNames may not be supported; fall back gracefully
     if (!displayNameFallbackWarningShown) {
       console.info(
@@ -405,6 +639,10 @@ export function getLanguageDisplayName(
   const primary = extractPrimarySubtag(code);
   return primary ? primary.toUpperCase() : code;
 }
+
+// ============================================================================
+// Browser language
+// ============================================================================
 
 const BROWSER_LANGUAGE_PREFERENCES: Record<string, LanguageCode> = {
   da: "da",
@@ -485,100 +723,183 @@ export function getBrowserLanguage(): LanguageCode {
   return defaultLanguage;
 }
 
-// Get stored language from localStorage
-const storedLanguage =
-  typeof window !== "undefined"
-    ? ((window.localStorage?.getItem(
-        "ds-one:language"
-      ) as LanguageCode | null) ?? undefined)
-    : undefined;
+// ============================================================================
+// Current language
+// ============================================================================
+
+function dispatchLanguageChanged(language: LanguageCode): void {
+  if (typeof window === "undefined") {
+    return;
+  }
+  window.dispatchEvent(
+    new CustomEvent("language-changed", {
+      detail: { language },
+      bubbles: true,
+      composed: true,
+    })
+  );
+}
 
 // Create a reactive signal for the current language (Portfolio pattern)
 export const currentLanguage = {
-  value:
-    (localStorage.getItem("language") as LanguageCode) || getBrowserLanguage(),
+  value: readStoredLanguage() || getBrowserLanguage(),
   set: function (lang: LanguageCode) {
     this.value = lang;
-    localStorage.setItem("language", lang);
-    window.dispatchEvent(
-      new CustomEvent("language-changed", {
-        detail: { language: lang },
-        bubbles: true,
-        composed: true,
-      })
-    );
+    storeLanguage(lang);
+    void loadLanguage(lang);
+    // What reads the document's language (dates, screen readers, hyphenation)
+    // follows too, rather than keeping the language the page was opened in.
+    if (typeof document !== "undefined" && document.documentElement) {
+      document.documentElement.lang = lang;
+    }
+    dispatchLanguageChanged(lang);
   },
 };
 
-// Auto-load translations when this module is imported (for CDN bundle)
-if (typeof window !== "undefined") {
-  // Wait a bit to ensure the DOM is ready
+/**
+ * Set the language module up for a product (see `I18nOptions`). Call it
+ * straight after importing the module: the first translations are fetched
+ * once the code that imported it has run. Called later, it fetches the current
+ * language's file if one is now configured.
+ */
+export function configureI18n(next: I18nOptions): void {
+  const previousKey = storageKey();
+  i18nOptions = { ...i18nOptions, ...next };
+
+  if (storageKey() !== previousKey) {
+    const stored = readStoredLanguage();
+    if (stored && stored !== currentLanguage.value) {
+      currentLanguage.value = stored;
+      dispatchLanguageChanged(stored);
+    }
+  }
+
+  if (loadAttempted && i18nOptions.languageFile) {
+    void loadLanguage(currentLanguage.value);
+  }
+}
+
+// Auto-load translations when this module is imported (for CDN bundle).
+// Waits a task, so a product can configure the module first, even after a
+// dynamic import.
+if (typeof window !== "undefined" && typeof document !== "undefined") {
+  const start = () => {
+    void loadExternalTranslations();
+  };
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => {
-      loadExternalTranslations();
-    });
+    document.addEventListener("DOMContentLoaded", start);
   } else {
     // DOM is already ready
-    loadExternalTranslations();
+    setTimeout(start, 0);
   }
 }
 
 // Listen for external translations being loaded
 if (typeof window !== "undefined") {
   window.addEventListener("translations-ready", () => {
-    // Refresh translation data from external source
-    translationData = getTranslationData();
-
     // Dispatch that translations are loaded
     window.dispatchEvent(new CustomEvent("translations-loaded"));
 
     // Dispatch language-changed to update all components
-    const currentLang = currentLanguage.value;
-    window.dispatchEvent(
-      new CustomEvent("language-changed", {
-        detail: { language: currentLang },
-        bubbles: true,
-        composed: true,
-      })
-    );
+    dispatchLanguageChanged(currentLanguage.value);
   });
+
+  // Initialize translations on module load
+  // Use setTimeout to give other parts of the app time to set up event listeners first
+  setTimeout(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+    window.dispatchEvent(new CustomEvent("translations-loaded"));
+
+    // Also dispatch language-changed with the current language
+    dispatchLanguageChanged(currentLanguage.value);
+  }, 100);
 }
 
-// Initialize translations on module load
-// Use setTimeout to give other parts of the app time to set up event listeners first
-setTimeout(() => {
-  // Since we directly imported the data, just dispatch the events
-  window.dispatchEvent(new CustomEvent("translations-loaded"));
+// ============================================================================
+// Looking words up
+// ============================================================================
 
-  // Also dispatch language-changed with the current language
-  const currentLang = currentLanguage.value;
+// Missing keys are ordinary: the same components carry what people write
+// themselves, and a list called "Iroco.com" is not a key anyone forgot. So the
+// console stays quiet unless someone is hunting for a missing key, and then
+// each key is only reported once.
+const REPORTED_MISSING_KEYS = new Set<string>();
 
-  window.dispatchEvent(
-    new CustomEvent("language-changed", {
-      detail: { language: currentLang },
-      bubbles: true,
-      composed: true,
-    })
+function missingKeyReportingOn(): boolean {
+  const option = i18nOptions.reportMissingKeys;
+  try {
+    if (typeof option === "function" ? option() : option) {
+      return true;
+    }
+  } catch {
+    // A failing check reports nothing
+  }
+
+  if (typeof window === "undefined") {
+    return false;
+  }
+  if (window.DS_ONE_I18N_DEBUG === true) {
+    return true;
+  }
+  try {
+    return storage()?.getItem(DEBUG_STORAGE_KEY) === "on";
+  } catch {
+    return false;
+  }
+}
+
+function reportMissingKey(key: string, language: LanguageCode): void {
+  if (!missingKeyReportingOn()) {
+    return;
+  }
+  const seen = `${language}:${key}`;
+  if (REPORTED_MISSING_KEYS.has(seen)) {
+    return;
+  }
+  REPORTED_MISSING_KEYS.add(seen);
+  console.warn(
+    `[Design system 1 (Internationalization)] No translation found for key "${key}" in "${language}"`
   );
-}, 100);
+}
 
 // Get translation by key
 export function translate(key: string): string {
-  const lang = currentLanguage.value;
+  return textInLanguage(key, currentLanguage.value);
+}
 
-  // Check if key exists in current language
-  if (translationData?.[lang]?.[key]) {
-    return translationData[lang][key];
+/**
+ * A key's text in a given language, whatever the page's own language is (a
+ * drawing made for one language, say). Region subtags fall back to the
+ * primary language (`ja-JP` reads `ja`), and every language falls back to
+ * English, then to the key itself.
+ */
+export function textInLanguage(key: string, language: LanguageCode): string {
+  const data = getTranslationData();
+  const codes = lookupCodes(language);
+
+  for (const code of codes) {
+    const text = data?.[code]?.[key];
+    if (text) {
+      return text;
+    }
   }
 
   // Try fallback to English
-  if (lang !== defaultLanguage && translationData?.[defaultLanguage]?.[key]) {
-    return translationData[defaultLanguage][key];
+  if (!codes.includes(defaultLanguage)) {
+    const text = data?.[defaultLanguage]?.[key];
+    if (text) {
+      return text;
+    }
+
+    // Loaded a language at a time, English may not have arrived yet
+    if (!data?.[defaultLanguage] && codes.some((code) => data?.[code])) {
+      void loadLanguage(defaultLanguage);
+    }
   }
 
-  console.warn(
-    `[Design system 1 (Internationalization)] No translation found for key "${key}"`
-  );
+  reportMissingKey(key, codes[codes.length - 1] ?? language);
   return key;
 }
 
@@ -590,20 +911,18 @@ export function hasTranslation(
     return false;
   }
 
-  const langData = translationData?.[language];
-  if (langData && Object.prototype.hasOwnProperty.call(langData, key)) {
-    return true;
+  const data = getTranslationData();
+  const codes = lookupCodes(language);
+  if (!codes.includes(defaultLanguage)) {
+    codes.push(defaultLanguage);
   }
 
-  if (
-    language !== defaultLanguage &&
-    translationData?.[defaultLanguage] &&
-    Object.prototype.hasOwnProperty.call(translationData[defaultLanguage], key)
-  ) {
-    return true;
-  }
-
-  return false;
+  return codes.some((code) => {
+    const langData = data?.[code];
+    return Boolean(
+      langData && Object.prototype.hasOwnProperty.call(langData, key)
+    );
+  });
 }
 
 // Get text - synchronous version for components
@@ -611,56 +930,72 @@ export function getText(key: string): string {
   return translate(key);
 }
 
-// Get available languages - dynamically detect from loaded data
+// Get available languages: the configured ones, else the ones in the loaded words
 export function getAvailableLanguages(): Promise<LanguageCode[]> {
-  // Always get fresh translation data
-  const currentData = getTranslationData();
-
-  if (currentData && Object.keys(currentData).length > 0) {
-    const languages = Object.keys(currentData) as LanguageCode[];
-    return Promise.resolve(sortLanguageCodes(languages));
-  }
-  return Promise.resolve([defaultLanguage]);
+  return Promise.resolve(getAvailableLanguagesSync());
 }
 
 // Synchronous version for immediate use
 export function getAvailableLanguagesSync(): LanguageCode[] {
+  if (i18nOptions.languages && i18nOptions.languages.length > 0) {
+    return sortLanguageCodes([...i18nOptions.languages]);
+  }
+
   const currentData = getTranslationData();
 
   if (currentData && Object.keys(currentData).length > 0) {
-    return sortLanguageCodes(Object.keys(currentData) as LanguageCode[]);
+    return sortLanguageCodes(Object.keys(currentData));
   }
   return [defaultLanguage];
 }
 
-// Load translations programmatically (for compatibility)
+/**
+ * Add words to what is loaded: one language's (`loadTranslations("da", {…})`)
+ * or several at once (`loadTranslations({ en: {…}, da: {…} })`). Components
+ * update as they do when a translation file arrives.
+ */
 export function loadTranslations(
   language: LanguageCode,
   translations: TranslationData
+): void;
+export function loadTranslations(translations: TranslationMap): void;
+export function loadTranslations(
+  languageOrMap: LanguageCode | TranslationMap,
+  translations?: TranslationData
 ): void {
-  // Since we have static data, this is mainly for compatibility
-  console.log(
-    `Loading additional translations for ${language}:`,
-    Object.keys(translations).length,
-    "keys"
-  );
+  const map: TranslationMap =
+    typeof languageOrMap === "string"
+      ? { [languageOrMap]: translations ?? {} }
+      : languageOrMap;
+
+  if (!validateTranslationMap(map)) {
+    console.warn(
+      "[Design system 1] loadTranslations expects words keyed by language code."
+    );
+    return;
+  }
+
+  const data = getTranslationData();
+  const merged: TranslationMap = {};
+  for (const [code, words] of Object.entries(map)) {
+    merged[code] = { ...data[code], ...words };
+  }
+  mergeTranslations(merged);
+
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent("translations-ready"));
+  }
 }
 
 // Set language (Portfolio pattern)
 export function setLanguage(language: LanguageCode): void {
   // Update the language in localStorage first
-  localStorage.setItem("language", language);
+  storeLanguage(language);
 
   // Then update the signal - this should trigger effects in components
   // that are subscribed to the signal
   currentLanguage.set(language);
 
   // Dispatch a custom event so non-signal-based components can update
-  window.dispatchEvent(
-    new CustomEvent("language-changed", {
-      detail: { language },
-      bubbles: true,
-      composed: true,
-    })
-  );
+  dispatchLanguageChanged(language);
 }
