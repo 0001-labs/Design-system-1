@@ -23,7 +23,7 @@ export type SignInOptions = {
  * The providers every product offers: the emailed code, Google and Apple, with
  * a password for the owner and Apple's native sheet where a product wants them.
  * Google and Apple hand the product a lower-case email, whether it is verified,
- * and a name; Apple's refresh token rides on the profile for
+ * and a name when the provider sends one; Apple's refresh token rides on the profile for
  * `rememberAppleTokenFromProfile`.
  */
 export function signInProviders(options: SignInOptions): AuthProviderConfig[] {
@@ -37,14 +37,15 @@ export function signInProviders(options: SignInOptions): AuthProviderConfig[] {
       },
     }),
     Apple({
+      // Apple sends the name on the first consent alone: a later callback leaves it out,
+      // so a returning person keeps the name they have.
       profile(profile, tokens) {
         const name = profile.user?.name
         return {
           id: profile.sub,
-          ...(tokens.refresh_token && process.env.AUTH_APPLE_ID ? { appleRefreshToken: tokens.refresh_token, appleClientId: process.env.AUTH_APPLE_ID } : {}),
-          ...(profile.email ? { email: normalizeEmail(profile.email) } : {}),
-          emailVerified: profile.email_verified === true || profile.email_verified === 'true',
-          name: name ? [name.firstName, name.lastName].filter(Boolean).join(' ') : `${options.product} user`,
+          ...(tokens?.refresh_token && process.env.AUTH_APPLE_ID ? { appleRefreshToken: tokens.refresh_token, appleClientId: process.env.AUTH_APPLE_ID } : {}),
+          ...(profile.email ? { email: normalizeEmail(profile.email), emailVerified: profile.email_verified === true || profile.email_verified === 'true' } : {}),
+          ...(name ? { name: [name.firstName, name.lastName].filter(Boolean).join(' ') } : {}),
         }
       },
     }),
