@@ -27,6 +27,7 @@ const neutrals = [
 const ezoAccents = ['#99ff73', '#979441', '#ccccff', '#594dff', '#f5aad1', '#ff5f5f', '#fec20d', '#eaff00'];
 const diagrams = [['light-green', '#99ff73'], ['light-blue', '#ccccff'], ['pink', '#f5aad1'], ['yellow', '#eaff00'], ['orange', '#fec20d'], ['red', '#ff5f5f'], ['white', '#e8e8e8']];
 const tau99 = [['--brand', '#f2ffcf', 'The 0001 site (--tau99-brand) and Link (--color-tau99) already use it'], ['--cart-badge-bg-logged-in', '#d8ff94', 'Only in tau99'], ['--cart-badge-bg', '#ebb208', 'Only in tau99']];
+const linkTokens = [['--color-chartreuse', '#ccff4d', 'Chartreuse, as the palette'], ['--color-zenith', '#ccccff', 'Zenith blue, as the palette'], ['--color-tau99', '#f2ffcf', "tau99's pale lime"], ['--color-brand-accent', '#ff4438', 'Its own red accent, near tuned red #ff5f5f'], ['--color-base-black', '#2c2c2b', 'Its own ink, near black #2a2a2a'], ['--color-base-white', '#ffffff', 'White paper']];
 const notion = [['Blue, purple', '#ccccff'], ['Green', '#99ff73'], ['Chartreuse', '#ccff4d'], ['Yellow', '#f3ff99'], ['Orange', '#ffd199'], ['Red', '#ffb3a7'], ['Pink', '#ffc7e8'], ['Grey', '#e8e8e8']];
 const hashed = ['#ccff4d', '#8bd3ff', '#ffd166', '#ff9f9f', '#c7b9ff', '#7ee0c3', '#f7a1d7', '#f3ff99', '#ffbf80', '#a8e6cf', '#b8f2ff', '#e6c7ff'];
 const inPalette = new Set([...palette, ...neutrals].map(([, hex]) => hex));
@@ -95,21 +96,26 @@ const inPalette = new Set([...palette, ...neutrals].map(([, hex]) => hex));
         <p class="note">On light paper, filled squares and chart lines mix the colour with the ink, about 85% colour, so they read on white. Lines that must stand out, as on the System map, take 70% accent and 30% ink, never the bare pale colour.</p>
       </section>
 
+      <section aria-labelledby="link">
+        <h2 id="link">Link's colours</h2>
+        <p>Link has a few interface colours of its own, and gives every project a colour.</p>
+        <h3>Link's own colours</h3>
+        <ul class="swatches">{linkTokens.map(([token, hex, use]) => <li class="swatch"><i style={`background:${hex}`}></i><b>{token}</b><code>{hex}</code><span>{use}</span></li>)}</ul>
+        <p class="note">In <code>Link/client/styles/shared/tokens.css</code>. The help pages also point <code>--every-green</code> at the red accent, so the same token name means a different colour in Link. Brought onto the system, the red would be tuned red and the ink slate.</p>
+        <p class="note">A project keeps one colour on the web and on iPhone, from <code>Link/shared/projectColors.ts</code>: its own colour if set, then its Notion colour, then one of twelve picked from its name. An ended subscription turns it grey. A round mark is a colour outside the palette.</p>
+        <h3>Project colours from Notion</h3>
+        <ul class="chips">{notion.map(([name, hex]) => <li class={`chip${inPalette.has(hex) ? '' : ' outside'}`}><i style={`background:${hex}`}></i>{name}</li>)}</ul>
+        <h3>Project colours picked from the name</h3>
+        <ul class="chips">{hashed.map(hex => <li class={`chip${inPalette.has(hex) ? '' : ' outside'}`}><i style={`background:${hex}`}></i><code>{hex}</code></li>)}</ul>
+        <p class="note">Only green, chartreuse and zenith blue are Design system 1 colours. Brought onto the system, Link would take its project colours from the palette, as tints, rather than its own pastels.</p>
+      </section>
+
       <section aria-labelledby="tau99">
         <h2 id="tau99">From tau99, a candidate</h2>
         <p>tau99 has its own set. Its pale lime is already used by two products under two names, so it is the one worth adding to the library, as <code>--tau99</code>: a paper tint for selected rows and quiet panels.</p>
         <ul class="swatches">{tau99.map(([token, hex, use]) => <li class="swatch"><i style={`background:${hex}`}></i><b>{token}</b><code>{hex}</code><span>{use}</span></li>)}</ul>
       </section>
 
-      <section aria-labelledby="link">
-        <h2 id="link">Link's project colours</h2>
-        <p>A project keeps one colour on the web and on iPhone, from <code>Link/shared/projectColors.ts</code>: its own colour if set, then its Notion colour, then one of twelve picked from its name. An ended subscription turns it grey. A round mark is a colour outside the palette.</p>
-        <h3>From Notion</h3>
-        <ul class="chips">{notion.map(([name, hex]) => <li class={`chip${inPalette.has(hex) ? '' : ' outside'}`}><i style={`background:${hex}`}></i>{name}</li>)}</ul>
-        <h3>Picked from the name</h3>
-        <ul class="chips">{hashed.map(hex => <li class={`chip${inPalette.has(hex) ? '' : ' outside'}`}><i style={`background:${hex}`}></i><code>{hex}</code></li>)}</ul>
-        <p class="note">Only green, chartreuse and zenith blue are Design system 1 colours. Brought onto the system, Link would take its project colours from the palette, as tints, rather than its own pastels.</p>
-      </section>
     </main>
   </body>
 </html>

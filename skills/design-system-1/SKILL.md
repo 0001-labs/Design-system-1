@@ -84,6 +84,10 @@ tau99 (`/Users/joachim/0001/tau99`) has its own set; one of them already lives o
 
 The pale lime #f2ffcf is the one worth adding to the library: two products already use it under two names. Proposed token: `--tau99: #f2ffcf`, a paper tint for selected rows and quiet panels, beside the accents. Until it is added to `one.css`, keep using the products' own names for it.
 
+### Link's own colours
+
+Link's interface tokens (`Link/client/styles/shared/tokens.css`): `--color-chartreuse` #ccff4d and `--color-zenith` #ccccff are the palette's; `--color-tau99` #f2ffcf is tau99's pale lime; `--color-brand-accent` #ff4438 is its own red, near tuned red #ff5f5f; `--color-base-black` and `--color-base-slate` #2c2c2b are its own ink, near black #2a2a2a; `--color-base-white` #ffffff. Its help pages also set `--every-green` to the red accent, so the token name means a different colour there. Brought onto the system, the red becomes tuned red and the ink slate.
+
 ### Link's project colours
 
 A project's colour in Link comes from `Link/shared/projectColors.ts` (`resolvedProjectCalendarColor`), shared by the web and the iPhone app so a project keeps its colour everywhere:
