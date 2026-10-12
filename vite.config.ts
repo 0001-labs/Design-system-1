@@ -33,6 +33,10 @@ export default defineConfig({
       typeCheck: true,
     },
   },
+  test: {
+    // The Playwright specs in e2e/ run with `vp run test:e2e`, not Vitest
+    exclude: ["**/node_modules/**", "**/.git/**", "e2e/**"],
+  },
   root: ".",
   server: {
     host: true,
