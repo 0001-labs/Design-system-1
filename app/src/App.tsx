@@ -10,6 +10,12 @@ import {
   useState,
 } from "react";
 import semanticCssTemplate from "../../DS1/1-root/one.semantic.css?raw";
+import { palette } from "../../DS1/1-root/palette";
+
+/** Design system 1's colours and their pastels, offered as the accent picker's suggestions. */
+const paletteSuggestions = palette()
+  .filter((colour) => !colour.ink)
+  .flatMap((colour) => [colour.hex, colour.pastel]);
 import { readCustomProperty, replaceCustomProperty } from "./lib/cssText";
 
 type ComponentKind =
@@ -2117,10 +2123,16 @@ export function App({ initialCss, initialConfig, onDirty, headerSlot }: AppProps
                   <div className="color-input">
                     <input
                       data-testid="accent-input"
+                      list="ds1-palette"
                       onChange={(event) => updateAccent(event.target.value)}
                       type="color"
                       value={accent}
                     />
+                    <datalist id="ds1-palette">
+                      {paletteSuggestions.map((hex) => (
+                        <option key={hex} value={hex} />
+                      ))}
+                    </datalist>
                     <code data-testid="accent-value">{accent}</code>
                   </div>
                 </ControlField>

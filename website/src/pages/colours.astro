@@ -1,58 +1,14 @@
 ---
-// One palette: every colour 0001's products use, named by its colour and sorted by hue, greys last.
-// Each has a dark-mode version, derived the way the ds1 Figma file derives Apple green's
-// (#99ff73 → #529d36): the same hue, about half the saturation, at 41% lightness. Greys turn over.
-// Where each colour is used is in the design-system-1 skill (skills/design-system-1/SKILL.md).
+// One palette, named by colour and sorted by hue, the inks after it; light and dark on two tabs.
+// The colours and their pastel, dark and dim versions come from DS1/1-root/palette.ts, which also writes them
+// into the CLASSless stylesheet. Where each colour is used is in the design-system-1 skill.
 import { PRODUCTS, drawingSvg } from '../lib/icons/studio';
 import '../styles/icons/studio.css';
 
-// The palette's colours; each also gets a pastel and a dark version below.
-const named: [string, string][] = [
-  ['Tuned red', '#ff5f5f'], ['Signal red', '#ff4438'], ['Red for blood', '#de0331'], ['Dark red variant', '#c50124'],
-  ['Orange', '#fec20d'], ['Old gold', '#b69e55'], ['Sand', '#dbc88f'], ['Drip yellow', '#fde70c'], ['Yellow', '#eaff00'],
-  ['Every green', '#979441'], ['Chartreuse', '#ccff4d'], ['Apple green', '#99ff73'], ['Metal green', '#026d5b'],
-  ['Hysteric blue', '#69d8fb'], ['Winning blue', '#0275fa'], ['Sharp blue', '#594dff'], ['Purple', '#e63aaf'], ['Pink', '#f5aad1'],
-  ['White', '#ffffff'], ['Egg', '#f9f6ef'], ['Light grey', '#e8e8e8'], ['Slate light', '#e6e6e6'], ['Darker grey', '#797979'],
-  ['Stealth', '#554455'], ['Slate dark', '#3c3c3c'], ['Ink', '#2c2c2b'], ['Black', '#2a2a2a'], ['Slate', '#1e1e1e'],
-];
-// Pastels that already have a name and a token keep them.
-const namedPastels: Record<string, [string, string]> = { 'Sharp blue': ['Zenith blue', '#ccccff'], Chartreuse: ['Comfortable green', '#f2ffcf'] };
-
-function toHsl(hex: string): [number, number, number] {
-  const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255);
-  const max = Math.max(r, g, b); const min = Math.min(r, g, b); const l = (max + min) / 2;
-  if (max === min) return [0, 0, l];
-  const d = max - min; const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-  const h = max === r ? (g - b) / d + (g < b ? 6 : 0) : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
-  return [h * 60, s, l];
-}
-function toHex(h: number, s: number, l: number): string {
-  const a = s * Math.min(l, 1 - l);
-  const f = (n: number) => { const k = (n + h / 30) % 12; return Math.round(255 * (l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)))).toString(16).padStart(2, '0'); };
-  return `#${f(0)}${f(8)}${f(4)}`;
-}
-const grey = ([, s, l]: [number, number, number]) => s < 0.15 || l > 0.95;
-function dark(hex: string): string {
-  const [h, s, l] = toHsl(hex);
-  if (grey([h, s, l])) return toHex(h, s, 0.12 + (1 - l) * 0.76);
-  return toHex(h, l > 0.41 ? s * 0.49 : s, 0.41);
-}
-const slug = (name: string) => '--' + name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-// A pastel keeps the colour's hue and saturation at 90% lightness.
-function pastel(hex: string): string { const [h, s] = toHsl(hex); return toHex(h, s, 0.9); }
-// In dark mode a pastel's job, a quiet tint behind things, is done by a dim version at 20% lightness.
-function darkPastel(hex: string): string { const [h, s] = toHsl(hex); return toHex(h, s * 0.49, 0.2); }
-const colours = named
-  .map(([name, hex]) => ({ name, hex, dark: dark(hex), hsl: toHsl(hex), token: slug(name), pastel: namedPastels[name]?.[1] || pastel(hex), pastelName: namedPastels[name]?.[0] || `${name} pastel`, darkPastel: darkPastel(hex) }))
-  .sort((a, b) => {
-    const ga = grey(a.hsl); const gb = grey(b.hsl);
-    if (ga !== gb) return ga ? 1 : -1;
-    if (ga) return b.hsl[2] - a.hsl[2];
-    const hue = Math.round(a.hsl[0] / 15) - Math.round(b.hsl[0] / 15);
-    return hue || b.hsl[2] - a.hsl[2];
-  });
-const palette = colours.filter(c => !grey(c.hsl));
-const inks = colours.filter(c => grey(c.hsl));
+import { palette as readPalette } from '../../../DS1/1-root/palette';
+const colours = readPalette().map(c => ({ ...c, darkPastel: c.dim }));
+const palette = colours.filter(c => !c.ink);
+const inks = colours.filter(c => c.ink);
 ---
 <!doctype html>
 <html lang="en">

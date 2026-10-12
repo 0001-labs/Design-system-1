@@ -37,7 +37,9 @@ Items stack edge to edge with no gap, as an Ezo list does; a header item wears t
 
 Shown at https://designsystem1.com/colours (`website/src/pages/colours.astro`) as one palette, named by colour and sorted by hue, and the inks (greys); change the page with this section.
 
-**Dark mode versions.** Each colour has one, derived as the ds1 Figma file derives Apple green (#99ff73 to #529d36): the same hue, the saturation times 0.49, at 41% lightness; a colour already at or below 41% keeps its saturation. An ink turns over: lightness 12% + (1 − L) × 76%. Write a token as `light-dark(light, dark)`; the page lists both hexes for every colour.
+**One source.** The palette lives in `DS1/1-root/palette.ts`. The Colours page draws it, and `scripts/write-palette-css.ts` writes it into the CLASSless stylesheet (`DS1/1-root/one.semantic.css`) as tokens: `--one-<colour>` and `--one-<colour>-pastel`, each `light-dark(light, dark)`, plus `--one-zenith-blue` and `--one-comfortable-green` for the named pastels. `tests/palette.test.ts` fails if the two drift.
+
+**Dark mode versions.** Each colour has one, derived as the ds1 Figma file derives Apple green (#99ff73 to #529d36): the same hue, the saturation times 0.49, at 41.4% lightness; a colour already at or below that keeps its saturation. An ink turns over: lightness 12% + (1 − L) × 76%. Write a token as `light-dark(light, dark)`; the page lists both hexes for every colour.
 
 **Pastels.** Every palette colour has a pastel: its hue and saturation at 90% lightness. Zenith blue (#ccccff) is Sharp blue's pastel and Comfortable green (#f2ffcf) Chartreuse's; the others are named "<colour> pastel". Link's own pastels are replaced by these. In dark mode a pastel's job, a quiet tint behind things, is a dim version: the hue, the saturation times 0.49, at 20% lightness. The page shows the light set (colour and pastel) and the dark set (dark and dim) on two tabs.
 
