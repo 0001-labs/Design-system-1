@@ -409,8 +409,8 @@ async function loadExternalTranslations(): Promise<boolean> {
     window.DS_ONE_TRANSLATIONS &&
     Object.keys(window.DS_ONE_TRANSLATIONS).length > 0
   ) {
-    console.log(
-      `[Design system 1] Translations already loaded (${Object.keys(window.DS_ONE_TRANSLATIONS).length} languages), skipping auto-load`
+    debugLog(
+      `Translations already loaded (${Object.keys(window.DS_ONE_TRANSLATIONS).length} languages), skipping auto-load`
     );
     return true;
   }
@@ -429,16 +429,16 @@ async function loadExternalTranslations(): Promise<boolean> {
     mergeTranslations(translations);
 
     const languages = Object.keys(translations);
-    console.log(
-      `[Design system 1] External translations loaded from ${source}: ${languages.length} language(s) – ${languages.join(", ")}`
+    debugLog(
+      `External translations loaded from ${source}: ${languages.length} language(s) – ${languages.join(", ")}`
     );
 
     window.dispatchEvent(new CustomEvent("translations-ready"));
     return true;
   }
 
-  console.info(
-    `[Design system 1] No external translations found at ${sources[0] ?? DEFAULT_TRANSLATION_FILE}. Using bundled translations.`
+  debugLog(
+    `No external translations found at ${sources[0] ?? DEFAULT_TRANSLATION_FILE}. Using bundled translations.`
   );
 
   return false;
@@ -832,16 +832,16 @@ if (typeof window !== "undefined") {
 // each key is only reported once.
 const REPORTED_MISSING_KEYS = new Set<string>();
 
-function missingKeyReportingOn(): boolean {
-  const option = i18nOptions.reportMissingKeys;
-  try {
-    if (typeof option === "function" ? option() : option) {
-      return true;
-    }
-  } catch {
-    // A failing check reports nothing
+// Loading is quiet too: what loaded, and from where, is only said when
+// someone has turned the debug switch on.
+function debugLog(message: string): void {
+  if (!debugSwitchOn()) {
+    return;
   }
+  console.info(`[Design system 1] ${message}`);
+}
 
+function debugSwitchOn(): boolean {
   if (typeof window === "undefined") {
     return false;
   }
@@ -853,6 +853,19 @@ function missingKeyReportingOn(): boolean {
   } catch {
     return false;
   }
+}
+
+function missingKeyReportingOn(): boolean {
+  const option = i18nOptions.reportMissingKeys;
+  try {
+    if (typeof option === "function" ? option() : option) {
+      return true;
+    }
+  } catch {
+    // A failing check reports nothing
+  }
+
+  return debugSwitchOn();
 }
 
 function reportMissingKey(key: string, language: LanguageCode): void {
