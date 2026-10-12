@@ -71,9 +71,9 @@ const inks = colours.filter(c => grey(c.hsl));
       .colours h2 { margin: 0 0 20px; font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: 0; }
       .swatches { display: grid; grid-template-columns: repeat(auto-fill, 160px); gap: 20px; margin: 0; padding: 0; list-style: none; }
       .swatch { font-size: 14px; line-height: 20px; }
-      .swatch-pair { display: grid; grid-template-columns: 1fr 1fr; height: 60px; margin: 4px 0; border: 1px solid #1e1e1e1a; }
+      .swatch-pair { display: grid; grid-template-columns: 1fr 1fr; height: 60px; margin: 4px 0; border-radius: 4px; overflow: hidden; }
       .swatch b { display: block; font-weight: 500; }
-      .swatch-one { display: block; height: 60px; margin: 4px 0; border: 1px solid #1e1e1e1a; }
+      .swatch-one { display: block; height: 60px; margin: 4px 0; border-radius: 4px; overflow: hidden; }
       .swatch-one i, .swatch-pair i { display: block; height: 100%; }
       .hexes { display: grid; grid-template-columns: 80px 80px; }
       .mode-tabs { display: flex; gap: 0; margin-top: 20px; }
@@ -82,7 +82,6 @@ const inks = colours.filter(c => grey(c.hsl));
       .mode { margin-top: 20px; padding: 0 20px 40px; }
       .mode.dark { background: #1e1e1e; color: #e6e6e6; }
       .mode.dark .swatch code { color: #b3b3b3; }
-      .mode.dark .swatch-pair, .mode.dark .swatch-one { border-color: #ffffff1a; }
       .mode section:first-child { padding-top: 20px; margin-top: 0; }
       .swatch code { display: block; font-size: 12px; line-height: 20px; color: var(--muted); }
     </style>
@@ -101,12 +100,12 @@ const inks = colours.filter(c => grey(c.hsl));
             <h2>Palette</h2>
             <ul class="swatches">{palette.map(c => {
               const [main, soft] = mode === 'light' ? [c.hex, c.pastel] : [c.dark, c.darkPastel];
-              return <li class="swatch"><b>{c.name}</b><span class="swatch-pair"><i style={`background:${main}`}></i><i style={`background:${soft}`} title={mode === 'light' ? c.pastelName : `${c.name} dim`}></i></span><span class="hexes"><code>{main}</code><code>{soft}</code></span></li>;
+              return <li class="swatch"><b>{c.name}</b><span class="swatch-pair"><i style={`background:${main}`} title={`${mode === 'light' ? c.name : `${c.name} dark`} ${main}`}></i><i style={`background:${soft}`} title={`${mode === 'light' ? c.pastelName : `${c.name} dim`} ${soft}`}></i></span></li>;
             })}</ul>
           </section>
           <section>
             <h2>Inks</h2>
-            <ul class="swatches">{inks.map(c => { const v = mode === 'light' ? c.hex : c.dark; return <li class="swatch"><b>{c.name}</b><span class="swatch-one"><i style={`background:${v}`}></i></span><code>{v}</code></li>; })}</ul>
+            <ul class="swatches">{inks.map(c => { const v = mode === 'light' ? c.hex : c.dark; return <li class="swatch"><b>{c.name}</b><span class="swatch-one"><i style={`background:${v}`} title={`${c.name} ${v}`}></i></span></li>; })}</ul>
           </section>
         </div>
       ))}
