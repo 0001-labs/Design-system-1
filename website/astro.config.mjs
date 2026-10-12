@@ -90,6 +90,7 @@ export default defineConfig({
             { label: "Gap", slug: "2-core/gap" },
             { label: "Icon", slug: "2-core/icon" },
             { label: "Input", slug: "2-core/input" },
+            { label: "Language", slug: "2-core/language" },
             { label: "Link", slug: "2-core/link" },
             { label: "Text", slug: "2-core/text" },
             { label: "Tooltip", slug: "2-core/tooltip" },

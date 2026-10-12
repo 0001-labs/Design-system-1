@@ -1,0 +1,64 @@
+/* ds-language.css */
+/* The language picker: one item, one square high, eight squares wide */
+
+:host {
+  display: inline-block;
+  vertical-align: top;
+  /* An item's pitch less the 1px correction, as every item is drawn */
+  width: calc(var(--8) * var(--sf) - var(--margin-correction));
+  height: calc(var(--1) * var(--sf) - var(--margin-correction));
+}
+
+/* Four squares, an ordinary item, when every label the product offers fits */
+:host([compact]) {
+  width: calc(var(--4) * var(--sf) - var(--margin-correction));
+}
+
+button {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0 calc(4px * var(--sf));
+  border: 0;
+  border-radius: 0;
+  background-color: var(--button-background-color-secondary);
+  color: var(--button-text-color-secondary, var(--button-text-color));
+  font-family: var(--typeface-regular);
+  font-size: var(--type-size-default);
+  font-weight: var(--type-weight-default);
+  line-height: var(--type-lineheight-default);
+  letter-spacing: calc(var(--type-letterspacing-default) * var(--sf));
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:host([variant="primary"]) button {
+  background-color: var(--accent-color);
+  color: var(--button-text-color-on-light, var(--black));
+}
+
+button:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: -1px;
+}
+
+button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+/* Each name is set in its own language's typeface */
+button:lang(ja) {
+  font-family: var(--typeface-regular-jp);
+}
+
+button:lang(zh) {
+  font-family: var(--typeface-regular-zh);
+}
