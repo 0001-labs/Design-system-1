@@ -39,6 +39,8 @@ Shown at https://designsystem1.com/colours (`website/src/pages/colours.astro`) a
 
 **Dark mode versions.** Each colour has one, derived as the ds1 Figma file derives Apple green (#99ff73 to #529d36): the same hue, the saturation times 0.49, at 41% lightness; a colour already at or below 41% keeps its saturation. An ink turns over: lightness 12% + (1 − L) × 76%. Write a token as `light-dark(light, dark)`; the page lists both hexes for every colour.
 
+**Pastels.** Every palette colour has a pastel: its hue and saturation at 90% lightness. Zenith blue (#ccccff) is Sharp blue's pastel and Comfortable green (#f2ffcf) Chartreuse's; the others are named "<colour> pastel". Link's own pastels are replaced by these. In dark mode a pastel's job, a quiet tint behind things, is a dim version: the hue, the saturation times 0.49, at 20% lightness. The page shows the light set (colour and pastel) and the dark set (dark and dim) on two tabs.
+
 Every colour is a token from `DS1/1-root/one.css` (Ezo's fork, `client/design/1-root/one.css`, holds the same values). Use the token, never the hex, and never invent a colour.
 
 ### The palette
