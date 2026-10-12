@@ -25,24 +25,15 @@ const neutrals = [
   ['--light-grey', '#e8e8e8', 'Light grey', ''],
 ];
 const ezoAccents = ['#99ff73', '#979441', '#ccccff', '#594dff', '#f5aad1', '#ff5f5f', '#fec20d', '#eaff00'];
-const diagrams = [['light-green', '#99ff73'], ['light-blue', '#ccccff'], ['pink', '#f5aad1'], ['yellow', '#eaff00'], ['orange', '#fec20d'], ['red', '#ff5f5f'], ['white', '#e8e8e8']];
+const diagrams = [['Light green', '#99ff73'], ['Light blue', '#ccccff'], ['Pink', '#f5aad1'], ['Yellow', '#eaff00'], ['Orange', '#fec20d'], ['Red', '#ff5f5f'], ['White', '#e8e8e8']];
 const tau99 = [
-  ['Comfortable green', '#f2ffcf', 'TAU99 brand. tau99 --brand, the 0001 site, Link'],
-  ['Hysteric blue', '#69d8fb', 'Sign-in and checkout buttons in tau99. Also TAU99/18'],
-  ['Purple', '#e63aaf', "An artwork number's colour in tau99"],
-  ['Drip yellow', '#fde70c', "An artwork number's colour in tau99"],
-  ['Soft blue', '#cdd3fe', 'Figma only'],
-  ['Egg', '#f9f6ef', 'Artwork background, Figma only'],
-  ['Winning blue', '#0275fa', 'Figma only'],
-  ['Metal green', '#026d5b', 'Figma only'],
-  ['Red for blood', '#de0331', 'Figma only'],
-  ['Dark red variant', '#c50124', 'Figma only'],
-  ['33', '#b69e55', 'Figma only'],
-  ['99', '#dbc88f', 'Figma only'],
+  ['Comfortable green', '#f2ffcf'], ['Hysteric blue', '#69d8fb'], ['Purple', '#e63aaf'], ['Drip yellow', '#fde70c'],
+  ['Soft blue', '#cdd3fe'], ['Egg', '#f9f6ef'], ['Winning blue', '#0275fa'], ['Metal green', '#026d5b'],
+  ['Red for blood', '#de0331'], ['Dark red variant', '#c50124'], ['Old gold', '#b69e55'], ['Sand', '#dbc88f'],
 ];
-const linkTokens = [['--color-chartreuse', '#ccff4d', 'Chartreuse, as the palette'], ['--color-zenith', '#ccccff', 'Zenith blue, as the palette'], ['--color-tau99', '#f2ffcf', "tau99's pale lime"], ['--color-brand-accent', '#ff4438', 'Its own red accent, near tuned red #ff5f5f'], ['--color-base-black', '#2c2c2b', 'Its own ink, near black #2a2a2a'], ['--color-base-white', '#ffffff', 'White paper']];
-const notion = [['Blue, purple', '#ccccff'], ['Green', '#99ff73'], ['Chartreuse', '#ccff4d'], ['Yellow', '#f3ff99'], ['Orange', '#ffd199'], ['Red', '#ffb3a7'], ['Pink', '#ffc7e8'], ['Grey', '#e8e8e8']];
-const hashed = ['#ccff4d', '#8bd3ff', '#ffd166', '#ff9f9f', '#c7b9ff', '#7ee0c3', '#f7a1d7', '#f3ff99', '#ffbf80', '#a8e6cf', '#b8f2ff', '#e6c7ff'];
+const linkTokens = [['Chartreuse', '#ccff4d'], ['Zenith blue', '#ccccff'], ['Comfortable green', '#f2ffcf'], ['Signal red', '#ff4438'], ['Ink', '#2c2c2b'], ['White', '#ffffff']];
+const notion = [['Zenith blue', '#ccccff'], ['Apple green', '#99ff73'], ['Chartreuse', '#ccff4d'], ['Pale yellow', '#f3ff99'], ['Peach', '#ffd199'], ['Coral', '#ffb3a7'], ['Blossom', '#ffc7e8'], ['Light grey', '#e8e8e8']];
+const hashed = [['Chartreuse', '#ccff4d'], ['Sky', '#8bd3ff'], ['Marigold', '#ffd166'], ['Salmon', '#ff9f9f'], ['Lavender', '#c7b9ff'], ['Teal', '#7ee0c3'], ['Orchid', '#f7a1d7'], ['Pale yellow', '#f3ff99'], ['Apricot', '#ffbf80'], ['Mint', '#a8e6cf'], ['Ice blue', '#b8f2ff'], ['Lilac', '#e6c7ff']];
 const inPalette = new Set([...palette, ...neutrals].map(([, hex]) => hex));
 ---
 <!doctype html>
@@ -91,13 +82,13 @@ const inPalette = new Set([...palette, ...neutrals].map(([, hex]) => hex));
       <section aria-labelledby="palette">
         <h2 id="palette">The palette</h2>
         <p>Nine accents. Text and surfaces go through light-dark() tokens, so dark mode needs no second set.</p>
-        <ul class="swatches">{palette.map(([token, hex, name, use]) => <li class="swatch"><i style={`background:${hex}`}></i><b>{name}</b><code>{token}</code><code>{hex}</code>{use && <span>{use}</span>}</li>)}</ul>
+        <ul class="swatches">{palette.map(([token, hex, name]) => <li class="swatch"><i style={`background:${hex}`}></i><b>{name}</b><code>{token}</code><code>{hex}</code></li>)}</ul>
       </section>
 
       <section aria-labelledby="neutrals">
         <h2 id="neutrals">Ink and greys</h2>
         <p>The ink is slate. The grid's lines are slate at 17%, #1e1e1e2b.</p>
-        <ul class="swatches">{neutrals.map(([token, hex, name, use]) => <li class="swatch"><i style={`background:${hex}`}></i><b>{name}</b><code>{token}</code><code>{hex}</code>{use && <span>{use}</span>}</li>)}</ul>
+        <ul class="swatches">{neutrals.map(([token, hex, name]) => <li class="swatch"><i style={`background:${hex}`}></i><b>{name}</b><code>{token}</code><code>{hex}</code></li>)}</ul>
       </section>
 
       <section aria-labelledby="ezo">
@@ -113,20 +104,20 @@ const inPalette = new Set([...palette, ...neutrals].map(([, hex]) => hex));
         <h2 id="link">Link's colours</h2>
         <p>Link has a few interface colours of its own, and gives every project a colour.</p>
         <h3>Link's own colours</h3>
-        <ul class="swatches">{linkTokens.map(([token, hex, use]) => <li class="swatch"><i style={`background:${hex}`}></i><b>{token}</b><code>{hex}</code><span>{use}</span></li>)}</ul>
+        <ul class="swatches">{linkTokens.map(([name, hex]) => <li class="swatch"><i style={`background:${hex}`}></i><b>{name}</b><code>{hex}</code></li>)}</ul>
         <p class="note">In <code>Link/client/styles/shared/tokens.css</code>. The help pages also point <code>--every-green</code> at the red accent, so the same token name means a different colour in Link. Brought onto the system, the red would be tuned red and the ink slate.</p>
         <p class="note">A project keeps one colour on the web and on iPhone, from <code>Link/shared/projectColors.ts</code>: its own colour if set, then its Notion colour, then one of twelve picked from its name. An ended subscription turns it grey. A round mark is a colour outside the palette.</p>
         <h3>Project colours from Notion</h3>
-        <ul class="chips">{notion.map(([name, hex]) => <li class={`chip${inPalette.has(hex) ? '' : ' outside'}`}><i style={`background:${hex}`}></i>{name}</li>)}</ul>
+        <ul class="chips">{notion.map(([name, hex]) => <li class={`chip${inPalette.has(hex) ? '' : ' outside'}`} title={hex}><i style={`background:${hex}`}></i>{name}</li>)}</ul>
         <h3>Project colours picked from the name</h3>
-        <ul class="chips">{hashed.map(hex => <li class={`chip${inPalette.has(hex) ? '' : ' outside'}`}><i style={`background:${hex}`}></i><code>{hex}</code></li>)}</ul>
+        <ul class="chips">{hashed.map(([name, hex]) => <li class={`chip${inPalette.has(hex) ? '' : ' outside'}`} title={hex}><i style={`background:${hex}`}></i>{name}</li>)}</ul>
         <p class="note">Only green, chartreuse and zenith blue are Design system 1 colours. Brought onto the system, Link would take its project colours from the palette, as tints, rather than its own pastels.</p>
       </section>
 
       <section aria-labelledby="tau99">
         <h2 id="tau99">tau99's colours</h2>
         <p>The TAU99 group in the Colors collection of the ds1 Figma file. Four are used in tau99's code; the rest live only in Figma. Its comfortable green, #f2ffcf, is already used by two more products under two names, so it is the one worth adding to the library, as <code>--tau99</code>: a paper tint for selected rows and quiet panels.</p>
-        <ul class="swatches">{tau99.map(([name, hex, use]) => <li class="swatch"><i style={`background:${hex}`}></i><b>{name}</b><code>{hex}</code><span>{use}</span></li>)}</ul>
+        <ul class="swatches">{tau99.map(([name, hex]) => <li class="swatch"><i style={`background:${hex}`}></i><b>{name}</b><code>{hex}</code></li>)}</ul>
         <p class="note">tau99 colours its artwork numbers from four: every green #979441, purple, comfortable green and drip yellow (<code>src/components/artwork-number.js</code>).</p>
       </section>
 
