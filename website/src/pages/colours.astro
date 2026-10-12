@@ -73,7 +73,9 @@ const inks = colours.filter(c => grey(c.hsl));
       .swatch { font-size: 14px; line-height: 20px; }
       .swatch-pair { display: grid; grid-template-columns: 1fr 1fr; height: 60px; margin: 4px 0; border-radius: 4px; overflow: hidden; }
       .swatch b { display: block; font-weight: 500; }
-      .swatch-one { display: block; height: 60px; margin: 4px 0; border-radius: 4px; overflow: hidden; }
+      .inks { grid-template-columns: repeat(auto-fill, 80px); }
+      .inks .swatch b { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+      .swatch-one { display: block; height: 40px; margin: 4px 0; border-radius: 4px; overflow: hidden; }
       .swatch-one i, .swatch-pair i { display: block; height: 100%; }
       .hexes { display: grid; grid-template-columns: 80px 80px; }
       /* The title small, and Light and Dark as one split button at the right, both on one 20px row. */
@@ -108,7 +110,7 @@ const inks = colours.filter(c => grey(c.hsl));
           </section>
           <section>
             <h2>Inks</h2>
-            <ul class="swatches">{inks.map(c => { const v = mode === 'light' ? c.hex : c.dark; return <li class="swatch"><b>{c.name}</b><span class="swatch-one"><i style={`background:${v}`} title={`${c.name} ${v}`}></i></span></li>; })}</ul>
+            <ul class="swatches inks">{inks.map(c => { const v = mode === 'light' ? c.hex : c.dark; return <li class="swatch"><b>{c.name}</b><span class="swatch-one"><i style={`background:${v}`} title={`${c.name} ${v}`}></i></span></li>; })}</ul>
           </section>
         </div>
       ))}
