@@ -73,16 +73,24 @@ Text and surfaces go through `light-dark()` tokens (`--text-color`, `--backgroun
 
 ### tau99's colours (candidates for the library)
 
-tau99 (`/Users/joachim/0001/tau99`) has its own set; one of them already lives on outside it:
+The ds1 Figma file (XAnoaRoq9LxVAHUZgtdO0r) holds them as the TAU99 group of its Colors collection. Four are used in tau99's code (`/Users/joachim/0001/tau99`):
 
-| tau99 token | Hex | Where it is used today |
+| Figma name | Hex | Where it is used |
 |---|---|---|
-| `--brand` | #f2ffcf | The 0001 site's `--tau99-brand` (its `--page-background-accent` and footer), Link's `--color-tau99` |
-| `--cart-badge-bg-logged-in` | #d8ff94 | nowhere |
-| `--cart-badge-bg` | #ebb208 | nowhere |
-| `--color-background` | #fafafa / #191919 | nowhere |
+| Comfortable green (TAU99 brand) | #f2ffcf | tau99 `--brand`; the 0001 site's `--tau99-brand`; Link's `--color-tau99` |
+| Hysteric blue (also TAU99/18) | #69d8fb | tau99's sign-in and checkout buttons |
+| Purple | #e63aaf | tau99's artwork numbers |
+| Drip yellow | #fde70c | tau99's artwork numbers |
+| Soft blue | #cdd3fe | Figma only |
+| Egg (Artwork background) | #f9f6ef | Figma only |
+| Winning blue | #0275fa | Figma only |
+| Metal green | #026d5b | Figma only |
+| Red for blood | #de0331 | Figma only |
+| Dark red variant | #c50124 | Figma only |
+| 33 | #b69e55 | Figma only |
+| 99 | #dbc88f | Figma only |
 
-The pale lime #f2ffcf is the one worth adding to the library: two products already use it under two names. Proposed token: `--tau99: #f2ffcf`, a paper tint for selected rows and quiet panels, beside the accents. Until it is added to `one.css`, keep using the products' own names for it.
+tau99's artwork numbers take one of every green, purple, comfortable green and drip yellow (`src/components/artwork-number.js`). Comfortable green is the one worth adding to the library: three products already use it under three names. Proposed token: `--tau99: #f2ffcf`, a paper tint for selected rows and quiet panels. Until it is added to `one.css`, keep using the products' own names for it.
 
 ### Link's own colours
 

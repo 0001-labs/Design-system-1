@@ -26,7 +26,20 @@ const neutrals = [
 ];
 const ezoAccents = ['#99ff73', '#979441', '#ccccff', '#594dff', '#f5aad1', '#ff5f5f', '#fec20d', '#eaff00'];
 const diagrams = [['light-green', '#99ff73'], ['light-blue', '#ccccff'], ['pink', '#f5aad1'], ['yellow', '#eaff00'], ['orange', '#fec20d'], ['red', '#ff5f5f'], ['white', '#e8e8e8']];
-const tau99 = [['--brand', '#f2ffcf', 'The 0001 site (--tau99-brand) and Link (--color-tau99) already use it'], ['--cart-badge-bg-logged-in', '#d8ff94', 'Only in tau99'], ['--cart-badge-bg', '#ebb208', 'Only in tau99']];
+const tau99 = [
+  ['Comfortable green', '#f2ffcf', 'TAU99 brand. tau99 --brand, the 0001 site, Link'],
+  ['Hysteric blue', '#69d8fb', 'Sign-in and checkout buttons in tau99. Also TAU99/18'],
+  ['Purple', '#e63aaf', "An artwork number's colour in tau99"],
+  ['Drip yellow', '#fde70c', "An artwork number's colour in tau99"],
+  ['Soft blue', '#cdd3fe', 'Figma only'],
+  ['Egg', '#f9f6ef', 'Artwork background, Figma only'],
+  ['Winning blue', '#0275fa', 'Figma only'],
+  ['Metal green', '#026d5b', 'Figma only'],
+  ['Red for blood', '#de0331', 'Figma only'],
+  ['Dark red variant', '#c50124', 'Figma only'],
+  ['33', '#b69e55', 'Figma only'],
+  ['99', '#dbc88f', 'Figma only'],
+];
 const linkTokens = [['--color-chartreuse', '#ccff4d', 'Chartreuse, as the palette'], ['--color-zenith', '#ccccff', 'Zenith blue, as the palette'], ['--color-tau99', '#f2ffcf', "tau99's pale lime"], ['--color-brand-accent', '#ff4438', 'Its own red accent, near tuned red #ff5f5f'], ['--color-base-black', '#2c2c2b', 'Its own ink, near black #2a2a2a'], ['--color-base-white', '#ffffff', 'White paper']];
 const notion = [['Blue, purple', '#ccccff'], ['Green', '#99ff73'], ['Chartreuse', '#ccff4d'], ['Yellow', '#f3ff99'], ['Orange', '#ffd199'], ['Red', '#ffb3a7'], ['Pink', '#ffc7e8'], ['Grey', '#e8e8e8']];
 const hashed = ['#ccff4d', '#8bd3ff', '#ffd166', '#ff9f9f', '#c7b9ff', '#7ee0c3', '#f7a1d7', '#f3ff99', '#ffbf80', '#a8e6cf', '#b8f2ff', '#e6c7ff'];
@@ -111,9 +124,10 @@ const inPalette = new Set([...palette, ...neutrals].map(([, hex]) => hex));
       </section>
 
       <section aria-labelledby="tau99">
-        <h2 id="tau99">From tau99, a candidate</h2>
-        <p>tau99 has its own set. Its pale lime is already used by two products under two names, so it is the one worth adding to the library, as <code>--tau99</code>: a paper tint for selected rows and quiet panels.</p>
-        <ul class="swatches">{tau99.map(([token, hex, use]) => <li class="swatch"><i style={`background:${hex}`}></i><b>{token}</b><code>{hex}</code><span>{use}</span></li>)}</ul>
+        <h2 id="tau99">tau99's colours</h2>
+        <p>The TAU99 group in the Colors collection of the ds1 Figma file. Four are used in tau99's code; the rest live only in Figma. Its comfortable green, #f2ffcf, is already used by two more products under two names, so it is the one worth adding to the library, as <code>--tau99</code>: a paper tint for selected rows and quiet panels.</p>
+        <ul class="swatches">{tau99.map(([name, hex, use]) => <li class="swatch"><i style={`background:${hex}`}></i><b>{name}</b><code>{hex}</code><span>{use}</span></li>)}</ul>
+        <p class="note">tau99 colours its artwork numbers from four: every green #979441, purple, comfortable green and drip yellow (<code>src/components/artwork-number.js</code>).</p>
       </section>
 
     </main>
