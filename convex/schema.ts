@@ -1,4 +1,5 @@
 import { authTables } from "@convex-dev/auth/server";
+import { signInTables } from "./signIn/schema";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
@@ -10,6 +11,7 @@ export default defineSchema({
   // users, authSessions, authAccounts, authRefreshTokens,
   // authVerificationCodes, authVerifiers, authRateLimits
   ...authTables,
+  ...signInTables,
 
   libraries: defineTable({
     /** 20-char Crockford base32, the `/ds1/{publicId}/` segment. */

@@ -56,6 +56,10 @@ Foundation for Ezo, TAU, and all 0001 products.
 
 For icon collection additions or SVG refinements, read `docs/icon-library.md`.
 
+## Sign-in
+
+The libraries app (`app/`) signs in through the shared piece from `/Users/joachim/0001/Sign-in`, copied into `convex/signIn` and `app/src/signIn` by `vp run sync-sign-in` (never edit the copies; both sit outside formatting and lint in `vite.config.ts`): the emailed code through `convex/lib/mail` from `MAIL_FROM`, Google and Apple once `SOCIAL_SIGN_IN` and their keys are set, and a password for the addresses in `SIGN_IN_PASSWORD_EMAILS`. The code replaced the magic link, so nothing a mail scanner opens can spend it. A dev deployment with `DEV_LOGIN_LINKS=1` keeps the latest code per address for the end-to-end test (`convex/devLinks.ts`, the `url` column). The dev deployment `aromatic-lapwing-453` carries `SIGN_IN_PASSWORD_EMAILS` and `SIGN_IN_OWNER_EMAIL`; the prod deployment `youthful-curlew-973` has no values yet and does not serve anything. Values never go into files or chat.
+
 ## App parity
 
 The App parity list in Ezo (`29iiBs`, in the 0001 folder) shows where Ezo, Consistency and Link stand, feature by feature, as Ezo diagrams. Before you build something those apps already have (sign-in, billing, languages, dark mode, the DS one port), read its row and follow the app that has it.

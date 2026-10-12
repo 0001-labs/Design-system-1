@@ -84,29 +84,32 @@
     "site:build": "vp run docs:build && vp run app:build",
     "site:deploy": "vp run site:build && vp exec wrangler deploy",
     "deploy": "vp run site:deploy",
-    "check:versions": "node scripts/versions.mjs"
+    "check:versions": "node scripts/versions.mjs",
+    "sync-sign-in": "node ../Sign-in/scripts/sync-into.mjs --convex convex/signIn --client app/src/signIn"
   },
   "dependencies": {
+    "@auth/core": "0.41.3",
     "@lit-labs/signals": "^0.1.3",
+    "jose": "5.10.0",
     "lit": "^3.0.0"
   },
   "devDependencies": {
-    "@convex-dev/auth": "^0.0.94",
+    "@convex-dev/auth": "^0.0.96",
     "@convex-dev/rate-limiter": "^0.3.2",
     "@ds-one/css-validate": "file:./packages/css-validate",
     "@edge-runtime/vm": "^5.0.0",
+    "@hono/node-server": "^2.1.0",
     "@playwright/test": "^1.56.0",
     "@types/node": "^20.0.0",
     "convex": "^1.42.3",
     "convex-test": "^0.0.54",
     "esbuild": "^0.27.0",
     "playwright": "^1.56.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.0.0",
     "vite": "catalog:",
     "vite-plus": "catalog:",
-    "tsx": "^4.21.0",
-    "vitest": "catalog:",
-    "@hono/node-server": "^2.1.0"
+    "vitest": "catalog:"
   },
   "peerDependencies": {
     "convex": "^1.17.0",

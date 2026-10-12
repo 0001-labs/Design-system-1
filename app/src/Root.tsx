@@ -14,7 +14,7 @@ import { SignIn } from "./screens/SignIn";
  * Route table.
  *
  *   /playground   today's workbench, no account, no persistence
- *   /signin       magic-link request, and the ?code= callback
+ *   /signin       the shared sign-in screen: the email, then the code or the owner's password
  *   /libraries    dashboard
  *   /l/:id        editor
  *
@@ -22,13 +22,9 @@ import { SignIn } from "./screens/SignIn";
  * something to try before creating an account.
  */
 function Routes() {
-  const { path, search } = useLocation();
+  const { path } = useLocation();
   const { isAuthenticated, isLoading } = useConvexAuth();
   const editor = useRoute("/l/:id");
-
-  // The magic-link callback lands on whatever SITE_URL points at, carrying
-  // ?code=. Route it to SignIn wherever it lands rather than assuming a path.
-  if (search.has("code")) return <SignIn />;
 
   if (path === "/" || path === "/playground") return <App />;
 
@@ -74,23 +70,7 @@ function NotFound() {
 
 export function Root({ children }: { children?: ReactNode }) {
   return (
-    <ConvexAuthProvider
-      client={convex}
-      /**
-       * Do not let the provider spend the magic-link token on mount.
-       *
-       * By default ConvexAuthProvider reads `?code=` straight out of the URL,
-       * strips it, and verifies it as a side effect of the page loading. That
-       * defeats the whole point of the callback screen: anything that merely
-       * *renders* the link — a security product that executes JavaScript, an
-       * over-eager preview generator — burns the token before the human clicks,
-       * and they arrive to "already used".
-       *
-       * With this off, `screens/SignIn.tsx` verifies on an explicit click and
-       * strips the query itself.
-       */
-      shouldHandleCode={false}
-    >
+    <ConvexAuthProvider client={convex}>
       <RouterProvider><AppShell>{children ?? <Routes />}</AppShell></RouterProvider>
     </ConvexAuthProvider>
   );

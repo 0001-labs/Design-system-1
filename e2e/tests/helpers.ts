@@ -26,23 +26,19 @@ export function uniqueEmail(prefix = "e2e"): string {
 export async function signIn(page: Page, email: string): Promise<void> {
   await page.goto("/app/signin");
 
-  await page.getByTestId("signin-email").fill(email);
-  await page.getByTestId("signin-submit").click();
-  await expect(page.getByTestId("signin-sent")).toBeVisible();
+  await page.locator("#sign-in-email").fill(email);
+  await page.locator("sign-in-screen button", { hasText: "Continue" }).click();
+  await expect(page.locator("#sign-in-secret")).toBeVisible();
 
-  // Fetch the link the way a mail client would receive it.
+  // The dev deployment keeps the latest code per address (DEV_LOGIN_LINKS=1), in the `url` field.
   const response = await page.request.get(
     `${CONVEX_SITE}/auth/_dev/last-link?email=${encodeURIComponent(email)}`,
   );
   expect(response.ok()).toBe(true);
-  const { url } = (await response.json()) as { url: string };
+  const { url: code } = (await response.json()) as { url: string };
 
-  await page.goto(url);
-
-  // Verification is deliberately gated behind a click, not done on mount — a
-  // JavaScript-executing mail scanner must not be able to burn the token.
-  await expect(page.getByTestId("signin-callback")).toBeVisible();
-  await page.getByTestId("signin-continue").click();
+  await page.locator("#sign-in-secret").fill(code);
+  await page.locator("sign-in-screen button", { hasText: "Sign in" }).click();
 
   await expect(page.getByTestId("library-list")).toBeVisible();
 }

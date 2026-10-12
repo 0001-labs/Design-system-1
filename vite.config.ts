@@ -7,12 +7,22 @@ export default defineConfig({
     fmt: false,
   },
   fmt: {
-    ignorePatterns: [".wrangler/**", "app/**", "dist/**", "move out/**", "sites/**", "website/**"],
+    ignorePatterns: [
+      ".wrangler/**",
+      "app/**",
+      "convex/signIn/**",
+      "dist/**",
+      "move out/**",
+      "sites/**",
+      "website/**",
+    ],
   },
   lint: {
     ignorePatterns: [
       ".wrangler/**",
       "app/**",
+      // The shared sign-in, copied from Sign-in by `vp run sync-sign-in`, keeps its own formatting.
+      "convex/signIn/**",
       "dist/**",
       "move out/**",
       "scripts/**",
