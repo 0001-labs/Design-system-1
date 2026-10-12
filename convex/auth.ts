@@ -1,7 +1,7 @@
 import { convexAuth } from "@convex-dev/auth/server";
 import type { MutationCtx } from "./_generated/server";
 import { internal } from "./_generated/api";
-import { mailFrom, resendApiKey, sendEmail } from "./lib/mail";
+import { resendApiKey, sendEmail } from "./lib/mail";
 import { normalizeEmail } from "./lib/token";
 import { signInProviders } from "./signIn/providers";
 import { signInFunctions } from "./signIn/functions";
@@ -76,7 +76,6 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
 export const { providers, passwordSignIn, remindAppleSecret } = signInFunctions({
   product: PRODUCT,
   owner: process.env.SIGN_IN_OWNER_EMAIL,
+  // The code goes through lib/mail, or into the dev capture: ready when either can take it.
+  codeReady: () => process.env.DEV_LOGIN_LINKS === "1" || Boolean(resendApiKey()),
 });
-
-// mailFrom stays the sender lib/mail uses; named here so a reader finds the From address beside the sign-in.
-void mailFrom;
