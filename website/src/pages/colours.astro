@@ -76,9 +76,13 @@ const inks = colours.filter(c => grey(c.hsl));
       .swatch-one { display: block; height: 60px; margin: 4px 0; border-radius: 4px; overflow: hidden; }
       .swatch-one i, .swatch-pair i { display: block; height: 100%; }
       .hexes { display: grid; grid-template-columns: 80px 80px; }
-      .mode-tabs { display: flex; gap: 0; margin-top: 20px; }
-      .mode-tabs button { height: 20px; padding: 0 4px; border: 0; border-radius: 0; font-size: 14px; line-height: 20px; color: var(--muted); }
-      .mode-tabs button[aria-selected=true] { color: inherit; text-decoration: underline; text-underline-offset: 4px; }
+      /* The title small, and Light and Dark as one split button at the right, both on one 20px row. */
+      .colours-bar { display: flex; align-items: center; justify-content: space-between; height: 20px; margin-top: 40px; padding: 0 20px; }
+      .colours-bar h1 { margin: 0; font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: 0; }
+      .mode-tabs { display: flex; border: 1px solid #1e1e1e; border-radius: 4px; overflow: hidden; }
+      .mode-tabs button { width: 60px; height: 18px; padding: 0; border: 0; border-radius: 0; background: transparent; font-size: 14px; line-height: 18px; color: inherit; }
+      .mode-tabs button + button { border-left: 1px solid #1e1e1e; }
+      .mode-tabs button[aria-selected=true], .mode-tabs button[aria-selected=true]:hover { background: #1e1e1e; color: #fbfcf6; }
       .mode { margin-top: 20px; padding: 0 20px 40px; }
       .mode.dark { background: #1e1e1e; color: #e6e6e6; }
       .mode.dark .swatch code { color: #b3b3b3; }
@@ -92,8 +96,7 @@ const inks = colours.filter(c => grey(c.hsl));
       <nav aria-label="Main"><a href="/getting-started/installation/">Documentation</a><a href="/classless/editor/">CLASSless</a><a href="/icons">Icons</a><a href="/colours" aria-current="page">Colours <span class="nav-dot"></span></a></nav>
     </header>
     <main class="colours">
-      <section class="intro"><h1>Colours<span class="green-dot">.</span></h1></section>
-      <div class="mode-tabs" role="tablist" aria-label="Mode"><button role="tab" id="tab-light" aria-controls="light" aria-selected="true">Light</button><button role="tab" id="tab-dark" aria-controls="dark" aria-selected="false" tabindex="-1">Dark</button></div>
+      <div class="colours-bar"><h1>Colours</h1><div class="mode-tabs" role="tablist" aria-label="Mode"><button role="tab" id="tab-light" aria-controls="light" aria-selected="true">Light</button><button role="tab" id="tab-dark" aria-controls="dark" aria-selected="false" tabindex="-1">Dark</button></div></div>
       {[['light', 'Light'], ['dark', 'Dark']].map(([mode]) => (
         <div id={mode} class={`mode ${mode}`} role="tabpanel" aria-labelledby={`tab-${mode}`} hidden={mode === 'dark'}>
           <section>
