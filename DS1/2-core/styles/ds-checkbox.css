@@ -1,9 +1,10 @@
 :host {
+  --ds-choice-unit: calc(var(--ds-1) * var(--ds-sf));
   display: inline-flex;
   flex: 0 0 auto;
   vertical-align: middle;
-  width: var(--ds-unit);
-  height: var(--ds-row-height);
+  width: var(--ds-choice-unit);
+  height: var(--ds-choice-unit);
 }
 :host([hidden]) { display: none !important; }
 ::slotted(input[type="checkbox"]) {
@@ -18,7 +19,7 @@
   margin: 0 !important;
   padding: 0 !important;
   border: 1px solid var(--ds-border-color) !important;
-  border-radius: var(--ds-radius) !important;
+  border-radius: calc(4px * var(--ds-sf)) !important;
   background: var(--ds-input-background) !important;
   color: var(--ds-button-text-color-on-accent) !important;
   box-shadow: none !important;
@@ -27,15 +28,15 @@
 ::slotted(input:checked), ::slotted(input:indeterminate) { background: var(--ds-accent-color) !important; }
 ::slotted(input)::before {
   content: "";
-  width: var(--ds-control-height);
-  height: var(--ds-control-height);
+  width: calc(.8 * var(--ds-choice-unit));
+  height: calc(.8 * var(--ds-choice-unit));
   background: currentColor;
   mask: var(--ds-checkbox-mark) center / contain no-repeat;
   opacity: 0;
 }
 ::slotted(input:checked)::before { opacity: 1; }
 ::slotted(input:indeterminate)::before {
-  width: calc(var(--ds-unit) / 2);
+  width: calc(var(--ds-choice-unit) / 2);
   height: calc(2px * var(--ds-sf));
   mask: none;
   opacity: 1;
