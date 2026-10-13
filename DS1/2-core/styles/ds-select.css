@@ -30,6 +30,7 @@
   font-family: var(--ds-typeface-regular) !important;
   font-size: var(--ds-type-size-default) !important;
   font-weight: var(--ds-type-weight-default) !important;
+  letter-spacing: var(--ds-type-letterspacing-default) !important;
   line-height: calc(var(--ds-select-unit) - 2px) !important;
   box-shadow: none !important;
   cursor: pointer !important;
@@ -53,3 +54,42 @@ span[hidden] { display: none; }
 ::slotted(select[size]:not([size="0"]):not([size="1"])) {
   padding: 0 calc(4px * var(--ds-sf)) !important;
 }
+
+/* Intrinsic width uses the native option sizing, including translated labels. */
+:host([fit]:not([data-listbox])) { width: max-content; }
+:host([fit]:not([data-listbox])) ::slotted(select) { width: auto !important; max-width: 100% !important; }
+
+/* A settings chip keeps the same native picker, on the shared control height. */
+:host([chip]:not([data-listbox])) { height: var(--ds-control-height); }
+:host([chip]:not([data-listbox])) ::slotted(select) {
+  border: 0 !important;
+  background: var(--ds-button-background-color-secondary) !important;
+  color: var(--ds-button-text-color-secondary) !important;
+  line-height: var(--ds-control-height) !important;
+}
+:host([chip][primary]:not([data-listbox])) ::slotted(select) {
+  background: var(--ds-button-background-color-primary) !important;
+  color: var(--ds-button-text-color-on-accent) !important;
+}
+:host([chip]) span { background: var(--ds-button-text-color-secondary); }
+:host([chip][primary]) span { background: var(--ds-button-text-color-on-accent); }
+
+/* A colour choice uses the shared swatch; the native select remains the hit target. */
+:host([swatch]:not([swatch=""]):not([data-listbox])) {
+  width: var(--ds-select-unit);
+  height: var(--ds-select-unit);
+  border-radius: var(--ds-radius);
+  background: var(--ds-input-background);
+}
+:host([swatch]:not([swatch=""]):not([data-listbox])) ::slotted(select) {
+  width: 100% !important;
+  opacity: 0 !important;
+  position: relative !important;
+  z-index: 1;
+}
+:host([swatch]:not([swatch=""]):not([data-listbox]):focus-within) {
+  outline: 2px solid var(--ds-focus-ring);
+  outline-offset: 1px;
+}
+ds-swatch { pointer-events: none; position: absolute; inset: 0; margin: auto; }
+ds-swatch.disabled { opacity: .5; }

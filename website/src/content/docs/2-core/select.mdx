@@ -37,3 +37,34 @@ Remove product select appearance CSS and duplicate arrows when migrating.
 Keep data and persistence callbacks in the product. Verify required validation,
 controlled changes, labels, reset, keyboard choices and disabled state on light
 and dark paper, with the product scale and at phone width.
+
+## Compact and colour choices
+
+Use `fit` to size a single picker to its native options. `chip` uses the shared
+16px control height and quiet button face; `primary` gives a chip the accent.
+Widths and type follow the containing surface scale. Lists with `multiple` or
+more than one visible row keep their normal field face.
+
+```html
+<ds-select fit chip primary><select aria-label="Sort direction">
+  <option value="asc">Ascending</option><option value="desc">Descending</option>
+</select></ds-select>
+```
+
+For a colour category picker, pass `swatch` a CSS colour. DS1 composes its own
+`ds-swatch` inside a one-square control; the native select still receives
+keyboard focus and opens the platform picker. Supply an accessible name and
+keep the colour/category mapping and selected value in the product.
+
+```tsx
+<Select swatch={categoryColour} aria-label="Category" value={category}
+  onChange={event => setCategory(event.currentTarget.value)}>
+  <option value="work">Work</option>
+  <option value="personal">Personal</option>
+</Select>
+```
+
+The React adapter also accepts `fit`, `chip` and `primary`. These visual
+properties go on the shared host; all native select properties stay on the
+select. No product overlay, hidden select styles or duplicate swatch face is
+needed.

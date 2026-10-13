@@ -177,3 +177,12 @@ it("recognizes explicit DOM dialog roles while leaving dynamic role values unres
     expect(sites[1]?.controlKind).toBe("color");
   }
 });
+
+it("recognizes direct native control frames without conflating separate scopes or unrelated children", () => {
+  for (const [hostTag, tag] of [["ds-select", "select"], ["ds-checkbox", "input"], ["ds-color", "input"], ["ds-switch", "button"]]) {
+    const source = `function shared() { const field = document.createElement("${tag}"); const host = document.createElement("${hostTag}"); host.setAttribute("fit", ""); host.append(field); } function separate() { const field = document.createElement("${tag}"); }`;
+    expect(sourceSites("view.ts", source).map(s => s.tag)).toEqual([hostTag, tag]);
+  }
+  expect(sourceSites("view.ts", 'const host = document.createElement("ds-select"); const field = document.createElement("select"); host.appendChild(field); const unrelated = document.createElement("input"); host.append(unrelated);').map(s => s.tag)).toEqual(["ds-select", "input"]);
+  expect(sourceSites("view.ts", 'let host = document.createElement("ds-select"); const field = document.createElement("select"); host.append(field);').map(s => s.tag)).toEqual(["ds-select", "select"]);
+});

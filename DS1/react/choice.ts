@@ -8,11 +8,16 @@ export const ColorInput = forwardRef<HTMLInputElement, ColorInputProps>(function
   return createElement("ds-color", { className, style, hidden }, createElement("input", { ...props, type: "color", hidden, ref }));
 });
 
-export type SelectProps = SelectHTMLAttributes<HTMLSelectElement>;
+export type SelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
+  fit?: boolean;
+  chip?: boolean;
+  primary?: boolean;
+  swatch?: string;
+};
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select(
-  { className, style, hidden, children, ...props }, ref,
+  { className, style, hidden, children, fit, chip, primary, swatch, ...props }, ref,
 ) {
-  return createElement("ds-select", { className, style, hidden }, createElement("select", { ...props, hidden, ref }, children));
+  return createElement("ds-select", { className, style, hidden, fit: fit ? "" : undefined, chip: chip ? "" : undefined, primary: primary ? "" : undefined, swatch }, createElement("select", { ...props, hidden, ref }, children));
 });
 
 export type CheckboxProps = Omit<InputHTMLAttributes<HTMLInputElement>, "type"> & { indeterminate?: boolean };

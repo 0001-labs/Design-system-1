@@ -2,9 +2,13 @@ import { LitElement, html, unsafeCSS } from "lit";
 import { define } from "../0-face/define";
 import down from "../x-icon/down.svg?raw";
 import styles from "./styles/ds-select.css?inline";
+import "./ds-swatch";
 
 /** Native selection, labels and forms; one shared face and scale. */
 export class Select extends LitElement {
+  static properties = { swatch: { type: String, reflect: true } };
+  declare swatch: string | undefined;
+  constructor() { super(); this.swatch = undefined; }
   static styles = [unsafeCSS(styles), unsafeCSS(`:host { --ds-select-arrow: url("data:image/svg+xml,${encodeURIComponent(down)}"); }`)];
   private listbox = false;
   private disabled = false;
@@ -17,6 +21,7 @@ export class Select extends LitElement {
     const select = this.control();
     this.style.setProperty("--ds-select-rows", String(select ? select.size || (select.multiple ? 4 : 1) : 1));
     this.listbox = Boolean(select && (select.multiple || select.size > 1));
+    this.toggleAttribute("data-listbox", this.listbox);
     this.disabled = Boolean(select?.matches(":disabled"));
     this.requestUpdate();
   }
@@ -32,7 +37,7 @@ export class Select extends LitElement {
   connectedCallback() { super.connectedCallback(); this.observeControl(); }
   disconnectedCallback() { this.observer.disconnect(); super.disconnectedCallback(); }
   focus(options?: FocusOptions) { this.control()?.focus(options); }
-  render() { return html`<slot @slotchange=${this.observeControl}></slot><span aria-hidden="true" ?hidden=${this.listbox} class=${this.disabled ? "disabled" : ""}></span>`; }
+  render() { return html`<slot @slotchange=${this.observeControl}></slot><span aria-hidden="true" ?hidden=${this.listbox || Boolean(this.swatch)} class=${this.disabled ? "disabled" : ""}></span>${this.swatch && !this.listbox ? html`<ds-swatch aria-hidden="true" .value=${this.swatch} class=${this.disabled ? "disabled" : ""}></ds-swatch>` : null}`; }
 }
 
 define("ds-select", Select);

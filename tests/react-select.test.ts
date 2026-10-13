@@ -65,3 +65,28 @@ test("listbox rows and the arrow follow native attributes when they change", asy
   expect(host.shadowRoot!.querySelector("span")!.hidden).toBe(false);
   expect(host.shadowRoot!.querySelector("span")!.className).toBe("disabled");
 });
+
+test("chip and swatch treatments stay on the shared host while native forms and refs remain usable", async () => {
+  const mount = document.createElement("div"); document.body.append(mount);
+  const root = createRoot(mount), ref = createRef<HTMLSelectElement>();
+  try {
+    await act(async () => root.render(h("form", null, h(Select, { name: "category", ref, fit: true, chip: true, primary: true, swatch: "var(--ds-apple-green)", defaultValue: "b", "aria-label": "Category" }, options))));
+    const host = mount.querySelector("ds-select")!, control = ref.current!;
+    await host.updateComplete;
+    expect(host.hasAttribute("fit")).toBe(true); expect(host.hasAttribute("chip")).toBe(true);
+    expect(control.hasAttribute("chip")).toBe(false); expect(control.hasAttribute("swatch")).toBe(false);
+    expect(host.shadowRoot!.querySelector("ds-swatch")!.value).toBe("var(--ds-apple-green)");
+    expect(host.shadowRoot!.querySelector("ds-swatch")!.getAttribute("aria-hidden")).toBe("true");
+    expect(new FormData(control.form!).get("category")).toBe("b");
+    host.focus(); expect(document.activeElement).toBe(control);
+    await act(async () => root.render(h("form", null, h(Select, { name: "category", ref, swatch: "var(--ds-pink)", defaultValue: "b", "aria-label": "Category" }, options))));
+    await host.updateComplete;
+    expect(host.hasAttribute("fit")).toBe(false); expect(host.hasAttribute("chip")).toBe(false);
+    expect(host.shadowRoot!.querySelector("ds-swatch")!.value).toBe("var(--ds-pink)");
+    expect(control.value).toBe("b");
+    control.multiple = true; control.size = 3;
+    await Promise.resolve(); await host.updateComplete;
+    expect(host.hasAttribute("data-listbox")).toBe(true);
+    expect(host.shadowRoot!.querySelector("ds-swatch")).toBeNull();
+  } finally { await act(async () => root.unmount()); }
+});

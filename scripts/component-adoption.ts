@@ -69,7 +69,7 @@ export function sourceSites(file: string, source: string): TagSite[] {
       if ((binding.propertyName ?? binding.name).text === "createElement") reactFactories.add(binding.name.text);
     }
   }
-  // A direct, const DOM append is evidence that the native dialog is the
+  // A direct, const DOM append is evidence that the native control is the
   // shared host's required frame. Do not infer dynamic factories or aliases.
   const frames = new Set<ts.Node>();
   const findFrames = (scope: ts.Node) => {
@@ -88,10 +88,13 @@ export function sourceSites(file: string, source: string): TagSite[] {
         if (!ts.isExpressionStatement(statement) || !ts.isCallExpression(statement.expression)) continue;
         const call = statement.expression;
         if (!ts.isPropertyAccessExpression(call.expression) || !ts.isIdentifier(call.expression.expression) || !["append", "appendChild"].includes(call.expression.name.text)) continue;
-        if (creations.get(call.expression.expression.text)?.tag !== "ds-dialog") continue;
+        const host = creations.get(call.expression.expression.text)?.tag;
+        const frameTags: Record<string, string> = { "ds-dialog": "dialog", "ds-select": "select", "ds-checkbox": "input", "ds-color": "input", "ds-switch": "button" };
+        const frameTag = host && frameTags[host];
+        if (!frameTag) continue;
         for (const arg of call.arguments) {
           const child = ts.isIdentifier(arg) ? creations.get(arg.text) : undefined;
-          if (child?.tag === "dialog") frames.add(child.call);
+          if (child?.tag === frameTag) frames.add(child.call);
         }
       }
     }
@@ -329,7 +332,7 @@ export function scanReport(studio = resolve(repository, "..")): AdoptionReport {
       "DS1 styles counts native controls with literal ds-button, ds-input, ds-select or ds-checkbox classes and verified shared control styles. These are not Lit components. Dynamic class expressions are not inferred.",
       "Local means recognized ezo-/c9y- components or native button, input/select/textarea, p/headings, ul/ol, table, form and dialog, plus literal dialog/alertdialog roles, including explicit setAttribute sites. Native semantics can be intentional; these counts are review leads, not automatic defects.",
       "Tests, demos in preview/dev directories, generated files, vendored implementations and shared sign-in internals are excluded. Link's inspected TabPill, TabPillRow and Tooltip/Tooltop adapters and DS1's verified React Input, Textarea, Checkbox, Switch, Select, ColorInput, Button, Split and DialogContent adapters count at imported JSX uses, without counting their inner DS1 tags again.",
-      "Native dialog/input/button children directly inside ds-dialog/ds-checkbox/ds-switch count as their shared frames, not as extra local controls. Literal color and checkbox types and switch roles have their own columns; dynamic types stay in Input. Direct const document.createElement plus append composition is also recognized. Other React abstractions, dynamic tag names, CSS-only controls, spans and inline SVGs are not inferred. Native apps are outside this scan. A zero means no recognized source site, not that a capability is absent.",
+      "Native dialog/input/button/select children directly inside ds-dialog/ds-checkbox/ds-color/ds-switch/ds-select count as their shared frames, not as extra local controls. Literal color and checkbox types and switch roles have their own columns; dynamic types stay in Input. Direct const document.createElement plus append composition is also recognized. Other React abstractions, dynamic tag names, CSS-only controls, spans and inline SVGs are not inferred. Native apps are outside this scan. A zero means no recognized source site, not that a capability is absent.",
     ],
   };
 }
