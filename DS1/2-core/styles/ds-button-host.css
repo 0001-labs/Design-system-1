@@ -1,3 +1,5 @@
+@import "../../1-root/component-metrics.css";
+
 /* ds-button.css */
 
 :host([control="host"]),

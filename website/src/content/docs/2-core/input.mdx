@@ -56,6 +56,19 @@ The component participates in native forms through `ElementInternals`: a named f
 
 Import `DS1/1-root/component-tokens.css` and set `--ds-sf` to the surface scale. The row treatment, password visibility, quiet focus and field colours are shared capabilities; configure them with attributes and `--ds-input-*` tokens rather than injecting styles or buttons into the shadow root.
 
+### Surface scale
+
+`--ds-sf` is an absolute scale: 1 gives a 20px row and 14px text; 1.5 gives 30px and 21px. Shared components resolve their measures at their own host, so a nested scale does not multiply its parent's scale. Add `data-ds-surface` to an ordinary layout container when its `--ds-unit`-based spacing should use that scale too.
+
+```html
+<section data-ds-surface style="--ds-sf: 1.5">
+  <ds-input variant="field" label="Name"></ds-input>
+  <ds-text literal>Scaled with the field</ds-text>
+</section>
+```
+
+Colours and typefaces inherit as usual. Resolved dimensions such as `--ds-row-height` and `--ds-type-size-default` are local to each component; set a one-off override on that host. To carry a measure through a whole subtree, use an unscaled base token (`--ds-row-size`, `--ds-control-size`, `--ds-text-size`, `--ds-small-text-size`, `--ds-heading-text-size`, `--ds-text-leading`, `--ds-text-tracking`, `--ds-corner-size` or `--ds-card-corner-size`). Its component computes the scaled value. Keep DS1's default measures unless the existing product layout requires an explicit exception.
+
 ```html
 <ds-input variant="row" type="password" name="password"
   aria-label="Password" autocomplete="current-password" revealable></ds-input>

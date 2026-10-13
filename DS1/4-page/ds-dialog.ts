@@ -1,9 +1,10 @@
-import { LitElement, css, html } from "lit";
+import { LitElement, css, html, unsafeCSS } from "lit";
 import { define } from "../0-face/define";
 import "../2-core/ds-button";
 import "../2-core/ds-icon";
 import "./styles/ds-dialog.css";
 import dialogStyles from "./styles/ds-dialog.css?inline";
+import metrics from "../1-root/component-metrics.css?inline";
 
 export type DialogCloseReason = "escape" | "backdrop" | "outside" | "button" | "native";
 const openDialogs = new WeakMap<Document, Set<Dialog>>();
@@ -72,7 +73,7 @@ export class Dialog extends LitElement {
     anchor: { attribute: false },
     returnFocus: { attribute: false },
   };
-  static styles = css`:host { display: contents; }`;
+  static styles = [unsafeCSS(metrics), css`:host { display: contents; }`];
   declare open: boolean;
   declare nonModal: boolean;
   declare closeOnOutside: boolean;

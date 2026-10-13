@@ -1,3 +1,5 @@
+@import "../../1-root/component-metrics.css";
+
 /* ds-text.css */
 /* Text component styles for displaying translations */
 
@@ -42,6 +44,8 @@
 /* ds-text.css */
 
 :host([literal]) {
+  height: auto;
+  min-height: var(--ds-control-height);
   display: inline-block;
   min-width: 0;
   max-width: 100%;
