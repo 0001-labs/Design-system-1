@@ -152,6 +152,7 @@ test("immediate opening exposes a control inside the gesture while children rend
   Object.defineProperty(host.querySelector("span"), "updateComplete", { value: new Promise<void>(resolve => { ready = resolve; }) });
   document.body.append(host);
   const shown = host.show({ immediate: true });
+  expect(host.shadowRoot!.querySelector('slot')?.assignedElements()).toContain(host.querySelector('dialog'));
   expect(host.querySelector("dialog")!.open).toBe(true);
   const input = host.querySelector("input")!; input.focus();
   expect(document.activeElement).toBe(input);

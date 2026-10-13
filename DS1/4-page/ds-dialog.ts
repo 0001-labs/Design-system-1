@@ -158,6 +158,9 @@ export class Dialog extends LitElement {
   async show({ immediate = false }: { immediate?: boolean } = {}) {
     this.open = true;
     if (immediate) {
+      // The native frame must be in the rendered tree within this gesture too.
+      // A newly connected Lit host has not drawn its slot yet.
+      this.performUpdate();
       this.bindDialog();
       if (this.dialog && this.isConnected) this.showDialog(this.dialog);
     }
