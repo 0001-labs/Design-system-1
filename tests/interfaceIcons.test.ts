@@ -2,12 +2,14 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { expect, test } from 'vite-plus/test';
 import icons from '../website/src/lib/icons/interface-catalog.json';
 import sources from '../website/src/lib/icons/figma-interface.json';
+import additions from '../website/src/lib/icons/figma-additions.json';
+import { isSharedInterfaceIcon } from '../website/src/lib/icons/icon-scope';
 import { scopedSvg } from '../website/src/lib/icons/svgView';
 
 test('the 69-icon Figma collection is present with its original vector geometry',()=>{
   expect(sources).toHaveLength(69);
   expect(new Set(icons.map(icon=>icon.key)).size).toBe(icons.length);
-  for(const source of sources){
+  for(const source of [...sources, ...additions]){
     const icon=icons.find(icon=>icon.key===source.key)!;
     expect(icon.source).toBe('Figma');
     expect(icon.svg).toBe(readFileSync(new URL('../website/public/icons/interface/'+source.file,import.meta.url),'utf8').trim());
@@ -19,9 +21,9 @@ test('the 69-icon Figma collection is present with its original vector geometry'
     expect(icon.svg).not.toMatch(/<(script|image|foreignObject)\b|\bon\w+=|(?:href|src)=/i);
   }
 });
-test('every installed icon is discoverable without maintaining a second manual list',()=>{
+test('shared interface icons are discoverable and Ezo artwork is excluded',()=>{
   for(const file of readdirSync(new URL('../DS1/x-icon/',import.meta.url)).filter(file=>file.endsWith('.svg'))){
-    expect(icons.find(icon=>icon.key===file.slice(0,-4)),file).toBeDefined();
+    expect(icons.some(icon=>icon.key===file.slice(0,-4)),file).toBe(isSharedInterfaceIcon(file.slice(0,-4)));
   }
   for(const icon of icons.filter(icon=>icon.source==='Library'))expect(icon.svg).toContain('viewBox="0 0 16 16"');
 });

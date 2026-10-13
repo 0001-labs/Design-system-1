@@ -40,6 +40,30 @@
     "shapes": 2
   },
   {
+    "key": "2xgrid-alt",
+    "name": "2x grid alternate",
+    "source": "Figma",
+    "node": "621:1508",
+    "url": "/icons/interface/2xgrid-alt.svg",
+    "shapes": 6
+  },
+  {
+    "key": "2xgrid-alt-2",
+    "name": "2x grid alternate 2",
+    "source": "Figma",
+    "node": "403:4750",
+    "url": "/icons/interface/2xgrid-alt-2.svg",
+    "shapes": 7
+  },
+  {
+    "key": "2xgrid-alt-3",
+    "name": "2x grid alternate 3",
+    "source": "Figma",
+    "node": "403:4752",
+    "url": "/icons/interface/2xgrid-alt-3.svg",
+    "shapes": 6
+  },
+  {
     "key": "2xdots",
     "name": "2xDots",
     "source": "Figma",
@@ -91,6 +115,14 @@
     "name": "Archive",
     "source": "Library",
     "url": "/icons/library/archive.svg",
+    "shapes": 2
+  },
+  {
+    "key": "archive-alt",
+    "name": "Archive alternate",
+    "source": "Figma",
+    "node": "627:2675",
+    "url": "/icons/interface/archive-alt.svg",
     "shapes": 2
   },
   {
@@ -191,244 +223,6 @@
     "node": "116:524",
     "url": "/icons/interface/avatar.svg",
     "shapes": 2
-  },
-  {
-    "key": "badge-bands",
-    "name": "Badge Bands",
-    "source": "Library",
-    "url": "/icons/library/badge-bands.svg",
-    "shapes": 4
-  },
-  {
-    "key": "badge-bands-3d",
-    "name": "Badge Bands 3d",
-    "source": "Library",
-    "url": "/icons/library/badge-bands-3d.svg",
-    "shapes": 20
-  },
-  {
-    "key": "badge-blue-fan",
-    "name": "Badge Blue Fan",
-    "source": "Library",
-    "url": "/icons/library/badge-blue-fan.svg",
-    "shapes": 9
-  },
-  {
-    "key": "badge-blue-fan-3d",
-    "name": "Badge Blue Fan 3d",
-    "source": "Library",
-    "url": "/icons/library/badge-blue-fan-3d.svg",
-    "shapes": 35
-  },
-  {
-    "key": "badge-bricks",
-    "name": "Badge Bricks",
-    "source": "Library",
-    "url": "/icons/library/badge-bricks.svg",
-    "shapes": 16
-  },
-  {
-    "key": "badge-bricks-3d",
-    "name": "Badge Bricks 3d",
-    "source": "Library",
-    "url": "/icons/library/badge-bricks-3d.svg",
-    "shapes": 56
-  },
-  {
-    "key": "badge-broken-stripes",
-    "name": "Badge Broken Stripes",
-    "source": "Library",
-    "url": "/icons/library/badge-broken-stripes.svg",
-    "shapes": 16
-  },
-  {
-    "key": "badge-broken-stripes-3d",
-    "name": "Badge Broken Stripes 3d",
-    "source": "Library",
-    "url": "/icons/library/badge-broken-stripes-3d.svg",
-    "shapes": 56
-  },
-  {
-    "key": "badge-checker",
-    "name": "Badge Checker",
-    "source": "Library",
-    "url": "/icons/library/badge-checker.svg",
-    "shapes": 64
-  },
-  {
-    "key": "badge-checker-3d",
-    "name": "Badge Checker 3d",
-    "source": "Library",
-    "url": "/icons/library/badge-checker-3d.svg",
-    "shapes": 200
-  },
-  {
-    "key": "badge-diamond",
-    "name": "Badge Diamond",
-    "source": "Library",
-    "url": "/icons/library/badge-diamond.svg",
-    "shapes": 3
-  },
-  {
-    "key": "badge-diamond-3d",
-    "name": "Badge Diamond 3d",
-    "source": "Library",
-    "url": "/icons/library/badge-diamond-3d.svg",
-    "shapes": 17
-  },
-  {
-    "key": "badge-fan",
-    "name": "Badge Fan",
-    "source": "Library",
-    "url": "/icons/library/badge-fan.svg",
-    "shapes": 8
-  },
-  {
-    "key": "badge-fan-3d",
-    "name": "Badge Fan 3d",
-    "source": "Library",
-    "url": "/icons/library/badge-fan-3d.svg",
-    "shapes": 32
-  },
-  {
-    "key": "badge-fan-dark",
-    "name": "Badge Fan Dark",
-    "source": "Library",
-    "url": "/icons/library/badge-fan-dark.svg",
-    "shapes": 8
-  },
-  {
-    "key": "badge-fan-dark-3d",
-    "name": "Badge Fan Dark 3d",
-    "source": "Library",
-    "url": "/icons/library/badge-fan-dark-3d.svg",
-    "shapes": 32
-  },
-  {
-    "key": "badge-halves",
-    "name": "Badge Halves",
-    "source": "Library",
-    "url": "/icons/library/badge-halves.svg",
-    "shapes": 2
-  },
-  {
-    "key": "badge-halves-3d",
-    "name": "Badge Halves 3d",
-    "source": "Library",
-    "url": "/icons/library/badge-halves-3d.svg",
-    "shapes": 14
-  },
-  {
-    "key": "badge-halves-green",
-    "name": "Badge Halves Green",
-    "source": "Library",
-    "url": "/icons/library/badge-halves-green.svg",
-    "shapes": 2
-  },
-  {
-    "key": "badge-halves-green-3d",
-    "name": "Badge Halves Green 3d",
-    "source": "Library",
-    "url": "/icons/library/badge-halves-green-3d.svg",
-    "shapes": 14
-  },
-  {
-    "key": "badge-red",
-    "name": "Badge Red",
-    "source": "Library",
-    "url": "/icons/library/badge-red.svg",
-    "shapes": 1
-  },
-  {
-    "key": "badge-red-3d",
-    "name": "Badge Red 3d",
-    "source": "Library",
-    "url": "/icons/library/badge-red-3d.svg",
-    "shapes": 11
-  },
-  {
-    "key": "badge-red-blue-bricks",
-    "name": "Badge Red Blue Bricks",
-    "source": "Library",
-    "url": "/icons/library/badge-red-blue-bricks.svg",
-    "shapes": 16
-  },
-  {
-    "key": "badge-red-blue-bricks-3d",
-    "name": "Badge Red Blue Bricks 3d",
-    "source": "Library",
-    "url": "/icons/library/badge-red-blue-bricks-3d.svg",
-    "shapes": 56
-  },
-  {
-    "key": "badge-round-fan",
-    "name": "Badge Round Fan",
-    "source": "Library",
-    "url": "/icons/library/badge-round-fan.svg",
-    "shapes": 5
-  },
-  {
-    "key": "badge-round-fan-3d",
-    "name": "Badge Round Fan 3d",
-    "source": "Library",
-    "url": "/icons/library/badge-round-fan-3d.svg",
-    "shapes": 23
-  },
-  {
-    "key": "badge-shard",
-    "name": "Badge Shard",
-    "source": "Library",
-    "url": "/icons/library/badge-shard.svg",
-    "shapes": 2
-  },
-  {
-    "key": "badge-shard-3d",
-    "name": "Badge Shard 3d",
-    "source": "Library",
-    "url": "/icons/library/badge-shard-3d.svg",
-    "shapes": 14
-  },
-  {
-    "key": "badge-split-circle",
-    "name": "Badge Split Circle",
-    "source": "Library",
-    "url": "/icons/library/badge-split-circle.svg",
-    "shapes": 2
-  },
-  {
-    "key": "badge-split-circle-3d",
-    "name": "Badge Split Circle 3d",
-    "source": "Library",
-    "url": "/icons/library/badge-split-circle-3d.svg",
-    "shapes": 14
-  },
-  {
-    "key": "badge-tall-bricks",
-    "name": "Badge Tall Bricks",
-    "source": "Library",
-    "url": "/icons/library/badge-tall-bricks.svg",
-    "shapes": 16
-  },
-  {
-    "key": "badge-tall-bricks-3d",
-    "name": "Badge Tall Bricks 3d",
-    "source": "Library",
-    "url": "/icons/library/badge-tall-bricks-3d.svg",
-    "shapes": 56
-  },
-  {
-    "key": "badge-weave",
-    "name": "Badge Weave",
-    "source": "Library",
-    "url": "/icons/library/badge-weave.svg",
-    "shapes": 24
-  },
-  {
-    "key": "badge-weave-3d",
-    "name": "Badge Weave 3d",
-    "source": "Library",
-    "url": "/icons/library/badge-weave-3d.svg",
-    "shapes": 80
   },
   {
     "key": "bag",
@@ -586,6 +380,14 @@
     "shapes": 3
   },
   {
+    "key": "categories",
+    "name": "Categories",
+    "source": "Figma",
+    "node": "403:4757",
+    "url": "/icons/interface/categories.svg",
+    "shapes": 1
+  },
+  {
     "key": "change",
     "name": "Change",
     "source": "Figma",
@@ -599,6 +401,14 @@
     "source": "Figma",
     "node": "116:553",
     "url": "/icons/interface/check.svg",
+    "shapes": 1
+  },
+  {
+    "key": "check-alt",
+    "name": "Check alternate",
+    "source": "Figma",
+    "node": "1177:314",
+    "url": "/icons/interface/check-alt.svg",
     "shapes": 1
   },
   {
@@ -660,6 +470,22 @@
     "source": "Library",
     "url": "/icons/library/compose.svg",
     "shapes": 2
+  },
+  {
+    "key": "connect",
+    "name": "Connect",
+    "source": "Figma",
+    "node": "627:3318",
+    "url": "/icons/interface/connect.svg",
+    "shapes": 3
+  },
+  {
+    "key": "content",
+    "name": "Content",
+    "source": "Figma",
+    "node": "697:796",
+    "url": "/icons/interface/content.svg",
+    "shapes": 4
   },
   {
     "key": "default",
@@ -976,13 +802,6 @@
     "shapes": 1
   },
   {
-    "key": "ezo-logo",
-    "name": "Ezo Logo",
-    "source": "Library",
-    "url": "/icons/library/ezo-logo.svg",
-    "shapes": 3
-  },
-  {
     "key": "ezo-mic",
     "name": "Ezo Mic",
     "source": "Library",
@@ -1193,6 +1012,14 @@
     "shapes": 1
   },
   {
+    "key": "form",
+    "name": "Form",
+    "source": "Figma",
+    "node": "689:1041",
+    "url": "/icons/interface/form.svg",
+    "shapes": 3
+  },
+  {
     "key": "gallery",
     "name": "Gallery",
     "source": "Figma",
@@ -1222,6 +1049,22 @@
     "source": "Figma",
     "node": "116:71",
     "url": "/icons/interface/group.svg",
+    "shapes": 1
+  },
+  {
+    "key": "group-alt",
+    "name": "Group alternate",
+    "source": "Figma",
+    "node": "633:3852",
+    "url": "/icons/interface/group-alt.svg",
+    "shapes": 5
+  },
+  {
+    "key": "group-alt-2",
+    "name": "Group alternate 2",
+    "source": "Figma",
+    "node": "715:786",
+    "url": "/icons/interface/group-alt-2.svg",
     "shapes": 1
   },
   {
@@ -1268,6 +1111,14 @@
     "shapes": 3
   },
   {
+    "key": "help-alt",
+    "name": "Help alternate",
+    "source": "Figma",
+    "node": "643:813",
+    "url": "/icons/interface/help-alt.svg",
+    "shapes": 1
+  },
+  {
     "key": "home",
     "name": "Home",
     "source": "Library",
@@ -1312,6 +1163,14 @@
     "shapes": 1
   },
   {
+    "key": "item",
+    "name": "Item",
+    "source": "Figma",
+    "node": "1191:1422",
+    "url": "/icons/interface/item.svg",
+    "shapes": 1
+  },
+  {
     "key": "left",
     "name": "Left",
     "source": "Figma",
@@ -1335,6 +1194,14 @@
     "shapes": 1
   },
   {
+    "key": "list-line",
+    "name": "List line",
+    "source": "Figma",
+    "node": "1191:1427",
+    "url": "/icons/interface/list-line.svg",
+    "shapes": 1
+  },
+  {
     "key": "lists",
     "name": "Lists",
     "source": "Library",
@@ -1348,6 +1215,22 @@
     "node": "116:212",
     "url": "/icons/interface/lock.svg",
     "shapes": 1
+  },
+  {
+    "key": "lock-filled",
+    "name": "Lock filled",
+    "source": "Figma",
+    "node": "657:902",
+    "url": "/icons/interface/lock-filled.svg",
+    "shapes": 1
+  },
+  {
+    "key": "logo-marquee",
+    "name": "Logo marquee",
+    "source": "Figma",
+    "node": "689:1099",
+    "url": "/icons/interface/logo-marquee.svg",
+    "shapes": 3
   },
   {
     "key": "loop",
@@ -1365,6 +1248,14 @@
     "shapes": 2
   },
   {
+    "key": "menu",
+    "name": "Menu",
+    "source": "Figma",
+    "node": "700:1483",
+    "url": "/icons/interface/menu.svg",
+    "shapes": 1
+  },
+  {
     "key": "mic",
     "name": "Mic",
     "source": "Figma",
@@ -1378,6 +1269,14 @@
     "source": "Figma",
     "node": "116:237",
     "url": "/icons/interface/minimize.svg",
+    "shapes": 2
+  },
+  {
+    "key": "minimize-alt",
+    "name": "Minimize alternate",
+    "source": "Figma",
+    "node": "643:811",
+    "url": "/icons/interface/minimize-alt.svg",
     "shapes": 2
   },
   {
@@ -1427,6 +1326,30 @@
     "shapes": 2
   },
   {
+    "key": "note-alt",
+    "name": "Note alternate",
+    "source": "Figma",
+    "node": "621:1549",
+    "url": "/icons/interface/note-alt.svg",
+    "shapes": 2
+  },
+  {
+    "key": "note-alt-2",
+    "name": "Note alternate 2",
+    "source": "Figma",
+    "node": "621:1537",
+    "url": "/icons/interface/note-alt-2.svg",
+    "shapes": 4
+  },
+  {
+    "key": "note-lines",
+    "name": "Note lines",
+    "source": "Figma",
+    "node": "1191:1424",
+    "url": "/icons/interface/note-lines.svg",
+    "shapes": 4
+  },
+  {
     "key": "notifications",
     "name": "Notifications",
     "source": "Library",
@@ -1446,6 +1369,14 @@
     "source": "Figma",
     "node": "116:238",
     "url": "/icons/interface/open.svg",
+    "shapes": 1
+  },
+  {
+    "key": "open-alt",
+    "name": "Open alternate",
+    "source": "Figma",
+    "node": "1177:310",
+    "url": "/icons/interface/open-alt.svg",
     "shapes": 1
   },
   {
@@ -1475,6 +1406,22 @@
     "source": "Figma",
     "node": "116:206",
     "url": "/icons/interface/page.svg",
+    "shapes": 1
+  },
+  {
+    "key": "page-18",
+    "name": "Page 18",
+    "source": "Figma",
+    "node": "701:1557",
+    "url": "/icons/interface/page-18.svg",
+    "shapes": 1
+  },
+  {
+    "key": "page-alt",
+    "name": "Page alternate",
+    "source": "Figma",
+    "node": "554:10",
+    "url": "/icons/interface/page-alt.svg",
     "shapes": 1
   },
   {
@@ -1535,6 +1482,14 @@
     "shapes": 4
   },
   {
+    "key": "play-alt",
+    "name": "Play alternate",
+    "source": "Figma",
+    "node": "1139:24",
+    "url": "/icons/interface/play-alt.svg",
+    "shapes": 1
+  },
+  {
     "key": "plus",
     "name": "Plus",
     "source": "Figma",
@@ -1570,6 +1525,22 @@
     "node": "116:566",
     "url": "/icons/interface/rewind.svg",
     "shapes": 3
+  },
+  {
+    "key": "rewind-30",
+    "name": "Rewind 30",
+    "source": "Figma",
+    "node": "1059:27",
+    "url": "/icons/interface/rewind-30.svg",
+    "shapes": 3
+  },
+  {
+    "key": "rewind-30-alt",
+    "name": "Rewind 30 alternate",
+    "source": "Figma",
+    "node": "1059:29",
+    "url": "/icons/interface/rewind-30-alt.svg",
+    "shapes": 2
   },
   {
     "key": "right",
@@ -1612,11 +1583,27 @@
     "shapes": 1
   },
   {
+    "key": "search-30",
+    "name": "Search 30",
+    "source": "Figma",
+    "node": "1044:33",
+    "url": "/icons/interface/search-30.svg",
+    "shapes": 2
+  },
+  {
     "key": "see",
     "name": "See",
     "source": "Figma",
     "node": "116:210",
     "url": "/icons/interface/see.svg",
+    "shapes": 2
+  },
+  {
+    "key": "see-30",
+    "name": "See 30",
+    "source": "Figma",
+    "node": "1044:26",
+    "url": "/icons/interface/see-30.svg",
     "shapes": 2
   },
   {
@@ -1657,6 +1644,22 @@
     "shapes": 1
   },
   {
+    "key": "star-alt",
+    "name": "Star alternate",
+    "source": "Figma",
+    "node": "1177:306",
+    "url": "/icons/interface/star-alt.svg",
+    "shapes": 1
+  },
+  {
+    "key": "star-alt-2",
+    "name": "Star alternate 2",
+    "source": "Figma",
+    "node": "1141:23",
+    "url": "/icons/interface/star-alt-2.svg",
+    "shapes": 1
+  },
+  {
     "key": "stats",
     "name": "Stats",
     "source": "Library",
@@ -1670,6 +1673,22 @@
     "node": "116:682",
     "url": "/icons/interface/status.svg",
     "shapes": 8
+  },
+  {
+    "key": "status-alt",
+    "name": "Status alternate",
+    "source": "Figma",
+    "node": "936:201",
+    "url": "/icons/interface/status-alt.svg",
+    "shapes": 9
+  },
+  {
+    "key": "status-filled",
+    "name": "Status filled",
+    "source": "Figma",
+    "node": "657:898",
+    "url": "/icons/interface/status-filled.svg",
+    "shapes": 24
   },
   {
     "key": "store",

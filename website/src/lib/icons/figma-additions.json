@@ -1,0 +1,200 @@
+[
+  {
+    "key": "item",
+    "name": "Item",
+    "node": "1191:1422",
+    "file": "item.svg"
+  },
+  {
+    "key": "note-lines",
+    "name": "Note lines",
+    "node": "1191:1424",
+    "file": "note-lines.svg"
+  },
+  {
+    "key": "list-line",
+    "name": "List line",
+    "node": "1191:1427",
+    "file": "list-line.svg"
+  },
+  {
+    "key": "check-alt",
+    "name": "Check alternate",
+    "node": "1177:314",
+    "file": "check-alt.svg"
+  },
+  {
+    "key": "open-alt",
+    "name": "Open alternate",
+    "node": "1177:310",
+    "file": "open-alt.svg"
+  },
+  {
+    "key": "star-alt",
+    "name": "Star alternate",
+    "node": "1177:306",
+    "file": "star-alt.svg"
+  },
+  {
+    "key": "rewind-30",
+    "name": "Rewind 30",
+    "node": "1059:27",
+    "file": "rewind-30.svg"
+  },
+  {
+    "key": "rewind-30-alt",
+    "name": "Rewind 30 alternate",
+    "node": "1059:29",
+    "file": "rewind-30-alt.svg"
+  },
+  {
+    "key": "see-30",
+    "name": "See 30",
+    "node": "1044:26",
+    "file": "see-30.svg"
+  },
+  {
+    "key": "page-18",
+    "name": "Page 18",
+    "node": "701:1557",
+    "file": "page-18.svg"
+  },
+  {
+    "key": "menu",
+    "name": "Menu",
+    "node": "700:1483",
+    "file": "menu.svg"
+  },
+  {
+    "key": "lock-filled",
+    "name": "Lock filled",
+    "node": "657:902",
+    "file": "lock-filled.svg"
+  },
+  {
+    "key": "minimize-alt",
+    "name": "Minimize alternate",
+    "node": "643:811",
+    "file": "minimize-alt.svg"
+  },
+  {
+    "key": "help-alt",
+    "name": "Help alternate",
+    "node": "643:813",
+    "file": "help-alt.svg"
+  },
+  {
+    "key": "status-alt",
+    "name": "Status alternate",
+    "node": "936:201",
+    "file": "status-alt.svg"
+  },
+  {
+    "key": "status-filled",
+    "name": "Status filled",
+    "node": "657:898",
+    "file": "status-filled.svg"
+  },
+  {
+    "key": "note-alt",
+    "name": "Note alternate",
+    "node": "621:1549",
+    "file": "note-alt.svg"
+  },
+  {
+    "key": "2xgrid-alt",
+    "name": "2x grid alternate",
+    "node": "621:1508",
+    "file": "2xgrid-alt.svg"
+  },
+  {
+    "key": "page-alt",
+    "name": "Page alternate",
+    "node": "554:10",
+    "file": "page-alt.svg"
+  },
+  {
+    "key": "archive-alt",
+    "name": "Archive alternate",
+    "node": "627:2675",
+    "file": "archive-alt.svg"
+  },
+  {
+    "key": "2xgrid-alt-2",
+    "name": "2x grid alternate 2",
+    "node": "403:4750",
+    "file": "2xgrid-alt-2.svg"
+  },
+  {
+    "key": "2xgrid-alt-3",
+    "name": "2x grid alternate 3",
+    "node": "403:4752",
+    "file": "2xgrid-alt-3.svg"
+  },
+  {
+    "key": "categories",
+    "name": "Categories",
+    "node": "403:4757",
+    "file": "categories.svg"
+  },
+  {
+    "key": "note-alt-2",
+    "name": "Note alternate 2",
+    "node": "621:1537",
+    "file": "note-alt-2.svg"
+  },
+  {
+    "key": "form",
+    "name": "Form",
+    "node": "689:1041",
+    "file": "form.svg"
+  },
+  {
+    "key": "logo-marquee",
+    "name": "Logo marquee",
+    "node": "689:1099",
+    "file": "logo-marquee.svg"
+  },
+  {
+    "key": "group-alt",
+    "name": "Group alternate",
+    "node": "633:3852",
+    "file": "group-alt.svg"
+  },
+  {
+    "key": "group-alt-2",
+    "name": "Group alternate 2",
+    "node": "715:786",
+    "file": "group-alt-2.svg"
+  },
+  {
+    "key": "content",
+    "name": "Content",
+    "node": "697:796",
+    "file": "content.svg"
+  },
+  {
+    "key": "connect",
+    "name": "Connect",
+    "node": "627:3318",
+    "file": "connect.svg"
+  },
+  {
+    "key": "search-30",
+    "name": "Search 30",
+    "node": "1044:33",
+    "file": "search-30.svg"
+  },
+  {
+    "key": "play-alt",
+    "name": "Play alternate",
+    "node": "1139:24",
+    "file": "play-alt.svg"
+  },
+  {
+    "key": "star-alt-2",
+    "name": "Star alternate 2",
+    "node": "1141:23",
+    "file": "star-alt-2.svg"
+  }
+]
