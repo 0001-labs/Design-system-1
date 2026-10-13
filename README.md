@@ -86,6 +86,33 @@ For the classless version, import only the semantic stylesheet:
 import "design-system-1/DS1/1-root/one.semantic.css";
 ```
 
+## Source snapshots in products
+
+Products can select shared Lit components without loading the full system's
+page, device or theme setup:
+
+```bash
+node scripts/sync-components.mjs --target ../Product/src/design --components button,text,gap,icon,row,list,menu,tabs,panel
+```
+
+Import the generated `components.ts` and `1-root/component-tokens.css` in the
+consumer. The sync copies the relative dependency graph, including shared
+languages and SVG maps, and writes a file-hash manifest. Add `--check` to fail
+on missing files or local drift. Files outside the previous manifest stay
+owned by the consumer. All component edits happen here, then consumers sync.
+
+Components use scoped `--ds-*` tokens so an embedded document can keep its own
+scale and theme. A product may configure those tokens at its surface.
+`ds-button control="host"` makes the custom element the accessible control
+for React event handlers and roles; the default keeps a native shadow button.
+`ds-text literal` preserves renderer-owned light DOM children; the default
+looks up translation keys. `ds-panel` provides header and footer slots around
+its body. The shared native-control sheet serves elements that need native
+form or third-party focus semantics.
+
+Reload the page after changing registered custom-element classes during
+development; the browser defines each element once per document.
+
 ## Documentation
 
 See the full documentation for Design system 1 at: [**designsystem1.com**](https://designsystem1.com/)

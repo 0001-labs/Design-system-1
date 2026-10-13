@@ -1,0 +1,119 @@
+/* ds-button.css */
+
+:host([control="host"]) {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--ds-button-gap, calc(4px * var(--ds-sf)));
+  min-width: 0;
+  max-width: 100%;
+  height: var(--ds-button-height, var(--ds-control-height));
+  /* Important, so a page's `* { padding: 0 }` reset cannot reach it: the
+     padding is set through --ds-button-padding. */
+  padding: var(--ds-button-padding, 0) !important;
+  border-radius: var(--ds-radius);
+  background: var(--ds-button-background, transparent);
+  color: var(--ds-button-color, var(--ds-button-text-color));
+  font-family: var(--ds-typeface-regular);
+  font-feature-settings: var(--ds-font-features);
+  font-size: var(--ds-type-size-default);
+  font-weight: var(--ds-type-weight-default);
+  line-height: var(--ds-type-lineheight-default);
+  letter-spacing: var(--ds-type-letterspacing-default);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+  transition: opacity 120ms ease;
+}
+
+:host([control="host"]) ::slotted(*) {
+  flex: 0 0 auto;
+}
+
+:host([control="host"][primary]) {
+  --ds-button-padding: 0 calc(4px * var(--ds-sf));
+  --ds-button-background: var(--ds-button-background-color-primary);
+  --ds-button-color: var(--ds-button-text-color-on-accent);
+}
+
+:host([control="host"][secondary]) {
+  --ds-button-padding: 0 calc(4px * var(--ds-sf));
+  --ds-button-background: var(--ds-button-background-color-secondary);
+}
+
+:host([control="host"][secondary]:hover:not([disabled])) {
+  --ds-button-background: var(--ds-fill-hover);
+}
+
+:host([control="host"][active]) {
+  --ds-button-background: var(--ds-fill);
+}
+
+/* A tab: muted until it is hovered or current. */
+:host([control="host"][role="tab"]) {
+  --ds-button-padding: 0 calc(4px * var(--ds-sf));
+  --ds-button-color: var(--ds-text-color-muted);
+}
+
+:host([control="host"][role="tab"]:hover:not([disabled])) {
+  --ds-button-background: color-mix(in srgb, var(--ds-fill) 72%, transparent);
+  --ds-button-color: var(--ds-text-color);
+}
+
+:host([control="host"][role="tab"][active]),
+:host([control="host"][role="tab"][active]:hover:not([disabled])) {
+  --ds-button-background: var(--ds-fill);
+  --ds-button-color: var(--ds-text-color);
+}
+
+:host([control="host"][icon]) {
+  justify-content: center;
+  width: var(--ds-button-height, var(--ds-control-height));
+  padding: 0;
+  color: var(--ds-button-color, var(--ds-text-color-muted));
+}
+
+:host([control="host"][icon]:hover:not([disabled])) {
+  --ds-button-color: var(--ds-text-color);
+}
+
+/* A choice in a ds-menu: a full-width row, filled under the pointer or focus. */
+:host([control="host"][role="option"]),
+:host([control="host"][role="menuitem"]),
+:host([control="host"][role="menuitemradio"]),
+:host([control="host"][role="menuitemcheckbox"]) {
+  --ds-button-height: auto;
+  --ds-button-padding: calc(4px * var(--ds-sf)) calc(6px * var(--ds-sf));
+  width: 100%;
+  min-height: var(--ds-row-height);
+  border-radius: calc(4px * var(--ds-sf));
+}
+
+:host([control="host"][role="option"]:hover),
+:host([control="host"][role="menuitem"]:hover),
+:host([control="host"][role="menuitemradio"]:hover),
+:host([control="host"][role="menuitemcheckbox"]:hover),
+:host([control="host"][role="option"]:focus-visible),
+:host([control="host"][role="menuitem"]:focus-visible) {
+  --ds-button-background: var(--ds-fill);
+  outline: none;
+}
+
+:host([control="host"][role="option"][active]) {
+  --ds-button-background: var(--ds-fill);
+}
+
+:host([control="host"]:focus-visible) {
+  outline: 2px solid var(--ds-focus-ring);
+  outline-offset: 1px;
+}
+
+:host([control="host"][disabled]) {
+  cursor: default;
+  opacity: 0.5;
+  pointer-events: none;
+}

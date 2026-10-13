@@ -47,9 +47,9 @@ function generateIconMap() {
  * Source: DS1/x-icon/*.svg
  */
 
-export const iconNameToSvgMap: Record<string, string> = {
+export const iconNameToSvgMap = {
 ${sortedKeys.map((key) => `  "${key}": ${JSON.stringify(iconMap[key])},`).join("\n")}
-};
+} as const;
 
 export type IconName = keyof typeof iconNameToSvgMap;
 

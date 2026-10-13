@@ -1,57 +1,39 @@
 /* ds-icon.css */
-/* Icon component styles */
 
 :host {
+  --ds-icon-box: calc(var(--ds-icon-size, 14px) * var(--ds-sf));
   display: inline-flex;
+  flex: 0 0 auto;
   justify-content: center;
   align-items: center;
-  width: calc(14px * var(--sf, 1));
-  height: calc(14px * var(--sf, 1));
-  /* Default: inherit text color (glyph variant) */
-  color: var(--icon-color, currentColor);
+  width: var(--ds-icon-box);
+  height: var(--ds-icon-box);
+  color: var(--ds-icon-color, currentColor);
   background: transparent;
 }
 
-/* --------------------------------------------------------
-   VARIANT: glyph (default)
-   No background, inherits text color. Behaves like text.
-   -------------------------------------------------------- */
-:host([variant="glyph"]),
-:host(:not([variant])) {
-  color: var(--icon-color, currentColor);
-  background: transparent;
+:host([size="small"]) {
+  --ds-icon-size: 12px;
 }
 
-/* --------------------------------------------------------
-   VARIANT: primary
-   Accent color background with contrasting icon color.
-   -------------------------------------------------------- */
+:host([size="large"]) {
+  --ds-icon-size: 16px;
+}
+
+/* An accent tile with dark ink. */
 :host([variant="primary"]) {
-  color: var(--icon-color, var(--button-text-color, currentColor));
-  background: var(--accent-color);
+  color: var(--ds-button-text-color-on-accent);
+  background: var(--ds-accent-color);
 }
 
-/* --------------------------------------------------------
-   VARIANT: secondary
-   Subtle background with icon color.
-   -------------------------------------------------------- */
+/* A grey tile. */
 :host([variant="secondary"]) {
-  color: var(--icon-color, var(--icon-color, currentColor));
-  background: var(
-    --icon-background,
-    light-dark(var(--slate-light, #e6e6e6), var(--slate-dark, #3c3c3c))
-  );
+  background: var(--ds-fill);
 }
 
-/* --------------------------------------------------------
-   SVG STYLING
-   -------------------------------------------------------- */
-svg {
+svg,
+::slotted(svg) {
   display: block;
-  width: calc(14px * var(--sf, 1));
-  height: calc(14px * var(--sf, 1));
-  /* 
-   * SVGs use fill="currentColor" or stroke="currentColor".
-   * They inherit the color from :host via currentColor.
-   */
+  width: 100%;
+  height: 100%;
 }

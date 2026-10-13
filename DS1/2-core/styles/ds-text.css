@@ -9,7 +9,8 @@
   font-family: var(--typeface-regular);
   font-size: var(--type-size-default);
   font-weight: var(--type-weight-default);
-  line-height: calc(var(--type-lineheight-default) * var(--sf));
+  /* The line-height token is already scaled; the letter-spacing token is not. */
+  line-height: var(--type-lineheight-default);
   letter-spacing: calc(var(--type-letterspacing-default) * var(--sf));
   text-align: left;
   text-transform: var(--text-transform-default);
@@ -26,14 +27,58 @@
 :host([data-language="zh"]),
 :host([data-language="zh-hant"]) {
   font-family: var(--typeface-regular-zh-hant);
-  font-weight: 800;
+  font-weight: var(--type-weight-default, 400);
 }
 
 :host([data-language="zh-hans"]) {
   font-family: var(--typeface-regular-zh-hans);
-  font-weight: 800;
+  font-weight: var(--type-weight-default, 400);
 }
 
 :host span {
   color: inherit;
+}
+
+/* ds-text.css */
+
+:host([literal]) {
+  display: inline-block;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--ds-text-tone, inherit);
+  font-family: var(--ds-typeface-regular);
+  font-feature-settings: var(--ds-font-features);
+  font-size: var(--ds-type-size-default);
+  font-weight: var(--ds-type-weight-default);
+  line-height: var(--ds-type-lineheight-default);
+  letter-spacing: var(--ds-type-letterspacing-default);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:host([literal][strong]) {
+  font-weight: var(--ds-type-weight-bold);
+}
+
+:host([literal][wrap]) {
+  overflow: visible;
+  white-space: normal;
+}
+
+:host([literal][tone="muted"]) {
+  --ds-text-tone: var(--ds-text-color-muted);
+}
+
+:host([literal][tone="title"]) {
+  --ds-text-tone: var(--ds-title-color);
+}
+
+:host([literal][size="small"]) {
+  font-size: var(--ds-type-size-small);
+}
+
+:host([literal][size="heading"]) {
+  font-size: var(--ds-type-size-heading);
+  line-height: var(--ds-row-height);
 }

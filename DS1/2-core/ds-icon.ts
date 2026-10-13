@@ -2,6 +2,42 @@ import { LitElement, html, unsafeCSS } from "lit";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import styles from "./styles/ds-icon.css?inline";
 import { iconNameToSvgMap, type IconName } from "./generated/ds-icon-map";
+import { define } from "../0-face/define";
+
+/**
+ * The ink an icon was drawn in, whatever the file happens to say.
+ *
+ * DS one's icons are exported with the design's own dark ink baked into every
+ * path — #1E1E1E, #2A2A2A, plain black — so on dark paper they disappear. A
+ * one-colour icon is turned over to `currentColor` here, where the component
+ * puts it on the page, so it takes the colour of the text around it.
+ *
+ * An icon with colours of its own is left exactly as drawn. Consistency's block
+ * and pattern tiles set dark ink on a coloured ground, and a brand mark keeps
+ * the colours that make it that brand. `white` never counts as a colour: in
+ * this set it is the rectangle inside a `<clipPath>`.
+ */
+const INK = /(fill|stroke)=("|')(#1E1E1E|#2A2A2A|#000000|#000|black)\2/gi;
+const PAINT = /(?:fill|stroke)=("|')([^"']+)\1/gi;
+const NOT_A_COLOUR = /^(none|currentColor|white|#fff|#ffffff|url\(.*\))$/i;
+const INK_VALUE = /^(#1E1E1E|#2A2A2A|#000000|#000|black)$/i;
+
+const themed = new Map<string, string>();
+
+function hasOwnColours(svg: string): boolean {
+  for (const [, , value] of svg.matchAll(PAINT)) {
+    if (!NOT_A_COLOUR.test(value) && !INK_VALUE.test(value)) return true;
+  }
+  return false;
+}
+
+export function themeIconSvg(svg: string): string {
+  const known = themed.get(svg);
+  if (known !== undefined) return known;
+  const next = hasOwnColours(svg) ? svg : svg.replace(INK, '$1="currentColor"');
+  themed.set(svg, next);
+  return next;
+}
 
 export type IconVariant = "glyph" | "primary" | "secondary";
 
@@ -17,17 +53,28 @@ export type IconVariant = "glyph" | "primary" | "secondary";
  *   - primary: Accent color background with contrasting icon color.
  *   - secondary: Subtle background with icon color.
  *
- * Size is controlled by the `--sf` CSS variable (design system scale factor).
- * Color can be customized via `--icon-color` CSS variable.
+ * An icon that is not in the set can be given as content instead:
+ *   <ds-icon><svg>…</svg></ds-icon>
+ *
+ * Size is `--ds-icon-size` (14px by default) times `--ds-sf`; `size="small"`
+ * draws it at 12px and `size="large"` at 16px. Colour is `--ds-icon-color`,
+ * which follows the text.
  */
 export class Icon extends LitElement {
   static properties = {
     type: { type: String, reflect: true },
     variant: { type: String, reflect: true },
+    size: { type: String, reflect: true },
   };
 
   private _type: IconName | "" = "";
-  variant: IconVariant = "glyph";
+  declare variant: IconVariant;
+  declare size: "small" | "large" | undefined;
+
+  constructor() {
+    super();
+    this.variant = "glyph";
+  }
 
   get type(): IconName | "" {
     return this._type;
@@ -48,7 +95,7 @@ export class Icon extends LitElement {
 
     const svg = iconNameToSvgMap[this._type.toLowerCase() as IconName];
     if (svg) {
-      return html`${unsafeHTML(svg)}`;
+      return html`${unsafeHTML(themeIconSvg(svg))}`;
     }
 
     // Fallback to slot if icon not found
@@ -56,7 +103,7 @@ export class Icon extends LitElement {
   }
 }
 
-customElements.define("ds-icon", Icon);
+define("ds-icon", Icon);
 
 declare global {
   interface HTMLElementTagNameMap {

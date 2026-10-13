@@ -1,15 +1,20 @@
 // ds-button.ts
 // Core button component
 
-import { LitElement, html, unsafeCSS } from "lit";
+import { html, unsafeCSS } from "lit";
 import "./ds-text";
+import { Control } from "../0-face/control";
+import { define } from "../0-face/define";
+import hostStyles from "./styles/ds-button-host.css?inline";
 import styles from "./styles/ds-button.css?inline";
 
-export class Button extends LitElement {
+export class Button extends Control {
   static properties = {
     primary: { type: Boolean, reflect: true },
     secondary: { type: Boolean, reflect: true },
-    disabled: { type: Boolean, reflect: true },
+    control: { type: String, reflect: true, noAccessor: true },
+    active: { type: Boolean, reflect: true },
+    icon: { type: Boolean, reflect: true },
     blank: { type: Boolean, reflect: true },
     language: { type: String },
     text: { type: String },
@@ -20,7 +25,17 @@ export class Button extends LitElement {
   // Public properties
   declare primary: boolean;
   declare secondary: boolean;
-  declare disabled: boolean;
+  declare active: boolean;
+  declare icon: boolean;
+  private _control = "native";
+  get control(): string { return this._control; }
+  set control(value: string) {
+    const old = this._control;
+    this._control = value;
+    this.syncControl();
+    this.requestUpdate("control", old);
+  }
+  protected get hostControl(): boolean { return this.control === "host"; }
   declare blank: boolean;
   declare language: string;
   declare text: string;
@@ -31,6 +46,8 @@ export class Button extends LitElement {
 
   constructor() {
     super();
+    this.active = false;
+    this.icon = false;
     this.primary = false; // Default to no-background (no attribute)
     this.secondary = false;
     this.disabled = false;
@@ -41,14 +58,27 @@ export class Button extends LitElement {
     this._loading = false;
   }
 
-  static styles = unsafeCSS(styles);
+  static styles = [unsafeCSS(styles), unsafeCSS(hostStyles)];
+
+  /**
+   * A button holding only an icon — every close button — says so on its host,
+   * so its styles can make it a 16-unit square with the icon filling it.
+   */
+  _reflectIcon() {
+    if (this.hostControl) return;
+    const only = this.firstElementChild;
+    const icon = !this.text && this.childElementCount === 1 && only?.localName === 'ds-icon' && !(this.textContent ?? '').trim();
+    this.toggleAttribute('icon', !!icon);
+  }
 
   connectedCallback() {
     super.connectedCallback();
+    this._reflectIcon();
   }
 
   render() {
     const hasTextProps = this.text;
+    if (this.hostControl) return html`<slot></slot>`;
 
     return html`
       <button
@@ -59,7 +89,7 @@ export class Button extends LitElement {
       >
         ${hasTextProps
           ? html`<ds-text .text=${this.text}></ds-text>`
-          : html`<slot></slot>`}
+          : html`<slot @slotchange=${this._reflectIcon}></slot>`}
       </button>
     `;
   }
@@ -90,7 +120,7 @@ export class Button extends LitElement {
   }
 }
 
-customElements.define("ds-button", Button);
+define("ds-button", Button);
 
 declare global {
   interface HTMLElementTagNameMap {

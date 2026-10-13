@@ -1,0 +1,36 @@
+/* ds-tabs.css */
+
+:host {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--ds-tabs-gap, calc(8px * var(--ds-sf)));
+  min-width: 0;
+  height: var(--ds-row-height);
+}
+
+:host([fill]) ::slotted(*) {
+  flex: 1 1 0;
+  justify-content: center;
+}
+
+/*
+ * An option group (role="group"): grey choices, the chosen one in the accent,
+ * as DS one's secondary and primary buttons.
+ */
+:host([role="group"]) ::slotted(ds-button) {
+  --ds-button-height: var(--ds-row-height);
+  --ds-button-padding: 0 calc(4px * var(--ds-sf));
+  --ds-button-background: var(--ds-button-background-color-secondary);
+  min-width: 0;
+}
+
+:host([role="group"]) ::slotted(ds-button:hover) {
+  --ds-button-background: var(--ds-fill-hover);
+}
+
+:host([role="group"]) ::slotted(ds-button[active]) {
+  --ds-button-background: var(--ds-button-background-color-primary);
+  --ds-button-color: var(--ds-button-text-color-on-accent);
+}

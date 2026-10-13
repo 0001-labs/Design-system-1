@@ -1,0 +1,22 @@
+/* ds-menu.css */
+
+:host {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: calc(160px * var(--ds-sf));
+  max-height: var(--ds-menu-max-height, calc(320px * var(--ds-sf)));
+  overflow-y: auto;
+  padding: calc(4px * var(--ds-sf));
+  border: 1px solid var(--ds-border-color);
+  border-radius: var(--ds-radius-card);
+  background: var(--ds-paper);
+  color: var(--ds-text-color);
+  box-shadow: 0 8px 24px color-mix(in srgb, #000000 18%, transparent);
+  font-family: var(--ds-typeface-regular);
+  font-feature-settings: var(--ds-font-features);
+  font-size: var(--ds-type-size-default);
+  line-height: var(--ds-type-lineheight-default);
+  letter-spacing: var(--ds-type-letterspacing-default);
+}

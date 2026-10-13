@@ -1,9 +1,24 @@
 /* ds-list.css */
-/* List component styles for displaying a list of items */
 
 :host {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: var(--ds-list-gap, 0);
   width: 100%;
+  min-width: 0;
+}
+
+:host([columns]) {
+  display: grid;
+  grid-template-columns: repeat(var(--ds-list-columns, 2), minmax(0, 1fr));
+  column-gap: var(--ds-list-column-gap, calc(8px * var(--ds-sf)));
+}
+
+:host([columns="2"]) {
+  --ds-list-columns: 2;
+}
+
+:host([columns="3"]) {
+  --ds-list-columns: 3;
 }

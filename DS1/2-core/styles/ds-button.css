@@ -6,10 +6,15 @@
   min-width: 0;
   flex: 0 1 auto;
   max-width: 100%;
-  overflow: hidden;
+  /* Clipped along the line only: a word that runs long ends in an ellipsis,
+     but the descenders of g, y, p and j hang below the 16-unit box as they
+     would anywhere else, instead of being cut off at its edge. */
+  overflow-x: clip;
+  overflow-y: visible;
 }
 
 button {
+  box-sizing: border-box;
   max-height: calc(var(--08) * var(--sf));
   height: calc(var(--08) * var(--sf));
   min-height: calc(var(--08) * var(--sf));
@@ -24,13 +29,13 @@ button {
   padding: 0;
   color: var(--button-color, var(--button-text-color));
   font-family: var(--typeface-regular);
-  /* Slotted plain text must not fall back to the browser's default button size. */
   font-size: var(--type-size-default);
   line-height: calc(var(--type-lineheight-default) * var(--sf));
   letter-spacing: calc(var(--type-letterspacing-default) * var(--sf));
   -webkit-tap-highlight-color: transparent;
   white-space: nowrap;
-  overflow: hidden;
+  overflow-x: clip;
+  overflow-y: visible;
   text-overflow: ellipsis;
   /* Default to no-background when no variant is specified */
   background-color: transparent;
@@ -39,7 +44,8 @@ button {
 
 button ds-text,
 button ::slotted(*) {
-  overflow: hidden;
+  overflow-x: clip;
+  overflow-y: visible;
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 100%;
@@ -65,4 +71,42 @@ button[secondary] {
 
 .loading {
   opacity: 0.7;
+}
+
+/* A button that holds only an icon — every close button — is a 16-unit
+   square, scaled with the page, in the shape's corners: the icon fills it,
+   no word-padding around it, so the glyph's lines are the same size wherever
+   a page or a panel closes, on the web and in the app alike. The element
+   marks itself `icon` when its only child is an ds-icon. */
+:host([icon]) {
+  flex: 0 0 auto;
+  width: calc(16px * var(--sf, 1));
+  height: calc(16px * var(--sf, 1));
+}
+:host([icon]) button {
+  width: calc(16px * var(--sf, 1));
+  padding: 0 !important;
+  justify-content: center;
+}
+:host([icon]) ::slotted(ds-icon) {
+  flex: 0 0 auto;
+  width: calc(16px * var(--sf, 1));
+  height: calc(16px * var(--sf, 1));
+}
+
+/* A button marked `square` is a 16-unit square whatever it holds, a count
+   or an initial, its words in its middle with no word-padding around them. */
+:host([square]) {
+  flex: 0 0 auto;
+  width: calc(16px * var(--sf, 1));
+}
+:host([square]) button {
+  width: calc(16px * var(--sf, 1));
+  padding: 0 !important;
+  justify-content: center;
+}
+
+/* A segment gets its outside corners from the enclosing split control. */
+:host([segment]) button {
+  border-radius: 0 !important;
 }

@@ -94,6 +94,97 @@
     "shapes": 2
   },
   {
+    "key": "arrange-archive",
+    "name": "Arrange Archive",
+    "source": "Library",
+    "url": "/icons/library/arrange-archive.svg",
+    "shapes": 2
+  },
+  {
+    "key": "arrange-check",
+    "name": "Arrange Check",
+    "source": "Library",
+    "url": "/icons/library/arrange-check.svg",
+    "shapes": 4
+  },
+  {
+    "key": "arrange-chevron",
+    "name": "Arrange Chevron",
+    "source": "Library",
+    "url": "/icons/library/arrange-chevron.svg",
+    "shapes": 1
+  },
+  {
+    "key": "arrange-connect",
+    "name": "Arrange Connect",
+    "source": "Library",
+    "url": "/icons/library/arrange-connect.svg",
+    "shapes": 1
+  },
+  {
+    "key": "arrange-draft",
+    "name": "Arrange Draft",
+    "source": "Library",
+    "url": "/icons/library/arrange-draft.svg",
+    "shapes": 2
+  },
+  {
+    "key": "arrange-dropdown",
+    "name": "Arrange Dropdown",
+    "source": "Library",
+    "url": "/icons/library/arrange-dropdown.svg",
+    "shapes": 2
+  },
+  {
+    "key": "arrange-home",
+    "name": "Arrange Home",
+    "source": "Library",
+    "url": "/icons/library/arrange-home.svg",
+    "shapes": 6
+  },
+  {
+    "key": "arrange-link",
+    "name": "Arrange Link",
+    "source": "Library",
+    "url": "/icons/library/arrange-link.svg",
+    "shapes": 2
+  },
+  {
+    "key": "arrange-menu",
+    "name": "Arrange Menu",
+    "source": "Library",
+    "url": "/icons/library/arrange-menu.svg",
+    "shapes": 7
+  },
+  {
+    "key": "arrange-more",
+    "name": "Arrange More",
+    "source": "Library",
+    "url": "/icons/library/arrange-more.svg",
+    "shapes": 3
+  },
+  {
+    "key": "arrange-page",
+    "name": "Arrange Page",
+    "source": "Library",
+    "url": "/icons/library/arrange-page.svg",
+    "shapes": 1
+  },
+  {
+    "key": "arrange-plus",
+    "name": "Arrange Plus",
+    "source": "Library",
+    "url": "/icons/library/arrange-plus.svg",
+    "shapes": 1
+  },
+  {
+    "key": "arrange-site",
+    "name": "Arrange Site",
+    "source": "Library",
+    "url": "/icons/library/arrange-site.svg",
+    "shapes": 36
+  },
+  {
     "key": "avatar",
     "name": "Avatar",
     "source": "Figma",
@@ -353,6 +444,111 @@
     "node": "116:232",
     "url": "/icons/interface/blank.svg",
     "shapes": 1
+  },
+  {
+    "key": "block-accordion",
+    "name": "Block Accordion",
+    "source": "Library",
+    "url": "/icons/library/block-accordion.svg",
+    "shapes": 4
+  },
+  {
+    "key": "block-banner",
+    "name": "Block Banner",
+    "source": "Library",
+    "url": "/icons/library/block-banner.svg",
+    "shapes": 3
+  },
+  {
+    "key": "block-breadcrumbs",
+    "name": "Block Breadcrumbs",
+    "source": "Library",
+    "url": "/icons/library/block-breadcrumbs.svg",
+    "shapes": 4
+  },
+  {
+    "key": "block-button",
+    "name": "Block Button",
+    "source": "Library",
+    "url": "/icons/library/block-button.svg",
+    "shapes": 3
+  },
+  {
+    "key": "block-divider",
+    "name": "Block Divider",
+    "source": "Library",
+    "url": "/icons/library/block-divider.svg",
+    "shapes": 3
+  },
+  {
+    "key": "block-forms",
+    "name": "Block Forms",
+    "source": "Library",
+    "url": "/icons/library/block-forms.svg",
+    "shapes": 5
+  },
+  {
+    "key": "block-group",
+    "name": "Block Group",
+    "source": "Library",
+    "url": "/icons/library/block-group.svg",
+    "shapes": 4
+  },
+  {
+    "key": "block-heading",
+    "name": "Block Heading",
+    "source": "Library",
+    "url": "/icons/library/block-heading.svg",
+    "shapes": 3
+  },
+  {
+    "key": "block-image",
+    "name": "Block Image",
+    "source": "Library",
+    "url": "/icons/library/block-image.svg",
+    "shapes": 4
+  },
+  {
+    "key": "block-logo-marquee",
+    "name": "Block Logo Marquee",
+    "source": "Library",
+    "url": "/icons/library/block-logo-marquee.svg",
+    "shapes": 6
+  },
+  {
+    "key": "block-page-progress",
+    "name": "Block Page Progress",
+    "source": "Library",
+    "url": "/icons/library/block-page-progress.svg",
+    "shapes": 3
+  },
+  {
+    "key": "block-section",
+    "name": "Block Section",
+    "source": "Library",
+    "url": "/icons/library/block-section.svg",
+    "shapes": 5
+  },
+  {
+    "key": "block-table",
+    "name": "Block Table",
+    "source": "Library",
+    "url": "/icons/library/block-table.svg",
+    "shapes": 8
+  },
+  {
+    "key": "block-tabs",
+    "name": "Block Tabs",
+    "source": "Library",
+    "url": "/icons/library/block-tabs.svg",
+    "shapes": 4
+  },
+  {
+    "key": "block-text",
+    "name": "Block Text",
+    "source": "Library",
+    "url": "/icons/library/block-text.svg",
+    "shapes": 3
   },
   {
     "key": "bold",
@@ -1009,6 +1205,13 @@
     "shapes": 1
   },
   {
+    "key": "help",
+    "name": "Help",
+    "source": "Library",
+    "url": "/icons/library/help.svg",
+    "shapes": 3
+  },
+  {
     "key": "home",
     "name": "Home",
     "source": "Library",
@@ -1137,6 +1340,13 @@
     "shapes": 3
   },
   {
+    "key": "navigation-check",
+    "name": "Navigation Check",
+    "source": "Library",
+    "url": "/icons/library/navigation-check.svg",
+    "shapes": 2
+  },
+  {
     "key": "neutral",
     "name": "Neutral",
     "source": "Figma",
@@ -1210,6 +1420,48 @@
     "node": "116:206",
     "url": "/icons/interface/page.svg",
     "shapes": 1
+  },
+  {
+    "key": "page-note",
+    "name": "Page Note",
+    "source": "Library",
+    "url": "/icons/library/page-note.svg",
+    "shapes": 4
+  },
+  {
+    "key": "panel",
+    "name": "Panel",
+    "source": "Library",
+    "url": "/icons/library/panel.svg",
+    "shapes": 2
+  },
+  {
+    "key": "pattern-call-to-action",
+    "name": "Pattern Call To Action",
+    "source": "Library",
+    "url": "/icons/library/pattern-call-to-action.svg",
+    "shapes": 4
+  },
+  {
+    "key": "pattern-card",
+    "name": "Pattern Card",
+    "source": "Library",
+    "url": "/icons/library/pattern-card.svg",
+    "shapes": 6
+  },
+  {
+    "key": "pattern-feature",
+    "name": "Pattern Feature",
+    "source": "Library",
+    "url": "/icons/library/pattern-feature.svg",
+    "shapes": 5
+  },
+  {
+    "key": "pattern-hero",
+    "name": "Pattern Hero",
+    "source": "Library",
+    "url": "/icons/library/pattern-hero.svg",
+    "shapes": 4
   },
   {
     "key": "pen",
@@ -1310,6 +1562,13 @@
     "node": "116:210",
     "url": "/icons/interface/see.svg",
     "shapes": 2
+  },
+  {
+    "key": "settings",
+    "name": "Settings",
+    "source": "Library",
+    "url": "/icons/library/settings.svg",
+    "shapes": 6
   },
   {
     "key": "shared",

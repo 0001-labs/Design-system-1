@@ -107,6 +107,7 @@
     "convex": "^1.42.3",
     "convex-test": "^0.0.54",
     "esbuild": "^0.27.0",
+    "happy-dom": "^21.0.1",
     "playwright": "^1.56.0",
     "tsx": "^4.21.0",
     "typescript": "^5.0.0",

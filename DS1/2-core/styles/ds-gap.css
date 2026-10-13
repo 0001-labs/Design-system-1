@@ -1,93 +1,45 @@
 /* ds-gap.css */
-/* Full-width vertical spacer styles */
 
 :host {
+  --ds-gap-size: var(--ds-1);
   display: block;
-  width: 100%;
-  /* Default if no attribute is provided */
-  --gap-size: var(--unit);
-  height: var(--gap-size);
   flex: 0 0 auto;
-}
-
-/* Semantic sizing tokens (from DS1/1-root/one.css) */
-:host([tenth]) {
-  --gap-size: var(--tenth);
-}
-
-:host([quarter]) {
-  --gap-size: var(--quarter);
-}
-
-:host([half]) {
-  --gap-size: var(--half);
-}
-
-:host([eight-tenth]) {
-  --gap-size: var(--eight-tenth);
-}
-
-:host([unit]) {
-  --gap-size: var(--unit);
-}
-
-:host([double]) {
-  --gap-size: var(--double);
-}
-
-:host([triple]) {
-  --gap-size: var(--triple);
-}
-
-:host([quad]) {
-  --gap-size: var(--quad);
-}
-
-:host([oct]) {
-  --gap-size: var(--oct);
-}
-
-:host([dozen]) {
-  --gap-size: var(--dozen);
-}
-
-/* Raw scale sizing (size="...") */
-:host([size="01"]) {
-  --gap-size: var(--01);
+  width: 100%;
+  height: calc(var(--ds-gap-size) * var(--ds-sf));
 }
 
 :host([size="025"]) {
-  --gap-size: var(--025);
+  --ds-gap-size: var(--ds-025);
 }
 
 :host([size="05"]) {
-  --gap-size: var(--05);
+  --ds-gap-size: var(--ds-05);
 }
 
 :host([size="08"]) {
-  --gap-size: var(--08);
-}
-
-:host([size="1"]) {
-  --gap-size: var(--1);
+  --ds-gap-size: var(--ds-08);
 }
 
 :host([size="2"]) {
-  --gap-size: var(--2);
+  --ds-gap-size: var(--ds-2);
 }
 
-:host([size="3"]) {
-  --gap-size: var(--3);
-}
+:host([tenth]), :host([size="01"]) { --ds-gap-size: var(--ds-01); }
 
-:host([size="4"]) {
-  --gap-size: var(--4);
-}
+:host([quarter]), :host([size="025"]) { --ds-gap-size: var(--ds-025); }
 
-:host([size="8"]) {
-  --gap-size: var(--8);
-}
+:host([half]), :host([size="05"]) { --ds-gap-size: var(--ds-05); }
 
-:host([size="12"]) {
-  --gap-size: var(--12);
-}
+:host([eight-tenth]), :host([size="08"]) { --ds-gap-size: var(--ds-08); }
+
+:host([unit]), :host([size="1"]) { --ds-gap-size: calc(var(--ds-1) * 1); }
+
+:host([double]), :host([size="2"]) { --ds-gap-size: calc(var(--ds-1) * 2); }
+
+:host([triple]), :host([size="3"]) { --ds-gap-size: calc(var(--ds-1) * 3); }
+
+:host([quad]), :host([size="4"]) { --ds-gap-size: calc(var(--ds-1) * 4); }
+
+:host([oct]), :host([size="8"]) { --ds-gap-size: calc(var(--ds-1) * 8); }
+
+:host([dozen]), :host([size="12"]) { --ds-gap-size: calc(var(--ds-1) * 12); }

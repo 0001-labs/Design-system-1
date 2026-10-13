@@ -1,5 +1,6 @@
 import { LitElement, html, unsafeCSS } from "lit";
 import { getText, currentLanguage } from "../0-face/i18n";
+import { define } from "../0-face/define";
 import styles from "./styles/ds-text.css?inline";
 
 /**
@@ -7,6 +8,8 @@ import styles from "./styles/ds-text.css?inline";
  *
  * @element ds-text
  * @prop {string} text - The translation key (optional if using slot content)
+ * @prop {boolean} literal - The text is what someone wrote, not a key: show it
+ *   as it stands, never looked up, never translated
  *
  * @example
  * // Using slot content as the key (preferred)
@@ -14,16 +17,29 @@ import styles from "./styles/ds-text.css?inline";
  *
  * // Using text attribute (still supported)
  * <ds-text text="Welcome to the app"></ds-text>
+ *
+ * // Something a person typed: a list title, an item, a search they saved
+ * <ds-text literal text="Marketing plan"></ds-text>
  */
 export class Text extends LitElement {
   static get properties() {
     return {
       text: { type: String, reflect: true },
+      literal: { type: Boolean, reflect: true },
+      tone: { type: String, reflect: true },
+      size: { type: String, reflect: true },
+      strong: { type: Boolean, reflect: true },
+      wrap: { type: Boolean, reflect: true },
       _text: { type: String, state: true },
     };
   }
 
   declare text: string;
+  declare literal: boolean;
+  declare tone?: "muted" | "title";
+  declare size?: "small" | "heading";
+  declare strong: boolean;
+  declare wrap: boolean;
   declare _text: string;
   declare _currentLanguage: string;
   private _slotKey: string = "";
@@ -32,6 +48,9 @@ export class Text extends LitElement {
   constructor() {
     super();
     this.text = "";
+    this.literal = false;
+    this.strong = false;
+    this.wrap = false;
     this._text = "";
     this._currentLanguage = currentLanguage.value;
 
@@ -52,7 +71,7 @@ export class Text extends LitElement {
     super.connectedCallback();
 
     // Capture slot content as the translation key if no text attribute
-    if (!this.text) {
+    if (!this.text && !this.literal) {
       const slotContent = this.textContent?.trim() || "";
       if (slotContent) {
         this._slotKey = slotContent;
@@ -90,10 +109,10 @@ export class Text extends LitElement {
     );
   }
 
-  updated(changedProperties: Map<string, unknown>) {
-    super.updated(changedProperties);
+  willUpdate(changedProperties: Map<string, unknown>) {
+    super.willUpdate(changedProperties);
 
-    if (changedProperties.has("text")) {
+    if (changedProperties.has("text") || changedProperties.has("literal")) {
       this._loadText();
     }
   }
@@ -135,7 +154,14 @@ export class Text extends LitElement {
     if (!key) {
       this._text = "";
       this._updateLanguageAttribute();
-      this.requestUpdate();
+      return;
+    }
+
+    // What someone wrote stands as it is: a list called "Home" stays "Home",
+    // and nothing about it reaches the translations.
+    if (this.literal) {
+      this._text = key;
+      this._updateLanguageAttribute();
       return;
     }
 
@@ -147,15 +173,15 @@ export class Text extends LitElement {
       this._text = key;
     }
     this._updateLanguageAttribute();
-    this.requestUpdate();
   }
 
   render() {
+    if (this.literal && !this.text) return html`<slot></slot>`;
     return html`<span>${this._text || this.text || this._slotKey}</span>`;
   }
 }
 
-customElements.define("ds-text", Text);
+define("ds-text", Text);
 
 declare global {
   interface HTMLElementTagNameMap {

@@ -1,26 +1,28 @@
 /* ds-row.css */
-/* Row component styles */
 
 :host {
+  box-sizing: border-box;
   display: flex;
   flex-direction: row;
-  align-items: end;
+  align-items: var(--ds-row-align, center);
+  gap: var(--ds-row-gap, calc(4px * var(--ds-sf)));
+  min-width: 0;
+  height: var(--ds-row-height);
+}
+
+:host([auto]) {
+  height: auto;
 }
 
 :host([fill]) {
   justify-content: space-between;
-  height: calc(var(--1) * var(--sf));
   width: 100%;
 }
 
 :host([centered]) {
   justify-content: center;
-  height: calc(var(--1) * var(--sf));
-  gap: calc(var(--025) * var(--sf));
 }
 
 :host([end]) {
   justify-content: flex-end;
-  height: calc(var(--1) * var(--sf));
-  gap: calc(var(--025) * var(--sf));
 }
