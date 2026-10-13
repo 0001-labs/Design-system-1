@@ -3,7 +3,7 @@ ds-dialog > dialog {
   box-sizing: border-box;
   position: var(--ds-dialog-position, fixed);
   inset: var(--ds-dialog-inset, 0);
-  width: min(var(--ds-dialog-width, calc(20 * var(--ds-unit))), calc(100vw - 2 * var(--ds-unit)));
+  width: var(--ds-dialog-width, calc(20 * var(--ds-unit)));
   max-width: var(--ds-dialog-max-width, calc(100vw - 2 * var(--ds-unit)));
   max-height: var(--ds-dialog-max-height, calc(100dvh - 2 * var(--ds-unit)));
   height: var(--ds-dialog-height, fit-content);
