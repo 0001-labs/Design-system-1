@@ -12,7 +12,6 @@ const star = icons.find(icon => icon.key === 'star') ?? icons[0];
         {icons.map(icon => <button data-vector-key={icon.key} aria-pressed={icon.key === star.key} title={icon.name}><span class="vector-thumbnail" set:html={scopedSvg(icon.svg,'tile-'+icon.key)} /><span>{icon.name}</span></button>)}
       </div>
       <p id="vector-empty" hidden>No icons match that name.</p>
-      <p class="vector-collection-note"><a href="https://www.figma.com/design/XAnoaRoq9LxVAHUZgtdO0r/ds1?node-id=403-4105" target="_blank" rel="noreferrer">View the original Figma collection ↗</a></p>
     </section>
     <section class="vector-inspector" aria-label="SVG outline inspector">
       <div class="vector-title-row"><h2 id="vector-name">{star.name}</h2><a id="vector-source" href="https://www.figma.com/design/XAnoaRoq9LxVAHUZgtdO0r/ds1?node-id=115-171" target="_blank" rel="noreferrer">Source ↗</a></div>
