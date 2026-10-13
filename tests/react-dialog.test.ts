@@ -75,3 +75,25 @@ test("React modeless panels retain their layout, native ref and controlled outsi
     expect(nativeRef.current).toBeNull(); expect(mount.querySelector('dialog')).toBeNull();
   } finally { await act(async () => root.unmount()); mount.remove(); outside.remove(); }
 });
+
+test('a modeless panel returns focus to a launcher remounted by React', async () => {
+  Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
+  const mount = document.createElement('div'); document.body.append(mount);
+  const root = createRoot(mount);
+  function Example() {
+    const [open, setOpen] = useState(false);
+    return h('div', null,
+      !open && h('button', { 'data-launcher': '', onClick: () => setOpen(true) }, 'Open tools'),
+      h(Dialog, { open, onOpenChange: setOpen },
+        h(DialogContent, { nonModal: true, portal: false, returnFocus: () => mount.querySelector('[data-launcher]'), 'aria-label': 'Tools' },
+          h('button', null, 'Tool action'))));
+  }
+  try {
+    await act(async () => root.render(h(Example)));
+    await act(async () => mount.querySelector<HTMLButtonElement>('[data-launcher]')!.click());
+    mount.querySelector<HTMLButtonElement>('dialog button')!.focus();
+    await act(async () => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
+    expect(mount.querySelector('dialog')).toBeNull();
+    expect(document.activeElement).toBe(mount.querySelector('[data-launcher]'));
+  } finally { await act(async () => root.unmount()); mount.remove(); }
+});

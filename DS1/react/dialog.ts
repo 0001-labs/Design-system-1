@@ -29,6 +29,7 @@ export interface DialogContentProps extends HTMLAttributes<HTMLDialogElement> {
   blockOutside?: boolean;
   holdScroll?: boolean;
   anchor?: { x: number; y: number } | null;
+  returnFocus?: (() => HTMLElement | null) | null;
   closeLabel?: string;
   showClose?: boolean;
   closeOnEscape?: boolean;
@@ -40,7 +41,7 @@ export interface DialogContentProps extends HTMLAttributes<HTMLDialogElement> {
   /** Rotate a document frame while keeping it within the viewport. */
   rotated?: boolean;
 }
-export function DialogContent({ children, portal = true, nonModal = false, closeOnOutside = false, blockOutside = false, holdScroll = false, anchor = null, closeLabel = "Close", showClose = true, closeOnEscape = true, closeOnBackdrop = true, fullScreen = false, flush = false, rotated = false, ...props }: DialogContentProps) {
+export function DialogContent({ children, portal = true, nonModal = false, closeOnOutside = false, blockOutside = false, holdScroll = false, anchor = null, returnFocus = null, closeLabel = "Close", showClose = true, closeOnEscape = true, closeOnBackdrop = true, fullScreen = false, flush = false, rotated = false, ...props }: DialogContentProps) {
   const context = useDialog();
   const host = useRef<DialogElement>(null);
   const [mounted, setMounted] = useState(false);
@@ -75,6 +76,7 @@ export function DialogContent({ children, portal = true, nonModal = false, close
     element.blockOutside = blockOutside;
     element.holdScroll = holdScroll;
     element.anchor = anchor;
+    element.returnFocus = returnFocus;
     element.open = context.open;
     return () => element.removeEventListener("ds-close-request", close);
   });

@@ -70,6 +70,7 @@ export class Dialog extends LitElement {
     closeOnEscape: { type: Boolean, attribute: "close-on-escape" },
     closeOnBackdrop: { type: Boolean, attribute: "close-on-backdrop" },
     anchor: { attribute: false },
+    returnFocus: { attribute: false },
   };
   static styles = css`:host { display: contents; }`;
   declare open: boolean;
@@ -81,6 +82,8 @@ export class Dialog extends LitElement {
   declare closeOnBackdrop: boolean;
   /** A viewport point for a floating panel; null uses ordinary dialog layout. */
   declare anchor: { x: number; y: number } | null;
+  /** Resolve a replacement opener after the product has rendered its closed state. */
+  declare returnFocus: (() => HTMLElement | null) | null;
   private dialog: HTMLDialogElement | null = null;
   private opener: HTMLElement | null = null;
   private pointerStartedOutside = false;
@@ -99,6 +102,7 @@ export class Dialog extends LitElement {
     this.closeOnEscape = true;
     this.closeOnBackdrop = true;
     this.anchor = null;
+    this.returnFocus = null;
   }
 
   connectedCallback() {
@@ -248,7 +252,14 @@ export class Dialog extends LitElement {
       const root = within.getRootNode();
       within = root instanceof ShadowRoot ? root.host : null;
     }
-    if (wasTop && (!this.nonModal || active === document.body || active === this.dialog || within) && this.opener?.isConnected) this.opener.focus({ preventScroll: true });
+    if (wasTop && (!this.nonModal || active === document.body || active === this.dialog || within)) {
+      const resolve = this.returnFocus;
+      if (resolve) queueMicrotask(() => {
+        const target = resolve();
+        if (target?.isConnected) target.focus({ preventScroll: true });
+      });
+      else if (this.opener?.isConnected) this.opener.focus({ preventScroll: true });
+    }
     this.opener = null;
   }
 
