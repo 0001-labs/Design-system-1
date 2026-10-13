@@ -1,0 +1,26 @@
+---
+title: Row
+description: Arrange pieces horizontally with one of three alignments.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+Arrange pieces horizontally with one of three alignments.
+
+## Try it
+
+<ComponentExample example="row" />
+
+<ComponentExample example="row-centered" />
+
+## Attributes
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `fill` | boolean | false | Pushes content to opposite ends. |
+| `centered` | boolean | false | Centres the group with small gaps. |
+| `end` | boolean | false | Places the group at the end. |
+
+Use one alignment at a time. Slot children can be ordinary HTML or components. The standard row is twelve squares wide and one square high for these alignments.
+
+[List](/3-unit/list/) · [Text](/2-core/text/) · [Icon](/2-core/icon/)

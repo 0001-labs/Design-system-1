@@ -1,0 +1,24 @@
+---
+title: Accordion
+description: A native details and summary disclosure composed from a row, text and an icon.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+A native details and summary disclosure composed from a row, text and an icon.
+
+## Try it
+
+<ComponentExample example="accordion" />
+
+## Attributes and slots
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `summary` | string | Empty | The summary text or translation key. |
+| `details` | string | Empty | Detail text when no named-slot content is supplied. |
+| `open` | boolean | false | Initially expands the disclosure. |
+
+For rich detail content, use `slot="details"` as in the example. The summary can be activated with the pointer, Enter or Space. Native `<details>` owns opening and closing.
+
+[Row](/3-unit/row/) · [Text](/2-core/text/)

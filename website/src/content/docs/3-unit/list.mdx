@@ -1,0 +1,22 @@
+---
+title: List
+description: A vertical container for rows or other content.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+A vertical container for rows or other content.
+
+## Try it
+
+<ComponentExample example="list" />
+
+## Compose rows
+
+Put `ds-row` elements directly in the list. `ds-list` supplies the containing layout; each row supplies its alignment and content. Use semantic `<ul>` and `<li>` elements when the content needs native list semantics.
+
+## API
+
+The component has a default slot and no public attributes. There is no `ds-list-item` custom element, sorting API or selection state built into it.
+
+[Row](/3-unit/row/) · [Text](/2-core/text/)

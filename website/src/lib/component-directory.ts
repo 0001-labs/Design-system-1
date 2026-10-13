@@ -38,7 +38,7 @@ export const LAYERS: DirectoryLayer[] = [
       { name: 'Icon', href: '/2-core/icon/', tag: 'ds-icon' },
       { name: 'Input', href: '/2-core/input/', tag: 'ds-input' },
       { name: 'Language', href: '/2-core/language/', tag: 'ds-language' },
-      { name: 'Link', href: '/2-core/link/', tag: 'ds-link' },
+      { name: 'Link', href: '/2-core/link/' },
       { name: 'Text', href: '/2-core/text/', tag: 'ds-text' },
       { name: 'Tooltip', href: '/2-core/tooltip/', tag: 'ds-tooltip' },
     ],

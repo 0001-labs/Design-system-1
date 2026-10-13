@@ -1,0 +1,1444 @@
+[
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#1x",
+    "name": "1x",
+    "sourceHash": "f2cf4ee90d6c459efce6ba275beb97c3fefe1a9569cb1f411acad196304dc39f",
+    "iconHash": "8dceda0ec85a5e74d4dc304bbec4a8f0b84956d78a5dea034a8ec4c20db70f59"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#1xdots",
+    "name": "1xdots",
+    "sourceHash": "826f70c3a0aae4df80282e82601b367a4d97b23f755dfd772e505a185de4ef52",
+    "iconHash": "2b0e294739c681dc3d5ca3dfc2d67474cb6aa09be0f8207be8cf28977f854e5e"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#1xgrid",
+    "name": "1xgrid",
+    "sourceHash": "7ff5d3a164dab7b2fe081cf963e3bea8f454707393e110dfe1ae494175501b36",
+    "iconHash": "b196247580a578754956488952d65c94f00ee12a5a787ab327ba46a89a554bf4"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#1xlines",
+    "name": "1xlines",
+    "sourceHash": "246e467e8c15e9d1ff1b880dc3ac511195b1272e5e43529778f210e0dbd53b6d",
+    "iconHash": "c0955ead2dc026380f39cd7d4e77b3dda8bc27a50c273b1f94f61aa909c08eae"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#2x",
+    "name": "2x",
+    "sourceHash": "301772d6e5a37f379267918689496237754852df84965b65fc005ac99691747e",
+    "iconHash": "123af2f30adc8f59c939ab29722d4a62140f930677792459380e65e00bfdc1ee"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#2xdots",
+    "name": "2xdots",
+    "sourceHash": "210076e51f5367ed54c1a3f7b47dd41203fc7def1e131e0a31871ba5a4313adf",
+    "iconHash": "718e52ee8a4c7f426b759fba639ff6a631decc791b0bf18c888bdd2d1c913130"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#2xgrid",
+    "name": "2xgrid",
+    "sourceHash": "221a86d78d6197af9a20c1c4e6a8dadb08915090f8682f4259e393790add8232",
+    "iconHash": "184be58a17eee534894b1f8528ef5d219cd1740fcebb0a8780e183471b47cd47"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#2xlines",
+    "name": "2xlines",
+    "sourceHash": "3a147161d4832eaba5cd0a72578302b604eb2a2e1ec83bc40dd27ff2786a43a6",
+    "iconHash": "26163a16492c89c941a0ca10c2dd9defd03bceaa36da7e77d736adf813a47600"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#4x4",
+    "name": "4x4",
+    "sourceHash": "29c27a16d43327dae63ca2e4439dd550b8b3aedae40d90815d0db0224f9807de",
+    "iconHash": "88f824ad752ccb6a0aaabcf259de6036790bed8071325cb0aaa1bfb709d31873"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#apple",
+    "name": "apple",
+    "sourceHash": "c5a0a8d9621ca477eb77e6d0fbfaf40c2f8e6b91dd134ef2992a363db01aac63",
+    "iconHash": "e18931d94eea6e54329ab1279ddb8d8bb11aa96084e035ad0eb50b466e634e11"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#avatar",
+    "name": "avatar",
+    "sourceHash": "12bd117bf253f460431dbe84f2379ff46f93b86cfad4e899ab095e19165a5bd6",
+    "iconHash": "f4e2ffc2d83d1638e13ef97385b323447686ef2903a3cc1b0a362ca29ee78972"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#check",
+    "name": "check",
+    "sourceHash": "28c71f8bb92f0180f6ef0c99e68c69ee6d1ddc74775a6611dabb77a2168cba50",
+    "iconHash": "f50904e9cf12dd555cf970ea300960dbabb98c4abdcc0e7f50376b54cefa6516"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#close",
+    "name": "close",
+    "sourceHash": "6ed5b6dcadba4831fba0f39f0ec4b2da53e51e2a95a22335c7793f15d09e6cb2",
+    "iconHash": "81451fdbb2da2526703749732fd5f2ccbba519668c9fa3c727b3f579a94a18b9"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#collapse",
+    "name": "collapse",
+    "sourceHash": "9a9c0210f438fa679e44fe9014335cd1bc905e99cc6a4ec15637fe448e7ea0ac",
+    "iconHash": "6f8db61f1675c537ca59be74697e19fe5b11417200ce11978242318e7b117b84"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#color",
+    "name": "color",
+    "sourceHash": "505a28ecbcfcf3b4245190db8517468440d5d6f407ba1d32b116faebced416fe",
+    "iconHash": "55842ed5b80bf48a5aed18b96828f5854c0e96e619c5a999942a013f9c4f70ad"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#column",
+    "name": "column",
+    "sourceHash": "520db7a48b8726ef4f0cd010afc824cd9677db834cccd7f6feaa9e8272adfb78",
+    "iconHash": "3f007b8e73ed6d80b5070db6ea5d95e515733d67c02574dd46dd4d9c5f8cd9a1"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#default",
+    "name": "default",
+    "sourceHash": "3acc3d8d13fa5223e2cb22864df8bff7779b0987a1f6ec04dd262c853552fbd4",
+    "iconHash": "b1a357b1326cd7922ddc8c9f821913b10f740e8a1b4c57dd1bb115c84a903757"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#delete",
+    "name": "delete",
+    "sourceHash": "a6ce411c642500f10d2aaf72b0386efaf9b65f8eff9f65bc93b154ef1f863aed",
+    "iconHash": "e523203601afeb801dde3f7263f45f9070caaf680d608e6fedfe3ff08f82f643"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#dictate",
+    "name": "dictate",
+    "sourceHash": "086eba431318e70eb3e7c6d0db8e47cc9a66de8efe7f81046562722768f205c4",
+    "iconHash": "b02553e18cbcf4d62d55cc11f998db26b7c5b56fdf60eb356ebd6a99b86b9d38"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#down",
+    "name": "ezo-down",
+    "sourceHash": "10811f86f8efd0bd7322f87ef67103a447ea0220390f38ba6650543afdeca527",
+    "iconHash": "416f7bfe4413ab9468676913f6528e0e4f1e105d0ab038cdece5a93056d24d7d"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#duplicate",
+    "name": "duplicate",
+    "sourceHash": "942778798428eca4f08ed94b91202a10963a34290baa97e06488733b0f09bb77",
+    "iconHash": "478568f4136976af568876e5f82cdf881c76d36daf6733e71cb4daba7b1e8dab"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#email",
+    "name": "email",
+    "sourceHash": "266377d00c7b31577a394fc0b1e115065ac9ab4735e2e16e77b44f047eec69fe",
+    "iconHash": "72d8e33892efdf57ffb9dddd3dafb353dc59d643d1390b3ed7b675a950f039ef"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#exercise",
+    "name": "exercise",
+    "sourceHash": "5ecaaece8ebbcf0d731d43e4f0c12d23e6451c67b94a3fcc5e74e5b9ca42f372",
+    "iconHash": "2f85a443f72aca8b41655ed3f8311f0c930df285887449abe29358c7962b5194"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#expand",
+    "name": "expand",
+    "sourceHash": "c8d1a718ee3c1f6f817cffd45f03d05cf16e82e1234ebd0774c94b38f86e52d1",
+    "iconHash": "806cfc97e595af6eeee166f3c15831603cd96e47b4b2ccce686f4443978ef7a6"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#gallery",
+    "name": "gallery",
+    "sourceHash": "ac2e67600e72a910985c3960c9d095bab4474efb74eab9c1c9d0da982cdc55e6",
+    "iconHash": "8f786ade53c8aff81853ee6517aba0d4f4da4d6a0b28cb3519984a0a0494284b"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#globe",
+    "name": "globe",
+    "sourceHash": "b65388c7d492691bcfe6a87f13df162f6c7420a353976495dff052e819ab0807",
+    "iconHash": "5d892833e248c5a6af3cc3e3a28ae1edf01c5ef6be748fc87de02587c037a8d5"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#google",
+    "name": "google",
+    "sourceHash": "2598006b38cf41c7994bf1142e2c9a7d4dd9df72d6c7456ea55314b89f7bd9df",
+    "iconHash": "040351c37d56b44511a74e8b4c9ad7fbbd6dcc8543445890d997727782590b5e"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#group",
+    "name": "group",
+    "sourceHash": "824603b16e1967457f9ed4cf5563bf6e00911759d537afdec3752afa8e106658",
+    "iconHash": "cd2022fdf67c37792d6ca3b6bfac0662e7c8c204e24fe86ac6654fbeb88ef4d0"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#head",
+    "name": "head",
+    "sourceHash": "add02c900748177be0fc954903001d3e09e6ff91fa34e3455a564ef8d827cc27",
+    "iconHash": "ba68be6bac4c8869da2fe793130ead5292e9fb777e35c670c2bcb2658aa6d8a2"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#home",
+    "name": "home",
+    "sourceHash": "f83cc21c1e10c05bfe49c93662ab47f07bb55bc1de091cc008f7546732316c58",
+    "iconHash": "b32240117e4e4dedab38367f0da88341b56df26448ff3c7d0dd2a055cd4cc11a"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#icon",
+    "name": "icon",
+    "sourceHash": "935ec9a17c31e3388820e089d0ef6186f4700dde655628d15789df16cb09339d",
+    "iconHash": "23af0192416d6e6ac57b025f8a357a578fbb7bcb7b68712ca411ba2bc0f9b415"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#in",
+    "name": "in",
+    "sourceHash": "d98e8fa89988e2b6f29c6b73ab228e45377c2e700afffc7907978215b505676b",
+    "iconHash": "dd89f996f3726c5bcd095a9deb27c6b15761cb656f3ccc5fe77e699a925e6c13"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#left",
+    "name": "ezo-left",
+    "sourceHash": "09e147744fd583b65aef61b6d90290aba149804e1189585be50dea2416da7883",
+    "iconHash": "dbcda45a0ca7068dd2ac99bbedb41429d609afdbfada2a2e4cf795a3e3c76bf3"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#life",
+    "name": "life",
+    "sourceHash": "c3f3e035ae92affe781accdf60d8cc2804f602779864f85dfe26508dd78c6fff",
+    "iconHash": "22c577be867b51ae5e70c8a5d9fd3ed2468e02a5b7f3ac354175b5a6b2b96fdd"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#lock",
+    "name": "lock",
+    "sourceHash": "b1bf5fbccfd57970255746913367a22f2cf9a855ea5a7f5ab503cb846a9bce3b",
+    "iconHash": "a22805c09df700d2e84ba1789da7368465b89dfea095d11442db0ef8e1856af0"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#loop",
+    "name": "loop",
+    "sourceHash": "b6d5379e5e74711e23347a6f56222b5ab5bbbeb3d9a420acca17c22c9066e87c",
+    "iconHash": "4c607eb9edc70c3791899812df917c612a01a9dc93340629f7a61db6e68b1a33"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#mic",
+    "name": "mic",
+    "sourceHash": "c298f52e5a8639aac0ab599d0bcafc4c23f4a129bee169c4fa2dd7793dda2530",
+    "iconHash": "d696456b87ebee1b026daee886bee729f2576fb13e3186e4a47cd0e1738b8d3c"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#minimize",
+    "name": "minimize",
+    "sourceHash": "eb572e9e462d3b4edca9bdf27aaa4e0bcfe4a8caf0193c1b675c8fbe20ce5dcd",
+    "iconHash": "4ef4fbbce2705455389a620103ac17f1d0162ce821ee570b7b38e6c61bbb2ce6"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#money",
+    "name": "money",
+    "sourceHash": "b5cb264cd5027e71fc2f384598e800732f4c8656018906cb8975dc9aea3bec02",
+    "iconHash": "e6ac3adc890fc75cb2af842f0bda08aab2a11cf9bffa9fd1055c6c9cf9b22649"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#more",
+    "name": "more",
+    "sourceHash": "7ac05e658b81d3c95505ca1490fb2edf979827b9bc28176617e3c77d7a30a835",
+    "iconHash": "d46c50a3c5837e10c04fdac86dba40166c43abb5ca78d9effe19772bfafe5e3b"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#note",
+    "name": "note",
+    "sourceHash": "348308f6eb83b6e45ee6c2711bff15651ad212d531bbe2676b45bd149d20b330",
+    "iconHash": "6fbd2912ed8a8f16070547c751921032013f0fe667cdb3fd16bf862c4d93d56d"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#open",
+    "name": "open",
+    "sourceHash": "67f3165c3e42a60b3daacc97bad71e84a7f286c94d76268b86e497669f2fc86b",
+    "iconHash": "abf911f799bd14b5ed94aa2f1490e51190082f38367bfc76d33922ce6f45a011"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#page",
+    "name": "page",
+    "sourceHash": "65702370e375c1fabf13c88c484a9bee67b61aea713ce7ee0ee2b5bf490c9783",
+    "iconHash": "88ddec61a8c379f7b45cdadb3432fe5c646acc7d0fad333e0ace6948fafb9c9c"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#plus",
+    "name": "plus",
+    "sourceHash": "04f3c907ae0625b84d31e37ebdb40ab93bb8bd7799b47096d04aa412cb59fd93",
+    "iconHash": "323e84ace16cf679440ebc0a5073f96b901945dc2418035f4549df18049b8e38"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#rewind",
+    "name": "rewind",
+    "sourceHash": "39509ed51fcefdff59034e6f510846976ba858d830b16b82c6ac48ec7fc1c8cd",
+    "iconHash": "9281c735d518904b9e06956945ae7dbf719ac83fe374ea0509bcbf96dec5febe"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#right",
+    "name": "right",
+    "sourceHash": "9f9dae4dffd597692a88e970499421cccba970a089d1d870ce4e271e2aeddbcb",
+    "iconHash": "8bb9dafaff1156d3f03e04c7d7a9f89913094453eaa51ceea20a58ed7de57c0e"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#row",
+    "name": "row",
+    "sourceHash": "c46dc1d5584e78a904f3cecbeec0b2c88aa652e0bde99c749b06097e3360f25d",
+    "iconHash": "d907ca132eb3e15ef88699fab83f40aaf4566e6148e2f4f0bd3b29687cc56de4"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#school",
+    "name": "school",
+    "sourceHash": "3bb046f41ea02ccec90ae567fe89853eee37c210c22951d251713e37cd422f1d",
+    "iconHash": "084fb9b7d992c1a02a3b032f26e24d2e946e4c123f3bc758610cfdbcefeba9f0"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#sdown",
+    "name": "sdown",
+    "sourceHash": "a5a4a3906b684916cd7e1fae24bc82370e0a8a8c9d67a3498530d97e73465f34",
+    "iconHash": "097221de83b6e607f5ec9744b3840220a7ada1cee9abe0af20aaa1b6f3047f4b"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#search",
+    "name": "search",
+    "sourceHash": "9dff6904e8175ae179ba599e327657c7c31d3e82d47f9be59e1f740f57f1fedf",
+    "iconHash": "aac3f4ee710cf57c6a79cf4531cfcd30afbde7b9b99b164d0413e677ce82d402"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#see",
+    "name": "see",
+    "sourceHash": "b5e9832a294aa3301ccc34492ec67421faf02de25c7cd9c16f3f52eb59c043aa",
+    "iconHash": "fa6a2255ca00b2599463a295746e86f0f24e43b4a1f2ce0550913ff3bca040c1"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#star",
+    "name": "star",
+    "sourceHash": "3d629c67fcd134d287cce76f17bd319bcb16426dd398dee8b9c162397ec46a54",
+    "iconHash": "fcdf6cfe2b18f84f44993ef9fd67420589e785d1a2943c7b7044297e7c4c29bc"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#status",
+    "name": "status",
+    "sourceHash": "6413cc55e9725c4fac7c4b7535809afb739e9f3b57c8c58fbbd155297064e5a0",
+    "iconHash": "7b5714e1b6ccf27851e79d36d2a0e7fd7ae78885637fe1e1f293a546c91ac968"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#sup",
+    "name": "sup",
+    "sourceHash": "09caa8f92af3dd164e447238816bb7e4695f55fc77e621308b3be8db3215d842",
+    "iconHash": "cba01ab6ddea918a00357c58cb106337d57553146e6b935ee04ff9d1bd4ff947"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#title",
+    "name": "title",
+    "sourceHash": "b0c9b9b319ba545fcafc442ce624756785fe5565322d38c313901975e5d76fdb",
+    "iconHash": "ba566bdaa2e27b1fca5ff7272d2050d434c0f3db9a8f66cfcf3f96a7fffc13a9"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#titlestyle",
+    "name": "titlestyle",
+    "sourceHash": "3387c2ce79864c2939ba5f8f83e94ee5d755a860627905b5e80fee6aa1d26838",
+    "iconHash": "08e9a1326b296d925934a31c87aa7ae889b8d5cc821c3c6cdd9a0e6259f96b61"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#undo",
+    "name": "undo",
+    "sourceHash": "bf806504a861c8c3a0201404d3ecaddc94feb9d137af3ee53fe227bd837b5c88",
+    "iconHash": "477ddd814369e432cbe4ff42649eb84e12400891656e98d1a2ca95d5712dc2f7"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#ungroup",
+    "name": "ungroup",
+    "sourceHash": "42cf68b5b039c3031b9c50a401b51e4d4b3a2f4b0982e2701f28a14738376655",
+    "iconHash": "4e2055a678b7bd3957e8764a4d17323243fa424458074790d85d5da66faf78e5"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#unhead",
+    "name": "unhead",
+    "sourceHash": "54dba69f3bfd4326b964131fbb3510aeed7496fff37f1faf06ad5818a262869d",
+    "iconHash": "76eaba0f19aae446cccbb7f9ec776f574e3ff199e64f51e91a6b4cf7852eac97"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#unicon",
+    "name": "unicon",
+    "sourceHash": "810af4b48e1de258fe58e0ba5185bb68c896b5deffd9f2cf92caf915ba0a4298",
+    "iconHash": "80b0154a912c1155b14cb58de18086a21e610be089b0e575a1c8a39466347e70"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#unlock",
+    "name": "unlock",
+    "sourceHash": "99002ff6a26bb5cbb64a2e7da462ffa8fcb92531e84495f39db25ac0bc016e16",
+    "iconHash": "f25b78ae605824a7e20c2114a40d8a8ad5b20f79cd1f3c2a46879efbe4bd3d4b"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#unmic",
+    "name": "unmic",
+    "sourceHash": "fd78f211bfb3eab7b8edfe56d72561008f4c7df0487b2f414ddd15ec53eaec67",
+    "iconHash": "40a87277ed9e0736d440bcba14a3013c9272ec49403df8a18577cd46a6305164"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#unsee",
+    "name": "unsee",
+    "sourceHash": "49e8211271b901d03b050b768f3c76791b8f36eaca67827539845c05be89bacb",
+    "iconHash": "8b38e8e6340e525f3702773792d4395c6c2c826cb38469316057416560100653"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#unstar",
+    "name": "unstar",
+    "sourceHash": "eab2063175e134ae6a0d557d8849d9ac4ab21af9f002c951fa7969603be1c7b4",
+    "iconHash": "71c83abeb1ae70fc076f5f0f95af56f570cd444e0e661aada5fe173eafddbaa0"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#untitle",
+    "name": "untitle",
+    "sourceHash": "035fea3504065cb47764802bf091389fd895fe1731528802c6bf53ad75419f91",
+    "iconHash": "70d0d4b1e9be678b5398545374b4e36e8d6acdb0e23cdfc2e7f1fd1e09880c09"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#up",
+    "name": "up",
+    "sourceHash": "f15cf05030472647a1ff13851ea82b550707574ac33355fb19d28ff38b281d09",
+    "iconHash": "e8231c10c627953798f6f7db4f00b4cafb065a7c721a1e7628b6943d570d63a9"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#work",
+    "name": "work",
+    "sourceHash": "f6c9dbf4c378ba0802fb33d80fa270af62548caa3dc7e93e4a71d7083891d128",
+    "iconHash": "63cec4b4b0afa1994971287469a17837aea131259560224bfb17fca94b889355"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#lists",
+    "name": "lists",
+    "sourceHash": "d0bf4130703d6188c0ef43bc0a3fab9e997b11b8e128e895aebf55ac4265854a",
+    "iconHash": "8bb44d3bd4e054aada3c2b309f850638dc9dd4766ac72fbb98f7414118239729"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#shared",
+    "name": "shared",
+    "sourceHash": "fac9fcc8fba4b095eab463c530f1292c7151f9a692a16672a096bdaf58eb46bc",
+    "iconHash": "7ea66e9d7243ea761383b327791e4ea5977d2936f04518ce0d0b73c17e2b58e8"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#calendar",
+    "name": "calendar",
+    "sourceHash": "b2c3f9e979805d5808ba4653dedffb333cd211ae8f03d229ab644d4137dbc0fe",
+    "iconHash": "43b12ea0adf4a749d47bf0f8663dd7be3fb0dfb3237ebebbd1b257c2ec4752b5"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#views",
+    "name": "views",
+    "sourceHash": "5272e9aa664aad2c5c0d606f53bd75a2e1ef6057baf8f1f237bc5f6b97b62b03",
+    "iconHash": "456c3f03cde2c7da3ac9583e0f70d17e73feaf403ddc6d73fa9db90cdc5545fb"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#templates",
+    "name": "templates",
+    "sourceHash": "a0a5a82c9968a9164f399fd8e7a26d55d58fe25d5b47a9e0e341028d76c8ef1f",
+    "iconHash": "394342a2d44158f0ee4e48613ff94ffc2f33202e3ac2aa566af078c2dd2115fc"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#compose",
+    "name": "compose",
+    "sourceHash": "d7579e73b710f554d4e23fd96201e735b85a030083ddce30c36d37c9db10da9b",
+    "iconHash": "e75e731f32014ae1813f52953c7ec598208e2a79400bee560ab95fbf5ef56a79"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#archive",
+    "name": "archive",
+    "sourceHash": "55fa8624aaa659a64e70fba32aef62027f0f3abb1f9834c813ff9d338ab2c2ba",
+    "iconHash": "5547ceb00c28f1a88f75465c1a16d73798e595167c3ecea690baffddbb2e9a96"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#stats",
+    "name": "stats",
+    "sourceHash": "65de2f45de33eed84f3ccc5c3adf5752ebf3f361eb49b9fd0068916e95836cb6",
+    "iconHash": "0e8abe113b596e6bbb3fdae6c953a0257a65389aec8c6c6ae410c7f8c206f6c8"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#notifications",
+    "name": "notifications",
+    "sourceHash": "d4def69a4f53ffa45e2987bab51eec3c0081ba2139f3003e7020fa65ed238be5",
+    "iconHash": "56e3bc4e5eb4eeb6c75c5085a1f15b23f9644ca016bf7c8445751f92fac47ea4"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#camera",
+    "name": "camera",
+    "sourceHash": "ed33bda9c47c82e07505bfd806105921e4507fdbcc01ec90473a15df0977c8fd",
+    "iconHash": "4b10a6cee388e0eb149735ba0a9425d7bb21da586fd628b1557d8a126f51712d"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#template",
+    "name": "template",
+    "sourceHash": "bb95a9abe5713ee387956c20b2a305120c6d213014f432d25a6b655f91658596",
+    "iconHash": "428fd95398b15b5333bb07306682d1d33a2a95a1ce7057211605af3f1f09d995"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#pad",
+    "name": "pad",
+    "sourceHash": "11fd2361b49578d5df4f16d596f3ee4000defbdead7de717e13b77dcd836a2b3",
+    "iconHash": "8276464610bb142a764c25f85196331f8c8163bf3360a3469795d7da36a0f821"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#folder",
+    "name": "folder",
+    "sourceHash": "89867fadfd2a2de1665d3e05d456d5c594b928e4df8cf0a9f79e57cc0055a580",
+    "iconHash": "9029a465f10c284855c4efb9eb38cc6606160c23ffc24f7704e9d54440a8f197"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#app",
+    "name": "app",
+    "sourceHash": "e02105e6faa1516e8ed3af2f4e12b0cc64932c812ffefe54d5c7011067bfa2cb",
+    "iconHash": "62b06cce835d3072ed2eb56dcb6564ffdee60a07b3a96439e171d16ca04c002c"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#store",
+    "name": "store",
+    "sourceHash": "5372a5c8f43c2b8951542b391e06019100d98859162dcadba955780f2262b4e9",
+    "iconHash": "fa06b4a0da44e91d84a1e2b97279c3d6b05a615c712515e7e83432a1491a5b78"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#bag",
+    "name": "bag",
+    "sourceHash": "cd815cbcde1e4b5da85c13d66da2d0e4907646d5e9f42345f7b89eb677f0ce7d",
+    "iconHash": "f36f75d479c5d485d8198bebf73b99538dc38501f26294e4b828affc6e7c922a"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#pen",
+    "name": "pen",
+    "sourceHash": "1f1d026b2f758c6aa8687553cd881070bb6a9d9cd4857e2ed59f41d25572da8f",
+    "iconHash": "226a7280ee74d4742b334f385567f4622fe3c9c07ec81dc07405b558716fc929"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/2-core/generated/ds-icon-map.ts#code",
+    "name": "ezo-code",
+    "sourceHash": "13fa28ad354206334a37ae976576c8020109f0a49c8779a300a15f59672586ec",
+    "iconHash": "01b9b7976957fce757e2fa0a6b2e68d66cd9ad4ab8e2f111caae98ec8bd72048"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/bold.svg",
+    "name": "bold",
+    "sourceHash": "d5bd68df02a97d9cae4c38922ae0915fa83721df5f9789aaa8da97e8d5d30484",
+    "iconHash": "d5bd68df02a97d9cae4c38922ae0915fa83721df5f9789aaa8da97e8d5d30484"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/bullet.svg",
+    "name": "bullet",
+    "sourceHash": "b3c9d33de48216590861086d9b6f9702c80de5ca1ae0bf0adcff230512b10e3a",
+    "iconHash": "b3c9d33de48216590861086d9b6f9702c80de5ca1ae0bf0adcff230512b10e3a"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/callout.svg",
+    "name": "callout",
+    "sourceHash": "8dfc0de403de77048df84a097dae8ce1e5fba399e310d6701f57a63f2d289987",
+    "iconHash": "8dfc0de403de77048df84a097dae8ce1e5fba399e310d6701f57a63f2d289987"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/check.svg",
+    "name": "check",
+    "sourceHash": "f50904e9cf12dd555cf970ea300960dbabb98c4abdcc0e7f50376b54cefa6516",
+    "iconHash": "f50904e9cf12dd555cf970ea300960dbabb98c4abdcc0e7f50376b54cefa6516"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/close.svg",
+    "name": "close",
+    "sourceHash": "217a1e21a7cd387167823f4326bae1df250ad543984b23810b5deb4f65c5b11f",
+    "iconHash": "81451fdbb2da2526703749732fd5f2ccbba519668c9fa3c727b3f579a94a18b9"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/code-block.svg",
+    "name": "code-block",
+    "sourceHash": "c6308929c7299383f27b256d6b78a40ca573b33c8df3321df384c0533bbac1a2",
+    "iconHash": "c6308929c7299383f27b256d6b78a40ca573b33c8df3321df384c0533bbac1a2"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/code.svg",
+    "name": "code",
+    "sourceHash": "8cbde874bbf435a5a2b2a9fe60dfa03b0fe0caa369ba2d55359896654a7720b0",
+    "iconHash": "8cbde874bbf435a5a2b2a9fe60dfa03b0fe0caa369ba2d55359896654a7720b0"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/comment.svg",
+    "name": "comment",
+    "sourceHash": "fb70b88ac368901df0063c41770447e8926bc1d8498730e1a5173a11d6f88302",
+    "iconHash": "fb70b88ac368901df0063c41770447e8926bc1d8498730e1a5173a11d6f88302"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/delete.svg",
+    "name": "delete",
+    "sourceHash": "880981034a1222067d48d129649f9b7f7768bc67ab0a27658d72cad72b9bc86c",
+    "iconHash": "e523203601afeb801dde3f7263f45f9070caaf680d608e6fedfe3ff08f82f643"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/divider.svg",
+    "name": "divider",
+    "sourceHash": "3cd7d81e8cfa4773a43916f3884ad19a0e0c7b80b114caaf6ff75c88c19702f1",
+    "iconHash": "3cd7d81e8cfa4773a43916f3884ad19a0e0c7b80b114caaf6ff75c88c19702f1"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/down.svg",
+    "name": "down",
+    "sourceHash": "e30c311b7f4bea8bbb8618111958e1251ccb6a7ed13ee0ee705a86043f252fb7",
+    "iconHash": "e30c311b7f4bea8bbb8618111958e1251ccb6a7ed13ee0ee705a86043f252fb7"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/duplicate.svg",
+    "name": "duplicate",
+    "sourceHash": "478568f4136976af568876e5f82cdf881c76d36daf6733e71cb4daba7b1e8dab",
+    "iconHash": "478568f4136976af568876e5f82cdf881c76d36daf6733e71cb4daba7b1e8dab"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/equation.svg",
+    "name": "equation",
+    "sourceHash": "3be7ce223574c7d931d44aa9603556126325c70fba2f7113a0a6c914f642cd2f",
+    "iconHash": "3be7ce223574c7d931d44aa9603556126325c70fba2f7113a0a6c914f642cd2f"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/h1.svg",
+    "name": "h1",
+    "sourceHash": "428dbeef5f68948d8fdfefb3094600211dd79c4049ac23ff8d355b5c0f0fc1b8",
+    "iconHash": "428dbeef5f68948d8fdfefb3094600211dd79c4049ac23ff8d355b5c0f0fc1b8"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/h2.svg",
+    "name": "h2",
+    "sourceHash": "9f6385a9c3e9a514761d36ff054a0653a0b3f8d4ae19d90a6b3d57930b86f7a1",
+    "iconHash": "9f6385a9c3e9a514761d36ff054a0653a0b3f8d4ae19d90a6b3d57930b86f7a1"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/h3.svg",
+    "name": "h3",
+    "sourceHash": "edd55d14c3841fa217e4e3a5959ea722c436af02e74d4d18ec44824861b21508",
+    "iconHash": "edd55d14c3841fa217e4e3a5959ea722c436af02e74d4d18ec44824861b21508"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/handle.svg",
+    "name": "handle",
+    "sourceHash": "7822bb5d84c18c332b7e6bf2bbeaf626dedc06eeb06527cda26de3eb5da2cfd8",
+    "iconHash": "7822bb5d84c18c332b7e6bf2bbeaf626dedc06eeb06527cda26de3eb5da2cfd8"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/image.svg",
+    "name": "image",
+    "sourceHash": "e11df71e066f3cd0146c112ae0c68649fdacb944894287c06ad8ea8f32a2bc1e",
+    "iconHash": "e11df71e066f3cd0146c112ae0c68649fdacb944894287c06ad8ea8f32a2bc1e"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/indent.svg",
+    "name": "indent",
+    "sourceHash": "1580c5ca79f9802e584d99eedb3a72fbfb240348fabecaedc59e8f83190c5d12",
+    "iconHash": "1580c5ca79f9802e584d99eedb3a72fbfb240348fabecaedc59e8f83190c5d12"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/italic.svg",
+    "name": "italic",
+    "sourceHash": "e90a949a23e358390e0561679bf2af1b0e30e63a88acd92f7f8d23d1faeea4d5",
+    "iconHash": "e90a949a23e358390e0561679bf2af1b0e30e63a88acd92f7f8d23d1faeea4d5"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/link.svg",
+    "name": "link",
+    "sourceHash": "81b06e47261152afd6153610808fe6f64e789d16189138b194f310cd40ba5bb9",
+    "iconHash": "81b06e47261152afd6153610808fe6f64e789d16189138b194f310cd40ba5bb9"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/mention.svg",
+    "name": "mention",
+    "sourceHash": "d8bf18a0d6a2503a2ab855aaee04452248f9f4a08b7d1e27fa498d1405c30fe8",
+    "iconHash": "d8bf18a0d6a2503a2ab855aaee04452248f9f4a08b7d1e27fa498d1405c30fe8"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/note.svg",
+    "name": "note",
+    "sourceHash": "297285c144672492caa35a2cc2ad731efc5cbbb6d5c112ed2aae86e72a2e3176",
+    "iconHash": "6fbd2912ed8a8f16070547c751921032013f0fe667cdb3fd16bf862c4d93d56d"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/numbered.svg",
+    "name": "numbered",
+    "sourceHash": "6488bc3aef38e3660848728fe24502d4f021696b56d860fe84647e7b6c34b4fc",
+    "iconHash": "6488bc3aef38e3660848728fe24502d4f021696b56d860fe84647e7b6c34b4fc"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/outdent.svg",
+    "name": "outdent",
+    "sourceHash": "e26bfc40987bc96a6f284e9d6be9bf527b2aa49e594b95a43dd5e48ee9f3e968",
+    "iconHash": "e26bfc40987bc96a6f284e9d6be9bf527b2aa49e594b95a43dd5e48ee9f3e968"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/plus.svg",
+    "name": "plus",
+    "sourceHash": "e085e4391cefd4ff8567e7beda7b294afc6012a7f0df1ee73a08eb9bfce9011c",
+    "iconHash": "323e84ace16cf679440ebc0a5073f96b901945dc2418035f4549df18049b8e38"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/quote.svg",
+    "name": "quote",
+    "sourceHash": "4c6d9505e60c0e3afb8b58fa6dbdf9b17db4456b83903462b8efabb550754321",
+    "iconHash": "4c6d9505e60c0e3afb8b58fa6dbdf9b17db4456b83903462b8efabb550754321"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/search.svg",
+    "name": "search",
+    "sourceHash": "2863357fd4d006e21f39e04078fa587459c19578f65b1cd4820a5fa7fa106233",
+    "iconHash": "aac3f4ee710cf57c6a79cf4531cfcd30afbde7b9b99b164d0413e677ce82d402"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/strike.svg",
+    "name": "strike",
+    "sourceHash": "50cc6729e268d8064c16e6012075ccd57a17dff3e2ac78dd3c4dc8dfa54530ab",
+    "iconHash": "50cc6729e268d8064c16e6012075ccd57a17dff3e2ac78dd3c4dc8dfa54530ab"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/table.svg",
+    "name": "table",
+    "sourceHash": "a54c1a3944d06a25e31e123bf11521ebd295f101b87f0ff4934beb7b96697ff1",
+    "iconHash": "a54c1a3944d06a25e31e123bf11521ebd295f101b87f0ff4934beb7b96697ff1"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/text.svg",
+    "name": "text",
+    "sourceHash": "a55ec028359b64a7389567d83c3f3eb37b38b61e3abd6cf2c88cb2bec289a41b",
+    "iconHash": "a55ec028359b64a7389567d83c3f3eb37b38b61e3abd6cf2c88cb2bec289a41b"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/todo.svg",
+    "name": "todo",
+    "sourceHash": "da11eb4967853fc0b41a15a4bf7a6f897a76acbb245544af0a0cc44c7f76fcb3",
+    "iconHash": "da11eb4967853fc0b41a15a4bf7a6f897a76acbb245544af0a0cc44c7f76fcb3"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/toggle.svg",
+    "name": "toggle",
+    "sourceHash": "01911c7641a74be1066e6844d318fb86cd567953042056346b9af3999172549e",
+    "iconHash": "01911c7641a74be1066e6844d318fb86cd567953042056346b9af3999172549e"
+  },
+  {
+    "product": "Aa",
+    "source": "src/icons/up.svg",
+    "name": "up",
+    "sourceHash": "f4a6f0df34a3cb4fa4703311833c063b0dfba8f9435f2ed1a886762b93ace4d0",
+    "iconHash": "e8231c10c627953798f6f7db4f00b4cafb065a7c721a1e7628b6943d570d63a9"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/assets/figma/premium-star.svg",
+    "name": "ezo-figma-premium-star",
+    "sourceHash": "faa75bfb5dde84e02f4b6b50c8ae7db55c5f934aa35faf495ca3e1973902c700",
+    "iconHash": "7a068cbba127e77594da0ad37eeb1fafbf6c1b4e57a293456b72b734bf3584fa"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/assets/item-button/complete.svg",
+    "name": "ezo-item-button-complete",
+    "sourceHash": "68f3f526531c37e3a49a9b1ac5e9c6fb0c78063b2d38e5978cc704413294072d",
+    "iconHash": "8fe77ec9bfd2591a77a8c80cc5e0538e155d6efbc4bd0c48f4eee2f321488f69"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/assets/item-button/header.svg",
+    "name": "ezo-item-button-header",
+    "sourceHash": "e4ad3e8df7d8c84ac6d1b24a35795d85954959e95819edd2bb7018ef508ed681",
+    "iconHash": "9c6dbb31e84107d6673344b6fb34bb557599110f9728831fb6f0832dcb28c8e9"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/assets/item-button/open.svg",
+    "name": "ezo-item-button-open",
+    "sourceHash": "b35ae7ee3f779131ca52bf5c2ba3e35bd9744c2050759b490bf3858c9df25d4e",
+    "iconHash": "abf911f799bd14b5ed94aa2f1490e51190082f38367bfc76d33922ce6f45a011"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/assets/item-button/reopen.svg",
+    "name": "ezo-item-button-reopen",
+    "sourceHash": "9e1e2400f4e16abf1b27dacd406eb529443073b5fb9581d6b100b8eed64c7dfd",
+    "iconHash": "0604e70af6a1b4d9612e548fc1a3a7fb87937ae1dd5fa33a6912b8957db9ad24"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/assets/item-button/star.svg",
+    "name": "ezo-item-button-star",
+    "sourceHash": "38afce33126ed9fe95af7bbce462b69a5b75a6b6e2da0dbbc2169e561df5d660",
+    "iconHash": "4a0ad61bd7b4e5872627347d77d80e8b315fa0f502dd2e33293c4e2b52f9ff40"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/assets/item-button/start.svg",
+    "name": "ezo-item-button-start",
+    "sourceHash": "287a8dcb3ab5cada7ef86ee1dee05bbd523321728025cff06ff4598c313715e1",
+    "iconHash": "c8b3a1ae8488eb92226f6104d47a3d884121e987b0e89db1ccf619aa6d93ff2b"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/assets/item-button/unheader.svg",
+    "name": "ezo-item-button-unheader",
+    "sourceHash": "d4517e2b4197e991522e5c4c65d25f7df91eaf2adde3bdc080f35125dec3c99a",
+    "iconHash": "c510d07f5ba2967a0c5cb3d0e8d873aeefeaa2ad8cf6f4844a3861c5ab7d2f33"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/assets/item-button/unstar.svg",
+    "name": "ezo-item-button-unstar",
+    "sourceHash": "ce4e64c03b71f2282bfd932b54b8685e06591b61592b2f047cb1693af0086399",
+    "iconHash": "c25ad8e43306ad66db96583dcd3735152419c1dbbf5e530afac1736ae25e26fa"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/assets/item-star.svg",
+    "name": "ezo-item-star",
+    "sourceHash": "9b32628dfd834459bc274f802b4df671f6822bb0172e15b59fae4b3beffcbc9c",
+    "iconHash": "4cd5419384eeb4dc15f23576fd1f0506d9dae877cd84d63ecf86912aa3e5b44f"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/assets/mic.svg",
+    "name": "ezo-mic",
+    "sourceHash": "ec3cd379b3c4326af63b52584af14b702c0a3c4fd6f34a6154d2a3235df6c828",
+    "iconHash": "a9dc6c6fba57083efcdd1103f46b1a24c2beb3c20256d9492328bce17031c7bf"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/assets/note-back.svg",
+    "name": "ezo-note-back",
+    "sourceHash": "994f0e695d13e7a53f6ce9aad3b20eae964138797b649154533c43619b2c6c60",
+    "iconHash": "331aa233e535b4ee29e7d4ed07431bd7c8dfcc2591e71a13f7d463d2098cabbf"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/assets/note-menu/complete.svg",
+    "name": "ezo-note-menu-complete",
+    "sourceHash": "3ba8cca67ac0c2f7e0fe5b39662c75cc78333bf401ec9c75e671cf50e146e7e5",
+    "iconHash": "d69a45768a74a7bea0088366ce1d2bfc0ad76cbaff1d9184a494a744510981c8"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/assets/note-menu/delete.svg",
+    "name": "ezo-note-menu-delete",
+    "sourceHash": "3e5015935d466241690a79af47d20b5b5622053f9268994122b957291c9af25b",
+    "iconHash": "fd7a9eee5a24010304bdd9a31ea7196938200ec1a8b5fd422950c297b1855ddd"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/assets/note-menu/duplicate.svg",
+    "name": "ezo-note-menu-duplicate",
+    "sourceHash": "478568f4136976af568876e5f82cdf881c76d36daf6733e71cb4daba7b1e8dab",
+    "iconHash": "478568f4136976af568876e5f82cdf881c76d36daf6733e71cb4daba7b1e8dab"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/assets/note-menu/note.svg",
+    "name": "ezo-note-menu-note",
+    "sourceHash": "7d289ca79ea7fa1fdeabdfcff5e6d16f22200c286dfff4d0ca31e3e457111ab4",
+    "iconHash": "7d289ca79ea7fa1fdeabdfcff5e6d16f22200c286dfff4d0ca31e3e457111ab4"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/assets/note-menu/page.svg",
+    "name": "ezo-note-menu-page",
+    "sourceHash": "09e97d5da8aea14a88236454060812d84320e064c1882949d96a9c09ffef0f70",
+    "iconHash": "09e97d5da8aea14a88236454060812d84320e064c1882949d96a9c09ffef0f70"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/assets/note-menu/star.svg",
+    "name": "ezo-note-menu-star",
+    "sourceHash": "c32c123b0a3646d2eec54a537d9cfe0c912232ff84bf79fff8ec62ac3240808d",
+    "iconHash": "c32c123b0a3646d2eec54a537d9cfe0c912232ff84bf79fff8ec62ac3240808d"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/assets/note-menu/start.svg",
+    "name": "ezo-note-menu-start",
+    "sourceHash": "1c8793769b009383c27c5af69d9e55d728ad9aa78979890f57873fc220533fce",
+    "iconHash": "c8ffa6dfa7fcc3c2e9e6888c6c7a1efd751d891967e8d88c16352fd35036d6c3"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/assets/note-menu/stop.svg",
+    "name": "ezo-note-menu-stop",
+    "sourceHash": "91e4bcba395ee7cd93ff288f0dd3eed835c44567f8dfa234693fcc7faa30ab77",
+    "iconHash": "e7766c0cc76de9cd0f257649346aa8abf38c7ef59d9b56c7fee7d5c0e8185203"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/assets/note-more.svg",
+    "name": "ezo-note-more",
+    "sourceHash": "3874071610a65f4ad1ba37d999dfbd59195ebcb1bb1cac42847d589c112d856c",
+    "iconHash": "22c766eeca794f01f2f7d48762de25c3c74f9fa55f52d5b57677f3d65864c494"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/assets/note-star.svg",
+    "name": "ezo-note-star",
+    "sourceHash": "9b32628dfd834459bc274f802b4df671f6822bb0172e15b59fae4b3beffcbc9c",
+    "iconHash": "4cd5419384eeb4dc15f23576fd1f0506d9dae877cd84d63ecf86912aa3e5b44f"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/assets/password-visibility/see.svg",
+    "name": "ezo-password-visibility-see",
+    "sourceHash": "661c74928695a2da7817b9762f2c8f0c965fa4e86ba36406cd473565e8cb9c69",
+    "iconHash": "ffa21d8594dda54fe96358a0041f4f1db105b3d3f20af797ddbb9613d2c4f977"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/assets/password-visibility/unsee.svg",
+    "name": "ezo-password-visibility-unsee",
+    "sourceHash": "2dac42adeefbcf8641dc94ac9712a5456a54a94c9068d38860de308f39a598be",
+    "iconHash": "f68136c200247d897adebb86be4b5fd9e7fafdbce2145e75416ffa5a78240483"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/assets/play.svg",
+    "name": "ezo-play",
+    "sourceHash": "707be580b82e0162d7febe220ef60669743e19469ad9dee9208d1ca1f7a09d89",
+    "iconHash": "4fe4368f1d79bdb7dfbf54cb6136fa3303e15cd006d19e240cd5217fca06b2e7"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/assets/premium-star.svg",
+    "name": "ezo-premium-star",
+    "sourceHash": "b570b6f8aa6c046c18c22af6671893505656d76ede154310c43643b13777bceb",
+    "iconHash": "ea9334182ca4c6ee8271e9682c38746c5f9148a9837bfe08111d440e2a096b92"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/assets/upgrade-close.svg",
+    "name": "ezo-upgrade-close",
+    "sourceHash": "010f6e11ecc1b3134615bc2d5a558ced22653cd44e9464171abdc40474b36bb2",
+    "iconHash": "4ad0ab556b4b2f6683987b807cf7666ece9e508a17bef55252ea8ff521f4babc"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/public/icons/settings/1xdots.svg",
+    "name": "ezo-setting-1xdots",
+    "sourceHash": "df583567128767c6e1f709b38bb4c5afe0bf4da4cb9f23016b1d70bf7e042cdb",
+    "iconHash": "44db12f88665b686a90792f5065f444b6cb848a10e5053a403fd394255defc6d"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/public/icons/settings/1xgrid.svg",
+    "name": "ezo-setting-1xgrid",
+    "sourceHash": "254636c18af960cd4837097318736276ee3387aa7068211a15d5cc94a39e26f1",
+    "iconHash": "f93eb6950f87199b12b52cb74fb81fa36cd89f4ac5bd7ace24c76619bcf70ae6"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/public/icons/settings/1xlines.svg",
+    "name": "ezo-setting-1xlines",
+    "sourceHash": "601ee282e74a543cdbcc9c9347c26bc9e3606bd177b0f1576b64b74279277110",
+    "iconHash": "2a6668de3ebfdb26e2de2b4fa4ef05e6f13bf5a657c9fbadfbec4be04716e393"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/public/icons/settings/2xdots.svg",
+    "name": "ezo-setting-2xdots",
+    "sourceHash": "eb3eec3c514d4da84fd098ebf5323ad7e29028aacf8aa2b2d6a91678db495e5e",
+    "iconHash": "b7c52cbc8467053824aa4040fa71908c5acd59cc34e444102e43029e97d6e269"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/public/icons/settings/2xgrid.svg",
+    "name": "ezo-setting-2xgrid",
+    "sourceHash": "0fb72461285926de526b0a1e0c4c3e826ce516cba8f052209aa9510aa39af3f7",
+    "iconHash": "a9788d7ffeabefd7d97198a4f23cc00dbce4af1d3dc4c161cc6fe37ac7175f62"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/public/icons/settings/2xlines.svg",
+    "name": "ezo-setting-2xlines",
+    "sourceHash": "e387597981b549191a6ca47424e8cb2837165feb63faa14bb880ab471546b856",
+    "iconHash": "219da3f4a5864207da0562d9bc4807e1b1fb695093497abeac49b19e0e4e42e9"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/public/icons/settings/blank.svg",
+    "name": "ezo-setting-blank",
+    "sourceHash": "90d3f8ce719a87ec0829f1ebc0aa47a39b14a568b273cf35056770aef95cb579",
+    "iconHash": "98e9dc707a6d6dc4663736af659e478ac0e67e78521c626b21772509d0a34e0e"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/public/icons/arrow-cursor.svg",
+    "name": "ezo-arrow-cursor",
+    "sourceHash": "a85a4d47cbb46d8ff8713b886519aede8de8fe6557e03828e1835cd0599ae7cc",
+    "iconHash": "9d7130dfa99b2009d85241000a77c764e3e68ea71e9fdc07f68a5e41d425370c"
+  },
+  {
+    "product": "Ezo",
+    "source": "android/shared/src/main/resources/screen-icons/Screen-archive.svg",
+    "name": "ezo-android-screen-archive",
+    "sourceHash": "db4454f83a7e149ffb04422fe0e0643cdd3fcb9e580dfa39215feed0cd185ca8",
+    "iconHash": "5547ceb00c28f1a88f75465c1a16d73798e595167c3ecea690baffddbb2e9a96"
+  },
+  {
+    "product": "Ezo",
+    "source": "android/shared/src/main/resources/screen-icons/Screen-calendar.svg",
+    "name": "ezo-android-screen-calendar",
+    "sourceHash": "e39b42fdd3fba153238eecfffad07099db8b5e6e3cce36a62d86afc56e68271e",
+    "iconHash": "43b12ea0adf4a749d47bf0f8663dd7be3fb0dfb3237ebebbd1b257c2ec4752b5"
+  },
+  {
+    "product": "Ezo",
+    "source": "android/shared/src/main/resources/screen-icons/Screen-camera.svg",
+    "name": "ezo-android-screen-camera",
+    "sourceHash": "14fc1da2e4669da2aa469c4e3239a42d84ee4edc6773c061872bb6077ec73298",
+    "iconHash": "4b10a6cee388e0eb149735ba0a9425d7bb21da586fd628b1557d8a126f51712d"
+  },
+  {
+    "product": "Ezo",
+    "source": "android/shared/src/main/resources/screen-icons/Screen-check.svg",
+    "name": "ezo-android-screen-check",
+    "sourceHash": "4a00aef8b166d15e1e88a29c3d00aca2290bff1f6905f1c85d9fea8e39ec001c",
+    "iconHash": "f50904e9cf12dd555cf970ea300960dbabb98c4abdcc0e7f50376b54cefa6516"
+  },
+  {
+    "product": "Ezo",
+    "source": "android/shared/src/main/resources/screen-icons/Screen-compose.svg",
+    "name": "ezo-android-screen-compose",
+    "sourceHash": "da6355b6357112ece88418f5b208a692cfc29cdedd29011df5b77862103de167",
+    "iconHash": "e75e731f32014ae1813f52953c7ec598208e2a79400bee560ab95fbf5ef56a79"
+  },
+  {
+    "product": "Ezo",
+    "source": "android/shared/src/main/resources/screen-icons/Screen-globe.svg",
+    "name": "ezo-android-screen-globe",
+    "sourceHash": "12a00e41334f599c3f0b079755adc475f4f29df245442c99fba85b6f62396353",
+    "iconHash": "dbc55837161aa580139447e8ec495bc6548a1ee0a2d0a921fe12f765642926e2"
+  },
+  {
+    "product": "Ezo",
+    "source": "android/shared/src/main/resources/screen-icons/Screen-lists.svg",
+    "name": "ezo-android-screen-lists",
+    "sourceHash": "734eab36bba6711591705b5f88f07958ddfc7dc2ddc9a03a97c20ee4527ae6f8",
+    "iconHash": "8bb44d3bd4e054aada3c2b309f850638dc9dd4766ac72fbb98f7414118239729"
+  },
+  {
+    "product": "Ezo",
+    "source": "android/shared/src/main/resources/screen-icons/Screen-shared.svg",
+    "name": "ezo-android-screen-shared",
+    "sourceHash": "8c8e2583b24abf1a77b30ff51582e8f98a2c51582b4c03a2f05a9c770e25b384",
+    "iconHash": "7ea66e9d7243ea761383b327791e4ea5977d2936f04518ce0d0b73c17e2b58e8"
+  },
+  {
+    "product": "Ezo",
+    "source": "android/shared/src/main/resources/screen-icons/Screen-stats.svg",
+    "name": "ezo-android-screen-stats",
+    "sourceHash": "a92ef76f510054ee435048e41855d16dcf9657d2221765488c93267fb0af7aad",
+    "iconHash": "0e8abe113b596e6bbb3fdae6c953a0257a65389aec8c6c6ae410c7f8c206f6c8"
+  },
+  {
+    "product": "Ezo",
+    "source": "android/shared/src/main/resources/screen-icons/Screen-store.svg",
+    "name": "ezo-android-screen-store",
+    "sourceHash": "edc656c29d8dd7a401e30697d6c1945a6d747105c6025b7d31e724e7ee538f92",
+    "iconHash": "fa06b4a0da44e91d84a1e2b97279c3d6b05a615c712515e7e83432a1491a5b78"
+  },
+  {
+    "product": "Ezo",
+    "source": "android/shared/src/main/resources/screen-icons/Screen-views.svg",
+    "name": "ezo-android-screen-views",
+    "sourceHash": "9578dbe77f87d814d30d8085b56e90c46b769c9d64432f9a11b4146b83630dca",
+    "iconHash": "456c3f03cde2c7da3ac9583e0f70d17e73feaf403ddc6d73fa9db90cdc5545fb"
+  },
+  {
+    "product": "Ezo",
+    "source": "android/shared/src/main/resources/screen-icons/Screen-work.svg",
+    "name": "ezo-android-screen-work",
+    "sourceHash": "ebed109189960458c46da14dcfc684a6838ec53968bad2b95e17806857f7deda",
+    "iconHash": "63cec4b4b0afa1994971287469a17837aea131259560224bfb17fca94b889355"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/app/pages/templates.ts#0",
+    "name": "ezo-store-chevron",
+    "sourceHash": "3d1e6d509b621ebde8108656a6b3ef4762597eb4b80dba1003c8fcc8ff800ad9",
+    "iconHash": "db200c5a2b950fccfa4c9e0f0749888869fa76fb46cef8043c902abd7a0eb5c7"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/components/ezo-createaccount.ts#0",
+    "name": "ezo-account-close",
+    "sourceHash": "6d981f7f568016e26e8f9864b3cf313161f0c9ae5f2baeba94823a7d06f454bb",
+    "iconHash": "7231e69fc412daaf11b8c5dc66419de75e9c920c71925edda71abddcc2f69724"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/design/3-unit/ezo-accordion.ts#0",
+    "name": "ezo-accordion-chevron",
+    "sourceHash": "13af368d57b0a9dc70870327763a02030ae276ed5680cd75ed6a62195c378f56",
+    "iconHash": "fe9c26809c8788ba88b11c7a124bd1a8daf61779296e830175dbf3e3e24eea90"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/react/DatabaseBoard.tsx#0",
+    "name": "ezo-move-column",
+    "sourceHash": "0b0e52737760ea7004a881234fcaaec251ce2e48b474f2151826ca0cc1bf7d03",
+    "iconHash": "6ff86f2281faffc952965012df9f6d3ef550d8bea6ac774f1a90fd16d7f9bc26"
+  },
+  {
+    "product": "Ezo",
+    "source": "client/react/DatabaseBoard.tsx#1",
+    "name": "ezo-move-row",
+    "sourceHash": "dfe975a206fb02703608e7d65845e69bdbff4351e02fa48d0e50c4afb2c76f6b",
+    "iconHash": "a0f94defb578cdf52300358cb59a51904f4bb097c5bfd4f1487f05a8d0e56f6d"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#fan",
+    "name": "badge-fan",
+    "sourceHash": "497a19f2e25933c64b4e78c5a90731a26c919b7c49c916312baead3fed6058c4",
+    "iconHash": "3f92bd9e16238995f2f60361f8ea4fd13db8f0087201e42e2176b006dbf12c3f"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#3d:fan",
+    "name": "badge-fan-3d",
+    "sourceHash": "46b2a28b577128cca1a79ee7cef69672a523c2cffd0ab7754f236e68d425ebb6",
+    "iconHash": "b57f151c06d2472b34f28ee3e095e8838a8ea81eafae65962b79d585cffcf316"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#fan-dark",
+    "name": "badge-fan-dark",
+    "sourceHash": "07ec9c9326e36e56fb66f55c869cb515e21abcf02449bd14cb4d69f9ddce294d",
+    "iconHash": "d9014771144ec9707061f83de407c42b580750dbed73d32d93dec0d05c97a12f"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#3d:fan-dark",
+    "name": "badge-fan-dark-3d",
+    "sourceHash": "2438bc5b02217b43d964badcd57d6fb27c25f98c965276e6044b4d3f672e35a1",
+    "iconHash": "b36c0cdc734a30593703c879ab6394445c26d5c6d13648d127330ece731cd5a8"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#red",
+    "name": "badge-red",
+    "sourceHash": "e66d973aae11e18acfb224459244c1ac9181a9e6fd266e8e09bb95ae391606da",
+    "iconHash": "7e181f7ed7e7d74f93af7280eba04b9c4418b2731d6477747b127244a47cdc22"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#3d:red",
+    "name": "badge-red-3d",
+    "sourceHash": "602f0bb5b20eea7afa6cfacfe4087d7e44e145eaca79fae0d7c741e41009b6a3",
+    "iconHash": "0958c7f538f7a0f0b3751a64b9285574301c7e69f4da7bd74f5e4aac549ec393"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#halves",
+    "name": "badge-halves",
+    "sourceHash": "ce2b8726325ae08d82843f6ff4b0ce0d4ad10e940f172a8c13e11ed75b7f28b8",
+    "iconHash": "8fb962b24704bad5a40ff0c8b57ac3bce65183280573dac15b84d04979c43d45"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#3d:halves",
+    "name": "badge-halves-3d",
+    "sourceHash": "e873f65a972aa3f5bb1c28c5b75377137c4c672d43cc8cd3d7f6d0090c5a0eeb",
+    "iconHash": "930083fdfa57948c6010544d82307da3f053371fbba60d7565cbce221e4511ee"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#bands",
+    "name": "badge-bands",
+    "sourceHash": "637e67c068830824ebaaab1d3fb76da5d243d3e8f32b4ffb988eb1156dd7ef29",
+    "iconHash": "7fb9697c9c0a6a087928389211eff682ef2c572895dd418ba17c0eacddec55ee"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#3d:bands",
+    "name": "badge-bands-3d",
+    "sourceHash": "707adb6d24bd899991f1b7a5cefa24008d691814ea392b3b29ecf5a61967e11a",
+    "iconHash": "ee024a5bcc780ea8a2716b3cfae05478d70023c3004bb91660fe1372a4ac0d2e"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#halves-green",
+    "name": "badge-halves-green",
+    "sourceHash": "b91d79a5e3fdf78398006c634bcceca6bbaabd7b03b78050e6a7ce674c3fdade",
+    "iconHash": "acab5f7e9d1a510cac6fd30528dcb8a011809fe1a45b2dfc69d68258eeeaa8cf"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#3d:halves-green",
+    "name": "badge-halves-green-3d",
+    "sourceHash": "078e42010e2248a4231ebeba3a4bcba61b04842a00953cc32411e29ad695a0e9",
+    "iconHash": "382db7bc53c017caf55d27fd69b980efd6cd29536c9b13631f66a0b534d26a8f"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#tall-bricks",
+    "name": "badge-tall-bricks",
+    "sourceHash": "e9bcd33dd9ec12ac915ccbbd09249191b13d946bf38309cd23cda857f8996306",
+    "iconHash": "3a0ad5cd996ad1af472374e8cedbf41f981be95a4d79acc8f939cab606a6af9b"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#3d:tall-bricks",
+    "name": "badge-tall-bricks-3d",
+    "sourceHash": "451717b2f9715bf28f100b4905fab9e98b5f16602ae89240ec2e75d6499c7fc9",
+    "iconHash": "a40985df11c743f8e34e353a7f262d0f5b7d45154abcb0c7012781a68e41483c"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#bricks",
+    "name": "badge-bricks",
+    "sourceHash": "4ce3af50ce2ca8f7ffdbe7b76c44c00098daf340e31cb3b964872651970c55e5",
+    "iconHash": "09bf202dae0fbd09ed92449027ae0cbd04156965a30388967a6b5187c992454e"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#3d:bricks",
+    "name": "badge-bricks-3d",
+    "sourceHash": "8e02ac9d0a0afdee2c8d7d6ff736935cc0ceadbd89d49fe0b501591b47daeef3",
+    "iconHash": "e015ffef5d60e68f8e73158257f9adca489477464bbe82f691d498c5075685f7"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#weave",
+    "name": "badge-weave",
+    "sourceHash": "825dd8cd258d5cbaccf08b1ea120b68a8ba028cdfcc6a930bf3025c3c65da2e6",
+    "iconHash": "b33e989e96e2f508b847ba298bab3072d14595e5a743002ba7b6e124e78327c0"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#3d:weave",
+    "name": "badge-weave-3d",
+    "sourceHash": "4ba2a272c49c5cdb27df7a219c124194f774618a44879f17a6bf294ab3eb0f76",
+    "iconHash": "180648998b395c3d4cdc96a4eec65f9678b3eebcb4c5188eefc6ec0300712362"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#broken-stripes",
+    "name": "badge-broken-stripes",
+    "sourceHash": "b955147a1f52a57dea4a511d95a06a875cb9abe358fce791c7f08e0dbb369334",
+    "iconHash": "986d6e7dfe38185c28a452a39813e59d8a8ce8f964eb65f727327d8ba33bf243"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#3d:broken-stripes",
+    "name": "badge-broken-stripes-3d",
+    "sourceHash": "d36dc21339208b974e5f5600205cc403a054da5970e377b0b70cce0258f73798",
+    "iconHash": "f325b0b38a9a9bc79c205e21de02914b585d24cdf9952658ebd145cf0c3b8c48"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#checker",
+    "name": "badge-checker",
+    "sourceHash": "1b059f0ae9e7a28a5eb8b7468b153ffea867a0e20feae0497d65c8bdfd4e1c67",
+    "iconHash": "e10f69372e533c44d7570b84c31f249dd6083db11fe67957404f557613fba258"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#3d:checker",
+    "name": "badge-checker-3d",
+    "sourceHash": "da6d06e2fb9f14e761373b76fb5becea8aad7b511cdf28ca0c7b53f9c6d350ab",
+    "iconHash": "c9c7bb2ca600805520d97f37f68e5481f8346d6d865c3a008f74e669de0bb174"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#shard",
+    "name": "badge-shard",
+    "sourceHash": "25fe9ae0be6fc756b6543ee7d26efed979e64a7d0cba71bb5bd0272274889a57",
+    "iconHash": "0a751267458afb65121b97dc5c243fe2384a0ff0150974b29dead7e35b96174f"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#3d:shard",
+    "name": "badge-shard-3d",
+    "sourceHash": "0764d7be64f8feda81456a504e8c657c6ee424e389dd3b3c562e870a1a2c852b",
+    "iconHash": "00c1258704813bf35072230b891fb130ad67a8a736fe94ea94dfd8362e15734d"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#red-blue-bricks",
+    "name": "badge-red-blue-bricks",
+    "sourceHash": "368bed3415f934d4bb423985f17c75f202d5b9054a3fb01bf0b54721961a8fcb",
+    "iconHash": "3fc4e1aea09ff65a90beda09d97603876da8a3707f609000f7e24c30462cd520"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#3d:red-blue-bricks",
+    "name": "badge-red-blue-bricks-3d",
+    "sourceHash": "4830b68f9eccc0624de70d87a08a7ca4f4e58922314acd82f1a1ac3848e11d6f",
+    "iconHash": "fba789fbd1b0e1447ff72309d0e378d2e14950e72633b176d28f6c339f5def7b"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#blue-fan",
+    "name": "badge-blue-fan",
+    "sourceHash": "0d216b6960be506c80a39c45086dcaae7b1d3a88dc801c1d5553d7fa04419410",
+    "iconHash": "f1f85b892baf9df98bcf56ada1c16124b786287a2f1395b8b5de1cf90e5c4e60"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#3d:blue-fan",
+    "name": "badge-blue-fan-3d",
+    "sourceHash": "43385cfbb0cff6d120dbfb7c6ebb78ccbe6a59164ea30977d53c99790a538fa6",
+    "iconHash": "dd4039d4c4a969e40ed4f5636019eca8f0d9cd8698437c7e9f7c642a80cd1322"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#split-circle",
+    "name": "badge-split-circle",
+    "sourceHash": "805371b49954a5923f2897859538a0336565120763400ef35f7271a40f8abbed",
+    "iconHash": "bea02d89d8a9034dff48f97feea970d56ee517e95348c8e43e59559f54df9470"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#3d:split-circle",
+    "name": "badge-split-circle-3d",
+    "sourceHash": "b3ca52b306667bd75d0226a5889c7d199267ec1b5c164517347584b345442e95",
+    "iconHash": "21f015d68d24c1134e0ea3fa680502d94be6502780e01bcb1144a05842702227"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#round-fan",
+    "name": "badge-round-fan",
+    "sourceHash": "451c2fbb2c9a1e08400b31b55a86246b9567581c7f18f3796c78836c9a0a9293",
+    "iconHash": "547d688437fdd9af82473ca6bb61f8c800b2ba157bc8a33cd21b1f23eaa2c8e4"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#3d:round-fan",
+    "name": "badge-round-fan-3d",
+    "sourceHash": "5da8f0c7c7a302aab2bc447f44c494df4e30d0fcd25660c1e09e05c768b5a4e2",
+    "iconHash": "6716770349aaf1dbe60c70ff6d0d2d1160464cc15b54022e5dbffcf5f806e6d3"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#diamond",
+    "name": "badge-diamond",
+    "sourceHash": "3b2c148bc3f98c0ff75ab45f02336659338dc84f0c07af7053b4a2fd3774bd13",
+    "iconHash": "6a32484f670c88c8a1d70a71dc307470bde0dabee0540da812a0fc33922fdfeb"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/gridIconFigma.ts#3d:diamond",
+    "name": "badge-diamond-3d",
+    "sourceHash": "eb6f20ef05b58da5ace55d8ba0bb46f07c75b03c5cbed708b63532400a75f467",
+    "iconHash": "35190a277a71b2ff61149af027e7b42bb42d5ed3686ed47e6622d3bcbb3df64e"
+  },
+  {
+    "product": "Ezo",
+    "source": "shared/isoCube.ts#logo",
+    "name": "ezo-logo",
+    "sourceHash": "afa681925387cee49ab2b21b4945d74b3e7facad6ccbe8b929c1a7310b1fcab8",
+    "iconHash": "5793bd6b26e3902e140b2c35b4b40dfa974acc528e9c17615f8ac02e0f2c6010"
+  }
+]

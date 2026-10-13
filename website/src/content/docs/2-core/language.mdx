@@ -1,0 +1,27 @@
+---
+title: Language
+description: A language picker built on the shared language module.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+A language picker built on the shared language module.
+
+## Try it
+
+<ComponentExample example="language" />
+
+## Configure first
+
+The picker follows the languages supplied to `configureI18n`. It remembers the chosen language and updates translated components in the document.
+
+```js
+import { configureI18n } from './DS1/0-face/i18n';
+configureI18n({ languages: ['en', 'da', 'ja'], sharedWords: true });
+```
+
+The example supplies translations for Save in English, Danish and Japanese. Click the picker to watch the word change.
+
+Use `compact` for the shorter picker and `disabled` to prevent changes.
+
+[Full languages guide](/built-ins/languages/) · [Text](/2-core/text/)

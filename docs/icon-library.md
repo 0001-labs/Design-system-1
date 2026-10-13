@@ -18,3 +18,11 @@ The catalog includes all reference icons plus additional names in `DS1/x-icon/`.
 `scripts/build-interface-catalog.ts` produces the generated `interface-catalog.json`, public `/icons/catalog.json`, and public copies of added SVGs. Do not edit those generated files directly. The Original/Outlines/Both inspector changes the display only; copying or downloading the main SVG returns the untouched source. The separate outline download exports a stroked construction view.
 
 Prompted additions are performed through the development conversation, not an in-page AI service. The page's Copy request control packages the description and these repository conventions for that workflow.
+
+## Product icon coverage
+
+Run `vp run icons:sync-products` to import the Ezo runtime map, UI SVG assets, settings glyphs, native screen SVGs, static inline controls, flat badges and their 3D forms, and Aa’s editing SVGs. It records each source and the installed drawing in `DS1/x-icon/product-sources.json`. Run `vp run icons:check-products` to check for drift against both product checkouts. Existing library drawings stay intact; a different product drawing gets an Ezo or Aa name. Duplicate is the reference Command-D drawing in all three products. Globe uses one unioned vector path so adjoining pieces cannot leave seams.
+
+For these shared refinements, change the SVGs here and run `vp run icons:sync-consumers`. It updates only Globe and Duplicate in Ezo, Duplicate in Aa, regenerates Ezo’s icon chunks, and refreshes the built Aa snapshot. Then run `vp run icons:sync-products` to refresh the inventory and its checks.
+
+The collection’s optical stroke weight is not a universal 1px. Preserve the source measurements, including 0.92-unit strokes, and the geometry of filled outlines. A construction outline in the inspector is a display aid, not the icon’s stroke width. Do not round artwork to 1px during import or regeneration.

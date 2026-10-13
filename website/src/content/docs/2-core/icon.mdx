@@ -1,0 +1,39 @@
+---
+title: Icon
+description: The system’s SVG drawings, rendered from the local library.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+The system’s SVG drawings, rendered from the local library.
+
+## Try it
+
+<ComponentExample example="icon" />
+
+<ComponentExample example="icon-variants" />
+
+## Find or build an icon
+
+[Browse the icon library](/icons/) to inspect and copy the actual SVGs. [Open the icon builder](/icons/#builder) to draw a badge or favicon, start from a preset, and export SVG, PNG or ICO. The builder is the **Badges & favicons** tab of the Icons page.
+
+For interface icons, use the library’s vector drawings and the **Copy request** workflow to request an addition.
+
+## Attributes
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `type` | string | Empty | File name from `DS1/x-icon/`, without `.svg`. |
+| `variant` | `glyph`, `primary`, `secondary` | `glyph` | Plain drawing or a background treatment. |
+
+Use `type="check"`, not `name="check"`. There is no `size` attribute. The drawing follows the system’s `--sf` scale. Use `--icon-color` when a control needs a different ink.
+
+## Accessible labels
+
+A decorative icon beside text can have `aria-hidden="true"`. Give an icon-only button an accessible name on its actual button. A tooltip supplements that name; it is not a replacement for it.
+
+## Source and additions
+
+The source files live in `DS1/x-icon/`. Add missing drawings to that library first, then generate the runtime map and public collection. Products carry the icons they use as local files.
+
+[Button](/2-core/button/) · [Tooltip](/2-core/tooltip/) · [All components](/components/)

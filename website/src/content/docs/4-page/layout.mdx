@@ -1,0 +1,28 @@
+---
+title: Layout
+description: Place content in named CSS grid areas for a page mode.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+Place content in named CSS grid areas for a page mode.
+
+## Try it
+
+<ComponentExample example="layout" />
+
+## Use a named area
+
+Assign `style="grid-area: header"` to the content that belongs in the header. Each mode defines its own area names and tracks. The example uses company mode with header, content and footer.
+
+## Attributes
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `mode` | string | `portfolio` | `portfolio`, `company`, `app`, `list`, `home` or `settings`. |
+| `align` | string | Unset | `left`, `center` or `right`. |
+| `view` | boolean | false | Draws labelled layout areas for inspection. |
+
+Specify `mode` explicitly. Choose a mode whose named areas match the page rather than using the overlay grid as a content layout.
+
+[Grid](/4-page/grid/) · [Container](/4-page/container/)

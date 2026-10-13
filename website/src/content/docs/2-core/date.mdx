@@ -1,0 +1,24 @@
+---
+title: Date
+description: Displays the current year from the browser’s clock.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+Displays the current year from the browser’s clock.
+
+## Try it
+
+<ComponentExample example="date" />
+
+## Usage
+
+Use `ds-date` in a copyright line or anywhere that needs the current year without a manual update.
+
+## API
+
+This component has no public attributes. It renders the year when it is rendered. `value`, `format`, `locale`, `show-time` and `live` are not supported.
+
+For a full date, use `Intl.DateTimeFormat` in your application and put the formatted result in ordinary text.
+
+[Text](/2-core/text/)

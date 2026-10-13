@@ -1,0 +1,28 @@
+---
+title: Card
+description: An optional content container with an outline or elevation treatment.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+An optional content container with an outline or elevation treatment.
+
+## Try it
+
+<ComponentExample example="card" />
+
+## Usage
+
+Put ordinary HTML and components in the default slot. Keep ordinary writing directly on the page; use a card only when the content needs a distinct container.
+
+## Attributes
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `variant` | string | `default` | `default`, `outlined` or `elevated`. |
+| `padding` | string | `medium` | `none`, `small`, `medium` or `large`. |
+| `elevation` | number | 1 | Elevation level for the elevated treatment. |
+| `interactive` | boolean | false | Enables the hover treatment. |
+| `disabled` | boolean | false | Disables interaction styling. |
+
+[Container](/4-page/container/) · [Row](/3-unit/row/)

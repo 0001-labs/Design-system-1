@@ -1,0 +1,37 @@
+---
+title: Tooltip
+description: A short label that appears when its trigger is hovered or focused.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+A short label that appears when its trigger is hovered or focused.
+
+## Try it
+
+<ComponentExample example="tooltip" />
+
+<ComponentExample example="tooltip-fallback" />
+
+## When to use it
+
+Use a tooltip to clarify a compact control. Keep essential instructions visible on the page: someone on a touch screen may never hover. Put a focusable button or link inside the wrapper so keyboard users can reveal the label too.
+
+## Attributes
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `text` | string | Empty | A translation key or literal label. |
+| `default-value` | string | Empty | Fallback when the key has no translation. |
+
+## Behaviour
+
+The label appears above the trigger on hover or focus and disappears on mouse leave or focus leaving the trigger. `position` is not a supported attribute: the component always places its label above the trigger.
+
+## Many tooltips on one page
+
+For a collection of controls, the shared tooltip module also supports `data-tooltip="Save changes"`. Import `DS1/0-face/tooltips.ts` once; it draws a shared label for those elements.
+
+## Related components
+
+[Button](/2-core/button/) provides a focusable trigger. [Icon](/2-core/icon/) supplies a compact drawing. [Languages](/built-ins/languages/) explains translation keys.

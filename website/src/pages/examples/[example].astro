@@ -1,0 +1,28 @@
+---
+import { EXAMPLES } from '../../lib/component-examples';
+import '../../../../DS1/1-root/one.css';
+export function getStaticPaths() {
+  return Object.keys(EXAMPLES).map(example => ({ params: { example } }));
+}
+const example = Astro.params.example!;
+const sample = EXAMPLES[example];
+---
+<!doctype html>
+<html lang="en" class="light-theme">
+  <head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="robots" content="noindex" /><title>{sample.title} — example</title></head>
+  <body data-example-id={example}>
+    <main id="sample" set:html={sample.html}></main>
+    <output id="event-output" aria-live="polite"></output>
+    <script>import '../../lib/example-runtime';</script>
+  </body>
+</html>
+<style is:global>
+  :root { color-scheme: light; --sf: 1; }
+  html, body { margin: 0; background: var(--background); color: var(--text-color); font-family: var(--typeface-regular); font-size: 14px; line-height: 20px; }
+  body { padding: 40px 20px 20px; }
+  #sample { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; }
+  #sample > :is(ds-input, ds-card, ds-accordion, ds-table, ds-form, ds-list, ds-container, ds-layout) { flex-basis: 100%; }
+  body[data-example-id='gap'] #sample { display: block; }
+  #event-output { display: block; margin-top: 20px; color: var(--text-color); font-size: 10px; overflow-wrap: anywhere; }
+  button { font: inherit; line-height: 20px; border: 0; border-radius: 4px; color: var(--black); background: var(--accent-color); padding: 0 4px; cursor: pointer; }
+</style>

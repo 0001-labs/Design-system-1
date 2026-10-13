@@ -1,63 +1,24 @@
 ---
-title: Link Component
-description: Navigation link component with automatic scroll position preservation
+title: Links
+description: Accessible links using native HTML or the button component.
 ---
 
-The `ds-link` component provides navigation links with built-in support for internal routing and scroll position preservation.
+Use a native HTML link for navigation in text. There is no `ds-link` custom element in the current source.
 
-## Basic Usage
+## A text link
 
-```html
-<ds-link href="/about">About</ds-link>
-```
-
-## External Links
+<a href="/icons/#builder">Open the icon builder</a>
 
 ```html
-<ds-link href="https://example.com">External Link</ds-link>
+<a href="/icons/#builder">Open the icon builder</a>
 ```
 
-## Internal Links
+For a link that opens another tab, use `target="_blank" rel="noopener noreferrer"`.
 
-Internal links automatically preserve scroll position when navigating:
+## A button that navigates
 
 ```html
-<ds-link href="/products" internal>View Products</ds-link>
+<ds-button secondary href="/icons/#builder">Icon builder</ds-button>
 ```
 
-## Attributes
-
-| Attribute  | Type      | Default | Description                                                    |
-| ---------- | --------- | ------- | -------------------------------------------------------------- |
-| `href`     | `string`  | -       | URL to navigate to                                             |
-| `internal` | `boolean` | `false` | Whether this is an internal link (enables scroll preservation) |
-| `target`   | `string`  | -       | Link target (`_blank`, `_self`, etc.)                          |
-
-## Scroll Position Preservation
-
-Design system 1 automatically preserves scroll position when navigating between pages using internal links. This provides a better user experience when users navigate back.
-
-```html
-<!-- Scroll position is preserved -->
-<ds-link href="/page1" internal>Page 1</ds-link>
-<ds-link href="/page2" internal>Page 2</ds-link>
-```
-
-## Examples
-
-### Open in New Tab
-
-```html
-<ds-link href="https://github.com/0001-labs/ds-one" target="_blank">
-  View on GitHub
-</ds-link>
-```
-
-### With Icon
-
-```html
-<ds-link href="/documentation">
-  <ds-icon name="open"></ds-icon>
-  Documentation
-</ds-link>
-```
+See [Button](/2-core/button/) for a working preview and [Icon](/2-core/icon/) for the library.

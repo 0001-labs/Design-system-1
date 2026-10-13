@@ -1,0 +1,32 @@
+---
+title: Banner
+description: A message across the top of its positioning context, optionally with an action.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+A message across the top of its positioning context, optionally with an action.
+
+## Try it
+
+<ComponentExample example="banner" />
+
+## Usage
+
+Put a banner in a positioned container, or at the page root. It uses absolute positioning at the top and does not reserve room in normal flow; leave space for it when content sits underneath.
+
+## Attributes
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `text` | string | Empty | Message or translation key. |
+| `variant` | string | `warning` | `warning`, `info`, `success` or `error`. |
+| `action` | string | Empty | Optional action label. |
+| `href` | string | Empty | Action destination. |
+| `version` | string | Empty | Clicking the message toggles this version string. |
+| `mailto` | string | Empty | Address for a support action. |
+| `subject`, `describe`, `app-version` | string | Empty | Translation keys for the support email. |
+
+A direct `href` takes precedence over the generated email link.
+
+[Text](/2-core/text/) · [Container](/4-page/container/)

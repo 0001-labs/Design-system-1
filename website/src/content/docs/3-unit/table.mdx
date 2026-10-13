@@ -1,0 +1,27 @@
+---
+title: Table
+description: Displays product, user, retention and status rows from a JavaScript array.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+Displays product, user, retention and status rows from a JavaScript array.
+
+## Try it
+
+<ComponentExample example="table" />
+
+## Assign data
+
+Set the `data` property to an array after the component has been registered. In Lit, use `.data=${rows}` property binding. Do not put arbitrary table cells in the slot: this component renders its own rows.
+
+## Properties
+
+| Property | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `data` | Array | `[]` | Rows with `product`, `users`, `retention` and optional `status`. |
+| `showStatus` | boolean | true | Shows the status column. Set the property to false to hide it. |
+
+A missing status displays Pending. Headers currently remain Product, Users, Retention and Status; the declared `columns` property does not change the rendered headers. For a general-purpose table, use semantic HTML `<table>`.
+
+[Row](/3-unit/row/) · [CLASSless](/classless/)

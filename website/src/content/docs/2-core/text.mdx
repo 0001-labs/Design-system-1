@@ -1,0 +1,30 @@
+---
+title: Text
+description: A line of text with a translation key and an English fallback.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+A line of text with a translation key and an English fallback.
+
+## Try it
+
+<ComponentExample example="text" />
+
+## Translation keys
+
+Slot content is both the key and the fallback: `<ds-text>Save</ds-text>`. The `text` attribute is another way to provide the key. Configure languages and load words before displaying translated content.
+
+## API
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `text` | string | Empty | Translation key. Without it, slot text supplies the key. |
+
+There is no `variant="heading"` or `variant="small"` attribute. Use semantic HTML headings and the typography tokens for hierarchy.
+
+## Keep markup outside the text
+
+The component reads and replaces its slot text. Put an icon next to `ds-text` in a row rather than nesting markup inside it.
+
+[Languages](/built-ins/languages/) · [Row](/3-unit/row/) · [Fonts](/1-root/fonts/)

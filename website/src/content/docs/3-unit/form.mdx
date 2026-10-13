@@ -1,0 +1,41 @@
+---
+title: Form
+description: Collect fields, validate them, and emit a submission event.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+Collect fields, validate them, and emit a submission event.
+
+## Try it
+
+<ComponentExample example="form" />
+
+## Try it locally
+
+The example has no `action` endpoint. Submit an empty field to see validation, then enter a name to see the form data. It sends no server request.
+
+Use a native `<button type="submit">` in the form slot. `ds-button` does not forward a submit type.
+
+## Attributes
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `action` | string | Empty | Optional server endpoint. |
+| `method` | string | `post` | HTTP method for a server submission. |
+| `name` | string | Empty | Form name. |
+| `novalidate` | boolean | false | Skips validation. |
+| `autocomplete` | string | `on` | Autocomplete preference. |
+
+## Events and methods
+
+```js
+const form = document.querySelector('ds-form');
+form.addEventListener('form-submit', (event) => {
+  console.log(event.detail.data);
+});
+```
+
+`form-invalid` reports validation errors. `form-reset`, `form-response` and `form-error` report reset and server outcomes. Methods are `getFormData()`, `validate()`, `reset()` and `submit()`.
+
+[Input](/2-core/input/) · [Button](/2-core/button/)

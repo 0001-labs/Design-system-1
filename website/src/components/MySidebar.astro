@@ -80,7 +80,7 @@ const entryTranslationKeys: Record<string, string> = {
                     </ds-button>
                   ) : (
                     <ds-button
-                      variant={entry.isCurrent ? 'primary' : 'secondary'}
+                      primary={entry.isCurrent} secondary={!entry.isCurrent}
                       text={entryKey}
                       default-text={entry.label}
                       aria-current={entry.isCurrent ? 'page' : undefined}

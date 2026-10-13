@@ -1,0 +1,48 @@
+---
+title: Input
+description: A labelled field with validation messages and value-change events.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+A labelled field with validation messages and value-change events.
+
+## Try it
+
+<ComponentExample example="input" />
+
+<ComponentExample example="input-states" />
+
+## When to use it
+
+Give a field a visible label. A placeholder is a hint, not a label. Put the reason for an error in `error`, next to the field that needs attention.
+
+## Attributes
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `type` | string | `text` | Native input type, including email, password and number. |
+| `name` | string | Empty | Key in form data. |
+| `value` | string | Empty | Current value. |
+| `label` | string | Empty | Visible field label. |
+| `label-text` | string | Empty | Translation key for the label. |
+| `placeholder` | string | Empty | Hint inside an empty field. |
+| `placeholder-key` | string | Empty | Translation key for the hint. |
+| `error` / `error-text` | string | Empty | Literal error or its translation key. |
+| `disabled`, `readonly`, `required` | boolean | false | Native field states. |
+| `variant` | string | `default` | `default`, `filled` or `outlined`. |
+
+Native constraints include `min`, `max`, `step`, `pattern`, `minlength` and `maxlength`.
+
+## Events and methods
+
+```js
+const field = document.querySelector('ds-input');
+field.addEventListener('input-change', (event) => {
+  console.log(event.detail.name, event.detail.value);
+});
+```
+
+`input-focus` and `input-blur` report focus changes. Call `focus()`, `blur()` or `select()` on the component.
+
+[Form](/3-unit/form/) · [Languages](/built-ins/languages/)

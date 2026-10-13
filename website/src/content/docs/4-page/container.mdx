@@ -1,0 +1,22 @@
+---
+title: Container
+description: A responsive vertical container that keeps its content within the available width.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+A responsive vertical container that keeps its content within the available width.
+
+## Try it
+
+<ComponentExample example="container" />
+
+## Behaviour
+
+The container stacks its default-slot content. At viewport widths above 820px it is centred with a maximum width of 1000px; on smaller viewports it follows the available width. Its children are constrained to the container’s width.
+
+## API
+
+The component has a default slot and no public attributes. There is no `size` or `fluid` attribute.
+
+[Layout](/4-page/layout/) · [List](/3-unit/list/)

@@ -1,0 +1,26 @@
+---
+title: Grid
+description: A fixed alignment overlay with a 20px pitch.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+A fixed alignment overlay with a 20px pitch.
+
+## Try it
+
+<ComponentExample example="grid" />
+
+## What you are seeing
+
+The overlay uses 19px tracks and 1px lines. It is fixed over the document and has `pointer-events: none`, so it does not intercept clicks or arrange children.
+
+## Attribute
+
+`align` accepts `left`, `center` or `right`. On a phone the overlay follows fourteen scaled columns. Keep the mobile track math intact.
+
+## Page shortcuts
+
+On the documentation, press **G three times** to toggle the shared page grid. Press **L three times** for labelled layout areas; give those areas `data-ds-area="name"`. Escape hides the overlays. Typing in a field does not trigger them.
+
+[Layout](/4-page/layout/) · [Styling](/1-root/styling/)

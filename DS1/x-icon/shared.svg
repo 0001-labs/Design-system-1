@@ -1,0 +1,5 @@
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="5" cy="8" r="3.5" stroke="currentColor" stroke-width="0.92"/>
+<clipPath id="shared-behind"><path d="M0 0H16V16H0ZM10 8A5 5 0 1 0 0 8A5 5 0 1 0 10 8Z" clip-rule="evenodd"/></clipPath>
+<circle cx="11" cy="8" r="3.5" stroke="currentColor" stroke-width="0.92" clip-path="url(#shared-behind)"/>
+</svg>

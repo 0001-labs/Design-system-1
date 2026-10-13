@@ -85,7 +85,10 @@
     "site:deploy": "vp run site:build && vp exec wrangler deploy",
     "deploy": "vp run site:deploy",
     "check:versions": "node scripts/versions.mjs",
-    "sync-sign-in": "node \"../ID 1/scripts/sync-into.mjs\" --convex convex/signIn --client app/src/signIn"
+    "sync-sign-in": "node \"../ID 1/scripts/sync-into.mjs\" --convex convex/signIn --client app/src/signIn",
+    "icons:sync-products": "vp exec tsx scripts/sync-product-icons.ts",
+    "icons:check-products": "vp exec tsx scripts/sync-product-icons.ts --check",
+    "icons:sync-consumers": "vp exec tsx scripts/sync-shared-icons.ts"
   },
   "dependencies": {
     "@auth/core": "0.41.3",

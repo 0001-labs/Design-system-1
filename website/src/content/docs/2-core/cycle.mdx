@@ -1,0 +1,31 @@
+---
+title: Cycle
+description: A button that advances through a built-in setting.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+A button that advances through a built-in setting.
+
+## Try it
+
+<ComponentExample example="cycle" />
+
+## Available settings
+
+| `type` | Values |
+| --- | --- |
+| `theme` | Light and dark. |
+| `language` | The configured languages. Prefer `ds-language` for a language picker. |
+| `accent-color` | The system’s eight accent colours. |
+| `page-style` | Note and page. |
+| `notes-style-medium` | Default, big and gallery. |
+| `icon-only` | Note and page icons. |
+
+## Behaviour
+
+These settings use the shared preferences module. Clicking a theme or accent cycle changes that setting for the document and remembers it in the browser. The preview above contains its own document, so trying a theme does not repaint the surrounding example list.
+
+Set `disabled` to prevent cycling. Each setting emits the corresponding window event, such as `theme-changed`, `language-changed` or `accent-color-changed`.
+
+[Language](/2-core/language/) · [Theming](/built-ins/theming/) · [Preferences](/built-ins/preferences/)

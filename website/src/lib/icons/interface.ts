@@ -67,11 +67,13 @@ $('vector-copy-request').addEventListener('click',()=>{
   if(!brief){message('Describe your new icon first.');$<HTMLInputElement>('vector-brief').focus();return;}
   copy(`Add an icon to the Design System 1 collection at https://designsystem1.com/icons: ${brief}. Use a self-contained SVG with width="16", height="16", and viewBox="0 0 16 16". Match the optical weight, curves, and spacing of the existing DS1/x-icon icons. Keep genuine vector paths; do not rasterize or convert curves to pixel cells. Add a descriptive kebab-case SVG to DS1/x-icon/. The icon catalog discovers these files automatically. Follow docs/icon-library.md, run the icon checks and site build, and publish the updated collection. Preserve existing icons and unrelated changes.`, 'Request copied. Paste it into your conversation.');
 });
-function pickHash(){const icon=icons.find(icon=>icon.key===location.hash.slice(1));if(icon){selected=icon;render();}}
-window.addEventListener('hashchange',pickHash);pickHash();render();
+function pickHash(){if(location.hash==='#builder'){selectTab('badge-tab');return;}const icon=icons.find(icon=>icon.key===location.hash.slice(1));if(icon){selected=icon;render();}}
+window.addEventListener('hashchange',pickHash);render();
 const tabs=[{tab:'interface-tab',panel:'interface-panel'},{tab:'badge-tab',panel:'badge-panel'}];
 function selectTab(id:string){for(const entry of tabs){$(entry.panel).hidden=entry.tab!==id;$(entry.tab).setAttribute('aria-selected',String(entry.tab===id));$(entry.tab).tabIndex=entry.tab===id?0:-1;}}
-for(const entry of tabs){$(entry.tab).addEventListener('click',()=>selectTab(entry.tab));$(entry.tab).addEventListener('keydown',event=>{if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();const other=tabs.find(t=>t.tab!==entry.tab)!;selectTab(other.tab);$(other.tab).focus();}});}
+for(const entry of tabs){$(entry.tab).addEventListener('click',()=>{selectTab(entry.tab);history.replaceState(null,'',`${location.pathname}#${entry.tab==='badge-tab'?'builder':selected.key}`);});$(entry.tab).addEventListener('keydown',event=>{if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();const other=tabs.find(t=>t.tab!==entry.tab)!;selectTab(other.tab);$(other.tab).focus();}});}
+
+pickHash();
 
 new ResizeObserver(entries=>{for(const entry of entries)$('vector-stage').style.setProperty('--vector-scale',String(entry.contentRect.width/16));}).observe($('vector-stage'));
 

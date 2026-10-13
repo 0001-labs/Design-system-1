@@ -1,0 +1,48 @@
+---
+title: Button
+description: An action or navigation control, with primary, secondary and text treatments.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+An action or navigation control, with primary, secondary and text treatments.
+
+## Try it
+
+<ComponentExample example="button" />
+
+<ComponentExample example="button-icon" />
+
+## Choose a treatment
+
+Use `primary` for the main action, `secondary` for a supporting action, and no attribute for a text button. These are boolean attributes: `primary="false"` still enables primary. Remove the attribute to disable it.
+
+## Attributes
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `primary` | boolean | false | Accent background. |
+| `secondary` | boolean | false | Quiet background. |
+| `disabled` | boolean | false | Disables the inner button and its action. |
+| `text` | string | Empty | Translation key; otherwise use slot content. |
+| `href` | string | Empty | Navigate on click. |
+| `blank` | boolean | false | Open `href` in a new tab. |
+
+`variant="primary"` is not supported. Use `<ds-button primary>`.
+
+## Listen for an action
+
+```js
+const button = document.querySelector('ds-button');
+button.addEventListener('click', () => {
+  console.log('Save requested');
+});
+```
+
+The native click crosses the shadow boundary once. A disabled button does not trigger it.
+
+## Navigation and forms
+
+Use `href="/icons/"` to navigate. For a form submit control, use a native `<button type="submit">` inside `ds-form`: `ds-button` does not expose a `type` attribute.
+
+[Form](/3-unit/form/) · [Icon](/2-core/icon/) · [Tooltip](/2-core/tooltip/)

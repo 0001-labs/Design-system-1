@@ -52,6 +52,9 @@ export default defineConfig({
           items: [
             { label: "Introduction", slug: "" },
             { label: "Manual Setup", slug: "start-here/quick-start" },
+            { label: "Component examples", link: "/components/" },
+            { label: "Icon builder", link: "/icons/#builder" },
+            { label: "Icon library", link: "/icons/" },
           ],
         },
         {
