@@ -19,13 +19,20 @@ export class Dialog extends LitElement {
     closeOnBackdrop: { type: Boolean, attribute: "close-on-backdrop" },
   };
   static styles = css`:host { display: contents; }`;
-  open = false;
-  closeOnEscape = true;
-  closeOnBackdrop = true;
+  declare open: boolean;
+  declare closeOnEscape: boolean;
+  declare closeOnBackdrop: boolean;
   private dialog: HTMLDialogElement | null = null;
   private opener: HTMLElement | null = null;
   private pointerStartedOutside = false;
   private observer = new MutationObserver(() => this.bindDialog());
+
+  constructor() {
+    super();
+    this.open = false;
+    this.closeOnEscape = true;
+    this.closeOnBackdrop = true;
+  }
 
   connectedCallback() {
     super.connectedCallback();
