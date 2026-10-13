@@ -8,7 +8,11 @@ const styledRoots = new WeakSet<ShadowRoot>();
 /** A native colour input owns the platform picker, labels, forms and reset. */
 export class ColorInput extends LitElement {
   static styles = css`
-    :host { display: inline-flex; flex: 0 0 auto; width: calc(2 * var(--ds-unit)); height: var(--ds-unit); }
+    :host {
+      --ds-color-unit: calc(var(--ds-1) * var(--ds-sf));
+      display: inline-flex; flex: 0 0 auto;
+      width: calc(2 * var(--ds-color-unit)); height: var(--ds-color-unit);
+    }
     :host([hidden]) { display: none !important; }
   `;
   connectedCallback() {
