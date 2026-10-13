@@ -23,7 +23,7 @@ export function initGridShortcut(): void {
       position: fixed !important;
       inset: 0 !important;
       pointer-events: none !important;
-      z-index: 2147483647 !important;
+      z-index: var(--ds-grid-z-index, 2147483647) !important;
     }
     :host([hidden]) { display: none !important; }
     .grid {
@@ -36,8 +36,8 @@ export function initGridShortcut(): void {
         linear-gradient(to bottom, var(--line) 1px, transparent 1px);
       background-size: var(--cell) var(--cell);
       background-position:
-        calc(var(--ds-grid-origin-x, 0px) - var(--ds-grid-scroll-x, 0px))
-        calc(var(--ds-grid-origin-y, 0px) - var(--ds-grid-scroll-y, 0px));
+        calc(var(--ds-grid-origin-x, 0px) - var(--ds-grid-scroll-x, 0px) - var(--ds-grid-line-offset, 0px))
+        calc(var(--ds-grid-origin-y, 0px) - var(--ds-grid-scroll-y, 0px) - var(--ds-grid-line-offset, 0px));
     }
     @media print { :host { display: none !important; } }
   </style><div class="grid"></div>`;
@@ -60,7 +60,7 @@ export function initGridShortcut(): void {
     window.dispatchEvent(new CustomEvent("design-system-grid-changed", { detail: { visible } }));
   };
 
-  window.addEventListener("design-system-toggle-grid", () => setVisible(overlay.hidden));
+  window.addEventListener("design-system-toggle-grid", () => setVisible(overlay.hidden !== false));
   window.addEventListener("design-system-toggle-layout", () => layout.toggle());
 
   const preview = new URLSearchParams(window.location.search);
@@ -129,7 +129,7 @@ export function initGridShortcut(): void {
     lastPress = now;
     if (presses === 3) {
       reset();
-      if (key === 'g') setVisible(overlay.hidden);
+      if (key === 'g') setVisible(overlay.hidden !== false);
       else layout.toggle();
     }
   });
