@@ -9,6 +9,7 @@ import { navigate, RouterProvider, useLocation, useRoute } from "./router";
 import { LibraryEditor } from "./screens/LibraryEditor";
 import { LibraryList } from "./screens/LibraryList";
 import { SignIn } from "./screens/SignIn";
+import { ComponentAdoption } from "./screens/ComponentAdoption";
 
 /**
  * Route table.
@@ -44,6 +45,7 @@ function Routes() {
   }
 
   if (path === "/libraries") return <LibraryList />;
+  if (path === "/reports/components") return <ComponentAdoption />;
   if (editor) return <LibraryEditor libraryId={editor.id} />;
 
   return <NotFound />;

@@ -40,6 +40,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <nav aria-label="App navigation" className="app-links">
           <Link to="/playground" aria-current={path === "/" || path === "/playground" || path.startsWith("/l/") ? "page" : undefined}>Editor</Link>
           <Link to="/libraries" aria-current={path === "/libraries" ? "page" : undefined}>My libraries</Link>
+          <Link to="/reports/components" aria-current={path === "/reports/components" ? "page" : undefined}>Reports</Link>
           <a href="/classless/" target={embedded ? "_top" : undefined}>Docs</a>
         </nav>
         <div className="app-inspect" aria-label="Layout tools">

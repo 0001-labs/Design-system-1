@@ -115,3 +115,6 @@ temp/
 CLAUDE.md
 
 .deployment-backups/
+
+# Private codebase reports are uploaded to authenticated R2 storage, never site assets.
+.reports/

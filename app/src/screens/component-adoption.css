@@ -1,0 +1,71 @@
+.adoption {
+  --report-unit: calc(20px * var(--sf, 1));
+  --report-paper: var(--background);
+  --report-ink: var(--text-color);
+  --report-line: color-mix(in srgb, var(--report-ink) 20%, transparent);
+  padding: var(--report-unit);
+  min-height: calc(100dvh - 3 * var(--report-unit));
+  color: var(--report-ink);
+  background: var(--report-paper);
+  font-size: calc(14px * var(--sf, 1));
+  line-height: var(--report-unit);
+}
+.adoption h1, .adoption h2, .adoption p { margin: 0; font-size: inherit; line-height: var(--report-unit); font-weight: 400; }
+.adoption h1 { font-size: var(--report-unit); }
+.adoption-heading, .adoption-detail-heading { display: flex; align-items: center; justify-content: space-between; gap: var(--report-unit); }
+.adoption-heading { margin-bottom: var(--report-unit); }
+.adoption-eyebrow, .adoption-meta { color: var(--base-darker-grey); }
+.adoption-intro { max-width: calc(50 * var(--report-unit)); }
+.adoption-controls, .adoption-views, .adoption-legend { display: flex; align-items: center; flex-wrap: wrap; gap: var(--report-unit); }
+.adoption-controls { margin-block: var(--report-unit); }
+.adoption-views { gap: calc(.5 * var(--report-unit)); }
+.adoption-controls label { display: inline-flex; align-items: center; gap: calc(.5 * var(--report-unit)); }
+.adoption-controls input { margin: 0; accent-color: var(--apple-green); }
+.adoption-scroll { overflow: auto; padding-right: calc(5 * var(--report-unit)); padding-bottom: var(--report-unit); }
+.adoption table { border-collapse: separate; border-spacing: 0; font-size: inherit; line-height: var(--report-unit); }
+.adoption tr { background: transparent; }
+.adoption-matrix { table-layout: fixed; width: max-content; }
+.adoption-matrix th, .adoption-matrix td { padding: 0; font-weight: 400; text-align: center; }
+.adoption-matrix td { min-width: calc(2 * var(--report-unit)); height: var(--report-unit); box-shadow: inset -1px -1px var(--report-line); font-variant-numeric: tabular-nums; }
+.adoption-matrix .adoption-app-column { width: calc(8 * var(--report-unit)); min-width: calc(8 * var(--report-unit)); padding-right: calc(.5 * var(--report-unit)); text-align: right; position: sticky; left: 0; z-index: 2; background: var(--report-paper); }
+.adoption-matrix .adoption-total { min-width: calc(4 * var(--report-unit)); padding-left: calc(.5 * var(--report-unit)); text-align: left; }
+.adoption-groups th { text-align: left; height: var(--report-unit); padding-left: calc(4px * var(--sf, 1)); }
+.adoption-groups .group-core { background: var(--apple-green); color: var(--base-slate); }
+.adoption-groups .group-composites { background: var(--pink); color: var(--base-slate); }
+.adoption-groups .group-layout { background: var(--zenith-blue); color: var(--base-slate); }
+.adoption-column-names th { height: calc(7 * var(--report-unit)); position: relative; vertical-align: bottom; }
+.adoption-column-names th:not(.adoption-app-column):not(.adoption-total) { width: calc(2 * var(--report-unit)); min-width: calc(2 * var(--report-unit)); }
+.adoption-column-names span { position: absolute; z-index: 1; bottom: calc(.5 * var(--report-unit)); left: calc(.5 * var(--report-unit)); transform: rotate(-48deg); transform-origin: bottom left; white-space: nowrap; }
+.adoption-column-names .group-core { background: color-mix(in srgb, var(--apple-green) 16%, var(--report-paper)); }
+.adoption-column-names .group-composites { background: color-mix(in srgb, var(--pink) 16%, var(--report-paper)); }
+.adoption-column-names .group-layout { background: color-mix(in srgb, var(--zenith-blue) 16%, var(--report-paper)); }
+.adoption .shared { background: color-mix(in srgb, var(--apple-green) 70%, var(--report-paper)); }
+.adoption .styled { background: color-mix(in srgb, var(--zenith-blue) 70%, var(--report-paper)); }
+.adoption .local { background: color-mix(in srgb, var(--pink) 65%, var(--report-paper)); }
+.adoption .unverified { background: color-mix(in srgb, var(--orange) 70%, var(--report-paper)); }
+.adoption .mixed { background: linear-gradient(135deg, color-mix(in srgb, var(--apple-green) 65%, var(--report-paper)) 50%, color-mix(in srgb, var(--pink) 65%, var(--report-paper)) 50%); }
+.adoption .empty, .adoption .unavailable { background: color-mix(in srgb, var(--report-ink) 3%, var(--report-paper)); color: var(--base-darker-grey); }
+.adoption-matrix td button { display: block; width: 100%; height: var(--report-unit); min-height: 0; border: 0; border-radius: 0; padding: 0; background: transparent; font-size: inherit; line-height: var(--report-unit); cursor: pointer; font-variant-numeric: tabular-nums; }
+.adoption-matrix td button:hover { box-shadow: inset 0 0 0 1px var(--report-ink); }
+.adoption-matrix td button[aria-pressed="true"] { box-shadow: inset 0 0 0 2px var(--report-ink); }
+.adoption-matrix td button:focus-visible { outline: 2px solid var(--report-ink); outline-offset: -2px; }
+.adoption-matrix tfoot tr:first-child > * { border-top: 1px solid var(--report-ink); }
+.adoption-legend { gap: calc(.5 * var(--report-unit)) var(--report-unit); margin-bottom: var(--report-unit); }
+.adoption-legend span { display: inline-flex; align-items: center; gap: calc(.5 * var(--report-unit)); }
+.adoption-legend i { width: var(--report-unit); height: var(--report-unit); box-shadow: inset 0 0 0 1px var(--report-line); }
+.adoption-detail, .adoption-next, .adoption-method { padding-block: var(--report-unit); border-top: 1px solid var(--report-line); }
+.adoption h2 { margin-bottom: var(--report-unit); }
+.adoption-detail-heading h2 { margin-bottom: 0; }
+.adoption-evidence { overflow: auto; margin-block: var(--report-unit); max-height: calc(18 * var(--report-unit)); }
+.adoption-evidence table { width: 100%; text-align: left; }
+.adoption-evidence th, .adoption-evidence td { font-weight: 400; height: var(--report-unit); padding: 0 calc(.5 * var(--report-unit)) 0 0; white-space: nowrap; box-shadow: inset 0 -1px var(--report-line); }
+.adoption-evidence thead { position: sticky; top: 0; background: var(--report-paper); }
+.adoption code { font-family: var(--typeface-mono), monospace; font-size: calc(10px * var(--sf, 1)); }
+.adoption ul, .adoption ol { padding-left: var(--report-unit); margin-block: var(--report-unit); }
+.adoption-method { max-width: calc(60 * var(--report-unit)); }
+.adoption summary { cursor: pointer; }
+.adoption-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+@media (max-width: 768px) {
+  .adoption-heading { align-items: flex-start; }
+  .adoption-matrix .adoption-app-column { width: calc(6 * var(--report-unit)); min-width: calc(6 * var(--report-unit)); }
+}
