@@ -81,4 +81,30 @@ describe("source adoption evidence", () => {
     expect(report.cells.button?.shared).toBe(2);
     expect(report.cells.button?.sites.every(s => s.file === "client/page.tsx")).toBe(true);
   });
+
+  it("verifies shared React input imports through pure re-exports and flags modified adapters", () => {
+    const { studio, app, ds } = fixture();
+    const added = {
+      '2-core/ds-input.ts': 'export class Input {}',
+      'react/input.ts': 'import type { Input as InputElement } from "../2-core/ds-input"; export const Input = () => null;',
+    };
+    for (const [file, body] of Object.entries(added)) { write(ds, `DS1/${file}`, body); write(app, `design/${file}`, body); }
+    git(ds, 'add', '.'); git(ds, '-c', 'user.name=Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'Add shared input');
+    const manifestPath = join(app, 'design/components-manifest.json');
+    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+    manifest.commit = git(ds, 'rev-parse', 'HEAD'); manifest.components.push('input');
+    Object.assign(manifest.files, Object.fromEntries(Object.entries(added).map(([file, body]) => [file, createHash('sha256').update(body).digest('hex')])));
+    writeFileSync(manifestPath, JSON.stringify(manifest));
+    write(app, 'src/field.ts', 'import "./register"; export { Input as Field } from "../design/react/input";');
+    write(app, 'src/local.tsx', 'export const Input = () => <input />;');
+    write(app, 'src/page.tsx', 'import { Field as SharedField } from "@/field"; import { Input as Direct } from "../design/react/input"; import { Input as Local } from "./local"; export const Page = () => <><SharedField /><Direct /><Local /></>;');
+    git(app, 'add', '.'); git(app, '-c', 'user.name=Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'Use shared input');
+    const scan = () => scanApp({ id: 'example', name: 'Example', directory: 'Example', roots: ['src'], manifest: 'design/components-manifest.json' }, studio, ds);
+    expect(scan().cells.input).toMatchObject({ shared: 2, local: 1, unverified: 0 });
+    write(app, 'design/react/input.ts', added['react/input.ts'] + '\n// Local changes');
+    expect(scan().cells.input).toMatchObject({ shared: 0, local: 1, unverified: 2 });
+    manifest.files['react/input.ts'] = createHash('sha256').update(readFileSync(join(app, 'design/react/input.ts'))).digest('hex');
+    writeFileSync(manifestPath, JSON.stringify(manifest));
+    expect(scan().cells.input).toMatchObject({ shared: 0, unverified: 2 });
+  });
 });
