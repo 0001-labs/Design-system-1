@@ -85,7 +85,9 @@ and media cleanup still belongs to the product's close handler.
 Use `element.show({ immediate: true })` only when a rendered control must take
 focus inside the opening gesture, such as a phone's search keyboard. The native
 frame opens synchronously; focus that control before awaiting the returned
-promise. The usual `show()` waits for child controls before opening. Modeless
+promise. Nested shared menus and inputs render synchronously too. When a new
+input is added to an already open panel, `input.renderNow()` exposes its native
+field before gesture-time focus. The usual `show()` waits for child controls before opening. Modeless
 Escape is handled after a nested editor can cancel it, and keyboard scrolling
 inside the panel remains available while the page behind is held.
 
