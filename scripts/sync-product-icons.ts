@@ -4,7 +4,7 @@ import { pathToFileURL, fileURLToPath } from 'node:url';
 import { resolve, relative } from 'node:path';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-const studio = resolve(root, '..');
+const studio = process.env.DS1_PRODUCT_STUDIO ?? resolve(root, '..');
 const destination = resolve(root, 'DS1/x-icon');
 const checkOnly = process.argv.includes('--check');
 const manifestFile = resolve(destination, 'product-sources.json');
@@ -41,7 +41,14 @@ async function add(product: string, source: string, desired: string, raw: string
     const current = await readFile(resolve(destination, name + '.svg'), 'utf8');
     if (!canonical && !desired.startsWith('ezo-') && !desired.startsWith('badge-') && compact(normalize(current)) !== compact(svg)) name = `${product.toLowerCase()}-${desired}`;
   }
-  if (!checkOnly && !canonical) await writeFile(resolve(destination, name + '.svg'), svg);
+  if (!checkOnly && !canonical) {
+    const current = await readFile(resolve(destination, name + '.svg'), 'utf8').catch(() => null);
+    // Keep an installed canonical drawing when the product uses the same
+    // geometry; only imported variants and badges are refreshed in place.
+    if (!current || name.startsWith('ezo-') || name.startsWith('aa-') || name.startsWith('badge-')) {
+      await writeFile(resolve(destination, name + '.svg'), svg);
+    }
+  }
   names.add(name);
   const installed = await readFile(resolve(destination, name + '.svg'), 'utf8');
   sources.push({ product, source, name, sourceHash: hash(raw), iconHash: hash(installed) });
@@ -94,6 +101,12 @@ const size = (boxes.ICON_3D_FRAME - 2) / Math.SQRT2;
 const top = (-3 * size) / Math.sqrt(6);
 const tall = (4 * size) / Math.sqrt(6);
 await add('Ezo', 'shared/isoCube.ts#logo', 'ezo-logo', cube.ezoCubeSvg({ size, stroke: 1, frame: { x: -1.5, y: top + tall / 2 - boxes.ICON_3D_FRAME * boxes.ICON_3D_TALL / 2, width: boxes.ICON_3D_FRAME, height: boxes.ICON_3D_FRAME * boxes.ICON_3D_TALL } }));
+
+// Multiple product sources may resolve to one drawing. Hash its final form
+// after every source has been processed, not an intermediate import.
+for (const source of sources) {
+  source.iconHash = hash(await readFile(resolve(destination, source.name + '.svg'), 'utf8'));
+}
 
 if (checkOnly) {
   if (JSON.stringify(previous) !== JSON.stringify(sources)) throw new Error('Product icons have changed. Run vp run icons:sync-products and review the additions.');

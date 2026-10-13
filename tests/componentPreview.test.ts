@@ -14,14 +14,16 @@ test('the actual preview entry registers and renders the button and opens its to
   await button.updateComplete;
   await tooltip.updateComplete;
   expect(button.shadowRoot?.querySelector('button')?.hasAttribute('secondary')).toBe(true);
-  const bubble = tooltip.shadowRoot?.querySelector<HTMLElement>('[role="tooltip"]');
+  await tooltip.updateComplete;
+  const bubble = tooltip.shadowRoot?.querySelector<HTMLElement>('.bubble');
+  const visible = () => bubble?.getAttribute('role') === 'tooltip' ? !bubble.hidden : bubble?.classList.contains('visible');
   expect(bubble?.textContent).toBe('Save your changes');
-  expect(bubble?.hidden).toBe(false);
+  expect(visible()).toBe(true);
   button.shadowRoot!.querySelector('button')!.click();
   expect(document.querySelector('#event-output')?.textContent).toContain('click: Hover or focus me');
   tooltip.dispatchEvent(new MouseEvent('mouseleave'));
   await tooltip.updateComplete;
-  expect(bubble?.hidden).toBe(true);
+  expect(visible()).toBe(false);
 });
 
 test('trying a preview setting never writes the documentation storage', () => {
