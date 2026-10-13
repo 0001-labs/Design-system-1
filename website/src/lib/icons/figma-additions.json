@@ -84,12 +84,6 @@
     "file": "help-alt.svg"
   },
   {
-    "key": "status-alt",
-    "name": "Status alternate",
-    "node": "936:201",
-    "file": "status-alt.svg"
-  },
-  {
     "key": "status-filled",
     "name": "Status filled",
     "node": "657:898",

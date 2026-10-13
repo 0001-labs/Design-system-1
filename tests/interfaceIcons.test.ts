@@ -27,6 +27,12 @@ test('shared interface icons are discoverable and Ezo artwork is excluded',()=>{
   }
   for(const icon of icons.filter(icon=>icon.source==='Library'))expect(icon.svg).toContain('viewBox="0 0 16 16"');
 });
+test('the removed status drawing with the extra bottom bar stays out of the collection', () => {
+  expect(icons.some(icon => icon.key === 'status-alt')).toBe(false);
+  expect(isSharedInterfaceIcon('status-alt')).toBe(false);
+  expect(icons.some(icon => icon.key === 'status')).toBe(true);
+  expect(icons.some(icon => icon.key === 'status-filled')).toBe(true);
+});
 test('the shared sheet uses single-word labels and excludes product collections and their SVG exports', () => {
   for (const icon of icons) {
     expect(icon.name, icon.key).toMatch(/^[A-Za-z][A-Za-z0-9]*$/);

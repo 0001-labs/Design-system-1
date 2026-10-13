@@ -1010,14 +1010,6 @@
     "shapes": 8
   },
   {
-    "key": "status-alt",
-    "name": "Status",
-    "source": "Figma",
-    "node": "936:201",
-    "url": "/icons/interface/status-alt.svg",
-    "shapes": 9
-  },
-  {
     "key": "status-filled",
     "name": "Status",
     "source": "Figma",

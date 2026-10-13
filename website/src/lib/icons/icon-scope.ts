@@ -1,6 +1,6 @@
 /** Product artwork is retained for existing consumers, outside the shared icon overview. */
 export function isSharedInterfaceIcon(key: string): boolean {
-  return !/^(ezo-|aa-|badge-|block-|pattern-|arrange-|navigation-)/.test(key);
+  return key !== 'status-alt' && !/^(ezo-|aa-|badge-|block-|pattern-|arrange-|navigation-)/.test(key);
 }
 
 /** One semantic word on the sheet; technical keys stay stable for consumers. */
