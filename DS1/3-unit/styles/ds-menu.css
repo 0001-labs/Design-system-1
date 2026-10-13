@@ -34,7 +34,7 @@
 slot { display: contents; }
 
 :host([floating]:not([open])) { display: none; }
-:host([floating]) { position: fixed; inset: auto; margin: 0; min-width: 0; z-index: 1; scroll-padding: calc(var(--ds-unit) / 2); }
+:host([floating]) { position: fixed; inset: auto; margin: 0; min-width: 0; width: var(--ds-menu-width, var(--ds-menu-anchor-width)); z-index: 1; scroll-padding: calc(var(--ds-unit) / 2); }
 :host([floating]) ::slotted(ds-button) { flex: 0 0 auto; --ds-button-height: var(--ds-row-height); --ds-button-align: flex-start; width: 100%; }
 :host([data-grid]) { width: max-content; min-width: 0; }
 :host([data-grid]) .frame { display: grid; grid-template-columns: repeat(var(--ds-menu-columns), var(--ds-row-height)); width: max-content; max-width: 100%; }

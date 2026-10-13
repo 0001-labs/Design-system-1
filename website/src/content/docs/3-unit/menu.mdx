@@ -21,8 +21,16 @@ activates it. Focus stays in the field, including when pressing an option.
 Home, End, modified keys and IME composition remain native editing commands.
 The product owns the candidates, matching, insertion and field ARIA references.
 
-For actions, focus starts on the first available choice and returns to the
-launcher when the menu closes. `columns` gives a small grid its horizontal and
+For actions, focus starts on the selected or checked choice, falling back to
+the first available choice, and returns to the launcher when the menu closes.
+Set `trigger` to a native launcher to share click toggling and Arrow Up/Down
+opening. Without a selection, Arrow Up starts at the last enabled choice.
+The cancelable `ds-menu-toggle` event carries `detail.open`; a controlled owner
+can decline it. Enter and Space still use the launcher's native click behavior.
+Typing a label searches enabled choices; repeated letters cycle matching labels.
+Products keep option data and callbacks, without their own navigation listeners.
+`--ds-menu-width` sets a preferred width, still clamped to the viewport.
+`columns` gives a small grid its horizontal and
 vertical navigation. Hidden, disabled and nested choices are skipped.
 Escape and outside presses request dismissal through `ds-menu-close`
 (`detail.reason` is `escape` or `outside`). Cancel the event to decline the
@@ -31,7 +39,9 @@ dialog. An outside press does not steal focus back from the chosen control.
 
 In React, register `ds-menu` in the browser before hydration, then import
 `Menu` from `DS1/react/menu`. Passing `open` creates a controlled floating menu;
-`onOpenChange(false, reason)` requests closure. `activeId` and `onActiveChange`
+`onOpenChange(open, reason)` requests a change (`trigger`, `escape` or `outside`).
+Keep the menu mounted when it owns a `trigger`, including while closed.
+`activeId` and `onActiveChange`
 similarly keep selection controlled. Classes and styles place the host only.
 Use shared buttons, text and icons inside it, with each entry one row high.
 Remove product popup positioning, keyboard listeners and appearance styles.

@@ -15,6 +15,7 @@ export class Menu extends LitElement {
     open: { type: Boolean, reflect: true },
     columns: { type: Number, reflect: true },
     anchor: { attribute: false },
+    trigger: { attribute: false },
     controller: { attribute: false },
     activeId: { type: String, attribute: "active-id" },
   };
@@ -23,9 +24,14 @@ export class Menu extends LitElement {
   declare open: boolean;
   declare columns: number;
   declare anchor: HTMLElement | null;
+  declare trigger: HTMLElement | null;
   declare controller: HTMLElement | null;
   declare activeId: string;
   private listeningTo: HTMLElement | null = null;
+  private listeningTrigger: HTMLElement | null = null;
+  private openingEdge: "first" | "last" = "first";
+  private search = "";
+  private searchAt = 0;
   private shown = false;
   private observer?: ResizeObserver;
   private opener: HTMLElement | null = null;
@@ -37,7 +43,7 @@ export class Menu extends LitElement {
   constructor() {
     super();
     this.compact = false; this.floating = false; this.open = false;
-    this.columns = 1; this.anchor = null; this.controller = null; this.activeId = "";
+    this.columns = 1; this.anchor = null; this.trigger = null; this.controller = null; this.activeId = "";
     this.addEventListener("keydown", this.onKeyDown);
     this.addEventListener("pointerdown", this.retainController);
     this.addEventListener("focusin", () => { this.heldFocus = true; this.syncTabStops(); });
@@ -53,10 +59,12 @@ export class Menu extends LitElement {
   disconnectedCallback() {
     this.listeningTo?.removeEventListener("keydown", this.onControllerKey);
     this.listeningTo = null;
+    this.bindTrigger(null);
     this.hide(true);
     super.disconnectedCallback();
   }
   updated() {
+    this.bindTrigger(this.trigger);
     this.style.setProperty("--ds-menu-columns", String(Math.max(1, Math.floor(this.columns || 1))));
     this.toggleAttribute("data-grid", this.columns > 1);
     if (this.listeningTo !== this.controller) {
@@ -76,6 +84,35 @@ export class Menu extends LitElement {
   }
   /** Prepare a newly inserted menu before gesture-time focus. */
   renderNow() { this.performUpdate(); }
+  private bindTrigger(trigger: HTMLElement | null) {
+    if (this.listeningTrigger === trigger) return;
+    this.listeningTrigger?.removeEventListener("click", this.onTriggerClick);
+    this.listeningTrigger?.removeEventListener("keydown", this.onTriggerKey);
+    this.listeningTrigger = trigger;
+    trigger?.addEventListener("click", this.onTriggerClick);
+    trigger?.addEventListener("keydown", this.onTriggerKey);
+  }
+  private toggleFromTrigger(open: boolean) {
+    if (!this.trigger || !this.enabled(this.trigger)) return;
+    const event = new CustomEvent("ds-menu-toggle", {detail: {open}, bubbles: true, composed: true, cancelable: true});
+    if (this.dispatchEvent(event)) this.open = open;
+  }
+  private onTriggerClick = (event: MouseEvent) => {
+    if (event.defaultPrevented) return;
+    this.openingEdge = "first";
+    this.toggleFromTrigger(!this.open);
+  };
+  private onTriggerKey = (event: KeyboardEvent) => {
+    if (event.defaultPrevented || event.isComposing || event.altKey || event.metaKey || event.ctrlKey || event.shiftKey || !this.trigger || !this.enabled(this.trigger)) return;
+    if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+    event.preventDefault();
+    this.openingEdge = event.key === "ArrowUp" ? "last" : "first";
+    if (this.open) this.initialChoice()?.focus(); else this.toggleFromTrigger(true);
+  };
+  private initialChoice() {
+    const items = this.items();
+    return items.find(item => item.getAttribute("aria-selected") === "true" || item.getAttribute("aria-checked") === "true") ?? (this.openingEdge === "last" ? items.at(-1) : items[0]);
+  }
   private items(includeDisabled = false): HTMLElement[] {
     return Array.from(this.querySelectorAll<HTMLElement>(ITEM)).filter(item =>
       (includeDisabled || this.enabled(item)) &&
@@ -97,7 +134,8 @@ export class Menu extends LitElement {
     if (this.shown || !this.isConnected) return;
     this.shown = true;
     const openingFocus = this.ownerDocument.activeElement;
-    this.opener = this.controller ?? this.anchor ?? (openingFocus instanceof HTMLElement ? openingFocus : null);
+    this.opener = this.controller ?? this.trigger ?? this.anchor ?? (openingFocus instanceof HTMLElement ? openingFocus : null);
+    this.search = "";
     this.restoreFocus = true;
     this.heldFocus = false;
     let stack = openMenus.get(this.ownerDocument);
@@ -125,7 +163,9 @@ export class Menu extends LitElement {
         const active = this.ownerDocument.activeElement;
         if (this.shown && this.isConnected && version === this.focusVersion && !this.controller &&
             (active === openingFocus || active === this.opener || active === this.ownerDocument.body || active === this)) {
-          this.items()[0]?.focus({ preventScroll: true });
+          const choice = this.initialChoice();
+          choice?.focus({ preventScroll: true });
+          if (choice) this.scrollChoice(choice);
         }
       });
     }
@@ -164,7 +204,7 @@ export class Menu extends LitElement {
   private onOutside = (event: Event) => {
     if (!this.isTop()) return;
     const path = event.composedPath();
-    if (!path.includes(this) && !(this.anchor && !this.controller && path.includes(this.anchor)) && !(this.controller && path.includes(this.controller))) this.requestClose("outside");
+    if (!path.includes(this) && !(this.anchor && !this.controller && path.includes(this.anchor)) && !(this.trigger && path.includes(this.trigger)) && !(this.controller && path.includes(this.controller))) this.requestClose("outside");
   };
   private retainController = (event: PointerEvent) => {
     if (this.controller && event.button === 0 && event.composedPath().some(node => node instanceof HTMLElement && node.matches(ITEM))) event.preventDefault();
@@ -178,8 +218,7 @@ export class Menu extends LitElement {
     const gap = parseFloat(view.getComputedStyle(this).scrollPaddingTop) || 10, unit = gap * 2;
     const room = Math.max(0, width - 2 * gap);
     this.style.maxWidth = `${room}px`;
-    if (this.columns <= 1) this.style.width = `${Math.min(room, Math.max(4 * unit, rect.width))}px`;
-    else this.style.removeProperty("width");
+    this.style.setProperty("--ds-menu-anchor-width", `${Math.min(room, Math.max(4 * unit, rect.width))}px`);
     const below = top + height - rect.bottom - 2 * gap, above = rect.top - top - 2 * gap;
     const frame = this.shadowRoot?.querySelector<HTMLElement>(".frame");
     const up = below < Math.min(frame?.scrollHeight ?? this.scrollHeight, 8 * unit) && above > below;
@@ -196,6 +235,9 @@ export class Menu extends LitElement {
     if (!this.controller || !this.shown) return;
     const item = this.items().find(item => item.id === this.activeId);
     if (!item) return;
+    this.scrollChoice(item);
+  }
+  private scrollChoice(item: HTMLElement) {
     // Scroll the accepted choice, never a controlled request the owner declined.
     const scroller = this.shadowRoot?.querySelector<HTMLElement>(".frame");
     if (!scroller) return;
@@ -220,12 +262,26 @@ export class Menu extends LitElement {
       case "Enter":
         if (external && current >= 0 && this.enabled(items[current]!)) { event.preventDefault(); items[current]!.click(); }
         return;
-      default: return;
+      default:
+        if (external || event.key.length !== 1 || event.key === " ") return;
+        const now = Date.now();
+        this.search = (now - this.searchAt < 700 ? this.search : "") + event.key.toLocaleLowerCase();
+        this.searchAt = now;
+        const repeated = [...this.search].every(char => char === this.search[0]);
+        const query = repeated ? this.search[0]! : this.search;
+        const start = repeated ? current + 1 : Math.max(0, current);
+        next = -1;
+        for (let offset = 0; offset < items.length; offset++) {
+          const index = (start + offset + items.length) % items.length;
+          const item = items[index]!;
+          if (this.enabled(item) && (item.getAttribute("aria-label") ?? item.textContent ?? "").trim().toLocaleLowerCase().startsWith(query)) { next = index; break; }
+        }
+        break;
     }
     if (next < 0) return;
     event.preventDefault();
     const item = items[next]!;
-    if (external) this.activate(item); else item.focus();
+    if (external) this.activate(item); else { item.focus({preventScroll: true}); this.scrollChoice(item); }
   }
   private lastEnabled(items: HTMLElement[]) { return items.reduce((last, item, index) => this.enabled(item) ? index : last, -1); }
   private step(items: HTMLElement[], current: number, columns: number, direction: number) {

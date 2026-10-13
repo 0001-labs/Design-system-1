@@ -97,3 +97,35 @@ test("grid navigation preserves columns, skips disabled cells and handles a shor
   buttons[3]!.focus(); key(buttons[3]!, "ArrowRight"); expect(document.activeElement).toBe(buttons[5]);
   key(buttons[5]!, "ArrowDown"); expect(document.activeElement).toBe(buttons[7]);
 });
+
+test("triggers open at the selected choice, arrows skip disabled choices and typeahead cycles", async () => {
+  const trigger = document.createElement("button"), menu = document.createElement("ds-menu");
+  menu.floating = true; menu.trigger = menu.anchor = trigger;
+  menu.innerHTML = '<button role="option">Apple</button><button role="option" disabled>Berry</button><button role="option" aria-selected="true">Banana</button><button role="option">Blueberry</button>';
+  document.body.append(trigger, menu); trigger.focus(); await menu.updateComplete;
+  key(trigger, "ArrowDown"); await menu.updateComplete;
+  const choices = menu.querySelectorAll("button");
+  expect(document.activeElement).toBe(choices[2]);
+  key(choices[2]!, "b"); expect(document.activeElement).toBe(choices[3]);
+  key(choices[3]!, "b"); expect(document.activeElement).toBe(choices[2]);
+  key(choices[2]!, "Home"); expect(document.activeElement).toBe(choices[0]);
+  key(choices[0]!, "ArrowDown"); expect(document.activeElement).toBe(choices[2]);
+  key(choices[2]!, "Escape"); await menu.updateComplete; expect(document.activeElement).toBe(trigger);
+  choices[2]!.removeAttribute("aria-selected");
+  key(trigger, "ArrowUp"); await menu.updateComplete; expect(document.activeElement).toBe(choices[3]);
+  menu.open = false; await menu.updateComplete;
+  trigger.disabled = true; key(trigger, "ArrowDown"); await menu.updateComplete; expect(menu.open).toBe(false);
+  menu.remove(); trigger.disabled = false; expect(key(trigger, "ArrowDown").defaultPrevented).toBe(false);
+});
+
+test("controlled trigger requests can be declined and a changed trigger releases its old listeners", async () => {
+  const trigger = document.createElement("button"), next = document.createElement("button"), menu = document.createElement("ds-menu");
+  menu.floating = true; menu.trigger = menu.anchor = trigger;
+  document.body.append(trigger, next, menu); await menu.updateComplete;
+  const request = vi.fn((event: Event) => event.preventDefault()); menu.addEventListener("ds-menu-toggle", request);
+  trigger.click(); await menu.updateComplete; expect(menu.open).toBe(false); expect(request).toHaveBeenCalledTimes(1);
+  menu.trigger = next; await menu.updateComplete;
+  trigger.click(); expect(request).toHaveBeenCalledTimes(1);
+  next.click(); expect(request).toHaveBeenCalledTimes(2);
+  expect(key(next, "ArrowDown", {isComposing: true}).defaultPrevented).toBe(false);
+});
