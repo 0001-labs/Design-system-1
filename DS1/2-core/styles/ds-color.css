@@ -10,7 +10,8 @@ ds-color > input[type="color"] {
   margin: 0 !important;
   padding: calc(2px * var(--ds-sf)) !important;
   border: 1px solid var(--ds-border-color) !important;
-  border-radius: calc(4px * var(--ds-sf)) !important;
+  border-radius: var(--ds-radius) !important;
+  corner-shape: var(--ds-corner-shape, round) !important;
   background: var(--ds-input-background) !important;
   box-shadow: none !important;
   cursor: pointer !important;

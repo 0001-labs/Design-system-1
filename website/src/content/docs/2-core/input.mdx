@@ -92,3 +92,21 @@ The React adapter defaults to `variant="field"`. It supports controlled `value`,
 Use the input for text, email, password, number, date and time fields. File, colour, checkbox and radio inputs and composite comboboxes need their own shared controls. A combobox's listbox and active-option relationships cannot be passed through as plain text-field attributes.
 
 [Form](/3-unit/form/) · [Languages](/built-ins/languages/)
+
+### Shape preferences
+
+Set `data-ds-shape="square"`, `"rounded"` or `"circular"` on the page, a
+`data-ds-surface` container, or one shared control. DS1 supplies the corner
+shape and the button inset; the product stores the preference. Rounded uses
+4px arcs, or 8px squircles where supported. Circular keeps true round ends.
+Every radius follows the component's own `--ds-sf`, including nested scales.
+Without the attribute, controls use their normal DS1 defaults.
+
+Buttons, fields, checkboxes, switches, selects and color fields share the
+preference. Row and plain inputs and compact menu entries retain their square
+edges. Multiline fields keep small 4px corners so a circular preference cannot
+cut into writing; `--ds-textarea-radius` can configure those separately.
+A surface can set the unscaled `--ds-corner-size`, `--ds-corner-shape`
+and `--ds-button-inset` tokens; a specific field can set `--ds-input-radius`.
+Do not inject product styles into a shared shadow root or restyle its native
+light-DOM frame. Preference changes do not animate corners or padding.

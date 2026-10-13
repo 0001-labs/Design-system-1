@@ -16,6 +16,7 @@
      padding is set through --ds-button-padding. */
   padding: var(--ds-button-padding, 0) !important;
   border-radius: var(--ds-radius) !important;
+  corner-shape: var(--ds-corner-shape, round) !important;
   background: var(--ds-button-background, transparent) !important;
   color: var(--ds-button-color, var(--ds-button-text-color)) !important;
   font-family: var(--ds-typeface-regular) !important;
@@ -39,14 +40,14 @@
 
 :host([control="host"][primary]),
 :host([control="slotted"][primary]) {
-  --ds-button-padding: 0 calc(4px * var(--ds-sf));
+  --ds-button-padding: 0 calc(var(--ds-button-inset, 4px) * var(--ds-sf));
   --ds-button-background: var(--ds-button-background-color-primary);
   --ds-button-color: var(--ds-button-text-color-on-accent);
 }
 
 :host([control="host"][secondary]),
 :host([control="slotted"][secondary]) {
-  --ds-button-padding: 0 calc(4px * var(--ds-sf));
+  --ds-button-padding: 0 calc(var(--ds-button-inset, 4px) * var(--ds-sf));
   --ds-button-background: var(--ds-button-background-color-secondary);
 }
 

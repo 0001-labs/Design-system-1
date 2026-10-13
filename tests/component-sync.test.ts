@@ -18,6 +18,7 @@ test('snapshots include dependencies, detect drift, and preserve consumer-owned 
   sync(target, 'button,panel,input');
   expect(existsSync(join(target, '2-core/ds-text.ts'))).toBe(true);
   expect(readFileSync(join(target, '1-root/component-metrics.css'), 'utf8')).toBe(readFileSync(resolve('DS1/1-root/component-metrics.css'), 'utf8'));
+  expect(readFileSync(join(target, '1-root/component-appearance.css'), 'utf8')).toBe(readFileSync(resolve('DS1/1-root/component-appearance.css'), 'utf8'));
   expect(existsSync(join(target, 'react/button.ts'))).toBe(true);
   expect(existsSync(join(target, '0-face/translations/en.json'))).toBe(true);
   expect(existsSync(join(target, 'x-icon/ezo-password-visibility-see.svg'))).toBe(true);

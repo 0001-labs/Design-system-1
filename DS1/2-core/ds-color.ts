@@ -1,20 +1,21 @@
-import { LitElement, html, css } from "lit";
+import { LitElement, html, css, unsafeCSS } from "lit";
 import { define } from "../0-face/define";
 import "./styles/ds-color.css";
 import styles from "./styles/ds-color.css?inline";
+import metrics from "../1-root/component-metrics.css?inline";
 
 const styledRoots = new WeakSet<ShadowRoot>();
 
 /** A native colour input owns the platform picker, labels, forms and reset. */
 export class ColorInput extends LitElement {
-  static styles = css`
+  static styles = [unsafeCSS(metrics), css`
     :host {
       --ds-color-unit: calc(var(--ds-1) * var(--ds-sf));
       display: inline-flex; flex: 0 0 auto;
       width: calc(2 * var(--ds-color-unit)); height: var(--ds-color-unit);
     }
     :host([hidden]) { display: none !important; }
-  `;
+  `];
   connectedCallback() {
     super.connectedCallback();
     const root = this.getRootNode();

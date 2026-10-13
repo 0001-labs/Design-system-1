@@ -1,4 +1,10 @@
 /* A text area spans whole rows; shared input styles own its field treatment. */
+/* Pill-shaped corners would cut into multiline writing. A text area's field
+ * corners stay small independently of the surrounding control preference. */
+:host([variant="field"]) textarea {
+  border-radius: var(--ds-textarea-radius, calc(4px * var(--ds-sf)));
+  corner-shape: var(--ds-textarea-corner-shape, squircle);
+}
 :host([variant]) textarea {
   height: var(--ds-textarea-height, calc(var(--ds-textarea-rows, 3) * var(--ds-row-height)));
   min-height: var(--ds-row-height);

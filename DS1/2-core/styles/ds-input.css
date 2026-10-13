@@ -51,6 +51,11 @@ label {
   color: var(--base-slate, #1e1e1e);
 }
 
+input {
+  border-radius: var(--ds-input-radius, var(--ds-radius));
+  corner-shape: var(--ds-corner-shape, round);
+}
+
 :is(input, textarea)::placeholder {
   color: var(--base-darker-grey, #797979);
   opacity: 0.5;
@@ -185,7 +190,7 @@ label {
 }
 @supports (corner-shape: squircle) {
   :is(input, textarea) {
-    corner-shape: squircle;
+    corner-shape: var(--ds-corner-shape, squircle);
   }
 }
 

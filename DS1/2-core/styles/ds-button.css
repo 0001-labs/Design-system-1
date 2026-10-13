@@ -15,9 +15,9 @@
 
 button {
   box-sizing: border-box;
-  max-height: calc(var(--08) * var(--sf));
-  height: calc(var(--08) * var(--sf));
-  min-height: calc(var(--08) * var(--sf));
+  max-height: var(--ds-control-height);
+  height: var(--ds-control-height);
+  min-height: var(--ds-control-height);
   width: 100%;
   max-width: 100%;
   min-width: 0;
@@ -25,13 +25,15 @@ button {
   align-items: center;
   justify-content: flex-start;
   border: none;
+  border-radius: var(--ds-radius);
+  corner-shape: var(--ds-corner-shape, round);
   cursor: pointer;
   padding: 0;
   color: var(--button-color, var(--button-text-color));
-  font-family: var(--typeface-regular);
-  font-size: var(--type-size-default);
-  line-height: calc(var(--type-lineheight-default) * var(--sf));
-  letter-spacing: calc(var(--type-letterspacing-default) * var(--sf));
+  font-family: var(--ds-typeface-regular);
+  font-size: var(--ds-type-size-default);
+  line-height: var(--ds-type-lineheight-default);
+  letter-spacing: var(--ds-type-letterspacing-default);
   -webkit-tap-highlight-color: transparent;
   white-space: nowrap;
   overflow-x: clip;
@@ -58,15 +60,15 @@ button[primary] {
   background-color: var(--accent-color);
   color: var(--button-text-color-on-light, var(--black));
   text-decoration-line: none;
-  font-family: var(--typeface-regular);
-  padding: 0 calc(0.5px * var(--sf));
+  font-family: var(--ds-typeface-regular);
+  padding: 0 calc(var(--ds-button-inset, 4px) * var(--ds-sf));
 }
 
 button[secondary] {
   background-color: var(--button-background-color-secondary);
   color: var(--button-text-color-secondary, var(--black));
-  font-family: var(--typeface-regular);
-  padding: 0 calc(0.5px * var(--sf));
+  font-family: var(--ds-typeface-regular);
+  padding: 0 calc(var(--ds-button-inset, 4px) * var(--ds-sf));
 }
 
 .loading {
@@ -80,28 +82,28 @@ button[secondary] {
    marks itself `icon` when its only child is an ds-icon. */
 :host([icon]) {
   flex: 0 0 auto;
-  width: calc(16px * var(--sf, 1));
-  height: calc(16px * var(--sf, 1));
+  width: var(--ds-control-height);
+  height: var(--ds-control-height);
 }
 :host([icon]) button {
-  width: calc(16px * var(--sf, 1));
+  width: var(--ds-control-height);
   padding: 0 !important;
   justify-content: center;
 }
 :host([icon]) ::slotted(ds-icon) {
   flex: 0 0 auto;
-  width: calc(16px * var(--sf, 1));
-  height: calc(16px * var(--sf, 1));
+  width: var(--ds-control-height);
+  height: var(--ds-control-height);
 }
 
 /* A button marked `square` is a 16-unit square whatever it holds, a count
    or an initial, its words in its middle with no word-padding around them. */
 :host([square]) {
   flex: 0 0 auto;
-  width: calc(16px * var(--sf, 1));
+  width: var(--ds-control-height);
 }
 :host([square]) button {
-  width: calc(16px * var(--sf, 1));
+  width: var(--ds-control-height);
   padding: 0 !important;
   justify-content: center;
 }

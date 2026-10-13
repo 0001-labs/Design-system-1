@@ -1,3 +1,5 @@
+@import "../../1-root/component-metrics.css";
+
 :host {
   --ds-choice-unit: calc(var(--ds-1) * var(--ds-sf));
   display: inline-flex;
@@ -19,7 +21,8 @@
   padding: calc(2px * var(--ds-sf)) !important;
   margin: 0 !important;
   border: 0 !important;
-  border-radius: calc(4px * var(--ds-sf)) !important;
+  border-radius: var(--ds-radius) !important;
+  corner-shape: var(--ds-corner-shape, round) !important;
   background: var(--ds-fill) !important;
   color: var(--ds-text-color-muted) !important;
   box-shadow: none !important;
@@ -31,7 +34,8 @@
   display: block;
   width: calc(var(--ds-choice-unit) - 4px * var(--ds-sf));
   height: 100%;
-  border-radius: calc(4px * var(--ds-sf));
+  border-radius: var(--ds-radius);
+  corner-shape: var(--ds-corner-shape, round);
   background: currentColor;
   transform: translateX(0);
   transition: transform 140ms ease;

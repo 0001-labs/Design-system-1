@@ -1,3 +1,5 @@
+@import "./component-appearance.css";
+
 /* Resolve dimensions where a component is drawn. Inherited calc() values have
  * already used their ancestor's scale. Base tokens stay unscaled and inherit;
  * resolved tokens can still be overridden directly on a component.

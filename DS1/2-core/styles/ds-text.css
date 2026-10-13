@@ -7,13 +7,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: flex-start;
-  height: calc(16px * var(--sf));
-  font-family: var(--typeface-regular);
-  font-size: var(--type-size-default);
-  font-weight: var(--type-weight-default);
-  /* The line-height token is already scaled; the letter-spacing token is not. */
-  line-height: var(--type-lineheight-default);
-  letter-spacing: calc(var(--type-letterspacing-default) * var(--sf));
+  height: var(--ds-control-height);
+  font-family: var(--ds-typeface-regular);
+  font-size: var(--ds-type-size-default);
+  font-weight: var(--ds-type-weight-default);
+  line-height: var(--ds-type-lineheight-default);
+  letter-spacing: var(--ds-type-letterspacing-default);
   text-align: left;
   text-transform: var(--text-transform-default);
   text-decoration: var(--text-decoration-default);
@@ -23,18 +22,18 @@
 }
 
 :host([data-language="ja"]) {
-  font-family: var(--typeface-regular-jp);
+  font-family: var(--ds-typeface-regular-jp, var(--typeface-regular-jp));
 }
 
 :host([data-language="zh"]),
 :host([data-language="zh-hant"]) {
-  font-family: var(--typeface-regular-zh-hant);
-  font-weight: var(--type-weight-default, 400);
+  font-family: var(--ds-typeface-regular-zh-hant, var(--typeface-regular-zh-hant));
+  font-weight: var(--ds-type-weight-default, 400);
 }
 
 :host([data-language="zh-hans"]) {
-  font-family: var(--typeface-regular-zh-hans);
-  font-weight: var(--type-weight-default, 400);
+  font-family: var(--ds-typeface-regular-zh-hans, var(--typeface-regular-zh-hans));
+  font-weight: var(--ds-type-weight-default, 400);
 }
 
 :host span {
