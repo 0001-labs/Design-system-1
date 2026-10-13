@@ -45,9 +45,8 @@ span {
 }
 ::slotted(select:focus-visible) { outline: 2px solid var(--ds-focus-ring) !important; outline-offset: 1px !important; }
 ::slotted(select:disabled) { cursor: default !important; opacity: .5 !important; }
-:host(:has(> select:disabled)) span { opacity: .5; }
-:host(:has(> select[multiple])) span,
-:host(:has(> select[size]:not([size="0"]):not([size="1"]))) span { display: none; }
+span.disabled { opacity: .5; }
+span[hidden] { display: none; }
 ::slotted(select[multiple]),
 ::slotted(select[size]:not([size="0"]):not([size="1"])) {
   padding: 0 calc(4px * var(--ds-sf)) !important;
