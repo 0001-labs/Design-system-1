@@ -1,8 +1,26 @@
 import { LitElement, html, unsafeCSS } from "lit";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import styles from "./styles/ds-icon.css?inline";
-import { iconNameToSvgMap, type IconName } from "./generated/ds-icon-map";
+import type { IconName } from "./generated/ds-icon-map";
+import { icons as immediateIcons, deferredIconNames } from "./generated/icons-immediate";
 import { define } from "../0-face/define";
+
+const iconNameToSvgMap: Record<string, string> = { ...immediateIcons }
+const deferred = new Set<string>(deferredIconNames)
+let extraReady = false
+let extraLoading: Promise<void> | undefined
+function loadExtraIcons(): Promise<void> {
+  return (extraLoading ??= import('./generated/icons-extra')
+    .then(({ icons }) => {
+      Object.assign(iconNameToSvgMap, icons)
+      extraReady = true
+    })
+    .catch((error) => {
+      extraLoading = undefined
+      throw error
+    }))
+}
+
 
 /**
  * The ink an icon was drawn in, whatever the file happens to say.
@@ -68,6 +86,8 @@ export class Icon extends LitElement {
   };
 
   private _type: IconName | "" = "";
+  private _iconsReady: Promise<void> | undefined;
+  private _failedType: string | undefined;
   declare variant: IconVariant;
   declare size: "small" | "large" | undefined;
 
@@ -86,6 +106,13 @@ export class Icon extends LitElement {
     this.requestUpdate("type", oldVal);
   }
 
+  /** Awaiting an icon also waits for its requested artwork and final render. */
+  protected async getUpdateComplete(): Promise<boolean> {
+    await super.getUpdateComplete()
+    await this._iconsReady
+    return super.getUpdateComplete()
+  }
+
   static styles = unsafeCSS(styles);
 
   render() {
@@ -96,6 +123,26 @@ export class Icon extends LitElement {
     const svg = iconNameToSvgMap[this._type.toLowerCase() as IconName];
     if (svg) {
       return html`${unsafeHTML(themeIconSvg(svg))}`;
+    }
+
+    if (
+      !extraReady &&
+      deferred.has(this._type.toLowerCase()) &&
+      !this._iconsReady &&
+      this._failedType !== this._type
+    ) {
+      const requested = this._type
+      this._iconsReady = loadExtraIcons()
+        .then(() => {
+          this._failedType = undefined
+          this.requestUpdate()
+        })
+        .catch(() => {
+          this._failedType = requested
+        })
+        .finally(() => {
+          this._iconsReady = undefined
+        })
     }
 
     // Fallback to slot if icon not found

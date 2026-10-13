@@ -5,7 +5,7 @@
   display: block;
   flex: 0 0 auto;
   width: 100%;
-  height: calc(var(--ds-gap-size) * var(--ds-sf));
+  height: calc(var(--ds-gap-size) * var(--ds-sf) + var(--ds-gap-rows, 1) * var(--ds-gap-row-space, 0px));
 }
 
 :host([size="025"]) {
@@ -43,3 +43,29 @@
 :host([oct]), :host([size="8"]) { --ds-gap-size: calc(var(--ds-1) * 8); }
 
 :host([dozen]), :host([size="12"]) { --ds-gap-size: calc(var(--ds-1) * 12); }
+
+:host([tenth]) { --ds-gap-rows: 0; }
+
+:host([quarter]) { --ds-gap-rows: 0; }
+
+:host([half]) { --ds-gap-rows: 0; }
+
+:host([eight-tenth]) { --ds-gap-rows: 0; }
+
+:host([size="01"]) { --ds-gap-rows: 0; }
+
+:host([size="025"]) { --ds-gap-rows: 0; }
+
+:host([size="05"]) { --ds-gap-rows: 0; }
+
+:host([size="08"]) { --ds-gap-rows: 0; }
+
+:host([double]), :host([size="2"]) { --ds-gap-rows: 2; }
+
+:host([triple]), :host([size="3"]) { --ds-gap-rows: 3; }
+
+:host([quad]), :host([size="4"]) { --ds-gap-rows: 4; }
+
+:host([oct]), :host([size="8"]) { --ds-gap-rows: 8; }
+
+:host([dozen]), :host([size="12"]) { --ds-gap-rows: 12; }

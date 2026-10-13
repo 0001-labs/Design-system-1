@@ -7,7 +7,7 @@
   align-items: var(--ds-row-align, center);
   gap: var(--ds-row-gap, calc(4px * var(--ds-sf)));
   min-width: 0;
-  height: var(--ds-row-height);
+  height: var(--ds-row-default-height, var(--ds-row-height));
 }
 
 :host([auto]) {
@@ -25,4 +25,11 @@
 
 :host([end]) {
   justify-content: flex-end;
+}
+
+:host([fill]), :host([centered]), :host([end]) {
+  height: var(--ds-row-height);
+}
+:host([centered]), :host([end]) {
+  gap: var(--ds-row-packed-gap, var(--ds-row-gap, calc(4px * var(--ds-sf))));
 }
