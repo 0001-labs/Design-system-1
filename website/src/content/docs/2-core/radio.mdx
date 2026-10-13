@@ -1,0 +1,48 @@
+---
+title: Radio
+description: Native exclusive choices with one shared face.
+---
+
+`ds-radio` wraps a native `input type="radio"`. The browser owns grouping,
+Arrow and Space keys, labels, required validation, form values, reset and
+disabled fieldsets. Radios in one group share a name; separate groups need
+distinct names. DS1 owns the face, focus ring, disabled state and scale.
+
+```html
+<fieldset><legend>Access</legend>
+  <label><ds-radio><input type="radio" name="access" value="all" checked></ds-radio>All projects</label>
+  <label><ds-radio><input type="radio" name="access" value="selected"></ds-radio>Selected projects</label>
+</fieldset>
+```
+
+The standard control is one square in each direction. `choice` presents the
+same native radio as a labelled choice, four squares wide and one high.
+`compact` makes it one square wide. `preview` adds a two-row preview above the
+label; put product artwork in the `preview` slot. Always give the native input
+an accessible name; the decorative face is hidden from assistive technology.
+
+```html
+<ds-radio choice preview label="Grid">
+  <input type="radio" name="pattern" value="grid" aria-label="Grid">
+  <span slot="preview">Product artwork</span>
+</ds-radio>
+```
+
+React products import `Radio` from `DS1/react/choice`. Standard native props
+and the native input ref pass through. `label` supplies the visible choice
+label and the native accessible name unless `aria-label` is supplied.
+`preview` accepts decorative React content. The adapter renders on the server;
+register `ds-radio` in the browser before hydrating. Use React `useId()` for
+independent groups that can mount more than once.
+
+```tsx
+<Radio choice name={groupName} value="grid" label="Grid"
+  checked={pattern === "grid"} onChange={() => setPattern("grid")}
+  preview={<PatternPreview pattern="grid" />} />
+```
+
+Products keep choice data, preview artwork, selection decisions and persistence.
+Remove replaced selection, focus and control face CSS. Do not recreate radio
+keyboard logic or move native inputs into separate shadow roots. Check accepted
+and declined controlled edits, required forms, reset, labels, multiple groups,
+disabled fieldsets, narrow layouts and independent surface scales.

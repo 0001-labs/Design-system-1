@@ -1,5 +1,5 @@
 /** Native controls retain labels, forms and events. Shared Lit elements own their faces. */
-import { createElement, forwardRef, useCallback, type ButtonHTMLAttributes, type InputHTMLAttributes, type SelectHTMLAttributes, type MouseEvent } from "react";
+import { createElement, forwardRef, useCallback, type ButtonHTMLAttributes, type InputHTMLAttributes, type SelectHTMLAttributes, type MouseEvent, type ReactNode } from "react";
 
 export type ColorInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "type">;
 export const ColorInput = forwardRef<HTMLInputElement, ColorInputProps>(function ColorInput(
@@ -30,6 +30,21 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
     if (ref) ref.current = input;
   }, [ref, indeterminate]);
   return createElement("ds-checkbox", { className, style, hidden }, createElement("input", { ...props, type: "checkbox", hidden, ref: controlRef }));
+});
+
+export type RadioProps = Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "children"> & {
+  choice?: boolean;
+  compact?: boolean;
+  label?: string;
+  preview?: ReactNode;
+};
+export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
+  { className, style, hidden, choice, compact, label, preview, ...props }, ref,
+) {
+  return createElement("ds-radio", { className, style, hidden, label, choice: Boolean(choice), compact: Boolean(compact), preview: preview != null },
+    createElement("input", { ...props, "aria-label": props["aria-label"] ?? label, type: "radio", hidden, ref }),
+    preview != null ? createElement("span", { slot: "preview", "aria-hidden": true }, preview) : null,
+  );
 });
 
 export type SwitchProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" | "role" | "aria-checked" | "onChange" | "type"> & {

@@ -37,6 +37,7 @@ export * from "./0-face/theme";
 export * from "./2-core/ds-banner";
 export * from "./2-core/ds-button";
 export * from "./2-core/ds-checkbox";
+export * from "./2-core/ds-radio";
 export * from "./2-core/ds-switch";
 export * from "./2-core/ds-split";
 export * from "./2-core/ds-select";
