@@ -256,7 +256,7 @@ export class Input extends LitElement {
   protected accessibleLabel(): string | undefined {
     if (this.ariaLabel) return this.ariaLabel;
     const root = this.getRootNode() as Document | ShadowRoot;
-    const label = this.ariaLabelledBy
+    const label = (this.ariaLabelledBy ?? "")
       .split(/\s+/)
       .filter(Boolean)
       .map((id) => {
@@ -443,7 +443,7 @@ export class Input extends LitElement {
   render() {
     const hasError = Boolean(this.error || this.errorText);
     const root = this.getRootNode() as Document | ShadowRoot;
-    const description = this.ariaDescribedBy
+    const description = (this.ariaDescribedBy ?? "")
       .split(/\s+/)
       .filter(Boolean)
       .map((id) => root.getElementById?.(id)?.textContent?.trim() ?? "")

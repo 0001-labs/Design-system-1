@@ -28,8 +28,8 @@ export function initTooltips(): void {
     [data-ds-tooltip].is-visible { visibility: visible; }
     @media print { [data-ds-tooltip] { display: none; } }
   `;
-  document.head.append(style);
-  document.body.append(bubble);
+  document.head.appendChild(style);
+  document.body.appendChild(bubble);
 
   let current: HTMLElement | null = null;
   const place = (target: HTMLElement) => {

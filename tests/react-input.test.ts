@@ -125,3 +125,21 @@ test('zero-valued numeric and length constraints are preserved', async () => {
   await field.updateComplete;
   expect(native.maxLength).toBe(0);
 });
+
+
+test('removing validation descriptions and external labels keeps the field usable', async () => {
+  const render = (described: boolean) => createElement(React.Fragment, null,
+    createElement('p', { id: 'dynamic-hint' }, 'Readable contrast required'),
+    createElement('label', { id: 'dynamic-label' }, 'Colour'),
+    createElement(Input, { 'aria-labelledby': described ? 'dynamic-label' : undefined,
+      'aria-describedby': described ? 'dynamic-hint' : undefined, value: '#ffffff' }));
+  await act(async () => root.render(render(true)));
+  const { field, native } = await input();
+  expect(native.getAttribute('aria-label')).toBe('Colour');
+  expect(native.getAttribute('aria-describedby')).toBe('description');
+  await act(async () => root.render(render(false)));
+  await field.updateComplete;
+  expect(native.getAttribute('aria-label')).toBeNull();
+  expect(native.getAttribute('aria-describedby')).toBeNull();
+  expect(native.value).toBe('#ffffff');
+});
