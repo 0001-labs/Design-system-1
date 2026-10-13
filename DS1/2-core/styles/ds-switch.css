@@ -1,0 +1,45 @@
+:host {
+  display: inline-flex;
+  flex: 0 0 auto;
+  vertical-align: middle;
+  width: calc(2 * var(--ds-unit));
+  height: var(--ds-row-height);
+}
+:host([hidden]) { display: none !important; }
+::slotted(button) {
+  appearance: none !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  padding: calc(2px * var(--ds-sf)) !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: var(--ds-radius) !important;
+  background: var(--ds-fill) !important;
+  color: var(--ds-text-color-muted) !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+  touch-action: manipulation;
+}
+::slotted(button)::after {
+  content: "";
+  display: block;
+  width: calc(var(--ds-row-height) - 4px * var(--ds-sf));
+  height: 100%;
+  border-radius: var(--ds-radius);
+  background: currentColor;
+  transform: translateX(0);
+  transition: transform 140ms ease;
+}
+::slotted(button[aria-checked="true"]) {
+  background: var(--ds-accent-color) !important;
+  color: var(--ds-button-text-color-on-accent) !important;
+}
+::slotted(button[aria-checked="true"])::after { transform: translateX(var(--ds-unit)); }
+::slotted(button:focus-visible) { outline: 2px solid var(--ds-focus-ring) !important; outline-offset: 1px !important; }
+::slotted(button:disabled) { cursor: default !important; opacity: .5 !important; }
+@media (prefers-reduced-motion: reduce) { ::slotted(button)::after { transition: none; } }

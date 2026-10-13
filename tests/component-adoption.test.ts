@@ -44,6 +44,13 @@ describe("source adoption evidence", () => {
     expect(sites[1]).toMatchObject({ tag: "input", nativeStyle: "ds-input" });
     expect(sourceSites("page.html", '<button class="ds-button secondary">Save</button>')[0]?.nativeStyle).toBe("ds-button");
   });
+  it("counts shared native choice frames only once and separates literal local choices", () => {
+    for (const file of ["page.html", "view.tsx"]) {
+      const sites = sourceSites(file, '<ds-checkbox><input type="checkbox" /></ds-checkbox><ds-switch><button role="switch" /></ds-switch><input type="checkbox" /><button role="switch" />');
+      expect(sites.map(site => site.tag)).toEqual(["ds-checkbox", "ds-switch", "input", "button"]);
+      expect(sites[2]?.controlKind).toBe("checkbox"); expect(sites[3]?.controlKind).toBe("switch");
+    }
+  });
   it("distinguishes a verified snapshot, an older snapshot, and a locally modified copy", () => {
     const { app, ds } = fixture();
     expect(checkSnapshots(app, "design/components-manifest.json", ds).cells.button).toMatchObject({ snapshot: "verified", current: true });
@@ -85,6 +92,9 @@ describe("source adoption evidence", () => {
   it("verifies shared React adapters through pure re-exports and flags each modified adapter", () => {
     const { studio, app, ds } = fixture();
     const added = {
+      '2-core/ds-checkbox.ts': 'export class Checkbox {}',
+      '2-core/ds-switch.ts': 'export class Switch {}',
+      'react/choice.ts': 'export const Checkbox = () => null; export const Switch = () => null;',
       '2-core/ds-input.ts': 'export class Input {}',
       '4-page/ds-dialog.ts': 'export class Dialog {}',
       'react/dialog.ts': 'import type { Dialog as DialogElement } from "../4-page/ds-dialog"; export const DialogContent = () => null;',
@@ -96,16 +106,21 @@ describe("source adoption evidence", () => {
     git(ds, 'add', '.'); git(ds, '-c', 'user.name=Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'Add shared input');
     const manifestPath = join(app, 'design/components-manifest.json');
     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
-    manifest.commit = git(ds, 'rev-parse', 'HEAD'); manifest.components.push('input', 'textarea', 'dialog');
+    manifest.commit = git(ds, 'rev-parse', 'HEAD'); manifest.components.push('input', 'textarea', 'dialog', 'checkbox', 'switch');
     Object.assign(manifest.files, Object.fromEntries(Object.entries(added).map(([file, body]) => [file, createHash('sha256').update(body).digest('hex')])));
     writeFileSync(manifestPath, JSON.stringify(manifest));
     write(app, 'src/field.ts', 'import "./register"; export { Input as Field, Textarea as Multiline } from "../design/react/input";');
     write(app, 'src/action.ts', 'export { Button as Action } from "../design/react/button";');
     write(app, 'src/dialog.ts', 'export { DialogContent as Modal, DialogTitle } from "../design/react/dialog";');
     write(app, 'src/local.tsx', 'export const Input = () => <input />;');
-    write(app, 'src/page.tsx', 'import { Modal, DialogTitle } from "./dialog"; import { Action as SharedAction } from "./action"; import { Button as DirectAction } from "../design/react/button"; import { Field as SharedField, Multiline as Notes } from "@/field"; import { Input as Direct } from "../design/react/input"; import { Input as Local } from "./local"; export const Page = () => <><SharedField /><Direct /><Local /><Notes /><textarea /><SharedAction /><DirectAction /><Modal><DialogTitle>Title</DialogTitle></Modal><dialog /><section role="dialog" /><div role="alertdialog" /></>;');
+    write(app, 'src/page.tsx', 'import { Checkbox as Check, Switch as Toggle } from "../design/react/choice"; import { Modal, DialogTitle } from "./dialog"; import { Action as SharedAction } from "./action"; import { Button as DirectAction } from "../design/react/button"; import { Field as SharedField, Multiline as Notes } from "@/field"; import { Input as Direct } from "../design/react/input"; import { Input as Local } from "./local"; export const Page = () => <><Check /><Toggle /><input type="checkbox" /><button role="switch" /><SharedField /><Direct /><Local /><Notes /><textarea /><SharedAction /><DirectAction /><Modal><DialogTitle>Title</DialogTitle></Modal><dialog /><section role="dialog" /><div role="alertdialog" /></>;');
     git(app, 'add', '.'); git(app, '-c', 'user.name=Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'Use shared input');
     const scan = () => scanApp({ id: 'example', name: 'Example', directory: 'Example', roots: ['src'], manifest: 'design/components-manifest.json' }, studio, ds);
+    expect(scan().cells.checkbox).toMatchObject({ shared: 1, local: 1, unverified: 0 });
+    expect(scan().cells.switch).toMatchObject({ shared: 1, local: 1, unverified: 0 });
+    write(app, 'design/react/choice.ts', added['react/choice.ts'] + '\n// Local changes');
+    expect(scan().cells.checkbox).toMatchObject({ shared: 0, local: 1, unverified: 1 });
+    expect(scan().cells.switch).toMatchObject({ shared: 0, local: 1, unverified: 1 });
     expect(scan().cells.input).toMatchObject({ shared: 2, local: 1, unverified: 0 });
     expect(scan().cells.textarea).toMatchObject({ shared: 1, local: 1, unverified: 0 });
     expect(scan().cells.button).toMatchObject({ shared: 2, unverified: 0 });
