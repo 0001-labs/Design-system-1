@@ -25,6 +25,7 @@ export class Dialog extends LitElement {
   private dialog: HTMLDialogElement | null = null;
   private opener: HTMLElement | null = null;
   private pointerStartedOutside = false;
+  private opening = false;
   private observer = new MutationObserver(() => this.bindDialog());
 
   constructor() {
@@ -75,23 +76,37 @@ export class Dialog extends LitElement {
     const dialog = this.dialog;
     if (!dialog || !this.isConnected) return;
     if (this.open && !dialog.open) {
-      let active = this.ownerDocument.activeElement;
-      while (active?.shadowRoot?.activeElement) active = active.shadowRoot.activeElement;
-      this.opener ??= active instanceof HTMLElement ? active : null;
-      dialog.showModal();
-      const document = this.ownerDocument;
-      let stack = openDialogs.get(document);
-      if (!stack) openDialogs.set(document, stack = new Set());
-      if (stack.size === 0) {
-        const style = document.documentElement.style;
-        scrollStyles.set(document, { value: style.getPropertyValue("overflow"), priority: style.getPropertyPriority("overflow") });
-        style.setProperty("overflow", "hidden", "important");
-      }
-      stack.add(this);
+      if (this.opening) return;
+      this.opening = true;
+      // Let slotted Lit fields/buttons render before the browser chooses focus.
+      // Otherwise their empty shadow roots can make the dialog itself receive it.
+      const updates = [...dialog.querySelectorAll("*")].map(element => (element as LitElement).updateComplete);
+      void Promise.all(updates).then(() => {
+        this.opening = false;
+        if (this.dialog !== dialog || !this.open || !this.isConnected) { this.syncOpen(); return; }
+        this.showDialog(dialog);
+      });
     } else if (!this.open) {
       if (dialog.open) dialog.close();
       this.release();
     }
+  }
+
+  private showDialog(dialog: HTMLDialogElement) {
+    if (dialog.open) return;
+    let active = this.ownerDocument.activeElement;
+    while (active?.shadowRoot?.activeElement) active = active.shadowRoot.activeElement;
+    this.opener ??= active instanceof HTMLElement ? active : null;
+    dialog.showModal();
+    const document = this.ownerDocument;
+    let stack = openDialogs.get(document);
+    if (!stack) openDialogs.set(document, stack = new Set());
+    if (stack.size === 0) {
+      const style = document.documentElement.style;
+      scrollStyles.set(document, { value: style.getPropertyValue("overflow"), priority: style.getPropertyPriority("overflow") });
+      style.setProperty("overflow", "hidden", "important");
+    }
+    stack.add(this);
   }
 
   private release() {
