@@ -1,22 +1,22 @@
 /** Optional React composition; behavior and appearance belong to ds-dialog. */
 import { createContext, createElement, useContext, useId, useLayoutEffect, useRef, useState, type HTMLAttributes, type ReactNode, type Ref } from "react";
 import { createPortal } from "react-dom";
-import type { Dialog as DialogElement } from "../4-page/ds-dialog";
+import type { Dialog as DialogElement, DialogCloseReason } from "../4-page/ds-dialog";
 
-const DialogContext = createContext<{ open: boolean; change: (open: boolean) => void; title: string; description: string } | null>(null);
+const DialogContext = createContext<{ open: boolean; change: (open: boolean, reason?: DialogCloseReason) => void; title: string; description: string } | null>(null);
 const useDialog = () => {
   const context = useContext(DialogContext);
   if (!context) throw new Error("Dialog content must be inside Dialog.");
   return context;
 };
 
-export interface DialogProps { open?: boolean; defaultOpen?: boolean; onOpenChange?: (open: boolean) => void; children: ReactNode }
+export interface DialogProps { open?: boolean; defaultOpen?: boolean; onOpenChange?: (open: boolean, reason?: DialogCloseReason) => void; children: ReactNode }
 export function Dialog({ open, defaultOpen = false, onOpenChange, children }: DialogProps) {
   const [internal, setInternal] = useState(defaultOpen);
   const id = useId();
   return createElement(DialogContext.Provider, { value: {
     open: open ?? internal, title: `${id}-title`, description: `${id}-description`,
-    change: next => { if (open === undefined) setInternal(next); onOpenChange?.(next); },
+    change: (next, reason) => { if (open === undefined) setInternal(next); onOpenChange?.(next, reason); },
   } }, children);
 }
 
@@ -54,7 +54,7 @@ export function DialogContent({ children, portal = true, nonModal = false, close
     const close = (event: Event) => {
       if (event.target !== element) return;
       event.preventDefault();
-      context.change(false);
+      context.change(false, (event as CustomEvent<{ reason: DialogCloseReason }>).detail.reason);
     };
     element.addEventListener("ds-close-request", close);
     const native = element.querySelector("dialog")!;

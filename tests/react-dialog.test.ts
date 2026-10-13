@@ -13,7 +13,7 @@ test("React keeps close decisions controlled, forwards events and links accessib
   const root = createRoot(mount); const requested = vi.fn(); const submit = vi.fn();
   function Example({ allow = false }) {
     const [open, setOpen] = useState(true);
-    return h(Dialog, { open, onOpenChange: value => { requested(value); if (allow) setOpen(value); } },
+    return h(Dialog, { open, onOpenChange: (value, reason) => { requested(value, reason); if (allow) setOpen(value); } },
       h(DialogContent, { closeLabel: "Dismiss example" },
         h(DialogTitle, null, "Example title"), h(DialogDescription, null, "Example description"),
         h("form", { onSubmit: event => { event.preventDefault(); submit(event.currentTarget); } }, h("button", { type: "submit" }, "Save"))));
@@ -27,7 +27,7 @@ test("React keeps close decisions controlled, forwards events and links accessib
     await act(async () => native.querySelector('button[type="submit"]')!.dispatchEvent(new MouseEvent("click", { bubbles: true })));
     expect(submit).toHaveBeenCalledExactlyOnceWith(native.querySelector("form"));
     await act(async () => native.querySelector<HTMLButtonElement>('[aria-label="Dismiss example"]')!.click());
-    expect(requested).toHaveBeenCalledWith(false); expect(native.open).toBe(true);
+    expect(requested).toHaveBeenCalledWith(false, "button"); expect(native.open).toBe(true);
     await act(async () => root.render(h(Example, { allow: true })));
     await act(async () => native.dispatchEvent(new Event("cancel", { cancelable: true })));
     expect(document.querySelector("dialog")).toBeNull();
@@ -59,7 +59,7 @@ test("React modeless panels retain their layout, native ref and controlled outsi
   const outside = document.createElement('button'); document.body.append(outside);
   function Example({ allow = false }) {
     const [open, setOpen] = useState(true);
-    return h(Dialog, { open, onOpenChange: value => { requested(value); if (allow) setOpen(value); } },
+    return h(Dialog, { open, onOpenChange: (value, reason) => { requested(value, reason); if (allow) setOpen(value); } },
       h(DialogContent, { nonModal: true, portal: false, closeOnOutside: true, showClose: false, ref: nativeRef, 'aria-label': 'Floating tools' },
         h('button', null, 'Local action')));
   }
@@ -69,7 +69,7 @@ test("React modeless panels retain their layout, native ref and controlled outsi
     expect(mount.contains(native)).toBe(true); expect(native.open).toBe(true);
     expect(document.documentElement.style.overflow).toBe('');
     await act(async () => { outside.dispatchEvent(new Event('pointerdown', { bubbles: true })); outside.click(); });
-    expect(requested).toHaveBeenCalledWith(false); expect(native.open).toBe(true);
+    expect(requested).toHaveBeenCalledWith(false, "outside"); expect(native.open).toBe(true);
     await act(async () => root.render(h(Example, { allow: true })));
     await act(async () => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
     expect(nativeRef.current).toBeNull(); expect(mount.querySelector('dialog')).toBeNull();
