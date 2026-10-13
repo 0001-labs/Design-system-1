@@ -1,0 +1,38 @@
+---
+title: Composer
+description: A native multiline writing field with aligned inline highlights.
+---
+
+`ds-composer` supplies the shared face, row-grid sizing and highlight layer for
+an editable message. Its direct child is a native `textarea`, so labels, forms,
+validation, selection and ARIA references to a mention list stay native.
+
+```html
+<ds-composer auto-grow max-rows="12" variant="plain">
+  <textarea rows="2" aria-label="Comment" aria-controls="people"></textarea>
+</ds-composer>
+```
+
+Set `highlights` to UTF-16 ranges: `[{ start: 3, end: 7, color: "var(--ds-sharp-blue)" }]`.
+Omit `color` for the shared accent. Invalid and overlapping ranges are ignored.
+The layer renders the exact original text; it never inserts avatars, padding or
+extra characters that would separate highlights from the native caret.
+Mention matching, candidates and submission remain product data and actions.
+
+Use `field` for a standalone field or `plain` inside a composed surface.
+Native `rows` sets the minimum. `auto-grow` grows on the row grid up to
+`max-rows`; additional content scrolls. Width, fonts and surface scale changes
+reflow both layers. Without automatic growth, the field can be resized vertically.
+`wrap="off"` preserves horizontal scrolling. Forced-colour mode uses native text.
+
+For React, register the component in the browser and import `Composer` from
+`DS1/react/composer`. It accepts native textarea properties, callbacks and refs,
+plus `highlights`, `variant`, `autoGrow` and `maxRows`. Classes and `style` place
+the host in the page; do not restyle the child. Controlled values, including a
+rejected edit, remain authoritative for both layers. Native form reset is kept.
+
+Outside React, call the host's `refresh()` after assigning a native `value`
+programmatically. User input and form reset refresh automatically. The mirror
+is hidden from assistive technology, and contains no interactive elements.
+Use `ds-textarea` for ordinary multiline fields that do not need highlights or
+a light-DOM connection to external options.

@@ -40,7 +40,7 @@ export function sourceSites(file: string, source: string): TagSite[] {
         if (at >= 0) stack.length = at;
         continue;
       }
-      const frame = (tag === "dialog" && stack.at(-1) === "ds-dialog") || (tag === "input" && ["ds-checkbox", "ds-color"].includes(stack.at(-1) ?? "")) || (tag === "button" && stack.at(-1) === "ds-switch") || (tag === "select" && stack.at(-1) === "ds-select");
+      const frame = (tag === "dialog" && stack.at(-1) === "ds-dialog") || (tag === "input" && ["ds-checkbox", "ds-color"].includes(stack.at(-1) ?? "")) || (tag === "button" && stack.at(-1) === "ds-switch") || (tag === "select" && stack.at(-1) === "ds-select") || (tag === "textarea" && stack.at(-1) === "ds-composer");
       const attributes = clean.slice(match.index! + match[0].length).split(">")[0]!;
       if (!/\/\s*$/.test(attributes) && !/^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/.test(tag)) stack.push(tag);
       if (frame) continue;
@@ -89,7 +89,7 @@ export function sourceSites(file: string, source: string): TagSite[] {
         const call = statement.expression;
         if (!ts.isPropertyAccessExpression(call.expression) || !ts.isIdentifier(call.expression.expression) || !["append", "appendChild"].includes(call.expression.name.text)) continue;
         const host = creations.get(call.expression.expression.text)?.tag;
-        const frameTags: Record<string, string> = { "ds-dialog": "dialog", "ds-select": "select", "ds-checkbox": "input", "ds-color": "input", "ds-switch": "button" };
+        const frameTags: Record<string, string> = { "ds-dialog": "dialog", "ds-select": "select", "ds-composer": "textarea", "ds-checkbox": "input", "ds-color": "input", "ds-switch": "button" };
         const frameTag = host && frameTags[host];
         if (!frameTag) continue;
         for (const arg of call.arguments) {
@@ -112,7 +112,7 @@ export function sourceSites(file: string, source: string): TagSite[] {
       const roleValue = role && ts.isJsxAttribute(role) ? role.initializer : undefined;
       const dialogRole = roleValue && ts.isStringLiteral(roleValue) && ["dialog", "alertdialog"].includes(roleValue.text);
       const parentElement = ts.isJsxOpeningElement(node) ? node.parent.parent : node.parent;
-      const frameHosts: Record<string, string> = { dialog: "ds-dialog", input: "ds-checkbox", button: "ds-switch", select: "ds-select" };
+      const frameHosts: Record<string, string> = { dialog: "ds-dialog", input: "ds-checkbox", button: "ds-switch", select: "ds-select", textarea: "ds-composer" };
       const sharedFrame = parentElement && ts.isJsxElement(parentElement) && (parentElement.openingElement.tagName.getText(ast) === frameHosts[tag] || (tag === "input" && parentElement.openingElement.tagName.getText(ast) === "ds-color"));
       const type = node.attributes.properties.find(p => ts.isJsxAttribute(p) && p.name.getText(ast) === "type");
       const typeValue = type && ts.isJsxAttribute(type) ? type.initializer : undefined;
@@ -145,7 +145,7 @@ export function sourceSites(file: string, source: string): TagSite[] {
 function emptyCell(): ComponentCell { return { shared: 0, styled: 0, local: 0, unverified: 0, sites: [], snapshot: "none", current: null, issues: [] }; }
 interface Manifest { commit: string; components: string[]; files: Record<string, string> }
 
-export function checkSnapshots(root: string, manifestPath: string | undefined, dsRoot: string): { commit: string | null; cells: Record<string, ComponentCell>; controls: ComponentCell; reactInput: ComponentCell; reactButton: ComponentCell; reactDialog: ComponentCell; reactChoice: ComponentCell; reactSplit: ComponentCell } {
+export function checkSnapshots(root: string, manifestPath: string | undefined, dsRoot: string): { commit: string | null; cells: Record<string, ComponentCell>; controls: ComponentCell; reactInput: ComponentCell; reactButton: ComponentCell; reactDialog: ComponentCell; reactChoice: ComponentCell; reactSplit: ComponentCell; reactComposer: ComponentCell } {
   const cells = Object.fromEntries(COMPONENT_COLUMNS.map(c => [c.id, emptyCell()]));
   const controls = emptyCell();
   const reactInput = emptyCell();
@@ -153,7 +153,8 @@ export function checkSnapshots(root: string, manifestPath: string | undefined, d
   const reactDialog = emptyCell();
   const reactChoice = emptyCell();
   const reactSplit = emptyCell();
-  if (!manifestPath || !existsSync(join(root, manifestPath))) return { commit: null, cells, controls, reactInput, reactButton, reactDialog, reactChoice, reactSplit };
+  const reactComposer = emptyCell();
+  if (!manifestPath || !existsSync(join(root, manifestPath))) return { commit: null, cells, controls, reactInput, reactButton, reactDialog, reactChoice, reactSplit, reactComposer };
   const manifest = JSON.parse(readFileSync(join(root, manifestPath), "utf8")) as Manifest;
   if (!/^[a-f0-9]{40}$/.test(manifest.commit) || !Array.isArray(manifest.components) || !manifest.files) throw new Error("Invalid component manifest");
   const snapshot = dirname(join(root, manifestPath));
@@ -165,10 +166,10 @@ export function checkSnapshots(root: string, manifestPath: string | undefined, d
     }
     return historical.get(file)!;
   };
-  for (const component of [...manifest.components, "@controls", ...(manifest.files['react/split.ts'] ? ['@react-split'] : []), ...(manifest.files['react/input.ts'] ? ['@react-input'] : []), ...(manifest.files['react/button.ts'] ? ['@react-button'] : []), ...(manifest.files['react/dialog.ts'] ? ['@react-dialog'] : []), ...(manifest.files['react/choice.ts'] ? ['@react-choice'] : [])]) {
-    const cell = component === "@controls" ? controls : component === '@react-input' ? reactInput : component === '@react-button' ? reactButton : component === '@react-dialog' ? reactDialog : component === '@react-choice' ? reactChoice : component === '@react-split' ? reactSplit : cells[component];
+  for (const component of [...manifest.components, "@controls", ...(manifest.files['react/composer.ts'] ? ['@react-composer'] : []), ...(manifest.files['react/split.ts'] ? ['@react-split'] : []), ...(manifest.files['react/input.ts'] ? ['@react-input'] : []), ...(manifest.files['react/button.ts'] ? ['@react-button'] : []), ...(manifest.files['react/dialog.ts'] ? ['@react-dialog'] : []), ...(manifest.files['react/choice.ts'] ? ['@react-choice'] : [])]) {
+    const cell = component === "@controls" ? controls : component === "@react-composer" ? reactComposer : component === '@react-input' ? reactInput : component === '@react-button' ? reactButton : component === '@react-dialog' ? reactDialog : component === '@react-choice' ? reactChoice : component === '@react-split' ? reactSplit : cells[component];
     if (!cell) continue;
-    const entry = component === "@controls" ? "1-root/controls.css" : component === '@react-input' ? 'react/input.ts' : component === '@react-button' ? 'react/button.ts' : component === '@react-dialog' ? 'react/dialog.ts' : component === '@react-choice' ? 'react/choice.ts' : component === '@react-split' ? 'react/split.ts' : Object.keys(manifest.files).find(f => f.endsWith(`/ds-${component}.ts`));
+    const entry = component === "@controls" ? "1-root/controls.css" : component === "@react-composer" ? "react/composer.ts" : component === '@react-input' ? 'react/input.ts' : component === '@react-button' ? 'react/button.ts' : component === '@react-dialog' ? 'react/dialog.ts' : component === '@react-choice' ? 'react/choice.ts' : component === '@react-split' ? 'react/split.ts' : Object.keys(manifest.files).find(f => f.endsWith(`/ds-${component}.ts`));
     const visited = new Set<string>();
     let modified = false, unverifiable = false, current = true;
     const visit = (file: string) => {
@@ -194,7 +195,7 @@ export function checkSnapshots(root: string, manifestPath: string | undefined, d
     cell.snapshot = modified ? "modified" : unverifiable ? "unverified" : "verified";
     cell.current = current && !unverifiable;
   }
-  return { commit: manifest.commit, cells, controls, reactInput, reactButton, reactDialog, reactChoice, reactSplit };
+  return { commit: manifest.commit, cells, controls, reactInput, reactButton, reactDialog, reactChoice, reactSplit, reactComposer };
 }
 
 /** Follow direct imports and pure registration/re-export entries to the snapshot.
@@ -205,6 +206,7 @@ function importedSharedAdapters(root: string, file: string, source: string, mani
   const found = new Map<string, string>();
   if (!manifestPath) return found;
   const adapterModules: Record<string, Record<string, string>> = {
+    [resolve(root, dirname(manifestPath), 'react/composer.ts')]: { Composer: 'composer' },
     [resolve(root, dirname(manifestPath), 'react/split.ts')]: { Split: 'split' },
     [resolve(root, dirname(manifestPath), 'react/input.ts')]: { Input: 'input', Textarea: 'textarea' },
     [resolve(root, dirname(manifestPath), 'react/button.ts')]: { Button: 'button' },
@@ -301,7 +303,7 @@ export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): Ado
         }
         const cell = app.cells[component]!;
         const ds = sharedAdapters.has(site.tag) || Boolean(aliases[site.tag]) || custom?.[1] === "ds";
-        const evidence = sharedAdapters.has(site.tag) ? (component === "split" ? snapshots.reactSplit : component === "button" ? snapshots.reactButton : component === "dialog" ? snapshots.reactDialog : ["checkbox", "switch", "select", "color"].includes(component) ? snapshots.reactChoice : snapshots.reactInput) : cell;
+        const evidence = sharedAdapters.has(site.tag) ? (component === "composer" ? snapshots.reactComposer : component === "split" ? snapshots.reactSplit : component === "button" ? snapshots.reactButton : component === "dialog" ? snapshots.reactDialog : ["checkbox", "switch", "select", "color"].includes(component) ? snapshots.reactChoice : snapshots.reactInput) : cell;
         if (sharedAdapters.has(site.tag)) {
           cell.issues = [...new Set([...cell.issues, ...evidence.issues])];
           cell.current = cell.current === true && evidence.current === true;

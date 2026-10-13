@@ -94,6 +94,8 @@ describe("source adoption evidence", () => {
   it("verifies shared React adapters through pure re-exports and flags each modified adapter", () => {
     const { studio, app, ds } = fixture();
     const added = {
+      '2-core/ds-composer.ts': 'export class Composer {}',
+      'react/composer.ts': 'import type { Composer } from "../2-core/ds-composer"; export const Composer = () => null;',
       '2-core/ds-split.ts': 'export class Split {}',
       'react/split.ts': 'import type { Split as SplitElement } from "../2-core/ds-split"; export const Split = () => null;',
       '2-core/ds-checkbox.ts': 'export class Checkbox {}',
@@ -112,7 +114,7 @@ describe("source adoption evidence", () => {
     git(ds, 'add', '.'); git(ds, '-c', 'user.name=Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'Add shared input');
     const manifestPath = join(app, 'design/components-manifest.json');
     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
-    manifest.commit = git(ds, 'rev-parse', 'HEAD'); manifest.components.push('split', 'input', 'textarea', 'dialog', 'checkbox', 'switch', 'select', 'color');
+    manifest.commit = git(ds, 'rev-parse', 'HEAD'); manifest.components.push('composer', 'split', 'input', 'textarea', 'dialog', 'checkbox', 'switch', 'select', 'color');
     Object.assign(manifest.files, Object.fromEntries(Object.entries(added).map(([file, body]) => [file, createHash('sha256').update(body).digest('hex')])));
     writeFileSync(manifestPath, JSON.stringify(manifest));
     write(app, 'src/field.ts', 'import "./register"; export { Input as Field, Textarea as Multiline } from "../design/react/input";');
@@ -120,9 +122,12 @@ describe("source adoption evidence", () => {
     write(app, 'src/dialog.ts', 'export { DialogContent as Modal, DialogTitle } from "../design/react/dialog";');
     write(app, 'src/local.tsx', 'export const Input = () => <input />;');
     write(app, 'src/split.ts', 'import "./register"; export { Split as Segments } from "../design/react/split";');
-    write(app, 'src/page.tsx', 'import { Segments } from "./split"; import { Checkbox as Check, Switch as Toggle, Select as Choice, ColorInput as Color } from "../design/react/choice"; import { Modal, DialogTitle } from "./dialog"; import { Action as SharedAction } from "./action"; import { Button as DirectAction } from "../design/react/button"; import { Field as SharedField, Multiline as Notes } from "@/field"; import { Input as Direct } from "../design/react/input"; import { Input as Local } from "./local"; export const Page = () => <><Segments /><ds-split /><ezo-split /><Check /><Toggle /><Choice /><Color /><input type="color" /><select /><input type="checkbox" /><button role="switch" /><SharedField /><Direct /><Local /><Notes /><textarea /><SharedAction /><DirectAction /><Modal><DialogTitle>Title</DialogTitle></Modal><dialog /><section role="dialog" /><div role="alertdialog" /></>;');
+    write(app, 'src/page.tsx', 'import { Composer } from "../design/react/composer"; import { Segments } from "./split"; import { Checkbox as Check, Switch as Toggle, Select as Choice, ColorInput as Color } from "../design/react/choice"; import { Modal, DialogTitle } from "./dialog"; import { Action as SharedAction } from "./action"; import { Button as DirectAction } from "../design/react/button"; import { Field as SharedField, Multiline as Notes } from "@/field"; import { Input as Direct } from "../design/react/input"; import { Input as Local } from "./local"; export const Page = () => <><Composer /><ds-composer><textarea /></ds-composer><Segments /><ds-split /><ezo-split /><Check /><Toggle /><Choice /><Color /><input type="color" /><select /><input type="checkbox" /><button role="switch" /><SharedField /><Direct /><Local /><Notes /><textarea /><SharedAction /><DirectAction /><Modal><DialogTitle>Title</DialogTitle></Modal><dialog /><section role="dialog" /><div role="alertdialog" /></>;');
     git(app, 'add', '.'); git(app, '-c', 'user.name=Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'Use shared input');
     const scan = () => scanApp({ id: 'example', name: 'Example', directory: 'Example', roots: ['src'], manifest: 'design/components-manifest.json' }, studio, ds);
+    expect(scan().cells.composer).toMatchObject({ shared: 2, local: 0, unverified: 0 });
+    write(app, 'design/react/composer.ts', added['react/composer.ts'] + '\n// Local changes');
+    expect(scan().cells.composer).toMatchObject({ shared: 1, local: 0, unverified: 1 });
     expect(scan().cells.split).toMatchObject({ shared: 2, local: 1, unverified: 0 });
     write(app, 'design/react/split.ts', added['react/split.ts'] + '\n// Local changes');
     expect(scan().cells.split).toMatchObject({ shared: 1, local: 1, unverified: 1 });
@@ -185,4 +190,9 @@ it("recognizes direct native control frames without conflating separate scopes o
   }
   expect(sourceSites("view.ts", 'const host = document.createElement("ds-select"); const field = document.createElement("select"); host.appendChild(field); const unrelated = document.createElement("input"); host.append(unrelated);').map(s => s.tag)).toEqual(["ds-select", "input"]);
   expect(sourceSites("view.ts", 'let host = document.createElement("ds-select"); const field = document.createElement("select"); host.append(field);').map(s => s.tag)).toEqual(["ds-select", "select"]);
+});
+
+it("counts highlighted native textarea frames once in HTML and direct DOM composition", () => {
+  expect(sourceSites("field.html", '<ds-composer><textarea></textarea></ds-composer>').map(site => site.tag)).toEqual(["ds-composer"]);
+  expect(sourceSites("field.ts", 'const host = document.createElement("ds-composer"); const input = document.createElement("textarea"); host.append(input);').map(site => site.tag)).toEqual(["ds-composer"]);
 });

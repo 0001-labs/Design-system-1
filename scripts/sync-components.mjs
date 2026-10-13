@@ -42,6 +42,7 @@ const entries = components.map(name => {
 // React consumers may import the optional, source-owned state adapter.
 if (components.includes('button')) visit('react/button.ts');
 if (components.includes('split')) visit('react/split.ts');
+if (components.includes('composer')) visit('react/composer.ts');
 if (['checkbox', 'switch', 'select', 'color'].some(name => components.includes(name))) visit('react/choice.ts');
 if (components.includes('dialog')) visit('react/dialog.ts');
 if (components.includes('swatch')) visit('0-face/tooltips.ts');

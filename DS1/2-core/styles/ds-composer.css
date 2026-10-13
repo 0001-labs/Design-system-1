@@ -1,0 +1,55 @@
+@import "../../1-root/component-metrics.css";
+
+:host { display: block; position: relative; width: 100%; min-width: 0; }
+:host([hidden]) { display: none !important; }
+.row-metric { position: absolute; width: 0; height: var(--ds-row-height); visibility: hidden; pointer-events: none; }
+::slotted(textarea), .mirror {
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: calc(4px * var(--ds-sf)) !important;
+  border: 1px solid var(--ds-border-color) !important;
+  border-radius: calc(4px * var(--ds-sf)) !important;
+  font-family: var(--ds-typeface-regular) !important;
+  font-size: var(--ds-type-size-default) !important;
+  font-weight: var(--ds-type-weight-default) !important;
+  line-height: var(--ds-type-lineheight-default) !important;
+  letter-spacing: var(--ds-type-letterspacing-default) !important;
+  text-align: start !important;
+  text-indent: 0 !important;
+  text-transform: none !important;
+  white-space: pre-wrap !important;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+  tab-size: 8 !important;
+  color: var(--ds-text-color) !important;
+}
+::slotted(textarea) {
+  display: block !important;
+  position: relative !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: var(--composer-height, calc(var(--composer-rows, 3) * var(--ds-row-height))) !important;
+  min-height: var(--ds-row-height) !important;
+  max-height: none !important;
+  overflow-y: var(--composer-overflow, auto) !important;
+  background: var(--ds-fill) !important;
+  caret-color: var(--ds-text-color) !important;
+  box-shadow: none !important;
+  outline: none !important;
+  resize: vertical !important;
+}
+::slotted(textarea:focus-visible) { outline: 1px solid var(--ds-focus-ring) !important; outline-offset: -1px !important; }
+::slotted(textarea:disabled) { opacity: .5 !important; cursor: not-allowed !important; resize: none !important; }
+.mirror { position: absolute; top: 0; left: 0; overflow: hidden; pointer-events: none; border-color: transparent !important; }
+mark { padding: 0; margin: 0; border: 0; font: inherit; letter-spacing: inherit; color: var(--ds-accent-color); background: transparent; }
+:host(:not([data-highlighted])) .mirror { display: none; }
+:host([data-highlighted]) ::slotted(textarea) { color: transparent !important; -webkit-text-fill-color: transparent !important; }
+:host(:has(> textarea:disabled)) .mirror { opacity: .5; }
+:host([variant="plain"]) ::slotted(textarea), :host([variant="plain"]) .mirror { padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: transparent !important; }
+:host([auto-grow]) ::slotted(textarea) { resize: none !important; }
+:host([data-nowrap]) ::slotted(textarea), :host([data-nowrap]) .mirror { white-space: pre !important; overflow-wrap: normal !important; }
+@media (forced-colors: active) {
+  .mirror { display: none !important; }
+  :host([data-highlighted]) ::slotted(textarea) { color: CanvasText !important; -webkit-text-fill-color: CanvasText !important; caret-color: CanvasText !important; }
+}
