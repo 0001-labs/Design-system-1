@@ -789,6 +789,13 @@
     "shapes": 1
   },
   {
+    "key": "relationships",
+    "name": "Relationships",
+    "source": "Library",
+    "url": "/icons/library/relationships.svg",
+    "shapes": 1
+  },
+  {
     "key": "triangle",
     "name": "Triangle",
     "source": "Library",

@@ -892,6 +892,14 @@
     "shapes": 1
   },
   {
+    "key": "relationships",
+    "name": "Relationships",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M2 6H6V10H2V6ZM10 2H14V6H10V2ZM10 10H14V14H10V10ZM6 7.5H7.5V3.5H10V4.5H8.5V7.5V8.5V11.5H10V12.5H7.5V8.5H6V7.5Z\" fill=\"#1E1E1E\"/>\n</svg>\n",
+    "url": "/icons/library/relationships.svg",
+    "shapes": 1
+  },
+  {
     "key": "triangle",
     "name": "Triangle",
     "source": "Library",
