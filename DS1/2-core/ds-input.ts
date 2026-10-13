@@ -137,7 +137,7 @@ export class Input extends LitElement {
     this._focused = false;
     this._placeholder = "";
     this._currentLanguage = currentLanguage.value;
-    
+
     // Create bound event handlers for proper cleanup
     this.boundHandlers = {
       languageChanged: (() => {
