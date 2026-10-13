@@ -18,40 +18,10 @@
     "file": "list-line.svg"
   },
   {
-    "key": "check-alt",
-    "name": "Check alternate",
-    "node": "1177:314",
-    "file": "check-alt.svg"
-  },
-  {
-    "key": "open-alt",
-    "name": "Open alternate",
-    "node": "1177:310",
-    "file": "open-alt.svg"
-  },
-  {
-    "key": "star-alt",
-    "name": "Star alternate",
-    "node": "1177:306",
-    "file": "star-alt.svg"
-  },
-  {
-    "key": "rewind-30",
-    "name": "Rewind 30",
-    "node": "1059:27",
-    "file": "rewind-30.svg"
-  },
-  {
     "key": "rewind-30-alt",
     "name": "Rewind 30 alternate",
     "node": "1059:29",
     "file": "rewind-30-alt.svg"
-  },
-  {
-    "key": "see-30",
-    "name": "See 30",
-    "node": "1044:26",
-    "file": "see-30.svg"
   },
   {
     "key": "page-18",
@@ -64,12 +34,6 @@
     "name": "Menu",
     "node": "700:1483",
     "file": "menu.svg"
-  },
-  {
-    "key": "lock-filled",
-    "name": "Lock filled",
-    "node": "657:902",
-    "file": "lock-filled.svg"
   },
   {
     "key": "minimize-alt",
@@ -100,12 +64,6 @@
     "name": "2x grid alternate",
     "node": "621:1508",
     "file": "2xgrid-alt.svg"
-  },
-  {
-    "key": "page-alt",
-    "name": "Page alternate",
-    "node": "554:10",
-    "file": "page-alt.svg"
   },
   {
     "key": "archive-alt",
@@ -184,11 +142,5 @@
     "name": "Play alternate",
     "node": "1139:24",
     "file": "play-alt.svg"
-  },
-  {
-    "key": "star-alt-2",
-    "name": "Star alternate 2",
-    "node": "1141:23",
-    "file": "star-alt-2.svg"
   }
 ]

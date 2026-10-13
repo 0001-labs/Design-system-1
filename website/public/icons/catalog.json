@@ -112,14 +112,6 @@
     "shapes": 1
   },
   {
-    "key": "check-alt",
-    "name": "Check",
-    "source": "Figma",
-    "node": "1177:314",
-    "url": "/icons/interface/check-alt.svg",
-    "shapes": 1
-  },
-  {
     "key": "close",
     "name": "Close",
     "source": "Figma",
@@ -564,14 +556,6 @@
     "shapes": 1
   },
   {
-    "key": "lock-filled",
-    "name": "Lock",
-    "source": "Figma",
-    "node": "657:902",
-    "url": "/icons/interface/lock-filled.svg",
-    "shapes": 1
-  },
-  {
     "key": "loop",
     "name": "Loop",
     "source": "Figma",
@@ -727,14 +711,6 @@
     "shapes": 1
   },
   {
-    "key": "open-alt",
-    "name": "Open",
-    "source": "Figma",
-    "node": "1177:310",
-    "url": "/icons/interface/open-alt.svg",
-    "shapes": 1
-  },
-  {
     "key": "up-right",
     "name": "Outbound",
     "source": "Library",
@@ -769,14 +745,6 @@
     "source": "Figma",
     "node": "701:1557",
     "url": "/icons/interface/page-18.svg",
-    "shapes": 1
-  },
-  {
-    "key": "page-alt",
-    "name": "Page",
-    "source": "Figma",
-    "node": "554:10",
-    "url": "/icons/interface/page-alt.svg",
     "shapes": 1
   },
   {
@@ -847,14 +815,6 @@
     "shapes": 3
   },
   {
-    "key": "rewind-30",
-    "name": "Rewind",
-    "source": "Figma",
-    "node": "1059:27",
-    "url": "/icons/interface/rewind-30.svg",
-    "shapes": 3
-  },
-  {
     "key": "rewind-30-alt",
     "name": "Rewind",
     "source": "Figma",
@@ -919,14 +879,6 @@
     "shapes": 2
   },
   {
-    "key": "see-30",
-    "name": "See",
-    "source": "Figma",
-    "node": "1044:26",
-    "url": "/icons/interface/see-30.svg",
-    "shapes": 2
-  },
-  {
     "key": "settings",
     "name": "Settings",
     "source": "Library",
@@ -976,22 +928,6 @@
     "source": "Figma",
     "node": "115:171",
     "url": "/icons/interface/star.svg",
-    "shapes": 1
-  },
-  {
-    "key": "star-alt",
-    "name": "Star",
-    "source": "Figma",
-    "node": "1177:306",
-    "url": "/icons/interface/star-alt.svg",
-    "shapes": 1
-  },
-  {
-    "key": "star-alt-2",
-    "name": "Star",
-    "source": "Figma",
-    "node": "1141:23",
-    "url": "/icons/interface/star-alt-2.svg",
     "shapes": 1
   },
   {
@@ -1082,13 +1018,6 @@
     "node": "116:208",
     "url": "/icons/interface/title-text.svg",
     "shapes": 1
-  },
-  {
-    "key": "titlestyle",
-    "name": "Titlestyle",
-    "source": "Library",
-    "url": "/icons/library/titlestyle.svg",
-    "shapes": 2
   },
   {
     "key": "todo",

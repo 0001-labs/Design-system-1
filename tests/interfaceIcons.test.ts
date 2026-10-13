@@ -3,7 +3,7 @@ import { expect, test } from 'vite-plus/test';
 import icons from '../website/src/lib/icons/interface-catalog.json';
 import sources from '../website/src/lib/icons/figma-interface.json';
 import additions from '../website/src/lib/icons/figma-additions.json';
-import { isSharedInterfaceIcon } from '../website/src/lib/icons/icon-scope';
+import { interfaceIconAliases, isSharedInterfaceIcon } from '../website/src/lib/icons/icon-scope';
 import { scopedSvg } from '../website/src/lib/icons/svgView';
 
 test('the 69-icon Figma collection is present with its original vector geometry',()=>{
@@ -32,6 +32,15 @@ test('the removed status drawing with the extra bottom bar stays out of the coll
   expect(isSharedInterfaceIcon('status-alt')).toBe(false);
   expect(icons.some(icon => icon.key === 'status')).toBe(true);
   expect(icons.some(icon => icon.key === 'status-filled')).toBe(true);
+});
+test('duplicate drawings appear only once, including a single Check', () => {
+  expect(icons.filter(icon => icon.name === 'Check').map(icon => icon.key)).toEqual(['check']);
+  for (const [alias, canonical] of Object.entries(interfaceIconAliases)) {
+    expect(icons.some(icon => icon.key === alias), alias).toBe(false);
+    expect(icons.some(icon => icon.key === canonical), canonical).toBe(true);
+    expect(readdirSync(new URL('../website/public/icons/interface/', import.meta.url))).not.toContain(alias + '.svg');
+    expect(readdirSync(new URL('../website/public/icons/library/', import.meta.url))).not.toContain(alias + '.svg');
+  }
 });
 test('the shared sheet uses single-word labels and excludes product collections and their SVG exports', () => {
   for (const icon of icons) {

@@ -1,6 +1,19 @@
-/** Product artwork is retained for existing consumers, outside the shared icon overview. */
+/** Repeated drawings resolve to the original shared icon; runtime keys stay compatible. */
+export const interfaceIconAliases: Record<string, string> = {
+  'check-alt': 'check',
+  'lock-filled': 'lock',
+  'open-alt': 'open',
+  'page-alt': 'page',
+  'rewind-30': 'rewind',
+  'see-30': 'see',
+  'star-alt': 'star',
+  'star-alt-2': 'star',
+  titlestyle: 'title',
+};
+
+/** Product artwork and repeated drawings remain available to existing consumers. */
 export function isSharedInterfaceIcon(key: string): boolean {
-  return key !== 'status-alt' && !/^(ezo-|aa-|badge-|block-|pattern-|arrange-|navigation-)/.test(key);
+  return key !== 'status-alt' && !Object.hasOwn(interfaceIconAliases, key) && !/^(ezo-|aa-|badge-|block-|pattern-|arrange-|navigation-)/.test(key);
 }
 
 /** One semantic word on the sheet; technical keys stay stable for consumers. */
