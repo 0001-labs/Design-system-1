@@ -19,7 +19,7 @@ export const APPS: AppSpec[] = [
   { id: "consistency", name: "Consistency", directory: "Consistency", roots: ["src"], manifest: "src/design/components-manifest.json" },
 ];
 const known = new Set(COMPONENT_COLUMNS.map(c => c.id));
-const native: Record<string, string> = { button: "button", input: "input", select: "input", textarea: "textarea", p: "text", h1: "text", h2: "text", h3: "text", h4: "text", h5: "text", h6: "text", ul: "list", ol: "list", table: "table", form: "form" };
+const native: Record<string, string> = { button: "button", input: "input", select: "input", textarea: "textarea", p: "text", h1: "text", h2: "text", h3: "text", h4: "text", h5: "text", h6: "text", ul: "list", ol: "list", table: "table", form: "form", dialog: "dialog" };
 type TagSite = { tag: string; line: number; nativeStyle?: string };
 function nativeStyle(tag: string, className: string): string | undefined {
   const classes = className.split(/\s+/);
@@ -83,12 +83,13 @@ export function sourceSites(file: string, source: string): TagSite[] {
 function emptyCell(): ComponentCell { return { shared: 0, styled: 0, local: 0, unverified: 0, sites: [], snapshot: "none", current: null, issues: [] }; }
 interface Manifest { commit: string; components: string[]; files: Record<string, string> }
 
-export function checkSnapshots(root: string, manifestPath: string | undefined, dsRoot: string): { commit: string | null; cells: Record<string, ComponentCell>; controls: ComponentCell; reactInput: ComponentCell; reactButton: ComponentCell } {
+export function checkSnapshots(root: string, manifestPath: string | undefined, dsRoot: string): { commit: string | null; cells: Record<string, ComponentCell>; controls: ComponentCell; reactInput: ComponentCell; reactButton: ComponentCell; reactDialog: ComponentCell } {
   const cells = Object.fromEntries(COMPONENT_COLUMNS.map(c => [c.id, emptyCell()]));
   const controls = emptyCell();
   const reactInput = emptyCell();
   const reactButton = emptyCell();
-  if (!manifestPath || !existsSync(join(root, manifestPath))) return { commit: null, cells, controls, reactInput, reactButton };
+  const reactDialog = emptyCell();
+  if (!manifestPath || !existsSync(join(root, manifestPath))) return { commit: null, cells, controls, reactInput, reactButton, reactDialog };
   const manifest = JSON.parse(readFileSync(join(root, manifestPath), "utf8")) as Manifest;
   if (!/^[a-f0-9]{40}$/.test(manifest.commit) || !Array.isArray(manifest.components) || !manifest.files) throw new Error("Invalid component manifest");
   const snapshot = dirname(join(root, manifestPath));
@@ -100,10 +101,10 @@ export function checkSnapshots(root: string, manifestPath: string | undefined, d
     }
     return historical.get(file)!;
   };
-  for (const component of [...manifest.components, "@controls", ...(manifest.files['react/input.ts'] ? ['@react-input'] : []), ...(manifest.files['react/button.ts'] ? ['@react-button'] : [])]) {
-    const cell = component === "@controls" ? controls : component === '@react-input' ? reactInput : component === '@react-button' ? reactButton : cells[component];
+  for (const component of [...manifest.components, "@controls", ...(manifest.files['react/input.ts'] ? ['@react-input'] : []), ...(manifest.files['react/button.ts'] ? ['@react-button'] : []), ...(manifest.files['react/dialog.ts'] ? ['@react-dialog'] : [])]) {
+    const cell = component === "@controls" ? controls : component === '@react-input' ? reactInput : component === '@react-button' ? reactButton : component === '@react-dialog' ? reactDialog : cells[component];
     if (!cell) continue;
-    const entry = component === "@controls" ? "1-root/controls.css" : component === '@react-input' ? 'react/input.ts' : component === '@react-button' ? 'react/button.ts' : Object.keys(manifest.files).find(f => f.endsWith(`/ds-${component}.ts`));
+    const entry = component === "@controls" ? "1-root/controls.css" : component === '@react-input' ? 'react/input.ts' : component === '@react-button' ? 'react/button.ts' : component === '@react-dialog' ? 'react/dialog.ts' : Object.keys(manifest.files).find(f => f.endsWith(`/ds-${component}.ts`));
     const visited = new Set<string>();
     let modified = false, unverifiable = false, current = true;
     const visit = (file: string) => {
@@ -129,7 +130,7 @@ export function checkSnapshots(root: string, manifestPath: string | undefined, d
     cell.snapshot = modified ? "modified" : unverifiable ? "unverified" : "verified";
     cell.current = current && !unverifiable;
   }
-  return { commit: manifest.commit, cells, controls, reactInput, reactButton };
+  return { commit: manifest.commit, cells, controls, reactInput, reactButton, reactDialog };
 }
 
 /** Follow direct imports and pure registration/re-export entries to the snapshot.
@@ -142,6 +143,7 @@ function importedSharedAdapters(root: string, file: string, source: string, mani
   const adapterModules: Record<string, Record<string, string>> = {
     [resolve(root, dirname(manifestPath), 'react/input.ts')]: { Input: 'input', Textarea: 'textarea' },
     [resolve(root, dirname(manifestPath), 'react/button.ts')]: { Button: 'button' },
+    [resolve(root, dirname(manifestPath), 'react/dialog.ts')]: { DialogContent: 'dialog' },
   };
   const resolveModule = (from: string, name: string) => {
     if (!name.startsWith('.') && !name.startsWith('@/')) return undefined;
@@ -233,7 +235,7 @@ export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): Ado
         }
         const cell = app.cells[component]!;
         const ds = sharedAdapters.has(site.tag) || Boolean(aliases[site.tag]) || custom?.[1] === "ds";
-        const evidence = sharedAdapters.has(site.tag) ? (component === "button" ? snapshots.reactButton : snapshots.reactInput) : cell;
+        const evidence = sharedAdapters.has(site.tag) ? (component === "button" ? snapshots.reactButton : component === "dialog" ? snapshots.reactDialog : snapshots.reactInput) : cell;
         if (sharedAdapters.has(site.tag)) {
           cell.issues = [...new Set([...cell.issues, ...evidence.issues])];
           cell.current = cell.current === true && evidence.current === true;

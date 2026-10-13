@@ -1,0 +1,78 @@
+/** Optional React composition; behavior and appearance belong to ds-dialog. */
+import { createContext, createElement, useContext, useId, useLayoutEffect, useRef, useState, type HTMLAttributes, type ReactNode } from "react";
+import { createPortal } from "react-dom";
+import type { Dialog as DialogElement } from "../4-page/ds-dialog";
+
+const DialogContext = createContext<{ open: boolean; change: (open: boolean) => void; title: string; description: string } | null>(null);
+const useDialog = () => {
+  const context = useContext(DialogContext);
+  if (!context) throw new Error("Dialog content must be inside Dialog.");
+  return context;
+};
+
+export interface DialogProps { open?: boolean; defaultOpen?: boolean; onOpenChange?: (open: boolean) => void; children: ReactNode }
+export function Dialog({ open, defaultOpen = false, onOpenChange, children }: DialogProps) {
+  const [internal, setInternal] = useState(defaultOpen);
+  const id = useId();
+  return createElement(DialogContext.Provider, { value: {
+    open: open ?? internal, title: `${id}-title`, description: `${id}-description`,
+    change: next => { if (open === undefined) setInternal(next); onOpenChange?.(next); },
+  } }, children);
+}
+
+export interface DialogContentProps extends HTMLAttributes<HTMLDialogElement> {
+  closeLabel?: string;
+  showClose?: boolean;
+  closeOnEscape?: boolean;
+  closeOnBackdrop?: boolean;
+}
+export function DialogContent({ children, closeLabel = "Close", showClose = true, closeOnEscape = true, closeOnBackdrop = true, ...props }: DialogContentProps) {
+  const context = useDialog();
+  const host = useRef<DialogElement>(null);
+  // Install the request handler before opening, and keep the app's decision authoritative.
+  useLayoutEffect(() => {
+    const element = host.current;
+    if (!element) return;
+    const close = (event: Event) => {
+      if (event.target !== element) return;
+      event.preventDefault();
+      context.change(false);
+    };
+    element.addEventListener("ds-close-request", close);
+    const native = element.querySelector("dialog")!;
+    if (!("aria-labelledby" in props) && !props["aria-label"]) {
+      const title = native.querySelector('[data-ds-dialog="title"]');
+      if (title) native.setAttribute("aria-labelledby", title.id);
+      else native.removeAttribute("aria-labelledby");
+    }
+    if (!("aria-describedby" in props)) {
+      const description = native.querySelector('[data-ds-dialog="description"]');
+      if (description) native.setAttribute("aria-describedby", description.id);
+      else native.removeAttribute("aria-describedby");
+    }
+    element.closeOnEscape = closeOnEscape;
+    element.closeOnBackdrop = closeOnBackdrop;
+    element.open = context.open;
+    return () => element.removeEventListener("ds-close-request", close);
+  });
+  if (!context.open) return null;
+  const content = createElement("ds-dialog", { ref: host },
+    createElement("dialog", { ...props }, children,
+      showClose && createElement("ds-button", { control: "slotted", icon: true, "data-ds-dialog": "close" },
+        createElement("button", { type: "button", "aria-label": closeLabel, "data-ds-dialog-dismiss": "" },
+          createElement("ds-icon", { type: "close", "aria-hidden": true }))),
+    ));
+  // Closed on the server. Client mounting calls showModal(), never an open attribute.
+  return typeof document === "undefined" ? content : createPortal(content, document.body);
+}
+
+export function DialogHeader(props: HTMLAttributes<HTMLDivElement>) { return createElement("div", { ...props, "data-ds-dialog": "header" }); }
+export function DialogFooter(props: HTMLAttributes<HTMLDivElement>) { return createElement("div", { ...props, "data-ds-dialog": "footer" }); }
+export function DialogTitle(props: HTMLAttributes<HTMLHeadingElement>) {
+  const context = useDialog();
+  return createElement("h2", { id: context.title, ...props, "data-ds-dialog": "title" });
+}
+export function DialogDescription(props: HTMLAttributes<HTMLParagraphElement>) {
+  const context = useDialog();
+  return createElement("p", { id: context.description, ...props, "data-ds-dialog": "description" });
+}

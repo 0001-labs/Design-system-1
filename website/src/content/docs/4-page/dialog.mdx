@@ -1,0 +1,52 @@
+---
+title: Dialog
+description: A shared modal with native focus and form behavior.
+---
+
+`ds-dialog` owns modal behavior and appearance around a light-DOM `<dialog>`.
+The native element keeps labels, descriptions and form controls in one tree.
+Opening it uses `showModal()`; the browser supplies the top layer and inert background.
+
+```html
+<ds-dialog open>
+  <dialog aria-labelledby="example-title">
+    <h2 id="example-title" data-ds-dialog="title">Example dialog</h2>
+    <button type="button" data-ds-dialog-dismiss>Close</button>
+  </dialog>
+</ds-dialog>
+```
+
+Set the host's `open` property to open or close it. `closeOnEscape` and
+`closeOnBackdrop` default to true. The cancelable `ds-close-request` event has
+a `detail.reason` of `escape`, `backdrop`, `button` or `native`. Prevent its
+default action when the application must decide whether closing is allowed.
+Nested dialogs retain the background scroll lock until the last one closes.
+
+Select `dialog` in the source snapshot to include the optional React adapter:
+
+```tsx
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription }
+  from "./design/react/dialog";
+
+<Dialog open={open} onOpenChange={setOpen}>
+  <DialogContent closeLabel="Close">
+    <DialogHeader>
+      <DialogTitle>Example dialog</DialogTitle>
+      <DialogDescription>Content and actions belong to the app.</DialogDescription>
+    </DialogHeader>
+  </DialogContent>
+</Dialog>
+```
+
+The adapter links the title and description, portals the content into the body,
+and provides the shared close button. It does not import Lit during server
+rendering; register the selected components in the browser before mounting it.
+Use `DialogFooter` for actions. `showClose={false}` is available when content
+already includes an accessible close action. A controlled root stays open when
+its `onOpenChange` handler declines a request.
+
+The default width is 20 squares, padding one square, with square corners and
+no shadow. Set `--ds-dialog-width` for a different whole-square width. Colours,
+type and scale follow the shared `--ds-*` tokens. Portals used by menus or
+popovers inside a modal must stay inside the native dialog or use the browser's
+own top layer; body-level overlays are outside the modal's interactive area.

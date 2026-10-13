@@ -41,6 +41,7 @@ const entries = components.map(name => {
 });
 // React consumers may import the optional, source-owned state adapter.
 if (components.includes('button')) visit('react/button.ts');
+if (components.includes('dialog')) visit('react/dialog.ts');
 if (components.includes('input') || components.includes('textarea')) visit('react/input.ts');
 visit('1-root/component-tokens.css');
 visit('1-root/controls.css');

@@ -1,0 +1,48 @@
+/* Light DOM preserves native forms, labels and React event targets. */
+ds-dialog > dialog {
+  box-sizing: border-box;
+  position: fixed;
+  inset: 0;
+  width: min(var(--ds-dialog-width, calc(20 * var(--ds-unit))), calc(100vw - 2 * var(--ds-unit)));
+  max-width: calc(100vw - 2 * var(--ds-unit));
+  max-height: calc(100dvh - 2 * var(--ds-unit));
+  margin: auto;
+  padding: var(--ds-unit);
+  border: 1px solid var(--ds-border-color);
+  border-radius: 0;
+  background: var(--ds-paper);
+  color: var(--ds-text-color);
+  box-shadow: none;
+  overflow: auto;
+  overscroll-behavior: contain;
+  font-family: var(--ds-typeface-regular);
+  font-feature-settings: var(--ds-font-features);
+  font-size: var(--ds-type-size-default);
+  font-weight: var(--ds-type-weight-default);
+  line-height: var(--ds-type-lineheight-default);
+  letter-spacing: var(--ds-type-letterspacing-default);
+}
+ds-dialog > dialog[open] { display: flex; flex-direction: column; gap: var(--ds-unit); }
+ds-dialog > dialog:not([open]) { display: none; }
+ds-dialog > dialog::backdrop { background: color-mix(in srgb, var(--ds-black) 40%, transparent); }
+ds-dialog [data-ds-dialog="header"] { display: flex; flex-direction: column; padding-right: var(--ds-unit); }
+ds-dialog [data-ds-dialog="title"] {
+  display: flex;
+  align-items: center;
+  min-height: var(--ds-row-height);
+  margin: 0;
+  color: var(--ds-text-color);
+  font: inherit;
+  font-weight: var(--ds-type-weight-bold);
+  line-height: var(--ds-row-height);
+}
+ds-dialog [data-ds-dialog="description"] { margin: 0; color: var(--ds-text-color-muted); font: inherit; }
+ds-dialog [data-ds-dialog="footer"] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: calc(var(--ds-unit) / 2);
+  min-height: var(--ds-row-height);
+}
+ds-dialog [data-ds-dialog="close"] { position: absolute; top: var(--ds-unit); right: var(--ds-unit); }

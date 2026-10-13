@@ -68,3 +68,4 @@ export * from "./4-page/ds-layout";
 export * from "./3-unit/ds-menu";
 export * from "./3-unit/ds-tabs";
 export * from "./4-page/ds-panel";
+export * from "./4-page/ds-dialog";

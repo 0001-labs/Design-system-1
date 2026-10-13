@@ -86,6 +86,8 @@ describe("source adoption evidence", () => {
     const { studio, app, ds } = fixture();
     const added = {
       '2-core/ds-input.ts': 'export class Input {}',
+      '4-page/ds-dialog.ts': 'export class Dialog {}',
+      'react/dialog.ts': 'import type { Dialog as DialogElement } from "../4-page/ds-dialog"; export const DialogContent = () => null;',
       '2-core/ds-textarea.ts': 'import { Input } from "./ds-input"; export class Textarea extends Input {}',
       'react/button.ts': 'import type { Button as ButtonElement } from "../2-core/ds-button"; export const Button = () => null;',
       'react/input.ts': 'import type { Input as InputElement } from "../2-core/ds-input"; export const Input = () => null; export const Textarea = () => null;',
@@ -94,18 +96,22 @@ describe("source adoption evidence", () => {
     git(ds, 'add', '.'); git(ds, '-c', 'user.name=Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'Add shared input');
     const manifestPath = join(app, 'design/components-manifest.json');
     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
-    manifest.commit = git(ds, 'rev-parse', 'HEAD'); manifest.components.push('input', 'textarea');
+    manifest.commit = git(ds, 'rev-parse', 'HEAD'); manifest.components.push('input', 'textarea', 'dialog');
     Object.assign(manifest.files, Object.fromEntries(Object.entries(added).map(([file, body]) => [file, createHash('sha256').update(body).digest('hex')])));
     writeFileSync(manifestPath, JSON.stringify(manifest));
     write(app, 'src/field.ts', 'import "./register"; export { Input as Field, Textarea as Multiline } from "../design/react/input";');
     write(app, 'src/action.ts', 'export { Button as Action } from "../design/react/button";');
+    write(app, 'src/dialog.ts', 'export { DialogContent as Modal, DialogTitle } from "../design/react/dialog";');
     write(app, 'src/local.tsx', 'export const Input = () => <input />;');
-    write(app, 'src/page.tsx', 'import { Action as SharedAction } from "./action"; import { Button as DirectAction } from "../design/react/button"; import { Field as SharedField, Multiline as Notes } from "@/field"; import { Input as Direct } from "../design/react/input"; import { Input as Local } from "./local"; export const Page = () => <><SharedField /><Direct /><Local /><Notes /><textarea /><SharedAction /><DirectAction /></>;');
+    write(app, 'src/page.tsx', 'import { Modal, DialogTitle } from "./dialog"; import { Action as SharedAction } from "./action"; import { Button as DirectAction } from "../design/react/button"; import { Field as SharedField, Multiline as Notes } from "@/field"; import { Input as Direct } from "../design/react/input"; import { Input as Local } from "./local"; export const Page = () => <><SharedField /><Direct /><Local /><Notes /><textarea /><SharedAction /><DirectAction /><Modal><DialogTitle>Title</DialogTitle></Modal><dialog /></>;');
     git(app, 'add', '.'); git(app, '-c', 'user.name=Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'Use shared input');
     const scan = () => scanApp({ id: 'example', name: 'Example', directory: 'Example', roots: ['src'], manifest: 'design/components-manifest.json' }, studio, ds);
     expect(scan().cells.input).toMatchObject({ shared: 2, local: 1, unverified: 0 });
     expect(scan().cells.textarea).toMatchObject({ shared: 1, local: 1, unverified: 0 });
     expect(scan().cells.button).toMatchObject({ shared: 2, unverified: 0 });
+    expect(scan().cells.dialog).toMatchObject({ shared: 1, local: 1, unverified: 0 });
+    write(app, 'design/react/dialog.ts', added['react/dialog.ts'] + '\n// Local changes');
+    expect(scan().cells.dialog).toMatchObject({ shared: 0, local: 1, unverified: 1 });
     write(app, 'design/react/button.ts', added['react/button.ts'] + '\n// Local changes');
     expect(scan().cells.button).toMatchObject({ shared: 0, unverified: 2 });
     expect(scan().cells.input).toMatchObject({ shared: 2, unverified: 0 });

@@ -38,7 +38,7 @@ export interface AdoptionReport {
 export const COMPONENT_COLUMNS: ComponentColumn[] = [
   ...["button", "text", "icon", "input", "textarea", "tooltip", "cycle", "date", "language", "gap", "banner", "card", "pagedots"].map(id => ({ id, name: id === "textarea" ? "Text area" : id === "pagedots" ? "Page dots" : id[0]!.toUpperCase() + id.slice(1), group: "Core" })),
   ...["row", "list", "tabs", "menu", "accordion", "form", "table"].map(id => ({ id, name: id[0]!.toUpperCase() + id.slice(1), group: "Composites" })),
-  ...["panel", "container", "layout", "grid"].map(id => ({ id, name: id[0]!.toUpperCase() + id.slice(1), group: "Layout" })),
+  ...["dialog", "panel", "container", "layout", "grid"].map(id => ({ id, name: id[0]!.toUpperCase() + id.slice(1), group: "Layout" })),
 ];
 
 export const totalSites = (cell: ComponentCell): number => cell.shared + cell.styled + cell.local + cell.unverified;
