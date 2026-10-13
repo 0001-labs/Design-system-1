@@ -19,7 +19,7 @@ Product-specific artwork belongs to its product. `icon-scope.ts` excludes Ezo an
 
 `scripts/build-interface-catalog.ts` produces the generated `interface-catalog.json`, public `/icons/catalog.json`, and public copies of added SVGs. Do not edit those generated files directly. The Original/Outlines/Both inspector changes the display only; copying or downloading the main SVG returns the untouched source. The separate outline download exports a stroked construction view.
 
-Prompted additions are performed through the development conversation, not an in-page AI service. The page's Copy request control packages the description and these repository conventions for that workflow.
+Request new icons through the development conversation, following the drawing and publishing steps above.
 
 ## Product icon coverage
 
