@@ -30,7 +30,13 @@ Give a field a visible label. A placeholder is a hint, not a label. Put the reas
 | `placeholder-key` | string | Empty | Translation key for the hint. |
 | `error` / `error-text` | string | Empty | Literal error or its translation key. |
 | `disabled`, `readonly`, `required` | boolean | false | Native field states. |
-| `variant` | string | `default` | `default`, `filled` or `outlined`. |
+| `variant` | string | `default` | `default`, `filled`, `outlined` or `row` (18px field in a 20px row). |
+
+| `revealable` | boolean | false | Show a password visibility button; the public type stays `password`. |
+| `quiet-focus` | boolean | false | Suppress the field focus box when its surrounding form supplies the focus treatment. |
+| `inputmode` | string | Empty | Native mobile keyboard hint, such as `numeric`. |
+| `aria-label` / `aria-labelledby` | string | Empty | Name the native field, including labels in the parent shadow root. |
+| `aria-invalid` | string | Empty | Forward an application validation state to the native field. |
 
 Native constraints include `min`, `max`, `step`, `pattern`, `minlength` and `maxlength`.
 
@@ -41,6 +47,17 @@ const field = document.querySelector('ds-input');
 field.addEventListener('input-change', (event) => {
   console.log(event.detail.name, event.detail.value);
 });
+```
+
+`input` and `change` bubble through shadow boundaries once, with the host’s current `value`. `input-change` also supplies `{ name, value }`.
+
+The component participates in native forms through `ElementInternals`: a named field contributes to `FormData`, constraints and `error` affect form validity, reset restores its initial value and a disabled fieldset disables its control. `checkValidity()` and `reportValidity()` expose native validation.
+
+Import `DS1/1-root/component-tokens.css` and set `--ds-sf` to the surface scale. The row treatment, password visibility, quiet focus and field colours are shared capabilities; configure them with attributes and `--ds-input-*` tokens rather than injecting styles or buttons into the shadow root.
+
+```html
+<ds-input variant="row" type="password" name="password"
+  aria-label="Password" autocomplete="current-password" revealable></ds-input>
 ```
 
 `input-focus` and `input-blur` report focus changes. Call `focus()`, `blur()` or `select()` on the component.

@@ -15,10 +15,11 @@ test('snapshots include dependencies, detect drift, and preserve consumer-owned 
   const target = mkdtempSync(join(tmpdir(), 'shared-components-'));
   targets.push(target);
   writeFileSync(join(target, 'application.ts'), 'export const application = true;');
-  sync(target, 'button,panel');
+  sync(target, 'button,panel,input');
   expect(existsSync(join(target, '2-core/ds-text.ts'))).toBe(true);
   expect(existsSync(join(target, '0-face/translations/en.json'))).toBe(true);
-  expect(sync(target, 'button,panel', true)).toContain('Verified');
+  expect(existsSync(join(target, 'x-icon/ezo-password-visibility-see.svg'))).toBe(true);
+  expect(sync(target, 'button,panel,input', true)).toContain('Verified');
   writeFileSync(join(target, '2-core/ds-button.ts'), 'changed');
   expect(() => sync(target, 'button,panel', true)).toThrow();
   sync(target, 'panel');

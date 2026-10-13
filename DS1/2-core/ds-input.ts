@@ -2,13 +2,28 @@
 // Input component for text and other input types
 
 import { LitElement, html, unsafeCSS } from "lit";
+import { ifDefined } from "lit/directives/if-defined.js";
+import { define } from "../0-face/define";
+import seeIcon from "../x-icon/ezo-password-visibility-see.svg?url";
+import unseeIcon from "../x-icon/ezo-password-visibility-unsee.svg?url";
 import { getText, currentLanguage } from "../0-face/i18n";
 import "./ds-text";
 import styles from "./styles/ds-input.css?inline";
 
 export class Input extends LitElement {
+  static formAssociated = true;
+  private internals = typeof this.attachInternals === "function" ? this.attachInternals() : null;
+  private initialValue: string | undefined;
   static properties = {
     type: { type: String, reflect: true },
+    inputMode: { type: String, attribute: "inputmode" },
+    ariaLabel: { type: String, attribute: "aria-label" },
+    ariaLabelledBy: { type: String, attribute: "aria-labelledby" },
+    ariaInvalid: { type: String, attribute: "aria-invalid" },
+    revealable: { type: Boolean, reflect: true },
+    quietFocus: { type: Boolean, attribute: "quiet-focus", reflect: true },
+    _passwordVisible: { type: Boolean, state: true },
+    _formDisabled: { type: Boolean, state: true },
     name: { type: String, reflect: true },
     value: { type: String },
     placeholder: { type: String },
@@ -45,6 +60,14 @@ export class Input extends LitElement {
     | "date"
     | "time"
     | "datetime-local";
+  declare inputMode: string;
+  declare ariaLabel: string;
+  declare ariaLabelledBy: string;
+  declare ariaInvalid: string;
+  declare revealable: boolean;
+  declare quietFocus: boolean;
+  declare _passwordVisible: boolean;
+  declare _formDisabled: boolean;
   declare name: string;
   declare value: string;
   declare placeholder: string;
@@ -62,7 +85,7 @@ export class Input extends LitElement {
   declare min: string;
   declare max: string;
   declare step: string;
-  declare variant: "default" | "filled" | "outlined";
+  declare variant: "default" | "filled" | "outlined" | "row";
   declare error: string;
   declare errorText: string;
   declare _focused: boolean;
@@ -73,6 +96,14 @@ export class Input extends LitElement {
   constructor() {
     super();
     this.type = "text";
+    this.inputMode = "";
+    this.ariaLabel = "";
+    this.ariaLabelledBy = "";
+    this.ariaInvalid = "";
+    this.revealable = false;
+    this.quietFocus = false;
+    this._passwordVisible = false;
+    this._formDisabled = false;
     this.name = "";
     this.value = "";
     this.placeholder = "";
@@ -145,6 +176,64 @@ export class Input extends LitElement {
     if (changedProperties.has("placeholder") || changedProperties.has("placeholderKey")) {
       this._loadPlaceholder();
     }
+    if (this.initialValue === undefined) this.initialValue = this.value;
+    if (changedProperties.has("type") && this.type !== "password") this._passwordVisible = false;
+    this.syncForm();
+  }
+
+  private get input(): HTMLInputElement | null { return this.shadowRoot?.querySelector("input") ?? null; }
+  get form(): HTMLFormElement | null { return this.internals?.form ?? null; }
+  get validity(): ValidityState | undefined { return this.input?.validity; }
+  get validationMessage(): string { return this.input?.validationMessage ?? ""; }
+  get willValidate(): boolean { return this.input?.willValidate ?? false; }
+
+  private syncForm(): void {
+    const input = this.input;
+    if (!input) return;
+    this.internals?.setFormValue(this.disabled || this._formDisabled ? null : this.value);
+    const message = this.errorText ? getText(this.errorText) : this.error;
+    input.setCustomValidity(message || "");
+    this.internals?.setValidity(input.validity, input.validationMessage, input);
+  }
+
+  checkValidity(): boolean { this.syncForm(); return this.input?.checkValidity() ?? true; }
+  reportValidity(): boolean { this.syncForm(); return this.input?.reportValidity() ?? true; }
+  formDisabledCallback(disabled: boolean): void { this._formDisabled = disabled; }
+  formResetCallback(): void {
+    this.value = this.getAttribute("value") ?? this.initialValue ?? "";
+    this._passwordVisible = false;
+    this.internals?.setFormValue(this.value);
+  }
+  formStateRestoreCallback(state: string | File | FormData): void {
+    if (typeof state === "string") { this.value = state; this.internals?.setFormValue(state); }
+  }
+
+  private accessibleLabel(): string | undefined {
+    if (this.ariaLabel) return this.ariaLabel;
+    const root = this.getRootNode() as Document | ShadowRoot;
+    const label = this.ariaLabelledBy.split(/\s+/).filter(Boolean).map(id => {
+      const element = root.getElementById?.(id);
+      const key = element?.getAttribute("text");
+      return key ? getText(key) : element?.textContent?.trim() ?? "";
+    }).join(" ").trim();
+    return label || undefined;
+  }
+
+  private togglePassword(): void {
+    const input = this.input;
+    if (!input || this.disabled || this._formDisabled) return;
+    const start = input.selectionStart, end = input.selectionEnd;
+    this._passwordVisible = !this._passwordVisible;
+    // Change only display. The field's public type stays password for forms and adapters.
+    input.type = this._passwordVisible ? "text" : "password";
+    if (start !== null && end !== null) input.setSelectionRange(start, end);
+  }
+
+  private handleChange(event: Event): void {
+    event.stopPropagation();
+    this.value = (event.target as HTMLInputElement).value;
+    this.syncForm();
+    this.dispatchEvent(new Event("change", { bubbles: true, composed: true }));
   }
 
   private _loadPlaceholder() {
@@ -168,10 +257,12 @@ export class Input extends LitElement {
   private _handleInput(e: Event): void {
     const target = e.target as HTMLInputElement;
     this.value = target.value;
+    this.syncForm();
     this.dispatchEvent(
       new CustomEvent("input-change", {
         detail: { value: this.value, name: this.name },
         bubbles: true,
+        composed: true,
       })
     );
   }
@@ -189,10 +280,7 @@ export class Input extends LitElement {
   /**
    * Focus the input element
    */
-  focus(): void {
-    const input = this.shadowRoot?.querySelector("input");
-    input?.focus();
-  }
+  focus(options?: FocusOptions): void { this.input?.focus(options); }
 
   /**
    * Blur the input element
@@ -228,31 +316,48 @@ export class Input extends LitElement {
         <div class="input-container">
           <input
             id="input"
-            .type=${this.type}
+            part="input"
+            .type=${this.type === "password" && this._passwordVisible ? "text" : this.type}
+            aria-label=${ifDefined(this.accessibleLabel())}
+            aria-invalid=${ifDefined(this.ariaInvalid || (hasError ? "true" : undefined))}
+            aria-describedby=${ifDefined(hasError ? "error" : undefined)}
+            inputmode=${ifDefined(this.inputMode || undefined)}
             .name=${this.name}
             .value=${this.value}
             .placeholder=${this._placeholder || this.placeholder}
-            ?disabled=${this.disabled}
+            ?disabled=${this.disabled || this._formDisabled}
             ?readonly=${this.readonly}
             ?required=${this.required}
             ?autofocus=${this.autofocus}
             autocomplete=${this.autocomplete}
-            pattern=${this.pattern || ""}
-            minlength=${this.minlength || ""}
-            maxlength=${this.maxlength || ""}
-            min=${this.min}
-            max=${this.max}
-            step=${this.step}
-            class=${hasError ? "has-error" : ""}
+            pattern=${ifDefined(this.pattern || undefined)}
+            minlength=${ifDefined(this.minlength || undefined)}
+            maxlength=${ifDefined(this.maxlength || undefined)}
+            min=${ifDefined(this.min || undefined)}
+            max=${ifDefined(this.max || undefined)}
+            step=${ifDefined(this.step || undefined)}
+            class=${[hasError ? "has-error" : "", this.revealable && this.type === "password" ? "has-reveal" : ""].join(" ")}
             @input=${this._handleInput}
+            @change=${this.handleChange}
             @focus=${this._handleFocus}
             @blur=${this._handleBlur}
           />
+          ${this.revealable && this.type === "password" ? html`
+            <button class="password-visibility" part="reveal" type="button"
+              aria-label=${getText(this._passwordVisible ? "Hide password" : "Show password")}
+              aria-pressed=${String(this._passwordVisible)}
+              ?disabled=${this.disabled || this._formDisabled}
+              @pointerdown=${(event: PointerEvent) => event.preventDefault()}
+              @keydown=${(event: KeyboardEvent) => { if (event.key === "Enter" || event.key === " ") event.stopPropagation(); }}
+              @click=${this.togglePassword}>
+              <span aria-hidden="true" style=${`--eye-icon: url("${this._passwordVisible ? unseeIcon : seeIcon}")`}></span>
+            </button>
+          ` : null}
         </div>
 
         ${hasError
           ? html`
-              <div class="error-message">
+              <div id="error" class="error-message" role="status">
                 ${this.errorText
                   ? html`<ds-text .text=${this.errorText}></ds-text>`
                   : this.error}
@@ -264,7 +369,7 @@ export class Input extends LitElement {
   }
 }
 
-customElements.define("ds-input", Input);
+define("ds-input", Input);
 
 declare global {
   interface HTMLElementTagNameMap {

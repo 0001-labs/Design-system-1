@@ -9,14 +9,15 @@
 .input-wrapper {
   display: flex;
   flex-direction: column;
-  gap: calc(var(--025) * var(--sf, 1));
+  gap: 0;
   width: 100%;
 }
 
 label {
-  font-family: var(--typeface-regular);
-  font-size: calc(12px * var(--sf, 1));
-  color: var(--text-color-secondary);
+  font-family: var(--ds-typeface-regular);
+  font-size: var(--ds-type-size-default);
+  line-height: var(--ds-row-height);
+  color: var(--ds-text-color);
 }
 
 .input-container {
@@ -29,20 +30,17 @@ label {
 input {
   background: var(--base-light-grey, #e8e8e8);
   border: none;
-  padding: 0 calc(2px * var(--sf, 1));
-  font-size: var(--type-size-default);
-  font-family: var(--typeface-regular, "GT-America-Standard-Regular");
+  padding: 0 calc(2px * var(--ds-sf, 1));
+  font-size: var(--ds-type-size-default);
+  font-family: var(--ds-typeface-regular);
   color: var(--base-darker-grey, #797979);
-  line-height: calc(16px * var(--sf, 1));
-  letter-spacing: calc(-0.4px * var(--sf, 1));
+  line-height: calc(16px * var(--ds-sf, 1));
+  letter-spacing: calc(-0.4px * var(--ds-sf, 1));
   opacity: 0.5;
-  height: calc(unit * var(--sf, 1));
+  height: var(--ds-input-height, calc(16px * var(--ds-sf, 1)));
   width: 100%;
   box-sizing: border-box;
   outline: none;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
 }
 
 input:focus {
@@ -72,7 +70,7 @@ input:read-only {
   );
   border: none;
   border-bottom: 2px solid var(--border-color, #ccc);
-  border-radius: calc(var(--025) * var(--sf, 1)) calc(var(--025) * var(--sf, 1))
+  border-radius: calc(var(--025) * var(--ds-sf, 1)) calc(var(--025) * var(--ds-sf, 1))
     0 0;
 }
 
@@ -91,10 +89,11 @@ input:read-only {
 }
 
 .error-message {
-  font-family: var(--typeface-regular);
-  font-size: calc(12px * var(--sf, 1));
+  font-family: var(--ds-typeface-regular);
+  font-size: var(--ds-type-size-default);
+  line-height: var(--ds-row-height);
   color: var(--error-color, #ff3b30);
-  margin-top: calc(var(--025) * var(--sf, 1));
+  margin-top: calc(var(--025) * var(--ds-sf, 1));
 }
 
 :host([required]) label::after {
@@ -109,4 +108,69 @@ input.has-error {
 
 input.has-error:focus {
   box-shadow: 0 0 0 2px rgba(255, 59, 48, 0.2);
+}
+
+/* A field drawn 18px high inside a 20px form row. */
+:host([variant="row"]) {
+  box-sizing: border-box;
+  padding-top: calc(2px * var(--ds-sf, 1));
+}
+:host([variant="row"]) .input-container,
+:host([variant="row"]) input {
+  box-sizing: border-box;
+  height: calc(18px * var(--ds-sf, 1));
+  min-height: calc(18px * var(--ds-sf, 1));
+  max-height: calc(18px * var(--ds-sf, 1));
+}
+:host([variant="row"]) input {
+  margin: 0;
+  padding-block: 0;
+  line-height: calc(16px * var(--ds-sf, 1));
+  border-radius: 0;
+  background: var(--ds-input-background);
+  color: var(--ds-input-color);
+  opacity: 1;
+}
+:host([variant="row"]) input::placeholder { color: var(--ds-input-placeholder-color); opacity: 1; }
+:host([variant="row"]) input:focus {
+  background: var(--ds-input-background);
+  color: var(--ds-input-color);
+  box-shadow: inset 0 0 0 1px var(--ds-accent-color);
+  opacity: 1;
+}
+:host([variant="row"]) input:disabled {
+  opacity: 1;
+  background: var(--ds-input-background);
+  color: var(--ds-input-disabled-color);
+  -webkit-text-fill-color: var(--ds-input-disabled-color);
+}
+:host([quiet-focus]) input:focus,
+:host([quiet-focus]) input:focus-visible,
+:host([quiet-focus]) .input-container:focus-within { outline: none !important; box-shadow: none !important; }
+input.has-reveal { padding-inline-end: calc(24px * var(--ds-sf, 1)); }
+.password-visibility {
+  position: absolute;
+  inset-inline-end: 0;
+  top: 0;
+  height: 100%;
+  width: calc(24px * var(--ds-sf, 1));
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ds-input-reveal-color);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.password-visibility:focus-visible { outline: 1px solid currentColor; outline-offset: -1px; }
+.password-visibility:disabled { cursor: default; opacity: .5; }
+.password-visibility span {
+  display: block;
+  width: calc(16px * var(--ds-sf, 1));
+  height: calc(16px * var(--ds-sf, 1));
+  background: currentColor;
+  mask: var(--eye-icon) center / 100% 100% no-repeat;
+}
+@supports (corner-shape: squircle) {
+  input { corner-shape: squircle; }
 }
