@@ -2,7 +2,7 @@
 import { createElement as h } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, test } from "vite-plus/test";
-import { Checkbox, Switch } from "../DS1/react/choice";
+import { Checkbox, Switch, Select } from "../DS1/react/choice";
 
 test("choice adapters render usable native controls without browser globals", () => {
   expect(typeof HTMLElement).toBe("undefined");
@@ -10,4 +10,7 @@ test("choice adapters render usable native controls without browser globals", ()
   expect(checkbox).toContain('<ds-checkbox><input'); expect(checkbox).toContain('type="checkbox"'); expect(checkbox).toContain('checked=""');
   const toggle = renderToStaticMarkup(h(Switch, { checked: true, disabled: true, "aria-label": "Sharing" }));
   expect(toggle).toContain('<ds-switch><button'); expect(toggle).toContain('aria-checked="true"'); expect(toggle).toContain('role="switch"');
+  const select = renderToStaticMarkup(h(Select, { name: "project", defaultValue: "a" }, h("option", { value: "a" }, "Alpha")));
+  expect(select).toContain('<ds-select><select name="project">');
+  expect(select).toContain('value="a" selected=""');
 });

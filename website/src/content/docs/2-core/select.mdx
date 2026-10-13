@@ -1,0 +1,39 @@
+---
+title: Select
+description: Native choices with the shared field face.
+---
+
+`ds-select` draws a native select field on the grid. It is one square high and
+eight wide by default; layout can set the host width. Size and multiple-selection
+lists use one square per visible row, four rows by default for `multiple`.
+
+```html
+<label>Project
+  <ds-select><select name="project" required>
+    <option value="">Choose a project</option>
+    <option value="alpha">Alpha</option>
+  </select></ds-select>
+</label>
+```
+
+The native select owns labels, options, option groups, selection, keyboard
+navigation, the platform picker, validation, FormData, disabled fieldsets and
+reset. DS1 owns the field face, arrow, scale, focus and disabled appearance.
+There is no second hidden input and no replacement popup or keyboard handler.
+
+React products import `Select` from `DS1/react/choice`. Standard native select
+props, children and the native ref pass through. `className`, `style` and `hidden`
+also place the host in the product layout. The adapter can render on the server;
+register `ds-select` in the browser before hydrating.
+
+```tsx
+<Select name="project" value={project} onChange={e => setProject(e.currentTarget.value)}>
+  <option value="alpha">Alpha</option>
+  <option value="beta">Beta</option>
+</Select>
+```
+
+Remove product select appearance CSS and duplicate arrows when migrating.
+Keep data and persistence callbacks in the product. Verify required validation,
+controlled changes, labels, reset, keyboard choices and disabled state on light
+and dark paper, with the product scale and at phone width.

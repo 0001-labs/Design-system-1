@@ -1,5 +1,12 @@
 /** Native controls retain labels, forms and events. Shared Lit elements own their faces. */
-import { createElement, forwardRef, useCallback, type ButtonHTMLAttributes, type InputHTMLAttributes, type MouseEvent } from "react";
+import { createElement, forwardRef, useCallback, type ButtonHTMLAttributes, type InputHTMLAttributes, type SelectHTMLAttributes, type MouseEvent } from "react";
+
+export type SelectProps = SelectHTMLAttributes<HTMLSelectElement>;
+export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select(
+  { className, style, hidden, children, ...props }, ref,
+) {
+  return createElement("ds-select", { className, style, hidden }, createElement("select", { ...props, hidden, ref }, children));
+});
 
 export type CheckboxProps = Omit<InputHTMLAttributes<HTMLInputElement>, "type"> & { indeterminate?: boolean };
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Checkbox(

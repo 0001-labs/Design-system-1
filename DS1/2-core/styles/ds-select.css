@@ -1,0 +1,54 @@
+:host {
+  --ds-select-unit: calc(var(--ds-1) * var(--ds-sf));
+  --ds-type-size-default: calc(14px * var(--ds-sf));
+  display: inline-flex;
+  position: relative;
+  vertical-align: middle;
+  width: calc(8 * var(--ds-select-unit));
+  max-width: 100%;
+  min-width: 0;
+  height: calc(var(--ds-select-rows, 1) * var(--ds-select-unit));
+}
+:host([hidden]) { display: none !important; }
+::slotted(select) {
+  appearance: none !important;
+  box-sizing: border-box !important;
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 var(--ds-select-unit) 0 calc(4px * var(--ds-sf)) !important;
+  border: 1px solid var(--ds-border-color) !important;
+  border-radius: calc(4px * var(--ds-sf)) !important;
+  background: var(--ds-input-background) !important;
+  color: var(--ds-input-color) !important;
+  font-family: var(--ds-typeface-regular) !important;
+  font-size: var(--ds-type-size-default) !important;
+  font-weight: var(--ds-type-weight-default) !important;
+  line-height: calc(var(--ds-select-unit) - 2px) !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+}
+span {
+  position: absolute;
+  pointer-events: none;
+  inset-inline-end: calc(2px * var(--ds-sf));
+  top: 50%;
+  transform: translateY(-50%);
+  width: calc(.8 * var(--ds-select-unit));
+  height: calc(.8 * var(--ds-select-unit));
+  background: var(--ds-input-color);
+  mask: var(--ds-select-arrow) center / contain no-repeat;
+}
+::slotted(select:focus-visible) { outline: 2px solid var(--ds-focus-ring) !important; outline-offset: 1px !important; }
+::slotted(select:disabled) { cursor: default !important; opacity: .5 !important; }
+:host(:has(> select:disabled)) span { opacity: .5; }
+:host(:has(> select[multiple])) span,
+:host(:has(> select[size]:not([size="0"]):not([size="1"]))) span { display: none; }
+::slotted(select[multiple]),
+::slotted(select[size]:not([size="0"]):not([size="1"])) {
+  padding: 0 calc(4px * var(--ds-sf)) !important;
+}
