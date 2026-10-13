@@ -19,7 +19,7 @@ export const APPS: AppSpec[] = [
   { id: "consistency", name: "Consistency", directory: "Consistency", roots: ["src"], manifest: "src/design/components-manifest.json" },
 ];
 const known = new Set(COMPONENT_COLUMNS.map(c => c.id));
-const native: Record<string, string> = { button: "button", input: "input", select: "input", textarea: "input", p: "text", h1: "text", h2: "text", h3: "text", h4: "text", h5: "text", h6: "text", ul: "list", ol: "list", table: "table", form: "form" };
+const native: Record<string, string> = { button: "button", input: "input", select: "input", textarea: "textarea", p: "text", h1: "text", h2: "text", h3: "text", h4: "text", h5: "text", h6: "text", ul: "list", ol: "list", table: "table", form: "form" };
 type TagSite = { tag: string; line: number; nativeStyle?: string };
 function nativeStyle(tag: string, className: string): string | undefined {
   const classes = className.split(/\s+/);
@@ -135,8 +135,8 @@ export function checkSnapshots(root: string, manifestPath: string | undefined, d
  * Matching names alone never establish adoption. The adapter's full dependency
  * graph is checked separately from direct Lit usage.
  */
-function importedInputAdapters(root: string, file: string, source: string, manifestPath?: string): Set<string> {
-  const found = new Set<string>();
+function importedFieldAdapters(root: string, file: string, source: string, manifestPath?: string): Map<string, string> {
+  const found = new Map<string, string>();
   if (!manifestPath) return found;
   const expected = resolve(root, dirname(manifestPath), 'react/input.ts');
   const resolveModule = (from: string, name: string) => {
@@ -145,23 +145,32 @@ function importedInputAdapters(root: string, file: string, source: string, manif
     if (!base.startsWith(resolve(root) + '/')) return undefined;
     return [base, `${base}.ts`, `${base}.tsx`, join(base, 'index.ts')].find(path => existsSync(path) && statSync(path).isFile());
   };
-  const forwards = (path: string | undefined, name: string, depth = 0): boolean => {
-    if (!path || depth > 3) return false;
-    if (path === expected) return name === 'Input';
+  const forwards = (path: string | undefined, name: string, depth = 0): string | undefined => {
+    if (!path || depth > 3) return undefined;
+    if (path === expected) return ({ Input: 'input', Textarea: 'textarea' } as Record<string,string>)[name];
     const module = ts.createSourceFile(path, readFileSync(path, 'utf8'), ts.ScriptTarget.Latest, true);
-    if (module.statements.some(node => !ts.isImportDeclaration(node) && !ts.isExportDeclaration(node) && !ts.isEmptyStatement(node))) return false;
-    return module.statements.some(node => {
-      if (!ts.isExportDeclaration(node) || node.isTypeOnly || !node.moduleSpecifier || !ts.isStringLiteral(node.moduleSpecifier) || !node.exportClause || !ts.isNamedExports(node.exportClause)) return false;
+    if (module.statements.some(node => !ts.isImportDeclaration(node) && !ts.isExportDeclaration(node) && !ts.isEmptyStatement(node))) return undefined;
+    for (const node of module.statements) {
+      if (!ts.isExportDeclaration(node) || node.isTypeOnly || !node.moduleSpecifier || !ts.isStringLiteral(node.moduleSpecifier) || !node.exportClause || !ts.isNamedExports(node.exportClause)) continue;
       const exportedModule = resolveModule(path, node.moduleSpecifier.text);
-      return node.exportClause.elements.some(binding => !binding.isTypeOnly && binding.name.text === name && forwards(exportedModule, (binding.propertyName ?? binding.name).text, depth + 1));
-    });
+      for (const binding of node.exportClause.elements) {
+        if (binding.isTypeOnly || binding.name.text !== name) continue;
+        const component = forwards(exportedModule, (binding.propertyName ?? binding.name).text, depth + 1);
+        if (component) return component;
+      }
+    }
+    return undefined;
   };
   const ast = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true);
   for (const node of ast.statements) {
     if (!ts.isImportDeclaration(node) || !ts.isStringLiteral(node.moduleSpecifier) || node.importClause?.isTypeOnly) continue;
     const bindings = node.importClause?.namedBindings;
     if (!bindings || !ts.isNamedImports(bindings)) continue;
-    for (const binding of bindings.elements) if (!binding.isTypeOnly && forwards(resolveModule(resolve(root, file), node.moduleSpecifier.text), (binding.propertyName ?? binding.name).text)) found.add(binding.name.text);
+    for (const binding of bindings.elements) {
+      if (binding.isTypeOnly) continue;
+      const component = forwards(resolveModule(resolve(root, file), node.moduleSpecifier.text), (binding.propertyName ?? binding.name).text);
+      if (component) found.set(binding.name.text, component);
+    }
   }
   return found;
 }
@@ -205,7 +214,7 @@ export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): Ado
       app.files++;
       const source = readFileSync(join(root, file), "utf8");
       const aliases = spec.id === "link" ? importedAdapters(root, file, source) : {};
-      const inputs = importedInputAdapters(root, file, source, spec.manifest);
+      const fields = importedFieldAdapters(root, file, source, spec.manifest);
       const sites = sourceSites(file, source);
       const adapterTags = spec.id === "link" && linkAdapters[file]
         ? new Set(Object.values(linkAdapters[file]!).map(id => `ds-${id}`).filter(tag => sites.filter(s => s.tag === tag).length === 1))
@@ -213,15 +222,15 @@ export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): Ado
       for (const site of sites) {
         if (adapterTags.has(site.tag)) continue;
         const custom = /^(ds|ezo|c9y)-(.+)$/.exec(site.tag);
-        const component = inputs.has(site.tag) ? 'input' : aliases[site.tag] ?? (custom && known.has(custom[2]!) ? custom[2]! : native[site.tag]);
+        const component = fields.has(site.tag) ? fields.get(site.tag)! : aliases[site.tag] ?? (custom && known.has(custom[2]!) ? custom[2]! : native[site.tag]);
         if (!component) {
           if (site.tag.includes("-")) app.otherCustomElements[site.tag] = (app.otherCustomElements[site.tag] ?? 0) + 1;
           continue;
         }
         const cell = app.cells[component]!;
-        const ds = inputs.has(site.tag) || Boolean(aliases[site.tag]) || custom?.[1] === "ds";
-        const evidence = inputs.has(site.tag) ? snapshots.reactInput : cell;
-        if (inputs.has(site.tag)) {
+        const ds = fields.has(site.tag) || Boolean(aliases[site.tag]) || custom?.[1] === "ds";
+        const evidence = fields.has(site.tag) ? snapshots.reactInput : cell;
+        if (fields.has(site.tag)) {
           cell.issues = [...new Set([...cell.issues, ...evidence.issues])];
           cell.current = cell.current === true && evidence.current === true;
         }
@@ -250,7 +259,7 @@ export function scanReport(studio = resolve(repository, "..")): AdoptionReport {
       "DS1 means the component and its imported dependencies match a recorded DS1 Git revision. An older verified snapshot still counts as DS1; the detail view shows whether it matches today's source. Modified or unverifiable DS1 is counted separately.",
       "DS1 styles counts native controls with literal ds-button, ds-input, ds-select or ds-checkbox classes and verified shared control styles. These are not Lit components. Dynamic class expressions are not inferred.",
       "Local means recognized ezo-/c9y- components or native button, input/select/textarea, p/headings, ul/ol, table and form. Native semantics can be intentional; these counts are review leads, not automatic defects.",
-      "Tests, demos in preview/dev directories, generated files, vendored implementations and shared sign-in internals are excluded. Link's inspected TabPill, TabPillRow and Tooltip/Tooltop adapters and DS1's verified React Input adapter count at imported JSX uses, without counting their inner DS1 tags again.",
+      "Tests, demos in preview/dev directories, generated files, vendored implementations and shared sign-in internals are excluded. Link's inspected TabPill, TabPillRow and Tooltip/Tooltop adapters and DS1's verified React Input and Textarea adapters count at imported JSX uses, without counting their inner DS1 tags again.",
       "Other React abstractions, dynamic tag names, CSS-only controls, spans and inline SVGs are not inferred. Native apps are outside this scan. A zero means no recognized source site, not that a capability is absent.",
     ],
   };
