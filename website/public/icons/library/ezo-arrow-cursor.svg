@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 32 32">
-  <defs>
-    <filter id="shadow" x="-40%" y="-30%" width="180%" height="190%">
-      <feDropShadow dx="0" dy="1" stdDeviation=".7" flood-color="#000" flood-opacity=".22"/>
-    </filter>
-  </defs>
-  <path d="M5.8 3.7L27 12.4Q29.4 13.4 26.9 14.3L17.4 17.1L14.4 27Q13.6 29.5 12.5 27L3.9 5.6Q2.6 2.5 5.8 3.7Z" fill="currentColor" stroke="#fff" stroke-width="2" stroke-linejoin="round" filter="url(#shadow)"/>
-</svg></svg>

@@ -27,6 +27,15 @@ test('shared interface icons are discoverable and Ezo artwork is excluded',()=>{
   }
   for(const icon of icons.filter(icon=>icon.source==='Library'))expect(icon.svg).toContain('viewBox="0 0 16 16"');
 });
+test('the shared sheet uses single-word labels and excludes product collections and their SVG exports', () => {
+  for (const icon of icons) {
+    expect(icon.name, icon.key).toMatch(/^[A-Za-z][A-Za-z0-9]*$/);
+    expect(icon.key).not.toMatch(/^(ezo-|aa-|badge-|block-|pattern-|arrange-|navigation-)/);
+  }
+  for (const file of readdirSync(new URL('../website/public/icons/library/', import.meta.url))) {
+    expect(file).not.toMatch(/^(ezo-|aa-|badge-|block-|pattern-|arrange-|navigation-)/);
+  }
+});
 test('inline copies isolate clip IDs while keeping exact path geometry and source immutable',()=>{
   const svg='<svg><defs><clipPath id="clip"><path d="M0 0L16 16Z"/></clipPath></defs><g id="layer" clip-path="url(#clip)"><path d="M2 3C4 5 6 7 8 9"/></g></svg>';
   const a=scopedSvg(svg,'first');const b=scopedSvg(svg,'second');

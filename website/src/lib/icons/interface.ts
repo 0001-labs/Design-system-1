@@ -26,7 +26,7 @@ function render(){
   $('vector-grid-lines').style.display=$<HTMLInputElement>('vector-grid').checked?'':'none';
   $('vector-shape-count').textContent=selected.shapes+' shapes';
   $<HTMLTextAreaElement>('vector-code').value=selected.svg;
-  const link=$<HTMLAnchorElement>('vector-download'); link.href=selected.url;link.download=selected.key+'.svg';
+  const link=$<HTMLAnchorElement>('vector-download'); link.href=selected.url;link.download=selected.name.toLowerCase()+'.svg';
   const source=$<HTMLAnchorElement>('vector-source');
   source.href=selected.node?`https://www.figma.com/design/XAnoaRoq9LxVAHUZgtdO0r/ds1?node-id=${selected.node.replace(':','-')}`:selected.url;
   source.textContent=selected.node?'Figma source ↗':'SVG source ↗';

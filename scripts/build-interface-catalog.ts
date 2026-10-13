@@ -1,7 +1,7 @@
 import { readFile, readdir, writeFile, mkdir, rm } from 'node:fs/promises';
 import figma from '../website/src/lib/icons/figma-interface.json';
 import additions from '../website/src/lib/icons/figma-additions.json';
-import { isSharedInterfaceIcon } from '../website/src/lib/icons/icon-scope';
+import { isSharedInterfaceIcon, sharedIconName } from '../website/src/lib/icons/icon-scope';
 const root = new URL('../', import.meta.url);
 const sourceDir = new URL('DS1/x-icon/', root);
 const publicDir = new URL('website/public/icons/', root);
@@ -12,8 +12,9 @@ function check(svg: string, name: string) {
   if (/<(?:script|foreignObject|image|iframe)\b|\bon[a-z]+\s*=|(?:href|src)\s*=/i.test(svg)) throw new Error(`${name}: only self-contained SVG geometry is supported`);
 }
 for (const icon of [...figma, ...additions]) {
+  if (!isSharedInterfaceIcon(icon.key)) continue;
   const svg = (await readFile(new URL('interface/' + icon.file, publicDir), 'utf8')).trim(); check(svg, icon.name);
-  catalog.push({ key:icon.key,name:icon.name,source:'Figma',node:icon.node,svg,url:'/icons/interface/'+icon.file,shapes:(svg.replace(/<defs\b[^>]*>[\s\S]*?<\/defs>/g,'').match(/<(?:path|circle|ellipse|rect|line|polyline|polygon)\b/g)||[]).length });
+  catalog.push({ key:icon.key,name:sharedIconName(icon.key),source:'Figma',node:icon.node,svg,url:'/icons/interface/'+icon.file,shapes:(svg.replace(/<defs\b[^>]*>[\s\S]*?<\/defs>/g,'').match(/<(?:path|circle|ellipse|rect|line|polyline|polygon)\b/g)||[]).length });
 }
 for (const file of (await readdir(sourceDir)).filter(file => file.endsWith('.svg')).sort()) {
   const key = file.slice(0,-4);
@@ -30,7 +31,7 @@ for (const file of (await readdir(sourceDir)).filter(file => file.endsWith('.svg
   const svg = width === 16 && height === 16 ? original : `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><g transform="translate(${(16-width*scale)/2} ${(16-height*scale)/2}) scale(${scale})">${original}</g></svg>`;
   check(svg,key);
   await writeFile(new URL('library/'+file,publicDir),svg);
-  catalog.push({key,name:key.replace(/(^|-)(\w)/g,(_all,dash,letter)=>(dash?' ':'')+letter.toUpperCase()),source:'Library',svg,url:'/icons/library/'+file,shapes:(svg.replace(/<defs\b[^>]*>[\s\S]*?<\/defs>/g,'').match(/<(?:path|circle|ellipse|rect|line|polyline|polygon)\b/g)||[]).length});
+  catalog.push({key,name:sharedIconName(key),source:'Library',svg,url:'/icons/library/'+file,shapes:(svg.replace(/<defs\b[^>]*>[\s\S]*?<\/defs>/g,'').match(/<(?:path|circle|ellipse|rect|line|polyline|polygon)\b/g)||[]).length});
 }
 catalog.sort((a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true}));
 await writeFile(new URL('website/src/lib/icons/interface-catalog.json',root),JSON.stringify(catalog,null,2)+'\n');

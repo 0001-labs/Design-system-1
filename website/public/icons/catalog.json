@@ -1,101 +1,5 @@
 [
   {
-    "key": "1x",
-    "name": "1x",
-    "source": "Figma",
-    "node": "116:507",
-    "url": "/icons/interface/1x.svg",
-    "shapes": 2
-  },
-  {
-    "key": "1xdots",
-    "name": "1xDots",
-    "source": "Figma",
-    "node": "116:155",
-    "url": "/icons/interface/1xdots.svg",
-    "shapes": 9
-  },
-  {
-    "key": "1xgrid",
-    "name": "1xGrid",
-    "source": "Figma",
-    "node": "116:434",
-    "url": "/icons/interface/1xgrid.svg",
-    "shapes": 6
-  },
-  {
-    "key": "1xlines",
-    "name": "1xLines",
-    "source": "Figma",
-    "node": "116:418",
-    "url": "/icons/interface/1xlines.svg",
-    "shapes": 3
-  },
-  {
-    "key": "2x",
-    "name": "2x",
-    "source": "Figma",
-    "node": "116:499",
-    "url": "/icons/interface/2x.svg",
-    "shapes": 2
-  },
-  {
-    "key": "2xgrid-alt",
-    "name": "2x grid alternate",
-    "source": "Figma",
-    "node": "621:1508",
-    "url": "/icons/interface/2xgrid-alt.svg",
-    "shapes": 6
-  },
-  {
-    "key": "2xgrid-alt-2",
-    "name": "2x grid alternate 2",
-    "source": "Figma",
-    "node": "403:4750",
-    "url": "/icons/interface/2xgrid-alt-2.svg",
-    "shapes": 7
-  },
-  {
-    "key": "2xgrid-alt-3",
-    "name": "2x grid alternate 3",
-    "source": "Figma",
-    "node": "403:4752",
-    "url": "/icons/interface/2xgrid-alt-3.svg",
-    "shapes": 6
-  },
-  {
-    "key": "2xdots",
-    "name": "2xDots",
-    "source": "Figma",
-    "node": "116:156",
-    "url": "/icons/interface/2xdots.svg",
-    "shapes": 4
-  },
-  {
-    "key": "2xgrid",
-    "name": "2xGrid",
-    "source": "Figma",
-    "node": "116:443",
-    "url": "/icons/interface/2xgrid.svg",
-    "shapes": 6
-  },
-  {
-    "key": "2xlines",
-    "name": "2xLines",
-    "source": "Figma",
-    "node": "116:426",
-    "url": "/icons/interface/2xlines.svg",
-    "shapes": 3
-  },
-  {
-    "key": "4x4",
-    "name": "4x4",
-    "source": "Figma",
-    "node": "119:266",
-    "url": "/icons/interface/4x4.svg",
-    "shapes": 1
-  },
-  {
     "key": "app",
     "name": "App",
     "source": "Library",
@@ -111,110 +15,19 @@
     "shapes": 1
   },
   {
-    "key": "archive",
-    "name": "Archive",
-    "source": "Library",
-    "url": "/icons/library/archive.svg",
-    "shapes": 2
-  },
-  {
     "key": "archive-alt",
-    "name": "Archive alternate",
+    "name": "Archive",
     "source": "Figma",
     "node": "627:2675",
     "url": "/icons/interface/archive-alt.svg",
     "shapes": 2
   },
   {
-    "key": "arrange-archive",
-    "name": "Arrange Archive",
+    "key": "archive",
+    "name": "Archive",
     "source": "Library",
-    "url": "/icons/library/arrange-archive.svg",
+    "url": "/icons/library/archive.svg",
     "shapes": 2
-  },
-  {
-    "key": "arrange-check",
-    "name": "Arrange Check",
-    "source": "Library",
-    "url": "/icons/library/arrange-check.svg",
-    "shapes": 4
-  },
-  {
-    "key": "arrange-chevron",
-    "name": "Arrange Chevron",
-    "source": "Library",
-    "url": "/icons/library/arrange-chevron.svg",
-    "shapes": 1
-  },
-  {
-    "key": "arrange-connect",
-    "name": "Arrange Connect",
-    "source": "Library",
-    "url": "/icons/library/arrange-connect.svg",
-    "shapes": 1
-  },
-  {
-    "key": "arrange-draft",
-    "name": "Arrange Draft",
-    "source": "Library",
-    "url": "/icons/library/arrange-draft.svg",
-    "shapes": 2
-  },
-  {
-    "key": "arrange-dropdown",
-    "name": "Arrange Dropdown",
-    "source": "Library",
-    "url": "/icons/library/arrange-dropdown.svg",
-    "shapes": 2
-  },
-  {
-    "key": "arrange-home",
-    "name": "Arrange Home",
-    "source": "Library",
-    "url": "/icons/library/arrange-home.svg",
-    "shapes": 6
-  },
-  {
-    "key": "arrange-link",
-    "name": "Arrange Link",
-    "source": "Library",
-    "url": "/icons/library/arrange-link.svg",
-    "shapes": 2
-  },
-  {
-    "key": "arrange-menu",
-    "name": "Arrange Menu",
-    "source": "Library",
-    "url": "/icons/library/arrange-menu.svg",
-    "shapes": 7
-  },
-  {
-    "key": "arrange-more",
-    "name": "Arrange More",
-    "source": "Library",
-    "url": "/icons/library/arrange-more.svg",
-    "shapes": 3
-  },
-  {
-    "key": "arrange-page",
-    "name": "Arrange Page",
-    "source": "Library",
-    "url": "/icons/library/arrange-page.svg",
-    "shapes": 1
-  },
-  {
-    "key": "arrange-plus",
-    "name": "Arrange Plus",
-    "source": "Library",
-    "url": "/icons/library/arrange-plus.svg",
-    "shapes": 1
-  },
-  {
-    "key": "arrange-site",
-    "name": "Arrange Site",
-    "source": "Library",
-    "url": "/icons/library/arrange-site.svg",
-    "shapes": 36
   },
   {
     "key": "avatar",
@@ -238,111 +51,6 @@
     "node": "116:232",
     "url": "/icons/interface/blank.svg",
     "shapes": 1
-  },
-  {
-    "key": "block-accordion",
-    "name": "Block Accordion",
-    "source": "Library",
-    "url": "/icons/library/block-accordion.svg",
-    "shapes": 4
-  },
-  {
-    "key": "block-banner",
-    "name": "Block Banner",
-    "source": "Library",
-    "url": "/icons/library/block-banner.svg",
-    "shapes": 3
-  },
-  {
-    "key": "block-breadcrumbs",
-    "name": "Block Breadcrumbs",
-    "source": "Library",
-    "url": "/icons/library/block-breadcrumbs.svg",
-    "shapes": 4
-  },
-  {
-    "key": "block-button",
-    "name": "Block Button",
-    "source": "Library",
-    "url": "/icons/library/block-button.svg",
-    "shapes": 3
-  },
-  {
-    "key": "block-divider",
-    "name": "Block Divider",
-    "source": "Library",
-    "url": "/icons/library/block-divider.svg",
-    "shapes": 3
-  },
-  {
-    "key": "block-forms",
-    "name": "Block Forms",
-    "source": "Library",
-    "url": "/icons/library/block-forms.svg",
-    "shapes": 5
-  },
-  {
-    "key": "block-group",
-    "name": "Block Group",
-    "source": "Library",
-    "url": "/icons/library/block-group.svg",
-    "shapes": 4
-  },
-  {
-    "key": "block-heading",
-    "name": "Block Heading",
-    "source": "Library",
-    "url": "/icons/library/block-heading.svg",
-    "shapes": 3
-  },
-  {
-    "key": "block-image",
-    "name": "Block Image",
-    "source": "Library",
-    "url": "/icons/library/block-image.svg",
-    "shapes": 4
-  },
-  {
-    "key": "block-logo-marquee",
-    "name": "Block Logo Marquee",
-    "source": "Library",
-    "url": "/icons/library/block-logo-marquee.svg",
-    "shapes": 6
-  },
-  {
-    "key": "block-page-progress",
-    "name": "Block Page Progress",
-    "source": "Library",
-    "url": "/icons/library/block-page-progress.svg",
-    "shapes": 3
-  },
-  {
-    "key": "block-section",
-    "name": "Block Section",
-    "source": "Library",
-    "url": "/icons/library/block-section.svg",
-    "shapes": 5
-  },
-  {
-    "key": "block-table",
-    "name": "Block Table",
-    "source": "Library",
-    "url": "/icons/library/block-table.svg",
-    "shapes": 8
-  },
-  {
-    "key": "block-tabs",
-    "name": "Block Tabs",
-    "source": "Library",
-    "url": "/icons/library/block-tabs.svg",
-    "shapes": 4
-  },
-  {
-    "key": "block-text",
-    "name": "Block Text",
-    "source": "Library",
-    "url": "/icons/library/block-text.svg",
-    "shapes": 3
   },
   {
     "key": "bold",
@@ -405,7 +113,7 @@
   },
   {
     "key": "check-alt",
-    "name": "Check alternate",
+    "name": "Check",
     "source": "Figma",
     "node": "1177:314",
     "url": "/icons/interface/check-alt.svg",
@@ -420,18 +128,18 @@
     "shapes": 1
   },
   {
+    "key": "code-block",
+    "name": "Code",
+    "source": "Library",
+    "url": "/icons/library/code-block.svg",
+    "shapes": 2
+  },
+  {
     "key": "code",
     "name": "Code",
     "source": "Library",
     "url": "/icons/library/code.svg",
     "shapes": 1
-  },
-  {
-    "key": "code-block",
-    "name": "Code Block",
-    "source": "Library",
-    "url": "/icons/library/code-block.svg",
-    "shapes": 2
   },
   {
     "key": "collapse",
@@ -519,6 +227,30 @@
     "shapes": 1
   },
   {
+    "key": "2xdots",
+    "name": "Dots",
+    "source": "Figma",
+    "node": "116:156",
+    "url": "/icons/interface/2xdots.svg",
+    "shapes": 4
+  },
+  {
+    "key": "1xdots",
+    "name": "Dots",
+    "source": "Figma",
+    "node": "116:155",
+    "url": "/icons/interface/1xdots.svg",
+    "shapes": 9
+  },
+  {
+    "key": "2x",
+    "name": "Double",
+    "source": "Figma",
+    "node": "116:499",
+    "url": "/icons/interface/2x.svg",
+    "shapes": 2
+  },
+  {
     "key": "down",
     "name": "Down",
     "source": "Figma",
@@ -564,447 +296,6 @@
     "shapes": 1
   },
   {
-    "key": "ezo-accordion-chevron",
-    "name": "Ezo Accordion Chevron",
-    "source": "Library",
-    "url": "/icons/library/ezo-accordion-chevron.svg",
-    "shapes": 1
-  },
-  {
-    "key": "ezo-account-close",
-    "name": "Ezo Account Close",
-    "source": "Library",
-    "url": "/icons/library/ezo-account-close.svg",
-    "shapes": 1
-  },
-  {
-    "key": "ezo-android-screen-archive",
-    "name": "Ezo Android Screen Archive",
-    "source": "Library",
-    "url": "/icons/library/ezo-android-screen-archive.svg",
-    "shapes": 2
-  },
-  {
-    "key": "ezo-android-screen-calendar",
-    "name": "Ezo Android Screen Calendar",
-    "source": "Library",
-    "url": "/icons/library/ezo-android-screen-calendar.svg",
-    "shapes": 4
-  },
-  {
-    "key": "ezo-android-screen-camera",
-    "name": "Ezo Android Screen Camera",
-    "source": "Library",
-    "url": "/icons/library/ezo-android-screen-camera.svg",
-    "shapes": 3
-  },
-  {
-    "key": "ezo-android-screen-check",
-    "name": "Ezo Android Screen Check",
-    "source": "Library",
-    "url": "/icons/library/ezo-android-screen-check.svg",
-    "shapes": 1
-  },
-  {
-    "key": "ezo-android-screen-compose",
-    "name": "Ezo Android Screen Compose",
-    "source": "Library",
-    "url": "/icons/library/ezo-android-screen-compose.svg",
-    "shapes": 2
-  },
-  {
-    "key": "ezo-android-screen-globe",
-    "name": "Ezo Android Screen Globe",
-    "source": "Library",
-    "url": "/icons/library/ezo-android-screen-globe.svg",
-    "shapes": 1
-  },
-  {
-    "key": "ezo-android-screen-lists",
-    "name": "Ezo Android Screen Lists",
-    "source": "Library",
-    "url": "/icons/library/ezo-android-screen-lists.svg",
-    "shapes": 1
-  },
-  {
-    "key": "ezo-android-screen-shared",
-    "name": "Ezo Android Screen Shared",
-    "source": "Library",
-    "url": "/icons/library/ezo-android-screen-shared.svg",
-    "shapes": 3
-  },
-  {
-    "key": "ezo-android-screen-stats",
-    "name": "Ezo Android Screen Stats",
-    "source": "Library",
-    "url": "/icons/library/ezo-android-screen-stats.svg",
-    "shapes": 1
-  },
-  {
-    "key": "ezo-android-screen-store",
-    "name": "Ezo Android Screen Store",
-    "source": "Library",
-    "url": "/icons/library/ezo-android-screen-store.svg",
-    "shapes": 2
-  },
-  {
-    "key": "ezo-android-screen-views",
-    "name": "Ezo Android Screen Views",
-    "source": "Library",
-    "url": "/icons/library/ezo-android-screen-views.svg",
-    "shapes": 2
-  },
-  {
-    "key": "ezo-android-screen-work",
-    "name": "Ezo Android Screen Work",
-    "source": "Library",
-    "url": "/icons/library/ezo-android-screen-work.svg",
-    "shapes": 1
-  },
-  {
-    "key": "ezo-arrow-cursor",
-    "name": "Ezo Arrow Cursor",
-    "source": "Library",
-    "url": "/icons/library/ezo-arrow-cursor.svg",
-    "shapes": 1
-  },
-  {
-    "key": "ezo-block-accordion",
-    "name": "Ezo Block Accordion",
-    "source": "Library",
-    "url": "/icons/library/ezo-block-accordion.svg",
-    "shapes": 4
-  },
-  {
-    "key": "ezo-block-divider",
-    "name": "Ezo Block Divider",
-    "source": "Library",
-    "url": "/icons/library/ezo-block-divider.svg",
-    "shapes": 3
-  },
-  {
-    "key": "ezo-block-group",
-    "name": "Ezo Block Group",
-    "source": "Library",
-    "url": "/icons/library/ezo-block-group.svg",
-    "shapes": 4
-  },
-  {
-    "key": "ezo-block-image",
-    "name": "Ezo Block Image",
-    "source": "Library",
-    "url": "/icons/library/ezo-block-image.svg",
-    "shapes": 4
-  },
-  {
-    "key": "ezo-block-section",
-    "name": "Ezo Block Section",
-    "source": "Library",
-    "url": "/icons/library/ezo-block-section.svg",
-    "shapes": 5
-  },
-  {
-    "key": "ezo-block-table",
-    "name": "Ezo Block Table",
-    "source": "Library",
-    "url": "/icons/library/ezo-block-table.svg",
-    "shapes": 8
-  },
-  {
-    "key": "ezo-code",
-    "name": "Ezo Code",
-    "source": "Library",
-    "url": "/icons/library/ezo-code.svg",
-    "shapes": 12
-  },
-  {
-    "key": "ezo-down",
-    "name": "Ezo Down",
-    "source": "Library",
-    "url": "/icons/library/ezo-down.svg",
-    "shapes": 1
-  },
-  {
-    "key": "ezo-figma-premium-star",
-    "name": "Ezo Figma Premium Star",
-    "source": "Library",
-    "url": "/icons/library/ezo-figma-premium-star.svg",
-    "shapes": 1
-  },
-  {
-    "key": "ezo-item-button-complete",
-    "name": "Ezo Item Button Complete",
-    "source": "Library",
-    "url": "/icons/library/ezo-item-button-complete.svg",
-    "shapes": 2
-  },
-  {
-    "key": "ezo-item-button-header",
-    "name": "Ezo Item Button Header",
-    "source": "Library",
-    "url": "/icons/library/ezo-item-button-header.svg",
-    "shapes": 1
-  },
-  {
-    "key": "ezo-item-button-open",
-    "name": "Ezo Item Button Open",
-    "source": "Library",
-    "url": "/icons/library/ezo-item-button-open.svg",
-    "shapes": 1
-  },
-  {
-    "key": "ezo-item-button-reopen",
-    "name": "Ezo Item Button Reopen",
-    "source": "Library",
-    "url": "/icons/library/ezo-item-button-reopen.svg",
-    "shapes": 1
-  },
-  {
-    "key": "ezo-item-button-star",
-    "name": "Ezo Item Button Star",
-    "source": "Library",
-    "url": "/icons/library/ezo-item-button-star.svg",
-    "shapes": 1
-  },
-  {
-    "key": "ezo-item-button-start",
-    "name": "Ezo Item Button Start",
-    "source": "Library",
-    "url": "/icons/library/ezo-item-button-start.svg",
-    "shapes": 1
-  },
-  {
-    "key": "ezo-item-button-unheader",
-    "name": "Ezo Item Button Unheader",
-    "source": "Library",
-    "url": "/icons/library/ezo-item-button-unheader.svg",
-    "shapes": 5
-  },
-  {
-    "key": "ezo-item-button-unstar",
-    "name": "Ezo Item Button Unstar",
-    "source": "Library",
-    "url": "/icons/library/ezo-item-button-unstar.svg",
-    "shapes": 3
-  },
-  {
-    "key": "ezo-item-star",
-    "name": "Ezo Item Star",
-    "source": "Library",
-    "url": "/icons/library/ezo-item-star.svg",
-    "shapes": 1
-  },
-  {
-    "key": "ezo-left",
-    "name": "Ezo Left",
-    "source": "Library",
-    "url": "/icons/library/ezo-left.svg",
-    "shapes": 1
-  },
-  {
-    "key": "ezo-mic",
-    "name": "Ezo Mic",
-    "source": "Library",
-    "url": "/icons/library/ezo-mic.svg",
-    "shapes": 2
-  },
-  {
-    "key": "ezo-move-column",
-    "name": "Ezo Move Column",
-    "source": "Library",
-    "url": "/icons/library/ezo-move-column.svg",
-    "shapes": 1
-  },
-  {
-    "key": "ezo-move-row",
-    "name": "Ezo Move Row",
-    "source": "Library",
-    "url": "/icons/library/ezo-move-row.svg",
-    "shapes": 1
-  },
-  {
-    "key": "ezo-navigation-check",
-    "name": "Ezo Navigation Check",
-    "source": "Library",
-    "url": "/icons/library/ezo-navigation-check.svg",
-    "shapes": 2
-  },
-  {
-    "key": "ezo-note-back",
-    "name": "Ezo Note Back",
-    "source": "Library",
-    "url": "/icons/library/ezo-note-back.svg",
-    "shapes": 1
-  },
-  {
-    "key": "ezo-note-menu-complete",
-    "name": "Ezo Note Menu Complete",
-    "source": "Library",
-    "url": "/icons/library/ezo-note-menu-complete.svg",
-    "shapes": 5
-  },
-  {
-    "key": "ezo-note-menu-delete",
-    "name": "Ezo Note Menu Delete",
-    "source": "Library",
-    "url": "/icons/library/ezo-note-menu-delete.svg",
-    "shapes": 2
-  },
-  {
-    "key": "ezo-note-menu-duplicate",
-    "name": "Ezo Note Menu Duplicate",
-    "source": "Library",
-    "url": "/icons/library/ezo-note-menu-duplicate.svg",
-    "shapes": 2
-  },
-  {
-    "key": "ezo-note-menu-note",
-    "name": "Ezo Note Menu Note",
-    "source": "Library",
-    "url": "/icons/library/ezo-note-menu-note.svg",
-    "shapes": 1
-  },
-  {
-    "key": "ezo-note-menu-page",
-    "name": "Ezo Note Menu Page",
-    "source": "Library",
-    "url": "/icons/library/ezo-note-menu-page.svg",
-    "shapes": 1
-  },
-  {
-    "key": "ezo-note-menu-star",
-    "name": "Ezo Note Menu Star",
-    "source": "Library",
-    "url": "/icons/library/ezo-note-menu-star.svg",
-    "shapes": 1
-  },
-  {
-    "key": "ezo-note-menu-start",
-    "name": "Ezo Note Menu Start",
-    "source": "Library",
-    "url": "/icons/library/ezo-note-menu-start.svg",
-    "shapes": 2
-  },
-  {
-    "key": "ezo-note-menu-stop",
-    "name": "Ezo Note Menu Stop",
-    "source": "Library",
-    "url": "/icons/library/ezo-note-menu-stop.svg",
-    "shapes": 2
-  },
-  {
-    "key": "ezo-note-more",
-    "name": "Ezo Note More",
-    "source": "Library",
-    "url": "/icons/library/ezo-note-more.svg",
-    "shapes": 3
-  },
-  {
-    "key": "ezo-note-star",
-    "name": "Ezo Note Star",
-    "source": "Library",
-    "url": "/icons/library/ezo-note-star.svg",
-    "shapes": 1
-  },
-  {
-    "key": "ezo-password-visibility-see",
-    "name": "Ezo Password Visibility See",
-    "source": "Library",
-    "url": "/icons/library/ezo-password-visibility-see.svg",
-    "shapes": 2
-  },
-  {
-    "key": "ezo-password-visibility-unsee",
-    "name": "Ezo Password Visibility Unsee",
-    "source": "Library",
-    "url": "/icons/library/ezo-password-visibility-unsee.svg",
-    "shapes": 3
-  },
-  {
-    "key": "ezo-pattern-call-to-action",
-    "name": "Ezo Pattern Call To Action",
-    "source": "Library",
-    "url": "/icons/library/ezo-pattern-call-to-action.svg",
-    "shapes": 4
-  },
-  {
-    "key": "ezo-play",
-    "name": "Ezo Play",
-    "source": "Library",
-    "url": "/icons/library/ezo-play.svg",
-    "shapes": 1
-  },
-  {
-    "key": "ezo-premium-star",
-    "name": "Ezo Premium Star",
-    "source": "Library",
-    "url": "/icons/library/ezo-premium-star.svg",
-    "shapes": 1
-  },
-  {
-    "key": "ezo-setting-1xdots",
-    "name": "Ezo Setting 1xdots",
-    "source": "Library",
-    "url": "/icons/library/ezo-setting-1xdots.svg",
-    "shapes": 9
-  },
-  {
-    "key": "ezo-setting-1xgrid",
-    "name": "Ezo Setting 1xgrid",
-    "source": "Library",
-    "url": "/icons/library/ezo-setting-1xgrid.svg",
-    "shapes": 6
-  },
-  {
-    "key": "ezo-setting-1xlines",
-    "name": "Ezo Setting 1xlines",
-    "source": "Library",
-    "url": "/icons/library/ezo-setting-1xlines.svg",
-    "shapes": 3
-  },
-  {
-    "key": "ezo-setting-2xdots",
-    "name": "Ezo Setting 2xdots",
-    "source": "Library",
-    "url": "/icons/library/ezo-setting-2xdots.svg",
-    "shapes": 4
-  },
-  {
-    "key": "ezo-setting-2xgrid",
-    "name": "Ezo Setting 2xgrid",
-    "source": "Library",
-    "url": "/icons/library/ezo-setting-2xgrid.svg",
-    "shapes": 4
-  },
-  {
-    "key": "ezo-setting-2xlines",
-    "name": "Ezo Setting 2xlines",
-    "source": "Library",
-    "url": "/icons/library/ezo-setting-2xlines.svg",
-    "shapes": 2
-  },
-  {
-    "key": "ezo-setting-blank",
-    "name": "Ezo Setting Blank",
-    "source": "Library",
-    "url": "/icons/library/ezo-setting-blank.svg",
-    "shapes": 1
-  },
-  {
-    "key": "ezo-store-chevron",
-    "name": "Ezo Store Chevron",
-    "source": "Library",
-    "url": "/icons/library/ezo-store-chevron.svg",
-    "shapes": 1
-  },
-  {
-    "key": "ezo-upgrade-close",
-    "name": "Ezo Upgrade Close",
-    "source": "Library",
-    "url": "/icons/library/ezo-upgrade-close.svg",
-    "shapes": 1
-  },
-  {
     "key": "folder",
     "name": "Folder",
     "source": "Library",
@@ -1044,6 +335,46 @@
     "shapes": 4
   },
   {
+    "key": "2xgrid",
+    "name": "Grid",
+    "source": "Figma",
+    "node": "116:443",
+    "url": "/icons/interface/2xgrid.svg",
+    "shapes": 6
+  },
+  {
+    "key": "1xgrid",
+    "name": "Grid",
+    "source": "Figma",
+    "node": "116:434",
+    "url": "/icons/interface/1xgrid.svg",
+    "shapes": 6
+  },
+  {
+    "key": "2xgrid-alt",
+    "name": "Grid",
+    "source": "Figma",
+    "node": "621:1508",
+    "url": "/icons/interface/2xgrid-alt.svg",
+    "shapes": 6
+  },
+  {
+    "key": "2xgrid-alt-2",
+    "name": "Grid",
+    "source": "Figma",
+    "node": "403:4750",
+    "url": "/icons/interface/2xgrid-alt-2.svg",
+    "shapes": 7
+  },
+  {
+    "key": "2xgrid-alt-3",
+    "name": "Grid",
+    "source": "Figma",
+    "node": "403:4752",
+    "url": "/icons/interface/2xgrid-alt-3.svg",
+    "shapes": 6
+  },
+  {
     "key": "group",
     "name": "Group",
     "source": "Figma",
@@ -1053,7 +384,7 @@
   },
   {
     "key": "group-alt",
-    "name": "Group alternate",
+    "name": "Group",
     "source": "Figma",
     "node": "633:3852",
     "url": "/icons/interface/group-alt.svg",
@@ -1061,7 +392,7 @@
   },
   {
     "key": "group-alt-2",
-    "name": "Group alternate 2",
+    "name": "Group",
     "source": "Figma",
     "node": "715:786",
     "url": "/icons/interface/group-alt-2.svg",
@@ -1104,19 +435,19 @@
     "shapes": 1
   },
   {
+    "key": "help-alt",
+    "name": "Help",
+    "source": "Figma",
+    "node": "643:813",
+    "url": "/icons/interface/help-alt.svg",
+    "shapes": 1
+  },
+  {
     "key": "help",
     "name": "Help",
     "source": "Library",
     "url": "/icons/library/help.svg",
     "shapes": 3
-  },
-  {
-    "key": "help-alt",
-    "name": "Help alternate",
-    "source": "Figma",
-    "node": "643:813",
-    "url": "/icons/interface/help-alt.svg",
-    "shapes": 1
   },
   {
     "key": "home",
@@ -1187,6 +518,22 @@
     "shapes": 6
   },
   {
+    "key": "2xlines",
+    "name": "Lines",
+    "source": "Figma",
+    "node": "116:426",
+    "url": "/icons/interface/2xlines.svg",
+    "shapes": 3
+  },
+  {
+    "key": "1xlines",
+    "name": "Lines",
+    "source": "Figma",
+    "node": "116:418",
+    "url": "/icons/interface/1xlines.svg",
+    "shapes": 3
+  },
+  {
     "key": "link",
     "name": "Link",
     "source": "Library",
@@ -1195,7 +542,7 @@
   },
   {
     "key": "list-line",
-    "name": "List line",
+    "name": "List",
     "source": "Figma",
     "node": "1191:1427",
     "url": "/icons/interface/list-line.svg",
@@ -1218,19 +565,11 @@
   },
   {
     "key": "lock-filled",
-    "name": "Lock filled",
+    "name": "Lock",
     "source": "Figma",
     "node": "657:902",
     "url": "/icons/interface/lock-filled.svg",
     "shapes": 1
-  },
-  {
-    "key": "logo-marquee",
-    "name": "Logo marquee",
-    "source": "Figma",
-    "node": "689:1099",
-    "url": "/icons/interface/logo-marquee.svg",
-    "shapes": 3
   },
   {
     "key": "loop",
@@ -1239,6 +578,22 @@
     "node": "116:251",
     "url": "/icons/interface/loop.svg",
     "shapes": 4
+  },
+  {
+    "key": "logo-marquee",
+    "name": "Marquee",
+    "source": "Figma",
+    "node": "689:1099",
+    "url": "/icons/interface/logo-marquee.svg",
+    "shapes": 3
+  },
+  {
+    "key": "4x4",
+    "name": "Matrix",
+    "source": "Figma",
+    "node": "119:266",
+    "url": "/icons/interface/4x4.svg",
+    "shapes": 1
   },
   {
     "key": "mention",
@@ -1273,7 +628,7 @@
   },
   {
     "key": "minimize-alt",
-    "name": "Minimize alternate",
+    "name": "Minimize",
     "source": "Figma",
     "node": "643:811",
     "url": "/icons/interface/minimize-alt.svg",
@@ -1295,13 +650,6 @@
     "shapes": 3
   },
   {
-    "key": "navigation-check",
-    "name": "Navigation Check",
-    "source": "Library",
-    "url": "/icons/library/navigation-check.svg",
-    "shapes": 2
-  },
-  {
     "key": "neutral",
     "name": "Neutral",
     "source": "Figma",
@@ -1319,15 +667,23 @@
   },
   {
     "key": "note-page",
-    "name": "Note · page",
+    "name": "Note",
     "source": "Figma",
     "node": "116:207",
     "url": "/icons/interface/note-page.svg",
     "shapes": 2
   },
   {
+    "key": "note-lines",
+    "name": "Note",
+    "source": "Figma",
+    "node": "1191:1424",
+    "url": "/icons/interface/note-lines.svg",
+    "shapes": 4
+  },
+  {
     "key": "note-alt",
-    "name": "Note alternate",
+    "name": "Note",
     "source": "Figma",
     "node": "621:1549",
     "url": "/icons/interface/note-alt.svg",
@@ -1335,18 +691,17 @@
   },
   {
     "key": "note-alt-2",
-    "name": "Note alternate 2",
+    "name": "Note",
     "source": "Figma",
     "node": "621:1537",
     "url": "/icons/interface/note-alt-2.svg",
     "shapes": 4
   },
   {
-    "key": "note-lines",
-    "name": "Note lines",
-    "source": "Figma",
-    "node": "1191:1424",
-    "url": "/icons/interface/note-lines.svg",
+    "key": "page-note",
+    "name": "Note",
+    "source": "Library",
+    "url": "/icons/library/page-note.svg",
     "shapes": 4
   },
   {
@@ -1373,17 +728,17 @@
   },
   {
     "key": "open-alt",
-    "name": "Open alternate",
+    "name": "Open",
     "source": "Figma",
     "node": "1177:310",
     "url": "/icons/interface/open-alt.svg",
     "shapes": 1
   },
   {
-    "key": "open-source",
-    "name": "Open Source",
+    "key": "up-right",
+    "name": "Outbound",
     "source": "Library",
-    "url": "/icons/library/open-source.svg",
+    "url": "/icons/library/up-right.svg",
     "shapes": 1
   },
   {
@@ -1410,7 +765,7 @@
   },
   {
     "key": "page-18",
-    "name": "Page 18",
+    "name": "Page",
     "source": "Figma",
     "node": "701:1557",
     "url": "/icons/interface/page-18.svg",
@@ -1418,18 +773,11 @@
   },
   {
     "key": "page-alt",
-    "name": "Page alternate",
+    "name": "Page",
     "source": "Figma",
     "node": "554:10",
     "url": "/icons/interface/page-alt.svg",
     "shapes": 1
-  },
-  {
-    "key": "page-note",
-    "name": "Page Note",
-    "source": "Library",
-    "url": "/icons/library/page-note.svg",
-    "shapes": 4
   },
   {
     "key": "panel",
@@ -1437,34 +785,6 @@
     "source": "Library",
     "url": "/icons/library/panel.svg",
     "shapes": 2
-  },
-  {
-    "key": "pattern-call-to-action",
-    "name": "Pattern Call To Action",
-    "source": "Library",
-    "url": "/icons/library/pattern-call-to-action.svg",
-    "shapes": 4
-  },
-  {
-    "key": "pattern-card",
-    "name": "Pattern Card",
-    "source": "Library",
-    "url": "/icons/library/pattern-card.svg",
-    "shapes": 6
-  },
-  {
-    "key": "pattern-feature",
-    "name": "Pattern Feature",
-    "source": "Library",
-    "url": "/icons/library/pattern-feature.svg",
-    "shapes": 5
-  },
-  {
-    "key": "pattern-hero",
-    "name": "Pattern Hero",
-    "source": "Library",
-    "url": "/icons/library/pattern-hero.svg",
-    "shapes": 4
   },
   {
     "key": "pen",
@@ -1483,7 +803,7 @@
   },
   {
     "key": "play-alt",
-    "name": "Play alternate",
+    "name": "Play",
     "source": "Figma",
     "node": "1139:24",
     "url": "/icons/interface/play-alt.svg",
@@ -1528,7 +848,7 @@
   },
   {
     "key": "rewind-30",
-    "name": "Rewind 30",
+    "name": "Rewind",
     "source": "Figma",
     "node": "1059:27",
     "url": "/icons/interface/rewind-30.svg",
@@ -1536,7 +856,7 @@
   },
   {
     "key": "rewind-30-alt",
-    "name": "Rewind 30 alternate",
+    "name": "Rewind",
     "source": "Figma",
     "node": "1059:29",
     "url": "/icons/interface/rewind-30-alt.svg",
@@ -1568,7 +888,7 @@
   },
   {
     "key": "sdown",
-    "name": "SDown",
+    "name": "Sdown",
     "source": "Figma",
     "node": "117:1648",
     "url": "/icons/interface/sdown.svg",
@@ -1584,7 +904,7 @@
   },
   {
     "key": "search-30",
-    "name": "Search 30",
+    "name": "Search",
     "source": "Figma",
     "node": "1044:33",
     "url": "/icons/interface/search-30.svg",
@@ -1600,7 +920,7 @@
   },
   {
     "key": "see-30",
-    "name": "See 30",
+    "name": "See",
     "source": "Figma",
     "node": "1044:26",
     "url": "/icons/interface/see-30.svg",
@@ -1629,10 +949,25 @@
     "shapes": 3
   },
   {
+    "key": "1x",
+    "name": "Single",
+    "source": "Figma",
+    "node": "116:507",
+    "url": "/icons/interface/1x.svg",
+    "shapes": 2
+  },
+  {
     "key": "slash",
     "name": "Slash",
     "source": "Library",
     "url": "/icons/library/slash.svg",
+    "shapes": 1
+  },
+  {
+    "key": "open-source",
+    "name": "Source",
+    "source": "Library",
+    "url": "/icons/library/open-source.svg",
     "shapes": 1
   },
   {
@@ -1645,7 +980,7 @@
   },
   {
     "key": "star-alt",
-    "name": "Star alternate",
+    "name": "Star",
     "source": "Figma",
     "node": "1177:306",
     "url": "/icons/interface/star-alt.svg",
@@ -1653,7 +988,7 @@
   },
   {
     "key": "star-alt-2",
-    "name": "Star alternate 2",
+    "name": "Star",
     "source": "Figma",
     "node": "1141:23",
     "url": "/icons/interface/star-alt-2.svg",
@@ -1676,7 +1011,7 @@
   },
   {
     "key": "status-alt",
-    "name": "Status alternate",
+    "name": "Status",
     "source": "Figma",
     "node": "936:201",
     "url": "/icons/interface/status-alt.svg",
@@ -1684,7 +1019,7 @@
   },
   {
     "key": "status-filled",
-    "name": "Status filled",
+    "name": "Status",
     "source": "Figma",
     "node": "657:898",
     "url": "/icons/interface/status-filled.svg",
@@ -1706,7 +1041,7 @@
   },
   {
     "key": "sup",
-    "name": "SUp",
+    "name": "Sup",
     "source": "Figma",
     "node": "117:1656",
     "url": "/icons/interface/sup.svg",
@@ -1750,7 +1085,7 @@
   },
   {
     "key": "title-text",
-    "name": "Title · text",
+    "name": "Title",
     "source": "Figma",
     "node": "116:208",
     "url": "/icons/interface/title-text.svg",
@@ -1876,13 +1211,6 @@
     "source": "Figma",
     "node": "116:240",
     "url": "/icons/interface/up.svg",
-    "shapes": 1
-  },
-  {
-    "key": "up-right",
-    "name": "Up Right",
-    "source": "Library",
-    "url": "/icons/library/up-right.svg",
     "shapes": 1
   },
   {

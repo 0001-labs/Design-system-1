@@ -3,6 +3,7 @@
  * them. `tag` is the name in code: the custom element, or the file for Root.
  * An entry with no `tag` is documented but has no element of its own.
  */
+import { isSharedInterfaceIcon, sharedIconName } from './icons/icon-scope';
 export type DirectoryEntry = { name: string; href: string; tag?: string };
 export type DirectoryLayer = {
   number: number;
@@ -75,6 +76,8 @@ export const LAYERS: DirectoryLayer[] = [
 /** Every drawing in DS1/x-icon, by file name: the name ds-icon takes. */
 const drawings = import.meta.glob<string>('../../../DS1/x-icon/*.svg', { query: '?raw', import: 'default', eager: true });
 export const ICONS = Object.entries(drawings)
-  .map(([path, svg]) => ({ name: path.split('/').pop()!.replace('.svg', ''), svg }))
+  .map(([path, svg]) => ({ key: path.split('/').pop()!.replace('.svg', ''), svg }))
+  .filter(icon => isSharedInterfaceIcon(icon.key))
+  .map(icon => ({ ...icon, name: sharedIconName(icon.key) }))
   .sort((a, b) => a.name.localeCompare(b.name, 'en', { numeric: true }));
 export const ICON_SUMMARY = 'The drawings ds-icon shows, each by its name.';

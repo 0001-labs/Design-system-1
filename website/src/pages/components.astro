@@ -96,7 +96,7 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
               <a href="/2-core/icon/">
                 <span class="directory-icon" aria-hidden="true" set:html={icon.svg} />
                 <span class="directory-name">{icon.name}</span>
-                <span class="directory-tag">{`<ds-icon name="${icon.name}">`}</span>
+                <span class="directory-tag">{`<ds-icon type="${icon.key}">`}</span>
               </a>
             </li>
           ))}
