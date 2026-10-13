@@ -110,11 +110,15 @@
     "@hono/node-server": "^2.1.0",
     "@playwright/test": "^1.56.0",
     "@types/node": "^20.0.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
     "convex": "^1.42.3",
     "convex-test": "^0.0.54",
     "esbuild": "^0.27.0",
     "happy-dom": "^21.0.1",
     "playwright": "^1.56.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "tsx": "^4.21.0",
     "typescript": "^5.0.0",
     "vite": "catalog:",
@@ -123,10 +127,14 @@
   },
   "peerDependencies": {
     "convex": "^1.17.0",
-    "lit": "^3.0.0"
+    "lit": "^3.0.0",
+    "react": "^19.0.0"
   },
   "peerDependenciesMeta": {
     "convex": {
+      "optional": true
+    },
+    "react": {
       "optional": true
     }
   },

@@ -30,13 +30,14 @@ Give a field a visible label. A placeholder is a hint, not a label. Put the reas
 | `placeholder-key` | string | Empty | Translation key for the hint. |
 | `error` / `error-text` | string | Empty | Literal error or its translation key. |
 | `disabled`, `readonly`, `required` | boolean | false | Native field states. |
-| `variant` | string | `default` | `default`, `filled`, `outlined` or `row` (18px field in a 20px row). |
-
+| `variant` | string | `default` | `default`, `filled`, `outlined`, `row` (18px field in a 20px row), `field` (20px form control) or `plain` (transparent inline field). |
 | `revealable` | boolean | false | Show a password visibility button; the public type stays `password`. |
 | `quiet-focus` | boolean | false | Suppress the field focus box when its surrounding form supplies the focus treatment. |
 | `inputmode` | string | Empty | Native mobile keyboard hint, such as `numeric`. |
 | `aria-label` / `aria-labelledby` | string | Empty | Name the native field, including labels in the parent shadow root. |
 | `aria-invalid` | string | Empty | Forward an application validation state to the native field. |
+| `aria-describedby` | string | Empty | Copy the referenced description into the field's shadow root. |
+| `spellcheck` | string | Empty | Native spelling hint, `true` or `false`. |
 
 Native constraints include `min`, `max`, `step`, `pattern`, `minlength` and `maxlength`.
 
@@ -60,6 +61,21 @@ Import `DS1/1-root/component-tokens.css` and set `--ds-sf` to the surface scale.
   aria-label="Password" autocomplete="current-password" revealable></ds-input>
 ```
 
-`input-focus` and `input-blur` report focus changes. Call `focus()`, `blur()` or `select()` on the component.
+`input-focus` and `input-blur` report focus changes. Call `focus()`, `blur()`, `select()` or `setSelectionRange()` on the component. `selectionStart`, `selectionEnd` and `valueAsNumber` expose the native field state. External HTML labels focus the field; Enter activates its form's enabled submit button unless an application keyboard handler cancels the event.
+
+## React
+
+Selecting `input` with `scripts/sync-components.mjs` also copies the shared `react/input.ts` adapter. Register the copied components through the product's browser entry, then import the adapter. It contains no visuals; `ds-input` owns the control. Registration must be browser-only in an application that renders on the server.
+
+```tsx
+import { Input, type InputElement } from './design/react/input';
+
+<Input name="name" value={name} onChange={event => setName(event.target.value)}
+  aria-label="Name" required />
+```
+
+The React adapter defaults to `variant="field"`. It supports controlled `value`, uncontrolled `defaultValue`, native hints such as `autoComplete`, keyboard and focus handlers, and refs typed as `InputElement`. Event `target` and `currentTarget` refer to the shared element. Controlled values are restored when an application rejects an edit or a form resets. React remains an optional peer dependency.
+
+Use the input for text, email, password, number, date and time fields. File, colour, checkbox and radio inputs and composite comboboxes need their own shared controls. A combobox's listbox and active-option relationships cannot be passed through as plain text-field attributes.
 
 [Form](/3-unit/form/) · [Languages](/built-ins/languages/)

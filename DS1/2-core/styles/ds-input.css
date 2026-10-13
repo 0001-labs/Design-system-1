@@ -174,3 +174,31 @@ input.has-reveal { padding-inline-end: calc(24px * var(--ds-sf, 1)); }
 @supports (corner-shape: squircle) {
   input { corner-shape: squircle; }
 }
+
+/* Standard standalone form field and text-only inline editor. */
+:host([variant="field"]) input,
+:host([variant="plain"]) input {
+  height: var(--ds-input-height, var(--ds-row-height));
+  padding: var(--ds-input-padding, 0 calc(4px * var(--ds-sf)));
+  border: var(--ds-input-border, 1px solid var(--ds-border-color));
+  border-radius: var(--ds-input-radius, var(--ds-radius));
+  background: var(--ds-input-field-background, var(--ds-fill));
+  color: var(--ds-text-color);
+  opacity: 1;
+  font-size: var(--ds-type-size-default);
+  line-height: var(--ds-type-lineheight-default);
+  letter-spacing: var(--ds-type-letterspacing-default);
+}
+:host([variant="plain"]) input {
+  padding: var(--ds-input-padding, 0);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+:host([variant="field"]) input::placeholder,
+:host([variant="plain"]) input::placeholder { color: var(--ds-text-color-muted); opacity: 1; }
+:host([variant="field"]) input:focus { outline: 1px solid var(--ds-focus-ring); outline-offset: -1px; }
+:host([variant="field"]) input:disabled,
+:host([variant="plain"]) input:disabled { opacity: .5; }
+:host([variant="field"]) input.has-reveal,
+:host([variant="plain"]) input.has-reveal { padding-inline-end: calc(24px * var(--ds-sf)); }
