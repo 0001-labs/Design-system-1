@@ -1,0 +1,37 @@
+---
+title: Menu
+description: Shared action menus, suggestion lists and small choice grids.
+---
+
+`ds-menu` owns the face, keyboard navigation and placement of a list of choices.
+Give each choice a native `option` or `menuitem` role. DS1 React `Button` keeps
+the native button in light DOM, so its label, selected state and focus remain
+available to the menu and to assistive technology.
+
+An inline menu remains in document flow. Use `compact` inside an existing
+shared dialog. Set `floating` and `open` for an anchored popup in the browser's
+native popover layer, including inside a modal. Set `anchor` to its launcher
+or writing field. DS1 flips above the anchor when necessary and clamps the menu
+to the visual viewport, including its keyboard and scale changes.
+
+For suggestions, set `controller` to the native input or textarea and
+`activeId` to the chosen option's ID. Arrow keys request the next enabled
+option through the cancelable `ds-menu-active` event (`detail.id`); Enter
+activates it. Focus stays in the field, including when pressing an option.
+Home, End, modified keys and IME composition remain native editing commands.
+The product owns the candidates, matching, insertion and field ARIA references.
+
+For actions, focus starts on the first available choice and returns to the
+launcher when the menu closes. `columns` gives a small grid its horizontal and
+vertical navigation. Hidden, disabled and nested choices are skipped.
+Escape and outside presses request dismissal through `ds-menu-close`
+(`detail.reason` is `escape` or `outside`). Cancel the event to decline the
+request. Only the top menu handles Escape; it does not dismiss the surrounding
+dialog. An outside press does not steal focus back from the chosen control.
+
+In React, register `ds-menu` in the browser before hydration, then import
+`Menu` from `DS1/react/menu`. Passing `open` creates a controlled floating menu;
+`onOpenChange(false, reason)` requests closure. `activeId` and `onActiveChange`
+similarly keep selection controlled. Classes and styles place the host only.
+Use shared buttons, text and icons inside it, with each entry one row high.
+Remove product popup positioning, keyboard listeners and appearance styles.

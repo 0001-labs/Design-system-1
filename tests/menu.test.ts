@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { afterEach, expect, test } from "vite-plus/test";
+import { afterEach, expect, test, vi } from "vite-plus/test";
 await import("../DS1/3-unit/ds-menu");
 afterEach(() => document.body.replaceChildren());
 
@@ -27,4 +27,73 @@ test("a nested menu handles its own keys once", () => {
   child.querySelector('button')!.focus();
   child.querySelector('button')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true, cancelable: true }));
   expect(document.activeElement).toBe(child.lastElementChild);
+});
+
+function key(target: HTMLElement, key: string, extra: KeyboardEventInit = {}) {
+  const event = new KeyboardEvent("keydown", { key, bubbles: true, composed: true, cancelable: true, ...extra });
+  target.dispatchEvent(event);
+  return event;
+}
+
+test("suggestions keep native field focus and editing keys while requesting controlled choices", async () => {
+  const field = document.createElement("textarea"), menu = document.createElement("ds-menu");
+  menu.innerHTML = '<button id="first" role="option">First</button><button id="disabled" role="option" disabled>Disabled</button><button id="last" role="option">Last</button>';
+  menu.floating = menu.open = true; menu.controller = menu.anchor = field; menu.activeId = "first";
+  document.body.append(field, menu); field.focus(); await menu.updateComplete;
+  const request = vi.fn((event: Event) => event.preventDefault());
+  menu.addEventListener("ds-menu-active", request);
+  expect(key(field, "ArrowDown").defaultPrevented).toBe(true);
+  expect((request.mock.calls[0]![0] as CustomEvent).detail.id).toBe("last");
+  expect(menu.activeId).toBe("first"); // The owner can decline a request.
+  expect(document.activeElement).toBe(field);
+  expect([...menu.querySelectorAll("button")].every(button => button.tabIndex === -1)).toBe(true);
+  menu.activeId = "last"; await menu.updateComplete;
+  const choose = vi.fn(); menu.lastElementChild!.addEventListener("click", choose);
+  for (const [name, extra] of [["Home", {}], ["End", {}], ["Enter", {isComposing: true}], ["Enter", {metaKey: true}], ["ArrowUp", {shiftKey: true}]] as const) {
+    expect(key(field, name, extra).defaultPrevented).toBe(false);
+  }
+  expect(choose).not.toHaveBeenCalled();
+  expect(key(field, "Enter").defaultPrevented).toBe(true); expect(choose).toHaveBeenCalledTimes(1);
+  const press = new PointerEvent("pointerdown", {button: 0, bubbles: true, composed: true, cancelable: true});
+  menu.lastElementChild!.dispatchEvent(press); expect(press.defaultPrevented).toBe(true);
+  menu.remove(); expect(key(field, "ArrowDown").defaultPrevented).toBe(false);
+});
+
+test("floating menus restore focus on controlled unmount, but do not steal an outside click", async () => {
+  const opener = document.createElement("button"), outside = document.createElement("button");
+  document.body.append(opener, outside); opener.focus();
+  const menu = document.createElement("ds-menu");
+  menu.innerHTML = '<button role="menuitem">Choice</button>';
+  menu.anchor = opener; menu.floating = menu.open = true; document.body.append(menu); await menu.updateComplete;
+  expect(document.activeElement).toBe(menu.firstElementChild);
+  expect(menu.firstElementChild!.getAttribute("tabindex")).toBe("0");
+  menu.addEventListener("ds-menu-close", event => { event.preventDefault(); menu.remove(); });
+  expect(key(menu.firstElementChild as HTMLElement, "Escape").defaultPrevented).toBe(true);
+  expect(document.activeElement).toBe(opener);
+  document.body.append(menu); await menu.updateComplete;
+  outside.dispatchEvent(new PointerEvent("pointerdown", {bubbles: true, composed: true}));
+  outside.focus(); expect(document.activeElement).toBe(outside);
+  expect(key(outside, "Escape").defaultPrevented).toBe(false);
+});
+
+test("only the top floating menu receives Escape and declining dismissal keeps it open", async () => {
+  const first = document.createElement("ds-menu"), second = document.createElement("ds-menu");
+  for (const menu of [first, second]) { menu.floating = menu.open = true; menu.innerHTML = '<button role="menuitem">Choice</button>'; document.body.append(menu); await menu.updateComplete; }
+  const close = vi.fn((event: Event) => event.preventDefault()); second.addEventListener("ds-menu-close", close);
+  key(second.firstElementChild as HTMLElement, "Escape"); await second.updateComplete;
+  expect(close).toHaveBeenCalledTimes(1); expect(second.open).toBe(true); expect(first.open).toBe(true);
+  second.remove();
+  key(first.firstElementChild as HTMLElement, "Escape"); await first.updateComplete;
+  expect(first.open).toBe(false);
+});
+
+test("grid navigation preserves columns, skips disabled cells and handles a short last row", async () => {
+  const menu = document.createElement("ds-menu"); menu.columns = 3;
+  menu.innerHTML = Array.from({length: 8}, (_, i) => `<button role="menuitem" ${i === 4 ? 'disabled' : ''}>${i}</button>`).join("");
+  document.body.append(menu); await menu.updateComplete;
+  const buttons = menu.querySelectorAll("button"); buttons[1]!.focus();
+  key(buttons[1]!, "ArrowDown"); expect(document.activeElement).toBe(buttons[7]);
+  key(buttons[7]!, "ArrowUp"); expect(document.activeElement).toBe(buttons[1]);
+  buttons[3]!.focus(); key(buttons[3]!, "ArrowRight"); expect(document.activeElement).toBe(buttons[5]);
+  key(buttons[5]!, "ArrowDown"); expect(document.activeElement).toBe(buttons[7]);
 });

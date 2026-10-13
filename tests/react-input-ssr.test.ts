@@ -3,6 +3,13 @@ import { createElement } from "react";
 import { renderToString } from "react-dom/server";
 import { expect, test } from "vite-plus/test";
 import { Input, Textarea } from "../DS1/react/input";
+import { Menu } from "../DS1/react/menu";
+test("a menu adapter renders without browser element globals", () => {
+  expect(typeof globalThis.HTMLElement).toBe("undefined");
+  const markup = renderToString(createElement(Menu, {open: false, role: "menu"}, createElement("button", {role: "menuitem"}, "Choice")));
+  expect(markup).toContain("<ds-menu");
+  expect(markup).toContain('role="menuitem"');
+});
 test("the React adapter renders without importing browser element globals", () => {
   expect(typeof globalThis.HTMLElement).toBe("undefined");
   const markup = renderToString(

@@ -1,14 +1,23 @@
 @import "../../1-root/component-metrics.css";
 
-/* ds-menu.css */
-
 :host {
+  box-sizing: border-box;
+  display: block;
+  min-width: calc(8 * var(--ds-unit));
+  max-height: var(--ds-menu-max-height, calc(16 * var(--ds-unit)));
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+/* Keep the shared face inside the boundary: product resets can reach a host. */
+.frame {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 1px;
-  min-width: calc(160px * var(--ds-sf));
-  max-height: var(--ds-menu-max-height, calc(320px * var(--ds-sf)));
+  gap: 0;
+  width: 100%;
+  max-height: min(var(--ds-menu-max-height, calc(16 * var(--ds-unit))), var(--ds-menu-available-height, 100vh));
   overflow-y: auto;
   padding: calc(4px * var(--ds-sf));
   border: 1px solid var(--ds-border-color);
@@ -22,12 +31,22 @@
   line-height: var(--ds-type-lineheight-default);
   letter-spacing: var(--ds-type-letterspacing-default);
 }
+slot { display: contents; }
+
+:host([floating]:not([open])) { display: none; }
+:host([floating]) { position: fixed; inset: auto; margin: 0; min-width: 0; z-index: 1; scroll-padding: calc(var(--ds-unit) / 2); }
+:host([floating]) ::slotted(ds-button) { flex: 0 0 auto; --ds-button-height: var(--ds-row-height); --ds-button-align: flex-start; width: 100%; }
+:host([data-grid]) { width: max-content; min-width: 0; }
+:host([data-grid]) .frame { display: grid; grid-template-columns: repeat(var(--ds-menu-columns), var(--ds-row-height)); width: max-content; max-width: 100%; }
+:host([data-grid]) ::slotted(ds-button) { --ds-button-height: var(--ds-row-height); --ds-button-min-width: 0px; --ds-button-padding: 0; --ds-button-align: center; }
 
 :host([compact]) {
   width: var(--ds-menu-width, calc(8 * var(--ds-unit)));
   min-width: calc(4 * var(--ds-unit));
   max-width: 100%;
   max-height: none;
+}
+:host([compact]) .frame {
   gap: 1px;
   padding: 0;
   border: 0;
