@@ -144,3 +144,35 @@ test("a queued native close cannot cancel a new opening awaiting a child render"
   ready(); await opened;
   expect(panel.querySelector("dialog")!.open).toBe(true);
 });
+
+test("immediate opening exposes a control inside the gesture while children render", async () => {
+  const host = document.createElement("ds-dialog"); host.nonModal = true;
+  host.innerHTML = '<dialog aria-label="Search"><input aria-label="Query"><span></span></dialog>';
+  let ready!: () => void;
+  Object.defineProperty(host.querySelector("span"), "updateComplete", { value: new Promise<void>(resolve => { ready = resolve; }) });
+  document.body.append(host);
+  const shown = host.show({ immediate: true });
+  expect(host.querySelector("dialog")!.open).toBe(true);
+  const input = host.querySelector("input")!; input.focus();
+  expect(document.activeElement).toBe(input);
+  host.close(); ready(); await shown;
+  expect(host.querySelector("dialog")!.open).toBe(false);
+  expect(host.open).toBe(false);
+});
+
+test("a modeless panel respects an editor's Escape and lets its content scroll by keyboard", async () => {
+  const host = document.createElement("ds-dialog"); host.nonModal = true; host.holdScroll = true;
+  host.innerHTML = '<dialog aria-label="Search"><input aria-label="Rename"><button>Result</button></dialog>';
+  document.body.append(host); await host.show();
+  const input = host.querySelector("input")!;
+  input.addEventListener("keydown", event => { if (event.key === "Escape") event.preventDefault(); });
+  input.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }));
+  expect(host.open).toBe(true);
+  const inside = new KeyboardEvent("keydown", { key: "PageDown", bubbles: true, cancelable: true });
+  host.querySelector("button")!.dispatchEvent(inside);
+  expect(inside.defaultPrevented).toBe(false);
+  const outside = new KeyboardEvent("keydown", { key: "PageDown", bubbles: true, cancelable: true });
+  document.body.dispatchEvent(outside); expect(outside.defaultPrevented).toBe(true);
+  host.querySelector("button")!.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }));
+  expect(host.open).toBe(false);
+});

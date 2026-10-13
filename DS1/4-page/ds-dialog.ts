@@ -153,9 +153,14 @@ export class Dialog extends LitElement {
     }
   }
 
-  /** Resolve only after native opening and the children's first render. */
-  async show() {
+  /** Immediate opening preserves a user gesture for mobile keyboard/media focus.
+   * The caller then focuses its already-rendered control synchronously. */
+  async show({ immediate = false }: { immediate?: boolean } = {}) {
     this.open = true;
+    if (immediate) {
+      this.bindDialog();
+      if (this.dialog && this.isConnected) this.showDialog(this.dialog);
+    }
     await this.updateComplete;
     await this.pendingOpen;
   }
@@ -174,7 +179,7 @@ export class Dialog extends LitElement {
     syncScroll(document);
     try { if (this.nonModal) dialog.show(); else dialog.showModal(); }
     catch (error) { stack.delete(this); syncScroll(document); throw error; }
-    document.addEventListener("keydown", this.onDocumentKey, true);
+    document.addEventListener("keydown", this.onDocumentKey);
     document.addEventListener("pointerdown", this.onOutsidePress, true);
     document.addEventListener("click", this.onOutsideClick, true);
     document.addEventListener("wheel", this.onScrollGesture, { passive: false });
@@ -188,7 +193,7 @@ export class Dialog extends LitElement {
     const wasTop = entries[entries.length - 1] === this;
     if (!stack?.delete(this)) return;
     syncScroll(document);
-    document.removeEventListener("keydown", this.onDocumentKey, true);
+    document.removeEventListener("keydown", this.onDocumentKey);
     document.removeEventListener("pointerdown", this.onOutsidePress, true);
     document.removeEventListener("click", this.onOutsideClick, true);
     document.removeEventListener("wheel", this.onScrollGesture);
@@ -216,7 +221,7 @@ export class Dialog extends LitElement {
     if (!this.nonModal || !this.isTop() || event.defaultPrevented) return;
     if (event.key === "Escape" && this.closeOnEscape) {
       event.preventDefault(); event.stopImmediatePropagation(); this.requestClose("escape");
-    } else if (this.holdScroll && !event.composedPath().some(node => node instanceof HTMLElement && (node.isContentEditable || node.matches("input, textarea, select"))) && ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "PageUp", "PageDown", "Home", "End", " "].includes(event.key)) event.preventDefault();
+    } else if (this.holdScroll && !event.composedPath().includes(this) && !event.composedPath().some(node => node instanceof HTMLElement && (node.isContentEditable || node.matches("input, textarea, select"))) && ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "PageUp", "PageDown", "Home", "End", " "].includes(event.key)) event.preventDefault();
   };
   private onScrollGesture = (event: Event) => {
     if (this.nonModal && this.holdScroll && this.isTop() && !event.composedPath().includes(this)) event.preventDefault();
