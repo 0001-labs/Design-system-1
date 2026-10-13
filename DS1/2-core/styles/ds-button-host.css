@@ -67,7 +67,8 @@
 }
 
 :host([control="host"][role="tab"]:hover:not([disabled])),
-:host([control="host"][choice]:hover:not([disabled])) {
+:host([control="host"][choice]:hover:not([disabled])),
+:host([control="slotted"][choice]:hover:not([disabled])) {
   --ds-button-background: color-mix(in srgb, var(--ds-fill) 72%, transparent);
   --ds-button-color: var(--ds-text-color);
 }
@@ -75,7 +76,9 @@
 :host([control="host"][role="tab"][active]),
 :host([control="host"][role="tab"][active]:hover:not([disabled])),
 :host([control="host"][choice][active]),
-:host([control="host"][choice][active]:hover:not([disabled])) {
+:host([control="host"][choice][active]:hover:not([disabled])),
+:host([control="slotted"][choice][active]),
+:host([control="slotted"][choice][active]:hover:not([disabled])) {
   --ds-button-background: var(--ds-fill);
   --ds-button-color: var(--ds-text-color);
 }
@@ -166,6 +169,8 @@
 }
 
 :host([control="slotted"]) {
+  /* The native focus ring extends beyond the face; only its text is clipped. */
+  overflow: visible;
   --ds-button-height: var(--ds-row-height);
   width: var(--ds-button-width, calc(4 * var(--ds-unit)));
 }
@@ -177,3 +182,5 @@
 :host([control="slotted"][danger]) {
   --ds-button-color: var(--ds-tuned-red);
 }
+
+:host([control="slotted"][hidden]) { display: none !important; }

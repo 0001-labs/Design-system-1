@@ -11,11 +11,12 @@ test('the shared button preserves native refs, event targets, labels and changin
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
   const mount = document.createElement('div'); document.body.append(mount);
   const root = createRoot(mount); const ref = createRef<HTMLButtonElement>(); const click = vi.fn();
-  const render = async (disabled = false) => act(async () => root.render(createElement(Button, { ref, disabled, primary: true, id: 'save', className: 'layout', 'aria-label': 'Save document', onClick: e => click(e.currentTarget) }, 'Save')));
+  const render = async (disabled = false) => act(async () => root.render(createElement(Button, { ref, disabled, icon: true, danger: true, hidden: disabled, primary: true, id: 'save', className: 'layout', 'aria-label': 'Save document', onClick: e => click(e.currentTarget) }, 'Save')));
   try {
     await render();
     const host = mount.querySelector('ds-button')!; await host.updateComplete;
     const native = mount.querySelector('button')!;
+    expect(host.icon).toBe(true); expect(host.danger).toBe(true); expect(host.hidden).toBe(false);
     expect(ref.current).toBe(native); expect(native.id).toBe('save');
     expect(native.getAttribute('aria-label')).toBe('Save document');
     expect(host.className).toBe('layout'); expect(host.hasAttribute('role')).toBe(false);
@@ -23,7 +24,7 @@ test('the shared button preserves native refs, event targets, labels and changin
     host.focus(); expect(document.activeElement).toBe(native);
     native.click(); expect(click).toHaveBeenCalledExactlyOnceWith(native);
     await render(true); await host.updateComplete; native.click();
-    expect(native.disabled).toBe(true); expect(click).toHaveBeenCalledTimes(1);
+    expect(native.disabled).toBe(true); expect(host.hidden).toBe(true); expect(click).toHaveBeenCalledTimes(1);
     await render(false); await host.updateComplete; native.click();
     expect(click).toHaveBeenCalledTimes(2);
   } finally { await act(async () => root.unmount()); }

@@ -18,6 +18,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     wide,
     danger,
     disabled,
+    hidden,
     type = "button",
     ...props
   },
@@ -35,9 +36,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       wide,
       danger,
       disabled,
+      hidden,
       className,
       style,
     },
-    createElement("button", { ...props, ref, type, disabled }, children),
+    createElement("button", { ...props, ref, type, disabled, hidden }, children),
   );
 });
