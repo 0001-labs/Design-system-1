@@ -21,7 +21,6 @@ function render(){
   $('vector-artwork').innerHTML=scopedSvg(selected.svg,'focus-original');
   $('vector-outlines').innerHTML=scopedSvg(outline(selected.svg),'focus-outline');
   $('vector-stage').dataset.view=view;
-  $('vector-grid-lines').style.display=$<HTMLInputElement>('vector-grid').checked?'':'none';
   const link=$<HTMLAnchorElement>('vector-download'); link.href=selected.url;link.download=selected.name.toLowerCase()+'.svg';
   const source=$<HTMLAnchorElement>('vector-source');
   source.href=selected.node?`https://www.figma.com/design/XAnoaRoq9LxVAHUZgtdO0r/ds1?node-id=${selected.node.replace(':','-')}`:selected.url;
@@ -46,7 +45,7 @@ for(const button of document.querySelectorAll<HTMLElement>('[data-vector-key]'))
   history.replaceState(null,'',`${location.pathname}#${selected.key}`);message('');
 });
 for(const button of document.querySelectorAll<HTMLElement>('[data-vector-view]'))button.addEventListener('click',()=>{view=button.dataset.vectorView!;render();});
-$('vector-search').addEventListener('input',search);$('vector-grid').addEventListener('change',render);
+$('vector-search').addEventListener('input',search);
 async function copy(text:string,success:string){try{await navigator.clipboard.writeText(text);message(success);}catch{message('Clipboard unavailable. Download the SVG instead.');}}
 $('vector-copy').addEventListener('click',()=>copy(selected.svg,'SVG copied.'));
 $('vector-download-outlines').addEventListener('click',()=>{
