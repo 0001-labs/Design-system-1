@@ -47,3 +47,21 @@ test("select keeps multiple values, disabled options and native reset without du
     expect(mount.querySelector("ds-select")!.hidden).toBe(true);
   } finally { await act(async () => root.unmount()); }
 });
+
+test("listbox rows and the arrow follow native attributes when they change", async () => {
+  const host = document.createElement("ds-select");
+  const select = document.createElement("select");
+  const option = document.createElement("option"); option.textContent = "Alpha"; option.value = "a";
+  select.append(option); host.append(select); document.body.append(host);
+  await host.updateComplete;
+  expect(host.shadowRoot!.querySelector("span")!.hidden).toBe(false);
+  select.multiple = true; select.size = 3;
+  await Promise.resolve(); await host.updateComplete;
+  expect(host.style.getPropertyValue("--ds-select-rows")).toBe("3");
+  expect(host.shadowRoot!.querySelector("span")!.hidden).toBe(true);
+  select.multiple = false; select.size = 0; select.disabled = true;
+  await Promise.resolve(); await host.updateComplete;
+  expect(host.style.getPropertyValue("--ds-select-rows")).toBe("1");
+  expect(host.shadowRoot!.querySelector("span")!.hidden).toBe(false);
+  expect(host.shadowRoot!.querySelector("span")!.className).toBe("disabled");
+});
