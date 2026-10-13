@@ -69,12 +69,13 @@ describe("source adoption evidence", () => {
   it("ignores previews, tests, vendored implementation and untracked files; unavailable is not zero", () => {
     const { studio, app, ds } = fixture();
     write(app, "client/page.tsx", "export const View = () => <><ds-button /><button /><ezo-input /><input className=\"ds-input\" /></>;");
+    write(app, "client/components/design/ColorLibraryDialog.tsx", "export const View = () => <button />;");
     for (const file of ["client/page.test.tsx", "client/__surface/demo.tsx", "client/design/inner.tsx"]) write(app, file, "const x = <button />;");
     git(app, "add", "."); git(app, "-c", "user.name=Test", "-c", "user.email=test@example.com", "commit", "-m", "Initial app");
     write(app, "client/scratch.tsx", "const x = <button />;");
     const report = scanApp({ id: "example", name: "Example", directory: "Example", roots: ["client"], manifest: "design/components-manifest.json" }, studio, ds);
-    expect(report.status).toBe("scanned"); expect(report.files).toBe(1); expect(report.dirty).toBe(true);
-    expect(report.cells.button).toMatchObject({ shared: 1, local: 1, unverified: 0 });
+    expect(report.status).toBe("scanned"); expect(report.files).toBe(2); expect(report.dirty).toBe(true);
+    expect(report.cells.button).toMatchObject({ shared: 1, local: 2, unverified: 0 });
     expect(report.cells.input?.local).toBe(1);
     expect(report.cells.input?.styled).toBe(1);
     const missing = scanApp({ id: "missing", name: "Missing", directory: "Missing", roots: ["src"] }, studio, ds);

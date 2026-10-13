@@ -9,7 +9,7 @@ import { COMPONENT_COLUMNS, type AdoptionApp, type AdoptionReport, type Componen
 const repository = fileURLToPath(new URL("../", import.meta.url));
 const hash = (body: string | Buffer) => createHash("sha256").update(body).digest("hex");
 const git = (root: string, ...args: string[]) => execFileSync("git", args, { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], maxBuffer: 20_000_000 }).trim();
-export const excluded = /(?:^|\/)(?:design|ds1|vendor|signIn|_generated|generated|node_modules|dist|__surface|surface|design-lab|designLab|dev|experiments|previews|__tests__|tests|test|fixtures|stories)(?:\/|$)|(?:\.test|\.spec|\.stories|\.d)\.[^.]+$/i;
+export const excluded = /^(?:(?:client|src|web)\/)?(?:design|ds1)\/|(?:^|\/)(?:vendor|signIn|_generated|generated|node_modules|dist|__surface|surface|design-lab|designLab|dev|experiments|previews|__tests__|tests|test|fixtures|stories)(?:\/|$)|(?:\.test|\.spec|\.stories|\.d)\.[^.]+$/i;
 
 export interface AppSpec { id: string; name: string; directory: string; roots: string[]; manifest?: string }
 export const APPS: AppSpec[] = [
