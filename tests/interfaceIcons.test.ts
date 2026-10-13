@@ -33,6 +33,12 @@ test('the removed status drawing with the extra bottom bar stays out of the coll
   expect(icons.some(icon => icon.key === 'status')).toBe(true);
   expect(icons.some(icon => icon.key === 'status-filled')).toBe(true);
 });
+test('Icon is the shared choice and Image is absent from the sheet and public exports', () => {
+  expect(icons.some(icon => icon.key === 'icon')).toBe(true);
+  expect(icons.some(icon => icon.key === 'image' || icon.name === 'Image')).toBe(false);
+  expect(isSharedInterfaceIcon('image')).toBe(false);
+  expect(readdirSync(new URL('../website/public/icons/library/', import.meta.url))).not.toContain('image.svg');
+});
 test('duplicate drawings appear only once, including a single Check', () => {
   expect(icons.filter(icon => icon.name === 'Check').map(icon => icon.key)).toEqual(['check']);
   for (const [alias, canonical] of Object.entries(interfaceIconAliases)) {

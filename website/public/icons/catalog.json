@@ -457,13 +457,6 @@
     "shapes": 1
   },
   {
-    "key": "image",
-    "name": "Image",
-    "source": "Library",
-    "url": "/icons/library/image.svg",
-    "shapes": 3
-  },
-  {
     "key": "in",
     "name": "In",
     "source": "Figma",
