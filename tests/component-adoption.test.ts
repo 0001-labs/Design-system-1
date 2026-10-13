@@ -94,6 +94,8 @@ describe("source adoption evidence", () => {
   it("verifies shared React adapters through pure re-exports and flags each modified adapter", () => {
     const { studio, app, ds } = fixture();
     const added = {
+      '2-core/ds-avatar.ts': 'export class Avatar {}',
+      'react/avatar.ts': 'import type { Avatar } from "../2-core/ds-avatar"; export const Avatar = () => null;',
       '3-unit/ds-accordion.ts': 'export class Accordion {}',
       'react/accordion.ts': 'import type { Accordion } from "../3-unit/ds-accordion"; export const Accordion = () => null;',
       '3-unit/ds-menu.ts': 'export class Menu {}',
@@ -118,7 +120,7 @@ describe("source adoption evidence", () => {
     git(ds, 'add', '.'); git(ds, '-c', 'user.name=Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'Add shared input');
     const manifestPath = join(app, 'design/components-manifest.json');
     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
-    manifest.commit = git(ds, 'rev-parse', 'HEAD'); manifest.components.push('accordion', 'menu', 'composer', 'split', 'input', 'textarea', 'dialog', 'checkbox', 'switch', 'select', 'color');
+    manifest.commit = git(ds, 'rev-parse', 'HEAD'); manifest.components.push('avatar', 'accordion', 'menu', 'composer', 'split', 'input', 'textarea', 'dialog', 'checkbox', 'switch', 'select', 'color');
     Object.assign(manifest.files, Object.fromEntries(Object.entries(added).map(([file, body]) => [file, createHash('sha256').update(body).digest('hex')])));
     writeFileSync(manifestPath, JSON.stringify(manifest));
     write(app, 'src/field.ts', 'import "./register"; export { Input as Field, Textarea as Multiline } from "../design/react/input";');
@@ -126,9 +128,12 @@ describe("source adoption evidence", () => {
     write(app, 'src/dialog.ts', 'export { DialogContent as Modal, DialogTitle } from "../design/react/dialog";');
     write(app, 'src/local.tsx', 'export const Input = () => <input />;');
     write(app, 'src/split.ts', 'import "./register"; export { Split as Segments } from "../design/react/split";');
-    write(app, 'src/page.tsx', 'import { Accordion } from "../design/react/accordion"; import { ButtonLink } from "../design/react/button"; import { Menu } from "../design/react/menu"; import { Composer } from "../design/react/composer"; import { Segments } from "./split"; import { Checkbox as Check, Switch as Toggle, Select as Choice, ColorInput as Color } from "../design/react/choice"; import { Modal, DialogTitle } from "./dialog"; import { Action as SharedAction } from "./action"; import { Button as DirectAction } from "../design/react/button"; import { Field as SharedField, Multiline as Notes } from "@/field"; import { Input as Direct } from "../design/react/input"; import { Input as Local } from "./local"; export const Page = () => <><Accordion /><ButtonLink /><Menu /><ds-menu /><Composer /><ds-composer><textarea /></ds-composer><Segments /><ds-split /><ezo-split /><Check /><Toggle /><Choice /><Color /><input type="color" /><select /><input type="checkbox" /><button role="switch" /><SharedField /><Direct /><Local /><Notes /><textarea /><SharedAction /><DirectAction /><Modal><DialogTitle>Title</DialogTitle></Modal><dialog /><section role="dialog" /><div role="alertdialog" /></>;');
+    write(app, 'src/page.tsx', 'import { Avatar } from "../design/react/avatar"; import { Accordion } from "../design/react/accordion"; import { ButtonLink } from "../design/react/button"; import { Menu } from "../design/react/menu"; import { Composer } from "../design/react/composer"; import { Segments } from "./split"; import { Checkbox as Check, Switch as Toggle, Select as Choice, ColorInput as Color } from "../design/react/choice"; import { Modal, DialogTitle } from "./dialog"; import { Action as SharedAction } from "./action"; import { Button as DirectAction } from "../design/react/button"; import { Field as SharedField, Multiline as Notes } from "@/field"; import { Input as Direct } from "../design/react/input"; import { Input as Local } from "./local"; export const Page = () => <><Avatar /><Accordion /><ButtonLink /><Menu /><ds-menu /><Composer /><ds-composer><textarea /></ds-composer><Segments /><ds-split /><ezo-split /><Check /><Toggle /><Choice /><Color /><input type="color" /><select /><input type="checkbox" /><button role="switch" /><SharedField /><Direct /><Local /><Notes /><textarea /><SharedAction /><DirectAction /><Modal><DialogTitle>Title</DialogTitle></Modal><dialog /><section role="dialog" /><div role="alertdialog" /></>;');
     git(app, 'add', '.'); git(app, '-c', 'user.name=Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'Use shared input');
     const scan = () => scanApp({ id: 'example', name: 'Example', directory: 'Example', roots: ['src'], manifest: 'design/components-manifest.json' }, studio, ds);
+    expect(scan().cells.avatar).toMatchObject({ shared: 1, local: 0, unverified: 0 });
+    write(app, "design/react/avatar.ts", added["react/avatar.ts"] + "\n// Local change");
+    expect(scan().cells.avatar).toMatchObject({ shared: 0, local: 0, unverified: 1 });
     expect(scan().cells.accordion).toMatchObject({ shared: 1, local: 0, unverified: 0 });
     write(app, "design/react/accordion.ts", added["react/accordion.ts"] + "\n// Local change");
     expect(scan().cells.accordion).toMatchObject({ shared: 0, local: 0, unverified: 1 });

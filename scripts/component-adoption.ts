@@ -145,7 +145,7 @@ export function sourceSites(file: string, source: string): TagSite[] {
 function emptyCell(): ComponentCell { return { shared: 0, styled: 0, local: 0, unverified: 0, sites: [], snapshot: "none", current: null, issues: [] }; }
 interface Manifest { commit: string; components: string[]; files: Record<string, string> }
 
-export function checkSnapshots(root: string, manifestPath: string | undefined, dsRoot: string): { commit: string | null; cells: Record<string, ComponentCell>; controls: ComponentCell; reactInput: ComponentCell; reactButton: ComponentCell; reactDialog: ComponentCell; reactChoice: ComponentCell; reactSplit: ComponentCell; reactComposer: ComponentCell; reactMenu: ComponentCell; reactAccordion: ComponentCell } {
+export function checkSnapshots(root: string, manifestPath: string | undefined, dsRoot: string): { commit: string | null; cells: Record<string, ComponentCell>; controls: ComponentCell; reactInput: ComponentCell; reactButton: ComponentCell; reactDialog: ComponentCell; reactChoice: ComponentCell; reactSplit: ComponentCell; reactComposer: ComponentCell; reactMenu: ComponentCell; reactAccordion: ComponentCell; reactAvatar: ComponentCell } {
   const cells = Object.fromEntries(COMPONENT_COLUMNS.map(c => [c.id, emptyCell()]));
   const controls = emptyCell();
   const reactInput = emptyCell();
@@ -156,7 +156,8 @@ export function checkSnapshots(root: string, manifestPath: string | undefined, d
   const reactComposer = emptyCell();
   const reactMenu = emptyCell();
   const reactAccordion = emptyCell();
-  if (!manifestPath || !existsSync(join(root, manifestPath))) return { commit: null, cells, controls, reactInput, reactButton, reactDialog, reactChoice, reactSplit, reactComposer, reactMenu, reactAccordion };
+  const reactAvatar = emptyCell();
+  if (!manifestPath || !existsSync(join(root, manifestPath))) return { commit: null, cells, controls, reactInput, reactButton, reactDialog, reactChoice, reactSplit, reactComposer, reactMenu, reactAccordion, reactAvatar };
   const manifest = JSON.parse(readFileSync(join(root, manifestPath), "utf8")) as Manifest;
   if (!/^[a-f0-9]{40}$/.test(manifest.commit) || !Array.isArray(manifest.components) || !manifest.files) throw new Error("Invalid component manifest");
   const snapshot = dirname(join(root, manifestPath));
@@ -168,10 +169,10 @@ export function checkSnapshots(root: string, manifestPath: string | undefined, d
     }
     return historical.get(file)!;
   };
-  for (const component of [...manifest.components, "@controls", ...(manifest.files["react/accordion.ts"] ? ["@react-accordion"] : []), ...(manifest.files["react/menu.ts"] ? ["@react-menu"] : []), ...(manifest.files['react/composer.ts'] ? ['@react-composer'] : []), ...(manifest.files['react/split.ts'] ? ['@react-split'] : []), ...(manifest.files['react/input.ts'] ? ['@react-input'] : []), ...(manifest.files['react/button.ts'] ? ['@react-button'] : []), ...(manifest.files['react/dialog.ts'] ? ['@react-dialog'] : []), ...(manifest.files['react/choice.ts'] ? ['@react-choice'] : [])]) {
-    const cell = component === "@react-accordion" ? reactAccordion : component === "@controls" ? controls : component === "@react-menu" ? reactMenu : component === "@react-composer" ? reactComposer : component === '@react-input' ? reactInput : component === '@react-button' ? reactButton : component === '@react-dialog' ? reactDialog : component === '@react-choice' ? reactChoice : component === '@react-split' ? reactSplit : cells[component];
+  for (const component of [...manifest.components, "@controls", ...(manifest.files["react/avatar.ts"] ? ["@react-avatar"] : []), ...(manifest.files["react/accordion.ts"] ? ["@react-accordion"] : []), ...(manifest.files["react/menu.ts"] ? ["@react-menu"] : []), ...(manifest.files['react/composer.ts'] ? ['@react-composer'] : []), ...(manifest.files['react/split.ts'] ? ['@react-split'] : []), ...(manifest.files['react/input.ts'] ? ['@react-input'] : []), ...(manifest.files['react/button.ts'] ? ['@react-button'] : []), ...(manifest.files['react/dialog.ts'] ? ['@react-dialog'] : []), ...(manifest.files['react/choice.ts'] ? ['@react-choice'] : [])]) {
+    const cell = component === "@react-avatar" ? reactAvatar : component === "@react-accordion" ? reactAccordion : component === "@controls" ? controls : component === "@react-menu" ? reactMenu : component === "@react-composer" ? reactComposer : component === '@react-input' ? reactInput : component === '@react-button' ? reactButton : component === '@react-dialog' ? reactDialog : component === '@react-choice' ? reactChoice : component === '@react-split' ? reactSplit : cells[component];
     if (!cell) continue;
-    const entry = component === "@react-accordion" ? "react/accordion.ts" : component === "@controls" ? "1-root/controls.css" : component === "@react-menu" ? "react/menu.ts" : component === "@react-composer" ? "react/composer.ts" : component === '@react-input' ? 'react/input.ts' : component === '@react-button' ? 'react/button.ts' : component === '@react-dialog' ? 'react/dialog.ts' : component === '@react-choice' ? 'react/choice.ts' : component === '@react-split' ? 'react/split.ts' : Object.keys(manifest.files).find(f => f.endsWith(`/ds-${component}.ts`));
+    const entry = component === "@react-avatar" ? "react/avatar.ts" : component === "@react-accordion" ? "react/accordion.ts" : component === "@controls" ? "1-root/controls.css" : component === "@react-menu" ? "react/menu.ts" : component === "@react-composer" ? "react/composer.ts" : component === '@react-input' ? 'react/input.ts' : component === '@react-button' ? 'react/button.ts' : component === '@react-dialog' ? 'react/dialog.ts' : component === '@react-choice' ? 'react/choice.ts' : component === '@react-split' ? 'react/split.ts' : Object.keys(manifest.files).find(f => f.endsWith(`/ds-${component}.ts`));
     const visited = new Set<string>();
     let modified = false, unverifiable = false, current = true;
     const visit = (file: string) => {
@@ -197,7 +198,7 @@ export function checkSnapshots(root: string, manifestPath: string | undefined, d
     cell.snapshot = modified ? "modified" : unverifiable ? "unverified" : "verified";
     cell.current = current && !unverifiable;
   }
-  return { commit: manifest.commit, cells, controls, reactInput, reactButton, reactDialog, reactChoice, reactSplit, reactComposer, reactMenu, reactAccordion };
+  return { commit: manifest.commit, cells, controls, reactInput, reactButton, reactDialog, reactChoice, reactSplit, reactComposer, reactMenu, reactAccordion, reactAvatar };
 }
 
 /** Follow direct imports and pure registration/re-export entries to the snapshot.
@@ -208,6 +209,7 @@ function importedSharedAdapters(root: string, file: string, source: string, mani
   const found = new Map<string, string>();
   if (!manifestPath) return found;
   const adapterModules: Record<string, Record<string, string>> = {
+    [resolve(root, dirname(manifestPath), "react/avatar.ts")]: { Avatar: "avatar" },
     [resolve(root, dirname(manifestPath), "react/accordion.ts")]: { Accordion: "accordion" },
     [resolve(root, dirname(manifestPath), "react/menu.ts")]: { Menu: "menu" },
     [resolve(root, dirname(manifestPath), 'react/composer.ts')]: { Composer: 'composer' },
@@ -307,7 +309,7 @@ export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): Ado
         }
         const cell = app.cells[component]!;
         const ds = sharedAdapters.has(site.tag) || Boolean(aliases[site.tag]) || custom?.[1] === "ds";
-        const evidence = sharedAdapters.has(site.tag) ? (component === "accordion" ? snapshots.reactAccordion : component === "menu" ? snapshots.reactMenu : component === "composer" ? snapshots.reactComposer : component === "split" ? snapshots.reactSplit : component === "button" ? snapshots.reactButton : component === "dialog" ? snapshots.reactDialog : ["checkbox", "switch", "select", "color"].includes(component) ? snapshots.reactChoice : snapshots.reactInput) : cell;
+        const evidence = sharedAdapters.has(site.tag) ? (component === "avatar" ? snapshots.reactAvatar : component === "accordion" ? snapshots.reactAccordion : component === "menu" ? snapshots.reactMenu : component === "composer" ? snapshots.reactComposer : component === "split" ? snapshots.reactSplit : component === "button" ? snapshots.reactButton : component === "dialog" ? snapshots.reactDialog : ["checkbox", "switch", "select", "color"].includes(component) ? snapshots.reactChoice : snapshots.reactInput) : cell;
         if (sharedAdapters.has(site.tag)) {
           cell.issues = [...new Set([...cell.issues, ...evidence.issues])];
           cell.current = cell.current === true && evidence.current === true;

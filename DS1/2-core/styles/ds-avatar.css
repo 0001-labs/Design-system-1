@@ -1,0 +1,113 @@
+@import "../../1-root/component-metrics.css";
+
+:host {
+  display: inline-flex;
+  position: relative;
+  flex: 0 0 auto;
+  vertical-align: middle;
+  width: var(--ds-unit);
+  height: var(--ds-unit);
+}
+:host([size="compact"]) {
+  width: var(--ds-control-height);
+  height: var(--ds-control-height);
+}
+:host([size="large"]) {
+  width: calc(2 * var(--ds-unit));
+  height: calc(2 * var(--ds-unit));
+}
+:host([hidden]) {
+  display: none !important;
+}
+.frame {
+  box-sizing: border-box;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 50%;
+  corner-shape: round;
+  background: var(--ds-avatar-background, var(--ds-fill));
+  color: var(--ds-avatar-color, var(--ds-text-color));
+  font: var(--ds-type-weight-default) var(--ds-type-size-default)/1 var(--ds-typeface-regular);
+  letter-spacing: normal;
+  user-select: none;
+  -webkit-user-select: none;
+}
+:host([shape="square"]) .frame {
+  border-radius: 0;
+}
+:host([shape="rounded"]) .frame {
+  border-radius: var(--ds-radius);
+}
+:host([size="compact"]) .frame,
+.initial[data-pair] {
+  font-size: var(--ds-type-size-small);
+}
+:host([size="large"]) .frame {
+  font-size: var(--ds-unit);
+}
+:host([size="large"]) .initial[data-pair] {
+  font-size: var(--ds-type-size-default);
+}
+:host([outlined]) .frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--ds-avatar-outline, currentColor);
+  border-radius: inherit;
+  pointer-events: none;
+}
+:host([pending]) .frame {
+  background: var(--ds-fill);
+  color: var(--ds-text-color-muted);
+}
+:host([pending]) img {
+  filter: grayscale(1);
+  opacity: 0.5;
+}
+:host([plain]) .frame {
+  background: transparent;
+}
+img,
+.mask {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+img {
+  object-fit: cover;
+  visibility: hidden;
+}
+img[data-visible] {
+  visibility: visible;
+}
+:host([fit="contain"]) img {
+  object-fit: contain;
+  padding: calc(2px * var(--ds-sf));
+  box-sizing: border-box;
+}
+.mask {
+  background: currentColor;
+  mask-position: center;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+}
+:host([fit="contain"]:not([plain])) .mask {
+  inset: 10%;
+  width: 80%;
+  height: 80%;
+}
+.initial {
+  overflow: hidden;
+  max-width: 100%;
+  white-space: nowrap;
+  text-align: center;
+}
+ds-icon {
+  flex: none;
+}

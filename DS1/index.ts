@@ -59,6 +59,7 @@ export * from "./2-core/ds-tooltip";
 // ============================================================================
 
 export * from "./3-unit/ds-accordion";
+export * from "./2-core/ds-avatar";
 export * from "./3-unit/ds-form";
 export * from "./3-unit/ds-list";
 export * from "./3-unit/ds-row";
