@@ -2,6 +2,7 @@
 import { afterEach, expect, test, vi } from "vite-plus/test";
 vi.stubGlobal("fetch", vi.fn(async () => new Response("{}")));
 await import("../DS1/4-page/ds-dialog");
+await import("../DS1/3-unit/ds-menu");
 afterEach(() => { document.body.replaceChildren(); document.documentElement.removeAttribute("style"); });
 
 test("anchored panels follow content and the visible viewport, and stop after close", async () => {
@@ -179,6 +180,14 @@ test("immediate opening exposes a control inside the gesture while children rend
   host.close(); ready(); await shown;
   expect(host.querySelector("dialog")!.open).toBe(false);
   expect(host.open).toBe(false);
+});
+
+test("immediate opening renders nested menu slots before initial focus", () => {
+  const host = document.createElement('ds-dialog'); host.nonModal = true;
+  host.innerHTML = '<dialog aria-label="Actions"><ds-menu><button role="menuitem">Share</button></ds-menu></dialog>';
+  document.body.append(host); void host.show({ immediate: true });
+  const menu = host.querySelector('ds-menu')!;
+  expect(menu.shadowRoot!.querySelector('slot')!.assignedElements()).toContain(menu.querySelector('button'));
 });
 
 test("a modeless panel respects an editor's Escape and lets its content scroll by keyboard", async () => {

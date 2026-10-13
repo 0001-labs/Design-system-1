@@ -22,6 +22,7 @@
 }
 
 :host([compact]) {
+  width: var(--ds-menu-width, calc(8 * var(--ds-unit)));
   min-width: calc(4 * var(--ds-unit));
   max-width: 100%;
   max-height: none;

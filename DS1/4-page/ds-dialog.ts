@@ -183,6 +183,10 @@ export class Dialog extends LitElement {
       // The native frame must be in the rendered tree within this gesture too.
       // A newly connected Lit host has not drawn its slot yet.
       this.performUpdate();
+      // Nested menu slots and fields must also exist before gesture-time focus.
+      for (const child of this.querySelectorAll('*')) {
+        (child as HTMLElement & { renderNow?: () => void }).renderNow?.();
+      }
       this.bindDialog();
       if (this.dialog && this.isConnected) this.showDialog(this.dialog);
     }

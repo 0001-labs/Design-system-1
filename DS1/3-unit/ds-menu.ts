@@ -40,6 +40,9 @@ export class Menu extends LitElement {
     if (!this.hasAttribute("role")) this.setAttribute("role", "listbox");
   }
 
+  /** Expose the slot before gesture-time focus in an immediately opened panel. */
+  renderNow(): void { this.performUpdate(); }
+
   #items(): HTMLElement[] {
     return Array.from(this.querySelectorAll<HTMLElement>(ITEM)).filter(
       (item) => !item.hasAttribute("disabled") && item.getAttribute("aria-disabled") !== "true" && !item.closest('[hidden], [inert]') && item.closest('ds-menu') === this,

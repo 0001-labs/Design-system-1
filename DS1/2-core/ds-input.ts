@@ -386,6 +386,9 @@ export class Input extends LitElement {
   /**
    * Focus the input element
    */
+  /** Render the native field within the tap that opens a phone keyboard. */
+  renderNow(): void { this.performUpdate(); }
+
   focus(options?: FocusOptions): void {
     this.input?.focus(options);
   }
