@@ -1,0 +1,46 @@
+---
+title: Text area
+description: Shared multiline text fields with native validation and optional automatic growth.
+---
+
+`ds-textarea` extends the shared input's labels, controlled values, selection,
+validation, reset and native form participation. Products supply the text and
+persistence; DS1 owns the field treatment and resizing.
+
+```html
+<label for="description">Description</label>
+<ds-textarea id="description" name="description" rows="3" required></ds-textarea>
+```
+
+Use `rows` to set the starting height in 20px rows, scaled by `--ds-sf`.
+`auto-grow` grows and shrinks with the content up to `max-rows` (default 10), then
+scrolls. It also responds to width changes. Without it, the field can be resized
+vertically. `variant="plain"` removes the field background and border for an
+inline editor; the default `field` uses the standard control treatment.
+
+The input's `value`, `name`, `label`, `label-text`, `placeholder`, `placeholder-key`,
+`required`, `readonly`, `disabled`, `minlength`, `maxlength`, `autocomplete`,
+`spellcheck`, ARIA labels/descriptions and `error`/`error-text` also apply.
+`wrap` accepts `soft`, `hard` or `off`. Enter inserts a newline; it does not activate
+the surrounding form. A product's keyboard handler may implement a deliberate
+send action and cancel the event.
+
+## React
+
+Select `textarea` in the product's component snapshot and register its generated
+`components.ts` in the browser. The same source-owned React adapter exports both
+`Input` and `Textarea`, with refs typed as `InputElement`.
+
+```tsx
+import { Textarea } from './design/react/input';
+
+<Textarea name="description" value={description}
+  onChange={event => setDescription(event.target.value)}
+  aria-label="Description" rows={3} autoGrow maxRows={8} />
+```
+
+`--ds-textarea-height` and `--ds-textarea-padding` configure the field through
+public tokens. Automatic growth takes ownership of height. Keep overlays for
+rich editing and suggestion menus in their own shared components.
+
+[Input](/2-core/input/)

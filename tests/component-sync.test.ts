@@ -33,3 +33,13 @@ test('sync refuses to write into or over its own source', () => {
     expect(() => sync(resolve(target), 'button')).toThrow(/consumer snapshot/);
   }
 });
+
+test('selecting multiline fields includes the shared input base and React binding', () => {
+  const target = mkdtempSync(join(tmpdir(), 'shared-textarea-'));
+  targets.push(target);
+  sync(target, 'textarea');
+  for (const file of ['2-core/ds-textarea.ts', '2-core/ds-input.ts', '2-core/styles/ds-textarea.css', 'react/input.ts']) {
+    expect(existsSync(join(target, file))).toBe(true);
+  }
+  expect(sync(target, 'textarea', true)).toContain('Verified');
+});

@@ -1,0 +1,13 @@
+/* A text area spans whole rows; shared input styles own its field treatment. */
+:host([variant]) textarea {
+  height: var(--ds-textarea-height, calc(var(--ds-textarea-rows, 3) * var(--ds-row-height)));
+  min-height: var(--ds-row-height);
+  padding: var(--ds-textarea-padding, calc(4px * var(--ds-sf)));
+  resize: vertical;
+}
+:host([variant="plain"]) textarea {
+  padding: 0;
+}
+:host([auto-grow]) textarea {
+  resize: none;
+}
