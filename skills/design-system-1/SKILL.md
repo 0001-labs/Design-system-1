@@ -23,7 +23,7 @@ Everything is counted in **squares**: one square is 20px (`--unit`, `--1`), mult
 | Lines | 1px, centred on the grid line | Ezo `--outline-stroke` |
 | Corners | square for items and rows; 4px (`--radius`) only on pictures, buttons and fields | Peer and Ins follow this |
 
-Items stack edge to edge with no gap, as an Ezo list does; a header item wears the accent colour. Positions snap to the grid: anything a person can move lands on whole squares. Before calling a design done, measure it in the browser (an element's width and height must be whole squares minus the 1px correction) instead of judging by eye.
+Items stack edge to edge with no gap, as an Ezo list does. Lists, table rows, cells and their headers use neutral or transparent backgrounds by default, never automatic accent fills. Colour is opt-in for a meaningful state, not decoration across an entire list or table. Positions snap to the grid: anything a person can move lands on whole squares. Before calling a design done, measure it in the browser (an element's width and height must be whole squares minus the 1px correction) instead of judging by eye.
 
 ## The rest of the language
 
@@ -75,7 +75,7 @@ Text and surfaces go through `light-dark()` tokens (`--text-color`, `--backgroun
 
 ### How Ezo uses it
 
-- **Accent**: a person picks one of eight in Settings, `--apple-green` by default: apple green, every green, zenith blue, sharp blue, pink, tuned red, orange or yellow, or none (`--slate-light`) (`shared/previewCard.ts`). A header item is painted in the accent and lettered in the ink the accent can carry.
+- **Accent**: a person picks one of eight in Settings, `--apple-green` by default: apple green, every green, zenith blue, sharp blue, pink, tuned red, orange or yellow, or none (`--slate-light`) (`shared/previewCard.ts`). The accent is available for explicit actions and meaningful states. Do not automatically paint list or table headers, rows, cells or counts in it.
 - **Diagrams** name seven colours, each mapped onto the palette (`shared/diagram.ts`, `ezo-diagram.css`): `light-green` apple green, `light-blue` zenith blue, `pink`, `yellow`, `orange`, `red` tuned red, `white` a warm grey. Filled squares and chart lines mix each with the ink in light mode (about 85% colour), so they read on white, and use the colour plainly on dark paper.
 - **The cube and boxes**: apple green, orange, pink and sharp blue (`shared/isoCube.ts`).
 - **Store templates** pair a paper with an accent, for example zenith blue paper with sharp blue, apple green with sharp blue, pink with sharp blue (`shared/templateStoreCore.ts`).

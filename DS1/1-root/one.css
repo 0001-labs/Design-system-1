@@ -521,7 +521,7 @@ body {
   padding-left: calc(3px * var(--sf));
   color: var(--text-color-primary);
   outline: var(--outline-stroke);
-  background-color: var(--accent-color);
+  background-color: transparent;
 }
 
 .item-container {
@@ -561,7 +561,7 @@ body {
 
 .grouped-item {
   width: var(--item-width);
-  background-color: #6f8f63;
+  background-color: transparent;
 }
 
 .grouped-item .card {
@@ -574,7 +574,7 @@ table {
 }
 
 tr {
-  background-color: var(--apple-green);
+  background-color: transparent;
 }
 
 td {

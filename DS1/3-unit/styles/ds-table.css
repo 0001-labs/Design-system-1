@@ -56,7 +56,7 @@
 }
 
 .status-cell {
-  background-color: var(--apple-green);
+  background-color: transparent;
   text-align: center;
 }
 
