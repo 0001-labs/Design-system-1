@@ -1135,13 +1135,6 @@
     "shapes": 2
   },
   {
-    "key": "warning",
-    "name": "Warning",
-    "source": "Library",
-    "url": "/icons/library/warning.svg",
-    "shapes": 1
-  },
-  {
     "key": "work",
     "name": "Work",
     "source": "Figma",
