@@ -45,3 +45,4 @@ sample.addEventListener('form-invalid', () => { output.textContent = 'form-inval
 
 const table = sample.querySelector<DsTable>('ds-table');
 if (table) table.data = TABLE_DATA;
+parent.postMessage({ type: 'ds1-example-ready' }, location.origin);

@@ -29,6 +29,9 @@ if (!sample) throw new Error(`Unknown component example: ${example}`);
     let theme = 'light';
     const sendTheme = () => frame.contentWindow?.postMessage({ type: 'ds1-example-theme', theme }, location.origin);
     frame.addEventListener('load', sendTheme);
+    window.addEventListener('message', event => {
+      if (event.origin === location.origin && event.source === frame.contentWindow && event.data?.type === 'ds1-example-ready') sendTheme();
+    });
     example.querySelectorAll<HTMLButtonElement>('[data-preview-theme]').forEach(button => button.addEventListener('click', () => {
       theme = button.dataset.previewTheme!;
       example.querySelectorAll<HTMLElement>('[data-preview-theme]').forEach(option => option.setAttribute('aria-pressed', String(option.dataset.previewTheme === theme)));
