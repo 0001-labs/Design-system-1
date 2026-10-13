@@ -5,9 +5,15 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: var(--ds-tabs-gap, calc(8px * var(--ds-sf)));
+  gap: var(--ds-tabs-gap, calc(10px * var(--ds-sf)));
   min-width: 0;
   height: var(--ds-row-height);
+}
+
+:host([wrap]) {
+  flex-wrap: wrap;
+  height: auto;
+  min-height: var(--ds-row-height);
 }
 
 :host([fill]) ::slotted(*) {

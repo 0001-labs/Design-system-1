@@ -1,144 +1,115 @@
 import { LitElement, html, unsafeCSS } from "lit";
 import { translate } from "../0-face/i18n";
+import { define } from "../0-face/define";
 import styles from "./styles/ds-tooltip.css?inline";
 
+let nextDescription = 0;
+
+/** A translated or literal label for one slotted control. */
 export class Tooltip extends LitElement {
   static properties = {
-    text: { type: String, reflect: true },
-    defaultValue: { type: String, reflect: true, attribute: "default-value" },
-    _text: { state: true },
+    text: { type: String },
+    defaultValue: { type: String, attribute: "default-value" },
+    literal: { type: Boolean },
+    placement: { type: String, reflect: true },
     _visible: { state: true },
   };
 
   declare text: string;
   declare defaultValue: string;
-  private _text: string;
-  private _visible: boolean;
-
-  private boundWindowHandlers: {
-    languageChanged: EventListener;
-    translationsLoaded: EventListener;
-  };
-  private boundHostHandlers: {
-    mouseenter: EventListener;
-    mouseleave: EventListener;
-    focusin: EventListener;
-    focusout: EventListener;
-  };
+  declare literal: boolean;
+  declare placement: "top" | "bottom";
+  declare private _visible: boolean;
+  private hovered = false;
+  private focused = false;
+  private trigger?: HTMLElement;
+  private description?: HTMLSpanElement;
 
   constructor() {
     super();
     this.text = "";
     this.defaultValue = "";
-    this._text = "";
+    this.literal = false;
+    this.placement = "top";
     this._visible = false;
-
-    this.boundWindowHandlers = {
-      languageChanged: (() => {
-        this._loadText();
-      }) as EventListener,
-      translationsLoaded: (() => {
-        this._loadText();
-      }) as EventListener,
-    };
-
-    this.boundHostHandlers = {
-      mouseenter: (() => {
-        this._visible = true;
-        this.requestUpdate();
-      }) as EventListener,
-      mouseleave: (() => {
-        this._visible = false;
-        this.requestUpdate();
-      }) as EventListener,
-      focusin: (() => {
-        this._visible = true;
-        this.requestUpdate();
-      }) as EventListener,
-      focusout: (() => {
-        this._visible = false;
-        this.requestUpdate();
-      }) as EventListener,
-    };
+    this.addEventListener("mouseenter", () => { this.hovered = true; this._visible = true; });
+    this.addEventListener("mouseleave", () => { this.hovered = false; this._visible = this.focused; });
+    this.addEventListener("focusin", () => { this.focused = true; this._visible = true; });
+    this.addEventListener("focusout", event => {
+      if (event.relatedTarget instanceof Node && this.contains(event.relatedTarget)) return;
+      this.focused = false;
+      this._visible = this.hovered;
+    });
+    this.addEventListener("keydown", event => {
+      if (event.key === "Escape") this._visible = false;
+    });
   }
 
   static styles = unsafeCSS(styles);
 
+  private languageChanged = () => this.requestUpdate();
+
   connectedCallback(): void {
     super.connectedCallback();
-    this._loadText();
-
-    window.addEventListener(
-      "language-changed",
-      this.boundWindowHandlers.languageChanged
-    );
-    window.addEventListener(
-      "translations-loaded",
-      this.boundWindowHandlers.translationsLoaded
-    );
-
-    this.addEventListener("mouseenter", this.boundHostHandlers.mouseenter);
-    this.addEventListener("mouseleave", this.boundHostHandlers.mouseleave);
-    this.addEventListener("focusin", this.boundHostHandlers.focusin);
-    this.addEventListener("focusout", this.boundHostHandlers.focusout);
+    this.requestUpdate();
+    window.addEventListener("language-changed", this.languageChanged);
+    window.addEventListener("translations-loaded", this.languageChanged);
   }
 
   disconnectedCallback(): void {
     super.disconnectedCallback();
-    window.removeEventListener(
-      "language-changed",
-      this.boundWindowHandlers.languageChanged
-    );
-    window.removeEventListener(
-      "translations-loaded",
-      this.boundWindowHandlers.translationsLoaded
-    );
-
-    this.removeEventListener("mouseenter", this.boundHostHandlers.mouseenter);
-    this.removeEventListener("mouseleave", this.boundHostHandlers.mouseleave);
-    this.removeEventListener("focusin", this.boundHostHandlers.focusin);
-    this.removeEventListener("focusout", this.boundHostHandlers.focusout);
+    window.removeEventListener("language-changed", this.languageChanged);
+    window.removeEventListener("translations-loaded", this.languageChanged);
+    this.releaseDescription();
+    this.hovered = this.focused = this._visible = false;
   }
 
-  updated(changed: Map<string, unknown>): void {
-    if (changed.has("text") || changed.has("defaultValue")) {
-      this._loadText();
-    }
+  private get label(): string {
+    if (this.literal) return this.text || this.defaultValue;
+    if (!this.text) return this.defaultValue;
+    const translated = translate(this.text);
+    return translated !== this.text ? translated : this.defaultValue || this.text;
   }
 
-  _loadText(): void {
-    if (!this.text) {
-      this._text = this.defaultValue || "";
-      this.requestUpdate();
-      return;
-    }
-
-    try {
-      const t = translate(this.text);
-      this._text = t && t !== this.text ? t : this.defaultValue || this.text;
-    } catch (err) {
-      console.error("ds-tooltip: error loading text for text", this.text, err);
-      this._text = this.defaultValue || this.text;
-    }
-    this.requestUpdate();
+  private releaseDescription(): void {
+    if (!this.trigger || !this.description) return;
+    const ids = (this.trigger.getAttribute("aria-describedby") || "").split(/\s+/)
+      .filter(id => id && id !== this.description!.id);
+    if (ids.length) this.trigger.setAttribute("aria-describedby", ids.join(" "));
+    else this.trigger.removeAttribute("aria-describedby");
+    this.trigger = undefined;
   }
+
+  // ID references cannot cross a shadow boundary. Keep a hidden description
+  // beside the consumer's children, never replacing or moving those children.
+  private describe = (): void => {
+    const trigger = this.querySelector<HTMLElement>("button, a[href], input, select, textarea, [tabindex], [role=button], [role=tab]")
+      ?? [...this.children].find(child => child !== this.description) as HTMLElement | undefined;
+    this.releaseDescription();
+    if (!trigger || !this.label) return;
+    if (!this.description) {
+      this.description = document.createElement("span");
+      this.description.id = `ds-tooltip-${++nextDescription}`;
+      this.description.slot = "description";
+      this.description.hidden = true;
+    }
+    this.description.textContent = this.label;
+    if (!this.description.isConnected) this.append(this.description);
+    this.trigger = trigger;
+    const ids = (trigger.getAttribute("aria-describedby") || "").split(/\s+/).filter(Boolean);
+    trigger.setAttribute("aria-describedby", [...ids, this.description.id].join(" "));
+  };
+
+  updated(): void { this.describe(); }
 
   render() {
-    const bubbleClasses = ["bubble", this._visible ? "visible" : ""].join(" ");
-
-    return html`
-      <span class="slot-wrapper"><slot></slot></span>
-      ${this._text
-        ? html`<div class="${bubbleClasses}">${this._text}</div>`
-        : null}
-    `;
+    return html`<slot @slotchange=${this.describe}></slot>
+      <span class="bubble" role="tooltip" aria-hidden="true" ?hidden=${!this._visible || !this.label}>${this.label}</span>`;
   }
 }
 
-customElements.define("ds-tooltip", Tooltip);
+define("ds-tooltip", Tooltip);
 
 declare global {
-  interface HTMLElementTagNameMap {
-    "ds-tooltip": Tooltip;
-  }
+  interface HTMLElementTagNameMap { "ds-tooltip": Tooltip; }
 }

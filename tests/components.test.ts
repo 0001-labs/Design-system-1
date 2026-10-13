@@ -107,5 +107,63 @@ test('shared icons preserve coloured artwork while monochrome drawings follow th
   });
   await Promise.all(icons.map(icon => icon.updateComplete));
   expect(icons[0].shadowRoot!.innerHTML).toContain('currentColor');
-  expect(icons[1].shadowRoot!.innerHTML).toMatch(/#1e1e1e/i);
+  expect(icons[1].shadowRoot!.innerHTML).toMatch(/#eaff00/i);
+});
+
+test('tooltips describe their child without replacing it and dismiss on Escape', async () => {
+  const tooltip = document.createElement('ds-tooltip');
+  tooltip.literal = true;
+  tooltip.text = 'Read this detail';
+  tooltip.placement = 'bottom';
+  const trigger = document.createElement('button');
+  trigger.textContent = 'Details';
+  trigger.setAttribute('aria-describedby', 'existing-description');
+  tooltip.append(trigger);
+  document.body.append(tooltip);
+  await tooltip.updateComplete;
+  const descriptionId = trigger.getAttribute('aria-describedby')!.split(' ').at(-1)!;
+  expect(document.getElementById(descriptionId)?.textContent).toBe('Read this detail');
+  expect(tooltip.firstElementChild).toBe(trigger);
+  const bubble = () => tooltip.shadowRoot!.querySelector<HTMLElement>('.bubble')!;
+  expect(bubble().hidden).toBe(true);
+  trigger.focus();
+  await tooltip.updateComplete;
+  expect(bubble().hidden).toBe(false);
+  trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+  await tooltip.updateComplete;
+  expect(bubble().hidden).toBe(true);
+  tooltip.text = 'Updated detail';
+  await tooltip.updateComplete;
+  expect(document.getElementById(descriptionId)?.textContent).toBe('Updated detail');
+  tooltip.remove();
+  expect(trigger.getAttribute('aria-describedby')).toBe('existing-description');
+  document.body.append(tooltip);
+  await tooltip.updateComplete;
+  expect(trigger.getAttribute('aria-describedby')).toContain(descriptionId);
+});
+
+test('tabs own arrow navigation, skip disabled tabs, and leave filter groups alone', async () => {
+  const tabs = document.createElement('ds-tabs');
+  const choices = ['First', 'Unavailable', 'Last'].map(label => {
+    const button = document.createElement('ds-button');
+    button.control = 'host';
+    button.setAttribute('role', 'tab');
+    button.textContent = label;
+    return button;
+  });
+  choices[1].disabled = true;
+  tabs.append(...choices);
+  document.body.append(tabs);
+  await Promise.all([tabs.updateComplete, ...choices.map(choice => choice.updateComplete)]);
+  const selected = vi.fn();
+  choices[2].addEventListener('click', selected);
+  choices[0].focus();
+  choices[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+  expect(document.activeElement).toBe(choices[2]);
+  expect(selected).toHaveBeenCalledTimes(1);
+  choices[2].dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+  expect(document.activeElement).toBe(choices[0]);
+  tabs.setAttribute('role', 'group');
+  choices[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+  expect(document.activeElement).toBe(choices[0]);
 });

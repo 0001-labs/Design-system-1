@@ -110,6 +110,13 @@ looks up translation keys. `ds-panel` provides header and footer slots around
 its body. The shared native-control sheet serves elements that need native
 form or third-party focus semantics.
 
+`ds-tooltip literal text="…"` accepts product-translated copy; omit `literal`
+for a shared translation key. It labels its slotted control, supports top and
+bottom placement, and dismisses on Escape. `ds-tabs` owns arrow, Home and End
+navigation for its tab controls; the product handles their clicks to select
+the corresponding content. Set `role="group"` for standalone filter choices.
+Host buttons accept `icon` and `trailing` slots for glyphs and counts.
+
 Reload the page after changing registered custom-element classes during
 development; the browser defines each element once per document.
 

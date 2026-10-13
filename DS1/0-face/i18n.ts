@@ -36,6 +36,8 @@ export type TranslationMap = Record<string, TranslationData>;
  * on `window.DS_ONE_I18N` before the module loads.
  */
 export type I18nOptions = {
+  /** Fetch external words at startup. Disable when the product supplies them in code. */
+  autoLoad?: boolean;
   /**
    * Every language the product speaks. When set, the picker offers these
    * whether or not their words have arrived yet, which matters when a page
@@ -789,7 +791,7 @@ if (i18nOptions.sharedWords) {
 // dynamic import.
 if (typeof window !== "undefined" && typeof document !== "undefined") {
   const start = () => {
-    void loadExternalTranslations();
+    if (i18nOptions.autoLoad !== false) void loadExternalTranslations();
   };
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", start);

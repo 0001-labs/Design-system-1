@@ -1,49 +1,37 @@
-/* ds-tooltip.css */
-/* Tooltip component styles */
-
 :host {
   position: relative;
-  display: inline-block;
-}
-
-.slot-wrapper {
   display: inline-flex;
   align-items: center;
 }
 
 .bubble {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  box-sizing: border-box;
   position: absolute;
   left: 50%;
-  bottom: 100%;
-  transform: translate(-50%, calc(-2px * var(--sf)));
-  z-index: 1000;
+  bottom: calc(100% + 2px * var(--ds-sf, var(--sf, 1)));
+  transform: translateX(-50%);
+  z-index: var(--ds-tooltip-z-index, 1000);
+  width: max-content;
+  max-width: min(calc(320px * var(--ds-sf, var(--sf, 1))), calc(100vw - 20px));
+  min-height: calc(16px * var(--ds-sf, var(--sf, 1)));
+  padding: 0 calc(2.5px * var(--ds-sf, var(--sf, 1)));
+  border-radius: calc(4px * var(--ds-sf, var(--sf, 1)));
+  background: var(--ds-tooltip-background, light-dark(var(--ds-black, var(--black)), var(--ds-white, var(--white))));
+  color: var(--ds-tooltip-color, light-dark(var(--ds-white, var(--white)), var(--ds-black, var(--black))));
+  font-family: var(--ds-typeface-regular, var(--typeface-regular));
+  font-size: calc(14px * var(--ds-sf, var(--sf, 1)));
+  line-height: calc(16px * var(--ds-sf, var(--sf, 1)));
+  font-weight: 400;
+  letter-spacing: var(--ds-type-letterspacing-default, 0);
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
   pointer-events: none;
-  height: calc(var(--08) * var(--sf));
-  opacity: 0;
-  transition:
-    opacity 120ms ease,
-    transform 120ms ease;
-  background-color: light-dark(var(--black), var(--white));
-  color: light-dark(var(--white), var(--black));
-  border-radius: 0;
-  font-size: var(--type-size-default);
-  padding: 0px calc(1px * var(--sf));
-  font-family: var(
-    --typeface-regular,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    sans-serif
-  );
-  font-weight: 500;
-  white-space: nowrap;
-  min-width: max-content;
 }
 
-.bubble.visible {
-  opacity: 1;
+.bubble[hidden] { display: none; }
+
+:host([placement="bottom"]) .bubble {
+  bottom: auto;
+  top: calc(100% + 2px * var(--ds-sf, var(--sf, 1)));
 }

@@ -54,20 +54,37 @@
 }
 
 /* A tab: muted until it is hovered or current. */
-:host([control="host"][role="tab"]) {
+:host([control="host"][role="tab"]),
+:host([control="host"][choice]) {
   --ds-button-padding: 0 calc(4px * var(--ds-sf));
   --ds-button-color: var(--ds-text-color-muted);
 }
 
-:host([control="host"][role="tab"]:hover:not([disabled])) {
+:host([control="host"][role="tab"]:hover:not([disabled])),
+:host([control="host"][choice]:hover:not([disabled])) {
   --ds-button-background: color-mix(in srgb, var(--ds-fill) 72%, transparent);
   --ds-button-color: var(--ds-text-color);
 }
 
 :host([control="host"][role="tab"][active]),
-:host([control="host"][role="tab"][active]:hover:not([disabled])) {
+:host([control="host"][role="tab"][active]:hover:not([disabled])),
+:host([control="host"][choice][active]),
+:host([control="host"][choice][active]:hover:not([disabled])) {
   --ds-button-background: var(--ds-fill);
   --ds-button-color: var(--ds-text-color);
+}
+
+:host([control="host"]) ::slotted([slot="icon"]) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ds-control-height);
+  height: var(--ds-control-height);
+}
+
+:host([control="host"]) ::slotted([slot="trailing"]) {
+  color: var(--ds-text-color-muted);
+  font-variant-numeric: tabular-nums;
 }
 
 :host([control="host"][icon]) {

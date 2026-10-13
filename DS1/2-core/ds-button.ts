@@ -14,6 +14,7 @@ export class Button extends Control {
     secondary: { type: Boolean, reflect: true },
     control: { type: String, reflect: true, noAccessor: true },
     active: { type: Boolean, reflect: true },
+    choice: { type: Boolean, reflect: true },
     icon: { type: Boolean, reflect: true },
     blank: { type: Boolean, reflect: true },
     language: { type: String },
@@ -26,6 +27,7 @@ export class Button extends Control {
   declare primary: boolean;
   declare secondary: boolean;
   declare active: boolean;
+  declare choice: boolean;
   declare icon: boolean;
   private _control = "native";
   get control(): string { return this._control; }
@@ -47,6 +49,7 @@ export class Button extends Control {
   constructor() {
     super();
     this.active = false;
+    this.choice = false;
     this.icon = false;
     this.primary = false; // Default to no-background (no attribute)
     this.secondary = false;
@@ -78,7 +81,7 @@ export class Button extends Control {
 
   render() {
     const hasTextProps = this.text;
-    if (this.hostControl) return html`<slot></slot>`;
+    if (this.hostControl) return html`<slot name="icon"></slot><slot></slot><slot name="trailing"></slot>`;
 
     return html`
       <button
