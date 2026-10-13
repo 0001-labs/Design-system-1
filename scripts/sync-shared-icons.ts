@@ -1,10 +1,11 @@
+import './sync-globe.mjs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 
 const ezo = new URL('../../Ezo/', import.meta.url);
 const mapFile = new URL('client/design/2-core/generated/ds-icon-map.ts', ezo);
 let map = await readFile(mapFile, 'utf8');
-for (const name of ['globe', 'duplicate']) {
+for (const name of ['duplicate']) {
   const svg = (await readFile(new URL(`../DS1/x-icon/${name}.svg`, import.meta.url), 'utf8')).trim();
   const pattern = new RegExp(`(^\\s*"${name}":\\s*)("(?:[^"\\\\]|\\\\.)*")`, 'm');
   if (!pattern.test(map)) throw new Error(`Ezo does not register ${name}`);
