@@ -33,6 +33,10 @@ Items stack edge to edge with no gap, as an Ezo list does; a header item wears t
 - Motion animates `transform` and `opacity` only.
 - On phones and tablets every measure is multiplied by `--sf` (1 on a computer; the screen width over 280 on a phone, between 0.75 and 2). Write lengths as units or `calc(Npx * var(--sf))`, never bare pixels, except hairlines.
 
+## Tooltips
+
+A tooltip is Design system 1's black bubble, never the browser's `title`: black with white text (white on black in dark mode), square corners, 14px medium, above the element, fading in over 120ms. Wrap one element in `<ds-tooltip>`, or give any number of elements `data-tooltip="…"` and load `DS1/0-face/tooltips.ts`, which shows one shared bubble for them all and wraps long text at 320px.
+
 ## Colours
 
 Shown at https://designsystem1.com/colours (`website/src/pages/colours.astro`) as one palette, named by colour and sorted by hue, and the inks (greys); change the page with this section.

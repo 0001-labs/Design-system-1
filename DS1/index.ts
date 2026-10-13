@@ -21,6 +21,7 @@ import "./0-face/i18n";
 
 export * from "./0-face/device";
 export * from "./0-face/grid";
+export * from "./0-face/tooltips";
 export * from "./0-face/i18n";
 export * from "./0-face/languages";
 export * from "./0-face/language-routing";
