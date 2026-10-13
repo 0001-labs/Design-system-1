@@ -35,7 +35,7 @@ Items stack edge to edge with no gap, as an Ezo list does; a header item wears t
 
 ## Tooltips
 
-A tooltip is Design system 1's black bubble, never the browser's `title`: black with white text (white on black in dark mode), 4px corners (as Ezo's rounded and circular styles), 14px regular, above the element, fading in over 120ms. Wrap one element in `<ds-tooltip>`, or give any number of elements `data-tooltip="…"` and load `DS1/0-face/tooltips.ts`, which shows one shared bubble for them all and wraps long text at 320px.
+A tooltip is Ezo's label, never the browser's `title`: 16px high on 16px lines, 14px regular, 2.5px at the sides, 4px corners, black with white text (white on black in dark mode), two pixels above the element, shown at once; `data-tooltip-colour` gives it a colour (an accent, a column's colour) lettered in the ink. Wrap one element in `<ds-tooltip>`, or give any number of elements `data-tooltip="…"` and load `DS1/0-face/tooltips.ts`, which shows one shared label for them all; a text longer than 320px wraps.
 
 ## Colours
 

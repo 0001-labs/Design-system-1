@@ -1,7 +1,7 @@
 /**
  * One tooltip for a whole page: any element with `data-tooltip="…"` shows its text in Design system 1's tooltip,
- * a black bubble with white text (white on black in dark mode), 4px corners as Ezo's rounded style, 14px regular, above the element, fading in
- * over 120ms. The same look as `<ds-tooltip>`, without wrapping each element in a component, so a table of
+ * Ezo's label: 16px high, black with white text (white on black in dark mode), 4px corners, 14px regular, 2.5px at
+ * the sides, two pixels above the element, shown at once. `data-tooltip-colour` gives it a colour of its own. The same look as `<ds-tooltip>`, without wrapping each element in a component, so a table of
  * hundreds of cells can carry one each. Long text wraps at 320px on 20px lines.
  */
 export function initTooltips(): void {
@@ -17,16 +17,15 @@ export function initTooltips(): void {
   const style = document.createElement("style");
   style.textContent = `
     [data-ds-tooltip] {
-      position: fixed; z-index: 2147483646; top: 0; left: 0; pointer-events: none;
-      max-width: 320px; min-height: 20px; box-sizing: border-box; padding: 0 4px; border-radius: 4px;
-      background: light-dark(var(--black, #2a2a2a), var(--white, #ffffff));
-      color: light-dark(var(--white, #ffffff), var(--black, #2a2a2a));
-      font-family: var(--typeface-regular, var(--font-regular, -apple-system, BlinkMacSystemFont, sans-serif)), sans-serif;
-      font-size: 14px; font-weight: 400; line-height: 20px; letter-spacing: 0;
-      opacity: 0; transition: opacity 120ms ease;
+      position: fixed; z-index: 2147483646; top: 0; left: 0; pointer-events: none; visibility: hidden;
+      max-width: 320px; min-height: 16px; box-sizing: border-box; padding: 0 2.5px; border-radius: 4px;
+      background: var(--ds-tooltip-background, light-dark(#000, #fff));
+      color: var(--ds-tooltip-color, light-dark(#fff, #000));
+      font-family: var(--typeface-regular, var(--font-regular, system-ui)), sans-serif;
+      font-size: 14px; font-weight: 400; line-height: 16px; letter-spacing: 0; white-space: nowrap;
     }
-    [data-ds-tooltip].is-visible { opacity: 1; }
-    @media (prefers-reduced-motion: reduce) { [data-ds-tooltip] { transition: none; } }
+    [data-ds-tooltip].is-wide { white-space: normal; }
+    [data-ds-tooltip].is-visible { visibility: visible; }
     @media print { [data-ds-tooltip] { display: none; } }
   `;
   document.head.append(style);
@@ -47,6 +46,14 @@ export function initTooltips(): void {
     if (!text) return;
     current = target;
     bubble.textContent = text;
+    // A colour of its own, as Ezo's labels take the accent: data-tooltip-colour="#f5aad1", lettered in the ink.
+    const colour = target.dataset.tooltipColour;
+    bubble.style.setProperty("--ds-tooltip-background", colour || "");
+    bubble.style.setProperty("--ds-tooltip-color", colour ? "#1e1e1e" : "");
+    if (!colour) { bubble.style.removeProperty("--ds-tooltip-background"); bubble.style.removeProperty("--ds-tooltip-color"); }
+    // One line, as Ezo's; a long text wraps at 320px instead of running off the page.
+    bubble.classList.remove("is-wide");
+    if (bubble.scrollWidth > 320) bubble.classList.add("is-wide");
     target.setAttribute("aria-describedby", bubble.id);
     place(target);
     bubble.classList.add("is-visible");
