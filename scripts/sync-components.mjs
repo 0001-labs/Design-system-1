@@ -42,6 +42,7 @@ const entries = components.map(name => {
 // React consumers may import the optional, source-owned state adapter.
 if (components.includes('button')) visit('react/button.ts');
 if (components.includes('split')) visit('react/split.ts');
+if (components.includes('token-field') || components.includes('token')) visit('react/token-field.ts');
 if (components.includes('composer')) visit('react/composer.ts');
 if (components.includes('menu')) visit('react/menu.ts');
 if (components.includes('accordion')) visit('react/accordion.ts');

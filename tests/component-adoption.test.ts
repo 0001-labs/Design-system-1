@@ -216,3 +216,21 @@ it("counts highlighted native textarea frames once in HTML and direct DOM compos
   expect(sourceSites("field.html", '<ds-composer><textarea></textarea></ds-composer>').map(site => site.tag)).toEqual(["ds-composer"]);
   expect(sourceSites("field.ts", 'const host = document.createElement("ds-composer"); const input = document.createElement("textarea"); host.append(input);').map(site => site.tag)).toEqual(["ds-composer"]);
 });
+
+it("counts token fields and tokens using verified adapter imports and rejects modified adapters", () => {
+  const {studio, ds, app}=fixture();
+  const files={"2-core/ds-token.ts":"export const token = true;", "3-unit/ds-token-field.ts":"export const field = true;", "react/token-field.ts":'import type { Token } from "../2-core/ds-token"; import type { TokenField } from "../3-unit/ds-token-field";'};
+  for (const [file,body] of Object.entries(files)) {write(ds,`DS1/${file}`,body);write(app,`design/${file}`,body);}
+  git(ds,'add','.');git(ds,'-c','user.name=Test','-c','user.email=test@example.com','commit','-m','Add token fields');
+  const path=join(app,'design/components-manifest.json'),manifest=JSON.parse(readFileSync(path,'utf8'));
+  manifest.commit=git(ds,'rev-parse','HEAD');manifest.components.push('token','token-field');
+  for(const [file,body] of Object.entries(files))manifest.files[file]=createHash('sha256').update(body).digest('hex');
+  writeFileSync(path,JSON.stringify(manifest));
+  write(app,'src/field.tsx','import {Token, TokenField} from "../design/react/token-field"; export const field = <><Token /><TokenField /><ds-token-field><input /></ds-token-field></>;');
+  git(app,'add','.');git(app,'-c','user.name=Test','-c','user.email=test@example.com','commit','-m','Use token fields');
+  const scan=()=>scanApp({id:'example',name:'Example',directory:'Example',roots:['src'],manifest:'design/components-manifest.json'},studio,ds);
+  expect(scan().cells['token-field']).toMatchObject({shared:2,local:0,unverified:0});expect(scan().cells.token.shared).toBe(1);expect(scan().cells.input.local).toBe(0);
+  write(app,'design/react/token-field.ts',files['react/token-field.ts']+'\n// Local modification');
+  expect(scan().cells['token-field']).toMatchObject({shared:1,unverified:1});expect(scan().cells.token.unverified).toBe(1);
+  for(const file of ['view.html','view.tsx'])expect(sourceSites(file,'<ds-token-field><input /></ds-token-field><input />').map(site=>site.tag)).toEqual(['ds-token-field','input']);
+});

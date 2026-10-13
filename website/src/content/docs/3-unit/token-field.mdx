@@ -1,0 +1,47 @@
+---
+title: Token field
+description: Native writing, removable values and suggestions on the shared row grid.
+---
+
+`ds-token-field` holds a native input, `ds-token` values and an optional `ds-menu`.
+The native input and menu choices stay in light DOM, preserving labels, native
+forms, validation, refs and combobox ARIA references. DS1 owns layout, chip faces,
+field focus, editing gestures and suggestion navigation. Products own candidate
+matching, parsing, validation messages and accepted values.
+
+```html
+<label for="people">People</label>
+<ds-token-field choose-label="Choose people" separators=",;">
+  <ds-token value="one" label="First person" remove-label="Remove first person"></ds-token>
+  <input id="people" type="text" autocomplete="off" />
+  <ds-menu slot="suggestions" aria-label="Choose people">
+    <ds-button control="slotted"><button type="button" role="option">Second person</button></ds-button>
+  </ds-menu>
+</ds-token-field>
+```
+
+The field assigns stable option IDs, one active descendant and selected state.
+Menu keeps focus on the input during pointer selection and handles arrows, Enter,
+Escape, scrolling and viewport placement. Escape closes suggestions before a
+containing dialog. Home, End and text selection remain native editing keys.
+Without suggestions, the field leaves the native input role unchanged.
+
+Listen for `ds-token-commit` with `{text, reason}` (`enter`, `separator`, `input`,
+`blur`) and `ds-token-remove` with `{value}`. These are requests: neither event
+changes product data or clears the native input. Empty-field Backspace requests
+removal of the last removable token. IME composition and modified editing keys
+are ignored. A separators string defaults to comma and semicolon; pasted input
+containing a separator requests commit after controlled values settle.
+
+Tokens accept `label`, optional `detail` and a `leading` slot for a shared Avatar.
+`remove-label` supplies the accessible name and enables removal. Omit it for a
+fixed token. Disabled fields, read-only inputs and native disabled fieldsets
+block editing and removal. Chips and field rows are one square high; the field
+wraps tokens on whole rows and follows the containing or independent DS1 scale.
+
+React uses `TokenField` and `Token` from `DS1/react/token-field` after browser-only
+registration. TokenField takes native input props and a native input ref, plus
+`tokens`, `suggestions`, `chooseLabel`, `separators` and `onCommit`. Token takes
+`value`, `label`, `detail`, `removeLabel`, `disabled` and `onRemove`. Keep product
+rules in those callbacks. Classes and styles place the host; do not rebuild its
+face. Outside React, call `refresh()` after programmatic changes to children.
