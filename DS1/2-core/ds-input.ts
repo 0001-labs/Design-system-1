@@ -239,6 +239,10 @@ export class Input extends LitElement {
   }
   formDisabledCallback(disabled: boolean): void {
     this._formDisabled = disabled;
+    // The browser can deliver this reaction while Lit reflects `disabled`,
+    // after render has already read the old state. Schedule a fresh render
+    // after that update so native inputs and inherited textareas re-enable.
+    queueMicrotask(() => { if (this.isConnected) this.requestUpdate(); });
   }
   formResetCallback(): void {
     this.value = this.getAttribute("value") ?? this.initialValue ?? "";

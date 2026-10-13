@@ -106,3 +106,30 @@ test('form reset, restoration and fieldset disabling retain the public value con
   await control.updateComplete;
   expect(input.disabled).toBe(true);
 });
+
+test.each(['ds-input', 'ds-textarea'])('a reflected disabled state can re-enable %s after native form reactions', async (tag) => {
+  await import('../DS1/2-core/ds-textarea');
+  const control = document.createElement(tag) as InstanceType<typeof Input>;
+  document.body.append(control);
+  await control.updateComplete;
+  // Browsers deliver this native reaction synchronously during Lit's attribute
+  // reflection. happy-dom does not implement form-associated custom elements.
+  const setAttribute = control.setAttribute.bind(control), removeAttribute = control.removeAttribute.bind(control);
+  vi.spyOn(control, 'setAttribute').mockImplementation((name, value) => {
+    setAttribute(name, value);
+    if (name === 'disabled') control.formDisabledCallback(true);
+  });
+  vi.spyOn(control, 'removeAttribute').mockImplementation(name => {
+    removeAttribute(name);
+    if (name === 'disabled') control.formDisabledCallback(false);
+  });
+  const native = control.shadowRoot!.querySelector('input, textarea') as HTMLInputElement;
+  control.disabled = true; await control.updateComplete; await control.updateComplete;
+  expect(native.disabled).toBe(true);
+  control.disabled = false; await control.updateComplete; await control.updateComplete;
+  expect(native.disabled).toBe(false);
+  control.formDisabledCallback(true); await control.updateComplete; await control.updateComplete;
+  expect(native.disabled).toBe(true);
+  control.formDisabledCallback(false); await control.updateComplete; await control.updateComplete;
+  expect(native.disabled).toBe(false);
+});
