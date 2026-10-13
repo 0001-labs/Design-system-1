@@ -16,6 +16,8 @@ export class Button extends Control {
     active: { type: Boolean, reflect: true },
     choice: { type: Boolean, reflect: true },
     icon: { type: Boolean, reflect: true },
+    wide: { type: Boolean, reflect: true },
+    danger: { type: Boolean, reflect: true },
     blank: { type: Boolean, reflect: true },
     language: { type: String },
     text: { type: String },
@@ -29,6 +31,8 @@ export class Button extends Control {
   declare active: boolean;
   declare choice: boolean;
   declare icon: boolean;
+  declare wide: boolean;
+  declare danger: boolean;
   private _control = "native";
   get control(): string { return this._control; }
   set control(value: string) {
@@ -51,6 +55,8 @@ export class Button extends Control {
     this.active = false;
     this.choice = false;
     this.icon = false;
+    this.wide = false;
+    this.danger = false;
     this.primary = false; // Default to no-background (no attribute)
     this.secondary = false;
     this.disabled = false;
@@ -68,19 +74,37 @@ export class Button extends Control {
    * so its styles can make it a 16-unit square with the icon filling it.
    */
   _reflectIcon() {
-    if (this.hostControl) return;
+    if (this.control !== "native") return;
     const only = this.firstElementChild;
     const icon = !this.text && this.childElementCount === 1 && only?.localName === 'ds-icon' && !(this.textContent ?? '').trim();
     this.toggleAttribute('icon', !!icon);
   }
 
+  private syncSlottedControl() {
+    if (this.control !== "slotted") return;
+    const button = this.querySelector<HTMLButtonElement>(":scope > button");
+    if (button) button.disabled = this.disabled;
+  }
+
+  updated() {
+    this.syncSlottedControl();
+  }
+
+  focus(options?: FocusOptions) {
+    if (this.control === "slotted") this.querySelector<HTMLButtonElement>(":scope > button")?.focus(options);
+    else if (this.hostControl) super.focus(options);
+    else this.shadowRoot?.querySelector("button")?.focus(options);
+  }
+
   connectedCallback() {
     super.connectedCallback();
     this._reflectIcon();
+    this.syncSlottedControl();
   }
 
   render() {
     const hasTextProps = this.text;
+    if (this.control === "slotted") return html`<slot @slotchange=${this.syncSlottedControl}></slot>`;
     if (this.hostControl) return html`<slot name="icon"></slot><slot></slot><slot name="trailing"></slot>`;
 
     return html`

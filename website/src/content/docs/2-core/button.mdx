@@ -43,6 +43,38 @@ The native click crosses the shadow boundary once. A disabled button does not tr
 
 ## Navigation and forms
 
-Use `href="/icons/"` to navigate. For a form submit control, use a native `<button type="submit">` inside `ds-form`: `ds-button` does not expose a `type` attribute.
+Use `href="/icons/"` to navigate. For forms, use `control="slotted"`. A native light-DOM button supplies submission,
+reset, focus, validation and disabled-fieldset behavior; DS1 owns its visual
+appearance. Keep button attributes on the native control and visual options on
+`ds-button`.
+
+```html
+<ds-button control="slotted" primary>
+  <button type="submit" name="action" value="save">Save</button>
+</ds-button>
+```
+
+Set `disabled` on the host; it forwards to the native control. Native form
+attributes (`form`, `formaction`, `formnovalidate`, `formmethod`, `name`, `value`)
+keep their browser behavior. The light-DOM control remains the actual submitter.
+The shared face is protected from document button resets; configure it through
+public `--ds-button-*` tokens and put layout on the host.
+
+React products select `button` in their snapshot and import the shared binding:
+
+```tsx
+import { Button } from './design/react/button';
+<Button type="submit" primary disabled={saving}>Save</Button>
+```
+
+Slotted buttons are one row high and four squares wide. Use `wide` for eight squares, `icon` for one square, or `--ds-button-width` for a layout-sized control.
+
+The adapter's default type is `button`; set `submit` or `reset` deliberately.
+Refs and event targets are the real native button. `className` and `style` apply
+to the host for layout; ARIA, IDs, native attributes and handlers reach the
+native control. Registration happens in the browser before hydration, as for
+shared inputs. The adapter does not import browser globals during SSR.
 
 [Form](/3-unit/form/) · [Icon](/2-core/icon/) · [Tooltip](/2-core/tooltip/)
+
+Use `danger` for destructive actions. It uses the shared tuned red token and can be combined with `secondary`.
