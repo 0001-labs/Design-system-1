@@ -21,6 +21,8 @@ Set the host's `open` property to open or close it. `closeOnEscape` and
 a `detail.reason` of `escape`, `backdrop`, `button` or `native`. Prevent its
 default action when the application must decide whether closing is allowed.
 Nested dialogs retain the background scroll lock until the last one closes.
+The lock fixes the body at its current offset, then restores its original inline
+styles and scroll position, including when an underlying dialog closes first.
 
 Select `dialog` in the source snapshot to include the optional React adapter:
 
@@ -50,3 +52,14 @@ no shadow. Set `--ds-dialog-width` for a different whole-square width. Colours,
 type and scale follow the shared `--ds-*` tokens. Portals used by menus or
 popovers inside a modal must stay inside the native dialog or use the browser's
 own top layer; body-level overlays are outside the modal's interactive area.
+
+`DialogContent fullScreen` fills the viewport for document viewers, without
+invoking the Fullscreen API. `flush` removes the default padding and gap when
+the content already provides its own spacing. Set `--ds-dialog-height` for a
+tall, bounded frame. Content layouts still belong to the application; the
+shared frame supplies its paper, type, border, backdrop and modal behavior.
+`rotated` turns a document frame 90 degrees and swaps its viewport bounds,
+keeping its normal margins. Applications decide when to offer rotation.
+
+Aa mounts its floating toolbar, menus, find controls and link field inside the
+closest native dialog. Sync Aa before placing an older editor copy in a modal.

@@ -6,7 +6,39 @@ import "./styles/ds-dialog.css";
 
 export type DialogCloseReason = "escape" | "backdrop" | "button" | "native";
 const openDialogs = new WeakMap<Document, Set<Dialog>>();
-const scrollStyles = new WeakMap<Document, { value: string; priority: string }>();
+type SavedStyle = { style: CSSStyleDeclaration; name: string; value: string; priority: string; locked: string };
+const scrollStyles = new WeakMap<Document, { declarations: SavedStyle[]; x: number; y: number }>();
+
+function lockScroll(document: Document) {
+  const view = document.defaultView;
+  const x = view?.scrollX ?? 0, y = view?.scrollY ?? 0;
+  const declarations: SavedStyle[] = [];
+  const set = (style: CSSStyleDeclaration, name: string, locked: string) => {
+    declarations.push({ style, name, value: style.getPropertyValue(name), priority: style.getPropertyPriority(name), locked });
+    style.setProperty(name, locked, "important");
+  };
+  set(document.documentElement.style, "overflow", "hidden");
+  set(document.documentElement.style, "overscroll-behavior", "none");
+  set(document.body.style, "position", "fixed");
+  set(document.body.style, "top", `${-y}px`);
+  set(document.body.style, "left", `${-x}px`);
+  set(document.body.style, "width", "100%");
+  scrollStyles.set(document, { declarations, x, y });
+}
+
+function unlockScroll(document: Document) {
+  const saved = scrollStyles.get(document);
+  if (!saved) return;
+  for (const { style, name, value, priority, locked } of saved.declarations) {
+    if (style.getPropertyValue(name) !== locked || style.getPropertyPriority(name) !== "important") continue;
+    if (value) style.setProperty(name, value, priority);
+    else style.removeProperty(name);
+  }
+  scrollStyles.delete(document);
+  if (document.defaultView && (document.defaultView.scrollX !== saved.x || document.defaultView.scrollY !== saved.y)) {
+    document.defaultView.scrollTo(saved.x, saved.y);
+  }
+}
 
 /** A native light-DOM dialog keeps forms and accessible ID references together.
  * The browser owns the top layer, inert background and modal focus navigation.
@@ -97,15 +129,12 @@ export class Dialog extends LitElement {
     let active = this.ownerDocument.activeElement;
     while (active?.shadowRoot?.activeElement) active = active.shadowRoot.activeElement;
     this.opener ??= active instanceof HTMLElement ? active : null;
-    dialog.showModal();
     const document = this.ownerDocument;
     let stack = openDialogs.get(document);
     if (!stack) openDialogs.set(document, stack = new Set());
-    if (stack.size === 0) {
-      const style = document.documentElement.style;
-      scrollStyles.set(document, { value: style.getPropertyValue("overflow"), priority: style.getPropertyPriority("overflow") });
-      style.setProperty("overflow", "hidden", "important");
-    }
+    if (stack.size === 0) lockScroll(document);
+    try { dialog.showModal(); }
+    catch (error) { if (stack.size === 0) unlockScroll(document); throw error; }
     stack.add(this);
   }
 
@@ -115,15 +144,7 @@ export class Dialog extends LitElement {
     const entries = stack ? [...stack] : [];
     const wasTop = entries[entries.length - 1] === this;
     if (!stack?.delete(this)) return;
-    if (stack.size === 0) {
-      const saved = scrollStyles.get(document);
-      const style = document.documentElement.style;
-      if (style.getPropertyValue("overflow") === "hidden" && style.getPropertyPriority("overflow") === "important") {
-        if (saved?.value) style.setProperty("overflow", saved.value, saved.priority);
-        else style.removeProperty("overflow");
-      }
-      scrollStyles.delete(document);
-    }
+    if (stack.size === 0) unlockScroll(document);
     if (wasTop && this.opener?.isConnected) this.opener.focus({ preventScroll: true });
     this.opener = null;
   }

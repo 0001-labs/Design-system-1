@@ -13,14 +13,21 @@ async function dialog() {
 
 test("nested dialogs retain scroll locking and restore the exact original declaration", async () => {
   document.documentElement.style.setProperty("overflow", "scroll", "important");
+  document.body.style.setProperty("position", "relative");
+  document.body.style.setProperty("top", "20px", "important");
   const first = await dialog(); const second = await dialog();
   expect(first.native.open).toBe(true); expect(second.native.open).toBe(true);
+  expect(document.body.style.position).toBe("fixed");
   first.host.remove();
   expect(document.documentElement.style.overflow).toBe("hidden");
   second.host.remove();
   expect(second.native.open).toBe(false);
   expect(document.documentElement.style.overflow).toBe("scroll");
   expect(document.documentElement.style.getPropertyPriority("overflow")).toBe("important");
+  expect(document.body.style.position).toBe("relative");
+  expect(document.body.style.top).toBe("20px");
+  expect(document.body.style.getPropertyPriority("top")).toBe("important");
+  document.body.removeAttribute("style");
 });
 
 test("Escape requests can be disabled or vetoed and close controls preserve the reason", async () => {

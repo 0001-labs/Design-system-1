@@ -25,8 +25,14 @@ export interface DialogContentProps extends HTMLAttributes<HTMLDialogElement> {
   showClose?: boolean;
   closeOnEscape?: boolean;
   closeOnBackdrop?: boolean;
+  /** Fill the viewport for document viewers; this is not the Fullscreen API. */
+  fullScreen?: boolean;
+  /** Content supplies its own internal spacing. The shared frame stays intact. */
+  flush?: boolean;
+  /** Rotate a document frame while keeping it within the viewport. */
+  rotated?: boolean;
 }
-export function DialogContent({ children, closeLabel = "Close", showClose = true, closeOnEscape = true, closeOnBackdrop = true, ...props }: DialogContentProps) {
+export function DialogContent({ children, closeLabel = "Close", showClose = true, closeOnEscape = true, closeOnBackdrop = true, fullScreen = false, flush = false, rotated = false, ...props }: DialogContentProps) {
   const context = useDialog();
   const host = useRef<DialogElement>(null);
   const [mounted, setMounted] = useState(false);
@@ -61,7 +67,7 @@ export function DialogContent({ children, closeLabel = "Close", showClose = true
   });
   if (!mounted || !context.open) return null;
   const content = createElement("ds-dialog", { ref: host },
-    createElement("dialog", { ...props }, children,
+    createElement("dialog", { ...props, "data-ds-dialog-fullscreen": fullScreen || undefined, "data-ds-dialog-flush": flush || undefined, "data-ds-dialog-rotated": rotated || undefined }, children,
       showClose && createElement("ds-button", { control: "slotted", icon: true, "data-ds-dialog": "close" },
         createElement("button", { type: "button", "aria-label": closeLabel, "data-ds-dialog-dismiss": "" },
           createElement("ds-icon", { type: "close", "aria-hidden": true }))),

@@ -6,6 +6,7 @@ ds-dialog > dialog {
   width: min(var(--ds-dialog-width, calc(20 * var(--ds-unit))), calc(100vw - 2 * var(--ds-unit)));
   max-width: calc(100vw - 2 * var(--ds-unit));
   max-height: calc(100dvh - 2 * var(--ds-unit));
+  height: var(--ds-dialog-height, auto);
   margin: auto;
   padding: var(--ds-unit);
   border: 1px solid var(--ds-border-color);
@@ -24,6 +25,28 @@ ds-dialog > dialog {
 }
 ds-dialog > dialog[open] { display: flex; flex-direction: column; gap: var(--ds-unit); }
 ds-dialog > dialog:not([open]) { display: none; }
+ds-dialog > dialog[data-ds-dialog-flush] { padding: 0; gap: 0; }
+ds-dialog > dialog[data-ds-dialog-fullscreen] {
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  padding: 0;
+  gap: 0;
+  border: 0;
+}
+ds-dialog > dialog[data-ds-dialog-rotated] {
+  inset: auto;
+  left: 50%;
+  top: 50%;
+  margin: 0;
+  width: calc(100dvh - 2 * var(--ds-unit));
+  height: calc(100vw - 2 * var(--ds-unit));
+  max-width: none;
+  max-height: none;
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+ds-dialog > dialog[data-ds-dialog-fullscreen][data-ds-dialog-rotated] { width: 100dvh; height: 100vw; }
 ds-dialog > dialog::backdrop { background: color-mix(in srgb, var(--ds-black) 40%, transparent); }
 ds-dialog [data-ds-dialog="header"] { display: flex; flex-direction: column; padding-right: var(--ds-unit); }
 ds-dialog [data-ds-dialog="title"] {
