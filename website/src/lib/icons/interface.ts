@@ -2,7 +2,6 @@ import { scopedSvg } from './svgView';
 import icons from './interface-catalog.json';
 const $ = <T extends HTMLElement = HTMLElement>(id:string) => document.getElementById(id) as T;
 let selected = icons.find(icon=>icon.key==='star') ?? icons[0];
-let filter = 'all';
 let view = 'outline';
 const colors=['#6552d9','#ce4c68','#188b74','#aa701c','#2974c5','#8b509c'];
 const geometry = 'path,rect,circle,ellipse,line,polyline,polygon';
@@ -38,7 +37,7 @@ function search(){
   const query=$<HTMLInputElement>('vector-search').value.trim().toLowerCase();let shown=0;
   for(const button of document.querySelectorAll<HTMLElement>('[data-vector-key]')){
     const icon=icons.find(icon=>icon.key===button.dataset.vectorKey)!;
-    button.hidden=!(filter==='all'||icon.source===filter)||!`${icon.key} ${icon.name}`.toLowerCase().includes(query);
+    button.hidden=!`${icon.key} ${icon.name}`.toLowerCase().includes(query);
     if(!button.hidden)shown++;
   }
   const visible=Array.from(document.querySelectorAll<HTMLElement>('[data-vector-key]')).filter(b=>!b.hidden);
@@ -49,10 +48,6 @@ function search(){
 for(const button of document.querySelectorAll<HTMLElement>('[data-vector-key]'))button.addEventListener('click',()=>{
   selected=icons.find(icon=>icon.key===button.dataset.vectorKey)!;render();
   history.replaceState(null,'',`${location.pathname}#${selected.key}`);message('');
-});
-for(const button of document.querySelectorAll<HTMLElement>('[data-vector-filter]'))button.addEventListener('click',()=>{
-  filter=button.dataset.vectorFilter!;
-  for(const option of document.querySelectorAll<HTMLElement>('[data-vector-filter]'))option.setAttribute('aria-pressed',String(option===button));search();
 });
 for(const button of document.querySelectorAll<HTMLElement>('[data-vector-view]'))button.addEventListener('click',()=>{view=button.dataset.vectorView!;render();});
 $('vector-search').addEventListener('input',search);$('vector-grid').addEventListener('change',render);$('vector-shapes').addEventListener('change',render);

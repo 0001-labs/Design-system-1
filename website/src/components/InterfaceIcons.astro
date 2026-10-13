@@ -8,7 +8,6 @@ const star = icons.find(icon => icon.key === 'star') ?? icons[0];
     <section class="vector-library" aria-label="SVG icon collection">
       <div class="vector-library-heading"><h2>The collection</h2><span id="vector-count">{icons.length} icons</span></div>
       <label class="vector-search"><span aria-hidden="true">⌕</span><input id="vector-search" type="search" placeholder="Find an icon…" aria-label="Find an icon" /></label>
-      <div class="vector-filter" aria-label="Filter collection"><button data-vector-filter="all" aria-pressed="true">All</button><button data-vector-filter="Figma" aria-pressed="false">Figma · {icons.filter(i=>i.source==='Figma').length}</button><button data-vector-filter="Library" aria-pressed="false">Additions</button></div>
       <div class="vector-tiles" id="vector-tiles">
         {icons.map(icon => <button data-vector-key={icon.key} aria-pressed={icon.key === star.key} title={icon.name}><span class="vector-thumbnail" set:html={scopedSvg(icon.svg,'tile-'+icon.key)} /><span>{icon.name}</span></button>)}
       </div>
