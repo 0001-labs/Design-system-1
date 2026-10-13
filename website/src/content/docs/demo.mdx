@@ -1,137 +1,38 @@
 ---
-title: Live Demo
-description: Interactive demo of Design system 1 components on this page
+title: Component examples
+description: Try real components and copy the code that renders them.
 ---
 
-import { Card } from "@astrojs/starlight/components";
+import ComponentExample from "../../components/ComponentExample.astro";
 
-## Design system 1 Components Live Demo
+Try the components directly below, or open the [full searchable gallery](/components/). Every preview uses the source components bundled with this site. Each has Light, Dark, Reset and copyable code.
 
-This page demonstrates Design system 1 components working live, loaded from the CDN. All components on this page are actual Design system 1 web components!
+## Buttons
 
-### Buttons
+<ComponentExample example="button" />
 
-<div style="display: flex; gap: 1rem; flex-wrap: wrap; margin: 2rem 0;">
-  <ds-button variant="primary">Primary Button</ds-button>
-  <ds-button variant="secondary">Secondary Button</ds-button>
-  <ds-button variant="text">Text Button</ds-button>
-</div>
+## Inputs
 
-```html
-<ds-button variant="primary">Primary Button</ds-button>
-<ds-button variant="secondary">Secondary Button</ds-button>
-<ds-button variant="text">Text Button</ds-button>
-```
+<ComponentExample example="input" />
 
-### Text Components
+## Tooltips
 
-<div style="margin: 2rem 0;">
-  <ds-text variant="heading">This is a Design system 1 heading</ds-text>
-  <ds-text variant="body">
-    This is Design system 1 body text. It adapts to your theme automatically.
-  </ds-text>
-  <ds-text variant="small">
-    This is small text for captions and secondary information.
-  </ds-text>
-</div>
+<ComponentExample example="tooltip" />
 
-```html
-<ds-text variant="heading">This is a Design system 1 heading</ds-text>
-<ds-text variant="body">Body text content</ds-text>
-<ds-text variant="small">Small text</ds-text>
-```
+## Icons
 
-### Icons
+<ComponentExample example="icon" />
 
-<div style="display: flex; gap: 1rem; font-size: 2rem; margin: 2rem 0;">
-  <ds-icon name="check"></ds-icon>
-  <ds-icon name="star"></ds-icon>
-  <ds-icon name="search"></ds-icon>
-  <ds-icon name="close"></ds-icon>
-  <ds-icon name="open"></ds-icon>
-</div>
+[Browse the vector library](/icons/) or [open the icon builder](/icons/#builder) to draw a badge or favicon.
 
-```html
-<ds-icon name="check"></ds-icon>
-<ds-icon name="star"></ds-icon>
-<ds-icon name="search"></ds-icon>
-```
+## Accordion
 
-### Links
+<ComponentExample example="accordion" />
 
-<div style="margin: 2rem 0;">
-  <ds-link href="https://github.com/0001-labs/ds-one">Visit GitHub</ds-link>
-</div>
+## Form
 
-```html
-<ds-link href="https://github.com/0001-labs/ds-one">Visit GitHub</ds-link>
-```
+<ComponentExample example="form" />
 
-### Tooltips
+## Data table
 
-<div style="margin: 2rem 0;">
-  <ds-tooltip text="This is helpful tooltip information!">
-    Hover over me
-  </ds-tooltip>
-</div>
-
-```html
-<ds-tooltip text="This is helpful tooltip information!">
-  Hover over me
-</ds-tooltip>
-```
-
-### Interactive Example
-
-All Design system 1 components support standard DOM events. Here's an example with buttons:
-
-<div style="margin: 2rem 0;">
-  <ds-button variant="primary">Interactive Button</ds-button>
-  <ds-button variant="secondary">Try Clicking!</ds-button>
-</div>
-
-```html
-<!-- Design system 1 buttons work with standard event listeners -->
-<ds-button variant="primary" id="my-button">Click Me</ds-button>
-
-<script>
-  document
-    .getElementById("my-button")
-    .addEventListener("click", () => alert("Clicked!"));
-</script>
-```
-
-### Combined Example
-
-<div style="padding: 2rem; background: rgba(102, 126, 234, 0.1); border-radius: 0.5rem; margin: 2rem 0;">
-  <ds-text variant="heading">
-    <ds-icon
-      name="star"
-      style="vertical-align: middle; margin-right: 0.5rem;"
-    ></ds-icon>
-    Featured Section
-  </ds-text>
-  <ds-text variant="body" style="display: block; margin: 1rem 0;">
-    Design system 1 components work seamlessly together and adapt to your design system.
-  </ds-text>
-  <div style="display: flex; gap: 1rem;">
-    <ds-button variant="primary">Get Started</ds-button>
-    <ds-button variant="secondary">Learn More</ds-button>
-  </div>
-</div>
-
-## Why It Works
-
-Design system 1 components are loaded from the CDN in the `<head>` of every page via our custom `MyHead.astro` component. This means:
-
-- ✅ Components work on every page
-- ✅ No build step required for the components
-- ✅ Always up-to-date with the latest version
-- ✅ Fast loading from CDN
-- ✅ Automatic theme adaptation
-
-## Next Steps
-
-- [View all components](/2-core/button/)
-- [Learn about theming](/built-in/theming/)
-- [Explore languages](/built-ins/languages/)
+<ComponentExample example="table" />
