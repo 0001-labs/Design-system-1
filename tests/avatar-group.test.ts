@@ -36,6 +36,8 @@ test("ordered members survive insert, remove, hide and reconnect without owning 
   await group.updateComplete;
   await vi.waitFor(() => expect(order(second)).toBe("1"));
   expect(group.querySelector("span[slot=lead]")).toBe(lead);
+  second.hidden = true;
+  await vi.waitFor(() => expect(group.shadowRoot?.querySelector(".members")?.classList.contains("separated")).toBe(false));
 });
 
 test("moving a member between groups restores its original styles after release", async () => {

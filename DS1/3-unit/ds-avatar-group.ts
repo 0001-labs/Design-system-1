@@ -8,10 +8,12 @@ export class AvatarGroup extends LitElement {
     size: { type: String, reflect: true },
     vertical: { type: Boolean, reflect: true },
     hasLead: { state: true },
+    hasMembers: { state: true },
   };
   declare size: "default" | "compact";
   declare vertical: boolean;
   declare private hasLead: boolean;
+  declare private hasMembers: boolean;
   static styles = unsafeCSS(styles);
   private static owners = new WeakMap<HTMLElement, AvatarGroup>();
   private owned = new Map<HTMLElement, Map<string, [string, string]>>();
@@ -20,6 +22,7 @@ export class AvatarGroup extends LitElement {
     super();
     this.size = "default";
     this.hasLead = false;
+    this.hasMembers = false;
     this.vertical = false;
   }
   connectedCallback() {
@@ -52,6 +55,7 @@ export class AvatarGroup extends LitElement {
     const members = (slot?.assignedElements() ?? []).filter(
       (element): element is HTMLElement => element instanceof HTMLElement && !element.hidden,
     );
+    this.hasMembers = members.length > 0;
     for (const element of this.owned.keys()) if (!members.includes(element)) this.release(element);
     members.forEach((element, index) => {
       const previous = AvatarGroup.owners.get(element);
@@ -82,7 +86,7 @@ export class AvatarGroup extends LitElement {
   };
   render() {
     return html`<slot name="lead" @slotchange=${this.arrange}></slot
-      ><span class=${this.hasLead ? "members separated" : "members"}
+      ><span class=${this.hasLead && this.hasMembers ? "members separated" : "members"}
         ><slot @slotchange=${this.arrange}></slot
       ></span>`;
   }
