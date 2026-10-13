@@ -115,6 +115,12 @@ export function sourceSites(file: string, source: string): TagSite[] {
       const arg = node.arguments[ts.isPropertyAccessExpression(node.expression) && node.expression.name.text === "createElementNS" ? 1 : 0];
       if (arg && ts.isStringLiteralLike(arg) && !frames.has(node)) found.push({ tag: arg.text, line: line(arg.getStart(ast)) });
     }
+    if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression) && node.expression.name.text === "setAttribute") {
+      const [name, value] = node.arguments;
+      if (name && value && ts.isStringLiteral(name) && name.text === "role" && ts.isStringLiteral(value) && ["dialog", "alertdialog"].includes(value.text)) {
+        found.push({ tag: "role-dialog", line: line(node.getStart(ast)), dialogRole: true });
+      }
+    }
     if (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node) || ts.isTemplateHead(node) || ts.isTemplateMiddle(node) || ts.isTemplateTail(node)) {
       // JSX attribute strings are copy, not elements. Other markup strings feed innerHTML/Lit.
       const template = ts.isTemplateHead(node) ? node.parent : (ts.isTemplateMiddle(node) || ts.isTemplateTail(node)) ? node.parent.parent : node;
@@ -312,7 +318,7 @@ export function scanReport(studio = resolve(repository, "..")): AdoptionReport {
       "Counts are authored source sites in tracked web files, read from the current working tree. A loop counts once. This is not a runtime or production audit; unused tracked source can be included.",
       "DS1 means the component and its imported dependencies match a recorded DS1 Git revision. An older verified snapshot still counts as DS1; the detail view shows whether it matches today's source. Modified or unverifiable DS1 is counted separately.",
       "DS1 styles counts native controls with literal ds-button, ds-input, ds-select or ds-checkbox classes and verified shared control styles. These are not Lit components. Dynamic class expressions are not inferred.",
-      "Local means recognized ezo-/c9y- components or native button, input/select/textarea, p/headings, ul/ol, table, form and dialog, plus literal dialog/alertdialog roles. Native semantics can be intentional; these counts are review leads, not automatic defects.",
+      "Local means recognized ezo-/c9y- components or native button, input/select/textarea, p/headings, ul/ol, table, form and dialog, plus literal dialog/alertdialog roles, including explicit setAttribute sites. Native semantics can be intentional; these counts are review leads, not automatic defects.",
       "Tests, demos in preview/dev directories, generated files, vendored implementations and shared sign-in internals are excluded. Link's inspected TabPill, TabPillRow and Tooltip/Tooltop adapters and DS1's verified React Input, Textarea, Button and DialogContent adapters count at imported JSX uses, without counting their inner DS1 tags again.",
       "A native dialog directly inside ds-dialog counts as its shared frame, not as another local dialog. Direct const document.createElement plus append composition is also recognized. Other React abstractions, dynamic tag names, CSS-only controls, spans and inline SVGs are not inferred. Native apps are outside this scan. A zero means no recognized source site, not that a capability is absent.",
     ],

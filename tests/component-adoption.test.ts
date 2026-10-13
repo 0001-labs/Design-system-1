@@ -135,3 +135,8 @@ it("counts a shared dialog frame once across HTML, Lit, JSX and direct DOM compo
   expect(sourceSites("view.ts", dom).map(s => s.tag)).toEqual(["ds-dialog", "dialog"]);
   expect(sourceSites("view.ts", 'let host = document.createElement("ds-dialog"); const frame = document.createElement("dialog"); host.append(frame);').map(s => s.tag)).toEqual(["ds-dialog", "dialog"]);
 });
+
+it("recognizes explicit DOM dialog roles while leaving dynamic role values unresolved", () => {
+  const sites = sourceSites("overlay.ts", 'menu.setAttribute("role", "dialog"); active.setAttribute("role", "alertdialog"); node.setAttribute("role", role);');
+  expect(sites.map(s => [s.tag, s.dialogRole])).toEqual([["role-dialog", true], ["role-dialog", true]]);
+});
