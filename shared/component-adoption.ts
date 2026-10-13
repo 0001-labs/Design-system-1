@@ -37,7 +37,7 @@ export interface AdoptionReport {
 
 export const COMPONENT_COLUMNS: ComponentColumn[] = [
   ...["button", "split", "checkbox", "switch", "text", "avatar", "icon", "input", "color", "swatch", "select", "textarea", "composer", "tooltip", "cycle", "date", "language", "gap", "banner", "card", "pagedots"].map(id => ({ id, name: id === "textarea" ? "Text area" : id === "pagedots" ? "Page dots" : id[0]!.toUpperCase() + id.slice(1), group: "Core" })),
-  ...["row", "list", "tabs", "menu", "accordion", "form", "table"].map(id => ({ id, name: id[0]!.toUpperCase() + id.slice(1), group: "Composites" })),
+  ...["avatar-group", "row", "list", "tabs", "menu", "accordion", "form", "table"].map(id => ({ id, name: id === "avatar-group" ? "Avatar group" : id[0]!.toUpperCase() + id.slice(1), group: "Composites" })),
   ...["dialog", "panel", "container", "layout", "grid"].map(id => ({ id, name: id[0]!.toUpperCase() + id.slice(1), group: "Layout" })),
 ];
 

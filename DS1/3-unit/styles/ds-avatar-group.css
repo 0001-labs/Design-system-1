@@ -1,0 +1,51 @@
+@import "../../1-root/component-metrics.css";
+
+:host {
+  --group-overlap: calc(4px * var(--ds-sf));
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  isolation: isolate;
+  vertical-align: middle;
+}
+:host([size="compact"]) {
+  --group-overlap: calc(3px * var(--ds-sf));
+}
+:host([hidden]) {
+  display: none !important;
+}
+.members {
+  display: var(--ds-avatar-group-members-display, inline-flex);
+  align-items: inherit;
+  isolation: isolate;
+}
+.members.separated {
+  margin-inline-start: calc(4px * var(--ds-sf));
+}
+::slotted(*) {
+  /* Structural slots must survive a document-wide margin/flex reset. */
+  display: inline-flex !important;
+  flex: 0 0 auto !important;
+  position: relative;
+  vertical-align: middle;
+}
+slot:not([name])::slotted(*) {
+  margin-inline-start: var(--ds-avatar-group-inset, 0px) !important;
+  z-index: var(--ds-avatar-group-order, 0);
+}
+::slotted([hidden]) {
+  display: none !important;
+}
+
+:host([vertical]),
+:host([vertical]) .members {
+  flex-direction: column;
+}
+:host([vertical]) slot:not([name])::slotted(*) {
+  margin-inline-start: 0 !important;
+  margin-block-start: calc(-1 * var(--ds-avatar-group-inset, 0px)) !important;
+}
+:host([vertical]) .members.separated {
+  margin-inline-start: 0;
+  margin-block-start: calc(4px * var(--ds-sf));
+}

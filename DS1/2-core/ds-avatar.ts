@@ -41,7 +41,7 @@ export class Avatar extends LitElement {
   declare icon: string;
   declare color: string;
   declare shape: "circle" | "square" | "rounded";
-  declare size: "default" | "compact" | "large";
+  declare size: "default" | "compact" | "large" | "fill";
   declare fit: "cover" | "contain";
   declare mask: boolean;
   declare outlined: boolean;
@@ -66,6 +66,7 @@ export class Avatar extends LitElement {
     if (changed.has("src")) {
       this.loaded = false;
       this.failed = false;
+      this.style.removeProperty("--ds-avatar-intrinsic-ratio");
     }
   }
   render() {
@@ -96,8 +97,16 @@ export class Avatar extends LitElement {
                 aria-hidden="true"
                 draggable="false"
                 ?data-visible=${this.loaded && !this.mask}
-                @load=${() => {
-                  if (this.src === src) this.loaded = true;
+                @load=${(event: Event) => {
+                  if (this.src === src) {
+                    const image = event.currentTarget as HTMLImageElement;
+                    if (image.naturalWidth && image.naturalHeight)
+                      this.style.setProperty(
+                        "--ds-avatar-intrinsic-ratio",
+                        `${image.naturalWidth} / ${image.naturalHeight}`,
+                      );
+                    this.loaded = true;
+                  }
                 }}
                 @error=${() => {
                   if (this.src === src) {

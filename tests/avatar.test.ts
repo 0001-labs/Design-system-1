@@ -27,12 +27,14 @@ test("image failure returns to initials and a new source can load without accept
   avatar.src = "data:image/png;base64,second";
   await avatar.updateComplete;
   const second = avatar.shadowRoot!.querySelector("img")!;
+  Object.defineProperties(second, { naturalWidth: { value: 120 }, naturalHeight: { value: 40 } });
   first.dispatchEvent(new Event("load"));
   await avatar.updateComplete;
   expect(second.hasAttribute("data-visible")).toBe(false);
   second.dispatchEvent(new Event("load"));
   await avatar.updateComplete;
   expect(second.hasAttribute("data-visible")).toBe(true);
+  expect(avatar.style.getPropertyValue("--ds-avatar-intrinsic-ratio")).toBe("120 / 40");
   expect(avatar.shadowRoot!.querySelector(".initial")).toBeNull();
   avatar.mask = true;
   await avatar.updateComplete;
@@ -44,6 +46,7 @@ test("image failure returns to initials and a new source can load without accept
   expect(avatar.shadowRoot!.querySelector('[role="img"]')).toBeNull();
   expect(avatar.shadowRoot!.querySelector(".frame")?.getAttribute("aria-hidden")).toBe("true");
   expect(avatar.shadowRoot!.querySelector(".initial")?.textContent).toBe("高橋");
+  expect(avatar.style.getPropertyValue("--ds-avatar-intrinsic-ratio")).toBe("");
 });
 
 test("public symbols and pending identity states remain shared properties", async () => {
