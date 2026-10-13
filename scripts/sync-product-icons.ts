@@ -15,8 +15,13 @@ const hash = (value: string) => createHash('sha256').update(value).digest('hex')
 const names = new Set((await readdir(destination)).filter(file => file.endsWith('.svg')).map(file => file.slice(0, -4)));
 
 function normalize(raw: string): string {
-  let svg = raw.trim().replace(/(fill|stroke)=("|')(#1e1e1e|#2a2a2a|#000000|#000|black)\2/gi, '$1="currentColor"');
-  svg = svg.replace(/var\(--(?:fill|stroke)-\d+,\s*(?:#1e1e1e|#2a2a2a|black)\)/gi, 'currentColor');
+  const ownColours = [...raw.matchAll(/(?:fill|stroke)=("|')([^"']+)\1/gi)]
+    .some(match => !/^(none|currentColor|white|#fff|#ffffff|#1e1e1e|#2a2a2a|#000000|#000|black)$/i.test(match[2]));
+  let svg = raw.trim();
+  if (!ownColours) {
+    svg = svg.replace(/(fill|stroke)=("|')(#1e1e1e|#2a2a2a|#000000|#000|black)\2/gi, '$1="currentColor"');
+    svg = svg.replace(/var\(--(?:fill|stroke)-\d+,\s*(?:#1e1e1e|#2a2a2a|black)\)/gi, 'currentColor');
+  }
   if (!/\bxmlns=/.test(svg.split('>')[0])) svg = svg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
   const bounds = svg.match(/viewBox="([^"]+)"/)?.[1];
   if (!bounds) throw new Error('An imported icon has no viewBox');

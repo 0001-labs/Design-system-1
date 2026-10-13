@@ -23,7 +23,7 @@ export const EXAMPLES: Record<string, ComponentExample> = {
     html: '<ds-button primary>\n  <ds-icon type="check"></ds-icon> Save\n</ds-button>',
   },
   'tooltip': {
-    title: 'Hover or focus', hint: 'Hover over the button, or click this preview and press Tab.',
+    title: 'Hover or focus', hint: 'The label starts visible. Hover over the button, or focus it with Tab to try it.',
     html: '<ds-tooltip text="Save your changes">\n  <ds-button secondary>Hover or focus me</ds-button>\n</ds-tooltip>',
   },
   'tooltip-fallback': {

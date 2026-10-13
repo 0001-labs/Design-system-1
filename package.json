@@ -82,7 +82,7 @@
     "typecheck:all": "cd packages/css-validate && vp exec tsc --noEmit && cd ../../app && vp exec tsc --noEmit && cd ../services && vp exec tsc --noEmit",
     "services:dryrun": "cd services && vp run dryrun",
     "site:build": "vp run docs:build && vp run app:build",
-    "site:deploy": "vp run site:build && vp exec wrangler deploy",
+    "site:deploy": "vp run site:build && cd services && vp exec wrangler deploy --config ../wrangler.jsonc",
     "deploy": "vp run site:deploy",
     "check:versions": "node scripts/versions.mjs",
     "sync-sign-in": "node \"../ID 1/scripts/sync-into.mjs\" --convex convex/signIn --client app/src/signIn",

@@ -843,6 +843,48 @@
     "shapes": 1
   },
   {
+    "key": "ezo-block-accordion",
+    "name": "Ezo Block Accordion",
+    "source": "Library",
+    "url": "/icons/library/ezo-block-accordion.svg",
+    "shapes": 4
+  },
+  {
+    "key": "ezo-block-divider",
+    "name": "Ezo Block Divider",
+    "source": "Library",
+    "url": "/icons/library/ezo-block-divider.svg",
+    "shapes": 3
+  },
+  {
+    "key": "ezo-block-group",
+    "name": "Ezo Block Group",
+    "source": "Library",
+    "url": "/icons/library/ezo-block-group.svg",
+    "shapes": 4
+  },
+  {
+    "key": "ezo-block-image",
+    "name": "Ezo Block Image",
+    "source": "Library",
+    "url": "/icons/library/ezo-block-image.svg",
+    "shapes": 4
+  },
+  {
+    "key": "ezo-block-section",
+    "name": "Ezo Block Section",
+    "source": "Library",
+    "url": "/icons/library/ezo-block-section.svg",
+    "shapes": 5
+  },
+  {
+    "key": "ezo-block-table",
+    "name": "Ezo Block Table",
+    "source": "Library",
+    "url": "/icons/library/ezo-block-table.svg",
+    "shapes": 8
+  },
+  {
     "key": "ezo-code",
     "name": "Ezo Code",
     "source": "Library",
@@ -962,6 +1004,13 @@
     "shapes": 1
   },
   {
+    "key": "ezo-navigation-check",
+    "name": "Ezo Navigation Check",
+    "source": "Library",
+    "url": "/icons/library/ezo-navigation-check.svg",
+    "shapes": 2
+  },
+  {
     "key": "ezo-note-back",
     "name": "Ezo Note Back",
     "source": "Library",
@@ -1051,6 +1100,13 @@
     "source": "Library",
     "url": "/icons/library/ezo-password-visibility-unsee.svg",
     "shapes": 3
+  },
+  {
+    "key": "ezo-pattern-call-to-action",
+    "name": "Ezo Pattern Call To Action",
+    "source": "Library",
+    "url": "/icons/library/ezo-pattern-call-to-action.svg",
+    "shapes": 4
   },
   {
     "key": "ezo-play",

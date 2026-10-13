@@ -5,7 +5,14 @@ import starlight from "@astrojs/starlight";
 // https://astro.build/config
 export default defineConfig({
   site: "https://designsystem1.com",
+  devToolbar: { enabled: false },
   vite: {
+    // Preview frames load components dynamically. Prebundle their shared
+    // dependencies before serving any frame so the first preview cannot
+    // invalidate another frame's Lit URLs halfway through registration.
+    optimizeDeps: {
+      include: ['lit', 'lit/directives/unsafe-html.js', '@lit-labs/signals'],
+    },
     server: {
       // Keep the embedded app same-origin while the docs and editor run locally.
       proxy: {

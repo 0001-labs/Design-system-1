@@ -1,4 +1,4 @@
-import { TABLE_DATA } from './component-examples';
+import { EXAMPLES, TABLE_DATA } from './component-examples';
 import type { DsTable } from '../../../DS1/3-unit/ds-table';
 
 // A preview has its own preferences. Trying a language or theme must not
@@ -21,6 +21,10 @@ loadTranslations({ en: { Save: 'Save' }, da: { Save: 'Gem' }, ja: { Save: '‰øùÂ≠
 setLanguage('en');
 const output = document.querySelector<HTMLOutputElement>('#event-output')!;
 const sample = document.querySelector<HTMLElement>('#sample')!;
+// Parse the sample with all its elements already registered, so attributes
+// and initial tooltip state are applied before the example becomes ready.
+const example = EXAMPLES[document.body.dataset.exampleId!];
+sample.innerHTML = example.html;
 
 window.addEventListener('message', event => {
   if (event.origin !== location.origin || event.source !== parent || event.data?.type !== 'ds1-example-theme') return;
@@ -45,4 +49,9 @@ sample.addEventListener('form-invalid', () => { output.textContent = 'form-inval
 
 const table = sample.querySelector<DsTable>('ds-table');
 if (table) table.data = TABLE_DATA;
+// A tooltip example should show the label on first sight, before someone
+// knows that they need to hover. Use its real hover behaviour for the demo.
+sample.querySelectorAll('ds-tooltip').forEach(tooltip => {
+  tooltip.dispatchEvent(new MouseEvent('mouseenter'));
+});
 parent.postMessage({ type: 'ds1-example-ready' }, location.origin);
