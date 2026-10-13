@@ -42,7 +42,7 @@
 ::slotted(textarea:focus-visible) { outline: 1px solid var(--ds-focus-ring) !important; outline-offset: -1px !important; }
 ::slotted(textarea:disabled) { opacity: .5 !important; cursor: not-allowed !important; resize: none !important; }
 .mirror { position: absolute; top: 0; left: 0; overflow: hidden; pointer-events: none; border-color: transparent !important; }
-mark { padding: 0; margin: 0; border: 0; font: inherit; letter-spacing: inherit; color: var(--ds-accent-color); background: transparent; }
+mark { padding: 0; margin: 0; border: 0; font: inherit; letter-spacing: inherit; color: color-mix(in srgb, var(--composer-highlight-color, var(--ds-accent-color)) 30%, var(--ds-text-color)); background: transparent; }
 :host(:not([data-highlighted])) .mirror { display: none; }
 :host([data-highlighted]) ::slotted(textarea) { color: transparent !important; -webkit-text-fill-color: transparent !important; }
 :host(:has(> textarea:disabled)) .mirror { opacity: .5; }

@@ -14,7 +14,8 @@ validation, selection and ARIA references to a mention list stay native.
 ```
 
 Set `highlights` to UTF-16 ranges: `[{ start: 3, end: 7, color: "var(--ds-sharp-blue)" }]`.
-Omit `color` for the shared accent. Invalid and overlapping ranges are ignored.
+Omit `color` for the shared accent. DS1 mixes the supplied hue with the surface
+ink so pale identity colours remain legible. Invalid and overlapping ranges are ignored.
 The layer renders the exact original text; it never inserts avatars, padding or
 extra characters that would separate highlights from the native caret.
 Mention matching, candidates and submission remain product data and actions.

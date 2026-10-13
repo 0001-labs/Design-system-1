@@ -173,7 +173,7 @@ export class Composer extends LitElement {
     const parts = this.validHighlights().map(range => {
       const before = this.text.slice(cursor, range.start);
       cursor = range.end;
-      return html`${before}<mark style=${styleMap({ color: range.color || undefined })}>${this.text.slice(range.start, range.end)}</mark>`;
+      return html`${before}<mark style=${styleMap({ "--composer-highlight-color": range.color || undefined })}>${this.text.slice(range.start, range.end)}</mark>`;
     });
     return html`<span class="row-metric" aria-hidden="true"></span><slot @slotchange=${this.bindControl}></slot><div class="mirror" aria-hidden="true">${parts}${this.text.slice(cursor)}${"\n"}</div>`;
   }
