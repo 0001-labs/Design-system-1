@@ -1,8 +1,21 @@
-import '../../../DS1/index';
 import { TABLE_DATA } from './component-examples';
-import { configureI18n, loadTranslations, setLanguage } from '../../../DS1/0-face/i18n';
 import type { DsTable } from '../../../DS1/3-unit/ds-table';
 
+// A preview has its own preferences. Trying a language or theme must not
+// overwrite the reader's choice in the surrounding documentation.
+const preferences = new Map<string, string>();
+Object.defineProperty(window, 'localStorage', {
+  value: {
+    get length() { return preferences.size; },
+    key: (index: number) => [...preferences.keys()][index] ?? null,
+    getItem: (key: string) => preferences.get(String(key)) ?? null,
+    setItem: (key: string, value: string) => { preferences.set(String(key), String(value)); },
+    removeItem: (key: string) => { preferences.delete(String(key)); },
+    clear: () => { preferences.clear(); },
+  } satisfies Storage,
+});
+await import('../../../DS1/index');
+const { configureI18n, loadTranslations, setLanguage } = await import('../../../DS1/0-face/i18n');
 configureI18n({ languages: ['en', 'da', 'ja'], sharedWords: true });
 loadTranslations({ en: { Save: 'Save' }, da: { Save: 'Gem' }, ja: { Save: '保存' } });
 setLanguage('en');
