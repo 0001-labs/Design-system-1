@@ -126,3 +126,12 @@ describe("source adoption evidence", () => {
     expect(scan().cells.input).toMatchObject({ shared: 0, unverified: 2 });
   });
 });
+
+it("counts a shared dialog frame once across HTML, Lit, JSX and direct DOM composition", () => {
+  expect(sourceSites("view.html", '<ds-dialog><dialog><p>Text</p></dialog></ds-dialog><dialog />').map(s => s.tag)).toEqual(["ds-dialog", "p", "dialog"]);
+  expect(sourceSites("view.ts", 'html`<ds-dialog .open=${open}><dialog>${text}</dialog></ds-dialog><dialog></dialog>`').map(s => s.tag)).toEqual(["ds-dialog", "dialog"]);
+  expect(sourceSites("view.tsx", 'const x = <><ds-dialog><dialog /></ds-dialog><dialog /></>').map(s => s.tag)).toEqual(["ds-dialog", "dialog"]);
+  const dom = 'function show() { const host = document.createElement("ds-dialog"); const frame = document.createElement("dialog"); host.append(frame); } function separate() { const frame = document.createElement("dialog"); }';
+  expect(sourceSites("view.ts", dom).map(s => s.tag)).toEqual(["ds-dialog", "dialog"]);
+  expect(sourceSites("view.ts", 'let host = document.createElement("ds-dialog"); const frame = document.createElement("dialog"); host.append(frame);').map(s => s.tag)).toEqual(["ds-dialog", "dialog"]);
+});

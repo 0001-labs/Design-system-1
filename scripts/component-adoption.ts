@@ -31,13 +31,22 @@ function nativeStyle(tag: string, className: string): string | undefined {
 export function sourceSites(file: string, source: string): TagSite[] {
   const found: TagSite[] = [];
   const line = (offset: number) => source.slice(0, offset).split("\n").length;
-  const markup = (text: string, offset: number) => {
+  const markup = (text: string, offset: number, stack: string[] = []) => {
     const clean = text.replace(/<!--[\s\S]*?-->/g, match => match.replace(/[^\n]/g, " "));
-    for (const match of clean.matchAll(/<([A-Za-z][\w.-]*)(?=[\s/>])/g)) {
+    for (const match of clean.matchAll(/<(\/?)([A-Za-z][\w.-]*)(?=[\s/>])/g)) {
+      const tag = match[2]!;
+      if (match[1]) {
+        const at = stack.lastIndexOf(tag);
+        if (at >= 0) stack.length = at;
+        continue;
+      }
+      const frame = tag === "dialog" && stack.at(-1) === "ds-dialog";
       const attributes = clean.slice(match.index! + match[0].length).split(">")[0]!;
+      if (!/\/\s*$/.test(attributes) && !/^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/.test(tag)) stack.push(tag);
+      if (frame) continue;
       const className = /\bclass\s*=\s*["']([^"']*)["']/.exec(attributes)?.[1] ?? "";
       const dialogRole = /\brole\s*=\s*["'](?:alertdialog|dialog)["']/.test(attributes);
-      found.push({ tag: match[1]!, line: line(offset + match.index!), nativeStyle: nativeStyle(match[1]!, className), ...(dialogRole ? { dialogRole } : {}) });
+      found.push({ tag, line: line(offset + match.index!), nativeStyle: nativeStyle(tag, className), ...(dialogRole ? { dialogRole } : {}) });
     }
   };
   if (/\.(html|astro)$/.test(file)) {
@@ -59,6 +68,36 @@ export function sourceSites(file: string, source: string): TagSite[] {
       if ((binding.propertyName ?? binding.name).text === "createElement") reactFactories.add(binding.name.text);
     }
   }
+  // A direct, const DOM append is evidence that the native dialog is the
+  // shared host's required frame. Do not infer dynamic factories or aliases.
+  const frames = new Set<ts.Node>();
+  const findFrames = (scope: ts.Node) => {
+    if (ts.isSourceFile(scope) || ts.isBlock(scope)) {
+      const creations = new Map<string, { tag: string; call: ts.CallExpression }>();
+      for (const statement of scope.statements) {
+        if (ts.isVariableStatement(statement) && (statement.declarationList.flags & ts.NodeFlags.Const)) {
+          for (const declaration of statement.declarationList.declarations) {
+            const call = declaration.initializer;
+            if (!ts.isIdentifier(declaration.name) || !call || !ts.isCallExpression(call) || !ts.isPropertyAccessExpression(call.expression)) continue;
+            if (call.expression.expression.getText(ast) !== "document" || call.expression.name.text !== "createElement") continue;
+            const tag = call.arguments[0];
+            if (tag && ts.isStringLiteral(tag)) creations.set(declaration.name.text, { tag: tag.text, call });
+          }
+        }
+        if (!ts.isExpressionStatement(statement) || !ts.isCallExpression(statement.expression)) continue;
+        const call = statement.expression;
+        if (!ts.isPropertyAccessExpression(call.expression) || !ts.isIdentifier(call.expression.expression) || !["append", "appendChild"].includes(call.expression.name.text)) continue;
+        if (creations.get(call.expression.expression.text)?.tag !== "ds-dialog") continue;
+        for (const arg of call.arguments) {
+          const child = ts.isIdentifier(arg) ? creations.get(arg.text) : undefined;
+          if (child?.tag === "dialog") frames.add(child.call);
+        }
+      }
+    }
+    ts.forEachChild(scope, findFrames);
+  };
+  findFrames(ast);
+  const templateStacks = new Map<ts.Node, string[]>();
   const walk = (node: ts.Node) => {
     if (ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) {
       const tag = node.tagName.getText(ast);
@@ -68,15 +107,20 @@ export function sourceSites(file: string, source: string): TagSite[] {
       const role = node.attributes.properties.find(p => ts.isJsxAttribute(p) && p.name.getText(ast) === "role");
       const roleValue = role && ts.isJsxAttribute(role) ? role.initializer : undefined;
       const dialogRole = roleValue && ts.isStringLiteral(roleValue) && ["dialog", "alertdialog"].includes(roleValue.text);
-      found.push({ tag, line: line(node.getStart(ast)), nativeStyle: nativeStyle(tag, className), ...(dialogRole ? { dialogRole: true } : {}) });
+      const parentElement = ts.isJsxOpeningElement(node) ? node.parent.parent : node.parent;
+      const sharedFrame = tag === "dialog" && parentElement && ts.isJsxElement(parentElement) && parentElement.openingElement.tagName.getText(ast) === "ds-dialog";
+      if (!sharedFrame) found.push({ tag, line: line(node.getStart(ast)), nativeStyle: nativeStyle(tag, className), ...(dialogRole ? { dialogRole: true } : {}) });
     }
     if (ts.isCallExpression(node) && ((ts.isPropertyAccessExpression(node.expression) && ["createElement", "createElementNS"].includes(node.expression.name.text)) || (ts.isIdentifier(node.expression) && reactFactories.has(node.expression.text)))) {
       const arg = node.arguments[ts.isPropertyAccessExpression(node.expression) && node.expression.name.text === "createElementNS" ? 1 : 0];
-      if (arg && ts.isStringLiteralLike(arg)) found.push({ tag: arg.text, line: line(arg.getStart(ast)) });
+      if (arg && ts.isStringLiteralLike(arg) && !frames.has(node)) found.push({ tag: arg.text, line: line(arg.getStart(ast)) });
     }
     if (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node) || ts.isTemplateHead(node) || ts.isTemplateMiddle(node) || ts.isTemplateTail(node)) {
       // JSX attribute strings are copy, not elements. Other markup strings feed innerHTML/Lit.
-      if (!ts.isJsxAttribute(node.parent)) markup(node.getText(ast).slice(1, ts.isTemplateHead(node) || ts.isTemplateMiddle(node) ? -2 : -1), node.getStart(ast) + 1);
+      const template = ts.isTemplateHead(node) ? node.parent : (ts.isTemplateMiddle(node) || ts.isTemplateTail(node)) ? node.parent.parent : node;
+      let stack = templateStacks.get(template);
+      if (!stack) templateStacks.set(template, stack = []);
+      if (!ts.isJsxAttribute(node.parent)) markup(node.getText(ast).slice(1, ts.isTemplateHead(node) || ts.isTemplateMiddle(node) ? -2 : -1), node.getStart(ast) + 1, stack);
     }
     ts.forEachChild(node, walk);
   };
@@ -270,7 +314,7 @@ export function scanReport(studio = resolve(repository, "..")): AdoptionReport {
       "DS1 styles counts native controls with literal ds-button, ds-input, ds-select or ds-checkbox classes and verified shared control styles. These are not Lit components. Dynamic class expressions are not inferred.",
       "Local means recognized ezo-/c9y- components or native button, input/select/textarea, p/headings, ul/ol, table, form and dialog, plus literal dialog/alertdialog roles. Native semantics can be intentional; these counts are review leads, not automatic defects.",
       "Tests, demos in preview/dev directories, generated files, vendored implementations and shared sign-in internals are excluded. Link's inspected TabPill, TabPillRow and Tooltip/Tooltop adapters and DS1's verified React Input, Textarea, Button and DialogContent adapters count at imported JSX uses, without counting their inner DS1 tags again.",
-      "Other React abstractions, dynamic tag names, CSS-only controls, spans and inline SVGs are not inferred. Native apps are outside this scan. A zero means no recognized source site, not that a capability is absent.",
+      "A native dialog directly inside ds-dialog counts as its shared frame, not as another local dialog. Direct const document.createElement plus append composition is also recognized. Other React abstractions, dynamic tag names, CSS-only controls, spans and inline SVGs are not inferred. Native apps are outside this scan. A zero means no recognized source site, not that a capability is absent.",
     ],
   };
 }

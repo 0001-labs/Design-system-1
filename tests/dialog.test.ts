@@ -62,3 +62,85 @@ test("a gesture starting inside cannot dismiss on release outside", async () => 
   native.dispatchEvent(new PointerEvent("pointerdown", outside)); native.dispatchEvent(new MouseEvent("click", outside));
   await host.updateComplete; expect(native.open).toBe(false);
 });
+
+test("modeless panels leave page styles alone and share close controls", async () => {
+  const host = document.createElement("ds-dialog");
+  host.nonModal = true;
+  host.innerHTML = '<dialog data-ds-dialog-inline aria-label="Preferences"><button data-ds-dialog-dismiss>Close</button></dialog>';
+  document.body.append(host);
+  await host.show();
+  expect(host.querySelector("dialog")!.open).toBe(true);
+  expect(document.body.style.position).toBe("");
+  expect(document.documentElement.style.overflow).toBe("");
+  host.querySelector("button")!.click();
+  expect(host.querySelector("dialog")!.open).toBe(false);
+});
+
+test("a stationary panel and nested modal release only their own scroll hold", async () => {
+  const panel = document.createElement("ds-dialog");
+  panel.nonModal = true; panel.holdScroll = true;
+  panel.innerHTML = '<dialog aria-label="Camera"><button>Capture</button></dialog>';
+  document.body.append(panel); await panel.show();
+  expect(document.documentElement.style.overflow).toBe("hidden");
+  expect(document.body.style.position).toBe("");
+  const nested = await dialog();
+  expect(document.body.style.position).toBe("fixed");
+  nested.host.close();
+  expect(document.body.style.position).toBe("");
+  expect(document.documentElement.style.overflow).toBe("hidden");
+  panel.close();
+  expect(document.documentElement.style.overflow).toBe("");
+  expect(document.body.style.touchAction).toBe("");
+});
+
+test("outside dismissal consumes its click and stops holding gestures immediately", async () => {
+  const panel = document.createElement("ds-dialog");
+  panel.nonModal = true; panel.holdScroll = true; panel.closeOnOutside = true; panel.blockOutside = true;
+  panel.innerHTML = '<dialog aria-label="Camera"><button>Capture</button></dialog>';
+  const behind = document.createElement("button"); const action = vi.fn();
+  behind.addEventListener("click", action); document.body.append(behind, panel);
+  await panel.show();
+  const wheel = new Event("wheel", { cancelable: true }); document.dispatchEvent(wheel);
+  expect(wheel.defaultPrevented).toBe(true);
+  behind.click();
+  expect(action).not.toHaveBeenCalled(); expect(panel.open).toBe(false);
+  behind.click(); expect(action).toHaveBeenCalledOnce();
+  const after = new Event("wheel", { cancelable: true }); document.dispatchEvent(after);
+  expect(after.defaultPrevented).toBe(false);
+});
+
+test("modeless Escape only closes the top panel, and an inside gesture does not dismiss outside", async () => {
+  const first = document.createElement("ds-dialog"), second = document.createElement("ds-dialog");
+  for (const panel of [first, second]) {
+    panel.nonModal = true; panel.closeOnOutside = true;
+    panel.innerHTML = '<dialog aria-label="Example"><button>Inside</button></dialog>';
+    document.body.append(panel); await panel.show();
+  }
+  second.querySelector("button")!.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, composed: true }));
+  document.body.click(); expect(second.open).toBe(true);
+  document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", cancelable: true }));
+  expect(second.open).toBe(false); expect(first.open).toBe(true);
+});
+
+test("shared frame styles reach a consumer shadow root and reopening ignores old close events", async () => {
+  const consumer = document.createElement("div"), root = consumer.attachShadow({ mode: "open" });
+  const panel = document.createElement("ds-dialog"); panel.nonModal = true;
+  panel.innerHTML = '<dialog aria-label="Example"><button>Inside</button></dialog>';
+  root.append(panel); document.body.append(consumer); await panel.show();
+  expect(root.adoptedStyleSheets).toHaveLength(1);
+  panel.close(); await panel.show(); panel.querySelector("dialog")!.dispatchEvent(new Event("close"));
+  expect(panel.open).toBe(true); expect(panel.querySelector("dialog")!.open).toBe(true);
+});
+
+test("a queued native close cannot cancel a new opening awaiting a child render", async () => {
+  const panel = document.createElement("ds-dialog"); panel.nonModal = true;
+  panel.innerHTML = '<dialog aria-label="Example"><button>Inside</button></dialog>';
+  document.body.append(panel); await panel.show(); panel.close();
+  let ready!: () => void;
+  Object.defineProperty(panel.querySelector("button"), "updateComplete", { value: new Promise<void>(resolve => { ready = resolve; }) });
+  const opened = panel.show(); await panel.updateComplete;
+  panel.querySelector("dialog")!.dispatchEvent(new Event("close"));
+  expect(panel.open).toBe(true);
+  ready(); await opened;
+  expect(panel.querySelector("dialog")!.open).toBe(true);
+});

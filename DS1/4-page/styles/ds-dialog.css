@@ -1,18 +1,19 @@
 /* Light DOM preserves native forms, labels and React event targets. */
 ds-dialog > dialog {
   box-sizing: border-box;
-  position: fixed;
-  inset: 0;
+  position: var(--ds-dialog-position, fixed);
+  inset: var(--ds-dialog-inset, 0);
   width: min(var(--ds-dialog-width, calc(20 * var(--ds-unit))), calc(100vw - 2 * var(--ds-unit)));
-  max-width: calc(100vw - 2 * var(--ds-unit));
-  max-height: calc(100dvh - 2 * var(--ds-unit));
-  height: var(--ds-dialog-height, auto);
-  margin: auto;
+  max-width: var(--ds-dialog-max-width, calc(100vw - 2 * var(--ds-unit)));
+  max-height: var(--ds-dialog-max-height, calc(100dvh - 2 * var(--ds-unit)));
+  height: var(--ds-dialog-height, fit-content);
+  margin: var(--ds-dialog-margin, auto);
   padding: var(--ds-unit);
-  border: 1px solid var(--ds-border-color);
+  border: var(--ds-dialog-border, 1px solid var(--ds-border-color));
   border-radius: 0;
-  background: var(--ds-paper);
+  background: var(--ds-dialog-paper, var(--ds-paper));
   color: var(--ds-text-color);
+  z-index: var(--ds-dialog-layer, auto);
   box-shadow: none;
   overflow: auto;
   overscroll-behavior: contain;
@@ -69,3 +70,16 @@ ds-dialog [data-ds-dialog="footer"] {
   min-height: var(--ds-row-height);
 }
 ds-dialog [data-ds-dialog="close"] { position: absolute; top: var(--ds-unit); right: var(--ds-unit); }
+
+ds-dialog > dialog[data-ds-dialog-inline] {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  gap: 0;
+  border: 0;
+  background: transparent;
+}

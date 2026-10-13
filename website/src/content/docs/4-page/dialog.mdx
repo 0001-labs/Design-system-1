@@ -18,7 +18,7 @@ Opening it uses `showModal()`; the browser supplies the top layer and inert back
 
 Set the host's `open` property to open or close it. `closeOnEscape` and
 `closeOnBackdrop` default to true. The cancelable `ds-close-request` event has
-a `detail.reason` of `escape`, `backdrop`, `button` or `native`. Prevent its
+a `detail.reason` of `escape`, `backdrop`, `outside`, `button` or `native`. Prevent its
 default action when the application must decide whether closing is allowed.
 Nested dialogs retain the background scroll lock until the last one closes.
 The lock fixes the body at its current offset, then restores its original inline
@@ -63,3 +63,26 @@ keeping its normal margins. Applications decide when to offer rotation.
 
 Aa mounts its floating toolbar, menus, find controls and link field inside the
 closest native dialog. Sync Aa before placing an older editor copy in a modal.
+
+## Modeless panels
+
+Set `non-modal` on `ds-dialog` to use native `show()` without a top layer or
+inert background. Use `data-ds-dialog-inline` on its native dialog for a panel
+in the document flow. The shared stylesheet also installs into a containing
+shadow root, so Lit products use the same frame without copying its CSS.
+
+Floating panels can opt into `close-on-outside` and `block-outside`: the outside
+click closes the panel and does not activate the control behind it. A gesture
+started inside stays inside. Escape closes only the top shared panel. Set
+`hold-scroll` to hold the page without fixing or moving its body. Nested modal
+and modeless panels release only their own scroll hold. Modeless panels do not
+steal focus back from an outside control that has already received it.
+
+`await element.show()` waits for native opening and the first render of its
+controls. `element.close()` closes and releases its hold immediately; camera
+and media cleanup still belongs to the product's close handler.
+
+Configure floating placement with `--ds-dialog-inset`, `--ds-dialog-margin`,
+`--ds-dialog-width`, `--ds-dialog-max-width`, `--ds-dialog-max-height` and
+`--ds-dialog-layer`. Transparent media frames may set `--ds-dialog-paper` and
+`--ds-dialog-border`. Set the opening mode before opening a panel.
