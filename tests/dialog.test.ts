@@ -3,6 +3,7 @@ import { afterEach, expect, test, vi } from "vite-plus/test";
 vi.stubGlobal("fetch", vi.fn(async () => new Response("{}")));
 await import("../DS1/4-page/ds-dialog");
 await import("../DS1/3-unit/ds-menu");
+await import("../DS1/2-core/ds-input");
 afterEach(() => { document.body.replaceChildren(); document.documentElement.removeAttribute("style"); });
 
 test("anchored panels follow content and the visible viewport, and stop after close", async () => {
@@ -188,6 +189,15 @@ test("immediate opening renders nested menu slots before initial focus", () => {
   document.body.append(host); void host.show({ immediate: true });
   const menu = host.querySelector('ds-menu')!;
   expect(menu.shadowRoot!.querySelector('slot')!.assignedElements()).toContain(menu.querySelector('button'));
+});
+
+test("closing a modeless panel restores focus from a field's shadow root", async () => {
+  const opener = document.createElement('button'); document.body.append(opener); opener.focus();
+  const host = document.createElement('ds-dialog'); host.nonModal = true;
+  host.innerHTML = '<dialog aria-label="Share"><ds-input aria-label="Recipient"></ds-input></dialog>';
+  document.body.append(host); await host.show(); host.querySelector('ds-input')!.focus();
+  expect(document.activeElement).toBe(host.querySelector('ds-input'));
+  host.close(); expect(document.activeElement).toBe(opener);
 });
 
 test("a modeless panel respects an editor's Escape and lets its content scroll by keyboard", async () => {

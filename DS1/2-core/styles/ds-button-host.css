@@ -115,9 +115,9 @@
 :host([control="host"][role="menuitemcheckbox"]) {
   --ds-button-height: auto;
   --ds-button-padding: calc(4px * var(--ds-sf)) calc(6px * var(--ds-sf));
-  width: 100% !important;
+  width: var(--ds-button-width, 100%) !important;
   min-height: var(--ds-row-height) !important;
-  border-radius: calc(4px * var(--ds-sf)) !important;
+  border-radius: var(--ds-radius) !important;
 }
 
 :host([control="host"][role="option"]:hover),

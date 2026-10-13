@@ -243,7 +243,12 @@ export class Dialog extends LitElement {
     // Modeless content must not steal focus from a control already used outside it.
     let active = document.activeElement;
     while (active?.shadowRoot?.activeElement) active = active.shadowRoot.activeElement;
-    if (wasTop && (!this.nonModal || active === document.body || active === this.dialog || (active && this.dialog?.contains(active))) && this.opener?.isConnected) this.opener.focus({ preventScroll: true });
+    let within = active;
+    while (within && !this.dialog?.contains(within)) {
+      const root = within.getRootNode();
+      within = root instanceof ShadowRoot ? root.host : null;
+    }
+    if (wasTop && (!this.nonModal || active === document.body || active === this.dialog || within) && this.opener?.isConnected) this.opener.focus({ preventScroll: true });
     this.opener = null;
   }
 
