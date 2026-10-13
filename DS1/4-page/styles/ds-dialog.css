@@ -15,7 +15,7 @@ ds-dialog > dialog {
   color: var(--ds-text-color);
   z-index: var(--ds-dialog-layer, auto);
   box-shadow: none;
-  overflow: auto;
+  overflow: var(--ds-dialog-overflow, auto);
   overscroll-behavior: contain;
   font-family: var(--ds-typeface-regular);
   font-feature-settings: var(--ds-font-features);

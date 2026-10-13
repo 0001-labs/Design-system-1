@@ -51,3 +51,27 @@ test("an initially open modal hydrates without a mismatched portal or duplicate 
     expect(document.querySelector('dialog [data-ds-dialog="title"]')!.textContent).toBe("Hydrated dialog");
   } finally { await act(async () => root!.unmount()); mount.remove(); }
 });
+
+test("React modeless panels retain their layout, native ref and controlled outside close", async () => {
+  Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
+  const mount = document.createElement('div'); document.body.append(mount);
+  const root = createRoot(mount); const requested = vi.fn(); const nativeRef = { current: null as HTMLDialogElement | null };
+  const outside = document.createElement('button'); document.body.append(outside);
+  function Example({ allow = false }) {
+    const [open, setOpen] = useState(true);
+    return h(Dialog, { open, onOpenChange: value => { requested(value); if (allow) setOpen(value); } },
+      h(DialogContent, { nonModal: true, portal: false, closeOnOutside: true, showClose: false, ref: nativeRef, 'aria-label': 'Floating tools' },
+        h('button', null, 'Local action')));
+  }
+  try {
+    await act(async () => root.render(h(Example)));
+    const native = nativeRef.current!;
+    expect(mount.contains(native)).toBe(true); expect(native.open).toBe(true);
+    expect(document.documentElement.style.overflow).toBe('');
+    await act(async () => { outside.dispatchEvent(new Event('pointerdown', { bubbles: true })); outside.click(); });
+    expect(requested).toHaveBeenCalledWith(false); expect(native.open).toBe(true);
+    await act(async () => root.render(h(Example, { allow: true })));
+    await act(async () => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
+    expect(nativeRef.current).toBeNull(); expect(mount.querySelector('dialog')).toBeNull();
+  } finally { await act(async () => root.unmount()); mount.remove(); outside.remove(); }
+});

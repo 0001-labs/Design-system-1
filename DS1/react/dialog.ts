@@ -1,5 +1,5 @@
 /** Optional React composition; behavior and appearance belong to ds-dialog. */
-import { createContext, createElement, useContext, useId, useLayoutEffect, useRef, useState, type HTMLAttributes, type ReactNode } from "react";
+import { createContext, createElement, useContext, useId, useLayoutEffect, useRef, useState, type HTMLAttributes, type ReactNode, type Ref } from "react";
 import { createPortal } from "react-dom";
 import type { Dialog as DialogElement } from "../4-page/ds-dialog";
 
@@ -21,6 +21,14 @@ export function Dialog({ open, defaultOpen = false, onOpenChange, children }: Di
 }
 
 export interface DialogContentProps extends HTMLAttributes<HTMLDialogElement> {
+  ref?: Ref<HTMLDialogElement>;
+  /** Keep floating panels within their product layout or containing modal. */
+  portal?: boolean;
+  nonModal?: boolean;
+  closeOnOutside?: boolean;
+  blockOutside?: boolean;
+  holdScroll?: boolean;
+  anchor?: { x: number; y: number } | null;
   closeLabel?: string;
   showClose?: boolean;
   closeOnEscape?: boolean;
@@ -32,7 +40,7 @@ export interface DialogContentProps extends HTMLAttributes<HTMLDialogElement> {
   /** Rotate a document frame while keeping it within the viewport. */
   rotated?: boolean;
 }
-export function DialogContent({ children, closeLabel = "Close", showClose = true, closeOnEscape = true, closeOnBackdrop = true, fullScreen = false, flush = false, rotated = false, ...props }: DialogContentProps) {
+export function DialogContent({ children, portal = true, nonModal = false, closeOnOutside = false, blockOutside = false, holdScroll = false, anchor = null, closeLabel = "Close", showClose = true, closeOnEscape = true, closeOnBackdrop = true, fullScreen = false, flush = false, rotated = false, ...props }: DialogContentProps) {
   const context = useDialog();
   const host = useRef<DialogElement>(null);
   const [mounted, setMounted] = useState(false);
@@ -62,6 +70,11 @@ export function DialogContent({ children, closeLabel = "Close", showClose = true
     }
     element.closeOnEscape = closeOnEscape;
     element.closeOnBackdrop = closeOnBackdrop;
+    element.nonModal = nonModal;
+    element.closeOnOutside = closeOnOutside;
+    element.blockOutside = blockOutside;
+    element.holdScroll = holdScroll;
+    element.anchor = anchor;
     element.open = context.open;
     return () => element.removeEventListener("ds-close-request", close);
   });
@@ -72,7 +85,7 @@ export function DialogContent({ children, closeLabel = "Close", showClose = true
         createElement("button", { type: "button", "aria-label": closeLabel, "data-ds-dialog-dismiss": "" },
           createElement("ds-icon", { type: "close", "aria-hidden": true }))),
     ));
-  return createPortal(content, document.body);
+  return portal ? createPortal(content, document.body) : content;
 }
 
 export function DialogHeader(props: HTMLAttributes<HTMLDivElement>) { return createElement("div", { ...props, "data-ds-dialog": "header" }); }

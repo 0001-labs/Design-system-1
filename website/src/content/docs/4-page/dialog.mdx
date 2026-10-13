@@ -68,7 +68,11 @@ closest native dialog. Sync Aa before placing an older editor copy in a modal.
 
 Set `non-modal` on `ds-dialog` to use native `show()` without a top layer or
 inert background. Use `data-ds-dialog-inline` on its native dialog for a panel
-in the document flow. The shared stylesheet also installs into a containing
+in the document flow. In React, use `DialogContent nonModal`; `portal={false}`
+keeps the panel inside its product layout or containing modal. `closeOnOutside`,
+`blockOutside`, `holdScroll` and `anchor` configure the same Lit behavior. A
+native `ref` points to the light-DOM dialog. Set the mode before opening.
+The shared stylesheet also installs into a containing
 shadow root, so Lit products use the same frame without copying its CSS.
 
 Floating panels can opt into `close-on-outside` and `block-outside`: the outside
@@ -95,7 +99,8 @@ Configure floating placement with `--ds-dialog-inset`, `--ds-dialog-margin`,
 `--ds-dialog-width`, `--ds-dialog-max-width`, `--ds-dialog-max-height` and
 `--ds-dialog-layer`. Transparent media frames may set `--ds-dialog-paper` and
 `--ds-dialog-border`. `--ds-dialog-padding` also applies to full-screen panels.
-Set the opening mode before opening a panel.
+Use `--ds-dialog-overflow: hidden` when a bounded layout provides its own
+scrolling regions. Set the opening mode before opening a panel.
 
 For a menu opened at a pointer or control, set `element.anchor = { x, y }`
 in viewport coordinates before opening. DS1 bounds it to the visible viewport
