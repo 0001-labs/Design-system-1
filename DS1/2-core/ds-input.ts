@@ -127,7 +127,7 @@ export class Input extends LitElement {
     this.autocomplete = "off";
     this.pattern = "";
     this.minlength = 0;
-    this.maxlength = 0;
+    this.maxlength = -1;
     this.min = "";
     this.max = "";
     this.step = "";
@@ -375,7 +375,7 @@ export class Input extends LitElement {
             autocomplete=${this.autocomplete}
             pattern=${ifDefined(this.pattern || undefined)}
             minlength=${ifDefined(this.minlength || undefined)}
-            maxlength=${ifDefined(this.maxlength || undefined)}
+            maxlength=${ifDefined(this.maxlength >= 0 ? this.maxlength : undefined)}
             min=${ifDefined(this.min || undefined)}
             max=${ifDefined(this.max || undefined)}
             step=${ifDefined(this.step || undefined)}

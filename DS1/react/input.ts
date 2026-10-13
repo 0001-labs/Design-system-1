@@ -33,7 +33,7 @@ function setRef(ref: Ref<InputElement> | undefined, field: InputElement | null) 
 
 export const Input = forwardRef<InputElement, InputProps>(function Input({
   value, defaultValue, onChange, onInput, autoFocus, autoComplete, inputMode,
-  readOnly, minLength, maxLength, spellCheck, form, variant = 'field', quietFocus,
+  readOnly, minLength, maxLength, min, max, step, spellCheck, form, type = 'text', variant = 'field', quietFocus,
   ...props
 }, forwardedRef) {
   const field = useRef<InputElement | null>(null);
@@ -88,9 +88,10 @@ export const Input = forwardRef<InputElement, InputProps>(function Input({
     return () => { for (const { name, callback, capture } of listeners) element.removeEventListener(name, callback, capture); };
   });
   return createElement('ds-input', {
-    ...attributes, ref, variant, value: controlled ? String(value) : initial.current,
+    ...attributes, ref, type, variant, value: controlled ? String(value) : initial.current,
     autofocus: autoFocus, autocomplete: autoComplete, inputmode: inputMode,
     readonly: readOnly, minlength: minLength, maxlength: maxLength,
+    min: min == null ? undefined : String(min), max: max == null ? undefined : String(max), step: step == null ? undefined : String(step),
     spellcheck: spellCheck === undefined ? undefined : String(spellCheck),
     'quiet-focus': quietFocus,
   });

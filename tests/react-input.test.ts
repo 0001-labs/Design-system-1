@@ -116,3 +116,12 @@ test('focus and keyboard handlers get the current element and native event metho
   await act(async () => native.dispatchEvent(key));
   expect(keys).toHaveBeenCalledWith(field, key, true);
 });
+
+test('zero-valued numeric and length constraints are preserved', async () => {
+  await act(async () => root.render(createElement(Input, { type: 'number', min: 0, max: 0, step: 0.5 })));
+  const { field, native } = await input();
+  expect(native.min).toBe('0'); expect(native.max).toBe('0'); expect(native.step).toBe('0.5');
+  await act(async () => root.render(createElement(Input, { maxLength: 0 })));
+  await field.updateComplete;
+  expect(native.maxLength).toBe(0);
+});
