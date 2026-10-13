@@ -4,6 +4,26 @@ vi.stubGlobal("fetch", vi.fn(async () => new Response("{}")));
 await import("../DS1/4-page/ds-dialog");
 afterEach(() => { document.body.replaceChildren(); document.documentElement.removeAttribute("style"); });
 
+test("anchored panels follow content and the visible viewport, and stop after close", async () => {
+  const host = document.createElement('ds-dialog'); host.nonModal = true;
+  host.anchor = { x: 980, y: 700 };
+  host.innerHTML = '<dialog style="margin:10px" aria-label="Actions"><button>Action</button></dialog>';
+  document.body.append(host);
+  const native = host.querySelector('dialog')!;
+  const viewport = Object.assign(new EventTarget(), { offsetLeft: 0, offsetTop: 0, width: 1000, height: 720 });
+  vi.stubGlobal('visualViewport', viewport);
+  vi.spyOn(native, 'getBoundingClientRect').mockReturnValue({ width: 240, height: 200 } as DOMRect);
+  await host.show();
+  expect(native.style.getPropertyValue('--ds-dialog-anchor-left')).toBe('740px');
+  expect(native.style.getPropertyValue('--ds-dialog-anchor-top')).toBe('500px');
+  viewport.height = 400; viewport.dispatchEvent(new Event('resize'));
+  expect(native.style.getPropertyValue('--ds-dialog-anchor-top')).toBe('180px');
+  expect(native.style.getPropertyValue('--ds-dialog-available-height')).toBe('380px');
+  host.close(); viewport.height = 300; viewport.dispatchEvent(new Event('resize'));
+  expect(native.style.getPropertyValue('--ds-dialog-anchor-top')).toBe('180px');
+  vi.unstubAllGlobals();
+});
+
 async function dialog() {
   const host = document.createElement("ds-dialog");
   host.innerHTML = '<dialog aria-label="Example"><button data-ds-dialog-dismiss>Close</button></dialog>';

@@ -7,7 +7,7 @@ const ITEM =
 
 /**
  * A floating list of choices: a picker's options or a menu's items, on Design system 1
- * paper with a border and a shadow.
+ * paper. Compact menus use the same single-square rows as a list.
  *
  * The choices are `ds-button`s with `role="option"` (the chosen one `active`
  * and `aria-selected="true"`) or `role="menuitem"`. The arrow keys, Home and
@@ -26,9 +26,12 @@ const ITEM =
  */
 export class Menu extends LitElement {
   static styles = unsafeCSS(styles);
+  static properties = { compact: { type: Boolean, reflect: true } };
+  declare compact: boolean;
 
   constructor() {
     super();
+    this.compact = false;
     this.addEventListener("keydown", this.#onKeyDown);
   }
 
@@ -39,14 +42,17 @@ export class Menu extends LitElement {
 
   #items(): HTMLElement[] {
     return Array.from(this.querySelectorAll<HTMLElement>(ITEM)).filter(
-      (item) => !item.hasAttribute("disabled"),
+      (item) => !item.hasAttribute("disabled") && item.getAttribute("aria-disabled") !== "true" && !item.closest('[hidden], [inert]') && item.closest('ds-menu') === this,
     );
   }
 
   #onKeyDown = (event: KeyboardEvent): void => {
+    if (event.defaultPrevented || event.isComposing) return;
+    if (event.composedPath().some(node => node instanceof HTMLElement && (node.isContentEditable || node.matches('input, textarea, select, [role="textbox"], [role="combobox"]')))) return;
+    if (event.composedPath().find(node => node instanceof Menu) !== this) return;
     const items = this.#items();
     if (items.length === 0) return;
-    const current = items.findIndex((item) => item.contains(document.activeElement));
+    const current = items.findIndex((item) => event.composedPath().includes(item));
     let next: number;
     switch (event.key) {
       case "ArrowDown":

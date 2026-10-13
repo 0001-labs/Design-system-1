@@ -69,6 +69,7 @@ export class Dialog extends LitElement {
     holdScroll: { type: Boolean, attribute: "hold-scroll" },
     closeOnEscape: { type: Boolean, attribute: "close-on-escape" },
     closeOnBackdrop: { type: Boolean, attribute: "close-on-backdrop" },
+    anchor: { attribute: false },
   };
   static styles = css`:host { display: contents; }`;
   declare open: boolean;
@@ -78,12 +79,15 @@ export class Dialog extends LitElement {
   declare holdScroll: boolean;
   declare closeOnEscape: boolean;
   declare closeOnBackdrop: boolean;
+  /** A viewport point for a floating panel; null uses ordinary dialog layout. */
+  declare anchor: { x: number; y: number } | null;
   private dialog: HTMLDialogElement | null = null;
   private opener: HTMLElement | null = null;
   private pointerStartedOutside = false;
   private pendingOpen: Promise<void> | null = null;
   private outsidePress: boolean | null = null;
   private observer = new MutationObserver(() => this.bindDialog());
+  private sizeObserver: ResizeObserver | null = null;
 
   constructor() {
     super();
@@ -94,6 +98,7 @@ export class Dialog extends LitElement {
     this.holdScroll = false;
     this.closeOnEscape = true;
     this.closeOnBackdrop = true;
+    this.anchor = null;
   }
 
   connectedCallback() {
@@ -109,7 +114,24 @@ export class Dialog extends LitElement {
     super.disconnectedCallback();
   }
 
-  protected updated() { this.syncOpen(); }
+  protected updated() { this.syncOpen(); this.place(); }
+
+  /** Keep an anchored panel inside the visible viewport as its content or keyboard changes. */
+  place = () => {
+    const dialog = this.dialog, view = this.ownerDocument.defaultView;
+    if (!dialog || !view) return;
+    dialog.toggleAttribute("data-ds-dialog-anchored", !!this.anchor);
+    if (!this.anchor || !dialog.open) return;
+    const viewport = view.visualViewport;
+    const left = viewport?.offsetLeft ?? 0, top = viewport?.offsetTop ?? 0;
+    const width = viewport?.width ?? view.innerWidth, height = viewport?.height ?? view.innerHeight;
+    const margin = parseFloat(view.getComputedStyle(dialog).marginLeft) || 0;
+    dialog.style.setProperty("--ds-dialog-available-width", `${Math.max(0, width - 2 * margin)}px`);
+    dialog.style.setProperty("--ds-dialog-available-height", `${Math.max(0, height - 2 * margin)}px`);
+    const rect = dialog.getBoundingClientRect();
+    dialog.style.setProperty("--ds-dialog-anchor-left", `${Math.max(left, Math.min(this.anchor.x - margin, left + width - rect.width - 2 * margin))}px`);
+    dialog.style.setProperty("--ds-dialog-anchor-top", `${Math.max(top, Math.min(this.anchor.y - margin, top + height - rect.height - 2 * margin))}px`);
+  };
 
   private bindDialog = () => {
     const dialog = this.querySelector<HTMLDialogElement>(":scope > dialog");
@@ -182,6 +204,14 @@ export class Dialog extends LitElement {
     syncScroll(document);
     try { if (this.nonModal) dialog.show(); else dialog.showModal(); }
     catch (error) { stack.delete(this); syncScroll(document); throw error; }
+    this.place();
+    if (typeof ResizeObserver !== "undefined") {
+      this.sizeObserver = new ResizeObserver(this.place);
+      this.sizeObserver.observe(dialog);
+    }
+    document.defaultView?.addEventListener("resize", this.place);
+    document.defaultView?.visualViewport?.addEventListener("resize", this.place);
+    document.defaultView?.visualViewport?.addEventListener("scroll", this.place);
     document.addEventListener("keydown", this.onDocumentKey);
     document.addEventListener("pointerdown", this.onOutsidePress, true);
     document.addEventListener("click", this.onOutsideClick, true);
@@ -191,6 +221,10 @@ export class Dialog extends LitElement {
 
   private release() {
     const document = this.ownerDocument;
+    this.sizeObserver?.disconnect(); this.sizeObserver = null;
+    document.defaultView?.removeEventListener("resize", this.place);
+    document.defaultView?.visualViewport?.removeEventListener("resize", this.place);
+    document.defaultView?.visualViewport?.removeEventListener("scroll", this.place);
     const stack = openDialogs.get(document);
     const entries = stack ? [...stack] : [];
     const wasTop = entries[entries.length - 1] === this;

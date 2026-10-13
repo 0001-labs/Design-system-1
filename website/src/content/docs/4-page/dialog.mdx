@@ -94,3 +94,12 @@ Configure floating placement with `--ds-dialog-inset`, `--ds-dialog-margin`,
 `--ds-dialog-layer`. Transparent media frames may set `--ds-dialog-paper` and
 `--ds-dialog-border`. `--ds-dialog-padding` also applies to full-screen panels.
 Set the opening mode before opening a panel.
+
+For a menu opened at a pointer or control, set `element.anchor = { x, y }`
+in viewport coordinates before opening. DS1 bounds it to the visible viewport
+with half a square of clearance and updates after content, window and mobile
+keyboard resizing. `element.place()` is available after a synchronous content
+change; reset `anchor` to `null` for ordinary dialog layout. Products do not
+need resize listeners or clamping code. Anchored panels can hold a compact
+`ds-menu`, whose arrow keys skip disabled/hidden choices and leave text editing
+keys to their fields. Keep the panel's accessible label on its native dialog.

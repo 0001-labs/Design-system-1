@@ -13,10 +13,30 @@
   border-radius: var(--ds-radius-card);
   background: var(--ds-paper);
   color: var(--ds-text-color);
-  box-shadow: 0 8px 24px color-mix(in srgb, #000000 18%, transparent);
+  box-shadow: none;
   font-family: var(--ds-typeface-regular);
   font-feature-settings: var(--ds-font-features);
   font-size: var(--ds-type-size-default);
   line-height: var(--ds-type-lineheight-default);
   letter-spacing: var(--ds-type-letterspacing-default);
+}
+
+:host([compact]) {
+  min-width: calc(4 * var(--ds-unit));
+  max-width: 100%;
+  max-height: none;
+  gap: 1px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+  background: transparent;
+}
+:host([compact]) ::slotted(ds-button) {
+  --ds-button-height: var(--ds-row-height);
+  --ds-button-padding: 0 calc(4px * var(--ds-sf));
+  --ds-button-background: var(--ds-fill);
+  --ds-button-color: var(--ds-text-color);
+  --ds-radius: 0px;
+  width: 100%;
 }

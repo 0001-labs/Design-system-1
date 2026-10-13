@@ -26,6 +26,15 @@ ds-dialog > dialog {
 }
 ds-dialog > dialog[open] { display: flex; flex-direction: column; gap: var(--ds-unit); }
 ds-dialog > dialog:not([open]) { display: none; }
+ds-dialog > dialog[data-ds-dialog-anchored] {
+  inset: auto;
+  left: var(--ds-dialog-anchor-left, 0px);
+  top: var(--ds-dialog-anchor-top, 0px);
+  margin: calc(var(--ds-unit) / 2);
+  width: var(--ds-dialog-width, max-content);
+  max-width: var(--ds-dialog-available-width, calc(100vw - var(--ds-unit)));
+  max-height: var(--ds-dialog-available-height, calc(100dvh - var(--ds-unit)));
+}
 ds-dialog > dialog[data-ds-dialog-flush] { padding: 0; gap: 0; }
 ds-dialog > dialog[data-ds-dialog-fullscreen] {
   width: 100vw;
