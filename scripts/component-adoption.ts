@@ -20,7 +20,7 @@ export const APPS: AppSpec[] = [
 ];
 const known = new Set(COMPONENT_COLUMNS.map(c => c.id));
 const native: Record<string, string> = { button: "button", input: "input", select: "select", textarea: "textarea", p: "text", h1: "text", h2: "text", h3: "text", h4: "text", h5: "text", h6: "text", ul: "list", ol: "list", table: "table", form: "form", dialog: "dialog" };
-type TagSite = { tag: string; line: number; nativeStyle?: string; dialogRole?: boolean; controlKind?: "checkbox" | "switch" };
+type TagSite = { tag: string; line: number; nativeStyle?: string; dialogRole?: boolean; controlKind?: "checkbox" | "switch" | "color" };
 function nativeStyle(tag: string, className: string): string | undefined {
   const classes = className.split(/\s+/);
   const supported = tag === "button" ? ["ds-button"] : ["input", "select", "textarea"].includes(tag) ? ["ds-input", "ds-select", "ds-checkbox"] : [];
@@ -40,13 +40,13 @@ export function sourceSites(file: string, source: string): TagSite[] {
         if (at >= 0) stack.length = at;
         continue;
       }
-      const frame = (tag === "dialog" && stack.at(-1) === "ds-dialog") || (tag === "input" && stack.at(-1) === "ds-checkbox") || (tag === "button" && stack.at(-1) === "ds-switch") || (tag === "select" && stack.at(-1) === "ds-select");
+      const frame = (tag === "dialog" && stack.at(-1) === "ds-dialog") || (tag === "input" && ["ds-checkbox", "ds-color"].includes(stack.at(-1) ?? "")) || (tag === "button" && stack.at(-1) === "ds-switch") || (tag === "select" && stack.at(-1) === "ds-select");
       const attributes = clean.slice(match.index! + match[0].length).split(">")[0]!;
       if (!/\/\s*$/.test(attributes) && !/^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/.test(tag)) stack.push(tag);
       if (frame) continue;
       const className = /\bclass\s*=\s*["']([^"']*)["']/.exec(attributes)?.[1] ?? "";
       const dialogRole = /\brole\s*=\s*["'](?:alertdialog|dialog)["']/.test(attributes);
-      const controlKind = /\brole\s*=\s*["']switch["']/.test(attributes) ? "switch" : tag === "input" && /\btype\s*=\s*["']checkbox["']/.test(attributes) ? "checkbox" : undefined;
+      const controlKind = /\brole\s*=\s*["']switch["']/.test(attributes) ? "switch" : tag === "input" && /\btype\s*=\s*["']checkbox["']/.test(attributes) ? "checkbox" : tag === "input" && /\btype\s*=\s*["']color["']/.test(attributes) ? "color" : undefined;
       found.push({ tag, line: line(offset + match.index!), nativeStyle: nativeStyle(tag, className), ...(dialogRole ? { dialogRole } : {}), ...(controlKind ? { controlKind } : {}) });
     }
   };
@@ -110,10 +110,10 @@ export function sourceSites(file: string, source: string): TagSite[] {
       const dialogRole = roleValue && ts.isStringLiteral(roleValue) && ["dialog", "alertdialog"].includes(roleValue.text);
       const parentElement = ts.isJsxOpeningElement(node) ? node.parent.parent : node.parent;
       const frameHosts: Record<string, string> = { dialog: "ds-dialog", input: "ds-checkbox", button: "ds-switch", select: "ds-select" };
-      const sharedFrame = parentElement && ts.isJsxElement(parentElement) && parentElement.openingElement.tagName.getText(ast) === frameHosts[tag];
+      const sharedFrame = parentElement && ts.isJsxElement(parentElement) && (parentElement.openingElement.tagName.getText(ast) === frameHosts[tag] || (tag === "input" && parentElement.openingElement.tagName.getText(ast) === "ds-color"));
       const type = node.attributes.properties.find(p => ts.isJsxAttribute(p) && p.name.getText(ast) === "type");
       const typeValue = type && ts.isJsxAttribute(type) ? type.initializer : undefined;
-      const controlKind = roleValue && ts.isStringLiteral(roleValue) && roleValue.text === "switch" ? "switch" : tag === "input" && typeValue && ts.isStringLiteral(typeValue) && typeValue.text === "checkbox" ? "checkbox" : undefined;
+      const controlKind = roleValue && ts.isStringLiteral(roleValue) && roleValue.text === "switch" ? "switch" : tag === "input" && typeValue && ts.isStringLiteral(typeValue) && typeValue.text === "checkbox" ? "checkbox" : tag === "input" && typeValue && ts.isStringLiteral(typeValue) && typeValue.text === "color" ? "color" : undefined;
       if (!sharedFrame) found.push({ tag, line: line(node.getStart(ast)), nativeStyle: nativeStyle(tag, className), ...(dialogRole ? { dialogRole: true } : {}), ...(controlKind ? { controlKind } : {}) });
     }
     if (ts.isCallExpression(node) && ((ts.isPropertyAccessExpression(node.expression) && ["createElement", "createElementNS"].includes(node.expression.name.text)) || (ts.isIdentifier(node.expression) && reactFactories.has(node.expression.text)))) {
@@ -204,7 +204,7 @@ function importedSharedAdapters(root: string, file: string, source: string, mani
     [resolve(root, dirname(manifestPath), 'react/input.ts')]: { Input: 'input', Textarea: 'textarea' },
     [resolve(root, dirname(manifestPath), 'react/button.ts')]: { Button: 'button' },
     [resolve(root, dirname(manifestPath), 'react/dialog.ts')]: { DialogContent: 'dialog' },
-    [resolve(root, dirname(manifestPath), 'react/choice.ts')]: { Checkbox: 'checkbox', Switch: 'switch', Select: 'select' },
+    [resolve(root, dirname(manifestPath), 'react/choice.ts')]: { Checkbox: 'checkbox', Switch: 'switch', Select: 'select', ColorInput: 'color' },
   };
   const resolveModule = (from: string, name: string) => {
     if (!name.startsWith('.') && !name.startsWith('@/')) return undefined;
@@ -296,7 +296,7 @@ export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): Ado
         }
         const cell = app.cells[component]!;
         const ds = sharedAdapters.has(site.tag) || Boolean(aliases[site.tag]) || custom?.[1] === "ds";
-        const evidence = sharedAdapters.has(site.tag) ? (component === "button" ? snapshots.reactButton : component === "dialog" ? snapshots.reactDialog : ["checkbox", "switch", "select"].includes(component) ? snapshots.reactChoice : snapshots.reactInput) : cell;
+        const evidence = sharedAdapters.has(site.tag) ? (component === "button" ? snapshots.reactButton : component === "dialog" ? snapshots.reactDialog : ["checkbox", "switch", "select", "color"].includes(component) ? snapshots.reactChoice : snapshots.reactInput) : cell;
         if (sharedAdapters.has(site.tag)) {
           cell.issues = [...new Set([...cell.issues, ...evidence.issues])];
           cell.current = cell.current === true && evidence.current === true;
@@ -326,8 +326,8 @@ export function scanReport(studio = resolve(repository, "..")): AdoptionReport {
       "DS1 means the component and its imported dependencies match a recorded DS1 Git revision. An older verified snapshot still counts as DS1; the detail view shows whether it matches today's source. Modified or unverifiable DS1 is counted separately.",
       "DS1 styles counts native controls with literal ds-button, ds-input, ds-select or ds-checkbox classes and verified shared control styles. These are not Lit components. Dynamic class expressions are not inferred.",
       "Local means recognized ezo-/c9y- components or native button, input/select/textarea, p/headings, ul/ol, table, form and dialog, plus literal dialog/alertdialog roles, including explicit setAttribute sites. Native semantics can be intentional; these counts are review leads, not automatic defects.",
-      "Tests, demos in preview/dev directories, generated files, vendored implementations and shared sign-in internals are excluded. Link's inspected TabPill, TabPillRow and Tooltip/Tooltop adapters and DS1's verified React Input, Textarea, Checkbox, Switch, Select, Button and DialogContent adapters count at imported JSX uses, without counting their inner DS1 tags again.",
-      "Native dialog/input/button children directly inside ds-dialog/ds-checkbox/ds-switch count as their shared frames, not as extra local controls. Literal checkbox types and switch roles have their own columns; dynamic types stay in Input. Direct const document.createElement plus append composition is also recognized. Other React abstractions, dynamic tag names, CSS-only controls, spans and inline SVGs are not inferred. Native apps are outside this scan. A zero means no recognized source site, not that a capability is absent.",
+      "Tests, demos in preview/dev directories, generated files, vendored implementations and shared sign-in internals are excluded. Link's inspected TabPill, TabPillRow and Tooltip/Tooltop adapters and DS1's verified React Input, Textarea, Checkbox, Switch, Select, ColorInput, Button and DialogContent adapters count at imported JSX uses, without counting their inner DS1 tags again.",
+      "Native dialog/input/button children directly inside ds-dialog/ds-checkbox/ds-switch count as their shared frames, not as extra local controls. Literal color and checkbox types and switch roles have their own columns; dynamic types stay in Input. Direct const document.createElement plus append composition is also recognized. Other React abstractions, dynamic tag names, CSS-only controls, spans and inline SVGs are not inferred. Native apps are outside this scan. A zero means no recognized source site, not that a capability is absent.",
     ],
   };
 }

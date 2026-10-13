@@ -1,0 +1,36 @@
+---
+title: Color
+description: Native colour fields and shared colour samples.
+---
+
+`ds-color` draws a native colour field two squares wide and one square high.
+The native input owns its platform picker, accessible label, form value,
+disabled fieldsets and reset. DS1 owns its border, focus, padding and scale.
+
+```html
+<label>Exact colour
+  <ds-color><input type="color" name="accent" value="#99ff73" /></ds-color>
+</label>
+```
+
+React products use `ColorInput` from `DS1/react/choice`. Native input props and
+refs pass through. Put layout classes and width on the host. The adapter is safe
+to render on the server; register the component before hydrating in the browser.
+
+`ds-swatch` displays a colour sample inside a shared button or beside a label.
+It is 16 units square, scaled with the surface, fitting within a 20-unit row.
+Its `value` is a CSS colour; `selected` adds a visible selection outline.
+It is decorative: give its enclosing button an accessible name and pressed
+state, or supply adjacent text. Colour data and saving belong to the product.
+
+```html
+<ds-button control="slotted" icon>
+  <button type="button" aria-label="Apple green" aria-pressed="true">
+    <ds-swatch value="#99ff73" selected aria-hidden="true"></ds-swatch>
+  </button>
+</ds-button>
+```
+
+For an exact hex text entry, compose with `ds-input`. The product validates
+its stored colour format and any contrast or permission requirements. Keep
+those requirements separate from the native picker and shared visual controls.

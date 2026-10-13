@@ -1,0 +1,23 @@
+/* The native colour control stays in light DOM, including its browser picker. */
+ds-color > input[type="color"] {
+  appearance: none !important;
+  box-sizing: border-box !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: calc(2px * var(--ds-sf)) !important;
+  border: 1px solid var(--ds-border-color) !important;
+  border-radius: var(--ds-radius) !important;
+  background: var(--ds-input-background) !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+}
+ds-color > input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+ds-color > input[type="color"]::-webkit-color-swatch { border: 0; border-radius: 0; }
+ds-color > input[type="color"]::-moz-color-swatch { border: 0; border-radius: 0; }
+ds-color > input[type="color"]:focus-visible { outline: 2px solid var(--ds-focus-ring) !important; outline-offset: 1px !important; }
+ds-color > input[type="color"]:disabled { opacity: .5 !important; cursor: default !important; }
+ds-color > input[type="color"][hidden] { display: none !important; }
