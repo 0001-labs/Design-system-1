@@ -1,0 +1,54 @@
+---
+title: Email design
+description: Ezo’s ruled-paper email design, ready to copy into a product.
+---
+
+import EmailShowcase from '../../../components/EmailShowcase.astro';
+
+Ezo’s email design brings the app’s paper into the inbox: a narrow column, quiet ruling, compact words and a green action. The renderer lives in `DS1/4-page/email.ts`. Consistency and Link carry a copy of that same source.
+
+## See it
+
+Choose a product, message, width and paper. These are sample messages rendered by the shared design, with no delivery or account actions. The HTML and plain text below are the actual generated output.
+
+<EmailShowcase />
+
+## How it is drawn
+
+| Part | Measure |
+| --- | --- |
+| Grid | 20px squares, 1px ruling |
+| Reading column | 240px, twelve squares |
+| Product label | 80px; 160px for a longer name |
+| Type | GT America, 14px on 20px lines; Arial and Helvetica fallbacks |
+| Paragraph spacing | One or two squares |
+| Action | Ezo’s 16px green control, square corners |
+| Phone scale | Viewport / 280, clamped to 0.75–2 |
+
+Text stands directly on the paper. There are no cards, shadows or oversized headings. The desktop values are inline, so the message remains readable when an inbox ignores styles, web fonts or background images. Presentation tables carry the layout; no scripts, web components, CSS variables or flexbox are required.
+
+The ruling uses translucent black. An inbox that automatically darkens the paper cannot leave bright grey grid lines behind. Clients that support dark-mode styles receive black paper and light text. Browser previews cannot prove how every mail client renders it; inspect delivered mail in Apple Mail, Gmail and Outlook before calling inbox compatibility verified.
+
+## Use it
+
+```ts
+import { emailMessage } from './design-system-1/email';
+
+const message = emailMessage({
+  product: 'Example',
+  homeUrl: 'https://example.com',
+  title: 'You’re invited',
+  paragraphs: ['Alex shared a project with you.'],
+  action: { label: 'Open project', href: 'https://example.com/project' },
+  footer: 'You received this because Alex invited you.',
+});
+// Send message.subject, message.html and message.text with your mail provider.
+```
+
+`emailMessage` escapes plain-text inputs and builds both HTML and plain text. For richer templates, `emailFrame`, `emailRow` and `emailAction` expose the same structure. The frame body and `headerHtml` are trusted template HTML: escape user values with `escapeHtml`, or render them with React. Use server-issued action URLs and keep permissions in the app.
+
+## Keep one source
+
+Products copy the renderer and font, just as they copy the rest of Design system 1. From Consistency run `vp run sync-email`; from Link run `bun run sync-email`. Add `-- --check` to the former, or `--check` to the latter, to verify the copy. Edit the source here, then sync; never edit the copies.
+
+Product-specific subjects, copy, recipients, replies, unsubscribe links, attachments and delivery stay in the product. Link’s client emails keep the workspace’s logo, typeface and colours within the same paper layout. Internal emails use Link’s neutral identity. Code emails must display the expiry of the provider that actually issued the code.

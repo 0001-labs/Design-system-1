@@ -53,6 +53,7 @@ export default defineConfig({
             { label: "Introduction", slug: "" },
             { label: "Manual Setup", slug: "start-here/quick-start" },
             { label: "Component examples", link: "/components/" },
+            { label: "Email design", slug: "email" },
             { label: "Icon builder", link: "/icons/#builder" },
             { label: "Icon library", link: "/icons/" },
           ],
