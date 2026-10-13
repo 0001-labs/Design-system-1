@@ -4,9 +4,15 @@
 :host {
   display: inline-flex;
   align-items: center;
+  flex: 0 0 auto;
+  width: max-content;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .cycle {
   display: inline-flex;
   align-items: center;
+  min-width: 0;
+  max-width: 100%;
 }

@@ -38,6 +38,12 @@
   flex: 0 0 auto !important;
 }
 
+:host([fit][control="slotted"]) ::slotted(button) {
+  width: max-content !important;
+  min-width: var(--ds-button-min-width, 0px) !important;
+  justify-content: var(--ds-button-align, flex-start) !important;
+}
+
 :host([control="host"][primary]),
 :host([control="slotted"][primary]) {
   --ds-button-padding: 0 calc(var(--ds-button-inset, 4px) * var(--ds-sf));
@@ -179,6 +185,9 @@
 }
 :host([control="slotted"][wide]) {
   width: var(--ds-button-width, calc(8 * var(--ds-unit)));
+}
+:host([control="slotted"][fit]) {
+  width: max-content;
 }
 
 :host([control="host"][danger]),

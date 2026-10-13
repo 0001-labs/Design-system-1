@@ -7,16 +7,32 @@ export type Preferences = {
   [key: string]: unknown;
 };
 
+/** Product storage names are configuration; the implementation stays shared. */
+export interface PreferenceOptions {
+  storageKey?: string;
+  themeStorageKey?: string;
+}
+
+declare global {
+  interface Window { DS_ONE_PREFERENCES?: PreferenceOptions; }
+}
+
+export function preferenceStorageKey(kind: "preferences" | "theme"): string {
+  const options = typeof window === "undefined" ? undefined : window.DS_ONE_PREFERENCES;
+  return (kind === "theme" ? options?.themeStorageKey : options?.storageKey) || `ds-one:${kind}`;
+}
+
 export function savePreferences(preferences: Preferences): void {
   if (typeof window === "undefined") {
     return;
   }
 
   try {
-    const raw = window.localStorage?.getItem("ds-one:preferences");
+    const key = preferenceStorageKey("preferences");
+    const raw = window.localStorage?.getItem(key);
     const existing = raw ? (JSON.parse(raw) as Record<string, unknown>) : {};
     const next = { ...existing, ...preferences };
-    window.localStorage?.setItem("ds-one:preferences", JSON.stringify(next));
+    window.localStorage?.setItem(key, JSON.stringify(next));
   } catch (error) {
     console.warn("ds-one: unable to persist preferences", error);
   }

@@ -13,6 +13,23 @@
   overflow-y: visible;
 }
 
+/* Intrinsic chips stay within their row without product shadow-root sheets. */
+:host([fit]) {
+  flex: 0 0 auto;
+  width: max-content;
+}
+:host([fit]) button {
+  flex: 0 0 auto;
+  width: max-content;
+  min-width: var(--ds-button-min-width, 0px);
+  justify-content: var(--ds-button-align, flex-start);
+}
+:host([fit]) button ds-text,
+:host([fit]) button ::slotted(*) {
+  flex: 0 0 auto;
+  width: max-content;
+}
+
 button {
   box-sizing: border-box;
   max-height: var(--ds-control-height);

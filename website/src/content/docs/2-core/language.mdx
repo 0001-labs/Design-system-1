@@ -24,4 +24,17 @@ The example supplies translations for Save in English, Danish and Japanese. Clic
 
 Use `compact` for the shorter picker and `disabled` to prevent changes.
 
+Use `chip` for a compact settings value that fits its native language name:
+
+```html
+<ds-language chip primary></ds-language>
+<ds-language chip secondary></ds-language>
+```
+
+DS1 owns the chip face, shape and scale through `ds-button`. No product shadow
+styles are needed. Both forms use native buttons, follow a disabled fieldset,
+and announce one language change per activation. An individual `disabled`
+attribute also prevents changes. The normal picker is eight squares wide,
+`compact` is four, and both retain the one-pixel item correction at every scale.
+
 [Full languages guide](/built-ins/languages/) · [Text](/2-core/text/)

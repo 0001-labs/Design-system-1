@@ -28,4 +28,16 @@ These settings use the shared preferences module. Clicking a theme or accent cyc
 
 Set `disabled` to prevent cycling. Each setting emits the corresponding window event, such as `theme-changed`, `language-changed` or `accent-color-changed`.
 
+Use `primary` or `secondary` to choose the shared button face. The older `variant`
+attribute remains supported. Language and theme cycles default to secondary;
+other built-in settings default to primary. Disabled fieldsets also disable a
+cycle. A language cycle with only one available language does not write or emit
+a redundant change.
+
+Products retaining existing browser storage names set `window.DS_ONE_PREFERENCES`
+before importing these modules. `storageKey` names the merged preference object
+and `themeStorageKey` names the saved light/dark value. Defaults remain
+`ds-one:preferences` and `ds-one:theme`; the language runtime's `storageKey` is
+configured separately through `configureI18n`.
+
 [Language](/2-core/language/) · [Theming](/built-ins/theming/) · [Preferences](/built-ins/preferences/)

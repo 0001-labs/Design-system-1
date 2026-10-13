@@ -1,4 +1,5 @@
 import { signal } from "@lit-labs/signals";
+import { preferenceStorageKey } from "./preferences";
 
 export type ThemeType = "light" | "dark";
 
@@ -7,13 +8,14 @@ function getInitialTheme(): ThemeType {
     return "light";
   }
 
-  const storedTheme = window.localStorage?.getItem("ds-one:theme");
+  let storedTheme: string | null = null;
+  try { storedTheme = window.localStorage?.getItem(preferenceStorageKey("theme")); } catch { /* Storage can be unavailable. */ }
   if (storedTheme === "light" || storedTheme === "dark") {
     return storedTheme;
   }
 
   // Check system preference
-  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
   return prefersDark ? "dark" : "light";
 }
 
@@ -28,7 +30,7 @@ export function setTheme(theme: ThemeType): void {
 
   if (typeof window !== "undefined") {
     try {
-      window.localStorage?.setItem("ds-one:theme", theme);
+      window.localStorage?.setItem(preferenceStorageKey("theme"), theme);
     } catch (error) {
       console.warn("ds-one: unable to persist theme preference", error);
     }

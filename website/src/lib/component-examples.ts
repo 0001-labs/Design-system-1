@@ -75,7 +75,7 @@ export const EXAMPLES: Record<string, ComponentExample> = {
   },
   'language': {
     title: 'Choose a language', hint: 'Click to cycle through the configured languages in this preview.',
-    html: '<ds-language></ds-language>\n<ds-text>Save</ds-text>',
+    html: '<ds-language></ds-language>\n<ds-language chip primary></ds-language>\n<ds-text>Save</ds-text>',
   },
   'gap': {
     title: 'One square of space', hint: 'The gap separates two lines by one 20px square.',

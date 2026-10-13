@@ -1,4 +1,5 @@
 import { LitElement, html, unsafeCSS } from "lit";
+import { define } from "../0-face/define";
 import {
   translate,
   currentLanguage,
@@ -51,6 +52,7 @@ const getPageStyle = (): string => {
 
 // Use a regular class with proper TypeScript type declarations and JSDoc comments
 export class Cycle extends LitElement {
+  static formAssociated = true;
   // Define reactive properties using Lit's property system
   static get properties() {
     return {
@@ -58,8 +60,14 @@ export class Cycle extends LitElement {
       values: { type: Array },
       currentValue: { type: String, state: true }, // Make this a private state property
       translationsReady: { type: Boolean, state: true }, // Track if translations are loaded
-      disabled: { type: Boolean, state: true },
+      disabled: { type: Boolean, reflect: true },
+      _fieldsetDisabled: { state: true },
       variant: { type: String },
+      // The same two words a button takes: `primary` is a chip in the accent,
+      // `secondary` a grey one. Neither given, the type decides (below), and
+      // the choice is written back onto the host so a page sheet can read it.
+      primary: { type: Boolean, reflect: true },
+      secondary: { type: Boolean, reflect: true },
     };
   }
 
@@ -72,7 +80,10 @@ export class Cycle extends LitElement {
   declare currentValue: string;
   declare translationsReady: boolean;
   declare disabled: boolean;
+  declare protected _fieldsetDisabled: boolean;
   declare variant: string;
+  declare primary: boolean;
+  declare secondary: boolean;
 
   // Store bound event handlers for proper cleanup
   private boundHandlers: {
@@ -86,6 +97,9 @@ export class Cycle extends LitElement {
 
   constructor() {
     super();
+    if (typeof this.attachInternals === "function") this.attachInternals();
+    this._fieldsetDisabled = false;
+    this.variant = "";
 
     // Initialize properties with default values
     this.type = "";
@@ -93,7 +107,8 @@ export class Cycle extends LitElement {
     this.currentValue = "";
     this.translationsReady = false;
     this.disabled = false;
-    this.variant = "";
+    this.primary = false;
+    this.secondary = false;
 
     // Bind event handlers to this instance for proper cleanup
     this.boundHandlers = {
@@ -105,6 +120,10 @@ export class Cycle extends LitElement {
       handleNoteBehaviorChanged: this.handleNoteBehaviorChanged.bind(this),
     };
   }
+
+  formDisabledCallback(disabled: boolean) { this._fieldsetDisabled = disabled; }
+
+  focus(options?: FocusOptions) { this.shadowRoot?.querySelector<HTMLElement>("ds-button, button")?.focus(options); }
 
   connectedCallback() {
     super.connectedCallback();
@@ -197,19 +216,6 @@ export class Cycle extends LitElement {
     this.requestUpdate();
   }
 
-  ensureThemeInitialized() {
-    // Ensure theme is properly initialized
-    const savedTheme = localStorage.getItem("theme");
-    if (!savedTheme) {
-      const prefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)"
-      ).matches;
-      const defaultTheme = prefersDark ? "dark" : "light";
-      localStorage.setItem("theme", defaultTheme);
-      document.documentElement.classList.add(`${defaultTheme}-theme`);
-    }
-  }
-
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
     super.attributeChangedCallback(name, oldValue, newValue);
 
@@ -292,7 +298,7 @@ export class Cycle extends LitElement {
     e.stopPropagation();
 
     // Don't handle clicks if disabled
-    if (this.disabled) {
+    if (this.disabled || this._fieldsetDisabled || !this.values.length || this.values.every(value => value === this.currentValue)) {
       return;
     }
 
@@ -317,12 +323,6 @@ export class Cycle extends LitElement {
       // Save preferences
       savePreferences({ language: newLanguage as LanguageCode });
 
-      // Dispatch language change event
-      window.dispatchEvent(
-        new CustomEvent("language-changed", {
-          detail: { language: newLanguage },
-        })
-      );
     } else if (this.type === "theme") {
       // Cycle through themes
       const currentIndex = this.values.indexOf(this.currentValue);
@@ -535,17 +535,30 @@ export class Cycle extends LitElement {
     return html`<span>${style}</span>`;
   }
 
+  /**
+   * A cycle without a stated look takes the one its type has always had: the
+   * language and theme cycles are grey chips, every other one, the accent
+   * colour's included, is in the accent. Written onto the host before the
+   * first paint, so the inner button and any page sheet see the same word.
+   */
+  willUpdate(changed: Map<PropertyKey, unknown>) {
+    if (changed.has("variant") && this.variant) {
+      this.primary = this.variant === "primary";
+      this.secondary = this.variant === "secondary";
+    }
+    if ((!this.hasUpdated || changed.has("type")) && !this.primary && !this.secondary) {
+      if (this.type === "language" || this.type === "theme") this.secondary = true;
+      else this.primary = true;
+    }
+  }
+
   render() {
     return html`
       <div class="cycle">
-        <ds-button
-          variant=${this.type === "accent-color"
-            ? "primary"
-            : this.variant ||
-              (this.type === "language" || this.type === "theme"
-                ? "secondary"
-                : "primary")}
-          ?disabled=${this.disabled}
+        <ds-button fit
+          ?primary=${this.primary && !this.secondary}
+          ?secondary=${this.secondary}
+          ?disabled=${this.disabled || this._fieldsetDisabled}
           @click=${this.handleButtonClick}
         >
           ${this.type === "notes-style-medium" || this.type === "icon-only"
@@ -555,7 +568,7 @@ export class Cycle extends LitElement {
               >`
             : this.type === "language"
               ? html`<ds-text
-                  text=${this.getValueDisplay(this.currentValue)}
+                  literal text=${this.getValueDisplay(this.currentValue)}
                 ></ds-text>`
               : this.type === "theme"
                 ? html`<ds-text
@@ -570,35 +583,11 @@ export class Cycle extends LitElement {
                         text=${this.currentValue === "note" ? "Note" : "Page"}
                       ></ds-text>`
                     : html`<ds-text
-                        text=${this.getValueDisplay(this.currentValue)}
+                        literal text=${this.getValueDisplay(this.currentValue)}
                       ></ds-text>`}
         </ds-button>
       </div>
     `;
-  }
-
-  private async waitForTranslations(): Promise<void> {
-    return new Promise((resolve) => {
-      if (this.translationsReady) {
-        resolve();
-        return;
-      }
-
-      const handleTranslationsLoaded = () => {
-        this.translationsReady = true;
-        resolve();
-      };
-
-      window.addEventListener("translations-loaded", handleTranslationsLoaded, {
-        once: true,
-      });
-
-      // Timeout after 5 seconds
-      setTimeout(() => {
-        this.translationsReady = true;
-        resolve();
-      }, 5000);
-    });
   }
 
   private handleTranslationsLoaded() {
@@ -630,7 +619,7 @@ export class Cycle extends LitElement {
   }
 }
 
-customElements.define("ds-cycle", Cycle);
+define("ds-cycle", Cycle);
 
 declare global {
   interface HTMLElementTagNameMap {

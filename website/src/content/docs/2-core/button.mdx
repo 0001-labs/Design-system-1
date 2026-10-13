@@ -24,6 +24,7 @@ Use `primary` for the main action, `secondary` for a supporting action, and no a
 | `primary` | boolean | false | Accent background. |
 | `secondary` | boolean | false | Quiet background. |
 | `disabled` | boolean | false | Disables the inner button and its action. |
+| `fit` | boolean | false | Fits the label instead of a fixed width. |
 | `text` | string | Empty | Translation key; otherwise use slot content. |
 | `href` | string | Empty | Navigate on click. |
 | `blank` | boolean | false | Open `href` in a new tab. |
@@ -66,6 +67,8 @@ React products select `button` in their snapshot and import the shared binding:
 import { Button } from './design/react/button';
 <Button type="submit" primary disabled={saving}>Save</Button>
 ```
+
+Use `fit` for intrinsic label width. Optional `--ds-button-min-width` and `--ds-button-align` tokens control a minimum width and label alignment without reaching into the shadow root.
 
 Slotted buttons are one row high and four squares wide. Use `wide` for eight squares, `icon` for one square, or `--ds-button-width` for a layout-sized control.
 

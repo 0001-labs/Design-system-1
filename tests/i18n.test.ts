@@ -159,7 +159,7 @@ describe("setLanguage and currentLanguage", () => {
     expect(i18n.currentLanguage.value).toBe("da");
     expect(win.localStorage.getItem("language")).toBe("da");
     expect(document.documentElement.lang).toBe("da");
-    expect(heard).toContain("da");
+    expect(heard).toEqual(["da"]);
     expect(i18n.translate("Hello")).toBe("Hej");
   });
 

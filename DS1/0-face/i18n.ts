@@ -1018,13 +1018,6 @@ export function loadTranslations(
 
 // Set language (Portfolio pattern)
 export function setLanguage(language: LanguageCode): void {
-  // Update the language in localStorage first
-  storeLanguage(language);
-
-  // Then update the signal - this should trigger effects in components
-  // that are subscribed to the signal
+  // The signal owns persistence, loading, document language and notification.
   currentLanguage.set(language);
-
-  // Dispatch a custom event so non-signal-based components can update
-  dispatchLanguageChanged(language);
 }

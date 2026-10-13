@@ -17,6 +17,7 @@ export class Button extends Control {
     choice: { type: Boolean, reflect: true },
     icon: { type: Boolean, reflect: true },
     wide: { type: Boolean, reflect: true },
+    fit: { type: Boolean, reflect: true },
     danger: { type: Boolean, reflect: true },
     blank: { type: Boolean, reflect: true },
     language: { type: String },
@@ -32,6 +33,7 @@ export class Button extends Control {
   declare choice: boolean;
   declare icon: boolean;
   declare wide: boolean;
+  declare fit: boolean;
   declare danger: boolean;
   private _control = "native";
   get control(): string { return this._control; }
@@ -56,6 +58,7 @@ export class Button extends Control {
     this.choice = false;
     this.icon = false;
     this.wide = false;
+    this.fit = false;
     this.danger = false;
     this.primary = false; // Default to no-background (no attribute)
     this.secondary = false;
@@ -109,6 +112,7 @@ export class Button extends Control {
 
     return html`
       <button
+        type="button"
         ?primary=${this.primary}
         ?secondary=${this.secondary}
         ?disabled=${this.disabled}

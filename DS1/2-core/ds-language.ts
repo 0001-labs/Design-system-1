@@ -7,6 +7,7 @@ import {
 } from "../0-face/i18n";
 import { LANGUAGE_METADATA, isLanguage, normalizeLanguage } from "../0-face/languages";
 import { Cycle } from "./ds-cycle";
+import { define } from "../0-face/define";
 import styles from "./styles/ds-language.css?inline";
 
 /**
@@ -44,11 +45,14 @@ export function nativeLanguageName(code: string): string {
  * <ds-language></ds-language>
  */
 export class LanguagePicker extends Cycle {
+  static get properties() { return { ...Cycle.properties, chip: { type: Boolean, reflect: true } }; }
+  declare chip: boolean;
   static styles = unsafeCSS(styles);
 
   constructor() {
     super();
     this.type = "language";
+    this.chip = false;
   }
 
   // The product's languages can change after the picker is drawn
@@ -61,23 +65,27 @@ export class LanguagePicker extends Cycle {
     return nativeLanguageName(value);
   }
 
+  focus(options?: FocusOptions) { this.shadowRoot?.querySelector("button")?.focus(options); }
+
   render() {
     const code = this.currentValue || currentLanguage.value;
     const name = nativeLanguageName(code);
-    return html`<button
+    const button = html`<button
       type="button"
       lang=${code}
-      title=${translate("Language")}
       aria-label=${`${translate("Language")}: ${name}`}
-      ?disabled=${this.disabled}
+      ?disabled=${this.disabled || this._fieldsetDisabled}
       @click=${(event: Event) => this.handleButtonClick(event)}
     >
       ${name}
     </button>`;
+    return this.chip ? html`<ds-button fit control="slotted"
+      ?primary=${this.primary && !this.secondary} ?secondary=${this.secondary}
+      ?disabled=${this.disabled || this._fieldsetDisabled}>${button}</ds-button>` : button;
   }
 }
 
-customElements.define("ds-language", LanguagePicker);
+define("ds-language", LanguagePicker);
 
 declare global {
   interface HTMLElementTagNameMap {
