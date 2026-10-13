@@ -1,6 +1,6 @@
 /**
  * One tooltip for a whole page: any element with `data-tooltip="…"` shows its text in Design system 1's tooltip,
- * a black bubble with white text (white on black in dark mode), square, 14px medium, above the element, fading in
+ * a black bubble with white text (white on black in dark mode), square, 14px regular, above the element, fading in
  * over 120ms. The same look as `<ds-tooltip>`, without wrapping each element in a component, so a table of
  * hundreds of cells can carry one each. Long text wraps at 320px on 20px lines.
  */
@@ -22,7 +22,7 @@ export function initTooltips(): void {
       background: light-dark(var(--black, #2a2a2a), var(--white, #ffffff));
       color: light-dark(var(--white, #ffffff), var(--black, #2a2a2a));
       font-family: var(--typeface-regular, var(--font-regular, -apple-system, BlinkMacSystemFont, sans-serif)), sans-serif;
-      font-size: 14px; font-weight: 500; line-height: 20px; letter-spacing: 0;
+      font-size: 14px; font-weight: 400; line-height: 20px; letter-spacing: 0;
       opacity: 0; transition: opacity 120ms ease;
     }
     [data-ds-tooltip].is-visible { opacity: 1; }
