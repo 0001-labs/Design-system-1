@@ -1,7 +1,8 @@
 // @vitest-environment happy-dom
 import { expect, test, vi } from "vite-plus/test";
 import { act, createElement as h, useState } from "react";
-import { createRoot } from "react-dom/client";
+import { createRoot, hydrateRoot } from "react-dom/client";
+import { renderToString } from "react-dom/server";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "../DS1/react/dialog";
 vi.stubGlobal("fetch", vi.fn(async () => new Response("{}")));
 await import("../DS1/4-page/ds-dialog");
@@ -32,4 +33,21 @@ test("React keeps close decisions controlled, forwards events and links accessib
     expect(document.querySelector("dialog")).toBeNull();
     expect(document.documentElement.style.overflow).toBe("");
   } finally { await act(async () => root.unmount()); mount.remove(); }
+});
+
+test("an initially open modal hydrates without a mismatched portal or duplicate dialog", async () => {
+  Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
+  const view = h(Dialog, { open: true }, h(DialogContent, null, h(DialogTitle, null, "Hydrated dialog")));
+  const mount = document.createElement("div");
+  mount.innerHTML = renderToString(view);
+  document.body.append(mount);
+  const recover = vi.fn();
+  let root: ReturnType<typeof hydrateRoot>;
+  await act(async () => { root = hydrateRoot(mount, view, { onRecoverableError: recover }); });
+  try {
+    expect(recover).not.toHaveBeenCalled();
+    expect(document.querySelectorAll("dialog")).toHaveLength(1);
+    expect(document.querySelector("dialog")!.open).toBe(true);
+    expect(document.querySelector('dialog [data-ds-dialog="title"]')!.textContent).toBe("Hydrated dialog");
+  } finally { await act(async () => root!.unmount()); mount.remove(); }
 });

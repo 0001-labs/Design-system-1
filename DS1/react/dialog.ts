@@ -29,6 +29,10 @@ export interface DialogContentProps extends HTMLAttributes<HTMLDialogElement> {
 export function DialogContent({ children, closeLabel = "Close", showClose = true, closeOnEscape = true, closeOnBackdrop = true, ...props }: DialogContentProps) {
   const context = useDialog();
   const host = useRef<DialogElement>(null);
+  const [mounted, setMounted] = useState(false);
+  // A portal has no server location. Keep the server and first client render
+  // identical, including when the application initially requests an open modal.
+  useLayoutEffect(() => { setMounted(true); }, []);
   // Install the request handler before opening, and keep the app's decision authoritative.
   useLayoutEffect(() => {
     const element = host.current;
@@ -55,15 +59,14 @@ export function DialogContent({ children, closeLabel = "Close", showClose = true
     element.open = context.open;
     return () => element.removeEventListener("ds-close-request", close);
   });
-  if (!context.open) return null;
+  if (!mounted || !context.open) return null;
   const content = createElement("ds-dialog", { ref: host },
     createElement("dialog", { ...props }, children,
       showClose && createElement("ds-button", { control: "slotted", icon: true, "data-ds-dialog": "close" },
         createElement("button", { type: "button", "aria-label": closeLabel, "data-ds-dialog-dismiss": "" },
           createElement("ds-icon", { type: "close", "aria-hidden": true }))),
     ));
-  // Closed on the server. Client mounting calls showModal(), never an open attribute.
-  return typeof document === "undefined" ? content : createPortal(content, document.body);
+  return createPortal(content, document.body);
 }
 
 export function DialogHeader(props: HTMLAttributes<HTMLDivElement>) { return createElement("div", { ...props, "data-ds-dialog": "header" }); }
