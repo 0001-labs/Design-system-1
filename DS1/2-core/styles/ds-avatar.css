@@ -1,20 +1,21 @@
 @import "../../1-root/component-metrics.css";
 
 :host {
+  --avatar-size: var(--ds-unit);
+  --avatar-pair-type-size: var(--ds-type-size-small);
   display: inline-flex;
   position: relative;
   flex: 0 0 auto;
   vertical-align: middle;
-  width: var(--ds-unit);
-  height: var(--ds-unit);
+  width: var(--avatar-size);
+  height: var(--avatar-size);
 }
 :host([size="compact"]) {
-  width: var(--ds-control-height);
-  height: var(--ds-control-height);
+  --avatar-size: var(--ds-control-height);
 }
 :host([size="large"]) {
-  width: calc(2 * var(--ds-unit));
-  height: calc(2 * var(--ds-unit));
+  --avatar-size: calc(2 * var(--ds-unit));
+  --avatar-pair-type-size: var(--ds-type-size-default);
 }
 :host([hidden]) {
   display: none !important;
@@ -42,15 +43,19 @@
 :host([shape="rounded"]) .frame {
   border-radius: var(--ds-radius);
 }
-:host([size="compact"]) .frame,
-.initial[data-pair] {
+:host([size="compact"]) .frame {
   font-size: var(--ds-type-size-small);
 }
 :host([size="large"]) .frame {
   font-size: var(--ds-unit);
 }
-:host([size="large"]) .initial[data-pair] {
-  font-size: var(--ds-type-size-default);
+.initial[data-pair] {
+  /* Full-width initials must fit inside both hairline edges, even at compact
+     and independent nested scales. Keep the normal type size when it fits. */
+  font-size: min(
+    var(--avatar-pair-type-size),
+    calc((var(--avatar-size) - 2px) / var(--initial-count))
+  );
 }
 :host([outlined]) .frame::after {
   content: "";
