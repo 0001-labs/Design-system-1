@@ -45,7 +45,7 @@ export function signInFunctions({ product, owner, codeReady }: {
         const text = [
           `Apple accepts a sign-in client secret for six months at most. Mint a new one for ${product} on the Mac that holds the .p8 key and set it:`,
           '',
-          'vp exec convex env set AUTH_APPLE_SECRET "$(vp exec tsx ../Sign-in/scripts/apple-client-secret.ts --key <AuthKey.p8> --key-id <key id> --team-id <team id> --client-id <services id>)"',
+          'vp exec convex env set AUTH_APPLE_SECRET "$(vp exec tsx \"../ID 1/scripts/apple-client-secret.ts\" --key <AuthKey.p8> --key-id <key id> --team-id <team id> --client-id <services id>)"',
           '',
           'Until then the Apple button stays inert; Google and the email code are unaffected.',
         ].join('\n')

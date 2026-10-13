@@ -13,7 +13,7 @@ import { rememberAppleTokenFromProfile } from "./signIn/appleTokens";
 const PRODUCT = "Design system 1";
 
 /**
- * Sign-in is the shared piece in convex/signIn (copied from /Users/joachim/0001/Sign-in
+ * Sign-in is the shared piece in convex/signIn (copied from /Users/joachim/0001/ID 1
  * by `vp run sync-sign-in`): the emailed code, Google and Apple, and a password for the
  * addresses in SIGN_IN_PASSWORD_EMAILS. The code replaced the magic link: nothing a mail
  * scanner opens can spend it, since the code is typed into the screen that asked for it.
