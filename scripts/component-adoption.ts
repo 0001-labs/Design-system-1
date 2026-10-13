@@ -20,7 +20,7 @@ export const APPS: AppSpec[] = [
 ];
 const known = new Set(COMPONENT_COLUMNS.map(c => c.id));
 const native: Record<string, string> = { button: "button", input: "input", select: "input", textarea: "textarea", p: "text", h1: "text", h2: "text", h3: "text", h4: "text", h5: "text", h6: "text", ul: "list", ol: "list", table: "table", form: "form", dialog: "dialog" };
-type TagSite = { tag: string; line: number; nativeStyle?: string };
+type TagSite = { tag: string; line: number; nativeStyle?: string; dialogRole?: boolean };
 function nativeStyle(tag: string, className: string): string | undefined {
   const classes = className.split(/\s+/);
   const supported = tag === "button" ? ["ds-button"] : ["input", "select", "textarea"].includes(tag) ? ["ds-input", "ds-select", "ds-checkbox"] : [];
@@ -36,7 +36,8 @@ export function sourceSites(file: string, source: string): TagSite[] {
     for (const match of clean.matchAll(/<([A-Za-z][\w.-]*)(?=[\s/>])/g)) {
       const attributes = clean.slice(match.index! + match[0].length).split(">")[0]!;
       const className = /\bclass\s*=\s*["']([^"']*)["']/.exec(attributes)?.[1] ?? "";
-      found.push({ tag: match[1]!, line: line(offset + match.index!), nativeStyle: nativeStyle(match[1]!, className) });
+      const dialogRole = /\brole\s*=\s*["'](?:alertdialog|dialog)["']/.test(attributes);
+      found.push({ tag: match[1]!, line: line(offset + match.index!), nativeStyle: nativeStyle(match[1]!, className), ...(dialogRole ? { dialogRole } : {}) });
     }
   };
   if (/\.(html|astro)$/.test(file)) {
@@ -64,7 +65,10 @@ export function sourceSites(file: string, source: string): TagSite[] {
       const attribute = node.attributes.properties.find(p => ts.isJsxAttribute(p) && ["class", "className"].includes(p.name.getText(ast)));
       const initializer = attribute && ts.isJsxAttribute(attribute) ? attribute.initializer : undefined;
       const className = initializer && ts.isStringLiteral(initializer) ? initializer.text : "";
-      found.push({ tag, line: line(node.getStart(ast)), nativeStyle: nativeStyle(tag, className) });
+      const role = node.attributes.properties.find(p => ts.isJsxAttribute(p) && p.name.getText(ast) === "role");
+      const roleValue = role && ts.isJsxAttribute(role) ? role.initializer : undefined;
+      const dialogRole = roleValue && ts.isStringLiteral(roleValue) && ["dialog", "alertdialog"].includes(roleValue.text);
+      found.push({ tag, line: line(node.getStart(ast)), nativeStyle: nativeStyle(tag, className), ...(dialogRole ? { dialogRole: true } : {}) });
     }
     if (ts.isCallExpression(node) && ((ts.isPropertyAccessExpression(node.expression) && ["createElement", "createElementNS"].includes(node.expression.name.text)) || (ts.isIdentifier(node.expression) && reactFactories.has(node.expression.text)))) {
       const arg = node.arguments[ts.isPropertyAccessExpression(node.expression) && node.expression.name.text === "createElementNS" ? 1 : 0];
@@ -228,7 +232,7 @@ export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): Ado
       for (const site of sites) {
         if (adapterTags.has(site.tag)) continue;
         const custom = /^(ds|ezo|c9y)-(.+)$/.exec(site.tag);
-        const component = sharedAdapters.has(site.tag) ? sharedAdapters.get(site.tag)! : aliases[site.tag] ?? (custom && known.has(custom[2]!) ? custom[2]! : native[site.tag]);
+        const component = sharedAdapters.has(site.tag) ? sharedAdapters.get(site.tag)! : aliases[site.tag] ?? (custom && known.has(custom[2]!) ? custom[2]! : site.dialogRole ? "dialog" : native[site.tag]);
         if (!component) {
           if (site.tag.includes("-")) app.otherCustomElements[site.tag] = (app.otherCustomElements[site.tag] ?? 0) + 1;
           continue;

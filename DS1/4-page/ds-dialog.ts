@@ -146,8 +146,9 @@ export class Dialog extends LitElement {
   };
 
   private outside(event: MouseEvent) {
-    if (event.target !== this.dialog) return false;
-    const rect = this.dialog.getBoundingClientRect();
+    const dialog = this.dialog;
+    if (!dialog || event.target !== dialog) return false;
+    const rect = dialog.getBoundingClientRect();
     return event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom;
   }
   private onPointerDown = (event: PointerEvent) => {

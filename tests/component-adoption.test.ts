@@ -103,15 +103,15 @@ describe("source adoption evidence", () => {
     write(app, 'src/action.ts', 'export { Button as Action } from "../design/react/button";');
     write(app, 'src/dialog.ts', 'export { DialogContent as Modal, DialogTitle } from "../design/react/dialog";');
     write(app, 'src/local.tsx', 'export const Input = () => <input />;');
-    write(app, 'src/page.tsx', 'import { Modal, DialogTitle } from "./dialog"; import { Action as SharedAction } from "./action"; import { Button as DirectAction } from "../design/react/button"; import { Field as SharedField, Multiline as Notes } from "@/field"; import { Input as Direct } from "../design/react/input"; import { Input as Local } from "./local"; export const Page = () => <><SharedField /><Direct /><Local /><Notes /><textarea /><SharedAction /><DirectAction /><Modal><DialogTitle>Title</DialogTitle></Modal><dialog /></>;');
+    write(app, 'src/page.tsx', 'import { Modal, DialogTitle } from "./dialog"; import { Action as SharedAction } from "./action"; import { Button as DirectAction } from "../design/react/button"; import { Field as SharedField, Multiline as Notes } from "@/field"; import { Input as Direct } from "../design/react/input"; import { Input as Local } from "./local"; export const Page = () => <><SharedField /><Direct /><Local /><Notes /><textarea /><SharedAction /><DirectAction /><Modal><DialogTitle>Title</DialogTitle></Modal><dialog /><section role="dialog" /><div role="alertdialog" /></>;');
     git(app, 'add', '.'); git(app, '-c', 'user.name=Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'Use shared input');
     const scan = () => scanApp({ id: 'example', name: 'Example', directory: 'Example', roots: ['src'], manifest: 'design/components-manifest.json' }, studio, ds);
     expect(scan().cells.input).toMatchObject({ shared: 2, local: 1, unverified: 0 });
     expect(scan().cells.textarea).toMatchObject({ shared: 1, local: 1, unverified: 0 });
     expect(scan().cells.button).toMatchObject({ shared: 2, unverified: 0 });
-    expect(scan().cells.dialog).toMatchObject({ shared: 1, local: 1, unverified: 0 });
+    expect(scan().cells.dialog).toMatchObject({ shared: 1, local: 3, unverified: 0 });
     write(app, 'design/react/dialog.ts', added['react/dialog.ts'] + '\n// Local changes');
-    expect(scan().cells.dialog).toMatchObject({ shared: 0, local: 1, unverified: 1 });
+    expect(scan().cells.dialog).toMatchObject({ shared: 0, local: 3, unverified: 1 });
     write(app, 'design/react/button.ts', added['react/button.ts'] + '\n// Local changes');
     expect(scan().cells.button).toMatchObject({ shared: 0, unverified: 2 });
     expect(scan().cells.input).toMatchObject({ shared: 2, unverified: 0 });
