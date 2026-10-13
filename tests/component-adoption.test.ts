@@ -82,11 +82,12 @@ describe("source adoption evidence", () => {
     expect(report.cells.button?.sites.every(s => s.file === "client/page.tsx")).toBe(true);
   });
 
-  it("verifies shared React input imports through pure re-exports and flags modified adapters", () => {
+  it("verifies shared React adapters through pure re-exports and flags each modified adapter", () => {
     const { studio, app, ds } = fixture();
     const added = {
       '2-core/ds-input.ts': 'export class Input {}',
       '2-core/ds-textarea.ts': 'import { Input } from "./ds-input"; export class Textarea extends Input {}',
+      'react/button.ts': 'import type { Button as ButtonElement } from "../2-core/ds-button"; export const Button = () => null;',
       'react/input.ts': 'import type { Input as InputElement } from "../2-core/ds-input"; export const Input = () => null; export const Textarea = () => null;',
     };
     for (const [file, body] of Object.entries(added)) { write(ds, `DS1/${file}`, body); write(app, `design/${file}`, body); }
@@ -97,12 +98,20 @@ describe("source adoption evidence", () => {
     Object.assign(manifest.files, Object.fromEntries(Object.entries(added).map(([file, body]) => [file, createHash('sha256').update(body).digest('hex')])));
     writeFileSync(manifestPath, JSON.stringify(manifest));
     write(app, 'src/field.ts', 'import "./register"; export { Input as Field, Textarea as Multiline } from "../design/react/input";');
+    write(app, 'src/action.ts', 'export { Button as Action } from "../design/react/button";');
     write(app, 'src/local.tsx', 'export const Input = () => <input />;');
-    write(app, 'src/page.tsx', 'import { Field as SharedField, Multiline as Notes } from "@/field"; import { Input as Direct } from "../design/react/input"; import { Input as Local } from "./local"; export const Page = () => <><SharedField /><Direct /><Local /><Notes /><textarea /></>;');
+    write(app, 'src/page.tsx', 'import { Action as SharedAction } from "./action"; import { Button as DirectAction } from "../design/react/button"; import { Field as SharedField, Multiline as Notes } from "@/field"; import { Input as Direct } from "../design/react/input"; import { Input as Local } from "./local"; export const Page = () => <><SharedField /><Direct /><Local /><Notes /><textarea /><SharedAction /><DirectAction /></>;');
     git(app, 'add', '.'); git(app, '-c', 'user.name=Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'Use shared input');
     const scan = () => scanApp({ id: 'example', name: 'Example', directory: 'Example', roots: ['src'], manifest: 'design/components-manifest.json' }, studio, ds);
     expect(scan().cells.input).toMatchObject({ shared: 2, local: 1, unverified: 0 });
     expect(scan().cells.textarea).toMatchObject({ shared: 1, local: 1, unverified: 0 });
+    expect(scan().cells.button).toMatchObject({ shared: 2, unverified: 0 });
+    write(app, 'design/react/button.ts', added['react/button.ts'] + '\n// Local changes');
+    expect(scan().cells.button).toMatchObject({ shared: 0, unverified: 2 });
+    expect(scan().cells.input).toMatchObject({ shared: 2, unverified: 0 });
+    manifest.files['react/button.ts'] = createHash('sha256').update(readFileSync(join(app, 'design/react/button.ts'))).digest('hex');
+    writeFileSync(manifestPath, JSON.stringify(manifest));
+    expect(scan().cells.button).toMatchObject({ shared: 0, unverified: 2 });
     write(app, 'design/react/input.ts', added['react/input.ts'] + '\n// Local changes');
     expect(scan().cells.input).toMatchObject({ shared: 0, local: 1, unverified: 2 });
     expect(scan().cells.textarea).toMatchObject({ shared: 0, local: 1, unverified: 1 });

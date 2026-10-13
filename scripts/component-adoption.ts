@@ -83,11 +83,12 @@ export function sourceSites(file: string, source: string): TagSite[] {
 function emptyCell(): ComponentCell { return { shared: 0, styled: 0, local: 0, unverified: 0, sites: [], snapshot: "none", current: null, issues: [] }; }
 interface Manifest { commit: string; components: string[]; files: Record<string, string> }
 
-export function checkSnapshots(root: string, manifestPath: string | undefined, dsRoot: string): { commit: string | null; cells: Record<string, ComponentCell>; controls: ComponentCell; reactInput: ComponentCell } {
+export function checkSnapshots(root: string, manifestPath: string | undefined, dsRoot: string): { commit: string | null; cells: Record<string, ComponentCell>; controls: ComponentCell; reactInput: ComponentCell; reactButton: ComponentCell } {
   const cells = Object.fromEntries(COMPONENT_COLUMNS.map(c => [c.id, emptyCell()]));
   const controls = emptyCell();
   const reactInput = emptyCell();
-  if (!manifestPath || !existsSync(join(root, manifestPath))) return { commit: null, cells, controls, reactInput };
+  const reactButton = emptyCell();
+  if (!manifestPath || !existsSync(join(root, manifestPath))) return { commit: null, cells, controls, reactInput, reactButton };
   const manifest = JSON.parse(readFileSync(join(root, manifestPath), "utf8")) as Manifest;
   if (!/^[a-f0-9]{40}$/.test(manifest.commit) || !Array.isArray(manifest.components) || !manifest.files) throw new Error("Invalid component manifest");
   const snapshot = dirname(join(root, manifestPath));
@@ -99,10 +100,10 @@ export function checkSnapshots(root: string, manifestPath: string | undefined, d
     }
     return historical.get(file)!;
   };
-  for (const component of [...manifest.components, "@controls", ...(manifest.files['react/input.ts'] ? ['@react-input'] : [])]) {
-    const cell = component === "@controls" ? controls : component === '@react-input' ? reactInput : cells[component];
+  for (const component of [...manifest.components, "@controls", ...(manifest.files['react/input.ts'] ? ['@react-input'] : []), ...(manifest.files['react/button.ts'] ? ['@react-button'] : [])]) {
+    const cell = component === "@controls" ? controls : component === '@react-input' ? reactInput : component === '@react-button' ? reactButton : cells[component];
     if (!cell) continue;
-    const entry = component === "@controls" ? "1-root/controls.css" : component === '@react-input' ? 'react/input.ts' : Object.keys(manifest.files).find(f => f.endsWith(`/ds-${component}.ts`));
+    const entry = component === "@controls" ? "1-root/controls.css" : component === '@react-input' ? 'react/input.ts' : component === '@react-button' ? 'react/button.ts' : Object.keys(manifest.files).find(f => f.endsWith(`/ds-${component}.ts`));
     const visited = new Set<string>();
     let modified = false, unverifiable = false, current = true;
     const visit = (file: string) => {
@@ -128,17 +129,20 @@ export function checkSnapshots(root: string, manifestPath: string | undefined, d
     cell.snapshot = modified ? "modified" : unverifiable ? "unverified" : "verified";
     cell.current = current && !unverifiable;
   }
-  return { commit: manifest.commit, cells, controls, reactInput };
+  return { commit: manifest.commit, cells, controls, reactInput, reactButton };
 }
 
 /** Follow direct imports and pure registration/re-export entries to the snapshot.
  * Matching names alone never establish adoption. The adapter's full dependency
  * graph is checked separately from direct Lit usage.
  */
-function importedFieldAdapters(root: string, file: string, source: string, manifestPath?: string): Map<string, string> {
+function importedSharedAdapters(root: string, file: string, source: string, manifestPath?: string): Map<string, string> {
   const found = new Map<string, string>();
   if (!manifestPath) return found;
-  const expected = resolve(root, dirname(manifestPath), 'react/input.ts');
+  const adapterModules: Record<string, Record<string, string>> = {
+    [resolve(root, dirname(manifestPath), 'react/input.ts')]: { Input: 'input', Textarea: 'textarea' },
+    [resolve(root, dirname(manifestPath), 'react/button.ts')]: { Button: 'button' },
+  };
   const resolveModule = (from: string, name: string) => {
     if (!name.startsWith('.') && !name.startsWith('@/')) return undefined;
     const base = name.startsWith('@/') ? resolve(root, 'src', name.slice(2)) : resolve(dirname(from), name);
@@ -147,7 +151,7 @@ function importedFieldAdapters(root: string, file: string, source: string, manif
   };
   const forwards = (path: string | undefined, name: string, depth = 0): string | undefined => {
     if (!path || depth > 3) return undefined;
-    if (path === expected) return ({ Input: 'input', Textarea: 'textarea' } as Record<string,string>)[name];
+    if (adapterModules[path]) return adapterModules[path][name];
     const module = ts.createSourceFile(path, readFileSync(path, 'utf8'), ts.ScriptTarget.Latest, true);
     if (module.statements.some(node => !ts.isImportDeclaration(node) && !ts.isExportDeclaration(node) && !ts.isEmptyStatement(node))) return undefined;
     for (const node of module.statements) {
@@ -214,7 +218,7 @@ export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): Ado
       app.files++;
       const source = readFileSync(join(root, file), "utf8");
       const aliases = spec.id === "link" ? importedAdapters(root, file, source) : {};
-      const fields = importedFieldAdapters(root, file, source, spec.manifest);
+      const sharedAdapters = importedSharedAdapters(root, file, source, spec.manifest);
       const sites = sourceSites(file, source);
       const adapterTags = spec.id === "link" && linkAdapters[file]
         ? new Set(Object.values(linkAdapters[file]!).map(id => `ds-${id}`).filter(tag => sites.filter(s => s.tag === tag).length === 1))
@@ -222,15 +226,15 @@ export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): Ado
       for (const site of sites) {
         if (adapterTags.has(site.tag)) continue;
         const custom = /^(ds|ezo|c9y)-(.+)$/.exec(site.tag);
-        const component = fields.has(site.tag) ? fields.get(site.tag)! : aliases[site.tag] ?? (custom && known.has(custom[2]!) ? custom[2]! : native[site.tag]);
+        const component = sharedAdapters.has(site.tag) ? sharedAdapters.get(site.tag)! : aliases[site.tag] ?? (custom && known.has(custom[2]!) ? custom[2]! : native[site.tag]);
         if (!component) {
           if (site.tag.includes("-")) app.otherCustomElements[site.tag] = (app.otherCustomElements[site.tag] ?? 0) + 1;
           continue;
         }
         const cell = app.cells[component]!;
-        const ds = fields.has(site.tag) || Boolean(aliases[site.tag]) || custom?.[1] === "ds";
-        const evidence = fields.has(site.tag) ? snapshots.reactInput : cell;
-        if (fields.has(site.tag)) {
+        const ds = sharedAdapters.has(site.tag) || Boolean(aliases[site.tag]) || custom?.[1] === "ds";
+        const evidence = sharedAdapters.has(site.tag) ? (component === "button" ? snapshots.reactButton : snapshots.reactInput) : cell;
+        if (sharedAdapters.has(site.tag)) {
           cell.issues = [...new Set([...cell.issues, ...evidence.issues])];
           cell.current = cell.current === true && evidence.current === true;
         }
@@ -259,7 +263,7 @@ export function scanReport(studio = resolve(repository, "..")): AdoptionReport {
       "DS1 means the component and its imported dependencies match a recorded DS1 Git revision. An older verified snapshot still counts as DS1; the detail view shows whether it matches today's source. Modified or unverifiable DS1 is counted separately.",
       "DS1 styles counts native controls with literal ds-button, ds-input, ds-select or ds-checkbox classes and verified shared control styles. These are not Lit components. Dynamic class expressions are not inferred.",
       "Local means recognized ezo-/c9y- components or native button, input/select/textarea, p/headings, ul/ol, table and form. Native semantics can be intentional; these counts are review leads, not automatic defects.",
-      "Tests, demos in preview/dev directories, generated files, vendored implementations and shared sign-in internals are excluded. Link's inspected TabPill, TabPillRow and Tooltip/Tooltop adapters and DS1's verified React Input and Textarea adapters count at imported JSX uses, without counting their inner DS1 tags again.",
+      "Tests, demos in preview/dev directories, generated files, vendored implementations and shared sign-in internals are excluded. Link's inspected TabPill, TabPillRow and Tooltip/Tooltop adapters and DS1's verified React Input, Textarea and Button adapters count at imported JSX uses, without counting their inner DS1 tags again.",
       "Other React abstractions, dynamic tag names, CSS-only controls, spans and inline SVGs are not inferred. Native apps are outside this scan. A zero means no recognized source site, not that a capability is absent.",
     ],
   };
