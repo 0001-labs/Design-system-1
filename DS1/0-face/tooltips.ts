@@ -1,6 +1,6 @@
 /**
  * One tooltip for a whole page: any element with `data-tooltip="…"` shows its text in Design system 1's tooltip,
- * a black bubble with white text (white on black in dark mode), square, 14px regular, above the element, fading in
+ * a black bubble with white text (white on black in dark mode), 4px corners as Ezo's rounded style, 14px regular, above the element, fading in
  * over 120ms. The same look as `<ds-tooltip>`, without wrapping each element in a component, so a table of
  * hundreds of cells can carry one each. Long text wraps at 320px on 20px lines.
  */
@@ -18,7 +18,7 @@ export function initTooltips(): void {
   style.textContent = `
     [data-ds-tooltip] {
       position: fixed; z-index: 2147483646; top: 0; left: 0; pointer-events: none;
-      max-width: 320px; min-height: 20px; box-sizing: border-box; padding: 0 4px;
+      max-width: 320px; min-height: 20px; box-sizing: border-box; padding: 0 4px; border-radius: 4px;
       background: light-dark(var(--black, #2a2a2a), var(--white, #ffffff));
       color: light-dark(var(--white, #ffffff), var(--black, #2a2a2a));
       font-family: var(--typeface-regular, var(--font-regular, -apple-system, BlinkMacSystemFont, sans-serif)), sans-serif;
