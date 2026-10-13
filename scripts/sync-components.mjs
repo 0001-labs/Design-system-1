@@ -44,6 +44,7 @@ if (components.includes('button')) visit('react/button.ts');
 if (components.includes('split')) visit('react/split.ts');
 if (components.includes('composer')) visit('react/composer.ts');
 if (components.includes('menu')) visit('react/menu.ts');
+if (components.includes('accordion')) visit('react/accordion.ts');
 if (['checkbox', 'switch', 'select', 'color'].some(name => components.includes(name))) visit('react/choice.ts');
 if (components.includes('dialog')) visit('react/dialog.ts');
 if (components.includes('swatch')) visit('0-face/tooltips.ts');

@@ -3,7 +3,7 @@
 /* ds-button.css */
 
 :host([control="host"]),
-:host([control="slotted"]) ::slotted(button) {
+:host([control="slotted"]) ::slotted(:is(button, a)) {
   box-sizing: border-box !important;
   display: inline-flex !important;
   align-items: center !important;
@@ -38,7 +38,7 @@
   flex: 0 0 auto !important;
 }
 
-:host([fit][control="slotted"]) ::slotted(button) {
+:host([fit][control="slotted"]) ::slotted(:is(button, a)) {
   width: max-content !important;
   min-width: var(--ds-button-min-width, 0px) !important;
   justify-content: var(--ds-button-align, flex-start) !important;
@@ -144,13 +144,13 @@
 }
 
 :host([control="host"]:focus-visible),
-:host([control="slotted"]) ::slotted(button:focus-visible) {
+:host([control="slotted"]) ::slotted(:is(button, a):focus-visible) {
   outline: 2px solid var(--ds-focus-ring) !important;
   outline-offset: 1px !important;
 }
 
 :host([control="host"][disabled]),
-:host([control="slotted"]) ::slotted(button:disabled) {
+:host([control="slotted"]) ::slotted(:is(button:disabled, a[aria-disabled="true"])) {
   cursor: default !important;
   opacity: 0.5 !important;
   pointer-events: none !important;
@@ -158,7 +158,7 @@
 
 /* The light-DOM button keeps native forms, submitters and fieldset semantics.
    DS1 owns its face; product layout belongs on the host. */
-:host([control="slotted"]) ::slotted(button) {
+:host([control="slotted"]) ::slotted(:is(button, a)) {
   appearance: none !important;
   box-sizing: border-box !important;
   border: 0 !important;
@@ -173,7 +173,7 @@
   overflow: hidden !important;
   text-overflow: ellipsis !important;
 }
-:host([control="slotted"][icon]) ::slotted(button) {
+:host([control="slotted"][icon]) ::slotted(:is(button, a)) {
   justify-content: center !important;
 }
 

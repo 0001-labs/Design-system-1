@@ -94,7 +94,7 @@ export class Button extends Control {
   }
 
   focus(options?: FocusOptions) {
-    if (this.control === "slotted") this.querySelector<HTMLButtonElement>(":scope > button")?.focus(options);
+    if (this.control === "slotted") this.querySelector<HTMLElement>(":scope > :is(button, a)")?.focus(options);
     else if (this.hostControl) super.focus(options);
     else this.shadowRoot?.querySelector("button")?.focus(options);
   }

@@ -16,6 +16,7 @@ export class Menu extends LitElement {
     columns: { type: Number, reflect: true },
     anchor: { attribute: false },
     trigger: { attribute: false },
+    hover: { type: Boolean, reflect: true },
     controller: { attribute: false },
     activeId: { type: String, attribute: "active-id" },
   };
@@ -25,13 +26,17 @@ export class Menu extends LitElement {
   declare columns: number;
   declare anchor: HTMLElement | null;
   declare trigger: HTMLElement | null;
+  declare hover: boolean;
   declare controller: HTMLElement | null;
   declare activeId: string;
   private listeningTo: HTMLElement | null = null;
   private listeningTrigger: HTMLElement | null = null;
+  private triggerAttributes = new Map<string, string | null>();
   private openingEdge: "first" | "last" = "first";
   private search = "";
   private searchAt = 0;
+  private focusOnOpen = true;
+  private hoverTimer?: ReturnType<typeof setTimeout>;
   private shown = false;
   private observer?: ResizeObserver;
   private opener: HTMLElement | null = null;
@@ -43,9 +48,11 @@ export class Menu extends LitElement {
   constructor() {
     super();
     this.compact = false; this.floating = false; this.open = false;
-    this.columns = 1; this.anchor = null; this.trigger = null; this.controller = null; this.activeId = "";
+    this.columns = 1; this.anchor = null; this.trigger = null; this.hover = false; this.controller = null; this.activeId = "";
     this.addEventListener("keydown", this.onKeyDown);
     this.addEventListener("pointerdown", this.retainController);
+    this.addEventListener("pointerenter", this.onHoverEnter);
+    this.addEventListener("pointerleave", this.onHoverLeave);
     this.addEventListener("focusin", () => { this.heldFocus = true; this.syncTabStops(); });
     this.addEventListener("focusout", event => {
       if (event.relatedTarget instanceof Node && !this.contains(event.relatedTarget)) this.heldFocus = false;
@@ -60,11 +67,17 @@ export class Menu extends LitElement {
     this.listeningTo?.removeEventListener("keydown", this.onControllerKey);
     this.listeningTo = null;
     this.bindTrigger(null);
+    clearTimeout(this.hoverTimer);
     this.hide(true);
     super.disconnectedCallback();
   }
   updated() {
     this.bindTrigger(this.trigger);
+    if (this.trigger) {
+      this.trigger.setAttribute("aria-haspopup", this.getAttribute("role") === "menu" ? "menu" : "listbox");
+      this.trigger.setAttribute("aria-expanded", String(this.open));
+      if (this.id) this.trigger.setAttribute("aria-controls", this.id);
+    }
     this.style.setProperty("--ds-menu-columns", String(Math.max(1, Math.floor(this.columns || 1))));
     this.toggleAttribute("data-grid", this.columns > 1);
     if (this.listeningTo !== this.controller) {
@@ -86,11 +99,20 @@ export class Menu extends LitElement {
   renderNow() { this.performUpdate(); }
   private bindTrigger(trigger: HTMLElement | null) {
     if (this.listeningTrigger === trigger) return;
+    for (const [name, value] of this.triggerAttributes) {
+      if (value === null) this.listeningTrigger?.removeAttribute(name); else this.listeningTrigger?.setAttribute(name, value);
+    }
+    this.triggerAttributes.clear();
     this.listeningTrigger?.removeEventListener("click", this.onTriggerClick);
     this.listeningTrigger?.removeEventListener("keydown", this.onTriggerKey);
+    this.listeningTrigger?.removeEventListener("pointerenter", this.onHoverEnter);
+    this.listeningTrigger?.removeEventListener("pointerleave", this.onHoverLeave);
     this.listeningTrigger = trigger;
+    if (trigger) for (const name of ["aria-haspopup", "aria-expanded", "aria-controls"]) this.triggerAttributes.set(name, trigger.getAttribute(name));
     trigger?.addEventListener("click", this.onTriggerClick);
     trigger?.addEventListener("keydown", this.onTriggerKey);
+    trigger?.addEventListener("pointerenter", this.onHoverEnter);
+    trigger?.addEventListener("pointerleave", this.onHoverLeave);
   }
   private toggleFromTrigger(open: boolean) {
     if (!this.trigger || !this.enabled(this.trigger)) return;
@@ -99,6 +121,8 @@ export class Menu extends LitElement {
   }
   private onTriggerClick = (event: MouseEvent) => {
     if (event.defaultPrevented) return;
+    if (this.hover && this.trigger?.matches("a[href]")) return;
+    this.focusOnOpen = true;
     this.openingEdge = "first";
     this.toggleFromTrigger(!this.open);
   };
@@ -106,8 +130,23 @@ export class Menu extends LitElement {
     if (event.defaultPrevented || event.isComposing || event.altKey || event.metaKey || event.ctrlKey || event.shiftKey || !this.trigger || !this.enabled(this.trigger)) return;
     if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
     event.preventDefault();
+    this.focusOnOpen = true;
     this.openingEdge = event.key === "ArrowUp" ? "last" : "first";
     if (this.open) this.initialChoice()?.focus(); else this.toggleFromTrigger(true);
+  };
+  private onHoverEnter = (event: PointerEvent) => {
+    if (!this.hover || event.pointerType === "touch") return;
+    clearTimeout(this.hoverTimer);
+    if (!this.open) { this.focusOnOpen = false; this.toggleFromTrigger(true); }
+  };
+  private onHoverLeave = (event: PointerEvent) => {
+    if (!this.hover || event.pointerType === "touch") return;
+    if (event.relatedTarget instanceof Node && (this.contains(event.relatedTarget) || this.trigger?.contains(event.relatedTarget))) return;
+    clearTimeout(this.hoverTimer);
+    // The half-square gap stays traversable without an invisible product overlay.
+    this.hoverTimer = setTimeout(() => {
+      if (this.open && !this.contains(this.ownerDocument.activeElement)) this.requestClose("outside");
+    }, 180);
   };
   private initialChoice() {
     const items = this.items();
@@ -156,7 +195,7 @@ export class Menu extends LitElement {
     this.ownerDocument.defaultView?.addEventListener("resize", this.place);
     this.ownerDocument.defaultView?.visualViewport?.addEventListener("resize", this.place);
     this.ownerDocument.defaultView?.visualViewport?.addEventListener("scroll", this.place);
-    if (!this.controller) {
+    if (!this.controller && this.focusOnOpen) {
       // Native frames must be distributed through newly inserted Lit slots first.
       const version = ++this.focusVersion;
       void Promise.all(Array.from(this.querySelectorAll<LitElement>("ds-button"), element => element.updateComplete)).then(() => {
@@ -173,6 +212,7 @@ export class Menu extends LitElement {
   private hide(restore: boolean) {
     if (!this.shown) return;
     this.shown = false;
+    clearTimeout(this.hoverTimer);
     this.focusVersion++;
     const active = this.ownerDocument.activeElement;
     const within = active instanceof Node && this.contains(active);

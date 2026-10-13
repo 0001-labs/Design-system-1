@@ -129,3 +129,22 @@ test("controlled trigger requests can be declined and a changed trigger releases
   next.click(); expect(request).toHaveBeenCalledTimes(2);
   expect(key(next, "ArrowDown", {isComposing: true}).defaultPrevented).toBe(false);
 });
+
+test("hover menus preserve link navigation and page focus, while keyboard opening enters the menu", async () => {
+  const trigger = document.createElement("a"), field = document.createElement("input"), menu = document.createElement("ds-menu");
+  trigger.href = "#example"; trigger.setAttribute("aria-haspopup", "dialog");
+  menu.id = "hover-example"; menu.hover = menu.floating = true; menu.trigger = menu.anchor = trigger;
+  menu.innerHTML = '<button role="menuitem">Choice</button>';
+  document.body.append(trigger, field, menu); field.focus(); await menu.updateComplete;
+  trigger.dispatchEvent(new PointerEvent("pointerenter", {pointerType: "mouse"})); await menu.updateComplete;
+  expect(menu.open).toBe(true); expect(document.activeElement).toBe(field);
+  expect(trigger.getAttribute("aria-controls")).toBe(menu.id); expect(trigger.getAttribute("aria-expanded")).toBe("true");
+  const navigation = vi.fn((event: MouseEvent) => { expect(event.defaultPrevented).toBe(false); event.preventDefault(); });
+  trigger.addEventListener("click", navigation, {once: true});
+  const click = new MouseEvent("click", {bubbles: true, cancelable: true, metaKey: true}); trigger.dispatchEvent(click);
+  expect(navigation).toHaveBeenCalledOnce(); expect(menu.open).toBe(true);
+  key(trigger, "ArrowDown"); expect(document.activeElement).toBe(menu.firstElementChild);
+  key(menu.firstElementChild as HTMLElement, "Escape"); await menu.updateComplete; expect(document.activeElement).toBe(trigger);
+  trigger.dispatchEvent(new PointerEvent("pointerenter", {pointerType: "touch"})); await menu.updateComplete; expect(menu.open).toBe(false);
+  menu.remove(); expect(trigger.getAttribute("aria-haspopup")).toBe("dialog"); expect(trigger.hasAttribute("aria-controls")).toBe(false);
+});

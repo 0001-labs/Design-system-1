@@ -94,6 +94,8 @@ describe("source adoption evidence", () => {
   it("verifies shared React adapters through pure re-exports and flags each modified adapter", () => {
     const { studio, app, ds } = fixture();
     const added = {
+      '3-unit/ds-accordion.ts': 'export class Accordion {}',
+      'react/accordion.ts': 'import type { Accordion } from "../3-unit/ds-accordion"; export const Accordion = () => null;',
       '3-unit/ds-menu.ts': 'export class Menu {}',
       'react/menu.ts': 'import type { Menu } from "../3-unit/ds-menu"; export const Menu = () => null;',
       '2-core/ds-composer.ts': 'export class Composer {}',
@@ -109,14 +111,14 @@ describe("source adoption evidence", () => {
       '4-page/ds-dialog.ts': 'export class Dialog {}',
       'react/dialog.ts': 'import type { Dialog as DialogElement } from "../4-page/ds-dialog"; export const DialogContent = () => null;',
       '2-core/ds-textarea.ts': 'import { Input } from "./ds-input"; export class Textarea extends Input {}',
-      'react/button.ts': 'import type { Button as ButtonElement } from "../2-core/ds-button"; export const Button = () => null;',
+      'react/button.ts': 'import type { Button as ButtonElement } from "../2-core/ds-button"; export const Button = () => null; export const ButtonLink = () => null;',
       'react/input.ts': 'import type { Input as InputElement } from "../2-core/ds-input"; export const Input = () => null; export const Textarea = () => null;',
     };
     for (const [file, body] of Object.entries(added)) { write(ds, `DS1/${file}`, body); write(app, `design/${file}`, body); }
     git(ds, 'add', '.'); git(ds, '-c', 'user.name=Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'Add shared input');
     const manifestPath = join(app, 'design/components-manifest.json');
     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
-    manifest.commit = git(ds, 'rev-parse', 'HEAD'); manifest.components.push('menu', 'composer', 'split', 'input', 'textarea', 'dialog', 'checkbox', 'switch', 'select', 'color');
+    manifest.commit = git(ds, 'rev-parse', 'HEAD'); manifest.components.push('accordion', 'menu', 'composer', 'split', 'input', 'textarea', 'dialog', 'checkbox', 'switch', 'select', 'color');
     Object.assign(manifest.files, Object.fromEntries(Object.entries(added).map(([file, body]) => [file, createHash('sha256').update(body).digest('hex')])));
     writeFileSync(manifestPath, JSON.stringify(manifest));
     write(app, 'src/field.ts', 'import "./register"; export { Input as Field, Textarea as Multiline } from "../design/react/input";');
@@ -124,9 +126,12 @@ describe("source adoption evidence", () => {
     write(app, 'src/dialog.ts', 'export { DialogContent as Modal, DialogTitle } from "../design/react/dialog";');
     write(app, 'src/local.tsx', 'export const Input = () => <input />;');
     write(app, 'src/split.ts', 'import "./register"; export { Split as Segments } from "../design/react/split";');
-    write(app, 'src/page.tsx', 'import { Menu } from "../design/react/menu"; import { Composer } from "../design/react/composer"; import { Segments } from "./split"; import { Checkbox as Check, Switch as Toggle, Select as Choice, ColorInput as Color } from "../design/react/choice"; import { Modal, DialogTitle } from "./dialog"; import { Action as SharedAction } from "./action"; import { Button as DirectAction } from "../design/react/button"; import { Field as SharedField, Multiline as Notes } from "@/field"; import { Input as Direct } from "../design/react/input"; import { Input as Local } from "./local"; export const Page = () => <><Menu /><ds-menu /><Composer /><ds-composer><textarea /></ds-composer><Segments /><ds-split /><ezo-split /><Check /><Toggle /><Choice /><Color /><input type="color" /><select /><input type="checkbox" /><button role="switch" /><SharedField /><Direct /><Local /><Notes /><textarea /><SharedAction /><DirectAction /><Modal><DialogTitle>Title</DialogTitle></Modal><dialog /><section role="dialog" /><div role="alertdialog" /></>;');
+    write(app, 'src/page.tsx', 'import { Accordion } from "../design/react/accordion"; import { ButtonLink } from "../design/react/button"; import { Menu } from "../design/react/menu"; import { Composer } from "../design/react/composer"; import { Segments } from "./split"; import { Checkbox as Check, Switch as Toggle, Select as Choice, ColorInput as Color } from "../design/react/choice"; import { Modal, DialogTitle } from "./dialog"; import { Action as SharedAction } from "./action"; import { Button as DirectAction } from "../design/react/button"; import { Field as SharedField, Multiline as Notes } from "@/field"; import { Input as Direct } from "../design/react/input"; import { Input as Local } from "./local"; export const Page = () => <><Accordion /><ButtonLink /><Menu /><ds-menu /><Composer /><ds-composer><textarea /></ds-composer><Segments /><ds-split /><ezo-split /><Check /><Toggle /><Choice /><Color /><input type="color" /><select /><input type="checkbox" /><button role="switch" /><SharedField /><Direct /><Local /><Notes /><textarea /><SharedAction /><DirectAction /><Modal><DialogTitle>Title</DialogTitle></Modal><dialog /><section role="dialog" /><div role="alertdialog" /></>;');
     git(app, 'add', '.'); git(app, '-c', 'user.name=Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'Use shared input');
     const scan = () => scanApp({ id: 'example', name: 'Example', directory: 'Example', roots: ['src'], manifest: 'design/components-manifest.json' }, studio, ds);
+    expect(scan().cells.accordion).toMatchObject({ shared: 1, local: 0, unverified: 0 });
+    write(app, "design/react/accordion.ts", added["react/accordion.ts"] + "\n// Local change");
+    expect(scan().cells.accordion).toMatchObject({ shared: 0, local: 0, unverified: 1 });
     expect(scan().cells.menu).toMatchObject({ shared: 2, local: 0, unverified: 0 });
     write(app, 'design/react/menu.ts', added['react/menu.ts'] + '\n// Local changes');
     expect(scan().cells.menu).toMatchObject({ shared: 1, local: 0, unverified: 1 });
@@ -147,16 +152,16 @@ describe("source adoption evidence", () => {
     expect(scan().cells.switch).toMatchObject({ shared: 0, local: 1, unverified: 1 });
     expect(scan().cells.input).toMatchObject({ shared: 2, local: 1, unverified: 0 });
     expect(scan().cells.textarea).toMatchObject({ shared: 1, local: 1, unverified: 0 });
-    expect(scan().cells.button).toMatchObject({ shared: 2, unverified: 0 });
+    expect(scan().cells.button).toMatchObject({ shared: 3, unverified: 0 });
     expect(scan().cells.dialog).toMatchObject({ shared: 1, local: 3, unverified: 0 });
     write(app, 'design/react/dialog.ts', added['react/dialog.ts'] + '\n// Local changes');
     expect(scan().cells.dialog).toMatchObject({ shared: 0, local: 3, unverified: 1 });
     write(app, 'design/react/button.ts', added['react/button.ts'] + '\n// Local changes');
-    expect(scan().cells.button).toMatchObject({ shared: 0, unverified: 2 });
+    expect(scan().cells.button).toMatchObject({ shared: 0, unverified: 3 });
     expect(scan().cells.input).toMatchObject({ shared: 2, unverified: 0 });
     manifest.files['react/button.ts'] = createHash('sha256').update(readFileSync(join(app, 'design/react/button.ts'))).digest('hex');
     writeFileSync(manifestPath, JSON.stringify(manifest));
-    expect(scan().cells.button).toMatchObject({ shared: 0, unverified: 2 });
+    expect(scan().cells.button).toMatchObject({ shared: 0, unverified: 3 });
     write(app, 'design/react/input.ts', added['react/input.ts'] + '\n// Local changes');
     expect(scan().cells.input).toMatchObject({ shared: 0, local: 1, unverified: 2 });
     expect(scan().cells.textarea).toMatchObject({ shared: 0, local: 1, unverified: 1 });

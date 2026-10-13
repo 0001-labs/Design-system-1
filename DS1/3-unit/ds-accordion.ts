@@ -1,6 +1,8 @@
 import { LitElement, html, unsafeCSS } from "lit";
 import "../2-core/ds-text";
 import "../2-core/ds-icon";
+import "../2-core/ds-button";
+import { define } from "../0-face/define";
 import "./ds-row";
 import styles from "./styles/ds-accordion.css?inline";
 
@@ -20,12 +22,14 @@ export class Accordion extends LitElement {
     summary: { type: String },
     details: { type: String },
     open: { type: Boolean, reflect: true },
+    control: { type: String, reflect: true },
     _hasSlottedContent: { type: Boolean, state: true },
   };
 
   declare summary: string;
   declare details: string;
   declare open: boolean;
+  declare control: string;
   declare _hasSlottedContent: boolean;
 
   constructor() {
@@ -33,8 +37,28 @@ export class Accordion extends LitElement {
     this.summary = "";
     this.details = "";
     this.open = false;
+    this.control = "native";
     this._hasSlottedContent = false;
+    this.addEventListener("click", event => {
+      if (this.control !== "slotted") return;
+      const trigger = this.querySelector<HTMLButtonElement>(':scope > [slot="trigger"] > button');
+      if (!trigger || trigger.disabled || event.defaultPrevented || !event.composedPath().includes(trigger)) return;
+      const request = new CustomEvent("ds-accordion-toggle", {detail: {open: !this.open}, bubbles: true, composed: true, cancelable: true});
+      if (this.dispatchEvent(request)) this.open = !this.open;
+    });
   }
+
+  private syncFrame = () => {
+    if (this.control !== "slotted") return;
+    const trigger = this.querySelector<HTMLButtonElement>(':scope > [slot="trigger"] > button');
+    const content = this.querySelector<HTMLElement>(':scope > [slot="details"]');
+    if (trigger) trigger.setAttribute("aria-expanded", String(this.open));
+    if (content) {
+      if (!this.open && content.contains(this.ownerDocument.activeElement)) trigger?.focus({preventScroll: true});
+      content.hidden = !this.open;
+    }
+  };
+  updated() { this.syncFrame(); }
 
   static styles = unsafeCSS(styles);
 
@@ -51,6 +75,7 @@ export class Accordion extends LitElement {
   }
 
   render() {
+    if (this.control === "slotted") return html`<slot name="trigger" @slotchange=${this.syncFrame}></slot><slot name="details" @slotchange=${this.syncFrame}></slot>`;
     return html`
       <details ?open=${this.open}>
         <summary>
@@ -86,7 +111,7 @@ export class Accordion extends LitElement {
   }
 }
 
-customElements.define("ds-accordion", Accordion);
+define("ds-accordion", Accordion);
 
 declare global {
   interface HTMLElementTagNameMap {

@@ -1,10 +1,12 @@
 /* ds-accordion.css */
 /* Accordion component styles using native <details>/<summary> */
+@import "../../1-root/component-metrics.css";
 
 :host {
   display: block;
-  width: calc(240px * var(--sf));
-  color: var(--text-color-primary);
+  width: var(--ds-accordion-width, calc(12 * var(--ds-unit)));
+  max-width: 100%;
+  color: var(--ds-text-color);
 }
 
 details {
@@ -44,3 +46,8 @@ details[open] ds-icon.chevron {
   white-space: normal;
   text-align: left;
 }
+
+:host([control="slotted"]) { width: 100%; }
+:host([control="slotted"]) ::slotted([slot="trigger"]) { width: 100%; --ds-button-height: var(--ds-row-height); }
+:host([control="slotted"]) ::slotted([slot="details"]) { display: block; }
+:host([control="slotted"]) ::slotted([slot="details"][hidden]) { display: none !important; }

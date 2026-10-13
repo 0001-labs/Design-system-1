@@ -1,14 +1,14 @@
 import { createElement, forwardRef, useEffect, useLayoutEffect, useRef, type HTMLAttributes } from "react";
 import type { Menu as MenuElement } from "../3-unit/ds-menu";
 export type MenuProps = HTMLAttributes<MenuElement> & {
-  open?: boolean; compact?: boolean; columns?: number;
+  open?: boolean; compact?: boolean; columns?: number; hover?: boolean;
   anchor?: HTMLElement | null; trigger?: HTMLElement | null; controller?: HTMLElement | null; activeId?: string;
   onActiveChange?: (id: string) => void;
   onOpenChange?: (open: boolean, reason: "escape" | "outside" | "trigger") => void;
 };
 const useCommitEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 export const Menu = forwardRef<MenuElement, MenuProps>(function Menu(
-  {open, compact, columns, anchor, trigger, controller, activeId, onActiveChange, onOpenChange, children, ...props}, ref,
+  {open, compact, columns, hover, anchor, trigger, controller, activeId, onActiveChange, onOpenChange, children, ...props}, ref,
 ) {
   const host = useRef<MenuElement>(null);
   useCommitEffect(() => {
@@ -19,5 +19,5 @@ export const Menu = forwardRef<MenuElement, MenuProps>(function Menu(
     element.addEventListener("ds-menu-active", active); element.addEventListener("ds-menu-close", close); element.addEventListener("ds-menu-toggle", toggle);
     return () => { element.removeEventListener("ds-menu-active", active); element.removeEventListener("ds-menu-close", close); element.removeEventListener("ds-menu-toggle", toggle); };
   });
-  return createElement("ds-menu", {...props, ref: (element: MenuElement | null) => { host.current = element; if (typeof ref === "function") ref(element); else if (ref) ref.current = element; }, floating: open !== undefined, open, compact, columns, anchor, trigger, controller, activeId}, children);
+  return createElement("ds-menu", {...props, ref: (element: MenuElement | null) => { host.current = element; if (typeof ref === "function") ref(element); else if (ref) ref.current = element; }, floating: open !== undefined, open, compact, columns, hover, anchor, trigger, controller, activeId}, children);
 });
