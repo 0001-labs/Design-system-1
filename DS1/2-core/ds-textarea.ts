@@ -22,6 +22,7 @@ export class Textarea extends Input {
   private resizeFrame = 0;
   private measuredWidth = 0;
   private resizeObserver?: ResizeObserver;
+  private readonly fontsChanged = () => this.resizeToContent();
   protected get isMultiline(): boolean {
     return true;
   }
@@ -38,18 +39,30 @@ export class Textarea extends Input {
   connectedCallback(): void {
     super.connectedCallback();
     if (typeof ResizeObserver !== "undefined") {
-      this.resizeObserver = new ResizeObserver(() => {
-        if (this.clientWidth !== this.measuredWidth) {
+      this.resizeObserver = new ResizeObserver((entries) => {
+        if (this.clientWidth !== this.measuredWidth || entries.some(entry => entry.target !== this)) {
           this.measuredWidth = this.clientWidth;
           this.resizeToContent();
         }
       });
       this.resizeObserver.observe(this);
+      const metric = this.shadowRoot?.querySelector(".row-metric");
+      if (metric) this.resizeObserver.observe(metric);
     }
+    document.fonts?.addEventListener("loadingdone", this.fontsChanged);
+  }
+
+  firstUpdated(): void {
+    super.firstUpdated();
+    // A fixed-width field can change scale without changing its width. Measure
+    // one shared row separately from the content height that we set ourselves.
+    const metric = this.shadowRoot?.querySelector(".row-metric");
+    if (metric) this.resizeObserver?.observe(metric);
   }
 
   disconnectedCallback(): void {
     this.resizeObserver?.disconnect();
+    document.fonts?.removeEventListener("loadingdone", this.fontsChanged);
     cancelAnimationFrame(this.resizeFrame);
     super.disconnectedCallback();
   }
@@ -86,7 +99,7 @@ export class Textarea extends Input {
   }
 
   protected renderControl(hasError: boolean, description: string) {
-    return html`<textarea
+    return html`<span class="row-metric" aria-hidden="true"></span><textarea
       id="input"
       part="input"
       aria-label=${ifDefined(this.accessibleLabel())}

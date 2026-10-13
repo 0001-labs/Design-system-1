@@ -1,4 +1,12 @@
 /* A text area spans whole rows; shared input styles own its field treatment. */
+.row-metric {
+  position: absolute;
+  width: 0;
+  height: var(--ds-row-height);
+  overflow: hidden;
+  visibility: hidden;
+  pointer-events: none;
+}
 /* Pill-shaped corners would cut into multiline writing. A text area's field
  * corners stay small independently of the surrounding control preference. */
 :host([variant="field"]) textarea {

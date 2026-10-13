@@ -14,7 +14,9 @@ persistence; DS1 owns the field treatment and resizing.
 
 Use `rows` to set the starting height in 20px rows, scaled by `--ds-sf`.
 `auto-grow` grows and shrinks with the content up to `max-rows` (default 10), then
-scrolls. It also responds to width changes. Without it, the field can be resized
+scrolls. It also responds to width, surface scale and loaded-font changes, even
+when its containing layout has a fixed width. Remove product height measurements
+and resize handlers when adopting it. Without it, the field can be resized
 vertically. `variant="plain"` removes the field background and border for an
 inline editor; the default `field` uses the standard control treatment.
 
