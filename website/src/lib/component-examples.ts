@@ -14,6 +14,10 @@ export const TABLE_DATA = [
 // The preview and the copyable code use the same source. These are local
 // examples only; no sample sends a request to a product's backend.
 export const EXAMPLES: Record<string, ComponentExample> = {
+  'split': {
+    title: 'Choices and repeated actions', hint: 'Choose a view or step through the date.',
+    html: '<ds-split aria-label="View" options="day:Day,week:Week,month:Month" value="week"></ds-split>\n<ds-split actions aria-label="Date" options="back:@left:Back,today:Today,next:@right:Next"></ds-split>',
+  },
   'button': {
     title: 'Button styles', hint: 'Click a button. The event appears below.',
     html: '<ds-button primary>Save changes</ds-button>\n<ds-button secondary>Cancel</ds-button>\n<ds-button>Text button</ds-button>\n<ds-button primary disabled>Disabled</ds-button>',

@@ -46,6 +46,10 @@ sample.addEventListener('form-submit', event => {
   output.textContent = `form-submit: ${JSON.stringify((event as CustomEvent).detail.data)}`;
 });
 sample.addEventListener('form-invalid', () => { output.textContent = 'form-invalid: fill in the required field.'; });
+for (const name of ['change', 'press']) sample.addEventListener(name, event => {
+  if ((event.target as HTMLElement).localName === 'ds-split')
+    output.textContent = `${name}: ${(event as CustomEvent).detail.value}`;
+});
 
 const table = sample.querySelector<DsTable>('ds-table');
 if (table) table.data = TABLE_DATA;

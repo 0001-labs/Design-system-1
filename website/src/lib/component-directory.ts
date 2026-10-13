@@ -32,6 +32,7 @@ export const LAYERS: DirectoryLayer[] = [
     entries: [
       { name: 'Banner', href: '/2-core/banner/', tag: 'ds-banner' },
       { name: 'Button', href: '/2-core/button/', tag: 'ds-button' },
+      { name: 'Split', href: '/2-core/split/', tag: 'ds-split' },
       { name: 'Card', href: '/2-core/card/', tag: 'ds-card' },
       { name: 'Cycle', href: '/2-core/cycle/', tag: 'ds-cycle' },
       { name: 'Date', href: '/2-core/date/', tag: 'ds-date' },

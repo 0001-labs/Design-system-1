@@ -15,14 +15,16 @@ test('snapshots include dependencies, detect drift, and preserve consumer-owned 
   const target = mkdtempSync(join(tmpdir(), 'shared-components-'));
   targets.push(target);
   writeFileSync(join(target, 'application.ts'), 'export const application = true;');
-  sync(target, 'button,panel,input');
+  sync(target, 'button,panel,input,split');
+  expect(existsSync(join(target, '2-core/ds-split.ts'))).toBe(true);
+  expect(existsSync(join(target, 'react/split.ts'))).toBe(true);
   expect(existsSync(join(target, '2-core/ds-text.ts'))).toBe(true);
   expect(readFileSync(join(target, '1-root/component-metrics.css'), 'utf8')).toBe(readFileSync(resolve('DS1/1-root/component-metrics.css'), 'utf8'));
   expect(readFileSync(join(target, '1-root/component-appearance.css'), 'utf8')).toBe(readFileSync(resolve('DS1/1-root/component-appearance.css'), 'utf8'));
   expect(existsSync(join(target, 'react/button.ts'))).toBe(true);
   expect(existsSync(join(target, '0-face/translations/en.json'))).toBe(true);
   expect(existsSync(join(target, 'x-icon/ezo-password-visibility-see.svg'))).toBe(true);
-  expect(sync(target, 'button,panel,input', true)).toContain('Verified');
+  expect(sync(target, 'button,panel,input,split', true)).toContain('Verified');
   writeFileSync(join(target, '2-core/ds-button.ts'), 'changed');
   expect(() => sync(target, 'button,panel', true)).toThrow();
   sync(target, 'panel');

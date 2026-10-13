@@ -1,0 +1,65 @@
+---
+title: Split
+description: Several choices or actions sharing one control's outside corners.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+A compact group for views, frame choices or repeated actions such as back,
+today and next. The chosen segment carries the accent. Only the outside
+corners take the current shape; interior joins stay square.
+
+<ComponentExample example="split" />
+
+## Choices and actions
+
+`options="day:Day,week:Week"` supplies value/label pairs. A bare word is its
+own label and lowercase value. `back:@left:Back` draws the shared `left` icon
+with Back as its accessible label. Labels follow the shared language runtime;
+set `literal` for already translated or user-supplied words.
+
+For arbitrary labels, including commas and colons, set the `segments` property
+to an array of `{ value, label, icon?, disabled? }` objects. An empty array
+renders no segments. `disabled` disables the entire group, and a disabled
+fieldset disables it through the browser's form association.
+
+Set `value` for a choice. Choosing a different segment emits a bubbling,
+composed, cancelable `change` with `detail.value`. The value changes after the
+event unless a listener calls `preventDefault()`. Choosing the current value
+does nothing. With `actions`, every activation emits `press` with `detail.value`
+and none of the segments is selected.
+
+Each segment is a native button: Tab focuses it, Enter and Space activate it.
+The group never submits a form or adds a form value. Give the host an
+`aria-label`; `focus()` focuses the selected enabled segment, or the first
+enabled segment in action mode.
+
+## React
+
+Select `split` in the source snapshot and register the Lit element before
+rendering. Import `Split` from the shared `react/split` entry. This binding
+owns no visual implementation and treats labels as literal product copy.
+
+```tsx
+<Split label="Frame" value={frame} onPress={setFrame}
+  segments={[{ value: "browser", label: "Browser" }, { value: "phone", label: "Phone" }]} />
+<Split label="History" onPress={handleHistory}
+  segments={[{ value: "undo", label: "Undo", icon: "undo" },
+    { value: "redo", label: "Redo", icon: "redo", disabled: !canRedo }]} />
+```
+
+Supplying `value` keeps selection controlled, including when the product
+declines a request. Omitting it selects action mode. The product retains
+permissions, history, persistence and all callbacks.
+
+## Shape and scale
+
+`data-ds-shape` chooses square, rounded or circular outside corners. Shared
+metrics resolve at the component's `--ds-sf`: the compact control is 16px high,
+with 14px text and 5px inline padding, all scaled. Icon-only segments are one
+compact control square; the separating hairline stays 1px. The face uses
+shared secondary, muted-text and accent tokens. Do not inject product styles
+into the shadow root or recreate the segments with local control classes.
+
+`compact` is the narrow numeric treatment: single-character labels occupy a
+compact square; longer values use the compressed face and 3px scaled insets.
