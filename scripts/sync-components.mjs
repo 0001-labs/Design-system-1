@@ -41,6 +41,7 @@ const entries = components.map(name => {
 });
 // React consumers may import the optional, source-owned state adapter.
 if (components.includes('button')) visit('react/button.ts');
+if (components.includes('file-picker')) visit('react/file-picker.ts');
 if (components.includes('split')) visit('react/split.ts');
 if (components.includes('token-field') || components.includes('token')) visit('react/token-field.ts');
 if (components.includes('composer')) visit('react/composer.ts');

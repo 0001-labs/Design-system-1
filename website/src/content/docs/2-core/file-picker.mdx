@@ -1,0 +1,41 @@
+---
+title: File picker
+description: Native file selection with a shared button or preview face.
+---
+
+`ds-file-picker` keeps a native `input type="file"` in light DOM. It is the
+focusable hit target: the browser owns the file chooser, labels, keyboard
+activation, file drops, required validation, form values, reset and disabled
+fieldsets. DS1 composes the visible Button face, focus ring and scale.
+
+```html
+<ds-file-picker label="Choose logo" secondary>
+  <input type="file" name="logo" accept="image/svg+xml,.svg" aria-label="Choose logo">
+</ds-file-picker>
+```
+
+The normal picker is one square high and as wide as its label. `icon` makes
+it a one-square icon control; `preview` makes a four-square image control,
+or two squares with `compact`.
+Put decorative content in the `content` slot. Keep an accessible name on the
+native input. The composed button is inert and hidden from assistive technology
+so there is one control and one tab stop.
+
+React products import `FilePicker` from `DS1/react/file-picker`, registering the
+Lit element in the browser before hydration. The required `label` supplies the
+visible copy and native accessible name. `children` supplies decorative content.
+The forwarded ref, native attributes and event handlers belong to the input;
+`className` and `style` belong to the host for placement.
+
+```tsx
+<FilePicker label="Attach files" multiple accept="image/*,.pdf"
+  disabled={pending} onChange={event => acceptFiles(event.currentTarget.files)} />
+```
+
+Products own accepted types, size limits, selected-file display, upload requests,
+permissions and persistence. No file leaves the browser through this component.
+Clear `event.currentTarget.value` after consuming a selection when choosing the
+same file again should be possible. Do not hide the input or add a second click
+trigger. Native `accept` guides selection; product validation still applies.
+Verify file selection and keyboard activation, disabled fieldsets, reset, focus,
+pending recovery and light/dark scaled layouts without uploading live test data.

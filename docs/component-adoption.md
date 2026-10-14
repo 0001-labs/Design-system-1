@@ -15,6 +15,8 @@ Each cell counts authored JSX, HTML, Lit template and DOM creation sites. A site
 
 A zero is no recognized usage, not proof that the capability is absent. An unavailable checkout is `?`, never zero. Source paths and lines are available by selecting a cell. The report does not include source contents, credentials or absolute paths.
 
+File picker has its own column. Literal native `input type="file"` sites count as local there; direct native children of `ds-file-picker` are its frame, counted once. The source-owned React `FilePicker` adapter counts at verified imported uses. Dynamic input types and imperative type assignments remain in Input; they are not inferred as file pickers. The picker composes its Button face internally, which is not an additional product-authored Button site.
+
 ## Refresh and verify
 
 Run `vp run reports:scan` from this repository. It writes `.reports/component-adoption.json`, which is ignored by Git. An unavailable source makes the command fail so publishing cannot silently replace a complete snapshot with missing data. Refresh after component migrations; page reloads read the latest published snapshot and do not scan the developer's disk.
