@@ -20,6 +20,7 @@ export const Menu = forwardRef<MenuElement, MenuProps>(function Menu(
     const focus = (event: Event) => { if (event.target === element) onCloseAutoFocus?.(event); };
     element.addEventListener("ds-menu-close-focus", focus);
     element.addEventListener("ds-menu-active", active); element.addEventListener("ds-menu-close", close); element.addEventListener("ds-menu-toggle", toggle);
+    element.renderNow?.();
     return () => { element.removeEventListener("ds-menu-close-focus", focus); element.removeEventListener("ds-menu-active", active); element.removeEventListener("ds-menu-close", close); element.removeEventListener("ds-menu-toggle", toggle); };
   });
   return createElement("ds-menu", {...props, ref: (element: MenuElement | null) => { host.current = element; if (typeof ref === "function") ref(element); else if (ref) ref.current = element; }, floating: open !== undefined, open, compact, columns, hover, anchor, placement, triggerMode, trigger, controller, activeId}, children);
