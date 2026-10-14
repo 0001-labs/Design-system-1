@@ -24,7 +24,7 @@ export class Menu extends LitElement {
     anchor: { attribute: false },
     placement: { type: String },
     trigger: { attribute: false },
-    triggerMode: { type: String, attribute: "trigger-mode" },
+    triggerMode: { type: String, attribute: "trigger-mode", reflect: true },
     hover: { type: Boolean, reflect: true },
     controller: { attribute: false },
     activeId: { type: String, attribute: "active-id" },
