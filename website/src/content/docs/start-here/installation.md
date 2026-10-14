@@ -11,13 +11,13 @@ Install Design system 1 using your preferred package manager:
 
 ```bash
 # Using Vite+ (recommended)
-vp add design-system-1@alpha
+vp add @0001-labs/design-system-1@alpha
 
 # Using npm
-npm install design-system-1@alpha
+npm install @0001-labs/design-system-1@alpha
 
 # Using yarn
-yarn add design-system-1@alpha
+yarn add @0001-labs/design-system-1@alpha
 ```
 
 ### CDN (No Build Step)
@@ -35,13 +35,13 @@ For quick prototyping or simple projects, you can load Design system 1 directly 
     <!-- Design system 1 Styles -->
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/design-system-1@alpha/DS1/1-root/one.css"
+      href="https://cdn.jsdelivr.net/npm/@0001-labs/design-system-1@alpha/DS1/1-root/one.css"
     />
 
     <!-- Design system 1 Components -->
     <script
       type="module"
-      src="https://cdn.jsdelivr.net/npm/design-system-1@alpha/dist/design-system-1.bundle.js"
+      src="https://cdn.jsdelivr.net/npm/@0001-labs/design-system-1@alpha/dist/design-system-1.bundle.js"
     ></script>
   </head>
   <body>
@@ -57,11 +57,11 @@ For automatic updates to the latest alpha version, you can use the `@alpha` tag:
 ```html
 <script
   type="module"
-  src="https://cdn.jsdelivr.net/npm/design-system-1@alpha/dist/design-system-1.bundle.js"
+  src="https://cdn.jsdelivr.net/npm/@0001-labs/design-system-1@alpha/dist/design-system-1.bundle.js"
 ></script>
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/design-system-1@alpha/DS1/1-root/one.css"
+  href="https://cdn.jsdelivr.net/npm/@0001-labs/design-system-1@alpha/DS1/1-root/one.css"
 />
 ```
 

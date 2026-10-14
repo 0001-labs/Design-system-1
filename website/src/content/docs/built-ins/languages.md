@@ -34,7 +34,7 @@ There is one list, `LANGUAGES` (`DS1/0-face/languages.ts`):
 A product turns on the languages it translates, once, at startup:
 
 ```javascript
-import { configureI18n } from "ds-one";
+import { configureI18n } from "@0001-labs/design-system-1";
 
 configureI18n({
   languages: ["en", "da", "ja"],
@@ -51,7 +51,7 @@ configureI18n({
 ## Choosing and remembering a language
 
 ```javascript
-import { setLanguage, currentLanguage } from "ds-one";
+import { setLanguage, currentLanguage } from "@0001-labs/design-system-1";
 
 setLanguage("da");
 currentLanguage.value; // "da"
@@ -64,7 +64,7 @@ On a first visit the language is the browser's, as one the product speaks: the f
 ## Translating
 
 ```javascript
-import { translate } from "ds-one";
+import { translate } from "@0001-labs/design-system-1";
 
 translate("Save");                                   // "Gem" in Danish
 translate("Hello {name}", { name: "Ada" });          // placeholders filled
@@ -130,7 +130,7 @@ Each file holds one language's table, wrapped (`{ "da": { … } }`, as Ezo publi
 A product can ship its words as a module of the same shape, as Link does, and hand them over at startup. Tables may be `Partial`:
 
 ```typescript
-import { loadTranslations } from "ds-one";
+import { loadTranslations } from "@0001-labs/design-system-1";
 import { translations } from "./i18n/translations";
 
 loadTranslations(translations); // { en: {…}, da: {…} }
@@ -162,7 +162,7 @@ import {
   stripLanguagePrefix,
   isLanguageSlug,
   setLanguage,
-} from "ds-one";
+} from "@0001-labs/design-system-1";
 
 parseLanguagePath("/ja/pricing"); // { language: "ja", restPath: "/pricing" }
 withLanguagePrefix("/pricing", "pt-BR"); // "/pt-br/pricing"
@@ -190,7 +190,7 @@ A prefix already there is replaced, never doubled, and a query and hash stay on 
 The server checks languages with a validator built from the same list, so it cannot drift from the interface. Import it by path in the product's `convex/` folder; it is not in the browser bundle:
 
 ```typescript
-import { languageValidator, languageValidatorFor } from "ds-one/DS1/0-face/language-validator.ts";
+import { languageValidator, languageValidatorFor } from "@0001-labs/design-system-1/DS1/0-face/language-validator.ts";
 
 export const setLanguage = mutation({
   args: { language: languageValidatorFor(["en", "da", "nb", "pt-BR"]) },

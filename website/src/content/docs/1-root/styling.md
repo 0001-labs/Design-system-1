@@ -21,7 +21,7 @@ Load `one.css`, then apply Design system 1 classes to native elements:
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/design-system-1@alpha/DS1/1-root/one.css"
+      href="https://cdn.jsdelivr.net/npm/@0001-labs/design-system-1@alpha/DS1/1-root/one.css"
     />
     <title>CSS-only Design system 1</title>
   </head>

@@ -23,7 +23,7 @@ Component-based design system with Lit Web Components.
 - `vp run build:bundle` — Standard + minified bundles
 - `vp lint` / `vp run lint:fix` — Oxlint
 - `vp test --passWithNoTests` — Vitest
-- `vp run release:patch|minor|major` — Semantic versioning
+- `vp run release patch|minor|major|alpha` — publish to npm with semantic versioning (see Distribution)
 
 ## Architecture (DS1/)
 
@@ -36,8 +36,17 @@ Component-based design system with Lit Web Components.
 
 ## Distribution
 
-- npm package (`@alpha` tag)
-- CDN via jsDelivr
+- npm package `@0001-labs/design-system-1` (it was `ds-one` before; that name keeps its old versions and gets no new ones)
+- CDN via jsDelivr: `https://cdn.jsdelivr.net/npm/@0001-labs/design-system-1@alpha/…`
+
+One command publishes a new version (`scripts/release.mjs`, the same file in Aa, Design system 1, ID 1 and Drag):
+
+- `vp run release alpha` — the next preview under the `alpha` tag (`-alpha.N` → `-alpha.N+1`)
+- `vp run release patch` / `minor` / `major` — a release under `latest`: fixes, something new, something that breaks (from a preview, patch and minor release its own number, major goes to the next major)
+- `vp run release current` — publishes the version already in `package.json`, for the first release under the new name
+- `--dry-run` after any of them goes through every step without publishing
+
+It refuses with uncommitted changes or when npm is signed out (`vp pm login`), writes the version into every `package.json` and the version references in the docs (`release:sync`, `scripts/versions.mjs`), runs `check`, `test` and `build`, publishes, then commits `Release @0001-labs/design-system-1 <version>` and tags `v<version>`. A failed step puts everything back.
 
 ## Integration
 

@@ -15,11 +15,11 @@ Create a simple HTML page using Design system 1 components:
 
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/design-system-1@alpha/DS1/1-root/one.css"
+      href="https://cdn.jsdelivr.net/npm/@0001-labs/design-system-1@alpha/DS1/1-root/one.css"
     />
     <script
       type="module"
-      src="https://cdn.jsdelivr.net/npm/design-system-1@alpha/dist/design-system-1.bundle.js"
+      src="https://cdn.jsdelivr.net/npm/@0001-labs/design-system-1@alpha/dist/design-system-1.bundle.js"
     ></script>
   </head>
   <body>
@@ -76,7 +76,7 @@ Design system 1 includes built-in internationalization. Use the `text` attribute
   import {
     setLanguage,
     loadTranslations,
-  } from "https://cdn.jsdelivr.net/npm/design-system-1@alpha/dist/design-system-1.bundle.js";
+  } from "https://cdn.jsdelivr.net/npm/@0001-labs/design-system-1@alpha/dist/design-system-1.bundle.js";
 
   // Load translations
   await loadTranslations({

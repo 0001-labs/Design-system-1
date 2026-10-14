@@ -5,7 +5,7 @@
  *
  * Import it by path, from a product's `convex/` folder:
  *
- *   import { languageValidator } from "ds-one/DS1/0-face/language-validator.ts";
+ *   import { languageValidator } from "@0001-labs/design-system-1/DS1/0-face/language-validator.ts";
  *
  * It is not exported from `DS1/index.ts`, so the browser bundle stays free of
  * `convex/values`.
