@@ -15,7 +15,7 @@ export type RedirectRules = {
   params?: Record<string, RegExp | null>
   /** Keys that have to be present. */
   require?: string[]
-  /** Custom URL schemes an app registers, with the colon (`ezo:`): the destination is then `<scheme>//callback?state=<uuid>` and nothing else. */
+  /** Custom URL schemes an app registers, with the colon (`myapp:`): the destination is then `<scheme>//callback?state=<uuid>` and nothing else. */
   nativeSchemes?: string[]
   /** A further rule for hosts outside `origins`, such as a product's customer subdomains; https only, no port. */
   hostAllowed?: (hostname: string) => boolean

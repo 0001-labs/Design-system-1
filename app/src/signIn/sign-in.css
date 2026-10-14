@@ -1,8 +1,8 @@
 /*
- * The sign-in screen, as Link's and the System login on 0001.dev: one column of
- * 36 squares, 26px type on rows two squares high, a field drawn as a single
- * line with its action as words at the line's end. Every measure is squares
- * times the device scale; colours are Design system 1's tokens.
+ * The sign-in screen: one column of 36 squares, 26px type on rows two squares
+ * high, a field drawn as a single line with its action as words at the line's
+ * end. Every measure is squares times the device scale; colours are Design
+ * system 1's tokens.
  */
 sign-in-screen { display: block; width: min(calc(720px * var(--sf, 1)), calc(100vw - 2 * var(--1, 20px))); margin: 0 auto; color: var(--text-color); font: inherit; }
 sign-in-screen * { box-sizing: border-box; }

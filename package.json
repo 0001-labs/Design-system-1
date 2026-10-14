@@ -87,7 +87,7 @@
     "release": "node scripts/release.mjs",
     "release:check": "vp run build:types",
     "release:sync": "node scripts/versions.mjs --write",
-    "sync-sign-in": "node \"../ID 1/scripts/sync-into.mjs\" --convex convex/signIn --client app/src/signIn",
+    "sync-sign-in": "node ../Sign-in/scripts/sync-into.mjs --convex convex/signIn --client app/src/signIn",
     "icons:sync-products": "vp exec tsx scripts/sync-product-icons.ts",
     "icons:check-products": "vp exec tsx scripts/sync-product-icons.ts --check",
     "icons:sync-globe": "node scripts/sync-globe.mjs",
