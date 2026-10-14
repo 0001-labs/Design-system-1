@@ -39,7 +39,7 @@ Component-based design system with Lit Web Components.
 - npm package `@0001-labs/design-system-1` (it was `ds-one` before; that name keeps its old versions and gets no new ones)
 - CDN via jsDelivr: `https://cdn.jsdelivr.net/npm/@0001-labs/design-system-1@alpha/…`
 
-One command publishes a new version (`scripts/release.mjs`, the same file in Aa, Design system 1, ID 1 and Drag):
+One command publishes a new version (`scripts/release.mjs`, the same file in Aa, Design system 1, ID v1 and Drag):
 
 - `vp run release alpha` — the next preview under the `alpha` tag (`-alpha.N` → `-alpha.N+1`)
 - `vp run release patch` / `minor` / `major` — a release under `latest`: fixes, something new, something that breaks (from a preview, patch and minor release its own number, major goes to the next major)
