@@ -44,6 +44,10 @@ describe("source adoption evidence", () => {
     expect(sites[1]).toMatchObject({ tag: "input", nativeStyle: "ds-input" });
     expect(sourceSites("page.html", '<button class="ds-button secondary">Save</button>')[0]?.nativeStyle).toBe("ds-button");
   });
+  it("recognizes explicitly styled native buttons created and tagged in the same block", () => {
+    const sites = sourceSites("view.ts", 'function view() { const button = document.createElement("button"); button.className = "local-action"; button.classList.add("ds-button"); host.append(button); } function other() { const button = document.createElement("button"); host.append(button); }');
+    expect(sites.map(site => site.nativeStyle)).toEqual(["ds-button", undefined]);
+  });
   it("counts shared native choice frames only once and separates literal local choices", () => {
     for (const file of ["page.html", "view.tsx"]) {
       const sites = sourceSites(file, '<ds-checkbox><input type="checkbox" /></ds-checkbox><ds-switch><button role="switch" /></ds-switch><input type="checkbox" /><button role="switch" />');

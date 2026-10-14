@@ -72,6 +72,30 @@ export function sourceSites(file: string, source: string): TagSite[] {
   // A direct, const DOM append is evidence that the native control is the
   // shared host's required frame. Do not infer dynamic factories or aliases.
   const frames = new Set<ts.Node>();
+  const styledButtons = new Set<ts.CallExpression>();
+  const findStyledButtons = (scope: ts.Node) => {
+    if (ts.isSourceFile(scope) || ts.isBlock(scope)) {
+      const creations = new Map<string, ts.CallExpression>();
+      const styled = new Set<string>();
+      const inspect = (node: ts.Node) => {
+        if (node !== scope && (ts.isBlock(node) || ts.isFunctionLike(node))) return;
+        if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer && ts.isCallExpression(node.initializer) && ts.isPropertyAccessExpression(node.initializer.expression) && node.initializer.expression.expression.getText(ast) === "document" && node.initializer.expression.name.text === "createElement" && node.initializer.arguments[0] && ts.isStringLiteral(node.initializer.arguments[0]) && node.initializer.arguments[0].text === "button") {
+          creations.set(node.name.text, node.initializer);
+        }
+        if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.EqualsToken && ts.isCallExpression(node.right) && ts.isPropertyAccessExpression(node.right.expression) && node.right.expression.expression.getText(ast) === "document" && node.right.expression.name.text === "createElement" && node.right.arguments[0] && ts.isStringLiteral(node.right.arguments[0]) && node.right.arguments[0].text === "button") {
+          creations.set(node.left.getText(ast), node.right);
+        }
+        if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression) && node.expression.name.text === "add" && ts.isPropertyAccessExpression(node.expression.expression) && node.expression.expression.name.text === "classList" && (ts.isIdentifier(node.expression.expression.expression) || ts.isPropertyAccessExpression(node.expression.expression.expression)) && node.arguments.some(arg => ts.isStringLiteral(arg) && arg.text === "ds-button")) {
+          styled.add(node.expression.expression.expression.getText(ast));
+        }
+        ts.forEachChild(node, inspect);
+      };
+      for (const statement of scope.statements) inspect(statement);
+      for (const [target, call] of creations) if (styled.has(target)) styledButtons.add(call);
+    }
+    ts.forEachChild(scope, findStyledButtons);
+  };
+  findStyledButtons(ast);
   const findFrames = (scope: ts.Node) => {
     if (ts.isSourceFile(scope) || ts.isBlock(scope)) {
       const creations = new Map<string, { tag: string; call: ts.CallExpression }>();
@@ -121,7 +145,7 @@ export function sourceSites(file: string, source: string): TagSite[] {
     }
     if (ts.isCallExpression(node) && ((ts.isPropertyAccessExpression(node.expression) && ["createElement", "createElementNS"].includes(node.expression.name.text)) || (ts.isIdentifier(node.expression) && reactFactories.has(node.expression.text)))) {
       const arg = node.arguments[ts.isPropertyAccessExpression(node.expression) && node.expression.name.text === "createElementNS" ? 1 : 0];
-      if (arg && ts.isStringLiteralLike(arg) && !frames.has(node)) found.push({ tag: arg.text, line: line(arg.getStart(ast)) });
+      if (arg && ts.isStringLiteralLike(arg) && !frames.has(node)) found.push({ tag: arg.text, line: line(arg.getStart(ast)), ...(styledButtons.has(node) ? { nativeStyle: nativeStyle(arg.text, "ds-button") } : {}) });
     }
     if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression) && node.expression.name.text === "setAttribute") {
       const [name, value] = node.arguments;
