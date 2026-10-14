@@ -1,0 +1,24 @@
+---
+title: Badge
+description: A shared, noninteractive status label with an optional icon.
+---
+
+`ds-badge` shows a status in one shared row. Products supply the words, icon
+and status meaning; DS1 owns the face, type, truncation and independent scale.
+It is not a button and adds no tab stop.
+
+```html
+<ds-badge icon="lock">Password on</ds-badge>
+<ds-badge icon="archive" icon-only data-tooltip="Archived">Archived</ds-badge>
+```
+
+Keep the status words as children even in `icon-only` mode. The label remains
+available to assistive technology; the shared icon is decorative. Without an
+icon, `icon-only` falls back to displaying the words. Load the shared tooltip
+helper to explain compact badges on hover or focus of their containing control.
+
+Set `--ds-badge-background` and `--ds-badge-color` with shared colour tokens
+when a status needs a meaningful colour. The default is neutral. Place a badge
+inside a shared Button when the containing action is interactive. Products may
+choose the compact mode from available layout space; do not draw a second chip
+or resize its internal icon and type. Copy `badge` through Sync 1.

@@ -1,0 +1,26 @@
+@import "../../1-root/component-metrics.css";
+
+:host { display: inline-flex; flex: 0 0 auto; min-width: 0; max-width: 100%; vertical-align: middle; }
+:host([hidden]) { display: none !important; }
+.frame {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  gap: calc(4px * var(--ds-sf));
+  height: var(--ds-row-height);
+  min-width: var(--ds-row-height);
+  max-width: 100%;
+  padding-inline: calc(4px * var(--ds-sf));
+  background: var(--ds-badge-background, var(--ds-fill));
+  color: var(--ds-badge-color, var(--ds-text-color));
+  font-family: var(--ds-typeface-regular);
+  font-feature-settings: var(--ds-font-features);
+  font-size: var(--ds-type-size-default);
+  line-height: var(--ds-type-lineheight-default);
+  letter-spacing: var(--ds-type-letterspacing-default);
+}
+.label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+ds-icon { flex: 0 0 auto; }
+.icon-only { position: relative; width: var(--ds-row-height); padding: 0; justify-content: center; }
+/* Keep the words available to assistive technology when only the icon fits. */
+.icon-only .label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
