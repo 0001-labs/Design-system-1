@@ -1,4 +1,4 @@
-/** Private report data. Sign-in remains the app's shared ID 1 implementation. */
+/** Private report data. Sign-in remains the app's shared Sign-in implementation. */
 export interface ReportsEnv {
   LIBRARIES: R2Bucket;
   /** The same deployment as the app's VITE_CONVEX_URL. */
