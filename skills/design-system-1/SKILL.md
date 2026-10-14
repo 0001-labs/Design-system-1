@@ -30,6 +30,8 @@ Items stack edge to edge with no gap, as an Ezo list does. Lists, table rows, ce
 - Colours, typefaces and tokens come from `DS1/1-root/one.css` (or the product's copy, e.g. Ezo's `client/design/1-root/one.css`). Use the tokens, never raw values.
 - Words sit straight on the paper, with no cards or shadows around content.
 - Sentence case in interface copy, never all caps.
+- Arrows (→ ← ↑ ↓ ⇒ ↩ …) are always Inter, in every typeface, code included: "Inter Arrows" (`fonts/Inter-Arrows.woff2`, Inter's arrows alone, limited by `unicode-range`) leads every `--typeface-*` token. A new typeface token or font stack starts with it; never draw an arrow in GT America, Iosevka or a system font.
+- Code is Iosevka (`--typeface-mono`), loaded from `fonts/Iosevka-Regular.woff2`, with a monospace fallback, never the browser's serif.
 - Motion animates `transform` and `opacity` only.
 - On phones and tablets every measure is multiplied by `--sf` (1 on a computer; the screen width over 280 on a phone, between 0.75 and 2). Write lengths as units or `calc(Npx * var(--sf))`, never bare pixels, except hairlines.
 

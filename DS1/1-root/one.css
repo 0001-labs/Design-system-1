@@ -31,6 +31,17 @@
   font-display: swap;
 }
 
+/* Arrows are always Inter: its arrows alone (fonts/Inter-LICENSE.md), first in
+   every typeface token, so the unicode-range draws only arrows with it. */
+@font-face {
+  font-family: "Inter Arrows";
+  src: url("./fonts/Inter-Arrows.woff2") format("woff2");
+  unicode-range: U+2190-21FF, U+27F0-27FF, U+2900-297F, U+2B00-2BFF;
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* The code font: Iosevka cut down to what code uses (fonts/Iosevka-LICENSE.md). */
 @font-face {
   font-family: Iosevka;
@@ -84,17 +95,17 @@ input {
   --grid-color-dark: var(--white);
 
   /* typefaces */
-  --typeface-regular: "GT-America-Standard-Regular";
-  --typeface-medium: "GT-America-Standard-Medium";
-  --typeface-compressed: "GT-America-Compressed-Regular";
-  --typeface-mono: "Iosevka", ui-monospace, "SF Mono", Menlo, monospace;
-  --typeface-canon: "GT-Canon-M-Standard-Medium";
+  --typeface-regular: "Inter Arrows", "GT-America-Standard-Regular";
+  --typeface-medium: "Inter Arrows", "GT-America-Standard-Medium";
+  --typeface-compressed: "Inter Arrows", "GT-America-Compressed-Regular";
+  --typeface-mono: "Inter Arrows", "Iosevka", ui-monospace, "SF Mono", Menlo, monospace;
+  --typeface-canon: "Inter Arrows", "GT-Canon-M-Standard-Medium";
 
   /* language specific typefaces */
 
-  --typeface-regular-jp: "Noto Sans JP";
-  --typeface-regular-zh-hans: "Noto Sans SC";
-  --typeface-regular-zh-hant: "Noto Sans TC";
+  --typeface-regular-jp: "Inter Arrows", "Noto Sans JP";
+  --typeface-regular-zh-hans: "Inter Arrows", "Noto Sans SC";
+  --typeface-regular-zh-hant: "Inter Arrows", "Noto Sans TC";
   --typeface-regular-zh: var(--typeface-regular-zh-hant);
 
   /* typefaces sizes and weight */

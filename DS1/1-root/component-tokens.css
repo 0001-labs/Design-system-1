@@ -47,9 +47,9 @@
    ---------------------------------------------------------- */
 
   --ds-typeface-regular:
-    "GT America", "GT-America-Standard-Regular", Inter, system-ui, -apple-system, sans-serif;
-  --ds-typeface-compressed: "GT-America-Compressed-Regular", var(--ds-typeface-regular);
-  --ds-typeface-regular-jp: "GT America", "Noto Sans JP", sans-serif;
+    "Inter Arrows", "GT America", "GT-America-Standard-Regular", Inter, system-ui, -apple-system, sans-serif;
+  --ds-typeface-compressed: "Inter Arrows", "GT-America-Compressed-Regular", var(--ds-typeface-regular);
+  --ds-typeface-regular-jp: "Inter Arrows", "GT America", "Noto Sans JP", sans-serif;
   /* GT America exposes circular dots as stylistic set 05. */
   --ds-font-features: "ss05" 1;
 
