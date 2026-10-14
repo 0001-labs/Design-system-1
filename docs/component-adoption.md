@@ -53,3 +53,5 @@ FilePicker in File picker. Root/state providers, groups and the composed
 indicators are not additional sites. Earlier scans did not infer Radix React
 abstractions: the increase when migrating those rows is expanded recognition,
 not a like-for-like reduction in a previously counted local column.
+
+Badge counts verified `ds-badge` and imported source-owned React `Badge` uses. Its icon and label are internal composition, not extra authored product sites. Local status-chip abstractions are not inferred by name.

@@ -287,3 +287,21 @@ it("counts native and shared file pickers separately and verifies the adapter so
     expect(sites[1].controlKind).toBe('file-picker');
   }
 });
+
+it("verifies badge adapters and keeps their composed icons out of product counts", () => {
+  const {studio, ds, app}=fixture();
+  const files={"2-core/ds-badge.ts":"export class Badge {}", "react/badge.ts":'import type { Badge } from "../2-core/ds-badge"; export const Badge = () => null;'};
+  for (const [file,body] of Object.entries(files)) {write(ds,`DS1/${file}`,body);write(app,`design/${file}`,body);}
+  git(ds,'add','.');git(ds,'-c','user.name=Test','-c','user.email=test@example.com','commit','-m','Add badge');
+  const path=join(app,'design/components-manifest.json'),manifest=JSON.parse(readFileSync(path,'utf8'));
+  manifest.commit=git(ds,'rev-parse','HEAD');manifest.components.push('badge');
+  for(const [file,body] of Object.entries(files))manifest.files[file]=createHash('sha256').update(body).digest('hex');
+  writeFileSync(path,JSON.stringify(manifest));
+  write(app,'src/status.tsx','import {Badge} from "../design/react/badge"; export const view = <><Badge icon="lock">Locked</Badge><ds-badge icon="archive">Archived</ds-badge></>;');
+  git(app,'add','.');git(app,'-c','user.name=Test','-c','user.email=test@example.com','commit','-m','Use badge');
+  const scan=()=>scanApp({id:'example',name:'Example',directory:'Example',roots:['src'],manifest:'design/components-manifest.json'},studio,ds);
+  expect(scan().cells.badge).toMatchObject({shared:2,unverified:0});
+  expect(scan().cells.icon.shared).toBe(0);
+  write(app,'design/react/badge.ts',files['react/badge.ts']+'\n// Local modification');
+  expect(scan().cells.badge).toMatchObject({shared:1,unverified:1});
+});

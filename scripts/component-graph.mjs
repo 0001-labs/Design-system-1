@@ -36,6 +36,7 @@ export function componentGraph(ds1, names) {
   });
   // React consumers may import the optional, source-owned state adapter.
   if (components.includes('button')) visit('react/button.ts');
+  if (components.includes('badge')) visit('react/badge.ts');
   if (components.includes('file-picker')) visit('react/file-picker.ts');
   if (components.includes('split')) visit('react/split.ts');
   if (components.includes('token-field') || components.includes('token')) visit('react/token-field.ts');
