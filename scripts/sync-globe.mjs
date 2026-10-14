@@ -2,7 +2,6 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
-import { createHash } from 'node:crypto';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const studio = resolve(root, '..');
@@ -37,7 +36,8 @@ for (const file of [
 // Android's SVG loader uses an explicit source colour, then applies its tint.
 put('Ezo/android/shared/src/main/resources/screen-icons/Screen-globe.svg', svg.replace('currentColor', '#1E1E1E') + '\n');
 
-for (const base of ['Design system 1/DS1', 'Ezo/client/design', 'Consistency/src/design']) {
+// Products take the generated maps with their component copy (Sync 1), so only the source is written here.
+for (const base of ['Design system 1/DS1']) {
   for (const part of ['ds-icon-map', 'icons-extra']) {
     put(`${base}/2-core/generated/${part}.ts`, source => {
       for (const name of ['globe', 'ezo-android-screen-globe']) {
@@ -49,17 +49,6 @@ for (const base of ['Design system 1/DS1', 'Ezo/client/design', 'Consistency/src
     });
   }
 }
-// Keep the source-owned snapshot manifest in step with the two changed maps.
-for (const base of ['Consistency/src/design', 'Ezo/client/design']) put(`${base}/components-manifest.json`, source => {
-  const manifest = JSON.parse(source);
-  for (const part of ['ds-icon-map', 'icons-extra']) {
-    const file = `2-core/generated/${part}.ts`;
-    if (file in manifest.files) {
-      manifest.files[file] = createHash('sha256').update(readFileSync(resolve(studio, base, file))).digest('hex');
-    }
-  }
-  return JSON.stringify(manifest, null, 2) + '\n';
-});
 put('tau99/src/vendor/design-system.js', source => replace(source, /globe:`<svg[\s\S]*?<\/svg>`/, `globe:\`${svg}\``));
 
 // React adapters keep each product's public props; the geometry is always filled.

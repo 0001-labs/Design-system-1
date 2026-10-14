@@ -78,7 +78,7 @@ Colours and typefaces inherit as usual. Resolved dimensions such as `--ds-row-he
 
 ## React
 
-Selecting `input` with `scripts/sync-components.mjs` also copies the shared `react/input.ts` adapter. Register the copied components through the product's browser entry, then import the adapter. It contains no visuals; `ds-input` owns the control. Registration must be browser-only in an application that renders on the server.
+Selecting `input` in a product's component copy also copies the shared `react/input.ts` adapter. Register the copied components through the product's browser entry, then import the adapter. It contains no visuals; `ds-input` owns the control. Registration must be browser-only in an application that renders on the server.
 
 ```tsx
 import { Input, type InputElement } from './design/react/input';

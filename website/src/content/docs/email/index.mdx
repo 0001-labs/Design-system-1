@@ -49,6 +49,6 @@ const message = emailMessage({
 
 ## Keep one source
 
-Products copy the renderer and font, just as they copy the rest of Design system 1. From Consistency run `vp run sync-email`; from Link run `bun run sync-email`. Add `-- --check` to the former, or `--check` to the latter, to verify the copy. Edit the source here, then sync; never edit the copies.
+Products copy the renderer and font, just as they copy the rest of Design system 1. A product takes them as the `email` export in its `sync.json`, and `sync1 check` verifies the copy. Edit the source here, then sync; never edit the copies.
 
 Product-specific subjects, copy, recipients, replies, unsubscribe links, attachments and delivery stay in the product. Link’s client emails keep the workspace’s logo, typeface and colours within the same paper layout. Internal emails use Link’s neutral identity. Code emails must display the expiry of the provider that actually issued the code.

@@ -93,8 +93,7 @@
     "icons:sync-products": "vp exec tsx scripts/sync-product-icons.ts",
     "icons:check-products": "vp exec tsx scripts/sync-product-icons.ts --check",
     "icons:sync-globe": "node scripts/sync-globe.mjs",
-    "icons:check-globe": "node scripts/sync-globe.mjs --check",
-    "icons:sync-consumers": "vp exec tsx scripts/sync-shared-icons.ts"
+    "icons:check-globe": "node scripts/sync-globe.mjs --check"
   },
   "dependencies": {
     "@auth/core": "0.41.3",

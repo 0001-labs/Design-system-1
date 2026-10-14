@@ -89,17 +89,24 @@ import "design-system-1/DS1/1-root/one.semantic.css";
 ## Source snapshots in products
 
 Products can select shared Lit components without loading the full system's
-page, device or theme setup:
+page, device or theme setup. `sync.exports.mjs` says what a product may copy:
+`languages`, `components`, `email` and `icons`. 0001's products copy them with
+Sync 1, naming what they take in their `sync.json`:
 
-```bash
-node scripts/sync-components.mjs --target ../Product/src/design --components button,text,gap,icon,row,list,menu,tabs,panel
+```json
+{ "sources": { "Design system 1": { "components": { "to": "src/design", "components": ["button", "text", "row"] } } } }
 ```
 
 Import the generated `components.ts` and `1-root/component-tokens.css` in the
-consumer. The sync copies the relative dependency graph, including shared
-languages and SVG maps, and writes a file-hash manifest. Add `--check` to fail
-on missing files or local drift. Files outside the previous manifest stay
-owned by the consumer. All component edits happen here, then consumers sync.
+consumer. The copy carries the relative dependency graph
+(`scripts/component-graph.mjs`), including shared languages and SVG maps, and a
+`components-manifest.json` for the adoption report. Sync 1 records every file's
+hash in the product's `sync.lock.json`, and `sync1 check` fails on missing
+files or local drift. Files the copy did not write stay owned by the consumer.
+All component edits happen here, then consumers sync.
+
+`node scripts/sync-components.mjs --target <folder> --components button,text`
+does the same for a product not yet on Sync 1.
 
 Components use scoped `--ds-*` tokens so an embedded document can keep its own
 scale and theme. A product may configure those tokens at its surface.
