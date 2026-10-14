@@ -54,16 +54,38 @@ test("public symbols and pending identity states remain shared properties", asyn
   avatar.icon = "globe";
   avatar.pending = true;
   avatar.outlined = true;
-  avatar.shape = "square";
   document.body.append(avatar);
   await avatar.updateComplete;
   expect(avatar.shadowRoot!.querySelector("ds-icon")?.getAttribute("type")).toBe("globe");
   expect(avatar.hasAttribute("pending")).toBe(true);
   expect(avatar.hasAttribute("outlined")).toBe(true);
-  expect(avatar.getAttribute("shape")).toBe("square");
   avatar.pending = false;
-  avatar.shape = "circle";
   await avatar.updateComplete;
   expect(avatar.hasAttribute("pending")).toBe(false);
-  expect(avatar.getAttribute("shape")).toBe("circle");
+});
+
+test("avatars are only round; a logo is the one mark that keeps its corners", async () => {
+  const avatar = document.createElement("ds-avatar");
+  document.body.append(avatar);
+  await avatar.updateComplete;
+  expect("shape" in avatar).toBe(false);
+  expect(avatar.hasAttribute("logo")).toBe(false);
+  avatar.logo = true;
+  await avatar.updateComplete;
+  expect(avatar.hasAttribute("logo")).toBe(true);
+});
+
+test("Link fills an avatar with its colour; Ezo letters it in an ink on the neutral fill", async () => {
+  const filled = document.createElement("ds-avatar");
+  filled.color = "#99ff73";
+  const inked = document.createElement("ds-avatar");
+  inked.ink = "var(--person-ink)";
+  document.body.append(filled, inked);
+  await Promise.all([filled.updateComplete, inked.updateComplete]);
+  const filledFrame = filled.shadowRoot!.querySelector<HTMLElement>(".frame")!;
+  const inkedFrame = inked.shadowRoot!.querySelector<HTMLElement>(".frame")!;
+  expect(filledFrame.style.backgroundColor).not.toBe("");
+  expect(filledFrame.style.color).toBe("var(--ds-black)");
+  expect(inkedFrame.style.backgroundColor).toBe("");
+  expect(inkedFrame.style.color).toBe("var(--person-ink)");
 });

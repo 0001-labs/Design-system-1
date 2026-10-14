@@ -1,0 +1,53 @@
+---
+title: Avatar
+description: A person's or workspace's mark, always round and the size of Ezo's badges.
+---
+
+`ds-avatar` draws a person or a workspace: a picture, an initial or an icon in a
+circle. It is only ever round. Its size is Ezo's people badge: one control high
+(16px times `--sf`), so it sits inside a one-square row with type in the small
+size. `size="large"` is two squares. The product picks who a mark stands for,
+and handles selecting and acting on it.
+
+```html
+<ds-avatar initial="J" label="Joachim"></ds-avatar>
+<ds-avatar initial="高橋" label="高橋 由紀"></ds-avatar>
+<ds-avatar src="/people/ana.jpg" initial="A" label="Ana"></ds-avatar>
+<ds-avatar icon="globe" outlined label="Public"></ds-avatar>
+```
+
+## Colour
+
+There are two ways to colour an avatar, one from each product that uses it:
+
+- **Fill (Link).** `color` fills the circle with a saved identity colour, and
+  the initial takes black or white, whichever reads on it. Add `outlined` for
+  the ink line around it.
+- **Ink (Ezo).** `ink` letters the initial in a person's colour on the neutral
+  fill, and with `outlined` draws the line in the same colour. Give it a
+  `light-dark()` pair, a darker shade that reads on white and a lighter one
+  that reads on black.
+
+```html
+<ds-avatar initial="A" color="#99ff73" outlined></ds-avatar>
+<ds-avatar initial="J" ink="light-dark(#4b44e6, #b3aeff)" outlined></ds-avatar>
+```
+
+`--ds-avatar-background` sets the neutral fill behind an inked avatar on tinted
+paper. `pending` greys out someone who has not accepted yet, whichever way they
+are coloured.
+
+## Pictures and logos
+
+A picture covers the circle; while it loads, or if it fails, the initial or icon
+stays. `mask` with `fit="contain"` draws a monochrome mark in the text colour.
+
+A logo is not an avatar. The React `Logo` sets `logo`, the one mark that keeps
+its corners: a brand mark fitted into its image area (`size="fill"`), unclipped.
+Without a picture it shows its `initial`.
+
+## Groups
+
+`ds-avatar-group` overlaps avatars by Ezo's 3px. Copy `avatar` and
+`avatar-group` through Sync 1; React products import `Avatar`, `Logo` and
+`AvatarGroup` from `DS1/react/avatar` and `DS1/react/avatar-group`.

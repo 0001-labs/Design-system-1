@@ -9,7 +9,6 @@ export type AvatarProps = Omit<HTMLAttributes<AvatarElement>, "children"> &
       | "initial"
       | "src"
       | "icon"
-      | "shape"
       | "size"
       | "fit"
       | "mask"
@@ -17,6 +16,7 @@ export type AvatarProps = Omit<HTMLAttributes<AvatarElement>, "children"> &
       | "pending"
       | "plain"
       | "color"
+      | "ink"
     >
   >;
 /** Browser-only registration stays in the product's runtime entry for SSR. */
@@ -24,14 +24,12 @@ export const Avatar = forwardRef<AvatarElement, AvatarProps>(function Avatar(pro
   return createElement("ds-avatar", { ...props, ref });
 });
 
-export type LogoProps = Omit<AvatarProps, "shape" | "size" | "fit" | "mask" | "plain"> & {
-  src: string;
-};
-/** A monochrome brand mark fitted into the page's image area. */
+export type LogoProps = Omit<AvatarProps, "size" | "fit" | "mask" | "plain">;
+/** A monochrome brand mark fitted into the page's image area; without `src`, its `initial`. */
 export const Logo = forwardRef<AvatarElement, LogoProps>(function Logo(props, ref) {
   return createElement("ds-avatar", {
     size: "fill",
-    shape: "square",
+    logo: true,
     fit: "contain",
     mask: true,
     plain: true,

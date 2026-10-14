@@ -1,7 +1,8 @@
 @import "../../1-root/component-metrics.css";
 
 :host {
-  --avatar-size: var(--ds-unit);
+  /* Ezo's people badges: one control high, inside a one-square row. */
+  --avatar-size: var(--ds-control-height);
   --avatar-pair-type-size: var(--ds-type-size-small);
   display: inline-flex;
   position: relative;
@@ -9,9 +10,6 @@
   vertical-align: middle;
   width: var(--avatar-size);
   height: var(--avatar-size);
-}
-:host([size="compact"]) {
-  --avatar-size: var(--ds-control-height);
 }
 :host([size="large"]) {
   --avatar-size: calc(2 * var(--ds-unit));
@@ -43,13 +41,11 @@
   user-select: none;
   -webkit-user-select: none;
 }
-:host([shape="square"]) .frame {
+/* An avatar is only ever round; a logo is a brand mark and keeps its corners. */
+:host([logo]) .frame {
   border-radius: 0;
 }
-:host([shape="rounded"]) .frame {
-  border-radius: var(--ds-radius);
-}
-:host([size="compact"]) .frame {
+:host(:not([size="large"], [size="fill"])) .frame {
   font-size: var(--ds-type-size-small);
 }
 :host([size="large"]) .frame {

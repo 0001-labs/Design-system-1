@@ -1,15 +1,13 @@
 @import "../../1-root/component-metrics.css";
 
 :host {
-  --group-overlap: calc(4px * var(--ds-sf));
+  /* Ezo's overlap for its badges, now every avatar's size. */
+  --group-overlap: calc(3px * var(--ds-sf));
   display: inline-flex;
   flex: 0 0 auto;
   align-items: center;
   isolation: isolate;
   vertical-align: middle;
-}
-:host([size="compact"]) {
-  --group-overlap: calc(3px * var(--ds-sf));
 }
 :host([hidden]) {
   display: none !important;

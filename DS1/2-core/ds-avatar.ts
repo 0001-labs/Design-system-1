@@ -17,7 +17,12 @@ export function avatarInk(color: string): string | undefined {
   return luminance > 0.22 ? "var(--ds-black)" : "var(--ds-white)";
 }
 
-/** A person's or workspace's mark. Identity selection and actions belong to the app. */
+/**
+ * A person's or workspace's mark, always round and the size of Ezo's badges.
+ * Two ways to colour it: `color` fills it (Link), `ink` letters and outlines
+ * it on the neutral fill (Ezo). Identity selection and actions belong to the app.
+ * `logo` is the one exception to round: a brand mark in its image area, unclipped.
+ */
 export class Avatar extends LitElement {
   static properties = {
     label: { type: String },
@@ -25,7 +30,8 @@ export class Avatar extends LitElement {
     src: { type: String },
     icon: { type: String },
     color: { type: String },
-    shape: { type: String, reflect: true },
+    ink: { type: String },
+    logo: { type: Boolean, reflect: true },
     size: { type: String, reflect: true },
     fit: { type: String, reflect: true },
     mask: { type: Boolean, reflect: true },
@@ -40,7 +46,9 @@ export class Avatar extends LitElement {
   declare src: string;
   declare icon: string;
   declare color: string;
-  declare shape: "circle" | "square" | "rounded";
+  declare ink: string;
+  declare logo: boolean;
+  /** `compact` is the default size, kept for products that still name it. */
   declare size: "default" | "compact" | "large" | "fill";
   declare fit: "cover" | "contain";
   declare mask: boolean;
@@ -57,10 +65,10 @@ export class Avatar extends LitElement {
     this.src = "";
     this.icon = "";
     this.color = "";
-    this.shape = "circle";
+    this.ink = "";
     this.size = "default";
     this.fit = "cover";
-    this.mask = this.outlined = this.pending = this.plain = this.loaded = this.failed = false;
+    this.logo = this.mask = this.outlined = this.pending = this.plain = this.loaded = this.failed = false;
   }
   protected willUpdate(changed: PropertyValues<this>) {
     if (changed.has("src")) {
@@ -81,7 +89,7 @@ export class Avatar extends LitElement {
         >`;
     return html`<span
       class="frame"
-      style=${styleMap({ backgroundColor: !this.pending && !this.plain ? this.color || undefined : undefined, color: !this.pending ? avatarInk(this.color) : undefined })}
+      style=${styleMap({ backgroundColor: !this.pending && !this.plain ? this.color || undefined : undefined, color: !this.pending ? this.ink || avatarInk(this.color) : undefined })}
       role=${this.label ? "img" : nothing}
       aria-label=${this.label || nothing}
       aria-hidden=${this.label ? nothing : "true"}

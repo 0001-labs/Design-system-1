@@ -22,6 +22,7 @@ Everything is counted in **squares**: one square is 20px (`--unit`, `--1`), mult
 | Text | 14px (`--type-size-default`), 10px small; padded 4px from the item's edge | `one.css`, Ezo `--item-text-padding` |
 | Lines | 1px, centred on the grid line | Ezo `--outline-stroke` |
 | Corners | square for items and rows; 4px (`--radius`) only on pictures, buttons and fields | Peer and Ins follow this |
+| An avatar (a person, a workspace) | **always round**, 16px (one control high) with small type; overlapping 3px in a group. Coloured by a fill (`color`, Link) or an ink (`ink`, Ezo). Only a logo keeps its corners | `ds-avatar`, sized from Ezo's people badges |
 
 Items stack edge to edge with no gap, as an Ezo list does. Lists, table rows, cells and their headers use neutral or transparent backgrounds by default, never automatic accent fills. Colour is opt-in for a meaningful state, not decoration across an entire list or table. Positions snap to the grid: anything a person can move lands on whole squares. Before calling a design done, measure it in the browser (an element's width and height must be whole squares minus the 1px correction) instead of judging by eye.
 
