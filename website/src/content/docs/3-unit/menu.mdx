@@ -60,6 +60,21 @@ left clicks still belong to the trigger. Touch movement cancels the gesture;
 the click following a completed long press is consumed by the shared menu.
 `openAt({x, y})` accepts a viewport point from an external control.
 
+For a long or changing list, keep one menu mounted. Set `trigger` to the list
+container and `contextSelector` to the marked row controls. DS1 delegates
+right-click, keyboard and touch gestures to the matching descendant, including
+rows inserted later. `ds-menu-toggle` includes `detail.trigger` (the actual row)
+and `detail.point`; React receives the same detail as the third argument of
+`onOpenChange`. Products read their row ID and choose actions. Native left clicks
+remain unchanged; the click after a long press is consumed before React capture.
+Give the marked row its own accessible name and `aria-haspopup="menu"`. DS1
+returns focus to that row and leaves container semantics unchanged.
+
+`openAt(point, rowControl)` also opens the same menu from an external shortcut.
+Keep confirmation and pending mutation state in the product, decline close and
+new-row requests while pending, and restore enabled actions on rejection. When
+confirmation replaces the focused action, DS1 focuses the first enabled choice.
+
 Nested menus stay in their parent's DOM and use `triggerMode="submenu"`,
 `trigger` and `anchor`. DS1 owns hover, forward/back arrow keys, viewport
 flipping, Escape and focus return. `select()` dismisses the whole branch;
