@@ -231,11 +231,11 @@ Design system 1/
 
 ## License
 
-MIT © [Design system 1](https://github.com/0001-labs/ds-one)
+MIT © [Design system 1](https://github.com/0001-labs/Design-system-1)
 
 ## 🔗 Links
 
 - [**Website**](https://designsystem1.com/) - Official website
-- [**GitHub**](https://github.com/0001-labs/ds-one) - Source code and issues
+- [**GitHub**](https://github.com/0001-labs/Design-system-1) - Source code and issues
 - [**NPM Package**](https://www.npmjs.com/package/design-system-1) - Install with `@alpha` tag
 - [**CDN**](https://cdn.jsdelivr.net/npm/@0001-labs/design-system-1@alpha/) - Direct browser usage

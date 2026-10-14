@@ -14,12 +14,12 @@
   ],
   "homepage": "https://designsystem1.com",
   "bugs": {
-    "url": "https://github.com/0001-labs/ds-one/issues"
+    "url": "https://github.com/0001-labs/Design-system-1/issues"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/0001-labs/ds-one.git"
+    "url": "git+https://github.com/0001-labs/Design-system-1.git"
   },
   "files": [
     "dist/",
