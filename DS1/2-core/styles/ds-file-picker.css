@@ -59,3 +59,8 @@ ds-button {
 :host(:is([secondary], [area]):hover:not([data-disabled])) ds-button { --ds-button-background: var(--ds-fill-hover); }
 :host(:is([data-dragging], [dragging]):not([data-disabled])) { outline: 2px solid var(--ds-focus-ring); outline-offset: 1px; }
 :host(:is([data-dragging], [dragging]):not([data-disabled])) ds-button { --ds-button-background: var(--ds-fill-hover); }
+
+/* A native file input can be an action in Menu without a second click target. */
+:host([data-menu-item]) { width: 100%; }
+:host([data-menu-item]) ds-button { width: 100%; --ds-button-padding: 0 calc(4px * var(--ds-sf)); }
+:host([data-menu-item]:is(:hover, :focus-within):not([data-disabled])) ds-button { --ds-button-background: var(--ds-fill); }

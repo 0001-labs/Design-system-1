@@ -35,6 +35,7 @@ export class FilePicker extends LitElement {
   private syncDisabled() {
     if (!this.isConnected) return;
     const control = this.control();
+    this.toggleAttribute("data-menu-item", control?.getAttribute("role") === "menuitem");
     this.controlDisabled = !control || control.matches(":disabled");
     this.toggleAttribute("data-disabled", this.controlDisabled);
     if (this.controlDisabled) this.clearDrag();
@@ -51,7 +52,7 @@ export class FilePicker extends LitElement {
     this.observer.disconnect();
     if (!this.isConnected) return;
     const control = this.control();
-    if (control) this.observer.observe(control, { attributes: true, attributeFilter: ["disabled"] });
+    if (control) this.observer.observe(control, { attributes: true, attributeFilter: ["disabled", "role"] });
     for (let parent = this.parentElement; parent; parent = parent.parentElement) {
       if (parent.localName === "fieldset") this.observer.observe(parent, { attributes: true, attributeFilter: ["disabled"] });
     }

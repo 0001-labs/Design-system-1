@@ -11,7 +11,9 @@ available to the menu and to assistive technology.
 An inline menu remains in document flow. Use `compact` inside an existing
 shared dialog. Set `floating` and `open` for an anchored popup in the browser's
 native popover layer, including inside a modal. Set `anchor` to its launcher
-or writing field. DS1 flips above the anchor when necessary and clamps the menu
+or writing field, or pass a viewport rectangle for a context menu. A rectangle
+uses the focused control as its focus-return target. `placement="top"` prefers
+the space above; the default is below. DS1 flips above the anchor when necessary and clamps the menu
 to the visual viewport, including its keyboard and scale changes.
 
 For suggestions, set `controller` to the native input or textarea and
@@ -44,4 +46,7 @@ Keep the menu mounted when it owns a `trigger`, including while closed.
 `activeId` and `onActiveChange`
 similarly keep selection controlled. Classes and styles place the host only.
 Use shared buttons, text and icons inside it, with each entry one row high.
+A `FilePicker` with `role="menuitem"` shares the row face and arrow navigation;
+Enter and Space still open the native chooser. Keep the picker mounted until
+its native change or cancel event, and copy its files before clearing its value.
 Remove product popup positioning, keyboard listeners and appearance styles.

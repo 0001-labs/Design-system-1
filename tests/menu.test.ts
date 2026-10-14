@@ -148,3 +148,41 @@ test("hover menus preserve link navigation and page focus, while keyboard openin
   trigger.dispatchEvent(new PointerEvent("pointerenter", {pointerType: "touch"})); await menu.updateComplete; expect(menu.open).toBe(false);
   menu.remove(); expect(trigger.getAttribute("aria-haspopup")).toBe("dialog"); expect(trigger.hasAttribute("aria-controls")).toBe(false);
 });
+
+
+test("rectangle anchors share viewport placement and return focus to the invoking control", async () => {
+  const opener = document.createElement("button"), menu = document.createElement("ds-menu");
+  document.body.append(opener); opener.focus();
+  const observe = vi.spyOn(ResizeObserver.prototype, "observe");
+  menu.anchor = new DOMRect(200, 300, 80, 20); menu.placement = "top";
+  menu.floating = menu.open = true; menu.innerHTML = '<button role="menuitem">Choice</button>';
+  vi.spyOn(menu, "getBoundingClientRect").mockReturnValue(new DOMRect(0, 0, 80, 40));
+  try {
+    document.body.append(menu); await menu.updateComplete;
+    expect(observe.mock.calls.every(([target]) => target instanceof Element)).toBe(true);
+    expect(menu.style.left).toBe("200px"); expect(menu.style.top).toBe("250px");
+    expect(document.activeElement).toBe(menu.firstElementChild);
+    menu.anchor = new DOMRect(200, 0, 80, 20); await menu.updateComplete;
+    expect(menu.style.top).toBe("30px"); // Prefer above, but flip when it has no space.
+    key(menu.firstElementChild as HTMLElement, "Escape"); await menu.updateComplete;
+    expect(document.activeElement).toBe(opener);
+  } finally { observe.mockRestore(); }
+});
+
+test("native file menu actions share navigation without intercepting chooser activation", async () => {
+  await import("../DS1/2-core/ds-file-picker");
+  const menu = document.createElement("ds-menu");
+  menu.innerHTML = '<button role="menuitem">Item</button><ds-file-picker label="Image"><input type="file" role="menuitem" aria-label="Image"></ds-file-picker><button role="menuitem">Cancel</button>';
+  document.body.append(menu); await menu.updateComplete;
+  const picker = menu.querySelector("ds-file-picker")!, input = picker.querySelector("input")!;
+  await picker.updateComplete;
+  const [first, last] = menu.querySelectorAll("button");
+  first!.focus(); key(first!, "ArrowDown"); expect(document.activeElement).toBe(input);
+  expect(picker.hasAttribute("data-menu-item")).toBe(true);
+  expect(key(input, "Enter").defaultPrevented).toBe(false);
+  expect(key(input, " ").defaultPrevented).toBe(false);
+  key(input, "ArrowDown"); expect(document.activeElement).toBe(last);
+  key(last!, "i"); expect(document.activeElement).toBe(first);
+  key(first!, "i"); expect(document.activeElement).toBe(input);
+  input.disabled = true; first!.focus(); key(first!, "ArrowDown"); expect(document.activeElement).toBe(last);
+});

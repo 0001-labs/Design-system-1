@@ -13,10 +13,11 @@ test("file selection keeps the native ref, labels, external form and events", as
   const mount = document.createElement("div"); document.body.append(mount);
   const root = createRoot(mount), ref = createRef<HTMLInputElement>();
   const changed: HTMLInputElement[] = [];
+  const cancelled = vi.fn();
   try {
     await act(async () => root.render(h("div", null, h("form", {id:"upload"}), h("label", {htmlFor:"logo"}, "Company logo"), h(FilePicker, {
       id:"logo", label:"Choose logo", name:"logo", form:"upload", required:true, multiple:true, area:true, dragging:true, accept:"image/svg+xml,.svg", ref,
-      onChange:event=>changed.push(event.currentTarget),
+      onChange:event=>changed.push(event.currentTarget), onCancel: cancelled,
     }))));
     const input=ref.current!, host=mount.querySelector("ds-file-picker")!;
     await host.updateComplete;
@@ -28,6 +29,8 @@ test("file selection keeps the native ref, labels, external form and events", as
     host.focus(); expect(document.activeElement).toBe(input);
     await act(async () => input.dispatchEvent(new Event("change",{bubbles:true})));
     expect(changed).toEqual([input]);
+    const cancellation = new Event("cancel", {bubbles:true});
+    input.dispatchEvent(cancellation); expect(cancelled).toHaveBeenCalledExactlyOnceWith(cancellation);
     const face=host.shadowRoot!.querySelector("ds-button")!;
     expect(face.hasAttribute("inert")).toBe(true); expect(face.getAttribute("aria-hidden")).toBe("true");
     expect(input.hidden).toBe(false);

@@ -3,6 +3,8 @@ import { define } from "../0-face/define";
 import styles from "./styles/ds-menu.css?inline";
 
 const ITEM = '[role="option"], [role="menuitem"], [role="menuitemradio"], [role="menuitemcheckbox"]';
+export type MenuAnchor = HTMLElement | Pick<DOMRectReadOnly, "left" | "top" | "right" | "bottom" | "width" | "height">;
+
 const openMenus = new WeakMap<Document, Set<Menu>>();
 
 /** Shared option/action face and navigation. Floating menus use the native
@@ -15,6 +17,7 @@ export class Menu extends LitElement {
     open: { type: Boolean, reflect: true },
     columns: { type: Number, reflect: true },
     anchor: { attribute: false },
+    placement: { type: String },
     trigger: { attribute: false },
     hover: { type: Boolean, reflect: true },
     controller: { attribute: false },
@@ -24,7 +27,8 @@ export class Menu extends LitElement {
   declare floating: boolean;
   declare open: boolean;
   declare columns: number;
-  declare anchor: HTMLElement | null;
+  declare anchor: MenuAnchor | null;
+  declare placement: "top" | "bottom";
   declare trigger: HTMLElement | null;
   declare hover: boolean;
   declare controller: HTMLElement | null;
@@ -48,6 +52,7 @@ export class Menu extends LitElement {
   constructor() {
     super();
     this.compact = false; this.floating = false; this.open = false;
+    this.placement = "bottom";
     this.columns = 1; this.anchor = null; this.trigger = null; this.hover = false; this.controller = null; this.activeId = "";
     this.addEventListener("keydown", this.onKeyDown);
     this.addEventListener("pointerdown", this.retainController);
@@ -87,10 +92,11 @@ export class Menu extends LitElement {
     }
     if (this.floating && this.open) this.show(); else this.hide(true);
     this.syncTabStops();
-    if (this.observer && this.observedAnchor !== this.anchor) {
+    const element = this.anchor instanceof HTMLElement ? this.anchor : null;
+    if (this.observer && this.observedAnchor !== element) {
       if (this.observedAnchor) this.observer.unobserve(this.observedAnchor);
-      if (this.anchor) this.observer.observe(this.anchor);
-      this.observedAnchor = this.anchor;
+      if (element) this.observer.observe(element);
+      this.observedAnchor = element;
     }
     this.place();
     this.scrollActive();
@@ -173,7 +179,7 @@ export class Menu extends LitElement {
     if (this.shown || !this.isConnected) return;
     this.shown = true;
     const openingFocus = this.ownerDocument.activeElement;
-    this.opener = this.controller ?? this.trigger ?? this.anchor ?? (openingFocus instanceof HTMLElement ? openingFocus : null);
+    this.opener = this.controller ?? this.trigger ?? (this.anchor instanceof HTMLElement ? this.anchor : null) ?? (openingFocus instanceof HTMLElement ? openingFocus : null);
     this.search = "";
     this.restoreFocus = true;
     this.heldFocus = false;
@@ -185,8 +191,8 @@ export class Menu extends LitElement {
     if (typeof ResizeObserver !== "undefined") {
       this.observer = new ResizeObserver(this.place);
       this.observer.observe(this);
-      if (this.anchor) this.observer.observe(this.anchor);
-      this.observedAnchor = this.anchor;
+      this.observedAnchor = this.anchor instanceof HTMLElement ? this.anchor : null;
+      if (this.observedAnchor) this.observer.observe(this.observedAnchor);
     }
     this.ownerDocument.addEventListener("pointerdown", this.onOutside, true);
     this.ownerDocument.addEventListener("focusin", this.onOutside);
@@ -198,7 +204,7 @@ export class Menu extends LitElement {
     if (!this.controller && this.focusOnOpen) {
       // Native frames must be distributed through newly inserted Lit slots first.
       const version = ++this.focusVersion;
-      void Promise.all(Array.from(this.querySelectorAll<LitElement>("ds-button"), element => element.updateComplete)).then(() => {
+      void Promise.all(Array.from(this.querySelectorAll<LitElement>("ds-button, ds-file-picker"), element => element.updateComplete)).then(() => {
         const active = this.ownerDocument.activeElement;
         if (this.shown && this.isConnected && version === this.focusVersion && !this.controller &&
             (active === openingFocus || active === this.opener || active === this.ownerDocument.body || active === this)) {
@@ -244,14 +250,14 @@ export class Menu extends LitElement {
   private onOutside = (event: Event) => {
     if (!this.isTop()) return;
     const path = event.composedPath();
-    if (!path.includes(this) && !(this.anchor && !this.controller && path.includes(this.anchor)) && !(this.trigger && path.includes(this.trigger)) && !(this.controller && path.includes(this.controller))) this.requestClose("outside");
+    if (!path.includes(this) && !(this.anchor instanceof HTMLElement && !this.controller && path.includes(this.anchor)) && !(this.trigger && path.includes(this.trigger)) && !(this.controller && path.includes(this.controller))) this.requestClose("outside");
   };
   private retainController = (event: PointerEvent) => {
     if (this.controller && event.button === 0 && event.composedPath().some(node => node instanceof HTMLElement && node.matches(ITEM))) event.preventDefault();
   };
   place = () => {
     if (!this.shown || !this.anchor) return;
-    const rect = this.anchor.getBoundingClientRect(), view = this.ownerDocument.defaultView!;
+    const rect = this.anchor instanceof HTMLElement ? this.anchor.getBoundingClientRect() : this.anchor, view = this.ownerDocument.defaultView!;
     const viewport = view.visualViewport;
     const left = viewport?.offsetLeft ?? 0, top = viewport?.offsetTop ?? 0;
     const width = viewport?.width ?? view.innerWidth, height = viewport?.height ?? view.innerHeight;
@@ -261,7 +267,8 @@ export class Menu extends LitElement {
     this.style.setProperty("--ds-menu-anchor-width", `${Math.min(room, Math.max(4 * unit, rect.width))}px`);
     const below = top + height - rect.bottom - 2 * gap, above = rect.top - top - 2 * gap;
     const frame = this.shadowRoot?.querySelector<HTMLElement>(".frame");
-    const up = below < Math.min(frame?.scrollHeight ?? this.scrollHeight, 8 * unit) && above > below;
+    const needed = Math.min(frame?.scrollHeight ?? this.scrollHeight, 8 * unit);
+    const up = this.placement === "top" ? above >= needed || above >= below : below < needed && above > below;
     this.style.setProperty("--ds-menu-available-height", `${Math.max(0, Math.min(height - 2 * gap, up ? above : below))}px`);
     const box = this.getBoundingClientRect();
     this.style.left = `${Math.max(left + gap, Math.min(rect.left, left + width - gap - box.width))}px`;
@@ -336,7 +343,7 @@ export class Menu extends LitElement {
   }
   private onControllerKey = (event: KeyboardEvent) => this.navigate(event, true);
   private onKeyDown = (event: KeyboardEvent) => {
-    if (event.composedPath().some(node => node instanceof HTMLElement && (node.isContentEditable || node.matches('input, textarea, select, [role="textbox"], [role="combobox"]')))) return;
+    if (event.composedPath().some(node => node instanceof HTMLElement && (node.isContentEditable || node.matches('input:not([type="file"][role="menuitem"]), textarea, select, [role="textbox"], [role="combobox"]')))) return;
     if (event.composedPath().find(node => node instanceof Menu) !== this) return;
     this.navigate(event, false);
   };

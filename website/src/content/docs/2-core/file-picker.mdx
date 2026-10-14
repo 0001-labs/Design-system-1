@@ -47,3 +47,8 @@ Set `dragging` when that outer surface has a file over it: DS1 applies the same
 drag feedback to the picker, suppressed when the native control is disabled.
 Verify file selection and keyboard activation, disabled fieldsets, reset, focus,
 pending recovery and light/dark scaled layouts without uploading live test data.
+
+In React, `onCancel` receives the native chooser cancellation event. Keep a menu
+that contains the picker mounted until `onChange` or `onCancel`, so returning
+from the system chooser cannot lose the selected files. Use `role="menuitem"`
+inside Menu to share its row and arrow navigation while Enter and Space stay native.
