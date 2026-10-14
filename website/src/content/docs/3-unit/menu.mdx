@@ -47,6 +47,16 @@ Keep the menu mounted when it owns a `trigger`, including while closed.
 `activeId` and `onActiveChange`
 similarly keep selection controlled. Classes and styles place the host only.
 Use shared buttons, text and icons inside it, with each entry one row high.
+For a palette, set `columns` and place shared Button choices directly in the
+menu. Each cell is one square. `data-ds-menu-start` on a Button starts a new
+section after a short row. Separators span the grid; mark the first choice
+after them as a section start. `data-ds-menu-row` on a Button makes a full-width
+action such as Remove or Create. Shared arrow navigation follows those rows,
+keeps the chosen column across full-width actions, and skips disabled choices.
+Native `menuitemradio` buttons use `aria-checked` for the selected ring.
+A supplied image can sit in a large `ds-icon`; `--ds-icon-ratio` describes its
+width divided by height and `--ds-icon-radius` its corners. DS1 owns the
+scaled image box. Product artwork and stored selection values stay in the app.
 A `FilePicker` with `role="menuitem"` shares the row face and arrow navigation;
 Enter and Space still open the native chooser. Keep the picker mounted until
 its native change or cancel event, and copy its files before clearing its value.

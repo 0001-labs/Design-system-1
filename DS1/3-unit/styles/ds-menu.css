@@ -68,6 +68,19 @@ slot { display: contents; }
 :host([trigger-mode="context"]), :host([trigger-mode="submenu"]), :host([trigger-mode="manual"]) {
   width: var(--ds-menu-width, calc(8 * var(--ds-unit)));
 }
+:host([data-grid]) {
+  width: calc((var(--ds-menu-columns) + 1) * var(--ds-row-height));
+}
+:host([data-grid]) .frame {
+  width: 100%;
+  padding-inline: calc(var(--ds-unit) / 2 - 1px);
+}
+:host([data-grid]) ::slotted([data-ds-menu-start]) { grid-column-start: 1; }
+:host([data-grid]) ::slotted(:is([data-ds-menu-row], [data-ds-menu-separator], [data-ds-menu-label])) { grid-column: 1 / -1; }
+:host([data-grid]) ::slotted([data-ds-menu-row]) {
+  --ds-button-align: flex-start;
+  --ds-button-padding: 0 calc(4px * var(--ds-sf));
+}
 ::slotted([data-ds-menu-label]) {
   display: block;
   box-sizing: border-box;

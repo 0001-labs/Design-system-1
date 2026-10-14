@@ -98,6 +98,21 @@ test("grid navigation preserves columns, skips disabled cells and handles a shor
   key(buttons[5]!, "ArrowDown"); expect(document.activeElement).toBe(buttons[7]);
 });
 
+test("grid sections and full-width actions keep vertical navigation aligned", async () => {
+  const menu = document.createElement("ds-menu"); menu.columns = 3;
+  menu.innerHTML = '<button role="menuitem">0</button><button role="menuitem">1</button><button role="menuitem">2</button><button role="menuitem">3</button><hr data-ds-menu-separator><button role="menuitem" data-ds-menu-start>4</button><button role="menuitem">5</button><button role="menuitem">6</button><button role="menuitem">7</button><button role="menuitem">8</button><ds-button control="slotted" data-ds-menu-row><button role="menuitem">Remove</button></ds-button><ds-button control="slotted" data-ds-menu-row><button role="menuitem">Create</button></ds-button>';
+  document.body.append(menu); await menu.updateComplete;
+  const buttons = menu.querySelectorAll("button");
+  buttons[3]!.focus(); key(buttons[3]!, "ArrowDown"); expect(document.activeElement).toBe(buttons[4]);
+  buttons[8]!.focus(); key(buttons[8]!, "ArrowDown"); expect(document.activeElement).toBe(buttons[9]);
+  key(buttons[9]!, "ArrowDown"); expect(document.activeElement).toBe(buttons[10]);
+  key(buttons[10]!, "ArrowUp"); expect(document.activeElement).toBe(buttons[9]);
+  key(buttons[9]!, "ArrowUp"); expect(document.activeElement).toBe(buttons[8]);
+  buttons[9]!.disabled = true;
+  key(buttons[8]!, "ArrowDown"); expect(document.activeElement).toBe(buttons[10]);
+  key(buttons[10]!, "ArrowDown"); expect(document.activeElement).toBe(buttons[1]);
+});
+
 test("triggers open at the selected choice, arrows skip disabled choices and typeahead cycles", async () => {
   const trigger = document.createElement("button"), menu = document.createElement("ds-menu");
   menu.floating = true; menu.trigger = menu.anchor = trigger;

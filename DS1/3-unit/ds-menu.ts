@@ -58,6 +58,7 @@ export class Menu extends LitElement {
   private openingEdge: "first" | "last" = "first";
   private search = "";
   private searchAt = 0;
+  private gridColumn = 0;
   private focusOnOpen = true;
   private hoverTimer?: ReturnType<typeof setTimeout>;
   private shown = false;
@@ -400,8 +401,8 @@ export class Menu extends LitElement {
     const columns = Math.max(1, Math.floor(this.columns || 1));
     let next: number;
     switch (event.key) {
-      case "ArrowDown": next = this.step(items, current, columns, 1); break;
-      case "ArrowUp": next = this.step(items, current, columns, -1); break;
+      case "ArrowDown": next = columns > 1 ? this.gridStep(items, current, columns, 1) : this.step(items, current, 1, 1); break;
+      case "ArrowUp": next = columns > 1 ? this.gridStep(items, current, columns, -1) : this.step(items, current, 1, -1); break;
       case "ArrowRight": if (columns === 1 || external) return; next = this.step(items, current, 1, 1); break;
       case "ArrowLeft": if (columns === 1 || external) return; next = this.step(items, current, 1, -1); break;
       case "Home": if (external) return; next = items.findIndex(item => this.enabled(item)); break;
@@ -431,6 +432,29 @@ export class Menu extends LitElement {
     if (external) this.activate(item); else { item.focus({preventScroll: true}); this.scrollChoice(item); }
   }
   private lastEnabled(items: HTMLElement[]) { return items.reduce((last, item, index) => this.enabled(item) ? index : last, -1); }
+  /** Full-width actions and section starts occupy their actual visual rows. */
+  private gridStep(items: HTMLElement[], current: number, columns: number, direction: number) {
+    if (current < 0) return direction > 0 ? items.findIndex(item => this.enabled(item)) : this.lastEnabled(items);
+    const rows: { indices: number[]; wide: boolean }[] = [];
+    let row: number[] = [];
+    const flush = () => { if (row.length) rows.push({ indices: row, wide: false }); row = []; };
+    for (let index = 0; index < items.length; index++) {
+      const item = items[index]!;
+      if (item.closest('[data-ds-menu-row], [data-ds-menu-start]')) flush();
+      if (item.closest('[data-ds-menu-row]')) rows.push({ indices: [index], wide: true });
+      else { row.push(index); if (row.length === columns) flush(); }
+    }
+    flush();
+    const at = rows.findIndex(row => row.indices.includes(current));
+    if (at < 0) return current;
+    if (!rows[at]!.wide) this.gridColumn = rows[at]!.indices.indexOf(current);
+    for (let offset = 1; offset <= rows.length; offset++) {
+      const target = rows[(at + direction * offset + rows.length * offset) % rows.length]!;
+      const next = target.indices[Math.min(this.gridColumn, target.indices.length - 1)]!;
+      if (this.enabled(items[next]!)) return next;
+    }
+    return current;
+  }
   private step(items: HTMLElement[], current: number, columns: number, direction: number) {
     if (current < 0) return direction > 0 ? items.findIndex(item => this.enabled(item)) : this.lastEnabled(items);
     const rows = Math.ceil(items.length / columns), column = current % columns;

@@ -208,3 +208,6 @@
 :host([menu-item]:is(:hover, :focus-within):not([disabled])) {
   --ds-button-background: var(--ds-fill);
 }
+:host([menu-item][control="slotted"]) ::slotted([aria-checked="true"]) {
+  box-shadow: inset 0 0 0 1px var(--ds-focus-ring) !important;
+}

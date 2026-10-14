@@ -7,7 +7,7 @@
   justify-content: center;
   align-items: center;
   width: var(--ds-icon-box);
-  height: var(--ds-icon-box);
+  height: calc(var(--ds-icon-box) / var(--ds-icon-ratio, 1));
   color: var(--ds-icon-color, currentColor);
   background: transparent;
 }
@@ -32,8 +32,13 @@
 }
 
 svg,
-::slotted(svg) {
+::slotted(svg),
+::slotted(img) {
   display: block;
   width: 100%;
   height: 100%;
+}
+::slotted(img) {
+  object-fit: contain;
+  border-radius: var(--ds-icon-radius, 0px);
 }
