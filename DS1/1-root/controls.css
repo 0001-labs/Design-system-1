@@ -20,7 +20,7 @@
   display: inline-flex;
   flex: 0 0 auto;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: var(--ds-button-align, flex-start);
   gap: var(--ds-button-gap, calc(4px * var(--ds-sf)));
   height: var(--ds-button-height, var(--ds-control-height));
   margin: 0;
