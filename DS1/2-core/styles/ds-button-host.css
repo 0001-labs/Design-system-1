@@ -196,3 +196,15 @@
 }
 
 :host([control="slotted"][hidden]) { display: none !important; }
+
+/* Native actions in menus, including grouped and nested choices. */
+:host([menu-item]) {
+  flex: 0 0 auto;
+  width: 100%;
+  --ds-button-height: var(--ds-row-height);
+  --ds-button-align: flex-start;
+  --ds-button-padding: 0 calc(4px * var(--ds-sf));
+}
+:host([menu-item]:is(:hover, :focus-within):not([disabled])) {
+  --ds-button-background: var(--ds-fill);
+}

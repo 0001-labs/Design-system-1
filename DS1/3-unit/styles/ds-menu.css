@@ -64,3 +64,21 @@ slot { display: contents; }
 }
 
 :host([floating]) ::slotted(:is(ds-button, ds-file-picker):is(:hover, :focus-within):not([disabled], [data-disabled])) { --ds-button-background: var(--ds-fill); }
+
+:host([trigger-mode="context"]), :host([trigger-mode="submenu"]) {
+  width: var(--ds-menu-width, calc(8 * var(--ds-unit)));
+}
+::slotted([data-ds-menu-label]) {
+  display: block;
+  box-sizing: border-box;
+  height: var(--ds-row-height);
+  padding: 0 calc(4px * var(--ds-sf));
+  color: var(--ds-text-color-muted);
+}
+::slotted([data-ds-menu-separator]) {
+  width: 100%;
+  box-sizing: border-box;
+  border: 0;
+  border-top: 1px solid var(--ds-border-color);
+  margin: calc(var(--ds-unit) / 2) 0;
+}

@@ -50,3 +50,32 @@ A `FilePicker` with `role="menuitem"` shares the row face and arrow navigation;
 Enter and Space still open the native chooser. Keep the picker mounted until
 its native change or cancel event, and copy its files before clearing its value.
 Remove product popup positioning, keyboard listeners and appearance styles.
+
+
+## Context and nested menus
+
+Set `triggerMode="context"` with a native `trigger` to open at the pointer,
+with Shift+F10 or the Context Menu key, or after a touch long press. Normal
+left clicks still belong to the trigger. Touch movement cancels the gesture;
+the click following a completed long press is consumed by the shared menu.
+`openAt({x, y})` accepts a viewport point from an external control.
+
+Nested menus stay in their parent's DOM and use `triggerMode="submenu"`,
+`trigger` and `anchor`. DS1 owns hover, forward/back arrow keys, viewport
+flipping, Escape and focus return. `select()` dismisses the whole branch;
+`requestClose()` is cancelable, and `ds-menu-close-focus` can decline focus
+return when an action opens a field or dialog. A closed parent closes its
+children too. Set `--ds-menu-width` for a preferred width within viewport bounds.
+
+React products import `react/context-menu`: `ContextMenu`, `ContextMenuTrigger`,
+`ContextMenuContent`, `ContextMenuItem`, `ContextMenuSub`, `ContextMenuSubTrigger`
+and `ContextMenuSubContent`. Checkbox and radio entries compose native shared
+Button menu rows; `onSelect` can prevent dismissal. Products supply actions,
+checked values and labels. The adapter owns only React composition and state;
+Lit owns the face, gestures, focus and placement. Register the selected shared
+components in the browser before mounting the adapter.
+
+`ContextMenuFilePicker` keeps the native chooser mounted through change and
+cancel, copies the selected files and resets the input before `onFiles`.
+Selection leaves the menu open so pending product state can disable the row.
+Do not wrap it in an auto-closing action or add hidden click proxies.

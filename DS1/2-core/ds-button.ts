@@ -19,6 +19,7 @@ export class Button extends Control {
     wide: { type: Boolean, reflect: true },
     fit: { type: Boolean, reflect: true },
     danger: { type: Boolean, reflect: true },
+    menuItem: { type: Boolean, reflect: true, attribute: "menu-item" },
     blank: { type: Boolean, reflect: true },
     language: { type: String },
     text: { type: String },
@@ -35,6 +36,7 @@ export class Button extends Control {
   declare wide: boolean;
   declare fit: boolean;
   declare danger: boolean;
+  declare menuItem: boolean;
   private _control = "native";
   get control(): string { return this._control; }
   set control(value: string) {
@@ -60,6 +62,7 @@ export class Button extends Control {
     this.wide = false;
     this.fit = false;
     this.danger = false;
+    this.menuItem = false;
     this.primary = false; // Default to no-background (no attribute)
     this.secondary = false;
     this.disabled = false;

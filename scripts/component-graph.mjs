@@ -40,7 +40,7 @@ export function componentGraph(ds1, names) {
   if (components.includes('split')) visit('react/split.ts');
   if (components.includes('token-field') || components.includes('token')) visit('react/token-field.ts');
   if (components.includes('composer')) visit('react/composer.ts');
-  if (components.includes('menu')) visit('react/menu.ts');
+  if (components.includes('menu')) { visit('react/menu.ts'); visit('react/context-menu.ts'); }
   if (components.includes('accordion')) visit('react/accordion.ts');
   if (components.includes('avatar')) visit('react/avatar.ts');
   if (components.includes('avatar-group')) visit('react/avatar-group.ts');
