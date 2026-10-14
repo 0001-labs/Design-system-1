@@ -109,3 +109,12 @@ test("long press opens once and consumes its synthetic click while movement canc
   await key(host.querySelector('[role=menuitem]')!, "Escape");
   await fire(trigger(), new MouseEvent("click", { bubbles: true, cancelable: true })); expect(click).toHaveBeenCalledOnce();
 });
+
+
+test("Tab exits a menu even when the browser's next focus is outside the document", async () => {
+  await act(async () => root.render(h(Example)));
+  await key(trigger(), "ContextMenu"); await key(item("First"), "Tab");
+  expect(menu().open).toBe(false);
+  await key(trigger(), "ContextMenu"); await key(item("First"), "Tab", { shiftKey: true });
+  expect(menu().open).toBe(false);
+});

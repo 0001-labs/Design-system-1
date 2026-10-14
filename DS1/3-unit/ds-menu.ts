@@ -447,6 +447,7 @@ export class Menu extends LitElement {
   }
   private onControllerKey = (event: KeyboardEvent) => this.navigate(event, true);
   private onKeyDown = (event: KeyboardEvent) => {
+    if (event.key === "Tab" && this.floating && !this.controller && !event.defaultPrevented) { this.rootMenu.requestClose("outside"); return; }
     if (event.composedPath().some(node => node instanceof HTMLElement && (node.isContentEditable || node.matches('input:not([type="file"][role="menuitem"]), textarea, select, [role="textbox"], [role="combobox"]')))) return;
     if (event.composedPath().find(node => node instanceof Menu) !== this) return;
     const back = this.ownerDocument.defaultView?.getComputedStyle(this).direction === "rtl" ? "ArrowRight" : "ArrowLeft";

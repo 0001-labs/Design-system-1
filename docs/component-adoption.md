@@ -43,3 +43,13 @@ After release approval:
 5. Verify anonymously that `/api/reports/components` returns 401, then as the owner verify the snapshot timestamp and at least one cell. Another authenticated account must get 403. Report responses use `private, no-store` and no CORS permission.
 
 For local Worker data, run `vp run reports:scan` and `vp run reports:upload:local`. The latter targets the configured local preview bucket, without publishing anything remotely. Data is never copied into `website/public`, `website/dist`, app bundles, Pagefind, or the npm package.
+
+
+Shared context-menu adapters are verified as a complete dependency graph through
+`react/context-menu.ts`, including pure product re-exports and imported aliases.
+`ContextMenuContent` and `ContextMenuSubContent` count in Menu; their Item,
+SubTrigger, CheckboxItem and RadioItem count in Button, Label in Text, and
+FilePicker in File picker. Root/state providers, groups and the composed
+indicators are not additional sites. Earlier scans did not infer Radix React
+abstractions: the increase when migrating those rows is expanded recognition,
+not a like-for-like reduction in a previously counted local column.

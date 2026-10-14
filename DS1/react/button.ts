@@ -38,7 +38,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       wide,
       fit,
       danger,
-    menuItem,
+      menuItem,
       disabled,
       hidden,
       className,
