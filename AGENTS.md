@@ -46,7 +46,7 @@ One command publishes a new version (`scripts/release.mjs`, the same file in Aa,
 - `vp run release current` — publishes the version already in `package.json`, for the first release under the new name
 - `--dry-run` after any of them goes through every step without publishing
 
-It refuses with uncommitted changes or when npm is signed out (`vp pm login`), writes the version into every `package.json` and the version references in the docs (`release:sync`, `scripts/versions.mjs`), runs `check`, `test` and `build`, publishes, then commits `Release @0001-labs/design-system-1 <version>` and tags `v<version>`. A failed step puts everything back.
+It refuses with uncommitted changes or when npm is signed out (`vp pm login`), writes the version into every `package.json` and the version references in the docs (`release:sync`, `scripts/versions.mjs`), runs `release:check` (the type check of the package, since `vp check` also covers the Worker, Convex and tests that are not published), `test` and `build`, publishes, then commits `Release @0001-labs/design-system-1 <version>` and tags `v<version>`. A failed step puts everything back.
 
 ## Integration
 
