@@ -45,7 +45,7 @@
 .adoption .unverified { background: color-mix(in srgb, var(--orange) 70%, var(--report-paper)); }
 .adoption .mixed { background: linear-gradient(135deg, color-mix(in srgb, var(--apple-green) 65%, var(--report-paper)) 50%, color-mix(in srgb, var(--pink) 65%, var(--report-paper)) 50%); }
 .adoption .empty, .adoption .unavailable { background: color-mix(in srgb, var(--report-ink) 3%, var(--report-paper)); color: var(--base-darker-grey); }
-.adoption-matrix td button { display: block; width: 100%; height: var(--report-unit); min-height: 0; border: 0; border-radius: 0; padding: 0; background: transparent; font-size: inherit; line-height: var(--report-unit); cursor: pointer; font-variant-numeric: tabular-nums; }
+.adoption-matrix td button { display: block; width: 100%; height: var(--report-unit); min-height: 0; border: 0; border-radius: 0; padding: 0; background: transparent; color: inherit; font-size: inherit; line-height: var(--report-unit); cursor: pointer; font-variant-numeric: tabular-nums; }
 .adoption-matrix td button:hover { box-shadow: inset 0 0 0 1px var(--report-ink); }
 .adoption-matrix td button[aria-pressed="true"] { box-shadow: inset 0 0 0 2px var(--report-ink); }
 .adoption-matrix td button:focus-visible { outline: 2px solid var(--report-ink); outline-offset: -2px; }
@@ -69,3 +69,9 @@
   .adoption-heading { align-items: flex-start; }
   .adoption-matrix .adoption-app-column { width: calc(6 * var(--report-unit)); min-width: calc(6 * var(--report-unit)); }
 }
+
+/* Filled status cells keep a dark ink even when the page uses a dark theme. */
+.adoption :is(.shared, .styled, .local, .unverified, .mixed) { color: var(--base-slate); }
+.adoption-column-names th { height: calc(9 * var(--report-unit)); }
+.adoption-heading, .adoption-detail-heading { flex-wrap: wrap; }
+.adoption { min-width: 0; max-width: 100%; box-sizing: border-box; }
