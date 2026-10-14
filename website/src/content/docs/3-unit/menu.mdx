@@ -68,11 +68,13 @@ and `detail.point`; React receives the same detail as the third argument of
 `onOpenChange`. Products read their row ID and choose actions. Native left clicks
 remain unchanged; the click after a long press is consumed before React capture.
 Give the marked row its own accessible name and `aria-haspopup="menu"`. DS1
-returns focus to that row and leaves container semantics unchanged.
+returns focus to that row (or its native focusable descendant) and leaves container semantics unchanged.
 
 `openAt(point, rowControl)` also opens the same menu from an external shortcut.
 Keep confirmation and pending mutation state in the product, decline close and
-new-row requests while pending, and restore enabled actions on rejection. When
+new-row requests while pending, and restore enabled actions on rejection. Set
+the menu's `disabled` property while pending to stop new trigger requests without
+closing the current confirmation. When
 confirmation replaces the focused action, DS1 focuses the first enabled choice.
 
 Nested menus stay in their parent's DOM and use `triggerMode="submenu"`,

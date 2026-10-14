@@ -51,6 +51,17 @@ test("a controlled owner may decline the delegated request",async()=>{
   await act(async()=>root.render(h(Example,{decline:true})));
   await key(row('Alpha'),'ContextMenu');expect(menu().open).toBe(false);
 });
+test("disabled requests retain the current row and focus returns to a row's native descendant",async()=>{
+  const container=document.createElement('section'), popup=document.createElement('ds-menu');
+  container.innerHTML='<div data-row="alpha"><a href="#alpha">Alpha</a></div><div data-row="beta"><button>Beta</button></div>';
+  popup.innerHTML='<button role="menuitem">Action</button>';popup.trigger=container;popup.triggerMode='context';popup.contextSelector='[data-row]';popup.floating=true;
+  document.body.append(container,popup);await popup.updateComplete;
+  const alpha=container.querySelector('a')!,beta=container.querySelector('button')!;
+  alpha.focus();await key(alpha,'ContextMenu');expect(popup.open).toBe(true);
+  popup.disabled=true;await popup.updateComplete;
+  await fire(beta,new MouseEvent('contextmenu',{bubbles:true,composed:true,cancelable:true}));
+  popup.requestClose('escape');await popup.updateComplete;expect(document.activeElement).toBe(alpha);
+});
 test("replacing the focused action with confirmation choices retains keyboard navigation",async()=>{
   await act(async()=>root.render(h(Example)));
   await key(row('Alpha'),'ContextMenu');

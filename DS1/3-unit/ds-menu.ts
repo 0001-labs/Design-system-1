@@ -6,6 +6,7 @@ import "../2-core/ds-icon";
 import styles from "./styles/ds-menu.css?inline";
 
 const ITEM = '[role="option"], [role="menuitem"], [role="menuitemradio"], [role="menuitemcheckbox"]';
+const FOCUSABLE = 'button, a[href], input, select, textarea, [tabindex]';
 export type MenuCloseReason = "escape" | "outside" | "select" | "back" | "parent";
 export type MenuTriggerMode = "click" | "context" | "submenu";
 export type MenuToggleDetail = { open: boolean; trigger: HTMLElement | null; point?: { x: number; y: number } };
@@ -21,6 +22,7 @@ export class Menu extends LitElement {
     compact: { type: Boolean, reflect: true },
     floating: { type: Boolean, reflect: true },
     open: { type: Boolean, reflect: true },
+    disabled: { type: Boolean, reflect: true },
     columns: { type: Number, reflect: true },
     anchor: { attribute: false },
     placement: { type: String },
@@ -34,6 +36,8 @@ export class Menu extends LitElement {
   declare compact: boolean;
   declare floating: boolean;
   declare open: boolean;
+  /** Stop new trigger requests without closing an operation already shown. */
+  declare disabled: boolean;
   declare columns: number;
   declare anchor: MenuAnchor | null;
   declare placement: "top" | "bottom" | "right" | "left";
@@ -73,7 +77,7 @@ export class Menu extends LitElement {
 
   constructor() {
     super();
-    this.compact = false; this.floating = false; this.open = false;
+    this.compact = false; this.floating = false; this.open = false; this.disabled = false;
     this.placement = "bottom"; this.triggerMode = "click"; this.contextSelector = "";
     this.columns = 1; this.anchor = null; this.trigger = null; this.hover = false; this.controller = null; this.activeId = "";
     this.addEventListener("keydown", this.onKeyDown);
@@ -100,6 +104,7 @@ export class Menu extends LitElement {
     super.disconnectedCallback();
   }
   updated() {
+    if (this.disabled) this.cancelPress();
     this.bindTrigger(this.trigger);
     if (this.trigger && !this.contextSelector) {
       this.trigger.setAttribute("aria-haspopup", this.getAttribute("role") === "menu" ? "menu" : "listbox");
@@ -156,17 +161,21 @@ export class Menu extends LitElement {
     trigger?.addEventListener("pointerleave", this.onHoverLeave);
   }
   private toggleFromTrigger(open: boolean, detail: Omit<MenuToggleDetail, "open"> = { trigger: this.trigger }) {
-    if (!this.trigger || !this.enabled(this.trigger)) return;
+    if (this.disabled || !this.trigger || !this.enabled(this.trigger)) return;
     const event = new CustomEvent<MenuToggleDetail>("ds-menu-toggle", {detail: {open, ...detail}, bubbles: true, composed: true, cancelable: true});
     if (this.dispatchEvent(event)) this.open = open;
   }
   /** Open a context menu from an actual viewport point or the trigger's keyboard position. */
   openAt(point: { x: number; y: number }, invokingControl = this.trigger) {
+    if (this.disabled) return;
     if (this.trigger && !this.enabled(this.trigger)) return;
     if (invokingControl && (!invokingControl.isConnected || !this.enabled(invokingControl))) return;
     this.contextPoint = { left: point.x, right: point.x, top: point.y, bottom: point.y, width: 0, height: 0 };
-    this.invokingControl = invokingControl;
-    if (this.shown) this.opener = invokingControl;
+    const focused = this.ownerDocument.activeElement;
+    this.invokingControl = invokingControl?.matches(FOCUSABLE) ? invokingControl
+      : invokingControl?.contains(focused) && focused instanceof HTMLElement ? focused
+      : invokingControl?.querySelector<HTMLElement>(FOCUSABLE) ?? invokingControl;
+    if (this.shown) this.opener = this.invokingControl;
     this.focusOnOpen = true; this.openingEdge = "first";
     this.toggleFromTrigger(true, { trigger: invokingControl, point });
     if (this.open) this.place();
@@ -174,7 +183,7 @@ export class Menu extends LitElement {
   /** A selected action dismisses its whole branch. Products can decline it. */
   select() { this.rootMenu.requestClose("select"); }
   private contextControl(event: Event): HTMLElement | null {
-    if (!this.trigger) return null;
+    if (this.disabled || !this.trigger) return null;
     if (!this.contextSelector) return this.enabled(this.trigger) ? this.trigger : null;
     for (const node of event.composedPath()) {
       if (node === this.trigger) break;

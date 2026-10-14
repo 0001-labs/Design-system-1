@@ -1,7 +1,7 @@
 import { createElement, forwardRef, useEffect, useLayoutEffect, useRef, type HTMLAttributes } from "react";
 import type { Menu as MenuElement, MenuAnchor, MenuCloseReason, MenuTriggerMode, MenuToggleDetail } from "../3-unit/ds-menu";
 export type MenuProps = HTMLAttributes<MenuElement> & {
-  open?: boolean; compact?: boolean; columns?: number; hover?: boolean;
+  open?: boolean; compact?: boolean; columns?: number; hover?: boolean; disabled?: boolean;
   contextSelector?: string;
   anchor?: MenuAnchor | null; placement?: "top" | "bottom" | "right" | "left"; triggerMode?: MenuTriggerMode; trigger?: HTMLElement | null; controller?: HTMLElement | null; activeId?: string;
   onActiveChange?: (id: string) => void;
@@ -10,7 +10,7 @@ export type MenuProps = HTMLAttributes<MenuElement> & {
 };
 const useCommitEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 export const Menu = forwardRef<MenuElement, MenuProps>(function Menu(
-  {open, compact, columns, hover, anchor, placement, triggerMode, contextSelector, trigger, controller, activeId, onActiveChange, onOpenChange, onCloseAutoFocus, children, ...props}, ref,
+  {open, compact, columns, hover, disabled, anchor, placement, triggerMode, contextSelector, trigger, controller, activeId, onActiveChange, onOpenChange, onCloseAutoFocus, children, ...props}, ref,
 ) {
   const host = useRef<MenuElement>(null);
   useCommitEffect(() => {
@@ -24,5 +24,5 @@ export const Menu = forwardRef<MenuElement, MenuProps>(function Menu(
     element.renderNow?.();
     return () => { element.removeEventListener("ds-menu-close-focus", focus); element.removeEventListener("ds-menu-active", active); element.removeEventListener("ds-menu-close", close); element.removeEventListener("ds-menu-toggle", toggle); };
   });
-  return createElement("ds-menu", {...props, ref: (element: MenuElement | null) => { host.current = element; if (typeof ref === "function") ref(element); else if (ref) ref.current = element; }, floating: open !== undefined, open, compact, columns, hover, anchor, placement, triggerMode, contextSelector, trigger, controller, activeId}, children);
+  return createElement("ds-menu", {...props, ref: (element: MenuElement | null) => { host.current = element; if (typeof ref === "function") ref(element); else if (ref) ref.current = element; }, floating: open !== undefined, open, compact, columns, hover, disabled, anchor, placement, triggerMode, contextSelector, trigger, controller, activeId}, children);
 });
