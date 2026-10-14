@@ -18,6 +18,10 @@ export const EXAMPLES: Record<string, ComponentExample> = {
     title: 'Choices and repeated actions', hint: 'Choose a view or step through the date.',
     html: '<ds-split aria-label="View" options="day:Day,week:Week,month:Month" value="week"></ds-split>\n<ds-split actions aria-label="Date" options="back:@left:Back,today:Today,next:@right:Next"></ds-split>',
   },
+  'avatar': {
+    title: 'People, always round', hint: 'Link fills an avatar with a colour; Ezo letters it in an ink.',
+    html: '<ds-avatar-group aria-label="People">\n  <ds-avatar initial="A" color="#99ff73" outlined></ds-avatar>\n  <ds-avatar initial="J" color="#f5aad1" outlined></ds-avatar>\n  <ds-avatar initial="M" color="#fec20d" outlined></ds-avatar>\n</ds-avatar-group>\n<ds-avatar-group aria-label="People">\n  <ds-avatar initial="E" ink="light-dark(#2e9e1f, #99ff73)" outlined></ds-avatar>\n  <ds-avatar initial="高橋" ink="light-dark(#4b44e6, #b3aeff)" outlined></ds-avatar>\n  <ds-avatar initial="S" pending></ds-avatar>\n</ds-avatar-group>',
+  },
   'button': {
     title: 'Button styles', hint: 'Click a button. The event appears below.',
     html: '<ds-button primary>Save changes</ds-button>\n<ds-button secondary>Cancel</ds-button>\n<ds-button>Text button</ds-button>\n<ds-button primary disabled>Disabled</ds-button>',
@@ -129,6 +133,7 @@ export const EXAMPLES: Record<string, ComponentExample> = {
 };
 
 export const PAGE_EXAMPLES: Record<string, string[]> = {
+  '2-core/avatar': ['avatar'],
   '2-core/button': ['button', 'button-icon'],
   '2-core/tooltip': ['tooltip', 'tooltip-fallback'],
   '2-core/icon': ['icon', 'icon-variants'],

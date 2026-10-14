@@ -93,6 +93,7 @@ export default defineConfig({
         {
           label: "2 Core",
           items: [
+            { label: "Avatar", slug: "2-core/avatar" },
             { label: "Banner", slug: "2-core/banner" },
             { label: "Button", slug: "2-core/button" },
             { label: "Split", slug: "2-core/split" },

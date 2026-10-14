@@ -30,6 +30,7 @@ export const LAYERS: DirectoryLayer[] = [
     color: 'light-green',
     summary: 'One piece each: a button, a text, an icon.',
     entries: [
+      { name: 'Avatar', href: '/2-core/avatar/', tag: 'ds-avatar' },
       { name: 'Banner', href: '/2-core/banner/', tag: 'ds-banner' },
       { name: 'Button', href: '/2-core/button/', tag: 'ds-button' },
       { name: 'Split', href: '/2-core/split/', tag: 'ds-split' },
