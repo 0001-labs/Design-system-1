@@ -109,6 +109,7 @@
 :host([control="slotted"][icon]) {
   justify-content: center !important;
   width: var(--ds-button-height, var(--ds-control-height)) !important;
+  height: var(--ds-button-height, var(--ds-control-height)) !important;
   padding: 0 !important;
   color: var(--ds-button-color, var(--ds-text-color-muted)) !important;
 }
