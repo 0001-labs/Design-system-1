@@ -7,7 +7,7 @@
   box-sizing: border-box !important;
   display: inline-flex !important;
   align-items: center !important;
-  justify-content: flex-start !important;
+  justify-content: var(--ds-button-align, flex-start) !important;
   gap: var(--ds-button-gap, calc(4px * var(--ds-sf))) !important;
   min-width: 0 !important;
   max-width: 100% !important;
