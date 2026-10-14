@@ -26,6 +26,14 @@ function nativeStyle(tag: string, className: string): string | undefined {
   const supported = tag === "button" ? ["ds-button"] : ["input", "select", "textarea"].includes(tag) ? ["ds-input", "ds-select", "ds-checkbox"] : [];
   return supported.find(name => classes.includes(name));
 }
+function jsxClassName(initializer: ts.JsxAttributeValue | undefined): string {
+  if (initializer && ts.isStringLiteral(initializer)) return initializer.text;
+  if (!initializer || !ts.isJsxExpression(initializer) || !initializer.expression) return "";
+  const expression = initializer.expression;
+  if (ts.isStringLiteralLike(expression)) return expression.text;
+  if (ts.isTemplateExpression(expression)) return [expression.head.text, ...expression.templateSpans.map(span => span.literal.text)].join(" ");
+  return "";
+}
 
 /** Parse syntax, not comments or import/selector strings. Template chunks preserve line offsets. */
 export function sourceSites(file: string, source: string): TagSite[] {
@@ -40,11 +48,11 @@ export function sourceSites(file: string, source: string): TagSite[] {
         if (at >= 0) stack.length = at;
         continue;
       }
-      const frame = (tag === "dialog" && stack.at(-1) === "ds-dialog") || (tag === "input" && ["ds-checkbox", "ds-radio", "ds-color", "ds-token-field", "ds-file-picker"].includes(stack.at(-1) ?? "")) || (tag === "button" && stack.at(-1) === "ds-switch") || (tag === "select" && stack.at(-1) === "ds-select") || (tag === "textarea" && stack.at(-1) === "ds-composer");
+      const frame = (tag === "dialog" && stack.at(-1) === "ds-dialog") || (tag === "input" && ["ds-checkbox", "ds-radio", "ds-color", "ds-token-field", "ds-file-picker"].includes(stack.at(-1) ?? "")) || (tag === "button" && ["ds-switch", "ds-button"].includes(stack.at(-1) ?? "")) || (tag === "select" && stack.at(-1) === "ds-select") || (tag === "textarea" && stack.at(-1) === "ds-composer");
       const attributes = clean.slice(match.index! + match[0].length).split(">")[0]!;
       if (!/\/\s*$/.test(attributes) && !/^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/.test(tag)) stack.push(tag);
       if (frame) continue;
-      const className = /\bclass\s*=\s*["']([^"']*)["']/.exec(attributes)?.[1] ?? "";
+      const className = /\bclass\s*=\s*["']([^"']*)["']/.exec(attributes)?.[1] ?? /\bclass\s*=\s*["']([^"']*)$/.exec(attributes)?.[1] ?? "";
       const dialogRole = /\brole\s*=\s*["'](?:alertdialog|dialog)["']/.test(attributes);
       const controlKind = /\brole\s*=\s*["']switch["']/.test(attributes) ? "switch" : tag === "input" && /\btype\s*=\s*["']checkbox["']/.test(attributes) ? "checkbox" : tag === "input" && /\btype\s*=\s*["']radio["']/.test(attributes) ? "radio" : tag === "input" && /\btype\s*=\s*["']color["']/.test(attributes) ? "color" : tag === "input" && /\btype\s*=\s*["']file["']/.test(attributes) ? "file-picker" : undefined;
       found.push({ tag, line: line(offset + match.index!), nativeStyle: nativeStyle(tag, className), ...(dialogRole ? { dialogRole } : {}), ...(controlKind ? { controlKind } : {}) });
@@ -113,7 +121,7 @@ export function sourceSites(file: string, source: string): TagSite[] {
         const call = statement.expression;
         if (!ts.isPropertyAccessExpression(call.expression) || !ts.isIdentifier(call.expression.expression) || !["append", "appendChild"].includes(call.expression.name.text)) continue;
         const host = creations.get(call.expression.expression.text)?.tag;
-        const frameTags: Record<string, string> = { "ds-dialog": "dialog", "ds-select": "select", "ds-token-field": "input", "ds-file-picker": "input", "ds-composer": "textarea", "ds-checkbox": "input", "ds-radio": "input", "ds-color": "input", "ds-switch": "button" };
+        const frameTags: Record<string, string> = { "ds-dialog": "dialog", "ds-select": "select", "ds-token-field": "input", "ds-file-picker": "input", "ds-composer": "textarea", "ds-checkbox": "input", "ds-radio": "input", "ds-color": "input", "ds-switch": "button", "ds-button": "button" };
         const frameTag = host && frameTags[host];
         if (!frameTag) continue;
         for (const arg of call.arguments) {
@@ -131,7 +139,7 @@ export function sourceSites(file: string, source: string): TagSite[] {
       const tag = node.tagName.getText(ast);
       const attribute = node.attributes.properties.find(p => ts.isJsxAttribute(p) && ["class", "className"].includes(p.name.getText(ast)));
       const initializer = attribute && ts.isJsxAttribute(attribute) ? attribute.initializer : undefined;
-      const className = initializer && ts.isStringLiteral(initializer) ? initializer.text : "";
+      const className = jsxClassName(initializer);
       const role = node.attributes.properties.find(p => ts.isJsxAttribute(p) && p.name.getText(ast) === "role");
       const roleValue = role && ts.isJsxAttribute(role) ? role.initializer : undefined;
       const dialogRole = roleValue && ts.isStringLiteral(roleValue) && ["dialog", "alertdialog"].includes(roleValue.text);

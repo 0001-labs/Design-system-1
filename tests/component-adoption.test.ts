@@ -43,6 +43,8 @@ describe("source adoption evidence", () => {
     expect(sites[0]?.tag).toBe("ds-button");
     expect(sites[1]).toMatchObject({ tag: "input", nativeStyle: "ds-input" });
     expect(sourceSites("page.html", '<button class="ds-button secondary">Save</button>')[0]?.nativeStyle).toBe("ds-button");
+    expect(sourceSites("view.tsx", 'const button = <button className={`archive-cell${active ? " active" : ""} ds-button`} />;')[0]?.nativeStyle).toBe("ds-button");
+    expect(sourceSites("view.ts", 'const button = html`<button class="dot ds-button ${state}" @click=${click}></button>`;')[0]?.nativeStyle).toBe("ds-button");
   });
   it("recognizes explicitly styled native buttons created and tagged in the same block", () => {
     const sites = sourceSites("view.ts", 'function view() { const button = document.createElement("button"); button.className = "local-action"; button.classList.add("ds-button"); host.append(button); } function other() { const button = document.createElement("button"); host.append(button); }');
@@ -57,6 +59,10 @@ describe("source adoption evidence", () => {
       const radios = sourceSites(file, '<ds-radio><input type="radio" /></ds-radio><input type="radio" />');
       expect(radios.map(site => site.tag)).toEqual(["ds-radio", "input"]); expect(radios[1]?.controlKind).toBe("radio");
     }
+  });
+  it("does not count the native button inside the shared DS1 button face twice", () => {
+    expect(sourceSites("page.html", '<ds-button control="slotted"><button type="submit">Save</button></ds-button>').map(site => site.tag)).toEqual(["ds-button"]);
+    expect(sourceSites("view.ts", 'function view() { const face = document.createElement("ds-button"); const button = document.createElement("button"); face.append(button); }').map(site => site.tag)).toEqual(["ds-button"]);
   });
   it("distinguishes a verified snapshot, an older snapshot, and a locally modified copy", () => {
     const { app, ds } = fixture();
