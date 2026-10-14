@@ -29,7 +29,7 @@ ds-button {
 :host([area]) ds-button { width: 100%; --ds-button-height: calc(8 * var(--ds-unit)); }
 :host([area][compact]) { height: calc(4 * var(--ds-unit)); }
 :host([area][compact]) ds-button { --ds-button-height: calc(4 * var(--ds-unit)); }
-:host([area]) slot[name="content"] { width: 100%; text-align: center; white-space: normal; }
+:host([area]) slot[name="content"] { display: block; width: 100%; text-align: center; white-space: normal; }
 :host([area]) ::slotted([slot="content"]) { box-sizing: border-box; width: 100%; padding: var(--ds-unit); white-space: normal; }
 /* The native control is the only focusable hit target. It is not display:none:
    labels, keyboard activation, required validation and file drops stay native. */
