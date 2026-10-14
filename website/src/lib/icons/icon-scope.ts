@@ -4,6 +4,8 @@ export const interfaceIconAliases: Record<string, string> = {
   'lock-filled': 'lock',
   'open-alt': 'open',
   'page-alt': 'page',
+  'password-see': 'see',
+  'password-unsee': 'unsee',
   'rewind-30': 'rewind',
   'see-30': 'see',
   'star-alt': 'star',
@@ -13,7 +15,7 @@ export const interfaceIconAliases: Record<string, string> = {
 
 /** Product artwork and repeated drawings remain available to existing consumers. */
 export function isSharedInterfaceIcon(key: string): boolean {
-  return key !== 'status-alt' && key !== 'image' && key !== 'warning' && !Object.hasOwn(interfaceIconAliases, key) && !/^(ezo-|aa-|badge-|block-|pattern-|arrange-|navigation-)/.test(key);
+  return key !== 'status-alt' && key !== 'image' && key !== 'warning' && !Object.hasOwn(interfaceIconAliases, key) && !/^(badge-|block-|pattern-|arrange-|navigation-)/.test(key);
 }
 
 /** One semantic word on the sheet; technical keys stay stable for consumers. */

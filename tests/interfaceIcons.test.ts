@@ -51,10 +51,10 @@ test('duplicate drawings appear only once, including a single Check', () => {
 test('the shared sheet uses single-word labels and excludes product collections and their SVG exports', () => {
   for (const icon of icons) {
     expect(icon.name, icon.key).toMatch(/^[A-Za-z][A-Za-z0-9]*$/);
-    expect(icon.key).not.toMatch(/^(ezo-|aa-|badge-|block-|pattern-|arrange-|navigation-)/);
+    expect(icon.key).not.toMatch(/^(badge-|block-|pattern-|arrange-|navigation-)/);
   }
   for (const file of readdirSync(new URL('../website/public/icons/library/', import.meta.url))) {
-    expect(file).not.toMatch(/^(ezo-|aa-|badge-|block-|pattern-|arrange-|navigation-)/);
+    expect(file).not.toMatch(/^(badge-|block-|pattern-|arrange-|navigation-)/);
   }
 });
 test('inline copies isolate clip IDs while keeping exact path geometry and source immutable',()=>{

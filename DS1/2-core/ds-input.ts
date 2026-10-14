@@ -5,8 +5,8 @@ import { LitElement, html, unsafeCSS, type CSSResultGroup, type PropertyDeclarat
 import { live } from "lit/directives/live.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { define } from "../0-face/define";
-import seeIcon from "../x-icon/ezo-password-visibility-see.svg?url";
-import unseeIcon from "../x-icon/ezo-password-visibility-unsee.svg?url";
+import seeIcon from "../x-icon/password-see.svg?url";
+import unseeIcon from "../x-icon/password-unsee.svg?url";
 import { getText, currentLanguage } from "../0-face/i18n";
 import "./ds-text";
 import styles from "./styles/ds-input.css?inline";

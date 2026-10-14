@@ -28,11 +28,9 @@ function replace(source, pattern, replacement) {
 }
 
 for (const file of [
-  'Design system 1/DS1/x-icon/ezo-android-screen-globe.svg',
   'Design system 1/website/public/icons/interface/globe.svg',
-  'Design system 1/website/public/icons/library/ezo-android-screen-globe.svg',
   'Link/public/icons/public-globe.svg',
-]) put(file, file.includes('/icons/library/') ? svg : svg + '\n');
+]) put(file, svg + '\n');
 // Android's SVG loader uses an explicit source colour, then applies its tint.
 put('Ezo/android/shared/src/main/resources/screen-icons/Screen-globe.svg', svg.replace('currentColor', '#1E1E1E') + '\n');
 
@@ -40,12 +38,9 @@ put('Ezo/android/shared/src/main/resources/screen-icons/Screen-globe.svg', svg.r
 for (const base of ['Design system 1/DS1']) {
   for (const part of ['ds-icon-map', 'icons-extra']) {
     put(`${base}/2-core/generated/${part}.ts`, source => {
-      for (const name of ['globe', 'ezo-android-screen-globe']) {
-        const pattern = new RegExp(`(^\\s*"${name}":\\s*)("(?:[^"\\\\]|\\\\.)*")`, 'm');
-        if (pattern.test(source)) source = source.replace(pattern, (_match, prefix) => prefix + JSON.stringify(svg));
-        else if (name === 'globe') throw new Error(`Missing globe in ${base}/${part}`);
-      }
-      return source;
+      const pattern = /(^\s*"globe":\s*)("(?:[^"\\]|\\.)*")/m;
+      if (!pattern.test(source)) throw new Error(`Missing globe in ${base}/${part}`);
+      return source.replace(pattern, (_match, prefix) => prefix + JSON.stringify(svg));
     });
   }
 }
