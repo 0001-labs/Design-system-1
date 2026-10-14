@@ -42,3 +42,31 @@ test("disclosures hide nested choices from menu navigation and can decline contr
     await act(async () => trigger.click()); expect(requested).toHaveBeenLastCalledWith(true); expect(trigger.getAttribute("aria-expanded")).toBe("false");
   } finally {await act(async () => root.unmount()); menu.remove();}
 });
+
+test("section actions remain independent of controlled disclosure and a disabled trigger", async () => {
+  Object.assign(globalThis, {IS_REACT_ACT_ENVIRONMENT: true});
+  const host = document.createElement("div"); document.body.append(host); const root = createRoot(host);
+  const requested = vi.fn(), action = vi.fn();
+  const example = (open: boolean, disabled = false) => h(Accordion, {
+    summary: "Translations", open, disabled, onOpenChange: requested,
+    actions: h("button", {type: "button", onClick: action}, "Translate"),
+  }, h("input", {"aria-label": "Translation"}));
+  try {
+    await act(async () => root.render(example(false)));
+    const trigger = host.querySelector('[slot="trigger"] button') as HTMLButtonElement;
+    const command = host.querySelector('[slot="actions"] button') as HTMLButtonElement;
+    const details = host.querySelector('[slot="details"]') as HTMLElement;
+    await act(async () => command.click());
+    expect(action).toHaveBeenCalledOnce(); expect(requested).not.toHaveBeenCalled();
+    expect(command.closest("[hidden]")).toBeNull(); expect(details.hidden).toBe(true);
+    expect(trigger.contains(command)).toBe(false);
+    await act(async () => trigger.click());
+    expect(requested).toHaveBeenLastCalledWith(true); expect(details.hidden).toBe(true);
+    await act(async () => root.render(example(true)));
+    const input = details.querySelector("input")!; input.focus();
+    await act(async () => root.render(example(false, true)));
+    expect(details.hidden).toBe(true); expect(trigger.disabled).toBe(true);
+    requested.mockClear(); await act(async () => trigger.click()); expect(requested).not.toHaveBeenCalled();
+    await act(async () => command.click()); expect(action).toHaveBeenCalledTimes(2);
+  } finally {await act(async () => root.unmount()); host.remove();}
+});

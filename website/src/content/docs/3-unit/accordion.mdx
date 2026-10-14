@@ -22,3 +22,12 @@ A native details and summary disclosure composed from a row, text and an icon.
 For rich detail content, use `slot="details"` as in the example. The summary can be activated with the pointer, Enter or Space. Native `<details>` owns opening and closing.
 
 [Row](/3-unit/row/) · [Text](/2-core/text/)
+
+## Controlled sections in React
+
+The source-owned `react/accordion` binding accepts `summary`, `open`,
+`onOpenChange` and optional `actions`. Actions sit beside the disclosure trigger,
+outside its button, and wrap below it on narrow surfaces. They remain available
+while details are collapsed. Use shared Button controls for those actions.
+The product decides whether to accept an open request; DS1 owns visibility,
+the disclosure icon, accessible relationships and focus return on collapse.

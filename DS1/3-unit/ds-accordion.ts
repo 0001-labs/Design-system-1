@@ -75,7 +75,7 @@ export class Accordion extends LitElement {
   }
 
   render() {
-    if (this.control === "slotted") return html`<slot name="trigger" @slotchange=${this.syncFrame}></slot><slot name="details" @slotchange=${this.syncFrame}></slot>`;
+    if (this.control === "slotted") return html`<div class="header"><slot name="trigger" @slotchange=${this.syncFrame}></slot><slot name="actions"></slot></div><slot name="details" @slotchange=${this.syncFrame}></slot>`;
     return html`
       <details ?open=${this.open}>
         <summary>

@@ -48,6 +48,17 @@ details[open] ds-icon.chevron {
 }
 
 :host([control="slotted"]) { width: 100%; }
-:host([control="slotted"]) ::slotted([slot="trigger"]) { width: 100%; --ds-button-height: var(--ds-row-height); }
+.header { display: flex; flex-wrap: wrap; align-items: start; gap: calc(var(--ds-unit) / 2); }
+:host([control="slotted"]) ::slotted([slot="trigger"]) {
+  flex: 1 1 0;
+  min-width: min(calc(8 * var(--ds-unit)), 100%);
+  --ds-button-height: var(--ds-row-height);
+}
+:host([control="slotted"]) ::slotted([slot="actions"]) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--ds-unit) / 2);
+  max-width: 100%;
+}
 :host([control="slotted"]) ::slotted([slot="details"]) { display: block; }
 :host([control="slotted"]) ::slotted([slot="details"][hidden]) { display: none !important; }

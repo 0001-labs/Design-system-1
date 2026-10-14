@@ -2,12 +2,12 @@ import { createElement as h, forwardRef, useEffect, useId, useLayoutEffect, useR
 import type { Accordion as AccordionElement } from "../3-unit/ds-accordion";
 
 export type AccordionProps = Omit<HTMLAttributes<AccordionElement>, "onToggle"> & {
-  summary: ReactNode; open?: boolean; defaultOpen?: boolean; disabled?: boolean;
+  summary: ReactNode; actions?: ReactNode; open?: boolean; defaultOpen?: boolean; disabled?: boolean;
   triggerRole?: string; onOpenChange?: (open: boolean) => void;
 };
 const useCommitEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 export const Accordion = forwardRef<AccordionElement, AccordionProps>(function Accordion(
-  {summary, open, defaultOpen = false, disabled, triggerRole, onOpenChange, children, ...props}, ref,
+  {summary, actions, open, defaultOpen = false, disabled, triggerRole, onOpenChange, children, ...props}, ref,
 ) {
   const host = useRef<AccordionElement>(null), id = useId();
   const [localOpen, setLocalOpen] = useState(defaultOpen), expanded = open ?? localOpen;
@@ -28,5 +28,6 @@ export const Accordion = forwardRef<AccordionElement, AccordionProps>(function A
   }, h("ds-button", {slot: "trigger", control: "slotted", choice: true, disabled},
     h("button", {type: "button", role: triggerRole, disabled, "aria-expanded": expanded, "aria-controls": id}, summary,
       h("ds-icon", {type: expanded ? "up" : "down", "aria-hidden": "true", style: {marginInlineStart: "auto", flex: "0 0 auto"}}))),
+    actions == null ? null : h("div", {slot: "actions"}, actions),
     h("div", {slot: "details", id, hidden: !expanded}, children));
 });
