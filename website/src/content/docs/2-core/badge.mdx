@@ -6,6 +6,9 @@ description: A shared, noninteractive status label with an optional icon.
 `ds-badge` shows a status in one shared row. Products supply the words, icon
 and status meaning; DS1 owns the face, type, truncation and independent scale.
 It is not a button and adds no tab stop.
+Its width rounds up to whole squares, within the available space. Content,
+font and surface-scale changes remeasure once per frame while changing;
+standing idle does not run a measurement loop.
 
 ```html
 <ds-badge icon="lock">Password on</ds-badge>

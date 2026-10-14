@@ -183,7 +183,7 @@ describe("source adoption evidence", () => {
     manifest.files['react/input.ts'] = createHash('sha256').update(readFileSync(join(app, 'design/react/input.ts'))).digest('hex');
     writeFileSync(manifestPath, JSON.stringify(manifest));
     expect(scan().cells.input).toMatchObject({ shared: 0, unverified: 2 });
-  });
+  }, 15_000); // This integration fixture repeatedly reads Git across every adapter graph.
 });
 
 it("counts a shared dialog frame once across HTML, Lit, JSX and direct DOM composition", () => {
