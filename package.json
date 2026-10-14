@@ -32,14 +32,14 @@
     "DS1/**/*.ts",
     "dist/**/*.js"
   ],
-  "main": "dist/index.js",
-  "module": "dist/index.esm.js",
+  "main": "dist/design-system-1.bundle.js",
+  "module": "dist/design-system-1.bundle.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.esm.js",
-      "require": "./dist/index.js"
+      "import": "./dist/design-system-1.bundle.js",
+      "default": "./dist/design-system-1.bundle.js"
     },
     "./DS1/*": "./DS1/*",
     "./styles": "./DS1/1-root/one.css",
