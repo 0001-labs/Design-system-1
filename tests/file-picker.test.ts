@@ -15,7 +15,7 @@ test("file selection keeps the native ref, labels, external form and events", as
   const changed: HTMLInputElement[] = [];
   try {
     await act(async () => root.render(h("div", null, h("form", {id:"upload"}), h("label", {htmlFor:"logo"}, "Company logo"), h(FilePicker, {
-      id:"logo", label:"Choose logo", name:"logo", form:"upload", required:true, multiple:true, accept:"image/svg+xml,.svg", ref,
+      id:"logo", label:"Choose logo", name:"logo", form:"upload", required:true, multiple:true, area:true, dragging:true, accept:"image/svg+xml,.svg", ref,
       onChange:event=>changed.push(event.currentTarget),
     }))));
     const input=ref.current!, host=mount.querySelector("ds-file-picker")!;
@@ -31,6 +31,8 @@ test("file selection keeps the native ref, labels, external form and events", as
     const face=host.shadowRoot!.querySelector("ds-button")!;
     expect(face.hasAttribute("inert")).toBe(true); expect(face.getAttribute("aria-hidden")).toBe("true");
     expect(input.hidden).toBe(false);
+    expect(input.hasAttribute("area")).toBe(false); expect(input.hasAttribute("dragging")).toBe(false);
+    expect(face.icon).toBe(false); expect(face.secondary).toBe(true);
   } finally { await act(async()=>root.unmount()); }
 });
 

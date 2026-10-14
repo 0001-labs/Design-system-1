@@ -9,6 +9,8 @@ export class FilePicker extends LitElement {
     label: { type: String },
     icon: { type: Boolean, reflect: true },
     preview: { type: Boolean, reflect: true },
+    area: { type: Boolean, reflect: true },
+    dragging: { type: Boolean, reflect: true },
     compact: { type: Boolean, reflect: true },
     primary: { type: Boolean, reflect: true },
     secondary: { type: Boolean, reflect: true },
@@ -17,6 +19,8 @@ export class FilePicker extends LitElement {
   declare label: string;
   declare icon: boolean;
   declare preview: boolean;
+  declare area: boolean;
+  declare dragging: boolean;
   declare compact: boolean;
   declare primary: boolean;
   declare secondary: boolean;
@@ -25,7 +29,7 @@ export class FilePicker extends LitElement {
   constructor() {
     super();
     this.label = "";
-    this.icon = this.preview = this.compact = this.primary = this.secondary = false;
+    this.icon = this.preview = this.area = this.dragging = this.compact = this.primary = this.secondary = false;
   }
   private control() { return this.querySelector<HTMLInputElement>(":scope > input[type=file]"); }
   private syncDisabled() {
@@ -69,7 +73,7 @@ export class FilePicker extends LitElement {
   focus(options?: FocusOptions) { this.control()?.focus(options); }
   render() {
     return html`<ds-button control="host" inert aria-hidden="true" tabindex="-1"
-      .icon=${this.icon || this.preview} .primary=${this.primary} .secondary=${this.secondary}
+      .icon=${!this.area && (this.icon || this.preview)} .primary=${this.primary} .secondary=${this.secondary || this.area}
       .disabled=${this.controlDisabled}><slot name="content">${this.label}</slot></ds-button>
       <slot @slotchange=${this.observeControl}></slot>`;
   }

@@ -17,6 +17,9 @@ fieldsets. DS1 composes the visible Button face, focus ring and scale.
 The normal picker is one square high and as wide as its label. `icon` makes
 it a one-square icon control; `preview` makes a four-square image control,
 or two squares with `compact`.
+`area` fills its container as an eight-square-high upload target, or four
+squares with `compact`. It uses the shared secondary face and wraps its label.
+Use it for a larger native drop target rather than drawing a product-owned well.
 Put decorative content in the `content` slot. Keep an accessible name on the
 native input. The composed button is inert and hidden from assistive technology
 so there is one control and one tab stop.
@@ -37,5 +40,10 @@ permissions and persistence. No file leaves the browser through this component.
 Clear `event.currentTarget.value` after consuming a selection when choosing the
 same file again should be possible. Do not hide the input or add a second click
 trigger. Native `accept` guides selection; product validation still applies.
+When a containing product surface also accepts dropped files, it owns that
+drop: prevent the native default and pass a copied array to the same guarded
+upload function. This avoids uploading once on drop and again on change.
+Set `dragging` when that outer surface has a file over it: DS1 applies the same
+drag feedback to the picker, suppressed when the native control is disabled.
 Verify file selection and keyboard activation, disabled fieldsets, reset, focus,
 pending recovery and light/dark scaled layouts without uploading live test data.

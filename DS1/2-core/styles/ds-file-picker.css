@@ -23,8 +23,14 @@ ds-button {
 :host([preview]) ds-button { --ds-button-height: calc(4 * var(--ds-unit)); }
 :host([preview][compact]) { width: calc(2 * var(--ds-unit)); height: calc(2 * var(--ds-unit)); }
 :host([preview][compact]) ds-button { --ds-button-height: calc(2 * var(--ds-unit)); }
-::slotted([slot="content"]) { display: inline-flex; align-items: center; justify-content: center; pointer-events: none; }
+::slotted([slot="content"]) { display: inline-flex; align-items: center; justify-content: center; gap: calc(var(--ds-unit) / 2); pointer-events: none; }
 :host([preview]) ::slotted([slot="content"]) { width: 100%; height: 100%; }
+:host([area]) { width: 100%; height: calc(8 * var(--ds-unit)); }
+:host([area]) ds-button { width: 100%; --ds-button-height: calc(8 * var(--ds-unit)); }
+:host([area][compact]) { height: calc(4 * var(--ds-unit)); }
+:host([area][compact]) ds-button { --ds-button-height: calc(4 * var(--ds-unit)); }
+:host([area]) slot[name="content"] { width: 100%; text-align: center; white-space: normal; }
+:host([area]) ::slotted([slot="content"]) { box-sizing: border-box; width: 100%; padding: var(--ds-unit); white-space: normal; }
 /* The native control is the only focusable hit target. It is not display:none:
    labels, keyboard activation, required validation and file drops stay native. */
 ::slotted(input[type="file"]) {
@@ -50,6 +56,6 @@ ds-button {
 ::slotted(input[type="file"]:disabled) { cursor: default !important; }
 ::slotted(input[hidden]) { display: none !important; }
 :host(:focus-within) { outline: 2px solid var(--ds-focus-ring); outline-offset: 1px; }
-:host([secondary]:hover:not([data-disabled])) ds-button { --ds-button-background: var(--ds-fill-hover); }
-:host([data-dragging]) { outline: 2px solid var(--ds-focus-ring); outline-offset: 1px; }
-:host([data-dragging]) ds-button { --ds-button-background: var(--ds-fill-hover); }
+:host(:is([secondary], [area]):hover:not([data-disabled])) ds-button { --ds-button-background: var(--ds-fill-hover); }
+:host(:is([data-dragging], [dragging]):not([data-disabled])) { outline: 2px solid var(--ds-focus-ring); outline-offset: 1px; }
+:host(:is([data-dragging], [dragging]):not([data-disabled])) ds-button { --ds-button-background: var(--ds-fill-hover); }
