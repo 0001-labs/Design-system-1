@@ -173,3 +173,6 @@ body { min-width: 0; overflow: auto; background: var(--workbench-panel); }
 }
 .app-shell .auth-screen > p { margin-top: var(--app-cell); color: var(--text-color); }
 .app-navigation { color: var(--text-color); background: var(--background); }
+body:has(.auth-screen), body:has(.adoption) { background: var(--background); color: var(--text-color); }
+.app-shell .auth-screen sign-in-screen input::placeholder { color: color-mix(in srgb, var(--text-color) 65%, var(--background)); }
+.app-shell .auth-screen > p a { white-space: normal; overflow-wrap: anywhere; }
