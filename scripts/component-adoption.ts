@@ -14,7 +14,7 @@ export const excluded = /^(?:(?:client|src|web)\/)?(?:design|ds1)\/|^src\/pages\
 export interface AppSpec { id: string; name: string; directory: string; roots: string[]; manifest?: string }
 export const APPS: AppSpec[] = [
   { id: "ezo", name: "Ezo", directory: "Ezo", roots: ["client"], manifest: "client/design/components-manifest.json" },
-  { id: "music", name: "Music", directory: "Music", roots: ["web"] },
+  { id: "music", name: "Music", directory: "Music", roots: ["web"], manifest: "web/ds1/components-manifest.json" },
   { id: "link", name: "Link", directory: "Link", roots: ["client", "src"], manifest: "shared/ds1/components-manifest.json" },
   { id: "consistency", name: "Consistency", directory: "Consistency", roots: ["src"], manifest: "src/design/components-manifest.json" },
 ];
