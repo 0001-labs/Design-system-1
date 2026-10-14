@@ -4,11 +4,12 @@ import "../2-core/ds-button";
 import "../2-core/ds-file-picker";
 import "../2-core/ds-icon";
 import styles from "./styles/ds-menu.css?inline";
+import { bindContextMenuTrigger } from "./context-trigger";
 
 const ITEM = '[role="option"], [role="menuitem"], [role="menuitemradio"], [role="menuitemcheckbox"]';
 const FOCUSABLE = 'button, a[href], input, select, textarea, [tabindex]';
 export type MenuCloseReason = "escape" | "outside" | "select" | "back" | "parent";
-export type MenuTriggerMode = "click" | "context" | "submenu";
+export type MenuTriggerMode = "click" | "context" | "submenu" | "manual";
 export type MenuToggleDetail = { open: boolean; trigger: HTMLElement | null; point?: { x: number; y: number } };
 export type MenuAnchor = HTMLElement | Pick<DOMRectReadOnly, "left" | "top" | "right" | "bottom" | "width" | "height">;
 
@@ -51,6 +52,8 @@ export class Menu extends LitElement {
   private listeningTo: HTMLElement | null = null;
   private listeningTrigger: HTMLElement | null = null;
   private listeningSelector = "";
+  private listeningMode: MenuTriggerMode | null = null;
+  private contextBinding?: ReturnType<typeof bindContextMenuTrigger>;
   private triggerAttributes = new Map<string, string | null>();
   private openingEdge: "first" | "last" = "first";
   private search = "";
@@ -66,11 +69,6 @@ export class Menu extends LitElement {
   private heldFocus = false;
   private focusVersion = 0;
   private contextPoint: MenuAnchor | null = null;
-  private pressTimer?: ReturnType<typeof setTimeout>;
-  private pressPoint?: { x: number; y: number };
-  private suppressedControl: HTMLElement | null = null;
-  private suppressClick = false;
-  private suppressClickTimer?: ReturnType<typeof setTimeout>;
   private invokingControl: HTMLElement | null = null;
   private get parentMenu(): Menu | null { return this.parentElement?.closest<Menu>("ds-menu") ?? null; }
   private get rootMenu(): Menu { return this.parentMenu?.rootMenu ?? this; }
@@ -99,12 +97,12 @@ export class Menu extends LitElement {
     this.listeningTo?.removeEventListener("keydown", this.onControllerKey);
     this.listeningTo = null;
     this.bindTrigger(null);
-    clearTimeout(this.hoverTimer); this.cancelPress(); this.clearSuppression();
+    clearTimeout(this.hoverTimer);
     this.hide(true);
     super.disconnectedCallback();
   }
   updated() {
-    if (this.disabled) this.cancelPress();
+    if (this.disabled) this.contextBinding?.cancel();
     this.bindTrigger(this.trigger);
     if (this.trigger && !this.contextSelector) {
       this.trigger.setAttribute("aria-haspopup", this.getAttribute("role") === "menu" ? "menu" : "listbox");
@@ -132,36 +130,31 @@ export class Menu extends LitElement {
   /** Prepare a newly inserted menu before gesture-time focus. */
   renderNow() { this.performUpdate(); }
   private bindTrigger(trigger: HTMLElement | null) {
-    if (this.listeningTrigger === trigger && this.listeningSelector === this.contextSelector) return;
-    this.cancelPress(); this.clearSuppression();
+    if (this.listeningTrigger === trigger && this.listeningSelector === this.contextSelector && this.listeningMode === this.triggerMode) return;
+    this.contextBinding?.dispose(); this.contextBinding = undefined;
     for (const [name, value] of this.triggerAttributes) {
       if (value === null) this.listeningTrigger?.removeAttribute(name); else this.listeningTrigger?.setAttribute(name, value);
     }
     this.triggerAttributes.clear();
     this.listeningTrigger?.removeEventListener("click", this.onTriggerClick);
-    this.listeningTrigger?.removeEventListener("contextmenu", this.onTriggerContext);
-    this.listeningTrigger?.removeEventListener("pointerdown", this.onTriggerPress);
-    this.listeningTrigger?.removeEventListener("pointermove", this.onTriggerMove);
-    this.listeningTrigger?.removeEventListener("pointerup", this.cancelPress);
-    this.listeningTrigger?.removeEventListener("pointercancel", this.cancelPress);
     this.listeningTrigger?.removeEventListener("keydown", this.onTriggerKey);
     this.listeningTrigger?.removeEventListener("pointerenter", this.onHoverEnter);
     this.listeningTrigger?.removeEventListener("pointerleave", this.onHoverLeave);
     this.listeningTrigger = trigger;
     this.listeningSelector = this.contextSelector;
+    this.listeningMode = this.triggerMode;
+    if (trigger && this.triggerMode === "context") this.contextBinding = bindContextMenuTrigger(trigger, (point, control) => {
+      if (this.disabled) return false;
+      this.openAt(point, control);
+    }, { resolve: event => this.contextControl(event), aria: false });
     if (trigger && !this.contextSelector) for (const name of ["aria-haspopup", "aria-expanded", "aria-controls"]) this.triggerAttributes.set(name, trigger.getAttribute(name));
     trigger?.addEventListener("click", this.onTriggerClick);
-    trigger?.addEventListener("contextmenu", this.onTriggerContext);
-    trigger?.addEventListener("pointerdown", this.onTriggerPress);
-    trigger?.addEventListener("pointermove", this.onTriggerMove);
-    trigger?.addEventListener("pointerup", this.cancelPress);
-    trigger?.addEventListener("pointercancel", this.cancelPress);
     trigger?.addEventListener("keydown", this.onTriggerKey);
     trigger?.addEventListener("pointerenter", this.onHoverEnter);
     trigger?.addEventListener("pointerleave", this.onHoverLeave);
   }
   private toggleFromTrigger(open: boolean, detail: Omit<MenuToggleDetail, "open"> = { trigger: this.trigger }) {
-    if (this.disabled || !this.trigger || !this.enabled(this.trigger)) return;
+    if (this.disabled || (!this.trigger && this.triggerMode !== "manual") || (this.trigger && !this.enabled(this.trigger))) return;
     const event = new CustomEvent<MenuToggleDetail>("ds-menu-toggle", {detail: {open, ...detail}, bubbles: true, composed: true, cancelable: true});
     if (this.dispatchEvent(event)) this.open = open;
   }
@@ -192,52 +185,8 @@ export class Menu extends LitElement {
     }
     return null;
   }
-  private onTriggerContext = (event: MouseEvent) => {
-    if (this.triggerMode !== "context" || event.defaultPrevented) return;
-    const control = this.contextControl(event); if (!control) return;
-    event.preventDefault(); this.cancelPress();
-    this.openAt({ x: event.clientX, y: event.clientY }, control);
-  };
-  private cancelPress = () => {
-    clearTimeout(this.pressTimer); this.pressTimer = undefined; this.pressPoint = undefined;
-    this.ownerDocument.removeEventListener("pointermove", this.onTriggerMove);
-    this.ownerDocument.removeEventListener("pointerup", this.cancelPress);
-    this.ownerDocument.removeEventListener("pointercancel", this.cancelPress);
-    if (this.suppressClick) {
-      clearTimeout(this.suppressClickTimer);
-      this.suppressClickTimer = setTimeout(this.clearSuppression, 1000);
-    }
-  };
-  private onTriggerPress = (event: PointerEvent) => {
-    if (event.defaultPrevented || this.triggerMode !== "context" || event.pointerType !== "touch" || event.button !== 0) return;
-    const control = this.contextControl(event); if (!control) return;
-    this.cancelPress(); this.clearSuppression();
-    const point = { x: event.clientX, y: event.clientY }; this.pressPoint = point;
-    this.ownerDocument.addEventListener("pointermove", this.onTriggerMove);
-    this.ownerDocument.addEventListener("pointerup", this.cancelPress);
-    this.ownerDocument.addEventListener("pointercancel", this.cancelPress);
-    this.pressTimer = setTimeout(() => {
-      this.pressTimer = undefined; this.pressPoint = undefined;
-      if (!control.isConnected || !this.trigger?.contains(control) || !this.enabled(control)) { this.cancelPress(); return; }
-      this.suppressClick = true; this.suppressedControl = control;
-      this.ownerDocument.addEventListener("click", this.suppressTriggerClick, true);
-      this.openAt(point, control);
-    }, 600);
-  };
-  private onTriggerMove = (event: PointerEvent) => {
-    if (this.pressPoint && Math.hypot(event.clientX - this.pressPoint.x, event.clientY - this.pressPoint.y) > 10) this.cancelPress();
-  };
-  private clearSuppression = () => {
-    clearTimeout(this.suppressClickTimer); this.suppressClick = false; this.suppressedControl = null;
-    this.ownerDocument.removeEventListener("click", this.suppressTriggerClick, true);
-  };
-  private suppressTriggerClick = (event: MouseEvent) => {
-    const consumes = this.suppressClick && this.suppressedControl && event.composedPath().includes(this.suppressedControl);
-    this.clearSuppression();
-    if (consumes) { event.preventDefault(); event.stopImmediatePropagation(); }
-  };
   private onTriggerClick = (event: MouseEvent) => {
-    if (this.triggerMode === "context" || event.defaultPrevented) return;
+    if (this.triggerMode === "context" || this.triggerMode === "manual" || event.defaultPrevented) return;
     if (this.hover && this.trigger?.matches("a[href]")) return;
     this.focusOnOpen = true;
     this.openingEdge = "first";
@@ -245,12 +194,7 @@ export class Menu extends LitElement {
   };
   private onTriggerKey = (event: KeyboardEvent) => {
     if (event.defaultPrevented || event.isComposing || event.altKey || event.metaKey || event.ctrlKey || (event.shiftKey && !(this.triggerMode === "context" && event.key === "F10")) || !this.trigger || !this.enabled(this.trigger)) return;
-    if (this.triggerMode === "context") {
-      if (event.key !== "ContextMenu" && !(event.key === "F10" && event.shiftKey)) return;
-      const control = this.contextControl(event); if (!control) return;
-      event.preventDefault(); event.stopPropagation();
-      const box = control.getBoundingClientRect(); this.openAt({ x: box.left, y: box.bottom }, control); return;
-    }
+    if (this.triggerMode === "context" || this.triggerMode === "manual") return;
     if (this.triggerMode === "submenu") {
       const forward = this.ownerDocument.defaultView?.getComputedStyle(this).direction === "rtl" ? "ArrowLeft" : "ArrowRight";
       if (event.key !== forward && event.key !== "Enter" && event.key !== " ") return;
@@ -389,7 +333,7 @@ export class Menu extends LitElement {
     const top = [...(openMenus.get(this.ownerDocument) ?? [])].at(-1);
     if (top !== this && (!top || !this.contains(top))) return;
     const path = event.composedPath();
-    const trigger = this.contextSelector ? this.invokingControl : this.trigger;
+    const trigger = this.contextSelector || this.triggerMode === "manual" ? this.invokingControl : this.trigger;
     if (!path.includes(this) && !(this.anchor instanceof HTMLElement && !this.controller && path.includes(this.anchor)) && !(trigger && path.includes(trigger)) && !(this.controller && path.includes(this.controller))) this.requestClose("outside");
   };
   private onPointerChoice = (event: PointerEvent) => {
@@ -401,7 +345,7 @@ export class Menu extends LitElement {
     if (this.controller && event.button === 0 && event.composedPath().some(node => node instanceof HTMLElement && node.matches(ITEM))) event.preventDefault();
   };
   place = () => {
-    const anchor = this.triggerMode === "context" ? this.contextPoint ?? this.anchor : this.anchor;
+    const anchor = this.triggerMode === "context" || this.triggerMode === "manual" ? this.contextPoint ?? this.anchor : this.anchor;
     if (!this.shown || !anchor) return;
     const rect = anchor instanceof HTMLElement ? anchor.getBoundingClientRect() : anchor, view = this.ownerDocument.defaultView!;
     const viewport = view.visualViewport;

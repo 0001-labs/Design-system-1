@@ -1,4 +1,5 @@
 ---
+
 title: Menu
 description: Shared action menus, suggestion lists and small choice grids.
 ---
@@ -96,3 +97,18 @@ components in the browser before mounting the adapter.
 cancel, copies the selected files and resets the input before `onFiles`.
 Selection leaves the menu open so pending product state can disable the row.
 Do not wrap it in an auto-closing action or add hidden click proxies.
+
+For a title that opens an existing action surface, import `bindContextMenuTrigger`
+from `DS1/3-unit/context-trigger`. It owns native right-click, ContextMenu / Shift+F10,
+cancellable 600ms touch holds and suppression of only the matching next click.
+The callback receives the viewport point, control and original event. Return
+`false` to leave a declined gesture to the browser. `selection: true` suppresses
+native title selection/callout while preserving vertical scrolling; `touch: false`
+keeps an ordinary content surface's touch gestures. Call the returned `dispose()`
+when removing the surface. Menu uses this same binding internally.
+
+A menu with `triggerMode="manual"` opens only through `openAt(point, control)`.
+This lets a title and a content surface invoke one shared menu without duplicate
+popup or keyboard implementations. DS1 still owns placement, dismissal and focus
+return to the native invoking control. Products retain permissions, action state
+and pending-operation guards.
