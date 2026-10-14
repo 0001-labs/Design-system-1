@@ -10,13 +10,13 @@ A plug and play design system
 
 ```bash
 # Using Vite+ (recommended)
-vp add design-system-1@alpha
+vp add @0001-labs/design-system-1@alpha
 
 # Using npm
-npm install design-system-1@alpha
+npm install @0001-labs/design-system-1@alpha
 
 # Using yarn
-yarn add design-system-1@alpha
+yarn add @0001-labs/design-system-1@alpha
 
 ```
 
@@ -33,7 +33,7 @@ directly, so no component classes or JavaScript are required.
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/design-system-1@alpha/DS1/1-root/one.semantic.css"
+  href="https://cdn.jsdelivr.net/npm/@0001-labs/design-system-1@alpha/DS1/1-root/one.semantic.css"
 />
 
 <section>
@@ -59,11 +59,11 @@ Components remain unchanged.
     <!-- CSS -->
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/design-system-1@alpha/DS1/1-root/one.css"
+      href="https://cdn.jsdelivr.net/npm/@0001-labs/design-system-1@alpha/DS1/1-root/one.css"
     />
     <!-- Bundle -->
     <script type="module">
-      import "https://cdn.jsdelivr.net/npm/design-system-1@alpha/dist/design-system-1.bundle.min.js";
+      import "https://cdn.jsdelivr.net/npm/@0001-labs/design-system-1@alpha/dist/design-system-1.bundle.min.js";
     </script>
   </head>
   <body>
@@ -104,9 +104,6 @@ consumer. The copy carries the relative dependency graph
 hash in the product's `sync.lock.json`, and `sync1 check` fails on missing
 files or local drift. Files the copy did not write stay owned by the consumer.
 All component edits happen here, then consumers sync.
-
-`node scripts/sync-components.mjs --target <folder> --components button,text`
-does the same for a product not yet on Sync 1.
 
 Components use scoped `--ds-*` tokens so an embedded document can keep its own
 scale and theme. A product may configure those tokens at its surface.
@@ -241,4 +238,4 @@ MIT © [Design system 1](https://github.com/0001-labs/ds-one)
 - [**Website**](https://designsystem1.com/) - Official website
 - [**GitHub**](https://github.com/0001-labs/ds-one) - Source code and issues
 - [**NPM Package**](https://www.npmjs.com/package/design-system-1) - Install with `@alpha` tag
-- [**CDN**](https://cdn.jsdelivr.net/npm/design-system-1@alpha/) - Direct browser usage
+- [**CDN**](https://cdn.jsdelivr.net/npm/@0001-labs/design-system-1@alpha/) - Direct browser usage
