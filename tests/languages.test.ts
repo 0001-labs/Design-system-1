@@ -10,9 +10,10 @@ import {
 } from "../DS1/0-face/languages";
 import type { Language } from "../DS1/0-face/languages";
 
-// The languages Link and Consistency speak today
-const LINK: Language[] = ["en", "da", "sv", "nb", "fi", "is", "ja", "de", "fr", "es", "ko", "pt-BR"];
-const CONSISTENCY: Language[] = [...LINK, "it", "zh"];
+// Two products' languages: one that speaks Bokmål and Brazilian Portuguese only,
+// and one that adds Italian and Chinese
+const TWELVE: Language[] = ["en", "da", "sv", "nb", "fi", "is", "ja", "de", "fr", "es", "ko", "pt-BR"];
+const FOURTEEN: Language[] = [...TWELVE, "it", "zh"];
 
 describe("the list", () => {
   test("is the union of every product's languages, in one order", () => {
@@ -67,22 +68,22 @@ describe("normalizeLanguage", () => {
     expect(normalizeLanguage("pt-AO")).toBe("pt");
   });
 
-  test("gives Link's outcomes with Link's languages", () => {
+  test("reads relatives as the language a twelve-language product speaks", () => {
     const cases: Record<string, Language> = {
       no: "nb", "no-no": "nb", nb: "nb", "nb-NO": "nb", nn: "nb", "nn-NO": "nb",
       pt: "pt-BR", "pt-pt": "pt-BR", "pt-br": "pt-BR", "pt-AO": "pt-BR",
       "": "en", xx: "en", "da-DK": "da", "en-GB": "en", "is-IS": "is", it: "en", zh: "en",
     };
     for (const [input, expected] of Object.entries(cases)) {
-      expect(normalizeLanguage(input, "en", LINK), input).toBe(expected);
+      expect(normalizeLanguage(input, "en", TWELVE), input).toBe(expected);
     }
   });
 
-  test("gives Consistency's outcomes with Consistency's languages", () => {
-    expect(normalizeLanguage("zh-HK", "en", CONSISTENCY)).toBe("zh");
-    expect(normalizeLanguage("it-IT", "en", CONSISTENCY)).toBe("it");
-    expect(normalizeLanguage("no", "en", CONSISTENCY)).toBe("nb");
-    expect(normalizeLanguage("pt", "en", CONSISTENCY)).toBe("pt-BR");
+  test("lands on Italian and Chinese when the product speaks them", () => {
+    expect(normalizeLanguage("zh-HK", "en", FOURTEEN)).toBe("zh");
+    expect(normalizeLanguage("it-IT", "en", FOURTEEN)).toBe("it");
+    expect(normalizeLanguage("no", "en", FOURTEEN)).toBe("nb");
+    expect(normalizeLanguage("pt", "en", FOURTEEN)).toBe("pt-BR");
   });
 
   test("reads a browser's list, the first language it knows winning", () => {

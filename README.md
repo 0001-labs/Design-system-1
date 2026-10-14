@@ -90,7 +90,7 @@ import "design-system-1/DS1/1-root/one.semantic.css";
 
 Products can select shared Lit components without loading the full system's
 page, device or theme setup. `sync.exports.mjs` says what a product may copy:
-`languages`, `components`, `email` and `icons`. 0001's products copy them with
+`languages`, `components`, `email` and `icons`. Products copy them with
 Sync 1, naming what they take in their `sync.json`:
 
 ```json

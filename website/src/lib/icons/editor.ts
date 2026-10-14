@@ -92,7 +92,7 @@ for (const button of document.querySelectorAll<HTMLElement>('[data-product]')) b
 });
 for (const button of document.querySelectorAll<HTMLElement>('[data-original]')) button.addEventListener('click', () => {
   const preset = FIGMA_ICONS.find(p => p.key === button.dataset.original)!;
-  take({ name: preset.name, icon: preset.icon, radius: 0, padding: 0 }, 'From Ezo’s original collection. Every ink and shape is editable.');
+  take({ name: preset.name, icon: preset.icon, radius: 0, padding: 0 }, 'From the original collection. Every ink and shape is editable.');
 });
 $('new-drawing').addEventListener('click', () => take({ name: 'Untitled icon', icon: { ...blankIcon(), cells: new Array(256).fill(CLEAR) }, radius: 0, padding: 0 }));
 function renderShelf() {

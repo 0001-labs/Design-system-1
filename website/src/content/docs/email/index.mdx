@@ -1,11 +1,11 @@
 ---
 title: Email design
-description: Ezo’s ruled-paper email design, ready to copy into a product.
+description: A ruled-paper email design, ready to copy into a product.
 ---
 
 import EmailShowcase from '../../../components/EmailShowcase.astro';
 
-Ezo’s email design brings the app’s paper into the inbox: a narrow column, quiet ruling, compact words and a green action. The renderer lives in `DS1/4-page/email.ts`. Consistency and Link carry a copy of that same source.
+The email design brings an app’s paper into the inbox: a narrow column, quiet ruling, compact words and a green action. The renderer lives in `DS1/4-page/email.ts`, and every product that sends mail carries a copy of that same source.
 
 ## See it
 
@@ -22,7 +22,7 @@ Choose a product, message, width and paper. These are sample messages rendered b
 | Product label | 80px; 160px for a longer name |
 | Type | GT America, 14px on 20px lines; Arial and Helvetica fallbacks |
 | Paragraph spacing | One or two squares |
-| Action | Ezo’s 16px green control, square corners |
+| Action | A 16px green control, square corners |
 | Phone scale | Viewport / 280, clamped to 0.75–2 |
 
 Text stands directly on the paper. There are no cards, shadows or oversized headings. The desktop values are inline, so the message remains readable when an inbox ignores styles, web fonts or background images. Presentation tables carry the layout; no scripts, web components, CSS variables or flexbox are required.
@@ -51,4 +51,4 @@ const message = emailMessage({
 
 Products copy the renderer and font, just as they copy the rest of Design system 1. A product takes them as the `email` export in its `sync.json`, and `sync1 check` verifies the copy. Edit the source here, then sync; never edit the copies.
 
-Product-specific subjects, copy, recipients, replies, unsubscribe links, attachments and delivery stay in the product. Link’s client emails keep the workspace’s logo, typeface and colours within the same paper layout. Internal emails use Link’s neutral identity. Code emails must display the expiry of the provider that actually issued the code.
+Product-specific subjects, copy, recipients, replies, unsubscribe links, attachments and delivery stay in the product. A product that sends mail for its customers can keep each workspace’s logo, typeface and colours within the same paper layout, and use a neutral identity for its own mail. Code emails must display the expiry of the provider that actually issued the code.

@@ -70,8 +70,8 @@ describe("generateMagicLinkToken", () => {
   });
 
   // A regression guard against someone "simplifying" this to Math.random, which
-  // is what the sibling Consistency repo uses for its 6-digit OTP — safe there
-  // only because its `authorize` check supplies a second factor.
+  // is safe for a short code only where an `authorize` check supplies a second
+  // factor.
   it("spreads across the alphabet rather than clustering", () => {
     const counts = new Map<string, number>();
     for (let i = 0; i < 2_000; i += 1) {
@@ -143,7 +143,7 @@ describe("renderMagicLinkEmail", () => {
     expect(email.text).toContain("once");
   });
 
-  // Consistency's renderEmailHtml interpolates unescaped, and a magic-link mail
+  // An email renderer may interpolate unescaped, and a magic-link mail
   // interpolates user-influenced values, so this is a real boundary.
   it("neutralizes a hostile URL rather than rendering it as markup", () => {
     const hostile = 'https://dsone.dev/?x="><script>alert(1)</script>';

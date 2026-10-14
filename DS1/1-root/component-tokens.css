@@ -76,7 +76,7 @@
   --ds-button-background-color-secondary: var(--ds-fill);
   --ds-icon-color: currentColor;
 
-  /* Shared fields, including the row treatment carried over from Ezo's forms. */
+  /* Shared fields, including the row treatment of a form's settings rows. */
   --ds-input-background: light-dark(#e8e8e8, #303030);
   --ds-input-color: light-dark(#2a2a2a, #f5f5f5);
   --ds-input-placeholder-color: light-dark(#797979, #ababab);

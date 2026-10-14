@@ -1,6 +1,6 @@
 /**
  * One tooltip for a whole page: any element with `data-tooltip="…"` shows its text in Design system 1's tooltip,
- * Ezo's label: 16px high, black with white text (white on black in dark mode), 4px corners, 14px regular, 2.5px at
+ * a small label: 16px high, black with white text (white on black in dark mode), 4px corners, 14px regular, 2.5px at
  * the sides, two pixels above the element, shown at once. `data-tooltip-colour` gives it a colour of its own. The same look as `<ds-tooltip>`, without wrapping each element in a component, so a table of
  * hundreds of cells can carry one each. Long text wraps at 320px on 20px lines.
  */
@@ -46,12 +46,12 @@ export function initTooltips(): void {
     if (!text) return;
     current = target;
     bubble.textContent = text;
-    // A colour of its own, as Ezo's labels take the accent: data-tooltip-colour="#f5aad1", lettered in the ink.
+    // A colour of its own, such as the accent: data-tooltip-colour="#f5aad1", lettered in the ink.
     const colour = target.dataset.tooltipColour;
     bubble.style.setProperty("--ds-tooltip-background", colour || "");
     bubble.style.setProperty("--ds-tooltip-color", colour ? "#1e1e1e" : "");
     if (!colour) { bubble.style.removeProperty("--ds-tooltip-background"); bubble.style.removeProperty("--ds-tooltip-color"); }
-    // One line, as Ezo's; a long text wraps at 320px instead of running off the page.
+    // One line; a long text wraps at 320px instead of running off the page.
     bubble.classList.remove("is-wide");
     if (bubble.scrollWidth > 320) bubble.classList.add("is-wide");
     target.setAttribute("aria-describedby", bubble.id);

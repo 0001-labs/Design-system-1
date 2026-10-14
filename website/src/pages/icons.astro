@@ -39,10 +39,10 @@ import '../styles/icons/studio.css';
           <div class="products" id="products">
             {PRODUCTS.map((preset, index) => <button class="product" data-product={preset.key} aria-pressed={index === 0}>
               <span class="product-image" set:html={drawingSvg(preset, 36, 'product-' + preset.key)} />
-              <span><strong>{preset.name}</strong><small>{preset.key === 'ezo' ? 'Original collection' : preset.key === 'design-system-1' ? 'Packaging mosaic' : 'Favicon concept'}</small></span><span class="product-arrow" aria-hidden="true">↗</span>
+              <span><strong>{preset.name}</strong><small>{preset.key === 'fan' ? 'Original collection' : preset.key === 'design-system-1' ? 'Packaging mosaic' : 'Favicon concept'}</small></span><span class="product-arrow" aria-hidden="true">↗</span>
             </button>)}
           </div>
-          <div class="section-heading collection-heading"><h2>From Ezo</h2><span>{FIGMA_ICONS.length} icons</span></div>
+          <div class="section-heading collection-heading"><h2>Original collection</h2><span>{FIGMA_ICONS.length} icons</span></div>
           <p class="section-note">The original shapes. Ready to refine.</p>
           <div class="collection" id="collection">
             {FIGMA_ICONS.map(preset => <button data-original={preset.key} title={preset.name} aria-label={`Edit ${preset.name}`} set:html={drawingSvg({name:preset.name,icon:preset.icon,radius:0,padding:0}, 28, 'original-'+preset.key)} />)}

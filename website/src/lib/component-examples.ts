@@ -7,8 +7,8 @@ export interface ComponentExample {
 }
 
 export const TABLE_DATA = [
-  { product: "Ezo", users: "120", retention: "92%", status: "Active" },
-  { product: "Link", users: "80", retention: "88%", status: "Active" },
+  { product: "Atlas", users: "120", retention: "92%", status: "Active" },
+  { product: "Harbor", users: "80", retention: "88%", status: "Active" },
 ];
 
 // The preview and the copyable code use the same source. These are local

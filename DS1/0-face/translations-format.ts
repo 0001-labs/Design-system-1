@@ -1,12 +1,11 @@
 /**
- * The one translations file format every 0001 product writes its words in.
+ * The one translations file format every product writes its words in.
  *
  *   { "<language>": { "<key>": "<text>" } }
  *
  * - `<language>` is a code from the language list (`da`, `pt-BR`).
- * - `<key>` is any string. Ezo, the 0001 site and Peer key by the English
- *   sentence (`"Send": "Send"`); Link and Consistency key by a dotted id
- *   (`"settings.language": "Language"`). Both are the same format.
+ * - `<key>` is any string: the English sentence (`"Send": "Send"`) or a
+ *   dotted id (`"settings.language": "Language"`). Both are the same format.
  * - English (`en`) is the fallback table. When a key is missing from `en`
  *   too, the key itself is the English text, so a sentence key needs no
  *   English entry and an id key needs one.

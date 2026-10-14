@@ -1,6 +1,5 @@
 ---
-// The four layers as bricks stacked on one another, the way Link's landing
-// draws its bricks (Link's client/design/IsoBrick.astro): each a box seen from
+// The four layers as bricks stacked on one another: each a box seen from
 // above at the same angle, its top and two sides filled in its layer's colour
 // and outlined in the ink, the foundation at the bottom. Root holds Core, Core
 // holds Unit, and Unit holds Page.
@@ -36,8 +35,8 @@ const bricks = LAYERS.map((layer, index) => ({
 
 <style>
   .layer-bricks {
-    /* Link's measures: a brick thirty pixels (a square and a half) tall and
-       deep and four times that long, outlined in Link's ink. */
+    /* A brick thirty pixels (a square and a half) tall and deep and four
+       times that long, outlined in a warm ink. */
     --brick-unit: calc(1.5 * var(--landing-unit, 20px));
     --brick-long: calc(4 * var(--brick-unit));
     --brick-ink: #2c2c2b;
@@ -52,7 +51,7 @@ const bricks = LAYERS.map((layer, index) => ({
   .layer-brick {
     transform-style: preserve-3d;
   }
-  /* The same view as Link's: tipped back sixty degrees and turned forty-five. */
+  /* The view: tipped back sixty degrees and turned forty-five. */
   .layer-bricks-world {
     position: relative;
     width: var(--brick-long);

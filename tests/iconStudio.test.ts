@@ -3,7 +3,7 @@ import { PRODUCTS, copyDrawing, drawingSvg, packIco, readDrawing, fileStem } fro
 import { FIGMA_ICONS } from '../website/src/lib/icons/gridIconFigma';
 import { parseIcon } from '../website/src/lib/icons/gridIcon';
 
-test('all product concepts and the full Ezo collection round-trip without losing geometry or alpha', () => {
+test('all concepts and the full original collection round-trip without losing geometry or alpha', () => {
   for (const preset of [...PRODUCTS, ...FIGMA_ICONS.map(p => ({...p,radius:0,padding:0}))]) {
     const original = copyDrawing(preset);
     expect(readDrawing(JSON.parse(JSON.stringify(original)))).toEqual(original);
@@ -23,7 +23,7 @@ test('import rejects executable colour markup, malformed cells and unsafe framin
 });
 
 test('export escapes names and uses unique clips while preserving transparent, padded geometry', () => {
-  const value = {...copyDrawing(PRODUCTS.find(preset => preset.key === 'ezo')!),name:'<svg onload="alert(1)">',padding:1,radius:2};
+  const value = {...copyDrawing(PRODUCTS.find(preset => preset.key === 'fan')!),name:'<svg onload="alert(1)">',padding:1,radius:2};
   const exported = drawingSvg(value,32,'test-icon');
   expect(exported).not.toContain('<svg onload=');
   expect(exported).toContain('width="32" height="32"');

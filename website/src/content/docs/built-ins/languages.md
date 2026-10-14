@@ -1,9 +1,9 @@
 ---
 title: Languages
-description: One language list for every 0001 product, the words, the translations file format, language-aware addresses, the Convex validator and the picker
+description: One language list for every product, the words, the translations file format, language-aware addresses, the Convex validator and the picker
 ---
 
-Design system 1 owns languages for every 0001 product: the list of languages, choosing and remembering one, looking words up, the shared interface words, addresses that carry a language, the server's check and the picker. Each product keeps its own words in its own translations file, in the format below.
+Design system 1 owns languages for every product built on it: the list of languages, choosing and remembering one, looking words up, the shared interface words, addresses that carry a language, the server's check and the picker. Each product keeps its own words in its own translations file, in the format below.
 
 ## The list and a product's subset
 
@@ -103,7 +103,7 @@ One format for every product's words:
 ```
 
 - The top level is keyed by language code from the list.
-- A key is any string. Ezo, the 0001 site and Peer key by the English sentence (`"Send": "Send"`); Link and Consistency key by a dotted id (`"settings.language"`). Both are the same format, and no product's words need rewriting.
+- A key is any string: the English sentence (`"Send": "Send"`) or a dotted id (`"settings.language"`). Both are the same format, and no product's words need rewriting.
 - English is the fallback table. When a key is missing from `en`, the key itself is the English text: a sentence key needs no English entry; an id key needs one.
 - Placeholders are `{name}` or `{{name}}`.
 - Sentence case everywhere, never all caps.
@@ -123,11 +123,11 @@ configureI18n({
 });
 ```
 
-Each file holds one language's table, wrapped (`{ "da": { … } }`, as Ezo publishes them) or bare (`{ … }`). When a language's file is missing, the whole table is the fallback. Switching language fetches the new language's file once.
+Each file holds one language's table, wrapped (`{ "da": { … } }`) or bare (`{ … }`). When a language's file is missing, the whole table is the fallback. Switching language fetches the new language's file once.
 
 ### Words in a TypeScript module
 
-A product can ship its words as a module of the same shape, as Link does, and hand them over at startup. Tables may be `Partial`:
+A product can ship its words as a module of the same shape and hand them over at startup. Tables may be `Partial`:
 
 ```typescript
 import { loadTranslations } from "@0001-labs/design-system-1";

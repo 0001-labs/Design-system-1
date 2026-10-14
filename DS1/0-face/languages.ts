@@ -1,5 +1,5 @@
 /**
- * The languages every 0001 product chooses from: one list, with the name of
+ * The languages every product chooses from: one list, with the name of
  * each in English and in itself, and how to read whatever a browser, a URL or
  * a saved setting calls a language.
  *
@@ -105,8 +105,8 @@ export const LANGUAGE_METADATA: Readonly<Record<Language, LanguageMetadata>> = {
 
 /**
  * Languages close enough to stand in for each other, nearest first. A product
- * that speaks only one of them gets it for the others (Link speaks `nb`, so
- * `no` and `nn` read as `nb`; it speaks `pt-BR`, so `pt` reads as `pt-BR`), and
+ * that speaks only one of them gets it for the others (one that speaks `nb`
+ * reads `no` and `nn` as `nb`; one that speaks `pt-BR` reads `pt` as it), and
  * a missing word is looked up in them before English.
  */
 const RELATED_LANGUAGES: Readonly<Partial<Record<Language, readonly Language[]>>> = {
@@ -150,7 +150,7 @@ function within(language: Language, allowed: ReadonlySet<Language>): Language | 
  * `pt-br`, or a browser's list (`"nl-NL,da;q=0.8"`, the first language it
  * knows wins). Pass the product's languages to land on one it speaks: a
  * relative stands in where the product lacks the language itself, so with
- * Link's languages `no` and `nn` read as `nb`, and `pt` as `pt-BR`. Returns
+ * `nb` and `pt-BR` among them, `no` and `nn` read as `nb`, and `pt` as `pt-BR`. Returns
  * `fallback` when nothing matches (`null` to tell).
  */
 export function normalizeLanguage(

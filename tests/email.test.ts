@@ -10,7 +10,7 @@ describe('email design', () => {
     expect(message.text).toContain('A & B <script>alert(1)</script>');
     expect(message.text).toContain('https://example.com/?a=1&b=2');
   });
-  test('keeps Ezo geometry, fallback tables, responsive scaling and dark ruling', () => {
+  test('keeps the ruled-paper geometry, fallback tables, responsive scaling and dark ruling', () => {
     const { html } = emailMessage({ product: 'Example', homeUrl: 'https://example.com', title: 'Welcome', paragraphs: ['Hello'] });
     expect(html).toContain('width="240"');
     expect(html).toContain('font-size:14px');
@@ -18,7 +18,7 @@ describe('email design', () => {
     expect(html).toContain('max-width:559.98px');
     expect(html).toContain('prefers-color-scheme:dark');
     expect(html).toContain('role="presentation"');
-    expect(html).not.toContain('ezo.gs');
+    expect(html).not.toMatch(/href="https?:\/\/(?!example\.com)/);
     expect(html).not.toContain('var(--');
   });
 });

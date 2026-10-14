@@ -21,7 +21,7 @@ test('the 69-icon Figma collection is present with its original vector geometry'
     expect(icon.svg).not.toMatch(/<(script|image|foreignObject)\b|\bon\w+=|(?:href|src)=/i);
   }
 });
-test('shared interface icons are discoverable and Ezo artwork is excluded',()=>{
+test('shared interface icons are discoverable and product artwork is excluded',()=>{
   for(const file of readdirSync(new URL('../DS1/x-icon/',import.meta.url)).filter(file=>file.endsWith('.svg'))){
     expect(icons.some(icon=>icon.key===file.slice(0,-4)),file).toBe(isSharedInterfaceIcon(file.slice(0,-4)));
   }

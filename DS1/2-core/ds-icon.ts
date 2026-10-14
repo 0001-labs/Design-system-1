@@ -30,8 +30,8 @@ function loadExtraIcons(): Promise<void> {
  * one-colour icon is turned over to `currentColor` here, where the component
  * puts it on the page, so it takes the colour of the text around it.
  *
- * An icon with colours of its own is left exactly as drawn. Consistency's block
- * and pattern tiles set dark ink on a coloured ground, and a brand mark keeps
+ * An icon with colours of its own is left exactly as drawn. The block and
+ * pattern tiles set dark ink on a coloured ground, and a brand mark keeps
  * the colours that make it that brand. `white` never counts as a colour: in
  * this set it is the rectangle inside a `<clipPath>`.
  */

@@ -1,5 +1,5 @@
 ---
-// The four layers drawn the way Ezo draws a diagram: every box an item cell,
+// The four layers drawn as a diagram of item cells: every box one cell,
 // four squares by one (80 by 20), stacked edge to edge under its group's name and what it is, groups
 // two squares apart with an arrow from each to the next.
 import { LAYERS } from '../lib/component-directory';
@@ -73,7 +73,7 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
   .layer-name { margin: 0; font-family: var(--typeface-medium); }
   .layer-group ul { margin: 0; padding: 0; list-style: none; }
   .layer-group li { margin: 0; }
-  /* A box is Ezo's item cell, four squares by one (80 by 20). A stack wears
+  /* A box is an item cell, four squares by one (80 by 20). A stack wears
      the item's radius on its outer corners only: a shared corner is square,
      and a coloured box's edge is its own fill, so none shows between two. */
   .layer-group li a {
@@ -120,7 +120,7 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
   /* The arrow leaves the first box's edge and ends on the next group's. */
   /* A layer leads to the next along the names' row: a line from a quarter
      square after its name to a fifth of a square before the next, ending in
-     Ezo's arrow, two strokes a fifth of a square long at 35 degrees. */
+     an arrowhead of two strokes a fifth of a square long at 35 degrees. */
   .layer-name { display: flex; align-items: center; width: calc(6 * var(--diagram-unit)); }
   .layer-arrow {
     position: relative;

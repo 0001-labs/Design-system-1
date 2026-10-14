@@ -202,7 +202,7 @@ body.sidebar-open {
 /* ------------------------------------------------------------------------
    The page on the grid. One square is 20px. Every panel is a whole number of
    squares wide, every line of writing is one square tall, and every space
-   between two blocks is one or two squares. The sizes are Ezo's: writing 14,
+   between two blocks is one or two squares. The sizes: writing 14,
    a heading 15, a section's title 17 and the page's 20, small print 10.
    A hairline is drawn as a shadow, so it takes no room from the squares.
    ------------------------------------------------------------------------ */
@@ -225,7 +225,7 @@ body.sidebar-open {
   letter-spacing: var(--docs-tracking);
 }
 
-/* The page's title: Ezo's title, on two squares. */
+/* The page's title, on two squares. */
 h1#_top {
   font-family: var(--typeface-medium, var(--typeface-regular));
   font-size: var(--docs-type-title-1);

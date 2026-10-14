@@ -10,21 +10,21 @@ const block = (icon: GridIcon, x: number, y: number, w: number, h: number, ink: 
 // The packaging front's 340-unit square, sampled on the favicon's 16-unit grid.
 // Preserve its original colour tokens and progression from large to small tiles.
 const system: GridIcon = { ...packagingMosaic, mask: 'square' };
-const consistency = blankIcon(['#594dff', '#f0ecff']);
-block(consistency, 3, 3, 10, 2, 1); block(consistency, 3, 7, 7, 2, 1); block(consistency, 3, 11, 10, 2, 1);
-const worktrees = blankIcon(['#204c38', '#c7f7a2']);
-block(worktrees, 7, 7, 2, 7, 1); block(worktrees, 3, 3, 3, 3, 1); block(worktrees, 10, 3, 3, 3, 1);
-block(worktrees, 4, 6, 2, 3, 1); block(worktrees, 10, 6, 2, 3, 1); block(worktrees, 6, 8, 4, 2, 1);
-const link = blankIcon(['#e9f64a', '#a2f67f', '#48e4ae', '#2adacb', '#124d45']);
-link.cells = link.cells.map((_, at) => Math.min(3, Math.floor(((at % 16) + Math.floor(at / 16)) / 8)));
-block(link, 3, 4, 6, 2, 4); block(link, 3, 4, 2, 6, 4); block(link, 3, 8, 5, 2, 4);
-block(link, 7, 6, 6, 2, 4); block(link, 11, 6, 2, 6, 4); block(link, 7, 10, 6, 2, 4);
+const rhythm = blankIcon(['#594dff', '#f0ecff']);
+block(rhythm, 3, 3, 10, 2, 1); block(rhythm, 3, 7, 7, 2, 1); block(rhythm, 3, 11, 10, 2, 1);
+const branches = blankIcon(['#204c38', '#c7f7a2']);
+block(branches, 7, 7, 2, 7, 1); block(branches, 3, 3, 3, 3, 1); block(branches, 10, 3, 3, 3, 1);
+block(branches, 4, 6, 2, 3, 1); block(branches, 10, 6, 2, 3, 1); block(branches, 6, 8, 4, 2, 1);
+const connected = blankIcon(['#e9f64a', '#a2f67f', '#48e4ae', '#2adacb', '#124d45']);
+connected.cells = connected.cells.map((_, at) => Math.min(3, Math.floor(((at % 16) + Math.floor(at / 16)) / 8)));
+block(connected, 3, 4, 6, 2, 4); block(connected, 3, 4, 2, 6, 4); block(connected, 3, 8, 5, 2, 4);
+block(connected, 7, 6, 6, 2, 4); block(connected, 11, 6, 2, 6, 4); block(connected, 7, 10, 6, 2, 4);
 export const PRODUCTS: Preset[] = [
   { key: 'design-system-1', name: 'Design System 1', description: 'The square colour mosaic from the packaging.', icon: system, radius: 0, padding: 0 },
-  { key: 'link', name: 'Link', description: 'Two connected forms in citrus and mint.', icon: link, radius: 3, padding: 0 },
-  { key: 'consistency', name: 'Consistency', description: 'A repeated rhythm, with a deliberate variation.', icon: consistency, radius: 2, padding: 0 },
-  { key: 'worktrees', name: 'Worktrees', description: 'Two branches. A shared starting point.', icon: worktrees, radius: 2, padding: 0 },
-  { key: 'ezo', name: 'Ezo', description: 'The original geometric fan from Ezo’s collection.', icon: cloneIcon(FIGMA_ICONS[0].icon), radius: 0, padding: 0 },
+  { key: 'connected', name: 'Connected forms', description: 'Two connected forms in citrus and mint.', icon: connected, radius: 3, padding: 0 },
+  { key: 'rhythm', name: 'Rhythm', description: 'A repeated rhythm, with a deliberate variation.', icon: rhythm, radius: 2, padding: 0 },
+  { key: 'branches', name: 'Branches', description: 'Two branches. A shared starting point.', icon: branches, radius: 2, padding: 0 },
+  { key: 'fan', name: 'Geometric fan', description: 'The geometric fan that opens the original collection.', icon: cloneIcon(FIGMA_ICONS[0].icon), radius: 0, padding: 0 },
 ];
 export function copyDrawing(drawing: Drawing): Drawing {
   return { name: drawing.name, icon: cloneIcon(drawing.icon), radius: drawing.radius, padding: drawing.padding };

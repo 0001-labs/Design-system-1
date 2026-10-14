@@ -9,13 +9,13 @@ import {
   validateTranslations,
 } from "../DS1/0-face/translations-format";
 
-// Ezo, the 0001 site and Peer: keyed by the English sentence, {name}
+// Keyed by the English sentence, {name}
 const sentenceKeyed = {
   da: { Send: "Send", "Hello {name}": "Hej {name}" },
   ja: { Send: "送信" },
 };
 
-// Link and Consistency: keyed by a dotted id, an English table, {{name}}
+// Keyed by a dotted id, an English table, {{name}}
 const idKeyed = {
   en: { "settings.language": "Language", "auth.magicLinkSentTo": "We sent a link to {{email}}." },
   da: { "settings.language": "Sprog", "auth.magicLinkSentTo": "Vi sendte et link til {{email}}." },

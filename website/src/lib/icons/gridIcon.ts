@@ -263,7 +263,7 @@ export interface IconSvgOptions {
 }
 
 export function iconSvg(icon: GridIcon, options: IconSvgOptions = {}): string {
-  const id = options.id ?? 'ezo-icon'
+  const id = options.id ?? 'grid-icon'
   const size = options.size ? ` width="${options.size}" height="${options.size}"` : ''
   const title = options.title ? `<title>${options.title.replace(/[<&>]/g, character => `&#${character.charCodeAt(0)};`)}</title>` : ''
   const ink = (index: number) => icon.inks[index] ?? '#000000'

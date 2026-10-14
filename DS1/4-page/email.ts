@@ -40,9 +40,8 @@ export function gridText(content: string): string {
   return `<div class="ds-email-ink" style="display:block;position:relative;top:2px;padding-left:2px">${content}</div>`
 }
 
-/** Static equivalent of Ezo’s ezo-button[primary] containing ezo-text.
- * Ezo client/design/2-core/styles/ezo-button.css: 16px control, 0.5px horizontal inset.
- * Ezo client/design/2-core/styles/ezo-text.css: centered 15px line in a 16px text box.
+/** Static equivalent of a primary ds-button containing ds-text:
+ * a 16px control with a 0.5px horizontal inset, and a centered 15px line in a 16px text box.
  * Half-pixel vertical padding reproduces that centering without Lit or flexbox.
  */
 export function primaryEmailButton(
