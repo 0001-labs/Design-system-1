@@ -10,7 +10,7 @@ export class AvatarGroup extends LitElement {
     hasLead: { state: true },
     hasMembers: { state: true },
   };
-  /** One size, Ezo's; `compact` is kept for products that still name it. */
+  /** Avatars have one size; `compact` is kept for products that still name it. */
   declare size: "default" | "compact";
   declare vertical: boolean;
   declare private hasLead: boolean;

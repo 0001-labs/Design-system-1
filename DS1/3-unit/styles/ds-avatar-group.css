@@ -1,7 +1,7 @@
 @import "../../1-root/component-metrics.css";
 
 :host {
-  /* Ezo's overlap for its badges, now every avatar's size. */
+  /* The overlap for avatars one control high. */
   --group-overlap: calc(3px * var(--ds-sf));
   display: inline-flex;
   flex: 0 0 auto;

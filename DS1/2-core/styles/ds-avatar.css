@@ -1,7 +1,7 @@
 @import "../../1-root/component-metrics.css";
 
 :host {
-  /* Ezo's people badges: one control high, inside a one-square row. */
+  /* One control high, inside a one-square row. */
   --avatar-size: var(--ds-control-height);
   --avatar-pair-type-size: var(--ds-type-size-small);
   display: inline-flex;

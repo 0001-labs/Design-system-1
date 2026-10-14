@@ -75,7 +75,7 @@ test("avatars are only round; a logo is the one mark that keeps its corners", as
   expect(avatar.hasAttribute("logo")).toBe(true);
 });
 
-test("Link fills an avatar with its colour; Ezo letters it in an ink on the neutral fill", async () => {
+test("an avatar is filled with a colour, or lettered in an ink on the neutral fill", async () => {
   const filled = document.createElement("ds-avatar");
   filled.color = "#99ff73";
   const inked = document.createElement("ds-avatar");

@@ -18,9 +18,9 @@ export function avatarInk(color: string): string | undefined {
 }
 
 /**
- * A person's or workspace's mark, always round and the size of Ezo's badges.
- * Two ways to colour it: `color` fills it (Link), `ink` letters and outlines
- * it on the neutral fill (Ezo). Identity selection and actions belong to the app.
+ * A person's or workspace's mark, always round and one control high.
+ * Two ways to colour it: `color` fills it, `ink` letters and outlines it on
+ * the neutral fill. Identity selection and actions belong to the app.
  * `logo` is the one exception to round: a brand mark in its image area, unclipped.
  */
 export class Avatar extends LitElement {

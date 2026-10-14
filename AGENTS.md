@@ -4,6 +4,10 @@
 
 Component-based design system with Lit Web Components.
 
+## No product names
+
+Design system 1 is a general design system anyone can use. Never name 0001's products (Ezo, Link, Consistency, Peer, Ins, tau99, Visual, the 0001 site, …) anywhere in it: not in components, their comments, CSS, tests, examples, docs, the website or the skill's rules for a component. Describe what a component does and how it looks on its own terms ("filled with a colour", "one control high"), never by the product it came from ("Link's fill", "Ezo's badge size"). The products' own briefs are where they say what they take from it.
+
 ## Stack
 
 - Lit 3.0.0 (Web Components)
@@ -50,7 +54,7 @@ It refuses with uncommitted changes or when npm is signed out (`vp pm login`), w
 
 ## Integration
 
-Foundation for Ezo, TAU, and all 0001 products.
+The foundation 0001's products are built on; they copy it with Sync 1.
 
 ## Git commits
 

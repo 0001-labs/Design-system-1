@@ -1,6 +1,6 @@
 ---
 title: Avatar
-description: A person's or workspace's mark, always round and the size of Ezo's badges.
+description: A person's or workspace's mark, always round and one control high.
 ---
 
 import ComponentExample from "../../../components/ComponentExample.astro";
@@ -8,8 +8,8 @@ import ComponentExample from "../../../components/ComponentExample.astro";
 <ComponentExample example="avatar" />
 
 `ds-avatar` draws a person or a workspace: a picture, an initial or an icon in a
-circle. It is only ever round. Its size is Ezo's people badge: one control high
-(16px times `--sf`), so it sits inside a one-square row with type in the small
+circle. It is only ever round. It is one control high (16px times `--sf`), so
+it sits inside a one-square row with type in the small
 size. `size="large"` is two squares. The product picks who a mark stands for,
 and handles selecting and acting on it.
 
@@ -22,12 +22,12 @@ and handles selecting and acting on it.
 
 ## Colour
 
-There are two ways to colour an avatar, one from each product that uses it:
+There are two ways to colour an avatar:
 
-- **Fill (Link).** `color` fills the circle with a saved identity colour, and
+- **Fill.** `color` fills the circle with a saved identity colour, and
   the initial takes black or white, whichever reads on it. Add `outlined` for
   the ink line around it.
-- **Ink (Ezo).** `ink` letters the initial in a person's colour on the neutral
+- **Ink.** `ink` letters the initial in a person's colour on the neutral
   fill, and with `outlined` draws the line in the same colour. Give it a
   `light-dark()` pair, a darker shade that reads on white and a lighter one
   that reads on black.
@@ -52,6 +52,6 @@ Without a picture it shows its `initial`.
 
 ## Groups
 
-`ds-avatar-group` overlaps avatars by Ezo's 3px. Copy `avatar` and
+`ds-avatar-group` overlaps avatars by 3px. Copy `avatar` and
 `avatar-group` through Sync 1; React products import `Avatar`, `Logo` and
 `AvatarGroup` from `DS1/react/avatar` and `DS1/react/avatar-group`.
