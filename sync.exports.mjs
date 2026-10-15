@@ -11,6 +11,12 @@ const languageFiles = ['i18n.ts', 'languages.ts', 'language-routing.ts', 'transl
 
 export default {
   exports: {
+    /** Component tokens for static stylesheets that import them by URL. */
+    tokens: {
+      files({ read }) {
+        return Object.fromEntries(['component-tokens.css', 'component-metrics.css', 'component-appearance.css'].map(file => [file, read(`DS1/1-root/${file}`)]));
+      },
+    },
     /** The language runtime, the shared words and the Convex validator, in 0-face/. `entries: true` adds a top-level re-export of each module. */
     languages: {
       files({ read, tree, options }) {
