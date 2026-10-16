@@ -7,7 +7,9 @@ import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 import { componentGraph } from './scripts/component-graph.mjs';
 
-const rootStyles = ['one.css', 'grid.css', 'component-tokens.css', 'component-metrics.css', 'component-appearance.css'];
+const rootStyles = ['one.css', 'grid.css', 'text.css', 'component-tokens.css', 'component-metrics.css', 'component-appearance.css'];
+/** one.css and controls.css both import the text classes. */
+const importsText = ['one.css', 'controls.css'];
 /** The faces one.css loads, by the file names its @font-face rules use. */
 const rootFonts = ['GT-America-Standard-Regular.woff2', 'GT-America-Standard-Medium.woff2', 'GT-America-Compressed-Regular.woff2', 'GT-Canon-M-Standard-Medium-Trial.woff2', 'Inter-Arrows.woff2', 'Iosevka-Regular.woff2', 'Inter-LICENSE.md', 'Iosevka-LICENSE.md'];
 /** Page scripts in 0-face/, each with the modules it imports. */
@@ -45,25 +47,28 @@ export default {
     },
     /**
      * Component tokens for static stylesheets that import them by URL.
-     * `nativeControls` adds controls.css; `bundle` writes them all as one
-     * bundle.css with the imports resolved, for a page that can carry only one
-     * stylesheet or inlines its styles.
+     * `nativeControls` adds controls.css with the text classes it imports
+     * (text.css); `bundle` writes them all as one bundle.css with the imports
+     * resolved, for a page that can carry only one stylesheet or inlines its
+     * styles.
      */
     tokens: {
       files({ read, options }) {
         const files = options.bundle ? [...tokenStyles] : ['component-tokens.css', 'component-metrics.css', 'component-appearance.css'];
-        if (options.nativeControls) files.push('controls.css');
+        if (options.nativeControls) files.push('text.css', 'controls.css');
         if (options.bundle) return { 'bundle.css': `/* Generated from Design system 1/DS1/1-root: ${files.join(', ')}. Change Design system 1 and sync. */\n` + files.map(file => withoutImports(read(`DS1/1-root/${file}`))).join('\n') };
         return Object.fromEntries(files.map(file => [file, read(`DS1/1-root/${file}`)]));
       },
     },
     /**
-     * The root stylesheet (one.css with grid.css and the component tokens) and
-     * the faces it loads, in fonts/. `styles` names the stylesheets to copy
-     * when a product loads only some (`["grid.css"]`, or `[]` for scripts
-     * alone); `fonts: false` leaves the faces to the product; `nativeControls` adds controls.css; `modules` names page scripts
+     * The root stylesheet (one.css with grid.css, the text classes and the
+     * component tokens) and the faces it loads, in fonts/. `styles` names the
+     * stylesheets to copy when a product loads only some (`["grid.css"]`, or
+     * `[]` for scripts alone); `fonts: false` leaves the faces to the product;
+     * `nativeControls` adds controls.css; `modules` names page scripts
      * from 0-face/ (grid, grid-fit, layout-inspector, scaling, tooltips), copied
-     * with what they import.
+     * with what they import. one.css and controls.css bring text.css, which
+     * they import.
      */
     root: {
       files({ read, options }) {
@@ -74,6 +79,7 @@ export default {
           files[file] = read(`DS1/1-root/${file}`);
         }
         if (options.nativeControls) files['controls.css'] = read('DS1/1-root/controls.css');
+        if (Object.keys(files).some(file => importsText.includes(file))) files['text.css'] = read('DS1/1-root/text.css');
         if (options.fonts !== false) for (const font of rootFonts) files[`fonts/${font}`] = read(`DS1/1-root/fonts/${font}`);
         for (const name of options.modules ?? []) {
           if (!Object.hasOwn(rootModules, name)) throw new Error(`Unknown page script: ${name}`);

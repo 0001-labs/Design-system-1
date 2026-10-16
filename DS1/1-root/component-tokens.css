@@ -34,6 +34,7 @@
   --ds-grey: #797979;
 
   --ds-tuned-red: #ff5f5f;
+  --ds-red-for-blood: #de0331;
   --ds-pink: #f5aad1;
   --ds-sharp-blue: #594dff;
   --ds-zenith-blue: #ccccff;
@@ -51,7 +52,11 @@
 
   --ds-typeface-regular:
     "Inter Arrows", "GT America", "GT-America-Standard-Regular", Inter, system-ui, -apple-system, sans-serif;
+  /* The medium face for headings and strong text; one.css loads it as GT-America-Standard-Medium. */
+  --ds-typeface-medium:
+    "Inter Arrows", "GT-America-Standard-Medium", "GT America", Inter, system-ui, -apple-system, sans-serif;
   --ds-typeface-compressed: "Inter Arrows", "GT-America-Compressed-Regular", var(--ds-typeface-regular);
+  --ds-typeface-mono: "Inter Arrows", "Iosevka", "Iosevka Extended", ui-monospace, "SF Mono", Menlo, monospace;
   --ds-typeface-regular-jp: "Inter Arrows", "GT America", "Noto Sans JP", sans-serif;
   /* GT America exposes circular dots as stylistic set 05. */
   --ds-font-features: "ss05" 1;
@@ -68,6 +73,9 @@
   --ds-text-color: light-dark(var(--ds-black), var(--ds-white));
   --ds-text-color-muted: light-dark(#5f5f5f, #cacaca);
   --ds-title-color: light-dark(var(--ds-grey), #9a9a9a);
+  /* Text that reports a failure or warns of a loss. Red for blood on light
+     paper and Tuned red on dark: both palette colours, legible as 14px text. */
+  --ds-danger-color: light-dark(var(--ds-red-for-blood), var(--ds-tuned-red));
   --ds-border-color: light-dark(#d8d8d8, #3d3d3d);
   --ds-fill: light-dark(var(--ds-slate-light), var(--ds-slate-dark));
   --ds-fill-hover: light-dark(#e2e2e2, #404040);

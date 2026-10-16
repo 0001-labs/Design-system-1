@@ -14,7 +14,8 @@ const files = (name: string, options: Record<string, unknown> = {}) => {
 
 test('the root export carries one.css, what it imports and every face it loads', () => {
   const copy = files('root');
-  for (const file of ['one.css', 'grid.css', 'component-tokens.css', 'component-metrics.css', 'component-appearance.css']) expect(copy).toHaveProperty([file]);
+  for (const file of ['one.css', 'grid.css', 'text.css', 'component-tokens.css', 'component-metrics.css', 'component-appearance.css']) expect(copy).toHaveProperty([file]);
+  for (const [, file] of String(copy['one.css']).matchAll(/@import "\.\/([^"]+)";/g)) expect(copy).toHaveProperty([file!]);
   const faces = [...String(copy['one.css']).matchAll(/url\("\.\/(fonts\/[^"]+)"\)/g)].map((match) => match[1]);
   expect(faces.length).toBeGreaterThan(0);
   for (const face of faces) expect(copy).toHaveProperty([face]);
@@ -37,6 +38,14 @@ test('bundled tokens are one stylesheet with no local imports left', () => {
   expect(css).toContain('--ds-row-height');
   expect(css).toContain('.ds-button');
   expect(css.indexOf('--ds-row-height')).toBeLessThan(css.indexOf('.ds-button {'));
+  expect(css).toContain('.ds-text {');
+});
+
+test('controls.css always arrives with the text classes it imports', () => {
+  expect(Object.keys(files('tokens', { nativeControls: true }))).toEqual(['component-tokens.css', 'component-metrics.css', 'component-appearance.css', 'text.css', 'controls.css']);
+  expect(Object.keys(files('tokens'))).not.toContain('text.css');
+  expect(Object.keys(files('root', { styles: ['grid.css'], fonts: false, nativeControls: true }))).toEqual(['grid.css', 'controls.css', 'text.css']);
+  expect(Object.keys(files('root', { styles: ['one.css', 'grid.css'], fonts: false }))).toContain('text.css');
 });
 
 test('the fonts export offers the root faces by name', () => {
