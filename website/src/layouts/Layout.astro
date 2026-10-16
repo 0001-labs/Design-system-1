@@ -36,7 +36,7 @@ const classlessMode = pathname === '/classless/editor' ? 'editor'
     <!-- Main Container with Sidebar and Content -->
     <div class:list={['main-container', { 'main-container--home': isHome }]}>
       <!-- Sidebar -->
-      {!isHome && <aside id="sidebar" class="sidebar">
+      {!isHome && <aside id="sidebar" class="sidebar" aria-label="Documentation navigation">
         <MySidebar />
       </aside>}
 
@@ -44,7 +44,7 @@ const classlessMode = pathname === '/classless/editor' ? 'editor'
       {!isHome && <div class="sidebar-gap"></div>}
 
       <!-- Main Content -->
-      <main class:list={['main-content', { 'main-content--app': classlessMode, 'main-content--home': isHome, 'main-content--tools': isTool }]}>
+      <main aria-label="Documentation content" class:list={['main-content', { 'main-content--app': classlessMode, 'main-content--home': isHome, 'main-content--tools': isTool }]}>
         {isHome ? <LandingPage /> : classlessMode ? <ClasslessWorkspace mode={classlessMode} /> : <slot />}
       </main>
     </div>
@@ -139,24 +139,18 @@ const classlessMode = pathname === '/classless/editor' ? 'editor'
         opacity: 1;
       }
 
-      /* Scrollbar styling */
-      ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
+      /* Keep scroll geometry stable; only the thumb changes while active. */
+      :is(.sidebar, .main-content, .right-sidebar, .right-sidebar-panel) {
+        --docs-scroll-thumb: transparent;
+        scrollbar-width: thin;
+        scrollbar-color: var(--docs-scroll-thumb) transparent;
       }
-
-      ::-webkit-scrollbar-track {
-        background: transparent;
+      :is(.sidebar, .main-content, .right-sidebar, .right-sidebar-panel):is([data-scrolling], :focus-visible) {
+        --docs-scroll-thumb: var(--ds-grey);
       }
-
-      ::-webkit-scrollbar-thumb {
-        background: light-dark(#c0c0c0, #3a3a3a);
-        border-radius: 4px;
-      }
-
-      ::-webkit-scrollbar-thumb:hover {
-        background: light-dark(#a0a0a0, #4a4a4a);
-      }
+      :is(.sidebar, .main-content, .right-sidebar, .right-sidebar-panel)::-webkit-scrollbar { width: calc(var(--site-unit) / 2); height: calc(var(--site-unit) / 2); }
+      :is(.sidebar, .main-content, .right-sidebar, .right-sidebar-panel)::-webkit-scrollbar-track { background: transparent; }
+      :is(.sidebar, .main-content, .right-sidebar, .right-sidebar-panel)::-webkit-scrollbar-thumb { background: var(--docs-scroll-thumb); border-radius: var(--radius); }
 
       /* Mobile Responsive Styles */
       @media (max-width: 768px) {
@@ -209,6 +203,14 @@ const classlessMode = pathname === '/classless/editor' ? 'editor'
     <script is:inline>
       // Mobile sidebar toggle functionality
       document.addEventListener('DOMContentLoaded', function() {
+        const scrollTimers = new WeakMap();
+        document.addEventListener('scroll', event => {
+          const panel = event.target;
+          if (!(panel instanceof HTMLElement) || !panel.matches('.sidebar, .main-content, .right-sidebar, .right-sidebar-panel')) return;
+          panel.setAttribute('data-scrolling', '');
+          clearTimeout(scrollTimers.get(panel));
+          scrollTimers.set(panel, setTimeout(() => panel.removeAttribute('data-scrolling'), 700));
+        }, true);
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebar-overlay');
         const menuButton = document.getElementById('mobile-menu-btn');

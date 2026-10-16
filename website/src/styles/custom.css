@@ -92,25 +92,6 @@ h6 {
   }
 }
 
-/* Custom scrollbar for sidebar */
-nav::-webkit-scrollbar {
-  width: 8px;
-}
-
-nav::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-}
-
-nav::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
-}
-
-nav::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.5);
-}
-
 /* Button styles in content */
 .sl-link-button {
   transition: all 0.2s ease;

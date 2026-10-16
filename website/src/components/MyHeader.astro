@@ -1,23 +1,15 @@
 ---
 import '../../../DS1/1-root/one.css';
 import PublicPreferences from './PublicPreferences.astro';
-import { siteNavigation, isNavigationCurrent } from '../../../shared/site-navigation';
 import '../../../shared/site-navigation.css';
 interface Props { landing?: boolean; }
 const { landing = false } = Astro.props;
 ---
 
 <PublicPreferences />
-<header class="site-navigation">
+<header class:list={['site-navigation', 'docs-header', { 'docs-header--with-sidebar': !landing }]}>
   <a class="site-brand" href="/">Design system 1</a>
-  <nav class="site-links" aria-label="Main navigation">
-    {!landing && <button id="mobile-menu-btn" class="site-browse" type="button" aria-controls="sidebar" aria-expanded="false">Browse docs</button>}
-    {siteNavigation.map((item) => (
-      <a data-requires-signin={item.href === "/app/libraries" || undefined} href={item.href} aria-current={isNavigationCurrent(item.href, Astro.url.pathname) ? 'page' : undefined}>{item.label}</a>
-    ))}
-
-  </nav>
-  {landing && <a class="site-account" href="/app/signin">Sign in</a>}
+  {!landing && <button id="mobile-menu-btn" class="site-brand docs-brand-menu" type="button" aria-label="Open documentation navigation" aria-controls="sidebar" aria-expanded="false">Design system 1</button>}
 </header>
 <iframe id="navigation-auth" src="/app/navigation-auth" title="Account status" hidden aria-hidden="true" tabindex="-1"></iframe>
 
@@ -35,10 +27,14 @@ const { landing = false } = Astro.props;
     const authenticated = event.data.authenticated === true;
     document.documentElement.toggleAttribute('data-signed-in', authenticated);
     window.dispatchEvent(new CustomEvent('ds1-navigation-auth', { detail: { authenticated } }));
-    const account = document.querySelector<HTMLAnchorElement>('.site-account');
-    if (account) {
-      account.textContent = authenticated ? 'Account' : 'Sign in';
-      account.href = authenticated ? '/app/libraries' : '/app/signin';
-    }
   });
 </script>
+
+<style>
+  .docs-header { display: flex; align-items: center; }
+  .docs-header .docs-brand-menu { display: none; padding: 0; justify-content: flex-start; }
+  @media (max-width: 768px) {
+    .docs-header--with-sidebar > a.site-brand { display: none; }
+    .docs-header .docs-brand-menu { display: inline-flex; }
+  }
+</style>
