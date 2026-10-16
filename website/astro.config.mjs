@@ -70,6 +70,7 @@ export default defineConfig({
             { label: "Colours", link: "/colours/" },
             { label: "Fonts", slug: "1-root/fonts" },
             { label: "Languages", slug: "1-root/languages" },
+            { label: "Formatting", slug: "1-root/formatting" },
             { label: "Theming", slug: "1-root/theming" },
             { label: "Native controls", slug: "1-root/native-controls" },
             { label: "Device", slug: "1-root/device" },

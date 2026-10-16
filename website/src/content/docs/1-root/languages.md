@@ -208,6 +208,10 @@ export const setLanguage = mutation({
 
 `ds-language` cycles through the product's languages, each shown by its own name, sets the language on a press and follows it when something else changes it. One square high and eight wide; `compact` makes it four. See [Language](/2-core/language/).
 
+## Dates, numbers and money
+
+Dates, times, relative time ("3 minutes ago"), numbers, money and lists follow the current language too, through cached `Intl` formatters: `formatDate`, `formatRelativeTime`, `formatNumber`, `formatMoney`, `formatList` and the rest. See [Formatting](/1-root/formatting/).
+
 ## Options
 
 | Option | Default | What it does |
