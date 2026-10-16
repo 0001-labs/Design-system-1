@@ -26,9 +26,10 @@ test("native destinations and modified clicks survive, while activation can be d
 });
 
 test("expansion remains controlled and actions do not also navigate", async () => {
-  const sidebar = await setup([{id: "folder", label: "Folder", expanded: false, action: {id: "add", label: "Add"}}]);
+  const sidebar = await setup([{id: "folder", label: "Folder", icon: "close", expanded: false, action: {id: "add", label: "Add"}}]);
   const toggle = vi.fn(), action = vi.fn(), activate = vi.fn();
   sidebar.addEventListener("sidebar-toggle", toggle); sidebar.addEventListener("sidebar-action", action); sidebar.addEventListener("sidebar-activate", activate);
+  expect(control(sidebar, "folder").querySelector('ds-icon[type="close"]')?.getAttribute("aria-hidden")).toBe("true");
   control(sidebar, "folder").click();
   expect(toggle.mock.calls[0][0].detail).toEqual({id: "folder", expanded: true});
   expect(control(sidebar, "folder").getAttribute("aria-expanded")).toBe("false");

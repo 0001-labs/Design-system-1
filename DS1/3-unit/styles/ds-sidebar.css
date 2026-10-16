@@ -29,6 +29,7 @@ ds-button { --ds-corner-size: 0px; --ds-button-padding: 0; }
 ds-icon { transform: rotate(0deg); }
 ds-icon[data-open] { transform: rotate(90deg); }
 .choice { flex: 1; min-width: 0; --ds-button-width: 100%; }
+.name:has(ds-icon) { display: flex; align-items: center; gap: calc(4px * var(--ds-sf)); }
 .name { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .meta { flex: none; padding-inline-start: calc(4px * var(--ds-sf)); font-size: var(--ds-type-size-small); color: var(--ds-text-color-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .action { margin-inline-start: calc(4px * var(--ds-sf)); --ds-text-size: 10px; --ds-button-color: var(--ds-text-color-muted); }

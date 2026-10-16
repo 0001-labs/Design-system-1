@@ -1,4 +1,5 @@
 ---
+import closeIcon from "../../../DS1/x-icon/close.svg?raw";
 // The four layers drawn as a diagram of item cells: every box one cell,
 // four squares by one (80 by 20), stacked edge to edge under its group's name and what it is, groups
 // two squares apart with an arrow from each to the next.
@@ -34,7 +35,7 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
   ))}
   {/* The icons are named once after the layers, joined to them by the last arrow: one grey chip leading to them all, not listed. */}
   <div class="layer-group" data-color="grey">
-    <p class="layer-name">x Icon</p>
+    <p class="layer-name icon-layer-name"><span class="section-cross" aria-hidden="true" set:html={closeIcon} />Icon</p>
     <p class="layer-summary">The drawings ds-icon shows.</p>
     <ul>
       <li>
@@ -50,6 +51,9 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
 </div>
 
 <style>
+  .layer-name.icon-layer-name { display: flex; align-items: center; gap: calc(.2 * var(--landing-unit)); font-family: var(--typeface-regular); font-weight: 400; }
+  .section-cross { display: inline-flex; width: calc(.8 * var(--landing-unit)); height: calc(.8 * var(--landing-unit)); }
+  .section-cross :global(svg) { width: 100%; height: 100%; }
   .layer-diagram {
     --diagram-unit: var(--landing-unit);
     --diagram-ink: var(--ds1-docs-header-text);

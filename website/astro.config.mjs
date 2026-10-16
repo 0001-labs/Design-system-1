@@ -133,7 +133,7 @@ export default defineConfig({
           ],
         },
         {
-          label: "x Icon",
+          label: "Icon",
           items: [
             { label: "Icons", link: "/icons/" },
             { label: "Icon builder", link: "/icons/#builder" },

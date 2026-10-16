@@ -41,6 +41,7 @@ const { sidebar } = Astro.locals.starlightRoute;
     return entries.flatMap((entry, index) => {
       const id = entry.href ?? `${parent}/group-${index}`;
       const item: SidebarItem = { id, label: label(entry.label), depth, href: entry.href, current: entry.isCurrent };
+      if (entry.entries && entry.label === "Icon") item.icon = "close";
       if (location.pathname.replace(/\/$/, '') === '/icons' && entry.href?.startsWith('/icons/')) {
         item.current = entry.href.includes('#builder') ? location.hash === '#builder' : location.hash !== '#builder';
       }

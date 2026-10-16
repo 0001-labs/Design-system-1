@@ -11,6 +11,8 @@ import styles from "./styles/ds-sidebar.css?inline";
 export interface SidebarItem {
   id: string;
   label: string;
+  /** Decorative leading icon; the label remains the accessible name. */
+  icon?: string;
   depth?: number;
   href?: string;
   expanded?: boolean;
@@ -102,12 +104,12 @@ export class Sidebar extends LitElement {
             ${item.href && !item.disabled ? html`
               <a href=${item.href} data-item=${item.id} aria-current=${ifDefined(item.current ? "page" : undefined)}
                 title=${item.label} @click=${(event: MouseEvent) => this.activate(event, item)}
-                @keydown=${(event: KeyboardEvent) => this.navigate(event, item)}><span class="name">${item.label}</span></a>` : html`
+                @keydown=${(event: KeyboardEvent) => this.navigate(event, item)}><span class="name">${item.icon ? html`<ds-icon type=${item.icon} aria-hidden="true"></ds-icon>` : nothing}${item.label}</span></a>` : html`
               <button type="button" data-item=${item.id} ?disabled=${item.disabled}
                 aria-expanded=${ifDefined(item.expanded === undefined ? undefined : String(item.expanded))}
                 aria-current=${ifDefined(item.current ? "page" : undefined)} title=${item.label}
                 @click=${(event: MouseEvent) => this.activate(event, item)}
-                @keydown=${(event: KeyboardEvent) => this.navigate(event, item)}><span class="name">${item.label}</span></button>`}
+                @keydown=${(event: KeyboardEvent) => this.navigate(event, item)}><span class="name">${item.icon ? html`<ds-icon type=${item.icon} aria-hidden="true"></ds-icon>` : nothing}${item.label}</span></button>`}
           </ds-button>
           ${item.meta ? html`<span class="meta">${item.meta}</span>` : nothing}
           ${item.action ? html`<ds-button control="slotted" fit class="action"><button type="button"

@@ -1,4 +1,5 @@
 ---
+import closeIcon from "../../../DS1/x-icon/close.svg?raw";
 import ComponentExample from './ComponentExample.astro';
 import { PAGE_EXAMPLES } from '../lib/component-examples';
 import '../../../DS1/1-root/one.css';
@@ -59,7 +60,7 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
       ))}
       <section class="directory-layer directory-layer--icons" data-color="yellow" aria-labelledby="layer-x">
         <div class="directory-layer-head">
-          <h2 id="layer-x"><span class="directory-swatch" aria-hidden="true"></span>x Icon</h2>
+          <h2 id="layer-x"><span class="section-cross" aria-hidden="true" set:html={closeIcon} />Icon</h2>
           <p>The drawings <code>ds-icon</code> shows, each by its name.</p>
         </div>
         <ul>
@@ -106,6 +107,9 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
 
     <style is:global>
 .component-catalog {
+      #layer-x { font-family: var(--typeface-regular); font-weight: 400; }
+      .section-cross { display: inline-flex; width: calc(16px * var(--sf, 1)); height: calc(16px * var(--sf, 1)); }
+      .section-cross svg { width: 100%; height: 100%; }
       .examples-gallery, .gallery-intro { display: none; }
       &[data-view='examples'] .directory-layer { display: none; }
       &[data-view='examples'] :is(.examples-gallery, .gallery-intro) { display: block; }
