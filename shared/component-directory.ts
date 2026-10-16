@@ -46,6 +46,7 @@ export const ALL_LAYERS: DirectoryLayer[] = [
       { name: 'Language', href: '/2-core/language/', tag: 'ds-language' },
       { name: 'Link', href: '/2-core/link/' },
       { name: 'Text', href: '/2-core/text/', tag: 'ds-text' },
+      { name: 'Toggle', href: '/2-core/toggle/', tag: 'ds-toggle' },
       { name: 'Tooltip', href: '/2-core/tooltip/', tag: 'ds-tooltip' },
     ],
   },

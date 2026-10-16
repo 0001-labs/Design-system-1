@@ -15,6 +15,18 @@ export const TABLE_DATA = [
 // The preview and the copyable code use the same source. These are local
 // examples only; no sample sends a request to a product's backend.
 export const EXAMPLES: Record<string, ComponentExample> = {
+  toggle: {
+    title: 'Turn a setting on or off',
+    hint: 'Click or press Space to change the local setting. No settings are saved.',
+    height: 180,
+    html: `<label style="display:flex;align-items:center;gap:20px">Notifications <ds-toggle><button type="button" role="switch" aria-label="Notifications" aria-checked="true"></button></ds-toggle></label>
+<label style="display:flex;align-items:center;gap:20px">Unavailable <ds-toggle><button type="button" role="switch" aria-label="Unavailable" aria-checked="false" disabled></button></ds-toggle></label>`,
+    script: `document.querySelectorAll('ds-toggle button').forEach(button => {
+  button.addEventListener('click', () => {
+    button.setAttribute('aria-checked', String(button.getAttribute('aria-checked') !== 'true'));
+  });
+});`,
+  },
   chart: {
     title: 'Series and compact charts',
     hint: 'Sample values: 12, 16, 14, 20, 18, 24, 19, 26. Move over a series to inspect a point. No live data is loaded.',
@@ -190,6 +202,7 @@ document.querySelectorAll('[data-grid-option]').forEach(control => {
 };
 
 export const PAGE_EXAMPLES: Record<string, string[]> = {
+  '2-core/toggle': ['toggle'],
   '2-core/chart': ['chart'],
   '2-core/avatar': ['avatar'],
   '2-core/button': ['button', 'button-icon', 'split'],

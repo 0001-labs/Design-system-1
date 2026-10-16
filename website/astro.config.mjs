@@ -107,6 +107,7 @@ export default defineConfig({
             { label: "Language", slug: "2-core/language" },
             { label: "Link", slug: "2-core/link" },
             { label: "Text", slug: "2-core/text" },
+            { label: "Toggle", slug: "2-core/toggle" },
             { label: "Tooltip", slug: "2-core/tooltip" },
           ],
         },

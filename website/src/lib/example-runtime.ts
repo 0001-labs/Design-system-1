@@ -26,6 +26,13 @@ const sample = document.querySelector<HTMLElement>('#sample')!;
 // and initial tooltip state are applied before the example becomes ready.
 const example = EXAMPLES[document.body.dataset.exampleId!];
 sample.innerHTML = example.html;
+sample.querySelectorAll<HTMLButtonElement>('ds-toggle button').forEach(button => {
+  button.addEventListener('click', () => {
+    const checked = button.getAttribute('aria-checked') !== 'true';
+    button.setAttribute('aria-checked', String(checked));
+    output.textContent = `Notifications: ${checked ? 'On' : 'Off'}`;
+  });
+});
 
 window.addEventListener('message', event => {
   if (event.origin !== location.origin || event.source !== parent || event.data?.type !== 'ds1-example-theme') return;
