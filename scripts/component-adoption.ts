@@ -551,7 +551,7 @@ export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): Ado
     app.cells = snapshots.cells;
     const files = git(root, "ls-files", "-z", "--", ...spec.roots).split("\0").filter(f => /\.(tsx?|jsx?|[cm]js|html|astro)$/.test(f) && !excluded.test(f) && !(spec.excludes ?? []).some(prefix => f === prefix || f.startsWith(prefix + "/")) && existsSync(join(root, f)));
     if (!files.length) throw new Error("No tracked web source was found in the configured scope.");
-    app.icons = scanIcons(root, spec.source === "direct" ? undefined : spec.manifest, files, ds1Icons(dsRoot), join(dsRoot, "DS1/x-icon"));
+    app.icons = scanIcons(root, spec.source === "direct" ? undefined : spec.manifest, files, ds1Icons(dsRoot), join(dsRoot, "DS1/x-icon"), { roots: spec.roots, include: file => !excluded.test(file) && !(spec.excludes ?? []).some(prefix => file === prefix || file.startsWith(prefix + "/")) });
     for (const file of files) {
       app.files++;
       const source = readFileSync(join(root, file), "utf8");

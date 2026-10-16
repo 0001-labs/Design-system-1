@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test } from "vite-plus/test";
-import { iconSites, importedIcons, scanIcons } from "../scripts/icon-adoption";
+import { drawingShapes, iconSites, importedIcons, resolveSvg, scanIcons } from "../scripts/icon-adoption";
 
 test("literal ds-icon names count as uses, expressions as dynamic and inline svg apart", () => {
   const sites = iconSites(`html\`<ds-icon type="close"></ds-icon><ds-icon type=\${name}></ds-icon>\`;
@@ -39,4 +39,60 @@ test("a copy is compared with today's DS1 drawing and names DS1 lacks are local 
   expect(icons.cells.globe).toBeUndefined();
   // Without a copy, a name resolves from DS1 itself.
   expect(scanIcons(root, undefined, ["src/app.ts"], ds1).cells.home).toMatchObject({ status: "shared", copy: "none" });
+});
+
+const close = `<svg width="16" height="16" viewBox="0 0 16 16"><path d="M3 3L13 13M3 13L13 3" fill="currentColor"/></svg>`;
+const star = `<svg width="16" height="16" viewBox="0 0 16 16"><path d="M8 1L10 6H15L11 9L13 15L8 11L3 15L5 9L1 6H6Z"/></svg>`;
+const ds1Drawings = new Map([["close", close], ["star", star]]);
+const app = (files: Record<string, string>) => {
+  const root = mkdtempSync(join(tmpdir(), "icons-"));
+  for (const [path, body] of Object.entries(files)) { mkdirSync(join(root, path, ".."), { recursive: true }); writeFileSync(join(root, path), body); }
+  return root;
+};
+
+test("one geometry compares equal however its path is written", () => {
+  expect(drawingShapes(`<svg><path d="M1 1H3V3Z" fill="red"/></svg>`)).toEqual(drawingShapes(`<svg><g><path d="m1 1h2v2z"/></g></svg>`));
+  expect(drawingShapes(`<path d="M1 1H3V3Z"/>`)).not.toEqual(drawingShapes(`<path d="M1 1H3V4Z"/>`));
+  expect(drawingShapes(`<path d={shape}/>`)).toBeNull();
+});
+
+test("CSS masks and backgrounds name the drawing they point at", () => {
+  const root = app({
+    "src/icons/close.svg": close,
+    "src/icons/close-copy.svg": close.replace(/\s+fill="currentColor"/, ""),
+    "src/icons/star.svg": star.replace("M8 1", "M8 2"),
+    "src/public/own.svg": `<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="4"/></svg>`,
+    "src/big.svg": `<svg viewBox="0 0 120 40"><rect width="120" height="40"/></svg>`,
+    "src/public/logos/client.svg": `<svg viewBox="0 0 24 12"><rect width="24" height="12"/></svg>`,
+    "src/app.css": `.a { -webkit-mask: url("./icons/close.svg") center; mask: url("./icons/close.svg") center; }
+.b { --glyph: url('./icons/star.svg'); }
+.c { mask-image: var(--glyph); }
+.d { background-image: url(/own.svg); }
+.e { --unused: url(./icons/close.svg); }
+.f { background: url(./big.svg); --logo: url(/logos/client.svg); mask: var(--logo); }
+.ds-icon-x { --ds-icon: url(./icons/close-copy.svg); }
+.g { mask: url("data:image/svg+xml,${encodeURIComponent(close)}"); }
+.h { mask: url("data:image/svg+xml,${encodeURIComponent(`<svg viewBox="0 0 8 8"><path d="M0 0L8 8"/></svg>`)}"); }`,
+    "src/page.html": `<span style="mask: url(&quot;icons/close.svg&quot;)"></span><img src="./icons/star.svg" alt="">`,
+  });
+  const icons = scanIcons(root, undefined, ["src/app.css", "src/page.html"], ds1Drawings);
+  expect(icons.cells.close).toMatchObject({ uses: 4, status: "shared" });
+  expect(icons.cells.close!.sites.map(site => [site.line, site.kind, site.drawing ?? ""])).toEqual([[1, "mask", "src/icons/close.svg"], [7, "mask", "src/icons/close-copy.svg"], [8, "mask", "data:"], [1, "mask", "src/icons/close.svg"]]);
+  // A file named after a DS1 icon that is not its drawing needs the DS1 drawing.
+  expect(icons.cells.star).toMatchObject({ uses: 2, status: "differs" });
+  expect(icons.cells.star!.sites.map(site => site.kind)).toEqual(["mask", "file"]);
+  expect(icons.cells.own).toMatchObject({ uses: 1, status: "local" });
+  // Unread custom properties and pictures are not icons; an inline drawing that is not DS1's is counted apart.
+  expect(Object.keys(icons.cells).sort()).toEqual(["close", "own", "star"]);
+  expect(icons.inline).toMatchObject([{ line: 9, kind: "mask" }]);
+});
+
+test("SVG imports and root paths resolve to the tracked file they name", () => {
+  const root = app({ "client/assets/glyph/stop.svg": `<svg viewBox="0 0 16 16"><rect x="4" y="4" width="8" height="8"/></svg>`, "client/vendor/kit/icons/close.svg": close });
+  expect(resolveSvg(root, "client/app.css", "/kit/icons/close.svg", ["client/vendor/kit/icons/close.svg"])?.path).toBe("client/vendor/kit/icons/close.svg");
+  expect(resolveSvg(root, "client/app.css", "https://example.com/close.svg")).toBeNull();
+  writeFileSync(join(root, "client/menu.ts"), `import stopSvg from './assets/glyph/stop.svg?raw'\nimport logo from './assets/missing.svg'`);
+  const icons = scanIcons(root, undefined, ["client/menu.ts"], ds1Drawings);
+  expect(icons.cells.stop).toMatchObject({ uses: 1, status: "local", sites: [{ kind: "file", drawing: "client/assets/glyph/stop.svg" }] });
+  expect(icons.cells.missing).toBeUndefined();
 });
