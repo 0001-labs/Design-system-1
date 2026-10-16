@@ -1,5 +1,4 @@
-import { useEffect, type ReactNode } from "react";
-import { calculateScalingFactor } from "../../DS1/0-face/scaling";
+import type { ReactNode } from "react";
 import { useConvexAuth } from "convex/react";
 import { siteNavigation, isNavigationCurrent } from "../../shared/site-navigation";
 import "../../shared/site-navigation.css";
@@ -10,19 +9,6 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const signInPath = path === "/reports/components" || path === "/libraries" || path.startsWith("/l/") ? path : "/signin";
   const embedded = document.documentElement.hasAttribute("data-docs-embed");
-
-  useEffect(() => {
-    const root = document.documentElement;
-    const scale = () => {
-      const width = window.innerWidth;
-      root.style.setProperty("--sf", String(width <= 768 ? calculateScalingFactor(width) : 1));
-    };
-    scale();
-    window.addEventListener("resize", scale);
-    return () => {
-      window.removeEventListener("resize", scale);
-    };
-  }, []);
 
   return (
     <div className="app-shell">

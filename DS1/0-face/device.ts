@@ -2,8 +2,10 @@
 // Device detection, context utilities, and responsive scaling
 
 import { signal } from "@lit-labs/signals";
-import { calculateScalingFactor as calculateScale, defaultScalingConfig, type ScalingConfig } from "./scaling";
-export type { ScalingConfig, ScalingMode } from "./scaling";
+import { applyScaling, calculateScalingFactor as calculateScale, defaultScalingConfig, detectMobileDevice, type ScalingConfig } from "./scaling";
+export type { ScalingConfig, ScalingMode, ScalingOptions, ScalingSnap } from "./scaling";
+// One rule for which screens scale, shared with pages that copy scaling.ts alone.
+export { applyScaling, detectMobileDevice, startScaling, toDevicePixel, toLayoutStep } from "./scaling";
 
 // ============================================================================
 // Types
@@ -31,38 +33,6 @@ export const scalingConfig = signal<ScalingConfig>(defaultScalingConfig);
 // ============================================================================
 // Device Detection
 // ============================================================================
-
-/**
- * Comprehensive mobile device detection
- * Combines user agent detection, touch capability, and viewport size
- */
-export function detectMobileDevice(): boolean {
-  if (typeof navigator === "undefined" || typeof window === "undefined") {
-    return false;
-  }
-
-  const nav = navigator as any;
-  const win = window as any;
-  const ua: string =
-    (nav && (nav.userAgent || nav.vendor)) || (win && win.opera) || "";
-
-  // User agent based detection
-  const uaMatchesMobile =
-    /Mobile|Android|iP(ad|hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)|Windows Phone|Phone|Tablet/i.test(
-      ua
-    );
-
-  // Touch capability detection
-  const touchPoints = (nav && nav.maxTouchPoints) || 0;
-  const isTouchCapable = touchPoints > 1;
-
-  // Viewport detection
-  const narrowViewport = win
-    ? Math.min(win.innerWidth || 0, win.innerHeight || 0) <= 820
-    : false;
-
-  return uaMatchesMobile || (isTouchCapable && narrowViewport);
-}
 
 /**
  * Get detailed device information
@@ -132,39 +102,19 @@ export function setScalingConfig(config: Partial<ScalingConfig>): void {
 
 /**
  * Update the scaling factor based on current viewport
- * Desktop always uses factor 1; mobile uses computed factor
+ * Desktop always uses factor 1; mobile uses computed factor (see scaling.ts)
  */
 export function updateScalingFactor(): void {
   if (typeof window === "undefined" || typeof document === "undefined") {
     return;
   }
 
-  const isMobile = detectMobileDevice();
-
-  // Desktop: always use factor 1
-  if (!isMobile) {
-    const factor = 1;
-    scalingFactor.set(factor);
-    document.documentElement.style.setProperty("--sf", factor.toString());
-    window.dispatchEvent(
-      new CustomEvent("scaling-changed", {
-        detail: { scalingFactor: factor, config: scalingConfig.get() },
-      })
-    );
-    return;
-  }
-
-  // Mobile: compute scaling based on viewport
-  const viewportWidth = document.documentElement.clientWidth;
   const config = scalingConfig.get();
-  const newFactor = calculateScalingFactor(viewportWidth, config);
-
-  scalingFactor.set(newFactor);
-  document.documentElement.style.setProperty("--sf", newFactor.toString());
-
+  const factor = applyScaling(config);
+  scalingFactor.set(factor);
   window.dispatchEvent(
     new CustomEvent("scaling-changed", {
-      detail: { scalingFactor: newFactor, config },
+      detail: { scalingFactor: factor, config },
     })
   );
 }
