@@ -6,6 +6,7 @@
 import { createHash } from 'node:crypto';
 import { join, posix } from 'node:path';
 import { componentGraph } from './scripts/component-graph.mjs';
+import { applePackage } from './scripts/native-apple.mjs';
 
 const rootStyles = ['one.css', 'grid.css', 'text.css', 'component-tokens.css', 'component-metrics.css', 'component-appearance.css'];
 /** one.css and controls.css both import the text classes. */
@@ -177,6 +178,17 @@ export default {
           [options.font ?? 'public/fonts/GT-America-Standard-Regular.woff2']: read('DS1/1-root/fonts/GT-America-Standard-Regular.woff2'),
         };
       },
+    },
+    /**
+     * The Swift package (native/apple, module DS1) as one folder the copy owns whole: its
+     * sources with the generated palette, measures and icon names, every icon in an asset
+     * catalogue and the typefaces as the woff2 files the web loads. Inter Arrows and Iosevka
+     * always travel; `fonts` names the others (`GT-America-Standard-Regular.woff2`,
+     * `OlivettiDot-Regular.woff2`, …). The product adds the folder as a local package.
+     */
+    swift: {
+      owned: true,
+      files({ read, tree, options }) { return applePackage({ read, tree, fonts: options.fonts ?? [] }); },
     },
     /** Icon files from DS1/x-icon: `icons` lists their names, or maps each name to the file it becomes. */
     icons: {
