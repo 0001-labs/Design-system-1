@@ -23,7 +23,7 @@ export function bindSpacingHandle(target: HTMLElement, options: () => SpacingOpt
     if (!keyboard) return;
     const state = keyboard; keyboard = undefined;
     const o = options();
-    if (cancel) { o.onPreview?.(state.start); if (state.immediate) o.onCommit(state.start); }
+    if (cancel) { if (!state.immediate) o.onPreview?.(state.start); }
     else if (!state.immediate) o.onCommit(state.value);
     o.onEnd?.(cancel);
   };

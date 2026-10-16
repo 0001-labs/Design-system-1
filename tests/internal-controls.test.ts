@@ -49,3 +49,10 @@ test('internal components remain exportable but are absent from public choices; 
  const graph=componentGraph('DS1',['loading','spacing-handle']);
  expect(graph.files.has('react/loading.ts')).toBe(true); expect(graph.files.has('react/spacing-handle.ts')).toBe(true);
 });
+
+test('unmount never reverses an already committed immediate keyboard edit', () => {
+ const {target,o}=setup({immediateKeyboard:true});
+ target.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowUp'}));
+ expect(o.onCommit).toHaveBeenCalledExactlyOnceWith(40);
+ dispose?.(); expect(o.onCommit).toHaveBeenCalledTimes(1);
+});
