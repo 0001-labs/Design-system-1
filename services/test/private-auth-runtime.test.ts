@@ -19,7 +19,7 @@ beforeAll(async () => {
       calls++;
       expect(request.url).toBe('https://example.convex.cloud/api/query');
       expect(request.headers.get('authorization')).toBe('Bearer session');
-      return Response.json({ status: 'success', value: { _id: 'owner', email: 'jaa90@icloud.com' } }, {
+      return Response.json({ status: 'success', value: { _id: 'owner', email: 'jaa90@icloud.com', emailVerified: true } }, {
         status: upstreamStatus,
         headers: upstreamStatus === 302 ? { location: 'https://unexpected.example/' } : {},
       });
