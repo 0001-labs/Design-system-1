@@ -1,0 +1,16 @@
+{
+  "name": "@0001-labs/design-system-1-tools",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "ds1": "./cli.mjs",
+    "ds1-mcp": "./mcp.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "scripts": {
+    "test": "vp test"
+  }
+}

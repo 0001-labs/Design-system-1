@@ -71,6 +71,7 @@ export default defineConfig({
             { label: "Overview", slug: "classless" },
             { label: "Editor", slug: "classless/editor" },
             { label: "My libraries", slug: "classless/libraries" },
+            { label: "Library API and tools", slug: "classless/library-api" },
           ],
         },
         {

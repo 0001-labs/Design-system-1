@@ -1,3 +1,4 @@
+import { libraryApi } from "./libraries";
 import { fontWorkspace } from "./fonts";
 import assets from "./assets/index.ts";
 import publish, { type Env as PublishEnv } from "./publish/index.ts";
@@ -19,6 +20,7 @@ function reportPage(response: Response, path: string): Response {
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    if (url.pathname === "/api/libraries" || url.pathname.startsWith("/api/libraries/") || url.pathname.startsWith("/api/library-auth/")) return libraryApi(request, env);
     if (url.pathname === "/api/fonts" || url.pathname.startsWith("/api/fonts/")) return fontWorkspace(request, env);
     if (url.hostname === "fonts.designsystem1.com") {
       if (!["GET", "HEAD"].includes(request.method)) return new Response("Not found", { status: 404 });

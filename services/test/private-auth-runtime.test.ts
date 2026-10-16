@@ -15,7 +15,7 @@ beforeAll(async () => {
     modules: true, compatibilityDate: '2026-07-24', script: bundle.outputFiles[0]!.text,
     r2Buckets: ['LIBRARIES'],
     bindings: { REPORTS_AUTH_URL: 'https://example.convex.cloud', REPORTS_OWNER_ID: 'owner' },
-    outboundService: async request => {
+    outboundService: async (request: Request) => {
       calls++;
       expect(request.url).toBe('https://example.convex.cloud/api/query');
       expect(request.headers.get('authorization')).toBe('Bearer session');

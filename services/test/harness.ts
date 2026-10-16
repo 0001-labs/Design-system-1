@@ -51,7 +51,7 @@ async function start(entry: string, bindings: Record<string, string> = {}): Prom
     r2Buckets: ["LIBRARIES"],
     bindings,
     serviceBindings: {
-      ASSETS: async (request) => {
+      ASSETS: async (request: Request) => {
         const path = new URL(request.url).pathname;
         if (path === "/") return new Response("Documentation");
         if (path === "/app/") return new Response("Application");
