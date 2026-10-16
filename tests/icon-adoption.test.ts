@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test } from "vite-plus/test";
-import { drawingShapes, iconSites, importedIcons, resolveSvg, scanIcons } from "../scripts/icon-adoption";
+import { drawingShapes, fontIcons, iconSites, importedIcons, resolveSvg, scanIcons } from "../scripts/icon-adoption";
 
 test("literal ds-icon names count as uses, expressions as dynamic and inline svg apart", () => {
   const sites = iconSites(`html\`<ds-icon type="close"></ds-icon><ds-icon type=\${name}></ds-icon>\`;
@@ -95,4 +95,19 @@ test("SVG imports and root paths resolve to the tracked file they name", () => {
   const icons = scanIcons(root, undefined, ["client/menu.ts"], ds1Drawings);
   expect(icons.cells.stop).toMatchObject({ uses: 1, status: "local", sites: [{ kind: "file", drawing: "client/assets/glyph/stop.svg" }] });
   expect(icons.cells.missing).toBeUndefined();
+});
+
+test("icon font classes are local, named after their set and icon, with the font's stylesheet", () => {
+  const found = fontIcons(`<link rel="stylesheet" href="/icons/regular/style.css" />
+<i class="ph ph-x" aria-hidden="true"></i><i class="ph-bold ph-trash"></i>
+el.innerHTML = '<i class="fa-solid fa-xmark fa-lg"></i>'; <span className="bi bi-gear"></span>
+<span class="material-symbols-outlined">home</span><i class="ph ph-\${name}"></i>
+@import url("https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css");
+<a href="https://fontawesome.com/">Credits</a><div class="ph phone-number"></div><span class="photo bi"></span>`);
+  expect(found.icons.map(use => `${use.set}: ${use.icon}`)).toEqual(["phosphor: x", "phosphor: trash", "font awesome: xmark", "bootstrap: gear", "material: home", "phosphor: null"]);
+  expect(found.sheets.map(sheet => [sheet.set, sheet.line])).toEqual([["phosphor", 1], ["phosphor", 5]]);
+  const root = app({ "src/view.ts": `node.innerHTML = '<i class="ph ph-x"></i><i class="ph ph-\${kind}"></i>'` });
+  const icons = scanIcons(root, undefined, ["src/view.ts"], ds1Drawings);
+  expect(icons.cells["phosphor: x"]).toMatchObject({ uses: 1, status: "local", ds1: "close", sites: [{ kind: "font" }] });
+  expect(icons.dynamic).toMatchObject([{ kind: "font" }]);
 });

@@ -285,6 +285,61 @@ export function importedIcons(source: string): { library: { name: string; set: s
 }
 
 // ---------------------------------------------------------------------------
+// Icon fonts: classes from a known set, and the stylesheet that loads it.
+
+const FONT_WEIGHTS = new Set(["thin", "light", "regular", "bold", "fill", "duotone"]);
+const FA_PREFIXES = new Set(["fa", "fas", "far", "fab", "fal", "fad", "fat", "fa-solid", "fa-regular", "fa-brands", "fa-light", "fa-thin", "fa-duotone", "fa-sharp"]);
+const FA_MODIFIERS = /^fa-(?:\d*x|[2]?xs|sm|lg|[2]?xl|fw|spin(?:-\w+)?|pulse|border|pull-\w+|stack(?:-\w+)?|inverse|rotate-\w+|flip(?:-\w+)?|beat(?:-\w+)?|bounce|fade|shake|li|ul|width-auto)$/;
+/** The set and icon a class list names, `{ icon: null }` when its icon is an expression. */
+export function fontIcon(classes: string): { set: string; icon: string | null } | null {
+  const tokens = classes.split(/\s+/).filter(Boolean);
+  const dynamic = tokens.some(token => token.includes("${") || token.includes("{"));
+  if (!dynamic && tokens.length === 0) return null;
+  const find = (prefix: string, skip: (token: string) => boolean) => tokens.find(token => token.startsWith(prefix) && /^[a-z0-9-]+$/.test(token) && !skip(token))?.slice(prefix.length);
+  if (tokens.includes("ph") || tokens.some(token => /^ph-(?:thin|light|bold|fill|duotone)$/.test(token))) {
+    const icon = find("ph-", token => FONT_WEIGHTS.has(token.slice(3)));
+    return icon || dynamic ? { set: "phosphor", icon: icon ?? null } : null;
+  }
+  if (tokens.some(token => FA_PREFIXES.has(token))) {
+    const icon = find("fa-", token => FA_PREFIXES.has(token) || FA_MODIFIERS.test(token));
+    return icon || dynamic ? { set: "font awesome", icon: icon ?? null } : null;
+  }
+  if (tokens.includes("bi")) { const icon = find("bi-", () => false); return icon || dynamic ? { set: "bootstrap", icon: icon ?? null } : null; }
+  if (tokens.some(token => /^material-(?:icons|symbols)(?:-[a-z]+)?$/.test(token))) return { set: "material", icon: null };
+  return null;
+}
+/** Stylesheets, links and imports that load a known icon font. */
+const ICON_FONT_SHEET = /phosphor|font-?awesome|fortawesome|bootstrap-icons|material[+_ -]?(?:symbols|icons)|icons?\/(?:regular|thin|light|bold|fill|duotone)\/style\.css/i;
+const sheetSet = (url: string) => /phosphor|icons?\/(?:regular|thin|light|bold|fill|duotone)\/style/i.test(url) ? "phosphor" : /awesome/i.test(url) ? "font awesome" : /bootstrap/i.test(url) ? "bootstrap" : "material";
+/**
+ * Icon font sites in one file: a class list from Phosphor (`ph ph-x`), Font
+ * Awesome (`fa-solid fa-x`), Bootstrap Icons (`bi bi-x`) or Material
+ * (`material-symbols-outlined` with the icon's name as its text), and the
+ * stylesheet links, `@import`s and imports that load one of them.
+ */
+export function fontIcons(source: string): { icons: { set: string; icon: string | null; line: number; classes: string }[]; sheets: { set: string; url: string; line: number }[] } {
+  const line = lines(source);
+  const icons: { set: string; icon: string | null; line: number; classes: string }[] = [];
+  const lists = [
+    ...[...source.matchAll(/\bclass(?:Name)?\s*[=:]\s*(?:\{\s*)?(["'`])((?:(?!\1)[^\\\n]|\\.)*)\1/g)].map(match => ({ classes: match[2]!, index: match.index!, end: match.index! + match[0].length })),
+    ...[...source.matchAll(/\.classList\.(?:add|toggle)\(([^)]*)\)/g)].map(match => ({ classes: [...match[1]!.matchAll(/["'`]([^"'`]*)["'`]/g)].map(part => part[1]).join(" "), index: match.index!, end: match.index! + match[0].length })),
+  ];
+  for (const { classes, index, end } of lists) {
+    const found = fontIcon(classes);
+    if (!found) continue;
+    // Material draws the icon named by the element's text, a ligature.
+    if (found.set === "material") found.icon = /^[^<>]*?>\s*([a-z][a-z0-9_]*)\s*</.exec(source.slice(end, end + 300))?.[1] ?? null;
+    icons.push({ ...found, line: line(index), classes });
+  }
+  const sheets: { set: string; url: string; line: number }[] = [];
+  for (const match of source.matchAll(/<link\b[^>]*?\bhref\s*=\s*["']([^"']+)["']|<script\b[^>]*?\bsrc\s*=\s*["']([^"']+)["']|@import\s+(?:url\(\s*)?["']?([^"');\s]+)|\bimport\s+["']([^"']+)["']/g)) {
+    const url = match[1] ?? match[2] ?? match[3] ?? match[4]!;
+    if (ICON_FONT_SHEET.test(url)) sheets.push({ set: sheetSet(url), url, line: line(match.index!) });
+  }
+  return { icons, sheets };
+}
+
+// ---------------------------------------------------------------------------
 // The app's icons.
 
 /** Where an app's sources and drawings are, for the stylesheets and SVG files the component scan does not read. */
@@ -380,6 +435,13 @@ export function scanIcons(root: string, manifest: string | undefined, files: str
     }
   }
   for (const { file, source } of sources) {
+    const font = fontIcons(source);
+    for (const use of font.icons) {
+      const site = { file, line: use.line, name: use.classes.trim() };
+      if (use.icon) add(`${use.set}: ${use.icon}`, site, "font", "local", wellKnown(use.icon));
+      else dynamic.push({ ...site, kind: "font", status: "local" });
+    }
+    for (const sheet of font.sheets) fonts.push({ file, line: sheet.line, name: `${sheet.set}: ${sheet.url}`, kind: "font", status: "local" });
     if (STYLESHEET.test(file)) continue;
     for (const image of imageIcons(source)) reference(file, image.url, image.line, "file");
     const imported = importedIcons(source);
