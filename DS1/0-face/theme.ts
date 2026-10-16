@@ -9,7 +9,7 @@ function getInitialTheme(): ThemeType {
   }
 
   let storedTheme: string | null = null;
-  try { storedTheme = window.localStorage?.getItem(preferenceStorageKey("theme")); } catch { /* Storage can be unavailable. */ }
+  try { if (window.DS_ONE_PREFERENCES?.themeMode !== "system") storedTheme = window.localStorage?.getItem(preferenceStorageKey("theme")); } catch { /* Storage can be unavailable. */ }
   if (storedTheme === "light" || storedTheme === "dark") {
     return storedTheme;
   }
@@ -30,7 +30,7 @@ export function setTheme(theme: ThemeType): void {
 
   if (typeof window !== "undefined") {
     try {
-      window.localStorage?.setItem(preferenceStorageKey("theme"), theme);
+      if (window.DS_ONE_PREFERENCES?.themeMode !== "system") window.localStorage?.setItem(preferenceStorageKey("theme"), theme);
     } catch (error) {
       console.warn("ds-one: unable to persist theme preference", error);
     }
@@ -55,4 +55,26 @@ if (typeof window !== "undefined") {
     root.classList.remove("light-theme", "dark-theme");
     root.classList.add(`${theme}-theme`);
   }
+}
+
+/** Bind an automatic surface to system appearance, leaving stored choices intact. */
+export function followSystemTheme(): () => void {
+  if (typeof window === "undefined") return () => {};
+  window.DS_ONE_PREFERENCES = { ...window.DS_ONE_PREFERENCES, themeMode: "system" };
+  const media = window.matchMedia("(prefers-color-scheme: dark)");
+  const apply = () => {
+    const theme = media.matches ? "dark" : "light";
+    setTheme(theme);
+    const root = document.documentElement;
+    root.classList.toggle("light-theme", theme === "light");
+    root.classList.toggle("dark-theme", theme === "dark");
+    root.style.colorScheme = theme;
+    root.dataset.theme = theme;
+    root.style.setProperty("--lightningcss-light", theme === "light" ? "initial" : " ");
+    root.style.setProperty("--lightningcss-dark", theme === "dark" ? "initial" : " ");
+  };
+  apply();
+  media.addEventListener("change", apply);
+  window.addEventListener("pageshow", apply);
+  return () => { media.removeEventListener("change", apply); window.removeEventListener("pageshow", apply); };
 }

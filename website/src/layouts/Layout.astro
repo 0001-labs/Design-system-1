@@ -213,6 +213,11 @@ const classlessMode = pathname === '/classless/editor' ? 'editor'
           menuButton?.setAttribute('aria-expanded', 'true');
           overlay?.classList.add('active');
           document.body.style.overflow = 'hidden';
+          sidebar?.removeAttribute('inert');
+          sidebar?.setAttribute('role', 'dialog');
+          sidebar?.setAttribute('aria-modal', 'true');
+          sidebar?.setAttribute('aria-label', 'Documentation');
+          document.getElementById('sidebar-close-btn')?.focus();
         }
 
         function closeSidebar() {
@@ -220,6 +225,10 @@ const classlessMode = pathname === '/classless/editor' ? 'editor'
           menuButton?.setAttribute('aria-expanded', 'false');
           overlay?.classList.remove('active');
           document.body.style.overflow = '';
+          sidebar?.toggleAttribute('inert', window.innerWidth <= 768);
+          sidebar?.removeAttribute('role');
+          sidebar?.removeAttribute('aria-modal');
+          menuButton?.focus();
         }
 
         document.getElementById('sidebar-close-btn')?.addEventListener('click', closeSidebar);
@@ -236,14 +245,24 @@ const classlessMode = pathname === '/classless/editor' ? 'editor'
         // Close on overlay click
         overlay?.addEventListener('click', closeSidebar);
 
-        // Close sidebar when clicking a link (for mobile navigation)
-        const sidebarLinks = sidebar?.querySelectorAll('ds-button[href]');
-        sidebarLinks?.forEach(link => {
-          link.addEventListener('click', function() {
-            if (window.innerWidth <= 768) {
-              closeSidebar();
-            }
-          });
+        sidebar?.addEventListener('sidebar-activate', () => {
+          if (window.innerWidth <= 768) closeSidebar();
+        });
+        sidebar?.toggleAttribute('inert', window.innerWidth <= 768);
+
+        function focusable(root) {
+          return [...root.querySelectorAll('*')].flatMap(element => [
+            ...(element.matches('a[href], button, input, select, textarea, [tabindex="0"]') && !element.disabled && element.getClientRects().length ? [element] : []),
+            ...(element.shadowRoot ? focusable(element.shadowRoot) : []),
+          ]);
+        }
+        sidebar?.addEventListener('keydown', event => {
+          if (event.key !== 'Tab' || !sidebar.classList.contains('open')) return;
+          const controls = focusable(sidebar);
+          const active = event.composedPath()[0];
+          const first = controls[0], last = controls[controls.length - 1];
+          if (event.shiftKey && active === first) { event.preventDefault(); last?.focus(); }
+          else if (!event.shiftKey && active === last) { event.preventDefault(); first?.focus(); }
         });
 
         // Close sidebar on escape key
@@ -255,6 +274,7 @@ const classlessMode = pathname === '/classless/editor' ? 'editor'
 
         // Handle resize - close mobile sidebar when switching to desktop
         window.addEventListener('resize', function() {
+          sidebar?.toggleAttribute('inert', window.innerWidth <= 768 && !sidebar?.classList.contains('open'));
           if (window.innerWidth > 768 && sidebar?.classList.contains('open')) {
             closeSidebar();
           }

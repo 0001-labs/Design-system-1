@@ -38,6 +38,8 @@ export type TranslationMap = Record<string, TranslationData>;
 export type I18nOptions = {
   /** Fetch external words at startup. Disable when the product supplies them in code. */
   autoLoad?: boolean;
+  /** Ignore saved choices and avoid writes on browser-managed surfaces. */
+  persist?: boolean;
   /**
    * Every language the product speaks. When set, the picker offers these
    * whether or not their words have arrived yet, which matters when a page
@@ -142,6 +144,7 @@ function storageKey(): string {
 }
 
 function readStoredLanguage(): LanguageCode | null {
+  if (i18nOptions.persist === false) return null;
   try {
     return (storage()?.getItem(storageKey()) as LanguageCode | null) || null;
   } catch {
@@ -150,6 +153,7 @@ function readStoredLanguage(): LanguageCode | null {
 }
 
 function storeLanguage(language: LanguageCode): void {
+  if (i18nOptions.persist === false) return;
   try {
     storage()?.setItem(storageKey(), language);
   } catch {
@@ -719,6 +723,7 @@ export const currentLanguage = {
  * language's file if one is now configured.
  */
 export function configureI18n(next: I18nOptions): void {
+  const previousPersist = i18nOptions.persist;
   const previousKey = storageKey();
   const previousLanguages = i18nOptions.languages;
   i18nOptions = { ...i18nOptions, ...next };
@@ -726,6 +731,7 @@ export function configureI18n(next: I18nOptions): void {
   applyRouting();
 
   if (
+    i18nOptions.persist !== previousPersist ||
     storageKey() !== previousKey ||
     i18nOptions.languages !== previousLanguages
   ) {

@@ -1,0 +1,13 @@
+---
+import translations from '../../public/translations.json';
+const languages = [...new Set(['en', ...Object.keys(translations)])];
+---
+<script is:inline define:vars={{ languages }}>
+  window.DS_ONE_I18N = { autoLoad: false, persist: false, languages };
+  window.DS_ONE_PREFERENCES = { ...window.DS_ONE_PREFERENCES, themeMode: 'system' };
+  const theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  document.documentElement.style.colorScheme = theme;
+  document.documentElement.dataset.theme = theme;
+  document.documentElement.classList.toggle('dark-theme', theme === 'dark');
+  document.documentElement.classList.toggle('light-theme', theme === 'light');
+</script>

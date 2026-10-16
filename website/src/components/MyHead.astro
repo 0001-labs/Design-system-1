@@ -1,23 +1,18 @@
 ---
 // Import the default Starlight Head component
 import Default from '@astrojs/starlight/components/Head.astro';
+import PublicPreferences from './PublicPreferences.astro';
 ---
 
 <!-- Include default Starlight head elements -->
 <Default><slot /></Default>
+<PublicPreferences />
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
 <script is:inline src="/google-analytics.js" defer />
 
 <script>
   import '../../../DS1/1-root/one.css';
   import '../../../DS1/index';
-  import { loadTranslations } from '../../../DS1/0-face/i18n';
-  const response = await fetch('/translations.json');
-  if (response.ok) {
-    const translations = await response.json();
-    loadTranslations(translations);
-    window.dispatchEvent(new CustomEvent('translations-ready', { detail: { languages: Object.keys(translations) } }));
-  }
 </script>
 
 <style>

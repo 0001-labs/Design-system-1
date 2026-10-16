@@ -1,11 +1,13 @@
 ---
 import '../../../DS1/1-root/one.css';
+import PublicPreferences from './PublicPreferences.astro';
 import { siteNavigation, isNavigationCurrent } from '../../../shared/site-navigation';
 import '../../../shared/site-navigation.css';
 interface Props { landing?: boolean; }
 const { landing = false } = Astro.props;
 ---
 
+<PublicPreferences />
 <header class="site-navigation">
   <a class="site-brand" href="/">Design system 1</a>
   <nav class="site-links" aria-label="Main navigation">
@@ -13,15 +15,12 @@ const { landing = false } = Astro.props;
     {siteNavigation.map((item) => (
       <a href={item.href} aria-current={isNavigationCurrent(item.href, Astro.url.pathname) ? 'page' : undefined}>{item.label}</a>
     ))}
-    <div class="site-tools" role="group" aria-label="Preferences">
-      <ds-cycle type="language" variant="secondary"></ds-cycle>
-      <ds-cycle type="theme" variant="secondary"></ds-cycle>
-    </div>
+
   </nav>
   <a class="site-account" href="/app/signin">Sign in</a>
 </header>
 
 <script>
-  import '../../../DS1/2-core/ds-cycle';
+  import '../lib/public-preferences';
   import '../../../DS1/0-face/device';
 </script>

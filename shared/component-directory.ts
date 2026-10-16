@@ -34,6 +34,7 @@ export const LAYERS: DirectoryLayer[] = [
       { name: 'Button', href: '/2-core/button/', tag: 'ds-button' },
       { name: 'Split', href: '/2-core/split/', tag: 'ds-split' },
       { name: 'Card', href: '/2-core/card/', tag: 'ds-card' },
+      { name: 'Charts', href: '/2-core/chart/', tag: 'ds-chart' },
       { name: 'Cycle', href: '/2-core/cycle/', tag: 'ds-cycle' },
       { name: 'Date', href: '/2-core/date/', tag: 'ds-date' },
       { name: 'Gap', href: '/2-core/gap/', tag: 'ds-gap' },

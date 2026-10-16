@@ -1,319 +1,66 @@
 ---
-import Search from '@astrojs/starlight/components/Search.astro';
-// Get the sidebar data from Starlight
-// No need for githubUrl, SVG will be inlined directly
+import { version } from '../../../package.json';
 const { sidebar } = Astro.locals.starlightRoute;
-
-const groupTranslationKeys: Record<string, string> = {
-  'Start Here': 'startHere',
-  'Built-ins': 'builtIns',
-  '1 Root': 'root',
-  '2 Core': 'core',
-  '3 Unit': 'unit',
-  '4 Page': 'page',
-};
-
-const entryTranslationKeys: Record<string, string> = {
-  Introduction: 'introduction',
-  'Manual Setup': 'manualSetup',
-  Theming: 'theming',
-  'Mobile Detection': 'mobileDetection',
-  Styling: 'styling',
-  Fonts: 'fonts',
-  Button: 'button',
-  Text: 'text',
-  Link: 'link',
-  Icon: 'icon',
-  Tooltip: 'tooltip',
-  Navigation: 'navigation',
-  List: 'list',
-  Panel: 'panel',
-  Card: 'card',
-  Layout: 'layout',
-  Grid: 'grid',
-};
 ---
+<div class="docs-sidebar-shell">
+  <ds-sidebar id="docs-navigation" label="Documentation" data-groups={JSON.stringify(sidebar)}>
+    <div slot="header" class="docs-sidebar-header">
+      <ds-button control="slotted" icon class="docs-sidebar-close">
+        <button id="sidebar-close-btn" type="button" aria-label="Close navigation menu"><ds-icon type="close"></ds-icon></button>
+      </ds-button>
+    </div>
+    <div slot="footer" class="docs-sidebar-footer">
+      <ds-button href="https://github.com/0001-labs/Design-system-1">GitHub</ds-button>
+      <span>{version}</span>
+    </div>
+  </ds-sidebar>
+</div>
 
-<nav id="sidebar-nav" class="sidebar-nav">
-  <!-- Mobile close button -->
-  <button id="sidebar-close-btn" class="sidebar-close-btn" aria-label="Close navigation menu">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <line x1="18" y1="6" x2="6" y2="18"></line>
-      <line x1="6" y1="6" x2="18" y2="18"></line>
-    </svg>
-  </button>
-
-  <div class="sidebar-search"><Search /></div>
-  <div class="sidebar-content">
-    {sidebar.map((group) => {
-      const groupKey = groupTranslationKeys[group.label];
-      const isIndented = ['Start Here', 'CLASSless', 'Built-ins', '1 Root'].includes(group.label);
-      return (
-        <details open class="sidebar-group">
-          <summary class="sidebar-group-summary">
-            <ds-button 
-              bold 
-              no-background
-              text={groupKey}
-              default-text={group.label}
-              style="pointer-events: none;"
-            >
-              {group.label}
-            </ds-button>
-          </summary>
-          
-          <ul class="sidebar-entries" data-first-three={isIndented}>
-            {group.entries.map((entry) => {
-              const isFirstThree = isIndented;
-              const entryKey = entryTranslationKeys[entry.label];
-              return (
-                <li class={`sidebar-entry ${isFirstThree ? 'first-three' : ''}`}>
-                  {isFirstThree ? (
-                    <ds-button
-                      no-background
-                      text={entryKey}
-                      default-text={entry.label}
-                      aria-current={entry.isCurrent ? 'page' : undefined}
-                      href={entry.href}
-                      class="sidebar-link"
-                      style={`--button-color: ${entry.isCurrent ? 'var(--accent-color)' : 'var(--button-text-color-secondary)'}; width: 100%; text-align: left; height: 20px;`}
-                    >
-                      {entry.label}
-                    </ds-button>
-                  ) : (
-                    <ds-button
-                      primary={entry.isCurrent} secondary={!entry.isCurrent}
-                      text={entryKey}
-                      default-text={entry.label}
-                      aria-current={entry.isCurrent ? 'page' : undefined}
-                      href={entry.href}
-                      class="sidebar-link"
-                      style="cursor: pointer; user-select: none; display: flex; align-items: center; width: 100%; height: 20px;"
-                    >
-                      {entry.label}
-                    </ds-button>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        </details>
-      );
-    })}
-  </div>
-
-  <!-- Spacer to push version control to bottom -->
-  <div class="sidebar-spacer"></div>
-
-  <!-- Version Control Section -->
-  <div class="sidebar-footer">
-    <ds-button blank no-background href="https://github.com/0001-labs/Design-system-1" class="github-link">
-      <div class="github-icon-wrapper">
-        <svg width="18" height="18" viewBox="0 0 98 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-          <path fill-rule="evenodd" clip-rule="evenodd" d="M49,8C25.3,8,6,27.3,6,51c0,19.1,12.4,35.3,29.6,41c2.2,0.4,3-1,3-2.2
-            c0-1.1,0-4.5,0-8.2c-12,2.6-14.5-5.2-14.5-5.2c-2-5.2-4.8-6.6-4.8-6.6c-3.9-2.6,0.3-2.5,0.3-2.5c4.3,0.3,6.6,4.4,6.6,4.4
-            c3.8,6.6,10,4.7,12.4,3.6c0.4-2.8,1.5-4.7,2.7-5.8c-9.6-1.1-19.6-4.8-19.6-21.3c0-4.7,1.7-8.5,4.3-11.6c-0.4-1.1-1.9-5.3,0.4-11
-            c0,0,3.6-1.1,11.8,4.4c3.4-1,7.1-1.5,10.8-1.5s7.4,0.5,10.8,1.5c8.2-5.5,11.8-4.4,11.8-4.4c2.3,5.8,0.8,9.9,0.4,11
-            c2.7,3.1,4.3,7,4.3,11.6c0,16.6-10.1,20.2-19.7,21.3c1.6,1.4,3,4.1,3,8.2c0,5.8,0,10.5,0,11.9c0,1.2,0.8,2.6,3,2.2
-            C79.6,86.3,92,70.1,92,51C92,27.3,72.7,8,49,8z" fill="currentColor"/>
-        </svg>
-      </div>
-    </ds-button>
-    <ds-button class="version-badge">0.3.0-alpha.13</ds-button>
-  </div>
-</nav>
-
-<style>
-  .sidebar-nav {
-    padding: 40px;
-    background: var(--ds1-docs-sidebar-bg);
-    height: 100%;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+<script>
+  import '../../../DS1/3-unit/ds-sidebar';
+  import { translate } from '../../../DS1/0-face/i18n';
+  import type { SidebarItem } from '../../../DS1/3-unit/ds-sidebar';
+  const navigation = document.querySelector('ds-sidebar#docs-navigation')!;
+  type Entry = { label: string; href?: string; isCurrent?: boolean; entries?: Entry[] };
+  const groups: Entry[] = JSON.parse(navigation.dataset.groups ?? '[]');
+  const collapsed = new Set<string>();
+  const translationKeys: Record<string, string> = {
+    'Start Here': 'startHere', 'Built-ins': 'builtIns', '1 Root': 'root', '2 Core': 'core', '3 Unit': 'unit', '4 Page': 'page',
+    Introduction: 'introduction', 'Manual Setup': 'manualSetup', Theming: 'theming', 'Mobile Detection': 'mobileDetection',
+    Styling: 'styling', Fonts: 'fonts', Button: 'button', Text: 'text', Link: 'link', Icon: 'icon', Tooltip: 'tooltip',
+    Navigation: 'navigation', List: 'list', Panel: 'panel', Card: 'card', Layout: 'layout', Grid: 'grid',
+  };
+  function label(text: string): string {
+    const key = translationKeys[text] ?? text;
+    const translated = translate(key);
+    return translated === key ? text : translated;
   }
 
-  /* Mobile close button - hidden by default */
-  .sidebar-close-btn {
-    display: none;
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    background: transparent;
-    border: none;
-    color: var(--ds1-docs-header-text);
-    cursor: pointer;
-    border-radius: 8px;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.2s ease;
-    z-index: 10;
+  function rows(entries: Entry[], depth = 0, parent = ''): SidebarItem[] {
+    return entries.flatMap((entry, index) => {
+      const id = entry.href ?? `${parent}/group-${index}`;
+      const item: SidebarItem = { id, label: label(entry.label), depth, href: entry.href, current: entry.isCurrent };
+      if (!entry.entries) return [item];
+      item.expanded = !collapsed.has(id);
+      return [item, ...(item.expanded ? rows(entry.entries, depth + 1, id) : [])];
+    });
   }
-
-  .sidebar-close-btn:hover {
-    background: var(--ds1-docs-search-bg);
-  }
-
-  .sidebar-content {
-    display: flex;
-    width: 100%;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .sidebar-group {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .sidebar-group-summary {
-    cursor: pointer;
-    list-style: none;
-    user-select: none;
-    display: flex;
-    align-items: center;
-    width: 100%;
-    height: 20px;
-  }
-
-  .sidebar-group-summary::-webkit-details-marker {
-    display: none;
-  }
-
-  /* The writing size, on one square a row. */
-  .sidebar-nav ds-button { font-size: 14px; line-height: 20px; letter-spacing: -0.28px; }
-  .sidebar-group-summary ds-button { height: 20px; }
-
-  details[open] .sidebar-group-summary ds-button {
-    color: var(--button-text-color) !important;
-  }
-
-  .sidebar-entries {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    align-items: left;
-    padding-left: 0;
-    margin: 0;
-  }
-
-  .sidebar-entries[data-first-three="true"] {
-    padding-left: 20px;
-  }
-
-  .sidebar-entry {
-    height: 20px;
-    display: flex;
-    align-items: center;
-  }
-
-
-  .sidebar-spacer {
-    flex: 1;
-  }
-
-  .sidebar-footer {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-end;
-    max-height: 20px;
-  }
-
-  .github-link {
-    --button-color: var(--button-text-color-secondary);
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .github-icon-wrapper {
-    display: flex;
-    padding-right: 10px;
-  }
-
-  .version-badge {
-    display: flex;
-    color: var(--button-text-color);
-    white-space: nowrap;
-  }
-
-  /* Mobile Responsive Styles */
-  @media (max-width: 768px) {
-    .sidebar-nav {
-      padding: 60px 20px 20px 20px;
-      position: relative;
-    }
-
-    .sidebar-close-btn {
-      display: flex;
-    }
-
-    .sidebar-content {
-      gap: 20px;
-    }
-
-    .sidebar-entry {
-      height: 40px;
-      min-height: 40px;
-    }
-
-    .sidebar-entry.first-three {
-      padding-bottom: 0;
-    }
-
-    .sidebar-footer {
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid var(--ds1-docs-header-border);
-    }
-  }
-
-  /* Touch-friendly tap targets on mobile */
-  @media (max-width: 768px) and (pointer: coarse) {
-    .sidebar-group-summary {
-      height: 40px;
-      min-height: 40px;
-    }
-  }
-</style>
-
-<script is:inline>
-  document.addEventListener('DOMContentLoaded', function() {
-    const nav = document.getElementById('sidebar-nav');
-    const sidebar = document.getElementById('sidebar');
-    const closeBtn = document.getElementById('sidebar-close-btn');
-    const overlay = document.getElementById('sidebar-overlay');
-    const menuButton = document.getElementById('mobile-menu-btn');
-
-    function closeSidebar() {
-      sidebar?.classList.remove('open');
-      overlay?.classList.remove('active');
-      document.body.style.overflow = '';
-    }
-
-    // Close button click
-    closeBtn?.addEventListener('click', closeSidebar);
-
-    if (nav) {
-      // Handle navigation for buttons with href
-      const navButtons = nav.querySelectorAll('ds-button[href]');
-      navButtons.forEach((button) => {
-        button.addEventListener('click', (e) => {
-          const href = button.getAttribute('href');
-          if (href) {
-            // Close sidebar on mobile before navigating
-            if (window.innerWidth <= 768) {
-              closeSidebar();
-            }
-            window.location.href = href;
-          }
-        });
-      });
-    }
+  navigation.items = rows(groups);
+  window.addEventListener("translations-ready", () => { navigation.items = rows(groups); });
+  window.addEventListener("language-changed", () => { navigation.items = rows(groups); });
+  navigation.addEventListener('sidebar-toggle', event => {
+    const { id, expanded } = (event as CustomEvent).detail;
+    if (expanded) collapsed.delete(id); else collapsed.add(id);
+    navigation.items = rows(groups);
+    navigation.updateComplete.then(() => navigation.focusItem(id));
   });
 </script>
+
+<style>
+  .docs-sidebar-shell { padding: 20px; min-height: 100%; }
+  ds-sidebar { width: 100%; }
+  .docs-sidebar-header { display: flex; flex-direction: column; gap: 20px; }
+  .docs-sidebar-close { display: none; align-self: flex-end; }
+  .docs-sidebar-footer { display: flex; align-items: center; gap: 10px; padding-top: 20px; font-size: 10px; }
+  @media (max-width: 768px) { .docs-sidebar-close { display: block; } }
+</style>

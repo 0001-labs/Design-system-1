@@ -27,6 +27,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "Design system 1",
+      pagefind: false,
       favicon: "/icons/design-system-1.svg",
       description:
         "A component-based design system built with TypeScript and LitElement that provides reusable UI components with built-in theming, internationalization, and accessibility features.",
@@ -99,6 +100,7 @@ export default defineConfig({
             { label: "Button", slug: "2-core/button" },
             { label: "Split", slug: "2-core/split" },
             { label: "Card", slug: "2-core/card" },
+            { label: "Charts", slug: "2-core/chart" },
             { label: "Cycle", slug: "2-core/cycle" },
             { label: "Date", slug: "2-core/date" },
             { label: "Gap", slug: "2-core/gap" },

@@ -11,6 +11,8 @@ export type Preferences = {
 export interface PreferenceOptions {
   storageKey?: string;
   themeStorageKey?: string;
+  /** Follow system appearance without reading or writing a saved theme. */
+  themeMode?: "system";
 }
 
 declare global {
