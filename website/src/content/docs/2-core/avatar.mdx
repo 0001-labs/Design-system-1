@@ -1,6 +1,6 @@
 ---
 title: Avatar
-description: A person's or workspace's mark, always round and one control high.
+description: A person's or workspace's mark, one control high, round or square.
 ---
 
 import ComponentExample from "../../../components/ComponentExample.astro";
@@ -8,10 +8,10 @@ import ComponentExample from "../../../components/ComponentExample.astro";
 <ComponentExample example="avatar" />
 
 `ds-avatar` draws a person or a workspace: a picture, an initial or an icon in a
-circle. It is only ever round. It is one control high (16px times `--sf`), so
-it sits inside a one-square row with type in the small
-size. `size="large"` is two squares. The product picks who a mark stands for,
-and handles selecting and acting on it.
+circle, or a square with `shape="square"`. It is one control high (16px times
+`--sf`), so it sits inside a one-square row with type in the small size.
+`size="large"` is two squares. The product picks who a mark stands for, and
+handles selecting and acting on it.
 
 ```html
 <ds-avatar initial="J" label="Joachim"></ds-avatar>
@@ -19,6 +19,22 @@ and handles selecting and acting on it.
 <ds-avatar src="/people/ana.jpg" initial="A" label="Ana"></ds-avatar>
 <ds-avatar icon="globe" outlined label="Public"></ds-avatar>
 ```
+
+## Shape
+
+An avatar is round. `shape="square"` gives it a picture's corners: the shared
+4px corner, scaled, or `--ds-avatar-radius`. It follows the surface's
+`data-ds-shape` preference as other corners do. The product decides which marks
+are square, for example a workspace beside round people.
+
+```html
+<ds-avatar shape="square" initial="S" label="Studio"></ds-avatar>
+<ds-avatar shape="square" size="large" src="/workspaces/studio.png" initial="S" label="Studio"></ds-avatar>
+```
+
+React takes the same `shape` on `Avatar`. A page without Lit draws the same mark
+with the `ds-avatar` class and `ds-avatar--square`; see
+[Native controls](/1-root/native-controls/#avatar).
 
 ## Colour
 
@@ -46,8 +62,8 @@ are coloured.
 A picture covers the circle; while it loads, or if it fails, the initial or icon
 stays. `mask` with `fit="contain"` draws a monochrome mark in the text colour.
 
-A logo is not an avatar. The React `Logo` sets `logo`, the one mark that keeps
-its corners: a brand mark fitted into its image area (`size="fill"`), unclipped.
+A logo is not an avatar. The React `Logo` sets `logo`: a brand mark fitted into
+its image area (`size="fill"`), unclipped and without the avatar's corners.
 Without a picture it shows its `initial`.
 
 ## Groups

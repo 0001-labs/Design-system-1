@@ -111,8 +111,8 @@ render();`,
     html: '<ds-button split aria-label="View" options="day:Day,week:Week,month:Month" value="week"></ds-button>\n<ds-button split actions aria-label="Date" options="back:@left:Back,today:Today,next:@right:Next"></ds-button>',
   },
   'avatar': {
-    title: 'People, always round', hint: 'Fill an avatar with a colour, or letter it in an ink on the neutral fill.',
-    html: '<ds-avatar-group aria-label="People">\n  <ds-avatar initial="A" color="#99ff73" outlined></ds-avatar>\n  <ds-avatar initial="J" color="#f5aad1" outlined></ds-avatar>\n  <ds-avatar initial="M" color="#fec20d" outlined></ds-avatar>\n</ds-avatar-group>\n<ds-avatar-group aria-label="People">\n  <ds-avatar initial="E" ink="light-dark(#2e9e1f, #99ff73)" outlined></ds-avatar>\n  <ds-avatar initial="高橋" ink="light-dark(#4b44e6, #b3aeff)" outlined></ds-avatar>\n  <ds-avatar initial="S" pending></ds-avatar>\n</ds-avatar-group>',
+    title: 'People and workspaces', hint: 'Fill an avatar with a colour, or letter it in an ink on the neutral fill. A square one takes a picture’s corners.',
+    html: '<ds-avatar-group aria-label="People">\n  <ds-avatar initial="A" color="#99ff73" outlined></ds-avatar>\n  <ds-avatar initial="J" color="#f5aad1" outlined></ds-avatar>\n  <ds-avatar initial="M" color="#fec20d" outlined></ds-avatar>\n</ds-avatar-group>\n<ds-avatar-group aria-label="People">\n  <ds-avatar initial="E" ink="light-dark(#2e9e1f, #99ff73)" outlined></ds-avatar>\n  <ds-avatar initial="高橋" ink="light-dark(#4b44e6, #b3aeff)" outlined></ds-avatar>\n  <ds-avatar initial="S" pending></ds-avatar>\n</ds-avatar-group>\n<ds-avatar shape="square" initial="S" color="#ccccff" label="Studio"></ds-avatar>\n<ds-avatar shape="square" size="large" initial="S" color="#ccccff" label="Studio"></ds-avatar>',
   },
   'button': {
     title: 'Button styles', hint: 'Click a button. The event appears below.',

@@ -29,15 +29,37 @@ const known = new Set(IMPLEMENTATION_COLUMNS.map(c => c.id));
 const native: Record<string, string> = { button: "button", input: "input", select: "select", textarea: "textarea", p: "text", h1: "text", h2: "text", h3: "text", h4: "text", h5: "text", h6: "text", ul: "list", ol: "list", table: "table", form: "form", dialog: "dialog" };
 /** `prose` marks native text, a list or a table inside an element marked data-ds-prose, which DS1's prose sheet draws. */
 type TagSite = { tag: string; line: number; nativeStyle?: string; prose?: boolean; dialogRole?: boolean; controlKind?: "checkbox" | "radio" | "switch" | "color" | "file-picker" };
-type OpenElement = { tag: string; prose?: boolean };
+type OpenElement = { tag: string; prose?: boolean; className?: string; site?: TagSite };
 const textTags = new Set(["p", "h1", "h2", "h3", "h4", "h5", "h6"]);
 const proseTags = new Set([...textTags, "ul", "ol", "table"]);
+/**
+ * The pieces controls.css draws on any element, and the column each counts in:
+ * a field's label row counts with forms, a drop zone as a file picker.
+ */
+export const nativePieces: Record<string, string> = { "ds-field": "form", "ds-avatar": "avatar", "ds-badge": "badge", "ds-icon": "icon", "ds-drop": "file-picker" };
+/** The column a native class moves its element into: the pieces, and a toggle button. */
+const nativeColumns: Record<string, string> = { ...nativePieces, "ds-toggle": "toggle" };
+/** A field's label, hint and error, drawn by controls.css on native text. */
+const fieldParts = ["ds-field__label", "ds-field__hint", "ds-field__error"];
+/**
+ * Classes newer than the first copies of controls.css: a site counts as DS1
+ * styles only when the copy it is verified through defines the class.
+ */
+export const definedNativeClasses = new Set([...Object.keys(nativeColumns), ...fieldParts]);
 function nativeStyle(tag: string, className: string): string | undefined {
   const classes = className.split(/\s+/);
-  // Native text with a literal .ds-text class or one of its sizes and tones.
-  if (textTags.has(tag)) return classes.some(name => name === "ds-text" || name.startsWith("ds-text--")) ? "ds-text" : undefined;
-  const supported = tag === "button" ? ["ds-button", "ds-switch"] : ["input", "select", "textarea"].includes(tag) ? ["ds-input", "ds-textarea", "ds-select", "ds-checkbox", "ds-radio"] : tag === "dialog" ? ["ds-dialog"] : [];
-  return supported.find(name => classes.includes(name));
+  // Native text with a literal .ds-text class or one of its sizes and tones, or a field's part.
+  if (textTags.has(tag)) return classes.some(name => name === "ds-text" || name.startsWith("ds-text--")) ? "ds-text" : fieldParts.find(name => classes.includes(name));
+  const supported = tag === "button" ? ["ds-toggle", "ds-button", "ds-switch"] : ["input", "select", "textarea"].includes(tag) ? ["ds-input", "ds-textarea", "ds-select", "ds-checkbox", "ds-radio"] : tag === "dialog" ? ["ds-dialog"] : [];
+  return supported.find(name => classes.includes(name)) ?? (native[tag] ? undefined : Object.keys(nativePieces).find(name => classes.includes(name)));
+}
+/** A file input directly inside a label drawn as a drop zone or a button is that file picker's frame. */
+const fileFrameClass = (className: string | undefined) => (className ?? "").split(/\s+/).find(name => name === "ds-drop" || name === "ds-button");
+/** The label counts as the file picker; a label.ds-button is one only once its file input is seen. */
+function claimFileFrame(label: TagSite | undefined, frameClass: string) {
+  if (!label || frameClass !== "ds-button") return;
+  label.nativeStyle = "ds-button";
+  label.controlKind = "file-picker";
 }
 function jsxClassName(initializer: ts.JsxAttributeValue | undefined): string {
   if (initializer && ts.isStringLiteral(initializer)) return initializer.text;
@@ -62,17 +84,23 @@ export function sourceSites(file: string, source: string): TagSite[] {
         if (at >= 0) stack.length = at;
         continue;
       }
-      const parent = stack.at(-1)?.tag ?? "";
-      const frame = (tag === "dialog" && parent === "ds-dialog") || (tag === "input" && ["ds-checkbox", "ds-radio", "ds-color", "ds-token-field", "ds-file-picker"].includes(parent)) || (tag === "button" && ["ds-switch", "ds-button"].includes(parent)) || (tag === "select" && parent === "ds-select") || (tag === "textarea" && parent === "ds-composer");
+      const parentElement = stack.at(-1);
+      const parent = parentElement?.tag ?? "";
       const attributes = clean.slice(match.index! + match[0].length).split(">")[0]!;
+      const fileFrame = tag === "input" && parent === "label" && /\btype\s*=\s*["']file["']/.test(attributes) ? fileFrameClass(parentElement!.className) : undefined;
+      const frame = (tag === "dialog" && parent === "ds-dialog") || (tag === "input" && ["ds-checkbox", "ds-radio", "ds-color", "ds-token-field", "ds-file-picker"].includes(parent)) || (tag === "button" && ["ds-switch", "ds-button"].includes(parent)) || (tag === "select" && parent === "ds-select") || (tag === "textarea" && parent === "ds-composer") || Boolean(fileFrame);
       const inProse = proseTags.has(tag) && [...stack].reverse().find(open => open.prose !== undefined)?.prose === true;
       const prose = /(?:^|\s)data-ds-not-prose(?=[\s=/]|$)/.test(attributes) ? false : /(?:^|\s)data-ds-prose(?=[\s=/]|$)/.test(attributes) ? true : undefined;
-      if (!/\/\s*$/.test(attributes) && !/^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/.test(tag)) stack.push({ tag, prose });
-      if (frame) continue;
       const className = /\bclass\s*=\s*["']([^"']*)["']/.exec(attributes)?.[1] ?? /\bclass\s*=\s*["']([^"']*)$/.exec(attributes)?.[1] ?? "";
+      const open: OpenElement = { tag, prose, className };
+      if (!/\/\s*$/.test(attributes) && !/^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/.test(tag)) stack.push(open);
+      if (fileFrame) claimFileFrame(parentElement!.site, fileFrame);
+      if (frame) continue;
       const dialogRole = /\brole\s*=\s*["'](?:alertdialog|dialog)["']/.test(attributes);
       const controlKind = /\brole\s*=\s*["']switch["']/.test(attributes) ? "switch" : tag === "input" && /\btype\s*=\s*["']checkbox["']/.test(attributes) ? "checkbox" : tag === "input" && /\btype\s*=\s*["']radio["']/.test(attributes) ? "radio" : tag === "input" && /\btype\s*=\s*["']color["']/.test(attributes) ? "color" : tag === "input" && /\btype\s*=\s*["']file["']/.test(attributes) ? "file-picker" : undefined;
-      found.push({ tag, line: line(offset + match.index!), nativeStyle: nativeStyle(tag, className), ...(inProse ? { prose: true } : {}), ...(dialogRole ? { dialogRole } : {}), ...(controlKind ? { controlKind } : {}) });
+      const site: TagSite = { tag, line: line(offset + match.index!), nativeStyle: nativeStyle(tag, className), ...(inProse ? { prose: true } : {}), ...(dialogRole ? { dialogRole } : {}), ...(controlKind ? { controlKind } : {}) };
+      open.site = site;
+      found.push(site);
     }
   };
   if (/\.(html|astro)$/.test(file)) {
@@ -155,6 +183,8 @@ export function sourceSites(file: string, source: string): TagSite[] {
   };
   findFrames(ast);
   const templateStacks = new Map<ts.Node, OpenElement[]>();
+  /** Sites and classes of JSX elements and h/createElement calls, for a file input to claim its label. */
+  const elementSites = new Map<ts.Node, OpenElement>();
   /** The nearest JSX ancestor marked data-ds-prose or data-ds-not-prose decides. */
   const jsxInProse = (node: ts.Node) => {
     for (let parent = node.parent; parent; parent = parent.parent) {
@@ -181,7 +211,14 @@ export function sourceSites(file: string, source: string): TagSite[] {
       const typeValue = type && ts.isJsxAttribute(type) ? type.initializer : undefined;
       const controlKind = roleValue && ts.isStringLiteral(roleValue) && roleValue.text === "switch" ? "switch" : tag === "input" && typeValue && ts.isStringLiteral(typeValue) && typeValue.text === "checkbox" ? "checkbox" : tag === "input" && typeValue && ts.isStringLiteral(typeValue) && typeValue.text === "radio" ? "radio" : tag === "input" && typeValue && ts.isStringLiteral(typeValue) && typeValue.text === "color" ? "color" : tag === "input" && typeValue && ts.isStringLiteral(typeValue) && typeValue.text === "file" ? "file-picker" : undefined;
       const prose = proseTags.has(tag) && jsxInProse(node);
-      if (!sharedFrame) found.push({ tag, line: line(node.getStart(ast)), nativeStyle: nativeStyle(tag, className), ...(prose ? { prose } : {}), ...(dialogRole ? { dialogRole: true } : {}), ...(controlKind ? { controlKind } : {}) });
+      const label = controlKind === "file-picker" && parentElement && ts.isJsxElement(parentElement) && parentElement.openingElement.tagName.getText(ast) === "label" ? elementSites.get(parentElement.openingElement) : undefined;
+      const fileFrame = label && fileFrameClass(label.className);
+      if (fileFrame) claimFileFrame(label.site, fileFrame);
+      else if (!sharedFrame) {
+        const site: TagSite = { tag, line: line(node.getStart(ast)), nativeStyle: nativeStyle(tag, className), ...(prose ? { prose } : {}), ...(dialogRole ? { dialogRole: true } : {}), ...(controlKind ? { controlKind } : {}) };
+        elementSites.set(node, { tag, className, site });
+        found.push(site);
+      }
     }
     if (ts.isCallExpression(node) && ((ts.isPropertyAccessExpression(node.expression) && ["createElement", "createElementNS"].includes(node.expression.name.text)) || (ts.isIdentifier(node.expression) && (reactFactories.has(node.expression.text) || domFactories.has(node.expression.text))))) {
       const arg = node.arguments[ts.isPropertyAccessExpression(node.expression) && node.expression.name.text === "createElementNS" ? 1 : 0];
@@ -192,8 +229,17 @@ export function sourceSites(file: string, source: string): TagSite[] {
           if (ts.isPropertyAssignment(property) && property.name && ts.isStringLiteralLike(property.initializer)) strings[property.name.getText(ast).replace(/["']/g, "")] = property.initializer.text;
         }
         const controlKind = strings.role === "switch" ? "switch" : arg.text === "input" && ["checkbox", "radio", "color", "file"].includes(strings.type ?? "") ? strings.type === "file" ? "file-picker" : strings.type as "checkbox" | "radio" | "color" : undefined;
-        const style = styledButtons.has(node) ? nativeStyle(arg.text, "ds-button") : nativeStyle(arg.text, strings.className ?? strings.class ?? "");
-        found.push({ tag: arg.text, line: line(arg.getStart(ast)), ...(style ? { nativeStyle: style } : {}), ...(controlKind ? { controlKind } : {}) });
+        const className = strings.className ?? strings.class ?? "";
+        const style = styledButtons.has(node) ? nativeStyle(arg.text, "ds-button") : nativeStyle(arg.text, className);
+        // A file input passed straight to the call that makes its label.
+        const label = controlKind === "file-picker" ? elementSites.get(node.parent) : undefined;
+        const fileFrame = label?.tag === "label" ? fileFrameClass(label.className) : undefined;
+        if (fileFrame) claimFileFrame(label!.site, fileFrame);
+        else {
+          const site: TagSite = { tag: arg.text, line: line(arg.getStart(ast)), ...(style ? { nativeStyle: style } : {}), ...(controlKind ? { controlKind } : {}) };
+          elementSites.set(node, { tag: arg.text, className, site });
+          found.push(site);
+        }
       }
     }
     if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression) && node.expression.name.text === "setAttribute") {
@@ -293,6 +339,9 @@ const lockedControlStyles = ["controls.css", ...componentStyles];
 const lockedTextStyles: LockedStyles[] = [{ names: ["text.css", ...componentStyles] }, { names: ["one.css", ...componentStyles], defines: { "one.css": /\.ds-text\s*\{/ } }];
 const lockedProseStyles = ["prose.css", ...componentStyles];
 type LockedStyles = { names: string[]; defines?: Record<string, RegExp> };
+const withoutComments = (css: string) => css.replace(/\/\*[\s\S]*?\*\//g, "");
+/** A rule whose selector names the class, outside comments. */
+export const classRule = (name: string) => new RegExp(`\\.${name}(?![\\w-])[^{};]*\\{`);
 export function checkLockedStyles(root: string, dsRoot: string, { names, defines = {} }: LockedStyles): ComponentCell | undefined {
   const lockPath = join(root, "sync.lock.json");
   if (!existsSync(lockPath)) return undefined;
@@ -316,7 +365,7 @@ export function checkLockedStyles(root: string, dsRoot: string, { names, defines
       let original: Buffer | null = null;
       try { original = execFileSync("git", ["show", `${source.commit}:DS1/1-root/${name}`], { cwd: dsRoot, stdio: ["ignore", "pipe", "ignore"] }); } catch { original = null; }
       if (!original || hash(original) !== source.files[path]) { unverifiable = true; cell.issues.push(`Source revision not verified: ${path}`); }
-      if (defines[name] && !defines[name]!.test(body.toString("utf8"))) { unverifiable = true; cell.issues.push(`No DS1 rule for these sites in ${path}`); }
+      if (defines[name] && !defines[name]!.test(withoutComments(body.toString("utf8")))) { unverifiable = true; cell.issues.push(`No DS1 rule for these sites in ${path}`); }
       const latest = join(dsRoot, "DS1/1-root", name);
       if (!existsSync(latest) || hash(readFileSync(latest)) !== hash(body)) current = false;
     }
@@ -327,7 +376,7 @@ export function checkLockedStyles(root: string, dsRoot: string, { names, defines
   }
   return best;
 }
-export const checkLockedControls = (root: string, dsRoot: string) => checkLockedStyles(root, dsRoot, { names: lockedControlStyles });
+export const checkLockedControls = (root: string, dsRoot: string, defines?: string) => checkLockedStyles(root, dsRoot, { names: lockedControlStyles, ...(defines ? { defines: { "controls.css": classRule(defines) } } : {}) });
 /** The first verified of the text sheets, else the closest attempt. */
 export function checkLockedText(root: string, dsRoot: string): ComponentCell | undefined {
   let best: ComponentCell | undefined;
@@ -461,14 +510,26 @@ export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): Ado
     if (spec.source === "direct" && resolve(root) !== resolve(dsRoot)) throw new Error("Only Design system 1 itself can be scanned as direct source.");
     const manifest = spec.source === "direct" ? directManifest : spec.manifest;
     const snapshots = spec.source === "direct" ? directSnapshots(dsRoot) : checkSnapshots(root, spec.manifest, dsRoot);
+    let lockedControls = false;
     if (spec.source !== "direct") {
       // Without a manifest copy, a product's sync.lock.json can still show its native class sheets.
       for (const [name, check] of [["controls", checkLockedControls], ["text", checkLockedText], ["prose", checkLockedProse]] as const) {
         if (snapshots[name].snapshot !== "none") continue;
         const locked = check(root, dsRoot);
-        if (locked) snapshots[name] = locked;
+        if (locked) { snapshots[name] = locked; lockedControls ||= name === "controls"; }
       }
     }
+    // A newer class is DS1 styles only where the verified copy of controls.css defines it.
+    const classEvidence = new Map<string, ComponentCell>();
+    const controlsFor = (style: string): ComponentCell => {
+      if (spec.source === "direct" || !definedNativeClasses.has(style) || snapshots.controls.snapshot !== "verified") return snapshots.controls;
+      if (!classEvidence.has(style)) {
+        const copy = lockedControls ? undefined : resolve(root, dirname(spec.manifest!), "1-root/controls.css");
+        const defined = lockedControls ? checkLockedControls(root, dsRoot, style)?.snapshot === "verified" : existsSync(copy!) && classRule(style).test(withoutComments(readFileSync(copy!, "utf8")));
+        classEvidence.set(style, defined ? snapshots.controls : { ...snapshots.controls, snapshot: "unverified", issues: [...snapshots.controls.issues, `No DS1 rule for .${style} in this copy of controls.css`] });
+      }
+      return classEvidence.get(style)!;
+    };
     app.snapshotCommit = spec.source === "direct" ? null : snapshots.commit;
     app.cells = snapshots.cells;
     const files = git(root, "ls-files", "-z", "--", ...spec.roots).split("\0").filter(f => /\.(tsx?|jsx?|[cm]js|html|astro)$/.test(f) && !excluded.test(f) && !(spec.excludes ?? []).some(prefix => f === prefix || f.startsWith(prefix + "/")) && existsSync(join(root, f)));
@@ -487,7 +548,7 @@ export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): Ado
         if (adapterTags.has(site.tag)) continue;
         const custom = /^(ds|ezo|c9y)-(.+)$/.exec(site.tag);
         const chartPart = custom?.[1] === "ds" && ["bars", "range", "ratio", "spark"].includes(custom[2] ?? "") ? "chart" : undefined;
-        const component = chartPart ?? (sharedAdapters.has(site.tag) ? sharedAdapters.get(site.tag)!.component : aliases[site.tag] ?? (custom && known.has(custom[2]!) ? custom[2]! : site.dialogRole ? "dialog" : site.controlKind ?? native[site.tag]));
+        const component = chartPart ?? (sharedAdapters.has(site.tag) ? sharedAdapters.get(site.tag)!.component : aliases[site.tag] ?? (custom && known.has(custom[2]!) ? custom[2]! : site.dialogRole ? "dialog" : (site.nativeStyle && nativeColumns[site.nativeStyle]) || (site.controlKind ?? native[site.tag])));
         if (!component) {
           if (site.tag.includes("-")) app.otherCustomElements[site.tag] = (app.otherCustomElements[site.tag] ?? 0) + 1;
           continue;
@@ -500,7 +561,7 @@ export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): Ado
           cell.current = cell.current === true && evidence.current === true;
         }
         // Native classes are verified by the sheet that draws them: controls.css, text.css, or prose.css for writing marked data-ds-prose.
-        const styled = site.nativeStyle === "ds-text" ? snapshots.text : site.nativeStyle ? snapshots.controls : site.prose ? snapshots.prose : undefined;
+        const styled = site.nativeStyle === "ds-text" ? snapshots.text : site.nativeStyle ? controlsFor(site.nativeStyle) : site.prose ? snapshots.prose : undefined;
         const kind: UsageSite["kind"] = ds ? cell.snapshot === "verified" && evidence.snapshot === "verified" ? "shared" : "unverified"
           : styled ? styled.snapshot === "verified" ? "styled" : "unverified" : "local";
         if (styled && styled.snapshot !== "verified") cell.issues = [...new Set([...cell.issues, ...styled.issues, site.nativeStyle === "ds-text" ? "Native DS1 text styles could not be verified." : site.nativeStyle ? "Native DS1 styles could not be verified." : "DS1 prose styles could not be verified."])];
@@ -528,6 +589,7 @@ export function scanReport(studio = resolve(repository, "..")): AdoptionReport {
       "Counts are authored source sites in tracked web files, read from the current working tree. A loop counts once. This is not a runtime or production audit; unused tracked source can be included.",
       "DS1 means the component and its imported dependencies match a recorded DS1 Git revision. An older verified snapshot still counts as DS1; the detail view shows whether it matches today's source. Modified or unverifiable DS1 is counted separately.",
       "DS1 styles counts native controls with literal ds-button, ds-switch, ds-input, ds-textarea, ds-select, ds-checkbox, ds-radio or ds-dialog classes and verified shared control styles: from a component manifest, or for a product that copies only the tokens and controls.css, from its sync.lock.json (the files match the lock and the lock matches DS1 at its revision). These are not Lit components. Dynamic class expressions are not inferred.",
+      "DS1 styles also counts the pieces controls.css draws on any element: ds-field in Form (with ds-field__label, ds-field__hint and ds-field__error on native text in Text), ds-avatar in Avatar, ds-badge in Badge, ds-icon in Icon and the ds-drop zone in File picker, and a button with ds-toggle in Toggle. Each counts only when the verified copy of controls.css defines its class; an older copy that does not is needs review. A native input type=file directly inside label.ds-drop or label.ds-button is that label's frame: the label counts once as a DS1-styled file picker and the input is not counted again.",
       "DS1 styles also counts native p and h1-h6 with a literal ds-text class (ds-text or a ds-text-- size or tone), verified through text.css (or, in an older copy, the one.css that held .ds-text), and native p, h1-h6, ul, ol and table inside an element marked data-ds-prose, verified through prose.css. The nearest data-ds-prose or data-ds-not-prose ancestor in the same markup or JSX decides; prose is not inferred across components or from DOM creation.",
       "Design system 1's own app and site import DS1/ directly at the same commit, so their DS1 sites count as DS1 when DS1/ has no uncommitted changes; there is no copied snapshot to verify. A checkout is dirty when the app's own folder has uncommitted changes, not the repository around it.",
       "Local means recognized ezo-/c9y- components or native button, input/select/textarea, p/headings, ul/ol, table, form and dialog, plus literal dialog/alertdialog roles, including explicit setAttribute sites. Native semantics can be intentional; these counts are review leads, not automatic defects.",

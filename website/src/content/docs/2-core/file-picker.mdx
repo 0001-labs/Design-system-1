@@ -52,3 +52,9 @@ In React, `onCancel` receives the native chooser cancellation event. Keep a menu
 that contains the picker mounted until `onChange` or `onCancel`, so returning
 from the system chooser cannot lose the selected files. Use `role="menuitem"`
 inside Menu to share its row and arrow navigation while Enter and Space stay native.
+
+## Without Lit
+
+A page without Lit draws the area with the `ds-drop` class, and the button with
+`ds-button`, on a `<label>` around the same native input; see
+[Native controls](/1-root/native-controls/#drop-zone).

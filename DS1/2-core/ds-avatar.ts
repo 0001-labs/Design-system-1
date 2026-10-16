@@ -18,10 +18,12 @@ export function avatarInk(color: string): string | undefined {
 }
 
 /**
- * A person's or workspace's mark, always round and one control high.
- * Two ways to colour it: `color` fills it, `ink` letters and outlines it on
- * the neutral fill. Identity selection and actions belong to the app.
- * `logo` is the one exception to round: a brand mark in its image area, unclipped.
+ * A person's or workspace's mark, one control high and round by default;
+ * `shape="square"` gives it a picture's corners (`--ds-avatar-radius`, the
+ * shared corner by default). Two ways to colour it: `color` fills it, `ink`
+ * letters and outlines it on the neutral fill. Identity selection, which
+ * identities are square, and actions belong to the app. `logo` is a brand
+ * mark in its image area, unclipped and with no corners at all.
  */
 export class Avatar extends LitElement {
   static properties = {
@@ -32,6 +34,7 @@ export class Avatar extends LitElement {
     color: { type: String },
     ink: { type: String },
     logo: { type: Boolean, reflect: true },
+    shape: { type: String, reflect: true },
     size: { type: String, reflect: true },
     fit: { type: String, reflect: true },
     mask: { type: Boolean, reflect: true },
@@ -48,6 +51,8 @@ export class Avatar extends LitElement {
   declare color: string;
   declare ink: string;
   declare logo: boolean;
+  /** `round` is the default; `square` takes a picture's corners. */
+  declare shape: "round" | "square";
   /** `compact` is the default size, kept for products that still name it. */
   declare size: "default" | "compact" | "large" | "fill";
   declare fit: "cover" | "contain";
@@ -66,6 +71,7 @@ export class Avatar extends LitElement {
     this.icon = "";
     this.color = "";
     this.ink = "";
+    this.shape = "round";
     this.size = "default";
     this.fit = "cover";
     this.logo = this.mask = this.outlined = this.pending = this.plain = this.loaded = this.failed = false;

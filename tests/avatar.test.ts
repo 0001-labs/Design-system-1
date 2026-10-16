@@ -1,4 +1,6 @@
 // @vitest-environment happy-dom
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { afterEach, expect, test } from "vite-plus/test";
 import { avatarInk } from "../DS1/2-core/ds-avatar";
 afterEach(() => document.body.replaceChildren());
@@ -64,15 +66,36 @@ test("public symbols and pending identity states remain shared properties", asyn
   expect(avatar.hasAttribute("pending")).toBe(false);
 });
 
-test("avatars are only round; a logo is the one mark that keeps its corners", async () => {
+test("avatars are round unless square, and a logo keeps its own corners", async () => {
   const avatar = document.createElement("ds-avatar");
   document.body.append(avatar);
   await avatar.updateComplete;
-  expect("shape" in avatar).toBe(false);
+  expect(avatar.shape).toBe("round");
+  expect(avatar.getAttribute("shape")).toBe("round");
   expect(avatar.hasAttribute("logo")).toBe(false);
+  avatar.shape = "square";
+  await avatar.updateComplete;
+  expect(avatar.getAttribute("shape")).toBe("square");
   avatar.logo = true;
   await avatar.updateComplete;
   expect(avatar.hasAttribute("logo")).toBe(true);
+});
+
+test("a square avatar takes a picture's corners, in the element and the native class alike", () => {
+  const read = (path: string) => readFileSync(join(import.meta.dirname, path), "utf8");
+  const rule = (css: string, selector: string) => {
+    const start = css.indexOf(`${selector} {`);
+    expect(start, selector).toBeGreaterThanOrEqual(0);
+    return css.slice(start, css.indexOf("}", start));
+  };
+  const element = rule(read("../DS1/2-core/styles/ds-avatar.css"), ':host([shape="square"]) .frame');
+  const native = rule(read("../DS1/1-root/controls.css"), ".ds-avatar--square");
+  for (const square of [element, native]) {
+    expect(square).toContain("border-radius: var(--ds-avatar-radius, var(--ds-radius))");
+    expect(square).toContain("corner-shape: var(--ds-corner-shape, round)");
+  }
+  expect(rule(read("../DS1/1-root/controls.css"), ".ds-avatar")).toContain("border-radius: 50%");
+  expect(read("../DS1/react/avatar.ts")).toMatch(/\| "shape"/);
 });
 
 test("an avatar is filled with a colour, or lettered in an ink on the neutral fill", async () => {

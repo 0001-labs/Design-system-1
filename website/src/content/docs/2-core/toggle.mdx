@@ -22,3 +22,5 @@ The control is 32 × 16 pixels at base scale, with a 12-pixel circular thumb and
 Import `DS1/2-core/ds-toggle` from your source copy, or select `toggle` in the Sync 1 components export. The package entry also registers it.
 
 Existing `<ds-switch>` integrations remain compatible. Use `<ds-toggle>` for the rounded Toggle shown here.
+
+A page without Lit draws this rounded switch with `ds-switch ds-switch--rounded` on the same native button. The `ds-toggle` class is something else: a toggle button that stays pressed, `<button aria-pressed>`. [Native controls](/1-root/native-controls/#toggle-button) says when to use a switch, a toggle button or a segmented control.
