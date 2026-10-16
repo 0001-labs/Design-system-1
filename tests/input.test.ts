@@ -133,3 +133,36 @@ test.each(['ds-input', 'ds-textarea'])('a reflected disabled state can re-enable
   control.formDisabledCallback(false); await control.updateComplete; await control.updateComplete;
   expect(native.disabled).toBe(false);
 });
+
+test('month and week fields, the return key label and suggestions reach the native control', async () => {
+  const { control, input } = await field('type="month" enterkeyhint="done"');
+  expect(input.type).toBe('month');
+  expect(input.getAttribute('enterkeyhint')).toBe('done');
+  control.type = 'week';
+  control.suggestions = ['Cardiff', { value: 'Cork', label: 'Cork, Ireland' }];
+  await control.updateComplete;
+  expect(input.type).toBe('week');
+  expect(input.getAttribute('list')).toBe('suggestions');
+  const options = [...control.shadowRoot!.querySelectorAll('datalist#suggestions option')];
+  expect(options.map((option) => option.getAttribute('value'))).toEqual(['Cardiff', 'Cork']);
+  expect(options[1].getAttribute('label')).toBe('Cork, Ireland');
+});
+
+test('a datalist beside the field is mirrored inside it and kept in step', async () => {
+  document.body.innerHTML = '<datalist id="towns"><option value="Bath"></option></datalist><ds-input list="towns"></ds-input>';
+  const control = document.querySelector('ds-input') as InstanceType<typeof Input>;
+  await control.updateComplete;
+  const values = () => [...control.shadowRoot!.querySelectorAll('datalist option')].map((option) => option.getAttribute('value'));
+  expect(control.shadowRoot!.querySelector('input')!.getAttribute('list')).toBe('suggestions');
+  expect(values()).toEqual(['Bath']);
+  document.getElementById('towns')!.append(Object.assign(document.createElement('option'), { value: 'Bristol' }));
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  await control.updateComplete;
+  expect(values()).toEqual(['Bath', 'Bristol']);
+});
+
+test('a field without suggestions names no list', async () => {
+  const { control, input } = await field();
+  expect(input.hasAttribute('list')).toBe(false);
+  expect(control.shadowRoot!.querySelector('datalist')).toBeNull();
+});

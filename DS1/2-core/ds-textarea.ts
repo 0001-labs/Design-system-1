@@ -106,6 +106,7 @@ export class Textarea extends Input {
       aria-invalid=${ifDefined(this.ariaInvalid || (hasError ? "true" : undefined))}
       aria-describedby=${ifDefined([description ? "description" : "", hasError ? "error" : ""].filter(Boolean).join(" ") || undefined)}
       inputmode=${ifDefined(this.inputMode || undefined)}
+      enterkeyhint=${ifDefined(this.enterKeyHint || undefined)}
       spellcheck=${ifDefined(this.spellcheckHint || undefined)}
       .name=${this.name}
       .value=${live(this.value)}

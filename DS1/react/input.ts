@@ -25,6 +25,8 @@ export type InputProps = Omit<
   revealable?: boolean;
   quietFocus?: boolean;
   error?: string;
+  /** Suggestions offered while typing; `list` names a `<datalist>` instead. */
+  suggestions?: InputElement["suggestions"];
 };
 const useCommitEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 /** Native listeners cross Lit's shadow boundary without React's input tracker.
@@ -56,7 +58,7 @@ type FieldProps = InputProps & {
 };
 export type TextareaProps = Omit<
   FieldProps,
-  "type" | "revealable" | "min" | "max" | "step" | "pattern"
+  "type" | "revealable" | "min" | "max" | "step" | "pattern" | "suggestions" | "list"
 > & { variant?: "field" | "plain" };
 function fieldAdapter<Props extends FieldProps>(tag: "ds-input" | "ds-textarea") {
   return forwardRef<InputElement, Props>(function Field(

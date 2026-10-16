@@ -21,7 +21,7 @@ Give a field a visible label. A placeholder is a hint, not a label. Put the reas
 
 | Attribute | Type | Default | What it does |
 | --- | --- | --- | --- |
-| `type` | string | `text` | Native input type, including email, password and number. |
+| `type` | string | `text` | Native input type, including email, password, number, date, month, week and time. |
 | `name` | string | Empty | Key in form data. |
 | `value` | string | Empty | Current value. |
 | `label` | string | Empty | Visible field label. |
@@ -34,6 +34,9 @@ Give a field a visible label. A placeholder is a hint, not a label. Put the reas
 | `revealable` | boolean | false | Show a password visibility button; the public type stays `password`. |
 | `quiet-focus` | boolean | false | Suppress the field focus box when its surrounding form supplies the focus treatment. |
 | `inputmode` | string | Empty | Native mobile keyboard hint, such as `numeric`. |
+| `enterkeyhint` | string | Empty | Label of the touch keyboard's return key: `enter`, `done`, `go`, `next`, `previous`, `search` or `send`. Text areas take it too. |
+| `list` | string | Empty | The id of a `<datalist>` beside the field. Its options are mirrored inside the field, which a shadow root would otherwise keep from reaching them, and follow its changes. |
+| `suggestions` | property | `[]` | Suggestions offered while typing, as strings or `{ value, label }`; wins over `list`. The React `Input` takes it as a prop. |
 | `aria-label` / `aria-labelledby` | string | Empty | Name the native field, including labels in the parent shadow root. |
 | `aria-invalid` | string | Empty | Forward an application validation state to the native field. |
 | `aria-describedby` | string | Empty | Copy the referenced description into the field's shadow root. |

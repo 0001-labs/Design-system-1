@@ -21,6 +21,9 @@ export class Input extends LitElement {
   static properties: PropertyDeclarations = {
     type: { type: String, reflect: true },
     inputMode: { type: String, attribute: "inputmode" },
+    enterKeyHint: { type: String, attribute: "enterkeyhint" },
+    list: { type: String },
+    suggestions: { attribute: false },
     ariaLabel: { type: String, attribute: "aria-label" },
     ariaLabelledBy: { type: String, attribute: "aria-labelledby" },
     ariaDescribedBy: { type: String, attribute: "aria-describedby" },
@@ -64,9 +67,21 @@ export class Input extends LitElement {
     | "url"
     | "search"
     | "date"
+    | "month"
+    | "week"
     | "time"
     | "datetime-local";
   declare inputMode: string;
+  /** The return key's label on a touch keyboard: enter, done, go, next, previous, search or send. */
+  declare enterKeyHint: string;
+  /**
+   * The id of a `<datalist>` beside the field. A shadow root keeps the inner
+   * input from reaching it, so its options are mirrored inside, and kept in step.
+   */
+  declare list: string;
+  /** Suggestions offered while typing, as a datalist would. Wins over `list`. */
+  declare suggestions: readonly (string | { value: string; label?: string })[];
+  private listObserver?: MutationObserver;
   declare ariaLabel: string;
   declare ariaLabelledBy: string;
   declare ariaDescribedBy: string;
@@ -105,6 +120,9 @@ export class Input extends LitElement {
     super();
     this.type = "text";
     this.inputMode = "";
+    this.enterKeyHint = "";
+    this.list = "";
+    this.suggestions = [];
     this.ariaLabel = "";
     this.ariaLabelledBy = "";
     this.ariaDescribedBy = "";
@@ -168,6 +186,8 @@ export class Input extends LitElement {
     this.removeEventListener("click", this.focusFromLabel);
     window.removeEventListener("language-changed", this.boundHandlers.languageChanged);
     window.removeEventListener("translations-loaded", this.boundHandlers.languageChanged);
+    this.listObserver?.disconnect();
+    this.listObserver = undefined;
   }
 
   firstUpdated(): void {
@@ -182,7 +202,37 @@ export class Input extends LitElement {
     }
     if (this.initialValue === undefined) this.initialValue = this.value;
     if (changedProperties.has("type") && this.type !== "password") this._passwordVisible = false;
+    if (changedProperties.has("list")) this.observeList();
     this.syncForm();
+  }
+
+  private listSource(): HTMLDataListElement | null {
+    if (!this.list) return null;
+    const root = this.getRootNode() as Document | ShadowRoot;
+    const source = root.getElementById?.(this.list);
+    return source instanceof HTMLDataListElement ? source : null;
+  }
+
+  private observeList(): void {
+    this.listObserver?.disconnect();
+    this.listObserver = undefined;
+    const source = this.listSource();
+    if (!source || typeof MutationObserver === "undefined") return;
+    this.listObserver = new MutationObserver(() => this.requestUpdate());
+    this.listObserver.observe(source, { childList: true, subtree: true, attributes: true, characterData: true });
+  }
+
+  /** The options the field offers, from `suggestions` or the named datalist. */
+  protected suggestionOptions(): { value: string; label?: string }[] {
+    if (this.suggestions?.length) return this.suggestions.map((option) => (typeof option === "string" ? { value: option } : option));
+    const source = this.listSource();
+    return source ? [...source.options].map((option) => ({ value: option.value, label: option.label !== option.value ? option.label : undefined })) : [];
+  }
+
+  protected renderSuggestions(options: { value: string; label?: string }[]) {
+    return options.length
+      ? html`<datalist id="suggestions">${options.map((option) => html`<option value=${option.value} label=${ifDefined(option.label)}></option>`)}</datalist>`
+      : null;
   }
 
   protected get input(): HTMLInputElement | HTMLTextAreaElement | null {
@@ -412,6 +462,7 @@ export class Input extends LitElement {
   }
 
   protected renderControl(hasError: boolean, description: string) {
+    const suggestions = this.suggestionOptions();
     return html`<input
       id="input"
       part="input"
@@ -420,6 +471,8 @@ export class Input extends LitElement {
       aria-invalid=${ifDefined(this.ariaInvalid || (hasError ? "true" : undefined))}
       aria-describedby=${ifDefined([description ? "description" : "", hasError ? "error" : ""].filter(Boolean).join(" ") || undefined)}
       inputmode=${ifDefined(this.inputMode || undefined)}
+      enterkeyhint=${ifDefined(this.enterKeyHint || undefined)}
+      list=${ifDefined(suggestions.length ? "suggestions" : undefined)}
       spellcheck=${ifDefined(this.spellcheckHint || undefined)}
       .name=${this.name}
       .value=${live(this.value)}
@@ -441,7 +494,7 @@ export class Input extends LitElement {
       @keydown=${this.handleKeyDown}
       @focus=${this._handleFocus}
       @blur=${this._handleBlur}
-    />`;
+    />${this.renderSuggestions(suggestions)}`;
   }
 
   render() {
