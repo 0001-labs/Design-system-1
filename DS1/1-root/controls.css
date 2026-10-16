@@ -555,3 +555,381 @@ dialog.ds-dialog::backdrop {
   color: var(--ds-title-color);
   font-size: var(--ds-type-size-small);
 }
+
+/*
+ * Pieces the components draw, as classes on native elements: a field's label
+ * row, an avatar, a badge, a toggle button, an icon and a file drop zone. Each
+ * reads the same tokens as its element, so a page without Lit draws the same
+ * look.
+ */
+
+/*
+ * `.ds-field` is the label row `ds-input` draws, around any native control:
+ * the label (`.ds-field__label`) on a one-square line above it, then a hint
+ * (`.ds-field__hint`) in the muted ink and an error (`.ds-field__error`) in
+ * the danger colour, each on one-square lines. Every row is at least one
+ * square high and a control lower than that stands centred on it, so the
+ * field keeps to whole squares. `.ds-field--beside` sets the label beside the
+ * control, in a column `--ds-field-label-width` wide (four squares), with the
+ * hint and the error under the control. An empty hint or error takes no room,
+ * so the error can stay in the page as a live region.
+ */
+
+.ds-field {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-rows: minmax(var(--ds-row-height), auto);
+  align-items: center;
+  justify-items: start;
+  min-width: 0;
+  margin: 0;
+  color: var(--ds-text-color);
+  font-family: var(--ds-typeface-regular);
+  font-feature-settings: var(--ds-font-features);
+  font-size: var(--ds-type-size-default);
+  font-weight: var(--ds-type-weight-default);
+  line-height: var(--ds-unit);
+  letter-spacing: var(--ds-type-letterspacing-default);
+}
+
+.ds-field > :is(.ds-input, .ds-select, .ds-textarea) {
+  justify-self: stretch;
+}
+
+.ds-field__label,
+.ds-field__hint,
+.ds-field__error {
+  display: block;
+  min-width: 0;
+  margin: 0;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+.ds-field__label {
+  color: var(--ds-field-label-color, var(--ds-text-color));
+}
+
+.ds-field__hint {
+  color: var(--ds-text-color-muted);
+}
+
+.ds-field__error {
+  color: var(--ds-danger-color);
+}
+
+.ds-field__hint:empty,
+.ds-field__error:empty {
+  display: none;
+}
+
+.ds-field--beside {
+  grid-template-columns: var(--ds-field-label-width, calc(4 * var(--ds-unit))) minmax(0, 1fr);
+}
+
+.ds-field--beside > * {
+  grid-column: 2;
+}
+
+.ds-field--beside > .ds-field__label {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: start;
+}
+
+/*
+ * `.ds-avatar` is the `ds-avatar` element's mark: round and one control high,
+ * an initial in small type on the neutral fill, or an `<img alt="">` after the
+ * initial, covering it. While the picture loads the initial shows; remove a
+ * picture that fails (`onerror`), as the element does, or the browser draws
+ * its broken-image mark. `--large` is two squares with type a square high,
+ * `--pair` fits two characters between the hairline edges, `--square` gives it
+ * a picture's corners, `--outlined` draws the hairline in its ink and
+ * `--pending` greys out someone who has not accepted yet.
+ * `--ds-avatar-background` fills it with a colour and `--ds-avatar-color`
+ * letters it: on a fill, pick the black or white ink that reads on it
+ * (`--ds-black`, `--ds-white`).
+ */
+
+.ds-avatar {
+  --ds-avatar-size: var(--ds-control-height);
+  --ds-avatar-pair-type-size: var(--ds-type-size-small);
+  box-sizing: border-box;
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  vertical-align: middle;
+  width: var(--ds-avatar-size);
+  height: var(--ds-avatar-size);
+  overflow: hidden;
+  border-radius: 50%;
+  corner-shape: round;
+  background: var(--ds-avatar-background, var(--ds-fill));
+  color: var(--ds-avatar-color, var(--ds-text-color));
+  font: var(--ds-type-weight-default) var(--ds-type-size-small) / 1 var(--ds-typeface-regular);
+  letter-spacing: normal;
+  text-align: center;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.ds-avatar > img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ds-avatar--large {
+  --ds-avatar-size: calc(2 * var(--ds-unit));
+  --ds-avatar-pair-type-size: var(--ds-type-size-default);
+  font-size: var(--ds-unit);
+}
+
+.ds-avatar--pair {
+  font-size: min(var(--ds-avatar-pair-type-size), calc((var(--ds-avatar-size) - 2px) / 2));
+}
+
+.ds-avatar--square {
+  border-radius: var(--ds-avatar-radius, var(--ds-radius));
+  corner-shape: var(--ds-corner-shape, round);
+}
+
+.ds-avatar--outlined::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--ds-avatar-outline, currentColor);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.ds-avatar--pending {
+  background: var(--ds-fill);
+  color: var(--ds-text-color-muted);
+}
+
+.ds-avatar--pending > img {
+  filter: grayscale(1);
+  opacity: 0.5;
+}
+
+/*
+ * `.ds-badge` is the `ds-badge` element's status label: one square high on the
+ * neutral fill, its words padded 4px and cut short with an ellipsis, never a
+ * button. Where the browser can size to content in calc (calc-size), its width
+ * rounds up to whole squares as the element's does; elsewhere it hugs the
+ * words. An icon inside is a `.ds-icon` before the words. `--icon` shows the
+ * icon alone, one square wide, and keeps the words for assistive technology:
+ * put them in an element of their own. `--ds-badge-background` and
+ * `--ds-badge-color` give a status a meaningful colour.
+ */
+
+.ds-badge {
+  box-sizing: border-box;
+  display: inline-block;
+  flex: 0 0 auto;
+  vertical-align: middle;
+  width: max-content;
+  width: calc-size(max-content, round(up, size, var(--ds-unit)));
+  min-width: var(--ds-row-height);
+  max-width: 100%;
+  height: var(--ds-row-height);
+  padding: 0 calc(4px * var(--ds-sf));
+  overflow: hidden;
+  background: var(--ds-badge-background, var(--ds-fill));
+  color: var(--ds-badge-color, var(--ds-text-color));
+  font-family: var(--ds-typeface-regular);
+  font-feature-settings: var(--ds-font-features);
+  font-size: var(--ds-type-size-default);
+  font-weight: var(--ds-type-weight-default);
+  line-height: var(--ds-row-height);
+  letter-spacing: var(--ds-type-letterspacing-default);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-badge > .ds-icon {
+  vertical-align: top;
+  margin-top: calc((var(--ds-row-height) - var(--ds-icon-box, var(--ds-control-height))) / 2);
+  margin-right: calc(4px * var(--ds-sf));
+}
+
+.ds-badge--icon {
+  position: relative;
+  width: var(--ds-row-height);
+  padding: 0;
+  text-align: center;
+}
+
+.ds-badge--icon > .ds-icon {
+  margin-right: 0;
+}
+
+.ds-badge--icon > :not(.ds-icon) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/*
+ * `.ds-toggle` makes a `.ds-button` a toggle button, `<button aria-pressed>`:
+ * the secondary button's grey while it is off, the primary button's accent
+ * while it is on, as a chosen segment of `.ds-tabs[role="group"]` is. Its
+ * words stay the same in both states; the page toggles `aria-pressed`.
+ * A setting that is on or off is a `.ds-switch`; one of several choices is a
+ * `.ds-tabs[role="group"]`.
+ */
+
+.ds-toggle {
+  --ds-button-padding: 0 calc(4px * var(--ds-sf));
+  --ds-button-background: var(--ds-button-background-color-secondary);
+}
+
+.ds-toggle:hover:not(:disabled, [aria-disabled="true"]) {
+  --ds-button-background: var(--ds-fill-hover);
+}
+
+.ds-toggle[aria-pressed="true"],
+.ds-toggle[aria-pressed="true"]:hover:not(:disabled, [aria-disabled="true"]) {
+  --ds-button-background: var(--ds-button-background-color-primary);
+  --ds-button-color: var(--ds-button-text-color-on-accent);
+}
+
+/*
+ * `.ds-icon` is the `ds-icon` element's drawing without the element: a
+ * Design system 1 icon file as a mask, painted in the text colour
+ * (`--ds-icon-color`), 14px by default, 12px with `--small` and 16px with
+ * `--large`, times the scale. `--ds-icon` names the file, as Sync 1's `icons`
+ * export copies it: `style="--ds-icon: url(icons/close.svg)"` (a path from the
+ * page) or a rule per icon in the page's stylesheet. The mask takes only the
+ * drawing's shape, so an icon with colours of its own is an `<img>`. These
+ * rules have no specificity: a page that drew its own `.ds-icon` keeps its
+ * rule until it removes it.
+ */
+
+:where(.ds-icon) {
+  --ds-icon-box: calc(var(--ds-icon-size, 14px) * var(--ds-sf));
+  display: inline-block;
+  flex: 0 0 auto;
+  width: var(--ds-icon-box);
+  height: calc(var(--ds-icon-box) / var(--ds-icon-ratio, 1));
+  color: var(--ds-icon-color, currentColor);
+  background-color: currentColor;
+  -webkit-mask: var(--ds-icon) center / contain no-repeat;
+  mask: var(--ds-icon) center / contain no-repeat;
+}
+
+:where(.ds-icon--small) {
+  --ds-icon-size: 12px;
+}
+
+:where(.ds-icon--large) {
+  --ds-icon-size: 16px;
+}
+
+/*
+ * `.ds-drop` is `ds-file-picker`'s area on a `<label>` around a native
+ * `<input type="file">`: the secondary button's face, as wide as its row and
+ * eight squares high (`--compact`: four), its words centred in a square of
+ * padding. The input covers the zone unseen, so a click, the keyboard and a
+ * dropped file all reach it, and the browser keeps labels, forms, `required`,
+ * `multiple` and reset. Keyboard focus draws the focus ring. A page that also
+ * handles drops on a larger surface sets `data-dragging` on the zone while
+ * files are dragged over it, for the ring and the hover fill. A `.ds-button`
+ * on a `<span>` inside draws a button face among the words.
+ *
+ * The same native input directly inside a `label.ds-button` is the file
+ * picker's button: the button's face, one square high.
+ */
+
+.ds-drop {
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--ds-unit) / 2);
+  width: 100%;
+  min-width: 0;
+  height: calc(8 * var(--ds-unit));
+  margin: 0;
+  padding: var(--ds-unit);
+  overflow: hidden;
+  border-radius: var(--ds-radius);
+  corner-shape: var(--ds-corner-shape, round);
+  background: var(--ds-button-background-color-secondary);
+  color: var(--ds-button-text-color);
+  font-family: var(--ds-typeface-regular);
+  font-feature-settings: var(--ds-font-features);
+  font-size: var(--ds-type-size-default);
+  font-weight: var(--ds-type-weight-default);
+  line-height: var(--ds-type-lineheight-default);
+  letter-spacing: var(--ds-type-letterspacing-default);
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ds-drop--compact {
+  height: calc(4 * var(--ds-unit));
+}
+
+label.ds-button:has(> input[type="file"]) {
+  --ds-button-height: var(--ds-row-height);
+  position: relative;
+  overflow: hidden;
+}
+
+:is(.ds-drop, label.ds-button) > input[type="file"]:not([hidden]) {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+:is(.ds-drop, label.ds-button) > input[type="file"]::file-selector-button {
+  cursor: pointer;
+}
+
+.ds-drop:hover:not(:has(> input:disabled)),
+.ds-drop[data-dragging]:not(:has(> input:disabled)) {
+  background: var(--ds-fill-hover);
+}
+
+.ds-drop:has(> input:focus-visible),
+.ds-drop[data-dragging]:not(:has(> input:disabled)),
+label.ds-button:has(> input[type="file"]:focus-visible) {
+  outline: 2px solid var(--ds-focus-ring);
+  outline-offset: 1px;
+}
+
+.ds-drop:has(> input:disabled),
+label.ds-button:has(> input[type="file"]:disabled) {
+  cursor: default;
+  opacity: 0.5;
+}
+
+:is(.ds-drop, label.ds-button) > input[type="file"]:disabled {
+  cursor: default;
+}
