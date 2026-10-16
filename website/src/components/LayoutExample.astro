@@ -1,6 +1,7 @@
 ---
 import { LAYOUT_EXAMPLES } from '../lib/layout-examples';
 import { layersIn } from '../lib/component-layers';
+import ExampleCode from './ExampleCode.astro';
 interface Props { layout: string; }
 const { layout } = Astro.props;
 const sample = LAYOUT_EXAMPLES[layout];
@@ -9,16 +10,10 @@ const inside = layersIn(sample.html);
 ---
 <section class="layout-example not-content" data-layout-example={layout} aria-label={`${sample.name} layout`}>
   <div class="layout-toolbar">
-    <div role="group" aria-label="Preview width">
-      <button type="button" data-preview-width="computer" aria-pressed="true">Computer</button>
-      <button type="button" data-preview-width="phone" aria-pressed="false">Phone</button>
-    </div>
-    <div role="group" aria-label="Preview appearance">
-      <button type="button" data-preview-theme="light" aria-pressed="true">Light</button>
-      <button type="button" data-preview-theme="dark" aria-pressed="false">Dark</button>
-    </div>
-    <div>
-      <button type="button" data-preview-layers aria-pressed="false">Show layers</button>
+    <ds-button split literal aria-label="Preview width" options="computer:Computer,phone:Phone" value="computer" data-preview-width></ds-button>
+    <ds-button split literal aria-label="Preview appearance" options="light:Light,dark:Dark" value="light" data-preview-theme></ds-button>
+    <div class="layout-toolbar-end">
+      <ds-button control="slotted" choice><button type="button" data-preview-layers aria-pressed="false">Show layers</button></ds-button>
       <a href={`/examples/layouts/${layout}/`} target="_blank" rel="noopener">Open full size</a>
     </div>
   </div>
@@ -34,14 +29,10 @@ const inside = layersIn(sample.html);
       </div>
     ))}
   </dl>
-  <details class="layout-source">
-    <summary>Code</summary>
-    <div class="layout-code"><button type="button" data-copy="html">Copy HTML</button><pre><code>{sample.html}</code></pre><textarea hidden data-source="html">{sample.html}</textarea></div>
-    {sample.script && <div class="layout-code"><button type="button" data-copy="script">Copy JavaScript</button><pre><code>{sample.script}</code></pre><textarea hidden data-source="script">{sample.script}</textarea></div>}
-  </details>
-  <span class="layout-status" role="status" aria-live="polite"></span>
+  <ExampleCode html={sample.html} script={sample.script} />
 </section>
 <script>
+  import { onChoice } from '../lib/example-controls';
   document.querySelectorAll<HTMLElement>('[data-layout-example]').forEach(example => {
     const frame = example.querySelector<HTMLIFrameElement>('iframe')!;
     const readout = example.querySelector<HTMLElement>('[data-readout]')!;
@@ -58,42 +49,24 @@ const inside = layersIn(sample.html);
       if (event.data?.type === 'ds1-example-ready') send();
       if (event.data?.type === 'ds1-layout-inspect') readout.textContent = event.data.text || resting;
     });
-    const press = (selector: string, chosen: HTMLElement) => example.querySelectorAll<HTMLElement>(selector).forEach(option => option.setAttribute('aria-pressed', String(option === chosen)));
-    example.querySelectorAll<HTMLButtonElement>('[data-preview-theme]').forEach(button => button.addEventListener('click', () => {
-      theme = button.dataset.previewTheme!;
-      press('[data-preview-theme]', button);
-      send();
-    }));
-    example.querySelectorAll<HTMLButtonElement>('[data-preview-width]').forEach(button => button.addEventListener('click', () => {
-      example.toggleAttribute('data-phone', button.dataset.previewWidth === 'phone');
-      press('[data-preview-width]', button);
-    }));
+    onChoice(example.querySelector('[data-preview-theme]'), value => { theme = value; send(); });
+    onChoice(example.querySelector('[data-preview-width]'), value => example.toggleAttribute('data-phone', value === 'phone'));
     const layersButton = example.querySelector<HTMLButtonElement>('[data-preview-layers]')!;
     layersButton.addEventListener('click', () => {
       layers = !layers;
       layersButton.setAttribute('aria-pressed', String(layers));
+      layersButton.parentElement!.toggleAttribute('active', layers);
       example.toggleAttribute('data-layers', layers);
       send();
     });
-    example.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach(button => button.addEventListener('click', async () => {
-      const status = example.querySelector<HTMLElement>('.layout-status')!;
-      try {
-        await navigator.clipboard.writeText(example.querySelector<HTMLTextAreaElement>(`[data-source="${button.dataset.copy}"]`)!.value);
-        status.textContent = 'Copied';
-      } catch { status.textContent = 'Select the code to copy it.'; }
-    }));
   });
 </script>
 <style is:global>
   .layout-example { --layout-unit: calc(20px * var(--sf, 1)); margin-block: var(--layout-unit) calc(2 * var(--layout-unit)); color: var(--text-color); font-size: 14px; line-height: var(--layout-unit); }
-  .layout-example .layout-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: calc(10px * var(--sf, 1)) var(--layout-unit); padding-block: calc(10px * var(--sf, 1)); }
-  .layout-example .layout-toolbar > div { display: flex; gap: calc(4px * var(--sf, 1)); }
-  .layout-example .layout-toolbar > :last-child { margin-inline-start: auto; align-items: center; }
+  .layout-example .layout-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: calc(var(--layout-unit) / 2) var(--layout-unit); padding-block: calc(var(--layout-unit) / 2); }
   .layout-example .layout-toolbar a { padding: 0 4px; color: inherit; }
-  .layout-example button { font: inherit; color: inherit; background: transparent; border: 0; padding: 0 4px; line-height: var(--layout-unit); cursor: pointer; border-radius: 4px; }
-  .layout-example button[aria-pressed='true'] { background: var(--accent-color); color: var(--black); }
-  .layout-example [data-preview-layers][aria-pressed='true'] { background: var(--pink); }
-  .layout-example :is(button, summary, a):focus-visible { outline: 1px solid currentColor; outline-offset: 2px; }
+  .layout-example .layout-toolbar-end { display: flex; align-items: center; gap: calc(4px * var(--sf, 1)); margin-inline-start: auto; }
+  .layout-example .layout-toolbar a:focus-visible { outline: 1px solid currentColor; outline-offset: 2px; }
   .layout-example .layout-stage { border: 1px solid var(--slate-light); }
   .layout-example iframe { display: block; width: 100%; margin-inline: auto; border: 0; background: var(--background); }
   .layout-example[data-phone] iframe { width: calc(375px * var(--sf, 1)); max-width: 100%; border-inline: 1px solid var(--slate-light); }
@@ -107,10 +80,5 @@ const inside = layersIn(sample.html);
   .layout-example [data-layer='4'] { --swatch: var(--pink); }
   .layout-example [data-layer='3'] { --swatch: var(--zenith-blue); }
   .layout-example [data-layer='2'] { --swatch: var(--apple-green); }
-  .layout-example .layout-source summary { cursor: pointer; line-height: var(--layout-unit); }
-  .layout-example .layout-code { margin-block: calc(10px * var(--sf, 1)); }
-  .layout-example .layout-code > button { display: block; margin-left: auto; }
-  .layout-example pre { margin: 0; padding: var(--layout-unit); overflow-x: auto; border-radius: 4px; font-size: 13px; line-height: var(--layout-unit); }
-  .layout-example .layout-status { display: block; min-height: var(--layout-unit); font-size: 10px; }
   @media (prefers-color-scheme: dark) { .layout-example :is(.layout-stage, iframe) { border-color: var(--slate-dark); } }
 </style>

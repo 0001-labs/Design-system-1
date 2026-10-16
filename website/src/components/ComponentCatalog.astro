@@ -8,16 +8,12 @@ import { LAYERS } from '../lib/component-directory';
 const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
 ---
     <div class="docs-tool not-content"><div class="directory component-catalog" data-view="examples">
-      <div class="directory-toggle" role="group" aria-label="Show components as">
-        <button type="button" data-view-option="examples" aria-pressed="true">Examples</button>
-        <button type="button" data-view-option="names" aria-pressed="false">Name</button>
-        <button type="button" data-view-option="tags" aria-pressed="false">&lt;element&gt;</button>
-      </div>
+      <ds-button split literal class="directory-toggle" aria-label="Show components as" options="examples:Examples,names:Name,tags:<element>" value="examples" data-view-choice></ds-button>
 
       <div class="gallery-intro">
         <p>See the actual components. Try their controls, switch the preview’s theme, then copy the code.</p>
         <label for="component-search">Find a component</label>
-        <input id="component-search" type="search" placeholder="Button, tooltip, ds-input…" />
+        <ds-input id="component-search" type="search" placeholder="Button, tooltip, ds-input…"></ds-input>
         <p id="component-count" role="status" aria-live="polite"></p>
       </div>
       <div class="examples-gallery">
@@ -61,23 +57,19 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
     </div></div>
 
     <script>
+      import { onChoice } from '../lib/example-controls';
       const root = document.querySelector<HTMLElement>('.component-catalog')!;
       try { const saved = localStorage.getItem('ds1-directory-view'); if (saved === 'tags' || saved === 'names') root.dataset.view = saved; } catch {}
-      const options = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-view-option]'));
-      const show = (view: string) => {
+      const choice = root.querySelector<HTMLElement & { value: string }>('[data-view-choice]')!;
+      choice.setAttribute('value', root.dataset.view ?? 'examples');
+      onChoice(choice, view => {
         root.dataset.view = view;
-        options.forEach((option) => option.setAttribute('aria-pressed', String(option.dataset.viewOption === view)));
-      };
-      show(root.dataset.view ?? 'examples');
-      options.forEach((option) => option.addEventListener('click', () => {
-        const view = option.dataset.viewOption ?? 'names';
-        show(view);
         try { localStorage.setItem('ds1-directory-view', view); } catch {}
-      }));
-      const search = document.querySelector<HTMLInputElement>('#component-search')!;
+      });
+      const search = document.querySelector<HTMLElement & { value: string }>('#component-search')!;
       const entries = Array.from(document.querySelectorAll<HTMLElement>('[data-component-search]'));
       const filter = () => {
-        const query = search.value.trim().toLowerCase();
+        const query = (search.value ?? '').trim().toLowerCase();
         entries.forEach(entry => { entry.hidden = !entry.dataset.componentSearch!.includes(query); });
         document.querySelectorAll<HTMLElement>('.gallery-layer').forEach(layer => { layer.hidden = !layer.querySelector('[data-component-search]:not([hidden])'); });
         const count = entries.filter(entry => !entry.hidden).length;
@@ -99,7 +91,7 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
       .gallery-intro { margin-bottom: calc(40px * var(--sf, 1)); max-width: calc(640px * var(--sf, 1)); }
       .gallery-intro p { margin: 0 0 calc(20px * var(--sf, 1)); }
       .gallery-intro label { display: block; }
-      .gallery-intro input { width: 100%; height: calc(20px * var(--sf, 1)); border: 1px solid var(--directory-line); border-radius: 4px; background: var(--directory-bg); color: inherit; font: inherit; padding: 0 4px; }
+      .gallery-intro ds-input { display: block; width: 100%; }
       .gallery-intro #component-count { font-size: 10px; margin: 0; }
       .gallery-layer { border-top: 1px solid var(--directory-line); padding-block: calc(20px * var(--sf, 1)); }
       .gallery-layer h2 { margin: 0; font-size: 17px; font-weight: 400; }
@@ -131,17 +123,7 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
       a { color: inherit; text-decoration: none; }
       :is(a, button):focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 
-      .directory-toggle { display: flex; width: fit-content; margin-block: var(--site-unit); border: 1px solid var(--directory-ink); }
-      .directory-toggle button {
-        min-height: 40px;
-        padding: 0 16px;
-        border: 0;
-        background: transparent;
-        color: inherit;
-        font: inherit;
-        cursor: pointer;
-      }
-      .directory-toggle button[aria-pressed='true'] { background: var(--directory-ink); color: var(--directory-bg); }
+      .directory-toggle { margin-block: var(--site-unit); }
 
       & { padding: 0; }
       .directory h1 {

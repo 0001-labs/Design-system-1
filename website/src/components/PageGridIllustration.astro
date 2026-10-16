@@ -34,8 +34,8 @@ const presets = [
   <div class="layout-switcher">
     <span data-layout-name aria-live="polite" aria-atomic="true">Portfolio</span>
     <div class="layout-arrows">
-      <button type="button" data-layout-direction="-1" aria-label="Previous layout" aria-controls="layout-stage">←</button>
-      <button type="button" data-layout-direction="1" aria-label="Next layout" aria-controls="layout-stage">→</button>
+      <ds-button control="slotted" icon><button type="button" data-layout-direction="-1" aria-label="Previous layout" aria-controls="layout-stage"><ds-icon type="left" aria-hidden="true"></ds-icon></button></ds-button>
+      <ds-button control="slotted" icon><button type="button" data-layout-direction="1" aria-label="Next layout" aria-controls="layout-stage"><ds-icon type="right" aria-hidden="true"></ds-icon></button></ds-button>
     </div>
   </div>
   <div id="layout-stage" class="layout-stage">
@@ -104,23 +104,6 @@ const presets = [
     line-height: var(--landing-unit);
   }
   .layout-arrows { display: flex; gap: var(--landing-unit); }
-  .layout-arrows button {
-    display: grid;
-    place-items: center;
-    width: var(--landing-unit);
-    height: var(--landing-unit);
-    padding: 0;
-    border: 0;
-    background: transparent;
-    color: inherit;
-    font-family: 'Inter Arrows', Inter, sans-serif;
-    font-size: var(--landing-type);
-    font-weight: 400;
-    line-height: 1;
-    cursor: pointer;
-  }
-  .layout-arrows button:hover { background: var(--button-background-color-secondary); }
-  .layout-arrows button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
   [data-layout-panel][hidden] { display: none; }
   [data-layout-panel] { width: 100%; }
   .preset-grid {

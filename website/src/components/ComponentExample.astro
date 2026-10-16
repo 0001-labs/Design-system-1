@@ -1,5 +1,6 @@
 ---
 import { EXAMPLES } from '../lib/component-examples';
+import ExampleCode from './ExampleCode.astro';
 interface Props { example: string; compact?: boolean; }
 const { example, compact = false } = Astro.props;
 const sample = EXAMPLES[example];
@@ -8,23 +9,18 @@ if (!sample) throw new Error(`Unknown component example: ${example}`);
 <section class="component-example not-content" data-example={example} aria-label={sample.title}>
   <div class="example-toolbar">
     <span>{sample.title}</span>
-    <div role="group" aria-label="Preview appearance">
-      <button type="button" data-preview-theme="light" aria-pressed="true">Light</button>
-      <button type="button" data-preview-theme="dark" aria-pressed="false">Dark</button>
-      <button type="button" data-preview-reset>Reset</button>
+    <div class="example-toolbar-actions">
+      <ds-button split literal aria-label="Preview appearance" options="light:Light,dark:Dark" value="light" data-preview-theme></ds-button>
+      <ds-button control="slotted"><button type="button" data-preview-reset>Reset</button></ds-button>
     </div>
   </div>
   <iframe src={`/examples/${example}/`} title={`${sample.title} — interactive preview`} loading="lazy" style={`height: ${sample.height ?? 160}px;`} data-preview-frame></iframe>
   <p class="example-hint">{sample.hint}</p>
-  <details class="example-source" open={!compact}>
-    <summary>Code</summary>
-    <div class="example-code"><button type="button" data-copy-example>Copy HTML</button><pre><code>{sample.html}</code></pre><textarea hidden data-example-html>{sample.html}</textarea></div>
-    {sample.script && <div class="example-code"><button type="button" data-copy-script>Copy JavaScript</button><pre><code>{sample.script}</code></pre><textarea hidden data-example-script>{sample.script}</textarea></div>}
-  </details>
-  <span class="example-status" role="status" aria-live="polite"></span>
+  <ExampleCode html={sample.html} script={sample.script} open={!compact} />
 </section>
 <script>
-  document.querySelectorAll<HTMLElement>('[data-example]').forEach(example => {
+  import { onChoice } from '../lib/example-controls';
+  document.querySelectorAll<HTMLElement>('section[data-example]').forEach(example => {
     const frame = example.querySelector<HTMLIFrameElement>('iframe')!;
     let theme = 'light';
     const sendTheme = () => frame.contentWindow?.postMessage({ type: 'ds1-example-theme', theme }, location.origin);
@@ -32,37 +28,15 @@ if (!sample) throw new Error(`Unknown component example: ${example}`);
     window.addEventListener('message', event => {
       if (event.origin === location.origin && event.source === frame.contentWindow && event.data?.type === 'ds1-example-ready') sendTheme();
     });
-    example.querySelectorAll<HTMLButtonElement>('[data-preview-theme]').forEach(button => button.addEventListener('click', () => {
-      theme = button.dataset.previewTheme!;
-      example.querySelectorAll<HTMLElement>('[data-preview-theme]').forEach(option => option.setAttribute('aria-pressed', String(option.dataset.previewTheme === theme)));
-      sendTheme();
-    }));
+    onChoice(example.querySelector('[data-preview-theme]'), value => { theme = value; sendTheme(); });
     example.querySelector('[data-preview-reset]')?.addEventListener('click', () => { frame.src = frame.src; });
-    const copy = async (selector: string) => {
-      const status = example.querySelector<HTMLElement>('.example-status')!;
-      try {
-        await navigator.clipboard.writeText(example.querySelector<HTMLTextAreaElement>(selector)!.value);
-        status.textContent = 'Copied';
-      } catch { status.textContent = 'Select the code to copy it.'; }
-    };
-    example.querySelector('[data-copy-example]')?.addEventListener('click', () => copy('[data-example-html]'));
-    example.querySelector('[data-copy-script]')?.addEventListener('click', () => copy('[data-example-script]'));
   });
 </script>
 <style is:global>
   .component-example { --example-unit: calc(20px * var(--sf, 1)); margin-block: var(--example-unit); color: var(--text-color); border-block: 1px solid var(--slate-light); font-size: 14px; line-height: var(--example-unit); }
-  .component-example .example-toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: calc(10px * var(--sf, 1)); padding-block: calc(10px * var(--sf, 1)); }
-  .component-example .example-toolbar > div { display: flex; gap: calc(10px * var(--sf, 1)); }
-  .component-example button { font: inherit; color: inherit; background: transparent; border: 0; padding: 0 4px; line-height: var(--example-unit); cursor: pointer; border-radius: 4px; }
-  .component-example button[aria-pressed='true'] { background: var(--accent-color); color: var(--black); }
-  .component-example :is(button, summary):focus-visible { outline: 1px solid currentColor; outline-offset: 2px; }
+  .component-example .example-toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: calc(var(--example-unit) / 2); padding-block: calc(var(--example-unit) / 2); }
+  .component-example .example-toolbar-actions { display: flex; align-items: center; gap: calc(var(--example-unit) / 2); }
   .component-example iframe { display: block; width: 100%; border: 0; background: var(--background); }
-  .component-example .example-hint { margin: calc(10px * var(--sf, 1)) 0; font-size: 14px; color: var(--text-color); }
-  .component-example .example-source { margin: 0; }
-  .component-example .example-source summary { cursor: pointer; line-height: var(--example-unit); }
-  .component-example .example-code { position: relative; margin-block: calc(10px * var(--sf, 1)); }
-  .component-example .example-code > button { display: block; margin-left: auto; }
-  .component-example pre { margin: 0; padding: var(--example-unit); overflow-x: auto; border-radius: 4px; font-size: 13px; line-height: var(--example-unit); }
-  .component-example .example-status { display: block; min-height: var(--example-unit); font-size: 10px; }
+  .component-example .example-hint { margin: calc(var(--example-unit) / 2) 0; font-size: 14px; color: var(--text-color); }
   @media (prefers-color-scheme: dark) { .component-example { border-color: var(--slate-dark); } }
 </style>

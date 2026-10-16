@@ -3,9 +3,9 @@ import { emailExamples } from '../lib/email-examples';
 ---
 <div class="email-showcase">
   <div class="email-controls">
-    <label>Example <select data-example>{emailExamples.map(e => <option value={e.id}>{e.label}</option>)}</select></label>
-    <label>Width <select data-width><option value="800">Desktop</option><option value="380">Phone</option></select></label>
-    <label>Paper <select data-theme><option value="light">Light</option><option value="dark">Dark</option></select></label>
+    <label>Example <ds-select><select data-example>{emailExamples.map(e => <option value={e.id}>{e.label}</option>)}</select></ds-select></label>
+    <label>Width <ds-select><select data-width><option value="800">Desktop</option><option value="380">Phone</option></select></ds-select></label>
+    <label>Paper <ds-select><select data-theme><option value="light">Light</option><option value="dark">Dark</option></select></ds-select></label>
   </div>
   <div class="email-preview"><iframe title="Email design preview" sandbox="allow-same-origin" srcdoc={emailExamples[0].html} /></div>
   <details><summary>Plain text</summary><pre data-text>{emailExamples[0].text}</pre></details>
@@ -34,7 +34,6 @@ import { emailExamples } from '../lib/email-examples';
 <style>
   .email-controls { display:flex;flex-wrap:wrap;gap:20px;margin:20px 0;font-size:14px;line-height:20px; }
   label { display:flex;gap:10px;align-items:center; }
-  select { font:inherit;color:inherit;background:var(--background);height:20px;padding:0 4px;border:1px solid currentColor;border-radius:4px; }
   .email-preview { overflow:auto;max-width:100%; }
   iframe { display:block;width:800px;height:1000px;border:0;margin:0 auto; }
   details { margin-top:20px; }

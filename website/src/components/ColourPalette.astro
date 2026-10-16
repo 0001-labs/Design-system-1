@@ -10,7 +10,7 @@ const palette = colours.filter(c => !c.ink);
 const inks = colours.filter(c => c.ink);
 ---
     <div class="colours not-content">
-      <div class="colours-bar"><div class="mode-tabs" role="tablist" aria-label="Mode"><button role="tab" id="tab-light" aria-controls="light" aria-selected="true">Light</button><button role="tab" id="tab-dark" aria-controls="dark" aria-selected="false" tabindex="-1">Dark</button></div></div>
+      <div class="colours-bar"><ds-tabs class="mode-tabs" aria-label="Mode"><ds-button control="host" role="tab" id="tab-light" aria-controls="light" aria-selected="true" active>Light</ds-button><ds-button control="host" role="tab" id="tab-dark" aria-controls="dark" aria-selected="false" tabindex="-1">Dark</ds-button></ds-tabs></div>
       {[['light', 'Light'], ['dark', 'Dark']].map(([mode]) => (
         <div id={mode} class={`mode ${mode}`} role="tabpanel" aria-labelledby={`tab-${mode}`} hidden={mode === 'dark'}>
           <section>
@@ -27,12 +27,10 @@ const inks = colours.filter(c => c.ink);
         </div>
       ))}
       <script is:inline>
+        // ds-tabs moves between the tabs with the arrow keys; each tab shows its own panel.
         const tabs = [...document.querySelectorAll('.mode-tabs [role=tab]')];
-        const show = tab => tabs.forEach(t => { const on = t === tab; t.setAttribute('aria-selected', on); t.tabIndex = on ? 0 : -1; document.getElementById(t.getAttribute('aria-controls')).hidden = !on; });
-        tabs.forEach((tab, i) => {
-          tab.addEventListener('click', () => show(tab));
-          tab.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { const next = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length]; show(next); next.focus(); } });
-        });
+        const show = tab => tabs.forEach(t => { const on = t === tab; t.setAttribute('aria-selected', on); t.toggleAttribute('active', on); t.tabIndex = on ? 0 : -1; document.getElementById(t.getAttribute('aria-controls')).hidden = !on; });
+        tabs.forEach(tab => tab.addEventListener('click', () => show(tab)));
       </script>
     </div>
 
@@ -53,10 +51,6 @@ const inks = colours.filter(c => c.ink);
       /* The title small, and Light and Dark as one split button at the right, both on one 20px row. */
       .colours-bar { display: flex; align-items: center; justify-content: space-between; height: 20px; margin-top: 40px; padding: 0 20px; }
       .colours-bar h1 { margin: 0; font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: 0; }
-      .mode-tabs { display: flex; border: 1px solid #1e1e1e; border-radius: 4px; overflow: hidden; }
-      .mode-tabs button { width: 60px; height: 18px; padding: 0; border: 0; border-radius: 0; background: transparent; font-size: 14px; line-height: 18px; color: inherit; }
-      .mode-tabs button + button { border-left: 1px solid #1e1e1e; }
-      .mode-tabs button[aria-selected=true], .mode-tabs button[aria-selected=true]:hover { background: #1e1e1e; color: #fbfcf6; }
       .mode { margin-top: 20px; padding: 0 20px 40px; }
       .mode.dark { background: #1e1e1e; color: #e6e6e6; }
       .mode.dark .swatch code { color: #b3b3b3; }
