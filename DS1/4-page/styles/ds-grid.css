@@ -1,95 +1,41 @@
-/* ds-grid.css */
-/* Grid layout component styles */
-
+/* A one-square pitch by default. Rules stay hairlines at every surface scale. */
 :host {
-  margin-top: 0.5px !important;
-  margin-left: 0.5px !important;
-  display: grid;
-  width: 1440px;
-  height: 1280px;
-  grid-template-columns: repeat(auto-fill, 19px);
-  grid-template-rows: repeat(auto-fill, 19px);
-  gap: 1px;
-  row-rule: calc(1px * var(--sf)) solid var(--grid-color);
-  column-rule: calc(1px * var(--sf)) solid var(--grid-color);
-  outline: calc(1px * var(--sf)) solid light-dark(var(--sharp-blue), var(--yellow));
+  --grid-scale: var(--ds-sf, var(--sf, 1));
+  display: block;
   position: fixed;
   top: 0;
   left: 50%;
   transform: translateX(-50%);
+  width: var(--ds-grid-width, calc(1440px * var(--grid-scale)));
+  height: var(--ds-grid-height, max(100vh, calc(1280px * var(--grid-scale))));
   pointer-events: none;
-  z-index: 300;
+  z-index: var(--ds-grid-z-index, 300);
 }
-
-/* DO NOT CHANGE THIS GRID CODE FOR MOBILE. ITS PERFECT FOR MOBILE. */
-:host(.mobile) {
-  width: calc(100% - calc(1px * var(--sf)));
-  max-width: 100vw;
-  margin-left: 0.5px !important;
-  margin-top: 0 !important;
-  box-sizing: border-box;
-  position: fixed;
-  top: calc(0.5px * var(--sf));
-  left: 50%;
-  transform: translateX(-50%);
-  pointer-events: none;
-  z-index: 300;
-  gap: calc(1px * var(--sf));
-  grid-template-columns: repeat(14, calc(19px * var(--sf)));
-  grid-template-rows: repeat(auto-fill, calc(19px * var(--sf)));
+:host([hidden]) { display: none; }
+:host([align="left"]) { left: 0; transform: none; }
+:host([align="right"]) { left: auto; right: 0; transform: none; }
+@media (max-width: 768px) {
+  :host { width: calc(100% - 1px); max-width: 100vw; }
 }
-
-:host([align="left"]) {
-  left: 0;
-  transform: none;
+/* The containing element establishes positioning; its content stays above the paper. */
+:host([contained]) { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; transform: none; z-index: 0; }
+.paper {
+  position: absolute;
+  inset: 0;
+  --cell: var(--ds-grid-unit, calc(var(--pitch-x) * var(--grid-scale)));
+  --row: var(--ds-grid-row, calc(var(--pitch-y) * var(--grid-scale)));
+  --stroke: var(--ds-grid-stroke, 1px);
+  background-color: var(--paper);
+  background-size: var(--cell) var(--row);
+  background-position: calc(var(--ds-grid-origin-x, 0px) - var(--stroke) / 2) calc(var(--ds-grid-origin-y, 0px) - var(--stroke) / 2);
+  background-repeat: repeat;
 }
-
-:host([align="center"]) {
-  left: 50%;
-  transform: translateX(-50%);
+[data-pattern="grid"] { background-image: linear-gradient(to right, var(--ink) var(--stroke), transparent var(--stroke)), linear-gradient(to bottom, var(--ink) var(--stroke), transparent var(--stroke)); }
+[data-pattern="lines"] { background-image: linear-gradient(to bottom, var(--ink) var(--stroke), transparent var(--stroke)); }
+[data-pattern="columns"] { background-image: linear-gradient(to right, var(--ink) var(--stroke), transparent var(--stroke)); }
+[data-pattern="dots"] {
+  background-image: radial-gradient(circle, var(--ink) var(--stroke), transparent var(--stroke));
+  background-position: var(--ds-grid-origin-x, 0px) calc(var(--ds-grid-origin-y, 0px) - var(--row) / 2);
 }
-
-:host([align="right"]) {
-  left: auto;
-  right: 0;
-  transform: none;
-}
-
-/* Visible 19px tracks when CSS Gap Decorations (`row-rule`) is unavailable */
-@supports not (row-rule: 1px solid black) {
-  :host {
-    background-image:
-      repeating-linear-gradient(
-        to right,
-        transparent 0,
-        transparent 19px,
-        var(--grid-color) 19px,
-        var(--grid-color) 20px
-      ),
-      repeating-linear-gradient(
-        to bottom,
-        transparent 0,
-        transparent 19px,
-        var(--grid-color) 19px,
-        var(--grid-color) 20px
-      );
-  }
-
-  :host(.mobile) {
-    background-image:
-      repeating-linear-gradient(
-        to right,
-        transparent 0,
-        transparent calc(19px * var(--sf, 1)),
-        var(--grid-color) calc(19px * var(--sf, 1)),
-        var(--grid-color) calc(20px * var(--sf, 1))
-      ),
-      repeating-linear-gradient(
-        to bottom,
-        transparent 0,
-        transparent calc(19px * var(--sf, 1)),
-        var(--grid-color) calc(19px * var(--sf, 1)),
-        var(--grid-color) calc(20px * var(--sf, 1))
-      );
-  }
-}
+[data-pattern="none"] { background-image: none; }
+@media print { :host(:not([contained])) { display: none; } }

@@ -1,74 +1,54 @@
-// ds-grid.ts
-// Simple grid layout component
-
 import { LitElement, html, unsafeCSS } from "lit";
-import { detectMobileDevice } from "../0-face/device";
+import { styleMap } from "lit/directives/style-map.js";
+import { define } from "../0-face/define";
 import styles from "./styles/ds-grid.css?inline";
 
-declare global {
-  interface CustomElementRegistry {
-    define(name: string, constructor: typeof LitElement): void;
-  }
-  var customElements: CustomElementRegistry;
-}
+export type GridPattern = "grid" | "lines" | "columns" | "dots" | "none";
+const patterns = new Set<GridPattern>(["grid", "lines", "columns", "dots", "none"]);
 
+/** Decorative paper or an alignment overlay; never arranges or captures content. */
 export class Grid extends LitElement {
   static properties = {
-    align: { type: String },
+    align: { type: String, reflect: true },
+    pattern: { type: String, reflect: true },
+    size: { type: Number },
+    rowSize: { type: Number, attribute: "row-size" },
+    color: { type: String },
+    paper: { type: String },
+    contained: { type: Boolean, reflect: true },
   };
-
-  align?: string;
-  private resizeObserver?: () => void;
-  private resizeTimeout?: any;
-
+  declare align: "left" | "center" | "right";
+  declare pattern: GridPattern;
+  declare size: number;
+  declare rowSize: number | undefined;
+  declare color: string;
+  declare paper: string;
+  declare contained: boolean;
   static styles = unsafeCSS(styles);
 
-  connectedCallback() {
-    super.connectedCallback();
-    this.updateMobileClass();
-
-    // Listen for resize events to update mobile class
-    this.resizeObserver = () => {
-      if (this.resizeTimeout) {
-        clearTimeout(this.resizeTimeout);
-      }
-      this.resizeTimeout = setTimeout(() => {
-        this.updateMobileClass();
-      }, 100);
-    };
-    window.addEventListener("resize", this.resizeObserver);
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback();
-    if (this.resizeObserver) {
-      window.removeEventListener("resize", this.resizeObserver);
-    }
-    if (this.resizeTimeout) {
-      clearTimeout(this.resizeTimeout);
-    }
-  }
-
-  private updateMobileClass() {
-    const isMobile = detectMobileDevice();
-    if (isMobile) {
-      this.classList.add("mobile");
-      this.classList.remove("desktop");
-    } else {
-      this.classList.add("desktop");
-      this.classList.remove("mobile");
-    }
+  constructor() {
+    super();
+    this.align = "center";
+    this.pattern = "grid";
+    this.size = 20;
+    this.rowSize = undefined;
+    this.color = "";
+    this.paper = "";
+    this.contained = false;
   }
 
   render() {
-    return html``;
+    const size = Number.isFinite(this.size) && this.size > 0 ? this.size : 20;
+    const row = Number.isFinite(this.rowSize) && this.rowSize! > 0 ? this.rowSize! : size;
+    return html`<div aria-hidden="true" class="paper" data-pattern=${patterns.has(this.pattern) ? this.pattern : "grid"}
+      style=${styleMap({
+        "--pitch-x": `${size}px`,
+        "--pitch-y": `${row}px`,
+        "--ink": this.color || "var(--ds-grid-color, color-mix(in srgb, var(--ds-text-color, var(--text-color, currentColor)) 12%, transparent))",
+        "--paper": this.paper || "var(--ds-grid-paper, transparent)",
+      })}></div>`;
   }
 }
 
-customElements.define("ds-grid", Grid);
-
-declare global {
-  interface HTMLElementTagNameMap {
-    "ds-grid": Grid;
-  }
-}
+define("ds-grid", Grid);
+declare global { interface HTMLElementTagNameMap { "ds-grid": Grid } }

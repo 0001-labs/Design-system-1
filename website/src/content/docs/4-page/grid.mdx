@@ -1,26 +1,40 @@
 ---
 title: Grid
-description: A fixed alignment overlay with a 20px pitch.
+description: Lines, squares, dots and coloured paper on the shared grid.
 ---
 
 import ComponentExample from "../../../components/ComponentExample.astro";
 
-A fixed alignment overlay with a 20px pitch.
+Lines, squares, dots or plain paper, with independent ink and paper colours. The default pitch is one 20px square. The Grid draws the background; your layout places the content.
 
 ## Try it
 
 <ComponentExample example="grid" />
 
-## What you are seeing
+## Attributes
 
-The overlay uses 19px tracks and 1px lines. It is fixed over the document and has `pointer-events: none`, so it does not intercept clicks or arrange children.
+| Attribute | Default | What it does |
+| --- | --- | --- |
+| `pattern` | `grid` | `grid`, `lines`, `columns`, `dots` or `none`. |
+| `size` | `20` | Column spacing in unscaled pixels; `10` gives half squares. |
+| `row-size` | Same as `size` | Independent row pitch, such as `30` for taller rows. |
+| `color` | Quiet neutral ink | Any CSS colour, including a token such as `var(--ds-sharp-blue)`. |
+| `paper` | Transparent | Any CSS colour or colour mix for the paper. |
+| `contained` | false | Fill a positioned container instead of overlaying the viewport. |
+| `align` | `center` | `left`, `center` or `right` for the fixed overlay. |
 
-## Attribute
+Use a positioned wrapper for contained paper. Keep content in a positioned sibling above the Grid, as in the example. The component ignores pointer events and has no interactive or readable content. Changing the ruling does not move or resize the surrounding content.
 
-`align` accepts `left`, `center` or `right`. On a phone the overlay follows fourteen scaled columns. Keep the mobile track math intact.
+Colours can use `light-dark()` or inherited theme tokens. Removing `color` or `paper` restores the theme default. `pattern="none"` keeps the paper colour while removing its marks.
+
+## Scale and alignment
+
+`--ds-sf` scales spacing and overlay dimensions; `--sf` is the fallback for older surfaces. A 20px pitch remains aligned with a fourteen-square phone layout when it shares that layout's scale. Rules stay one physical CSS pixel by default.
+
+Override `--ds-grid-color`, `--ds-grid-paper`, `--ds-grid-stroke`, `--ds-grid-origin-x` and `--ds-grid-origin-y` at the host. `--ds-grid-unit` and `--ds-grid-row` accept already-scaled pitches. The fixed overlay accepts `--ds-grid-width`, `--ds-grid-height` and `--ds-grid-z-index`. A contained Grid fills its wrapper and scrolls with it.
 
 ## Page shortcuts
 
-On the documentation, press **G three times** to toggle the shared page grid. Press **L three times** for labelled layout areas; give those areas `data-ds-area="name"`. Escape hides the overlays. Typing in a field does not trigger them.
+On the documentation, press **G three times** to toggle the separate page inspection grid. Press **L three times** for labelled layout areas; give those areas `data-ds-area="name"`. Escape hides the inspection overlays. Typing in a field does not trigger them.
 
 [Layout](/4-page/layout/) · [Styling](/1-root/styling/)

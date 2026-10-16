@@ -143,9 +143,27 @@ render();`,
     height: 200,
   },
   'grid': {
-    title: 'The page grid', hint: 'A fixed alignment overlay. It does not lay out content.',
-    html: '<ds-grid align="left"></ds-grid>\n<ds-text>Each square is 20px: a 19px track and a 1px line.</ds-text>',
-    height: 240,
+    title: 'Patterns and paper', hint: 'Change the ruling, spacing, ink and paper. The content stays in place.',
+    html: `<div class="grid-controls">
+  <label>Pattern <ds-select><select data-grid-option="pattern"><option value="grid">Squares</option><option value="lines">Lines</option><option value="columns">Columns</option><option value="dots">Dots</option><option value="none">Plain</option></select></ds-select></label>
+  <label>Spacing <ds-select><select data-grid-option="size"><option value="10">10px</option><option value="20" selected>20px</option><option value="40">40px</option></select></ds-select></label>
+  <label>Rows <ds-select><select data-grid-option="row-size"><option value="">Square</option><option value="30">30px</option><option value="40">40px</option></select></ds-select></label>
+  <label>Ink <ds-select><select data-grid-option="color"><option value="">Neutral</option><option value="var(--ds-sharp-blue)">Blue</option><option value="var(--ds-apple-green)">Green</option><option value="var(--ds-pink)">Pink</option></select></ds-select></label>
+  <label>Paper <ds-select><select data-grid-option="paper"><option value="">Clear</option><option value="color-mix(in srgb, var(--ds-sharp-blue) 12%, var(--background))">Blue</option><option value="color-mix(in srgb, var(--ds-apple-green) 12%, var(--background))">Green</option><option value="color-mix(in srgb, var(--ds-pink) 12%, var(--background))">Pink</option></select></ds-select></label>
+</div>
+<div style="position: relative; isolation: isolate; width: 100%; min-height: calc(160px * var(--ds-sf, 1));">
+  <ds-grid contained></ds-grid>
+  <div style="position: relative; padding: calc(20px * var(--ds-sf, 1));"><ds-text>Words stay on the paper.</ds-text></div>
+</div>`,
+    script: `const grid = document.querySelector('ds-grid');
+document.querySelectorAll('[data-grid-option]').forEach(control => {
+  control.addEventListener('change', () => {
+    const attribute = control.dataset.gridOption;
+    if (control.value) grid.setAttribute(attribute, control.value);
+    else grid.removeAttribute(attribute);
+  });
+});`,
+    height: 360,
   },
   'layout': {
     title: 'Named page areas', hint: 'The company layout places content in named CSS grid areas.',

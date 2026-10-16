@@ -23,6 +23,9 @@ const sample = EXAMPLES[example];
   #sample { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; }
   #sample > :is(ds-input, ds-card, ds-accordion, ds-table, ds-form, ds-list, ds-container, ds-layout) { flex-basis: 100%; }
   body[data-example-id='gap'] #sample { display: block; }
+  .grid-controls { display: flex; flex-wrap: wrap; gap: calc(10px * var(--ds-sf, 1)); width: 100%; }
+  .grid-controls label { display: flex; flex-direction: column; gap: calc(4px * var(--ds-sf, 1)); font-size: var(--ds-type-size-small); }
+  .grid-controls ds-select { width: calc(5 * var(--ds-unit)); }
   #event-output { display: block; margin-top: 20px; color: var(--text-color); font-size: 10px; overflow-wrap: anywhere; }
   button { font: inherit; line-height: 20px; border: 0; border-radius: 4px; color: var(--black); background: var(--accent-color); padding: 0 4px; cursor: pointer; }
 </style>

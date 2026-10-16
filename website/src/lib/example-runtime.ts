@@ -71,6 +71,15 @@ if (sidebar) {
   sidebar.addEventListener('sidebar-activate', event => { selected = (event as CustomEvent).detail.id; render(); output.textContent = `Selected: ${selected}`; });
   render();
 }
+const grid = sample.querySelector('ds-grid');
+if (grid) sample.querySelectorAll<HTMLSelectElement>('[data-grid-option]').forEach(control => {
+  control.addEventListener('change', () => {
+    const attribute = control.dataset.gridOption!;
+    if (control.value) grid.setAttribute(attribute, control.value);
+    else grid.removeAttribute(attribute);
+    output.textContent = `${attribute}: ${control.selectedOptions[0].text}`;
+  });
+});
 const table = sample.querySelector<DsTable>('ds-table');
 if (table) table.data = TABLE_DATA;
 // A tooltip example should show the label on first sight, before someone
