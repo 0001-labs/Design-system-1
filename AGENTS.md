@@ -4,6 +4,14 @@
 
 Component-based design system with Lit Web Components.
 
+## System parts
+
+System node: `ds1` ([map](https://system.0001.dev/system?focus=ds1)). Follow the studio’s Selecting System requirements workflow; inspect current edges for Stack dependencies and their evidence.
+
+- Recorded relationships — shared: `auth`, `id1`, `documentation`; local: `design`, `language`, `themes`, `platform-web`; dependency: `sharing`.
+- Decisions/exceptions: Architecture, Distribution and Design rules below define the foundation source; Sign-in and Private font workspace define the separate application and private-data scope.
+- Coverage: relationships select guides, not proof of acceptance. Proposed (`opportunity`) and unknown (`unverified`) relationships stay distinct; verify applicable requirements for the current change.
+
 ## No product names
 
 Design system 1 is a general design system anyone can use. Never name 0001's products (Ezo, Link, Consistency, Peer, Ins, tau99, Visual, the 0001 site, …) anywhere in it: not in components, their comments, CSS, tests, examples, docs, the website or the skill's rules for a component. Describe what a component does and how it looks on its own terms ("filled with a colour", "one control high"), never by the product it came from ("Link's fill", "Ezo's badge size"). The products' own briefs are where they say what they take from it.
