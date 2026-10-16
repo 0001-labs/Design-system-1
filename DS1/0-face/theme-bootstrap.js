@@ -48,7 +48,7 @@
   function options() { return window.DS_ONE_PREFERENCES || {}; }
   function key() { return options().themeStorageKey || "ds-one:theme"; }
   function query(media) {
-    try { return window.matchMedia ? window.matchMedia(media) : null; } catch (error) { return null; }
+    try { return window.matchMedia ? window.matchMedia(media) : null; } catch { return null; }
   }
 
   function mode() {
@@ -57,7 +57,7 @@
     try {
       var stored = window.localStorage.getItem(key());
       if (MODES.indexOf(stored) >= 0) return stored;
-    } catch (error) { /* Storage can be blocked. */ }
+    } catch { /* Storage can be blocked. */ }
     return "system";
   }
 
@@ -101,10 +101,10 @@
       var transition = document.startViewTransition(once);
       crossing = transition;
       // A skipped crossing rejects all three promises; none may swallow the change.
-      transition.ready.catch(function () {});
-      transition.updateCallbackDone.catch(once);
-      transition.finished.catch(function () {}).then(function () { if (crossing === transition) crossing = null; });
-    } catch (error) {
+      void transition.ready.catch(function () {});
+      void transition.updateCallbackDone.catch(once);
+      void transition.finished.catch(function () {}).then(function () { if (crossing === transition) crossing = null; });
+    } catch {
       once();
     }
   }
@@ -127,7 +127,7 @@
     if (options().themeMode === "system") {
       if (choice !== "system") session = choice;
     } else {
-      try { window.localStorage.setItem(key(), choice); } catch (error) { session = choice; }
+      try { window.localStorage.setItem(key(), choice); } catch { session = choice; }
     }
     apply();
   }
@@ -137,7 +137,7 @@
     try {
       var language = window.localStorage.getItem(i18n.storageKey || "language");
       if (language && /^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$/.test(language) && (!i18n.languages || i18n.languages.indexOf(language) >= 0)) root.lang = language;
-    } catch (error) { /* Storage can be blocked. */ }
+    } catch { /* Storage can be blocked. */ }
   }
 
   window.DS_ONE_THEME = {
