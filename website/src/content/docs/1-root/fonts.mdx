@@ -1,0 +1,16 @@
+---
+title: Fonts
+description: Olivetti Dot, Supernatural in development, and the typefaces used in Design system 1.
+---
+
+import FontCatalog from '../../../components/FontCatalog.astro';
+
+<FontCatalog />
+
+## Using the system fonts
+
+The system stylesheet loads GT America Standard Regular and Medium, GT America Compressed Regular, the GT Canon trial, and Iosevka. Noto Sans provides Japanese, Simplified Chinese and Traditional Chinese text through the language-specific tokens. Inter Arrows leads every typeface token and supplies the arrows.
+
+Use `--typeface-regular` for body text, `--typeface-medium` for emphasis, `--typeface-compressed` for narrow display text and `--typeface-mono` for code. `--typeface-canon` uses the bundled trial face. Check the original foundry's licence before using a commercial or trial font in your own work.
+
+Olivetti Dot is available here as a specimen; it is not loaded by the system stylesheet. Supernatural has no font asset or typeface token yet.

@@ -1,0 +1,153 @@
+---
+import '../../../DS1/1-root/controls.css';
+
+const systemFonts = [
+  { name: 'GT America Standard', detail: 'Regular and Medium · Interface and text', face: 'regular', sample: 'Words to work with.' },
+  { name: 'GT America Compressed', detail: 'Regular · Narrow display', face: 'compressed', sample: 'A little more room.' },
+  { name: 'GT Canon', detail: 'M Standard Medium Trial · Serif', face: 'canon', sample: 'A different point of view.' },
+  { name: 'Iosevka', detail: 'Regular · Monospaced code', face: 'mono', sample: 'const square = 20;' },
+];
+---
+
+<div class="font-catalog not-content" data-ds-surface>
+  <p class="intro">Letterforms, from a matrix of dots to the rhythm of a hand.</p>
+  <nav class="font-index" aria-label="Typefaces">
+    <a href="#olivetti-dot">Olivetti Dot</a>
+    <a href="#supernatural">Supernatural</a>
+    <a href="#system-fonts">System fonts</a>
+  </nav>
+
+  <section id="olivetti-dot" aria-labelledby="olivetti-title">
+    <div class="family-heading">
+      <h2 id="olivetti-title">Olivetti Dot</h2>
+      <span>Regular · Dot matrix</span>
+    </div>
+    <p>A dot-matrix alphabet with round marks and proportional spacing. One empty column separates the letters.</p>
+    <div class="specimen-tools" hidden data-specimen-tools>
+      <label for="olivetti-size">Specimen size</label>
+      <select class="ds-select" id="olivetti-size" aria-controls="olivetti-specimen">
+        <option value="20">20 px</option>
+        <option value="40" selected>40 px</option>
+        <option value="60">60 px</option>
+        <option value="80">80 px</option>
+      </select>
+      <span id="specimen-help">Click the text to try your own words.</span>
+    </div>
+    <p data-font-status role="status">Loading the Olivetti Dot specimen…</p>
+    <noscript>The interactive specimen needs JavaScript. Olivetti Dot Regular is included with this page.</noscript>
+    <div data-olivetti-samples hidden>
+      <div id="olivetti-specimen" class="dot-specimen" contenteditable="plaintext-only" role="textbox" aria-label="Try Olivetti Dot" aria-multiline="true" aria-describedby="specimen-help" spellcheck="false">Every dot counts.</div>
+      <div class="alphabet" aria-label="Olivetti Dot alphabet and supported characters">
+        <div>ABCDEFGHIJKLMNOPQRSTUVWXYZ</div>
+        <div>abcdefghijklmnopqrstuvwxyz</div>
+        <div>0123456789</div>
+        <div>{'!"#$%&\'()*+,-./:;<=>?@[\\]^_|~ £© ÅÆØåæø'}</div>
+      </div>
+    </div>
+    <p class="family-detail">101 encoded characters, including spaces. English alphabet, numerals, punctuation and Å Æ Ø å æ ø. Characters outside this set use a fallback.</p>
+  </section>
+
+  <section id="supernatural" aria-labelledby="supernatural-title">
+    <div class="family-heading">
+      <h2 id="supernatural-title">Supernatural</h2>
+      <span>Handwriting · In development</span>
+    </div>
+    <p>A typeface based on Joachim’s own handwriting. Personal quirks, uneven forms and the rhythm of words belong in the design.</p>
+    <dl class="development-details">
+      <div><dt>Starting alphabet</dt><dd>English</dd></div>
+      <div><dt>Planned variation</dt><dd>About ten forms per letter</dd></div>
+      <div><dt>Intended behaviour</dt><dd>Contextual letter selection, natural spacing and rhythm</dd></div>
+      <div><dt>Next step</dt><dd>Original handwriting scans</dd></div>
+    </dl>
+    <p class="pending">The specimen is still to come. Handwriting scans, outlines and font files have not been supplied. This description is set in the system font.</p>
+  </section>
+
+  <section id="system-fonts" aria-labelledby="system-fonts-title">
+    <h2 id="system-fonts-title">System fonts</h2>
+    <p>The existing typefaces remain the foundation for interfaces, reading and code.</p>
+    {systemFonts.map(font => (
+      <div class="system-family">
+        <div class="family-heading"><h3>{font.name}</h3><span>{font.detail}</span></div>
+        <div class={`system-specimen face-${font.face}`}>{font.sample}</div>
+        {font.face === 'regular' && <div class="medium-sample">The same words, with a little emphasis.</div>}
+      </div>
+    ))}
+  </section>
+</div>
+
+<script>
+  const samples = document.querySelector<HTMLElement>('[data-olivetti-samples]');
+  const status = document.querySelector<HTMLElement>('[data-font-status]');
+  const tools = document.querySelector<HTMLElement>('[data-specimen-tools]');
+  const size = document.querySelector<HTMLSelectElement>('#olivetti-size');
+  const specimen = document.querySelector<HTMLElement>('#olivetti-specimen');
+  size?.addEventListener('change', () => {
+    specimen?.style.setProperty('--specimen-size', `${size.value}px`);
+  });
+  document.fonts.load('40px "Olivetti Dot"').then(faces => {
+    if (!faces.length) throw new Error('Font unavailable');
+    if (samples) samples.hidden = false;
+    if (tools) tools.hidden = false;
+    if (status) status.hidden = true;
+  }).catch(() => {
+    if (status) status.textContent = 'The Olivetti Dot specimen could not load. Reload the page to try again.';
+  });
+</script>
+
+<style>
+  @font-face {
+    font-family: 'Olivetti Dot';
+    src: url('../assets/fonts/OlivettiDot-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  .font-catalog {
+    --square: calc(20px * var(--sf));
+    --ds-sf: var(--sf);
+    font-family: var(--typeface-regular);
+    color: var(--ds1-docs-header-text);
+  }
+  .font-catalog [hidden] { display: none; }
+  .font-catalog p, .font-catalog dt, .font-catalog dd, .font-catalog span, .font-catalog label, .font-catalog a {
+    font-family: var(--typeface-regular);
+    font-size: var(--type-size-default);
+    line-height: var(--square);
+  }
+  .font-catalog p { margin: var(--square) 0; max-width: 65ch; }
+  .font-index { display: flex; flex-wrap: wrap; gap: var(--square); }
+  .font-index a { color: inherit; text-underline-offset: calc(4px * var(--sf)); }
+  .font-catalog section { margin-top: calc(3 * var(--square)); scroll-margin-top: var(--square); }
+  .font-catalog h2, .font-catalog h3 {
+    margin: 0; padding: 0; font-family: var(--typeface-medium);
+    font-size: var(--type-size-default); line-height: var(--square); font-weight: 400; letter-spacing: 0;
+  }
+  .family-heading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0 var(--square); }
+  .family-heading span, .family-detail { color: var(--ds1-docs-header-text-secondary); }
+  .specimen-tools { display: flex; flex-wrap: wrap; align-items: center; gap: calc(var(--square) / 2); margin-top: var(--square); }
+  .specimen-tools select { width: calc(4 * var(--square)); }
+  .dot-specimen, .alphabet, .alphabet div { font-family: 'Inter Arrows', 'Olivetti Dot', sans-serif; font-weight: 400; letter-spacing: 0; }
+  .dot-specimen {
+    --specimen-size: 40px;
+    font-size: calc(var(--specimen-size) * var(--sf)); line-height: 1.5;
+    min-height: calc(5 * var(--square)); padding: var(--square) 0;
+    white-space: pre-wrap; overflow-wrap: anywhere;
+  }
+  .alphabet { font-size: var(--square); line-height: calc(2 * var(--square)); overflow-wrap: anywhere; }
+  .development-details { margin: calc(2 * var(--square)) 0; }
+  .development-details > div { display: grid; grid-template-columns: calc(9 * var(--square)) minmax(0, 1fr); }
+  .development-details dt { color: var(--ds1-docs-header-text-secondary); }
+  .development-details dd { margin: 0; }
+  .pending { color: var(--ds1-docs-header-text-secondary); }
+  .system-family { margin-top: calc(2 * var(--square)); }
+  .system-specimen { font-size: calc(2 * var(--square)); line-height: calc(3 * var(--square)); overflow-wrap: anywhere; }
+  .face-regular { font-family: var(--typeface-regular); }
+  .face-compressed { font-family: var(--typeface-compressed); }
+  .face-canon { font-family: var(--typeface-canon); }
+  .face-mono { font-family: var(--typeface-mono); }
+  .medium-sample { font-family: var(--typeface-medium); font-size: var(--type-size-default); line-height: var(--square); }
+  .font-catalog :is(a, select, [contenteditable]):focus-visible { outline: 2px solid currentColor; outline-offset: calc(4px * var(--sf)); }
+  @media (max-width: 50rem) {
+    .development-details > div { grid-template-columns: 1fr; margin-bottom: var(--square); }
+  }
+</style>
