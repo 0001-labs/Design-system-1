@@ -47,9 +47,6 @@ const { sidebar } = Astro.locals.starlightRoute;
       const href = entry.href ?? (entry.entries ? overviewPaths[entry.label] : undefined);
       const id = href ?? `${parent}/group-${index}`;
       const item: SidebarItem = { id, label: label(entry.label), depth, href, current: href ? location.pathname.replace(/\/$/, "") === href.replace(/\/$/, "") : entry.isCurrent };
-      if (location.pathname.replace(/\/$/, '') === '/2-core/icon/collection' && entry.href?.startsWith('/2-core/icon/collection/')) {
-        item.current = entry.href.includes('#builder') ? location.hash === '#builder' : location.hash !== '#builder';
-      }
       if (entry.href === "/app/libraries" && !signedIn) { item.label = "Sign in to My libraries"; item.href = "/app/signin"; }
       if (!entry.entries) return [item];
       item.expanded = !collapsed.has(id);

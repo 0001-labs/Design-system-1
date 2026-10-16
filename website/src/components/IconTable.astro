@@ -1,0 +1,28 @@
+---
+// Every shared interface icon, by name, in the catalogue's order. A cell is
+// the icon's SVG as a download; nothing else to choose or set.
+import { scopedSvg } from '../lib/icons/svgView';
+import icons from '../lib/icons/interface-catalog.json';
+---
+<div class="icon-table not-content">
+  <p class="icon-count">{icons.length} icons · 16 × 16 · click one to download its SVG</p>
+  <ul class="icons">{icons.map(icon => (
+    <li><a href={icon.url} download={`${icon.key}.svg`} title={`${icon.name} · ${icon.key}.svg`}>
+      <span class="icon-tile" set:html={scopedSvg(icon.svg, 'table-' + icon.key)} />
+      <span class="icon-name">{icon.name}</span>
+    </a></li>
+  ))}</ul>
+</div>
+
+<style>
+  /* On the 20px square: a cell is four squares wide, a three-square tile and one line of 14px text. */
+  .icon-table { padding: 40px 0 80px; }
+  .icon-count { margin: 0 0 20px; font-size: 14px; line-height: 20px; }
+  .icons { display: grid; grid-template-columns: repeat(auto-fill, 80px); gap: 20px; margin: 0; padding: 0; list-style: none; }
+  .icons a { display: block; color: inherit; text-decoration: none; font-size: 14px; line-height: 20px; }
+  .icon-tile { display: grid; place-items: center; height: 60px; border-radius: 4px; background: color-mix(in srgb, currentColor 6%, transparent); }
+  .icon-tile :global(svg) { width: 32px; height: 32px; }
+  .icons a:hover .icon-tile { background: color-mix(in srgb, currentColor 12%, transparent); }
+  .icons a:focus-visible { outline: 1px solid currentColor; outline-offset: 2px; border-radius: 4px; }
+  .icon-name { display: block; margin-top: 4px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+</style>

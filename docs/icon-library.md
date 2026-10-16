@@ -1,6 +1,6 @@
 # SVG icon collection
 
-The public collection is at https://designsystem1.com/icons. Interface icons use real vector geometry in a 16 × 16 coordinate space. They are separate from the gridded badge/favicon editor, which remains available in its own tab.
+The public collection is at https://designsystem1.com/icons. Interface icons use real vector geometry in a 16 × 16 coordinate space. The page is a plain table: each icon by name, a click downloads its SVG. The gridded badge and favicon drawings (`website/src/lib/icons/studio.ts`) only generate the site's own favicon assets; there is no public editor.
 
 ## Add an icon from a request
 
@@ -17,7 +17,7 @@ The catalog includes the original reference icons, additional loose Figma drawin
 
 Product-specific artwork belongs to its product and stays there; the library never names a product, in an icon's name or anywhere else. `icon-scope.ts` excludes coloured badges, block and pattern thumbnails, and arrangement/navigation collections from the shared overview and its public SVG exports. Shared icon labels are one semantic word, without product names. Use `icon` as the shared symbol for artwork; `image` is retired from the collection and its public exports. Variations of one concept share that word; their existing technical keys and Figma node references distinguish the drawings. Repeated drawings appear once in the shared collection: `interfaceIconAliases` records their canonical keys and prevents old runtime copies from being rediscovered as additions. Compare the rendered geometry when checking duplicates, including tiny coordinate rounding differences; matching names alone do not make different drawings duplicates. Existing runtime copies remain for compatibility with product consumers; their presence there does not make them shared icons. Future product imports must respect this boundary. Existing names are not silently replaced: a reference name takes precedence in the gallery. To refine a reference icon, update its source SVG deliberately and compare it with the linked Figma component; update the runtime counterpart in `DS1/x-icon/` only when the requested scope includes it.
 
-`scripts/build-interface-catalog.ts` produces the generated `interface-catalog.json`, public `/icons/catalog.json`, and public copies of added SVGs. Do not edit those generated files directly. The Original/Outlines/Both inspector changes the display only; copying or downloading the main SVG returns the untouched source. The separate outline download exports a stroked construction view.
+`scripts/build-interface-catalog.ts` produces the generated `interface-catalog.json`, public `/icons/catalog.json`, and public copies of added SVGs. Do not edit those generated files directly. Downloading an icon returns the untouched source SVG.
 
 Request new icons through the development conversation, following the drawing and publishing steps above.
 
@@ -27,4 +27,4 @@ Run `vp run icons:sync-products` to import the icons the products share: the run
 
 For these shared refinements, change the SVGs here and run `vp run icons:sync-consumers`. It synchronizes Globe across Ezo (web, iPhone and Android), Consistency (Lit and React), Link (web and iPhone), and tau99, then updates Duplicate in Ezo and Aa, regenerates Ezo’s icon chunks, and refreshes the built Aa snapshot. `vp run icons:sync-globe` updates only Globe; `vp run icons:check-globe` verifies all its consumers without writing. The canonical source is `DS1/x-icon/globe.svg`; native Swift paths and React adapters are generated from that exact path. Keep display sizes, including 30px, separate from the 16-unit drawing grid. The Android library name remains a compatibility alias of Globe, not a separate drawing. Then run `vp run icons:sync-products` to refresh the inventory and its checks.
 
-The collection’s optical stroke weight is not a universal 1px. Preserve the source measurements, including 0.92-unit strokes, and the geometry of filled outlines. A construction outline in the inspector is a display aid, not the icon’s stroke width. Do not round artwork to 1px during import or regeneration.
+The collection’s optical stroke weight is not a universal 1px. Preserve the source measurements, including 0.92-unit strokes, and the geometry of filled outlines. Do not round artwork to 1px during import or regeneration.

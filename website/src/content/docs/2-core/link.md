@@ -7,10 +7,10 @@ Use a native HTML link for navigation in text. There is no `ds-link` custom elem
 
 ## A text link
 
-<a href="/icons/#builder">Open the icon builder</a>
+<a href="/icons/">Browse the icons</a>
 
 ```html
-<a href="/icons/#builder">Open the icon builder</a>
+<a href="/icons/">Browse the icons</a>
 ```
 
 For a link that opens another tab, use `target="_blank" rel="noopener noreferrer"`.
@@ -18,7 +18,7 @@ For a link that opens another tab, use `target="_blank" rel="noopener noreferrer
 ## A button that navigates
 
 ```html
-<ds-button secondary href="/icons/#builder">Icon builder</ds-button>
+<ds-button secondary href="/icons/">Icons</ds-button>
 ```
 
 See [Button](/2-core/button/) for a working preview and [Icon](/2-core/icon/) for the library.

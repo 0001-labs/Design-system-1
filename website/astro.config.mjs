@@ -98,7 +98,6 @@ export default defineConfig({
             { label: "Gap", slug: "2-core/gap" },
             { label: "Icon", items: [
               { label: "Collection", slug: "2-core/icon/collection" },
-              { label: "Builder", link: "/2-core/icon/collection/#builder" },
             ] },
             { label: "Input", slug: "2-core/input" },
             { label: "Language", slug: "2-core/language" },
