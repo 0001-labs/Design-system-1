@@ -45,6 +45,7 @@ Items stack edge to edge with no gap, as an Ezo list does. Lists, table rows, ce
 - Arrows (→ ← ↑ ↓ ⇒ ↩ …) are always Inter, in every typeface, code included: "Inter Arrows" (`fonts/Inter-Arrows.woff2`, Inter's arrows alone, limited by `unicode-range`) leads every `--typeface-*` token. A new typeface token or font stack starts with it; never draw an arrow in GT America, Iosevka or a system font.
 - Code is Iosevka Extended (`--typeface-mono`), loaded from `fonts/Iosevka-Regular.woff2`, with a monospace fallback, never the browser's serif.
 - Motion animates `transform` and `opacity` only.
+- A page without Lit draws the components with `DS1/1-root/controls.css` classes on native elements (`ds-button`, `ds-input`, `ds-textarea`, `ds-select`, `ds-checkbox`, `ds-radio`, `ds-switch`, `ds-tabs`, `ds-dialog`, `ds-menu`), copied through Sync 1's `tokens` or `root` export; never restyle native controls by hand. See https://designsystem1.com/1-root/native-controls/.
 - On phones and tablets every measure is multiplied by `--sf` (1 on a computer; the screen width over 280 on a phone, between 0.75 and 2). Write lengths as units or `calc(Npx * var(--sf))`, never bare pixels, except hairlines.
 
 ## Toasts

@@ -62,6 +62,7 @@
 }
 
 .ds-input,
+.ds-textarea,
 .ds-select {
   box-sizing: border-box;
   min-width: 0;
@@ -80,20 +81,27 @@
   outline: none;
 }
 
-.ds-input::placeholder {
+.ds-input::placeholder,
+.ds-textarea::placeholder {
   color: var(--ds-title-color);
 }
 
 .ds-input:focus-visible,
+.ds-textarea:focus-visible,
 .ds-select:focus-visible,
-.ds-checkbox:focus-visible {
+.ds-checkbox:focus-visible,
+.ds-radio:focus-visible,
+.ds-switch:focus-visible {
   outline: 2px solid var(--ds-focus-ring);
   outline-offset: 1px;
 }
 
 .ds-input:disabled,
+.ds-textarea:disabled,
 .ds-select:disabled,
-.ds-checkbox:disabled {
+.ds-checkbox:disabled,
+.ds-radio:disabled,
+.ds-switch:disabled {
   cursor: default;
   opacity: 0.5;
 }
@@ -114,12 +122,208 @@
   cursor: pointer;
 }
 
-.ds-checkbox {
+/* A text area spans whole rows: --ds-textarea-rows sets how many, three by default. */
+.ds-textarea {
+  display: block;
+  height: var(--ds-textarea-height, calc(var(--ds-textarea-rows, 3) * var(--ds-row-height)));
+  min-height: var(--ds-row-height);
+  padding: var(--ds-textarea-padding, calc(4px * var(--ds-sf)));
+  border-radius: var(--ds-textarea-radius, calc(4px * var(--ds-sf)));
+  resize: vertical;
+}
+
+.ds-checkbox,
+.ds-radio {
   width: calc(12px * var(--ds-sf));
   height: calc(12px * var(--ds-sf));
   margin: 0;
   accent-color: var(--ds-text-color);
   cursor: pointer;
+}
+
+/*
+ * `.ds-switch` is the `ds-switch` element's look on a native
+ * `<button role="switch" aria-checked>`: two control heights wide, its thumb
+ * one control high less a 2px inset, travelling one control height.
+ * `.ds-switch--rounded` is the round variant with a white thumb.
+ */
+
+.ds-switch {
+  --ds-choice-unit: var(--ds-control-height);
+  appearance: none;
+  box-sizing: border-box;
+  position: relative;
+  display: inline-block;
+  flex: 0 0 auto;
+  vertical-align: middle;
+  width: calc(2 * var(--ds-choice-unit));
+  height: var(--ds-choice-unit);
+  margin: 0;
+  padding: calc(2px * var(--ds-sf));
+  border: 0;
+  border-radius: var(--ds-radius);
+  background: var(--ds-fill);
+  color: var(--ds-text-color-muted);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.ds-switch::after {
+  content: "";
+  display: block;
+  width: calc(var(--ds-choice-unit) - 4px * var(--ds-sf));
+  height: 100%;
+  border-radius: var(--ds-radius);
+  background: currentColor;
+  transform: translateX(0);
+  transition: transform 140ms ease;
+}
+
+.ds-switch[aria-checked="true"] {
+  background: var(--ds-accent-color);
+  color: var(--ds-button-text-color-on-accent);
+}
+
+.ds-switch[aria-checked="true"]::after {
+  transform: translateX(var(--ds-choice-unit));
+}
+
+.ds-switch--rounded {
+  border-radius: var(--ds-choice-unit);
+  color: var(--ds-white);
+}
+
+.ds-switch--rounded::after {
+  border-radius: 50%;
+  background: var(--ds-white);
+}
+
+.ds-switch--rounded[aria-checked="true"] {
+  background: var(--ds-switch-track-on);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-switch::after {
+    transition: none;
+  }
+}
+
+/*
+ * `.ds-tabs` is the `ds-tabs` element's row on native buttons. As an option
+ * group (role="group", a segmented control) its `.ds-button` choices are
+ * grey and the chosen one, aria-pressed, aria-selected or aria-current, is in
+ * the accent, as the primary and secondary buttons are.
+ */
+
+.ds-tabs {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--ds-tabs-gap, calc(10px * var(--ds-sf)));
+  min-width: 0;
+  height: var(--ds-row-height);
+}
+
+.ds-tabs--fill > * {
+  flex: 1 1 0;
+  justify-content: center;
+}
+
+.ds-tabs[role="group"] > .ds-button {
+  --ds-button-height: var(--ds-row-height);
+  --ds-button-padding: 0 calc(4px * var(--ds-sf));
+  --ds-button-background: var(--ds-button-background-color-secondary);
+  min-width: 0;
+}
+
+.ds-tabs[role="group"] > .ds-button:hover:not(:disabled) {
+  --ds-button-background: var(--ds-fill-hover);
+}
+
+.ds-tabs[role="group"] > .ds-button:is([aria-pressed="true"], [aria-selected="true"], [aria-current]:not([aria-current="false"])) {
+  --ds-button-background: var(--ds-button-background-color-primary);
+  --ds-button-color: var(--ds-button-text-color-on-accent);
+}
+
+/*
+ * `.ds-dialog` is the `ds-dialog` element's frame on a native `<dialog>`:
+ * twenty squares wide, a square of padding, square corners, a hairline and the
+ * paper. Its header, title, description, footer and close button are marked
+ * with data-ds-dialog, as inside the element.
+ */
+
+dialog.ds-dialog {
+  box-sizing: border-box;
+  position: fixed;
+  inset: 0;
+  width: var(--ds-dialog-width, calc(20 * var(--ds-unit)));
+  max-width: var(--ds-dialog-max-width, calc(100vw - 2 * var(--ds-unit)));
+  max-height: var(--ds-dialog-max-height, calc(100dvh - 2 * var(--ds-unit)));
+  height: var(--ds-dialog-height, fit-content);
+  margin: auto;
+  padding: var(--ds-dialog-padding, var(--ds-unit));
+  border: var(--ds-dialog-border, 1px solid var(--ds-border-color));
+  border-radius: 0;
+  background: var(--ds-dialog-paper, var(--ds-paper));
+  color: var(--ds-text-color);
+  box-shadow: none;
+  overflow: auto;
+  overscroll-behavior: contain;
+  font-family: var(--ds-typeface-regular);
+  font-feature-settings: var(--ds-font-features);
+  font-size: var(--ds-type-size-default);
+  font-weight: var(--ds-type-weight-default);
+  line-height: var(--ds-type-lineheight-default);
+  letter-spacing: var(--ds-type-letterspacing-default);
+}
+
+dialog.ds-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-unit);
+}
+
+dialog.ds-dialog::backdrop {
+  background: color-mix(in srgb, var(--ds-black) 40%, transparent);
+}
+
+.ds-dialog [data-ds-dialog="header"] {
+  display: flex;
+  flex-direction: column;
+  padding-right: var(--ds-unit);
+}
+
+.ds-dialog [data-ds-dialog="title"] {
+  display: flex;
+  align-items: center;
+  min-height: var(--ds-row-height);
+  margin: 0;
+  color: var(--ds-text-color);
+  font: inherit;
+  font-weight: var(--ds-type-weight-bold);
+  line-height: var(--ds-row-height);
+}
+
+.ds-dialog [data-ds-dialog="description"] {
+  margin: 0;
+  color: var(--ds-text-color-muted);
+  font: inherit;
+}
+
+.ds-dialog [data-ds-dialog="footer"] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: calc(var(--ds-unit) / 2);
+  min-height: var(--ds-row-height);
+}
+
+.ds-dialog [data-ds-dialog="close"] {
+  position: absolute;
+  top: var(--ds-unit);
+  right: var(--ds-unit);
 }
 
 /*
@@ -201,6 +405,17 @@
   cursor: default;
   user-select: none;
   outline: none;
+}
+
+/* A menu item may be a native button: it keeps the row's look, not a button's. */
+:where(button).ds-menu__item {
+  appearance: none;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: start;
 }
 
 .ds-menu__item--inset {
