@@ -50,6 +50,7 @@ export function componentGraph(ds1, names) {
   if (components.includes('avatar-group')) visit('react/avatar-group.ts');
   if (['checkbox', 'radio', 'switch', 'select', 'color'].some(name => components.includes(name))) visit('react/choice.ts');
   if (components.includes('dialog')) visit('react/dialog.ts');
+  if (components.includes('page')) visit('react/page.ts');
   if (components.includes('swatch')) visit('0-face/tooltips.ts');
   if (components.includes('input') || components.includes('textarea')) visit('react/input.ts');
   visit('1-root/component-tokens.css');

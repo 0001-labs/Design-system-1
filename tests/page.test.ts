@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { afterEach, expect, test } from "vite-plus/test";
 import type { Page } from "../DS1/4-page/ds-page";
-const { PAGE_LAYOUTS } = await import("../DS1/4-page/ds-page");
+const { PAGE_LAYOUTS, measureStyle } = await import("../DS1/4-page/ds-page");
 
 afterEach(() => document.body.replaceChildren());
 async function setup(markup: string) {
@@ -47,4 +47,25 @@ test("layout, divided, fill and view reflect for styling", async () => {
   Object.assign(page, { divided: true, fill: true, view: true });
   await page.updateComplete;
   expect(["divided", "fill", "view"].every(name => page.hasAttribute(name))).toBe(true);
+});
+
+test("measure sets the column width in whole squares on the page and reflects", async () => {
+  const page = await setup(`<ds-page layout="column" measure="28"></ds-page>`);
+  expect(page.measure).toBe(28);
+  const surface = page.shadowRoot!.querySelector<HTMLElement>(".page")!;
+  expect(surface.getAttribute("style")).toBe("--ds-page-measure: calc(28 * var(--ds-unit))");
+  page.measure = 30;
+  await page.updateComplete;
+  expect(page.getAttribute("measure")).toBe("30");
+  expect(surface.getAttribute("style")).toBe("--ds-page-measure: calc(30 * var(--ds-unit))");
+  page.measure = undefined;
+  await page.updateComplete;
+  expect(surface.hasAttribute("style")).toBe(false);
+});
+
+test("a measure is rounded to a whole square and anything else is ignored", () => {
+  expect(measureStyle(28)).toBe("--ds-page-measure: calc(28 * var(--ds-unit))");
+  expect(measureStyle(27.6)).toBe("--ds-page-measure: calc(28 * var(--ds-unit))");
+  expect(measureStyle(0.4)).toBeUndefined();
+  for (const value of [0, -4, Number.NaN, Infinity, null, undefined]) expect(measureStyle(value)).toBeUndefined();
 });

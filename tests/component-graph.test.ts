@@ -23,6 +23,11 @@ test('selecting multiline fields includes the shared input base and React bindin
   for (const file of ['2-core/ds-textarea.ts', '2-core/ds-input.ts', '2-core/styles/ds-textarea.css', 'react/input.ts']) expect(files.has(file)).toBe(true);
 });
 
+test('selecting the page carries its React adapter, so a product needs no JSX typing of its own', () => {
+  const { files } = componentGraph(ds1, ['page']);
+  for (const file of ['4-page/ds-page.ts', '4-page/styles/ds-page.css', 'react/page.ts']) expect(files.has(file)).toBe(true);
+});
+
 test('unknown and malformed names are refused', () => {
   expect(() => componentGraph(ds1, ['nothing'])).toThrow(/Unknown component/);
   expect(() => componentGraph(ds1, ['../x'])).toThrow(/Invalid component/);

@@ -70,12 +70,22 @@
 :host([layout="inspector"]) .aside { margin-block-start: 0; }
 
 /* One column down the middle; centred is narrower and sits in the middle of
- * the height it is given. Tiles fill the width with 12-square tiles. */
+ * the height it is given. Tiles fill the width with 12-square tiles.
+ *
+ * A centred column stands on a whole square. The room beside it is shared out
+ * and rounded down to squares, then added to the page's own square of padding,
+ * so when the room is an odd number of squares the extra one falls on the
+ * trailing side instead of leaving the column on a half. 100% is the width of
+ * the element; with less room than the measure needs, the padding stays one
+ * square and the column takes what is left. */
 :host(:is([layout="column"], [layout="centered"], [layout="tiles"])) .page {
   grid-template-columns: minmax(0, var(--ds-page-measure));
   grid-template-rows: auto auto minmax(0, 1fr) auto auto;
   grid-template-areas: "header" "nav" "main" "aside" "footer";
-  justify-content: center;
+}
+:host(:is([layout="column"], [layout="centered"])) .page {
+  justify-content: start;
+  padding-inline-start: calc(var(--ds-unit) + max(0px, round(down, calc((100% - 2 * var(--ds-unit) - var(--ds-page-measure)) / 2), var(--ds-unit))));
 }
 :host(:is([layout="column"], [layout="centered"], [layout="tiles"])) .nav { margin-block-end: var(--ds-unit); }
 

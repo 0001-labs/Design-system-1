@@ -1,4 +1,5 @@
 import { LitElement, html, unsafeCSS } from "lit";
+import { ifDefined } from "lit/directives/if-defined.js";
 import { define } from "../0-face/define";
 import styles from "./styles/ds-page.css?inline";
 
@@ -16,12 +17,16 @@ export const PAGE_LAYOUTS: readonly PageLayout[] = ["sidebar", "split", "inspect
  * - `slot="footer"` runs along the bottom of the main area
  *
  * Columns are whole squares: `sidebar` and `inspector` lead with 12, `split`
- * with 16; `column` is 32 wide and `centered` 16. `tiles` places each main
- * child in a 12-square tile. Below 30 squares of width every layout stacks.
+ * with 16; `column` is 32 wide and `centered` 16, and `measure` sets either in
+ * whole squares. A centred column stands on a whole square: the room beside it
+ * is rounded down to squares, so the column never straddles a grid line.
+ * `tiles` places each main child in a 12-square tile. Below 30 squares of
+ * width every layout stacks.
  *
  * @element ds-page
  * @attr layout - `sidebar`, `split`, `inspector`, `column`, `centered` or `tiles`.
  * @attr divided - Draws a hairline between the columns.
+ * @attr measure - Width of the `column` or `centered` column in whole squares.
  * @attr fill - Takes its container's height; each column scrolls on its own.
  * @attr view - Labels each area with its slot name, for inspection.
  *
@@ -36,12 +41,14 @@ export class Page extends LitElement {
   static properties = {
     layout: { type: String, reflect: true },
     divided: { type: Boolean, reflect: true },
+    measure: { type: Number, reflect: true },
     fill: { type: Boolean, reflect: true },
     view: { type: Boolean, reflect: true },
   };
 
   declare layout: PageLayout;
   declare divided: boolean;
+  declare measure: number | undefined;
   declare fill: boolean;
   declare view: boolean;
 
@@ -57,7 +64,7 @@ export class Page extends LitElement {
 
   render() {
     return html`
-      <div class="page" part="page">
+      <div class="page" part="page" style=${ifDefined(measureStyle(this.measure))}>
         <div class="area nav" part="nav" data-area="nav"><slot name="nav"></slot></div>
         <div class="area header" part="header" data-area="header"><slot name="header"></slot></div>
         <div class="area main" part="main" data-area="main"><slot></slot></div>
@@ -75,6 +82,16 @@ export class Page extends LitElement {
       sync();
     });
   }
+}
+
+/**
+ * A measure is a count of squares: 28 is 28 squares, never 28.5 or 28px. A
+ * fraction rounds to the nearest square, and anything that is not a positive
+ * number is ignored so the layout keeps its own width.
+ */
+export function measureStyle(measure: number | null | undefined): string | undefined {
+  const squares = Math.round(Number(measure));
+  return Number.isFinite(squares) && squares >= 1 ? `--ds-page-measure: calc(${squares} * var(--ds-unit))` : undefined;
 }
 
 function empty(node: Node): boolean {

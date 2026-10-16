@@ -29,13 +29,13 @@ Making something: pages on the left, the work in the middle, its settings on the
 
 ## Column
 
-Something read or filled in from top to bottom: settings, an article, a long form. The column is 32 squares wide and sits in the middle.
+Something read or filled in from top to bottom: settings, an article, a long form. The column is 32 squares wide and sits in the middle, on a whole square.
 
 <LayoutExample layout="column" />
 
 ## Centred
 
-One task and nothing else on the screen: signing in, confirming, a single question. The column is 16 squares and sits in the middle of the height too.
+One task and nothing else on the screen: signing in, confirming, a single question. The column is 16 squares and sits in the middle of the height too, on a whole square.
 
 <LayoutExample layout="centered" />
 
@@ -66,8 +66,8 @@ Every column is a whole number of squares. Between columns there are two squares
 | `sidebar` | 12 squares | The rest | — |
 | `split` | 16 squares | The rest | — |
 | `inspector` | 12 squares | The rest | 12 squares |
-| `column` | — | 32 squares, centred | — |
-| `centered` | — | 16 squares, centred both ways | — |
+| `column` | — | 32 squares, centred on the grid | — |
+| `centered` | — | 16 squares, centred on the grid both ways | — |
 | `tiles` | — | 12-square tiles | — |
 
 Below 30 squares of width every layout becomes one column, navigation first. The layout follows the width of its own container, not the window, so a page inside a panel stacks when the panel is narrow.
@@ -78,9 +78,37 @@ Below 30 squares of width every layout becomes one column, navigation first. The
 | --- | --- | --- |
 | `layout` | `sidebar` | `sidebar`, `split`, `inspector`, `column`, `centered` or `tiles`. |
 | `divided` | false | Draws a hairline between the columns. |
+| `measure` | — | The width of the `column` or `centered` column, in whole squares. |
 | `fill` | false | Takes its container's full height; each column scrolls on its own. |
 | `view` | false | Outlines each area and names it, for inspection. |
 
-Change a width with `--ds-page-nav`, `--ds-page-aside`, `--ds-page-measure` or `--ds-page-tile` on the element. Keep them whole squares: `calc(16 * var(--ds-unit))`.
+## Setting the measure
+
+A `column` or `centered` page is as wide as its measure: 32 squares and 16 by default. Set another in whole squares with `measure`:
+
+```html
+<ds-page layout="column" measure="28">…</ds-page>
+```
+
+`measure="28"` is exactly 28 squares at every scale. A fraction rounds to the nearest square, and zero, a negative number or text is ignored, so the layout keeps its own width. The attribute wins over `--ds-page-measure`, which is the same width as a custom property for styles that cannot reach the element's attributes; write it in squares too, never pixels: `--ds-page-measure: calc(28 * var(--ds-unit))`. `--ds-page-nav`, `--ds-page-aside` and `--ds-page-tile` set the other widths the same way.
+
+### Standing on the grid
+
+Centring a column in the width it has can leave it on a half square, off the grid lines the rest of the page is drawn on. `ds-page` shares the room beside the column out and rounds it down to whole squares, so the column always starts and ends on a grid line. When that room is an odd number of squares, the extra square falls on the trailing side. With less room than the measure needs, the column takes the width it has and stays one square in from the edge.
+
+## In React
+
+Import the typed adapter. It renders `<ds-page>` with `layout`, `divided`, `measure`, `fill` and `view` typed, so the product declares nothing of its own:
+
+```tsx
+import { Page } from "./design/react/page";
+
+<Page layout="column" measure={28} divided>
+  <h1 slot="header">Settings</h1>
+  …
+</Page>
+```
+
+The adapter does not register the element: import `4-page/ds-page` once in the browser entry, as for the other components. A product that writes `<ds-page>` directly instead needs a `JSX.IntrinsicElements` entry for it in its own declarations, because React does not know custom elements; the adapter replaces that entry. Sync 1 copies `react/page.ts` with the component when a product names `page` in its `components`.
 
 [Grid](/4-page/grid/) · [Container](/4-page/container/) · [Sidebar](/3-unit/sidebar/) · [List](/3-unit/list/) · [Row](/3-unit/row/)
