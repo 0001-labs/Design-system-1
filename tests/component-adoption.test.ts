@@ -465,3 +465,78 @@ describe("text on the grid: .ds-text classes and prose", () => {
     expect(checkLockedText(app, ds)?.snapshot).toBe("unverified");
   });
 });
+
+describe("empty states and notices", () => {
+  const sha = (body: string) => createHash("sha256").update(body).digest("hex");
+  const commit = (root: string, message: string) => { git(root, "add", "."); git(root, "-c", "user.name=Test", "-c", "user.email=test@example.com", "commit", "-m", message); };
+
+  it("recognizes .ds-empty and .ds-notice on any element and keeps their text parts in the block", () => {
+    for (const file of ["page.html", "view.tsx"]) {
+      const attribute = file.endsWith("x") ? "className" : "class";
+      const sites = sourceSites(file, `<><section ${attribute}="ds-empty ds-empty--centered"><h2 ${attribute}="ds-empty__title">Nothing here yet</h2><p ${attribute}="ds-empty__text">Add one.</p><div ${attribute}="ds-empty__actions"><button ${attribute}="ds-button">Add</button></div></section><div ${attribute}="ds-notice ds-notice--danger" role="alert"><p ${attribute}="ds-notice__text">Failed</p></div><p ${attribute}="my-ds-notice">Local</p></>`);
+      expect(sites.filter(site => site.nativeStyle).map(site => [site.tag, site.nativeStyle]), file).toEqual([["section", "ds-empty"], ["h2", "block-part"], ["p", "block-part"], ["button", "ds-button"], ["div", "ds-notice"], ["p", "block-part"]]);
+    }
+    expect(sourceSites("view.ts", 'import { h } from "./dom"; h("div", { class: "ds-notice ds-notice--warning" });')[0]).toMatchObject({ tag: "div", nativeStyle: "ds-notice" });
+  });
+
+  it("verifies the native classes through the sheet that draws each, from the lock", () => {
+    const studio = mkdtempSync(join(tmpdir(), "component-adoption-")); temporary.push(studio);
+    const ds = join(studio, "Design system 1"), app = join(studio, "Pages");
+    for (const root of [ds, app]) { mkdirSync(root); git(root, "init", "-b", "main"); }
+    const sheets = { "notice.css": ".ds-notice { display: grid; }", "empty.css": ".ds-empty { display: flex; }", "component-tokens.css": ":root { --t: 1; }", "component-metrics.css": ":root { --m: 1; }", "component-appearance.css": ":root { --a: 1; }" };
+    for (const [file, body] of Object.entries(sheets)) write(ds, `DS1/1-root/${file}`, body);
+    commit(ds, "Sheets");
+    // The product copied the notice sheet and the tokens, not the empty-state sheet.
+    const copied = Object.fromEntries(Object.entries(sheets).filter(([file]) => file !== "empty.css"));
+    for (const [file, body] of Object.entries(copied)) write(app, `web/ds1/${file}`, body);
+    write(app, "sync.lock.json", JSON.stringify({ "Design system 1": { commit: git(ds, "rev-parse", "HEAD"), files: Object.fromEntries(Object.entries(copied).map(([file, body]) => [`web/ds1/${file}`, sha(body)])) } }));
+    write(app, "web/index.html", '<div class="ds-notice" role="status"><p class="ds-notice__text">Saved</p></div>\n<section class="ds-empty"><p class="ds-empty__title">Nothing here yet</p></section>\n<p>Local</p>');
+    commit(app, "Page");
+    const scan = () => scanApp({ id: "pages", name: "Pages", directory: "Pages", roots: ["web"] }, studio, ds);
+    expect(scan().cells.notice).toMatchObject({ styled: 1, unverified: 0 });
+    expect(scan().cells.notice!.sites.map(site => site.tag)).toEqual(["div.ds-notice"]);
+    expect(scan().cells.empty).toMatchObject({ styled: 0, unverified: 1 });
+    expect(scan().cells.text).toMatchObject({ local: 1, styled: 0, unverified: 0 });
+    write(app, "web/ds1/notice.css", ".ds-notice { display: block; }");
+    expect(scan().cells.notice).toMatchObject({ styled: 0, unverified: 1 });
+  });
+
+  it("verifies ds-empty, ds-notice and their React adapters through the manifest, and flags a modified adapter", () => {
+    const { studio, ds, app } = fixture();
+    const files = {
+      "2-core/ds-empty.ts": "export class Empty {}",
+      "2-core/ds-notice.ts": "export class Notice {}",
+      "1-root/empty.css": ".ds-empty { display: flex; }",
+      "1-root/notice.css": ".ds-notice { display: grid; }",
+      "react/empty.ts": 'import type { Empty as E } from "../2-core/ds-empty"; export const Empty = () => null;',
+      "react/notice.ts": 'import type { Notice as N } from "../2-core/ds-notice"; export const Notice = () => null;',
+    };
+    for (const [file, body] of Object.entries(files)) { write(ds, `DS1/${file}`, body); write(app, `design/${file}`, body); }
+    commit(ds, "Add empty states and notices");
+    const path = join(app, "design/components-manifest.json"), manifest = JSON.parse(readFileSync(path, "utf8"));
+    manifest.commit = git(ds, "rev-parse", "HEAD"); manifest.components.push("empty", "notice");
+    for (const [file, body] of Object.entries(files)) manifest.files[file] = sha(body);
+    writeFileSync(path, JSON.stringify(manifest));
+    write(app, "src/view.tsx", 'import { Notice } from "../design/react/notice";\nimport { Empty } from "../design/react/empty";\nexport const view = <><Notice tone="danger">Failed</Notice><Empty heading="No lists" /><ds-notice tone="success"></ds-notice><div className="ds-empty" /></>;\n');
+    commit(app, "Use empty states and notices");
+    const scan = () => scanApp({ id: "example", name: "Example", directory: "Example", roots: ["src"], manifest: "design/components-manifest.json" }, studio, ds);
+    expect(scan().cells.notice).toMatchObject({ shared: 2, unverified: 0, local: 0 });
+    expect(scan().cells.empty).toMatchObject({ shared: 1, styled: 1, unverified: 0 });
+    write(app, "design/react/notice.ts", files["react/notice.ts"] + "\n// Local modification");
+    expect(scan().cells.notice).toMatchObject({ shared: 1, unverified: 1 });
+    expect(scan().cells.notice!.issues).toContain("Locally modified: react/notice.ts");
+  });
+
+  it("counts Design system 1's own empty states and notices as source", () => {
+    const studio = mkdtempSync(join(tmpdir(), "component-adoption-")); temporary.push(studio);
+    const ds = join(studio, "Design system 1"); mkdirSync(ds); git(ds, "init", "-b", "main");
+    write(ds, "DS1/2-core/ds-notice.ts", "export class Notice {}");
+    write(ds, "DS1/1-root/notice.css", ".ds-notice { display: grid; }");
+    write(ds, "DS1/react/notice.ts", 'import type { Notice as N } from "../2-core/ds-notice"; export const Notice = () => null;');
+    write(ds, "app/src/view.tsx", 'import { Notice } from "../../DS1/react/notice";\nexport const view = <><Notice tone="danger">Failed</Notice><div className="ds-notice"><p className="ds-notice__text">Saved</p></div></>;\n');
+    commit(ds, "App");
+    const report = scanApp({ id: "ds1", name: "Design system 1", directory: "Design system 1", roots: ["app/src"], source: "direct" }, studio, ds);
+    expect(report.cells.notice).toMatchObject({ shared: 1, styled: 1, unverified: 0 });
+    expect(report.cells.text).toMatchObject({ shared: 0, styled: 0, local: 0 });
+  });
+});
