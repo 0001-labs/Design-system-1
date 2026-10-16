@@ -501,6 +501,24 @@ describe("empty states and notices", () => {
     expect(scan().cells.notice).toMatchObject({ styled: 0, unverified: 1 });
   });
 
+  it("counts a native table with the ds-table class as DS1 styles, verified through table.css", () => {
+    expect(sourceSites("view.html", '<div class="ds-table-scroll"><table class="ds-table"><tr><td data-numeric>1</td></tr></table></div><table><tr><td>2</td></tr></table>').filter(site => site.tag === "table").map(site => site.nativeStyle)).toEqual(["ds-table", undefined]);
+    const studio = mkdtempSync(join(tmpdir(), "component-adoption-")); temporary.push(studio);
+    const ds = join(studio, "Design system 1"), app = join(studio, "Pages");
+    for (const root of [ds, app]) { mkdirSync(root); git(root, "init", "-b", "main"); }
+    const sheets = { "table.css": ".ds-table { border-collapse: collapse; }", "component-tokens.css": ":root { --t: 1; }", "component-metrics.css": ":root { --m: 1; }", "component-appearance.css": ":root { --a: 1; }" };
+    for (const [file, body] of Object.entries(sheets)) write(ds, `DS1/1-root/${file}`, body);
+    commit(ds, "Sheets");
+    for (const [file, body] of Object.entries(sheets)) write(app, `web/ds1/${file}`, body);
+    write(app, "sync.lock.json", JSON.stringify({ "Design system 1": { commit: git(ds, "rev-parse", "HEAD"), files: Object.fromEntries(Object.entries(sheets).map(([file, body]) => [`web/ds1/${file}`, sha(body)])) } }));
+    write(app, "web/index.html", '<table class="ds-table"><tr><td>1</td></tr></table>\n<table><tr><td>2</td></tr></table>');
+    commit(app, "Page");
+    const scan = () => scanApp({ id: "pages", name: "Pages", directory: "Pages", roots: ["web"] }, studio, ds);
+    expect(scan().cells.table).toMatchObject({ styled: 1, local: 1, unverified: 0 });
+    write(app, "web/ds1/table.css", ".ds-table { border: 0; }");
+    expect(scan().cells.table).toMatchObject({ styled: 0, local: 1, unverified: 1 });
+  });
+
   it("verifies ds-empty, ds-notice and their React adapters through the manifest, and flags a modified adapter", () => {
     const { studio, ds, app } = fixture();
     const files = {
