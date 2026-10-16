@@ -1,10 +1,12 @@
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync, mkdirSync, writeFileSync, statSync } from "node:fs";
+import { existsSync, readFileSync, mkdirSync, writeFileSync, statSync, realpathSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import ts from "typescript";
 import { readIconMap, scanIcons } from "./icon-adoption";
+import { countLibrarySite, libraryMethod, publishedLibrary } from "./library-provenance";
+import { markdownMethod, markdownScope } from "./markdown-sites";
 import { COMPONENT_COLUMNS, IMPLEMENTATION_COLUMNS, catalogueApp, type AdoptionApp, type AdoptionReport, type ComponentCell, type UsageSite } from "../shared/component-adoption";
 
 const repository = fileURLToPath(new URL("../", import.meta.url));
@@ -15,8 +17,9 @@ export const excluded = /^(?:(?:client|src|web)\/)?(?:design|ds1)\/|^src\/pages\
 /** `source: "direct"` is Design system 1 itself: its app and site import DS1/ from the same commit, so there is no copy to verify. */
 export interface AppSpec { id: string; name: string; directory: string; roots: string[]; manifest?: string; source?: "direct"; group?: "Products" | "Clients"; excludes?: string[]; migration?: "deferred"; migrationReason?: string }
 /** The studio owns product names and scan scope; the reusable scanner owns recognition. */
-export function loadAppSpecs(studio: string): AppSpec[] {
-  const config = JSON.parse(readFileSync(join(studio, "0001/server/component-adoption.config.json"), "utf8")) as { apps: AppSpec[] };
+/** `ADOPTION_CONFIG` names another configuration file, to try a scope without editing the studio's. */
+export function loadAppSpecs(studio: string, configPath = process.env.ADOPTION_CONFIG ? resolve(process.env.ADOPTION_CONFIG) : join(studio, "0001/server/component-adoption.config.json")): AppSpec[] {
+  const config = JSON.parse(readFileSync(configPath, "utf8")) as { apps: AppSpec[] };
   if (!Array.isArray(config.apps) || !config.apps.length) throw new Error("The studio adoption configuration has no apps.");
   const ids = new Set<string>();
   for (const app of config.apps) {
@@ -519,7 +522,7 @@ export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): Ado
     app.commit = git(root, "rev-parse", "HEAD");
     // Several products share one repository: only this app's own folder counts.
     app.dirty = Boolean(git(root, "status", "--porcelain", "--", "."));
-    if (spec.source === "direct" && resolve(root) !== resolve(dsRoot)) throw new Error("Only Design system 1 itself can be scanned as direct source.");
+    if (spec.source === "direct" && realpathSync(root) !== realpathSync(dsRoot)) throw new Error("Only Design system 1 itself can be scanned as direct source.");
     const manifest = spec.source === "direct" ? directManifest : spec.manifest;
     const snapshots = spec.source === "direct" ? directSnapshots(dsRoot) : checkSnapshots(root, spec.manifest, dsRoot);
     let lockedControls = false;
@@ -549,20 +552,27 @@ export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): Ado
     }));
     app.snapshotCommit = spec.source === "direct" ? null : snapshots.commit;
     app.cells = snapshots.cells;
-    const files = git(root, "ls-files", "-z", "--", ...spec.roots).split("\0").filter(f => /\.(tsx?|jsx?|[cm]js|html|astro)$/.test(f) && !excluded.test(f) && !(spec.excludes ?? []).some(prefix => f === prefix || f.startsWith(prefix + "/")) && existsSync(join(root, f)));
+    const markdown = markdownScope(root);
+    const library = publishedLibrary(root);
+    const files = git(root, "ls-files", "-z", "--", ...spec.roots).split("\0").filter(f => (/\.(tsx?|jsx?|[cm]js|html|astro)$/.test(f) || markdown.includes(f)) && !excluded.test(f) && !(spec.excludes ?? []).some(prefix => f === prefix || f.startsWith(prefix + "/")) && existsSync(join(root, f)));
     if (!files.length) throw new Error("No tracked web source was found in the configured scope.");
     app.icons = scanIcons(root, spec.source === "direct" ? undefined : spec.manifest, files, ds1Icons(dsRoot), join(dsRoot, "DS1/x-icon"));
     for (const file of files) {
       app.files++;
       const source = readFileSync(join(root, file), "utf8");
       const aliases = spec.id === "link" ? importedAdapters(root, file, source) : {};
-      const sharedAdapters = importedSharedAdapters(root, file, source, manifest);
-      const sites = sourceSites(file, source);
+      const document = markdown.read(file, source, sourceSites);
+      const sharedAdapters = importedSharedAdapters(root, file, document?.code ?? source, manifest);
+      const sites = document?.sites ?? sourceSites(file, source);
+      const libraryFile = library?.read(file, source);
       const adapterTags = spec.id === "link" && linkAdapters[file]
         ? new Set(Object.values(linkAdapters[file]!).map(id => `ds-${id}`).filter(tag => sites.filter(s => s.tag === tag).length === 1))
         : new Set<string>();
       for (const site of sites) {
         if (adapterTags.has(site.tag) || site.nativeStyle === "block-part") continue;
+        // A published library's controls are needs review; a wrapper's own face counts at its uses.
+        const viaLibrary = libraryFile?.site(site);
+        if (viaLibrary !== undefined) { if (viaLibrary) countLibrarySite(app.cells[viaLibrary.component]!, file, site, library!.connection); continue; }
         const block = site.nativeStyle ? blockClasses[site.nativeStyle] : undefined;
         const custom = /^(ds|ezo|c9y)-(.+)$/.exec(site.tag);
         const chartPart = custom?.[1] === "ds" && ["bars", "range", "ratio", "spark"].includes(custom[2] ?? "") ? "chart" : undefined;
@@ -617,6 +627,8 @@ export function scanReport(studio = resolve(repository, "..")): AdoptionReport {
       "Tests, demos in preview/dev directories, generated files, vendored implementations and shared sign-in internals are excluded. Link's inspected TabPill, TabPillRow and Tooltip/Tooltop adapters and DS1's verified React FilePicker, Input, Textarea, Composer, Menu, ContextMenuContent/SubContent and their Button, Text and FilePicker entries, Checkbox, Radio, Switch, Select, ColorInput, Button, ButtonLink, Token, TokenField, Avatar, Logo, AvatarGroup, Accordion, Split, DialogContent, Empty and Notice adapters count at imported JSX uses, without counting their inner DS1 tags again.",
       "Icons: ds-icon with a literal type in markup, Lit, JSX or h/createElement calls counts as a use of that name; a type set by an expression is a dynamic use, and inline <svg> drawings are counted apart. An app with a copied icon map beside its DS1 snapshot is compared drawing by drawing with today's DS1 map: Differs marks a copy that is not DS1's drawing, or a DS1 name missing from the copy; Local only is a name DS1 does not draw. Apps without a copy resolve names from DS1 itself.",
       "Native dialog/input/button/select/textarea children directly inside ds-dialog/ds-file-picker/ds-checkbox/ds-radio/ds-color/ds-switch/ds-select/ds-composer count as their shared frames, not as extra local controls. Literal file, color, checkbox and radio types have their own columns; switch roles are grouped as Toggle; dynamic types stay in Input. Direct const document.createElement plus append composition and statically imported h factories from inspected DOM helpers are also recognized. Other React abstractions, dynamic tag names, CSS-only controls, spans and inline SVGs are not inferred. Native apps are outside this scan. A zero means no recognized source site, not that a capability is absent.",
+      ...libraryMethod,
+      ...markdownMethod,
     ],
   };
 }
