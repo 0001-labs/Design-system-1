@@ -52,6 +52,10 @@
     "Swedish": "Sænska",
     "Chinese": "Kínverska",
     "Show password": "Sýna lykilorð",
-    "Hide password": "Fela lykilorð"
+    "Hide password": "Fela lykilorð",
+    "OK": "Í lagi",
+    "Copied": "Afritað",
+    "Could not copy": "Ekki tókst að afrita",
+    "Notifications": "Tilkynningar"
   }
 }

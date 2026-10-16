@@ -59,6 +59,10 @@
     "Swedish": "Schwedisch",
     "Chinese": "Chinesisch",
     "Show password": "Passwort anzeigen",
-    "Hide password": "Passwort verbergen"
+    "Hide password": "Passwort verbergen",
+    "OK": "OK",
+    "Copied": "Kopiert",
+    "Could not copy": "Kopieren fehlgeschlagen",
+    "Notifications": "Mitteilungen"
   }
 }

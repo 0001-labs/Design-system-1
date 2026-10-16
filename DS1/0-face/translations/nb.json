@@ -59,6 +59,10 @@
     "Swedish": "Svensk",
     "Chinese": "Kinesisk",
     "Show password": "Vis passord",
-    "Hide password": "Skjul passord"
+    "Hide password": "Skjul passord",
+    "OK": "OK",
+    "Copied": "Kopiert",
+    "Could not copy": "Kunne ikke kopiere",
+    "Notifications": "Varsler"
   }
 }

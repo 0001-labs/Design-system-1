@@ -401,10 +401,27 @@ dialog.ds-dialog::backdrop {
   right: var(--ds-unit);
 }
 
+/* A field in the frame, as a prompt has: its label one row high, the field
+ * one row high beneath it and as wide as the frame, two squares in all. */
+.ds-dialog [data-ds-dialog="field"] {
+  display: flex;
+  flex-direction: column;
+}
+
+.ds-dialog [data-ds-dialog="label"] {
+  min-height: var(--ds-row-height);
+  line-height: var(--ds-row-height);
+}
+
+.ds-dialog [data-ds-dialog="field"] > .ds-input {
+  --ds-input-height: var(--ds-row-height);
+  width: 100%;
+}
+
 /*
  * `.ds-button--primary` and `--secondary` are the element's variants on a
  * native button: a form's submit button stays native so Enter in a field
- * submits the form.
+ * submits the form. `--danger` is its `danger` attribute.
  */
 
 .ds-button--primary,
@@ -423,6 +440,12 @@ dialog.ds-dialog::backdrop {
 
 .ds-button--secondary:hover:not(:disabled, [aria-disabled="true"]) {
   --ds-button-background: var(--ds-fill-hover);
+}
+
+/* `.ds-button--danger` is the element's `danger`: a destructive action's words
+ * in the danger colour, on the secondary face or none. */
+.ds-button--danger {
+  --ds-button-color: var(--ds-danger-color, var(--ds-tuned-red));
 }
 
 .ds-button--fixed {

@@ -59,6 +59,10 @@
     "Swedish": "スウェーデン語",
     "Chinese": "中国語",
     "Show password": "パスワードを表示",
-    "Hide password": "パスワードを非表示"
+    "Hide password": "パスワードを非表示",
+    "OK": "OK",
+    "Copied": "コピーしました",
+    "Could not copy": "コピーできませんでした",
+    "Notifications": "通知"
   }
 }

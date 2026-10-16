@@ -4,7 +4,7 @@
  * sync.json; never edit the copies, change them here and sync.
  */
 import { createHash } from 'node:crypto';
-import { join } from 'node:path';
+import { join, posix } from 'node:path';
 import { componentGraph } from './scripts/component-graph.mjs';
 
 const rootStyles = ['one.css', 'grid.css', 'component-tokens.css', 'component-metrics.css', 'component-appearance.css'];
@@ -25,6 +25,32 @@ const tokenStyles = ['component-appearance.css', 'component-metrics.css', 'compo
 const withoutImports = css => css.replace(/^@import\s+"\.\/[^"]+";\s*\n/gm, '');
 
 const languageFiles = ['i18n.ts', 'languages.ts', 'language-routing.ts', 'translations-format.ts', 'language-validator.ts', 'shared-words.ts'];
+
+/**
+ * A module and everything it imports, keyed by their paths inside DS1/
+ * (`0-face/feedback.ts`, `2-core/styles/ds-toast.css`, `x-icon/check.svg`), as
+ * the components export lays them out.
+ */
+function moduleGraph(read, entry) {
+  const imports = /(?:\bfrom\s*|\bimport\s*\(\s*|^\s*import\s*|@import\s*)["'](\.[^"']+)["']/gm;
+  const exists = path => { try { read(`DS1/${path}`); return true; } catch { return false; } };
+  const files = new Map();
+  const visit = file => {
+    if (files.has(file)) return;
+    const content = read(`DS1/${file}`);
+    files.set(file, content);
+    if (!/\.(ts|css)$/.test(file)) return;
+    for (const match of String(content).matchAll(imports)) {
+      const base = posix.normalize(posix.join(posix.dirname(file), match[1].split('?')[0]));
+      if (base.startsWith('..')) throw new Error(`Dependency outside DS1: ${match[1]} in ${file}`);
+      const dependency = [base, `${base}.ts`, `${base}.json`, `${base}/index.ts`].find(exists);
+      if (!dependency) throw new Error(`Unresolved ${match[1]} in ${file}`);
+      visit(dependency);
+    }
+  };
+  visit(entry);
+  return files;
+}
 
 export default {
   exports: {
@@ -111,6 +137,17 @@ export default {
         files.set('components-manifest.json', JSON.stringify({ source: 'Design system 1/DS1', commit, components, files: hashes }, null, 2) + '\n');
         return files;
       },
+    },
+    /**
+     * Feedback without Lit (`0-face/feedback.ts`): toasts drawn by the page
+     * toaster, the promise dialogs and copyText, with everything they import
+     * (the language module and shared words, the toast's stylesheet and icons),
+     * by their paths inside DS1/. Copied to the same `to` as `languages` or
+     * `components`, the page keeps one language runtime; the dialogs need
+     * controls.css (`nativeControls` on `root` or `tokens`).
+     */
+    feedback: {
+      files({ read }) { return moduleGraph(read, '0-face/feedback.ts'); },
     },
     /** The email renderer and its font: `email` and `font` say where they go, from "to". */
     email: {

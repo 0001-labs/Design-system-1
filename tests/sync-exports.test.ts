@@ -51,3 +51,11 @@ test('the root export can copy only the stylesheets a product loads', () => {
   expect(Object.keys(files('root', { styles: [], fonts: false, modules: ['scaling'] }))).toEqual(['0-face/scaling.ts']);
   expect(() => files('root', { styles: ['other.css'] })).toThrow(/Unknown root stylesheet/);
 });
+
+test('the feedback export carries the module with everything it imports, by its paths in DS1', () => {
+  const copy = files('feedback');
+  for (const file of ['0-face/feedback.ts', '0-face/toaster.ts', '0-face/toast-queue.ts', '0-face/dialogs.ts', '0-face/copy-text.ts', '0-face/i18n.ts', '0-face/shared-words.ts', '0-face/translations/da.json', '2-core/styles/ds-toast.css', '1-root/component-metrics.css', 'x-icon/check.svg', 'x-icon/close.svg']) expect(copy).toHaveProperty([file]);
+  // No Lit and no component comes with it.
+  expect(Object.keys(copy).some((file) => /^2-core\/ds-|^3-unit|^4-page/.test(file))).toBe(false);
+  expect(Object.values(copy).some((content) => /from\s+["']lit/.test(String(content)))).toBe(false);
+});

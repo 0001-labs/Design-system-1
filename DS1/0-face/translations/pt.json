@@ -59,6 +59,10 @@
     "Swedish": "Sueco",
     "Chinese": "Chinês",
     "Show password": "Mostrar palavra-passe",
-    "Hide password": "Ocultar palavra-passe"
+    "Hide password": "Ocultar palavra-passe",
+    "OK": "OK",
+    "Copied": "Copiado",
+    "Could not copy": "Não foi possível copiar",
+    "Notifications": "Notificações"
   }
 }

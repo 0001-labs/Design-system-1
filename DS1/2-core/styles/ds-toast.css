@@ -10,8 +10,8 @@
   --ds-toast-width: calc(16 * var(--ds-unit));
   --ds-toast-offset: var(--ds-unit);
   --ds-toast-gap: calc(var(--ds-unit) - var(--ds-control-height));
-  --ds-toast-background: var(--ds-tooltip-background, light-dark(var(--ds-black), var(--ds-white)));
-  --ds-toast-color: var(--ds-tooltip-color, light-dark(var(--ds-white), var(--ds-black)));
+  --ds-toast-background: var(--ds-tooltip-background, light-dark(var(--ds-black, #2a2a2a), var(--ds-white, #ffffff)));
+  --ds-toast-color: var(--ds-tooltip-color, light-dark(var(--ds-white, #ffffff), var(--ds-black, #2a2a2a)));
   display: contents;
 }
 
@@ -116,6 +116,8 @@ ol[data-expanded="true"] .toast[data-mounted="true"] {
   --ds-icon-color: currentColor;
 }
 .icon:first-child { margin-left: calc(-4px * var(--ds-sf)); }
+/* The page toaster (0-face/toaster.ts) draws its icons as inline SVG, at ds-icon's size. */
+.icon > svg, .close > svg { width: calc(14px * var(--ds-sf)); height: calc(14px * var(--ds-sf)); }
 .content { flex: 1 1 auto; min-width: 0; }
 .title, .description { white-space: normal; overflow-wrap: anywhere; }
 .description { opacity: 0.7; }
