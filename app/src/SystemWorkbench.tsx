@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { LAYERS } from '../../shared/component-directory';
 import { EXAMPLES, PAGE_EXAMPLES } from '../../website/src/lib/component-examples';
-import { readLibraryToken, setLibraryToken } from './lib/libraryTokens';
+import { libraryTokenValues, setLibraryToken } from './lib/libraryTokens';
 import componentTokens from '../../DS1/1-root/component-tokens.css?raw';
 import componentMetrics from '../../DS1/1-root/component-metrics.css?raw';
 import './system-workbench.css';
@@ -11,6 +11,7 @@ export const libraryTemplate = `/* Design system 1 component library */\n${compo
 const sources = import.meta.glob<string>('../../DS1/{2-core,3-unit,4-page}/**/*.css', { query: '?raw', import: 'default', eager: true });
 const properties = (text: string) => [...new Set([...text.matchAll(/(--[a-zA-Z0-9_-]+)\s*:/g)].map(match => match[1]!))].sort();
 const sharedTokens = properties(libraryTemplate);
+const defaults = libraryTokenValues(libraryTemplate);
 const aliases: Record<string, string> = { '--ds-accent-color': '--one-accent-color', '--ds-radius': '--one-radius', '--ds-text-color': '--one-text', '--ds-typeface-regular': '--one-font', '--ds-type-size-default': '--one-font-size' };
 
 function Preview({ example, css }: { example: string; css: string }) {
@@ -29,6 +30,7 @@ export function SystemWorkbench({ initialCss, initialConfig, onDirty, headerSlot
   const [selected, setSelected] = useState('/2-core/button/');
   const [css, setCss] = useState(initialCss ?? libraryTemplate);
   const [search, setSearch] = useState('');
+  const values = useMemo(() => libraryTokenValues(css), [css]);
   const config = useRef(initialConfig ?? { schema: 2 });
   const entry = LAYERS.flatMap(layer => layer.entries).find(item => item.href === selected)!;
   const examples = PAGE_EXAMPLES[selected.replace(/^\/|\/$/g, '')] ?? [];
@@ -42,7 +44,7 @@ export function SystemWorkbench({ initialCss, initialConfig, onDirty, headerSlot
     // Preserve older native-element libraries while exposing the canonical component tokens.
     let next = setLibraryToken(css, name, value);
     const alias = aliases[name];
-    if (alias && readLibraryToken(css, alias) !== undefined) next = setLibraryToken(next, alias, value);
+    if (alias && values.get(alias) !== undefined) next = setLibraryToken(next, alias, value);
     update(next);
   };
   return <div className="workbench system-workbench" data-testid="workbench">
@@ -64,7 +66,7 @@ export function SystemWorkbench({ initialCss, initialConfig, onDirty, headerSlot
       <aside className="system-workbench-tokens">
         <h2 className="app-panel-label">Tokens</h2>
         <input aria-label="Filter tokens" placeholder="Filter tokens" value={search} onChange={event => setSearch(event.target.value)} />
-        {tokens.map(name => <label key={name}><span>{name}</span><input aria-label={name} placeholder={readLibraryToken(libraryTemplate, name) ?? 'Inherited'} value={readLibraryToken(css, name) ?? ''} onChange={event => setToken(name, event.target.value)} /></label>)}
+        {tokens.map(name => <label key={name}><span>{name}</span><input aria-label={name} placeholder={defaults.get(name) ?? 'Inherited'} value={values.get(name) ?? ''} onChange={event => setToken(name, event.target.value)} /></label>)}
       </aside>
     </div>
     <section aria-label="Live CSS file" className="css-file-panel">
