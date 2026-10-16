@@ -1,6 +1,10 @@
 /* ds-banner.css */
 /* Fixed banner component styles for notifications/alerts */
 
+:host([hidden]) {
+  display: none !important;
+}
+
 :host {
   display: flex;
   position: absolute;
@@ -55,7 +59,13 @@
   font-size: calc(12px * var(--sf, 1));
 }
 
-.action-wrapper a {
+.action-wrapper a,
+.action-wrapper button {
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
   color: var(--banner-action-color);
   text-decoration: none;
   font-family: var(--typeface-regular);
@@ -65,8 +75,35 @@
   display: inline-block;
 }
 
-.action-wrapper a:hover {
+.action-wrapper a:hover,
+.action-wrapper button:hover {
   opacity: 0.8;
+}
+
+.action-wrapper a:focus-visible,
+.action-wrapper button:focus-visible,
+.dismiss:focus-visible {
+  outline: 2px solid var(--ds-focus-ring, var(--sharp-blue));
+  outline-offset: 1px;
+}
+
+/* The dismiss button: one control high and as wide, at the banner's end. */
+.dismiss {
+  appearance: none;
+  box-sizing: border-box;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: calc(16px * var(--sf, 1));
+  height: calc(16px * var(--sf, 1));
+  margin: 0 0 0 calc(4px * var(--sf, 1));
+  padding: 0;
+  border: 0;
+  border-radius: calc(4px * var(--sf, 1));
+  background: none;
+  color: var(--banner-action-color);
+  cursor: pointer;
 }
 
 .action-wrapper ds-text {
