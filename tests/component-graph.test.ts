@@ -28,6 +28,14 @@ test('selecting the page carries its React adapter, so a product needs no JSX ty
   for (const file of ['4-page/ds-page.ts', '4-page/styles/ds-page.css', 'react/page.ts']) expect(files.has(file)).toBe(true);
 });
 
+test('empty states and notices carry their React adapters and the classes that draw them', () => {
+  const { files } = componentGraph(ds1, ['empty', 'notice']);
+  for (const file of ['2-core/ds-empty.ts', '2-core/ds-notice.ts', 'react/empty.ts', 'react/notice.ts', '1-root/empty.css', '1-root/notice.css', '2-core/ds-icon.ts']) expect(files.has(file)).toBe(true);
+  // controls.css travels with every selection, so its native classes do too.
+  expect(componentGraph(ds1, ['text']).files.has('1-root/notice.css')).toBe(true);
+  expect(componentGraph(ds1, ['text']).files.has('react/notice.ts')).toBe(false);
+});
+
 test('unknown and malformed names are refused', () => {
   expect(() => componentGraph(ds1, ['nothing'])).toThrow(/Unknown component/);
   expect(() => componentGraph(ds1, ['../x'])).toThrow(/Invalid component/);

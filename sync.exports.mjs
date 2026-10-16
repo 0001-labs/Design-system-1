@@ -10,6 +10,8 @@ import { componentGraph } from './scripts/component-graph.mjs';
 const rootStyles = ['one.css', 'grid.css', 'text.css', 'component-tokens.css', 'component-metrics.css', 'component-appearance.css'];
 /** one.css and controls.css both import the text classes. */
 const importsText = ['one.css', 'controls.css'];
+/** The sheets controls.css imports besides the text classes: tables, empty states and notices. */
+const controlSheets = ['table.css', 'empty.css', 'notice.css'];
 /** Sheets for writing that a product asks for by name, as a flag or in `styles`. */
 const writingSheets = { prose: 'prose.css', classless: 'one.semantic.css' };
 const askedSheets = options => Object.entries(writingSheets).filter(([flag]) => options[flag]).map(([, file]) => file);
@@ -52,9 +54,9 @@ export default {
     },
     /**
      * Component tokens for static stylesheets that import them by URL.
-     * `nativeControls` adds controls.css with the table and text classes it
-     * imports (table.css, text.css); `prose` adds the prose sheet (prose.css,
-     * for writing marked data-ds-prose) and `classless` the classless sheet
+     * `nativeControls` adds controls.css with the table, text, empty-state and
+     * notice classes it imports (table.css, text.css, empty.css, notice.css);
+     * `prose` adds the prose sheet (prose.css, for writing marked data-ds-prose) and `classless` the classless sheet
      * (one.semantic.css, which styles a whole page of plain HTML); `bundle` writes them all as one
      * bundle.css with the imports resolved, for a page that can carry only one
      * stylesheet or inlines its styles.
@@ -62,7 +64,7 @@ export default {
     tokens: {
       files({ read, options }) {
         const files = options.bundle ? [...tokenStyles] : ['component-tokens.css', 'component-metrics.css', 'component-appearance.css'];
-        if (options.nativeControls) files.push('table.css', 'text.css', 'controls.css');
+        if (options.nativeControls) files.push('table.css', 'text.css', 'empty.css', 'notice.css', 'controls.css');
         files.push(...askedSheets(options));
         if (options.bundle) return { 'bundle.css': `/* Generated from Design system 1/DS1/1-root: ${files.join(', ')}. Change Design system 1 and sync. */\n` + files.map(file => withoutImports(read(`DS1/1-root/${file}`))).join('\n') };
         return Object.fromEntries(files.map(file => [file, read(`DS1/1-root/${file}`)]));
@@ -73,7 +75,8 @@ export default {
      * component tokens) and the faces it loads, in fonts/. `styles` names the
      * stylesheets to copy when a product loads only some (`["grid.css"]`, or
      * `[]` for scripts alone); `fonts: false` leaves the faces to the product;
-     * `nativeControls` adds controls.css and the table.css it imports; `prose`
+     * `nativeControls` adds controls.css and the table.css, empty.css and
+     * notice.css it imports; `prose`
      * adds the prose sheet (prose.css) and `classless` the classless sheet
      * (one.semantic.css), which `styles` may also name; `modules` names page scripts
      * from 0-face/ (grid, grid-fit, layout-inspector, scaling, tooltips), copied
@@ -88,7 +91,7 @@ export default {
           if (!rootStyles.includes(file) && !Object.values(writingSheets).includes(file)) throw new Error(`Unknown root stylesheet: ${file}`);
           files[file] = read(`DS1/1-root/${file}`);
         }
-        if (options.nativeControls) for (const file of ['table.css', 'controls.css']) files[file] = read(`DS1/1-root/${file}`);
+        if (options.nativeControls) for (const file of [...controlSheets, 'controls.css']) files[file] = read(`DS1/1-root/${file}`);
         if (Object.keys(files).some(file => importsText.includes(file))) files['text.css'] = read('DS1/1-root/text.css');
         if (options.fonts !== false) for (const font of rootFonts) files[`fonts/${font}`] = read(`DS1/1-root/fonts/${font}`);
         for (const name of options.modules ?? []) {
@@ -112,8 +115,11 @@ export default {
     },
     /**
      * The Lit components named in `components`, with everything they import and
-     * their React adapters. components-manifest.json records them for the
-     * component adoption report, at the last commit that changed them.
+     * their React adapters (`empty` brings react/empty.ts, `notice`
+     * react/notice.ts). controls.css always travels with them, and with it the
+     * native classes it imports, `.ds-empty` and `.ds-notice` among them.
+     * components-manifest.json records them for the component adoption report,
+     * at the last commit that changed them.
      */
     components: {
       files({ source, options, git }) {

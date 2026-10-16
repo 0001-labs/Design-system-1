@@ -1,0 +1,83 @@
+@import "./component-metrics.css";
+
+/*
+ * An empty state, as plain classes on native elements.
+ *
+ * It says that a place has nothing in it yet and what to do about it: a title,
+ * a line of text and, when there is one, the action that fills it. The words
+ * sit on the paper with no box, no illustration and no colour; every line is
+ * one square, so the whole stands on whole squares. The `ds-empty` element
+ * draws the same parts from a translation key, with the shared words' "Nothing
+ * here yet" as its title when none is given.
+ *
+ *   ds-empty                 the block, at most sixteen squares wide
+ *   ds-empty__icon           an icon from the library, on its own square, muted
+ *   ds-empty__title          one line in the medium face
+ *   ds-empty__text           lines of one square, muted
+ *   ds-empty__actions        buttons or links on one row, one square below
+ *   ds-empty--centered       centred in the space it stands in
+ *
+ * Tokens: `--ds-empty-measure` (the widest it grows, sixteen squares) and
+ * `--ds-empty-padding` (the room above and below, none by default).
+ */
+
+.ds-empty {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  max-width: var(--ds-empty-measure, calc(16 * var(--ds-unit)));
+  margin: 0;
+  padding-block: var(--ds-empty-padding, 0);
+  color: var(--ds-text-color);
+  font-family: var(--ds-typeface-regular);
+  font-feature-settings: var(--ds-font-features);
+  font-size: var(--ds-type-size-default);
+  font-weight: var(--ds-type-weight-default);
+  line-height: var(--ds-unit);
+  letter-spacing: var(--ds-type-letterspacing-default);
+  text-transform: none;
+}
+
+.ds-empty__icon {
+  display: flex;
+  align-items: center;
+  height: var(--ds-unit);
+  color: var(--ds-text-color-muted);
+}
+
+.ds-empty__title,
+.ds-empty__text {
+  margin: 0;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+.ds-empty__title {
+  font-family: var(--ds-typeface-medium);
+  font-weight: var(--ds-type-weight-bold);
+}
+
+.ds-empty__text {
+  color: var(--ds-text-color-muted);
+}
+
+.ds-empty__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 calc(var(--ds-unit) / 2);
+  min-height: var(--ds-row-height);
+  margin-top: var(--ds-unit);
+}
+
+.ds-empty--centered {
+  align-items: center;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.ds-empty--centered .ds-empty__actions {
+  justify-content: center;
+}
