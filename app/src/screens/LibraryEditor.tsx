@@ -324,13 +324,13 @@ function ConflictBar({
 
 /**
  * `draftConfig` is advisory. If it is unparseable or from a future schema, the
- * editor still opens — the stylesheet text is what actually matters, and
- * App.tsx re-derives the controls from it.
+ * editor still opens. Preserve any readable advisory configuration; token
+ * controls derive their values from the stylesheet.
  */
 function parseConfig(raw: string, label: string): WorkbenchConfig | undefined {
   try {
     const parsed = JSON.parse(raw) as Partial<WorkbenchConfig>;
-    if (parsed?.schema !== 1 || !parsed.configs || typeof parsed.accent !== "string") {
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed) || typeof parsed.schema !== "number") {
       return undefined;
     }
     return parsed as WorkbenchConfig;
