@@ -83,3 +83,10 @@
 .adoption-icon-name { display: flex; align-items: center; justify-content: flex-end; gap: calc(.5 * var(--report-unit)); height: var(--report-unit); }
 .adoption-icon-name > span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .adoption-icon-name ds-icon { flex: none; width: var(--report-unit); height: var(--report-unit); }
+/* A local icon that stands for a DS1 icon shows that drawing, quieter than DS1's own. */
+.adoption-icon-name .adoption-icon-stands { opacity: .45; }
+/* What each kind of site means, on one-square rows below the legend. */
+.adoption-kinds { display: flex; flex-wrap: wrap; gap: 0 var(--report-unit); margin: 0 0 var(--report-unit); }
+.adoption-kinds div { display: flex; gap: calc(.5 * var(--report-unit)); height: var(--report-unit); }
+.adoption-kinds dt, .adoption-kinds dd { margin: 0; line-height: var(--report-unit); white-space: nowrap; }
+.adoption-kinds dd { color: var(--base-darker-grey); }

@@ -15,15 +15,41 @@ export interface ComponentCell {
 }
 /** An icon an app names: DS1's drawing, a copy that is not today's DS1 drawing, or a name DS1 does not have. */
 export type IconStatus = "shared" | "differs" | "local";
-export interface IconSite { file: string; line: number; name: string }
+/**
+ * How a site draws its icon: a `ds-icon` element, a React icon component, an
+ * icon set package, an imported or linked SVG file, a CSS mask or background,
+ * an icon font class, a text glyph, an inline `<svg>`, or SVG made in script.
+ */
+export type IconKind = "element" | "component" | "library" | "file" | "mask" | "font" | "glyph" | "inline" | "script";
+export interface IconSite {
+  file: string;
+  line: number;
+  /** The name as the source writes it: an icon name, a component, a class, a glyph, a file name. */
+  name: string;
+  /** Absent in snapshots made before kinds were recorded: those are `element` sites. */
+  kind?: IconKind;
+  status?: IconStatus;
+  /** The drawing a mask, file or import resolves to, relative to the app. */
+  drawing?: string;
+}
 export interface IconCell {
   uses: number;
   status: IconStatus;
   /** The app's copied drawing against today's DS1: none when the app has no copy and resolves from DS1. */
   copy: "same" | "differs" | "missing" | "local" | "none";
   sites: IconSite[];
+  /** The DS1 icon a local icon stands for, where its name makes that obvious. */
+  ds1?: string;
 }
-export interface IconAdoption { copy: string | null; cells: Record<string, IconCell>; dynamic: IconSite[]; inline: IconSite[] }
+export interface IconAdoption {
+  copy: string | null;
+  cells: Record<string, IconCell>;
+  dynamic: IconSite[];
+  /** Drawings made in the source (inline SVG, SVG made in script, SVG data addresses) that are not a DS1 drawing. */
+  inline: IconSite[];
+  /** Stylesheets and links that load an icon font. */
+  fonts?: IconSite[];
+}
 
 export interface AdoptionApp {
   id: string;
