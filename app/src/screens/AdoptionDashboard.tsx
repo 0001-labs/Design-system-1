@@ -2,6 +2,8 @@ import { useAuthActions, useAuthToken } from '@convex-dev/auth/react';
 import { useConvexAuth } from 'convex/react';
 import { useEffect, useState } from 'react';
 import { calculateScalingFactor } from '../../../DS1/0-face/scaling';
+import '../../../DS1/2-core/ds-button';
+import { Button } from '../../../DS1/react/button';
 import { SignIn } from './SignIn';
 import { ComponentAdoption } from './ComponentAdoption';
 
@@ -50,7 +52,7 @@ export function AdoptionDashboard() {
   const { isLoading, isAuthenticated, ready, error, leave } = useOwnerSession('Component adoption · Design system 1');
   if (isLoading) return <main className="adoption" role="status">Checking your session…</main>;
   if (!isAuthenticated) return <div className="app-shell"><SignIn dashboardOnly redirectTo="/reports/components" /></div>;
-  if (error) return <main className="adoption" role="alert"><p>{error}</p><button type="button" onClick={() => void leave()}>Sign out</button></main>;
+  if (error) return <main className="adoption" role="alert"><p>{error}</p><Button secondary onClick={() => void leave()}>Sign out</Button></main>;
   if (!ready) return <main className="adoption" role="status">Checking dashboard access…</main>;
   return <ComponentAdoption onSignOut={leave} />;
 }

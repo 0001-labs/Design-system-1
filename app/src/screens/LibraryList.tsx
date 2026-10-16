@@ -3,6 +3,8 @@ import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 
 import { api } from "../../../convex/_generated/api";
+import "../../../DS1/2-core/ds-button";
+import { Button } from "../../../DS1/react/button";
 import { libraryTemplate } from "../SystemWorkbench";
 import { failureCode } from "../lib/convex";
 import { Link, navigate } from "../router";
@@ -72,18 +74,18 @@ export function LibraryList() {
       <header className="workbench-header" data-ds-area="Library actions">
         <h1>Your libraries</h1>
         <div className="workbench-header-actions">
-          <button
-            className="action-button action-button--primary"
+          <Button
+            primary
             data-testid="create-library"
             disabled={busy}
             onClick={onCreate}
             type="button"
           >
             {busy ? "Creating…" : "New library"}
-          </button>
-          <button className="action-button" onClick={() => void signOut()} type="button">
+          </Button>
+          <Button secondary onClick={() => void signOut()} type="button">
             Sign out
-          </button>
+          </Button>
         </div>
       </header>
 

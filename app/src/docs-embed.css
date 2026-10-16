@@ -28,7 +28,6 @@
 [data-docs-embed] .library-card,
 [data-docs-embed] .publish-panel { background: var(--workbench-panel); }
 
-[data-docs-embed] .action-button:not(.action-button--primary),
 [data-docs-embed] .copy-length-control button,
 [data-docs-embed] .number-input,
 [data-docs-embed] .color-input,
@@ -38,10 +37,6 @@
 [data-docs-embed] .auth-screen input[type='email'] {
   background: var(--docs-control);
   color: var(--workbench-ink);
-}
-
-[data-docs-embed] .action-button.action-button--primary {
-  color: var(--workbench-canvas);
 }
 
 [data-docs-embed] .controls-section--output code { background: var(--docs-hover); }

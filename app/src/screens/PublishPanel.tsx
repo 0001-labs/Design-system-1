@@ -3,6 +3,8 @@ import { useAction, useQuery } from "convex/react";
 import { useMemo, useState } from "react";
 
 import { api } from "../../../convex/_generated/api";
+import "../../../DS1/2-core/ds-button";
+import { Button } from "../../../DS1/react/button";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { downloadCss } from "../lib/download";
 
@@ -97,9 +99,9 @@ export function PublishPanel(props: Props) {
     <aside className="publish-panel" data-testid="publish-panel">
       <header>
         <h2>Publish</h2>
-        <button className="action-button" onClick={props.onClose} type="button">
+        <Button secondary onClick={props.onClose} type="button">
           Close
-        </button>
+        </Button>
       </header>
 
       <p className="library-card__state" data-state={props.state} data-testid="state-pill">
@@ -129,24 +131,24 @@ export function PublishPanel(props: Props) {
         </p>
       ) : null}
 
-      <button
-        className="action-button action-button--primary"
+      <Button
+        primary
         data-testid="publish-button"
         disabled={stage === "publishing" || blocking.length > 0}
         onClick={() => void onPublish()}
         type="button"
       >
         {stage === "publishing" ? "Publishing…" : "Publish"}
-      </button>
+      </Button>
 
       <section>
         <h3>Install</h3>
         {snippet ? (
           <>
             <pre data-testid="install-snippet">{snippet}</pre>
-            <button className="action-button" data-testid="install-link" onClick={() => void onCopy()} type="button">
+            <Button secondary data-testid="install-link" onClick={() => void onCopy()} type="button">
               {copied ? "Copied" : "Copy install link"}
-            </button>
+            </Button>
           </>
         ) : (
           // A copied link to a 404 is the obvious top support ticket.
@@ -156,16 +158,16 @@ export function PublishPanel(props: Props) {
 
       <section>
         <h3>Download</h3>
-        <button
-          className="action-button"
+        <Button
+          secondary
           onClick={() => downloadCss(props.css, `${props.slug}-draft.css`)}
           type="button"
         >
           Download draft
-        </button>
+        </Button>
         {props.installUrl ? (
-          <button
-            className="action-button"
+          <Button
+            secondary
             onClick={() => {
               // Fetched from the public URL, so it is byte-identical to what
               // customers receive rather than to what the editor happens to hold.
@@ -176,7 +178,7 @@ export function PublishPanel(props: Props) {
             type="button"
           >
             Download published
-          </button>
+          </Button>
         ) : null}
       </section>
 
@@ -196,8 +198,8 @@ export function PublishPanel(props: Props) {
                   <small>{version.byteSize} bytes</small>
                 </div>
                 {!version.isLive && version.status === "published" ? (
-                  <button
-                    className="action-button"
+                  <Button
+                    secondary
                     data-testid={`rollback-${version.version}`}
                     onClick={() => {
                       if (!confirm(`Roll the live stylesheet back to v${version.version}?`)) return;
@@ -209,7 +211,7 @@ export function PublishPanel(props: Props) {
                     type="button"
                   >
                     Roll back
-                  </button>
+                  </Button>
                 ) : null}
               </li>
             ))}

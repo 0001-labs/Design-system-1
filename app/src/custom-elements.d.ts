@@ -7,6 +7,7 @@ declare module "react" {
     interface IntrinsicElements {
       "ds-icon": DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement> & { type?: string };
       "ds-button": DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement> & { control?: "host"; choice?: boolean; active?: boolean };
+      "ds-icon": DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement> & { type: string };
       "ds-page": DetailedHTMLProps<HTMLAttributes<Page>, Page> & Partial<Pick<Page, "layout" | "divided" | "fill">>;
       "ds-sidebar": DetailedHTMLProps<HTMLAttributes<Sidebar>, Sidebar> & { label?: string; empty?: string };
     }

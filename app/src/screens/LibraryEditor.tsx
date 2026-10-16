@@ -2,6 +2,10 @@ import { useMutation, useQuery } from "convex/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { api } from "../../../convex/_generated/api";
+import "../../../DS1/2-core/ds-button";
+import { Button } from "../../../DS1/react/button";
+import "../../../DS1/2-core/ds-input";
+import { Input } from "../../../DS1/react/input";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { SystemWorkbench as App, type LibraryWorkbenchConfig as WorkbenchConfig } from "../SystemWorkbench";
 import {
@@ -181,9 +185,9 @@ export function LibraryEditor({ libraryId }: { libraryId: string }) {
     return (
       <main className="route-splash">
         <p>That library does not exist.</p>
-        <button onClick={() => navigate("/libraries")} type="button">
+        <Button secondary onClick={() => navigate("/libraries")} type="button">
           Back to your libraries
-        </button>
+        </Button>
       </main>
     );
   }
@@ -201,7 +205,7 @@ export function LibraryEditor({ libraryId }: { libraryId: string }) {
       headerSlot={
         <header className="workbench-header" data-ds-area="Library actions">
           <div>
-            <Link to="/libraries">← Libraries</Link>
+            <Link className="workbench-back" to="/libraries"><ds-icon type="left" aria-hidden="true"></ds-icon>Libraries</Link>
             {editingName ? (
               <form onSubmit={async (event) => {
                 event.preventDefault();
@@ -217,20 +221,20 @@ export function LibraryEditor({ libraryId }: { libraryId: string }) {
                   setRenaming(false);
                 }
               }}>
-                <input aria-label="Library name" autoFocus maxLength={60} required
+                <Input aria-label="Library name" autoFocus maxLength={60} required
                   value={nameInput} disabled={renaming}
                   onChange={(event) => setNameInput(event.target.value)} />
-                <button className="action-button" type="submit" disabled={renaming || !nameInput.trim()}>
+                <Button secondary type="submit" disabled={renaming || !nameInput.trim()}>
                   {renaming ? "Saving…" : "Save name"}
-                </button>
-                <button className="action-button" type="button" disabled={renaming}
-                  onClick={() => { setEditingName(false); setRenameError(null); }}>Cancel</button>
+                </Button>
+                <Button secondary type="button" disabled={renaming}
+                  onClick={() => { setEditingName(false); setRenameError(null); }}>Cancel</Button>
               </form>
             ) : <>
               <strong>{library.name}</strong>
-              <button className="action-button" type="button" onClick={() => {
+              <Button secondary type="button" onClick={() => {
                 setNameInput(library.name); setEditingName(true); setRenameError(null);
-              }}>Rename</button>
+              }}>Rename</Button>
             </>}
             {renameError ? <span role="alert">{renameError}</span> : null}
           </div>
@@ -239,14 +243,14 @@ export function LibraryEditor({ libraryId }: { libraryId: string }) {
             <span data-testid="save-state" data-state={saveState}>
               {SAVE_LABEL[saveState]}
             </span>
-            <button
-              className="action-button action-button--primary"
+            <Button
+              primary
               data-testid="open-publish"
               onClick={() => setPublishOpen((open) => !open)}
               type="button"
             >
               {publishOpen ? "Hide publish" : "Publish"}
-            </button>
+            </Button>
           </div>
 
           {publishOpen ? (
@@ -312,12 +316,12 @@ function ConflictBar({
         Your changes are safe on this device.
       </p>
       {/* Never auto-merge CSS text — the user decides. */}
-      <button className="action-button" onClick={onKeepMine} type="button">
+      <Button secondary onClick={onKeepMine} type="button">
         Keep mine
-      </button>
-      <button className="action-button" onClick={onLoadTheirs} type="button">
+      </Button>
+      <Button secondary onClick={onLoadTheirs} type="button">
         Load theirs
-      </button>
+      </Button>
     </div>
   );
 }

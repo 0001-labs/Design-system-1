@@ -5,6 +5,8 @@ import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { useConvexAuth } from "convex/react";
 import { useEffect, type ReactNode } from "react";
 
+import "../../DS1/2-core/ds-button";
+import { Button } from "../../DS1/react/button";
 import { App } from "./App";
 import { AppShell } from "./AppShell";
 import { convex } from "./lib/convex";
@@ -65,9 +67,9 @@ function NotFound() {
   return (
     <div className="route-splash">
       <p>That page does not exist.</p>
-      <button onClick={() => navigate("/libraries")} type="button">
+      <Button secondary onClick={() => navigate("/libraries")}>
         Go to your libraries
-      </button>
+      </Button>
     </div>
   );
 }

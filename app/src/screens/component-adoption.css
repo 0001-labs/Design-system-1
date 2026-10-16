@@ -16,11 +16,9 @@
 .adoption-heading { margin-bottom: var(--report-unit); }
 .adoption-eyebrow, .adoption-meta { color: var(--base-darker-grey); }
 .adoption-intro { max-width: calc(50 * var(--report-unit)); }
-.adoption-controls, .adoption-views, .adoption-legend { display: flex; align-items: center; flex-wrap: wrap; gap: var(--report-unit); }
+.adoption-controls, .adoption-legend { display: flex; align-items: center; flex-wrap: wrap; gap: var(--report-unit); }
 .adoption-controls { margin-block: var(--report-unit); }
-.adoption-views { gap: calc(.5 * var(--report-unit)); }
 .adoption-controls label { display: inline-flex; align-items: center; gap: calc(.5 * var(--report-unit)); }
-.adoption-controls input { margin: 0; accent-color: var(--apple-green); }
 .adoption-scroll { overflow: auto; padding-right: calc(5 * var(--report-unit)); padding-bottom: var(--report-unit); }
 .adoption table { border-collapse: separate; border-spacing: 0; font-size: inherit; line-height: var(--report-unit); }
 .adoption tr { background: transparent; }

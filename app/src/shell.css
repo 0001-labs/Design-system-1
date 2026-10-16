@@ -58,7 +58,6 @@ body { min-width: 0; overflow: auto; background: var(--workbench-panel); }
 .app-shell .css-editor-shell textarea { padding: 20px; font-size: 12px; line-height: 20px; }
 .app-shell .workbench-header { min-height: calc(3 * var(--app-cell)); padding: var(--app-cell); border: 0; box-shadow: inset 0 -1px var(--workbench-line); gap: var(--app-cell); }
 .app-shell .workbench-header-actions { flex-wrap: wrap; gap: var(--app-cell); }
-.app-shell .action-button { min-height: var(--app-cell); padding: 0 4px; border-radius: 0; font-size: calc(.65 * var(--app-cell)); line-height: var(--app-cell); width: fit-content; }
 .app-shell .publish-panel { gap: var(--app-cell); padding: var(--app-cell) 0; }
 .app-shell .auth-screen { height: auto; align-content: start; min-height: 0; width: calc(20 * var(--app-cell)); max-width: calc(100% - 2 * var(--app-cell)); margin: calc(4 * var(--app-cell)) 0 calc(4 * var(--app-cell)) calc(3 * var(--app-cell)); padding: 0; gap: var(--app-cell); font-size: calc(.75 * var(--app-cell)); line-height: var(--app-cell); }
 .app-shell .auth-screen h1 { font-size: calc(1.4 * var(--app-cell)); font-weight: 400; line-height: calc(2 * var(--app-cell)); margin: 0; }

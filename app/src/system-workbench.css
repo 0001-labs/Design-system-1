@@ -24,3 +24,4 @@
 .system-workbench .library-button-properties .library-button-gap input { width: calc(3 * var(--site-unit)); }
 .system-workbench .library-button-properties .box-model input { width: var(--site-unit); height: calc(16px * var(--sf, 1)); padding: 0; background: transparent; border: 0; border-radius: 0; font: inherit; }
 .system-workbench .library-button-mode { padding-top: var(--site-unit); }
+.system-workbench-docs { display: inline-flex; align-items: center; }

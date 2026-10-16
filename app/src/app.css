@@ -113,30 +113,6 @@ button:not([data-preview-component]) {
   background: #43a52e;
 }
 
-.action-button {
-  min-height: 29px;
-  border: 1px solid var(--workbench-line);
-  border-radius: 3px;
-  padding: 0 11px;
-  background: #fff;
-  cursor: pointer;
-  font-size: 10px;
-}
-
-.action-button:hover {
-  border-color: var(--workbench-ink);
-}
-
-/* Doubled class on purpose. `button:not([data-preview-component])` above sets
-   `color: inherit` at specificity (0,1,1), which outranks a single class — so
-   a single `.action-button--primary` renders dark text on a dark fill, i.e. an
-   invisible label. (0,2,0) wins it back. */
-.action-button.action-button--primary {
-  border-color: var(--workbench-ink);
-  background: var(--workbench-ink);
-  color: #fff;
-}
-
 .design-pane,
 .design-stack,
 .library-panel,
@@ -1660,15 +1636,6 @@ body.box-value-scrubbing * {
   outline-offset: 1px;
 }
 
-/* The shared .action-button is sized for the 10px chrome; these screens need a
-   target that matches their own scale. */
-.auth-screen .action-button,
-.dashboard .action-button {
-  min-height: 34px;
-  padding: 0 14px;
-  font-size: 12px;
-}
-
 .auth-screen [role="alert"] {
   color: #900b09;
 }
@@ -1821,6 +1788,11 @@ body.box-value-scrubbing * {
   text-decoration: none;
 }
 
+.workbench > .workbench-header .workbench-back {
+  display: inline-flex;
+  align-items: center;
+}
+
 .workbench > .workbench-header a:hover {
   color: var(--workbench-ink);
 }
@@ -1935,11 +1907,6 @@ body.box-value-scrubbing * {
   padding: 10px;
   background: #fff;
   font-size: 11px;
-}
-
-.publish-panel button:disabled {
-  cursor: not-allowed;
-  opacity: 0.45;
 }
 
 .publish-issues ul,

@@ -2,6 +2,9 @@ import { useAuthActions, useAuthToken } from "@convex-dev/auth/react";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { totalSites, type AdoptionReport, type ComponentCell } from "../../../shared/component-adoption";
 import "../../../DS1/2-core/ds-button";
+import "../../../DS1/2-core/ds-checkbox";
+import { Button } from "../../../DS1/react/button";
+import { Checkbox } from "../../../DS1/react/choice";
 import "../../../DS1/1-root/component-tokens.css";
 import { IconMatrix } from "./IconAdoption";
 import "./component-adoption.css";
@@ -77,10 +80,9 @@ export function ComponentMatrix({ report }: { report: AdoptionReport }) {
     <p className="adoption-intro">One row per app. One column per component. Numbers are places in the web source where a component is used.</p>
     <p className="adoption-meta">Snapshot <time dateTime={report.generatedAt}>{scannedAt.toLocaleString()}</time>{old ? " · More than a week old" : ""} · {available.length} of {report.apps.length} apps scanned · Click a number to inspect it.</p>
     <div className="adoption-controls">
-      <div className="adoption-views" role="group" aria-label="Count to show">
-        {views.map(option => <ds-button key={option.id} control="host" choice active={view === option.id} aria-pressed={view === option.id} onClick={() => { setView(option.id); setLimit(100); }}>{option.name}</ds-button>)}
-      </div>
-      <label><input type="checkbox" checked={showEmpty} onChange={event => setShowEmpty(event.target.checked)} /> Show unused components</label>
+      <Button split className="adoption-views" label="Count to show" value={view} onPress={(next: View) => { setView(next); setLimit(100); }}
+        segments={views.map(option => ({ value: option.id, label: option.name }))} />
+      <label><Checkbox checked={showEmpty} onChange={event => setShowEmpty(event.target.checked)} /> Show unused components</label>
     </div>
     <div className="adoption-scroll" tabIndex={0} role="region" aria-label="Component adoption matrix, scroll horizontally for more components">
       <table className="adoption-matrix" style={{ width: `calc(${columns.length + 12} * var(--report-unit))` }}>

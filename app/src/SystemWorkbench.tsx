@@ -88,7 +88,7 @@ export function SystemWorkbench({ initialCss, initialConfig, onDirty, headerSlot
         </nav>
       </aside>
       <main className="system-workbench-preview">
-        <div className="app-panel-heading"><h1>{entry.name}</h1><a href={entry.href} target="_blank" rel="noreferrer">Documentation ↗</a></div>
+        <div className="app-panel-heading"><h1>{entry.name}</h1><a className="system-workbench-docs" href={entry.href} target="_blank" rel="noreferrer">Documentation<ds-icon type="up-right" aria-hidden="true"></ds-icon></a></div>
         {examples.length ? examples.map((example, index) => <section key={example}><h2>{EXAMPLES[example]!.title}</h2><Preview example={example} css={previewCss} hoverRegion={buttonSelected ? hoverRegion : null} onMetrics={buttonSelected && index === 0 ? metrics => setButtonMetrics(previous => JSON.stringify(previous) === JSON.stringify(metrics) ? previous : metrics) : undefined} /></section>) : <p>This composition is described in the <a href={entry.href} target="_blank" rel="noreferrer">documentation</a>.</p>}
       </main>
       <aside className="system-workbench-tokens">
