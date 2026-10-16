@@ -612,6 +612,13 @@
     "shapes": 2
   },
   {
+    "key": "minus",
+    "name": "Minus",
+    "source": "Library",
+    "url": "/icons/library/minus.svg",
+    "shapes": 1
+  },
+  {
     "key": "money",
     "name": "Money",
     "source": "Library",
@@ -745,6 +752,13 @@
     "name": "Panel",
     "source": "Library",
     "url": "/icons/library/panel.svg",
+    "shapes": 2
+  },
+  {
+    "key": "pause",
+    "name": "Pause",
+    "source": "Library",
+    "url": "/icons/library/pause.svg",
     "shapes": 2
   },
   {
@@ -922,6 +936,13 @@
     "node": "115:171",
     "url": "/icons/interface/star.svg",
     "shapes": 1
+  },
+  {
+    "key": "start",
+    "name": "Start",
+    "source": "Library",
+    "url": "/icons/library/start.svg",
+    "shapes": 2
   },
   {
     "key": "stats",

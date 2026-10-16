@@ -692,6 +692,14 @@
     "shapes": 2
   },
   {
+    "key": "minus",
+    "name": "Minus",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M13.3334 7.5V8.5H2.66663V7.5H13.3334Z\" fill=\"currentColor\"/>\n</svg>",
+    "url": "/icons/library/minus.svg",
+    "shapes": 1
+  },
+  {
     "key": "money",
     "name": "Money",
     "source": "Library",
@@ -843,6 +851,14 @@
     "source": "Library",
     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\">\n  <path d=\"M13.9653 3.31348V12.6865H2.03467V3.31348H13.9653ZM3.03467 11.6865H12.9653V4.31348H3.03467V11.6865Z\" fill=\"currentColor\"/>\n  <path d=\"M12.9653 9.94276V8.94276H3.03467V9.94276H12.9653Z\" fill=\"currentColor\"/>\n</svg>",
     "url": "/icons/library/panel.svg",
+    "shapes": 2
+  },
+  {
+    "key": "pause",
+    "name": "Pause",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M4.5 3.0365H6.75V12.9635H4.5V3.0365Z\" fill=\"currentColor\"/>\n<path d=\"M9.25 3.0365H11.5V12.9635H9.25V3.0365Z\" fill=\"currentColor\"/>\n</svg>",
+    "url": "/icons/library/pause.svg",
     "shapes": 2
   },
   {
@@ -1043,6 +1059,14 @@
     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\">\n<g id=\"Icons\">\n<g id=\"Star\">\n<path id=\"Vector\" d=\"M4.38604 13.4L5.77704 9.26605L2.42304 7.01705H6.53104L8.00004 2.58405L9.49504 7.01705H13.577L10.223 9.26605L11.64 13.4L8.00004 10.761L4.38604 13.4Z\" fill=\"#1E1E1E\" />\n</g>\n</g>\n</svg>",
     "url": "/icons/interface/star.svg",
     "shapes": 1
+  },
+  {
+    "key": "start",
+    "name": "Start",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M4.5 3.0365H5.5V12.9635H4.5V3.0365Z\" fill=\"currentColor\"/>\n<path d=\"M11.5 3.0365V12.9635L6.25 8L11.5 3.0365Z\" fill=\"currentColor\"/>\n</svg>",
+    "url": "/icons/library/start.svg",
+    "shapes": 2
   },
   {
     "key": "stats",
