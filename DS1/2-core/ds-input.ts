@@ -508,7 +508,7 @@ export class Input extends LitElement {
       .join(" ");
 
     return html`
-      <div class="input-wrapper">
+      <div class=${hasError ? "input-wrapper has-error" : "input-wrapper"}>
         ${
           this.label || this.labelText
             ? html`
@@ -552,7 +552,7 @@ export class Input extends LitElement {
           hasError
             ? html`
                 <div id="error" class="error-message" role="status">
-                  ${this.errorText ? html`<ds-text .text=${this.errorText}></ds-text>` : this.error}
+                  ${this.errorText ? html`<ds-text wrap .text=${this.errorText}></ds-text>` : this.error}
                 </div>
               `
             : null

@@ -86,9 +86,11 @@
   padding: 0 calc(var(--ds-button-inset, 4px) * var(--ds-sf));
 }
 
+/* The secondary face's words are the text's ink, as on `.ds-button--secondary`
+   and the host and slotted faces; the grey is the face, not the words. */
 :is(button, a)[secondary] {
   background-color: var(--button-background-color-secondary);
-  color: var(--button-text-color-secondary, var(--black));
+  color: var(--ds-button-color, var(--ds-button-text-color));
   font-family: var(--ds-typeface-regular);
   padding: 0 calc(var(--ds-button-inset, 4px) * var(--ds-sf));
 }

@@ -52,16 +52,16 @@ export class Badge extends LitElement {
     this.measureFrame = requestAnimationFrame(() => {
       this.measureFrame = 0;
       const frame = this.shadowRoot!.querySelector<HTMLElement>(".frame")!;
-      if (this.iconOnly && this.icon) { frame.style.removeProperty("width"); return; }
+      frame.style.removeProperty("width");
+      if (this.iconOnly && this.icon) return;
       const unit = frame.getBoundingClientRect().height;
       if (!unit) return;
-      const label = this.shadowRoot!.querySelector<HTMLElement>(".label")!;
-      const icon = this.shadowRoot!.querySelector("ds-icon");
-      const styles = getComputedStyle(frame);
-      const natural = label.scrollWidth + parseFloat(styles.paddingLeft) + parseFloat(styles.paddingRight)
-        + (icon ? icon.getBoundingClientRect().width + parseFloat(styles.columnGap) : 0);
-      const width = `${Math.max(1, Math.ceil(natural / unit)) * unit}px`;
-      if (frame.style.width !== width) frame.style.width = width;
+      // Unset, the frame hugs its icon, words and padding at their fractional
+      // width, as the native class's max-content does; round that up to whole
+      // squares. (A label's scrollWidth is a whole pixel rounded to nearest:
+      // "Done" at 32.3px read as 32 and was cut short in a 40px badge.)
+      const natural = frame.getBoundingClientRect().width;
+      frame.style.width = `${Math.max(1, Math.ceil(natural / unit)) * unit}px`;
     });
   };
 

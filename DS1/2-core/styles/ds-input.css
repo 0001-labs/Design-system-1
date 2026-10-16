@@ -91,32 +91,56 @@ input {
   border-color: var(--accent-color, #007aff);
 }
 
+/*
+ * The error stands on one-square lines in the danger colour, as
+ * `.ds-field__error` does. While it shows, every row of the field is at least
+ * one square high and a lower control keeps its place at the top of its row,
+ * so the error starts on the square below the control in every variant.
+ */
+.input-wrapper.has-error {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-rows: minmax(var(--ds-input-control-row, var(--ds-row-height)), auto);
+  align-items: start;
+}
+
 .error-message {
+  margin: 0;
+  min-width: 0;
+  color: var(--ds-danger-color);
   font-family: var(--ds-typeface-regular);
+  font-feature-settings: var(--ds-font-features);
   font-size: var(--ds-type-size-default);
-  line-height: var(--ds-row-height);
-  color: var(--error-color, #ff3b30);
-  margin-top: calc(var(--025) * var(--ds-sf, 1));
+  font-weight: var(--ds-type-weight-default);
+  line-height: var(--ds-unit);
+  letter-spacing: var(--ds-type-letterspacing-default);
+}
+
+/* A translated error wraps on the same lines as a literal one. */
+.error-message > ds-text {
+  display: block;
 }
 
 :host([required]) label::after {
   content: " *";
-  color: var(--error-color, #ff3b30);
+  color: var(--ds-danger-color);
 }
 
 /* Error state */
 :is(input, textarea).has-error {
-  border-color: var(--error-color, #ff3b30);
+  border-color: var(--ds-danger-color);
 }
 
 :is(input, textarea).has-error:focus {
-  box-shadow: 0 0 0 2px rgba(255, 59, 48, 0.2);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ds-danger-color) 20%, transparent);
 }
 
 /* A field drawn 18px high inside a 20px form row. */
 :host([variant="row"]) {
   box-sizing: border-box;
   padding-top: calc(2px * var(--ds-sf, 1));
+  /* The host's 2px above the 18px field make up its row. */
+  --ds-input-control-row: calc(18px * var(--ds-sf, 1));
 }
 :host([variant="row"]) .input-container,
 :host([variant="row"]) :is(input, textarea) {
