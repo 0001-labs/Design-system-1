@@ -136,10 +136,6 @@ export default defineConfig({
             { label: "Pricing", slug: "built-ins/pricing" },
           ],
         },
-        {
-          label: "Demo",
-          items: [{ label: "Interactive Demo", slug: "demo" }],
-        },
       ],
     }),
   ],
