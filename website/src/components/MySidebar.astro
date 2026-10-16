@@ -41,6 +41,9 @@ const { sidebar } = Astro.locals.starlightRoute;
     return entries.flatMap((entry, index) => {
       const id = entry.href ?? `${parent}/group-${index}`;
       const item: SidebarItem = { id, label: label(entry.label), depth, href: entry.href, current: entry.isCurrent };
+      if (location.pathname.replace(/\/$/, '') === '/icons' && entry.href?.startsWith('/icons/')) {
+        item.current = entry.href.includes('#builder') ? location.hash === '#builder' : location.hash !== '#builder';
+      }
       if (entry.href === "/app/libraries" && !signedIn) { item.label = "Sign in to My libraries"; item.href = "/app/signin"; }
       if (!entry.entries) return [item];
       item.expanded = !collapsed.has(id);
@@ -48,6 +51,7 @@ const { sidebar } = Astro.locals.starlightRoute;
     });
   }
   navigation.items = rows(groups);
+  window.addEventListener("hashchange", () => { navigation.items = rows(groups); });
   window.addEventListener("ds1-navigation-auth", event => { signedIn = (event as CustomEvent).detail.authenticated; navigation.items = rows(groups); });
   window.addEventListener("translations-ready", () => { navigation.items = rows(groups); });
   window.addEventListener("language-changed", () => { navigation.items = rows(groups); });

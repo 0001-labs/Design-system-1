@@ -42,7 +42,7 @@ function search(){
 }
 for(const button of document.querySelectorAll<HTMLElement>('[data-vector-key]'))button.addEventListener('click',()=>{
   selected=icons.find(icon=>icon.key===button.dataset.vectorKey)!;render();
-  history.replaceState(null,'',`${location.pathname}#${selected.key}`);message('');
+  history.replaceState(null,'',`${location.pathname}${location.search}#${selected.key}`);window.dispatchEvent(new HashChangeEvent('hashchange'));message('');
 });
 for(const button of document.querySelectorAll<HTMLElement>('[data-vector-view]'))button.addEventListener('click',()=>{view=button.dataset.vectorView!;render();});
 $('vector-search').addEventListener('input',search);
@@ -52,11 +52,11 @@ $('vector-download-outlines').addEventListener('click',()=>{
   const blob=new Blob([outline(selected.svg)],{type:'image/svg+xml'});
   const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=selected.key+'-outlines.svg';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);
 });
-function pickHash(){if(location.hash==='#builder'){selectTab('badge-tab');return;}const icon=icons.find(icon=>icon.key===location.hash.slice(1));if(icon){selected=icon;render();}}
+function pickHash(){if(location.hash==='#builder'){selectTab('badge-tab');return;}const icon=icons.find(icon=>icon.key===location.hash.slice(1));if(icon){selectTab('interface-tab');selected=icon;render();}}
 window.addEventListener('hashchange',pickHash);render();
 const tabs=[{tab:'interface-tab',panel:'interface-panel'},{tab:'badge-tab',panel:'badge-panel'}];
 function selectTab(id:string){for(const entry of tabs){$(entry.panel).hidden=entry.tab!==id;$(entry.tab).setAttribute('aria-selected',String(entry.tab===id));$(entry.tab).tabIndex=entry.tab===id?0:-1;}}
-for(const entry of tabs){$(entry.tab).addEventListener('click',()=>{selectTab(entry.tab);history.replaceState(null,'',`${location.pathname}#${entry.tab==='badge-tab'?'builder':selected.key}`);});$(entry.tab).addEventListener('keydown',event=>{if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();const other=tabs.find(t=>t.tab!==entry.tab)!;selectTab(other.tab);$(other.tab).focus();}});}
+for(const entry of tabs){$(entry.tab).addEventListener('click',()=>{selectTab(entry.tab);history.replaceState(null,'',`${location.pathname}${location.search}#${entry.tab==='badge-tab'?'builder':selected.key}`);window.dispatchEvent(new HashChangeEvent('hashchange'));});$(entry.tab).addEventListener('keydown',event=>{if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();const other=tabs.find(t=>t.tab!==entry.tab)!;$(other.tab).click();$(other.tab).focus();}});}
 
 pickHash();
 

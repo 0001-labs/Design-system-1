@@ -1,26 +1,42 @@
 ---
-import MyHeader from "../components/MyHeader.astro";
 // One palette, named by colour and sorted by hue, the inks after it; light and dark on two tabs.
 // The colours and their pastel, dark and dim versions come from DS1/1-root/palette.ts, which also writes them
 // into the CLASSless stylesheet. Where each colour is used is in the design-system-1 skill.
-import '../styles/icons/studio.css';
+
 
 import { palette as readPalette } from '../../../DS1/1-root/palette';
 const colours = readPalette().map(c => ({ ...c, darkPastel: c.dim }));
 const palette = colours.filter(c => !c.ink);
 const inks = colours.filter(c => c.ink);
 ---
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Colours — Design System 1</title>
-    <meta name="description" content="One palette for every product, each colour with a dark-mode version." />
-    <link rel="canonical" href="https://designsystem1.com/colours" />
-    <link rel="icon" type="image/svg+xml" href="/icons/design-system-1.svg" />
-    <script is:inline src="/google-analytics.js" defer></script>
-    <style>
+    <div class="colours not-content">
+      <div class="colours-bar"><div class="mode-tabs" role="tablist" aria-label="Mode"><button role="tab" id="tab-light" aria-controls="light" aria-selected="true">Light</button><button role="tab" id="tab-dark" aria-controls="dark" aria-selected="false" tabindex="-1">Dark</button></div></div>
+      {[['light', 'Light'], ['dark', 'Dark']].map(([mode]) => (
+        <div id={mode} class={`mode ${mode}`} role="tabpanel" aria-labelledby={`tab-${mode}`} hidden={mode === 'dark'}>
+          <section>
+            <h2>Palette</h2>
+            <ul class="swatches">{palette.map(c => {
+              const [main, soft] = mode === 'light' ? [c.hex, c.pastel] : [c.dark, c.darkPastel];
+              return <li class="swatch"><b>{c.name}</b><span class="swatch-pair"><i style={`background:${main}`} title={`${mode === 'light' ? c.name : `${c.name} dark`} ${main}`}></i><i style={`background:${soft}`} title={`${mode === 'light' ? c.pastelName : `${c.name} dim`} ${soft}`}></i></span></li>;
+            })}</ul>
+          </section>
+          <section>
+            <h2>Inks</h2>
+            <ul class="swatches inks">{inks.map(c => { const v = mode === 'light' ? c.hex : c.dark; return <li class="swatch"><b>{c.name}</b><span class="swatch-one"><i style={`background:${v}`} title={`${c.name} ${v}`}></i></span></li>; })}</ul>
+          </section>
+        </div>
+      ))}
+      <script is:inline>
+        const tabs = [...document.querySelectorAll('.mode-tabs [role=tab]')];
+        const show = tab => tabs.forEach(t => { const on = t === tab; t.setAttribute('aria-selected', on); t.tabIndex = on ? 0 : -1; document.getElementById(t.getAttribute('aria-controls')).hidden = !on; });
+        tabs.forEach((tab, i) => {
+          tab.addEventListener('click', () => show(tab));
+          tab.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { const next = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length]; show(next); next.focus(); } });
+        });
+      </script>
+    </div>
+
+<style>
       /* On the 20px square: a swatch is eight squares wide, light and dark halves of four, three squares high; 14px text on 20px lines. */
       .colours { padding-bottom: 80px; }
       .colours section { margin-top: 40px; }
@@ -46,35 +62,7 @@ const inks = colours.filter(c => c.ink);
       .mode.dark .swatch code { color: #b3b3b3; }
       .mode section:first-child { padding-top: 20px; margin-top: 0; }
       .swatch code { display: block; font-size: 12px; line-height: 20px; color: var(--muted); }
-    </style>
-  </head>
-  <body>
-    <MyHeader landing />
-    <main class="colours">
-      <div class="colours-bar"><h1>Colours</h1><div class="mode-tabs" role="tablist" aria-label="Mode"><button role="tab" id="tab-light" aria-controls="light" aria-selected="true">Light</button><button role="tab" id="tab-dark" aria-controls="dark" aria-selected="false" tabindex="-1">Dark</button></div></div>
-      {[['light', 'Light'], ['dark', 'Dark']].map(([mode]) => (
-        <div id={mode} class={`mode ${mode}`} role="tabpanel" aria-labelledby={`tab-${mode}`} hidden={mode === 'dark'}>
-          <section>
-            <h2>Palette</h2>
-            <ul class="swatches">{palette.map(c => {
-              const [main, soft] = mode === 'light' ? [c.hex, c.pastel] : [c.dark, c.darkPastel];
-              return <li class="swatch"><b>{c.name}</b><span class="swatch-pair"><i style={`background:${main}`} title={`${mode === 'light' ? c.name : `${c.name} dark`} ${main}`}></i><i style={`background:${soft}`} title={`${mode === 'light' ? c.pastelName : `${c.name} dim`} ${soft}`}></i></span></li>;
-            })}</ul>
-          </section>
-          <section>
-            <h2>Inks</h2>
-            <ul class="swatches inks">{inks.map(c => { const v = mode === 'light' ? c.hex : c.dark; return <li class="swatch"><b>{c.name}</b><span class="swatch-one"><i style={`background:${v}`} title={`${c.name} ${v}`}></i></span></li>; })}</ul>
-          </section>
-        </div>
-      ))}
-      <script is:inline>
-        const tabs = [...document.querySelectorAll('.mode-tabs [role=tab]')];
-        const show = tab => tabs.forEach(t => { const on = t === tab; t.setAttribute('aria-selected', on); t.tabIndex = on ? 0 : -1; document.getElementById(t.getAttribute('aria-controls')).hidden = !on; });
-        tabs.forEach((tab, i) => {
-          tab.addEventListener('click', () => show(tab));
-          tab.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { const next = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length]; show(next); next.focus(); } });
-        });
-      </script>
-    </main>
-  </body>
-</html>
+
+.colours-bar { margin-top: 0; padding: 0; justify-content: flex-start; }
+.mode { padding-inline: 0; }
+</style>

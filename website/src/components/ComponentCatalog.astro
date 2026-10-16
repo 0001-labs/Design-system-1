@@ -1,6 +1,5 @@
 ---
-import MyHeader from "../components/MyHeader.astro";
-import ComponentExample from '../components/ComponentExample.astro';
+import ComponentExample from './ComponentExample.astro';
 import { PAGE_EXAMPLES } from '../lib/component-examples';
 import '../../../DS1/1-root/one.css';
 import { ICONS, LAYERS } from '../lib/component-directory';
@@ -8,29 +7,7 @@ import { ICONS, LAYERS } from '../lib/component-directory';
 // Root is files; every other layer is custom elements.
 const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
 ---
-<!doctype html>
-<html lang="en" data-view="examples">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Components — Design system 1</title>
-    <meta name="description" content="Every part of Design system 1 by layer: Root, Core, Unit and Page. Read them by name or as the elements you write in HTML." />
-    <link rel="canonical" href="https://designsystem1.com/components/" />
-    <link rel="icon" type="image/svg+xml" href="/icons/design-system-1.svg" />
-    <script is:inline src="/google-analytics.js" defer></script>
-    <script is:inline>
-      // Before the first paint, so the names never flash ahead of the elements.
-      try {
-        const view = localStorage.getItem('ds1-directory-view');
-        if (view === 'tags' || view === 'names') document.documentElement.dataset.view = view;
-      } catch {}
-    </script>
-  </head>
-  <body>
-    <MyHeader landing />
-
-    <main class="directory">
-      <h1>Components</h1>
+    <div class="docs-tool not-content"><div class="directory component-catalog" data-view="examples">
       <div class="directory-toggle" role="group" aria-label="Show components as">
         <button type="button" data-view-option="examples" aria-pressed="true">Examples</button>
         <button type="button" data-view-option="names" aria-pressed="false">Name</button>
@@ -97,10 +74,11 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
           ))}
         </ul>
       </section>
-    </main>
+    </div></div>
 
     <script>
-      const root = document.documentElement;
+      const root = document.querySelector<HTMLElement>('.component-catalog')!;
+      try { const saved = localStorage.getItem('ds1-directory-view'); if (saved === 'tags' || saved === 'names') root.dataset.view = saved; } catch {}
       const options = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-view-option]'));
       const show = (view: string) => {
         root.dataset.view = view;
@@ -127,9 +105,10 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
     </script>
 
     <style is:global>
+.component-catalog {
       .examples-gallery, .gallery-intro { display: none; }
-      [data-view='examples'] .directory-layer { display: none; }
-      [data-view='examples'] :is(.examples-gallery, .gallery-intro) { display: block; }
+      &[data-view='examples'] .directory-layer { display: none; }
+      &[data-view='examples'] :is(.examples-gallery, .gallery-intro) { display: block; }
       .gallery-intro { margin-bottom: calc(40px * var(--sf, 1)); max-width: calc(640px * var(--sf, 1)); }
       .gallery-intro p { margin: 0 0 calc(20px * var(--sf, 1)); }
       .gallery-intro label { display: block; }
@@ -144,7 +123,7 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
       .gallery-entry-heading code { font-size: 13px; color: var(--directory-muted); }
       .gallery-docs-link { text-decoration: underline; text-underline-offset: 4px; }
       [hidden] { display: none !important; }
-      :root {
+      & {
         color-scheme: light dark;
         --directory-bg: light-dark(#ffffff, #171717);
         --directory-ink: light-dark(#1e1e1e, #f1f1f1);
@@ -153,8 +132,8 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
         --directory-edge: clamp(16px, 2.5vw, 40px);
       }
       * { box-sizing: border-box; }
-      html, body { margin: 0; }
-      body {
+      & { margin: 0; }
+      & {
         background: var(--directory-bg);
         color: var(--directory-ink);
         font-family: var(--typeface-regular, 'GT-America-Standard-Regular'), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -177,7 +156,7 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
       }
       .directory-toggle button[aria-pressed='true'] { background: var(--directory-ink); color: var(--directory-bg); }
 
-      .directory { padding: clamp(32px, 6vw, 96px) var(--directory-edge) clamp(64px, 10vw, 160px); }
+      & { padding: 0; }
       .directory h1 {
         margin: 0 0 calc(40px * var(--sf, 1));
         color: var(--directory-muted);
@@ -201,7 +180,7 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
       .directory-layer.directory-layer--icons li a { display: flex; align-items: center; gap: 0.18em; }
       .directory-icon { display: block; flex: none; width: 0.82em; height: 0.82em; }
       .directory-icon svg { display: block; width: 100%; height: 100%; }
-      [data-view='tags'] .directory-layer.directory-layer--icons li a { font-size: clamp(22px, 4.6vw, 84px); }
+      &[data-view='tags'] .directory-layer.directory-layer--icons li a { font-size: clamp(22px, 4.6vw, 84px); }
       .directory-layer-head { position: sticky; top: 88px; align-self: start; }
       .directory-layer h2 {
         display: flex;
@@ -231,19 +210,18 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
       }
       .directory-layer li a:hover { background: var(--layer-color); color: #1e1e1e; }
       .directory-tag { display: none; }
-      [data-view='tags'] .directory-name { display: none; }
-      [data-view='tags'] .directory-tag { display: inline; }
-      [data-view='tags'] .directory-layer li a { font-size: clamp(34px, 7.6vw, 136px); }
+      &[data-view='tags'] .directory-name { display: none; }
+      &[data-view='tags'] .directory-tag { display: inline; }
+      &[data-view='tags'] .directory-layer li a { font-size: clamp(34px, 7.6vw, 136px); }
       /* Documented, with no element of its own to write. */
-      [data-view='tags'] .directory-layer li a[data-untagged] { color: var(--directory-muted); }
+      &[data-view='tags'] .directory-layer li a[data-untagged] { color: var(--directory-muted); }
 
-      @media (max-width: 720px) {
+      @container tool (max-width: 720px) {
         .directory-layer { grid-template-columns: 1fr; }
         .directory-layer-head { position: static; }
       }
       @media (prefers-reduced-motion: reduce) {
         .directory-layer li a { transition: none; }
       }
+}
     </style>
-  </body>
-</html>

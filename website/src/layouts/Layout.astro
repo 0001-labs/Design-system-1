@@ -12,6 +12,7 @@ interface Props {
 const { title } = Astro.props;
 const pathname = Astro.url.pathname.replace(/\/$/, '');
 const isHome = pathname === '';
+const isTool = ['/icons', '/colours', '/components'].includes(pathname);
 const classlessMode = pathname === '/classless/editor' ? 'editor'
   : pathname === '/classless/libraries' ? 'libraries' : null;
 ---
@@ -43,7 +44,7 @@ const classlessMode = pathname === '/classless/editor' ? 'editor'
       {!isHome && <div class="sidebar-gap"></div>}
 
       <!-- Main Content -->
-      <main class:list={['main-content', { 'main-content--app': classlessMode, 'main-content--home': isHome }]}>
+      <main class:list={['main-content', { 'main-content--app': classlessMode, 'main-content--home': isHome, 'main-content--tools': isTool }]}>
         {isHome ? <LandingPage /> : classlessMode ? <ClasslessWorkspace mode={classlessMode} /> : <slot />}
       </main>
     </div>
@@ -92,6 +93,10 @@ const classlessMode = pathname === '/classless/editor' ? 'editor'
         box-shadow: inset -1px 0 var(--ds1-docs-header-border);
       }
 
+      .docs-tool { container: tool / inline-size; min-width: 0; }
+      .main-content--tools .sl-container { max-width: none; }
+      .main-content--tools .content-panel { max-width: none; }
+      .main-content--tools .right-sidebar-container { display: none; }
       /* Main content */
       .main-content {
         flex: 1;
