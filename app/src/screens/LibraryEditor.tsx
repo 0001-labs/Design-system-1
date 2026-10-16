@@ -30,6 +30,9 @@ export function LibraryEditor({ libraryId }: { libraryId: string }) {
   const id = libraryId as Id<"libraries">;
   const library = useQuery(api.libraries.get, { id });
   const saveDraft = useMutation(api.libraries.saveDraft);
+  const rename = useMutation(api.libraries.rename);
+  const [renaming, setRenaming] = useState(false);
+  const [renameError, setRenameError] = useState<string | null>(null);
 
   const [saveState, setSaveState] = useState<SaveState>("saved");
   const [serverRev, setServerRev] = useState<number | null>(null);
@@ -198,6 +201,20 @@ export function LibraryEditor({ libraryId }: { libraryId: string }) {
           <div>
             <Link to="/libraries">← Libraries</Link>
             <strong>{library.name}</strong>
+            <button className="action-button" type="button" disabled={renaming} onClick={async () => {
+              const name = window.prompt("Library name", library.name);
+              if (name === null || name.trim() === library.name) return;
+              setRenaming(true);
+              setRenameError(null);
+              try {
+                await rename({ id, name });
+              } catch (error) {
+                setRenameError(asFailure(error)?.message ?? "Could not rename the library. Try again.");
+              } finally {
+                setRenaming(false);
+              }
+            }}>{renaming ? "Renaming…" : "Rename"}</button>
+            {renameError ? <span role="alert">{renameError}</span> : null}
           </div>
 
           <div className="workbench-header-actions">
