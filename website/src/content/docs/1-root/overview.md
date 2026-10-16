@@ -11,6 +11,7 @@ Root establishes the common ground for the system: the square, colours, type, sc
 | --- | --- |
 | [Colours](/colours/) | Palette, inks, pastels and their dark counterparts. |
 | [Fonts](/1-root/fonts/) | Typefaces, font loading and specimens. |
+| [Prose](/1-root/prose/) | Long-form writing in native HTML, drawn on the grid inside `data-ds-prose`. |
 | [Languages](/1-root/languages/) | Supported languages, shared words and translation lookup. |
 | [Theming](/1-root/theming/) | Appearance tokens and light/dark behavior. |
 | [Device](/1-root/device/) | Device detection and responsive scale. |
@@ -42,7 +43,7 @@ These native elements do not need a class on every node. CSS gives them an appea
 
 ## Configure the stylesheet
 
-The native stylesheet is generated from the canonical `DS1/1-root/one.semantic.css`. The public `/resources/vanilla.css` route serves that source directly. The font companion sets the native font tokens to the shared font files.
+The native stylesheet is generated from the canonical `DS1/1-root/one.semantic.css`. The public `/resources/vanilla.css` route serves that source directly. The font companion sets the native font tokens to the shared font files. It draws on Design system 1's measures: 14px type on one-square lines, a 20px title on two squares, controls one control high with 4px corners, and hairlines that take no room. Products copy it with Sync 1's `"classless": true`.
 
 Set tokens on `:root` or a scoped region when a page needs a deliberate variation:
 

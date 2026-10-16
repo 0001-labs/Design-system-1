@@ -16,6 +16,9 @@ description: The components' look as plain classes on native elements, and the s
 | `ds-tabs`, with `ds-tabs--fill` | a row of `.ds-button` | The Tabs row. With `role="group"` it is a segmented control: the choices grey, the chosen one (`aria-pressed`, `aria-selected` or `aria-current`) in the accent. |
 | `ds-dialog` | `<dialog>` | The Dialog's frame: twenty squares wide, a square of padding, a hairline, the paper and a dimmed backdrop. Mark its parts with `data-ds-dialog="header"`, `title`, `description`, `footer` and `close`, as inside the element. |
 | `ds-menu`, `ds-menu__item` and its parts | a menu a library draws | The Menu; an item may be a `<button>`, which keeps the row's look. |
+| `ds-text`, with `ds-text--small`, `--heading`, `--display`, `--strong`, `--muted`, `--title`, `--danger` | native text: `<p>`, `<h1>`–`<h6>`, `<span>`, `<label>` | The [Text](/2-core/text/) element's look, on one-square lines. These come from `text.css`, which `controls.css` and `one.css` import. |
+
+Writing that stays native, such as an article or a landing page's story, takes the [prose sheet](/1-root/prose/) rather than a class on every element.
 
 ```html
 <link rel="stylesheet" href="/ds1/controls.css" />
@@ -32,15 +35,15 @@ description: The components' look as plain classes on native elements, and the s
 
 Products copy these files with Sync 1, from the exports in `sync.exports.mjs`:
 
-- `tokens` copies the component tokens; `"nativeControls": true` adds `controls.css`, and `"bundle": true` writes them all as one `bundle.css` with their imports resolved, for a page that can carry only one stylesheet or inlines its styles.
-- `root` copies `one.css` with `grid.css` and the component tokens it imports, and the faces it loads into `fonts/`. `"styles"` names the stylesheets to copy when a product loads only some (`["grid.css"]`, or `[]` for scripts alone), `"fonts": false` leaves the faces to the product, `"nativeControls": true` adds `controls.css`, and `"modules"` adds page scripts from `0-face/` (`grid`, `grid-fit`, `layout-inspector`, `scaling`, `tooltips`) with the modules they import.
+- `tokens` copies the component tokens; `"nativeControls": true` adds `controls.css` with the text classes it imports (`text.css`), `"prose": true` adds the [prose sheet](/1-root/prose/) (`prose.css`), `"classless": true` adds the classless sheet (`one.semantic.css`), and `"bundle": true` writes them all as one `bundle.css` with their imports resolved, for a page that can carry only one stylesheet or inlines its styles.
+- `root` copies `one.css` with `grid.css`, the text classes and the component tokens it imports, and the faces it loads into `fonts/`. `"styles"` names the stylesheets to copy when a product loads only some (`["grid.css"]`, or `[]` for scripts alone), `"fonts": false` leaves the faces to the product, `"nativeControls": true` adds `controls.css`, `"prose": true` and `"classless": true` add `prose.css` and `one.semantic.css` (which `"styles"` may also name), and `"modules"` adds page scripts from `0-face/` (`grid`, `grid-fit`, `layout-inspector`, `scaling`, `tooltips`) with the modules they import. `text.css` comes with `one.css` or `controls.css`, which import it.
 - `fonts` copies named faces, including the root faces such as `GT-America-Standard-Regular.woff2` and `Iosevka-Regular.woff2`.
 
 ```json
 {
   "sources": {
     "Design system 1": {
-      "root": { "to": "web/ds1", "nativeControls": true, "modules": ["tooltips"] }
+      "root": { "to": "web/ds1", "nativeControls": true, "prose": true, "modules": ["tooltips"] }
     }
   }
 }
