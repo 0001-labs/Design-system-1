@@ -3,7 +3,7 @@ import { toast, type Toaster as ToasterElement, type ToastPosition } from "../2-
 
 /**
  * Toast for React, based on Sonner (https://sonner.emilkowal.ski, MIT licence).
- * The same import as Sonner's: `import { Toaster, toast } from ".../react/toast"`,
+ * The same names as Sonner: import `Toaster` and `toast` from this adapter,
  * then one `<Toaster />` in the app and `toast("Saved")` anywhere.
  */
 export type ToasterProps = HTMLAttributes<ToasterElement> & {
