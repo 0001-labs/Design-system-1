@@ -4,7 +4,11 @@ import { useMemo, useState } from "react";
 
 import { api } from "../../../convex/_generated/api";
 import "../../../DS1/2-core/ds-button";
+import "../../../DS1/2-core/ds-empty";
+import "../../../DS1/2-core/ds-notice";
 import { Button } from "../../../DS1/react/button";
+import { Empty } from "../../../DS1/react/empty";
+import { Notice } from "../../../DS1/react/notice";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { downloadCss } from "../lib/download";
 
@@ -126,9 +130,9 @@ export function PublishPanel(props: Props) {
       ) : null}
 
       {error && blocking.length === 0 ? (
-        <p role="alert" data-testid="publish-error">
+        <Notice tone="danger" data-testid="publish-error">
           {error}
-        </p>
+        </Notice>
       ) : null}
 
       <Button
@@ -152,7 +156,7 @@ export function PublishPanel(props: Props) {
           </>
         ) : (
           // A copied link to a 404 is the obvious top support ticket.
-          <p>Publish once to get an install link.</p>
+          <Empty heading="No install link yet" text="Publish once to get an install link." />
         )}
       </section>
 
@@ -187,7 +191,7 @@ export function PublishPanel(props: Props) {
         {history === undefined ? (
           <p>Loading…</p>
         ) : history.versions.length === 0 ? (
-          <p>Nothing published yet.</p>
+          <Empty heading="Nothing published yet" text="Each version you publish is listed here." />
         ) : (
           <ol className="version-list" data-testid="version-list">
             {history.versions.map((version) => (

@@ -1833,26 +1833,10 @@ body.box-value-scrubbing * {
   color: #900b09;
 }
 
-.conflict-bar {
-  flex-basis: 100%;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  border-top: 1px solid var(--workbench-line);
-  padding: 8px 0;
-  font-size: 11px;
-}
-
-.conflict-bar p {
-  margin: 0;
-  flex: 1;
-}
-
+/* The editor's notices take the header's full width; ds-notice draws them. */
+[data-testid="conflict-bar"],
 [data-testid="local-draft-notice"] {
   flex-basis: 100%;
-  margin: 0 0 8px;
-  color: var(--workbench-muted);
-  font-size: 10px;
 }
 
 /* Publish panel ------------------------------------------------------------ */

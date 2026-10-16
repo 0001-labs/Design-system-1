@@ -6,6 +6,8 @@ import "../../../DS1/2-core/ds-button";
 import { Button } from "../../../DS1/react/button";
 import "../../../DS1/2-core/ds-input";
 import { Input } from "../../../DS1/react/input";
+import "../../../DS1/2-core/ds-notice";
+import { Notice } from "../../../DS1/react/notice";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { SystemWorkbench as App, type LibraryWorkbenchConfig as WorkbenchConfig } from "../SystemWorkbench";
 import {
@@ -289,9 +291,9 @@ export function LibraryEditor({ libraryId }: { libraryId: string }) {
           ) : null}
 
           {local && saveState !== "conflict" ? (
-            <p data-testid="local-draft-notice">
+            <Notice data-testid="local-draft-notice">
               Unsaved changes from an earlier session are stored on this device.
-            </p>
+            </Notice>
           ) : null}
         </header>
       }
@@ -310,19 +312,25 @@ function ConflictBar({
   onLoadTheirs: () => void;
 }) {
   return (
-    <div className="conflict-bar" data-testid="conflict-bar" role="alert">
-      <p>
-        This library was edited somewhere else{serverRev === null ? "" : ` (revision ${serverRev})`}.
-        Your changes are safe on this device.
-      </p>
-      {/* Never auto-merge CSS text — the user decides. */}
-      <Button secondary onClick={onKeepMine} type="button">
-        Keep mine
-      </Button>
-      <Button secondary onClick={onLoadTheirs} type="button">
-        Load theirs
-      </Button>
-    </div>
+    <Notice
+      tone="warning"
+      role="alert"
+      data-testid="conflict-bar"
+      heading={`This library was edited somewhere else${serverRev === null ? "" : ` (revision ${serverRev})`}`}
+      actions={
+        // Never auto-merge CSS text — the user decides.
+        <>
+          <Button secondary onClick={onKeepMine} type="button">
+            Keep mine
+          </Button>
+          <Button secondary onClick={onLoadTheirs} type="button">
+            Load theirs
+          </Button>
+        </>
+      }
+    >
+      Your changes are safe on this device.
+    </Notice>
   );
 }
 
