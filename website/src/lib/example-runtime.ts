@@ -151,9 +151,21 @@ function syncLegacyButtonPreview(css: string) {
     Object.assign(legacyReference.style, { position: 'fixed', left: '-10000px', visibility: 'hidden', pointerEvents: 'none' });
     document.body.append(legacyReference);
   }
-  const face = getComputedStyle(legacyReference);
   const properties = ['padding-top', 'padding-right', 'padding-bottom', 'padding-left', 'border-top-width', 'border-right-width', 'border-bottom-width', 'border-left-width', 'border-style', 'border-color', 'border-radius', 'column-gap', 'background-color', 'color', 'font-family', 'font-size', 'font-weight', 'line-height'];
-  legacyPreviewStyle.textContent = `ds-button { margin: ${face.margin}; } ds-button::part(control) { ${properties.map(name => `${name}: ${face.getPropertyValue(name)};`).join(' ')} height: auto; min-height: 0; max-height: none; }`;
+  const variants = [
+    ['ds-button[primary]:not([disabled])', '', false],
+    ['ds-button[secondary]:not([disabled])', 'neutral', false],
+    ['ds-button:not([primary]):not([secondary]):not([disabled])', 'subtle', false],
+    ['ds-button[danger]:not([disabled])', 'danger', false],
+    ['ds-button[disabled]', '', true],
+  ] as const;
+  legacyPreviewStyle.textContent = variants.map(([selector, variant, disabled]) => {
+    if (variant) legacyReference!.setAttribute('variant', variant); else legacyReference!.removeAttribute('variant');
+    legacyReference!.disabled = disabled;
+    const face = getComputedStyle(legacyReference!);
+    // Zero selector specificity lets the user's authored part rules win.
+    return `:where(${selector}) { margin: ${face.margin}; } :where(${selector})::part(control) { ${properties.map(name => `${name}: ${face.getPropertyValue(name)};`).join(' ')} height: auto; min-height: 0; max-height: none; }`;
+  }).join('\n');
 }
 
 if (document.body.dataset.exampleId === 'chart') {

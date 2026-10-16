@@ -65,5 +65,8 @@ test('a legacy library initializes the box model from its authored face without 
   await expect(page.getByRole('spinbutton',{name:'Padding top',exact:true})).toHaveValue('4');
   await expect(page.getByRole('spinbutton',{name:'Border radius top-left',exact:true})).toHaveValue('8');
   await expect(page.locator('.box-model__content')).not.toHaveText('0×0');
+  const frame=page.frameLocator('iframe').first();
+  await expect.poll(()=>frame.locator('ds-button[secondary]').locator('button').evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(227, 227, 227)');
+  await expect.poll(()=>frame.locator('ds-button[disabled]').locator('button').evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(217, 217, 217)');
   await expect(page.locator('#saved-draft')).toHaveText('null');
 });
