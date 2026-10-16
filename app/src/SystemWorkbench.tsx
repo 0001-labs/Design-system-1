@@ -23,11 +23,14 @@ function Preview({ example, css, hoverRegion, onMetrics }: { example: string; cs
   const frame = useRef<HTMLIFrameElement>(null);
   const requestId = useRef(0);
   const latest = useRef(onMetrics); latest.current = onMetrics;
-  const send = () => frame.current?.contentWindow?.postMessage({ type: 'ds1-example-styles', css, hoverRegion, requestId: ++requestId.current }, location.origin);
+  const payload = useRef({ css, hoverRegion }); payload.current = { css, hoverRegion };
+  const send = () => frame.current?.contentWindow?.postMessage({ type: 'ds1-example-styles', ...payload.current, requestId: ++requestId.current }, location.origin);
   useEffect(send, [css, hoverRegion]);
   useEffect(() => {
     const receive = (event: MessageEvent) => {
-      if (event.origin !== location.origin || event.source !== frame.current?.contentWindow || event.data?.type !== 'ds1-example-button-metrics' || event.data.requestId !== requestId.current) return;
+      if (event.origin !== location.origin || event.source !== frame.current?.contentWindow) return;
+      if (event.data?.type === 'ds1-example-library-ready') { send(); return; }
+      if (event.data?.type !== 'ds1-example-button-metrics' || event.data.requestId !== requestId.current) return;
       const { box, contentSize } = event.data;
       if (!box || !contentSize || !Object.values({ ...box, ...contentSize }).every(value => typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 100000)) return;
       latest.current?.({ box, contentSize });

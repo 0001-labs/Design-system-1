@@ -12,6 +12,9 @@
 
 :host([split]) button {
   appearance: none;
+  width: auto;
+  max-width: none;
+  flex: 0 0 auto;
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;

@@ -163,3 +163,7 @@ if (document.body.dataset.exampleId === 'chart') {
     if (event.origin === location.origin && event.source === parent && ['ds1-example-theme', 'ds1-example-styles'].includes(event.data?.type)) refreshCharts();
   });
 }
+
+// Announce readiness after the library listeners exist, including in browsers
+// whose iframe load event precedes completion of awaited module imports.
+parent.postMessage({ type: 'ds1-example-library-ready' }, location.origin);

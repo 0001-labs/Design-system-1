@@ -6,6 +6,7 @@ test('box controls edit the actual shared button, preserve draft data and cancel
   await expect(first.locator('button')).toBeVisible();
   const padding = page.getByRole('spinbutton',{name:'Padding right',exact:true});
   await expect(padding).toHaveValue('4');
+  await expect(page.locator('.box-model__content')).not.toHaveText('0×0');
   await padding.fill('20');
   await expect.poll(() => first.locator('button').evaluate(el => getComputedStyle(el).paddingRight)).toBe('20px');
   const border = page.getByRole('spinbutton',{name:'Border top',exact:true});
@@ -40,6 +41,8 @@ for (const width of [1440,390]) test(`sidebar headings do not overlap at ${width
 test('split is a Button mode with native keyboard choices and repeated actions',async({page})=>{
   await page.goto('/e2e/fixtures/library-box-model.html');
   const mode=page.getByRole('group',{name:'Button mode'});
+  const single = mode.getByRole('button',{name:'Single',exact:true});
+  expect(await single.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
   await mode.getByRole('button',{name:'Split',exact:true}).click();
   const frame=page.frameLocator('iframe').first();
   const choice=frame.locator('ds-button[split]').first();
@@ -54,4 +57,13 @@ test('split is a Button mode with native keyboard choices and repeated actions',
   await actions.evaluate(el=>{const fieldset=document.createElement('fieldset');el.before(fieldset);fieldset.append(el);fieldset.disabled=true;});
   await expect(actions.getByRole('button',{name:'Back',exact:true})).toBeDisabled();
   await expect(page.getByRole('navigation',{name:'Component library'}).getByRole('button',{name:'Split',exact:true})).toHaveCount(0);
+});
+
+test('a legacy library initializes the box model from its authored face without saving', async ({page})=>{
+  await page.goto('/e2e/fixtures/library-box-model.html?legacy=1');
+  await expect(page.getByRole('spinbutton',{name:'Padding right',exact:true})).toHaveValue('48');
+  await expect(page.getByRole('spinbutton',{name:'Padding top',exact:true})).toHaveValue('4');
+  await expect(page.getByRole('spinbutton',{name:'Border radius top-left',exact:true})).toHaveValue('8');
+  await expect(page.locator('.box-model__content')).not.toHaveText('0×0');
+  await expect(page.locator('#saved-draft')).toHaveText('null');
 });
