@@ -57,7 +57,8 @@ export class Sidebar extends LitElement {
       this.resizeObserver.observe(this);
     }
     // Labels measured before the typeface arrives are measured again once it has.
-    if (!this.fontsReady) void document.fonts?.ready.then(() => { this.fontsReady = true; this.markCutLabels(); });
+    const fonts = this.fontsReady ? undefined : document.fonts?.ready;
+    if (fonts) void fonts.then(() => { this.fontsReady = true; this.markCutLabels(); });
   }
 
   disconnectedCallback() {
