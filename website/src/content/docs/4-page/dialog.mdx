@@ -16,6 +16,10 @@ Opening it uses `showModal()`; the browser supplies the top layer and inert back
 </ds-dialog>
 ```
 
+For a single question on a page without Lit, use `confirm()`, `prompt()` and
+`alert()` from the [feedback module](/1-root/feedback/): they answer with a
+promise and are drawn on the same native frame. Never the browser's own.
+
 Set the host's `open` property to open or close it. `closeOnEscape` and
 `closeOnBackdrop` default to true. The cancelable `ds-close-request` event has
 a `detail.reason` of `escape`, `backdrop`, `outside`, `button` or `native`. Prevent its

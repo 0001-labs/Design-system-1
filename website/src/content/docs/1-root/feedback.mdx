@@ -1,0 +1,166 @@
+---
+title: Feedback
+description: Toasts, dialogs that answer with a promise, and copying text, for pages without Lit or any other framework.
+---
+
+import FeedbackDemo from "../../../components/FeedbackDemo.astro";
+
+A page without Lit cannot use [`<ds-toast>`](/2-core/toast/) or [`<ds-dialog>`](/4-page/dialog/),
+and falls back on the browser's `alert()`, `confirm()` and `prompt()`, or builds a toast and a
+copy button of its own. The feedback module gives such a page the system's own, from one import and with no framework:
+
+```js
+import { toast, confirm, prompt, alert, copyText } from "./ds1/0-face/feedback";
+
+toast.success("Saved");
+if (await confirm({ title: "Delete this track?", confirm: "Delete", danger: true })) remove();
+const name = await prompt({ title: "Rename", label: "Name", value: track.name });
+await alert({ title: "Exported", text: "The file is in your downloads." });
+await copyText(link);
+```
+
+Never call the browser's `alert()`, `confirm()` or `prompt()`: they block the page, cannot be
+styled or translated, and some browsers stop showing them. Never build a page's own toast or
+copy helper either.
+
+## Try it
+
+<FeedbackDemo />
+
+This page also loads the Lit components, so its toasts are drawn by `<ds-toast>`; a page without
+Lit gets the same stack from the page toaster.
+
+## When to use which
+
+| The page | Toasts | Dialogs |
+| --- | --- | --- |
+| Uses Lit components, or React through the adapters | [`<ds-toast>`](/2-core/toast/) and `toast()`; the module's `toast()` reaches the same stack | [`<ds-dialog>`](/4-page/dialog/) for anything with a form or content of its own; `confirm()`, `prompt()` and `alert()` from this module for a single question |
+| Has no framework | This module's `toast()` | This module's `confirm()`, `prompt()` and `alert()`; a native `dialog.ds-dialog` of its own for more |
+
+## Toasts
+
+`toast()` is [Sonner's](https://sonner.emilkowal.ski), exactly as with `<ds-toast>`: `toast()`,
+`toast.success()`, `.info()`, `.warning()`, `.error()`, `.loading()`, `.message()`,
+`.promise()` and `.dismiss()`, with the same options (`id`, `description`, `duration`,
+`action`, `cancel`, `dismissible`, `closeButton`, `important`, `onDismiss`, `onAutoClose`).
+Toast is based on Sonner, the React toast library by Emil Kowalski (MIT licence), so Sonner's
+documentation describes how it works. The stack behaves as Sonner's: three show at once, hovering
+or focusing spreads them and pauses their time, a swipe towards the edge dismisses one, and Alt+T
+reaches them from the keyboard.
+
+`configureToaster()` takes Sonner's `<Toaster />` props:
+
+```js
+import { configureToaster } from "./ds1/0-face/feedback";
+
+configureToaster({ position: "top-center", closeButton: true });
+```
+
+| Option | Default | What it does (as in Sonner) |
+| --- | --- | --- |
+| `position` | `bottom-right` | `top-left`, `top-center`, `top-right`, `bottom-left`, `bottom-center` or `bottom-right`. |
+| `expand` | Off | Keeps the toasts spread out instead of stacked. |
+| `visibleToasts` | `3` | How many toasts show at once. |
+| `duration` | `4000` | Milliseconds each toast stays. |
+| `closeButton` | Off | Adds a close button to every toast. |
+| `richColors` | Off | Fills success, info, warning and error toasts with their colour. |
+| `label` | Notifications | The region's accessible name. |
+| `closeLabel` | Close | The close button's accessible name. |
+
+### How it shares the look
+
+The page toaster shares `<ds-toast>`'s stylesheet rather than wrapping the element. It draws the
+element's markup in a shadow root of its own with the element's stylesheet
+(`2-core/styles/ds-toast.css`), so a toast looks the same whichever draws it and the two cannot
+drift apart. A layer that hands toasts to `<ds-toast>` would need Lit to draw anything, which is
+exactly what these pages lack.
+
+Both read one queue of Sonner's calls (`0-face/toast-queue.ts`). Where a `<ds-toast>` is in the
+page, it takes every toast and the page toaster stays quiet, so a page that has both, or a Lit page
+that copies text with `copyText()`, shows one stack. `toast()` with nothing listening adds a
+`<ds-toast>` when the element is registered, and the page toaster otherwise.
+
+### Accessibility and motion
+
+The page toaster's region is in the page before the first toast arrives: a polite live region in
+which each toast is announced. An error is announced assertively unless it says
+`important: false`, here and in `<ds-toast>`. Only `transform` and `opacity` animate, and with
+reduced motion nothing moves.
+
+The page toaster carries the type icons (success, info, warning, error) and the close button. An
+`icon` of another name is drawn where `<ds-toast>` draws the toast.
+
+## Dialogs
+
+Each dialog is drawn on the native [`dialog.ds-dialog`](/1-root/native-controls/) frame, with
+its native buttons, and opened with `showModal()`, so the browser keeps the rest of the page
+inert behind it. The page loads `controls.css`.
+
+| Call | Options | Resolves to |
+| --- | --- | --- |
+| `confirm(options)` | `title`, `text`, `confirm`, `cancel`, `danger` | `true` when confirmed, `false` otherwise |
+| `prompt(options)` | `title`, `text`, `label`, `value`, `placeholder`, `confirm`, `cancel` | the text written (empty text included), or `null` when cancelled |
+| `alert(options)` | `title`, `text`, `confirm` | nothing, once it is dismissed |
+
+A string in place of the options is the title: `confirm("Leave without saving?")`.
+
+- The buttons are `.ds-button--secondary` (Cancel) and `.ds-button--primary` (the answer). With
+  `danger`, the answer is a destructive action: its words are in the danger colour
+  (`.ds-button--danger`), Cancel has the focus, and a click on the backdrop does not close it.
+  Name the action (`confirm: "Delete"`) rather than leaving it OK.
+- Focus moves into the dialog when it opens (the field in a prompt, with its text selected) and
+  back to what had it when it closes.
+- Escape cancels; Enter in a prompt's field confirms it.
+- A click on the backdrop cancels, except with `danger`.
+- Two never open at once: a dialog asked for while another is open waits for it to close.
+- A dialog asked for in a click opens within that click, so a phone shows its keyboard for a
+  prompt's field.
+
+A prompt's field is labelled by `label`, shown above it, or by the title. Its label and the field
+are each one row high, so the field takes two squares of the frame.
+
+## Copying text
+
+`copyText(text, { toast })` writes the text with the Clipboard API, and where that is missing or
+refused (a page served over plain HTTP, an older browser) copies it from a hidden field. It
+resolves to whether it was copied, and says so in a toast: "Copied", or the words in `toast`;
+`toast: false` shows none. A failure says "Could not copy". Call it from the click or key press
+that asks for it: browsers allow writing to the clipboard only then.
+
+## Words
+
+Every default word is a shared word in the page's language: OK, Cancel, Copied, Could not copy,
+Notifications and Close, in all fifteen [languages](/1-root/languages/). The module reads them
+through the language module, as the components do, so turn them on with
+`configureI18n({ sharedWords: true })`; without it they read English. A page with no words of its
+own can stop the language module's startup request with `configureI18n({ autoLoad: false })`.
+Pass a dialog's or a toast's own words where they say more than the shared ones.
+
+## Copying the module
+
+Sync 1's `feedback` export copies the module with everything it imports, by their paths in
+`DS1/`: the toaster, the dialogs, `copyText`, the language module with the shared words, the
+toast's stylesheet and its icons. No Lit and no component comes with it. Copy it to the same
+folder as the `languages` or `components` export, so the page keeps one language runtime, and take
+`controls.css` for the dialogs (`"nativeControls": true` on `root` or `tokens`).
+
+```json
+{
+  "sources": {
+    "Design system 1": {
+      "root": { "to": "web/ds1", "nativeControls": true },
+      "languages": { "to": "web/ds1" },
+      "feedback": { "to": "web/ds1" }
+    }
+  }
+}
+```
+
+The module is TypeScript for a Vite build, like the rest of `DS1/`: its stylesheet and icons are
+imported with `?inline` and `?raw`.
+
+## Related
+
+[Toast](/2-core/toast/) is the Lit element. [Dialog](/4-page/dialog/) is the Lit element for
+dialogs with content of their own. [Native controls](/1-root/native-controls/) draws the dialog
+frame and its buttons.
