@@ -88,3 +88,12 @@ sample.querySelectorAll('ds-tooltip').forEach(tooltip => {
   tooltip.dispatchEvent(new MouseEvent('mouseenter'));
 });
 parent.postMessage({ type: 'ds1-example-ready' }, location.origin);
+
+// Library previews use the identical examples and component runtime as the catalogue.
+const libraryStyle = document.createElement('style');
+document.head.append(libraryStyle);
+window.addEventListener('message', event => {
+  if (event.origin !== location.origin || event.source !== parent || event.data?.type !== 'ds1-example-styles') return;
+  if (typeof event.data.css !== 'string' || new TextEncoder().encode(event.data.css).length > 524288) return;
+  libraryStyle.textContent = event.data.css;
+});

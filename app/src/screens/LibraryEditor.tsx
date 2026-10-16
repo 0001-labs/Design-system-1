@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
-import { App, type WorkbenchConfig } from "../App";
+import { SystemWorkbench as App, type LibraryWorkbenchConfig as WorkbenchConfig } from "../SystemWorkbench";
 import {
   AUTOSAVE_DEBOUNCE_MS,
   AUTOSAVE_MAX_WAIT_MS,

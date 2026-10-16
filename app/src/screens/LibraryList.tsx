@@ -3,7 +3,7 @@ import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 
 import { api } from "../../../convex/_generated/api";
-import semanticCssTemplate from "../../../DS1/1-root/one.semantic.css?raw";
+import { libraryTemplate } from "../SystemWorkbench";
 import { failureCode } from "../lib/convex";
 import { Link, navigate } from "../router";
 
@@ -23,8 +23,8 @@ const STATE_LABEL: Record<string, string> = {
  * to the libraries created from it.
  */
 function templateVersion(): string {
-  const stamped = /\/\* DS1 — version ([^*]+?) \*\//.exec(semanticCssTemplate);
-  return stamped?.[1]?.trim() ?? "unknown";
+  const stamped = /\/\* DS1 — version ([^*]+?) \*\//.exec(libraryTemplate);
+  return stamped?.[1]?.trim() ?? "components-1";
 }
 
 export function LibraryList() {
@@ -43,8 +43,8 @@ export function LibraryList() {
     try {
       const created = await create({
         name: "Untitled library",
-        css: semanticCssTemplate,
-        config: JSON.stringify({ schema: 1 }),
+        css: libraryTemplate,
+        config: JSON.stringify({ schema: 2 }),
         templateVersion: templateVersion(),
       });
       navigate(`/l/${created._id}`);
