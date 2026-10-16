@@ -10,12 +10,17 @@ const { sidebar } = Astro.locals.starlightRoute;
     </div>
     <div slot="footer" class="docs-sidebar-footer">
       <ds-button href="https://github.com/0001-labs/Design-system-1">GitHub</ds-button>
+      <a id="docs-account" href="/app/signin" aria-label="Sign in">
+        <span data-account-signin>Sign in</span>
+        <ds-avatar data-account-avatar icon="avatar" aria-hidden="true" hidden></ds-avatar>
+      </a>
     </div>
   </ds-sidebar>
 </div>
 
 <script>
   import '../../../DS1/3-unit/ds-sidebar';
+  import '../../../DS1/2-core/ds-avatar';
   import { translate } from '../../../DS1/0-face/i18n';
   import type { SidebarItem } from '../../../DS1/3-unit/ds-sidebar';
   const navigation = document.querySelector('ds-sidebar#docs-navigation')!;
@@ -51,9 +56,19 @@ const { sidebar } = Astro.locals.starlightRoute;
       return [item, ...(item.expanded ? rows(entry.entries, depth + 1, id) : [])];
     });
   }
+  const account = document.querySelector<HTMLAnchorElement>('#docs-account')!;
+  const signInLabel = account.querySelector<HTMLElement>('[data-account-signin]')!;
+  const avatar = account.querySelector<HTMLElement>('[data-account-avatar]')!;
+  function renderAccount() {
+    account.href = signedIn ? '/app/libraries' : '/app/signin';
+    account.setAttribute('aria-label', signedIn ? 'Account' : 'Sign in');
+    signInLabel.hidden = signedIn;
+    avatar.hidden = !signedIn;
+  }
+  renderAccount();
   navigation.items = rows(groups);
   window.addEventListener("hashchange", () => { navigation.items = rows(groups); });
-  window.addEventListener("ds1-navigation-auth", event => { signedIn = (event as CustomEvent).detail.authenticated; navigation.items = rows(groups); });
+  window.addEventListener("ds1-navigation-auth", event => { signedIn = (event as CustomEvent).detail.authenticated; navigation.items = rows(groups); renderAccount(); });
   window.addEventListener("translations-ready", () => { navigation.items = rows(groups); });
   window.addEventListener("language-changed", () => { navigation.items = rows(groups); });
   navigation.addEventListener('sidebar-toggle', event => {
@@ -70,5 +85,9 @@ const { sidebar } = Astro.locals.starlightRoute;
   .docs-sidebar-header { display: flex; flex-direction: column; gap: 20px; }
   .docs-sidebar-close { display: none; align-self: flex-end; }
   .docs-sidebar-footer { display: flex; align-items: center; gap: 10px; padding-top: 20px; font-size: 10px; }
+  #docs-account { display: inline-flex; align-items: center; justify-content: center; margin-left: auto; min-width: var(--site-unit); height: var(--site-unit); color: inherit; text-decoration: none; }
+  #docs-account:hover { text-decoration: underline; }
+  #docs-account:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+  #docs-account [hidden] { display: none !important; }
   @media (max-width: 768px) { .docs-sidebar-close { display: block; } }
 </style>

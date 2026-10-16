@@ -17,7 +17,7 @@ const { landing = false } = Astro.props;
     ))}
 
   </nav>
-  <a class="site-account" href="/app/signin">Sign in</a>
+  {landing && <a class="site-account" href="/app/signin">Sign in</a>}
 </header>
 <iframe id="navigation-auth" src="/app/navigation-auth" title="Account status" hidden aria-hidden="true" tabindex="-1"></iframe>
 
@@ -27,6 +27,8 @@ const { landing = false } = Astro.props;
   const frame = document.querySelector<HTMLIFrameElement>('#navigation-auth');
   const requestStatus = () => frame?.contentWindow?.postMessage({ type: 'ds1:navigation-auth-request' }, location.origin);
   frame?.addEventListener('load', requestStatus);
+  window.addEventListener('pageshow', requestStatus);
+  window.addEventListener('focus', requestStatus);
   requestStatus();
   window.addEventListener('message', (event) => {
     if (event.origin !== location.origin || event.source !== frame?.contentWindow || event.data?.type !== 'ds1:navigation-auth') return;
