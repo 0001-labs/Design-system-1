@@ -52,11 +52,32 @@
     "shapes": 2
   },
   {
+    "key": "bag-alt",
+    "name": "Bag",
+    "source": "Library",
+    "url": "/icons/library/bag-alt.svg",
+    "shapes": 2
+  },
+  {
     "key": "bag",
     "name": "Bag",
     "source": "Library",
     "url": "/icons/library/bag.svg",
     "shapes": 2
+  },
+  {
+    "key": "bank",
+    "name": "Bank",
+    "source": "Library",
+    "url": "/icons/library/bank.svg",
+    "shapes": 3
+  },
+  {
+    "key": "banknote",
+    "name": "Banknote",
+    "source": "Library",
+    "url": "/icons/library/banknote.svg",
+    "shapes": 3
   },
   {
     "key": "blank",
@@ -74,11 +95,39 @@
     "shapes": 1
   },
   {
+    "key": "bolt",
+    "name": "Bolt",
+    "source": "Library",
+    "url": "/icons/library/bolt.svg",
+    "shapes": 1
+  },
+  {
+    "key": "book-alt",
+    "name": "Book",
+    "source": "Library",
+    "url": "/icons/library/book-alt.svg",
+    "shapes": 2
+  },
+  {
     "key": "book",
     "name": "Book",
     "source": "Library",
     "url": "/icons/library/book.svg",
     "shapes": 2
+  },
+  {
+    "key": "box",
+    "name": "Box",
+    "source": "Library",
+    "url": "/icons/library/box.svg",
+    "shapes": 3
+  },
+  {
+    "key": "briefcase",
+    "name": "Briefcase",
+    "source": "Library",
+    "url": "/icons/library/briefcase.svg",
+    "shapes": 3
   },
   {
     "key": "building",
@@ -116,6 +165,27 @@
     "shapes": 3
   },
   {
+    "key": "car",
+    "name": "Car",
+    "source": "Library",
+    "url": "/icons/library/car.svg",
+    "shapes": 4
+  },
+  {
+    "key": "card",
+    "name": "Card",
+    "source": "Library",
+    "url": "/icons/library/card.svg",
+    "shapes": 2
+  },
+  {
+    "key": "cart",
+    "name": "Cart",
+    "source": "Library",
+    "url": "/icons/library/cart.svg",
+    "shapes": 3
+  },
+  {
     "key": "categories",
     "name": "Categories",
     "source": "Figma",
@@ -148,6 +218,13 @@
     "shapes": 1
   },
   {
+    "key": "cloud",
+    "name": "Cloud",
+    "source": "Library",
+    "url": "/icons/library/cloud.svg",
+    "shapes": 1
+  },
+  {
     "key": "code-block",
     "name": "Code",
     "source": "Library",
@@ -160,6 +237,20 @@
     "source": "Library",
     "url": "/icons/library/code.svg",
     "shapes": 1
+  },
+  {
+    "key": "coffee",
+    "name": "Coffee",
+    "source": "Library",
+    "url": "/icons/library/coffee.svg",
+    "shapes": 3
+  },
+  {
+    "key": "coins",
+    "name": "Coins",
+    "source": "Library",
+    "url": "/icons/library/coins.svg",
+    "shapes": 5
   },
   {
     "key": "collapse",
@@ -300,11 +391,25 @@
     "shapes": 3
   },
   {
+    "key": "drop",
+    "name": "Drop",
+    "source": "Library",
+    "url": "/icons/library/drop.svg",
+    "shapes": 1
+  },
+  {
     "key": "dropbox",
     "name": "Dropbox",
     "source": "Library",
     "url": "/icons/library/dropbox.svg",
     "shapes": 1
+  },
+  {
+    "key": "dumbbell",
+    "name": "Dumbbell",
+    "source": "Library",
+    "url": "/icons/library/dumbbell.svg",
+    "shapes": 4
   },
   {
     "key": "duplicate",
@@ -351,11 +456,25 @@
     "shapes": 3
   },
   {
+    "key": "flame",
+    "name": "Flame",
+    "source": "Library",
+    "url": "/icons/library/flame.svg",
+    "shapes": 1
+  },
+  {
     "key": "folder",
     "name": "Folder",
     "source": "Library",
     "url": "/icons/library/folder.svg",
     "shapes": 1
+  },
+  {
+    "key": "food",
+    "name": "Food",
+    "source": "Library",
+    "url": "/icons/library/food.svg",
+    "shapes": 2
   },
   {
     "key": "form",
@@ -366,12 +485,33 @@
     "shapes": 3
   },
   {
+    "key": "fuel",
+    "name": "Fuel",
+    "source": "Library",
+    "url": "/icons/library/fuel.svg",
+    "shapes": 3
+  },
+  {
     "key": "gallery",
     "name": "Gallery",
     "source": "Figma",
     "node": "117:116",
     "url": "/icons/interface/gallery.svg",
     "shapes": 1
+  },
+  {
+    "key": "game",
+    "name": "Game",
+    "source": "Library",
+    "url": "/icons/library/game.svg",
+    "shapes": 2
+  },
+  {
+    "key": "gift",
+    "name": "Gift",
+    "source": "Library",
+    "url": "/icons/library/gift.svg",
+    "shapes": 3
   },
   {
     "key": "github",
@@ -497,6 +637,13 @@
     "shapes": 1
   },
   {
+    "key": "heart",
+    "name": "Heart",
+    "source": "Library",
+    "url": "/icons/library/heart.svg",
+    "shapes": 1
+  },
+  {
     "key": "help-alt",
     "name": "Help",
     "source": "Figma",
@@ -509,6 +656,13 @@
     "name": "Help",
     "source": "Library",
     "url": "/icons/library/help.svg",
+    "shapes": 3
+  },
+  {
+    "key": "home-alt",
+    "name": "Home",
+    "source": "Library",
+    "url": "/icons/library/home-alt.svg",
     "shapes": 3
   },
   {
@@ -532,6 +686,13 @@
     "source": "Figma",
     "node": "116:246",
     "url": "/icons/interface/in.svg",
+    "shapes": 2
+  },
+  {
+    "key": "income",
+    "name": "Income",
+    "source": "Library",
+    "url": "/icons/library/income.svg",
     "shapes": 2
   },
   {
@@ -678,6 +839,13 @@
     "shapes": 1
   },
   {
+    "key": "medical",
+    "name": "Medical",
+    "source": "Library",
+    "url": "/icons/library/medical.svg",
+    "shapes": 2
+  },
+  {
     "key": "mention",
     "name": "Mention",
     "source": "Library",
@@ -736,6 +904,13 @@
     "source": "Figma",
     "node": "116:247",
     "url": "/icons/interface/more.svg",
+    "shapes": 3
+  },
+  {
+    "key": "music-alt",
+    "name": "Music",
+    "source": "Library",
+    "url": "/icons/library/music-alt.svg",
     "shapes": 3
   },
   {
@@ -881,6 +1056,13 @@
     "shapes": 2
   },
   {
+    "key": "paw",
+    "name": "Paw",
+    "source": "Library",
+    "url": "/icons/library/paw.svg",
+    "shapes": 5
+  },
+  {
     "key": "pen",
     "name": "Pen",
     "source": "Library",
@@ -893,6 +1075,34 @@
     "source": "Library",
     "url": "/icons/library/people.svg",
     "shapes": 3
+  },
+  {
+    "key": "percent",
+    "name": "Percent",
+    "source": "Library",
+    "url": "/icons/library/percent.svg",
+    "shapes": 3
+  },
+  {
+    "key": "phone",
+    "name": "Phone",
+    "source": "Library",
+    "url": "/icons/library/phone.svg",
+    "shapes": 2
+  },
+  {
+    "key": "pill",
+    "name": "Pill",
+    "source": "Library",
+    "url": "/icons/library/pill.svg",
+    "shapes": 2
+  },
+  {
+    "key": "plane",
+    "name": "Plane",
+    "source": "Library",
+    "url": "/icons/library/plane.svg",
+    "shapes": 1
   },
   {
     "key": "play",
@@ -919,6 +1129,13 @@
     "shapes": 1
   },
   {
+    "key": "postal",
+    "name": "Postal",
+    "source": "Library",
+    "url": "/icons/library/postal.svg",
+    "shapes": 2
+  },
+  {
     "key": "present",
     "name": "Present",
     "source": "Library",
@@ -940,6 +1157,13 @@
     "shapes": 3
   },
   {
+    "key": "receipt",
+    "name": "Receipt",
+    "source": "Library",
+    "url": "/icons/library/receipt.svg",
+    "shapes": 2
+  },
+  {
     "key": "redo",
     "name": "Redo",
     "source": "Library",
@@ -947,11 +1171,25 @@
     "shapes": 1
   },
   {
+    "key": "refund",
+    "name": "Refund",
+    "source": "Library",
+    "url": "/icons/library/refund.svg",
+    "shapes": 2
+  },
+  {
     "key": "relationships",
     "name": "Relationships",
     "source": "Library",
     "url": "/icons/library/relationships.svg",
     "shapes": 1
+  },
+  {
+    "key": "repeat",
+    "name": "Repeat",
+    "source": "Library",
+    "url": "/icons/library/repeat.svg",
+    "shapes": 4
   },
   {
     "key": "rewind",
@@ -986,12 +1224,26 @@
     "shapes": 1
   },
   {
+    "key": "safe",
+    "name": "Safe",
+    "source": "Library",
+    "url": "/icons/library/safe.svg",
+    "shapes": 3
+  },
+  {
     "key": "school",
     "name": "School",
     "source": "Figma",
     "node": "467:1253",
     "url": "/icons/interface/school.svg",
     "shapes": 2
+  },
+  {
+    "key": "school-alt",
+    "name": "School",
+    "source": "Library",
+    "url": "/icons/library/school-alt.svg",
+    "shapes": 3
   },
   {
     "key": "sdown",
@@ -1040,6 +1292,13 @@
     "shapes": 3
   },
   {
+    "key": "shield-alt",
+    "name": "Shield",
+    "source": "Library",
+    "url": "/icons/library/shield-alt.svg",
+    "shapes": 2
+  },
+  {
     "key": "shield",
     "name": "Shield",
     "source": "Library",
@@ -1053,6 +1312,20 @@
     "node": "116:252",
     "url": "/icons/interface/ship.svg",
     "shapes": 3
+  },
+  {
+    "key": "shirt",
+    "name": "Shirt",
+    "source": "Library",
+    "url": "/icons/library/shirt.svg",
+    "shapes": 1
+  },
+  {
+    "key": "shop",
+    "name": "Shop",
+    "source": "Library",
+    "url": "/icons/library/shop.svg",
+    "shapes": 4
   },
   {
     "key": "1x",
@@ -1151,6 +1424,13 @@
     "shapes": 2
   },
   {
+    "key": "tag",
+    "name": "Tag",
+    "source": "Library",
+    "url": "/icons/library/tag.svg",
+    "shapes": 2
+  },
+  {
     "key": "template",
     "name": "Template",
     "source": "Library",
@@ -1170,6 +1450,13 @@
     "source": "Library",
     "url": "/icons/library/text.svg",
     "shapes": 1
+  },
+  {
+    "key": "ticket",
+    "name": "Ticket",
+    "source": "Library",
+    "url": "/icons/library/ticket.svg",
+    "shapes": 2
   },
   {
     "key": "title",
@@ -1202,11 +1489,32 @@
     "shapes": 2
   },
   {
+    "key": "train",
+    "name": "Train",
+    "source": "Library",
+    "url": "/icons/library/train.svg",
+    "shapes": 4
+  },
+  {
+    "key": "transfer",
+    "name": "Transfer",
+    "source": "Library",
+    "url": "/icons/library/transfer.svg",
+    "shapes": 2
+  },
+  {
     "key": "triangle",
     "name": "Triangle",
     "source": "Library",
     "url": "/icons/library/triangle.svg",
     "shapes": 1
+  },
+  {
+    "key": "tv",
+    "name": "Tv",
+    "source": "Library",
+    "url": "/icons/library/tv.svg",
+    "shapes": 3
   },
   {
     "key": "underline",
@@ -1331,6 +1639,20 @@
     "shapes": 1
   },
   {
+    "key": "wallet",
+    "name": "Wallet",
+    "source": "Library",
+    "url": "/icons/library/wallet.svg",
+    "shapes": 3
+  },
+  {
+    "key": "wifi",
+    "name": "Wifi",
+    "source": "Library",
+    "url": "/icons/library/wifi.svg",
+    "shapes": 4
+  },
+  {
     "key": "window",
     "name": "Window",
     "source": "Library",
@@ -1343,6 +1665,13 @@
     "source": "Figma",
     "node": "467:1319",
     "url": "/icons/interface/work.svg",
+    "shapes": 1
+  },
+  {
+    "key": "wrench",
+    "name": "Wrench",
+    "source": "Library",
+    "url": "/icons/library/wrench.svg",
     "shapes": 1
   },
   {

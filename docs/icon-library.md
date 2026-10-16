@@ -9,6 +9,10 @@ The public collection is at https://designsystem1.com/icons. Interface icons use
 3. `vp run icons:build` automatically discovers the SVG, validates it and adds it to the public collection. No manual gallery list or frontend code change is needed for a new icon.
 4. Run `vp test --run tests/interfaceIcons.test.ts tests/iconGrid.test.ts tests/iconStudio.test.ts`, then `vp run site:build`. Publish through the existing site deployment workflow when requested, and verify the public SVG and page assets by HTTP. Respect the user's browser-testing preference.
 
+## Rounded everyday icons
+
+A family for money and everyday life: accounts (`bank`, `postal`, `card`, `wallet`, `banknote`, `coins`, `safe`), movements (`transfer`, `income`, `refund`, `repeat`, `receipt`, `percent`, `tag`), bills (`home-alt`, `wifi`, `phone`, `bolt`, `flame`, `drop`, `wrench`, `medical`, `pill`, `shield-alt`), shopping (`cart`, `food`, `coffee`, `shop`, `bag-alt`, `shirt`, `gift`, `box`), getting around (`train`, `car`, `plane`, `fuel`) and leisure (`ticket`, `music-alt`, `tv`, `game`, `book-alt`, `dumbbell`, `cloud`, `school-alt`, `paw`, `heart`, `briefcase`). They are strokes at the collection's 0.92 weight with round caps and joins and soft corners, so they read as one set beside each other in a list. Where the library already had a square drawing of the same concept, the rounded one takes the `-alt` key.
+
 ## Brand marks
 
 Third-party brand marks are monochrome outlines in `currentColor`, named after the brand in one word (`figma`, `drive`, `github`). Ten of them (airtable, drive, dropbox, figma, github, loom, notion, slack, vimeo, youtube) are adapted from Tabler Icons' MIT outlines, drawn in a 24-unit inner frame at a 1.5 stroke so they render at the library's one-unit weight; the licence is in `DS1/x-icon/Tabler-LICENSE.md`. `google` and `apple` keep their own drawings.
