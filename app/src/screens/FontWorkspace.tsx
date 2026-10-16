@@ -6,6 +6,7 @@ import '../../../DS1/3-unit/ds-sidebar';
 import '../../../DS1/4-page/ds-page';
 import type { Sidebar, SidebarItem } from '../../../DS1/3-unit/ds-sidebar';
 import { Button } from '../../../DS1/react/button';
+import { Page } from '../../../DS1/react/page';
 import '../../../DS1/1-root/controls.css';
 import { calculateScalingFactor } from '../../../DS1/0-face/scaling';
 import { SignIn } from './SignIn';
@@ -139,7 +140,7 @@ function PrivateFonts() {
 
   return <main className={`font-workspace${dark ? ' font-workspace-dark' : ''}`} data-ds-surface>
     <header className="fonts-header"><h1>Fonts</h1><span>Private workspace</span><Control onClick={() => void signOut()}>Sign out</Control></header>
-    <ds-page layout="sidebar" divided fill className="fonts-body">
+    <Page layout="sidebar" divided fill className="fonts-body">
       <ds-sidebar slot="nav" label="Fonts" ref={list} />
       <header slot="header" className="font-heading"><h2>{active?.name}</h2><span>{active?.detail}</span></header>
       <section className="font-desk" aria-label={active?.name}>
@@ -157,6 +158,6 @@ function PrivateFonts() {
         </div>
       </section>
       <footer slot="footer" className="font-footer"><p role={error ? 'alert' : 'status'}>{error || message || (family ? selected === 'supernatural' ? 'Development study. Missing characters use a fallback.' : mode === 'glyphs' ? 'Unsupported characters use a fallback.' : 'Edit the specimen text. Size changes stay inside the specimen.' : 'No substitute handwriting font is shown.')}</p>{error && <Control onClick={() => setRetry(n => n + 1)}>Try again</Control>}</footer>
-    </ds-page>
+    </Page>
   </main>;
 }
