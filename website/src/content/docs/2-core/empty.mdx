@@ -1,0 +1,78 @@
+---
+title: Empty state
+description: A place with nothing in it yet, said quietly, with the action that fills it.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+An empty state takes the place of a list, a table or a panel that has nothing to show. It says so in a title, explains in a line of text, and offers the action that fills the place. The words sit on the paper with no box, no picture and no colour; every line is one square.
+
+## Try it
+
+<ComponentExample example="empty" />
+
+<ComponentExample example="empty-search" compact />
+
+## Use it
+
+Without a `heading`, the title is the shared words' "Nothing here yet" in the current language. Give a `text` that says what will appear here or what to do, and put the action in the `actions` slot: a button for an action, a link drawn as a button for a destination.
+
+```html
+<ds-empty icon="lists" text="Lists you make or are given appear here.">
+  <ds-button slot="actions" primary>New list</ds-button>
+</ds-empty>
+```
+
+`heading` and `text` are translation keys, like [Text](/2-core/text/); `literal` shows them as written. Words that need a link or a strong word go in the default slot, and a title that needs markup in the `heading` slot, as inline content.
+
+## API
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `heading` | string | "Nothing here yet" | The title: a translation key, or the words with `literal`. |
+| `text` | string | Empty | The line under the title. The default slot takes its place. |
+| `literal` | boolean | `false` | Show `heading` and `text` as written, never looked up. |
+| `icon` | string | Empty | An [icon](/2-core/icon/) on its own square above the title, in the muted ink. |
+| `centered` | boolean | `false` | Centre the words in the space the element stands in. |
+| `level` | number | None | Make the title a heading of this level, 1 to 6. |
+
+| Slot | What it holds |
+| --- | --- |
+| Default | The text, when it needs more than words. |
+| `heading` | The title. |
+| `icon` | An icon of the page's own. |
+| `actions` | Buttons or links, on one row one square below the text. |
+
+## Measures
+
+The block is at most sixteen squares wide (`--ds-empty-measure`), with no room above or below unless the page gives it some (`--ds-empty-padding`). The icon, the title and each line of text take one square; one square stands between the text and the actions, which share a row with half a square between them. The title is in the medium face and the text in the muted ink. Nothing is illustrated and nothing is in capitals.
+
+## React
+
+```tsx
+import { Empty } from "@0001-labs/design-system-1/DS1/react/empty";
+
+<Empty icon="search" heading="No results" actions={<Button secondary onClick={clear}>Clear the search</Button>}>
+  Try another word.
+</Empty>
+```
+
+`Empty` renders `ds-empty` with its heading, text and actions in the light DOM, so the words are in the server's HTML and in the product's tests. Register `ds-empty` in the browser before hydration.
+
+## Without JavaScript
+
+A page without Lit draws the same block with the classes in `empty.css`, which `controls.css` imports. The classes do not translate: the page writes its own words.
+
+```html
+<section class="ds-empty">
+  <h2 class="ds-empty__title">Nothing here yet</h2>
+  <p class="ds-empty__text">Lists you make or are given appear here.</p>
+  <div class="ds-empty__actions">
+    <button class="ds-button ds-button--primary" type="button">New list</button>
+  </div>
+</section>
+```
+
+`ds-empty__icon` holds an icon, and `ds-empty--centered` centres the block. See [Native controls](/1-root/native-controls/).
+
+[Notice](/2-core/notice/) · [Text](/2-core/text/) · [Button](/2-core/button/)

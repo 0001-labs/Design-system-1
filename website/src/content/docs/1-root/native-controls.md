@@ -18,6 +18,8 @@ description: The components' look as plain classes on native elements, and the s
 | `ds-dialog` | `<dialog>` | The Dialog's frame: twenty squares wide, a square of padding, a hairline, the paper and a dimmed backdrop. Mark its parts with `data-ds-dialog="header"`, `title`, `description`, `footer` and `close`, as inside the element, and a field with `field`, its label with `label`. The [feedback module](/1-root/feedback/) draws `confirm()`, `prompt()` and `alert()` on it. |
 | `ds-menu`, `ds-menu__item` and its parts | a menu a library draws | The Menu; an item may be a `<button>`, which keeps the row's look. |
 | `ds-table`, in `ds-table-scroll` to scroll sideways | `<table>` | The [Table](/3-unit/table/): rows one square high on hairlines, no box or column lines; `data-sticky`, `data-numeric` and `aria-selected` as there. From `table.css`, which controls.css imports. |
+| `ds-empty`, with `ds-empty__icon`, `__title`, `__text`, `__actions` and `ds-empty--centered` | a `<section>` or `<div>`, its parts on native text and a row of buttons | The [Empty state](/2-core/empty/): a title in the medium face and muted text on one-square lines, at most sixteen squares wide, the actions one square below. No box and no picture. From `empty.css`, which controls.css imports. |
+| `ds-notice`, with `ds-notice__mark`, `__title`, `__text`, `__actions`, `__dismiss` and `ds-notice--success`, `--warning`, `--danger` | a `<div>` with `role="status"`, or `role="alert"` for danger | The [Notice](/2-core/notice/): a square mark one control high in the tone's colour, the words beside it on one-square lines, the actions below and a `.ds-button--icon` dismiss at the end of the first line; danger words in `--ds-danger-color`. From `notice.css`, which controls.css imports. |
 | `ds-text`, with `ds-text--small`, `--heading`, `--display`, `--strong`, `--muted`, `--title`, `--danger` | native text: `<p>`, `<h1>`–`<h6>`, `<span>`, `<label>` | The [Text](/2-core/text/) element's look, on one-square lines. These come from `text.css`, which `controls.css` and `one.css` import. |
 | `ds-field`, with `ds-field--beside` and the parts `ds-field__label`, `ds-field__hint`, `ds-field__error` | a `<div>` or `<label>` around a native control | The label row the [Input](/2-core/input/) draws: the label on a one-square line above the control, or four squares beside it, a muted hint and an error in the danger colour. See [Field](#field). |
 | `ds-avatar`, with `ds-avatar--large`, `--square`, `--pair`, `--outlined`, `--pending` | `<span>` holding an initial, and an `<img alt="">` | The [Avatar](/2-core/avatar/): round and one control high, two squares large, or square with a picture's corners. See [Avatar](#avatar). |
@@ -37,6 +39,15 @@ Writing that stays native, such as an article or a landing page's story, takes t
 </div>
 <button class="ds-switch" role="switch" aria-checked="false" aria-label="Grid"></button>
 <textarea class="ds-textarea" name="description"></textarea>
+
+<div class="ds-notice ds-notice--warning" role="status">
+  <span class="ds-notice__mark" aria-hidden="true"></span>
+  <p class="ds-notice__text">Unsaved changes are stored on this device.</p>
+</div>
+<section class="ds-empty">
+  <h2 class="ds-empty__title">Nothing here yet</h2>
+  <p class="ds-empty__text">Items you add appear here.</p>
+</section>
 ```
 
 ## Field
@@ -156,8 +167,8 @@ for (const type of ['dragleave', 'drop']) zone.addEventListener(type, () => zone
 
 Products copy these files with Sync 1, from the exports in `sync.exports.mjs`:
 
-- `tokens` copies the component tokens; `"nativeControls": true` adds `controls.css` with the table and text classes it imports (`table.css`, `text.css`), `"prose": true` adds the [prose sheet](/1-root/prose/) (`prose.css`), `"classless": true` adds the classless sheet (`one.semantic.css`), and `"bundle": true` writes them all as one `bundle.css` with their imports resolved, for a page that can carry only one stylesheet or inlines its styles.
-- `root` copies `one.css` with `grid.css`, the text classes and the component tokens it imports, and the faces it loads into `fonts/`. `"styles"` names the stylesheets to copy when a product loads only some (`["grid.css"]`, or `[]` for scripts alone), `"fonts": false` leaves the faces to the product, `"nativeControls": true` adds `controls.css` and the `table.css` it imports, `"prose": true` and `"classless": true` add `prose.css` and `one.semantic.css` (which `"styles"` may also name), and `"modules"` adds page scripts from `0-face/` (`grid`, `grid-fit`, `layout-inspector`, `scaling`, `theme-bootstrap`, `tooltips`) with the modules they import. `scaling` puts the phone scale on the page ([Scaling](/1-root/scaling/)); `theme-bootstrap` is the classic script that puts the theme on before the first paint ([Theming](/1-root/theming/#before-the-first-paint)). `text.css` comes with `one.css` or `controls.css`, which import it.
+- `tokens` copies the component tokens; `"nativeControls": true` adds `controls.css` with the table, text, empty-state and notice classes it imports (`table.css`, `text.css`, `empty.css`, `notice.css`), `"prose": true` adds the [prose sheet](/1-root/prose/) (`prose.css`), `"classless": true` adds the classless sheet (`one.semantic.css`), and `"bundle": true` writes them all as one `bundle.css` with their imports resolved, for a page that can carry only one stylesheet or inlines its styles.
+- `root` copies `one.css` with `grid.css`, the text classes and the component tokens it imports, and the faces it loads into `fonts/`. `"styles"` names the stylesheets to copy when a product loads only some (`["grid.css"]`, or `[]` for scripts alone), `"fonts": false` leaves the faces to the product, `"nativeControls": true` adds `controls.css` and the `table.css`, `empty.css` and `notice.css` it imports, `"prose": true` and `"classless": true` add `prose.css` and `one.semantic.css` (which `"styles"` may also name), and `"modules"` adds page scripts from `0-face/` (`grid`, `grid-fit`, `layout-inspector`, `scaling`, `theme-bootstrap`, `tooltips`) with the modules they import. `scaling` puts the phone scale on the page ([Scaling](/1-root/scaling/)); `theme-bootstrap` is the classic script that puts the theme on before the first paint ([Theming](/1-root/theming/#before-the-first-paint)). `text.css` comes with `one.css` or `controls.css`, which import it.
 - `fonts` copies named faces, including the root faces such as `GT-America-Standard-Regular.woff2` and `Iosevka-Regular.woff2`.
 - `feedback` copies the [feedback module](/1-root/feedback/), toasts, promise dialogs and `copyText`, with everything it imports, by their paths in `DS1/`.
 

@@ -1,0 +1,18 @@
+/* ds-empty.css */
+/* The element only places the block; 1-root/empty.css draws it. */
+
+:host {
+  display: block;
+  min-width: 0;
+}
+
+:host([hidden]),
+[hidden] {
+  display: none !important;
+}
+
+/* Slotted words take the block's lines rather than their own margins. */
+::slotted([slot="heading"]),
+::slotted(:not([slot])) {
+  margin: 0;
+}

@@ -4,7 +4,11 @@ import { useState } from "react";
 
 import { api } from "../../../convex/_generated/api";
 import "../../../DS1/2-core/ds-button";
+import "../../../DS1/2-core/ds-empty";
+import "../../../DS1/2-core/ds-notice";
 import { Button } from "../../../DS1/react/button";
+import { Empty } from "../../../DS1/react/empty";
+import { Notice } from "../../../DS1/react/notice";
 import { libraryTemplate } from "../SystemWorkbench";
 import { failureCode } from "../lib/convex";
 import { Link, navigate } from "../router";
@@ -89,16 +93,13 @@ export function LibraryList() {
         </div>
       </header>
 
-      {error ? <p role="alert">{error}</p> : null}
+      {error ? <Notice tone="danger">{error}</Notice> : null}
 
       {libraries.length === 0 ? (
-        <section data-testid="library-list-empty">
-          <h2>Nothing here yet</h2>
-          <p>
-            A library is a copy of the DS1 semantic stylesheet that you customize and publish. Your
-            site then loads it from one link.
-          </p>
-        </section>
+        <Empty data-testid="library-list-empty" icon="templates" level={2}>
+          A library is a copy of the DS1 semantic stylesheet that you customize and publish. Your
+          site then loads it from one link.
+        </Empty>
       ) : (
         <ul className="library-grid">
           {libraries.map((library) => (

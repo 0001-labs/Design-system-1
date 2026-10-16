@@ -3,8 +3,10 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import { totalSites, type AdoptionReport, type ComponentCell } from "../../../shared/component-adoption";
 import "../../../DS1/2-core/ds-button";
 import "../../../DS1/2-core/ds-checkbox";
+import "../../../DS1/2-core/ds-notice";
 import { Button } from "../../../DS1/react/button";
 import { Checkbox } from "../../../DS1/react/choice";
+import { Notice } from "../../../DS1/react/notice";
 import "../../../DS1/1-root/component-tokens.css";
 import { IconMatrix } from "./IconAdoption";
 import "./component-adoption.css";
@@ -47,7 +49,7 @@ export function ComponentAdoption({ onSignOut }: { onSignOut?: () => Promise<voi
       <div><p className="adoption-eyebrow">Reports · Private</p><h1>Component adoption</h1></div>
       <ds-button onClick={() => void (onSignOut ? onSignOut() : signOut())}>Sign out</ds-button>
     </header>
-    {error ? <div role="alert"><p>{error}</p><ds-button onClick={() => setRetry(value => value + 1)}>Try again</ds-button></div>
+    {error ? <Notice tone="danger" actions={<Button secondary type="button" onClick={() => setRetry(value => value + 1)}>Try again</Button>}>{error}</Notice>
       : report ? <><ComponentMatrix report={report} /><IconMatrix report={report} /></> : <p role="status">Reading the source snapshot…</p>}
   </main>;
 }

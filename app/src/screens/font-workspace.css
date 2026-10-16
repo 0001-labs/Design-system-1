@@ -14,9 +14,7 @@
 .font-toolbar button[aria-pressed="true"] { text-decoration: underline; text-underline-offset: calc(3px * var(--sf, 1)); }
 .font-stage { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; overflow-anchor: none; border-block: 1px solid var(--grid-color); }
 .font-stage textarea { display: block; box-sizing: border-box; width: 100%; height: 100%; resize: none; border: 0; border-radius: 0; background: transparent; color: inherit; padding: var(--font-unit) 0; margin: 0; line-height: 1.5; outline-offset: -2px; }
-.font-empty { max-width: 52ch; margin-block: calc(3 * var(--font-unit)); }
-.font-empty h3, .font-empty p { font: inherit; margin: 0 0 var(--font-unit); line-height: 1.5; }
-.font-empty h3 { font-family: var(--typeface-medium); }
+.font-empty { margin-block: calc(3 * var(--font-unit)); }
 .font-glyphs { display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(6 * var(--font-unit)), 1fr)); }
 .font-glyphs > div { min-height: calc(7 * var(--font-unit)); display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 1px solid var(--grid-color); gap: calc(var(--font-unit) / 2); }
 .font-glyphs small { font-family: var(--typeface-mono); font-size: calc(10px * var(--sf, 1)); opacity: .5; }

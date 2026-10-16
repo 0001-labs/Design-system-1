@@ -2,10 +2,12 @@ import { useAuthActions, useAuthToken } from '@convex-dev/auth/react';
 import { useConvexAuth } from 'convex/react';
 import { useEffect, useRef, useState, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import '../../../DS1/2-core/ds-button';
+import '../../../DS1/2-core/ds-empty';
 import '../../../DS1/3-unit/ds-sidebar';
 import '../../../DS1/4-page/ds-page';
 import type { Sidebar, SidebarItem } from '../../../DS1/3-unit/ds-sidebar';
 import { Button } from '../../../DS1/react/button';
+import { Empty } from '../../../DS1/react/empty';
 import { Page } from '../../../DS1/react/page';
 import '../../../DS1/1-root/controls.css';
 import { SignIn } from './SignIn';
@@ -150,7 +152,7 @@ function PrivateFonts() {
         <div className="font-stage" aria-busy={busy}>
           {family ? mode === 'specimen' ? <textarea aria-label={`${active?.name} specimen text`} spellCheck={false} value={text} onChange={event => setText(event.target.value)} style={{ fontFamily: `"${family}"`, fontSize: `calc(${size}px * var(--sf, 1))`, letterSpacing: `calc(${spacing}px * var(--sf, 1))` }} />
             : <div className="font-glyphs" style={{ fontFamily: `"${family}"`, fontSize: `calc(${size}px * var(--sf, 1))` }}>{alphabets.flatMap(line => [...line]).map((letter, index) => <div key={`${letter}-${index}`}><span>{letter}</span><small>U+{letter.codePointAt(0)!.toString(16).toUpperCase().padStart(4, '0')}</small></div>)}</div>
-          : <div className="font-empty"><h3>{busy ? 'Loading the font…' : selected === 'supernatural' ? 'Supernatural starts with your handwriting.' : 'No specimen loaded.'}</h3><p>{selected === 'supernatural' ? 'Open a font build to try it here. Handwriting scans and original letterforms are still needed to create the first version.' : 'Select a font to view it, or try again if it could not load.'}</p>{selected === 'supernatural' && <p>English first. About ten forms per letter, with variation in shape, spacing and rhythm.</p>}</div>}
+          : <Empty className="font-empty" heading={busy ? 'Loading the font…' : selected === 'supernatural' ? 'Supernatural starts with your handwriting.' : 'No specimen loaded.'}>{selected === 'supernatural' ? 'Open a font build to try it here. Handwriting scans and original letterforms are still needed to create the first version. English first. About ten forms per letter, with variation in shape, spacing and rhythm.' : 'Select a font to view it, or try again if it could not load.'}</Empty>}
         </div>
       </section>
       <footer slot="footer" className="font-footer"><p role={error ? 'alert' : 'status'}>{error || message || (family ? selected === 'supernatural' ? 'Development study. Missing characters use a fallback.' : mode === 'glyphs' ? 'Unsupported characters use a fallback.' : 'Edit the specimen text. Size changes stay inside the specimen.' : 'No substitute handwriting font is shown.')}</p>{error && <Control onClick={() => setRetry(n => n + 1)}>Try again</Control>}</footer>

@@ -1,0 +1,19 @@
+/* ds-notice.css */
+/* The element only places the block; 1-root/notice.css draws it and
+   controls.css its dismiss button. */
+
+:host {
+  display: block;
+  min-width: 0;
+}
+
+:host([hidden]),
+[hidden] {
+  display: none !important;
+}
+
+/* Slotted words take the notice's lines rather than their own margins. */
+::slotted([slot="heading"]),
+::slotted(:not([slot])) {
+  margin: 0;
+}
