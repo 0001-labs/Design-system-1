@@ -10,6 +10,7 @@ System node: `ds1` ([map](https://system.0001.dev/system?focus=ds1)). Follow the
 
 - Recorded relationships — shared: `auth`, `id1`, `documentation`; local: `design`, `language`, `themes`, `platform-web`; dependency: `sharing`.
 - Decisions/exceptions: Architecture, Distribution and Design rules below define the foundation source; Sign-in and Private font workspace define the separate application and private-data scope.
+- Text colour decision (`themes`): `--ds-danger-color` is Red for blood on light paper and Tuned red on dark. Red for blood's rule-derived dark version (#9c374c) reads at about 2:1 as 14px text on dark paper; Tuned red reads at 4.8:1. `tests/text-classes.test.ts` checks both contrasts.
 - Coverage: relationships select guides, not proof of acceptance. Proposed (`opportunity`) and unknown (`unverified`) relationships stay distinct; verify applicable requirements for the current change.
 
 ## No product names
