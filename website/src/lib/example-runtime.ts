@@ -37,7 +37,7 @@ window.addEventListener('message', event => {
 
 sample.addEventListener('click', event => {
   const button = event.composedPath().find(node => node instanceof HTMLElement && node.tagName === 'DS-BUTTON') as HTMLElement | undefined;
-  if (button && !button.hasAttribute('disabled')) output.textContent = `click: ${button.textContent?.trim()}`;
+  if (button && !button.hasAttribute('disabled') && !button.hasAttribute('split')) output.textContent = `click: ${button.textContent?.trim()}`;
 });
 sample.addEventListener('input-change', event => {
   const detail = (event as CustomEvent).detail;
@@ -48,7 +48,7 @@ sample.addEventListener('form-submit', event => {
 });
 sample.addEventListener('form-invalid', () => { output.textContent = 'form-invalid: fill in the required field.'; });
 for (const name of ['change', 'press']) sample.addEventListener(name, event => {
-  if ((event.target as HTMLElement).localName === 'ds-split')
+  if (((event.target as HTMLElement).localName === 'ds-split' || (event.target as HTMLElement).matches('ds-button[split]')))
     output.textContent = `${name}: ${(event as CustomEvent).detail.value}`;
 });
 
@@ -91,13 +91,70 @@ sample.querySelectorAll('ds-tooltip').forEach(tooltip => {
 parent.postMessage({ type: 'ds1-example-ready' }, location.origin);
 
 // Library previews use the identical examples and component runtime as the catalogue.
+const legacyPreviewStyle = document.createElement('style');
 const libraryStyle = document.createElement('style');
-document.head.append(libraryStyle);
+document.head.append(legacyPreviewStyle, libraryStyle);
 window.addEventListener('message', event => {
   if (event.origin !== location.origin || event.source !== parent || event.data?.type !== 'ds1-example-styles') return;
   if (typeof event.data.css !== 'string' || new TextEncoder().encode(event.data.css).length > 524288) return;
   libraryStyle.textContent = event.data.css;
 });
+
+// The library's box diagram measures the real shared control and never reaches
+// into its shadow root to override implementation styles. Editing uses its part.
+let libraryRequestId: number | undefined;
+let libraryHoverRegion: string | null = null;
+const boxOverlay = document.createElement('div');
+boxOverlay.setAttribute('aria-hidden', 'true');
+Object.assign(boxOverlay.style, { position: 'fixed', pointerEvents: 'none', zIndex: '1000', outline: '1px dashed var(--sharp-blue)', background: 'color-mix(in srgb, var(--sharp-blue) 12%, transparent)', display: 'none' });
+document.body.append(boxOverlay);
+function buttonMetrics() {
+  if (libraryRequestId === undefined) return;
+  const host = sample.querySelector<HTMLElement>('ds-button');
+  const control = host?.shadowRoot?.querySelector<HTMLElement>('button');
+  if (!host || !control) return;
+  const style = getComputedStyle(control); const outer = getComputedStyle(host);
+  const scale = Number.parseFloat(getComputedStyle(host).getPropertyValue('--ds-sf')) || 1;
+  const px = (value: string) => (Number.parseFloat(value) || 0) / scale;
+  const box = { paddingX: px(style.paddingRight), paddingY: px(style.paddingTop), radius: px(style.borderTopLeftRadius), gap: px(style.columnGap),
+    borderTop: px(style.borderTopWidth), borderRight: px(style.borderRightWidth), borderBottom: px(style.borderBottomWidth), borderLeft: px(style.borderLeftWidth),
+    marginTop: px(outer.marginTop), marginRight: px(outer.marginRight), marginBottom: px(outer.marginBottom), marginLeft: px(outer.marginLeft) };
+  const rect = control.getBoundingClientRect();
+  const contentSize = { width: Math.round(rect.width / scale - box.paddingX * 2 - box.borderLeft - box.borderRight), height: Math.round(rect.height / scale - box.paddingY * 2 - box.borderTop - box.borderBottom) };
+  parent.postMessage({ type: 'ds1-example-button-metrics', requestId: libraryRequestId, box, contentSize }, location.origin);
+  boxOverlay.style.display = libraryHoverRegion ? 'block' : 'none';
+  let top = rect.top, left = rect.left, width = rect.width, height = rect.height;
+  if (libraryHoverRegion === 'content') { top += (box.paddingY + box.borderTop) * scale; left += (box.paddingX + box.borderLeft) * scale; width = contentSize.width * scale; height = contentSize.height * scale; }
+  else if (libraryHoverRegion === 'padding') { top += box.borderTop * scale; left += box.borderLeft * scale; width -= (box.borderLeft + box.borderRight) * scale; height -= (box.borderTop + box.borderBottom) * scale; }
+  else if (libraryHoverRegion === 'margin' || libraryHoverRegion === 'all') { top -= box.marginTop * scale; left -= box.marginLeft * scale; width += (box.marginLeft + box.marginRight) * scale; height += (box.marginTop + box.marginBottom) * scale; }
+  Object.assign(boxOverlay.style, { top: `${top}px`, left: `${left}px`, width: `${width}px`, height: `${height}px` });
+}
+window.addEventListener('message', event => {
+  if (event.origin !== location.origin || event.source !== parent || event.data?.type !== 'ds1-example-styles' || typeof event.data.css !== 'string' || new TextEncoder().encode(event.data.css).length > 524288) return;
+  syncLegacyButtonPreview(event.data.css);
+  libraryRequestId = event.data.requestId;
+  libraryHoverRegion = ['margin', 'border', 'padding', 'content', 'all'].includes(event.data.hoverRegion) ? event.data.hoverRegion : null;
+  requestAnimationFrame(buttonMetrics);
+});
+const measuredButton = sample.querySelector('ds-button');
+if (measuredButton) new ResizeObserver(buttonMetrics).observe(measuredButton);
+
+// Earlier libraries authored ordinary button rules. Project that authored face
+// onto the real DS1 control only inside its preview; keep saved CSS untouched.
+let legacyReference: HTMLButtonElement | undefined;
+function syncLegacyButtonPreview(css: string) {
+  if (!/--one-button-padding-inline\s*:/.test(css)) { legacyPreviewStyle.textContent = ''; return; }
+  if (!legacyReference) {
+    legacyReference = document.createElement('button');
+    legacyReference.setAttribute('aria-hidden', 'true'); legacyReference.tabIndex = -1;
+    legacyReference.textContent = 'Save changes';
+    Object.assign(legacyReference.style, { position: 'fixed', left: '-10000px', visibility: 'hidden', pointerEvents: 'none' });
+    document.body.append(legacyReference);
+  }
+  const face = getComputedStyle(legacyReference);
+  const properties = ['padding-top', 'padding-right', 'padding-bottom', 'padding-left', 'border-top-width', 'border-right-width', 'border-bottom-width', 'border-left-width', 'border-style', 'border-color', 'border-radius', 'column-gap', 'background-color', 'color', 'font-family', 'font-size', 'font-weight', 'line-height'];
+  legacyPreviewStyle.textContent = `ds-button { margin: ${face.margin}; } ds-button::part(control) { ${properties.map(name => `${name}: ${face.getPropertyValue(name)};`).join(' ')} height: auto; min-height: 0; max-height: none; }`;
+}
 
 if (document.body.dataset.exampleId === 'chart') {
   mountChartExample(sample);

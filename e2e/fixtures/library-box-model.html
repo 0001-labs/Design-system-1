@@ -1,0 +1,11 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><div id="root"></div><script type="module">
+import React from 'react'; import {createRoot} from 'react-dom/client';
+import '/DS1/1-root/one.css'; import '/shared/site-navigation.css';
+import '/app/src/app.css'; import '/app/src/shell.css';
+import {SystemWorkbench} from '/app/src/SystemWorkbench.tsx';
+const initialCss=':root { --brand: pink; }\n.brand { color: var(--brand); }';
+function App() {const [saved,setSaved]=React.useState(null); return React.createElement('div',{className:'app-shell'},
+React.createElement(SystemWorkbench,{initialCss,initialConfig:{schema:1,brand:'preserved'},onDirty:setSaved}),
+React.createElement('output',{id:'saved-draft',style:{display:'none'}},JSON.stringify(saved)));}
+createRoot(document.getElementById('root')).render(React.createElement(App));
+</script></body></html>

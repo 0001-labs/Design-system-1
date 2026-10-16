@@ -55,7 +55,7 @@ render();`,
   },
   'split': {
     title: 'Choices and repeated actions', hint: 'Choose a view or step through the date.',
-    html: '<ds-split aria-label="View" options="day:Day,week:Week,month:Month" value="week"></ds-split>\n<ds-split actions aria-label="Date" options="back:@left:Back,today:Today,next:@right:Next"></ds-split>',
+    html: '<ds-button split aria-label="View" options="day:Day,week:Week,month:Month" value="week"></ds-button>\n<ds-button split actions aria-label="Date" options="back:@left:Back,today:Today,next:@right:Next"></ds-button>',
   },
   'avatar': {
     title: 'People, always round', hint: 'Fill an avatar with a colour, or letter it in an ink on the neutral fill.',
@@ -192,7 +192,7 @@ document.querySelectorAll('[data-grid-option]').forEach(control => {
 export const PAGE_EXAMPLES: Record<string, string[]> = {
   '2-core/chart': ['chart'],
   '2-core/avatar': ['avatar'],
-  '2-core/button': ['button', 'button-icon'],
+  '2-core/button': ['button', 'button-icon', 'split'],
   '2-core/tooltip': ['tooltip', 'tooltip-fallback'],
   '2-core/icon': ['icon', 'icon-variants'],
   '2-core/input': ['input', 'input-states'],

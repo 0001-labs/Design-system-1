@@ -8,8 +8,21 @@ import { define } from "../0-face/define";
 import hostStyles from "./styles/ds-button-host.css?inline";
 import styles from "./styles/ds-button.css?inline";
 
+import { renderSplit, focusSplit, type SplitSegment } from "./button-split";
+import splitStyles from "./styles/ds-button-split.css?inline";
+export type { SplitSegment } from "./button-split";
+
 export class Button extends Control {
+  static formAssociated = true;
   static properties = {
+    split: { type: Boolean, reflect: true },
+    options: { type: String },
+    segments: { attribute: false },
+    value: { type: String, reflect: true },
+    actions: { type: Boolean, reflect: true },
+    literal: { type: Boolean, reflect: true },
+    compact: { type: Boolean, reflect: true },
+    _fieldsetDisabled: { state: true },
     primary: { type: Boolean, reflect: true },
     secondary: { type: Boolean, reflect: true },
     control: { type: String, reflect: true, noAccessor: true },
@@ -27,6 +40,18 @@ export class Button extends Control {
     href: { type: String },
     _loading: { type: Boolean, state: true },
   };
+
+  declare split: boolean;
+  declare options: string;
+  declare segments: ReadonlyArray<SplitSegment> | undefined;
+  declare value: string;
+  declare actions: boolean;
+  declare literal: boolean;
+  declare compact: boolean;
+  declare private _fieldsetDisabled: boolean;
+  private splitRole = false;
+  get splitDisabled(): boolean { return this.disabled || this._fieldsetDisabled; }
+  private splitLanguageChanged = () => { if (this.split) this.requestUpdate(); };
 
   // Public properties
   declare primary: boolean;
@@ -47,7 +72,7 @@ export class Button extends Control {
     this.syncControl();
     this.requestUpdate("control", old);
   }
-  protected get hostControl(): boolean { return this.control === "host"; }
+  protected get hostControl(): boolean { return this.control === "host" && !this.split; }
   declare blank: boolean;
   declare language: string;
   declare text: string;
@@ -58,6 +83,12 @@ export class Button extends Control {
 
   constructor() {
     super();
+    if (typeof this.attachInternals === "function") this.attachInternals();
+    this.split = false; this.options = ""; this.value = "";
+    this.actions = false; this.literal = false; this.compact = false; this._fieldsetDisabled = false;
+    this.addEventListener("click", event => {
+      if (this._fieldsetDisabled) { event.preventDefault(); event.stopImmediatePropagation(); }
+    }, { capture: true });
     this.active = false;
     this.choice = false;
     this.icon = false;
@@ -76,30 +107,33 @@ export class Button extends Control {
     this._loading = false;
   }
 
-  static styles = [unsafeCSS(styles), unsafeCSS(hostStyles)];
+  static styles = [unsafeCSS(styles), unsafeCSS(hostStyles), unsafeCSS(splitStyles)];
 
   /**
    * A button holding only an icon — every close button — says so on its host,
    * so its styles can make it a 16-unit square with the icon filling it.
    */
   _reflectIcon() {
-    if (this.control !== "native") return;
+    if (this.control !== "native" || this.split) return;
     const only = this.firstElementChild;
     const icon = !this.text && this.childElementCount === 1 && only?.localName === 'ds-icon' && !(this.textContent ?? '').trim();
     this.toggleAttribute('icon', !!icon);
   }
 
   private syncSlottedControl() {
-    if (this.control !== "slotted") return;
+    if (this.control !== "slotted" || this.split) return;
     const button = this.querySelector<HTMLButtonElement>(":scope > button");
-    if (button) button.disabled = this.disabled;
+    if (button) button.disabled = this.splitDisabled;
   }
 
   updated() {
+    if (this.split && !this.hasAttribute("role")) { this.setAttribute("role", "group"); this.splitRole = true; }
+    else if (!this.split && this.splitRole) { this.removeAttribute("role"); this.splitRole = false; this.syncControl(); }
     this.syncSlottedControl();
   }
 
   focus(options?: FocusOptions) {
+    if (this.split) { focusSplit(this, options); return; }
     if (this.control === "slotted") this.querySelector<HTMLElement>(":scope > :is(button, a)")?.focus(options);
     else if (this.hostControl) super.focus(options);
     else this.shadowRoot?.querySelector("button")?.focus(options);
@@ -109,19 +143,30 @@ export class Button extends Control {
     super.connectedCallback();
     this._reflectIcon();
     this.syncSlottedControl();
+    window.addEventListener("language-changed", this.splitLanguageChanged);
+    window.addEventListener("translations-loaded", this.splitLanguageChanged);
   }
 
+  disconnectedCallback() {
+    window.removeEventListener("language-changed", this.splitLanguageChanged);
+    window.removeEventListener("translations-loaded", this.splitLanguageChanged);
+    super.disconnectedCallback();
+  }
+  formDisabledCallback(disabled: boolean) { this._fieldsetDisabled = disabled; this.syncSlottedControl(); }
+
   render() {
+    if (this.split) return renderSplit(this);
     const hasTextProps = this.text;
     if (this.control === "slotted") return html`<slot @slotchange=${this.syncSlottedControl}></slot>`;
     if (this.hostControl) return html`<slot name="icon"></slot><slot></slot><slot name="trailing"></slot>`;
 
     return html`
       <button
+        part="control"
         type="button"
         ?primary=${this.primary}
         ?secondary=${this.secondary}
-        ?disabled=${this.disabled}
+        ?disabled=${this.splitDisabled}
         @click=${this._handleClick}
       >
         ${hasTextProps

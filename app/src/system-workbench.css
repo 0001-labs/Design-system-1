@@ -12,3 +12,15 @@
 .system-workbench-tokens label span { display: block; font: calc(10px * var(--sf, 1))/var(--site-unit) var(--typeface-mono); }
 .system-workbench-tokens input { box-sizing: border-box; width: 100%; height: var(--site-unit); font: inherit; color: inherit; background: var(--ds-input-background); border: 0; border-radius: var(--ds-radius); padding-inline: calc(4px * var(--sf, 1)); }
 @media (max-width: 1100px) { .system-workbench-panes { grid-template-columns: calc(10 * var(--site-unit)) minmax(0, 1fr); max-height: none; } .system-workbench-tokens { grid-column: 1 / -1; max-height: calc(15 * var(--site-unit)); border-top: 1px solid var(--ds-border-color); } }
+/* The old two-row library panel belonged to the catalogue + properties stack.
+   The catalogue now has one scrolling flow, with a heading above its sections. */
+.app-shell .system-workbench .system-library-panel { display: block; overflow: auto; }
+.system-workbench .system-library-panel > .app-panel-label { position: sticky; top: 0; z-index: 1; flex-shrink: 0; background: var(--workbench-panel); }
+.system-workbench .system-library-panel .component-tree { display: block; }
+.system-workbench .system-library-panel .component-tree > div { display: block; }
+.system-workbench .library-button-properties { padding: var(--site-unit) 0; }
+.system-workbench .library-button-properties > h2 { margin: 0; font-size: inherit; line-height: var(--site-unit); }
+.system-workbench .library-button-properties label { display: flex; align-items: center; justify-content: space-between; gap: var(--site-unit); }
+.system-workbench .library-button-properties .library-button-gap input { width: calc(3 * var(--site-unit)); }
+.system-workbench .library-button-properties .box-model input { width: var(--site-unit); height: calc(16px * var(--sf, 1)); padding: 0; background: transparent; border: 0; border-radius: 0; font: inherit; }
+.system-workbench .library-button-mode { padding-top: var(--site-unit); }

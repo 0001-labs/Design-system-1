@@ -7,6 +7,8 @@ export interface SpacingOptions {
   value: number; min?: number; max?: number; step?: number; shiftStep?: number;
   axis?: "horizontal" | "vertical"; gain?: number; disabled?: boolean;
   snapPreview?: boolean; immediateKeyboard?: boolean; threshold?: number;
+  /** Disable slider keys when a native input owns keyboard editing. */
+  keyboard?: boolean;
   onPointerStart?: (event: PointerEvent) => void;
   onStart?: (kind: "pointer" | "keyboard") => void;
   onPreview?: (value: number) => void;
@@ -69,6 +71,7 @@ export function bindSpacingHandle(target: HTMLElement, options: () => SpacingOpt
   };
   const key = (e: KeyboardEvent) => {
     const o = options();
+    if (o.keyboard === false) return;
     if (o.disabled) { finishKeyboard(true); return; }
     if (e.key === "Escape" && keyboard) { e.preventDefault(); e.stopPropagation(); finishKeyboard(true); return; }
     const positive = o.axis === "vertical" ? "ArrowUp" : "ArrowRight";

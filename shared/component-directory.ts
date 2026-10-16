@@ -35,7 +35,6 @@ export const ALL_LAYERS: DirectoryLayer[] = [
       { name: 'Avatar', href: '/2-core/avatar/', tag: 'ds-avatar' },
       { name: 'Banner', href: '/2-core/banner/', tag: 'ds-banner' },
       { name: 'Button', href: '/2-core/button/', tag: 'ds-button' },
-      { name: 'Split', href: '/2-core/split/', tag: 'ds-split' },
       { name: 'Card', href: '/2-core/card/', tag: 'ds-card' },
       { name: 'Charts', href: '/2-core/chart/', tag: 'ds-chart' },
       { name: 'Cycle', href: '/2-core/cycle/', tag: 'ds-cycle' },

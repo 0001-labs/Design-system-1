@@ -1,12 +1,17 @@
 /** Native semantics and React events; the shared Lit element owns the face. */
-import { createElement, forwardRef, type AnchorHTMLAttributes, type ButtonHTMLAttributes } from "react";
+import { createElement, forwardRef, type AnchorHTMLAttributes, type ReactElement, type RefAttributes, type Ref, type ButtonHTMLAttributes } from "react";
+import { SplitButton, type SplitButtonProps } from "./button-split";
+export type { SplitButtonProps, SplitSegment } from "./button-split";
 import type { Button as ButtonElement } from "../2-core/ds-button";
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
   Partial<Pick<ButtonElement, "primary" | "secondary" | "active" | "choice" | "icon" | "wide" | "fixed" | "fit" | "danger" | "menuItem">>;
 
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  {
+const ButtonControl = forwardRef<HTMLButtonElement, ButtonProps | SplitButtonProps<string>>(function Button(
+  props, ref,
+) {
+  if ("split" in props && props.split) return createElement(SplitButton, { ...props, forwardedRef: ref as unknown as Ref<ButtonElement> });
+  const {
     children,
     className,
     style,
@@ -23,10 +28,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     disabled,
     hidden,
     type = "button",
-    ...props
-  },
-  ref,
-) {
+    ...nativeProps
+  } = props as ButtonProps;
   return createElement(
     "ds-button",
     {
@@ -46,9 +49,15 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       className,
       style,
     },
-    createElement("button", { ...props, ref, type, disabled, hidden }, children),
+    createElement("button", { ...nativeProps, ref, type, disabled, hidden }, children),
   );
 });
+
+export const Button = ButtonControl as unknown as {
+  <const T extends string>(props: SplitButtonProps<T> & RefAttributes<ButtonElement>): ReactElement | null;
+  (props: ButtonProps & RefAttributes<HTMLButtonElement>): ReactElement | null;
+  displayName?: string;
+};
 
 /** A real link: browser navigation, context menus and modifier clicks survive. */
 export type ButtonLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> &
