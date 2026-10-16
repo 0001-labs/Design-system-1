@@ -89,7 +89,7 @@ test("an action runs and closes the toast; the close button dismisses it", async
   const onDismiss = vi.fn();
   toast("Item archived", { action: { label: "Undo", onClick } });
   await settle(element, 20);
-  const action = toasts(element)[0]!.querySelector<HTMLElement>("ds-button.action")!;
+  const action = toasts(element)[0]!.querySelector<HTMLButtonElement>("button.action")!;
   expect(action.textContent).toBe("Undo");
   action.click();
   await settle(element);
@@ -112,4 +112,17 @@ test("toast() adds a toaster when the page has none", async () => {
   expect(element).not.toBeNull();
   await settle(element, 20);
   expect(toasts(element)[0]!.querySelector(".title")?.textContent).toBe("Alone");
+});
+
+test("moving the toaster keeps its toasts and the time they had left", async () => {
+  const element = await toaster("contained");
+  toast("Moved");
+  await settle(element, 3000);
+  const parent = document.createElement("div");
+  document.body.append(parent);
+  parent.append(element);
+  await settle(element, 900);
+  expect(toasts(element)).toHaveLength(1);
+  await settle(element, 300);
+  expect(toasts(element)).toHaveLength(0);
 });

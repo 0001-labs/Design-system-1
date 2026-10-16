@@ -1,16 +1,17 @@
 @import "../../1-root/component-metrics.css";
 
 /* Toast, based on Sonner (https://sonner.emilkowal.ski, MIT licence).
- * Sonner's stack, drawn in Design system 1's measures: sixteen squares wide,
- * one square from the edge, half a square between toasts and peeking behind
- * the front one. Sonner's 400ms transitions on transform and opacity only. */
+ * Sonner's stack, drawn as Design system 1's label: an ink chip one control
+ * high per line of words, the tooltip's colours, no line and no shadow. The
+ * pile advances one square per toast (a control and the rest of the square),
+ * one square clear of the edge. Sonner's 400ms transitions on transform and
+ * opacity only. */
 :host {
   --ds-toast-width: calc(16 * var(--ds-unit));
   --ds-toast-offset: var(--ds-unit);
-  --ds-toast-gap: calc(var(--ds-unit) / 2);
-  --ds-toast-background: var(--ds-paper);
-  --ds-toast-color: var(--ds-text-color);
-  --ds-toast-border: var(--ds-border-color);
+  --ds-toast-gap: calc(var(--ds-unit) - var(--ds-control-height));
+  --ds-toast-background: var(--ds-tooltip-background, light-dark(var(--ds-black), var(--ds-white)));
+  --ds-toast-color: var(--ds-tooltip-color, light-dark(var(--ds-white), var(--ds-black)));
   display: contents;
 }
 
@@ -21,18 +22,24 @@ ol {
   position: fixed;
   z-index: 2147483000;
   box-sizing: border-box;
-  width: min(var(--ds-toast-width), calc(100vw - 2 * var(--ds-toast-offset)));
+  width: min(var(--ds-toast-width), calc(100% - 2 * var(--ds-toast-offset)));
   height: calc(var(--height) + var(--gaps) * var(--ds-toast-gap));
   margin: 0;
   padding: 0;
   list-style: none;
   outline: none;
+  pointer-events: none;
 }
-ol[data-y="top"] { --lift: 1; top: var(--ds-toast-offset); }
-ol[data-y="bottom"] { bottom: var(--ds-toast-offset); }
+/* In the window, the offset clears the phone's safe area too. */
+ol[data-y="top"] { --lift: 1; top: calc(var(--ds-toast-offset) + env(safe-area-inset-top, 0px)); }
+ol[data-y="bottom"] { bottom: calc(var(--ds-toast-offset) + env(safe-area-inset-bottom, 0px)); }
 ol[data-x="left"] { left: var(--ds-toast-offset); }
 ol[data-x="right"] { right: var(--ds-toast-offset); }
 ol[data-x="center"] { left: 50%; transform: translateX(-50%); }
+/* Contained: within the nearest positioned ancestor instead of the window. */
+:host([contained]) ol { position: absolute; z-index: var(--ds-toast-z-index, 60); }
+:host([contained]) ol[data-y="top"] { top: var(--ds-toast-offset); }
+:host([contained]) ol[data-y="bottom"] { bottom: var(--ds-toast-offset); }
 
 .toast {
   --swipe: 0px;
@@ -40,24 +47,30 @@ ol[data-x="center"] { left: 50%; transform: translateX(-50%); }
   left: 0;
   right: 0;
   box-sizing: border-box;
+  width: max-content;
+  max-width: 100%;
   overflow: hidden;
-  border: 1px solid var(--ds-toast-border);
   border-radius: var(--ds-radius);
   background: var(--ds-toast-background);
   color: var(--ds-toast-color);
   font-family: var(--ds-typeface-regular);
   font-feature-settings: var(--ds-font-features);
   font-size: var(--ds-type-size-default);
+  line-height: var(--ds-control-height);
   letter-spacing: var(--ds-type-letterspacing-default);
   outline: none;
   touch-action: none;
   user-select: none;
+  pointer-events: auto;
   opacity: 0;
   transition: transform 400ms ease, opacity 400ms ease;
 }
 ol[data-y="bottom"] .toast { bottom: 0; }
 ol[data-y="top"] .toast { top: 0; }
-.toast:focus-visible { outline: 2px solid var(--ds-focus-ring); outline-offset: -2px; }
+ol[data-x="center"] .toast { margin-inline: auto; }
+ol[data-x="left"] .toast { margin-right: auto; }
+ol[data-x="right"] .toast { margin-left: auto; }
+.toast:focus-visible { outline: 2px solid var(--ds-focus-ring); outline-offset: 1px; }
 
 /* Entering: from beyond the edge, then into the stack. */
 .toast[data-mounted="false"] { transform: translateY(calc(var(--lift) * -100%)); }
@@ -83,14 +96,14 @@ ol[data-expanded="true"] .toast[data-mounted="true"] {
 .toast[data-removed="true"][data-front="true"] { transform: translateY(calc(var(--lift) * -100%)); }
 .toast[data-swipe-out="true"] { transform: translateY(calc(var(--swipe) + var(--lift) * -100%)); }
 
-/* Half a square around one-square rows, less the line: one line of words
- * makes a toast two squares high. */
+/* Words padded 4px from the chip's edge; each line one control high. */
 .body {
   display: flex;
   align-items: flex-start;
   gap: calc(4px * var(--ds-sf));
   box-sizing: border-box;
-  padding: calc(var(--ds-unit) / 2 - 1px);
+  min-height: var(--ds-control-height);
+  padding-inline: calc(4px * var(--ds-sf));
   transition: opacity 400ms ease;
 }
 .icon {
@@ -98,37 +111,53 @@ ol[data-expanded="true"] .toast[data-mounted="true"] {
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  width: var(--ds-row-height);
-  height: var(--ds-row-height);
+  width: var(--ds-control-height);
+  height: var(--ds-control-height);
+  --ds-icon-color: currentColor;
 }
+.icon:first-child { margin-left: calc(-4px * var(--ds-sf)); }
 .content { flex: 1 1 auto; min-width: 0; }
-.title, .description { line-height: var(--ds-row-height); overflow-wrap: anywhere; }
-.description { color: var(--ds-text-color-muted); }
-ds-button { flex: 0 0 auto; margin-block: calc((var(--ds-row-height) - var(--ds-control-height)) / 2); }
+.title, .description { white-space: normal; overflow-wrap: anywhere; }
+.description { opacity: 0.7; }
+
+/* Actions are words of the same size, underlined as text buttons are. */
+.button {
+  flex: 0 0 auto;
+  margin: 0 0 0 calc(4px * var(--ds-sf));
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.button.cancel { opacity: 0.7; }
+.button:focus-visible, .close:focus-visible { outline: 1px solid currentColor; outline-offset: 1px; border-radius: 1px; }
 
 .close {
   display: inline-flex;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  width: var(--ds-row-height);
-  height: var(--ds-row-height);
-  margin: 0;
+  width: var(--ds-control-height);
+  height: var(--ds-control-height);
+  margin: 0 calc(-4px * var(--ds-sf)) 0 0;
   padding: 0;
   border: 0;
-  border-radius: var(--ds-radius);
   background: none;
   color: inherit;
   cursor: pointer;
+  --ds-icon-color: currentColor;
 }
-.close:hover { background: var(--ds-fill-hover); }
-.close:focus-visible { outline: 2px solid var(--ds-focus-ring); outline-offset: -2px; }
 
 .spinner {
-  width: calc(12px * var(--ds-sf));
-  height: calc(12px * var(--ds-sf));
+  width: calc(10px * var(--ds-sf));
+  height: calc(10px * var(--ds-sf));
   box-sizing: border-box;
-  border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
   border-top-color: currentColor;
   border-radius: 50%;
   animation: ds-toast-spin 720ms linear infinite;
@@ -142,8 +171,6 @@ ds-button { flex: 0 0 auto; margin-block: calc((var(--ds-row-height) - var(--ds-
 :host([rich-colors]) .toast[data-type="error"] { --ds-toast-background: var(--ds-tuned-red); }
 :host([rich-colors]) .toast:is([data-type="success"], [data-type="info"], [data-type="warning"], [data-type="error"]) {
   --ds-toast-color: var(--ds-black);
-  --ds-toast-border: var(--ds-toast-background);
-  --ds-text-color-muted: color-mix(in srgb, var(--ds-black) 75%, transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {

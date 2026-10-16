@@ -13,14 +13,15 @@ export type ToasterProps = HTMLAttributes<ToasterElement> & {
   duration?: number;
   closeButton?: boolean;
   richColors?: boolean;
+  contained?: boolean;
   label?: string;
   closeLabel?: string;
 };
-export const Toaster = forwardRef<ToasterElement, ToasterProps>(function Toaster({ visibleToasts, closeButton, richColors, closeLabel, expand, ...props }, ref) {
+export const Toaster = forwardRef<ToasterElement, ToasterProps>(function Toaster({ visibleToasts, closeButton, richColors, closeLabel, expand, contained, ...props }, ref) {
   return createElement("ds-toast", {
     ...props, ref,
     "visible-toasts": visibleToasts, "close-label": closeLabel,
-    expand: expand || undefined, "close-button": closeButton || undefined, "rich-colors": richColors || undefined,
+    expand: expand || undefined, "close-button": closeButton || undefined, "rich-colors": richColors || undefined, contained: contained || undefined,
   });
 });
 export { toast };

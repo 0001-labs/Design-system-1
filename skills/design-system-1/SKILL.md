@@ -49,7 +49,7 @@ Items stack edge to edge with no gap, as an Ezo list does. Lists, table rows, ce
 
 ## Toasts
 
-A toast is `<ds-toast>` and `toast()` from `DS1/2-core/ds-toast.ts`, based on Sonner: Sonner's calls, options and stacking behaviour, drawn sixteen squares wide, one square from the edge, half a square apart, two squares high for one line, with a 1px line and no shadow. Never build a product's own toast or notification stack.
+A toast is `<ds-toast>` and `toast()` from `DS1/2-core/ds-toast.ts`, based on Sonner: Sonner's calls, options and stacking behaviour, drawn as the system's label: an ink chip one control high per line in the tooltip's colours, padded 4px, no line or shadow, actions as underlined words, as wide as its words up to sixteen squares, the pile advancing one square per toast and standing one square from the edge. Never build a product's own toast or notification stack.
 
 ## Tooltips
 

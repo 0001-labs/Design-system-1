@@ -11,23 +11,25 @@
  *   with Sonner's options (`id`, `description`, `duration`, `action`, `cancel`,
  *   `dismissible`, `closeButton`, `important`, `onDismiss`, `onAutoClose`).
  * - `<ds-toast>` is Sonner's `<Toaster />`, with its `position`, `expand`,
- *   `visible-toasts`, `duration`, `close-button` and `rich-colors`.
+ *   `visible-toasts`, `duration`, `close-button` and `rich-colors`;
+ *   `contained` draws it inside its positioned parent instead of the window.
  * - A toast stays 4 seconds; its timer pauses while the stack is hovered,
  *   focused, held or the tab is hidden. Three show at once, stacked behind
  *   one another and spread out on hover. A swipe towards the edge dismisses one,
  *   Alt+T reaches them from the keyboard, and they come and go with Sonner's
  *   400ms slide and fade.
  *
- * Where it departs from Sonner, it follows Design system 1: widths and spacing
- * in squares, the shared type, colours and buttons, a 1px line and no shadow,
- * and only `transform` and `opacity` animate (a toast stacked behind takes the
- * front one's height at once instead of animating it). `toast()` also adds a
- * `<ds-toast>` to the page when there is none.
+ * Where it departs from Sonner, it follows Design system 1: a toast is drawn as
+ * the system's label, an ink chip one control high per line in the tooltip's
+ * colours, with no line or shadow, its actions underlined words; the pile
+ * advances one square per toast, one square from the edge. Only `transform`
+ * and `opacity` animate (a toast stacked behind takes the front one's height at
+ * once instead of animating it). `toast()` also adds a `<ds-toast>` to the page
+ * when there is none, and moving the element keeps its toasts and their time.
  */
 import { LitElement, html, nothing, unsafeCSS } from "lit";
 import { repeat } from "lit/directives/repeat.js";
 import { define } from "../0-face/define";
-import "./ds-button";
 import "./ds-icon";
 import styles from "./styles/ds-toast.css?inline";
 
@@ -125,6 +127,7 @@ export class Toaster extends LitElement {
     duration: { type: Number },
     closeButton: { type: Boolean, attribute: "close-button" },
     richColors: { type: Boolean, attribute: "rich-colors", reflect: true },
+    contained: { type: Boolean, reflect: true },
     label: { type: String },
     closeLabel: { type: String, attribute: "close-label" },
     _items: { state: true },
@@ -139,6 +142,8 @@ export class Toaster extends LitElement {
   declare duration: number;
   declare closeButton: boolean;
   declare richColors: boolean;
+  /** Draw within the nearest positioned ancestor instead of the window. */
+  declare contained: boolean;
   /** The region's accessible name; products pass their own words. */
   declare label: string;
   declare closeLabel: string;
@@ -159,6 +164,7 @@ export class Toaster extends LitElement {
     this.duration = DURATION;
     this.closeButton = false;
     this.richColors = false;
+    this.contained = false;
     this.label = "Notifications";
     this.closeLabel = "Close toast";
     this._items = [];
@@ -171,6 +177,8 @@ export class Toaster extends LitElement {
     listeners.add(this.receive);
     document.addEventListener("keydown", this.hotkey);
     document.addEventListener("visibilitychange", this.syncTimers);
+    // Moved to another parent: carry on with the time each toast had left.
+    this.requestUpdate();
   }
 
   disconnectedCallback(): void {
@@ -178,8 +186,13 @@ export class Toaster extends LitElement {
     listeners.delete(this.receive);
     document.removeEventListener("keydown", this.hotkey);
     document.removeEventListener("visibilitychange", this.syncTimers);
-    for (const timer of this.timers.values()) clearTimeout(timer.handle);
-    this.timers.clear();
+    const now = Date.now();
+    for (const timer of this.timers.values()) {
+      if (timer.handle === undefined) continue;
+      clearTimeout(timer.handle);
+      timer.handle = undefined;
+      timer.remaining -= now - timer.started;
+    }
     this.resizes?.disconnect();
   }
 
@@ -279,7 +292,7 @@ export class Toaster extends LitElement {
 
   private onPointerDown(event: PointerEvent, item: Item) {
     if (item.data.dismissible === false || item.data.type === "loading") return;
-    if ((event.composedPath()[0] as Element | undefined)?.closest?.("button, ds-button")) return;
+    if ((event.composedPath()[0] as Element | undefined)?.closest?.("button")) return;
     (event.currentTarget as HTMLElement).setPointerCapture?.(event.pointerId);
     this.swipe = { id: item.data.id, start: event.clientY, time: Date.now(), amount: 0 };
     this.interacting = true;
@@ -348,8 +361,8 @@ export class Toaster extends LitElement {
           <div class="title">${data.title}</div>
           ${data.description ? html`<div class="description">${data.description}</div>` : nothing}
         </div>
-        ${data.cancel ? html`<ds-button class="cancel" secondary @click=${(event: MouseEvent) => this.press(event, item, data.cancel!)}>${data.cancel.label}</ds-button>` : nothing}
-        ${data.action ? html`<ds-button class="action" primary @click=${(event: MouseEvent) => this.press(event, item, data.action!)}>${data.action.label}</ds-button>` : nothing}
+        ${data.cancel ? html`<button class="button cancel" type="button" @click=${(event: MouseEvent) => this.press(event, item, data.cancel!)}>${data.cancel.label}</button>` : nothing}
+        ${data.action ? html`<button class="button action" type="button" @click=${(event: MouseEvent) => this.press(event, item, data.action!)}>${data.action.label}</button>` : nothing}
         ${closeButton ? html`<button class="close" type="button" aria-label=${this.closeLabel} @click=${() => this.removeToast(data.id)}><ds-icon type="close"></ds-icon></button>` : nothing}
       </div>
     </li>`;

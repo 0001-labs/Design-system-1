@@ -59,6 +59,7 @@ import { Toaster, toast } from "@0001-labs/design-system-1/DS1/react/toast";
 | `duration` | `4000` | Milliseconds each toast stays. |
 | `close-button` | Off | Adds a close button to every toast. |
 | `rich-colors` | Off | Fills success, info, warning and error toasts with their colour. |
+| `contained` | Off | Not in Sonner: draws the toasts inside the nearest positioned parent, such as a panel's status area, instead of the window. |
 | `label` | `Notifications` | The region's accessible name; pass the product's own words. |
 | `close-label` | `Close toast` | The close button's accessible name. |
 
@@ -81,15 +82,19 @@ until they are updated or dismissed.
 
 ## Where it departs from Sonner
 
-The toasts follow Design system 1 rather than Sonner's look: sixteen squares
-wide, one square from the edge, half a square between them, one line of words
-making a toast two squares high, the shared type, colours and buttons, a 1px
-line and no shadow. Only `transform` and `opacity` animate; a toast stacked
-behind takes the front one's height at once. Swiping works towards the
-vertical edge only.
+A toast is drawn as Design system 1's label, not as Sonner's card: an ink chip
+one control high for each line of words, in the tooltip's colours (black with
+white words, turning over in dark mode), padded 4px, with no line and no
+shadow. It is as wide as its words, up to sixteen squares. Actions and Cancel
+are words of the same size, underlined. The pile advances one square per
+toast, a control and the rest of the square, and stands one square clear of
+the edge and the phone's safe area. Only `transform` and `opacity` animate; a
+toast stacked behind takes the front one's height at once. Swiping works
+towards the vertical edge only. Moving the element to another parent keeps its
+toasts and the time each had left.
 
-Set `--ds-toast-background`, `--ds-toast-color` and `--ds-toast-border` on
-`ds-toast` to change its colours with shared tokens. Copy `toast` through Sync 1.
+Set `--ds-toast-width`, `--ds-toast-background` and `--ds-toast-color` on
+`ds-toast` with shared tokens to fit a surface. Copy `toast` through Sync 1.
 
 ## Related components
 
