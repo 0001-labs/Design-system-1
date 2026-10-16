@@ -132,7 +132,6 @@ export default defineConfig({
         {
           label: "Advanced",
           items: [
-            { label: "Theming", slug: "advanced/theming" },
           ],
         },
       ],

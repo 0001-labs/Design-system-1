@@ -32,6 +32,7 @@ describe("combined website routes", () => {
       '/icons/': '/2-core/icon/collection/',
       '/1-root/styling/': '/1-root/overview/',
       '/built-ins/languages/': '/1-root/languages/',
+      '/advanced/theming/': '/1-root/theming/',
       '/built-ins/theming/': '/1-root/theming/',
       '/built-ins/device/': '/1-root/device/',
       '/built-ins/preferences/': '/1-root/preferences/',
