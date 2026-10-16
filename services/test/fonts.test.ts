@@ -47,7 +47,7 @@ describe('private font workspace', () => {
     expect(response.headers.get('cache-control')).toBe('private, no-store');
     expect(response.headers.get('access-control-allow-origin')).toBeNull();
     expect(((await response.json()) as { fonts: { id: string; available: boolean }[] }).fonts[0]).toMatchObject({ id: 'supernatural', available: false });
-    expect(send).toHaveBeenCalledWith('https://example.convex.cloud/api/query', expect.objectContaining({ redirect: 'error', headers: { authorization: 'Bearer owner-session', 'Content-Type': 'application/json' } }));
+    expect(send).toHaveBeenCalledWith('https://example.convex.cloud/api/query', expect.objectContaining({ redirect: 'manual', headers: { authorization: 'Bearer owner-session', 'Content-Type': 'application/json' } }));
   });
   it('keeps uploads versioned and returns their bytes only to the owner', async () => {
     const { env, send, request, objects } = setup();

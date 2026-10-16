@@ -29,7 +29,7 @@ export async function componentReport(request: Request, env: ReportsEnv, send: t
     const response = await send(`${env.REPORTS_AUTH_URL}/api/query`, {
       method: "POST", headers: { authorization, "Content-Type": "application/json" },
       body: JSON.stringify({ path: "users:current", args: [{}], format: "convex_encoded_json" }),
-      signal: AbortSignal.timeout(8_000), redirect: "error",
+      signal: AbortSignal.timeout(8_000), redirect: "manual",
     });
     if (response.status === 401 || response.status === 403) return failure("Your session has expired. Sign in again.", 401);
     if (!response.ok) return failure("Sign-in could not be checked. Try again.", 503);
