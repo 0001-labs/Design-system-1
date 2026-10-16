@@ -10,6 +10,15 @@ import styles from "./styles/ds-text.css?inline";
  * @prop {string} text - The translation key (optional if using slot content)
  * @prop {boolean} literal - The text is what someone wrote, not a key: show it
  *   as it stands, never looked up, never translated
+ * @prop {"muted" | "title" | "danger"} tone - A quieter colour, the title grey,
+ *   or the danger colour for a failure or a warning
+ * @prop {"small" | "heading" | "display"} size - 10px, a 13px heading on one
+ *   square, or a 20px title on two squares
+ * @prop {boolean} strong - The medium weight
+ * @prop {boolean} wrap - Let the text run over several lines, each one square
+ *
+ * The four work alike for a translation key and for literal text. For a
+ * heading, give the element `role="heading"` and `aria-level`.
  *
  * @example
  * // Using slot content as the key (preferred)
@@ -20,6 +29,9 @@ import styles from "./styles/ds-text.css?inline";
  *
  * // Something a person typed: a list title, an item, a search they saved
  * <ds-text literal text="Marketing plan"></ds-text>
+ *
+ * // A translated message over several lines, in the danger colour
+ * <ds-text wrap tone="danger" role="alert">Couldn't save your changes</ds-text>
  */
 export class Text extends LitElement {
   static get properties() {
@@ -36,8 +48,8 @@ export class Text extends LitElement {
 
   declare text: string;
   declare literal: boolean;
-  declare tone?: "muted" | "title";
-  declare size?: "small" | "heading";
+  declare tone?: "muted" | "title" | "danger";
+  declare size?: "small" | "heading" | "display";
   declare strong: boolean;
   declare wrap: boolean;
   declare _text: string;
