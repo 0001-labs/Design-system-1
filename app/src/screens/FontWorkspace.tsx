@@ -34,7 +34,7 @@ function PrivateFonts() {
   const [fonts, setFonts] = useState<FontEntry[] | null>(null);
   const [selected, setSelected] = useState('supernatural');
   const [mode, setMode] = useState<'specimen' | 'glyphs'>('specimen');
-  const [text, setText] = useState('A little of the unexpected.\nEvery letter, a little different.');
+  const [text, setText] = useState('a little of the natural.\nevery letter a little different.');
   const [size, setSize] = useState(40);
   const [spacing, setSpacing] = useState(0);
   const [dark, setDark] = useState(false);
@@ -135,7 +135,7 @@ function PrivateFonts() {
             : <div className="font-glyphs" style={{ fontFamily: `"${family}"`, fontSize: `calc(${size}px * var(--sf, 1))` }}>{alphabets.flatMap(line => [...line]).map((letter, index) => <div key={`${letter}-${index}`}><span>{letter}</span><small>U+{letter.codePointAt(0)!.toString(16).toUpperCase().padStart(4, '0')}</small></div>)}</div>
           : <div className="font-empty"><h3>{busy ? 'Loading the font…' : selected === 'supernatural' ? 'Supernatural starts with your handwriting.' : 'No specimen loaded.'}</h3><p>{selected === 'supernatural' ? 'Open a font build to try it here. Handwriting scans and original letterforms are still needed to create the first version.' : 'Select a font to view it, or try again if it could not load.'}</p>{selected === 'supernatural' && <p>English first. About ten forms per letter, with variation in shape, spacing and rhythm.</p>}</div>}
         </div>
-        <footer className="font-footer"><p role={error ? 'alert' : 'status'}>{error || message || (family ? mode === 'glyphs' ? 'Unsupported characters use a fallback.' : 'Edit the specimen text. Size changes stay inside the specimen.' : 'No substitute handwriting font is shown.')}</p>{error && <Control onClick={() => setRetry(n => n + 1)}>Try again</Control>}</footer>
+        <footer className="font-footer"><p role={error ? 'alert' : 'status'}>{error || message || (family ? selected === 'supernatural' ? 'Development study. Missing characters use a fallback.' : mode === 'glyphs' ? 'Unsupported characters use a fallback.' : 'Edit the specimen text. Size changes stay inside the specimen.' : 'No substitute handwriting font is shown.')}</p>{error && <Control onClick={() => setRetry(n => n + 1)}>Try again</Control>}</footer>
       </section>
     </div>
   </main>;
