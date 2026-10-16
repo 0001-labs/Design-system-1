@@ -14,7 +14,10 @@ const example = `<link rel="stylesheet"
 
 <article class="landing" aria-labelledby="landing-title" data-pagefind-body>
   <LandingHero />
-  <section id="learn-more" class="landing-layers" aria-labelledby="what-title">
+  <section id="learn-more" class="landing-layers" aria-label="Component list">
+    <LayerDiagram />
+  </section>
+  <section class="landing-layers" aria-labelledby="what-title">
     <div class="landing-content">
       <h2 id="what-title">What Design system 1 is</h2>
       <p>A design system for ordinary HTML, shared CSS and fonts. Style a page without a framework or build step. Add JavaScript when you need the richer interactive components.</p>
@@ -23,8 +26,6 @@ const example = `<link rel="stylesheet"
       <p>Root sets the unit. Core components are single pieces sized by it. Units put those pieces together, and pages place the units on the grid.</p>
     </div>
     <LayerBricks />
-    <LayerDiagram />
-    <a href="/components/">All components <span aria-hidden="true">→</span></a>
   </section>
   <div class="landing-layout">
   <div class="landing-content">
@@ -50,13 +51,10 @@ const example = `<link rel="stylesheet"
     <section class="landing-section" aria-labelledby="components-title">
       <h2 id="components-title">Components when you need them</h2>
       <p>For interactive controls, use the Web Components with their stylesheet and JavaScript bundle. Themes, translations, and preferences are part of the system too.</p>
-      <a href="/components/">Explore the components <span aria-hidden="true">→</span></a>
     </section>
 
     <nav class="landing-footer" aria-label="Explore Design system 1">
-      <a href="/start-here/examples/">HTML examples <span aria-hidden="true">↗</span></a>
-      <a href="/components/">Components <span aria-hidden="true">→</span></a>
-      <a href="/start-here/overview/">Documentation <span aria-hidden="true">→</span></a>
+      <a href="/start-here/overview/">Docs</a>
     </nav>
   </div>
   <PageGridIllustration />

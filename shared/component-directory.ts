@@ -21,6 +21,7 @@ export const ALL_LAYERS: DirectoryLayer[] = [
     summary: 'The unit, the colours and the type.',
     entries: [
       { name: 'Styling', href: '/1-root/styling/', tag: 'one.css' },
+      { name: 'Colours', href: '/colours/' },
       { name: 'Fonts', href: '/1-root/fonts/', tag: 'fonts' },
     ],
   },

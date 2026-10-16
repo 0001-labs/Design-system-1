@@ -63,8 +63,6 @@ export default defineConfig({
             { label: "Examples", slug: "start-here/examples" },
             { label: "Component examples", link: "/components/" },
             { label: "Email design", slug: "email" },
-            { label: "Icon builder", link: "/icons/#builder" },
-            { label: "Icon library", link: "/icons/" },
           ],
         },
         {
@@ -89,6 +87,7 @@ export default defineConfig({
           label: "1 Root",
           items: [
             { label: "Styling", slug: "1-root/styling" },
+            { label: "Colours", link: "/colours/" },
             { label: "Fonts", slug: "1-root/fonts" },
           ],
         },
@@ -131,6 +130,13 @@ export default defineConfig({
             { label: "Container", slug: "4-page/container" },
             { label: "Grid", slug: "4-page/grid" },
             { label: "Layout", slug: "4-page/layout" },
+          ],
+        },
+        {
+          label: "x Icon",
+          items: [
+            { label: "Icons", link: "/icons/" },
+            { label: "Icon builder", link: "/icons/#builder" },
           ],
         },
         {
