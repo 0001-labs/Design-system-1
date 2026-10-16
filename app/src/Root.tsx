@@ -1,5 +1,6 @@
 import { AdoptionDashboard } from "./screens/AdoptionDashboard";
 import { FontWorkspace } from "./screens/FontWorkspace";
+import { IconBuilder } from "./screens/iconBuilder/IconBuilder";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { useConvexAuth } from "convex/react";
 import { useEffect, type ReactNode } from "react";
@@ -89,7 +90,7 @@ function NavigationAuth() {
 export function Root({ children }: { children?: ReactNode }) {
   return (
     <ConvexAuthProvider client={convex}>
-      <RouterProvider>{window.location.pathname === "/app/navigation-auth" ? <NavigationAuth /> : window.location.hostname === "dash.designsystem1.com" ? <AdoptionDashboard /> : window.location.hostname === "fonts.designsystem1.com" ? <FontWorkspace /> : <AppShell>{children ?? <Routes />}</AppShell>}</RouterProvider>
+      <RouterProvider>{window.location.pathname === "/app/navigation-auth" ? <NavigationAuth /> : window.location.hostname === "dash.designsystem1.com" ? <AdoptionDashboard /> : window.location.hostname === "fonts.designsystem1.com" ? <FontWorkspace /> : window.location.hostname === "icon.designsystem1.com" ? <IconBuilder /> : <AppShell>{children ?? <Routes />}</AppShell>}</RouterProvider>
     </ConvexAuthProvider>
   );
 }

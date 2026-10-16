@@ -4,6 +4,7 @@ import { existsSync, readFileSync, mkdirSync, writeFileSync, statSync } from "no
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import ts from "typescript";
+import { readIconMap, scanIcons } from "./icon-adoption";
 import { COMPONENT_COLUMNS, IMPLEMENTATION_COLUMNS, catalogueApp, type AdoptionApp, type AdoptionReport, type ComponentCell, type UsageSite } from "../shared/component-adoption";
 
 const repository = fileURLToPath(new URL("../", import.meta.url));
@@ -348,6 +349,8 @@ function importedAdapters(root: string, file: string, source: string): Record<st
   return result;
 }
 
+const ds1Icons = (dsRoot: string) => readIconMap(join(dsRoot, "DS1/2-core/generated/ds-icon-map.ts")) ?? new Map<string, string>();
+
 export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): AdoptionApp {
   const root = join(studio, spec.directory);
   const app: AdoptionApp = { id: spec.id, name: spec.name, status: "unavailable", commit: null, dirty: false, files: 0, scope: spec.roots, snapshotCommit: null, cells: {}, otherCustomElements: {}, group: spec.group ?? "Products", ...(spec.migration ? { migration: spec.migration, migrationReason: spec.migrationReason } : {}) };
@@ -359,6 +362,7 @@ export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): Ado
     app.cells = snapshots.cells;
     const files = git(root, "ls-files", "-z", "--", ...spec.roots).split("\0").filter(f => /\.(tsx?|jsx?|[cm]js|html|astro)$/.test(f) && !excluded.test(f) && !(spec.excludes ?? []).some(prefix => f === prefix || f.startsWith(prefix + "/")) && existsSync(join(root, f)));
     if (!files.length) throw new Error("No tracked web source was found in the configured scope.");
+    app.icons = scanIcons(root, spec.manifest, files, ds1Icons(dsRoot), join(dsRoot, "DS1/x-icon"));
     for (const file of files) {
       app.files++;
       const source = readFileSync(join(root, file), "utf8");
@@ -403,6 +407,7 @@ export function scanReport(studio = resolve(repository, "..")): AdoptionReport {
   return {
     schema: 1, generatedAt: new Date().toISOString(), sourceCommit: git(repository, "rev-parse", "HEAD"), sourceDirty: Boolean(git(repository, "status", "--porcelain")),
     columns: COMPONENT_COLUMNS,
+    icons: { names: [...ds1Icons(repository).keys()] },
     apps: loadAppSpecs(studio).map(app => catalogueApp(scanApp(app, studio))),
     method: [
       "Names and layers follow the shared DS1 catalogue (Core, Unit and Page). Split compatibility uses are included under Button, and Switch uses under Toggle; original source tags remain in drilldowns. Specialist implementation components retain their source names. Internal Spacing handle and Loading are included in this private audit, not the public picker.",
@@ -412,6 +417,7 @@ export function scanReport(studio = resolve(repository, "..")): AdoptionReport {
       "DS1 styles counts native controls with literal ds-button, ds-input, ds-select or ds-checkbox classes and verified shared control styles. These are not Lit components. Dynamic class expressions are not inferred.",
       "Local means recognized ezo-/c9y- components or native button, input/select/textarea, p/headings, ul/ol, table, form and dialog, plus literal dialog/alertdialog roles, including explicit setAttribute sites. Native semantics can be intentional; these counts are review leads, not automatic defects.",
       "Tests, demos in preview/dev directories, generated files, vendored implementations and shared sign-in internals are excluded. Link's inspected TabPill, TabPillRow and Tooltip/Tooltop adapters and DS1's verified React FilePicker, Input, Textarea, Composer, Menu, ContextMenuContent/SubContent and their Button, Text and FilePicker entries, Checkbox, Radio, Switch, Select, ColorInput, Button, ButtonLink, Token, TokenField, Avatar, Logo, AvatarGroup, Accordion, Split and DialogContent adapters count at imported JSX uses, without counting their inner DS1 tags again.",
+      "Icons: ds-icon with a literal type in markup, Lit, JSX or h/createElement calls counts as a use of that name; a type set by an expression is a dynamic use, and inline <svg> drawings are counted apart. An app with a copied icon map beside its DS1 snapshot is compared drawing by drawing with today's DS1 map: Differs marks a copy that is not DS1's drawing, or a DS1 name missing from the copy; Local only is a name DS1 does not draw. Apps without a copy resolve names from DS1 itself.",
       "Native dialog/input/button/select/textarea children directly inside ds-dialog/ds-file-picker/ds-checkbox/ds-radio/ds-color/ds-switch/ds-select/ds-composer count as their shared frames, not as extra local controls. Literal file, color, checkbox and radio types have their own columns; switch roles are grouped as Toggle; dynamic types stay in Input. Direct const document.createElement plus append composition and statically imported h factories from inspected DOM helpers are also recognized. Other React abstractions, dynamic tag names, CSS-only controls, spans and inline SVGs are not inferred. Native apps are outside this scan. A zero means no recognized source site, not that a capability is absent.",
     ],
   };

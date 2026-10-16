@@ -1,4 +1,4 @@
-import { dashboard, DASHBOARD_HOST } from "./dashboard";
+import { dashboard, DASHBOARD_HOST, ICON_HOST } from "./dashboard";
 import { libraryApi } from "./libraries";
 import { fontWorkspace } from "./fonts";
 import assets from "./assets/index.ts";
@@ -22,6 +22,7 @@ export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
     if (url.hostname === DASHBOARD_HOST && url.pathname !== "/api/reports/components") return dashboard(request, env);
+    if (url.hostname === ICON_HOST) return dashboard(request, env);
     if (url.pathname === "/api/libraries" || url.pathname.startsWith("/api/libraries/") || url.pathname.startsWith("/api/library-auth/")) return libraryApi(request, env);
     if (url.pathname === "/api/fonts" || url.pathname.startsWith("/api/fonts/")) return fontWorkspace(request, env);
     if (url.hostname === "fonts.designsystem1.com") {

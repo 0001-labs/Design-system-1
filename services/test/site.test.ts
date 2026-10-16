@@ -21,6 +21,18 @@ describe("combined website routes", () => {
     }
   });
 
+  it("gates the icon builder host like the dashboard and serves it nothing else", async () => {
+    const origin = "https://icon.designsystem1.com";
+    const page = await site.fetch(origin + "/", { redirect: "manual" });
+    expect(page.status).toBe(302);
+    expect(page.headers.get("location")).toBe("/app/signin");
+    expect(page.headers.get("cache-control")).toBe("private, no-store");
+    expect(await (await site.fetch(origin + "/app/signin")).text()).toBe("Application");
+    for (const path of ["/app/libraries", "/api/libraries", "/api/fonts", "/api/reports/components", "/2-core/icon/collection/", "/reports/component-adoption.json"]) {
+      expect((await site.fetch(origin + path)).status, path).toBe(404);
+    }
+  });
+
   it("preserves query parameters when normalizing the app URL", async () => {
     const response = await site.fetch("/app?code=example", { redirect: "manual" });
     expect(response.status).toBe(308);

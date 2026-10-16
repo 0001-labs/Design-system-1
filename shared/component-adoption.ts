@@ -13,6 +13,18 @@ export interface ComponentCell {
   current: boolean | null;
   issues: string[];
 }
+/** An icon an app names: DS1's drawing, a copy that is not today's DS1 drawing, or a name DS1 does not have. */
+export type IconStatus = "shared" | "differs" | "local";
+export interface IconSite { file: string; line: number; name: string }
+export interface IconCell {
+  uses: number;
+  status: IconStatus;
+  /** The app's copied drawing against today's DS1: none when the app has no copy and resolves from DS1. */
+  copy: "same" | "differs" | "missing" | "local" | "none";
+  sites: IconSite[];
+}
+export interface IconAdoption { copy: string | null; cells: Record<string, IconCell>; dynamic: IconSite[]; inline: IconSite[] }
+
 export interface AdoptionApp {
   id: string;
   name: string;
@@ -28,6 +40,7 @@ export interface AdoptionApp {
   group?: "Products" | "Clients";
   migration?: "deferred";
   migrationReason?: string;
+  icons?: IconAdoption;
 }
 export interface AdoptionReport {
   schema: 1;
@@ -37,6 +50,8 @@ export interface AdoptionReport {
   columns: ComponentColumn[];
   apps: AdoptionApp[];
   method: string[];
+  /** Every icon name DS1 draws today. */
+  icons?: { names: string[] };
 }
 
 /** Implementation IDs remain distinct for provenance checks and source drilldowns. */

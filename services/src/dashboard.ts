@@ -2,6 +2,8 @@
 import { authorizeReport, type ReportsEnv } from './reports';
 
 export const DASHBOARD_HOST = 'dash.designsystem1.com';
+/** The owner's icon builder: the same gate and session as the dashboard, on its own host. */
+export const ICON_HOST = 'icon.designsystem1.com';
 const COOKIE = '__Host-ds1-dashboard';
 const security = { 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow', 'Referrer-Policy': 'same-origin', Vary: 'Cookie, Authorization' };
 const expired = `${COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0`;

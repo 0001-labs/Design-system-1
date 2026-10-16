@@ -25,6 +25,12 @@ A zero is no recognized usage, not proof that the capability is absent. An unava
 
 File picker has its own column. Literal native `input type="file"` sites count as local there; direct native children of `ds-file-picker` are its frame, counted once. The source-owned React `FilePicker` adapter counts at verified imported uses. Dynamic input types and imperative type assignments remain in Input; they are not inferred as file pickers. The picker composes its Button face internally, which is not an additional product-authored Button site.
 
+## Icons
+
+Below the component matrix, the icon matrix has one row per icon and one column per app. `scripts/icon-adoption.ts` reads the same tracked files. A `ds-icon` with a literal `type` (markup, Lit, JSX, `h`/`createElement` calls, or an element named right after `document.createElement`) is a use of that name; a `type` that is an expression is a dynamic use, and inline `<svg>` drawings are counted apart. Components imported from an icon set (Tabler, Lucide, Heroicons, React Icons, Phosphor, Radix icons) are local only, named after the set. Direct imports of an `x-icon/*.svg` file are compared with DS1's file.
+
+An app with a copied icon map beside its DS1 snapshot (`<snapshot>/2-core/generated/ds-icon-map.ts`) is compared drawing by drawing with today's DS1 map. **DS1 drawing** is a match, or a use in an app without a copy. **Needs the DS1 drawing** is a copy that differs, or a DS1 name the copy lacks. **Local only** is a name DS1 does not draw. Unused copies are listed only when they differ (≠) or are local additions (+).
+
 ## Refresh and verify
 
 Run `vp run reports:scan` from this repository. It writes `.reports/component-adoption.json`, which is ignored by Git. An unavailable source makes the command fail so publishing cannot silently replace a complete snapshot with missing data. Refresh after component migrations; page reloads read the latest published snapshot and do not scan the developer's disk.
@@ -32,7 +38,7 @@ Run `vp run reports:scan` from this repository. It writes `.reports/component-ad
 Checks:
 
 ```sh
-vp test tests/component-adoption.test.ts services/test/reports.test.ts services/test/dashboard.test.ts services/test/site.test.ts services/test/config.test.ts
+vp test tests/component-adoption.test.ts tests/icon-adoption.test.ts services/test/reports.test.ts services/test/dashboard.test.ts services/test/site.test.ts services/test/config.test.ts
 vp run app:build
 cd services
 vp exec tsc --noEmit

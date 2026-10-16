@@ -3,6 +3,7 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import { totalSites, type AdoptionReport, type ComponentCell } from "../../../shared/component-adoption";
 import "../../../DS1/2-core/ds-button";
 import "../../../DS1/1-root/component-tokens.css";
+import { IconMatrix } from "./IconAdoption";
 import "./component-adoption.css";
 
 type View = "all" | "shared" | "styled" | "local" | "unverified";
@@ -44,7 +45,7 @@ export function ComponentAdoption({ onSignOut }: { onSignOut?: () => Promise<voi
       <ds-button onClick={() => void (onSignOut ? onSignOut() : signOut())}>Sign out</ds-button>
     </header>
     {error ? <div role="alert"><p>{error}</p><ds-button onClick={() => setRetry(value => value + 1)}>Try again</ds-button></div>
-      : report ? <ComponentMatrix report={report} /> : <p role="status">Reading the source snapshot…</p>}
+      : report ? <><ComponentMatrix report={report} /><IconMatrix report={report} /></> : <p role="status">Reading the source snapshot…</p>}
   </main>;
 }
 

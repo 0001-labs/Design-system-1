@@ -95,6 +95,10 @@ The exact measures and rules of the system (the 20px square, items one square hi
 
 Two type rules every product keeps, here and in Aa: **arrows are always Inter**, in every typeface, code included, through the "Inter Arrows" face (`DS1/1-root/fonts/Inter-Arrows.woff2`, Inter's arrows alone, `unicode-range`) that leads every `--typeface-*` token in `one.css` and `component-tokens.css`; a new typeface token or font stack starts with it. And **code is Iosevka Extended** (`--typeface-mono`, `fonts/Iosevka-Regular.woff2`, cut to what code uses), falling back to a system monospace, never a serif.
 
+## Private icon builder
+
+`icon.designsystem1.com` is the badge and favicon builder, for the owner alone. It is the dashboard's gate on another host: the Worker routes it through `services/src/dashboard.ts` (`ICON_HOST`), which revalidates the owner on every HTML request and keeps its own host-only session cookie; only the sign-in shell and app assets are public. The app shows `app/src/screens/iconBuilder/` there. The builder is not on the public site; the public Icon collection is a plain table. Its drawings (`website/src/lib/icons/studio.ts`, `gridIcon.ts`) also generate the site's favicons.
+
 ## Private font workspace
 
 `fonts.designsystem1.com` uses the existing app sign-in. Only the configured owner user ID whose verified account resolves to `jaa90@icloud.com` can read `/api/fonts`, fetch font files or save a Supernatural build. The Worker revalidates each request through `users:current`; the existing `REPORTS_AUTH_URL` and `REPORTS_OWNER_ID` secrets identify that account. The public shell contains no private font data. Sign-in offers the shared email code and owner password; social redirects remain on the main app.

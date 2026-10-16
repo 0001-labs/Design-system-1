@@ -78,3 +78,10 @@
 
 .adoption-app-group th { text-align: left; font-weight: normal; height: var(--1); background: var(--report-paper); }
 .adoption-deferred { font-weight: normal; }
+
+/* The icon matrix: its own section, each DS1 icon drawn one square high beside its name. */
+.adoption-icons { padding-block: var(--report-unit); border-top: 1px solid var(--report-line); }
+.adoption-icons .adoption-column-names th { height: calc(7 * var(--report-unit)); }
+.adoption-icon-name { display: flex; align-items: center; justify-content: flex-end; gap: calc(.5 * var(--report-unit)); height: var(--report-unit); }
+.adoption-icon-name > span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.adoption-icon-name ds-icon { flex: none; width: var(--report-unit); height: var(--report-unit); }
