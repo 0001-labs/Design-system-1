@@ -140,3 +140,21 @@ test("a required field's mark is the danger colour", async () => {
     expect(mark, scheme).toBe(danger);
   }
 });
+
+test("a secondary ds-button's words are the native secondary button's ink, light and dark", async () => {
+  for (const scheme of SCHEMES) {
+    const page = pages[scheme];
+    await stage(page, '<button class="ds-button ds-button--secondary">Cancel</button><ds-button secondary>Cancel</ds-button><ds-button secondary href="#cancel">Cancel</ds-button><ds-button secondary control="host">Cancel</ds-button><p class="ds-text">Cancel</p>');
+    const [native, element, link, host, text] = await page.evaluate(() => [...document.getElementById("stage")!.children].map((element) => {
+      const face = element.localName === "ds-button" && element.getAttribute("control") !== "host" ? element.shadowRoot!.querySelector('[part="control"]')! : element;
+      const style = getComputedStyle(face);
+      return { color: style.color, background: style.backgroundColor };
+    }));
+    expect(native!.color, scheme).toBe(text!.color);
+    expect(native!.color, scheme).toBe(scheme === "light" ? "rgb(42, 42, 42)" : "rgb(255, 255, 255)");
+    for (const face of [element!, link!, host!]) {
+      expect(face.color, scheme).toBe(native!.color);
+      expect(face.background, scheme).toBe(native!.background);
+    }
+  }
+});
