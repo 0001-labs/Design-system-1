@@ -77,7 +77,7 @@ export function bindSpacingHandle(target: HTMLElement, options: () => SpacingOpt
     e.preventDefault(); e.stopPropagation();
     if (!keyboard) { keyboard = { start: o.value, value: o.value, immediate: !!o.immediateKeyboard }; o.onStart?.("keyboard"); }
     const step = e.shiftKey ? (o.shiftStep ?? (o.step || 1) * 10) : (o.step || 1);
-    keyboard.value = snap(e.key === "Home" ? (o.min ?? 0) : e.key === "End" ? o.max! : keyboard.value + (e.key === positive ? step : -step), o);
+    keyboard.value = snap(e.key === "Home" ? (o.min ?? 0) : e.key === "End" ? o.max! : (keyboard.immediate ? o.value : keyboard.value) + (e.key === positive ? step : -step), o);
     if (keyboard.immediate) o.onCommit(keyboard.value); else o.onPreview?.(keyboard.value);
   };
   const keyup = (e: KeyboardEvent) => { if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) finishKeyboard(); };
