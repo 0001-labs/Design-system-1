@@ -86,3 +86,5 @@ export * from "./2-core/ds-token";
 export * from "./3-unit/ds-token-field";
 
 export * from "./3-unit/ds-sidebar";
+
+export * from "./2-core/ds-chart";

@@ -1,0 +1,44 @@
+---
+title: Charts
+description: Pixel-aligned series, sparklines, bars, ratios and ranges.
+---
+
+Charts belong to `2-core`. They own their drawing and interaction; a chart composed with headings, summaries and range controls belongs to `3-unit`.
+
+Import `DS1/2-core/ds-chart` to register `ds-chart`, `ds-spark`, `ds-bars`, `ds-ratio` and `ds-range`. The same entry exports `GridChart`, `createChart`, `drawSparkline` and the data and option types. With Sync 1, select `"components": ["chart"]` in the components export.
+
+```ts
+import './design/2-core/ds-chart';
+import type { GridLineChart } from './design/2-core/ds-chart';
+
+const chart = document.querySelector('ds-chart') as GridLineChart;
+chart.data = [{ time: 0, value: 12 }, { time: 60, value: 18 }];
+chart.kind = 'area'; // line, area or baseline
+chart.unit = 20; // CSS pixels per square; pass 20 × the surface scale
+chart.rows = 8;
+chart.grid = 'rows'; // full, rows or none
+chart.addEventListener('scrub', event => {
+  // CustomEvent.detail is the nearest DataPoint, or null.
+});
+```
+
+## Series charts
+
+`ds-chart` accepts `data`, `kind`, `base` (the baseline value), `color` (a CSS colour or custom-property name), `rows`, `markers`, `timeRange`, `extremes`, `labels`, `live`, `format` and `drawKey`. Data and markers are JavaScript properties. Each marker has a Unix-seconds `time` and `text`. Assign a new array after editing data. Changing `drawKey` replays the draw-in; reduced motion skips it. The `scrub` event bubbles and is composed across shadow roots. Mouse hover or pointer dragging moves the crosshair.
+
+For multiple series, use `createChart(canvas, options)`, `addSeries`, `setData`, `update`, `setMarkers`, `applyOptions`, `setTimeRange`, `resize` and `subscribeCrosshairMove`. Unsubscribe listeners and call `destroy` when removing a chart. `timeRange` sets the horizontal viewport; vertical scale currently includes all supplied data. The components resize automatically and can be removed and reinserted.
+
+## Compact charts
+
+- `ds-spark`: `values`, optional `base`, and `cols` (default four). One square high.
+- `ds-bars`: `items` with `label`, `value`, optional `compare`, `tone` (`up`, `down`, `ink`) and `caption`; `rows` and `span` in squares. Intended for nonnegative values.
+- `ds-ratio`: `value` between zero and one; out-of-range values clamp.
+- `ds-range`: `min`, `max`, `from`, `to` and `marks` (`value`, optional `label`, `kind` of `dot` or `tick`). This is a display, not a range input.
+
+Every component has independent `unit` and `grid` settings. There are no global setters. Set `unit` when the containing surface scale changes. Call `refreshTheme()` after changing application theme classes or tokens; system colour-scheme changes redraw automatically.
+
+## Appearance and accessible content
+
+Set scoped tokens on the chart host: `--ds-chart-ink`, `--ds-chart-muted`, `--ds-chart-faint`, `--ds-chart-up`, `--ds-chart-down`, `--ds-chart-surface`, `--ds-chart-grid-minor`, `--ds-chart-grid-major`, `--ds-chart-live`, `--ds-chart-line`, `--ds-chart-fill`, `--ds-chart-font` and `--ds-chart-small`. Defaults use the design palette. Fonts and client branding remain configurable. Geometry and internal styles live in shadow DOM; products own placement and outer margins.
+
+Supply an accessible label and a textual summary or data table beside a canvas chart. The canvas crosshair is a pointer aid, not a keyboard-accessible data browser. These components do not own data fetching, currency, dates, account state or range controls.

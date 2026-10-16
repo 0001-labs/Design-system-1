@@ -1,0 +1,168 @@
+ :host { --ds-chart-ink: var(--text-color, #1e1e1e); --ds-chart-muted: var(--base-darker-grey, #797979); --ds-chart-faint: var(--slate-light, #e6e6e6); --ds-chart-up: var(--apple-green, #99ff73); --ds-chart-down: var(--tuned-red, #ff5f5f); --ds-chart-live: var(--ds-chart-up); --ds-chart-line: var(--ds-chart-faint); --ds-chart-fill: var(--ds-chart-faint); --ds-chart-small: calc(var(--ds-chart-unit, 20px) / 2); font-family: var(--ds-chart-font, var(--typeface-regular, sans-serif)); }
+* { box-sizing: border-box; }
+:host([data-chart-kind="line"]) {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+:host([data-chart-kind="line"]) canvas {
+  display: block;
+  touch-action: pan-y;
+  cursor: crosshair;
+}
+
+.live-dot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  background: var(--ds-chart-live);
+  pointer-events: none;
+  animation: blink 1s steps(2, jump-none) infinite;
+}
+
+
+:host([data-chart-kind="spark"]) {
+  display: block;
+  height: var(--ds-chart-unit);
+}
+
+:host([data-chart-kind="spark"]) canvas {
+  display: block;
+  border-top-color: var(--ds-chart-faint);
+}
+
+:host([data-chart-kind="spark"]) canvas.up {
+  color: var(--ds-chart-up);
+}
+
+:host([data-chart-kind="spark"]) canvas.down {
+  color: var(--ds-chart-down);
+}
+
+
+:host([data-chart-kind="ratio"]) {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  height: var(--ds-chart-unit);
+}
+
+.ratio-buy,
+.ratio-sell {
+  height: calc(var(--ds-chart-unit) / 2);
+}
+
+.ratio-buy {
+  background: var(--ds-chart-up);
+}
+
+.ratio-sell {
+  background: var(--ds-chart-down);
+}
+
+
+:host([data-chart-kind="range"]) {
+  position: relative;
+  display: block;
+  height: var(--ds-chart-unit);
+}
+
+.range-track {
+  position: absolute;
+  top: calc(var(--ds-chart-unit) / 2);
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--ds-chart-line);
+}
+
+.range-fill {
+  position: absolute;
+  top: calc(var(--ds-chart-unit) / 4);
+  left: 0;
+  height: calc(var(--ds-chart-unit) / 2);
+  background: var(--ds-chart-fill);
+}
+
+.range-tick {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: var(--ds-chart-unit);
+  background: var(--ds-chart-muted);
+}
+
+.range-dot {
+  position: absolute;
+  top: calc(var(--ds-chart-unit) / 2 - 2px);
+  left: 0;
+  width: 5px;
+  height: 5px;
+  background: var(--ds-chart-ink);
+}
+
+:host([data-chart-kind="bars"]) {
+  display: block;
+}
+
+.bars {
+  display: flex;
+}
+
+.bar-cell {
+  display: grid;
+  grid-template-rows: auto var(--ds-chart-unit) var(--ds-chart-unit);
+  align-items: center;
+  width: calc(var(--span) * var(--ds-chart-unit));
+}
+
+.bar-area {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  box-shadow: inset 0 -1px 0 var(--ds-chart-line);
+}
+
+.bar-fill {
+  width: calc(var(--span) * var(--ds-chart-unit) - 1px);
+}
+
+.bar-fill.up {
+  background: var(--ds-chart-up);
+}
+
+.bar-fill.down {
+  background: var(--ds-chart-down);
+}
+
+.bar-fill.ink {
+  background: var(--ds-chart-faint);
+}
+
+.bar-compare {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 1;
+  width: calc(var(--span) * var(--ds-chart-unit) - 1px);
+  box-shadow: inset 0 0 0 1px var(--ds-chart-ink);
+}
+
+.bar-caption,
+.bar-label {
+  font-size: var(--ds-chart-small);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.bar-label {
+  color: var(--ds-chart-muted);
+}
+
+
+@keyframes blink { from { opacity: 1; } to { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { .live-dot { animation: none; } }
