@@ -10,6 +10,9 @@ import { componentGraph } from './scripts/component-graph.mjs';
 const rootStyles = ['one.css', 'grid.css', 'text.css', 'component-tokens.css', 'component-metrics.css', 'component-appearance.css'];
 /** one.css and controls.css both import the text classes. */
 const importsText = ['one.css', 'controls.css'];
+/** Sheets for writing that a product asks for by name, as a flag or in `styles`. */
+const writingSheets = { prose: 'prose.css' };
+const askedSheets = options => Object.entries(writingSheets).filter(([flag]) => options[flag]).map(([, file]) => file);
 /** The faces one.css loads, by the file names its @font-face rules use. */
 const rootFonts = ['GT-America-Standard-Regular.woff2', 'GT-America-Standard-Medium.woff2', 'GT-America-Compressed-Regular.woff2', 'GT-Canon-M-Standard-Medium-Trial.woff2', 'Inter-Arrows.woff2', 'Iosevka-Regular.woff2', 'Inter-LICENSE.md', 'Iosevka-LICENSE.md'];
 /** Page scripts in 0-face/, each with the modules it imports. */
@@ -48,14 +51,16 @@ export default {
     /**
      * Component tokens for static stylesheets that import them by URL.
      * `nativeControls` adds controls.css with the text classes it imports
-     * (text.css); `bundle` writes them all as one bundle.css with the imports
-     * resolved, for a page that can carry only one stylesheet or inlines its
-     * styles.
+     * (text.css); `prose` adds the prose sheet (prose.css, for writing marked
+     * data-ds-prose); `bundle` writes them all as one bundle.css with the
+     * imports resolved, for a page that can carry only one stylesheet or
+     * inlines its styles.
      */
     tokens: {
       files({ read, options }) {
         const files = options.bundle ? [...tokenStyles] : ['component-tokens.css', 'component-metrics.css', 'component-appearance.css'];
         if (options.nativeControls) files.push('text.css', 'controls.css');
+        files.push(...askedSheets(options));
         if (options.bundle) return { 'bundle.css': `/* Generated from Design system 1/DS1/1-root: ${files.join(', ')}. Change Design system 1 and sync. */\n` + files.map(file => withoutImports(read(`DS1/1-root/${file}`))).join('\n') };
         return Object.fromEntries(files.map(file => [file, read(`DS1/1-root/${file}`)]));
       },
@@ -65,7 +70,8 @@ export default {
      * component tokens) and the faces it loads, in fonts/. `styles` names the
      * stylesheets to copy when a product loads only some (`["grid.css"]`, or
      * `[]` for scripts alone); `fonts: false` leaves the faces to the product;
-     * `nativeControls` adds controls.css; `modules` names page scripts
+     * `nativeControls` adds controls.css; `prose` adds the prose sheet
+     * (prose.css), which `styles` may also name; `modules` names page scripts
      * from 0-face/ (grid, grid-fit, layout-inspector, scaling, tooltips), copied
      * with what they import. one.css and controls.css bring text.css, which
      * they import.
@@ -73,9 +79,9 @@ export default {
     root: {
       files({ read, options }) {
         const files = {};
-        const styles = options.styles ?? rootStyles;
+        const styles = [...(options.styles ?? rootStyles), ...askedSheets(options)];
         for (const file of styles) {
-          if (!rootStyles.includes(file)) throw new Error(`Unknown root stylesheet: ${file}`);
+          if (!rootStyles.includes(file) && !Object.values(writingSheets).includes(file)) throw new Error(`Unknown root stylesheet: ${file}`);
           files[file] = read(`DS1/1-root/${file}`);
         }
         if (options.nativeControls) files['controls.css'] = read('DS1/1-root/controls.css');

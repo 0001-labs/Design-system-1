@@ -27,6 +27,19 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "Design system 1",
+      expressiveCode: {
+        // Code frames draw themselves: keep Design system 1's prose sheet out of them.
+        plugins: [
+          {
+            name: "Not prose",
+            hooks: {
+              postprocessRenderedBlock: ({ renderData }) => {
+                renderData.blockAst.properties.dataDsNotProse = "";
+              },
+            },
+          },
+        ],
+      },
       pagefind: false,
       favicon: "/icons/design-system-1.svg",
       description:
@@ -47,6 +60,8 @@ export default defineConfig({
         Header: "./src/components/MyHeader.astro",
         // Override the default PageFrame to use our custom layout
         PageFrame: "./src/layouts/Layout.astro",
+        // Mark the Markdown body as prose for Design system 1's prose sheet
+        MarkdownContent: "./src/components/MarkdownContent.astro",
         // Override h1 to use ds-one text component
         h1: "./src/components/Heading.astro",
       },

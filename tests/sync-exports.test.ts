@@ -41,6 +41,14 @@ test('bundled tokens are one stylesheet with no local imports left', () => {
   expect(css).toContain('.ds-text {');
 });
 
+test('the prose sheet is copied when a product asks for it', () => {
+  expect(files('root')).not.toHaveProperty(['prose.css']);
+  expect(files('root', { prose: true, fonts: false })).toHaveProperty(['prose.css']);
+  expect(Object.keys(files('root', { styles: ['prose.css', 'component-tokens.css', 'component-metrics.css', 'component-appearance.css'], fonts: false }))).toEqual(['prose.css', 'component-tokens.css', 'component-metrics.css', 'component-appearance.css']);
+  expect(Object.keys(files('tokens', { prose: true }))).toContain('prose.css');
+  expect(String(files('tokens', { prose: true, bundle: true })['bundle.css'])).toContain('[data-ds-prose] {');
+});
+
 test('controls.css always arrives with the text classes it imports', () => {
   expect(Object.keys(files('tokens', { nativeControls: true }))).toEqual(['component-tokens.css', 'component-metrics.css', 'component-appearance.css', 'text.css', 'controls.css']);
   expect(Object.keys(files('tokens'))).not.toContain('text.css');

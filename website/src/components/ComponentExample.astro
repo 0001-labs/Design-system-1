@@ -6,7 +6,7 @@ const { example, compact = false } = Astro.props;
 const sample = EXAMPLES[example];
 if (!sample) throw new Error(`Unknown component example: ${example}`);
 ---
-<section class="component-example not-content" data-example={example} aria-label={sample.title}>
+<section class="component-example not-content" data-ds-not-prose data-example={example} aria-label={sample.title}>
   <div class="example-toolbar">
     <span>{sample.title}</span>
     <div class="example-toolbar-actions">
