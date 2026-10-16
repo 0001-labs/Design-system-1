@@ -19,7 +19,7 @@ const cellClass = (cell: ComponentCell, view: View) => {
   return cell.shared ? "shared" : cell.styled ? "styled" : cell.local ? "local" : "unverified";
 };
 
-export function ComponentAdoption() {
+export function ComponentAdoption({ onSignOut }: { onSignOut?: () => Promise<void> } = {}) {
   const token = useAuthToken();
   const { signOut } = useAuthActions();
   const [report, setReport] = useState<AdoptionReport | null>(null);
@@ -41,7 +41,7 @@ export function ComponentAdoption() {
   return <main className="adoption" data-testid="component-adoption">
     <header className="adoption-heading">
       <div><p className="adoption-eyebrow">Reports · Private</p><h1>Component adoption</h1></div>
-      <ds-button onClick={() => void signOut()}>Sign out</ds-button>
+      <ds-button onClick={() => void (onSignOut ? onSignOut() : signOut())}>Sign out</ds-button>
     </header>
     {error ? <div role="alert"><p>{error}</p><ds-button onClick={() => setRetry(value => value + 1)}>Try again</ds-button></div>
       : report ? <ComponentMatrix report={report} /> : <p role="status">Reading the source snapshot…</p>}

@@ -11,6 +11,16 @@ describe("combined website routes", () => {
     expect(await (await site.fetch("/app/")).text()).toBe("Application");
   });
 
+  it("isolates the dashboard host from the public app and library endpoints", async () => {
+    const origin = "https://dash.designsystem1.com";
+    expect((await site.fetch(origin + "/", { redirect: "manual" })).status).toBe(302);
+    expect(await (await site.fetch(origin + "/app/signin")).text()).toBe("Application");
+    expect((await site.fetch(origin + "/api/reports/components")).status).toBe(401);
+    for (const path of ["/app/libraries", "/api/libraries", "/api/fonts", "/reports/component-adoption.json"]) {
+      expect((await site.fetch(origin + path)).status).toBe(404);
+    }
+  });
+
   it("preserves query parameters when normalizing the app URL", async () => {
     const response = await site.fetch("/app?code=example", { redirect: "manual" });
     expect(response.status).toBe(308);
@@ -42,10 +52,11 @@ describe("combined website routes", () => {
       expect(await response.text()).not.toContain('"private":true');
     }
     const shortcut = await site.fetch("/reports/components", { redirect: "manual" });
-    expect(shortcut.headers.get("location")).toBe("https://designsystem1.com/app/reports/components");
-    const shell = await site.fetch("/app/reports/components");
+    expect(shortcut.headers.get("location")).toBe("https://dash.designsystem1.com/");
+    const shell = await site.fetch("/app/reports/components", { redirect: "manual" });
     expect(shell.headers.get("x-robots-tag")).toBe("noindex, nofollow");
     expect(shell.headers.get("cache-control")).toBe("private, no-store");
-    expect(await shell.text()).toBe("Application");
+    expect(shell.status).toBe(302);
+    expect(shell.headers.get("location")).toBe("https://dash.designsystem1.com/");
   });
 });

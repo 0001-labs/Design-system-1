@@ -1,3 +1,4 @@
+import { dashboard, DASHBOARD_HOST } from "./dashboard";
 import { libraryApi } from "./libraries";
 import { fontWorkspace } from "./fonts";
 import assets from "./assets/index.ts";
@@ -20,6 +21,7 @@ function reportPage(response: Response, path: string): Response {
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    if (url.hostname === DASHBOARD_HOST && url.pathname !== "/api/reports/components") return dashboard(request, env);
     if (url.pathname === "/api/libraries" || url.pathname.startsWith("/api/libraries/") || url.pathname.startsWith("/api/library-auth/")) return libraryApi(request, env);
     if (url.pathname === "/api/fonts" || url.pathname.startsWith("/api/fonts/")) return fontWorkspace(request, env);
     if (url.hostname === "fonts.designsystem1.com") {
@@ -53,10 +55,8 @@ export default {
 
     if (url.pathname === "/api/reports/components") return componentReport(request, env);
 
-    if (/^\/reports(?:\/components)?\/?$/.test(url.pathname)) {
-      url.pathname = "/app/reports/components";
-      url.search = "";
-      return new Response(null, { status: 302, headers: { Location: url.toString(), "X-Robots-Tag": "noindex, nofollow", "Cache-Control": "private, no-store" } });
+    if (/^\/(?:app\/)?reports(?:\/components)?\/?$/.test(url.pathname)) {
+      return new Response(null, { status: 302, headers: { Location: `https://${DASHBOARD_HOST}/`, "X-Robots-Tag": "noindex, nofollow", "Cache-Control": "private, no-store" } });
     }
 
     if (url.pathname.startsWith("/api/")) {

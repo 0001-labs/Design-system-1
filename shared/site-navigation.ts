@@ -6,7 +6,6 @@ export const siteNavigation = [
   { label: "Icons", href: "/icons/" },
   { label: "Colours", href: "/colours/" },
   { label: "My libraries", href: "/app/libraries" },
-  { label: "Reports", href: "/app/reports/components" },
 ] as const;
 
 export function isNavigationCurrent(href: string, pathname: string): boolean {

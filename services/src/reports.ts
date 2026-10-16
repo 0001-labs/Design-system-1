@@ -16,15 +16,14 @@ const headers = {
 };
 const failure = (error: string, status: number) => Response.json({ error }, { status, headers });
 
-export async function componentReport(request: Request, env: ReportsEnv, send: typeof fetch = fetch): Promise<Response> {
-  if (request.method !== "GET") return new Response(null, { status: 405, headers: { ...headers, Allow: "GET" } });
+export async function authorizeReport(request: Request, env: ReportsEnv, send: typeof fetch = fetch): Promise<Response | null> {
   const authorization = request.headers.get("authorization") ?? "";
   if (!/^Bearer [^\s]{1,8192}$/.test(authorization)) return failure("Sign in to view this report.", 401);
   if (!env.REPORTS_OWNER_ID || !env.REPORTS_AUTH_URL || !/^https:\/\/[a-z0-9-]+\.convex\.cloud$/.test(env.REPORTS_AUTH_URL)) {
     return failure("Report access has not been configured.", 503);
   }
   // Convex validates its own session token. Never trust a decoded JWT or a client-supplied ID.
-  let identity: { status?: string; value?: { _id?: string } | null };
+  let identity: { status?: string; value?: { _id?: string; email?: string; emailVerified?: boolean } | null };
   try {
     const response = await send(`${env.REPORTS_AUTH_URL}/api/query`, {
       method: "POST", headers: { authorization, "Content-Type": "application/json" },
@@ -36,7 +35,14 @@ export async function componentReport(request: Request, env: ReportsEnv, send: t
     identity = await response.json();
   } catch { return failure("Sign-in could not be checked. Try again.", 503); }
   if (identity.status !== "success" || !identity.value?._id) return failure("Your session has expired. Sign in again.", 401);
-  if (identity.value._id !== env.REPORTS_OWNER_ID) return failure("This report is private to the studio owner.", 403);
+  if (identity.value._id !== env.REPORTS_OWNER_ID || identity.value.email?.trim().toLowerCase() !== "jaa90@icloud.com" || identity.value.emailVerified !== true) return failure("This report is private to the studio owner.", 403);
+  return null;
+}
+
+export async function componentReport(request: Request, env: ReportsEnv, send: typeof fetch = fetch): Promise<Response> {
+  if (request.method !== "GET") return new Response(null, { status: 405, headers: { ...headers, Allow: "GET" } });
+  const denied = await authorizeReport(request, env, send);
+  if (denied) return denied;
   const report = await env.LIBRARIES.get(REPORT_KEY);
   if (!report) return failure("No source snapshot has been published yet.", 404);
   return new Response(report.body, { headers });

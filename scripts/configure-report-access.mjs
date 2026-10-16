@@ -12,10 +12,13 @@ function convex(...args) {
   catch { throw new Error("Could not read the app's Convex deployment. Check CLI access before configuring report access."); }
 }
 const ownerEmail = convex("env", "get", "SIGN_IN_OWNER_EMAIL").replace(/^["']|["']$/g, "").trim().toLowerCase();
-if (!ownerEmail.includes("@")) throw new Error("The app has no configured owner address.");
+if (ownerEmail !== "jaa90@icloud.com") throw new Error("The configured owner must be the requested dashboard identity.");
 const accounts = JSON.parse(convex("data", "authAccounts", "--limit", "10000", "--format", "json"));
 const ownerIds = [...new Set(accounts.filter(account => typeof account.providerAccountId === "string" && account.providerAccountId.toLowerCase() === ownerEmail).map(account => account.userId))];
 if (ownerIds.length !== 1 || typeof ownerIds[0] !== "string") throw new Error("Exactly one existing owner account is required. Sign in as the owner or resolve duplicate accounts first.");
+const users = JSON.parse(convex("data", "users", "--limit", "10000", "--format", "json"));
+const owner = users.find(user => user._id === ownerIds[0]);
+if (owner?.email?.trim().toLowerCase() !== ownerEmail || typeof owner.emailVerificationTime !== "number") throw new Error("The existing owner must have a verified email before dashboard access is configured.");
 const bindings = { REPORTS_AUTH_URL: authUrl, REPORTS_OWNER_ID: ownerIds[0] };
 if (process.argv.includes("--apply")) {
   try {

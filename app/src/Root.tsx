@@ -1,3 +1,4 @@
+import { AdoptionDashboard } from "./screens/AdoptionDashboard";
 import { FontWorkspace } from "./screens/FontWorkspace";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { useConvexAuth } from "convex/react";
@@ -10,7 +11,6 @@ import { navigate, RouterProvider, useLocation, useRoute } from "./router";
 import { LibraryEditor } from "./screens/LibraryEditor";
 import { LibraryList } from "./screens/LibraryList";
 import { SignIn } from "./screens/SignIn";
-import { ComponentAdoption } from "./screens/ComponentAdoption";
 
 /**
  * Route table.
@@ -46,7 +46,7 @@ function Routes() {
   }
 
   if (path === "/libraries") return <LibraryList />;
-  if (path === "/reports/components") return <ComponentAdoption />;
+  if (path === "/reports/components") { window.location.replace("https://dash.designsystem1.com/"); return <Splash />; }
   if (editor) return <LibraryEditor libraryId={editor.id} />;
 
   return <NotFound />;
@@ -89,7 +89,7 @@ function NavigationAuth() {
 export function Root({ children }: { children?: ReactNode }) {
   return (
     <ConvexAuthProvider client={convex}>
-      <RouterProvider>{window.location.pathname === "/app/navigation-auth" ? <NavigationAuth /> : window.location.hostname === "fonts.designsystem1.com" ? <FontWorkspace /> : <AppShell>{children ?? <Routes />}</AppShell>}</RouterProvider>
+      <RouterProvider>{window.location.pathname === "/app/navigation-auth" ? <NavigationAuth /> : window.location.hostname === "dash.designsystem1.com" ? <AdoptionDashboard /> : window.location.hostname === "fonts.designsystem1.com" ? <FontWorkspace /> : <AppShell>{children ?? <Routes />}</AppShell>}</RouterProvider>
     </ConvexAuthProvider>
   );
 }

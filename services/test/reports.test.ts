@@ -5,7 +5,7 @@ const request = (token = "owner-token") => new Request("https://designsystem1.co
 const setup = () => {
   const get = vi.fn().mockResolvedValue({ body: '{"private":true}' });
   const env = { LIBRARIES: { get }, REPORTS_AUTH_URL: "https://example.convex.cloud", REPORTS_OWNER_ID: "owner" } as unknown as ReportsEnv;
-  const send = vi.fn().mockResolvedValue(Response.json({ status: "success", value: { _id: "owner" } }));
+  const send = vi.fn().mockResolvedValue(Response.json({ status: "success", value: { _id: "owner", email: "jaa90@icloud.com", emailVerified: true } }));
   return { env, get, send };
 };
 
@@ -27,6 +27,18 @@ describe("owner-only component report", () => {
     send.mockResolvedValue(Response.json({ status: "success", value: { _id: "another-user" } }));
     expect((await componentReport(request(), env, send)).status).toBe(403);
     expect(get).not.toHaveBeenCalled();
+  });
+  it("requires both the pinned user ID and verified owner email", async () => {
+    for (const identity of [
+      { _id: "owner", email: "someone@example.com", emailVerified: true },
+      { _id: "owner", email: "jaa90@icloud.com", emailVerified: false },
+      { _id: "owner", email: "jaa90@icloud.com" },
+    ]) {
+      const { env, get, send } = setup();
+      send.mockResolvedValue(Response.json({ status: "success", value: identity }));
+      expect((await componentReport(request(), env, send)).status).toBe(403);
+      expect(get).not.toHaveBeenCalled();
+    }
   });
   it("fails closed for rejected, expired and unavailable sessions", async () => {
     for (const response of [Response.json({ status: "success", value: null }), new Response(null, { status: 401 }), new Response(null, { status: 503 })]) {

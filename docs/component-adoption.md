@@ -1,6 +1,10 @@
 # Component adoption
 
-`/app/reports/components` is the private matrix for Ezo, Music, Link and Consistency. `/reports/components` redirects there. The existing app sign-in supplies a Convex Auth token; the Worker checks `users:current` on the app's deployment and compares its user ID with the configured owner ID before reading any report data. The report adds no account or sign-in provider.
+The internal dashboard preserves the component matrix, filters, source drilldowns and freshness evidence. The prepared destination is `dash.designsystem1.com`; hostname confirmation and binding are pending. Do not deploy this migration until the requested hostname is resolved. The former `/app/reports/components`, `/reports/components` and `/reports` routes redirect to the dashboard, without report data. Reports is absent from public navigation.
+
+The existing app sign-in supplies a Convex Auth token. Before serving the dashboard HTML, creating its browser session or reading any report data, the Worker calls `users:current` on the app's deployment and requires all three: the configured owner user ID, email `jaa90@icloud.com`, and `emailVerified: true` derived from the stored verification timestamp. Missing configuration or an unavailable identity authority fails closed. The report adds no account or sign-in provider.
+
+Only `/app/signin` and its data-free static shell/assets are public on the dashboard host. A same-origin authenticated POST to `/api/dashboard/session` sets a host-only `__Host-` cookie with HttpOnly, Secure, SameSite=Strict and a one-hour maximum age. The cookie contains the existing session token; the Worker revalidates it with Convex on every protected HTML request. Tokens never appear in URLs. Sign-out clears the cookie and revokes the existing Convex session. The report API continues to require a freshly checked bearer token; no report snapshot is bundled in the shell, assets or cookies. Protected responses are private/no-store and noindex.
 
 ## Source and counts
 
@@ -24,7 +28,7 @@ Run `vp run reports:scan` from this repository. It writes `.reports/component-ad
 Checks:
 
 ```sh
-vp test tests/component-adoption.test.ts services/test/reports.test.ts services/test/site.test.ts services/test/config.test.ts
+vp test tests/component-adoption.test.ts services/test/reports.test.ts services/test/dashboard.test.ts services/test/site.test.ts services/test/config.test.ts
 vp run app:build
 cd services
 vp exec tsc --noEmit
@@ -32,15 +36,16 @@ vp exec tsc --noEmit
 
 ## Owner access and release
 
-The app's existing owner must sign in once before access can be configured. `vp run reports:configure` checks the app's `VITE_CONVEX_URL`, reads `SIGN_IN_OWNER_EMAIL` from that deployment and resolves exactly one existing owner account. It makes no changes and does not print account values. Missing or ambiguous accounts stop configuration; let the owner complete sign-in rather than creating an account for them.
+The app's existing owner must sign in once before access can be configured. `vp run reports:configure` checks the app's `VITE_CONVEX_URL`, reads `SIGN_IN_OWNER_EMAIL` from that deployment, requires the requested address, and resolves exactly one existing account with a matching verified user record. It makes no changes and does not print account values. Missing or ambiguous accounts stop configuration; let the owner complete sign-in rather than creating an account for them.
 
-After release approval:
+After hostname confirmation, follow the harness deployment policy:
 
 1. Confirm the checkout is the intended release source and the app's backend URL matches the deployment being used.
 2. Run `node scripts/configure-report-access.mjs --apply`. This writes `REPORTS_AUTH_URL` and `REPORTS_OWNER_ID` as Worker secrets. It does not modify Convex or its accounts.
 3. Check the `ds-one-libraries` bucket's public access with `wrangler r2 bucket dev-url get` and `wrangler r2 bucket domain list` from `services/`. Both direct public access paths must remain disabled: only the authenticated Worker may read report data.
-4. Run `vp run reports:upload` to rescan and upload `reports/component-adoption.json` into that private bucket, then `vp run deploy` to publish the site and Worker. The public stylesheet routes only resolve `ds1/` keys and cannot serve `reports/` keys.
-5. Verify anonymously that `/api/reports/components` returns 401, then as the owner verify the snapshot timestamp and at least one cell. Another authenticated account must get 403. Report responses use `private, no-store` and no CORS permission.
+4. Publish the small `users:current` response addition to the app’s existing live backend (dry run before deploy); do not select the unused deployment by its production label. Bind the confirmed dashboard custom domain in `wrangler.jsonc` and test both routing and configuration.
+5. Run `vp run reports:upload` to rescan and upload `reports/component-adoption.json` into that private bucket, then `vp run deploy` to publish the site and Worker. The public stylesheet routes only resolve `ds1/` keys and cannot serve `reports/` keys.
+6. Verify anonymously that `/api/reports/components` returns 401, then as the owner verify the snapshot timestamp and at least one cell. Another authenticated account must get 403. Report responses use `private, no-store` and no CORS permission.
 
 For local Worker data, run `vp run reports:scan` and `vp run reports:upload:local`. The latter targets the configured local preview bucket, without publishing anything remotely. Data is never copied into `website/public`, `website/dist`, app bundles, Pagefind, or the npm package.
 
