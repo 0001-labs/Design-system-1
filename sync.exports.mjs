@@ -11,6 +11,17 @@ const languageFiles = ['i18n.ts', 'languages.ts', 'language-routing.ts', 'transl
 
 export default {
   exports: {
+    /** Optional display faces, copied as local assets by consumers. */
+    fonts: {
+      files({ read, options }) {
+        const available = { 'OlivettiDot-Regular.woff2': 'website/src/assets/fonts/OlivettiDot-Regular.woff2' };
+        if (!Array.isArray(options.fonts) || !options.fonts.length) throw new Error('Name the fonts to copy');
+        return Object.fromEntries(options.fonts.map(name => {
+          if (!Object.hasOwn(available, name)) throw new Error(`Unknown font: ${name}`);
+          return [name, read(available[name])];
+        }));
+      },
+    },
     /** Component tokens for static stylesheets that import them by URL. */
     tokens: {
       files({ read }) {
