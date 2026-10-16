@@ -1,0 +1,12 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body {padding:40px; --text-color:#222;--background:white;} .surface {margin:40px;} .dark {color-scheme:dark; --text-color:#eee;--background:#222; color:#eee; background:#222;}</style></head><body><div id="root"></div><script type="module">
+import React from 'react'; import {createRoot} from 'react-dom/client';
+import {SpacingHandle} from '/DS1/react/spacing-handle.ts';
+import {LoadingIndicator} from '/DS1/react/loading.ts';
+function App() { const [value,setValue]=React.useState(20); const [saved,setSaved]=React.useState(20);
+return React.createElement('div',null,
+React.createElement('div',{className:'surface'},React.createElement(SpacingHandle,{label:'Spacing',value,min:0,max:200,step:10,gain:1,onPreview:setValue,onCommit:v=>{setValue(v);setSaved(v);}})),
+React.createElement('output',{id:'saved'},saved),
+React.createElement('div',{className:'surface dark',style:{'--ds-sf':2}},React.createElement(SpacingHandle,{label:'Scaled spacing',value:20,min:0,max:200,onCommit:()=>{}}),React.createElement(LoadingIndicator,{label:'Opening document'})),
+React.createElement(LoadingIndicator,{label:'Working'})); }
+createRoot(document.getElementById('root')).render(React.createElement(App));
+</script></body></html>
