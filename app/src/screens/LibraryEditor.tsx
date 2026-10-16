@@ -32,6 +32,8 @@ export function LibraryEditor({ libraryId }: { libraryId: string }) {
   const saveDraft = useMutation(api.libraries.saveDraft);
   const rename = useMutation(api.libraries.rename);
   const [renaming, setRenaming] = useState(false);
+  const [editingName, setEditingName] = useState(false);
+  const [nameInput, setNameInput] = useState("");
   const [renameError, setRenameError] = useState<string | null>(null);
 
   const [saveState, setSaveState] = useState<SaveState>("saved");
@@ -200,20 +202,36 @@ export function LibraryEditor({ libraryId }: { libraryId: string }) {
         <header className="workbench-header" data-ds-area="Library actions">
           <div>
             <Link to="/libraries">← Libraries</Link>
-            <strong>{library.name}</strong>
-            <button className="action-button" type="button" disabled={renaming} onClick={async () => {
-              const name = window.prompt("Library name", library.name);
-              if (name === null || name.trim() === library.name) return;
-              setRenaming(true);
-              setRenameError(null);
-              try {
-                await rename({ id, name });
-              } catch (error) {
-                setRenameError(asFailure(error)?.message ?? "Could not rename the library. Try again.");
-              } finally {
-                setRenaming(false);
-              }
-            }}>{renaming ? "Renaming…" : "Rename"}</button>
+            {editingName ? (
+              <form onSubmit={async (event) => {
+                event.preventDefault();
+                if (renaming) return;
+                setRenaming(true);
+                setRenameError(null);
+                try {
+                  await rename({ id, name: nameInput });
+                  setEditingName(false);
+                } catch (error) {
+                  setRenameError(asFailure(error)?.message ?? "Could not rename the library. Try again.");
+                } finally {
+                  setRenaming(false);
+                }
+              }}>
+                <input aria-label="Library name" autoFocus maxLength={60} required
+                  value={nameInput} disabled={renaming}
+                  onChange={(event) => setNameInput(event.target.value)} />
+                <button className="action-button" type="submit" disabled={renaming || !nameInput.trim()}>
+                  {renaming ? "Saving…" : "Save name"}
+                </button>
+                <button className="action-button" type="button" disabled={renaming}
+                  onClick={() => { setEditingName(false); setRenameError(null); }}>Cancel</button>
+              </form>
+            ) : <>
+              <strong>{library.name}</strong>
+              <button className="action-button" type="button" onClick={() => {
+                setNameInput(library.name); setEditingName(true); setRenameError(null);
+              }}>Rename</button>
+            </>}
             {renameError ? <span role="alert">{renameError}</span> : null}
           </div>
 
