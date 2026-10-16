@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test } from "vite-plus/test";
-import { drawingShapes, fontIcons, iconSites, importedIcons, resolveSvg, scanIcons } from "../scripts/icon-adoption";
+import { drawingShapes, fontIcons, glyphSites, iconSites, importedIcons, resolveSvg, scanIcons } from "../scripts/icon-adoption";
 
 test("literal ds-icon names count as uses, expressions as dynamic and inline svg apart", () => {
   const sites = iconSites(`html\`<ds-icon type="close"></ds-icon><ds-icon type=\${name}></ds-icon>\`;
@@ -110,4 +110,26 @@ el.innerHTML = '<i class="fa-solid fa-xmark fa-lg"></i>'; <span className="bi bi
   const icons = scanIcons(root, undefined, ["src/view.ts"], ds1Drawings);
   expect(icons.cells["phosphor: x"]).toMatchObject({ uses: 1, status: "local", ds1: "close", sites: [{ kind: "font" }] });
   expect(icons.dynamic).toMatchObject([{ kind: "font" }]);
+});
+
+test("a control or icon whose whole text is one glyph stands for a DS1 icon", () => {
+  const html = glyphSites("page.html", `<nav><a href="/a"><span class="nav__arrow" aria-hidden="true">←</span> Back</a>
+<button type="button">×</button><button><span>▶</span></button>
+<p>Read the guide →</p><p>Next <span>→</span></p><td>–</td><span class="price">+</span>
+<script>close.textContent = '×'; toggle.textContent = open ? '▾' : '▸'; label.textContent = 'Done →'</script></nav>`);
+  expect(html.map(site => `${site.glyph}@${site.line}`)).toEqual(["←@1", "×@2", "▶@2", "×@4", "▾@4", "▸@4"]);
+  const jsx = glyphSites("Row.tsx", `export const Row = ({ on }) => <>
+  <button className="ds-button" onClick={() => { on(); }}>
+    ⋯
+  </button>
+  <span className="archive-star" aria-label="Starred">★</span>
+  <button><ds-text text="✕" /></button>
+  <p>{"→"}</p>
+  <h1>Projects ↗ and more</h1>
+</>;
+const tile = h('span', { 'aria-hidden': 'true' }, '↗'), sum = h('span', { class: 'total' }, '+');
+const view = html\`<button @click=\${close}>×</button>\`;`);
+  expect(jsx.map(site => `${site.glyph}@${site.line}`)).toEqual(["⋯@3", "★@5", "✕@6", "↗@10", "×@11"]);
+  const root = app({ "src/menu.ts": "remove.textContent = '×'" });
+  expect(scanIcons(root, undefined, ["src/menu.ts"], ds1Drawings).cells.close).toMatchObject({ uses: 1, status: "differs", sites: [{ kind: "glyph", name: "×" }] });
 });

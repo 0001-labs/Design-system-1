@@ -1,6 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { basename, dirname, join, posix } from "node:path";
+import ts from "typescript";
 import type { IconAdoption, IconCell, IconKind, IconSite, IconStatus } from "../shared/component-adoption";
 import { interfaceIconAliases } from "../website/src/lib/icons/icon-scope";
 
@@ -340,6 +341,141 @@ export function fontIcons(source: string): { icons: { set: string; icon: string 
 }
 
 // ---------------------------------------------------------------------------
+// Glyphs: a control or icon whose whole text is one symbol.
+
+/** Symbol glyphs written as icons, and the DS1 icon each stands for. */
+export const GLYPHS: Record<string, string> = {
+  "×": "close", "✕": "close", "✖": "close", "⨯": "close", "╳": "close",
+  "▶": "play-alt", "▷": "play-alt", "►": "play-alt", "⏵": "play-alt", "■": "stop", "◼": "stop", "◾": "stop", "⏹": "stop", "⏸": "pause",
+  "↶": "undo", "↺": "undo", "↩": "undo", "↷": "redo", "↪": "redo", "↻": "refresh", "⟳": "refresh", "↗": "up-right", "⇗": "up-right",
+  "↓": "down", "⬇": "down", "▾": "down", "▼": "down", "⌄": "down", "↑": "up", "⬆": "up", "▴": "up", "▲": "up", "⌃": "up",
+  "←": "left", "⬅": "left", "◂": "left", "◀": "left", "‹": "left", "→": "right", "➜": "right", "➔": "right", "▸": "right", "›": "right",
+  "★": "star", "☆": "star", "⋯": "more", "⋮": "more", "+": "plus", "＋": "plus", "➕": "plus", "−": "minus", "➖": "minus",
+  "✓": "check", "✔": "check", "☰": "menu", "≡": "menu", "⚙": "settings", "✎": "pen", "✏": "pen", "⧉": "duplicate", "⤓": "download", "⤒": "upload",
+  "♥": "heart", "❤": "heart", "♡": "heart", "⌕": "search", "ⓘ": "info", "ℹ": "info", "◲": "window",
+};
+const glyphOf = (text: string) => { const glyph = text.replace(/[\uFE0E\uFE0F]/g, "").trim(); return Object.hasOwn(GLYPHS, glyph) ? glyph : null; };
+const GLYPH_CLASS = Object.keys(GLYPHS).map(glyph => glyph.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
+const CONTROL_TAG = /^(?:button|a|summary)$/i;
+/**
+ * A glyph element stands alone when it is a control (a button, a link, a
+ * summary, a control role or a click handler), sits alone in one, or is
+ * marked as an icon: hidden from assistive technology, labelled, an image
+ * role or an icon-like class. A glyph inside running text is the text's own.
+ */
+function standalone(tag: string, attrs: Record<string, string>, inControl: boolean): boolean {
+  if (inControl || CONTROL_TAG.test(tag)) return true;
+  if (/^(?:button|link|menuitem\w*|tab|switch|option|checkbox)$/.test(attrs.role ?? "") || attrs.role === "img") return true;
+  if (Object.keys(attrs).some(name => /^(?:on[a-z]+|onClick|@click|on:click)$/i.test(name))) return true;
+  if (attrs["aria-hidden"] === "true" || "aria-label" in attrs || "ariaLabel" in attrs) return true;
+  return /(?:^|[\s_-])(?:icon|arrow|caret|chevron|close|toggle|glyph|star)(?:[\s_-]|$)/i.test(attrs.class ?? attrs.className ?? "");
+}
+/** Glyph elements in markup: HTML, Lit templates and HTML strings. */
+function markupGlyphs(text: string, at: (offset: number) => number, offset = 0): { glyph: string; line: number }[] {
+  const found: { glyph: string; line: number }[] = [];
+  for (const match of text.matchAll(new RegExp(`>\\s*(${GLYPH_CLASS})[\\uFE0E\\uFE0F]?\\s*<\\/([A-Za-z][\\w-]*)\\s*>`, "gu"))) {
+    const tag = match[2]!;
+    let open = text.lastIndexOf(`<${tag}`, match.index!);
+    while (open > 0 && !/[\s/>]/.test(text[open + tag.length + 1] ?? "")) open = text.lastIndexOf(`<${tag}`, open - 1);
+    if (open < 0) continue;
+    const attrs = attributes(text.slice(open + tag.length + 1, match.index!));
+    const end = match.index! + match[0].length;
+    const inControl = /<(?:button|a|summary)\b(?:[^<>"']|"[^"]*"|'[^']*')*>\s*$/i.test(text.slice(Math.max(0, open - 600), open)) && /^\s*<\/(?:button|a|summary)\s*>/i.test(text.slice(end, end + 40));
+    if (standalone(tag, attrs, inControl)) found.push({ glyph: match[1]!, line: at(offset + match.index! + match[0].indexOf(match[1]!)) });
+  }
+  for (const match of text.matchAll(new RegExp(`<ds-text\\b[^>]*?\\btext\\s*=\\s*["'](${GLYPH_CLASS})[\\uFE0E\\uFE0F]?["']`, "gu"))) found.push({ glyph: match[1]!, line: at(offset + match.index!) });
+  return found;
+}
+/** A template literal's text with its `${…}` parts blanked, so markup split by a binding still reads as one tag. */
+function templateText(node: ts.TemplateExpression, source: string): string {
+  let text = source.slice(node.getStart(), node.getEnd());
+  for (const span of node.templateSpans) {
+    const from = span.expression.getFullStart() - 2 - node.getStart();
+    const to = span.literal.getStart() + 1 - node.getStart();
+    text = text.slice(0, from) + text.slice(from, to).replace(/[^\n]/g, " ") + text.slice(to);
+  }
+  return text;
+}
+/** The glyph literals an expression can be: a string, or each branch of a condition. */
+function literalGlyphs(node: ts.Expression | undefined): string[] | null {
+  if (!node) return null;
+  if (ts.isParenthesizedExpression(node)) return literalGlyphs(node.expression);
+  if (ts.isStringLiteralLike(node)) { const glyph = glyphOf(node.text); return glyph ? [glyph] : null; }
+  if (ts.isConditionalExpression(node)) { const a = literalGlyphs(node.whenTrue), b = literalGlyphs(node.whenFalse); return a && b ? [...a, ...b] : null; }
+  return null;
+}
+const parsed = (file: string, source: string) => ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, /x$/.test(file) ? ts.ScriptKind.TSX : /\.[cm]?js$/.test(file) ? ts.ScriptKind.JS : ts.ScriptKind.TS);
+function jsxAttributes(element: ts.JsxOpeningLikeElement): Record<string, string> {
+  const found: Record<string, string> = {};
+  for (const property of element.attributes.properties) {
+    if (!ts.isJsxAttribute(property)) continue;
+    const value = property.initializer;
+    found[property.name.getText()] = !value ? "true" : ts.isStringLiteral(value) ? value.text : value.expression && ts.isStringLiteralLike(value.expression) ? value.expression.text : value.expression?.kind === ts.SyntaxKind.TrueKeyword ? "true" : "\u0000dynamic";
+  }
+  return found;
+}
+/**
+ * Glyph icons in one file: markup elements, JSX elements, `h`/`createElement`
+ * calls with one glyph child, `<ds-text text="×">`, and a glyph assigned as
+ * an element's whole `textContent`. A glyph in running text is not counted.
+ */
+export function glyphSites(file: string, source: string): { glyph: string; line: number }[] {
+  const at = lines(source);
+  if (/\.(?:html|astro)$/.test(file)) {
+    const scripts = [...source.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)];
+    const body = source.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, match => match.replace(/[^\n]/g, " ")).replace(/^---[\s\S]*?\n---/, match => match.replace(/[^\n]/g, " "));
+    return [...markupGlyphs(body, at), ...scripts.flatMap(match => {
+      const start = at(match.index! + match[0].indexOf(">") + 1) - 1;
+      return glyphSites("embedded.ts", match[1]!).map(site => ({ ...site, line: site.line + start }));
+    })];
+  }
+  const found: { glyph: string; line: number }[] = [];
+  const ast = parsed(file, source);
+  const push = (glyphs: string[], node: ts.Node) => { for (const glyph of glyphs) found.push({ glyph, line: at(node.getStart()) }); };
+  const visit = (node: ts.Node) => {
+    if (ts.isJsxElement(node)) {
+      const children = node.children.filter(child => !(ts.isJsxText(child) && child.containsOnlyTriviaWhiteSpaces));
+      const child = children.length === 1 ? children[0]! : undefined;
+      const glyphs = !child ? null : ts.isJsxText(child) ? (glyphOf(child.text) ? [glyphOf(child.text)!] : null) : ts.isJsxExpression(child) ? literalGlyphs(child.expression) : null;
+      if (glyphs) {
+        const parent = node.parent;
+        const inControl = ts.isJsxElement(parent) && CONTROL_TAG.test(parent.openingElement.tagName.getText()) && parent.children.filter(c => !(ts.isJsxText(c) && c.containsOnlyTriviaWhiteSpaces)).length === 1;
+        if (standalone(node.openingElement.tagName.getText(), jsxAttributes(node.openingElement), inControl)) push(glyphs, child!);
+      }
+    }
+    if ((ts.isJsxSelfClosingElement(node) || ts.isJsxOpeningElement(node)) && node.tagName.getText() === "ds-text") {
+      const glyph = glyphOf(jsxAttributes(node).text ?? "");
+      if (glyph) push([glyph], node);
+    }
+    if (ts.isCallExpression(node) && node.arguments.length === 3) {
+      const callee = node.expression;
+      const name = ts.isIdentifier(callee) ? callee.text : ts.isPropertyAccessExpression(callee) && callee.expression.getText() !== "document" ? callee.name.text : "";
+      const tag = node.arguments[0]!;
+      const glyphs = literalGlyphs(node.arguments[2]);
+      if (["h", "el", "createElement"].includes(name) && ts.isStringLiteral(tag) && glyphs) {
+        const props = node.arguments[1]!;
+        const attrs: Record<string, string> = {};
+        if (ts.isObjectLiteralExpression(props)) for (const property of props.properties) {
+          if (!property.name) continue;
+          const key = ts.isIdentifier(property.name) || ts.isStringLiteral(property.name) ? property.name.text : "";
+          attrs[key] = ts.isPropertyAssignment(property) && ts.isStringLiteralLike(property.initializer) ? property.initializer.text : "true";
+        } else if (ts.isStringLiteral(props)) attrs.class = props.text;
+        if (standalone(tag.text, attrs, false)) push(glyphs, node.arguments[2]!);
+      }
+    }
+    if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.EqualsToken && ts.isPropertyAccessExpression(node.left) && ["textContent", "innerText", "innerHTML"].includes(node.left.name.text)) {
+      const glyphs = literalGlyphs(node.right);
+      if (glyphs) push(glyphs, node.right);
+    }
+    if ((ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) && node.text.includes("<") && !ts.isImportDeclaration(node.parent)) found.push(...markupGlyphs(source.slice(node.getStart(), node.getEnd()), at, node.getStart()));
+    if (ts.isTemplateExpression(node)) found.push(...markupGlyphs(templateText(node, source), at, node.getStart()));
+    ts.forEachChild(node, visit);
+  };
+  visit(ast);
+  return found;
+}
+
+// ---------------------------------------------------------------------------
 // The app's icons.
 
 /** Where an app's sources and drawings are, for the stylesheets and SVG files the component scan does not read. */
@@ -454,6 +590,7 @@ export function scanIcons(root: string, manifest: string | undefined, files: str
       // A DS1 drawing named by its path still names the icon when the file is not there.
       else if (!resolved && /(?:^|\/)x-icon\/[a-z0-9-]+\.svg$/.test(use.path)) add(use.name, site, "file");
     }
+    for (const use of glyphSites(file, source)) add(GLYPHS[use.glyph]!, { file, line: use.line, name: use.glyph }, "glyph", "differs");
     for (const use of iconSites(source)) {
       const site = { file, line: use.line, name: use.name ?? (use.inline ? "svg" : "ds-icon") };
       if (use.inline) inline.push({ ...site, kind: "inline", status: "local" });
