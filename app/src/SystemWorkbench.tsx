@@ -1,5 +1,7 @@
 import { Button as ModeButton } from '../../DS1/react/button';
 import '../../DS1/2-core/ds-button';
+import '../../DS1/2-core/ds-input';
+import { Input } from '../../DS1/react/input';
 import { BoxModel, type BoxRegion, type BoxModelConfig } from './BoxModel';
 import { defaultButtonBox, writeButtonBox, type ButtonBox } from './lib/buttonBoxModel';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
@@ -96,11 +98,11 @@ export function SystemWorkbench({ initialCss, initialConfig, onDirty, headerSlot
         {buttonSelected && <section className="controls-section controls-section--box-model library-button-properties" aria-label="Button properties">
           <h2 onMouseEnter={() => setHoverRegion('all')} onMouseLeave={() => setHoverRegion(null)}>Box model</h2>
           <BoxModel config={shownBox} contentSize={buttonMetrics.contentSize} hoverRegion={hoverRegion} onChange={commitBox} onPreview={patch => setBoxPreview(patch)} onHoverRegion={setHoverRegion} supportsSpacing />
-          <label className="library-button-gap">Content gap <input aria-label="Content gap px" type="number" min="0" max="48" step="4" value={shownBox.gap} onChange={event => commitBox({ gap: Math.min(48, Math.max(0, Number(event.target.value))) })} /></label>
+          <label className="library-button-gap">Content gap <Input aria-label="Content gap px" type="number" min="0" max="48" step="4" value={shownBox.gap} onChange={event => commitBox({ gap: Math.min(48, Math.max(0, Number(event.target.value))) })} /></label>
         </section>}
         <h2 className="app-panel-label">Tokens</h2>
-        <input aria-label="Filter tokens" placeholder="Filter tokens" value={search} onChange={event => setSearch(event.target.value)} />
-        {tokens.map(name => <label key={name}><span>{name}</span><input aria-label={name} placeholder={defaults.get(name) ?? 'Inherited'} value={values.get(name) ?? ''} onChange={event => setToken(name, event.target.value)} /></label>)}
+        <Input className="system-workbench-filter" type="search" aria-label="Filter tokens" placeholder="Filter tokens" value={search} onChange={event => setSearch(event.target.value)} />
+        {tokens.map(name => <label key={name}><span>{name}</span><Input aria-label={name} placeholder={defaults.get(name) ?? 'Inherited'} value={values.get(name) ?? ''} onChange={event => setToken(name, event.target.value)} /></label>)}
       </aside>
     </div>
     <section aria-label="Live CSS file" className="css-file-panel">
