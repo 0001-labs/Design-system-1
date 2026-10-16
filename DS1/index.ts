@@ -88,3 +88,7 @@ export * from "./3-unit/ds-token-field";
 export * from "./3-unit/ds-sidebar";
 
 export * from "./2-core/ds-chart";
+
+export * from "./2-core/ds-spacing-handle";
+export * from "./2-core/ds-loading";
+export * from "./0-face/component-visibility";

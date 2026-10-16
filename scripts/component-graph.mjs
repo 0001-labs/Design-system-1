@@ -35,6 +35,8 @@ export function componentGraph(ds1, names) {
     return file;
   });
   // React consumers may import the optional, source-owned state adapter.
+  if (components.includes('spacing-handle')) visit('react/spacing-handle.ts');
+  if (components.includes('loading')) visit('react/loading.ts');
   if (components.includes('button')) visit('react/button.ts');
   if (components.includes('badge')) visit('react/badge.ts');
   if (components.includes('file-picker')) visit('react/file-picker.ts');
