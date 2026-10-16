@@ -1,0 +1,26 @@
+---
+title: Core
+description: Individual reusable controls built on the shared foundations.
+---
+
+Core contains the individual pieces you place in an interface. Each component has one focused job, a public API and states that can be understood on their own. They use Root’s type, colour and scale rather than introducing a separate design language.
+
+## Choose a piece
+
+| Need | Components |
+| --- | --- |
+| Trigger an action or choose a state | [Button](/2-core/button/), [Toggle](/2-core/toggle/), [Cycle](/2-core/cycle/). |
+| Enter a value | [Input](/2-core/input/), [Date](/2-core/date/), [Language](/2-core/language/). |
+| Communicate or identify | [Text](/2-core/text/), [Icon](/2-core/icon/), [Avatar](/2-core/avatar/), [Tooltip](/2-core/tooltip/). |
+| Show data or emphasis | [Chart](/2-core/chart/), [Banner](/2-core/banner/), [Card](/2-core/card/). |
+| Link or separate content | [Link](/2-core/link/), [Gap](/2-core/gap/). |
+
+Icon includes the rendering component, its [SVG collection](/2-core/icon/collection/) and the [builder](/2-core/icon/collection/#builder). The drawings support that component; they are not another numbered layer.
+
+## Use the public API
+
+Import and register the component before using its custom element. Configure documented properties, attributes, slots and scoped tokens; listen for its events to connect application behavior. A native button or field retained inside a component keeps the browser’s keyboard and form semantics. Follow the individual page for controlled state, disabled behavior and accessibility requirements.
+
+## Compose upwards
+
+Use [Root](/1-root/overview/) for shared foundations. Combine Core pieces into a [Unit](/3-unit/overview/) when they need a common interaction or layout, then arrange units in a [Page](/4-page/overview/). The [component examples](/components/) show the public catalogue; built-in internal controls remain excluded.

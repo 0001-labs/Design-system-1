@@ -74,21 +74,14 @@ export default defineConfig({
           ],
         },
         {
-          label: "Built-ins",
-          items: [
-            { label: "Languages", slug: "built-ins/languages" },
-            { label: "Theming", slug: "built-ins/theming" },
-            { label: "Device", slug: "built-ins/device" },
-            { label: "Preferences", slug: "built-ins/preferences" },
-            { label: "Pricing", slug: "built-ins/pricing" },
-          ],
-        },
-        {
           label: "1 Root",
           items: [
-            { label: "Styling", slug: "1-root/styling" },
             { label: "Colours", link: "/colours/" },
             { label: "Fonts", slug: "1-root/fonts" },
+            { label: "Languages", slug: "1-root/languages" },
+            { label: "Theming", slug: "1-root/theming" },
+            { label: "Device", slug: "1-root/device" },
+            { label: "Preferences", slug: "1-root/preferences" },
           ],
         },
         {
@@ -102,7 +95,10 @@ export default defineConfig({
             { label: "Cycle", slug: "2-core/cycle" },
             { label: "Date", slug: "2-core/date" },
             { label: "Gap", slug: "2-core/gap" },
-            { label: "Icon", slug: "2-core/icon" },
+            { label: "Icon", items: [
+              { label: "Collection", slug: "2-core/icon/collection" },
+              { label: "Builder", link: "/2-core/icon/collection/#builder" },
+            ] },
             { label: "Input", slug: "2-core/input" },
             { label: "Language", slug: "2-core/language" },
             { label: "Link", slug: "2-core/link" },
@@ -134,16 +130,10 @@ export default defineConfig({
           ],
         },
         {
-          label: "Icon",
-          items: [
-            { label: "Icons", link: "/icons/" },
-            { label: "Icon builder", link: "/icons/#builder" },
-          ],
-        },
-        {
           label: "Advanced",
           items: [
             { label: "Theming", slug: "advanced/theming" },
+            { label: "Pricing", slug: "built-ins/pricing" },
           ],
         },
         {

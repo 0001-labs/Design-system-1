@@ -12,7 +12,7 @@ interface Props {
 const { title } = Astro.props;
 const pathname = Astro.url.pathname.replace(/\/$/, '');
 const isHome = pathname === '';
-const isTool = ['/icons', '/colours', '/components'].includes(pathname);
+const isTool = ['/2-core/icon/collection', '/colours', '/components'].includes(pathname);
 const classlessMode = pathname === '/classless/editor' ? 'editor'
   : pathname === '/classless/libraries' ? 'libraries' : null;
 ---

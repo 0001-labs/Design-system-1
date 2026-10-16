@@ -1,0 +1,26 @@
+---
+title: Unit
+description: Compositions of Core pieces that solve a larger interface job.
+---
+
+A Unit brings individual Core pieces together. It provides the shared structure or interaction of a collection, form or navigation area while the application supplies content and decisions.
+
+## What belongs here
+
+| Composition | Purpose |
+| --- | --- |
+| [List](/3-unit/list/), [Row](/3-unit/row/), [Table](/3-unit/table/) | Organize related items and comparable values. |
+| [Form](/3-unit/form/) | Coordinate fields and submission feedback. |
+| [Sidebar](/3-unit/sidebar/), [Navigation](/3-unit/navigation/) | Organize destinations and hierarchy. |
+| [Accordion](/3-unit/accordion/) | Reveal and hide related sections. |
+| [Panel](/3-unit/panel/), [Card](/3-unit/card/) | Group related content into a composition. |
+
+Some entries describe composition patterns rather than a custom element. Follow each page’s markup and API instead of assuming every pattern has a matching tag.
+
+## Keep responsibilities clear
+
+The shared composition owns its documented layout, focus and keyboard behavior. The application owns the data, routes, selected values, permissions and accepted changes. For a sidebar, a label can navigate while the separate disclosure arrow expands its children; those are distinct actions.
+
+## Build on the other layers
+
+[Core](/2-core/overview/) supplies the smaller controls and [Root](/1-root/overview/) supplies the shared measures and appearance. [Page](/4-page/overview/) places units into an overall layout. Prefer an existing Unit when it covers the interaction; compose new application content without rebuilding its controls.

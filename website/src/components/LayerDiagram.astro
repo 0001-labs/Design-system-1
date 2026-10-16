@@ -1,5 +1,4 @@
 ---
-import closeIcon from "../../../DS1/x-icon/close.svg?raw";
 // The four layers drawn as a diagram of item cells: every box one cell,
 // four squares by one (80 by 20), stacked edge to edge under its group's name and what it is, groups
 // two squares apart with an arrow from each to the next.
@@ -9,11 +8,11 @@ import { LAYERS } from '../lib/component-directory';
 const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
 ---
 
-<div class="layer-diagram" role="group" aria-label="The four layers of Design system 1, each built from the one before, and its icons">
+<div class="layer-diagram" role="group" aria-label="The four layers of Design system 1, each built from the one before">
   {LAYERS.map((layer, index) => (
     <div class="layer-group" data-color={layer.color}>
       <p class="layer-name">
-        <span>{layer.number} {layer.name}</span>
+        <a href={`/${layer.number}-${layer.name.toLowerCase()}/overview/`}>{layer.number} {layer.name}</a>
         <span class="layer-arrow" aria-hidden="true">
           <svg class="layer-arrow-head" viewBox="-0.17 -0.12 0.17 0.24"><polyline points="-0.164,-0.115 0,0 -0.164,0.115" /></svg>
         </span>
@@ -33,21 +32,7 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
       </ul>
     </div>
   ))}
-  {/* The icons are named once after the layers, joined to them by the last arrow: one grey chip leading to them all, not listed. */}
-  <div class="layer-group" data-color="grey">
-    <p class="layer-name icon-layer-name"><span class="section-cross" aria-hidden="true" set:html={closeIcon} />Icon</p>
-    <p class="layer-summary">The drawings ds-icon shows.</p>
-    <ul>
-      <li>
-        <a href="/icons/">
-          <span class="layer-text">
-            <span class="layer-word">Icons</span>
-            <span class="layer-tag">{'<ds-icon>'}</span>
-          </span>
-        </a>
-      </li>
-    </ul>
-  </div>
+
 </div>
 
 <style>
@@ -58,7 +43,7 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
     --diagram-unit: var(--landing-unit);
     --diagram-ink: var(--ds1-docs-header-text);
     display: grid;
-    grid-template-columns: repeat(5, calc(4 * var(--diagram-unit)));
+    grid-template-columns: repeat(4, calc(4 * var(--diagram-unit)));
     column-gap: calc(2 * var(--diagram-unit));
     row-gap: calc(2 * var(--diagram-unit));
     align-items: start;

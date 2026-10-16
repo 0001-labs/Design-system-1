@@ -1,9 +1,8 @@
 ---
-import closeIcon from "../../../DS1/x-icon/close.svg?raw";
 import ComponentExample from './ComponentExample.astro';
 import { PAGE_EXAMPLES } from '../lib/component-examples';
 import '../../../DS1/1-root/one.css';
-import { ICONS, LAYERS } from '../lib/component-directory';
+import { LAYERS } from '../lib/component-directory';
 
 // Root is files; every other layer is custom elements.
 const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
@@ -58,23 +57,7 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
           </ul>
         </section>
       ))}
-      <section class="directory-layer directory-layer--icons" data-color="yellow" aria-labelledby="layer-x">
-        <div class="directory-layer-head">
-          <h2 id="layer-x"><span class="section-cross" aria-hidden="true" set:html={closeIcon} />Icon</h2>
-          <p>The drawings <code>ds-icon</code> shows, each by its name.</p>
-        </div>
-        <ul>
-          {ICONS.map((icon) => (
-            <li>
-              <a href="/2-core/icon/">
-                <span class="directory-icon" aria-hidden="true" set:html={icon.svg} />
-                <span class="directory-name">{icon.name}</span>
-                <span class="directory-tag">{`<ds-icon type="${icon.key}">`}</span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      </section>
+
     </div></div>
 
     <script>

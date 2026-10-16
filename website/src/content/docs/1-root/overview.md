@@ -1,7 +1,28 @@
 ---
-title: Styling
-description: Style semantic HTML and configure its shared tokens.
+title: Root
+description: Shared visual foundations and behavior used by every layer.
 ---
+
+Root establishes the common ground for the system: the square, colours, type, scale and the behavior every component can share. Configure these foundations before composing a page; a change here can affect many controls at once.
+
+## What belongs here
+
+| Topic | Responsibility |
+| --- | --- |
+| [Colours](/colours/) | Palette, inks, pastels and their dark counterparts. |
+| [Fonts](/1-root/fonts/) | Typefaces, font loading and specimens. |
+| [Languages](/1-root/languages/) | Supported languages, shared words and translation lookup. |
+| [Theming](/1-root/theming/) | Appearance tokens and light/dark behavior. |
+| [Device](/1-root/device/) | Device detection and responsive scale. |
+| [Preferences](/1-root/preferences/) | Remembering supported user choices. |
+
+These are foundations, not individual interface controls. The language module belongs here; the visible [Language control](/2-core/language/) belongs in Core. The docs group runtime foundations here even when their implementation lives in `DS1/0-face/`; this does not move their source or change import paths.
+
+## How the layers fit
+
+[Core](/2-core/overview/) uses these foundations for individual controls. [Unit](/3-unit/overview/) composes controls, and [Page](/4-page/overview/) arranges those compositions. Application state, permissions and persistence stay with the application. Internal component visibility is separate from these layers: an internal control does not become a Root topic merely because it is hidden from the catalogue.
+
+## Style ordinary HTML
 
 Design system 1 styles native HTML through a shared stylesheet. Start with real elements: headings for structure, links for destinations, buttons for actions, labels for fields and tables for tabular data.
 

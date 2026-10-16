@@ -27,6 +27,23 @@ describe("combined website routes", () => {
     expect(response.headers.get("location")).toBe("https://designsystem1.com/app/?code=example");
   });
 
+  it("redirects reorganized docs without losing query parameters or redirecting icon assets", async () => {
+    const moves = {
+      '/icons/': '/2-core/icon/collection/',
+      '/1-root/styling/': '/1-root/overview/',
+      '/built-ins/languages/': '/1-root/languages/',
+      '/built-ins/theming/': '/1-root/theming/',
+      '/built-ins/device/': '/1-root/device/',
+      '/built-ins/preferences/': '/1-root/preferences/',
+    };
+    for (const [from, to] of Object.entries(moves)) {
+      const response = await site.fetch(from + '?view=example', { redirect: 'manual' });
+      expect(response.status).toBe(308);
+      expect(response.headers.get('location')).toBe('https://designsystem1.com' + to + '?view=example');
+    }
+    expect((await site.fetch('/icons/library/star.svg', { redirect: 'manual' })).status).not.toBe(308);
+  });
+
   it("serves the app shell for nested app routes", async () => {
     const response = await site.fetch("/app/l/example");
     expect(response.status).toBe(200);

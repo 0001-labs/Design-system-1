@@ -54,3 +54,19 @@ test("arrow navigation follows visible hierarchy and skips unavailable rows", as
   folder.focus(); sidebar.items = [sidebar.items[0]]; await sidebar.updateComplete;
   expect(sidebar.shadowRoot!.activeElement).toBe(folder);
 });
+
+
+test("a linked parent navigates independently of its disclosure", async () => {
+  const sidebar = await setup([{ id: 'core', label: 'Core', href: '/2-core/overview/', expanded: true }]);
+  const toggle = vi.fn(), activate = vi.fn(event => event.preventDefault());
+  sidebar.addEventListener('sidebar-toggle', toggle);
+  sidebar.addEventListener('sidebar-activate', activate);
+  const link = control(sidebar, 'core');
+  expect(link.tagName).toBe('A');
+  link.click();
+  expect(activate).toHaveBeenCalledOnce();
+  expect(toggle).not.toHaveBeenCalled();
+  sidebar.shadowRoot!.querySelector<HTMLButtonElement>('.disclosure button')!.click();
+  expect(toggle.mock.calls[0][0].detail).toEqual({ id: 'core', expanded: false });
+  expect(activate).toHaveBeenCalledOnce();
+});

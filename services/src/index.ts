@@ -45,6 +45,21 @@ export default {
       return Response.redirect(url.toString(), 308);
     }
 
+    const docsRedirects: Record<string, string> = {
+      '/icons': '/2-core/icon/collection/',
+      '/1-root/styling': '/1-root/overview/',
+      '/built-ins/languages': '/1-root/languages/',
+      '/built-ins/theming': '/1-root/theming/',
+      '/built-ins/device': '/1-root/device/',
+      '/built-ins/preferences': '/1-root/preferences/',
+    };
+    const docsTarget = docsRedirects[url.pathname.replace(/\/$/, '')];
+    if (docsTarget && (request.method === 'GET' || request.method === 'HEAD')) {
+      url.pathname = docsTarget;
+      // Query is retained; browsers carry the original fragment across this redirect.
+      return Response.redirect(url.toString(), 308);
+    }
+
     if (url.pathname.startsWith("/ds1/")) {
       return assets.fetch(request, { LIBRARIES: env.LIBRARIES }, ctx);
     }

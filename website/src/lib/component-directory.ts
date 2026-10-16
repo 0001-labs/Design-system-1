@@ -1,4 +1,16 @@
-export { LAYERS, type DirectoryEntry, type DirectoryLayer } from '../../../shared/component-directory';
+import { LAYERS as COMPONENT_LAYERS } from '../../../shared/component-directory';
+export type { DirectoryEntry, DirectoryLayer } from '../../../shared/component-directory';
+// Documentation groups foundations without changing the private workbench catalogue.
+export const LAYERS = COMPONENT_LAYERS.map(layer => layer.number !== 1 ? layer : {
+  ...layer,
+  entries: [
+    ...layer.entries.filter(entry => entry.name !== 'Styling'),
+    { name: 'Languages', href: '/1-root/languages/' },
+    { name: 'Theming', href: '/1-root/theming/' },
+    { name: 'Device', href: '/1-root/device/' },
+    { name: 'Preferences', href: '/1-root/preferences/' },
+  ],
+});
 import { isSharedInterfaceIcon, sharedIconName } from './icons/icon-scope';
 
 /** Every drawing in DS1/x-icon, by file name: the name ds-icon takes. */
