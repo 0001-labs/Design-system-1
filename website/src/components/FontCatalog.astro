@@ -152,7 +152,8 @@ const systemFonts = [
   .face-canon { font-family: var(--typeface-canon); }
   .face-mono { font-family: var(--typeface-mono); }
   .medium-sample { font-family: var(--typeface-medium); font-size: var(--type-size-default); line-height: var(--square); }
-  .font-catalog :is(a, button, [contenteditable]):focus-visible { outline: 2px solid currentColor; outline-offset: calc(4px * var(--sf)); }
+  .font-catalog [contenteditable]:focus { outline: none; }
+  .font-catalog :is(a, button):focus-visible { outline: 2px solid currentColor; outline-offset: calc(4px * var(--sf)); }
   @media (max-width: 50rem) {
     .development-details > div { grid-template-columns: 1fr; margin-bottom: var(--square); }
   }
