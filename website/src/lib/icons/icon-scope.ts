@@ -29,6 +29,7 @@ export function sharedIconName(key: string): string {
     'code-block': 'Code', 'list-line': 'List', 'logo-marquee': 'Marquee',
     'note-page': 'Note', 'note-lines': 'Note', 'page-note': 'Note',
     'title-text': 'Title', 'open-source': 'Source', 'up-right': 'Outbound',
+    'sign-in': 'Enter', 'sign-out': 'Exit', pdf: 'PDF',
   } as Record<string, string>)[key] ?? key.split('-')[0];
   return word.charAt(0).toUpperCase() + word.slice(1);
 }

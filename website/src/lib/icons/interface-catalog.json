@@ -50,6 +50,14 @@
     "shapes": 1
   },
   {
+    "key": "audio",
+    "name": "Audio",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M2 6.5V9.5M4 5V11M6 3V13M8 5V11M10 4V12M12 5.5V10.5M14 7V9\" stroke=\"currentColor\" stroke-width=\"0.92\"/>\n</svg>",
+    "url": "/icons/library/audio.svg",
+    "shapes": 1
+  },
+  {
     "key": "avatar",
     "name": "Avatar",
     "source": "Figma",
@@ -349,6 +357,14 @@
     "shapes": 4
   },
   {
+    "key": "cursor",
+    "name": "Cursor",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<g stroke=\"currentColor\" stroke-width=\"0.92\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 2.25V12.75L6.75 10.25L8.5 14L10 13.25L8.25 9.75H12L4 2.25Z\"/></g>\n</svg>",
+    "url": "/icons/library/cursor.svg",
+    "shapes": 1
+  },
+  {
     "key": "default",
     "name": "Default",
     "source": "Figma",
@@ -485,6 +501,14 @@
     "shapes": 1
   },
   {
+    "key": "sign-in",
+    "name": "Enter",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M1.5 8H9.5M6 4.5L9.5 8L6 11.5M9.5 2.5H13.5V13.5H9.5\" stroke=\"currentColor\" stroke-width=\"0.92\"/>\n</svg>",
+    "url": "/icons/library/sign-in.svg",
+    "shapes": 1
+  },
+  {
     "key": "equation",
     "name": "Equation",
     "source": "Library",
@@ -502,11 +526,27 @@
     "shapes": 1
   },
   {
+    "key": "sign-out",
+    "name": "Exit",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M6.5 8H14.5M11 4.5L14.5 8L11 11.5M6.5 2.5H2.5V13.5H6.5\" stroke=\"currentColor\" stroke-width=\"0.92\"/>\n</svg>",
+    "url": "/icons/library/sign-out.svg",
+    "shapes": 1
+  },
+  {
     "key": "expand",
     "name": "Expand",
     "source": "Library",
     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 12 12\" fill=\"none\">\n  <path d=\"M0 5.81415V0H5.80924L5.81842 0.990424H1.70698L11.0089 10.2943L10.9997 6.18585H12V12H6.19076L6.18158 11.0096H10.293L0.99115 1.70573L1.00033 5.81415H0Z\" fill=\"currentColor\"/>\n</svg></svg>",
     "url": "/icons/library/expand.svg",
+    "shapes": 1
+  },
+  {
+    "key": "facebook",
+    "name": "Facebook",
+    "source": "Library",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3\"/>\n</svg></svg>",
+    "url": "/icons/library/facebook.svg",
     "shapes": 1
   },
   {
@@ -524,6 +564,14 @@
     "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<g stroke=\"currentColor\" stroke-width=\"0.92\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M8 14C10.49 14 12.5 12.15 12.5 9.75C12.5 6.5 9.5 5.25 8.75 2C7 3.25 6.25 5 6.5 6.75C5.75 6.5 5.25 5.75 5.25 5C4.25 6 3.5 7.75 3.5 9.75C3.5 12.15 5.51 14 8 14Z\"/></g>\n</svg>",
     "url": "/icons/library/flame.svg",
     "shapes": 1
+  },
+  {
+    "key": "flip",
+    "name": "Flip",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M8 1.5V2.5M8 3.5V4.5M8 5.5V6.5M8 7.5V8.5M8 9.5V10.5M8 11.5V12.5M8 13.5V14.5\" stroke=\"currentColor\" stroke-width=\"0.92\"/>\n<path d=\"M6 3.5V12.5H1.5Z\" stroke=\"currentColor\" stroke-width=\"0.92\" stroke-linejoin=\"round\"/>\n<path d=\"M10 3.5V12.5H14.5Z\" fill=\"currentColor\" stroke=\"currentColor\" stroke-width=\"0.92\" stroke-linejoin=\"round\"/>\n</svg>",
+    "url": "/icons/library/flip.svg",
+    "shapes": 3
   },
   {
     "key": "folder",
@@ -748,6 +796,14 @@
     "shapes": 3
   },
   {
+    "key": "history",
+    "name": "History",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M4.71 11.79A5 5 0 1 0 4.71 4.71L3.83 5.6M6.83 5.6H3.83V2.6M8.25 5.25V8.25L10.5 9.5\" stroke=\"currentColor\" stroke-width=\"0.92\"/>\n</svg>",
+    "url": "/icons/library/history.svg",
+    "shapes": 1
+  },
+  {
     "key": "home-alt",
     "name": "Home",
     "source": "Library",
@@ -806,6 +862,14 @@
     "shapes": 3
   },
   {
+    "key": "instagram",
+    "name": "Instagram",
+    "source": "Library",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M4 8a4 4 0 0 1 4 -4h8a4 4 0 0 1 4 4v8a4 4 0 0 1 -4 4h-8a4 4 0 0 1 -4 -4l0 -8\"/>\n<path d=\"M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0\"/>\n<path d=\"M16.5 7.5v.01\"/>\n</svg></svg>",
+    "url": "/icons/library/instagram.svg",
+    "shapes": 3
+  },
+  {
     "key": "italic",
     "name": "Italic",
     "source": "Library",
@@ -828,6 +892,14 @@
     "source": "Library",
     "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<circle cx=\"5.5\" cy=\"10.5\" r=\"3\" stroke=\"currentColor\"/>\n<path d=\"M7.6 8.4L13.5 2.5M11.5 4.5L13 6M9.5 6.5L11 8\" stroke=\"currentColor\"/>\n</svg>",
     "url": "/icons/library/key.svg",
+    "shapes": 2
+  },
+  {
+    "key": "keyboard",
+    "name": "Keyboard",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<g stroke=\"currentColor\" stroke-width=\"0.92\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"1.75\" y=\"3.75\" width=\"12.5\" height=\"8.5\" rx=\"1.75\"/><path d=\"M4.25 6.25V6.26M6.75 6.25V6.26M9.25 6.25V6.26M11.75 6.25V6.26M4.25 8.25V8.26M6.75 8.25V8.26M9.25 8.25V8.26M11.75 8.25V8.26M5.5 10.25H10.5\"/></g>\n</svg>",
+    "url": "/icons/library/keyboard.svg",
     "shapes": 2
   },
   {
@@ -881,6 +953,14 @@
     "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M8.25 4.75L9.5 3.5A2.12 2.12 0 0 1 12.5 6.5L11.25 7.75M7.75 11.25L6.5 12.5A2.12 2.12 0 0 1 3.5 9.5L4.75 8.25M6 10L10 6\" stroke=\"currentColor\" stroke-width=\"1.1\"/>\n</svg>",
     "url": "/icons/library/link.svg",
     "shapes": 1
+  },
+  {
+    "key": "linkedin",
+    "name": "Linkedin",
+    "source": "Library",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M8 11v5\"/>\n<path d=\"M8 8v.01\"/>\n<path d=\"M12 16v-5\"/>\n<path d=\"M16 16v-3a2 2 0 1 0 -4 0\"/>\n<path d=\"M3 7a4 4 0 0 1 4 -4h10a4 4 0 0 1 4 4v10a4 4 0 0 1 -4 4h-10a4 4 0 0 1 -4 -4l0 -10\"/>\n</svg></svg>",
+    "url": "/icons/library/linkedin.svg",
+    "shapes": 5
   },
   {
     "key": "list-line",
@@ -1020,6 +1100,14 @@
     "shapes": 4
   },
   {
+    "key": "moon",
+    "name": "Moon",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<g stroke=\"currentColor\" stroke-width=\"0.92\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M7.5 2.25A4.5 4.5 0 0 0 13.75 8.5A5.75 5.75 0 1 1 7.5 2.25Z\"/></g>\n</svg>",
+    "url": "/icons/library/moon.svg",
+    "shapes": 1
+  },
+  {
     "key": "more",
     "name": "More",
     "source": "Figma",
@@ -1027,6 +1115,14 @@
     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\">\n<g id=\"Icons\">\n<g id=\"More\">\n<g id=\"Vector\">\n<path d=\"M5.47 7.49001H6.49V8.51001H5.47V7.49001Z\" fill=\"#1E1E1E\" />\n<path d=\"M7.49 7.49001H8.51V8.51001H7.49V7.49001Z\" fill=\"#1E1E1E\" />\n<path d=\"M9.51 7.49001H10.53V8.51001H9.51V7.49001Z\" fill=\"#1E1E1E\" />\n</g>\n</g>\n</g>\n</svg>",
     "url": "/icons/interface/more.svg",
     "shapes": 3
+  },
+  {
+    "key": "move",
+    "name": "Move",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M8 1.75V14.25M1.75 8H14.25M5.5 4.25L8 1.75L10.5 4.25M5.5 11.75L8 14.25L10.5 11.75M4.25 5.5L1.75 8L4.25 10.5M11.75 5.5L14.25 8L11.75 10.5\" stroke=\"currentColor\" stroke-width=\"0.92\"/>\n</svg>",
+    "url": "/icons/library/move.svg",
+    "shapes": 1
   },
   {
     "key": "music-alt",
@@ -1131,6 +1227,14 @@
     "shapes": 2
   },
   {
+    "key": "offline",
+    "name": "Offline",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<g stroke=\"currentColor\" stroke-width=\"0.92\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M1.75 6.25C2.15 5.9 2.58 5.59 3.03 5.33M6.42 4.12C9.17 3.69 12.12 4.4 14.25 6.25M3.75 8.5C4.22 8.12 4.73 7.81 5.27 7.57M9.45 7.15C10.45 7.37 11.42 7.82 12.25 8.5M5.75 10.75C6.32 10.31 7.01 10.06 7.72 10.01\"/><path d=\"M8 12.99V13\"/><path d=\"M2.25 2.25L13.75 13.75\"/></g>\n</svg>",
+    "url": "/icons/library/offline.svg",
+    "shapes": 3
+  },
+  {
     "key": "open",
     "name": "Open",
     "source": "Figma",
@@ -1204,6 +1308,14 @@
     "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<g stroke=\"currentColor\" stroke-width=\"0.92\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M8 8.75C6.25 8.75 4.5 10.5 4.5 12C4.5 13 5.25 13.5 6 13.5C6.75 13.5 7.25 13 8 13C8.75 13 9.25 13.5 10 13.5C10.75 13.5 11.5 13 11.5 12C11.5 10.5 9.75 8.75 8 8.75Z\"/><ellipse cx=\"6.25\" cy=\"4.5\" rx=\"1.25\" ry=\"1.75\"/><ellipse cx=\"9.75\" cy=\"4.5\" rx=\"1.25\" ry=\"1.75\"/><ellipse cx=\"3.5\" cy=\"7.5\" rx=\"1.1\" ry=\"1.5\"/><ellipse cx=\"12.5\" cy=\"7.5\" rx=\"1.1\" ry=\"1.5\"/></g>\n</svg>",
     "url": "/icons/library/paw.svg",
     "shapes": 5
+  },
+  {
+    "key": "pdf",
+    "name": "PDF",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M3.46 8V2.16H12.54V8M5.13 4.45H10.03M5.13 6.39H8M1.96 14.46V10H3.6A1.2 1.2 0 0 1 3.6 12.4H1.96M6.66 10H7.96A2 2 0 0 1 9.96 12A2 2 0 0 1 7.96 14H6.66ZM14.5 10H11.66V14.46M11.66 12.2H13.8\" stroke=\"currentColor\" stroke-width=\"0.92\"/>\n</svg>",
+    "url": "/icons/library/pdf.svg",
+    "shapes": 1
   },
   {
     "key": "pen",
@@ -1329,6 +1441,14 @@
     "shapes": 1
   },
   {
+    "key": "refresh",
+    "name": "Refresh",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M11.29 11.79A5 5 0 1 1 11.29 4.71L12.17 5.6M9.17 5.6H12.17V2.6\" stroke=\"currentColor\" stroke-width=\"0.92\"/>\n</svg>",
+    "url": "/icons/library/refresh.svg",
+    "shapes": 1
+  },
+  {
     "key": "refund",
     "name": "Refund",
     "source": "Library",
@@ -1378,6 +1498,14 @@
     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\">\n<g id=\"Icons\">\n<g id=\"Right\">\n<path id=\"Vector\" d=\"M13.1566 8.60594H0V9.61651L13.1562 9.61791L10.249 12.5251L10.9558 13.219L15.0636 9.11123L10.9524 5L10.245 5.70734L13.1566 8.60594Z\" fill=\"#1E1E1E\" />\n</g>\n</g>\n</svg>",
     "url": "/icons/interface/right.svg",
     "shapes": 1
+  },
+  {
+    "key": "rotate",
+    "name": "Rotate",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<rect x=\"2.25\" y=\"6.75\" width=\"6.5\" height=\"6.5\" stroke=\"currentColor\" stroke-width=\"0.92\"/>\n<path d=\"M3.62 4.77A5.75 5.75 0 0 1 12.25 9.75V10.75M10.25 8.75L12.25 10.75L14.25 8.75\" stroke=\"currentColor\" stroke-width=\"0.92\"/>\n</svg>",
+    "url": "/icons/library/rotate.svg",
+    "shapes": 2
   },
   {
     "key": "row",
@@ -1540,6 +1668,14 @@
     "shapes": 1
   },
   {
+    "key": "sparkle",
+    "name": "Sparkle",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M7 3.5Q7.6 8.4 12.5 9Q7.6 9.6 7 14.5Q6.4 9.6 1.5 9Q6.4 8.4 7 3.5ZM12.25 1.5Q12.5 3.5 14.5 3.75Q12.5 4 12.25 6Q12 4 10 3.75Q12 3.5 12.25 1.5Z\" fill=\"currentColor\"/>\n</svg>",
+    "url": "/icons/library/sparkle.svg",
+    "shapes": 1
+  },
+  {
     "key": "star",
     "name": "Star",
     "source": "Figma",
@@ -1583,6 +1719,14 @@
     "shapes": 24
   },
   {
+    "key": "stop",
+    "name": "Stop",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M4.25 4.25H11.75V11.75H4.25V4.25Z\" fill=\"currentColor\"/>\n</svg>",
+    "url": "/icons/library/stop.svg",
+    "shapes": 1
+  },
+  {
     "key": "store",
     "name": "Store",
     "source": "Library",
@@ -1599,6 +1743,14 @@
     "shapes": 1
   },
   {
+    "key": "sun",
+    "name": "Sun",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<g stroke=\"currentColor\" stroke-width=\"0.92\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"8\" cy=\"8\" r=\"2.75\"/><path d=\"M12.75 8L14.25 8M11.36 11.36L12.42 12.42M8 12.75L8 14.25M4.64 11.36L3.58 12.42M3.25 8L1.75 8M4.64 4.64L3.58 3.58M8 3.25L8 1.75M11.36 4.64L12.42 3.58\"/></g>\n</svg>",
+    "url": "/icons/library/sun.svg",
+    "shapes": 2
+  },
+  {
     "key": "sup",
     "name": "Sup",
     "source": "Figma",
@@ -1606,6 +1758,14 @@
     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\">\n<g id=\"Icons\">\n<g id=\"SUp\">\n<path id=\"Vector\" d=\"M7.49658 4.82836L7.49798 13.0787L8.50855 13.0787L8.50855 4.82873L11.4158 7.73596L12.1096 7.02913L8.00187 2.92138L3.89064 7.03261L4.59798 7.73995L7.49658 4.82836Z\" fill=\"#1E1E1E\" />\n</g>\n</g>\n</svg>",
     "url": "/icons/interface/sup.svg",
     "shapes": 1
+  },
+  {
+    "key": "system",
+    "name": "System",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<circle cx=\"8\" cy=\"8\" r=\"5.75\" stroke=\"currentColor\" stroke-width=\"0.92\"/>\n<path d=\"M8 2.25A5.75 5.75 0 0 0 8 13.75Z\" fill=\"currentColor\"/>\n</svg>",
+    "url": "/icons/library/system.svg",
+    "shapes": 2
   },
   {
     "key": "table",
@@ -1672,6 +1832,14 @@
     "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\">\n<g id=\"Icons\">\n<g id=\"Title\">\n<path id=\"T\" d=\"M7.38251 12.615V4.42501H4.48351V3.38501H11.5165V4.42501H8.61751V12.615H7.38251Z\" fill=\"#1E1E1E\" />\n</g>\n</g>\n</svg>",
     "url": "/icons/interface/title-text.svg",
     "shapes": 1
+  },
+  {
+    "key": "title-struck",
+    "name": "Title",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M7.38251 12.615V4.42501H4.48351V3.38501H11.5165V4.42501H8.61751V12.615H7.38251Z\" fill=\"currentColor\"/>\n<path d=\"M2.5 7.48H13.5V8.52H2.5V7.48Z\" fill=\"currentColor\"/>\n</svg>",
+    "url": "/icons/library/title-struck.svg",
+    "shapes": 2
   },
   {
     "key": "todo",
@@ -1899,6 +2067,14 @@
     "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<g stroke=\"currentColor\" stroke-width=\"0.92\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M9.75 2.5C8.07 2.85 6.98 4.5 7.33 6.18L2.85 10.65C2.27 11.24 2.27 12.19 2.85 12.77L3.23 13.15C3.81 13.73 4.76 13.73 5.35 13.15L9.82 8.67C11.5 9.02 13.15 7.93 13.5 6.25L11.5 6.5L9.5 4.5Z\"/></g>\n</svg>",
     "url": "/icons/library/wrench.svg",
     "shapes": 1
+  },
+  {
+    "key": "x-brand",
+    "name": "X",
+    "source": "Library",
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M4 4l11.733 16h4.267l-11.733 -16l-4.267 0\"/>\n<path d=\"M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772\"/>\n</svg></svg>",
+    "url": "/icons/library/x-brand.svg",
+    "shapes": 2
   },
   {
     "key": "youtube",

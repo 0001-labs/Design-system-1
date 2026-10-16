@@ -1,6 +1,6 @@
 # Tabler Icons
 
-The outlines of airtable, drive, dropbox, figma, github, loom, notion, slack, vimeo and youtube are adapted from Tabler Icons (https://tabler.io/icons), redrawn into this library's 16-unit frame.
+The outlines of airtable, drive, dropbox, facebook, figma, github, instagram, linkedin, loom, notion, slack, vimeo, x-brand (the X mark) and youtube are adapted from Tabler Icons (https://tabler.io/icons), redrawn into this library's 16-unit frame.
 
 ```
 MIT License

@@ -44,6 +44,13 @@
     "shapes": 1
   },
   {
+    "key": "audio",
+    "name": "Audio",
+    "source": "Library",
+    "url": "/icons/library/audio.svg",
+    "shapes": 1
+  },
+  {
     "key": "avatar",
     "name": "Avatar",
     "source": "Figma",
@@ -307,6 +314,13 @@
     "shapes": 4
   },
   {
+    "key": "cursor",
+    "name": "Cursor",
+    "source": "Library",
+    "url": "/icons/library/cursor.svg",
+    "shapes": 1
+  },
+  {
     "key": "default",
     "name": "Default",
     "source": "Figma",
@@ -427,6 +441,13 @@
     "shapes": 1
   },
   {
+    "key": "sign-in",
+    "name": "Enter",
+    "source": "Library",
+    "url": "/icons/library/sign-in.svg",
+    "shapes": 1
+  },
+  {
     "key": "equation",
     "name": "Equation",
     "source": "Library",
@@ -442,10 +463,24 @@
     "shapes": 1
   },
   {
+    "key": "sign-out",
+    "name": "Exit",
+    "source": "Library",
+    "url": "/icons/library/sign-out.svg",
+    "shapes": 1
+  },
+  {
     "key": "expand",
     "name": "Expand",
     "source": "Library",
     "url": "/icons/library/expand.svg",
+    "shapes": 1
+  },
+  {
+    "key": "facebook",
+    "name": "Facebook",
+    "source": "Library",
+    "url": "/icons/library/facebook.svg",
     "shapes": 1
   },
   {
@@ -461,6 +496,13 @@
     "source": "Library",
     "url": "/icons/library/flame.svg",
     "shapes": 1
+  },
+  {
+    "key": "flip",
+    "name": "Flip",
+    "source": "Library",
+    "url": "/icons/library/flip.svg",
+    "shapes": 3
   },
   {
     "key": "folder",
@@ -659,6 +701,13 @@
     "shapes": 3
   },
   {
+    "key": "history",
+    "name": "History",
+    "source": "Library",
+    "url": "/icons/library/history.svg",
+    "shapes": 1
+  },
+  {
     "key": "home-alt",
     "name": "Home",
     "source": "Library",
@@ -710,6 +759,13 @@
     "shapes": 3
   },
   {
+    "key": "instagram",
+    "name": "Instagram",
+    "source": "Library",
+    "url": "/icons/library/instagram.svg",
+    "shapes": 3
+  },
+  {
     "key": "italic",
     "name": "Italic",
     "source": "Library",
@@ -729,6 +785,13 @@
     "name": "Key",
     "source": "Library",
     "url": "/icons/library/key.svg",
+    "shapes": 2
+  },
+  {
+    "key": "keyboard",
+    "name": "Keyboard",
+    "source": "Library",
+    "url": "/icons/library/keyboard.svg",
     "shapes": 2
   },
   {
@@ -776,6 +839,13 @@
     "source": "Library",
     "url": "/icons/library/link.svg",
     "shapes": 1
+  },
+  {
+    "key": "linkedin",
+    "name": "Linkedin",
+    "source": "Library",
+    "url": "/icons/library/linkedin.svg",
+    "shapes": 5
   },
   {
     "key": "list-line",
@@ -899,12 +969,26 @@
     "shapes": 4
   },
   {
+    "key": "moon",
+    "name": "Moon",
+    "source": "Library",
+    "url": "/icons/library/moon.svg",
+    "shapes": 1
+  },
+  {
     "key": "more",
     "name": "More",
     "source": "Figma",
     "node": "116:247",
     "url": "/icons/interface/more.svg",
     "shapes": 3
+  },
+  {
+    "key": "move",
+    "name": "Move",
+    "source": "Library",
+    "url": "/icons/library/move.svg",
+    "shapes": 1
   },
   {
     "key": "music-alt",
@@ -997,6 +1081,13 @@
     "shapes": 2
   },
   {
+    "key": "offline",
+    "name": "Offline",
+    "source": "Library",
+    "url": "/icons/library/offline.svg",
+    "shapes": 3
+  },
+  {
     "key": "open",
     "name": "Open",
     "source": "Figma",
@@ -1061,6 +1152,13 @@
     "source": "Library",
     "url": "/icons/library/paw.svg",
     "shapes": 5
+  },
+  {
+    "key": "pdf",
+    "name": "PDF",
+    "source": "Library",
+    "url": "/icons/library/pdf.svg",
+    "shapes": 1
   },
   {
     "key": "pen",
@@ -1171,6 +1269,13 @@
     "shapes": 1
   },
   {
+    "key": "refresh",
+    "name": "Refresh",
+    "source": "Library",
+    "url": "/icons/library/refresh.svg",
+    "shapes": 1
+  },
+  {
     "key": "refund",
     "name": "Refund",
     "source": "Library",
@@ -1214,6 +1319,13 @@
     "node": "116:243",
     "url": "/icons/interface/right.svg",
     "shapes": 1
+  },
+  {
+    "key": "rotate",
+    "name": "Rotate",
+    "source": "Library",
+    "url": "/icons/library/rotate.svg",
+    "shapes": 2
   },
   {
     "key": "row",
@@ -1357,6 +1469,13 @@
     "shapes": 1
   },
   {
+    "key": "sparkle",
+    "name": "Sparkle",
+    "source": "Library",
+    "url": "/icons/library/sparkle.svg",
+    "shapes": 1
+  },
+  {
     "key": "star",
     "name": "Star",
     "source": "Figma",
@@ -1395,6 +1514,13 @@
     "shapes": 24
   },
   {
+    "key": "stop",
+    "name": "Stop",
+    "source": "Library",
+    "url": "/icons/library/stop.svg",
+    "shapes": 1
+  },
+  {
     "key": "store",
     "name": "Store",
     "source": "Library",
@@ -1409,12 +1535,26 @@
     "shapes": 1
   },
   {
+    "key": "sun",
+    "name": "Sun",
+    "source": "Library",
+    "url": "/icons/library/sun.svg",
+    "shapes": 2
+  },
+  {
     "key": "sup",
     "name": "Sup",
     "source": "Figma",
     "node": "117:1656",
     "url": "/icons/interface/sup.svg",
     "shapes": 1
+  },
+  {
+    "key": "system",
+    "name": "System",
+    "source": "Library",
+    "url": "/icons/library/system.svg",
+    "shapes": 2
   },
   {
     "key": "table",
@@ -1473,6 +1613,13 @@
     "node": "116:208",
     "url": "/icons/interface/title-text.svg",
     "shapes": 1
+  },
+  {
+    "key": "title-struck",
+    "name": "Title",
+    "source": "Library",
+    "url": "/icons/library/title-struck.svg",
+    "shapes": 2
   },
   {
     "key": "todo",
@@ -1673,6 +1820,13 @@
     "source": "Library",
     "url": "/icons/library/wrench.svg",
     "shapes": 1
+  },
+  {
+    "key": "x-brand",
+    "name": "X",
+    "source": "Library",
+    "url": "/icons/library/x-brand.svg",
+    "shapes": 2
   },
   {
     "key": "youtube",

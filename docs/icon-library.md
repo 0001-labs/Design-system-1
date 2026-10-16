@@ -13,9 +13,21 @@ The public collection is at https://designsystem1.com/icons. Interface icons use
 
 A family for money and everyday life: accounts (`bank`, `postal`, `card`, `wallet`, `banknote`, `coins`, `safe`), movements (`transfer`, `income`, `refund`, `repeat`, `receipt`, `percent`, `tag`), bills (`home-alt`, `wifi`, `phone`, `bolt`, `flame`, `drop`, `wrench`, `medical`, `pill`, `shield-alt`), shopping (`cart`, `food`, `coffee`, `shop`, `bag-alt`, `shirt`, `gift`, `box`), getting around (`train`, `car`, `plane`, `fuel`) and leisure (`ticket`, `music-alt`, `tv`, `game`, `book-alt`, `dumbbell`, `cloud`, `school-alt`, `paw`, `heart`, `briefcase`). They are strokes at the collection's 0.92 weight with round caps and joins and soft corners, so they read as one set beside each other in a list. Where the library already had a square drawing of the same concept, the rounded one takes the `-alt` key.
 
+## Drawn arrows
+
+An arrow drawn inside an icon keeps the form of the Inter arrows the type uses: a 90° head whose arms are cut square, as in `right`, `in`, `download` and `upload`. `move` puts four of these heads on a cross. The circular arrows follow `rewind`: an open ring that runs a short way along its tangent into an L-shaped head with one vertical and one horizontal arm. `refresh` turns clockwise with its head at the upper right, so it reads apart from `loop` (two square arrows) and `repeat` (the rounded media pair); `history` is the counter-clockwise ring with clock hands, and `rotate` is a quarter turn over an image frame.
+
+## Interface additions
+
+- `sign-in` and `sign-out` are the download and upload arrows turned towards a door frame; the sheet calls them Enter and Exit. `in` is a different drawing: two arrows meeting at a line.
+- `stop` is the filled square of the media set, beside `play-alt` and `pause`.
+- File kinds are drawn as what they hold: `video`, `audio` (a waveform centred on the middle line, where `stats` stands on a baseline), `pdf` (the top of `page` with its text lines, above the letters), `page` for a generic file and `code` for a code file.
+- `flip` mirrors a shape across a dashed axis. `title-struck` is the title T crossed by a level line, where `untitle` is crossed diagonally.
+- The theme picker uses `sun`, `moon` and `system`, a circle filled on its left half, in the rounded family's weight. `offline` is `wifi` with its arcs cut around a slash. `sparkle` is filled like `star`; `keyboard` and `cursor`, the pointer, are rounded.
+
 ## Brand marks
 
-Third-party brand marks are monochrome outlines in `currentColor`, named after the brand in one word (`figma`, `drive`, `github`). Ten of them (airtable, drive, dropbox, figma, github, loom, notion, slack, vimeo, youtube) are adapted from Tabler Icons' MIT outlines, drawn in a 24-unit inner frame at a 1.5 stroke so they render at the library's one-unit weight; the licence is in `DS1/x-icon/Tabler-LICENSE.md`. `google` and `apple` keep their own drawings.
+Third-party brand marks are monochrome outlines in `currentColor`, named after the brand in one word (`figma`, `drive`, `github`). Fourteen of them (airtable, drive, dropbox, facebook, figma, github, instagram, linkedin, loom, notion, slack, vimeo, x-brand, youtube) are adapted from Tabler Icons' MIT outlines, drawn in a 24-unit inner frame at a 1.5 stroke so they render at the library's one-unit weight; the licence is in `DS1/x-icon/Tabler-LICENSE.md`. The X mark's key is `x-brand`, because `close` is the cross and a bare `x` would read as one. `google` and `apple` keep their own drawings.
 
 ## Source collection
 
