@@ -49,6 +49,13 @@ test('the prose sheet is copied when a product asks for it', () => {
   expect(String(files('tokens', { prose: true, bundle: true })['bundle.css'])).toContain('[data-ds-prose] {');
 });
 
+test('the classless sheet is copied when a product asks for it, and keeps its palette', () => {
+  expect(files('root')).not.toHaveProperty(['one.semantic.css']);
+  expect(Object.keys(files('root', { styles: ['one.semantic.css'], fonts: false }))).toEqual(['one.semantic.css']);
+  expect(String(files('tokens', { classless: true })['one.semantic.css'])).toContain('--one-apple-green: light-dark(');
+  expect(Object.keys(files('root', { classless: true, prose: true, fonts: false }))).toEqual(expect.arrayContaining(['one.css', 'prose.css', 'one.semantic.css']));
+});
+
 test('controls.css always arrives with the text classes it imports', () => {
   expect(Object.keys(files('tokens', { nativeControls: true }))).toEqual(['component-tokens.css', 'component-metrics.css', 'component-appearance.css', 'text.css', 'controls.css']);
   expect(Object.keys(files('tokens'))).not.toContain('text.css');

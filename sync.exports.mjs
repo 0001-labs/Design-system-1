@@ -11,7 +11,7 @@ const rootStyles = ['one.css', 'grid.css', 'text.css', 'component-tokens.css', '
 /** one.css and controls.css both import the text classes. */
 const importsText = ['one.css', 'controls.css'];
 /** Sheets for writing that a product asks for by name, as a flag or in `styles`. */
-const writingSheets = { prose: 'prose.css' };
+const writingSheets = { prose: 'prose.css', classless: 'one.semantic.css' };
 const askedSheets = options => Object.entries(writingSheets).filter(([flag]) => options[flag]).map(([, file]) => file);
 /** The faces one.css loads, by the file names its @font-face rules use. */
 const rootFonts = ['GT-America-Standard-Regular.woff2', 'GT-America-Standard-Medium.woff2', 'GT-America-Compressed-Regular.woff2', 'GT-Canon-M-Standard-Medium-Trial.woff2', 'Inter-Arrows.woff2', 'Iosevka-Regular.woff2', 'Inter-LICENSE.md', 'Iosevka-LICENSE.md'];
@@ -52,9 +52,10 @@ export default {
      * Component tokens for static stylesheets that import them by URL.
      * `nativeControls` adds controls.css with the text classes it imports
      * (text.css); `prose` adds the prose sheet (prose.css, for writing marked
-     * data-ds-prose); `bundle` writes them all as one bundle.css with the
-     * imports resolved, for a page that can carry only one stylesheet or
-     * inlines its styles.
+     * data-ds-prose) and `classless` the classless sheet (one.semantic.css,
+     * which styles a whole page of plain HTML); `bundle` writes them all as one
+     * bundle.css with the imports resolved, for a page that can carry only one
+     * stylesheet or inlines its styles.
      */
     tokens: {
       files({ read, options }) {
@@ -71,7 +72,8 @@ export default {
      * stylesheets to copy when a product loads only some (`["grid.css"]`, or
      * `[]` for scripts alone); `fonts: false` leaves the faces to the product;
      * `nativeControls` adds controls.css; `prose` adds the prose sheet
-     * (prose.css), which `styles` may also name; `modules` names page scripts
+     * (prose.css) and `classless` the classless sheet (one.semantic.css), which
+     * `styles` may also name; `modules` names page scripts
      * from 0-face/ (grid, grid-fit, layout-inspector, scaling, tooltips), copied
      * with what they import. one.css and controls.css bring text.css, which
      * they import.

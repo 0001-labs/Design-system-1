@@ -61,4 +61,4 @@ The `ds-*` components have their own scoped tokens and JavaScript implementation
 
 ## Dependencies
 
-The public stylesheets and fonts need network access unless you save and re-link them locally. The native stylesheet imports Inter from Google Fonts for some controls. [Use with HTML](/start-here/quick-start/) explains the distinction between one authored HTML file and an offline bundle.
+The public stylesheets and fonts need network access unless you save and re-link them locally. The native stylesheet imports no fonts of its own: the font companion, `one.css` or Sync 1's `fonts` export bring the faces. [Use with HTML](/start-here/quick-start/) explains the distinction between one authored HTML file and an offline bundle.

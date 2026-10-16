@@ -75,13 +75,14 @@ describe("replaceCustomProperty", () => {
 
   it("preserves the rest of the stylesheet byte for byte", () => {
     const css = stock();
+    const radius = readCustomProperty(css, "--one-radius")!;
     const next = replaceCustomProperty(css, "--one-radius", "13px");
 
     expect(next).not.toBe(css);
-    expect(next.length - css.length).toBe("13px".length - "8px".length);
+    expect(next.length - css.length).toBe("13px".length - radius.length);
     // Undoing that single declaration must restore the file exactly, which is
     // only true if nothing else moved — including the token's own alignment.
-    expect(next.replace(/(--one-radius:\s*)13px;/, "$18px;")).toBe(css);
+    expect(next.replace(/(--one-radius:\s*)13px;/, (_, name: string) => `${name}${radius};`)).toBe(css);
   });
 
   // The regression this whole module exists for. Before the fix, an unanchored
