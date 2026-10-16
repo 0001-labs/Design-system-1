@@ -422,12 +422,8 @@ function jsxAttributes(element: ts.JsxOpeningLikeElement): Record<string, string
 export function glyphSites(file: string, source: string): { glyph: string; line: number }[] {
   const at = lines(source);
   if (/\.(?:html|astro)$/.test(file)) {
-    const scripts = [...source.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)];
     const body = source.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, match => match.replace(/[^\n]/g, " ")).replace(/^---[\s\S]*?\n---/, match => match.replace(/[^\n]/g, " "));
-    return [...markupGlyphs(body, at), ...scripts.flatMap(match => {
-      const start = at(match.index! + match[0].indexOf(">") + 1) - 1;
-      return glyphSites("embedded.ts", match[1]!).map(site => ({ ...site, line: site.line + start }));
-    })];
+    return [...markupGlyphs(body, at), ...embeddedScripts(source).flatMap(script => glyphSites("embedded.ts", script.code).map(site => ({ ...site, line: site.line + script.line - 1 })))];
   }
   const found: { glyph: string; line: number }[] = [];
   const ast = parsed(file, source);
@@ -472,6 +468,53 @@ export function glyphSites(file: string, source: string): { glyph: string; line:
     ts.forEachChild(node, visit);
   };
   visit(ast);
+  return found;
+}
+
+// ---------------------------------------------------------------------------
+// SVG made in script.
+
+/** The scripts of an HTML or Astro file, each with the line it starts on. */
+function embeddedScripts(source: string): { code: string; line: number }[] {
+  const at = lines(source);
+  return [...source.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)].map(match => ({ code: match[1]!, line: at(match.index! + match[0].indexOf(">") + 1) }));
+}
+/**
+ * `createElementNS(…, "svg")` drawings, counted like inline `<svg>`, each
+ * with its markup when the function that makes it gives every path a
+ * literal `d` (through `setAttribute` or literal `innerHTML`), so a pasted
+ * DS1 drawing can be named. A path drawn from data is not inferred.
+ */
+export function scriptDrawings(file: string, source: string): { line: number; svg: string | null }[] {
+  if (/\.(?:html|astro)$/.test(file)) return embeddedScripts(source).flatMap(script => scriptDrawings("embedded.ts", script.code).map(drawing => ({ ...drawing, line: drawing.line + script.line - 1 })));
+  const at = lines(source);
+  const found: { line: number; svg: string | null }[] = [];
+  const scope = (node: ts.Node): ts.Node => { for (let parent = node.parent; parent; parent = parent.parent) if (ts.isFunctionLike(parent) || ts.isSourceFile(parent)) return parent; return node.getSourceFile(); };
+  const markup = (body: ts.Node): string | null => {
+    const parts: string[] = [];
+    let literal = true;
+    const visit = (node: ts.Node) => {
+      if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression) && node.expression.name.text === "setAttribute" && node.arguments[0] && ts.isStringLiteral(node.arguments[0]) && node.arguments[0].text === "d") {
+        const d = node.arguments[1];
+        if (d && ts.isStringLiteralLike(d)) parts.push(`<path d="${d.text}"/>`); else literal = false;
+      }
+      if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.EqualsToken && ts.isPropertyAccessExpression(node.left) && node.left.name.text === "innerHTML") {
+        const strings: string[] = [];
+        const collect = (part: ts.Node): boolean => ts.isStringLiteralLike(part) ? (strings.push(part.text), true) : ts.isBinaryExpression(part) && part.operatorToken.kind === ts.SyntaxKind.PlusToken ? collect(part.left) && collect(part.right) : ts.isParenthesizedExpression(part) ? collect(part.expression) : false;
+        if (collect(node.right)) parts.push(strings.join("")); else literal = false;
+      }
+      ts.forEachChild(node, visit);
+    };
+    visit(body);
+    return literal && parts.length ? `<svg>${parts.join("")}</svg>` : null;
+  };
+  const visit = (node: ts.Node) => {
+    if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression) && node.expression.name.text === "createElementNS" && node.arguments[1] && ts.isStringLiteralLike(node.arguments[1]) && node.arguments[1].text === "svg") {
+      found.push({ line: at(node.getStart()), svg: markup(scope(node)) });
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(parsed(file, source));
   return found;
 }
 
@@ -589,6 +632,12 @@ export function scanIcons(root: string, manifest: string | undefined, files: str
       if (found) add(found.name, { ...site, drawing: resolved!.path }, "file", found.status);
       // A DS1 drawing named by its path still names the icon when the file is not there.
       else if (!resolved && /(?:^|\/)x-icon\/[a-z0-9-]+\.svg$/.test(use.path)) add(use.name, site, "file");
+    }
+    for (const drawing of scriptDrawings(file, source)) {
+      const site = { file, line: drawing.line, name: "createElementNS" };
+      const match = drawing.svg ? drawings.match(drawing.svg) : undefined;
+      if (match) add(match, site, "script", "shared");
+      else inline.push({ ...site, kind: "script", status: "local" });
     }
     for (const use of glyphSites(file, source)) add(GLYPHS[use.glyph]!, { file, line: use.line, name: use.glyph }, "glyph", "differs");
     for (const use of iconSites(source)) {

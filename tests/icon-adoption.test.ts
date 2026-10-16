@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test } from "vite-plus/test";
-import { drawingShapes, fontIcons, glyphSites, iconSites, importedIcons, resolveSvg, scanIcons } from "../scripts/icon-adoption";
+import { drawingShapes, fontIcons, glyphSites, iconSites, importedIcons, resolveSvg, scanIcons, scriptDrawings } from "../scripts/icon-adoption";
 
 test("literal ds-icon names count as uses, expressions as dynamic and inline svg apart", () => {
   const sites = iconSites(`html\`<ds-icon type="close"></ds-icon><ds-icon type=\${name}></ds-icon>\`;
@@ -132,4 +132,29 @@ const view = html\`<button @click=\${close}>×</button>\`;`);
   expect(jsx.map(site => `${site.glyph}@${site.line}`)).toEqual(["⋯@3", "★@5", "✕@6", "↗@10", "×@11"]);
   const root = app({ "src/menu.ts": "remove.textContent = '×'" });
   expect(scanIcons(root, undefined, ["src/menu.ts"], ds1Drawings).cells.close).toMatchObject({ uses: 1, status: "differs", sites: [{ kind: "glyph", name: "×" }] });
+});
+
+test("SVG made in script counts like inline SVG, named when its paths are a DS1 drawing", () => {
+  const source = `const SVG = 'http://www.w3.org/2000/svg'
+export function closeMark() {
+  const svg = document.createElementNS(SVG, 'svg')
+  const path = document.createElementNS(SVG, 'path')
+  path.setAttribute('d', 'm3 3 10 10M3 13 13 3')
+  svg.append(path)
+  return svg
+}
+export function categoryIcon(key) {
+  const svg = document.createElementNS(SVG, 'svg')
+  for (const d of LOOK[key]) { const path = document.createElementNS(SVG, 'path'); path.setAttribute('d', d); svg.append(path) }
+  return svg
+}
+export function badge() {
+  const svg = document.createElementNS(SVG, 'svg')
+  svg.innerHTML = '<path d="M3 3L13 13"/>' + '<circle cx="8" cy="8" r="2"/>'
+  return svg
+}`;
+  expect(scriptDrawings("draw.ts", source).map(drawing => [drawing.line, Boolean(drawing.svg)])).toEqual([[3, true], [10, false], [15, true]]);
+  const icons = scanIcons(app({ "web/draw.ts": source }), undefined, ["web/draw.ts"], ds1Drawings);
+  expect(icons.cells.close).toMatchObject({ uses: 1, status: "shared", sites: [{ kind: "script", line: 3 }] });
+  expect(icons.inline.map(site => [site.kind, site.line])).toEqual([["script", 10], ["script", 15]]);
 });
