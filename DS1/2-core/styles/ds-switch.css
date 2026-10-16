@@ -1,7 +1,7 @@
 @import "../../1-root/component-metrics.css";
 
 :host {
-  --ds-choice-unit: calc(var(--ds-1) * var(--ds-sf));
+  --ds-choice-unit: var(--ds-control-height);
   display: inline-flex;
   flex: 0 0 auto;
   vertical-align: middle;
