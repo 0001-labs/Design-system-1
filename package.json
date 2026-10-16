@@ -53,7 +53,7 @@
     "reports:upload": "vp run reports:scan && cd services && vp exec wrangler r2 object put ds-one-libraries/reports/component-adoption.json --file ../.reports/component-adoption.json --remote --config ../wrangler.jsonc",
     "dev": "vp dev --host",
     "build": "vp run build:bundle",
-    "check": "vp check",
+    "check": "sync1 check && vp check",
     "generate:icons": "vp exec tsx scripts/generate-icons.ts",
     "build:bundle": "vp run generate:icons && vp exec tsc && vp run build:vite && vp run build:vite:min",
     "build:vite": "vp build --config vite.config.lib.ts",
@@ -82,7 +82,7 @@
     "typecheck:all": "cd packages/css-validate && vp exec tsc --noEmit && cd ../../app && vp exec tsc --noEmit && cd ../services && vp exec tsc --noEmit",
     "services:dryrun": "cd services && vp run dryrun",
     "site:build": "vp run docs:build && vp run app:build",
-    "site:deploy": "vp run site:build && cd services && vp exec wrangler deploy --config ../wrangler.jsonc",
+    "site:deploy": "sync1 guard && vp run site:build && cd services && vp exec wrangler deploy --config ../wrangler.jsonc",
     "deploy": "vp run site:deploy",
     "check:versions": "node scripts/versions.mjs",
     "release": "node scripts/release.mjs",
@@ -94,7 +94,9 @@
     "icons:sync-globe": "node scripts/sync-globe.mjs",
     "icons:check-globe": "node scripts/sync-globe.mjs --check",
     "cli": "node packages/library-tools/cli.mjs",
-    "mcp": "node packages/library-tools/mcp.mjs"
+    "mcp": "node packages/library-tools/mcp.mjs",
+    "sync": "sync1",
+    "sync:check": "sync1 check"
   },
   "dependencies": {
     "@auth/core": "0.41.3",

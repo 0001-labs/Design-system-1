@@ -1,0 +1,9 @@
+{
+  "sources": {
+    "Aa": {
+      "build": {
+        "to": "website/src/vendor/aa"
+      }
+    }
+  }
+}

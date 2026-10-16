@@ -1,5 +1,6 @@
 ---
 import '../../../DS1/1-root/controls.css';
+import '../vendor/aa/aa.css';
 
 const systemFonts = [
   { name: 'GT America Standard', detail: 'Regular and Medium · Interface and text', face: 'regular', sample: 'Words to work with.' },
@@ -35,7 +36,7 @@ const systemFonts = [
     <p data-font-status role="status">Loading the Olivetti Dot specimen…</p>
     <noscript>The interactive specimen needs JavaScript. Olivetti Dot Regular is included with this page.</noscript>
     <div data-olivetti-samples hidden>
-      <div id="olivetti-specimen" class="dot-specimen" contenteditable="plaintext-only" role="textbox" aria-label="Try Olivetti Dot" aria-multiline="true" aria-describedby="specimen-help" spellcheck="false">Every dot counts.</div>
+      <div id="olivetti-specimen" class="dot-specimen" data-font-editor role="textbox" aria-label="Try Olivetti Dot" aria-multiline="true" aria-describedby="specimen-help" spellcheck="false">Every dot counts.</div>
       <div class="alphabet" aria-label="Olivetti Dot alphabet and supported characters">
         <div>ABCDEFGHIJKLMNOPQRSTUVWXYZ</div>
         <div>abcdefghijklmnopqrstuvwxyz</div>
@@ -67,8 +68,8 @@ const systemFonts = [
     {systemFonts.map(font => (
       <div class="system-family">
         <div class="family-heading"><h3>{font.name}</h3><span>{font.detail}</span></div>
-        <div class={`system-specimen face-${font.face}`} contenteditable="plaintext-only" role="textbox" aria-label={`Try ${font.name}`} aria-multiline="true" spellcheck="false">{font.sample}</div>
-        {font.face === 'regular' && <div class="medium-sample" contenteditable="plaintext-only" role="textbox" aria-label="Try GT America Standard Medium" aria-multiline="true" spellcheck="false">The same words, with a little emphasis.</div>}
+        <div class={`system-specimen face-${font.face}`} data-font-editor role="textbox" aria-label={`Try ${font.name}`} aria-multiline="true" spellcheck="false">{font.sample}</div>
+        {font.face === 'regular' && <div class="medium-sample" data-font-editor role="textbox" aria-label="Try GT America Standard Medium" aria-multiline="true" spellcheck="false">The same words, with a little emphasis.</div>}
       </div>
     ))}
   </section>
@@ -76,6 +77,11 @@ const systemFonts = [
 
 <script>
   import '../../../DS1/2-core/ds-button';
+  import { createPlainEditor } from '../vendor/aa/aa.js';
+
+  document.querySelectorAll<HTMLElement>('[data-font-editor]').forEach(host => {
+    createPlainEditor(host);
+  });
   const samples = document.querySelector<HTMLElement>('[data-olivetti-samples]');
   const status = document.querySelector<HTMLElement>('[data-font-status]');
   const tools = document.querySelector<HTMLElement>('[data-specimen-tools]');
@@ -152,7 +158,7 @@ const systemFonts = [
   .face-canon { font-family: var(--typeface-canon); }
   .face-mono { font-family: var(--typeface-mono); }
   .medium-sample { font-family: var(--typeface-medium); font-size: var(--type-size-default); line-height: var(--square); }
-  .font-catalog [contenteditable]:focus { outline: none; }
+  .font-catalog [data-font-editor]:focus { outline: none; }
   .font-catalog :is(a, button):focus-visible { outline: 2px solid currentColor; outline-offset: calc(4px * var(--sf)); }
   @media (max-width: 50rem) {
     .development-details > div { grid-template-columns: 1fr; margin-bottom: var(--square); }

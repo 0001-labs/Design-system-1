@@ -110,3 +110,7 @@ System node: `ds1` ([map](https://system.0001.dev/system?focus=ds1)). Selected p
 ## Internal component visibility
 
 Visibility is independent of the numbered layers. `DS1/0-face/component-visibility.ts` classifies `spacing-handle` and `loading` as internal Core components: built-in editor interactions and automatic pending-state feedback. Their API is documented in source. They remain importable and available through Sync 1, but must not appear in public docs/search/examples or the normal library/workbench picker. `shared/component-directory.ts` exports filtered `LAYERS` for public surfaces and `ALL_LAYERS` for implementation tooling. The docs loader excludes internal names. Do not classify ordinary content components or charts as internal. Visibility is discoverability, not a secrecy or authorization boundary.
+
+## Public font specimens
+
+The public Fonts catalogue uses Aa's `createPlainEditor` for plain specimen text, copied through Sync 1 to `website/src/vendor/aa`. It inherits the specimen font and size, has no focus border or formatting controls, and uses Aa's rounded native-selection painter. This single-block specimen is an intentional exception to Markdown document storage/history in the `editing` guide; no specimen text is persisted. The selected parts for this interaction are `editing`, `design`, and `sharing`.
