@@ -1,57 +1,112 @@
 /**
- * Currency label utilities for regional price display
- *
- * Note: This module provides currency symbols/labels based on language and region.
- * Consider moving this functionality into i18n.ts as it's region/locale-related.
- * Actual price values will be stored in a database or managed via Stripe.
+ * The currency a reader is most likely to think in, from their language or
+ * country, and prices written in it. The amounts themselves come from the
+ * product's billing (a payment service or its database); this only says how
+ * they read. Writing them is `formatMoney` in `./format`.
  */
-
+import { currencySymbol, formatMoney } from "./format";
+import type { MoneyOptions } from "./format";
+import { currentLanguage } from "./i18n";
 import type { LanguageCode } from "./i18n";
 
 type PriceLabelOptions = {
-  language: LanguageCode;
+  /** The reader's language. Defaults to the current language. */
+  language?: LanguageCode;
+  /** The reader's country, when known (`US`, `GB`, `JP`); it wins over the language. */
   country?: string;
 };
 
-// Simple price label mapping based on language/country
-const PRICE_LABELS: Record<string, string> = {
-  da: "kr.",
-  nb: "kr.",
-  sv: "kr.",
-  de: "€",
-  en: "$",
-  pt: "€",
-  es: "€",
-  zh: "¥",
-  ja: "¥",
-  ko: "₩",
+/** The currency each language's readers most often pay in. */
+const LANGUAGE_CURRENCIES: Record<string, string> = {
+  da: "DKK",
+  de: "EUR",
+  en: "USD",
+  es: "EUR",
+  fi: "EUR",
+  fr: "EUR",
+  is: "ISK",
+  it: "EUR",
+  ja: "JPY",
+  ko: "KRW",
+  nb: "NOK",
+  nn: "NOK",
+  no: "NOK",
+  pt: "EUR",
+  "pt-br": "BRL",
+  sv: "SEK",
+  zh: "CNY",
 };
 
-export function getPriceLabel(options: PriceLabelOptions): string {
-  const { language, country } = options;
+const COUNTRY_CURRENCIES: Record<string, string> = {
+  US: "USD",
+  USA: "USD",
+  GB: "GBP",
+  UK: "GBP",
+  JP: "JPY",
+  JPN: "JPY",
+  CN: "CNY",
+  CHN: "CNY",
+  KR: "KRW",
+  KOR: "KRW",
+};
 
-  // If country is provided, try to map it to a currency
-  if (country) {
-    const countryUpper = country.toUpperCase();
-    // Add country-specific mappings if needed
-    if (countryUpper === "US" || countryUpper === "USA") {
-      return "$";
-    }
-    if (countryUpper === "GB" || countryUpper === "UK") {
-      return "£";
-    }
-    if (countryUpper === "JP" || countryUpper === "JPN") {
-      return "¥";
-    }
-    if (countryUpper === "CN" || countryUpper === "CHN") {
-      return "¥";
-    }
-    if (countryUpper === "KR" || countryUpper === "KOR") {
-      return "₩";
-    }
+/**
+ * The short labels `getPriceLabel` has always given. Other currencies read
+ * the symbol the language writes them with.
+ */
+const PRICE_LABELS: Record<string, string> = {
+  DKK: "kr.",
+  NOK: "kr.",
+  SEK: "kr.",
+  ISK: "kr.",
+  EUR: "€",
+  USD: "$",
+  GBP: "£",
+  JPY: "¥",
+  CNY: "¥",
+  KRW: "₩",
+  BRL: "R$",
+};
+
+/**
+ * The currency (ISO 4217 code) for a reader: their country's when it is
+ * known, else their language's, else USD. `pt-BR` reads BRL.
+ */
+export function getPriceCurrency(options: PriceLabelOptions = {}): string {
+  const country = options.country?.toUpperCase();
+  if (country && COUNTRY_CURRENCIES[country]) {
+    return COUNTRY_CURRENCIES[country];
   }
 
-  // Fall back to language-based mapping
-  const primaryLang = language.toLowerCase().split(/[-_]/)[0];
-  return PRICE_LABELS[primaryLang] || "$";
+  const language = String(options.language || currentLanguage.value || "en")
+    .toLowerCase()
+    .replace(/_/g, "-");
+  const primary = language.split("-")[0] ?? "";
+  return LANGUAGE_CURRENCIES[language] ?? LANGUAGE_CURRENCIES[primary] ?? "USD";
+}
+
+/** The currency label for a reader: `kr.`, `€`, `$`, `£`, `¥`, `₩`. */
+export function getPriceLabel(options: PriceLabelOptions = {}): string {
+  const currency = getPriceCurrency(options);
+  return (
+    PRICE_LABELS[currency] ??
+    currencySymbol(currency, { language: options.language })
+  );
+}
+
+/**
+ * A price for a reader: in `currency`, or the reader's currency
+ * (`getPriceCurrency`) when none is given, written in their language.
+ * `minor` reads the amount in cents, as payment services send it.
+ */
+export function formatPrice(
+  amount: number,
+  options: PriceLabelOptions & MoneyOptions & { currency?: string } = {}
+): string {
+  const { country, currency, ...money } = options;
+  return formatMoney(
+    amount,
+    currency ?? getPriceCurrency({ language: options.language, country }),
+    money
+  );
 }

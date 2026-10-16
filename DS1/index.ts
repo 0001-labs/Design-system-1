@@ -26,6 +26,7 @@ export * from "./0-face/i18n";
 export * from "./0-face/languages";
 export * from "./0-face/language-routing";
 export * from "./0-face/translations-format";
+export * from "./0-face/format";
 export * from "./0-face/preferences";
 export * from "./0-face/pricing";
 export * from "./0-face/theme";

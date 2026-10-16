@@ -1,104 +1,42 @@
 ---
 title: Pricing
-description: Currency and pricing utilities for internationalized applications
+description: The currency a reader is likely to think in, from their language or country, and prices written in it
 ---
 
-The pricing module provides utilities for formatting and displaying prices with proper currency formatting.
-
-## Overview
-
-Design system 1 includes utilities for handling pricing display with support for multiple currencies and locales.
-
-## Basic Usage
+The pricing module says which currency a reader is most likely to think in and writes prices in it (`DS1/0-face/pricing.ts`). The amounts come from the product's billing; this only says how they read. It writes them through [Formatting](/1-root/formatting/)'s `formatMoney`, so the currency's decimals and the language's separators are right.
 
 ```javascript
-import { formatPrice, getCurrencySymbol } from 'design-system-1';
+import { formatPrice, getPriceCurrency, getPriceLabel } from "@0001-labs/design-system-1";
 
-// Format a price
-const formatted = formatPrice(29.99, 'USD');
-// Output: "$29.99"
+getPriceCurrency({ language: "da" });            // "DKK"
+getPriceCurrency({ language: "en", country: "GB" }); // "GBP"
+getPriceLabel({ language: "ja" });               // "¥"
 
-// Get currency symbol
-const symbol = getCurrencySymbol('EUR');
-// Output: "€"
+formatPrice(1999, { language: "en", minor: true }); // "$19.99"
+formatPrice(1200, { language: "ja" });           // "￥1,200"
+formatPrice(5, { currency: "EUR", language: "de" }); // "5,00 €"
 ```
 
-## Currency Formatting
+## The reader's currency
 
-### By Locale
+`getPriceCurrency({ language?, country? })` gives an ISO 4217 code: the country's currency when the country is known (`US`, `GB`, `JP`, `CN`, `KR`, as two or three letters), else the language's, else USD. Without a language, the current language's.
 
-```javascript
-import { formatPrice } from 'design-system-1';
+| Language | Currency |
+| --- | --- |
+| `da` | DKK |
+| `de`, `es`, `fi`, `fr`, `it`, `pt` | EUR |
+| `en` | USD |
+| `is` | ISK |
+| `ja` | JPY |
+| `ko` | KRW |
+| `nb`, `nn`, `no` | NOK |
+| `pt-BR` | BRL |
+| `sv` | SEK |
+| `zh` | CNY |
 
-// US Dollar
-formatPrice(1234.56, 'USD', 'en-US');
-// Output: "$1,234.56"
+## Labels and prices
 
-// Japanese Yen
-formatPrice(1234, 'JPY', 'ja');
-// Output: "¥1,234"
+- `getPriceLabel({ language?, country? })` gives the reader's currency as a short label: `kr.` for the Nordic crowns, `€`, `$`, `£`, `¥`, `₩`, `R$`; any other currency as the symbol the language writes it with.
+- `formatPrice(amount, options?)` writes an amount in `currency`, or in the reader's currency when none is given. It takes [the money options](/1-root/formatting/#money): `minor` for amounts in cents, `display`, `whole`.
 
-// Euro (French locale)
-formatPrice(1234.56, 'EUR', 'fr-FR');
-// Output: "1 234,56 €"
-```
-
-## Supported Currencies
-
-| Currency | Symbol | Example        |
-| -------- | ------ | -------------- |
-| USD      | $      | $99.99         |
-| EUR      | €      | €99.99         |
-| GBP      | £      | £99.99         |
-| JPY      | ¥      | ¥9,999         |
-| CNY      | ¥      | ¥99.99         |
-| KRW      | ₩      | ₩99,999        |
-
-## Pricing Display Component
-
-Use with Design system 1 components:
-
-```html
-<ds-text text="$29.99"></ds-text>
-```
-
-## Configuration
-
-```javascript
-import { setPricingConfig } from 'design-system-1';
-
-setPricingConfig({
-  defaultCurrency: 'USD',
-  defaultLocale: 'en-US',
-  showCurrencyCode: false,
-  decimalPlaces: 2
-});
-```
-
-## Functions
-
-| Function              | Description                          |
-| --------------------- | ------------------------------------ |
-| `formatPrice(amount, currency, locale)` | Format a price string |
-| `getCurrencySymbol(currency)` | Get currency symbol        |
-| `parsePriceString(string)` | Parse a price string to number |
-
-## Integration with i18n
-
-Pricing automatically uses the current language for locale:
-
-```javascript
-import { setLanguage } from 'design-system-1';
-import { formatPrice } from 'design-system-1';
-
-setLanguage('ja');
-formatPrice(1000, 'JPY');
-// Uses Japanese locale formatting
-```
-
-## Best Practices
-
-1. **Use native Intl.NumberFormat** - For accurate localized formatting
-2. **Consider currency decimals** - JPY has no decimals, USD has 2
-3. **Store prices in cents** - Avoid floating-point issues
-4. **Display local currency** - Use user's preferred currency when possible
+A price a person pays is in the currency the product charges, not a guess from their language: pass `currency` whenever the billing names one, and keep the reader's currency for estimates and labels.

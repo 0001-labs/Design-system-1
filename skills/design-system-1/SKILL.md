@@ -165,8 +165,19 @@ Design system 1 owns languages for every product: the list, choosing and remembe
 4. **Shared words** (Save, Cancel, Sign in, Nothing here yet, Today, the language names) come from `DS1/0-face/translations/`; use their keys before writing a product's own, and add a word every product needs there.
 5. **The picker** is `<ds-language>`: one square high, eight wide (`compact`: four).
 6. **The backend** checks languages with `languageValidator` or `languageValidatorFor(subset)` from `ds-one/DS1/0-face/language-validator.ts`, imported by path in `convex/`.
+7. **Dates, numbers and money** are written by `DS1/0-face/format.ts`, in the current language or `{ language }`, never by a product's own `Intl` wrapper or a hard-coded locale. The guide is the Formatting page (`website/src/content/docs/1-root/formatting.md`, https://designsystem1.com/1-root/formatting/).
 
 Every text is sentence case, in every language.
+
+## Formatting
+
+- **Dates:** `formatDate`, `formatTime`, `formatDateTime`, `formatMonthYear` and `formatMonthDay`, each `short`, `medium` or `long` (`formatDate(at, "long")`). A date without a time (`"2026-10-17"`) stays on its day in every zone.
+- **Relative time:** `formatRelativeTime(at, { now })` gives "now", "3 minutes ago", "yesterday" (by the calendar) or "in 2 days".
+- **Numbers:** `formatNumber`, `formatCompact` ("12.3K") and `formatPercent` (it takes a fraction: `0.25` is 25%).
+- **Money:** `formatMoney(amount, currency, { minor, display, whole })`. The currency decides the decimals (none for JPY), and `minor: true` reads an amount in cents. `formatMoneyToParts` is for digits drawn in equal cells.
+- **Lists:** `formatList(items)`.
+- **Locale:** `localeTag(language)` gives the locale (`da` is `da-DK`, `pt` is `pt-PT`). `configureFormat({ locales: { en: "en-GB" }, timeZone })` sets a product's region and zone once, at startup.
+- **Servers:** pass the request's `language` on every call. `format.ts` and `pricing.ts` travel in the `languages` Sync 1 export.
 
 ## Checking a design
 

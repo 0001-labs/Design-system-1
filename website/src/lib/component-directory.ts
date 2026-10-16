@@ -6,6 +6,7 @@ export const LAYERS = COMPONENT_LAYERS.map(layer => layer.number !== 1 ? layer :
   entries: [
     ...layer.entries.filter(entry => entry.name !== 'Styling'),
     { name: 'Languages', href: '/1-root/languages/' },
+    { name: 'Formatting', href: '/1-root/formatting/' },
     { name: 'Theming', href: '/1-root/theming/' },
     { name: 'Device', href: '/1-root/device/' },
     { name: 'Preferences', href: '/1-root/preferences/' },

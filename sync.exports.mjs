@@ -29,7 +29,7 @@ const rootModules = {
 const tokenStyles = ['component-appearance.css', 'component-metrics.css', 'component-tokens.css'];
 const withoutImports = css => css.replace(/^@import\s+"\.\/[^"]+";\s*\n/gm, '');
 
-const languageFiles = ['i18n.ts', 'languages.ts', 'language-routing.ts', 'translations-format.ts', 'language-validator.ts', 'shared-words.ts'];
+const languageFiles = ['i18n.ts', 'languages.ts', 'language-routing.ts', 'translations-format.ts', 'language-validator.ts', 'shared-words.ts', 'format.ts', 'pricing.ts'];
 
 export default {
   exports: {
@@ -98,7 +98,7 @@ export default {
         return files;
       },
     },
-    /** The language runtime, the shared words and the Convex validator, in 0-face/. `entries: true` adds a top-level re-export of each module. */
+    /** The language runtime, the shared words, the Convex validator and formatting in the language (format.ts, pricing.ts), in 0-face/. `entries: true` adds a top-level re-export of each module. */
     languages: {
       files({ read, tree, options }) {
         const files = new Map();

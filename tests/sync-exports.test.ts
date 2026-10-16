@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { expect, test } from 'vite-plus/test';
 import config from '../sync.exports.mjs';
@@ -74,4 +74,14 @@ test('the root export can copy only the stylesheets a product loads', () => {
   expect(Object.keys(files('root', { styles: ['grid.css'], fonts: false }))).toEqual(['grid.css']);
   expect(Object.keys(files('root', { styles: [], fonts: false, modules: ['scaling'] }))).toEqual(['0-face/scaling.ts']);
   expect(() => files('root', { styles: ['other.css'] })).toThrow(/Unknown root stylesheet/);
+});
+
+test('the languages export carries formatting with every module the language runtime imports', () => {
+  const tree = (dir: string, { only }: { only?: RegExp } = {}) => new Map(readdirSync(join(root, dir)).filter((file) => !only || only.test(file)).map((file) => [file, read(`${dir}/${file}`)]));
+  const copy = Object.fromEntries(exports.languages.files({ read, tree, options: {} } as Parameters<Exported['files']>[0]) as Map<string, unknown>);
+  for (const file of ['0-face/format.ts', '0-face/pricing.ts', '0-face/i18n.ts', '0-face/languages.ts']) expect(copy).toHaveProperty([file]);
+  for (const [file, content] of Object.entries(copy)) {
+    if (!file.endsWith('.ts')) continue;
+    for (const [, path] of String(content).matchAll(/(?:from|import\()\s*["'](\.\/[^"']+)["']/g)) expect(copy, `${file} imports ${path}`).toHaveProperty([`0-face/${path.slice(2)}${/\.\w+$/.test(path) ? '' : '.ts'}`]);
+  }
 });
