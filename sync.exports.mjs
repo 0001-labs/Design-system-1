@@ -7,6 +7,21 @@ import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 import { componentGraph } from './scripts/component-graph.mjs';
 
+const rootStyles = ['one.css', 'grid.css', 'component-tokens.css', 'component-metrics.css', 'component-appearance.css'];
+/** The faces one.css loads, by the file names its @font-face rules use. */
+const rootFonts = ['GT-America-Standard-Regular.woff2', 'GT-America-Standard-Medium.woff2', 'GT-America-Compressed-Regular.woff2', 'GT-Canon-M-Standard-Medium-Trial.woff2', 'Inter-Arrows.woff2', 'Iosevka-Regular.woff2', 'Inter-LICENSE.md', 'Iosevka-LICENSE.md'];
+/** Page scripts in 0-face/, each with the modules it imports. */
+const rootModules = {
+  grid: ['grid.ts', 'layout-inspector.ts', 'grid-fit.ts'],
+  'grid-fit': ['grid-fit.ts'],
+  'layout-inspector': ['layout-inspector.ts'],
+  scaling: ['scaling.ts'],
+  tooltips: ['tooltips.ts'],
+};
+/** The component stylesheets in the order they import each other. */
+const tokenStyles = ['component-appearance.css', 'component-metrics.css', 'component-tokens.css'];
+const withoutImports = css => css.replace(/^@import\s+"\.\/[^"]+";\s*\n/gm, '');
+
 const languageFiles = ['i18n.ts', 'languages.ts', 'language-routing.ts', 'translations-format.ts', 'language-validator.ts', 'shared-words.ts'];
 
 export default {
@@ -17,7 +32,10 @@ export default {
     /** Optional display faces, copied as local assets by consumers. */
     fonts: {
       files({ read, options }) {
-        const available = { 'OlivettiDot-Regular.woff2': 'website/src/assets/fonts/OlivettiDot-Regular.woff2' };
+        const available = {
+          'OlivettiDot-Regular.woff2': 'website/src/assets/fonts/OlivettiDot-Regular.woff2',
+          ...Object.fromEntries(rootFonts.map(name => [name, `DS1/1-root/fonts/${name}`])),
+        };
         if (!Array.isArray(options.fonts) || !options.fonts.length) throw new Error('Name the fonts to copy');
         return Object.fromEntries(options.fonts.map(name => {
           if (!Object.hasOwn(available, name)) throw new Error(`Unknown font: ${name}`);
@@ -25,12 +43,38 @@ export default {
         }));
       },
     },
-    /** Component tokens for static stylesheets that import them by URL. */
+    /**
+     * Component tokens for static stylesheets that import them by URL.
+     * `nativeControls` adds controls.css; `bundle` writes them all as one
+     * bundle.css with the imports resolved, for a page that can carry only one
+     * stylesheet or inlines its styles.
+     */
     tokens: {
       files({ read, options }) {
-        const files = ['component-tokens.css', 'component-metrics.css', 'component-appearance.css'];
+        const files = options.bundle ? [...tokenStyles] : ['component-tokens.css', 'component-metrics.css', 'component-appearance.css'];
         if (options.nativeControls) files.push('controls.css');
+        if (options.bundle) return { 'bundle.css': `/* Generated from Design system 1/DS1/1-root: ${files.join(', ')}. Change Design system 1 and sync. */\n` + files.map(file => withoutImports(read(`DS1/1-root/${file}`))).join('\n') };
         return Object.fromEntries(files.map(file => [file, read(`DS1/1-root/${file}`)]));
+      },
+    },
+    /**
+     * The root stylesheet (one.css with grid.css and the component tokens) and
+     * the faces it loads, in fonts/. `fonts: false` leaves the faces to the
+     * product; `nativeControls` adds controls.css; `modules` names page scripts
+     * from 0-face/ (grid, grid-fit, layout-inspector, scaling, tooltips), copied
+     * with what they import.
+     */
+    root: {
+      files({ read, options }) {
+        const files = {};
+        for (const file of rootStyles) files[file] = read(`DS1/1-root/${file}`);
+        if (options.nativeControls) files['controls.css'] = read('DS1/1-root/controls.css');
+        if (options.fonts !== false) for (const font of rootFonts) files[`fonts/${font}`] = read(`DS1/1-root/fonts/${font}`);
+        for (const name of options.modules ?? []) {
+          if (!Object.hasOwn(rootModules, name)) throw new Error(`Unknown page script: ${name}`);
+          for (const file of rootModules[name]) files[`0-face/${file}`] = read(`DS1/0-face/${file}`);
+        }
+        return files;
       },
     },
     /** The language runtime, the shared words and the Convex validator, in 0-face/. `entries: true` adds a top-level re-export of each module. */
