@@ -27,8 +27,10 @@ export default {
     },
     /** Component tokens for static stylesheets that import them by URL. */
     tokens: {
-      files({ read }) {
-        return Object.fromEntries(['component-tokens.css', 'component-metrics.css', 'component-appearance.css'].map(file => [file, read(`DS1/1-root/${file}`)]));
+      files({ read, options }) {
+        const files = ['component-tokens.css', 'component-metrics.css', 'component-appearance.css'];
+        if (options.nativeControls) files.push('controls.css');
+        return Object.fromEntries(files.map(file => [file, read(`DS1/1-root/${file}`)]));
       },
     },
     /** The language runtime, the shared words and the Convex validator, in 0-face/. `entries: true` adds a top-level re-export of each module. */
