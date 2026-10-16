@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, mkdirSync, writeFileSync, statSync } from "node:fs";
-import { dirname, join, relative, resolve } from "node:path";
+import { basename, dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import ts from "typescript";
 import { readIconMap, scanIcons } from "./icon-adoption";
@@ -12,7 +12,8 @@ const hash = (body: string | Buffer) => createHash("sha256").update(body).digest
 const git = (root: string, ...args: string[]) => execFileSync("git", args, { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], maxBuffer: 20_000_000 }).trim();
 export const excluded = /^(?:(?:client|src|web)\/)?(?:design|ds1)\/|^src\/pages\/design\/|(?:^|\/)(?:vendor|signIn|_generated|generated|node_modules|dist|__surface|surface|design-lab|designLab|dev|experiments|previews|__tests__|tests|test|fixtures|stories)(?:\/|$)|(?:\.test|\.spec|\.stories|\.d)\.[^.]+$/i;
 
-export interface AppSpec { id: string; name: string; directory: string; roots: string[]; manifest?: string; group?: "Products" | "Clients"; excludes?: string[]; migration?: "deferred"; migrationReason?: string }
+/** `source: "direct"` is Design system 1 itself: its app and site import DS1/ from the same commit, so there is no copy to verify. */
+export interface AppSpec { id: string; name: string; directory: string; roots: string[]; manifest?: string; source?: "direct"; group?: "Products" | "Clients"; excludes?: string[]; migration?: "deferred"; migrationReason?: string }
 /** The studio owns product names and scan scope; the reusable scanner owns recognition. */
 export function loadAppSpecs(studio: string): AppSpec[] {
   const config = JSON.parse(readFileSync(join(studio, "0001/server/component-adoption.config.json"), "utf8")) as { apps: AppSpec[] };
@@ -29,7 +30,7 @@ const native: Record<string, string> = { button: "button", input: "input", selec
 type TagSite = { tag: string; line: number; nativeStyle?: string; dialogRole?: boolean; controlKind?: "checkbox" | "radio" | "switch" | "color" | "file-picker" };
 function nativeStyle(tag: string, className: string): string | undefined {
   const classes = className.split(/\s+/);
-  const supported = tag === "button" ? ["ds-button"] : ["input", "select", "textarea"].includes(tag) ? ["ds-input", "ds-select", "ds-checkbox"] : [];
+  const supported = tag === "button" ? ["ds-button", "ds-switch"] : ["input", "select", "textarea"].includes(tag) ? ["ds-input", "ds-textarea", "ds-select", "ds-checkbox", "ds-radio"] : tag === "dialog" ? ["ds-dialog"] : [];
   return supported.find(name => classes.includes(name));
 }
 function jsxClassName(initializer: ts.JsxAttributeValue | undefined): string {
@@ -257,6 +258,64 @@ export function checkSnapshots(root: string, manifestPath: string | undefined, d
   return { commit: manifest.commit, cells, controls, reactInput, reactButton, reactDialog, reactChoice, reactSplit, reactComposer, reactMenu, reactAccordion, reactAvatar, reactAvatarGroup, reactToken, reactFilePicker, reactContextMenu, reactBadge };
 }
 
+/**
+ * A product that copies only the tokens and controls.css (Sync 1's `tokens` or
+ * `root` export) has no component manifest. Its sync.lock.json records the DS1
+ * revision and each copied file's hash: the copy is verified when the files on
+ * disk match the lock and the lock matches DS1 at that revision.
+ */
+const lockedControlStyles = ["controls.css", "component-tokens.css", "component-metrics.css", "component-appearance.css"];
+export function checkLockedControls(root: string, dsRoot: string): ComponentCell | undefined {
+  const lockPath = join(root, "sync.lock.json");
+  if (!existsSync(lockPath)) return undefined;
+  const source = (JSON.parse(readFileSync(lockPath, "utf8")) as Record<string, { commit?: string; files?: Record<string, string> }>)["Design system 1"];
+  if (!source?.files || !/^[a-f0-9]{40}$/.test(source.commit ?? "")) return undefined;
+  const copies = new Map<string, Record<string, string>>();
+  for (const path of Object.keys(source.files)) {
+    const name = basename(path);
+    if (lockedControlStyles.includes(name)) copies.set(dirname(path), { ...copies.get(dirname(path)), [name]: path });
+  }
+  let best: ComponentCell | undefined;
+  for (const found of copies.values()) {
+    if (!lockedControlStyles.every(name => found[name])) continue;
+    const cell = emptyCell();
+    let modified = false, unverifiable = false, current = true;
+    for (const name of lockedControlStyles) {
+      const path = found[name]!, full = resolve(root, path);
+      if (!full.startsWith(resolve(root) + "/") || !existsSync(full)) { unverifiable = true; cell.issues.push(`Missing copy: ${path}`); continue; }
+      const body = readFileSync(full);
+      if (hash(body) !== source.files[path]) { modified = true; cell.issues.push(`Locally modified: ${path}`); }
+      let original: Buffer | null = null;
+      try { original = execFileSync("git", ["show", `${source.commit}:DS1/1-root/${name}`], { cwd: dsRoot, stdio: ["ignore", "pipe", "ignore"] }); } catch { original = null; }
+      if (!original || hash(original) !== source.files[path]) { unverifiable = true; cell.issues.push(`Source revision not verified: ${path}`); }
+      const latest = join(dsRoot, "DS1/1-root", name);
+      if (!existsSync(latest) || hash(readFileSync(latest)) !== hash(body)) current = false;
+    }
+    cell.snapshot = modified ? "modified" : unverifiable ? "unverified" : "verified";
+    cell.current = current && !unverifiable;
+    if (cell.snapshot === "verified") return cell;
+    best ??= cell;
+  }
+  return best;
+}
+
+/**
+ * Design system 1's own app and site import DS1/ directly, at the same commit:
+ * a component is its source when DS1 defines it and DS1/ has no uncommitted
+ * changes. There is no copy, so nothing is recorded as a consumer manifest.
+ */
+function directSnapshots(dsRoot: string): ReturnType<typeof checkSnapshots> {
+  const dirty = Boolean(git(dsRoot, "status", "--porcelain", "--", "DS1"));
+  const source = (): ComponentCell => dirty
+    ? { ...emptyCell(), snapshot: "unverified", current: false, issues: ["Design system 1 source has uncommitted changes."] }
+    : { ...emptyCell(), snapshot: "verified", current: true };
+  const files = git(dsRoot, "ls-files", "--", "DS1").split("\n");
+  const cells = Object.fromEntries(IMPLEMENTATION_COLUMNS.map(c => [c.id, files.some(f => f.endsWith(`/ds-${c.id}.ts`)) ? source() : emptyCell()]));
+  return { commit: git(dsRoot, "rev-parse", "HEAD"), cells, controls: source(), reactInput: source(), reactButton: source(), reactDialog: source(), reactChoice: source(), reactSplit: source(), reactComposer: source(), reactMenu: source(), reactAccordion: source(), reactAvatar: source(), reactAvatarGroup: source(), reactToken: source(), reactFilePicker: source(), reactContextMenu: source(), reactBadge: source() };
+}
+/** Where a direct-source app's shared adapters live, as if DS1/ were its snapshot. */
+const directManifest = "DS1/components-manifest.json";
+
 /** Follow direct imports and pure registration/re-export entries to the snapshot.
  * Matching names alone never establish adoption. The adapter's full dependency
  * graph is checked separately from direct Lit usage.
@@ -356,18 +415,25 @@ export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): Ado
   const app: AdoptionApp = { id: spec.id, name: spec.name, status: "unavailable", commit: null, dirty: false, files: 0, scope: spec.roots, snapshotCommit: null, cells: {}, otherCustomElements: {}, group: spec.group ?? "Products", ...(spec.migration ? { migration: spec.migration, migrationReason: spec.migrationReason } : {}) };
   try {
     app.commit = git(root, "rev-parse", "HEAD");
-    app.dirty = Boolean(git(root, "status", "--porcelain"));
-    const snapshots = checkSnapshots(root, spec.manifest, dsRoot);
-    app.snapshotCommit = snapshots.commit;
+    // Several products share one repository: only this app's own folder counts.
+    app.dirty = Boolean(git(root, "status", "--porcelain", "--", "."));
+    if (spec.source === "direct" && resolve(root) !== resolve(dsRoot)) throw new Error("Only Design system 1 itself can be scanned as direct source.");
+    const manifest = spec.source === "direct" ? directManifest : spec.manifest;
+    const snapshots = spec.source === "direct" ? directSnapshots(dsRoot) : checkSnapshots(root, spec.manifest, dsRoot);
+    if (spec.source !== "direct" && snapshots.controls.snapshot === "none") {
+      const locked = checkLockedControls(root, dsRoot);
+      if (locked) snapshots.controls = locked;
+    }
+    app.snapshotCommit = spec.source === "direct" ? null : snapshots.commit;
     app.cells = snapshots.cells;
     const files = git(root, "ls-files", "-z", "--", ...spec.roots).split("\0").filter(f => /\.(tsx?|jsx?|[cm]js|html|astro)$/.test(f) && !excluded.test(f) && !(spec.excludes ?? []).some(prefix => f === prefix || f.startsWith(prefix + "/")) && existsSync(join(root, f)));
     if (!files.length) throw new Error("No tracked web source was found in the configured scope.");
-    app.icons = scanIcons(root, spec.manifest, files, ds1Icons(dsRoot), join(dsRoot, "DS1/x-icon"));
+    app.icons = scanIcons(root, spec.source === "direct" ? undefined : spec.manifest, files, ds1Icons(dsRoot), join(dsRoot, "DS1/x-icon"));
     for (const file of files) {
       app.files++;
       const source = readFileSync(join(root, file), "utf8");
       const aliases = spec.id === "link" ? importedAdapters(root, file, source) : {};
-      const sharedAdapters = importedSharedAdapters(root, file, source, spec.manifest);
+      const sharedAdapters = importedSharedAdapters(root, file, source, manifest);
       const sites = sourceSites(file, source);
       const adapterTags = spec.id === "link" && linkAdapters[file]
         ? new Set(Object.values(linkAdapters[file]!).map(id => `ds-${id}`).filter(tag => sites.filter(s => s.tag === tag).length === 1))
@@ -414,7 +480,8 @@ export function scanReport(studio = resolve(repository, "..")): AdoptionReport {
       "Products and Clients have separate row groups. Deferred products remain measured but are excluded from migration recommendations. Only configured tracked web roots are scanned; native apps, libraries and film recreations remain outside this report.",
       "Counts are authored source sites in tracked web files, read from the current working tree. A loop counts once. This is not a runtime or production audit; unused tracked source can be included.",
       "DS1 means the component and its imported dependencies match a recorded DS1 Git revision. An older verified snapshot still counts as DS1; the detail view shows whether it matches today's source. Modified or unverifiable DS1 is counted separately.",
-      "DS1 styles counts native controls with literal ds-button, ds-input, ds-select or ds-checkbox classes and verified shared control styles. These are not Lit components. Dynamic class expressions are not inferred.",
+      "DS1 styles counts native controls with literal ds-button, ds-switch, ds-input, ds-textarea, ds-select, ds-checkbox, ds-radio or ds-dialog classes and verified shared control styles: from a component manifest, or for a product that copies only the tokens and controls.css, from its sync.lock.json (the files match the lock and the lock matches DS1 at its revision). These are not Lit components. Dynamic class expressions are not inferred.",
+      "Design system 1's own app and site import DS1/ directly at the same commit, so their DS1 sites count as DS1 when DS1/ has no uncommitted changes; there is no copied snapshot to verify. A checkout is dirty when the app's own folder has uncommitted changes, not the repository around it.",
       "Local means recognized ezo-/c9y- components or native button, input/select/textarea, p/headings, ul/ol, table, form and dialog, plus literal dialog/alertdialog roles, including explicit setAttribute sites. Native semantics can be intentional; these counts are review leads, not automatic defects.",
       "Tests, demos in preview/dev directories, generated files, vendored implementations and shared sign-in internals are excluded. Link's inspected TabPill, TabPillRow and Tooltip/Tooltop adapters and DS1's verified React FilePicker, Input, Textarea, Composer, Menu, ContextMenuContent/SubContent and their Button, Text and FilePicker entries, Checkbox, Radio, Switch, Select, ColorInput, Button, ButtonLink, Token, TokenField, Avatar, Logo, AvatarGroup, Accordion, Split and DialogContent adapters count at imported JSX uses, without counting their inner DS1 tags again.",
       "Icons: ds-icon with a literal type in markup, Lit, JSX or h/createElement calls counts as a use of that name; a type set by an expression is a dynamic use, and inline <svg> drawings are counted apart. An app with a copied icon map beside its DS1 snapshot is compared drawing by drawing with today's DS1 map: Differs marks a copy that is not DS1's drawing, or a DS1 name missing from the copy; Local only is a name DS1 does not draw. Apps without a copy resolve names from DS1 itself.",

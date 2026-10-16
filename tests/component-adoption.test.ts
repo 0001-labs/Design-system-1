@@ -4,7 +4,7 @@ import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { sourceSites, scanApp, checkSnapshots } from "../scripts/component-adoption";
+import { sourceSites, scanApp, checkSnapshots, checkLockedControls } from "../scripts/component-adoption";
 
 const temporary: string[] = [];
 afterEach(() => { for (const dir of temporary.splice(0)) rmSync(dir, { recursive: true, force: true }); });
@@ -314,4 +314,66 @@ it("verifies badge adapters and keeps their composed icons out of product counts
   expect(scan().cells.icon.shared).toBe(0);
   write(app,'design/react/badge.ts',files['react/badge.ts']+'\n// Local modification');
   expect(scan().cells.badge).toMatchObject({shared:1,unverified:1});
+});
+
+describe("class copies, direct source and scoped checkouts", () => {
+  const sha = (body: string) => createHash("sha256").update(body).digest("hex");
+  const styles = { "controls.css": ".ds-button { }", "component-tokens.css": ":root { --t: 1; }", "component-metrics.css": ":root { --m: 1; }", "component-appearance.css": ":root { --a: 1; }" };
+  function lockFixture() {
+    const studio = mkdtempSync(join(tmpdir(), "component-adoption-")); temporary.push(studio);
+    const ds = join(studio, "Design system 1"), app = join(studio, "Classes");
+    for (const root of [ds, app]) { mkdirSync(root); git(root, "init", "-b", "main"); }
+    for (const [file, body] of Object.entries(styles)) { write(ds, `DS1/1-root/${file}`, body); write(app, `web/ds1/${file}`, body); }
+    write(ds, "DS1/2-core/ds-button.ts", "export const tag = 'ds-button';");
+    git(ds, "add", "."); git(ds, "-c", "user.name=Test", "-c", "user.email=test@example.com", "commit", "-m", "Styles");
+    const commit = git(ds, "rev-parse", "HEAD");
+    write(app, "sync.lock.json", JSON.stringify({ "Design system 1": { commit, files: Object.fromEntries(Object.entries(styles).map(([file, body]) => [`web/ds1/${file}`, sha(body)])) } }));
+    write(app, "web/src/page.ts", 'import { h } from "./dom";\nexport const view = () => [h("button", { className: "ds-button" }), h("textarea", { className: "ds-textarea" }), h("input", { className: "ds-radio", type: "radio" })];\n');
+    write(app, "web/src/dom.ts", "export const h = (tag: string, props: object) => ({ tag, props });\n");
+    git(app, "add", "."); git(app, "-c", "user.name=Test", "-c", "user.email=test@example.com", "commit", "-m", "Page");
+    return { studio, ds, app };
+  }
+
+  it("verifies a tokens-only copy from its lock and counts its native classes as DS1 styles", () => {
+    const { studio, ds } = lockFixture();
+    const report = scanApp({ id: "classes", name: "Classes", directory: "Classes", roots: ["web"] }, studio, ds);
+    expect(report.status).toBe("scanned");
+    expect(report.cells.button).toMatchObject({ styled: 1, unverified: 0 });
+    expect(report.cells.textarea).toMatchObject({ styled: 1, unverified: 0 });
+    expect(report.cells.radio).toMatchObject({ styled: 1, unverified: 0 });
+  });
+
+  it("does not verify a locked copy that was edited or whose lock does not match the revision", () => {
+    const { ds, app } = lockFixture();
+    expect(checkLockedControls(app, ds)).toMatchObject({ snapshot: "verified", current: true });
+    write(app, "web/ds1/controls.css", ".ds-button { color: red; }");
+    expect(checkLockedControls(app, ds)?.snapshot).toBe("modified");
+    write(app, "web/ds1/controls.css", styles["controls.css"]);
+    const lock = JSON.parse(readFileSync(join(app, "sync.lock.json"), "utf8"));
+    lock["Design system 1"].files["web/ds1/controls.css"] = sha(".ds-button { forged }");
+    write(app, "web/ds1/controls.css", ".ds-button { forged }");
+    write(app, "sync.lock.json", JSON.stringify(lock));
+    expect(checkLockedControls(app, ds)?.snapshot).toBe("unverified");
+  });
+
+  it("counts Design system 1's own direct DS1 imports as source, and refuses direct source elsewhere", () => {
+    const { studio, ds } = lockFixture();
+    write(ds, "app/src/view.ts", "export const view = html`<ds-button>Save</ds-button>`;\n");
+    git(ds, "add", "."); git(ds, "-c", "user.name=Test", "-c", "user.email=test@example.com", "commit", "-m", "App");
+    const report = scanApp({ id: "ds1", name: "Design system 1", directory: "Design system 1", roots: ["app/src"], source: "direct" }, studio, ds);
+    expect(report.cells.button).toMatchObject({ shared: 1, unverified: 0 });
+    expect(report.snapshotCommit).toBeNull();
+    write(ds, "DS1/2-core/ds-button.ts", "export const tag = 'changed';");
+    expect(scanApp({ id: "ds1", name: "Design system 1", directory: "Design system 1", roots: ["app/src"], source: "direct" }, studio, ds).cells.button).toMatchObject({ shared: 0, unverified: 1 });
+    expect(scanApp({ id: "x", name: "X", directory: "Classes", roots: ["web"], source: "direct" }, studio, ds).status).toBe("unavailable");
+  });
+
+  it("reports a checkout dirty only for changes in the app's own folder", () => {
+    const { studio, ds, app } = lockFixture();
+    write(app, "sibling/note.txt", "another product's uncommitted work");
+    const scoped = scanApp({ id: "classes", name: "Classes", directory: "Classes/web", roots: ["src"] }, studio, ds);
+    expect(scoped.dirty).toBe(false);
+    write(app, "web/src/new.ts", "export {};\n");
+    expect(scanApp({ id: "classes", name: "Classes", directory: "Classes/web", roots: ["src"] }, studio, ds).dirty).toBe(true);
+  });
 });
