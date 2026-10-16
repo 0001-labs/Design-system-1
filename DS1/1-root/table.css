@@ -1,0 +1,108 @@
+/*
+ * A table: words straight on the paper, one square a row. No box and no
+ * column lines: each row stands on a hairline at its foot, its words set on
+ * that line like a caption (19px of words and 1px of line, a 20px pitch).
+ * Column headers keep the text's weight in the title grey; the first column
+ * of a body row is a row header in the text colour. Nothing is filled with
+ * the accent except a cell someone has selected.
+ *
+ * `.ds-table` dresses a native <table>; `<ds-table>` draws the same table
+ * from data. Put a wide table in `.ds-table-scroll` to scroll it sideways,
+ * and give the table `data-sticky` to keep its first column in place.
+ *
+ *   <th data-numeric>, <td data-numeric>   numbers, set to the column's end
+ *   <tfoot>                                totals, under a line of their own
+ *   <th colspan="2">                       a column group, in a header row
+ *   <th scope="rowgroup">                  a row group, a heading row in grey
+ *   <td aria-selected="true">              a selected cell
+ */
+
+.ds-table {
+  --ds-table-row: var(--ds-row-height, calc(20px * var(--ds-sf, 1)));
+  --ds-table-gap: calc(var(--ds-table-row) / 2);
+  --ds-table-rule: var(--ds-border-color, light-dark(#d8d8d8, #3d3d3d));
+  --ds-table-paper: var(--ds-background, Canvas);
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: var(--ds-text-color, inherit);
+  font-family: var(--ds-typeface-regular, inherit);
+  font-feature-settings: var(--ds-font-features, normal);
+  font-size: var(--ds-type-size-default, 14px);
+  letter-spacing: var(--ds-type-letterspacing-default, normal);
+}
+
+.ds-table :is(th, td) {
+  box-sizing: border-box;
+  height: var(--ds-table-row);
+  padding: 0 var(--ds-table-gap) 0 0;
+  border: 0;
+  border-bottom: 1px solid var(--ds-table-rule);
+  background: transparent;
+  line-height: calc(var(--ds-table-row) - 1px);
+  text-align: start;
+  vertical-align: bottom;
+  font-weight: inherit;
+  white-space: nowrap;
+}
+
+.ds-table :is(th, td):last-child {
+  padding-inline-end: 0;
+}
+
+.ds-table thead th,
+.ds-table th[scope="rowgroup"] {
+  color: var(--ds-title-color, light-dark(#797979, #9a9a9a));
+}
+
+.ds-table tbody th:not([scope="rowgroup"]) {
+  color: inherit;
+}
+
+.ds-table [data-numeric] {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Totals: the rule above them is the last body row's; theirs closes the table. */
+.ds-table tfoot :is(th, td) {
+  color: inherit;
+}
+
+.ds-table [aria-selected="true"] {
+  background: var(--ds-accent-color, Highlight);
+  color: var(--ds-button-text-color-on-accent, inherit);
+}
+
+.ds-table :is(th, td):has(> :is(a, button):only-child) {
+  cursor: pointer;
+}
+
+.ds-table caption {
+  height: var(--ds-table-row);
+  line-height: var(--ds-table-row);
+  text-align: start;
+  color: var(--ds-title-color, light-dark(#797979, #9a9a9a));
+}
+
+.ds-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.ds-table-scroll > .ds-table {
+  width: max-content;
+  min-width: 100%;
+}
+
+.ds-table[data-sticky] :is(th, td):first-child {
+  position: sticky;
+  inset-inline-start: 0;
+  z-index: 1;
+  background: var(--ds-table-paper);
+}
+
+.ds-table[data-sticky] [aria-selected="true"]:first-child {
+  background: var(--ds-accent-color, Highlight);
+}

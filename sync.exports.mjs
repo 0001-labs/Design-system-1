@@ -45,14 +45,14 @@ export default {
     },
     /**
      * Component tokens for static stylesheets that import them by URL.
-     * `nativeControls` adds controls.css; `bundle` writes them all as one
+     * `nativeControls` adds controls.css and the table.css it imports; `bundle` writes them all as one
      * bundle.css with the imports resolved, for a page that can carry only one
      * stylesheet or inlines its styles.
      */
     tokens: {
       files({ read, options }) {
         const files = options.bundle ? [...tokenStyles] : ['component-tokens.css', 'component-metrics.css', 'component-appearance.css'];
-        if (options.nativeControls) files.push('controls.css');
+        if (options.nativeControls) files.push('table.css', 'controls.css');
         if (options.bundle) return { 'bundle.css': `/* Generated from Design system 1/DS1/1-root: ${files.join(', ')}. Change Design system 1 and sync. */\n` + files.map(file => withoutImports(read(`DS1/1-root/${file}`))).join('\n') };
         return Object.fromEntries(files.map(file => [file, read(`DS1/1-root/${file}`)]));
       },
@@ -61,7 +61,7 @@ export default {
      * The root stylesheet (one.css with grid.css and the component tokens) and
      * the faces it loads, in fonts/. `styles` names the stylesheets to copy
      * when a product loads only some (`["grid.css"]`, or `[]` for scripts
-     * alone); `fonts: false` leaves the faces to the product; `nativeControls` adds controls.css; `modules` names page scripts
+     * alone); `fonts: false` leaves the faces to the product; `nativeControls` adds controls.css and table.css; `modules` names page scripts
      * from 0-face/ (grid, grid-fit, layout-inspector, scaling, tooltips), copied
      * with what they import.
      */
@@ -73,7 +73,7 @@ export default {
           if (!rootStyles.includes(file)) throw new Error(`Unknown root stylesheet: ${file}`);
           files[file] = read(`DS1/1-root/${file}`);
         }
-        if (options.nativeControls) files['controls.css'] = read('DS1/1-root/controls.css');
+        if (options.nativeControls) for (const file of ['table.css', 'controls.css']) files[file] = read(`DS1/1-root/${file}`);
         if (options.fonts !== false) for (const font of rootFonts) files[`fonts/${font}`] = read(`DS1/1-root/fonts/${font}`);
         for (const name of options.modules ?? []) {
           if (!Object.hasOwn(rootModules, name)) throw new Error(`Unknown page script: ${name}`);

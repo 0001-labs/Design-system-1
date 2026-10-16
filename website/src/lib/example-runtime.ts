@@ -1,5 +1,5 @@
 import { mountChartExample } from './chart-example';
-import { EXAMPLES, TABLE_DATA } from './component-examples';
+import { EXAMPLES, TABLE_DATA, TABLE_FOOTER } from './component-examples';
 import type { DsTable } from '../../../DS1/3-unit/ds-table';
 
 // A preview has its own preferences. Trying a language or theme must not
@@ -99,7 +99,7 @@ if (grid) sample.querySelectorAll<HTMLSelectElement>('[data-grid-option]').forEa
   });
 });
 const table = sample.querySelector<DsTable>('ds-table');
-if (table) table.data = TABLE_DATA;
+if (table) Object.assign(table, { data: TABLE_DATA, footer: TABLE_FOOTER });
 // A tooltip example should show the label on first sight, before someone
 // knows that they need to hover. Use its real hover behaviour for the demo.
 sample.querySelectorAll('ds-tooltip').forEach(tooltip => {

@@ -42,9 +42,9 @@ bars.items = [
 ];
 document.querySelector('ds-ratio').value = 0.65;
 document.querySelector('ds-table').data = [
-  { product: 'Atlas', users: '120', retention: '92%' },
-  { product: 'Harbor', users: '80', retention: '88%' },
-  { product: 'Meadow', users: '64', retention: '79%' },
+  { product: 'Atlas', users: 120, retention: '92%' },
+  { product: 'Harbor', users: 80, retention: '88%' },
+  { product: 'Meadow', users: 64, retention: '79%' },
 ];`;
 
 export const LAYOUT_EXAMPLES: Record<string, LayoutExample> = {

@@ -16,6 +16,7 @@ description: The components' look as plain classes on native elements, and the s
 | `ds-tabs`, with `ds-tabs--fill` | a row of `.ds-button` | The Tabs row. With `role="group"` it is a segmented control: the choices grey, the chosen one (`aria-pressed`, `aria-selected` or `aria-current`) in the accent. |
 | `ds-dialog` | `<dialog>` | The Dialog's frame: twenty squares wide, a square of padding, a hairline, the paper and a dimmed backdrop. Mark its parts with `data-ds-dialog="header"`, `title`, `description`, `footer` and `close`, as inside the element. |
 | `ds-menu`, `ds-menu__item` and its parts | a menu a library draws | The Menu; an item may be a `<button>`, which keeps the row's look. |
+| `ds-table`, in `ds-table-scroll` to scroll sideways | `<table>` | The [Table](/3-unit/table/): rows one square high on hairlines, no box or column lines; `data-sticky`, `data-numeric` and `aria-selected` as there. From `table.css`, which controls.css imports. |
 
 ```html
 <link rel="stylesheet" href="/ds1/controls.css" />

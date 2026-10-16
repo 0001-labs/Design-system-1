@@ -25,6 +25,7 @@ test('the root export can leave the faces to the product and add controls and pa
   const copy = files('root', { fonts: false, nativeControls: true, modules: ['grid', 'tooltips'] });
   expect(Object.keys(copy).some((file) => file.startsWith('fonts/'))).toBe(false);
   expect(copy).toHaveProperty(['controls.css']);
+  expect(copy).toHaveProperty(['table.css']);
   for (const file of ['0-face/grid.ts', '0-face/layout-inspector.ts', '0-face/grid-fit.ts', '0-face/tooltips.ts']) expect(copy).toHaveProperty([file]);
   expect(() => files('root', { modules: ['nothing'] })).toThrow(/Unknown page script/);
 });
@@ -36,6 +37,7 @@ test('bundled tokens are one stylesheet with no local imports left', () => {
   expect(css).not.toMatch(/@import\s+"\.\//);
   expect(css).toContain('--ds-row-height');
   expect(css).toContain('.ds-button');
+  expect(css).toContain('.ds-table');
   expect(css.indexOf('--ds-row-height')).toBeLessThan(css.indexOf('.ds-button {'));
 });
 

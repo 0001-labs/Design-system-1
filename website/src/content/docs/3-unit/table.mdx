@@ -1,27 +1,56 @@
 ---
 title: Table
-description: Displays product, user, retention and status rows from a JavaScript array.
+description: Rows one square high on hairlines, from data or on a native table.
 ---
 
 import ComponentExample from "../../../components/ComponentExample.astro";
 
-Displays product, user, retention and status rows from a JavaScript array.
+Rows one square high, each standing on a hairline at its foot, with no box and no column lines. Column headers keep the text's weight in the title grey; the first cell of each row is its row header. Numbers are set to the end of their column in tabular figures. Nothing is filled with the accent except a cell someone has selected.
 
 ## Try it
 
 <ComponentExample example="table" />
 
-## Assign data
+## From data
 
-Set the `data` property to an array after the component has been registered. In Lit, use `.data=${rows}` property binding. Do not put arbitrary table cells in the slot: this component renders its own rows.
-
-## Properties
+Set the properties after the component has been registered. In Lit, bind them: `.data=${rows}`.
 
 | Property | Type | Default | What it does |
 | --- | --- | --- | --- |
-| `data` | Array | `[]` | Rows with `product`, `users`, `retention` and optional `status`. |
-| `showStatus` | boolean | true | Shows the status column. Set the property to false to hide it. |
+| `data` | Array | `[]` | The body rows: objects read by column key, or arrays read by position. |
+| `columns` | Array | `[]` | Headers. A string is a label read from its lowercase key (`"Users"` reads `users`); an object is `{ key, label, numeric? }`. Empty, the first row's keys are the headers. |
+| `footer` | Object or Array | none | A totals row under the body. |
+| `sticky` | boolean | false | Keeps the first column in place while the table scrolls sideways. |
+| `label` | string | none | The table's accessible name. |
 
-A missing status displays Pending. Headers currently remain Product, Users, Retention and Status; the declared `columns` property does not change the rendered headers. For a general-purpose table, use semantic HTML `<table>`.
+A column whose values are all numbers is numeric unless its `numeric` says otherwise. A table wider than its place scrolls sideways.
 
-[Row](/3-unit/row/) · [Use with HTML](/start-here/quick-start/)
+```js
+const table = document.querySelector("ds-table");
+table.columns = ["Product", { key: "users", label: "Users", numeric: true }, "Status"];
+table.data = [{ product: "Atlas", users: 120, status: "Active" }];
+table.footer = { product: "Total", users: 120 };
+```
+
+## On a native table
+
+Give a `<table>` the `ds-table` class from the native controls stylesheet (`controls.css`, which imports `table.css`) for the same look with your own markup: column groups as header cells with `colspan`, row groups as `<th scope="rowgroup">`, totals in `<tfoot>`.
+
+| Markup | What it does |
+| --- | --- |
+| `<div class="ds-table-scroll">` around the table | Scrolls a wide table sideways. |
+| `data-sticky` on the table | Keeps the first column in place. |
+| `data-numeric` on a cell | Sets a number to the column's end in tabular figures. |
+| `aria-selected="true"` on a cell | Marks a selected cell with the accent. |
+
+```html
+<div class="ds-table-scroll">
+  <table class="ds-table" data-sticky>
+    <thead><tr><th scope="col">Product</th><th scope="col" data-numeric>Users</th></tr></thead>
+    <tbody><tr><th scope="row">Atlas</th><td data-numeric>120</td></tr></tbody>
+    <tfoot><tr><th scope="row">Total</th><td data-numeric>120</td></tr></tfoot>
+  </table>
+</div>
+```
+
+[Row](/3-unit/row/) · [Native controls](/1-root/native-controls/)

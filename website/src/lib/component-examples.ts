@@ -8,9 +8,11 @@ export interface ComponentExample {
 }
 
 export const TABLE_DATA = [
-  { product: "Atlas", users: "120", retention: "92%", status: "Active" },
-  { product: "Harbor", users: "80", retention: "88%", status: "Active" },
+  { product: "Atlas", users: 120, retention: "92%", status: "Active" },
+  { product: "Harbor", users: 80, retention: "88%", status: "Active" },
+  { product: "Meadow", users: 64, retention: "79%", status: "Paused" },
 ];
+export const TABLE_FOOTER = { product: "Total", users: 264 };
 
 // The preview and the copyable code use the same source. These are local
 // examples only; no sample sends a request to a product's backend.
@@ -200,9 +202,9 @@ render();`,
     height: 240,
   },
   'table': {
-    title: 'A table with data', hint: 'Rows are assigned to the data property in JavaScript.',
-    html: '<ds-table></ds-table>',
-    script: `const table = document.querySelector("ds-table");\ntable.data = ${JSON.stringify(TABLE_DATA, null, 2)};`,
+    title: 'A table with data', hint: 'Rows and the totals are assigned in JavaScript; the headers come from the keys.',
+    html: '<ds-table label="Products"></ds-table>',
+    script: `const table = document.querySelector("ds-table");\ntable.data = ${JSON.stringify(TABLE_DATA, null, 2)};\ntable.footer = ${JSON.stringify(TABLE_FOOTER)};`,
     height: 240,
   },
   'container': {
