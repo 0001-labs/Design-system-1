@@ -1,11 +1,11 @@
 ---
 title: Cycle
-description: A button that advances through a built-in setting.
+description: A button that advances through a built-in setting or its own values.
 ---
 
 import ComponentExample from "../../../components/ComponentExample.astro";
 
-A button that advances through a built-in setting.
+A button that advances through a built-in setting or a list of its own.
 
 ## Try it
 
@@ -21,6 +21,14 @@ A button that advances through a built-in setting.
 | `page-style` | Note and page. |
 | `notes-style-medium` | Default, big and gallery. |
 | `icon-only` | Note and page icons. |
+
+## Your own values
+
+Leave out `type` and give `values` instead, as a JSON array in the attribute or an array property. The cycle shows each value as its label, starts on `value` when that is one of them and otherwise on the first, and on each click moves to the next and emits a `change` event whose `detail.value` is the new one. Setting `value` from a script moves the cycle without an event. Nothing is remembered. The [Chart](/2-core/chart/) page uses one to step through the chart types.
+
+```html
+<ds-cycle values='["Line","Area","Bars"]'></ds-cycle>
+```
 
 ## Behaviour
 

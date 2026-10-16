@@ -87,3 +87,23 @@ test("existing cycle variants map to the shared button and disabled cycles do no
   element.formDisabledCallback(true); await element.updateComplete;
   const before = currentTheme.get(); button.click(); expect(currentTheme.get()).toBe(before);
 });
+
+test("a cycle through its own values starts on value, steps on click and emits change", async () => {
+  const cycle = new Cycle();
+  cycle.values = ["Line", "Area", "Bars"];
+  cycle.value = "Area";
+  document.body.append(cycle);
+  await cycle.updateComplete;
+  const label = () => cycle.shadowRoot!.querySelector("ds-text")!.getAttribute("text");
+  expect(label()).toBe("Area");
+  const changes: string[] = [];
+  cycle.addEventListener("change", event => changes.push((event as CustomEvent).detail.value));
+  const click = async () => { cycle.shadowRoot!.querySelector("ds-button")!.dispatchEvent(new Event("click")); await cycle.updateComplete; };
+  await click(); await click();
+  expect(changes).toEqual(["Bars", "Line"]);
+  expect(cycle.value).toBe("Line");
+  cycle.value = "Bars"; await cycle.updateComplete;
+  expect(label()).toBe("Bars");
+  expect(changes).toHaveLength(2);
+  expect(localStorage.length).toBe(0);
+});

@@ -50,6 +50,10 @@ const getPageStyle = (): string => {
 
 // App width utilities removed
 
+// The settings a cycle knows by name. Any other cycle steps through its own
+// `values` and reports each step as a `change` event.
+const SETTINGS = new Set(["language", "theme", "accent-color", "notes-style-medium", "page-style", "icon-only"]);
+
 // Use a regular class with proper TypeScript type declarations and JSDoc comments
 export class Cycle extends LitElement {
   static formAssociated = true;
@@ -58,6 +62,7 @@ export class Cycle extends LitElement {
     return {
       type: { type: String },
       values: { type: Array },
+      value: { type: String },
       currentValue: { type: String, state: true }, // Make this a private state property
       translationsReady: { type: Boolean, state: true }, // Track if translations are loaded
       disabled: { type: Boolean, reflect: true },
@@ -77,6 +82,7 @@ export class Cycle extends LitElement {
   // These are just for TypeScript and don't create shadowing fields
   declare type: string;
   declare values: string[];
+  declare value: string;
   declare currentValue: string;
   declare translationsReady: boolean;
   declare disabled: boolean;
@@ -104,6 +110,7 @@ export class Cycle extends LitElement {
     // Initialize properties with default values
     this.type = "";
     this.values = [];
+    this.value = "";
     this.currentValue = "";
     this.translationsReady = false;
     this.disabled = false;
@@ -426,6 +433,10 @@ export class Cycle extends LitElement {
           detail: { behavior: newIconOnlyValue },
         })
       );
+    } else if (!SETTINGS.has(this.type)) {
+      const next = this.values[(this.values.indexOf(this.currentValue) + 1) % this.values.length];
+      this.currentValue = this.value = next;
+      this.dispatchEvent(new CustomEvent("change", { detail: { value: next }, bubbles: true, composed: true }));
     }
 
     // Request update to re-render
@@ -542,6 +553,12 @@ export class Cycle extends LitElement {
    * first paint, so the inner button and any page sheet see the same word.
    */
   willUpdate(changed: Map<PropertyKey, unknown>) {
+    // A cycle through its own values shows `value` when it is one of them,
+    // and otherwise the first.
+    if (!SETTINGS.has(this.type) && this.values.length) {
+      if (changed.has("value") && this.values.includes(this.value)) this.currentValue = this.value;
+      else if (!this.values.includes(this.currentValue)) this.currentValue = this.values.includes(this.value) ? this.value : this.values[0];
+    }
     if (changed.has("variant") && this.variant) {
       this.primary = this.variant === "primary";
       this.secondary = this.variant === "secondary";

@@ -28,18 +28,37 @@ export const EXAMPLES: Record<string, ComponentExample> = {
 });`,
   },
   chart: {
-    title: 'Series and compact charts',
-    hint: 'Sample values: 12, 16, 14, 20, 18, 24, 19, 26. Move over a series to inspect a point. No live data is loaded.',
-    height: 1040,
-    html: `<section style="width:100%;min-width:0">
-  <h2>Line</h2><ds-chart kind="line" rows="4" aria-label="Sample line chart"></ds-chart>
-  <h2>Area</h2><ds-chart kind="area" rows="4" aria-label="Sample area chart"></ds-chart>
-  <h2>Baseline</h2><ds-chart kind="baseline" rows="4" aria-label="Sample baseline chart, reference 18"></ds-chart>
-  <output aria-live="polite">Move over a chart to inspect a value.</output>
-  <h2>Sparkline</h2><ds-spark aria-label="Sample trend from 12 to 26"></ds-spark>
-  <h2>Bars</h2><ds-bars rows="3" aria-label="A 12, B 20, C 15; A comparison 16"></ds-bars>
-  <h2>Ratio</h2><ds-ratio aria-label="65 percent to 35 percent"></ds-ratio>
-  <h2>Range</h2><ds-range aria-label="20 to 80 out of 100, midpoint 50"></ds-range>
+    title: 'Chart types on the grid',
+    hint: 'The cycle moves through the seven chart types by itself; click it to choose one. Sample values only; move over a series to inspect a point. No live data is loaded.',
+    height: 340,
+    html: `<style>
+  .chart-stage { --ds-grid-color: color-mix(in srgb, var(--text-color) 12%, transparent); position: relative; isolation: isolate; box-sizing: border-box; width: 100%; width: round(down, 100%, 20px); padding: 20px; box-shadow: inset -1px -1px 0 var(--ds-grid-color); }
+  .chart-stage > :not(ds-grid) { position: relative; }
+  .chart-head { display: flex; justify-content: space-between; align-items: center; height: 20px; }
+  .chart-views { height: 160px; margin-block: 20px; }
+  .chart-views > [hidden] { display: none; }
+  .chart-views > :not([hidden]) { animation: chart-in 240ms cubic-bezier(.2, 0, 0, 1); }
+  .chart-views .compact { width: min(100%, 240px); margin-top: 60px; }
+  .chart-stage output { display: block; height: 20px; font-size: 10px; color: var(--text-color); }
+  @keyframes chart-in { from { opacity: 0; transform: translateY(4px); } }
+  @media (prefers-reduced-motion: reduce) { .chart-views > :not([hidden]) { animation: none; } }
+</style>
+<section class="chart-stage" data-chart-stage aria-label="Chart types">
+  <ds-grid contained></ds-grid>
+  <div class="chart-head">
+    <ds-cycle values='["Line","Area","Baseline","Sparkline","Bars","Ratio","Range"]'></ds-cycle>
+    <span data-chart-count aria-hidden="true">1 of 7</span>
+  </div>
+  <div class="chart-views">
+    <div data-chart-view="Line"><ds-chart kind="line" rows="8" grid="none" aria-label="Line: sample values rising from 12 to 27"></ds-chart></div>
+    <div data-chart-view="Area" hidden><ds-chart kind="area" rows="8" grid="none" aria-label="Area: sample values rising from 12 to 27"></ds-chart></div>
+    <div data-chart-view="Baseline" hidden><ds-chart kind="baseline" rows="8" grid="none" aria-label="Baseline: sample values against a reference of 18"></ds-chart></div>
+    <div data-chart-view="Sparkline" hidden><ds-spark class="compact" cols="12" aria-label="Sparkline: a trend from 12 to 27"></ds-spark></div>
+    <div data-chart-view="Bars" hidden><ds-bars rows="6" span="2" aria-label="Bars: A 12 against 16 expected, B 20, C 15, D 18, E 24"></ds-bars></div>
+    <div data-chart-view="Ratio" hidden><ds-ratio class="compact" aria-label="Ratio: 65 percent to 35 percent"></ds-ratio></div>
+    <div data-chart-view="Range" hidden><ds-range class="compact" aria-label="Range: 20 to 80 out of 100, midpoint 50"></ds-range></div>
+  </div>
+  <output data-chart-status aria-live="polite"></output>
 </section>`,
     script: `(${mountChartExample.toString()})(document);`,
   },

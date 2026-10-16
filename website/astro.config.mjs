@@ -98,7 +98,7 @@ export default defineConfig({
             { label: "Banner", slug: "2-core/banner" },
             { label: "Button", slug: "2-core/button" },
             { label: "Card", slug: "2-core/card" },
-            { label: "Charts", slug: "2-core/chart" },
+            { label: "Chart", slug: "2-core/chart" },
             { label: "Cycle", slug: "2-core/cycle" },
             { label: "Date", slug: "2-core/date" },
             { label: "Gap", slug: "2-core/gap" },
