@@ -56,9 +56,23 @@
   outline-offset: 1px;
 }
 
-.ds-button:disabled {
+.ds-button:disabled,
+.ds-button[aria-disabled="true"] {
   cursor: default;
   opacity: 0.5;
+}
+
+/*
+ * one.css carries older button rules that dim a button on hover and nudge it
+ * on press. The shared button does neither: these match their specificity, so
+ * controls.css, loaded after one.css, wins.
+ */
+.ds-button:hover:not(:disabled, [aria-disabled="true"]) {
+  filter: none;
+}
+
+.ds-button:active:not(:disabled, [aria-disabled="true"]) {
+  transform: none;
 }
 
 .ds-input,

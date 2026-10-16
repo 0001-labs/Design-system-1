@@ -43,3 +43,9 @@ test('the fonts export offers the root faces by name', () => {
   const copy = files('fonts', { fonts: ['GT-America-Standard-Regular.woff2', 'Iosevka-Regular.woff2'] });
   expect(Object.keys(copy)).toEqual(['GT-America-Standard-Regular.woff2', 'Iosevka-Regular.woff2']);
 });
+
+test('the root export can copy only the stylesheets a product loads', () => {
+  expect(Object.keys(files('root', { styles: ['grid.css'], fonts: false }))).toEqual(['grid.css']);
+  expect(Object.keys(files('root', { styles: [], fonts: false, modules: ['scaling'] }))).toEqual(['0-face/scaling.ts']);
+  expect(() => files('root', { styles: ['other.css'] })).toThrow(/Unknown root stylesheet/);
+});

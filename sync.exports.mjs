@@ -59,15 +59,20 @@ export default {
     },
     /**
      * The root stylesheet (one.css with grid.css and the component tokens) and
-     * the faces it loads, in fonts/. `fonts: false` leaves the faces to the
-     * product; `nativeControls` adds controls.css; `modules` names page scripts
+     * the faces it loads, in fonts/. `styles` names the stylesheets to copy
+     * when a product loads only some (`["grid.css"]`, or `[]` for scripts
+     * alone); `fonts: false` leaves the faces to the product; `nativeControls` adds controls.css; `modules` names page scripts
      * from 0-face/ (grid, grid-fit, layout-inspector, scaling, tooltips), copied
      * with what they import.
      */
     root: {
       files({ read, options }) {
         const files = {};
-        for (const file of rootStyles) files[file] = read(`DS1/1-root/${file}`);
+        const styles = options.styles ?? rootStyles;
+        for (const file of styles) {
+          if (!rootStyles.includes(file)) throw new Error(`Unknown root stylesheet: ${file}`);
+          files[file] = read(`DS1/1-root/${file}`);
+        }
         if (options.nativeControls) files['controls.css'] = read('DS1/1-root/controls.css');
         if (options.fonts !== false) for (const font of rootFonts) files[`fonts/${font}`] = read(`DS1/1-root/fonts/${font}`);
         for (const name of options.modules ?? []) {

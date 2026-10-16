@@ -33,7 +33,7 @@ description: The components' look as plain classes on native elements, and the s
 Products copy these files with Sync 1, from the exports in `sync.exports.mjs`:
 
 - `tokens` copies the component tokens; `"nativeControls": true` adds `controls.css`, and `"bundle": true` writes them all as one `bundle.css` with their imports resolved, for a page that can carry only one stylesheet or inlines its styles.
-- `root` copies `one.css` with `grid.css` and the component tokens it imports, and the faces it loads into `fonts/`. `"fonts": false` leaves the faces to the product, `"nativeControls": true` adds `controls.css`, and `"modules"` adds page scripts from `0-face/` (`grid`, `grid-fit`, `layout-inspector`, `scaling`, `tooltips`) with the modules they import.
+- `root` copies `one.css` with `grid.css` and the component tokens it imports, and the faces it loads into `fonts/`. `"styles"` names the stylesheets to copy when a product loads only some (`["grid.css"]`, or `[]` for scripts alone), `"fonts": false` leaves the faces to the product, `"nativeControls": true` adds `controls.css`, and `"modules"` adds page scripts from `0-face/` (`grid`, `grid-fit`, `layout-inspector`, `scaling`, `tooltips`) with the modules they import.
 - `fonts` copies named faces, including the root faces such as `GT-America-Standard-Regular.woff2` and `Iosevka-Regular.woff2`.
 
 ```json
