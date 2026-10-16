@@ -1,7 +1,6 @@
 /** Owner dashboard: the public sign-in shell contains no report data. */
 import { authorizeReport, type ReportsEnv } from './reports';
 
-// Prepared destination; bind this hostname only after the owner confirms it.
 export const DASHBOARD_HOST = 'dash.designsystem1.com';
 const COOKIE = '__Host-ds1-dashboard';
 const security = { 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow', 'Referrer-Policy': 'same-origin', Vary: 'Cookie, Authorization' };

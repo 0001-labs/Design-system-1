@@ -13,7 +13,7 @@ import "../signIn/sign-in.css";
  * sent to it or the owner's password, with Google and Apple when the backend has them.
  * Signed in, the app goes where the person was headed.
  */
-export function SignIn({ redirectTo, fontsOnly = false }: { redirectTo?: string; fontsOnly?: boolean } = {}) {
+export function SignIn({ redirectTo, fontsOnly = false, dashboardOnly = false }: { redirectTo?: string; fontsOnly?: boolean; dashboardOnly?: boolean } = {}) {
   const { signIn } = useAuthActions();
   const convex = useConvex();
   const host = useRef<HTMLDivElement>(null);
@@ -24,12 +24,12 @@ export function SignIn({ redirectTo, fontsOnly = false }: { redirectTo?: string;
     const screen = document.createElement("sign-in-screen") as SignInScreenElement;
     screen.adapter = signInAdapter({
       signIn: (provider, params) => {
-        if (fontsOnly && (typeof params.email !== "string" || params.email.trim().toLowerCase() !== "jaa90@icloud.com")) throw new Error("This font workspace is private.");
+        if ((fontsOnly || dashboardOnly) && (typeof params.email !== "string" || params.email.trim().toLowerCase() !== "jaa90@icloud.com")) throw new Error(dashboardOnly ? "This dashboard is private." : "This font workspace is private.");
         return signIn(provider, params as Record<string, string>);
       },
       providers: async () => {
         const available = await convex.query(api.auth.providers, {});
-        return fontsOnly ? { ...available, google: false, apple: false } : available;
+        return fontsOnly || dashboardOnly ? { ...available, google: false, apple: false } : available;
       },
       passwordSignIn: (email) => convex.query(api.auth.passwordSignIn, { email }),
       redirectTo: () => `${window.location.origin}${window.location.pathname}`,
@@ -39,16 +39,16 @@ export function SignIn({ redirectTo, fontsOnly = false }: { redirectTo?: string;
     });
     host.current.replaceChildren(screen);
     return () => screen.remove();
-  }, [signIn, convex, redirectTo, fontsOnly]);
+  }, [signIn, convex, redirectTo, fontsOnly, dashboardOnly]);
 
   return (
     <main className="auth-screen" data-ds-area="Sign in" data-testid="signin">
-      <h1>{fontsOnly ? "Fonts" : "Sign in to Design system 1"}</h1>
+      <h1>{fontsOnly ? "Fonts" : dashboardOnly ? "Component adoption" : "Sign in to Design system 1"}</h1>
       <p className="auth-intro">{fontsOnly ? "Sign in to your private font workspace." : redirectTo === "/reports/components"
         ? "Sign in with an authorised account to view component reports."
         : "Save, edit and publish your design libraries."}</p>
       <div ref={host} />
-      {!fontsOnly && <div className="auth-alternative">
+      {!fontsOnly && !dashboardOnly && <div className="auth-alternative">
         <p>Just exploring? No account needed.</p>
         <Link to="/playground">Try the editor</Link>
       </div>}

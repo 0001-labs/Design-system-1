@@ -1,6 +1,6 @@
 # Component adoption
 
-The internal dashboard preserves the component matrix, filters, source drilldowns and freshness evidence. The prepared destination is `dash.designsystem1.com`; hostname confirmation and binding are pending. Do not deploy this migration until the requested hostname is resolved. The former `/app/reports/components`, `/reports/components` and `/reports` routes redirect to the dashboard, without report data. Reports is absent from public navigation.
+The internal dashboard preserves the component matrix, filters, source drilldowns and freshness evidence. Its destination is `dash.designsystem1.com` (confirmed by the owner). The former `/app/reports/components`, `/reports/components` and `/reports` routes redirect to the dashboard, without report data. Reports is absent from public navigation.
 
 The existing app sign-in supplies a Convex Auth token. Before serving the dashboard HTML, creating its browser session or reading any report data, the Worker calls `users:current` on the app's deployment and requires all three: the configured owner user ID, email `jaa90@icloud.com`, and `emailVerified: true` derived from the stored verification timestamp. Missing configuration or an unavailable identity authority fails closed. The report adds no account or sign-in provider.
 

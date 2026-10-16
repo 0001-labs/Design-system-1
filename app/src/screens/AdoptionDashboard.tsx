@@ -39,7 +39,7 @@ export function AdoptionDashboard() {
     window.location.replace('/app/signin');
   }
   if (isLoading) return <main className="adoption" role="status">Checking your session…</main>;
-  if (!isAuthenticated) return <div className="app-shell"><SignIn redirectTo="/reports/components" /></div>;
+  if (!isAuthenticated) return <div className="app-shell"><SignIn dashboardOnly redirectTo="/reports/components" /></div>;
   if (error) return <main className="adoption" role="alert"><p>{error}</p><button type="button" onClick={() => void leave()}>Sign out</button></main>;
   if (!ready) return <main className="adoption" role="status">Checking dashboard access…</main>;
   return <ComponentAdoption onSignOut={leave} />;

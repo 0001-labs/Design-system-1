@@ -83,7 +83,7 @@ The libraries app (`app/`) signs in through the shared piece from `/Users/joachi
 
 ## Component adoption report
 
-The owner-only adoption dashboard migration (prepared for `dash.designsystem1.com`, hostname confirmation/binding pending) reads a source snapshot through the Worker. Before changing its scanner or access, or refreshing and publishing its data, read `docs/component-adoption.md`. Keep generated snapshots in private storage, outside the website assets and Git. The Worker must require the pinned owner ID and verified `jaa90@icloud.com` identity for HTML and data; only the sign-in shell is public. The old report routes redirect without data, and Reports is absent from public navigation. Use the existing product account and host-only dashboard session, never a shared-domain cookie.
+The owner-only adoption dashboard at `dash.designsystem1.com` reads a source snapshot through the Worker. Before changing its scanner or access, or refreshing and publishing its data, read `docs/component-adoption.md`. Keep generated snapshots in private storage, outside the website assets and Git. The Worker must require the pinned owner ID and verified `jaa90@icloud.com` identity for HTML and data; only the sign-in shell is public. The old report routes redirect without data, and Reports is absent from public navigation. Use the existing product account and host-only dashboard session, never a shared-domain cookie.
 
 ## App parity
 
