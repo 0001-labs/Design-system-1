@@ -1,5 +1,12 @@
 [
   {
+    "key": "airtable",
+    "name": "Airtable",
+    "source": "Library",
+    "url": "/icons/library/airtable.svg",
+    "shapes": 3
+  },
+  {
     "key": "app",
     "name": "App",
     "source": "Library",
@@ -30,6 +37,13 @@
     "shapes": 2
   },
   {
+    "key": "attach",
+    "name": "Attach",
+    "source": "Library",
+    "url": "/icons/library/attach.svg",
+    "shapes": 1
+  },
+  {
     "key": "avatar",
     "name": "Avatar",
     "source": "Figma",
@@ -58,6 +72,20 @@
     "source": "Library",
     "url": "/icons/library/bold.svg",
     "shapes": 1
+  },
+  {
+    "key": "book",
+    "name": "Book",
+    "source": "Library",
+    "url": "/icons/library/book.svg",
+    "shapes": 2
+  },
+  {
+    "key": "building",
+    "name": "Building",
+    "source": "Library",
+    "url": "/icons/library/building.svg",
+    "shapes": 2
   },
   {
     "key": "bullet",
@@ -212,6 +240,13 @@
     "shapes": 3
   },
   {
+    "key": "dislike",
+    "name": "Dislike",
+    "source": "Library",
+    "url": "/icons/library/dislike.svg",
+    "shapes": 2
+  },
+  {
     "key": "divider",
     "name": "Divider",
     "source": "Library",
@@ -248,6 +283,27 @@
     "source": "Figma",
     "node": "317:1717",
     "url": "/icons/interface/down.svg",
+    "shapes": 1
+  },
+  {
+    "key": "download",
+    "name": "Download",
+    "source": "Library",
+    "url": "/icons/library/download.svg",
+    "shapes": 2
+  },
+  {
+    "key": "drive",
+    "name": "Drive",
+    "source": "Library",
+    "url": "/icons/library/drive.svg",
+    "shapes": 3
+  },
+  {
+    "key": "dropbox",
+    "name": "Dropbox",
+    "source": "Library",
+    "url": "/icons/library/dropbox.svg",
     "shapes": 1
   },
   {
@@ -288,6 +344,13 @@
     "shapes": 1
   },
   {
+    "key": "figma",
+    "name": "Figma",
+    "source": "Library",
+    "url": "/icons/library/figma.svg",
+    "shapes": 3
+  },
+  {
     "key": "folder",
     "name": "Folder",
     "source": "Library",
@@ -308,6 +371,13 @@
     "source": "Figma",
     "node": "117:116",
     "url": "/icons/interface/gallery.svg",
+    "shapes": 1
+  },
+  {
+    "key": "github",
+    "name": "Github",
+    "source": "Library",
+    "url": "/icons/library/github.svg",
     "shapes": 1
   },
   {
@@ -472,6 +542,13 @@
     "shapes": 2
   },
   {
+    "key": "info",
+    "name": "Info",
+    "source": "Library",
+    "url": "/icons/library/info.svg",
+    "shapes": 3
+  },
+  {
     "key": "italic",
     "name": "Italic",
     "source": "Library",
@@ -485,6 +562,13 @@
     "node": "1191:1422",
     "url": "/icons/interface/item.svg",
     "shapes": 1
+  },
+  {
+    "key": "key",
+    "name": "Key",
+    "source": "Library",
+    "url": "/icons/library/key.svg",
+    "shapes": 2
   },
   {
     "key": "left",
@@ -501,6 +585,13 @@
     "node": "467:1264",
     "url": "/icons/interface/life.svg",
     "shapes": 6
+  },
+  {
+    "key": "like",
+    "name": "Like",
+    "source": "Library",
+    "url": "/icons/library/like.svg",
+    "shapes": 2
   },
   {
     "key": "2xlines",
@@ -549,12 +640,26 @@
     "shapes": 1
   },
   {
+    "key": "loom",
+    "name": "Loom",
+    "source": "Library",
+    "url": "/icons/library/loom.svg",
+    "shapes": 4
+  },
+  {
     "key": "loop",
     "name": "Loop",
     "source": "Figma",
     "node": "116:251",
     "url": "/icons/interface/loop.svg",
     "shapes": 4
+  },
+  {
+    "key": "map",
+    "name": "Map",
+    "source": "Library",
+    "url": "/icons/library/map.svg",
+    "shapes": 2
   },
   {
     "key": "logo-marquee",
@@ -634,6 +739,13 @@
     "shapes": 3
   },
   {
+    "key": "music",
+    "name": "Music",
+    "source": "Library",
+    "url": "/icons/library/music.svg",
+    "shapes": 3
+  },
+  {
     "key": "neutral",
     "name": "Neutral",
     "source": "Figma",
@@ -694,6 +806,13 @@
     "source": "Library",
     "url": "/icons/library/notifications.svg",
     "shapes": 1
+  },
+  {
+    "key": "notion",
+    "name": "Notion",
+    "source": "Library",
+    "url": "/icons/library/notion.svg",
+    "shapes": 4
   },
   {
     "key": "numbered",
@@ -769,6 +888,13 @@
     "shapes": 2
   },
   {
+    "key": "people",
+    "name": "People",
+    "source": "Library",
+    "url": "/icons/library/people.svg",
+    "shapes": 3
+  },
+  {
     "key": "play",
     "name": "Play",
     "source": "Figma",
@@ -793,11 +919,25 @@
     "shapes": 1
   },
   {
+    "key": "present",
+    "name": "Present",
+    "source": "Library",
+    "url": "/icons/library/present.svg",
+    "shapes": 2
+  },
+  {
     "key": "quote",
     "name": "Quote",
     "source": "Library",
     "url": "/icons/library/quote.svg",
     "shapes": 1
+  },
+  {
+    "key": "reaction",
+    "name": "Reaction",
+    "source": "Library",
+    "url": "/icons/library/reaction.svg",
+    "shapes": 3
   },
   {
     "key": "redo",
@@ -900,6 +1040,13 @@
     "shapes": 3
   },
   {
+    "key": "shield",
+    "name": "Shield",
+    "source": "Library",
+    "url": "/icons/library/shield.svg",
+    "shapes": 2
+  },
+  {
     "key": "ship",
     "name": "Ship",
     "source": "Figma",
@@ -914,6 +1061,13 @@
     "node": "116:507",
     "url": "/icons/interface/1x.svg",
     "shapes": 2
+  },
+  {
+    "key": "slack",
+    "name": "Slack",
+    "source": "Library",
+    "url": "/icons/library/slack.svg",
+    "shapes": 4
   },
   {
     "key": "slash",
@@ -1149,10 +1303,38 @@
     "shapes": 1
   },
   {
+    "key": "upload",
+    "name": "Upload",
+    "source": "Library",
+    "url": "/icons/library/upload.svg",
+    "shapes": 2
+  },
+  {
+    "key": "video",
+    "name": "Video",
+    "source": "Library",
+    "url": "/icons/library/video.svg",
+    "shapes": 2
+  },
+  {
     "key": "views",
     "name": "Views",
     "source": "Library",
     "url": "/icons/library/views.svg",
+    "shapes": 2
+  },
+  {
+    "key": "vimeo",
+    "name": "Vimeo",
+    "source": "Library",
+    "url": "/icons/library/vimeo.svg",
+    "shapes": 1
+  },
+  {
+    "key": "window",
+    "name": "Window",
+    "source": "Library",
+    "url": "/icons/library/window.svg",
     "shapes": 2
   },
   {
@@ -1162,5 +1344,12 @@
     "node": "467:1319",
     "url": "/icons/interface/work.svg",
     "shapes": 1
+  },
+  {
+    "key": "youtube",
+    "name": "Youtube",
+    "source": "Library",
+    "url": "/icons/library/youtube.svg",
+    "shapes": 2
   }
 ]

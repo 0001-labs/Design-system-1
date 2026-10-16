@@ -9,6 +9,10 @@ The public collection is at https://designsystem1.com/icons. Interface icons use
 3. `vp run icons:build` automatically discovers the SVG, validates it and adds it to the public collection. No manual gallery list or frontend code change is needed for a new icon.
 4. Run `vp test --run tests/interfaceIcons.test.ts tests/iconGrid.test.ts tests/iconStudio.test.ts`, then `vp run site:build`. Publish through the existing site deployment workflow when requested, and verify the public SVG and page assets by HTTP. Respect the user's browser-testing preference.
 
+## Brand marks
+
+Third-party brand marks are monochrome outlines in `currentColor`, named after the brand in one word (`figma`, `drive`, `github`). Ten of them (airtable, drive, dropbox, figma, github, loom, notion, slack, vimeo, youtube) are adapted from Tabler Icons' MIT outlines, drawn in a 24-unit inner frame at a 1.5 stroke so they render at the library's one-unit weight; the licence is in `DS1/x-icon/Tabler-LICENSE.md`. `google` and `apple` keep their own drawings.
+
 ## Source collection
 
 The reference is Figma file `XAnoaRoq9LxVAHUZgtdO0r`, frame `403:4105`. Its 72 original SVGs, less the three panel icons since removed as unused (`panel`, `pleft`, `pright`), are stored in `website/public/icons/interface/`; metadata is in `website/src/lib/icons/figma-interface.json`. These assets preserve the original Figma icon coordinates, transforms, and clipping in their 16-unit frames. The export renderer’s page background and purple component-set boundary were removed; the icon layers were not redrawn. Existing additions with smaller bounds are centred without changing their paths. `note-page` and `title-text` distinguish identically named Figma components.
