@@ -519,6 +519,172 @@ export function scriptDrawings(file: string, source: string): { line: number; sv
 }
 
 // ---------------------------------------------------------------------------
+// React icon components: an app's own icon set, recognised by its shape.
+
+/** What one export of an icon set draws: a DS1 icon through ds-icon, or its own SVG. */
+export type IconExport = { kind: "ds1"; type: string } | { kind: "svg"; name?: string };
+const PASCAL = /^[A-Z][A-Za-z0-9]*$/;
+/** At least this many exported components drawing an icon make a module an icon set. */
+const ICON_SET_SIZE = 5;
+/**
+ * The app's own icon components, read from the modules its files import.
+ * A module is an icon set when it exports many components that each draw
+ * an `<svg>` (a set converted locally) or render `ds-icon` with a literal
+ * type, directly or through a factory such as `createIcon("X", "close")`.
+ * Names alone never make a module an icon set.
+ */
+export class IconComponents {
+  private sets = new Map<string, Map<string, IconExport> | null>();
+  private asts = new Map<string, ts.SourceFile | null>();
+  constructor(readonly root: string) {}
+  private ast(path: string): ts.SourceFile | null {
+    if (!this.asts.has(path)) this.asts.set(path, /\.[cm]?[jt]sx?$/.test(path) && isFile(join(this.root, path)) ? parsed(path, readFileSync(join(this.root, path), "utf8")) : null);
+    return this.asts.get(path)!;
+  }
+  /** A relative or `@/` import, resolved to a tracked module path. */
+  resolve(from: string, specifier: string): string | undefined {
+    if (!specifier.startsWith(".") && !specifier.startsWith("@/")) return undefined;
+    const base = posix.normalize(specifier.startsWith("@/") ? posix.join("src", specifier.slice(2)) : posix.join(posix.dirname(from), specifier));
+    if (base.startsWith("..")) return undefined;
+    const stem = base.replace(/\.[cm]?[jt]sx?$/, "");
+    return [base, ...[".ts", ".tsx", ".js", ".jsx"].map(ext => stem + ext), ...["index.ts", "index.tsx", "index.js"].map(index => posix.join(base, index))].find(path => isFile(join(this.root, path)));
+  }
+  /** How a function creates `ds-icon` (the parameter that becomes its type, or a literal) or an `<svg>`. */
+  private draws(fn: ts.Node, params: readonly ts.ParameterDeclaration[] = []): { type?: string; param?: number; svg?: boolean } | null {
+    let found: { type?: string; param?: number; svg?: boolean } | null = null;
+    const typeOf = (value: ts.Node | undefined, name?: string) => {
+      if (value && ts.isStringLiteralLike(value)) return { type: value.text };
+      const identifier = value && ts.isIdentifier(value) ? value.text : name;
+      const index = params.findIndex(param => ts.isIdentifier(param.name) && param.name.text === identifier);
+      return index >= 0 ? { param: index } : null;
+    };
+    const visit = (node: ts.Node) => {
+      if (found?.type !== undefined || found?.param !== undefined) return;
+      if (ts.isJsxOpeningLikeElement(node)) {
+        const tag = node.tagName.getText();
+        if (tag === "svg") found ??= { svg: true };
+        if (tag === "ds-icon") for (const attr of node.attributes.properties) {
+          if (ts.isJsxAttribute(attr) && attr.name.getText() === "type") found = (attr.initializer && ts.isStringLiteral(attr.initializer) ? { type: attr.initializer.text } : attr.initializer && ts.isJsxExpression(attr.initializer) ? typeOf(attr.initializer.expression) : null) ?? found;
+        }
+      }
+      if (ts.isCallExpression(node) && node.arguments[0] && ts.isStringLiteralLike(node.arguments[0])) {
+        const tag = node.arguments[0].text;
+        if (tag === "svg") found ??= { svg: true };
+        const props = node.arguments[1];
+        if (tag === "ds-icon" && props && ts.isObjectLiteralExpression(props)) for (const property of props.properties) {
+          if (ts.isShorthandPropertyAssignment(property) && property.name.text === "type") found = typeOf(undefined, "type") ?? found;
+          if (ts.isPropertyAssignment(property) && property.name.getText() === "type") found = typeOf(property.initializer) ?? found;
+        }
+      }
+      ts.forEachChild(node, visit);
+    };
+    visit(fn);
+    return found;
+  }
+  /** The function a factory call names: declared in the module or imported from another one. */
+  private factory(path: string, ast: ts.SourceFile, name: string, depth = 0): ts.SignatureDeclaration | undefined {
+    for (const statement of ast.statements) {
+      if (ts.isFunctionDeclaration(statement) && statement.name?.text === name) return statement;
+      if (ts.isVariableStatement(statement)) for (const declaration of statement.declarationList.declarations) {
+        if (ts.isIdentifier(declaration.name) && declaration.name.text === name && declaration.initializer && (ts.isArrowFunction(declaration.initializer) || ts.isFunctionExpression(declaration.initializer))) return declaration.initializer;
+      }
+      if (depth < 3 && ts.isImportDeclaration(statement) && ts.isStringLiteral(statement.moduleSpecifier) && statement.importClause?.namedBindings && ts.isNamedImports(statement.importClause.namedBindings)) {
+        const binding = statement.importClause.namedBindings.elements.find(element => element.name.text === name);
+        const module = binding && this.resolve(path, statement.moduleSpecifier.text);
+        const target = module && this.ast(module);
+        if (module && target) return this.factory(module, target, (binding!.propertyName ?? binding!.name).text, depth + 1);
+      }
+    }
+    return undefined;
+  }
+  private classify(path: string, ast: ts.SourceFile, init: ts.Expression): IconExport | undefined {
+    if (ts.isCallExpression(init)) {
+      const callee = init.expression.getText();
+      if (/^(?:React\.)?(?:forwardRef|memo)$/.test(callee)) return init.arguments[0] ? this.classify(path, ast, init.arguments[0]) : undefined;
+      const fn = ts.isIdentifier(init.expression) ? this.factory(path, ast, init.expression.text) : undefined;
+      const drawn = fn ? this.draws(fn, fn.parameters) : null;
+      if (drawn?.param !== undefined) { const arg = init.arguments[drawn.param]; return arg && ts.isStringLiteralLike(arg) && NAME.test(arg.text) ? { kind: "ds1", type: arg.text } : undefined; }
+      if (drawn?.type) return { kind: "ds1", type: drawn.type };
+      // A factory from a package that is handed path data, as a converted set does.
+      if (drawn?.svg || (!fn && init.arguments.some(arg => ts.isArrayLiteralExpression(arg) && /["']path["']|\bd\s*:/.test(arg.getText())))) return { kind: "svg" };
+      return undefined;
+    }
+    if (ts.isArrowFunction(init) || ts.isFunctionExpression(init)) {
+      const drawn = this.draws(init);
+      return drawn?.type ? { kind: "ds1", type: drawn.type } : drawn?.svg ? { kind: "svg" } : undefined;
+    }
+    return undefined;
+  }
+  /** The module's own icon components, when there are enough of them to call it an icon set. */
+  iconSet(path: string): Map<string, IconExport> | null {
+    if (this.sets.has(path)) return this.sets.get(path)!;
+    const ast = this.ast(path);
+    const found = new Map<string, IconExport>();
+    const aliases: [string, string][] = [];
+    const exported = (node: ts.Node) => ts.canHaveModifiers(node) && ts.getModifiers(node)?.some(modifier => modifier.kind === ts.SyntaxKind.ExportKeyword);
+    for (const statement of ast?.statements ?? []) {
+      if (ts.isVariableStatement(statement) && exported(statement)) for (const declaration of statement.declarationList.declarations) {
+        if (!ts.isIdentifier(declaration.name) || !PASCAL.test(declaration.name.text) || !declaration.initializer) continue;
+        if (ts.isIdentifier(declaration.initializer)) { aliases.push([declaration.name.text, declaration.initializer.text]); continue; }
+        const icon = this.classify(path, ast!, declaration.initializer);
+        if (icon) found.set(declaration.name.text, icon.kind === "svg" ? { kind: "svg", name: declaration.name.text } : icon);
+      }
+      if (ts.isFunctionDeclaration(statement) && exported(statement) && statement.name && PASCAL.test(statement.name.text)) {
+        const drawn = this.draws(statement);
+        if (drawn?.type || drawn?.svg) found.set(statement.name.text, drawn.type ? { kind: "ds1", type: drawn.type } : { kind: "svg", name: statement.name.text });
+      }
+    }
+    const set = found.size >= ICON_SET_SIZE ? found : null;
+    for (const [alias, target] of aliases) if (set?.has(target)) set.set(alias, set.get(target)!);
+    this.sets.set(path, set);
+    return set;
+  }
+  /** What an imported name draws, following re-exports (`export *`, `export { X } from`) to the icon set. */
+  lookup(path: string | undefined, name: string, depth = 0): IconExport | undefined {
+    if (!path || depth > 4) return undefined;
+    const own = this.iconSet(path)?.get(name);
+    if (own) return own;
+    for (const statement of this.ast(path)?.statements ?? []) {
+      if (!ts.isExportDeclaration(statement) || statement.isTypeOnly || !statement.moduleSpecifier || !ts.isStringLiteral(statement.moduleSpecifier)) continue;
+      const module = this.resolve(path, statement.moduleSpecifier.text);
+      if (!statement.exportClause) { const found = this.lookup(module, name, depth + 1); if (found) return found; }
+      else if (ts.isNamedExports(statement.exportClause)) for (const element of statement.exportClause.elements) {
+        if (element.name.text === name) return this.lookup(module, (element.propertyName ?? element.name).text, depth + 1);
+      }
+    }
+    return undefined;
+  }
+  /** JSX uses in one file of components imported from an icon set. */
+  uses(file: string, source: string): { component: string; icon: IconExport; line: number }[] {
+    if (!/\.[cm]?[jt]sx?$/.test(file)) return [];
+    const ast = parsed(file, source);
+    const at = lines(source);
+    const imported = new Map<string, { name: string; icon: IconExport }>();
+    for (const statement of ast.statements) {
+      if (!ts.isImportDeclaration(statement) || statement.importClause?.isTypeOnly || !ts.isStringLiteral(statement.moduleSpecifier)) continue;
+      const bindings = statement.importClause?.namedBindings;
+      if (!bindings || !ts.isNamedImports(bindings)) continue;
+      const module = this.resolve(file, statement.moduleSpecifier.text);
+      if (!module) continue;
+      for (const element of bindings.elements) {
+        if (element.isTypeOnly) continue;
+        const name = (element.propertyName ?? element.name).text;
+        const icon = this.lookup(module, name);
+        if (icon) imported.set(element.name.text, { name, icon });
+      }
+    }
+    if (!imported.size) return [];
+    const found: { component: string; icon: IconExport; line: number }[] = [];
+    const visit = (node: ts.Node) => {
+      if (ts.isJsxOpeningLikeElement(node)) { const use = imported.get(node.tagName.getText()); if (use) found.push({ component: use.name, icon: use.icon, line: at(node.getStart()) }); }
+      ts.forEachChild(node, visit);
+    };
+    visit(ast);
+    return found;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // The app's icons.
 
 /** Where an app's sources and drawings are, for the stylesheets and SVG files the component scan does not read. */
@@ -557,6 +723,7 @@ export function scanIcons(root: string, manifest: string | undefined, files: str
   const copyPath = manifest ? join(dirname(manifest), "2-core/generated/ds-icon-map.ts") : null;
   const copy = copyPath ? readIconMap(join(root, copyPath)) : null;
   const drawings = drawingsOf(ds1);
+  const components = new IconComponents(root);
   const cells: Record<string, IconCell> = {};
   const dynamic: IconSite[] = [];
   const inline: IconSite[] = [];
@@ -632,6 +799,11 @@ export function scanIcons(root: string, manifest: string | undefined, files: str
       if (found) add(found.name, { ...site, drawing: resolved!.path }, "file", found.status);
       // A DS1 drawing named by its path still names the icon when the file is not there.
       else if (!resolved && /(?:^|\/)x-icon\/[a-z0-9-]+\.svg$/.test(use.path)) add(use.name, site, "file");
+    }
+    for (const use of components.uses(file, source)) {
+      const site = { file, line: use.line, name: use.component };
+      if (use.icon.kind === "ds1") add(use.icon.type, site, "component");
+      else { const name = use.icon.name ?? use.component; add(name, site, "component", "local", wellKnown(name)); }
     }
     for (const drawing of scriptDrawings(file, source)) {
       const site = { file, line: drawing.line, name: "createElementNS" };

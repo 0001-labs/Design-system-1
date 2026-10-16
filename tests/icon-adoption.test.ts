@@ -158,3 +158,29 @@ export function badge() {
   expect(icons.cells.close).toMatchObject({ uses: 1, status: "shared", sites: [{ kind: "script", line: 3 }] });
   expect(icons.inline.map(site => [site.kind, site.line])).toEqual([["script", 10], ["script", 15]]);
 });
+
+test("an app's own icon set is recognised by its shape and its components counted at their JSX uses", () => {
+  const svgComponent = (name: string) => `export const ${name} = forwardRef((props, ref) => <svg ref={ref} viewBox="0 0 24 24" {...props}><path d="M1 1L${name.length} 2" /></svg>);`;
+  const root = app({
+    "src/kit/converted.tsx": ["X", "Trash2", "Copy", "ChevronDown", "Sparkle"].map(svgComponent).join("\n") + "\nexport const XIcon = X;",
+    "src/kit/make.tsx": `export function makeIcon(displayName: string, type: string) { return (props) => createElement("ds-icon", { type, ...props }); }`,
+    "src/kit/named.tsx": `import { makeIcon } from "./make.tsx";\n` + ["Close:close", "Star:star", "Up:up", "Down:down", "Plus:plus"].map(pair => `export const ${pair.split(":")[0]} = makeIcon("${pair.split(":")[0]}", "${pair.split(":")[1]}");`).join("\n"),
+    "src/kit/index.ts": `export * from "./converted.tsx";\nexport { Close, Star } from "./named.tsx";`,
+    "src/kit/few.tsx": ["A", "B", "C"].map(svgComponent).join("\n"),
+    "src/kit/panels.tsx": ["One", "Two", "Three", "Four", "Five"].map(name => `export const ${name} = () => <div>${name}</div>;`).join("\n"),
+    "src/app.tsx": `import { XIcon, Trash2, Close } from "@/kit";
+import { Up } from "./kit/named";
+import { A } from "./kit/few";
+import { One } from "./kit/panels";
+import type { Star } from "./kit/named";
+export const App = () => <><XIcon /><Trash2 size={16} /><Close /><Up /><A /><One /><Trash2 /></>;`,
+  });
+  const icons = scanIcons(root, undefined, ["src/app.tsx"], ds1Drawings);
+  expect(icons.cells.X).toMatchObject({ uses: 1, status: "local", ds1: "close", sites: [{ kind: "component", name: "XIcon" }] });
+  expect(icons.cells.Trash2).toMatchObject({ uses: 2, status: "local" });
+  // DS1 has no delete drawing in this fixture, so no DS1 icon is suggested.
+  expect(icons.cells.Trash2!.ds1).toBeUndefined();
+  expect(icons.cells.close).toMatchObject({ uses: 1, status: "shared", sites: [{ kind: "component", name: "Close" }] });
+  expect(icons.cells.up).toMatchObject({ uses: 1, sites: [{ kind: "component" }] });
+  expect(Object.keys(icons.cells).sort()).toEqual(["Trash2", "X", "close", "up"]);
+});
