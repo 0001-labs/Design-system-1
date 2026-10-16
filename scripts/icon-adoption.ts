@@ -189,7 +189,7 @@ export function styleIconUrls(text: string): { uses: StyleUse[]; consumed: Set<s
   const uses: StyleUse[] = [];
   const consumed = new Set<string>();
   const declarations = [
-    ...[...source.matchAll(/(?<![\w-])(-webkit-mask-image|-webkit-mask|mask-image|mask|background-image|background|WebkitMaskImage|WebkitMask|maskImage|backgroundImage|--[\w-]+)\s*:\s*([^;{}]*)/g)].map(match => ({ property: match[1]!, value: match[2]!, index: match.index! })),
+    ...[...source.matchAll(/(?<![\w-])(-webkit-mask-image|-webkit-mask|mask-image|mask|background-image|background|WebkitMaskImage|WebkitMask|maskImage|backgroundImage|--[\w-]+)\s*:\s*((?:\$\{[^}]*\}|[^;{}])*)/g)].map(match => ({ property: match[1]!, value: match[2]!, index: match.index! })),
     ...[...source.matchAll(/\.setProperty\(\s*["'](--[\w-]+)["']\s*,\s*(["'`])((?:(?!\2)[\s\S])*)\2/g)].map(match => ({ property: match[1]!, value: match[3]!, index: match.index! })),
   ];
   for (const { property, value, index } of declarations) {
@@ -758,6 +758,8 @@ export function scanIcons(root: string, manifest: string | undefined, files: str
   // A custom property counts where a mask or background reads it; DS1's .ds-icon reads --ds-icon.
   const consumed = new Set(["--ds-icon", ...cssUses.flatMap(use => [...use.consumed])]);
   const reference = (file: string, url: string, line: number, kind: IconKind) => {
+    // A file named by an expression is a dynamic use, its icon unknown.
+    if (url.includes("${") && /\.svg(?:[?#]|$)/i.test(url)) { dynamic.push({ file, line, name: "url()", kind, status: "local" }); return; }
     const data = dataSvg(url);
     if (data !== null) {
       const match = drawings.match(data);

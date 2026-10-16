@@ -74,8 +74,9 @@ test("CSS masks and backgrounds name the drawing they point at", () => {
 .g { mask: url("data:image/svg+xml,${encodeURIComponent(close)}"); }
 .h { mask: url("data:image/svg+xml,${encodeURIComponent(`<svg viewBox="0 0 8 8"><path d="M0 0L8 8"/></svg>`)}"); }`,
     "src/page.html": `<span style="mask: url(&quot;icons/close.svg&quot;)"></span><img src="./icons/star.svg" alt="">`,
+    "src/icon.ts": "export const icon = name => html`<span style=\"--ds-icon: url(/icons/${FILES[name]}.svg)\"></span>`;",
   });
-  const icons = scanIcons(root, undefined, ["src/app.css", "src/page.html"], ds1Drawings);
+  const icons = scanIcons(root, undefined, ["src/app.css", "src/page.html", "src/icon.ts"], ds1Drawings);
   expect(icons.cells.close).toMatchObject({ uses: 4, status: "shared" });
   expect(icons.cells.close!.sites.map(site => [site.line, site.kind, site.drawing ?? ""])).toEqual([[1, "mask", "src/icons/close.svg"], [7, "mask", "src/icons/close-copy.svg"], [8, "mask", "data:"], [1, "mask", "src/icons/close.svg"]]);
   // A file named after a DS1 icon that is not its drawing needs the DS1 drawing.
@@ -85,6 +86,7 @@ test("CSS masks and backgrounds name the drawing they point at", () => {
   // Unread custom properties and pictures are not icons; an inline drawing that is not DS1's is counted apart.
   expect(Object.keys(icons.cells).sort()).toEqual(["close", "own", "star"]);
   expect(icons.inline).toMatchObject([{ line: 9, kind: "mask" }]);
+  expect(icons.dynamic).toMatchObject([{ file: "src/icon.ts", kind: "mask" }]);
 });
 
 test("SVG imports and root paths resolve to the tracked file they name", () => {
