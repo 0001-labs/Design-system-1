@@ -137,6 +137,7 @@ export function ComponentMatrix({ report }: { report: AdoptionReport }) {
       <ul>{report.method.map(rule => <li key={rule}>{rule}</li>)}</ul>
       <p>Refresh the source snapshot with <code>vp run reports:scan</code>; publish it with <code>vp run reports:upload</code>. Reloading this page only reads the last published snapshot.</p>
       {available.some(app => Object.keys(app.otherCustomElements).length > 0) && <details><summary>Custom elements outside this component catalogue</summary>{available.map(app => <p key={app.id}><strong>{app.name}</strong>: {Object.entries(app.otherCustomElements).map(([tag, n]) => `${tag} (${n})`).join(", ") || "None"}</p>)}</details>}
+      {available.some(app => Object.keys(app.sharedParts ?? {}).length > 0 || (app.gaps?.range?.length ?? 0) > 0) && <details><summary>Shared parts and known gaps</summary><p>Shared parts are custom elements copied from a studio part, not product-local; a Sync 1 lock that matches the copy is named. Ranges (range inputs and slider roles) have no DS1 column yet.</p>{available.map(app => <p key={app.id}><strong>{app.name}</strong>: {[...Object.entries(app.sharedParts ?? {}).map(([tag, part]) => `${tag} (${part.uses}${part.lock ? `, ${part.lock} lock` : ""})`), ...(app.gaps?.range?.length ? [`ranges (${app.gaps.range.length})`] : [])].join(", ") || "None"}</p>)}</details>}
     </details>
   </>;
 }
