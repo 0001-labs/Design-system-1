@@ -11,6 +11,9 @@ const languageFiles = ['i18n.ts', 'languages.ts', 'language-routing.ts', 'transl
 
 export default {
   exports: {
+    library: {
+      files({ read }) { return { 'library-styles.ts': read('DS1/0-face/library-styles.ts') }; },
+    },
     /** Optional display faces, copied as local assets by consumers. */
     fonts: {
       files({ read, options }) {
