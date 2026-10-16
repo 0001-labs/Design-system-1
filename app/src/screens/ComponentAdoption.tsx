@@ -1,5 +1,5 @@
 import { useAuthActions, useAuthToken } from "@convex-dev/auth/react";
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { totalSites, type AdoptionReport, type ComponentCell } from "../../../shared/component-adoption";
 import "../../../DS1/2-core/ds-button";
 import "../../../DS1/1-root/component-tokens.css";
@@ -54,6 +54,7 @@ export function ComponentMatrix({ report }: { report: AdoptionReport }) {
   const [showEmpty, setShowEmpty] = useState(false);
   const [selection, setSelection] = useState<{ app: string; component: string } | null>(null);
   const [limit, setLimit] = useState(100);
+  const appGroups = [...new Set(report.apps.map(app => app.group ?? "Products"))];
   const available = report.apps.filter(app => app.status === "scanned");
   const columns = report.columns.filter(column => showEmpty || available.some(app => totalSites(app.cells[column.id]!) > 0));
   const groups = [...new Set(columns.map(column => column.group))];
@@ -65,8 +66,8 @@ export function ComponentMatrix({ report }: { report: AdoptionReport }) {
   const needsReview = available.reduce((sum, app) => sum + Object.values(app.cells).reduce((n, c) => n + c.unverified, 0), 0);
   const priorities = useMemo(() => ["button", "input", "tooltip", "tabs", "text"].map(id => ({
     column: report.columns.find(c => c.id === id)!,
-    apps: report.apps.filter(a => a.status === "scanned" && a.cells[id]!.local > 0),
-    total: report.apps.reduce((sum, a) => sum + (a.cells[id]?.local ?? 0), 0),
+    apps: report.apps.filter(a => a.status === "scanned" && a.migration !== "deferred" && (a.cells[id]?.local ?? 0) > 0),
+    total: report.apps.filter(a => a.migration !== "deferred").reduce((sum, a) => sum + (a.cells[id]?.local ?? 0), 0),
   })).filter(row => row.total > 0).slice(0, 3), [report]);
   const scannedAt = new Date(report.generatedAt);
   const old = Date.now() - scannedAt.getTime() > 7 * 24 * 60 * 60 * 1000;
@@ -81,14 +82,17 @@ export function ComponentMatrix({ report }: { report: AdoptionReport }) {
       <label><input type="checkbox" checked={showEmpty} onChange={event => setShowEmpty(event.target.checked)} /> Show unused components</label>
     </div>
     <div className="adoption-scroll" tabIndex={0} role="region" aria-label="Component adoption matrix, scroll horizontally for more components">
-      <table className="adoption-matrix">
+      <table className="adoption-matrix" style={{ width: `calc(${columns.length + 12} * var(--report-unit))` }}>
         <caption className="adoption-sr">{views.find(v => v.id === view)!.name} by app and component. Counts are source sites.</caption>
+        <colgroup><col style={{ width: "calc(8 * var(--report-unit))" }} />{columns.map(column => <col key={column.id} style={{ width: "var(--report-unit)" }} />)}<col style={{ width: "calc(4 * var(--report-unit))" }} /></colgroup>
         <thead>
-          <tr className="adoption-groups"><th className="adoption-app-column" /><>{groups.map(group => <th key={group} colSpan={columns.filter(c => c.group === group).length} className={`group-${group.toLowerCase()}`} scope="colgroup">{group}</th>)}</><th /></tr>
+          <tr className="adoption-groups"><th className="adoption-app-column" /><>{groups.map(group => <th key={group} colSpan={columns.filter(c => c.group === group).length} style={{ width: `calc(${columns.filter(c => c.group === group).length} * var(--report-unit))` }} className={`group-${group.toLowerCase()}`} scope="colgroup">{group}</th>)}</><th /></tr>
           <tr className="adoption-column-names"><th className="adoption-app-column" scope="col">App</th>{columns.map(column => <th key={column.id} scope="col" className={`group-${column.group.toLowerCase()}`}><span>{column.name}</span></th>)}<th className="adoption-total" scope="col">Total</th></tr>
         </thead>
-        <tbody>{report.apps.map(app => <tr key={app.id}>
-          <th className="adoption-app-column" scope="row">{app.name}</th>
+        <tbody>{appGroups.map(appGroup => <Fragment key={appGroup}>
+          <tr className="adoption-app-group"><th colSpan={columns.length + 2} scope="rowgroup">{appGroup}</th></tr>
+          {report.apps.filter(app => (app.group ?? "Products") === appGroup).map(app => <tr key={app.id}>
+          <th className="adoption-app-column" scope="row">{app.name}{app.migration === "deferred" && <span className="adoption-deferred"> · Deferred</span>}</th>
           {columns.map(column => {
             const cell = app.cells[column.id];
             if (app.status !== "scanned" || !cell) return <td key={column.id} className="unavailable" aria-label={`${app.name}, ${column.name}: not scanned`}>?</td>;
@@ -96,7 +100,8 @@ export function ComponentMatrix({ report }: { report: AdoptionReport }) {
             return <td key={column.id} className={cellClass(cell, view)}><button type="button" aria-label={`${app.name}, ${column.name}: ${cell.shared} DS1 components, ${cell.styled} DS1 styles, ${cell.local} local, ${cell.unverified} need review`} aria-pressed={selection?.app === app.id && selection.component === column.id} onClick={() => { setSelection({ app: app.id, component: column.id }); setLimit(100); }}>{n || "–"}</button></td>;
           })}
           <td className="adoption-total">{app.status === "scanned" ? Object.values(app.cells).reduce((sum, cell) => sum + count(cell, view), 0) : "?"}</td>
-        </tr>)}</tbody>
+        </tr>)}
+        </Fragment>)}</tbody>
         <tfoot>{([ ["shared", "DS1 components"], ["styled", "DS1 styles"], ["local", "Local uses"], ["unverified", "Needs review"] ] as const).map(([kind, name]) => <tr key={kind}>
           <th className="adoption-app-column" scope="row">{name}</th>{columns.map(column => <td key={column.id} className={totals(column.id, kind) ? kind : "empty"}>{totals(column.id, kind) || "–"}</td>)}<td className="adoption-total">{report.columns.reduce((sum, col) => sum + totals(col.id, kind), 0)}</td>
         </tr>)}</tfoot>
@@ -108,6 +113,7 @@ export function ComponentMatrix({ report }: { report: AdoptionReport }) {
 
     {selected && selectedApp && selectedColumn ? <section className="adoption-detail" aria-label="Selected component" aria-live="polite">
       <div className="adoption-detail-heading"><h2>{selectedApp.name} · {selectedColumn.name}</h2><ds-button onClick={() => setSelection(null)}>Close details</ds-button></div>
+      {selectedApp.migrationReason && <p>{selectedApp.migrationReason}</p>}
       <p>{selected.shared} DS1 components · {selected.styled} native controls with DS1 styles · {selected.local} local · {selected.unverified} need review. {selected.snapshot === "verified" ? selected.current ? "The shared component copy matches the current DS1 source." : "The shared component copy matches its recorded DS1 revision; a newer source is available." : selected.snapshot === "none" ? "No verified DS1 Lit component snapshot is recorded for this component." : "The DS1 copy could not be fully verified."}</p>
       {selected.issues.length > 0 && <ul>{selected.issues.map(issue => <li key={issue}>{issue}</li>)}</ul>}
       {sites.length ? <><p className="adoption-meta">{sites.length} {view === "all" ? "source sites" : views.find(v => v.id === view)!.name.toLowerCase() + " sites"}. Paths are relative to {selectedApp.name}.</p>
@@ -118,7 +124,7 @@ export function ComponentMatrix({ report }: { report: AdoptionReport }) {
     <section className="adoption-next"><h2>Next to consolidate</h2>
       {needsReview > 0 && <p>Verify the {needsReview} DS1 uses marked for review before treating them as shared. Open a cell to see which files differ or lack source evidence.</p>}
       <ol>{priorities.map(row => <li key={row.column.id}><strong>{row.column.name}</strong> · {row.total} local sites across {row.apps.map(a => a.name).join(", ")}. Inspect the local view and move common behavior into DS1.</li>)}</ol>
-      <p className="adoption-meta">These are consolidation leads. Native HTML can be intentional; inspect its role before replacing it.</p>
+      <p className="adoption-meta">These are consolidation leads. Native HTML can be intentional; inspect its role before replacing it. Apps marked Deferred remain measured but are excluded from migration recommendations.</p>
     </section>
     <details className="adoption-method"><summary>Source snapshots and counting rules</summary>
       <p>DS1 reference: <code>{report.sourceCommit.slice(0, 10)}</code>{report.sourceDirty ? " + working changes" : ""}. This snapshot describes local source, not what is deployed.</p>

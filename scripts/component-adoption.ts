@@ -4,21 +4,26 @@ import { existsSync, readFileSync, mkdirSync, writeFileSync, statSync } from "no
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import ts from "typescript";
-import { COMPONENT_COLUMNS, type AdoptionApp, type AdoptionReport, type ComponentCell, type UsageSite } from "../shared/component-adoption";
+import { COMPONENT_COLUMNS, IMPLEMENTATION_COLUMNS, catalogueApp, type AdoptionApp, type AdoptionReport, type ComponentCell, type UsageSite } from "../shared/component-adoption";
 
 const repository = fileURLToPath(new URL("../", import.meta.url));
 const hash = (body: string | Buffer) => createHash("sha256").update(body).digest("hex");
 const git = (root: string, ...args: string[]) => execFileSync("git", args, { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], maxBuffer: 20_000_000 }).trim();
 export const excluded = /^(?:(?:client|src|web)\/)?(?:design|ds1)\/|^src\/pages\/design\/|(?:^|\/)(?:vendor|signIn|_generated|generated|node_modules|dist|__surface|surface|design-lab|designLab|dev|experiments|previews|__tests__|tests|test|fixtures|stories)(?:\/|$)|(?:\.test|\.spec|\.stories|\.d)\.[^.]+$/i;
 
-export interface AppSpec { id: string; name: string; directory: string; roots: string[]; manifest?: string }
-export const APPS: AppSpec[] = [
-  { id: "ezo", name: "Ezo", directory: "Ezo", roots: ["client"], manifest: "client/design/components-manifest.json" },
-  { id: "music", name: "Music", directory: "Music", roots: ["web"], manifest: "web/ds1/components-manifest.json" },
-  { id: "link", name: "Link", directory: "Link", roots: ["client", "src"], manifest: "shared/ds1/components-manifest.json" },
-  { id: "consistency", name: "Consistency", directory: "Consistency", roots: ["src"], manifest: "src/design/components-manifest.json" },
-];
-const known = new Set(COMPONENT_COLUMNS.map(c => c.id));
+export interface AppSpec { id: string; name: string; directory: string; roots: string[]; manifest?: string; group?: "Products" | "Clients"; excludes?: string[]; migration?: "deferred"; migrationReason?: string }
+/** The studio owns product names and scan scope; the reusable scanner owns recognition. */
+export function loadAppSpecs(studio: string): AppSpec[] {
+  const config = JSON.parse(readFileSync(join(studio, "0001/server/component-adoption.config.json"), "utf8")) as { apps: AppSpec[] };
+  if (!Array.isArray(config.apps) || !config.apps.length) throw new Error("The studio adoption configuration has no apps.");
+  const ids = new Set<string>();
+  for (const app of config.apps) {
+    if (!app.id || ids.has(app.id) || !app.name || !app.directory || !app.roots?.length || [app.directory, ...app.roots].some(path => path.startsWith("/") || path.split("/").includes(".."))) throw new Error("Invalid or duplicate adoption app scope.");
+    ids.add(app.id);
+  }
+  return config.apps;
+}
+const known = new Set(IMPLEMENTATION_COLUMNS.map(c => c.id));
 const native: Record<string, string> = { button: "button", input: "input", select: "select", textarea: "textarea", p: "text", h1: "text", h2: "text", h3: "text", h4: "text", h5: "text", h6: "text", ul: "list", ol: "list", table: "table", form: "form", dialog: "dialog" };
 type TagSite = { tag: string; line: number; nativeStyle?: string; dialogRole?: boolean; controlKind?: "checkbox" | "radio" | "switch" | "color" | "file-picker" };
 function nativeStyle(tag: string, className: string): string | undefined {
@@ -70,11 +75,15 @@ export function sourceSites(file: string, source: string): TagSite[] {
   }
   const ast = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, /x$/.test(file) ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
   const reactFactories = new Set<string>();
+  const domFactories = new Set<string>();
   for (const statement of ast.statements) {
-    if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier) || statement.moduleSpecifier.text !== "react") continue;
+    if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier)) continue;
+    const module = statement.moduleSpecifier.text;
+    if (module !== "react" && !/(?:^|\/)dom(?:\.[cm]?[jt]s)?$/.test(module)) continue;
     const bindings = statement.importClause?.namedBindings;
     if (bindings && ts.isNamedImports(bindings)) for (const binding of bindings.elements) {
-      if ((binding.propertyName ?? binding.name).text === "createElement") reactFactories.add(binding.name.text);
+      if (module === "react" && (binding.propertyName ?? binding.name).text === "createElement") reactFactories.add(binding.name.text);
+      if (module !== "react" && (binding.propertyName ?? binding.name).text === "h") domFactories.add(binding.name.text);
     }
   }
   // A direct, const DOM append is evidence that the native control is the
@@ -151,9 +160,18 @@ export function sourceSites(file: string, source: string): TagSite[] {
       const controlKind = roleValue && ts.isStringLiteral(roleValue) && roleValue.text === "switch" ? "switch" : tag === "input" && typeValue && ts.isStringLiteral(typeValue) && typeValue.text === "checkbox" ? "checkbox" : tag === "input" && typeValue && ts.isStringLiteral(typeValue) && typeValue.text === "radio" ? "radio" : tag === "input" && typeValue && ts.isStringLiteral(typeValue) && typeValue.text === "color" ? "color" : tag === "input" && typeValue && ts.isStringLiteral(typeValue) && typeValue.text === "file" ? "file-picker" : undefined;
       if (!sharedFrame) found.push({ tag, line: line(node.getStart(ast)), nativeStyle: nativeStyle(tag, className), ...(dialogRole ? { dialogRole: true } : {}), ...(controlKind ? { controlKind } : {}) });
     }
-    if (ts.isCallExpression(node) && ((ts.isPropertyAccessExpression(node.expression) && ["createElement", "createElementNS"].includes(node.expression.name.text)) || (ts.isIdentifier(node.expression) && reactFactories.has(node.expression.text)))) {
+    if (ts.isCallExpression(node) && ((ts.isPropertyAccessExpression(node.expression) && ["createElement", "createElementNS"].includes(node.expression.name.text)) || (ts.isIdentifier(node.expression) && (reactFactories.has(node.expression.text) || domFactories.has(node.expression.text))))) {
       const arg = node.arguments[ts.isPropertyAccessExpression(node.expression) && node.expression.name.text === "createElementNS" ? 1 : 0];
-      if (arg && ts.isStringLiteralLike(arg) && !frames.has(node)) found.push({ tag: arg.text, line: line(arg.getStart(ast)), ...(styledButtons.has(node) ? { nativeStyle: nativeStyle(arg.text, "ds-button") } : {}) });
+      if (arg && ts.isStringLiteralLike(arg) && !frames.has(node)) {
+        const props = node.arguments[1];
+        const strings: Record<string, string> = {};
+        if (props && ts.isObjectLiteralExpression(props)) for (const property of props.properties) {
+          if (ts.isPropertyAssignment(property) && property.name && ts.isStringLiteralLike(property.initializer)) strings[property.name.getText(ast).replace(/["']/g, "")] = property.initializer.text;
+        }
+        const controlKind = strings.role === "switch" ? "switch" : arg.text === "input" && ["checkbox", "radio", "color", "file"].includes(strings.type ?? "") ? strings.type === "file" ? "file-picker" : strings.type as "checkbox" | "radio" | "color" : undefined;
+        const style = styledButtons.has(node) ? nativeStyle(arg.text, "ds-button") : nativeStyle(arg.text, strings.className ?? strings.class ?? "");
+        found.push({ tag: arg.text, line: line(arg.getStart(ast)), ...(style ? { nativeStyle: style } : {}), ...(controlKind ? { controlKind } : {}) });
+      }
     }
     if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression) && node.expression.name.text === "setAttribute") {
       const [name, value] = node.arguments;
@@ -178,7 +196,7 @@ function emptyCell(): ComponentCell { return { shared: 0, styled: 0, local: 0, u
 interface Manifest { commit: string; components: string[]; files: Record<string, string> }
 
 export function checkSnapshots(root: string, manifestPath: string | undefined, dsRoot: string): { commit: string | null; cells: Record<string, ComponentCell>; controls: ComponentCell; reactInput: ComponentCell; reactButton: ComponentCell; reactDialog: ComponentCell; reactChoice: ComponentCell; reactSplit: ComponentCell; reactComposer: ComponentCell; reactMenu: ComponentCell; reactAccordion: ComponentCell; reactAvatar: ComponentCell; reactAvatarGroup: ComponentCell; reactToken: ComponentCell; reactFilePicker: ComponentCell; reactContextMenu: ComponentCell; reactBadge: ComponentCell } {
-  const cells = Object.fromEntries(COMPONENT_COLUMNS.map(c => [c.id, emptyCell()]));
+  const cells = Object.fromEntries(IMPLEMENTATION_COLUMNS.map(c => [c.id, emptyCell()]));
   const controls = emptyCell();
   const reactInput = emptyCell();
   const reactButton = emptyCell();
@@ -332,14 +350,14 @@ function importedAdapters(root: string, file: string, source: string): Record<st
 
 export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): AdoptionApp {
   const root = join(studio, spec.directory);
-  const app: AdoptionApp = { id: spec.id, name: spec.name, status: "unavailable", commit: null, dirty: false, files: 0, scope: spec.roots, snapshotCommit: null, cells: {}, otherCustomElements: {} };
+  const app: AdoptionApp = { id: spec.id, name: spec.name, status: "unavailable", commit: null, dirty: false, files: 0, scope: spec.roots, snapshotCommit: null, cells: {}, otherCustomElements: {}, group: spec.group ?? "Products", ...(spec.migration ? { migration: spec.migration, migrationReason: spec.migrationReason } : {}) };
   try {
     app.commit = git(root, "rev-parse", "HEAD");
     app.dirty = Boolean(git(root, "status", "--porcelain"));
     const snapshots = checkSnapshots(root, spec.manifest, dsRoot);
     app.snapshotCommit = snapshots.commit;
     app.cells = snapshots.cells;
-    const files = git(root, "ls-files", "-z", "--", ...spec.roots).split("\0").filter(f => /\.(tsx?|jsx?|mjs|html|astro)$/.test(f) && !excluded.test(f) && existsSync(join(root, f)));
+    const files = git(root, "ls-files", "-z", "--", ...spec.roots).split("\0").filter(f => /\.(tsx?|jsx?|[cm]js|html|astro)$/.test(f) && !excluded.test(f) && !(spec.excludes ?? []).some(prefix => f === prefix || f.startsWith(prefix + "/")) && existsSync(join(root, f)));
     if (!files.length) throw new Error("No tracked web source was found in the configured scope.");
     for (const file of files) {
       app.files++;
@@ -353,7 +371,8 @@ export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): Ado
       for (const site of sites) {
         if (adapterTags.has(site.tag)) continue;
         const custom = /^(ds|ezo|c9y)-(.+)$/.exec(site.tag);
-        const component = sharedAdapters.has(site.tag) ? sharedAdapters.get(site.tag)!.component : aliases[site.tag] ?? (custom && known.has(custom[2]!) ? custom[2]! : site.dialogRole ? "dialog" : site.controlKind ?? native[site.tag]);
+        const chartPart = custom?.[1] === "ds" && ["bars", "range", "ratio", "spark"].includes(custom[2] ?? "") ? "chart" : undefined;
+        const component = chartPart ?? (sharedAdapters.has(site.tag) ? sharedAdapters.get(site.tag)!.component : aliases[site.tag] ?? (custom && known.has(custom[2]!) ? custom[2]! : site.dialogRole ? "dialog" : site.controlKind ?? native[site.tag]));
         if (!component) {
           if (site.tag.includes("-")) app.otherCustomElements[site.tag] = (app.otherCustomElements[site.tag] ?? 0) + 1;
           continue;
@@ -384,20 +403,22 @@ export function scanReport(studio = resolve(repository, "..")): AdoptionReport {
   return {
     schema: 1, generatedAt: new Date().toISOString(), sourceCommit: git(repository, "rev-parse", "HEAD"), sourceDirty: Boolean(git(repository, "status", "--porcelain")),
     columns: COMPONENT_COLUMNS,
-    apps: APPS.map(app => scanApp(app, studio)),
+    apps: loadAppSpecs(studio).map(app => catalogueApp(scanApp(app, studio))),
     method: [
+      "Names and layers follow the shared DS1 catalogue (Core, Unit and Page). Split compatibility uses are included under Button, and Switch uses under Toggle; original source tags remain in drilldowns. Specialist implementation components retain their source names. Internal Spacing handle and Loading are included in this private audit, not the public picker.",
+      "Products and Clients have separate row groups. Deferred products remain measured but are excluded from migration recommendations. Only configured tracked web roots are scanned; native apps, libraries and film recreations remain outside this report.",
       "Counts are authored source sites in tracked web files, read from the current working tree. A loop counts once. This is not a runtime or production audit; unused tracked source can be included.",
       "DS1 means the component and its imported dependencies match a recorded DS1 Git revision. An older verified snapshot still counts as DS1; the detail view shows whether it matches today's source. Modified or unverifiable DS1 is counted separately.",
       "DS1 styles counts native controls with literal ds-button, ds-input, ds-select or ds-checkbox classes and verified shared control styles. These are not Lit components. Dynamic class expressions are not inferred.",
       "Local means recognized ezo-/c9y- components or native button, input/select/textarea, p/headings, ul/ol, table, form and dialog, plus literal dialog/alertdialog roles, including explicit setAttribute sites. Native semantics can be intentional; these counts are review leads, not automatic defects.",
       "Tests, demos in preview/dev directories, generated files, vendored implementations and shared sign-in internals are excluded. Link's inspected TabPill, TabPillRow and Tooltip/Tooltop adapters and DS1's verified React FilePicker, Input, Textarea, Composer, Menu, ContextMenuContent/SubContent and their Button, Text and FilePicker entries, Checkbox, Radio, Switch, Select, ColorInput, Button, ButtonLink, Token, TokenField, Avatar, Logo, AvatarGroup, Accordion, Split and DialogContent adapters count at imported JSX uses, without counting their inner DS1 tags again.",
-      "Native dialog/input/button/select/textarea children directly inside ds-dialog/ds-file-picker/ds-checkbox/ds-radio/ds-color/ds-switch/ds-select/ds-composer count as their shared frames, not as extra local controls. Literal file, color, checkbox and radio types and switch roles have their own columns; dynamic types stay in Input. Direct const document.createElement plus append composition is also recognized. Other React abstractions, dynamic tag names, CSS-only controls, spans and inline SVGs are not inferred. Native apps are outside this scan. A zero means no recognized source site, not that a capability is absent.",
+      "Native dialog/input/button/select/textarea children directly inside ds-dialog/ds-file-picker/ds-checkbox/ds-radio/ds-color/ds-switch/ds-select/ds-composer count as their shared frames, not as extra local controls. Literal file, color, checkbox and radio types have their own columns; switch roles are grouped as Toggle; dynamic types stay in Input. Direct const document.createElement plus append composition and statically imported h factories from inspected DOM helpers are also recognized. Other React abstractions, dynamic tag names, CSS-only controls, spans and inline SVGs are not inferred. Native apps are outside this scan. A zero means no recognized source site, not that a capability is absent.",
     ],
   };
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const report = scanReport();
+  const report = scanReport(process.env.ADOPTION_STUDIO_ROOT ?? resolve(repository, ".."));
   const output = join(repository, ".reports/component-adoption.json");
   mkdirSync(dirname(output), { recursive: true });
   writeFileSync(output, JSON.stringify(report, null, 2) + "\n");

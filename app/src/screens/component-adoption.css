@@ -24,28 +24,28 @@
 .adoption-scroll { overflow: auto; padding-right: calc(5 * var(--report-unit)); padding-bottom: var(--report-unit); }
 .adoption table { border-collapse: separate; border-spacing: 0; font-size: inherit; line-height: var(--report-unit); }
 .adoption tr { background: transparent; }
-.adoption-matrix { table-layout: fixed; width: max-content; }
-.adoption-matrix th, .adoption-matrix td { padding: 0; font-weight: 400; text-align: center; }
-.adoption-matrix td { min-width: calc(2 * var(--report-unit)); height: var(--report-unit); box-shadow: inset -1px -1px var(--report-line); font-variant-numeric: tabular-nums; }
+.adoption .adoption-matrix { border-collapse: separate; table-layout: fixed; width: max-content; }
+.adoption-matrix th, .adoption-matrix td { box-sizing: border-box; border: 0; padding: 0; font-weight: 400; text-align: center; }
+.adoption-matrix td { font-size: calc(10px * var(--sf, 1)); width: var(--report-unit); min-width: var(--report-unit); max-width: var(--report-unit); height: var(--report-unit); box-shadow: inset -1px -1px var(--report-line); font-family: var(--typeface-compressed); font-variant-numeric: tabular-nums; }
 .adoption-matrix .adoption-app-column { width: calc(8 * var(--report-unit)); min-width: calc(8 * var(--report-unit)); padding-right: calc(.5 * var(--report-unit)); text-align: right; position: sticky; left: 0; z-index: 2; background: var(--report-paper); }
-.adoption-matrix .adoption-total { min-width: calc(4 * var(--report-unit)); padding-left: calc(.5 * var(--report-unit)); text-align: left; }
+.adoption-matrix .adoption-total { width: calc(4 * var(--report-unit)); max-width: none; min-width: calc(4 * var(--report-unit)); padding-left: calc(.5 * var(--report-unit)); text-align: left; }
 .adoption-groups th { text-align: left; height: var(--report-unit); padding-left: calc(4px * var(--sf, 1)); }
 .adoption-groups .group-core { background: var(--apple-green); color: var(--base-slate); }
-.adoption-groups .group-composites { background: var(--pink); color: var(--base-slate); }
-.adoption-groups .group-layout { background: var(--zenith-blue); color: var(--base-slate); }
+.adoption-groups .group-unit { background: var(--zenith-blue); color: var(--base-slate); }
+.adoption-groups .group-page { background: var(--pink); color: var(--base-slate); }
 .adoption-column-names th { height: calc(7 * var(--report-unit)); position: relative; vertical-align: bottom; }
-.adoption-column-names th:not(.adoption-app-column):not(.adoption-total) { width: calc(2 * var(--report-unit)); min-width: calc(2 * var(--report-unit)); }
+.adoption-column-names th:not(.adoption-app-column):not(.adoption-total) { width: var(--report-unit); min-width: var(--report-unit); max-width: var(--report-unit); }
 .adoption-column-names span { position: absolute; z-index: 1; bottom: calc(.5 * var(--report-unit)); left: calc(.5 * var(--report-unit)); transform: rotate(-48deg); transform-origin: bottom left; white-space: nowrap; }
 .adoption-column-names .group-core { background: color-mix(in srgb, var(--apple-green) 16%, var(--report-paper)); }
-.adoption-column-names .group-composites { background: color-mix(in srgb, var(--pink) 16%, var(--report-paper)); }
-.adoption-column-names .group-layout { background: color-mix(in srgb, var(--zenith-blue) 16%, var(--report-paper)); }
+.adoption-column-names .group-unit { background: color-mix(in srgb, var(--zenith-blue) 16%, var(--report-paper)); }
+.adoption-column-names .group-page { background: color-mix(in srgb, var(--pink) 16%, var(--report-paper)); }
 .adoption .shared { background: color-mix(in srgb, var(--apple-green) 70%, var(--report-paper)); }
 .adoption .styled { background: color-mix(in srgb, var(--zenith-blue) 70%, var(--report-paper)); }
 .adoption .local { background: color-mix(in srgb, var(--pink) 65%, var(--report-paper)); }
 .adoption .unverified { background: color-mix(in srgb, var(--orange) 70%, var(--report-paper)); }
 .adoption .mixed { background: linear-gradient(135deg, color-mix(in srgb, var(--apple-green) 65%, var(--report-paper)) 50%, color-mix(in srgb, var(--pink) 65%, var(--report-paper)) 50%); }
 .adoption .empty, .adoption .unavailable { background: color-mix(in srgb, var(--report-ink) 3%, var(--report-paper)); color: var(--base-darker-grey); }
-.adoption-matrix td button { display: block; width: 100%; height: var(--report-unit); min-height: 0; border: 0; border-radius: 0; padding: 0; background: transparent; color: inherit; font-size: inherit; line-height: var(--report-unit); cursor: pointer; font-variant-numeric: tabular-nums; }
+.adoption-matrix td button { display: block; box-sizing: border-box; width: var(--report-unit); height: var(--report-unit); min-height: 0; border: 0; border-radius: 0; padding: 0; background: transparent; color: inherit; font-size: inherit; line-height: var(--report-unit); cursor: pointer; font-family: var(--typeface-compressed); font-variant-numeric: tabular-nums; }
 .adoption-matrix td button:hover { box-shadow: inset 0 0 0 1px var(--report-ink); }
 .adoption-matrix td button[aria-pressed="true"] { box-shadow: inset 0 0 0 2px var(--report-ink); }
 .adoption-matrix td button:focus-visible { outline: 2px solid var(--report-ink); outline-offset: -2px; }
@@ -67,7 +67,7 @@
 .adoption-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 @media (max-width: 768px) {
   .adoption-heading { align-items: flex-start; }
-  .adoption-matrix .adoption-app-column { width: calc(6 * var(--report-unit)); min-width: calc(6 * var(--report-unit)); }
+
 }
 
 /* Filled status cells keep a dark ink even when the page uses a dark theme. */
@@ -75,3 +75,6 @@
 .adoption-column-names th { height: calc(9 * var(--report-unit)); }
 .adoption-heading, .adoption-detail-heading { flex-wrap: wrap; }
 .adoption { min-width: 0; max-width: 100%; box-sizing: border-box; }
+
+.adoption-app-group th { text-align: left; font-weight: normal; height: var(--1); background: var(--report-paper); }
+.adoption-deferred { font-weight: normal; }
