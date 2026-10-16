@@ -3,12 +3,27 @@
 // the icon's SVG as a download; nothing else to choose or set.
 import { scopedSvg } from '../lib/icons/svgView';
 import icons from '../lib/icons/interface-catalog.json';
+
+// Shown in the page's ink so every icon reads the same in light and dark: a
+// near-black neutral becomes currentColor and a white full-frame backing
+// rect is dropped. Colour that is part of a drawing stays, and the download
+// remains the untouched source.
+const dark = (value: string) => {
+  const hex = value.toLowerCase() === 'black' ? '000000' : value.replace('#', '');
+  const full = hex.length === 3 ? [...hex].map(c => c + c).join('') : hex;
+  if (!/^[0-9a-f]{6}$/i.test(full)) return false;
+  const [r, g, b] = [0, 2, 4].map(i => parseInt(full.slice(i, i + 2), 16));
+  return Math.max(r, g, b) - Math.min(r, g, b) < 24 && Math.max(r, g, b) < 100;
+};
+const themed = (svg: string) => svg
+  .replace(/<rect width="16" height="16" fill="(?:white|#fff|#ffffff)"[^>]*\/?>/gi, '')
+  .replace(/\b(fill|stroke|stop-color)="([^"]+)"/g, (all, attribute, value) => dark(value) ? `${attribute}="currentColor"` : all);
 ---
 <div class="icon-table not-content">
   <p class="icon-count">{icons.length} icons · 16 × 16 · click one to download its SVG</p>
   <ul class="icons">{icons.map(icon => (
     <li><a href={icon.url} download={`${icon.key}.svg`} title={`${icon.name} · ${icon.key}.svg`}>
-      <span class="icon-tile" set:html={scopedSvg(icon.svg, 'table-' + icon.key)} />
+      <span class="icon-tile" set:html={scopedSvg(themed(icon.svg), 'table-' + icon.key)} />
       <span class="icon-name">{icon.name}</span>
     </a></li>
   ))}</ul>
