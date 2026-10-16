@@ -1,0 +1,99 @@
+---
+title: Notice
+description: A message in the flow of the page, in a tone, with actions and an optional dismiss.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+A notice stands where its words apply: the failure beside the form that failed, the warning above the list it is about. It is not positioned and takes no box or shadow. A square mark, one control high and filled in the tone's colour, carries the tone; the words sit on the paper beside it, each line one square, with the actions on the row below.
+
+For a message across the top of a page, use the [Banner](/2-core/banner/); for a short confirmation that leaves on its own, a [Toast](/2-core/toast/).
+
+## Try it
+
+<ComponentExample example="notice" />
+
+## Use it
+
+```html
+<ds-notice tone="danger" heading="Couldn't save" text="Check your connection and try again." dismissible>
+  <ds-button slot="actions" secondary>Try again</ds-button>
+</ds-notice>
+```
+
+Say what happened and what to do about it, in plain words. A notice needs a title, a text or both: a one-line message is a `text` alone.
+
+| Tone | Mark | Words | Role |
+| --- | --- | --- | --- |
+| `neutral` (the default) | The grey fill, with `info` | The text colour | `status` |
+| `success` | Apple green, with `check` | The text colour | `status` |
+| `warning` | Orange, with `warning` | The text colour | `status` |
+| `danger` | The danger colour, with `warning` | The danger colour (`--ds-danger-color`) | `alert` |
+
+The element is a live region: it gives itself `role="status"`, or `role="alert"` for danger, so a screen reader reads it when it appears. A `role` the page writes on the element is kept. `icon` names another icon from the [library](/2-core/icon/) for the mark, such as `lock` for something that cannot be changed.
+
+## Dismissing
+
+`dismissible` adds a close button at the end of the first line, labelled with the shared word "Close". Pressing it fires `ds-notice-dismiss`, which bubbles and is cancelable: unless a listener cancels it, the notice hides itself. Cancel it to keep the notice, or to remove it from the page's own state. `dismiss()` asks in the same way.
+
+```js
+notice.addEventListener("ds-notice-dismiss", event => {
+  event.preventDefault();
+  store.dismiss(id);
+});
+```
+
+## API
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `tone` | `neutral`, `success`, `warning`, `danger` | `neutral` | The mark's colour and icon, and the role. |
+| `heading` | string | Empty | A title on the first line, in the medium face. |
+| `text` | string | Empty | The text. The default slot takes its place. |
+| `literal` | boolean | `false` | Show `heading` and `text` as written, never looked up. |
+| `icon` | string | The tone's | Another icon for the mark. |
+| `dismissible` | boolean | `false` | Show the close button. |
+
+| Slot | What it holds |
+| --- | --- |
+| Default | The text, when it needs more than words. |
+| `heading` | The title. |
+| `icon` | An icon of the page's own inside the mark. |
+| `actions` | Buttons or links, on the row under the words. |
+
+## Measures
+
+The mark is one control high (16px) in a one-square cell, so the words start one square in; the close button takes a one-square cell at the end of the first line. Each line of the title and the text is one square, and the actions share one row with half a square between them. The notice fills the width it is given. Tones set `--ds-notice-mark`, `--ds-notice-mark-ink` and `--ds-notice-ink`.
+
+## React
+
+```tsx
+import { Notice } from "@0001-labs/design-system-1/DS1/react/notice";
+
+<Notice tone="warning" heading="Edited somewhere else" onDismiss={() => setShown(false)}
+  actions={<><Button secondary onClick={keepMine}>Keep mine</Button><Button secondary onClick={loadTheirs}>Load theirs</Button></>}>
+  Your changes are safe on this device.
+</Notice>
+```
+
+`Notice` renders `ds-notice` with its words and actions in the light DOM and its role in the markup, so the server's HTML is already a live region. `onDismiss` shows the close button and leaves removing the notice to the product. Register `ds-notice` in the browser before hydration.
+
+## Without JavaScript
+
+A page without Lit draws the same notice with the classes in `notice.css`, which `controls.css` imports. The page writes its own words, its icon and its role.
+
+```html
+<div class="ds-notice ds-notice--danger" role="alert">
+  <span class="ds-notice__mark" aria-hidden="true"><!-- the warning icon --></span>
+  <p class="ds-notice__title">Couldn't save</p>
+  <p class="ds-notice__text">Check your connection and try again.</p>
+  <div class="ds-notice__actions">
+    <button class="ds-button ds-button--secondary" type="button">Try again</button>
+  </div>
+  <button class="ds-button ds-button--icon ds-notice__dismiss" type="button" aria-label="Close"><!-- the close icon --></button>
+</div>
+```
+
+`ds-notice--success` and `ds-notice--warning` are the other tones; without one the notice is neutral. See [Native controls](/1-root/native-controls/).
+
+[Banner](/2-core/banner/) · [Toast](/2-core/toast/) · [Empty state](/2-core/empty/)

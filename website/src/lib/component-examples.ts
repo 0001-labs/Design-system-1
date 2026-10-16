@@ -160,6 +160,33 @@ render();`,
     title: 'A message with an action', hint: 'The banner sits at the top of this isolated preview.',
     html: '<ds-banner text="Your changes are saved" variant="success" action="Browse icons" href="/icons/" ></ds-banner>',
   },
+  'banner-dismiss': {
+    title: 'An action and a dismiss', hint: 'The action fires ds-banner-action; the close button fires ds-banner-dismiss and hides the banner.',
+    html: '<ds-banner text="A new version is ready" variant="info" action="Reload" dismissible></ds-banner>',
+  },
+  'empty': {
+    title: 'Nothing here yet', hint: 'Without a heading, the title is the shared words in the current language.',
+    html: '<ds-empty icon="lists" text="Lists you make or are given appear here.">\n  <ds-button slot="actions" primary>New list</ds-button>\n</ds-empty>',
+    height: 200,
+  },
+  'empty-search': {
+    title: 'No results, centred', hint: 'A heading and text of the page\'s own, centred in the space they stand in.',
+    html: '<ds-empty icon="search" heading="No results" text="Try another word, or clear the search." literal centered>\n  <ds-button slot="actions" secondary>Clear the search</ds-button>\n</ds-empty>',
+    height: 200,
+  },
+  'notice': {
+    title: 'Four tones', hint: 'Danger is an alert, the others a status. The close button fires ds-notice-dismiss and hides the notice.',
+    html: `<ds-notice text="Changes from an earlier session are stored on this device." literal></ds-notice>
+<ds-notice tone="success" text="Your changes are saved." literal></ds-notice>
+<ds-notice tone="warning" heading="This list was edited somewhere else" text="Your changes are safe on this device." literal>
+  <ds-button slot="actions" secondary>Keep mine</ds-button>
+  <ds-button slot="actions" secondary>Load theirs</ds-button>
+</ds-notice>
+<ds-notice tone="danger" heading="Couldn't save" text="Check your connection and try again." literal dismissible>
+  <ds-button slot="actions" secondary>Try again</ds-button>
+</ds-notice>`,
+    height: 340,
+  },
   'card': {
     title: 'A container for content', hint: 'Card is an optional component. Ordinary writing sits directly on the paper.',
     html: '<ds-card variant="outlined" padding="small">\n  <ds-text>A little content</ds-text>\n  <ds-button primary>Continue</ds-button>\n</ds-card>',
@@ -257,7 +284,8 @@ export const PAGE_EXAMPLES: Record<string, string[]> = {
   '2-core/icon': ['icon', 'icon-variants'],
   '2-core/input': ['input', 'input-states'],
   '2-core/text': ['text'], '2-core/date': ['date'],
-  '2-core/banner': ['banner'], '2-core/card': ['card'],
+  '2-core/banner': ['banner', 'banner-dismiss'], '2-core/card': ['card'],
+  '2-core/empty': ['empty', 'empty-search'], '2-core/notice': ['notice'],
   '2-core/cycle': ['cycle'], '2-core/language': ['language'],
   '2-core/gap': ['gap'],
   '3-unit/row': ['row', 'row-centered'], '3-unit/list': ['list'],

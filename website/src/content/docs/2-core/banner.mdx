@@ -11,9 +11,11 @@ A message across the top of its positioning context, optionally with an action.
 
 <ComponentExample example="banner" />
 
+<ComponentExample example="banner-dismiss" compact />
+
 ## Usage
 
-Put a banner in a positioned container, or at the page root. It uses absolute positioning at the top and does not reserve room in normal flow; leave space for it when content sits underneath.
+Put a banner in a positioned container, or at the page root. It uses absolute positioning at the top and does not reserve room in normal flow; leave space for it when content sits underneath. For a message in the flow of the page, beside what it is about, use a [Notice](/2-core/notice/).
 
 ## Attributes
 
@@ -26,7 +28,22 @@ Put a banner in a positioned container, or at the page root. It uses absolute po
 | `version` | string | Empty | Clicking the message toggles this version string. |
 | `mailto` | string | Empty | Address for a support action. |
 | `subject`, `describe`, `app-version` | string | Empty | Translation keys for the support email. |
+| `dismissible` | boolean | `false` | Show a close button at the end, labelled with the shared word "Close". |
 
-A direct `href` takes precedence over the generated email link.
+A direct `href` takes precedence over the generated email link. With a destination (`href` or `mailto`) the action is a link; without one it is a button.
 
-[Text](/2-core/text/) · [Container](/4-page/container/)
+## Events
+
+| Event | Detail | When |
+| --- | --- | --- |
+| `ds-banner-action` | `{ action, href }`: the action's key and its destination, or `null` | The action is pressed. It bubbles and is cancelable: cancelling it keeps a link from being followed. |
+| `ds-banner-dismiss` | None | The close button is pressed, or `dismiss()` is called. Unless a listener cancels it, the banner hides itself. |
+
+```js
+banner.addEventListener("ds-banner-action", event => {
+  event.preventDefault();
+  location.reload();
+});
+```
+
+[Notice](/2-core/notice/) · [Text](/2-core/text/) · [Container](/4-page/container/)

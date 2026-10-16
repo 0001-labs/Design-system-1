@@ -104,6 +104,7 @@ export default defineConfig({
             { label: "Chart", slug: "2-core/chart" },
             { label: "Cycle", slug: "2-core/cycle" },
             { label: "Date", slug: "2-core/date" },
+            { label: "Empty state", slug: "2-core/empty" },
             { label: "Gap", slug: "2-core/gap" },
             { label: "Icon", items: [
               { label: "Collection", slug: "2-core/icon/collection" },
@@ -111,6 +112,7 @@ export default defineConfig({
             { label: "Input", slug: "2-core/input" },
             { label: "Language", slug: "2-core/language" },
             { label: "Link", slug: "2-core/link" },
+            { label: "Notice", slug: "2-core/notice" },
             { label: "Text", slug: "2-core/text" },
             { label: "Toast", slug: "2-core/toast" },
             { label: "Toggle", slug: "2-core/toggle" },
