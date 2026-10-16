@@ -126,9 +126,14 @@ export class Button extends Control {
     if (button) button.disabled = this.splitDisabled;
   }
 
-  updated() {
+  /** A split is a named group from the moment it is in the document, before its first render. */
+  private syncSplitRole() {
     if (this.split && !this.hasAttribute("role")) { this.setAttribute("role", "group"); this.splitRole = true; }
     else if (!this.split && this.splitRole) { this.removeAttribute("role"); this.splitRole = false; this.syncControl(); }
+  }
+
+  updated() {
+    this.syncSplitRole();
     this.syncSlottedControl();
   }
 
@@ -141,6 +146,7 @@ export class Button extends Control {
 
   connectedCallback() {
     super.connectedCallback();
+    this.syncSplitRole();
     this._reflectIcon();
     this.syncSlottedControl();
     window.addEventListener("language-changed", this.splitLanguageChanged);
