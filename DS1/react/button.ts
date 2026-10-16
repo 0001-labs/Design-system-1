@@ -3,7 +3,7 @@ import { createElement, forwardRef, type AnchorHTMLAttributes, type ButtonHTMLAt
 import type { Button as ButtonElement } from "../2-core/ds-button";
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
-  Partial<Pick<ButtonElement, "primary" | "secondary" | "active" | "choice" | "icon" | "wide" | "fit" | "danger" | "menuItem">>;
+  Partial<Pick<ButtonElement, "primary" | "secondary" | "active" | "choice" | "icon" | "wide" | "fixed" | "fit" | "danger" | "menuItem">>;
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   {
@@ -16,6 +16,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     choice,
     icon,
     wide,
+    fixed,
     fit,
     danger,
     menuItem,
@@ -36,6 +37,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       choice,
       icon,
       wide,
+      fixed,
       fit,
       danger,
       menuItem,
@@ -50,11 +52,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
 
 /** A real link: browser navigation, context menus and modifier clicks survive. */
 export type ButtonLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> &
-  Partial<Pick<ButtonElement, "primary" | "secondary" | "active" | "choice" | "icon" | "wide" | "fit" | "danger" | "menuItem">> & {disabled?: boolean};
+  Partial<Pick<ButtonElement, "primary" | "secondary" | "active" | "choice" | "icon" | "wide" | "fixed" | "fit" | "danger" | "menuItem">> & {disabled?: boolean};
 export const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(function ButtonLink(
-  {children, className, style, primary, secondary, active, choice, icon, wide, fit, danger, menuItem, disabled, hidden, href, onClick, onAuxClick, tabIndex, ...props}, ref,
+  {children, className, style, primary, secondary, active, choice, icon, wide, fixed, fit, danger, menuItem, disabled, hidden, href, onClick, onAuxClick, tabIndex, ...props}, ref,
 ) {
-  return createElement("ds-button", {control: "slotted", primary, secondary, active, choice, icon, wide, fit, danger, menuItem, disabled, hidden, className, style},
+  return createElement("ds-button", {control: "slotted", primary, secondary, active, choice, icon, wide, fixed, fit, danger, menuItem, disabled, hidden, className, style},
     createElement("a", {...props, ref, href: disabled ? undefined : href, hidden,
       "aria-disabled": disabled || undefined, tabIndex: disabled ? -1 : tabIndex,
       onClick: event => { if (disabled) { event.preventDefault(); event.stopPropagation(); } else onClick?.(event); },

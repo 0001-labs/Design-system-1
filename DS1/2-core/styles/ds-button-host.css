@@ -182,6 +182,9 @@
   /* The native focus ring extends beyond the face; only its text is clipped. */
   overflow: visible;
   --ds-button-height: var(--ds-row-height);
+  width: var(--ds-button-width, max-content);
+}
+:host([control="slotted"][fixed]) {
   width: var(--ds-button-width, calc(4 * var(--ds-unit)));
 }
 :host([control="slotted"][wide]) {
