@@ -2,6 +2,9 @@ import { useAuthActions, useAuthToken } from '@convex-dev/auth/react';
 import { useConvexAuth } from 'convex/react';
 import { useEffect, useRef, useState, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import '../../../DS1/2-core/ds-button';
+import '../../../DS1/3-unit/ds-sidebar';
+import '../../../DS1/4-page/ds-page';
+import type { Sidebar, SidebarItem } from '../../../DS1/3-unit/ds-sidebar';
 import { Button } from '../../../DS1/react/button';
 import '../../../DS1/1-root/controls.css';
 import { calculateScalingFactor } from '../../../DS1/0-face/scaling';
@@ -45,6 +48,8 @@ function PrivateFonts() {
   const [local, setLocal] = useState<File | null>(null);
   const [retry, setRetry] = useState(0);
   const picker = useRef<HTMLInputElement>(null);
+  const list = useRef<Sidebar>(null);
+  const choosing = useRef({ busy, choose: (_id: string) => {} });
   const generation = useRef(0);
   const loaded = useRef<FontFace | null>(null);
   const active = fonts?.find(font => font.id === selected);
@@ -115,14 +120,29 @@ function PrivateFonts() {
     finally { setBusy(false); }
   }
 
+  // The shared sidebar owns rows, focus and arrow keys; the workspace owns which font is open.
+  choosing.current = { busy, choose: id => { setMessage(''); setSelected(id); } };
+  const listItems: SidebarItem[] | null = fonts && fonts.map(font => ({ id: font.id, label: font.name, current: selected === font.id, disabled: busy }));
+  useEffect(() => { if (list.current && listItems) list.current.items = listItems; }, [fonts, selected, busy]);
+  useEffect(() => {
+    const element = list.current;
+    if (!element) return;
+    const activate = (event: Event) => {
+      const { id } = (event as CustomEvent<{ id: string }>).detail;
+      if (!choosing.current.busy) choosing.current.choose(id);
+    };
+    element.addEventListener('sidebar-activate', activate);
+    return () => element.removeEventListener('sidebar-activate', activate);
+  }, [fonts === null]);
+
   if (!fonts) return <main className="fonts-status"><h1>Fonts</h1><p role={error ? 'alert' : 'status'}>{error || 'Checking access…'}</p>{error && <Control onClick={() => setRetry(n => n + 1)}>Try again</Control>}<Control onClick={() => void signOut()}>Sign out</Control></main>;
 
   return <main className={`font-workspace${dark ? ' font-workspace-dark' : ''}`} data-ds-surface>
     <header className="fonts-header"><h1>Fonts</h1><span>Private workspace</span><Control onClick={() => void signOut()}>Sign out</Control></header>
-    <div className="fonts-body">
-      <nav className="fonts-list" aria-label="Fonts">{fonts.map(font => <button type="button" key={font.id} aria-current={selected === font.id ? 'true' : undefined} onClick={() => { if (!busy) { setMessage(''); setSelected(font.id); } }} disabled={busy}><span>{font.name}</span><small>{font.detail}</small></button>)}</nav>
+    <ds-page layout="sidebar" divided fill className="fonts-body">
+      <ds-sidebar slot="nav" label="Fonts" ref={list} />
+      <header slot="header" className="font-heading"><h2>{active?.name}</h2><span>{active?.detail}</span></header>
       <section className="font-desk" aria-label={active?.name}>
-        <header className="font-heading"><h2>{active?.name}</h2><span>{active?.detail}</span></header>
         <div className="font-toolbar">
           <div role="group" aria-label="View"><Control aria-pressed={mode === 'specimen'} onClick={() => setMode('specimen')}>Specimen</Control><Control aria-pressed={mode === 'glyphs'} onClick={() => setMode('glyphs')}>Glyphs</Control></div>
           <Control aria-label={`Size: ${size} pixels. Change size`} onClick={() => setSize(sizes[(sizes.indexOf(size) + 1) % sizes.length]!)}>{size} px</Control>
@@ -135,8 +155,8 @@ function PrivateFonts() {
             : <div className="font-glyphs" style={{ fontFamily: `"${family}"`, fontSize: `calc(${size}px * var(--sf, 1))` }}>{alphabets.flatMap(line => [...line]).map((letter, index) => <div key={`${letter}-${index}`}><span>{letter}</span><small>U+{letter.codePointAt(0)!.toString(16).toUpperCase().padStart(4, '0')}</small></div>)}</div>
           : <div className="font-empty"><h3>{busy ? 'Loading the font…' : selected === 'supernatural' ? 'Supernatural starts with your handwriting.' : 'No specimen loaded.'}</h3><p>{selected === 'supernatural' ? 'Open a font build to try it here. Handwriting scans and original letterforms are still needed to create the first version.' : 'Select a font to view it, or try again if it could not load.'}</p>{selected === 'supernatural' && <p>English first. About ten forms per letter, with variation in shape, spacing and rhythm.</p>}</div>}
         </div>
-        <footer className="font-footer"><p role={error ? 'alert' : 'status'}>{error || message || (family ? selected === 'supernatural' ? 'Development study. Missing characters use a fallback.' : mode === 'glyphs' ? 'Unsupported characters use a fallback.' : 'Edit the specimen text. Size changes stay inside the specimen.' : 'No substitute handwriting font is shown.')}</p>{error && <Control onClick={() => setRetry(n => n + 1)}>Try again</Control>}</footer>
       </section>
-    </div>
+      <footer slot="footer" className="font-footer"><p role={error ? 'alert' : 'status'}>{error || message || (family ? selected === 'supernatural' ? 'Development study. Missing characters use a fallback.' : mode === 'glyphs' ? 'Unsupported characters use a fallback.' : 'Edit the specimen text. Size changes stay inside the specimen.' : 'No substitute handwriting font is shown.')}</p>{error && <Control onClick={() => setRetry(n => n + 1)}>Try again</Control>}</footer>
+    </ds-page>
   </main>;
 }

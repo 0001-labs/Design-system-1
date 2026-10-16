@@ -26,7 +26,14 @@ describe('font workspace', () => {
     await act(async () => root.render(createElement(FontWorkspace))); await settle();
     expect(host.textContent).toContain('Supernatural starts with your handwriting.');
     expect(host.querySelector('textarea')).toBeNull();
-    await act(async () => (host.querySelectorAll('.fonts-list button')[1] as HTMLButtonElement).click()); await settle();
+    const list = host.querySelector('ds-page[layout="sidebar"] > ds-sidebar[slot="nav"]')!;
+    expect(list).not.toBeNull();
+    expect(['divided', 'fill'].every(name => list.parentElement!.hasAttribute(name))).toBe(true);
+    const rows = () => [...list.shadowRoot!.querySelectorAll<HTMLButtonElement>('button[data-item]')];
+    expect(rows().map(row => row.textContent?.trim())).toEqual(['Supernatural', 'Olivetti Dot']);
+    expect(rows()[0]!.getAttribute('aria-current')).toBe('page');
+    await act(async () => rows()[1]!.click()); await settle();
+    expect(rows()[1]!.getAttribute('aria-current')).toBe('page');
     const specimen = host.querySelector('textarea')!;
     expect(specimen).not.toBeNull();
     const words = specimen.value;
