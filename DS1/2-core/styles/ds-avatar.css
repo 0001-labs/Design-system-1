@@ -41,7 +41,12 @@
   user-select: none;
   -webkit-user-select: none;
 }
-/* An avatar is only ever round; a logo is a brand mark and keeps its corners. */
+/* An avatar is round unless it is square, with a picture's corners; a logo is
+   a brand mark and keeps the corners of its own drawing. */
+:host([shape="square"]) .frame {
+  border-radius: var(--ds-avatar-radius, var(--ds-radius));
+  corner-shape: var(--ds-corner-shape, round);
+}
 :host([logo]) .frame {
   border-radius: 0;
 }
