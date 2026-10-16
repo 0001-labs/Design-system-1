@@ -4,6 +4,7 @@ const baseURL = process.env.DOCS_URL || 'http://127.0.0.1:4401';
 
 export default defineConfig({
   testDir: './tests',
+  workers: 1,
   testMatch: 'fonts.spec.ts',
   outputDir: './test-results/fonts',
   use: { baseURL },

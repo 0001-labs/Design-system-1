@@ -6,6 +6,11 @@ test('font specimens accept a pointer click and native text editing', async ({ p
     const specimen = page.getByRole('textbox', { name: `Try ${name}`, exact: true });
     await specimen.click({ timeout: 5000 });
     await expect(specimen.locator('[contenteditable]')).toBeFocused();
+    expect(await specimen.evaluate(host => {
+      const block = host.querySelector('.aa-block')!;
+      return getComputedStyle(block).fontFamily === getComputedStyle(host).fontFamily
+        && getComputedStyle(block).fontSize === getComputedStyle(host).fontSize;
+    })).toBe(true);
     await page.keyboard.press('ControlOrMeta+A');
     await page.keyboard.type('My own words.');
     await expect(specimen).toHaveText('My own words.');
