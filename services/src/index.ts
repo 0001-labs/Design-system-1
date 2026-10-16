@@ -1,3 +1,4 @@
+import { fontWorkspace } from "./fonts";
 import assets from "./assets/index.ts";
 import publish, { type Env as PublishEnv } from "./publish/index.ts";
 import { componentReport, type ReportsEnv } from "./reports.ts";
@@ -18,6 +19,21 @@ function reportPage(response: Response, path: string): Response {
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    if (url.pathname === "/api/fonts" || url.pathname.startsWith("/api/fonts/")) return fontWorkspace(request, env);
+    if (url.hostname === "fonts.designsystem1.com") {
+      if (!["GET", "HEAD"].includes(request.method)) return new Response("Not found", { status: 404 });
+      if (url.pathname.startsWith("/app/assets/") || url.pathname === "/icons/design-system-1.svg") return env.ASSETS.fetch(request);
+      if (!["/", "/app/", "/app/fonts", "/app/signin"].includes(url.pathname)) return new Response("Not found", { status: 404 });
+      const asset = new URL(request.url);
+      // Only the sign-in shell and its assets are public; workspace data and font files are owner-gated above.
+      asset.pathname = "/app/";
+      const original = await env.ASSETS.fetch(new Request(asset, request));
+      const response = new Response(original.body, original);
+      response.headers.set("Cache-Control", "private, no-store");
+      response.headers.set("X-Robots-Tag", "noindex, nofollow");
+      response.headers.set("Referrer-Policy", "same-origin");
+      return response;
+    }
 
     if (url.hostname === "www.designsystem1.com" ||
       (url.hostname === "dsone.dev" && !url.pathname.startsWith("/ds1/") && !url.pathname.startsWith("/api/"))) {

@@ -1,0 +1,42 @@
+.font-workspace { --font-unit: calc(20px * var(--sf, 1)); --ds-sf: var(--sf, 1); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; color: var(--text-color); background: var(--background); font-family: var(--typeface-regular); font-size: calc(14px * var(--sf, 1)); color-scheme: light; }
+.font-workspace-dark { color-scheme: dark; }
+.fonts-header { display: flex; align-items: center; flex: none; gap: var(--font-unit); height: calc(3 * var(--font-unit)); padding: 0 var(--font-unit); border-bottom: 1px solid var(--grid-color); }
+.fonts-header h1, .font-heading h2 { font: inherit; font-family: var(--typeface-medium); margin: 0; }
+.fonts-header > span { flex: 1; opacity: .6; }
+.fonts-body { display: grid; grid-template-columns: calc(12 * var(--font-unit)) minmax(0, 1fr); min-height: 0; flex: 1; }
+.fonts-list { display: flex; flex-direction: column; padding: var(--font-unit) 0; overflow: auto; border-right: 1px solid var(--grid-color); }
+.fonts-list button { border: 0; background: none; color: inherit; font: inherit; text-align: left; padding: calc(var(--font-unit) / 2) var(--font-unit); cursor: pointer; }
+.fonts-list button[aria-current] { background: var(--ds-fill); }
+.fonts-list button > span, .fonts-list small { display: block; line-height: var(--font-unit); }
+.fonts-list small { font-size: calc(10px * var(--sf, 1)); opacity: .6; }
+.font-desk { display: flex; flex-direction: column; min-width: 0; min-height: 0; padding: var(--font-unit); gap: var(--font-unit); }
+.font-heading { display: flex; justify-content: space-between; flex-wrap: wrap; gap: var(--font-unit); flex: none; line-height: var(--font-unit); }
+.font-heading > span { opacity: .6; }
+.font-toolbar { display: flex; align-items: center; flex-wrap: wrap; flex: none; gap: calc(var(--font-unit) / 2); }
+.font-toolbar > div { display: flex; gap: calc(var(--font-unit) / 2); margin-right: calc(var(--font-unit) / 2); }
+.font-toolbar button[aria-pressed="true"] { text-decoration: underline; text-underline-offset: calc(3px * var(--sf, 1)); }
+.font-stage { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; overflow-anchor: none; border-block: 1px solid var(--grid-color); }
+.font-stage textarea { display: block; box-sizing: border-box; width: 100%; height: 100%; resize: none; border: 0; border-radius: 0; background: transparent; color: inherit; padding: var(--font-unit) 0; margin: 0; line-height: 1.5; outline-offset: -2px; }
+.font-empty { max-width: 52ch; margin-block: calc(3 * var(--font-unit)); }
+.font-empty h3, .font-empty p { font: inherit; margin: 0 0 var(--font-unit); line-height: 1.5; }
+.font-empty h3 { font-family: var(--typeface-medium); }
+.font-glyphs { display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(6 * var(--font-unit)), 1fr)); }
+.font-glyphs > div { min-height: calc(7 * var(--font-unit)); display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 1px solid var(--grid-color); gap: calc(var(--font-unit) / 2); }
+.font-glyphs small { font-family: var(--typeface-mono); font-size: calc(10px * var(--sf, 1)); opacity: .5; }
+.font-footer { flex: none; min-height: calc(2 * var(--font-unit)); display: flex; align-items: center; gap: var(--font-unit); font-size: calc(10px * var(--sf, 1)); }
+.font-footer p { margin: 0; }
+.font-file { display: none; }
+.fonts-status { padding: calc(2 * 20px * var(--sf, 1)); font-family: var(--typeface-regular); }
+.fonts-status h1 { font-size: calc(20px * var(--sf, 1)); }
+.fonts-status ds-button { margin-right: calc(20px * var(--sf, 1)); }
+.font-workspace :focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+@media (max-width: 760px) {
+  .fonts-body { display: flex; flex-direction: column; }
+  .fonts-list { flex-direction: row; flex: none; padding: 0; border-right: 0; border-bottom: 1px solid var(--grid-color); }
+  .fonts-list button { white-space: nowrap; }
+  .fonts-list small { display: none; }
+  .font-desk { flex: 1; }
+  .font-heading > span { display: none; }
+}
+body:has(.font-workspace) { overflow: hidden; }
+.fonts-sign-in .auth-screen { max-width: calc(100% - 2 * var(--app-cell)); }

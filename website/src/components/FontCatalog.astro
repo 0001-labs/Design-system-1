@@ -136,7 +136,7 @@ const systemFonts = [
   .dot-specimen {
     --specimen-size: 40px;
     font-size: calc(var(--specimen-size) * var(--sf)); line-height: 1.5;
-    min-height: calc(5 * var(--square)); padding: var(--square) 0;
+    height: calc(12 * var(--square)); box-sizing: border-box; overflow: auto; overscroll-behavior: contain; overflow-anchor: none; padding: var(--square) 0;
     white-space: pre-wrap; overflow-wrap: anywhere;
   }
   .alphabet { font-size: var(--square); line-height: calc(2 * var(--square)); overflow-wrap: anywhere; }

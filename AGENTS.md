@@ -86,3 +86,11 @@ The App parity list in Ezo (`29iiBs`, in the 0001 folder) shows where Ezo, Consi
 The exact measures and rules of the system (the 20px square, items one square high, widths in whole squares, type, lines, corners, motion) are the `design-system-1` skill in `skills/design-system-1/SKILL.md`. It is linked into `~/.agents/skills`, so every agent loads it for interface work in any 0001 project. Change the rules there, in this repository.
 
 Two type rules every product keeps, here and in Aa: **arrows are always Inter**, in every typeface, code included, through the "Inter Arrows" face (`DS1/1-root/fonts/Inter-Arrows.woff2`, Inter's arrows alone, `unicode-range`) that leads every `--typeface-*` token in `one.css` and `component-tokens.css`; a new typeface token or font stack starts with it. And **code is Iosevka Extended** (`--typeface-mono`, `fonts/Iosevka-Regular.woff2`, cut to what code uses), falling back to a system monospace, never a serif.
+
+## Private font workspace
+
+`fonts.designsystem1.com` uses the existing app sign-in. Only the configured owner user ID whose verified account resolves to `jaa90@icloud.com` can read `/api/fonts`, fetch font files or save a Supernatural build. The Worker revalidates each request through `users:current`; the existing `REPORTS_AUTH_URL` and `REPORTS_OWNER_ID` secrets identify that account. The public shell contains no private font data. Sign-in offers the shared email code and owner password; social redirects remain on the main app.
+
+Font files live under `fonts/` in the private `ds-one-libraries` R2 bucket. Keep its public URL and custom domains disabled. Reference files are seeded with `vp run fonts:seed`. Supernatural uploads are capped at 10 MB, stored by content hash and selected by `fonts/supernatural/current.json`; previous versions remain stored. Never place private builds in website assets, app bundles or the npm package. The viewer can preview a local font without saving it; Save font is explicit. Until an original build is supplied, Supernatural has an honest empty state.
+
+The fixed specimen viewport scrolls internally, keeping size changes from moving the page. `vp run deploy` publishes the workspace with the existing site. Run the font access, report access, site routing and configuration tests plus app and Worker typechecks before release.

@@ -46,6 +46,7 @@
     "./dist/*": "./dist/*"
   },
   "scripts": {
+    "fonts:seed": "node scripts/seed-font-references.mjs",
     "reports:scan": "vp exec tsx scripts/component-adoption.ts",
     "reports:configure": "node scripts/configure-report-access.mjs",
     "reports:upload:local": "cd services && vp exec wrangler r2 object put ds-one-libraries-preview/reports/component-adoption.json --file ../.reports/component-adoption.json --local --config ../wrangler.jsonc",

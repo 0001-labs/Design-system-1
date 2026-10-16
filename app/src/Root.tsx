@@ -1,3 +1,4 @@
+import { FontWorkspace } from "./screens/FontWorkspace";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { useConvexAuth } from "convex/react";
 import type { ReactNode } from "react";
@@ -73,7 +74,7 @@ function NotFound() {
 export function Root({ children }: { children?: ReactNode }) {
   return (
     <ConvexAuthProvider client={convex}>
-      <RouterProvider><AppShell>{children ?? <Routes />}</AppShell></RouterProvider>
+      <RouterProvider>{window.location.hostname === "fonts.designsystem1.com" ? <FontWorkspace /> : <AppShell>{children ?? <Routes />}</AppShell>}</RouterProvider>
     </ConvexAuthProvider>
   );
 }

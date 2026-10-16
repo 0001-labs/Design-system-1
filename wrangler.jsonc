@@ -24,6 +24,7 @@
     "MAX_CSS_BYTES": "524288"
   },
   "routes": [
+    { "pattern": "fonts.designsystem1.com", "custom_domain": true },
     {
       "pattern": "designsystem1.com",
       "custom_domain": true

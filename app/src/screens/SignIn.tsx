@@ -13,7 +13,7 @@ import "../signIn/sign-in.css";
  * sent to it or the owner's password, with Google and Apple when the backend has them.
  * Signed in, the app goes where the person was headed.
  */
-export function SignIn({ redirectTo }: { redirectTo?: string } = {}) {
+export function SignIn({ redirectTo, fontsOnly = false }: { redirectTo?: string; fontsOnly?: boolean } = {}) {
   const { signIn } = useAuthActions();
   const convex = useConvex();
   const host = useRef<HTMLDivElement>(null);
@@ -23,8 +23,14 @@ export function SignIn({ redirectTo }: { redirectTo?: string } = {}) {
     defineSignInScreen();
     const screen = document.createElement("sign-in-screen") as SignInScreenElement;
     screen.adapter = signInAdapter({
-      signIn: (provider, params) => signIn(provider, params as Record<string, string>),
-      providers: () => convex.query(api.auth.providers, {}),
+      signIn: (provider, params) => {
+        if (fontsOnly && (typeof params.email !== "string" || params.email.trim().toLowerCase() !== "jaa90@icloud.com")) throw new Error("This font workspace is private.");
+        return signIn(provider, params as Record<string, string>);
+      },
+      providers: async () => {
+        const available = await convex.query(api.auth.providers, {});
+        return fontsOnly ? { ...available, google: false, apple: false } : available;
+      },
       passwordSignIn: (email) => convex.query(api.auth.passwordSignIn, { email }),
       redirectTo: () => `${window.location.origin}${window.location.pathname}`,
     });
@@ -33,19 +39,19 @@ export function SignIn({ redirectTo }: { redirectTo?: string } = {}) {
     });
     host.current.replaceChildren(screen);
     return () => screen.remove();
-  }, [signIn, convex, redirectTo]);
+  }, [signIn, convex, redirectTo, fontsOnly]);
 
   return (
     <main className="auth-screen" data-ds-area="Sign in" data-testid="signin">
-      <h1>Sign in to Design system 1</h1>
-      <p className="auth-intro">{redirectTo === "/reports/components"
+      <h1>{fontsOnly ? "Fonts" : "Sign in to Design system 1"}</h1>
+      <p className="auth-intro">{fontsOnly ? "Sign in to your private font workspace." : redirectTo === "/reports/components"
         ? "Sign in with an authorised account to view component reports."
         : "Save, edit and publish your design libraries."}</p>
       <div ref={host} />
-      <div className="auth-alternative">
+      {!fontsOnly && <div className="auth-alternative">
         <p>Just exploring? No account needed.</p>
         <Link to="/playground">Try the editor</Link>
-      </div>
+      </div>}
     </main>
   );
 }
