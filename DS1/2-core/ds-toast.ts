@@ -36,8 +36,12 @@ import styles from "./styles/ds-toast.css?inline";
 export type ToastId = string | number;
 export type ToastType = "default" | "success" | "info" | "warning" | "error" | "loading";
 export type ToastPosition = "top-left" | "top-center" | "top-right" | "bottom-left" | "bottom-center" | "bottom-right";
-/** A button in a toast. Clicking it closes the toast unless `onClick` calls `preventDefault()`, as in Sonner. */
-export interface ToastButton { label: string; onClick?: (event: MouseEvent) => void }
+/**
+ * A button in a toast. Clicking it closes the toast unless `onClick` calls
+ * `preventDefault()`, as in Sonner. With `href` it is a link instead (not in
+ * Sonner), which still closes the toast as the page follows it.
+ */
+export interface ToastButton { label: string; onClick?: (event: MouseEvent) => void; href?: string }
 export interface ToastOptions {
   /** Reuse an id to update a toast in place, as Sonner does. */
   id?: ToastId;
@@ -292,7 +296,7 @@ export class Toaster extends LitElement {
 
   private onPointerDown(event: PointerEvent, item: Item) {
     if (item.data.dismissible === false || item.data.type === "loading") return;
-    if ((event.composedPath()[0] as Element | undefined)?.closest?.("button")) return;
+    if ((event.composedPath()[0] as Element | undefined)?.closest?.("button, a")) return;
     (event.currentTarget as HTMLElement).setPointerCapture?.(event.pointerId);
     this.swipe = { id: item.data.id, start: event.clientY, time: Date.now(), amount: 0 };
     this.interacting = true;
@@ -324,7 +328,15 @@ export class Toaster extends LitElement {
 
   private press(event: MouseEvent, item: Item, button: ToastButton) {
     button.onClick?.(event);
-    if (!event.defaultPrevented) this.removeToast(item.data.id);
+    if (button.href) this.removeToast(item.data.id);
+    else if (!event.defaultPrevented) this.removeToast(item.data.id);
+  }
+
+  private renderButton(item: Item, button: ToastButton, kind: "cancel" | "action") {
+    const press = (event: MouseEvent) => this.press(event, item, button);
+    return button.href
+      ? html`<a class=${`button ${kind}`} href=${button.href} @click=${press}>${button.label}</a>`
+      : html`<button class=${`button ${kind}`} type="button" @click=${press}>${button.label}</button>`;
   }
 
   private renderIcon(data: ToastData) {
@@ -361,8 +373,8 @@ export class Toaster extends LitElement {
           <div class="title">${data.title}</div>
           ${data.description ? html`<div class="description">${data.description}</div>` : nothing}
         </div>
-        ${data.cancel ? html`<button class="button cancel" type="button" @click=${(event: MouseEvent) => this.press(event, item, data.cancel!)}>${data.cancel.label}</button>` : nothing}
-        ${data.action ? html`<button class="button action" type="button" @click=${(event: MouseEvent) => this.press(event, item, data.action!)}>${data.action.label}</button>` : nothing}
+        ${data.cancel ? this.renderButton(item, data.cancel, "cancel") : nothing}
+        ${data.action ? this.renderButton(item, data.action, "action") : nothing}
         ${closeButton ? html`<button class="close" type="button" aria-label=${this.closeLabel} @click=${() => this.removeToast(data.id)}><ds-icon type="close"></ds-icon></button>` : nothing}
       </div>
     </li>`;

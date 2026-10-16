@@ -126,3 +126,14 @@ test("moving the toaster keeps its toasts and the time they had left", async () 
   await settle(element, 300);
   expect(toasts(element)).toHaveLength(0);
 });
+
+test("an action can be a link, and following it closes the toast", async () => {
+  const element = await toaster();
+  toast("Invite sent", { action: { label: "Open", href: "#people" } });
+  await settle(element, 20);
+  const link = toasts(element)[0]!.querySelector<HTMLAnchorElement>("a.action")!;
+  expect(link.getAttribute("href")).toBe("#people");
+  link.click();
+  await settle(element);
+  expect(toasts(element)).toHaveLength(0);
+});

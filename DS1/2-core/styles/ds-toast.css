@@ -134,6 +134,7 @@ ol[data-expanded="true"] .toast[data-mounted="true"] {
   text-underline-offset: 2px;
   cursor: pointer;
 }
+a.button { display: inline-block; }
 .button.cancel { opacity: 0.7; }
 .button:focus-visible, .close:focus-visible { outline: 1px solid currentColor; outline-offset: 1px; border-radius: 1px; }
 

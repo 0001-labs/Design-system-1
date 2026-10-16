@@ -67,7 +67,8 @@ import { Toaster, toast } from "@0001-labs/design-system-1/DS1/react/toast";
 
 `id`, `description`, `duration` (`Infinity` keeps it), `icon` (a Design system 1
 icon name), `action` and `cancel` (`{ label, onClick }`; the toast closes after
-the click unless `onClick` calls `preventDefault()`), `dismissible`,
+the click unless `onClick` calls `preventDefault()`; with `href`, not in Sonner,
+the button is a link and closes the toast as it is followed), `dismissible`,
 `closeButton`, `important` (announced assertively), `onDismiss` and
 `onAutoClose`. `toast.promise()` also takes `loading`, `success`, `error` (text,
 or a function of the result) and `finally`.
