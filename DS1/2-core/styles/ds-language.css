@@ -38,7 +38,7 @@
   border: 0;
   border-radius: 0;
   background-color: var(--ds-button-background-color-secondary);
-  color: var(--ds-button-text-color-secondary, var(--ds-button-text-color));
+  color: var(--ds-button-text-color);
   font-family: var(--ds-typeface-regular);
   font-size: var(--ds-type-size-default);
   font-weight: var(--ds-type-weight-default);

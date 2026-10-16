@@ -64,14 +64,14 @@ span[hidden] { display: none; }
 :host([chip]:not([data-listbox])) ::slotted(select) {
   border: 0 !important;
   background: var(--ds-button-background-color-secondary) !important;
-  color: var(--ds-button-text-color-secondary) !important;
+  color: var(--ds-button-text-color) !important;
   line-height: var(--ds-control-height) !important;
 }
 :host([chip][primary]:not([data-listbox])) ::slotted(select) {
   background: var(--ds-button-background-color-primary) !important;
   color: var(--ds-button-text-color-on-accent) !important;
 }
-:host([chip]) span { background: var(--ds-button-text-color-secondary); }
+:host([chip]) span { background: var(--ds-button-text-color); }
 :host([chip][primary]) span { background: var(--ds-button-text-color-on-accent); }
 
 /* A colour choice uses the shared swatch; the native select remains the hit target. */

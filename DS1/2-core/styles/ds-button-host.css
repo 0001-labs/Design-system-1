@@ -196,7 +196,7 @@
 
 :host([control="host"][danger]),
 :host([control="slotted"][danger]) {
-  --ds-button-color: var(--ds-tuned-red);
+  --ds-button-color: var(--ds-danger-color, var(--ds-tuned-red));
 }
 
 :host([control="slotted"][hidden]) { display: none !important; }

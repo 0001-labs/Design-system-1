@@ -530,7 +530,7 @@ dialog.ds-dialog::backdrop {
 }
 
 .ds-menu__item[data-variant="destructive"] {
-  color: var(--ds-tuned-red);
+  color: var(--ds-danger-color, var(--ds-tuned-red));
 }
 
 .ds-menu__item[data-disabled],
