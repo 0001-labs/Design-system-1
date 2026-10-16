@@ -28,7 +28,7 @@ describe("source adoption evidence", () => {
       '// <ds-button />',
       'const selector = "ds-button";',
       'const template = html`<ds-button>${value}<ds-text>text</ds-text><!-- <button> --></ds-button>`;',
-      'const view = <><button title="<button>" /><ds-row>{items.map(item => <ds-button />)}</ds-row></>;',
+      'const view = <><button aria-label="<button>" /><ds-row>{items.map(item => <ds-button />)}</ds-row></>;',
       'document.createElement("input");',
       'const dynamic = document.createElement(tag);',
     ].join("\n"));
@@ -556,5 +556,177 @@ describe("empty states and notices", () => {
     const report = scanApp({ id: "ds1", name: "Design system 1", directory: "Design system 1", roots: ["app/src"], source: "direct" }, studio, ds);
     expect(report.cells.notice).toMatchObject({ shared: 1, styled: 1, unverified: 0 });
     expect(report.cells.text).toMatchObject({ shared: 0, styled: 0, local: 0 });
+  });
+});
+
+/** Tags the scanner places in a column: custom elements and the recognized native elements. */
+const counted = (tag: string) => tag.includes("-") || ["button", "input", "select", "textarea", "p", "h1", "h2", "h3", "h4", "h5", "h6", "ul", "ol", "table", "form", "dialog", "details"].includes(tag);
+
+describe("classes written in code and local DOM builders", () => {
+  const styles = (source: string) => sourceSites("view.ts", source).map(site => [site.tag, site.nativeStyle]);
+  it("reads literal className, class attributes and class lists on an element created in the same block", () => {
+    expect(styles('function view() { const save = document.createElement("button"); save.className = "ds-button ds-button--primary"; const name = document.createElement("input"); name.setAttribute("class", "ds-input wide"); const icon = document.createElement("span"); icon.className = "ds-icon " + kind; host.append(save, name, icon); }'))
+      .toEqual([["button", "ds-button"], ["input", "ds-input"], ["span", "ds-icon"]]);
+    expect(styles('let face; if (!face) { face = document.createElement("button"); face.className = "ds-button"; }')).toEqual([["button", "ds-button"]]);
+  });
+  it("does not infer dynamic classes or classes written in another scope", () => {
+    expect(styles('function view(kind) { const save = document.createElement("button"); save.className = kind; return save; } function later(save) { save.className = "ds-button"; }')).toEqual([["button", undefined]]);
+    expect(styles('const save = document.createElement("button"); function later() { save.className = "ds-button"; }')).toEqual([["button", undefined]]);
+  });
+  it("follows a helper whose first parameter goes into document.createElement, with its class parameter and options", () => {
+    const source = [
+      'function el(tag, cls, text) { const node = document.createElement(tag); if (cls) node.className = cls; if (text) node.textContent = text; return node; }',
+      'const make = (tag, props) => Object.assign(document.createElement(tag), props);',
+      'el("button", "ds-button", "Save"); el("button", null, "No"); el(tagName); make("input", { className: "ds-input" });',
+      'const yes = el("button", null, "Yes"); yes.classList.add("ds-button");',
+    ].join("\n");
+    expect(styles(source)).toEqual([["button", "ds-button"], ["button", undefined], ["input", "ds-input"], ["button", "ds-button"]]);
+  });
+  it("recognizes a builder by its definition, not its name", () => {
+    expect(sourceSites("view.ts", 'const el = (id) => document.getElementById(id); el("button"); function make(name) { return document.createElement("div"); } make("input");').map(site => site.tag)).toEqual(["div"]);
+  });
+});
+
+describe("markup is read only where it is markup", () => {
+  const tags = (file: string, source: string) => sourceSites(file, source).map(site => site.tag).filter(counted);
+  it("does not count code samples or ordinary strings", () => {
+    expect(tags("view.tsx", 'const rows = [{ semantic: "<button>" }, { semantic: \'<input type="text">\' }]; const sample = "<button>Get started</button>"; export const View = () => <p>{"<select>"}</p>; run("formatBlock", "<p>");')).toEqual(["p"]);
+  });
+  it("reads Lit html templates, innerHTML, outerHTML, insertAdjacentHTML, __html, document.write and whole documents", () => {
+    expect(tags("view.ts", [
+      'const a = html`<button>A</button>`;',
+      'host.innerHTML = `<input>` + (open ? "<select></select>" : "");',
+      'host.outerHTML = "<textarea></textarea>";',
+      'host.insertAdjacentHTML("beforeend", "<table></table>");',
+      'const b = { __html: "<p>B</p>" };',
+      'popup.document.write(`<h1>Log</h1>`);',
+      'return new Response("<html><body><p>Waiting</p></body></html>");',
+    ].join("\n"))).toEqual(["button", "input", "select", "textarea", "table", "p", "h1", "p"]);
+  });
+  it("follows markup built in local names, functions and arrays before it is written", () => {
+    const source = [
+      'const MENU = `<button class="ds-button">Menu</button>`;',
+      'function row(name) { return `<li><button>${name}</button></li>`; }',
+      'function list() { const out = []; out.push("<p>Intro</p>"); let html = "<ul>"; html += items.map(row).join(""); return out.join("") + html + "</ul>"; }',
+      'host.innerHTML = MENU + list();',
+      'const unused = "<input>";',
+    ].join("\n");
+    expect(tags("view.ts", source)).toEqual(["button", "button", "p", "ul"]);
+  });
+  it("follows a function another file writes into markup into the module that exports it", () => {
+    const { studio, ds, app } = fixture();
+    write(app, "src/details.ts", 'export function detailsHtml(name) { return `<h2>${name}</h2><button class="ds-button">Open</button>`; }\nexport const label = "<button>Not markup</button>";\n');
+    write(app, "src/page.ts", 'import { detailsHtml, label } from "./details";\nhost.innerHTML = detailsHtml("A");\nconsole.log(label);\n');
+    git(app, "add", "."); git(app, "-c", "user.name=Test", "-c", "user.email=test@example.com", "commit", "-m", "Page");
+    const report = scanApp({ id: "example", name: "Example", directory: "Example", roots: ["src"], manifest: "design/components-manifest.json" }, studio, ds);
+    expect(report.cells.text).toMatchObject({ local: 1 });
+    expect(report.cells.button?.sites.map(site => site.tag)).toEqual(["button.ds-button"]);
+  });
+});
+
+describe("specimens, native frames of DS1 sites and shared parts", () => {
+  const tags = (file: string, source: string) => sourceSites(file, source).map(site => site.tag).filter(counted);
+  it("counts nothing under data-ds-specimen, in markup, JSX and DOM creation", () => {
+    for (const file of ["page.html", "view.tsx"]) {
+      expect(tags(file, '<section data-ds-specimen><h1>Heading</h1><button title="Specimen">Button</button><details><summary>More</summary></details></section><button>Counted</button>'), file).toEqual(["button"]);
+    }
+    expect(tags("view.tsx", 'import { createElement } from "react"; export const View = () => <div data-ds-specimen><button>{createElement("ds-icon", { type: "star" })}</button></div>;')).toEqual([]);
+    expect(tags("view.ts", 'function measure() { const probe = document.createElement("button"); probe.setAttribute("data-ds-specimen", ""); document.body.append(probe); const real = document.createElement("button"); }')).toEqual(["button"]);
+  });
+  it("counts a heading or paragraph holding only a ds-text once, as the ds-text", () => {
+    for (const file of ["page.html", "view.tsx"]) {
+      expect(tags(file, '<h1 class="title"><ds-text text="welcome"></ds-text></h1><p>\n  <ds-text text="note"></ds-text>\n</p><h2>Plain <ds-text text="more"></ds-text></h2><p><ds-text text="a"></ds-text><ds-text text="b"></ds-text></p>'), file)
+        .toEqual(["ds-text", "ds-text", "h2", "ds-text", "p", "ds-text", "ds-text"]);
+    }
+    expect(tags("view.ts", 'const a = html`<h1 class=${tone}><ds-text text="a"></ds-text></h1>`; const b = html`<h2>${title}<ds-text text="b"></ds-text></h2>`;')).toEqual(["ds-text", "h2", "ds-text"]);
+    expect(tags("view.tsx", 'export const View = () => <h3>{label}<ds-text text="x" /></h3>;')).toEqual(["h3", "ds-text"]);
+  });
+  it("counts a list of ds-row items once, as its rows, and keeps other lists", () => {
+    for (const file of ["page.html", "view.tsx"]) {
+      expect(tags(file, '<ul><li><ds-row></ds-row><ds-row></ds-row></li><li><ds-row></ds-row></li></ul><ol><li>Text</li></ol><ul><li><ds-row></ds-row>More</li></ul>'), file)
+        .toEqual(["ds-row", "ds-row", "ds-row", "ol", "ul", "ds-row"]);
+    }
+  });
+  it("counts a dialog's data-ds-dialog parts as its frame, including markup written into a ds-dialog's native dialog", () => {
+    for (const file of ["page.html", "view.tsx"]) {
+      const attribute = file.endsWith("x") ? "className" : "class";
+      expect(tags(file, `<dialog ${attribute}="ds-dialog"><h2 data-ds-dialog="title">Title</h2><p data-ds-dialog="description">Text</p><p>Other</p></dialog><div><h2 data-ds-dialog="title">Loose</h2></div>`), file).toEqual(["dialog", "p", "h2"]);
+    }
+    expect(tags("view.ts", 'function ask() { const frame = document.createElement("ds-dialog"); const dialog = document.createElement("dialog"); dialog.innerHTML = `<h2 data-ds-dialog="title">Sure?</h2><p data-ds-dialog="description">It goes.</p><p role="alert"></p>`; frame.append(dialog); }')).toEqual(["ds-dialog", "p"]);
+    expect(tags("view.ts", 'function ask() { const dialog = document.createElement("dialog"); dialog.innerHTML = `<h2 data-ds-dialog="title">Sure?</h2>`; }')).toEqual(["dialog", "h2"]);
+  });
+  it("keeps a form around DS1 controls as a local Form lead", () => {
+    expect(tags("page.html", '<form><ds-input></ds-input><ds-button></ds-button></form>')).toEqual(["form", "ds-input", "ds-button"]);
+  });
+  it("records custom elements defined in a copied shared folder as shared parts, verified by the lock when it matches", () => {
+    const { studio, ds, app } = fixture();
+    const definition = 'export function definePart(tag = "part-screen") { if (!customElements.get(tag)) customElements.define(tag, class extends HTMLElement {}); }\n';
+    write(app, "src/signIn/part.ts", definition);
+    write(app, "src/vendor/editor/editor.js", 'customElements.define("text-editor", class extends HTMLElement {});\n');
+    write(app, "src/own.ts", 'customElements.define("own-widget", class extends HTMLElement {});\n');
+    write(app, "src/page.html", "<part-screen></part-screen><text-editor></text-editor><own-widget></own-widget>");
+    write(app, "sync.lock.json", JSON.stringify({ Editor: { commit: "0".repeat(40), files: { "src/vendor/editor/editor.js": createHash("sha256").update('customElements.define("text-editor", class extends HTMLElement {});\n').digest("hex") } } }));
+    git(app, "add", "."); git(app, "-c", "user.name=Test", "-c", "user.email=test@example.com", "commit", "-m", "Parts");
+    const report = scanApp({ id: "example", name: "Example", directory: "Example", roots: ["src"], manifest: "design/components-manifest.json" }, studio, ds);
+    expect(report.sharedParts).toEqual({ "part-screen": { uses: 1, definition: "src/signIn/part.ts" }, "text-editor": { uses: 1, definition: "src/vendor/editor/editor.js", lock: "Editor" } });
+    expect(report.otherCustomElements).toEqual({ "own-widget": 1 });
+  });
+});
+
+describe("tooltips, disclosures, browser dialogs, ranges and table roles", () => {
+  const sha = (body: string) => createHash("sha256").update(body).digest("hex");
+  const commit = (root: string, message: string) => { git(root, "add", "."); git(root, "-c", "user.name=Test", "-c", "user.email=test@example.com", "commit", "-m", message); };
+  const marks = (file: string, source: string) => sourceSites(file, source).filter(site => site.column || site.controlKind === "range").map(site => [site.tag, site.column ?? site.controlKind]);
+  it("counts a literal title as a local Tooltip and data-tooltip as DS1's, in markup, JSX, factories and DOM", () => {
+    for (const file of ["page.html", "view.tsx"]) {
+      expect(marks(file, '<button title="Refresh">R</button><span data-tooltip="Close"></span><abbr title="Design system">DS</abbr><iframe title="Preview"></iframe><a title="">x</a><svg><title>Mark</title></svg>'), file)
+        .toEqual([["button[title]", "tooltip"], ["span[data-tooltip]", "tooltip"]]);
+    }
+    expect(marks("view.tsx", 'export const View = () => <><Card title="Settings" /><button title={t("close")} /><button title={"Close"} /></>;')).toEqual([["button[title]", "tooltip"]]);
+    expect(marks("view.ts", 'import { h } from "./dom"; h("button", { title: "Save" }); const b = document.createElement("button"); b.title = "Open"; b.setAttribute("data-tooltip", "Open"); document.title = "Page"; item.title = "Untitled"; node.setAttribute("title", "Loose");'))
+      .toEqual([["button[title]", "tooltip"], ["button[title]", "tooltip"], ["button[data-tooltip]", "tooltip"], ["[title]", "tooltip"]]);
+    expect(sourceSites("view.ts", 'host.innerHTML = `<button data-tooltip="Close"></button>`;').find(site => site.column)?.module).toBe("tooltips");
+  });
+  it("counts details once as a local Accordion, without its summary", () => {
+    for (const file of ["page.html", "view.tsx"]) expect(sourceSites(file, "<details><summary>More</summary><p>Text</p></details>").map(site => site.tag).filter(counted), file).toEqual(["details", "p"]);
+    expect(sourceSites("view.ts", 'const more = document.createElement("details"); const summary = document.createElement("summary");').map(site => site.tag).filter(counted)).toEqual(["details"]);
+  });
+  it("counts the browser's alert, confirm and prompt, and not a local or imported function of the same name", () => {
+    expect(marks("view.ts", 'alert("Saved"); if (window.confirm("Delete?")) remove(); const name = globalThis.prompt("Name"); dialog.confirm(); state.alert = true;')).toEqual([["alert()", "dialog"], ["confirm()", "dialog"], ["prompt()", "dialog"]]);
+    expect(marks("view.ts", 'function confirm(text) { return true; } confirm("Sure?"); const prompt = ask; prompt();')).toEqual([]);
+    expect(sourceSites("view.ts", 'import { confirm as ask } from "./feedback"; ask({ title: "Sure?" });')).toMatchObject([{ tag: "confirm()", column: "dialog", imported: "ask" }]);
+  });
+  it("keeps range inputs and slider roles out of Input as a known gap", () => {
+    for (const file of ["page.html", "view.tsx"]) expect(marks(file, '<input type="range" /><div role="slider"></div><input type="text" />'), file).toEqual([["input[type=range]", "range"], ["div[role=slider]", "range"]]);
+    const { studio, ds, app } = fixture();
+    write(app, "src/page.html", '<input type="range"><div role="slider" tabindex="0"></div><input>');
+    commit(app, "Ranges");
+    const report = scanApp({ id: "example", name: "Example", directory: "Example", roots: ["src"], manifest: "design/components-manifest.json" }, studio, ds);
+    expect(report.gaps?.range?.map(site => site.tag)).toEqual(["input[type=range]", "div[role=slider]"]);
+    expect(report.cells.input).toMatchObject({ local: 1 });
+  });
+  it("counts a literal table or grid role on a non-table element as a local Table", () => {
+    for (const file of ["page.html", "view.tsx"]) expect(marks(file, '<div role="grid"></div><section role="table"></section><table role="grid"></table><ds-list role="grid"></ds-list><div role="list"></div>'), file).toEqual([["div[role=grid]", "table"], ["section[role=table]", "table"]]);
+    expect(marks("view.ts", 'const grid = document.createElement("div"); grid.setAttribute("role", "grid"); other.setAttribute("role", "table");')).toEqual([["div[role=grid]", "table"], ["[role=table]", "table"]]);
+  });
+  it("verifies data-tooltip and imported DS1 dialogs through the copied page scripts, and needs review without them", () => {
+    const studio = mkdtempSync(join(tmpdir(), "component-adoption-")); temporary.push(studio);
+    const ds = join(studio, "Design system 1"), app = join(studio, "Pages");
+    for (const root of [ds, app]) { mkdirSync(root); git(root, "init", "-b", "main"); }
+    const scripts = { "0-face/tooltips.ts": "export function startTooltips() {}\n", "0-face/feedback.ts": 'export { alert, confirm, prompt } from "./dialogs";\n', "0-face/dialogs.ts": "export const confirm = async () => true; export const alert = async () => {}; export const prompt = async () => null;\n" };
+    for (const [file, body] of Object.entries(scripts)) { write(ds, `DS1/${file}`, body); write(app, `web/ds1/${file}`, body); }
+    commit(ds, "Scripts");
+    write(app, "sync.lock.json", JSON.stringify({ "Design system 1": { commit: git(ds, "rev-parse", "HEAD"), files: Object.fromEntries(Object.entries(scripts).map(([file, body]) => [`web/ds1/${file}`, sha(body)])) } }));
+    write(app, "web/src/page.ts", 'import { confirm } from "../ds1/0-face/feedback";\nimport { prompt } from "./ask";\nhost.innerHTML = `<button data-tooltip="Close"></button>`;\nif (await confirm({ title: "Delete?" })) remove();\nprompt();\nalert("Done");\n');
+    write(app, "web/src/ask.ts", "export const prompt = () => null;\n");
+    commit(app, "Page");
+    const scan = () => scanApp({ id: "pages", name: "Pages", directory: "Pages", roots: ["web/src"] }, studio, ds);
+    expect(scan().cells.tooltip).toMatchObject({ shared: 1, local: 0, unverified: 0 });
+    expect(scan().cells.dialog).toMatchObject({ shared: 1, local: 1, unverified: 0 });
+    write(app, "web/ds1/0-face/dialogs.ts", scripts["0-face/dialogs.ts"] + "// Local change\n");
+    expect(scan().cells.dialog).toMatchObject({ shared: 0, local: 1, unverified: 1 });
+    expect(scan().cells.dialog!.issues).toContain("Locally modified: web/ds1/0-face/dialogs.ts");
+    write(app, "sync.lock.json", JSON.stringify({ "Design system 1": { commit: git(ds, "rev-parse", "HEAD"), files: {} } }));
+    expect(scan().cells.tooltip).toMatchObject({ shared: 0, unverified: 1 });
   });
 });

@@ -36,6 +36,13 @@ export interface AdoptionApp {
   snapshotCommit: string | null;
   cells: Record<string, ComponentCell>;
   otherCustomElements: Record<string, number>;
+  /**
+   * Custom elements copied from a shared studio part rather than authored by the product: their uses, the copied
+   * file that defines them, and the sync.lock.json source that verifies that copy, when one does.
+   */
+  sharedParts?: Record<string, { uses: number; definition: string; lock?: string }>;
+  /** Local sites with no DS1 column yet, kept out of the matrix so it holds only what DS1 can replace: `range`. */
+  gaps?: Record<string, UsageSite[]>;
   error?: string;
   group?: "Products" | "Clients";
   migration?: "deferred";
