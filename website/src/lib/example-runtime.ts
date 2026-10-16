@@ -164,7 +164,7 @@ function syncLegacyButtonPreview(css: string) {
     legacyReference!.disabled = disabled;
     const face = getComputedStyle(legacyReference!);
     // Zero selector specificity lets the user's authored part rules win.
-    return `:where(${selector}) { margin: ${face.margin}; } :where(${selector})::part(control) { ${properties.map(name => `${name}: ${face.getPropertyValue(name)};`).join(' ')} height: auto; min-height: ${face.minHeight}; max-height: none; }`;
+    return `:where(${selector}) { margin: ${face.margin}; max-width: ${face.maxWidth}; } :where(${selector})::part(control) { ${properties.map(name => `${name}: ${face.getPropertyValue(name)};`).join(' ')} height: auto; min-height: ${face.minHeight}; max-height: none; }`;
   }).join('\n');
 }
 

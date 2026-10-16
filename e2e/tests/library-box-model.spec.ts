@@ -47,6 +47,7 @@ test('split is a Button mode with native keyboard choices and repeated actions',
   const frame=page.frameLocator('iframe').first();
   const choice=frame.locator('ds-button[split]').first();
   await expect(choice).toHaveAttribute('value','week');
+  await expect.poll(()=>choice.evaluate(el=>getComputedStyle(el).overflowX)).toBe('visible');
   await choice.getByRole('button',{name:'Month',exact:true}).focus();await page.keyboard.press('Space');
   await expect(choice).toHaveAttribute('value','month');
   await expect(frame.locator('#event-output')).toHaveText('change: month');
@@ -60,11 +61,13 @@ test('split is a Button mode with native keyboard choices and repeated actions',
 });
 
 test('a legacy library initializes the box model from its authored face without saving', async ({page})=>{
+  await page.setViewportSize({width:1280,height:1000});
   await page.goto('/e2e/fixtures/library-box-model.html?legacy=1');
   await expect(page.getByRole('spinbutton',{name:'Padding right',exact:true})).toHaveValue('48');
   await expect(page.getByRole('spinbutton',{name:'Padding top',exact:true})).toHaveValue('4');
   await expect(page.getByRole('spinbutton',{name:'Border radius top-left',exact:true})).toHaveValue('8');
   await expect(page.locator('.box-model__content')).not.toHaveText('0×0');
+  await expect.poll(async()=>Number((await page.locator('.box-model__content').innerText()).split('×')[0])).toBeGreaterThan(0);
   const frame=page.frameLocator('iframe').first();
   await expect.poll(()=>frame.locator('ds-button[secondary]').locator('button').evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(227, 227, 227)');
   await expect.poll(()=>frame.locator('ds-button[disabled]').locator('button').evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(217, 217, 217)');

@@ -2,6 +2,8 @@
 
 :host([split]) {
   display: inline-flex;
+  max-width: none;
+  overflow: visible;
   flex: none;
   align-items: stretch;
   height: var(--ds-control-height);
