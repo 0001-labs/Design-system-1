@@ -7,6 +7,14 @@ description: The exact rules of Design system 1, the 0001 design framework: the 
 
 Design system 1 (`/Users/joachim/0001/Design system 1`, source in `DS1/`) is the framework every 0001 product is drawn on. Products carry a copy or a fork of it (see the 0001 brief), so these rules hold even where the package is not imported. Client sites keep the client's own design unless 0001 is designing for them.
 
+## Propagating shared design
+
+1. Identify the canonical component, token or interaction in `DS1/`. Move a reusable improvement discovered in a consumer into that source first, including its documented measure or behavior.
+2. Inventory applicable consumers from the System implementation guide, Sync 1 manifests and lockfiles, and targeted source searches, including copied or forked implementations and native ports. Record the scope in the work item's note.
+3. Commit the shared source, then copy it through each consumer's approved Sync 1 exports. Preserve product-owned code and reconcile legacy forks deliberately; remove superseded local design overrides. Keep content, domain behavior, intentional platform conventions and client branding in the consumer.
+4. Run source and consumer checks, follow each project's release procedure and deployment policy, and verify released assets over HTTP. Browser verification follows the project's brief and the user's request.
+5. Finish with an explicit account of consumers migrated and released, consumers with no applicable usage, intentional exceptions and blocked consumers. Source checks and copied files alone do not establish live adoption. Keep unfinished propagation visible in the work item.
+
 ## Measures (get these exactly right)
 
 Everything is counted in **squares**: one square is 20px (`--unit`, `--1`), multiplied by `--sf` on phones and tablets. Never invent a size: take it from this table, or from the code it names.
@@ -23,6 +31,7 @@ Everything is counted in **squares**: one square is 20px (`--unit`, `--1`), mult
 | Lines | 1px, centred on the grid line | Ezo `--outline-stroke` |
 | Corners | square for items and rows; 4px (`--radius`) only on pictures, buttons and fields | Peer and Ins follow this |
 | An avatar (a person, a workspace) | **always round**, 16px (one control high) with small type; overlapping 3px in a group. Coloured by a fill (`color`) or an ink (`ink`). Only a logo keeps its corners | `ds-avatar` |
+| Switch | **32 × 16px** at base scale: two control heights wide, 12px thumb, 2px inset and 16px travel; all multiplied by the shared scale | `ds-switch`, `--ds-control-height` |
 | Button width | **Hug the label by default**, including React and slotted native controls. `fixed` opts into four squares, `wide` eight; `fit` is the explicit hug alias. Icons stay square and menu items fill their row. | `ds-button` |
 
 Items stack edge to edge with no gap, as an Ezo list does. Lists, table rows, cells and their headers use neutral or transparent backgrounds by default, never automatic accent fills. Colour is opt-in for a meaningful state, not decoration across an entire list or table. Positions snap to the grid: anything a person can move lands on whole squares. Before calling a design done, measure it in the browser (an element's width and height must be whole squares minus the 1px correction) instead of judging by eye.
