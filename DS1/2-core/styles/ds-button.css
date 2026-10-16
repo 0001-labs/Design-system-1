@@ -4,7 +4,8 @@
 :host {
   display: inline-flex;
   min-width: 0;
-  flex: 0 1 auto;
+  flex: 0 0 auto;
+  width: var(--ds-button-width, max-content);
   max-width: 100%;
   /* Clipped along the line only: a word that runs long ends in an ellipsis,
      but the descenders of g, y, p and j hang below the 16-unit box as they
@@ -13,7 +14,10 @@
   overflow-y: visible;
 }
 
-/* Intrinsic chips stay within their row without product shadow-root sheets. */
+/* Label width is standard. Fixed grid widths are explicit layout choices. */
+:host([fixed]) { width: var(--ds-button-width, calc(4 * var(--ds-unit))); }
+:host([wide]) { width: var(--ds-button-width, calc(8 * var(--ds-unit))); }
+/* Keep fit as an explicit intrinsic-width alias for existing consumers. */
 :host([fit]) {
   flex: 0 0 auto;
   width: max-content;

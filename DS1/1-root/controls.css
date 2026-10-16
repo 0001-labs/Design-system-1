@@ -19,6 +19,7 @@
   box-sizing: border-box;
   display: inline-flex;
   flex: 0 0 auto;
+  width: var(--ds-button-width, max-content);
   align-items: center;
   justify-content: var(--ds-button-align, flex-start);
   gap: var(--ds-button-gap, calc(4px * var(--ds-sf)));
@@ -143,6 +144,10 @@
 
 .ds-button--secondary:hover:not(:disabled) {
   --ds-button-background: var(--ds-fill-hover);
+}
+
+.ds-button--fixed {
+  width: var(--ds-button-width, calc(4 * var(--ds-unit)));
 }
 
 .ds-button--wide {

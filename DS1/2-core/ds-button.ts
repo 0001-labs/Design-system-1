@@ -17,6 +17,7 @@ export class Button extends Control {
     choice: { type: Boolean, reflect: true },
     icon: { type: Boolean, reflect: true },
     wide: { type: Boolean, reflect: true },
+    fixed: { type: Boolean, reflect: true },
     fit: { type: Boolean, reflect: true },
     danger: { type: Boolean, reflect: true },
     menuItem: { type: Boolean, reflect: true, attribute: "menu-item" },
@@ -34,6 +35,7 @@ export class Button extends Control {
   declare choice: boolean;
   declare icon: boolean;
   declare wide: boolean;
+  declare fixed: boolean;
   declare fit: boolean;
   declare danger: boolean;
   declare menuItem: boolean;
@@ -60,6 +62,7 @@ export class Button extends Control {
     this.choice = false;
     this.icon = false;
     this.wide = false;
+    this.fixed = false;
     this.fit = false;
     this.danger = false;
     this.menuItem = false;
