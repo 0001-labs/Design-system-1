@@ -1,3 +1,4 @@
+import { mountChartExample } from './chart-example';
 export interface ComponentExample {
   title: string;
   hint: string;
@@ -14,6 +15,22 @@ export const TABLE_DATA = [
 // The preview and the copyable code use the same source. These are local
 // examples only; no sample sends a request to a product's backend.
 export const EXAMPLES: Record<string, ComponentExample> = {
+  chart: {
+    title: 'Series and compact charts',
+    hint: 'Sample values: 12, 16, 14, 20, 18, 24, 19, 26. Move over a series to inspect a point. No live data is loaded.',
+    height: 1040,
+    html: `<section style="width:100%;min-width:0">
+  <h2>Line</h2><ds-chart kind="line" rows="4" aria-label="Sample line chart"></ds-chart>
+  <h2>Area</h2><ds-chart kind="area" rows="4" aria-label="Sample area chart"></ds-chart>
+  <h2>Baseline</h2><ds-chart kind="baseline" rows="4" aria-label="Sample baseline chart, reference 18"></ds-chart>
+  <output aria-live="polite">Move over a chart to inspect a value.</output>
+  <h2>Sparkline</h2><ds-spark aria-label="Sample trend from 12 to 26"></ds-spark>
+  <h2>Bars</h2><ds-bars rows="3" aria-label="A 12, B 20, C 15; A comparison 16"></ds-bars>
+  <h2>Ratio</h2><ds-ratio aria-label="65 percent to 35 percent"></ds-ratio>
+  <h2>Range</h2><ds-range aria-label="20 to 80 out of 100, midpoint 50"></ds-range>
+</section>`,
+    script: `(${mountChartExample.toString()})(document);`,
+  },
   'sidebar': {
     title: 'Compact document navigation', hint: 'Open a section, choose a document, or navigate with the arrow keys.', height: 240,
     html: '<ds-sidebar label="Library"></ds-sidebar>',
@@ -173,6 +190,7 @@ document.querySelectorAll('[data-grid-option]').forEach(control => {
 };
 
 export const PAGE_EXAMPLES: Record<string, string[]> = {
+  '2-core/chart': ['chart'],
   '2-core/avatar': ['avatar'],
   '2-core/button': ['button', 'button-icon'],
   '2-core/tooltip': ['tooltip', 'tooltip-fallback'],

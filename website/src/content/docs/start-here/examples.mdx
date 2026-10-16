@@ -1,0 +1,26 @@
+---
+title: HTML examples
+description: View, download and edit complete HTML files using Design system 1.
+---
+
+import { HTML_EXAMPLES } from '../../../lib/html-examples';
+
+Each example is a complete HTML document. Open it to try the page, or download the file and edit it in any text editor. No framework, package install or build step is needed.
+
+The files use the same native stylesheet as Design system 1's library workspace, served from this site's canonical source. The companion font stylesheet configures the supplied GT America and Iosevka fonts. The native stylesheet also imports Inter from Google Fonts for some controls. These are online dependencies, not embedded files.
+
+{HTML_EXAMPLES.map(example => <section>
+  <h2>{example.title}</h2>
+  <p>{example.description}</p>
+  <p><a href={`/examples/files/${example.id}.html`} target="_blank" rel="noopener">View example</a> · <a href={`/examples/files/${example.id}.html`} download={`${example.id}.html`}>Download HTML</a></p>
+</section>)}
+
+## What you download
+
+One authored HTML file, including any small example-specific script. The article, report and reference have no JavaScript. The form's script only shows local feedback and prevents submission; it has no backend.
+
+The CSS and fonts load over the internet. To work offline, save both CSS files, their referenced fonts and the imported Google Fonts CSS/fonts, then change the paths in your copy. A file opened with no connection falls back to browser styling if those resources are unavailable.
+
+## More behavior
+
+For custom charts, menus, sidebars and other interactive controls, use the [Web Component examples](/components/). Those components need JavaScript; a stylesheet alone does not implement them. Start with the [overview](/start-here/overview/) for the full map, or [My libraries](/libraries/) for saved stylesheets.

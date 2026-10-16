@@ -1,99 +1,42 @@
 ---
-title: Quick Start
-description: Get up and running with Design system 1 in minutes
+title: Use with HTML
+description: Open an ordinary HTML file with the shared stylesheet and fonts.
 ---
 
-Create a simple HTML page using Design system 1 components:
+Create `index.html`, paste this document, and open it in your browser:
 
 ```html
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Design system 1 App</title>
-
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@0001-labs/design-system-1@alpha/DS1/1-root/one.css"
-    />
-    <script
-      type="module"
-      src="https://cdn.jsdelivr.net/npm/@0001-labs/design-system-1@alpha/dist/design-system-1.bundle.js"
-    ></script>
-  </head>
-  <body>
-    <ds-layout>
-      <ds-header slot="header">
-        <ds-title variant="site">My App</ds-title>
-      </ds-header>
-
-      <main>
-        <ds-text variant="heading">Welcome to Design system 1</ds-text>
-        <ds-text variant="body">
-          A modern design system built with TypeScript and Lit.
-        </ds-text>
-
-        <ds-button variant="primary">Get Started</ds-button>
-        <ds-button variant="secondary">Learn More</ds-button>
-      </main>
-    </ds-layout>
-  </body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My first page</title>
+  <link rel="stylesheet" href="https://designsystem1.com/resources/vanilla.css">
+  <link rel="stylesheet" href="https://designsystem1.com/resources/fonts.css">
+</head>
+<body>
+  <main>
+    <h1>A place to begin</h1>
+    <p>This is ordinary HTML with Design system 1 styling.</p>
+    <details><summary>How it works</summary>
+      <p>The browser owns this disclosure. No JavaScript is needed.</p>
+    </details>
+  </main>
+</body>
 </html>
 ```
 
-## Basic Components
+No package install or build step is needed. These public asset URLs are served by the documentation site, not an assumed npm version. They follow the current documentation release.
 
-### Button
+## View, download, edit
 
-```html
-<ds-button variant="primary">Primary Button</ds-button>
-<ds-button variant="secondary">Secondary Button</ds-button>
-<ds-button variant="text">Text Button</ds-button>
-```
+The [examples](/start-here/examples/) include an article, a form, a report and a reference page. Each has a complete description and an HTML download. Edit the words and semantic structure first; use CSS custom properties for your own type and colour choices.
 
-### Text
+## Internet and offline use
 
-```html
-<ds-text variant="heading">This is a heading</ds-text>
-<ds-text variant="body">This is body text</ds-text>
-<ds-text variant="small">This is small text</ds-text>
-```
+The HTML loads the stylesheet and fonts over HTTPS. The native stylesheet also imports Inter from Google Fonts for some controls. To use it entirely offline, save both stylesheets, the font files and that imported CSS/fonts, and change every external URL to a local path. Otherwise, keep the network references and describe the page as online-dependent.
 
-### Link
+## When JavaScript is needed
 
-```html
-<ds-link href="https://example.com">Visit Example</ds-link>
-<ds-link href="/about" internal>About Page</ds-link>
-```
-
-## With Translation Support
-
-Design system 1 includes built-in internationalization. Use the `text` attribute (not `key`) to specify translation keys:
-
-```html
-<script type="module">
-  import {
-    setLanguage,
-    loadTranslations,
-  } from "https://cdn.jsdelivr.net/npm/@0001-labs/design-system-1@alpha/dist/design-system-1.bundle.js";
-
-  // Load translations
-  await loadTranslations({
-    en: { greeting: "Hello", welcome: "Welcome" },
-    es: { greeting: "Hola", welcome: "Bienvenido" },
-  });
-
-  // Set language
-  setLanguage("en");
-</script>
-
-<ds-text text="Greeting"></ds-text>
-<ds-text text="Welcome"></ds-text>
-```
-
-## Next Steps
-
-- Explore [all components](/2-core/button/)
-- Learn about [theming](/advanced/theming/)
-- Set up [languages](/built-ins/languages/)
+The [Web Component examples](/components/) demonstrate interactive elements such as `ds-sidebar` and `ds-chart`. Those elements need their JavaScript implementation; adding a custom tag to a CSS-only page is not enough. Application data, submissions and sign-in are separate from visual styling.

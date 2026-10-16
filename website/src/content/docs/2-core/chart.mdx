@@ -3,6 +3,16 @@ title: Charts
 description: Pixel-aligned series, sparklines, bars, ratios and ranges.
 ---
 
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+## Try the charts
+
+These working examples use the shared components and local sample data. Switch the preview theme, inspect a series with the pointer, or copy the HTML and JavaScript. The same example is available in the component catalogue and library preview. Canvas inspection is pointer-based; the sample values and labels provide a text alternative.
+
+<ComponentExample example="chart" />
+
+Charts require JavaScript. They are different from the [native HTML page downloads](/start-here/examples/), which do not include the chart runtime. Set each chart's `unit` when its surface scale changes; widths respond to their container. Theme changes redraw through `refreshTheme()`.
+
 Charts belong to `2-core`. They own their drawing and interaction; a chart composed with headings, summaries and range controls belongs to `3-unit`.
 
 Import `DS1/2-core/ds-chart` to register `ds-chart`, `ds-spark`, `ds-bars`, `ds-ratio` and `ds-range`. The same entry exports `GridChart`, `createChart`, `drawSparkline` and the data and option types. With Sync 1, select `"components": ["chart"]` in the components export.

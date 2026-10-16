@@ -1,3 +1,4 @@
+import { mountChartExample } from './chart-example';
 import { EXAMPLES, TABLE_DATA } from './component-examples';
 import type { DsTable } from '../../../DS1/3-unit/ds-table';
 
@@ -97,3 +98,11 @@ window.addEventListener('message', event => {
   if (typeof event.data.css !== 'string' || new TextEncoder().encode(event.data.css).length > 524288) return;
   libraryStyle.textContent = event.data.css;
 });
+
+if (document.body.dataset.exampleId === 'chart') {
+  mountChartExample(sample);
+  const refreshCharts = () => requestAnimationFrame(() => sample.querySelectorAll('ds-chart,ds-spark').forEach(chart => (chart as HTMLElement & { refreshTheme(): void }).refreshTheme()));
+  window.addEventListener('message', event => {
+    if (event.origin === location.origin && event.source === parent && ['ds1-example-theme', 'ds1-example-styles'].includes(event.data?.type)) refreshCharts();
+  });
+}

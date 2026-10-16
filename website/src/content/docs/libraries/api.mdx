@@ -1,0 +1,63 @@
+---
+title: Library API and tools
+description: Read, edit and publish the same libraries from HTTP, the command line and MCP.
+---
+
+The browser, API, CLI and MCP work on the same libraries. Saving a draft does not publish it. Every save and publish requires the draft revision you read, so another editor's changes cannot be silently overwritten.
+
+## HTTP API
+
+`GET https://designsystem1.com/api/libraries` returns the operation names and JSON input schemas. Call an operation with `POST /api/libraries/{operation}`, `Content-Type: application/json` and `Authorization: Bearer <session token>`.
+
+| Operation | Required fields |
+| --- | --- |
+| `list` | None |
+| `get` | `id` |
+| `create` | `name`, `css`, `config`, `templateVersion` |
+| `save` | `id`, `css`, `config`, `baseRev` |
+| `rename` | `id`, `name` |
+| `history` | `id` |
+| `publish` | `id`, `baseRev` (optional `note`) |
+| `rollback` | `id`, `version` |
+
+`css` is the complete stylesheet. `config` is the editor's JSON configuration encoded as a string; preserve the value returned by `get` when changing only CSS. Success returns `{ "result": ... }`. Errors return `{ "error": { "code": "...", "message": "...", "details": {} } }`. A stale draft returns HTTP 409 with `draft_conflict`; read the latest draft and resolve the changes before saving again. Do not automatically retry a timed-out publish: read its history first.
+
+The API uses the app's sign-in and ownership checks. An unknown library and another account's library both return 404. The published CSS URLs remain public; drafts require sign-in.
+
+## CLI
+
+The source repository includes the tools in `packages/library-tools`. After installing workspace dependencies, run `node packages/library-tools/cli.mjs help` or link its `ds1` executable into your command path.
+
+```sh
+ds1 login
+ds1 list
+ds1 get --id LIBRARY_ID
+ds1 save --id LIBRARY_ID --css-file theme.css --config-file editor.json --base-rev 3
+ds1 publish --id LIBRARY_ID --base-rev 4
+ds1 history --id LIBRARY_ID
+```
+
+`ds1 login` asks for your email and emailed code. It stores a renewable session in a private file under `~/.config/design-system-1`; `ds1 logout` revokes it. `DS1_CONFIG_DIR` changes that directory. `DS1_TOKEN` can supply an existing session token for automation. Do not put tokens in arguments or version control.
+
+Every operation also accepts `--json request.json`, or `--json -` to read JSON from stdin. Results are JSON on stdout; failures go to stderr with a nonzero exit code. `ds1 schema` prints the current API contract.
+
+## MCP
+
+Sign in through the CLI first. Add this stdio server to an MCP client, replacing the path with your checkout:
+
+```json
+{
+  "mcpServers": {
+    "design-system-1": {
+      "command": "node",
+      "args": ["/absolute/path/to/Design system 1/packages/library-tools/mcp.mjs"]
+    }
+  }
+}
+```
+
+The server exposes `libraries_list`, `libraries_get`, `libraries_create`, `libraries_save`, `libraries_rename`, `libraries_history`, `libraries_publish` and `libraries_rollback`. It uses the CLI's stored session and reads tool schemas from the API. Publish and rollback are marked as writes that affect connected apps. This is a local stdio MCP server; there is no remote MCP URL.
+
+## Sign-in for other clients
+
+`POST /api/library-auth/sign-in` with `{ "provider": "email-code", "params": { "email": "you@example.com" } }` requests a code. Repeat with `code` inside `params` to exchange it for `result.tokens.token` and `result.tokens.refreshToken`. Refresh with `{ "refreshToken": "..." }` and store both replacement tokens. `POST /api/library-auth/sign-out` with bearer authorization and `{}` revokes the session. Responses are never cached.

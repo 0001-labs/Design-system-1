@@ -1,73 +1,42 @@
 ---
-title: CSS
-description: Learn about the CSS styling in Design system 1
+title: Styling
+description: Style semantic HTML and configure its shared tokens.
 ---
 
-# CSS
-
-Design system 1 can style native HTML without loading its JavaScript bundle. The
-CSS-only API is useful for static pages, server-rendered interfaces, and
-progressive enhancement.
-
-## CDN usage
-
-Load `one.css`, then apply Design system 1 classes to native elements:
+Design system 1 styles native HTML through a shared stylesheet. Start with real elements: headings for structure, links for destinations, buttons for actions, labels for fields and tables for tabular data.
 
 ```html
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@0001-labs/design-system-1@alpha/DS1/1-root/one.css"
-    />
-    <title>CSS-only Design system 1</title>
-  </head>
-  <body>
-    <main class="ds-card">
-      <h1 class="ds-text ds-text--heading">Welcome</h1>
-      <p class="ds-text">This page uses Design system 1 without JavaScript.</p>
-      <label class="ds-text" for="email">Email</label>
-      <input
-        class="ds-input"
-        id="email"
-        name="email"
-        type="email"
-        placeholder="you@example.com"
-      />
-      <button class="ds-button ds-button--primary" type="button">
-        Get started
-      </button>
-      <button class="ds-button ds-button--secondary" type="button" disabled>
-        Unavailable
-      </button>
-    </main>
-  </body>
-</html>
+<link rel="stylesheet" href="https://designsystem1.com/resources/vanilla.css">
+<link rel="stylesheet" href="https://designsystem1.com/resources/fonts.css">
+
+<main>
+  <h1>A clear starting point</h1>
+  <p>Ordinary HTML, with a shared appearance.</p>
+  <details><summary>Read more</summary><p>No JavaScript is needed here.</p></details>
+</main>
 ```
 
-There is intentionally no `<script>` element in this example.
+These native elements do not need a class on every node. CSS gives them an appearance; the browser supplies their native behavior. Use the [complete HTML downloads](/start-here/examples/) to inspect a working document.
 
-## Available classes
+## Configure the stylesheet
 
-| Class | Purpose |
-| --- | --- |
-| `.ds-text` | Default text treatment |
-| `.ds-text--heading` | Heading variant used with `.ds-text` |
-| `.ds-text--small` | Small-text variant used with `.ds-text` |
-| `.ds-button` | Base native button or link |
-| `.ds-button--primary` | Primary button variant |
-| `.ds-button--secondary` | Secondary button variant |
-| `.ds-input` | Native form input |
-| `.ds-card` | Bordered content container |
+The native stylesheet is generated from the canonical `DS1/1-root/one.semantic.css`. The public `/resources/vanilla.css` route serves that source directly. The font companion sets the native font tokens to the shared font files.
 
-The classes use the same CSS custom properties as the Web Components, including
-the color, typography, spacing, scaling, and theme tokens in `one.css`.
+Set tokens on `:root` or a scoped region when a page needs a deliberate variation:
 
-## Optional JavaScript
+```css
+:root {
+  --one-accent-color: var(--one-sharp-blue);
+  --one-font: "Inter Arrows", "GT America", sans-serif;
+}
+```
 
-The CSS-only classes do not replace the component bundle. Load the JavaScript
-bundle separately when you need Design system 1's Web Components, internationalization,
-stored preferences, or other scripted behavior.
+Keep application data, submission logic and routing in your page. A stylesheet does not implement them. [My libraries](/libraries/) lets you save a stylesheet and publish a URL for consumers, while [the API](/libraries/api/) works on the same drafts and revisions.
+
+## Interactive components
+
+The `ds-*` components have their own scoped tokens and JavaScript implementations. Follow the API on each [component page](/components/) rather than assuming a native HTML token controls a shadow-root component. CSS-only setup does not register custom elements.
+
+## Dependencies
+
+The public stylesheets and fonts need network access unless you save and re-link them locally. The native stylesheet imports Inter from Google Fonts for some controls. [Use with HTML](/start-here/quick-start/) explains the distinction between one authored HTML file and an offline bundle.

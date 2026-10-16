@@ -24,6 +24,7 @@ const { sidebar } = Astro.locals.starlightRoute;
   type Entry = { label: string; href?: string; isCurrent?: boolean; entries?: Entry[] };
   const groups: Entry[] = JSON.parse(navigation.dataset.groups ?? '[]');
   const collapsed = new Set<string>();
+  let signedIn = document.documentElement.hasAttribute("data-signed-in");
   const translationKeys: Record<string, string> = {
     'Start Here': 'startHere', 'Built-ins': 'builtIns', '1 Root': 'root', '2 Core': 'core', '3 Unit': 'unit', '4 Page': 'page',
     Introduction: 'introduction', 'Manual Setup': 'manualSetup', Theming: 'theming', 'Mobile Detection': 'mobileDetection',
@@ -40,12 +41,14 @@ const { sidebar } = Astro.locals.starlightRoute;
     return entries.flatMap((entry, index) => {
       const id = entry.href ?? `${parent}/group-${index}`;
       const item: SidebarItem = { id, label: label(entry.label), depth, href: entry.href, current: entry.isCurrent };
+      if (entry.href === "/app/libraries" && !signedIn) { item.label = "Sign in to My libraries"; item.href = "/app/signin"; }
       if (!entry.entries) return [item];
       item.expanded = !collapsed.has(id);
       return [item, ...(item.expanded ? rows(entry.entries, depth + 1, id) : [])];
     });
   }
   navigation.items = rows(groups);
+  window.addEventListener("ds1-navigation-auth", event => { signedIn = (event as CustomEvent).detail.authenticated; navigation.items = rows(groups); });
   window.addEventListener("translations-ready", () => { navigation.items = rows(groups); });
   window.addEventListener("language-changed", () => { navigation.items = rows(groups); });
   navigation.addEventListener('sidebar-toggle', event => {

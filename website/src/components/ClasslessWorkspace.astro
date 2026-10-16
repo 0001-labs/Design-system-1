@@ -10,20 +10,20 @@ const appPath = mode === 'editor' ? '/app/playground' : '/app/libraries';
 <section class="classless-workspace" aria-labelledby="classless-title" data-pagefind-body>
   <div class="classless-heading">
     <div>
-      <h1 id="classless-title">CLASSless Design System</h1>
+      <h1 id="classless-title">Design system 1</h1>
       <p>Native HTML. Your design. One stylesheet.</p>
     </div>
     <a href={appPath} target="_blank" rel="noopener">Open full screen</a>
   </div>
-  <nav class="classless-tabs" aria-label="CLASSless Design System">
-    <a href="/classless/">Overview</a>
+  <nav class="classless-tabs" aria-label="Design system 1">
+    <a href="/start-here/overview/">Overview</a>
     <a data-requires-signin href="/classless/libraries/" aria-current="page">My libraries</a>
     <span>{mode === 'editor' ? 'Playground · changes are temporary' : 'Saved stylesheets'}</span>
   </nav>
   <iframe
     id="classless-app"
     src={`${appPath}?embed=docs`}
-    title={mode === 'editor' ? 'CLASSless visual editor' : 'CLASSless libraries'}
+    title={mode === 'editor' ? 'Design system 1 editor' : 'My libraries'}
   ></iframe>
 </section>
 

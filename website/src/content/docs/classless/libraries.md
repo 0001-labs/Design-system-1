@@ -1,7 +1,7 @@
 ---
-title: CLASSless libraries
-description: Sign in to create, edit, and publish your saved CLASSless stylesheets.
+title: My libraries
+description: Sign in to create, edit, and publish your saved stylesheets.
 tableOfContents: false
 ---
 
-Create, edit, and publish your saved CLASSless stylesheets.
+Create, edit, and publish your saved stylesheets.

@@ -58,8 +58,9 @@ export default defineConfig({
         {
           label: "Start Here",
           items: [
-            { label: "Introduction", slug: "" },
-            { label: "Manual Setup", slug: "start-here/quick-start" },
+            { label: "Overview", slug: "start-here/overview" },
+            { label: "Use with HTML", slug: "start-here/quick-start" },
+            { label: "Examples", slug: "start-here/examples" },
             { label: "Component examples", link: "/components/" },
             { label: "Email design", slug: "email" },
             { label: "Icon builder", link: "/icons/#builder" },
@@ -67,11 +68,11 @@ export default defineConfig({
           ],
         },
         {
-          label: "CLASSless",
+          label: "My libraries",
           items: [
-            { label: "Overview", slug: "classless" },
-            { label: "My libraries", slug: "classless/libraries" },
-            { label: "Library API and tools", slug: "classless/library-api" },
+            { label: "About My libraries", slug: "libraries" },
+            { label: "Open My libraries", link: "/app/libraries" },
+            { label: "API and tools", slug: "libraries/api" },
           ],
         },
         {
@@ -97,7 +98,6 @@ export default defineConfig({
             { label: "Avatar", slug: "2-core/avatar" },
             { label: "Banner", slug: "2-core/banner" },
             { label: "Button", slug: "2-core/button" },
-            { label: "Split", slug: "2-core/split" },
             { label: "Card", slug: "2-core/card" },
             { label: "Charts", slug: "2-core/chart" },
             { label: "Cycle", slug: "2-core/cycle" },
