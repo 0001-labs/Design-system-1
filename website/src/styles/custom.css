@@ -259,7 +259,7 @@ h1#_top {
   line-height: var(--grid);
 }
 .sl-markdown-content .sl-heading-wrapper > :is(h1, h2, h3, h4, h5, h6) { display: block; margin: 0; padding: 0; }
-.sl-markdown-content .sl-heading-wrapper .sl-anchor-link { position: static; display: flex; align-items: center; height: var(--grid); margin: 0; }
+.sl-markdown-content .sl-heading-wrapper .sl-anchor-link { position: relative; display: flex; align-items: center; height: var(--grid); margin: 0; }
 .sl-markdown-content :is(h1, h2, h3, h4, h5, h6) {
   font-family: var(--typeface-medium, var(--typeface-regular));
   font-weight: 400;

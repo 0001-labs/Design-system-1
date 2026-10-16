@@ -67,8 +67,8 @@ const systemFonts = [
     {systemFonts.map(font => (
       <div class="system-family">
         <div class="family-heading"><h3>{font.name}</h3><span>{font.detail}</span></div>
-        <div class={`system-specimen face-${font.face}`}>{font.sample}</div>
-        {font.face === 'regular' && <div class="medium-sample">The same words, with a little emphasis.</div>}
+        <div class={`system-specimen face-${font.face}`} contenteditable="plaintext-only" role="textbox" aria-label={`Try ${font.name}`} aria-multiline="true" spellcheck="false">{font.sample}</div>
+        {font.face === 'regular' && <div class="medium-sample" contenteditable="plaintext-only" role="textbox" aria-label="Try GT America Standard Medium" aria-multiline="true" spellcheck="false">The same words, with a little emphasis.</div>}
       </div>
     ))}
   </section>
