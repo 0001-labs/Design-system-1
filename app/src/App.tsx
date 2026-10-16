@@ -1060,7 +1060,7 @@ function ComponentPreview({
 }) {
   if (kind === "headings") {
     return (
-      <div className="heading-preview" data-preview-component>
+      <div className="heading-preview" data-ds-specimen data-preview-component>
         <h1>{config.text} 1</h1>
         <h2>{config.text} 2</h2>
         <h3>{config.text} 3</h3>
@@ -1072,13 +1072,13 @@ function ComponentPreview({
   }
 
   if (kind === "p") {
-    return <p data-preview-component>{config.text}</p>;
+    return <p data-ds-specimen data-preview-component>{config.text}</p>;
   }
 
   if (kind === "a") {
     return (
       <a
-        data-preview-component
+        data-ds-specimen data-preview-component
         href="#documentation"
         onClick={(event) => event.preventDefault()}
       >
@@ -1088,24 +1088,24 @@ function ComponentPreview({
   }
 
   if (kind === "blockquote") {
-    return <blockquote data-preview-component>{config.text}</blockquote>;
+    return <blockquote data-ds-specimen data-preview-component>{config.text}</blockquote>;
   }
 
   if (kind === "button") {
     return (
-      <button data-preview-component type="button">
+      <button data-ds-specimen data-preview-component type="button">
         {config.text}
       </button>
     );
   }
 
   if (kind === "code") {
-    return <code data-preview-component>{config.text}</code>;
+    return <code data-ds-specimen data-preview-component>{config.text}</code>;
   }
 
   if (kind === "details") {
     return (
-      <details data-preview-component open>
+      <details data-ds-specimen data-preview-component open>
         <summary>{config.text}</summary>
         <p>{config.detail}</p>
       </details>
@@ -1113,7 +1113,7 @@ function ComponentPreview({
   }
 
   if (kind === "hr") {
-    return <hr data-preview-component />;
+    return <hr data-ds-specimen data-preview-component />;
   }
 
   if (kind === "input") {
@@ -1160,7 +1160,7 @@ function ComponentPreview({
     ];
 
     return (
-      <div className="input-preview">
+      <div className="input-preview" data-ds-specimen>
         {inputExamples.map((input) => (
           <div
             className="input-preview__instance"
@@ -1183,12 +1183,12 @@ function ComponentPreview({
   }
 
   if (kind === "progress") {
-    return <progress data-preview-component max="100" value="64" />;
+    return <progress data-ds-specimen data-preview-component max="100" value="64" />;
   }
 
   if (kind === "select") {
     return (
-      <label data-preview-component htmlFor="story-select">
+      <label data-ds-specimen data-preview-component htmlFor="story-select">
         <span>{config.text}</span>
         <select defaultValue="system" id="story-select">
           <option value="system">System</option>
@@ -1207,7 +1207,7 @@ function ComponentPreview({
     ].slice(0, config.copyLength === "short" ? 1 : config.copyLength === "long" ? 3 : 2);
 
     return (
-      <table data-preview-component>
+      <table data-ds-specimen data-preview-component>
         <thead>
           <tr>
             <th>Token</th>
@@ -1228,7 +1228,7 @@ function ComponentPreview({
 
   if (kind === "textarea") {
     return (
-      <label data-preview-component htmlFor="story-textarea">
+      <label data-ds-specimen data-preview-component htmlFor="story-textarea">
         <span>{config.text}</span>
         <textarea
           id="story-textarea"
@@ -1240,7 +1240,7 @@ function ComponentPreview({
   }
 
   return (
-    <section data-preview-component>
+    <section data-ds-specimen data-preview-component>
       <h2>{config.text}</h2>
       <p>{config.detail}</p>
     </section>
@@ -1905,6 +1905,7 @@ export function App({ initialCss, initialConfig, onDirty, headerSlot }: AppProps
                     selectedButtonFamily === "icon-button" ? (
                       <div
                         className="variant-gallery button-matrix icon-button-matrix semantic-preview"
+                        data-ds-specimen
                         ref={previewRef}
                       >
                         <div className="button-matrix__group">
@@ -1961,6 +1962,7 @@ export function App({ initialCss, initialConfig, onDirty, headerSlot }: AppProps
                     ) : (
                     <div
                       className="variant-gallery button-matrix semantic-preview"
+                      data-ds-specimen
                       ref={previewRef}
                     >
                       {BUTTON_MATRIX_GROUPS.filter((group) =>
@@ -2042,6 +2044,7 @@ export function App({ initialCss, initialConfig, onDirty, headerSlot }: AppProps
                   ) : selectedKind === "input" ? (
                     <div
                       className="variant-gallery button-matrix input-field-matrix semantic-preview"
+                      data-ds-specimen
                       ref={previewRef}
                     >
                       <div className="button-matrix__group">

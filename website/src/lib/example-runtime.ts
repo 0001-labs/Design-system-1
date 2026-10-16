@@ -168,7 +168,7 @@ function syncLegacyButtonPreview(css: string) {
   if (!/--one-button-padding-inline\s*:/.test(css)) { legacyPreviewStyle.textContent = ''; return; }
   if (!legacyReference) {
     legacyReference = document.createElement('button');
-    legacyReference.setAttribute('aria-hidden', 'true'); legacyReference.setAttribute('data-library-reference', ''); legacyReference.tabIndex = -1;
+    legacyReference.setAttribute('aria-hidden', 'true'); legacyReference.setAttribute('data-library-reference', ''); legacyReference.setAttribute('data-ds-specimen', ''); legacyReference.tabIndex = -1;
     legacyReference.textContent = 'Save changes';
     Object.assign(legacyReference.style, { position: 'fixed', left: '-10000px', visibility: 'hidden', pointerEvents: 'none' });
     document.body.append(legacyReference);
