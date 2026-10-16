@@ -2,6 +2,7 @@
 // Core button component
 
 import { html, unsafeCSS } from "lit";
+import { ifDefined } from "lit/directives/if-defined.js";
 import "./ds-text";
 import { Control } from "../0-face/control";
 import { define } from "../0-face/define";
@@ -38,6 +39,8 @@ export class Button extends Control {
     language: { type: String },
     text: { type: String },
     href: { type: String },
+    target: { type: String },
+    rel: { type: String },
     _loading: { type: Boolean, state: true },
   };
 
@@ -76,7 +79,16 @@ export class Button extends Control {
   declare blank: boolean;
   declare language: string;
   declare text: string;
+  /**
+   * With `href` the face is a real link (`<a part="control">`): the browser
+   * navigates, so middle-click, ⌘- or Ctrl-click, Copy link and Enter work as
+   * on any link. `target` and `rel` go on the link; `blank` is `target="_blank"`,
+   * which gets `rel="noopener noreferrer"` unless `rel` says otherwise. A
+   * disabled link has no `href`, so it cannot navigate.
+   */
   declare href: string;
+  declare target: string;
+  declare rel: string;
 
   // Private state
   declare _loading: boolean;
@@ -104,6 +116,8 @@ export class Button extends Control {
     this.language = "en-US";
     this.text = "";
     this.href = "";
+    this.target = "";
+    this.rel = "";
     this._loading = false;
   }
 
@@ -141,7 +155,7 @@ export class Button extends Control {
     if (this.split) { focusSplit(this, options); return; }
     if (this.control === "slotted") this.querySelector<HTMLElement>(":scope > :is(button, a)")?.focus(options);
     else if (this.hostControl) super.focus(options);
-    else this.shadowRoot?.querySelector("button")?.focus(options);
+    else this.shadowRoot?.querySelector<HTMLElement>('[part="control"]')?.focus(options);
   }
 
   connectedCallback() {
@@ -166,6 +180,27 @@ export class Button extends Control {
     if (this.control === "slotted") return html`<slot @slotchange=${this.syncSlottedControl}></slot>`;
     if (this.hostControl) return html`<slot name="icon"></slot><slot></slot><slot name="trailing"></slot>`;
 
+    const content = hasTextProps
+      ? html`<ds-text .text=${this.text}></ds-text>`
+      : html`<slot @slotchange=${this._reflectIcon}></slot>`;
+
+    if (this.href) {
+      const disabled = this.splitDisabled;
+      const target = this.target || (this.blank ? "_blank" : "");
+      const rel = this.rel || (target === "_blank" ? "noopener noreferrer" : "");
+      return html`<a
+        part="control"
+        ?primary=${this.primary}
+        ?secondary=${this.secondary}
+        href=${ifDefined(disabled ? undefined : this.href)}
+        target=${ifDefined(disabled || !target ? undefined : target)}
+        rel=${ifDefined(disabled || !rel ? undefined : rel)}
+        role=${ifDefined(disabled ? "link" : undefined)}
+        aria-disabled=${ifDefined(disabled ? "true" : undefined)}
+        @click=${this._handleClick}
+      >${content}</a>`;
+    }
+
     return html`
       <button
         part="control"
@@ -175,36 +210,22 @@ export class Button extends Control {
         ?disabled=${this.splitDisabled}
         @click=${this._handleClick}
       >
-        ${hasTextProps
-          ? html`<ds-text .text=${this.text}></ds-text>`
-          : html`<slot @slotchange=${this._reflectIcon}></slot>`}
+        ${content}
       </button>
     `;
   }
 
   private _handleClick(e: Event) {
     // Prevent any action if disabled and stop event propagation
-    if (this.disabled) {
+    if (this.splitDisabled) {
       e.preventDefault();
       e.stopPropagation();
       return;
     }
 
-    // If href is provided, navigate to the URL and do not bubble further
-    if (this.href) {
-      e.preventDefault();
-      e.stopPropagation();
-      if (this.blank) {
-        window.open(this.href, "_blank", "noopener,noreferrer");
-      } else {
-        window.location.href = this.href;
-      }
-      return;
-    }
-
-    // Otherwise, rely on the native 'click' event bubbling from the inner
-    // <button> through the shadow boundary to consumers of <ds-button>.
-    // Do not re-dispatch a synthetic 'click' here to avoid duplicate events.
+    // Otherwise the native click bubbles from the inner <button> or <a>
+    // through the shadow boundary to consumers of <ds-button>, and a link
+    // navigates as the browser does. Nothing is re-dispatched or redirected.
   }
 }
 

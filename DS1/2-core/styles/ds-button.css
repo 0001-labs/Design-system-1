@@ -1,5 +1,6 @@
 /* ds-button.css */
-/* Core button component styles */
+/* Core button component styles. The face is a <button>, or an <a> when the
+   element has an href: both draw alike in every variant and state. */
 
 :host {
   display: inline-flex;
@@ -22,19 +23,19 @@
   flex: 0 0 auto;
   width: max-content;
 }
-:host([fit]) button {
+:host([fit]) :is(button, a) {
   flex: 0 0 auto;
   width: max-content;
   min-width: var(--ds-button-min-width, 0px);
   justify-content: var(--ds-button-align, flex-start);
 }
-:host([fit]) button ds-text,
-:host([fit]) button ::slotted(*) {
+:host([fit]) :is(button, a) ds-text,
+:host([fit]) :is(button, a) ::slotted(*) {
   flex: 0 0 auto;
   width: max-content;
 }
 
-button {
+:is(button, a) {
   box-sizing: border-box;
   max-height: var(--ds-control-height);
   height: var(--ds-control-height);
@@ -65,8 +66,8 @@ button {
   text-decoration: none;
 }
 
-button ds-text,
-button ::slotted(*) {
+:is(button, a) ds-text,
+:is(button, a) ::slotted(*) {
   overflow-x: clip;
   overflow-y: visible;
   text-overflow: ellipsis;
@@ -77,7 +78,7 @@ button ::slotted(*) {
   color: inherit;
 }
 
-button[primary] {
+:is(button, a)[primary] {
   background-color: var(--accent-color);
   color: var(--button-text-color-on-light, var(--black));
   text-decoration-line: none;
@@ -85,11 +86,17 @@ button[primary] {
   padding: 0 calc(var(--ds-button-inset, 4px) * var(--ds-sf));
 }
 
-button[secondary] {
+:is(button, a)[secondary] {
   background-color: var(--button-background-color-secondary);
   color: var(--button-text-color-secondary, var(--black));
   font-family: var(--ds-typeface-regular);
   padding: 0 calc(var(--ds-button-inset, 4px) * var(--ds-sf));
+}
+
+/* Disabled, as in the slotted and host modes. A disabled link has no href. */
+:is(button:disabled, a[aria-disabled="true"]) {
+  cursor: default;
+  opacity: 0.5;
 }
 
 .loading {
@@ -106,7 +113,7 @@ button[secondary] {
   width: var(--ds-control-height);
   height: var(--ds-control-height);
 }
-:host([icon]) button {
+:host([icon]) :is(button, a) {
   width: var(--ds-control-height);
   padding: 0 !important;
   justify-content: center;
@@ -123,13 +130,13 @@ button[secondary] {
   flex: 0 0 auto;
   width: var(--ds-control-height);
 }
-:host([square]) button {
+:host([square]) :is(button, a) {
   width: var(--ds-control-height);
   padding: 0 !important;
   justify-content: center;
 }
 
 /* A segment gets its outside corners from the enclosing split control. */
-:host([segment]) button {
+:host([segment]) :is(button, a) {
   border-radius: 0 !important;
 }
