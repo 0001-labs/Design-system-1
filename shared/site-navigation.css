@@ -86,3 +86,9 @@
 @media (max-width: 768px) {
   .site-navigation .site-browse { display: inline-flex; align-items: center; }
 }
+
+/* Private navigation stays hidden while the existing session is checked. */
+html:not([data-signed-in]) [data-requires-signin],
+html:not([data-signed-in]) .sidebar-content a[href="/classless/libraries/"] {
+  display: none !important;
+}

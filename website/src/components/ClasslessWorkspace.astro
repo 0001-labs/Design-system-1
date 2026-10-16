@@ -17,7 +17,7 @@ const appPath = mode === 'editor' ? '/app/playground' : '/app/libraries';
   </div>
   <nav class="classless-tabs" aria-label="CLASSless Design System">
     <a href="/classless/">Overview</a>
-    <a href="/classless/libraries/" aria-current="page">My libraries</a>
+    <a data-requires-signin href="/classless/libraries/" aria-current="page">My libraries</a>
     <span>{mode === 'editor' ? 'Playground · changes are temporary' : 'Saved stylesheets'}</span>
   </nav>
   <iframe

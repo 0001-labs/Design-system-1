@@ -1,7 +1,7 @@
 import { FontWorkspace } from "./screens/FontWorkspace";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { useConvexAuth } from "convex/react";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 
 import { App } from "./App";
 import { AppShell } from "./AppShell";
@@ -71,10 +71,25 @@ function NotFound() {
   );
 }
 
+// Same-origin public navigation receives only a verified session boolean.
+function NavigationAuth() {
+  const { isAuthenticated, isLoading } = useConvexAuth();
+  useEffect(() => {
+    const report = () => window.parent.postMessage({ type: "ds1:navigation-auth", authenticated: !isLoading && isAuthenticated }, window.location.origin);
+    const request = (event: MessageEvent) => {
+      if (event.origin === window.location.origin && event.source === window.parent && event.data?.type === "ds1:navigation-auth-request") report();
+    };
+    window.addEventListener("message", request);
+    report();
+    return () => window.removeEventListener("message", request);
+  }, [isAuthenticated, isLoading]);
+  return null;
+}
+
 export function Root({ children }: { children?: ReactNode }) {
   return (
     <ConvexAuthProvider client={convex}>
-      <RouterProvider>{window.location.hostname === "fonts.designsystem1.com" ? <FontWorkspace /> : <AppShell>{children ?? <Routes />}</AppShell>}</RouterProvider>
+      <RouterProvider>{window.location.pathname === "/app/navigation-auth" ? <NavigationAuth /> : window.location.hostname === "fonts.designsystem1.com" ? <FontWorkspace /> : <AppShell>{children ?? <Routes />}</AppShell>}</RouterProvider>
     </ConvexAuthProvider>
   );
 }

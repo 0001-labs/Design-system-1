@@ -13,14 +13,29 @@ const { landing = false } = Astro.props;
   <nav class="site-links" aria-label="Main navigation">
     {!landing && <button id="mobile-menu-btn" class="site-browse" type="button" aria-controls="sidebar" aria-expanded="false">Browse docs</button>}
     {siteNavigation.map((item) => (
-      <a href={item.href} aria-current={isNavigationCurrent(item.href, Astro.url.pathname) ? 'page' : undefined}>{item.label}</a>
+      <a data-requires-signin={item.href === "/app/libraries" || undefined} href={item.href} aria-current={isNavigationCurrent(item.href, Astro.url.pathname) ? 'page' : undefined}>{item.label}</a>
     ))}
 
   </nav>
   <a class="site-account" href="/app/signin">Sign in</a>
 </header>
+<iframe id="navigation-auth" src="/app/navigation-auth" title="Account status" hidden aria-hidden="true" tabindex="-1"></iframe>
 
 <script>
   import '../lib/public-preferences';
   import '../../../DS1/0-face/device';
+  const frame = document.querySelector<HTMLIFrameElement>('#navigation-auth');
+  const requestStatus = () => frame?.contentWindow?.postMessage({ type: 'ds1:navigation-auth-request' }, location.origin);
+  frame?.addEventListener('load', requestStatus);
+  requestStatus();
+  window.addEventListener('message', (event) => {
+    if (event.origin !== location.origin || event.source !== frame?.contentWindow || event.data?.type !== 'ds1:navigation-auth') return;
+    const authenticated = event.data.authenticated === true;
+    document.documentElement.toggleAttribute('data-signed-in', authenticated);
+    const account = document.querySelector<HTMLAnchorElement>('.site-account');
+    if (account) {
+      account.textContent = authenticated ? 'Account' : 'Sign in';
+      account.href = authenticated ? '/app/libraries' : '/app/signin';
+    }
+  });
 </script>
