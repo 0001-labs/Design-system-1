@@ -47,6 +47,10 @@ Items stack edge to edge with no gap, as an Ezo list does. Lists, table rows, ce
 - Motion animates `transform` and `opacity` only.
 - On phones and tablets every measure is multiplied by `--sf` (1 on a computer; the screen width over 280 on a phone, between 0.75 and 2). Write lengths as units or `calc(Npx * var(--sf))`, never bare pixels, except hairlines.
 
+## Toasts
+
+A toast is `<ds-toast>` and `toast()` from `DS1/2-core/ds-toast.ts`, based on Sonner: Sonner's calls, options and stacking behaviour, drawn sixteen squares wide, one square from the edge, half a square apart, two squares high for one line, with a 1px line and no shadow. Never build a product's own toast or notification stack.
+
 ## Tooltips
 
 A tooltip is Ezo's label, never the browser's `title`: 16px high on 16px lines, 14px regular, 2.5px at the sides, 4px corners, black with white text (white on black in dark mode), two pixels above the element, shown at once; `data-tooltip-colour` gives it a colour (an accent, a column's colour) lettered in the ink. Wrap one element in `<ds-tooltip>`, or give any number of elements `data-tooltip="…"` and load `DS1/0-face/tooltips.ts`, which shows one shared label for them all; a text longer than 320px wraps.

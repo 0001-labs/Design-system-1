@@ -1,0 +1,97 @@
+---
+title: Toast
+description: Short messages that stack in a corner and leave on their own. Based on Sonner.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+**Toast is based on [Sonner](https://sonner.emilkowal.ski)**, the React toast
+library by Emil Kowalski ([source](https://github.com/emilkowalski/sonner), MIT
+licence). It is a Lit port of Sonner's API and behaviour, drawn in Design
+system 1's measures, so Sonner's documentation describes how it works.
+
+## Try it
+
+<ComponentExample example="toast" />
+
+## Use it
+
+Put one `<ds-toast>` in the page, Sonner's `<Toaster />`, and call `toast()`
+from anywhere. When the page has none, the first `toast()` adds one.
+
+```html
+<ds-toast position="bottom-right"></ds-toast>
+```
+
+```ts
+import { toast } from "@0001-labs/design-system-1";
+
+toast("Event created", { description: "Monday at 9:00" });
+toast.success("Changes saved");
+toast.info("A new version is ready");
+toast.warning("Storage almost full");
+toast.error("Could not save");
+
+const id = toast.loading("Uploading");
+toast.success("Uploaded", { id }); // the same id updates the toast in place
+
+toast("Item archived", { action: { label: "Undo", onClick: () => restore() } });
+toast.promise(save(), { loading: "Saving", success: "Saved", error: "Could not save" });
+
+toast.dismiss(id); // one toast; toast.dismiss() for all of them
+```
+
+In React, import Sonner's names from the adapter:
+
+```tsx
+import { Toaster, toast } from "@0001-labs/design-system-1/DS1/react/toast";
+
+<Toaster position="top-center" richColors />
+```
+
+## The toaster
+
+| Attribute | Default | What it does (as in Sonner) |
+| --- | --- | --- |
+| `position` | `bottom-right` | `top-left`, `top-center`, `top-right`, `bottom-left`, `bottom-center` or `bottom-right`. |
+| `expand` | Off | Keeps the toasts spread out instead of stacked. |
+| `visible-toasts` | `3` | How many toasts show at once. |
+| `duration` | `4000` | Milliseconds each toast stays. |
+| `close-button` | Off | Adds a close button to every toast. |
+| `rich-colors` | Off | Fills success, info, warning and error toasts with their colour. |
+| `label` | `Notifications` | The region's accessible name; pass the product's own words. |
+| `close-label` | `Close toast` | The close button's accessible name. |
+
+## A toast's options
+
+`id`, `description`, `duration` (`Infinity` keeps it), `icon` (a Design system 1
+icon name), `action` and `cancel` (`{ label, onClick }`; the toast closes after
+the click unless `onClick` calls `preventDefault()`), `dismissible`,
+`closeButton`, `important` (announced assertively), `onDismiss` and
+`onAutoClose`. `toast.promise()` also takes `loading`, `success`, `error` (text,
+or a function of the result) and `finally`.
+
+## Behaviour
+
+As in Sonner: the newest toast is in front, the next two peek out behind it,
+and hovering or focusing the stack spreads them out and pauses their time, as
+does holding a toast or hiding the tab. A swipe towards the edge dismisses a
+toast; Alt+T moves focus to the toasts and Escape lets go. Loading toasts stay
+until they are updated or dismissed.
+
+## Where it departs from Sonner
+
+The toasts follow Design system 1 rather than Sonner's look: sixteen squares
+wide, one square from the edge, half a square between them, one line of words
+making a toast two squares high, the shared type, colours and buttons, a 1px
+line and no shadow. Only `transform` and `opacity` animate; a toast stacked
+behind takes the front one's height at once. Swiping works towards the
+vertical edge only.
+
+Set `--ds-toast-background`, `--ds-toast-color` and `--ds-toast-border` on
+`ds-toast` to change its colours with shared tokens. Copy `toast` through Sync 1.
+
+## Related components
+
+[Banner](/2-core/banner/) holds a message that stays. [Button](/2-core/button/)
+draws a toast's action.

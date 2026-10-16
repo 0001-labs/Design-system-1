@@ -1,0 +1,152 @@
+@import "../../1-root/component-metrics.css";
+
+/* Toast, based on Sonner (https://sonner.emilkowal.ski, MIT licence).
+ * Sonner's stack, drawn in Design system 1's measures: sixteen squares wide,
+ * one square from the edge, half a square between toasts and peeking behind
+ * the front one. Sonner's 400ms transitions on transform and opacity only. */
+:host {
+  --ds-toast-width: calc(16 * var(--ds-unit));
+  --ds-toast-offset: var(--ds-unit);
+  --ds-toast-gap: calc(var(--ds-unit) / 2);
+  --ds-toast-background: var(--ds-paper);
+  --ds-toast-color: var(--ds-text-color);
+  --ds-toast-border: var(--ds-border-color);
+  display: contents;
+}
+
+section { display: contents; }
+
+ol {
+  --lift: -1;
+  position: fixed;
+  z-index: 2147483000;
+  box-sizing: border-box;
+  width: min(var(--ds-toast-width), calc(100vw - 2 * var(--ds-toast-offset)));
+  height: calc(var(--height) + var(--gaps) * var(--ds-toast-gap));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  outline: none;
+}
+ol[data-y="top"] { --lift: 1; top: var(--ds-toast-offset); }
+ol[data-y="bottom"] { bottom: var(--ds-toast-offset); }
+ol[data-x="left"] { left: var(--ds-toast-offset); }
+ol[data-x="right"] { right: var(--ds-toast-offset); }
+ol[data-x="center"] { left: 50%; transform: translateX(-50%); }
+
+.toast {
+  --swipe: 0px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid var(--ds-toast-border);
+  border-radius: var(--ds-radius);
+  background: var(--ds-toast-background);
+  color: var(--ds-toast-color);
+  font-family: var(--ds-typeface-regular);
+  font-feature-settings: var(--ds-font-features);
+  font-size: var(--ds-type-size-default);
+  letter-spacing: var(--ds-type-letterspacing-default);
+  outline: none;
+  touch-action: none;
+  user-select: none;
+  opacity: 0;
+  transition: transform 400ms ease, opacity 400ms ease;
+}
+ol[data-y="bottom"] .toast { bottom: 0; }
+ol[data-y="top"] .toast { top: 0; }
+.toast:focus-visible { outline: 2px solid var(--ds-focus-ring); outline-offset: -2px; }
+
+/* Entering: from beyond the edge, then into the stack. */
+.toast[data-mounted="false"] { transform: translateY(calc(var(--lift) * -100%)); }
+.toast[data-mounted="true"] { opacity: 1; }
+
+/* Collapsed: the front toast, and the next ones peeking out a little smaller. */
+ol[data-expanded="false"] .toast[data-mounted="true"] {
+  transform: translateY(calc(var(--lift) * var(--index) * var(--ds-toast-gap) + var(--swipe))) scale(calc(1 - var(--index) * 0.05));
+}
+ol[data-expanded="false"] .toast[data-front="false"] { height: var(--front-height); }
+ol[data-expanded="false"] .toast[data-front="false"] .body { opacity: 0; }
+
+/* Expanded: each toast after the ones in front of it. */
+ol[data-expanded="true"] .toast[data-mounted="true"] {
+  transform: translateY(calc(var(--lift) * (var(--offset) + var(--index) * var(--ds-toast-gap)) + var(--swipe)));
+}
+
+.toast[data-visible="false"] { opacity: 0; pointer-events: none; }
+.toast[data-swiping="true"] { transition: none; }
+
+/* Leaving: the front one back over its edge, the others fade where they are. */
+.toast[data-removed="true"] { opacity: 0; pointer-events: none; }
+.toast[data-removed="true"][data-front="true"] { transform: translateY(calc(var(--lift) * -100%)); }
+.toast[data-swipe-out="true"] { transform: translateY(calc(var(--swipe) + var(--lift) * -100%)); }
+
+/* Half a square around one-square rows, less the line: one line of words
+ * makes a toast two squares high. */
+.body {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(4px * var(--ds-sf));
+  box-sizing: border-box;
+  padding: calc(var(--ds-unit) / 2 - 1px);
+  transition: opacity 400ms ease;
+}
+.icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: var(--ds-row-height);
+  height: var(--ds-row-height);
+}
+.content { flex: 1 1 auto; min-width: 0; }
+.title, .description { line-height: var(--ds-row-height); overflow-wrap: anywhere; }
+.description { color: var(--ds-text-color-muted); }
+ds-button { flex: 0 0 auto; margin-block: calc((var(--ds-row-height) - var(--ds-control-height)) / 2); }
+
+.close {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: var(--ds-row-height);
+  height: var(--ds-row-height);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--ds-radius);
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+.close:hover { background: var(--ds-fill-hover); }
+.close:focus-visible { outline: 2px solid var(--ds-focus-ring); outline-offset: -2px; }
+
+.spinner {
+  width: calc(12px * var(--ds-sf));
+  height: calc(12px * var(--ds-sf));
+  box-sizing: border-box;
+  border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: ds-toast-spin 720ms linear infinite;
+}
+@keyframes ds-toast-spin { to { transform: rotate(360deg); } }
+
+/* Sonner's rich colours: a meaningful fill for each type, lettered in the ink. */
+:host([rich-colors]) .toast[data-type="success"] { --ds-toast-background: var(--ds-apple-green); }
+:host([rich-colors]) .toast[data-type="info"] { --ds-toast-background: var(--ds-zenith-blue); }
+:host([rich-colors]) .toast[data-type="warning"] { --ds-toast-background: var(--ds-orange); }
+:host([rich-colors]) .toast[data-type="error"] { --ds-toast-background: var(--ds-tuned-red); }
+:host([rich-colors]) .toast:is([data-type="success"], [data-type="info"], [data-type="warning"], [data-type="error"]) {
+  --ds-toast-color: var(--ds-black);
+  --ds-toast-border: var(--ds-toast-background);
+  --ds-text-color-muted: color-mix(in srgb, var(--ds-black) 75%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast, .body { transition: none; }
+  .spinner { animation: none; }
+}

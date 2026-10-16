@@ -214,7 +214,7 @@ Design system 1/
 │   ├── 1-root/       # Core styles, fonts, and design tokens
 │   │                 # (everything as CSS variables)
 │   ├── 2-core/       # Core components (banner, buttons, text, cycle,
-│   │                 # date, icon, input, tooltip)
+│   │                 # date, icon, input, toast (based on Sonner), tooltip)
 │   ├── 3-unit/       # Composite components (list, row, table)
 │   ├── 4-page/       # Page-level components for layout (layout, grid)
 │   └── x-icon/       # SVG icon library

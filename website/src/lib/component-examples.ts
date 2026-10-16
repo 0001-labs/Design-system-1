@@ -27,6 +27,26 @@ export const EXAMPLES: Record<string, ComponentExample> = {
   });
 });`,
   },
+  toast: {
+    title: 'Toasts, as in Sonner',
+    hint: 'Each button calls toast(). Hover the stack to spread it out and pause it; swipe one down to dismiss it.',
+    height: 260,
+    html: `<ds-toast position="bottom-right" close-button></ds-toast>
+<ds-row>
+  <ds-button secondary data-toast="default">Default</ds-button>
+  <ds-button secondary data-toast="success">Success</ds-button>
+  <ds-button secondary data-toast="error">Error</ds-button>
+  <ds-button secondary data-toast="action">Action</ds-button>
+  <ds-button secondary data-toast="promise">Promise</ds-button>
+</ds-row>`,
+    script: `import { toast } from "@0001-labs/design-system-1";
+
+toast("Event created", { description: "Monday at 9:00" });
+toast.success("Changes saved");
+toast.error("Could not save");
+toast("Item archived", { action: { label: "Undo", onClick: () => restore() } });
+toast.promise(save(), { loading: "Saving", success: "Saved", error: "Could not save" });`,
+  },
   chart: {
     title: 'Chart types on the grid',
     hint: 'The cycle moves through the seven chart types by itself; click it to choose one. Sample values only; move over a series to inspect a point. No live data is loaded.',
@@ -227,6 +247,7 @@ document.querySelectorAll('[data-grid-option]').forEach(control => {
 
 export const PAGE_EXAMPLES: Record<string, string[]> = {
   '2-core/toggle': ['toggle'],
+  '2-core/toast': ['toast'],
   '2-core/chart': ['chart'],
   '2-core/avatar': ['avatar'],
   '2-core/button': ['button', 'button-icon', 'split'],

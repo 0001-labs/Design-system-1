@@ -59,6 +59,16 @@ for (const name of ['change', 'press']) sample.addEventListener(name, event => {
     output.textContent = `${name}: ${(event as CustomEvent).detail.value}`;
 });
 
+const { toast } = await import('../../../DS1/2-core/ds-toast');
+sample.querySelectorAll<HTMLElement>('[data-toast]').forEach(button => button.addEventListener('click', () => {
+  const kind = button.dataset.toast;
+  if (kind === 'success') toast.success('Changes saved');
+  else if (kind === 'error') toast.error('Could not save', { description: 'Check the connection and try again.' });
+  else if (kind === 'action') toast('Item archived', { action: { label: 'Undo', onClick: () => toast('Item restored') } });
+  else if (kind === 'promise') toast.promise(new Promise(resolve => setTimeout(resolve, 1600)), { loading: 'Saving', success: 'Saved', error: 'Could not save' });
+  else toast('Event created', { description: 'Monday at 9:00' });
+}));
+
 const sidebar = sample.querySelector('ds-sidebar');
 if (sidebar) {
   let expanded = true;
