@@ -42,7 +42,7 @@
   font-display: swap;
 }
 
-/* The code font: Iosevka cut down to what code uses (fonts/Iosevka-LICENSE.md). */
+/* The code font: Iosevka Extended, subset for code (fonts/Iosevka-LICENSE.md). */
 @font-face {
   font-family: Iosevka;
   src: url("./fonts/Iosevka-Regular.woff2") format("woff2");
