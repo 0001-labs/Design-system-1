@@ -37,6 +37,8 @@
   --ds-sharp-blue: #594dff;
   --ds-zenith-blue: #ccccff;
   --ds-apple-green: #99ff73;
+  /* Dark Apple green keeps a white switch thumb clear in either scheme. */
+  --ds-switch-track-on: #529d36;
   --ds-yellow: #eaff00;
   --ds-orange: #fec20d;
 
