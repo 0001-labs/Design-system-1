@@ -1,9 +1,9 @@
 import type { LanguageCode } from "./i18n";
-import type { ThemeType } from "./theme";
+import type { ThemeMode } from "./theme";
 
 export type Preferences = {
   language?: LanguageCode;
-  theme?: ThemeType;
+  theme?: ThemeMode;
   [key: string]: unknown;
 };
 
@@ -13,6 +13,12 @@ export interface PreferenceOptions {
   themeStorageKey?: string;
   /** Follow system appearance without reading or writing a saved theme. */
   themeMode?: "system";
+  /**
+   * The canvas behind the page and the browser's theme-color, per theme, set
+   * by the theme runtime before the first paint: Design system 1's paper
+   * (`--background`) by default. `false` leaves both to the page.
+   */
+  themePaper?: { light: string; dark: string } | false;
 }
 
 declare global {

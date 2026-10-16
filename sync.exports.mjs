@@ -16,6 +16,7 @@ const rootModules = {
   'grid-fit': ['grid-fit.ts'],
   'layout-inspector': ['layout-inspector.ts'],
   scaling: ['scaling.ts'],
+  'theme-bootstrap': ['theme-bootstrap.js'],
   tooltips: ['tooltips.ts'],
 };
 /** The component stylesheets in the order they import each other. */
@@ -62,7 +63,7 @@ export default {
      * the faces it loads, in fonts/. `styles` names the stylesheets to copy
      * when a product loads only some (`["grid.css"]`, or `[]` for scripts
      * alone); `fonts: false` leaves the faces to the product; `nativeControls` adds controls.css and table.css; `modules` names page scripts
-     * from 0-face/ (grid, grid-fit, layout-inspector, scaling, tooltips), copied
+     * from 0-face/ (grid, grid-fit, layout-inspector, scaling, theme-bootstrap, tooltips), copied
      * with what they import.
      */
     root: {

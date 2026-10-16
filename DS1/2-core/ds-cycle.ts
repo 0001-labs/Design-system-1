@@ -8,8 +8,8 @@ import {
   setLanguage,
 } from "../0-face/i18n";
 import type { LanguageCode } from "../0-face/i18n";
-import { currentTheme, setTheme } from "../0-face/theme";
-import type { ThemeType } from "../0-face/theme";
+import { currentThemeMode, setThemeMode, THEME_MODES } from "../0-face/theme";
+import type { ThemeMode } from "../0-face/theme";
 import { savePreferences } from "../0-face/preferences";
 import "./ds-button";
 import "./ds-icon";
@@ -168,12 +168,9 @@ export class Cycle extends LitElement {
       this.values = availableLanguages;
       this.currentValue = currentLanguage.value;
     } else if (this.type === "theme") {
-      // Set up theme cycling
-      this.values = ["light", "dark"];
-
-      // Set initial value based on current theme
-      const currentThemeValue = currentTheme.get();
-      this.currentValue = currentThemeValue;
+      // Light, dark and the system's, the stored choice
+      this.values = [...THEME_MODES];
+      this.currentValue = currentThemeMode.get();
     } else if (this.type === "accent-color") {
       // Set up accent color cycling
       this.values = [
@@ -238,9 +235,8 @@ export class Cycle extends LitElement {
       const currentLang = currentLanguage.value;
       this.currentValue = currentLang;
     } else if (this.type === "theme") {
-      // Get current theme
-      const currentThemeValue = currentTheme.get();
-      this.currentValue = currentThemeValue;
+      // The stored choice, which may be the system's
+      this.currentValue = currentThemeMode.get();
     } else if (this.type === "accent-color") {
       // Get current accent color
       const currentAccentColor = getAccentColor();
@@ -339,11 +335,11 @@ export class Cycle extends LitElement {
       // Update current value
       this.currentValue = newTheme;
 
-      // Set the new theme using the shared helper
-      setTheme(newTheme as ThemeType);
+      // Set the new choice using the shared helper
+      setThemeMode(newTheme as ThemeMode);
 
       // Save preferences
-      savePreferences({ theme: newTheme as ThemeType });
+      savePreferences({ theme: newTheme as ThemeMode });
 
       // Theme helper already emits the change event, so no manual dispatch here
     } else if (this.type === "accent-color") {
@@ -589,7 +585,7 @@ export class Cycle extends LitElement {
                 ></ds-text>`
               : this.type === "theme"
                 ? html`<ds-text
-                    text=${this.currentValue === "light" ? "Light" : "Dark"}
+                    text=${this.currentValue === "light" ? "Light" : this.currentValue === "dark" ? "Dark" : "System"}
                   ></ds-text>`
                 : this.type === "accent-color"
                   ? html`<ds-text
