@@ -4,7 +4,7 @@ import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { sourceSites, scanApp, checkSnapshots, checkLockedControls } from "../scripts/component-adoption";
+import { sourceSites, scanApp, checkSnapshots, checkLockedControls, checkLockedText } from "../scripts/component-adoption";
 
 const temporary: string[] = [];
 afterEach(() => { for (const dir of temporary.splice(0)) rmSync(dir, { recursive: true, force: true }); });
@@ -375,5 +375,93 @@ describe("class copies, direct source and scoped checkouts", () => {
     expect(scoped.dirty).toBe(false);
     write(app, "web/src/new.ts", "export {};\n");
     expect(scanApp({ id: "classes", name: "Classes", directory: "Classes/web", roots: ["src"] }, studio, ds).dirty).toBe(true);
+  });
+});
+
+describe("text on the grid: .ds-text classes and prose", () => {
+  const sha = (body: string) => createHash("sha256").update(body).digest("hex");
+  const component = { "component-tokens.css": ":root { --t: 1; }", "component-metrics.css": ":root { --m: 1; }", "component-appearance.css": ":root { --a: 1; }" };
+  function textFixture(copied: Record<string, string>) {
+    const studio = mkdtempSync(join(tmpdir(), "component-adoption-")); temporary.push(studio);
+    const ds = join(studio, "Design system 1"), app = join(studio, "Pages");
+    for (const root of [ds, app]) { mkdirSync(root); git(root, "init", "-b", "main"); }
+    const sheets = { "text.css": ".ds-text { line-height: 20px; }", "prose.css": "[data-ds-prose] { line-height: 20px; }", "one.css": ".ds-text { margin: 0; }", ...component };
+    for (const [file, body] of Object.entries(sheets)) write(ds, `DS1/1-root/${file}`, body);
+    write(ds, "DS1/2-core/ds-text.ts", "export const tag = 'ds-text';");
+    git(ds, "add", "."); git(ds, "-c", "user.name=Test", "-c", "user.email=test@example.com", "commit", "-m", "Sheets");
+    const commit = git(ds, "rev-parse", "HEAD");
+    const files = { ...component, ...copied };
+    for (const [file, body] of Object.entries(files)) write(app, `web/ds1/${file}`, body);
+    write(app, "sync.lock.json", JSON.stringify({ "Design system 1": { commit, files: Object.fromEntries(Object.entries(files).map(([file, body]) => [`web/ds1/${file}`, sha(body)])) } }));
+    write(app, "web/index.html", [
+      '<h1 class="ds-text ds-text--display">Title</h1>',
+      '<p class="ds-text--muted">A note</p>',
+      '<article data-ds-prose><h2>Section</h2><p>Writing</p><ul><li>One</li></ul><table></table><div data-ds-not-prose><p>Example</p></div></article>',
+      '<p>Local</p>',
+    ].join("\n"));
+    git(app, "add", "."); git(app, "-c", "user.name=Test", "-c", "user.email=test@example.com", "commit", "-m", "Page");
+    return { studio, ds, app, scan: () => scanApp({ id: "pages", name: "Pages", directory: "Pages", roots: ["web"] }, studio, ds) };
+  }
+
+  it("recognizes native text with a literal ds-text class, and only text", () => {
+    for (const file of ["page.html", "view.tsx"]) {
+      const attribute = file.endsWith("x") ? "className" : "class";
+      const sites = sourceSites(file, `<><p ${attribute}="lead ds-text ds-text--muted">A</p><h3 ${attribute}="ds-text--heading">B</h3><p ${attribute}="my-ds-text">C</p><textarea ${attribute}="ds-textarea" /><span ${attribute}="ds-text">D</span></>`);
+      expect(sites.filter(site => site.nativeStyle).map(site => [site.tag, site.nativeStyle])).toEqual([["p", "ds-text"], ["h3", "ds-text"], ["textarea", "ds-textarea"]]);
+    }
+  });
+
+  it("marks text, lists and tables inside data-ds-prose, and leaves data-ds-not-prose parts and the outside alone", () => {
+    const markup = '<article data-ds-prose><h1>T</h1><p>A</p><ul><li>x</li></ul><table></table><div data-ds-not-prose><p>B</p></div><p>C</p></article><p>D</p>';
+    for (const [file, source] of [["page.html", markup], ["view.tsx", `const view = <>${markup}</>;`], ["view.ts", `const view = html\`<article data-ds-prose>\${intro}<p>A</p></article><p>D</p>\`;`]] as const) {
+      const sites = sourceSites(file, source).filter(site => ["h1", "p", "ul", "table"].includes(site.tag));
+      const expected = file === "view.ts" ? [["p", true], ["p", false]] : [["h1", true], ["p", true], ["ul", true], ["table", true], ["p", false], ["p", true], ["p", false]];
+      expect(sites.map(site => [site.tag, site.prose === true]), file).toEqual(expected);
+    }
+  });
+
+  it("counts .ds-text and prose sites as DS1 styles when the lock verifies text.css and prose.css", () => {
+    const { scan } = textFixture({ "text.css": ".ds-text { line-height: 20px; }", "prose.css": "[data-ds-prose] { line-height: 20px; }" });
+    const report = scan();
+    // The example inside data-ds-not-prose and the paragraph outside stay local.
+    expect(report.cells.text).toMatchObject({ styled: 4, local: 2, unverified: 0 });
+    expect(report.cells.list).toMatchObject({ styled: 1, local: 0 });
+    expect(report.cells.table).toMatchObject({ styled: 1, local: 0 });
+    expect(report.cells.text!.sites.map(site => site.tag)).toEqual(["h1.ds-text", "p.ds-text", "h2[data-ds-prose]", "p[data-ds-prose]", "p", "p"]);
+  });
+
+  it("needs review when the sheet that draws a site is edited or missing", () => {
+    const { app, scan } = textFixture({ "text.css": ".ds-text { line-height: 20px; }" });
+    expect(scan().cells.text).toMatchObject({ styled: 2, unverified: 2, local: 2 });
+    expect(scan().cells.text!.issues).toContain("DS1 prose styles could not be verified.");
+    write(app, "web/ds1/text.css", ".ds-text { line-height: 16px; }");
+    expect(scan().cells.text).toMatchObject({ styled: 0, unverified: 4 });
+    expect(scan().cells.text!.issues).toContain("Native DS1 text styles could not be verified.");
+  });
+
+  it("verifies .ds-text through a component manifest that carries text.css", () => {
+    const { studio, ds, app } = fixture();
+    write(app, "src/page.tsx", 'export const Page = () => <p className="ds-text">Saved</p>;');
+    git(app, "add", "."); git(app, "-c", "user.name=Test", "-c", "user.email=test@example.com", "commit", "-m", "Page");
+    const scan = () => scanApp({ id: "example", name: "Example", directory: "Example", roots: ["src"], manifest: "design/components-manifest.json" }, studio, ds);
+    expect(scan().cells.text).toMatchObject({ styled: 0, unverified: 1 });
+    const body = ".ds-text { line-height: 20px; }";
+    write(ds, "DS1/1-root/text.css", body); write(app, "design/1-root/text.css", body);
+    git(ds, "add", "."); git(ds, "-c", "user.name=Test", "-c", "user.email=test@example.com", "commit", "-m", "Text");
+    const path = join(app, "design/components-manifest.json"), manifest = JSON.parse(readFileSync(path, "utf8"));
+    manifest.commit = git(ds, "rev-parse", "HEAD"); manifest.files["1-root/text.css"] = sha(body);
+    writeFileSync(path, JSON.stringify(manifest));
+    expect(scan().cells.text).toMatchObject({ styled: 1, unverified: 0 });
+  });
+
+  it("accepts an older copy of one.css that held .ds-text itself, and no other", () => {
+    expect(textFixture({ "one.css": ".ds-text { margin: 0; }" }).scan().cells.text).toMatchObject({ styled: 2, unverified: 2 });
+    const { ds, app } = textFixture({ "one.css": ".ds-text { margin: 0; }" });
+    expect(checkLockedText(app, ds)).toMatchObject({ snapshot: "verified" });
+    write(ds, "DS1/1-root/one.css", ":root { --x: 1; }"); git(ds, "add", "."); git(ds, "-c", "user.name=Test", "-c", "user.email=test@example.com", "commit", "-m", "Move text out");
+    const lock = JSON.parse(readFileSync(join(app, "sync.lock.json"), "utf8"));
+    lock["Design system 1"].commit = git(ds, "rev-parse", "HEAD"); lock["Design system 1"].files["web/ds1/one.css"] = sha(":root { --x: 1; }");
+    write(app, "web/ds1/one.css", ":root { --x: 1; }"); write(app, "sync.lock.json", JSON.stringify(lock));
+    expect(checkLockedText(app, ds)?.snapshot).toBe("unverified");
   });
 });

@@ -14,7 +14,8 @@ const files = (name: string, options: Record<string, unknown> = {}) => {
 
 test('the root export carries one.css, what it imports and every face it loads', () => {
   const copy = files('root');
-  for (const file of ['one.css', 'grid.css', 'component-tokens.css', 'component-metrics.css', 'component-appearance.css']) expect(copy).toHaveProperty([file]);
+  for (const file of ['one.css', 'grid.css', 'text.css', 'component-tokens.css', 'component-metrics.css', 'component-appearance.css']) expect(copy).toHaveProperty([file]);
+  for (const [, file] of String(copy['one.css']).matchAll(/@import "\.\/([^"]+)";/g)) expect(copy).toHaveProperty([file!]);
   const faces = [...String(copy['one.css']).matchAll(/url\("\.\/(fonts\/[^"]+)"\)/g)].map((match) => match[1]);
   expect(faces.length).toBeGreaterThan(0);
   for (const face of faces) expect(copy).toHaveProperty([face]);
@@ -39,6 +40,29 @@ test('bundled tokens are one stylesheet with no local imports left', () => {
   expect(css).toContain('.ds-button');
   expect(css).toContain('.ds-table');
   expect(css.indexOf('--ds-row-height')).toBeLessThan(css.indexOf('.ds-button {'));
+  expect(css).toContain('.ds-text {');
+});
+
+test('the prose sheet is copied when a product asks for it', () => {
+  expect(files('root')).not.toHaveProperty(['prose.css']);
+  expect(files('root', { prose: true, fonts: false })).toHaveProperty(['prose.css']);
+  expect(Object.keys(files('root', { styles: ['prose.css', 'component-tokens.css', 'component-metrics.css', 'component-appearance.css'], fonts: false }))).toEqual(['prose.css', 'component-tokens.css', 'component-metrics.css', 'component-appearance.css']);
+  expect(Object.keys(files('tokens', { prose: true }))).toContain('prose.css');
+  expect(String(files('tokens', { prose: true, bundle: true })['bundle.css'])).toContain('[data-ds-prose] {');
+});
+
+test('the classless sheet is copied when a product asks for it, and keeps its palette', () => {
+  expect(files('root')).not.toHaveProperty(['one.semantic.css']);
+  expect(Object.keys(files('root', { styles: ['one.semantic.css'], fonts: false }))).toEqual(['one.semantic.css']);
+  expect(String(files('tokens', { classless: true })['one.semantic.css'])).toContain('--one-apple-green: light-dark(');
+  expect(Object.keys(files('root', { classless: true, prose: true, fonts: false }))).toEqual(expect.arrayContaining(['one.css', 'prose.css', 'one.semantic.css']));
+});
+
+test('controls.css always arrives with the table and text classes it imports', () => {
+  expect(Object.keys(files('tokens', { nativeControls: true }))).toEqual(['component-tokens.css', 'component-metrics.css', 'component-appearance.css', 'table.css', 'text.css', 'controls.css']);
+  expect(Object.keys(files('tokens'))).not.toContain('text.css');
+  expect(Object.keys(files('root', { styles: ['grid.css'], fonts: false, nativeControls: true }))).toEqual(['grid.css', 'table.css', 'controls.css', 'text.css']);
+  expect(Object.keys(files('root', { styles: ['one.css', 'grid.css'], fonts: false }))).toContain('text.css');
 });
 
 test('the fonts export offers the root faces by name', () => {

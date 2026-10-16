@@ -19,7 +19,7 @@ const themed = (svg: string) => svg
   .replace(/<rect width="16" height="16" fill="(?:white|#fff|#ffffff)"[^>]*\/?>/gi, '')
   .replace(/\b(fill|stroke|stop-color)="([^"]+)"/g, (all, attribute, value) => dark(value) ? `${attribute}="currentColor"` : all);
 ---
-<div class="icon-table not-content">
+<div class="icon-table not-content" data-ds-not-prose>
   <p class="icon-count">{icons.length} icons · 16 × 16 · click one to download its SVG</p>
   <ul class="icons">{icons.map(icon => (
     <li><a href={icon.url} download={`${icon.key}.svg`} title={`${icon.name} · ${icon.key}.svg`}>

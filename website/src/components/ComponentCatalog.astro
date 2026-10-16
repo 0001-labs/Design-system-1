@@ -7,7 +7,7 @@ import { LAYERS } from '../lib/component-directory';
 // Root is files; every other layer is custom elements.
 const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
 ---
-    <div class="docs-tool not-content"><div class="directory component-catalog" data-view="examples">
+    <div class="docs-tool not-content" data-ds-not-prose><div class="directory component-catalog" data-view="examples">
       <ds-button split literal class="directory-toggle" aria-label="Show components as" options="examples:Examples,names:Name,tags:<element>" value="examples" data-view-choice></ds-button>
 
       <div class="gallery-intro">

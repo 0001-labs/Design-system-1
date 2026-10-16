@@ -1,11 +1,17 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap");
-
 /* DS1 — version 0.3.0-alpha.13 */
 /* A classless stylesheet for native HTML. No JavaScript is required. */
 
+/* It draws on Design system 1's measures: the 20px square, 14px type on
+   one-square lines, a 16px control height, 4px corners on buttons, fields and
+   pictures, and hairlines that take no room. Lengths follow --sf, the device
+   scale, when a page sets it. It names Design system 1's typefaces and loads
+   none: one.css, Sync 1's fonts export or
+   https://designsystem1.com/resources/fonts.css bring the faces. */
+
 /* Root
    Global color, type, spacing, and component tokens.
-   The workbench edits these values without changing semantic markup. */
+   The workbench edits these values without changing semantic markup.
+   Lengths are unscaled here; each rule multiplies them by --sf. */
 
 :root {
   color-scheme: light dark;
@@ -40,9 +46,9 @@
   --one-button-disabled-background:   #d9d9d9;
   --one-button-disabled-border:   #b3b3b3;
   --one-button-disabled-text:   #b3b3b3;
-  --one-icon-button-size: 40px;
-  --one-icon-button-small-size: 32px;
-  --one-icon-button-icon-size: 20px;
+  --one-icon-button-size: 16px;
+  --one-icon-button-small-size: 16px;
+  --one-icon-button-icon-size: 16px;
   --one-icon-button-neutral-background:   #f5f5f5;
   --one-icon-button-neutral-background-hover:   #e6e6e6;
   --one-icon-button-neutral-border:   #d9d9d9;
@@ -114,41 +120,47 @@
   --one-slate: light-dark(#1e1e1e, #cacaca);
   /* Palette: end */
 
-  --one-font: Arial, Helvetica, sans-serif;
-  --one-font-medium: Arial, Helvetica, sans-serif;
-  --one-font-display: Georgia, "Times New Roman", serif;
-  --one-font-mono: "Courier New", Courier, monospace;
+  --one-font: "Inter Arrows", "GT America", "GT-America-Standard-Regular", Inter, system-ui, -apple-system, sans-serif;
+  --one-font-medium: "Inter Arrows", "GT-America-Standard-Medium", "GT America", Inter, system-ui, -apple-system, sans-serif;
+  --one-font-display: "Inter Arrows", "GT-America-Standard-Medium", "GT America", Inter, system-ui, -apple-system, sans-serif;
+  --one-font-mono: "Inter Arrows", "Iosevka", "Iosevka Extended", ui-monospace, "SF Mono", Menlo, monospace;
 
-  --one-font-size: 16px;
-  --one-font-size-small: 11px;
-  --one-line-height: 1.45;
-  --one-radius: 8px;
+  --one-font-size: 14px;
+  --one-font-size-small: 10px;
+  --one-font-size-code: 13px;
+  --one-heading-size: 15px;
+  --one-title-size: 17px;
+  --one-display-size: 20px;
+  --one-letter-spacing: -0.3px;
+  --one-line-height: 20px;
+  --one-control-height: 16px;
+  --one-radius: 4px;
   --one-unit: 20px;
-  --one-page-width: 72rem;
+  --one-page-width: calc(32 * var(--one-unit));
 
   --one-text-padding-block: 0px;
   --one-text-padding-inline: 0px;
   --one-link-padding-block: 0px;
   --one-link-padding-inline: 0px;
-  --one-button-padding-block: 12px;
-  --one-button-padding-inline: 12px;
-  --one-button-small-min-height: 32px;
-  --one-button-small-padding-block: 8px;
-  --one-button-small-padding-inline: 8px;
-  --one-input-padding-block: 12px;
-  --one-input-padding-inline: 16px;
-  --one-input-gap: 8px;
+  --one-button-padding-block: 0px;
+  --one-button-padding-inline: 4px;
+  --one-button-small-min-height: 16px;
+  --one-button-small-padding-block: 0px;
+  --one-button-small-padding-inline: 4px;
+  --one-input-padding-block: 0px;
+  --one-input-padding-inline: 4px;
+  --one-input-gap: 4px;
   --one-blockquote-padding-block: 0px;
   --one-blockquote-padding-inline: 20px;
-  --one-details-padding-block: 12px;
+  --one-details-padding-block: 10px;
   --one-details-padding-inline: 0px;
-  --one-section-padding-block: 24px;
-  --one-section-padding-inline: 24px;
-  --one-section-gap: 12px;
-  --one-table-cell-padding-block: 12px;
-  --one-table-cell-padding-inline: 12px;
-  --one-code-padding-block: 2px;
-  --one-code-padding-inline: 5px;
+  --one-section-padding-block: 20px;
+  --one-section-padding-inline: 20px;
+  --one-section-gap: 20px;
+  --one-table-cell-padding-block: 10px;
+  --one-table-cell-padding-inline: 10px;
+  --one-code-padding-block: 0px;
+  --one-code-padding-inline: 4px;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -170,8 +182,9 @@ body {
   background: var(--one-background);
   color: var(--one-text);
   font-family: var(--one-font);
-  font-size: var(--one-font-size);
-  line-height: var(--one-line-height);
+  font-size: calc(var(--one-font-size) * var(--sf, 1));
+  line-height: calc(var(--one-line-height) * var(--sf, 1));
+  letter-spacing: calc(var(--one-letter-spacing) * var(--sf, 1));
 }
 
 img,
@@ -183,63 +196,70 @@ canvas {
 }
 
 /* Layout
-   Header, main, and footer become centered semantic containers. */
+   Header, main, and footer become centered semantic containers: a reading
+   column of 32 squares, one square from the edge of a narrower screen. */
 
 body > header,
 body > main,
 body > footer {
-  width: min(100% - 2rem, var(--one-page-width));
+  width: min(100% - 2 * var(--one-unit) * var(--sf, 1), var(--one-page-width) * var(--sf, 1));
   margin-inline: auto;
 }
 
 body > header,
 body > footer {
-  padding-block: var(--one-unit);
+  padding-block: calc(var(--one-unit) * var(--sf, 1));
 }
 
 body > main {
-  padding-block: calc(var(--one-unit) * 2);
+  padding-block: calc(var(--one-unit) * 2 * var(--sf, 1));
 }
 
 section + section {
-  margin-block-start: calc(var(--one-unit) * 2);
+  margin-block-start: calc(var(--one-unit) * 2 * var(--sf, 1));
 }
 
 /* Typography
-   Headings and text work directly from their native elements. */
+   Headings and text work directly from their native elements. Every line is
+   one square; a title (h1) takes two. */
 
 :where(h1, h2, h3, h4, h5, h6, p, small) {
   margin-block: 0;
-  padding-block: var(--one-text-padding-block);
-  padding-inline: var(--one-text-padding-inline);
+  padding-block: calc(var(--one-text-padding-block) * var(--sf, 1));
+  padding-inline: calc(var(--one-text-padding-inline) * var(--sf, 1));
 }
 
 :where(h1, h2, h3, h4, h5, h6) {
   color: var(--one-text);
   font-family: var(--one-font-medium);
+  font-size: calc(var(--one-font-size) * var(--sf, 1));
   font-weight: 500;
-  line-height: 1.15;
+  line-height: calc(var(--one-line-height) * var(--sf, 1));
 }
 
 h1 {
-  font-size: clamp(2rem, 5vw, 4.5rem);
+  font-family: var(--one-font-display);
+  font-size: calc(var(--one-display-size) * var(--sf, 1));
+  line-height: calc(var(--one-line-height) * 2 * var(--sf, 1));
+  letter-spacing: calc(-0.4px * var(--sf, 1));
 }
 
 h2 {
-  font-size: clamp(1.35rem, 3vw, 2.25rem);
+  font-size: calc(var(--one-title-size) * var(--sf, 1));
+  letter-spacing: calc(-0.34px * var(--sf, 1));
 }
 
 h3 {
-  font-size: 1.125rem;
+  font-size: calc(var(--one-heading-size) * var(--sf, 1));
 }
 
 p + p {
-  margin-block-start: 1em;
+  margin-block-start: calc(var(--one-unit) * var(--sf, 1));
 }
 
 small {
   color: var(--one-text-muted);
-  font-size: var(--one-font-size-small);
+  font-size: calc(var(--one-font-size-small) * var(--sf, 1));
 }
 
 :where(strong, b) {
@@ -249,12 +269,12 @@ small {
 
 a {
   display: inline-block;
-  padding-block: var(--one-link-padding-block);
-  padding-inline: var(--one-link-padding-inline);
+  padding-block: calc(var(--one-link-padding-block) * var(--sf, 1));
+  padding-inline: calc(var(--one-link-padding-inline) * var(--sf, 1));
   color: inherit;
   text-decoration-color: var(--one-accent-color);
   text-decoration-thickness: 2px;
-  text-underline-offset: 0.2em;
+  text-underline-offset: calc(3px * var(--sf, 1));
 }
 
 a:hover {
@@ -264,7 +284,9 @@ a:hover {
 /* Buttons
    A native button is the primary action. No component class is needed.
    Neutral and other weights use the variant attribute, mirroring how
-   input uses type — variant="neutral" instead of a component class. */
+   input uses type — variant="neutral" instead of a component class.
+   A button is one control high and hugs its label; its line is a hairline
+   drawn inside it, so it takes no room. */
 
 :where(
   button,
@@ -272,30 +294,34 @@ a:hover {
   input[type="submit"],
   input[type="reset"]
 ) {
+  --one-button-line: var(--one-button-primary-border);
+
   appearance: none;
-  min-height: 40px;
+  min-height: calc(var(--one-control-height) * var(--sf, 1));
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--one-button-primary-border);
-  border-radius: var(--one-radius);
-  padding-block: var(--one-button-padding-block);
-  padding-inline: var(--one-button-padding-inline);
+  border: 0 solid var(--one-button-line);
+  border-radius: calc(var(--one-radius) * var(--sf, 1));
+  padding-block: calc(var(--one-button-padding-block) * var(--sf, 1));
+  padding-inline: calc(var(--one-button-padding-inline) * var(--sf, 1));
   background: var(--one-button-primary-background);
+  box-shadow: inset 0 0 0 1px var(--one-button-line);
   color: var(--one-button-primary-text);
   cursor: pointer;
-  font-family: Inter, var(--one-font);
-  font-size: 16px;
+  font-family: var(--one-font);
+  font-size: calc(var(--one-font-size) * var(--sf, 1));
   font-weight: 400;
-  line-height: 1;
-  letter-spacing: 0;
+  line-height: calc(var(--one-control-height) * var(--sf, 1));
+  letter-spacing: calc(var(--one-letter-spacing) * var(--sf, 1));
 }
 
 :where(
   button[variant="neutral"],
   input[variant="neutral"]
 ) {
-  border-color: var(--one-button-neutral-border);
+  --one-button-line: var(--one-button-neutral-border);
+
   background: var(--one-button-neutral-background);
   color: var(--one-button-neutral-text);
 }
@@ -306,16 +332,17 @@ a:hover {
   input[small][type="submit"],
   input[small][type="reset"]
 ) {
-  min-height: var(--one-button-small-min-height);
-  padding-block: var(--one-button-small-padding-block);
-  padding-inline: var(--one-button-small-padding-inline);
+  min-height: calc(var(--one-button-small-min-height) * var(--sf, 1));
+  padding-block: calc(var(--one-button-small-padding-block) * var(--sf, 1));
+  padding-inline: calc(var(--one-button-small-padding-inline) * var(--sf, 1));
 }
 
 :where(
   button[variant="subtle"],
   input[variant="subtle"]
 ) {
-  border-color: transparent;
+  --one-button-line: transparent;
+
   background: transparent;
   color: var(--one-button-subtle-text);
 }
@@ -332,7 +359,8 @@ a:hover {
   button[variant="danger"],
   input[variant="danger"]
 ) {
-  border-color: var(--one-button-danger-border);
+  --one-button-line: var(--one-button-danger-border);
+
   background: var(--one-button-danger-background);
   color: var(--one-button-danger-text);
 }
@@ -341,37 +369,37 @@ a:hover {
   button[variant="danger-subtle"],
   input[variant="danger-subtle"]
 ) {
-  border-color: transparent;
+  --one-button-line: transparent;
+
   background: transparent;
   color: var(--one-button-danger-subtle-text);
 }
 
+/* An icon alone makes a square button, one control on each side. */
 :where(button:has(> ds-icon:only-child)) {
-  width: var(--one-icon-button-size);
-  min-width: var(--one-icon-button-size);
-  height: var(--one-icon-button-size);
-  min-height: var(--one-icon-button-size);
+  width: calc(var(--one-icon-button-size) * var(--sf, 1));
+  min-width: calc(var(--one-icon-button-size) * var(--sf, 1));
+  height: calc(var(--one-icon-button-size) * var(--sf, 1));
+  min-height: calc(var(--one-icon-button-size) * var(--sf, 1));
   flex: none;
-  border-radius: 50%;
   padding: 0;
 }
 
 :where(button[small]:has(> ds-icon:only-child)) {
-  width: var(--one-icon-button-small-size);
-  min-width: var(--one-icon-button-small-size);
-  height: var(--one-icon-button-small-size);
-  min-height: var(--one-icon-button-small-size);
+  width: calc(var(--one-icon-button-small-size) * var(--sf, 1));
+  min-width: calc(var(--one-icon-button-small-size) * var(--sf, 1));
+  height: calc(var(--one-icon-button-small-size) * var(--sf, 1));
+  min-height: calc(var(--one-icon-button-small-size) * var(--sf, 1));
   padding: 0;
 }
 
 :where(button:has(> ds-icon:only-child) > ds-icon) {
-  --sf: 1.428571;
-
   flex: none;
 }
 
 :where(button[variant="neutral"]:has(> ds-icon:only-child)) {
-  border-color: var(--one-icon-button-neutral-border);
+  --one-button-line: var(--one-icon-button-neutral-border);
+
   background: var(--one-icon-button-neutral-background);
 }
 
@@ -399,7 +427,8 @@ a:hover {
     button[variant="subtle"],
     input[variant="subtle"]
   ):hover:not(:disabled) {
-  border-color: var(--one-button-subtle-border-hover);
+  --one-button-line: var(--one-button-subtle-border-hover);
+
   color: var(--one-button-subtle-text-hover);
 }
 
@@ -414,7 +443,8 @@ a:hover {
     button[variant="danger"],
     input[variant="danger"]
   ):hover:not(:disabled) {
-  border-color: var(--one-button-danger-border-hover);
+  --one-button-line: var(--one-button-danger-border-hover);
+
   background: var(--one-button-danger-background-hover);
 }
 
@@ -422,31 +452,25 @@ a:hover {
     button[variant="danger-subtle"],
     input[variant="danger-subtle"]
   ):hover:not(:disabled) {
-  border-color: var(--one-button-danger-border-hover);
+  --one-button-line: var(--one-button-danger-border-hover);
+
   background: var(--one-button-danger-subtle-background-hover);
 }
 
 :where(
     button[variant="neutral"]:has(> ds-icon:only-child)
   ):hover:not(:disabled) {
-  border-color: var(--one-icon-button-neutral-border);
+  --one-button-line: var(--one-icon-button-neutral-border);
+
   background: var(--one-icon-button-neutral-background-hover);
 }
 
 :where(
     button[variant="subtle"]:has(> ds-icon:only-child)
   ):hover:not(:disabled) {
-  border-color: transparent;
-  background: var(--one-icon-button-subtle-background-hover);
-}
+  --one-button-line: transparent;
 
-:where(
-    button,
-    input[type="button"],
-    input[type="submit"],
-    input[type="reset"]
-  ):active:not(:disabled) {
-  transform: translateY(1px);
+  background: var(--one-icon-button-subtle-background-hover);
 }
 
 :where(
@@ -455,7 +479,8 @@ a:hover {
   input[type="submit"],
   input[type="reset"]
 ):disabled {
-  border-color: var(--one-button-disabled-border);
+  --one-button-line: var(--one-button-disabled-border);
+
   background: var(--one-button-disabled-background);
   color: var(--one-button-disabled-text);
   cursor: not-allowed;
@@ -463,34 +488,39 @@ a:hover {
 }
 
 /* Forms
-   Labels, inputs, selects, and textareas use their semantic relationship. */
+   Labels, inputs, selects, and textareas use their semantic relationship.
+   A label's line and its field stand on two squares. */
 
 form {
   display: grid;
-  gap: var(--one-unit);
+  gap: calc(var(--one-unit) * var(--sf, 1));
 }
 
+/* A group of fields stands on the paper, its legend a line above them. */
 fieldset {
   display: grid;
-  gap: var(--one-unit);
-  border: 1px solid var(--one-border);
-  padding: var(--one-unit);
+  gap: calc(var(--one-unit) * var(--sf, 1));
+  min-inline-size: 0;
+  margin: 0;
+  border: 0;
+  padding: 0;
 }
 
 legend {
-  padding-inline: 0.5rem;
+  padding: 0 0 calc(var(--one-unit) * var(--sf, 1));
   font-family: var(--one-font-medium);
+  font-weight: 500;
 }
 
 label {
   display: grid;
-  gap: var(--one-input-gap);
+  gap: calc(var(--one-input-gap) * var(--sf, 1));
   color: var(--one-text);
-  font-family: Inter, var(--one-font);
-  font-size: 16px;
+  font-family: var(--one-font);
+  font-size: calc(var(--one-font-size) * var(--sf, 1));
   font-weight: 400;
-  line-height: 1.4;
-  letter-spacing: 0;
+  line-height: calc(var(--one-line-height) * var(--sf, 1));
+  letter-spacing: calc(var(--one-letter-spacing) * var(--sf, 1));
 }
 
 :where(
@@ -506,28 +536,29 @@ label {
 ) {
   appearance: none;
   width: 100%;
-  min-width: 120px;
-  min-height: 40px;
-  border: 1px solid var(--one-input-border);
-  border-radius: var(--one-radius);
-  padding-block: var(--one-input-padding-block);
-  padding-inline: var(--one-input-padding-inline);
+  min-width: calc(var(--one-unit) * 4 * var(--sf, 1));
+  min-height: calc(var(--one-control-height) * var(--sf, 1));
+  border: 0 solid var(--one-input-border);
+  border-radius: calc(var(--one-radius) * var(--sf, 1));
+  padding-block: calc(var(--one-input-padding-block) * var(--sf, 1));
+  padding-inline: calc(var(--one-input-padding-inline) * var(--sf, 1));
   background: var(--one-input-background);
+  box-shadow: inset 0 0 0 1px var(--one-input-border);
   color: var(--one-input-text);
-  font-family: Inter, var(--one-font);
-  font-size: 16px;
+  font-family: var(--one-font);
+  font-size: calc(var(--one-font-size) * var(--sf, 1));
   font-weight: 400;
-  line-height: 1;
-  letter-spacing: 0;
+  line-height: calc(var(--one-control-height) * var(--sf, 1));
+  letter-spacing: calc(var(--one-letter-spacing) * var(--sf, 1));
 }
 
 input[aria-invalid="true"] {
-  border-color: var(--one-input-error-border);
+  box-shadow: inset 0 0 0 1px var(--one-input-error-border);
 }
 
 input:disabled {
-  border-color: var(--one-input-disabled-border);
   background: var(--one-input-disabled-background);
+  box-shadow: inset 0 0 0 1px var(--one-input-disabled-border);
   color: var(--one-input-disabled-text);
   cursor: not-allowed;
   opacity: 1;
@@ -537,8 +568,12 @@ label:has(input:disabled) > span {
   color: var(--one-input-disabled-text);
 }
 
+/* A text area spans whole rows, four squares at first; its writing sits 4px
+   further in than a one-line field's. */
 textarea {
-  min-height: 8rem;
+  min-height: calc(var(--one-unit) * 4 * var(--sf, 1));
+  padding-block: calc((var(--one-input-padding-block) + 4px) * var(--sf, 1));
+  line-height: calc(var(--one-line-height) * var(--sf, 1));
   resize: vertical;
 }
 
@@ -549,20 +584,22 @@ textarea {
 
 :where(input, select, textarea, button):focus-visible {
   outline: 2px solid var(--one-color-focus);
-  outline-offset: 2px;
+  outline-offset: 1px;
 }
 
 /* Sections
-   A semantic section is the default content surface or card. */
+   A semantic section is the default content surface: square corners, a
+   hairline and a square of room inside. */
 
 section {
   display: grid;
-  gap: var(--one-section-gap);
-  border: 1px solid var(--one-border);
-  border-radius: var(--one-radius);
-  padding-block: var(--one-section-padding-block);
-  padding-inline: var(--one-section-padding-inline);
+  gap: calc(var(--one-section-gap) * var(--sf, 1));
+  border: 0;
+  border-radius: 0;
+  padding-block: calc(var(--one-section-padding-block) * var(--sf, 1));
+  padding-inline: calc(var(--one-section-padding-inline) * var(--sf, 1));
   background: var(--one-background);
+  box-shadow: inset 0 0 0 1px var(--one-border);
   color: var(--one-text);
 }
 
@@ -573,17 +610,20 @@ section > footer {
 }
 
 blockquote {
+  margin-block: 0;
   margin-inline: 0;
-  border-inline-start: 4px solid var(--one-accent-color);
-  padding-block: var(--one-blockquote-padding-block);
-  padding-inline: var(--one-blockquote-padding-inline);
+  border: 0;
+  padding-block: calc(var(--one-blockquote-padding-block) * var(--sf, 1));
+  padding-inline: calc(var(--one-blockquote-padding-inline) * var(--sf, 1));
+  box-shadow: inset 1px 0 var(--one-accent-color);
   color: var(--one-text-muted);
 }
 
 details {
-  border-block: 1px solid var(--one-border);
-  padding-block: var(--one-details-padding-block);
-  padding-inline: var(--one-details-padding-inline);
+  border: 0;
+  padding-block: calc(var(--one-details-padding-block) * var(--sf, 1));
+  padding-inline: calc(var(--one-details-padding-inline) * var(--sf, 1));
+  box-shadow: inset 0 1px var(--one-border), inset 0 -1px var(--one-border);
 }
 
 summary {
@@ -592,11 +632,12 @@ summary {
 }
 
 dialog {
-  max-width: min(36rem, calc(100% - 2rem));
-  border: 1px solid var(--one-border);
-  border-radius: var(--one-radius);
-  padding: var(--one-unit);
+  max-width: min(calc(var(--one-unit) * 20 * var(--sf, 1)), 100% - 2 * var(--one-unit) * var(--sf, 1));
+  border: 0;
+  border-radius: 0;
+  padding: calc(var(--one-unit) * var(--sf, 1));
   background: var(--one-background);
+  box-shadow: inset 0 0 0 1px var(--one-border);
   color: var(--one-text);
 }
 
@@ -605,7 +646,8 @@ dialog::backdrop {
 }
 
 /* Tables
-   Native table structure receives readable defaults. */
+   Native table structure receives readable defaults: a row is two squares,
+   ruled by a hairline under it. */
 
 table {
   width: 100%;
@@ -614,9 +656,10 @@ table {
 }
 
 :where(th, td) {
-  border-bottom: 1px solid var(--one-border);
-  padding-block: var(--one-table-cell-padding-block);
-  padding-inline: var(--one-table-cell-padding-inline);
+  border: 0;
+  padding-block: calc(var(--one-table-cell-padding-block) * var(--sf, 1));
+  padding-inline: calc(var(--one-table-cell-padding-inline) * var(--sf, 1));
+  box-shadow: inset 0 -1px var(--one-border);
   text-align: start;
 }
 
@@ -630,22 +673,28 @@ tbody tr:hover {
 }
 
 /* Code
-   Inline and block code share the same monospace language. */
+   Inline and block code share the same monospace language, at 13 on the
+   same one-square lines. */
 
 :where(code, kbd, samp, pre) {
   font-family: var(--one-font-mono);
+  font-size: calc(var(--one-font-size-code) * var(--sf, 1));
+  line-height: calc(var(--one-line-height) * var(--sf, 1));
+  letter-spacing: 0;
 }
 
 :where(code, kbd) {
-  padding-block: var(--one-code-padding-block);
-  padding-inline: var(--one-code-padding-inline);
+  padding-block: calc(var(--one-code-padding-block) * var(--sf, 1));
+  padding-inline: calc(var(--one-code-padding-inline) * var(--sf, 1));
+  border-radius: calc(var(--one-radius) * var(--sf, 1));
   background: var(--one-surface);
-  font-size: 0.9em;
 }
 
 pre {
   overflow: auto;
-  padding: var(--one-unit);
+  margin-block: 0;
+  padding: calc(var(--one-unit) * var(--sf, 1));
+  border-radius: calc(var(--one-radius) * var(--sf, 1));
   background: var(--one-color-slate);
   color: var(--one-color-white);
 }
@@ -653,14 +702,17 @@ pre {
 pre code {
   padding: 0;
   background: transparent;
+  font-size: inherit;
 }
 
 /* Feedback
-   Native progress and horizontal rules inherit the theme. */
+   Native progress and horizontal rules inherit the theme. A rule is a
+   hairline that takes no room. */
 
 hr {
+  height: 0;
   border: 0;
-  border-top: 1px solid var(--one-border);
+  box-shadow: 0 1px var(--one-border);
 }
 
 progress {

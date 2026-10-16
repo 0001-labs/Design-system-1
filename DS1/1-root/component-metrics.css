@@ -14,6 +14,7 @@
   --ds-type-size-default: calc(var(--ds-text-size, 14px) * var(--ds-sf, 1));
   --ds-type-size-small: calc(var(--ds-small-text-size, 10px) * var(--ds-sf, 1));
   --ds-type-size-heading: calc(var(--ds-heading-text-size, 13px) * var(--ds-sf, 1));
+  --ds-type-size-display: calc(var(--ds-display-text-size, 20px) * var(--ds-sf, 1));
   --ds-type-lineheight-default: calc(var(--ds-text-leading, 16px) * var(--ds-sf, 1));
   --ds-type-letterspacing-default: calc(var(--ds-text-tracking, -0.3px) * var(--ds-sf, 1));
   --ds-radius: calc(var(--ds-corner-size, 4px) * var(--ds-sf, 1));

@@ -27,6 +27,19 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "Design system 1",
+      expressiveCode: {
+        // Code frames draw themselves: keep Design system 1's prose sheet out of them.
+        plugins: [
+          {
+            name: "Not prose",
+            hooks: {
+              postprocessRenderedBlock: ({ renderData }) => {
+                renderData.blockAst.properties.dataDsNotProse = "";
+              },
+            },
+          },
+        ],
+      },
       pagefind: false,
       favicon: "/icons/design-system-1.svg",
       description:
@@ -47,8 +60,10 @@ export default defineConfig({
         Header: "./src/components/MyHeader.astro",
         // Override the default PageFrame to use our custom layout
         PageFrame: "./src/layouts/Layout.astro",
-        // Override h1 to use ds-one text component
-        h1: "./src/components/Heading.astro",
+        // Mark the Markdown body as prose for Design system 1's prose sheet
+        MarkdownContent: "./src/components/MarkdownContent.astro",
+        // The page's title, drawn as Design system 1's display text
+        PageTitle: "./src/components/Heading.astro",
       },
       customCss: [
         // Custom CSS file
@@ -72,6 +87,7 @@ export default defineConfig({
             { label: "Languages", slug: "1-root/languages" },
             { label: "Theming", slug: "1-root/theming" },
             { label: "Native controls", slug: "1-root/native-controls" },
+            { label: "Prose", slug: "1-root/prose" },
             { label: "Device", slug: "1-root/device" },
             { label: "Scaling", slug: "1-root/scaling" },
             { label: "Preferences", slug: "1-root/preferences" },

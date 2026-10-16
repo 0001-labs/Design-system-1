@@ -66,6 +66,6 @@ test.describe("customer fixture", () => {
     const radius = await page
       .locator("#submit")
       .evaluate((node) => getComputedStyle(node).borderRadius);
-    expect(radius).not.toBe("8px");
+    expect(radius).not.toBe("4px");
   });
 });

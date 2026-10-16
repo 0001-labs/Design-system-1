@@ -206,30 +206,12 @@ body.sidebar-open {
   letter-spacing: var(--docs-tracking);
 }
 
-/* The page's title, on two squares. */
-h1#_top {
-  font-family: var(--typeface-medium, var(--typeface-regular));
-  font-size: var(--docs-type-title-1);
-  font-weight: 400;
-  line-height: calc(2 * var(--grid));
-  letter-spacing: -0.4px;
-}
+/* The page's title is .ds-text--display (src/components/Heading.astro): 20 on two squares. */
 
-.sl-markdown-content {
-  font-size: var(--docs-type);
-  line-height: var(--grid);
-}
-
-.sl-markdown-content :is(p, li, dt, dd, td, th, blockquote, summary) {
-  font-size: var(--docs-type);
-  line-height: var(--grid);
-}
-
-/* One square between two blocks, two before a heading. */
-.sl-markdown-content :not(a, strong, em, del, span, input, code, br) + :not(a, strong, em, del, span, input, code, br, :where(.not-content *)) {
-  margin-top: var(--grid);
-}
-.sl-markdown-content :not(h1, h2, h3, h4, h5, h6, .sl-heading-wrapper) + :is(h1, h2, h3, h4, h5, h6, .sl-heading-wrapper):not(:where(.not-content *)) {
+/* The writing itself is drawn by Design system 1's prose sheet
+   (DS1/1-root/prose.css), on data-ds-prose (src/components/MarkdownContent.astro).
+   What follows is Starlight's own markup: its anchored headings and its code frames. */
+.sl-markdown-content :not(h1, h2, h3, h4, h5, h6, .sl-heading-wrapper) + .sl-heading-wrapper:not(:where(.not-content *)) {
   margin-top: calc(2 * var(--grid));
 }
 .sl-markdown-content .sl-heading-wrapper {
@@ -241,30 +223,8 @@ h1#_top {
 }
 .sl-markdown-content .sl-heading-wrapper > :is(h1, h2, h3, h4, h5, h6) { display: block; margin: 0; padding: 0; }
 .sl-markdown-content .sl-heading-wrapper .sl-anchor-link { position: relative; display: flex; align-items: center; height: var(--grid); margin: 0; }
-.sl-markdown-content :is(h1, h2, h3, h4, h5, h6) {
-  font-family: var(--typeface-medium, var(--typeface-regular));
-  font-weight: 400;
-  line-height: var(--grid);
-}
-.sl-markdown-content :is(h1, h2) { font-size: var(--docs-type-title-2); letter-spacing: -0.34px; }
-.sl-markdown-content h3 { font-size: var(--docs-type-heading); letter-spacing: -0.3px; }
-.sl-markdown-content :is(h4, h5, h6) { font-size: var(--docs-type); }
 
-.sl-markdown-content li + li:not(:where(.not-content *)),
-.sl-markdown-content li > :is(ul, ol):not(:where(.not-content *)) {
-  margin-top: 0;
-}
-.sl-markdown-content :is(ul, ol):not(:where(.not-content *)) {
-  padding-inline-start: var(--grid);
-}
-
-/* Code: thirteen on the same rows, a square of room around it, its frame a shadow. */
-.sl-markdown-content :not(pre) > code {
-  padding: 0 4px;
-  margin-block: 0;
-  font-size: 13px;
-  line-height: var(--grid);
-}
+/* Code frames: thirteen on the same rows, a square of room around it, its frame a shadow. */
 .expressive-code {
   --ec-brdRad: 4px;
   margin: var(--grid) 0;
@@ -287,24 +247,6 @@ h1#_top {
   line-height: var(--grid);
 }
 .expressive-code .frame .copy button { width: var(--grid); height: var(--grid); }
-
-/* A table's row is two squares, ruled by a shadow under it. */
-.sl-markdown-content table:not(:where(.not-content *)) { border-radius: 0; }
-.sl-markdown-content :is(th, td):not(:where(.not-content *)) {
-  padding: 10px 10px;
-  border: 0;
-  box-shadow: inset 0 -1px var(--ds1-docs-divider);
-}
-.sl-markdown-content hr:not(:where(.not-content *)) {
-  height: 0;
-  border: 0;
-  box-shadow: 0 1px var(--ds1-docs-divider);
-}
-.sl-markdown-content blockquote:not(:where(.not-content *)) {
-  padding-inline-start: var(--grid);
-  border: 0;
-  box-shadow: inset 1px 0 var(--ds1-docs-header-text-secondary);
-}
 
 /* The page's foot: two squares under the writing. */
 .main-pane footer { margin-top: calc(2 * var(--grid)); gap: var(--grid); font-size: var(--docs-type); line-height: var(--grid); }

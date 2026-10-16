@@ -1,11 +1,11 @@
 ---
 title: Text
-description: A line of text with a translation key and an English fallback.
+description: Interface copy from a translation key, with tones, sizes and lines on the grid.
 ---
 
 import ComponentExample from "../../../components/ComponentExample.astro";
 
-A line of text with a translation key and an English fallback.
+A line of interface copy from a translation key, with the key as its English fallback. Its tone, size, weight and wrapping work alike for a key and for text someone wrote.
 
 ## Try it
 
@@ -15,16 +15,59 @@ A line of text with a translation key and an English fallback.
 
 Slot content is both the key and the fallback: `<ds-text>Save</ds-text>`. The `text` attribute is another way to provide the key. Configure languages and load words before displaying translated content.
 
+Text a person wrote, such as a list's name or an item, is `literal`: it is shown as it stands and never looked up.
+
 ## API
 
 | Attribute | Type | Default | What it does |
 | --- | --- | --- | --- |
 | `text` | string | Empty | Translation key. Without it, slot text supplies the key. |
+| `literal` | boolean | `false` | Show the text as written, cut with an ellipsis at its width. |
+| `tone` | `muted`, `title`, `danger` | None | A quieter grey, the title grey, or the danger colour (`--ds-danger-color`) for a failure or a warning. |
+| `size` | `small`, `heading`, `display` | None | 10px; a 13px heading on one square; a 20px title on two squares. |
+| `strong` | boolean | `false` | The medium weight. |
+| `wrap` | boolean | `false` | Let the text run over several lines, each one square. |
 
-There is no `variant="heading"` or `variant="small"` attribute. Use semantic HTML headings and the typography tokens for hierarchy.
+Without attributes the element is one control high, so it sits in a row of one square. There is no `variant` attribute.
+
+## Headings and messages
+
+The element reads as plain text. For a heading, give it a role and a level:
+
+```html
+<ds-text role="heading" aria-level="2" size="heading">Settings</ds-text>
+```
+
+A message that reports a failure is announced with `role="alert"`:
+
+```html
+<ds-text wrap tone="danger" role="alert">Could not save your changes</ds-text>
+```
+
+## Without JavaScript
+
+A page without Lit gives native text the same look with the text classes in `text.css`. `one.css` and `controls.css` both import it, so a page that copies either has them. The classes do not translate: the page supplies its own words.
+
+| Class | Draws |
+| --- | --- |
+| `ds-text` | 14px on a one-square line, in the text colour |
+| `ds-text--small` | 10px |
+| `ds-text--heading` | 13px in the medium face |
+| `ds-text--display` | 20px on two squares, in the medium face |
+| `ds-text--strong` | The medium face |
+| `ds-text--muted`, `ds-text--title`, `ds-text--danger` | The element's tones |
+
+```html
+<h1 class="ds-text ds-text--display">Settings</h1>
+<p class="ds-text ds-text--danger" role="alert">Could not save your changes</p>
+```
+
+## Interface copy and writing
+
+Copy in an application's interface (labels, messages, titles) uses `ds-text`, or the `.ds-text` classes where the page has no scripts. Long-form and marketing writing stays in native headings, paragraphs and lists, drawn by the [prose sheet](/1-root/prose/). Both are Design system 1's styles.
 
 ## Keep markup outside the text
 
 The component reads and replaces its slot text. Put an icon next to `ds-text` in a row rather than nesting markup inside it.
 
-[Languages](/1-root/languages/) · [Row](/3-unit/row/) · [Fonts](/1-root/fonts/)
+[Languages](/1-root/languages/) · [Prose](/1-root/prose/) · [Row](/3-unit/row/) · [Fonts](/1-root/fonts/)

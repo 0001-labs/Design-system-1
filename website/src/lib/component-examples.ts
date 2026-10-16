@@ -150,7 +150,7 @@ render();`,
   },
   'text': {
     title: 'Text and translation keys', hint: 'Slot text is the translation key and the fallback.',
-    html: '<ds-text>Welcome to the app</ds-text>\n<ds-text text="Save"></ds-text>',
+    html: '<ds-text>Welcome to the app</ds-text>\n<ds-text text="Save" strong></ds-text>\n<ds-text tone="danger" wrap>Could not save your changes</ds-text>',
   },
   'date': {
     title: 'The current year', hint: 'The year comes from the browser’s clock.',

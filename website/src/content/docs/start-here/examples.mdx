@@ -7,7 +7,7 @@ import { HTML_EXAMPLES } from '../../../lib/html-examples';
 
 Each example is a complete HTML document. Open it to try the page, or download the file and edit it in any text editor. No framework, package install or build step is needed.
 
-The files use the same native stylesheet as Design system 1's library workspace, served from this site's canonical source. The companion font stylesheet configures the supplied GT America and Iosevka fonts. The native stylesheet also imports Inter from Google Fonts for some controls. These are online dependencies, not embedded files.
+The files use the same native stylesheet as Design system 1's library workspace, served from this site's canonical source. The companion font stylesheet configures the supplied GT America and Iosevka fonts; the native stylesheet itself imports no fonts. These are online dependencies, not embedded files.
 
 {HTML_EXAMPLES.map(example => <section>
   <h2>{example.title}</h2>
@@ -19,7 +19,7 @@ The files use the same native stylesheet as Design system 1's library workspace,
 
 One authored HTML file, including any small example-specific script. The article, report and reference have no JavaScript. The form's script only shows local feedback and prevents submission; it has no backend.
 
-The CSS and fonts load over the internet. To work offline, save both CSS files, their referenced fonts and the imported Google Fonts CSS/fonts, then change the paths in your copy. A file opened with no connection falls back to browser styling if those resources are unavailable.
+The CSS and fonts load over the internet. To work offline, save both CSS files and the fonts the font stylesheet references, then change the paths in your copy. A file opened with no connection falls back to browser styling if those resources are unavailable.
 
 ## More behavior
 

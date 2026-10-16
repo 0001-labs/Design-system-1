@@ -8,7 +8,7 @@ const sample = LAYOUT_EXAMPLES[layout];
 if (!sample) throw new Error(`Unknown layout example: ${layout}`);
 const inside = layersIn(sample.html);
 ---
-<section class="layout-example not-content" data-layout-example={layout} aria-label={`${sample.name} layout`}>
+<section class="layout-example not-content" data-ds-not-prose data-layout-example={layout} aria-label={`${sample.name} layout`}>
   <div class="layout-toolbar">
     <ds-button split literal aria-label="Preview width" options="computer:Computer,phone:Phone" value="computer" data-preview-width></ds-button>
     <ds-button split literal aria-label="Preview appearance" options="light:Light,dark:Dark" value="light" data-preview-theme></ds-button>

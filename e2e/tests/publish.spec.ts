@@ -73,7 +73,7 @@ test.describe("publishing", () => {
       .locator("a, button")
       .first()
       .evaluate((node) => getComputedStyle(node).borderRadius);
-    expect(decoration).toBe("8px");
+    expect(decoration).toBe("4px");
 
     const accent = await customer.evaluate(() =>
       getComputedStyle(document.documentElement).getPropertyValue("--one-accent-color").trim(),

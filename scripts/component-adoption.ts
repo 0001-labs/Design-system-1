@@ -27,9 +27,15 @@ export function loadAppSpecs(studio: string): AppSpec[] {
 }
 const known = new Set(IMPLEMENTATION_COLUMNS.map(c => c.id));
 const native: Record<string, string> = { button: "button", input: "input", select: "select", textarea: "textarea", p: "text", h1: "text", h2: "text", h3: "text", h4: "text", h5: "text", h6: "text", ul: "list", ol: "list", table: "table", form: "form", dialog: "dialog" };
-type TagSite = { tag: string; line: number; nativeStyle?: string; dialogRole?: boolean; controlKind?: "checkbox" | "radio" | "switch" | "color" | "file-picker" };
+/** `prose` marks native text, a list or a table inside an element marked data-ds-prose, which DS1's prose sheet draws. */
+type TagSite = { tag: string; line: number; nativeStyle?: string; prose?: boolean; dialogRole?: boolean; controlKind?: "checkbox" | "radio" | "switch" | "color" | "file-picker" };
+type OpenElement = { tag: string; prose?: boolean };
+const textTags = new Set(["p", "h1", "h2", "h3", "h4", "h5", "h6"]);
+const proseTags = new Set([...textTags, "ul", "ol", "table"]);
 function nativeStyle(tag: string, className: string): string | undefined {
   const classes = className.split(/\s+/);
+  // Native text with a literal .ds-text class or one of its sizes and tones.
+  if (textTags.has(tag)) return classes.some(name => name === "ds-text" || name.startsWith("ds-text--")) ? "ds-text" : undefined;
   const supported = tag === "button" ? ["ds-button", "ds-switch"] : ["input", "select", "textarea"].includes(tag) ? ["ds-input", "ds-textarea", "ds-select", "ds-checkbox", "ds-radio"] : tag === "dialog" ? ["ds-dialog"] : [];
   return supported.find(name => classes.includes(name));
 }
@@ -46,23 +52,27 @@ function jsxClassName(initializer: ts.JsxAttributeValue | undefined): string {
 export function sourceSites(file: string, source: string): TagSite[] {
   const found: TagSite[] = [];
   const line = (offset: number) => source.slice(0, offset).split("\n").length;
-  const markup = (text: string, offset: number, stack: string[] = []) => {
+  const markup = (text: string, offset: number, stack: OpenElement[] = []) => {
     const clean = text.replace(/<!--[\s\S]*?-->/g, match => match.replace(/[^\n]/g, " "));
     for (const match of clean.matchAll(/<(\/?)([A-Za-z][\w.-]*)(?=[\s/>])/g)) {
       const tag = match[2]!;
       if (match[1]) {
-        const at = stack.lastIndexOf(tag);
+        let at = stack.length - 1;
+        while (at >= 0 && stack[at]!.tag !== tag) at--;
         if (at >= 0) stack.length = at;
         continue;
       }
-      const frame = (tag === "dialog" && stack.at(-1) === "ds-dialog") || (tag === "input" && ["ds-checkbox", "ds-radio", "ds-color", "ds-token-field", "ds-file-picker"].includes(stack.at(-1) ?? "")) || (tag === "button" && ["ds-switch", "ds-button"].includes(stack.at(-1) ?? "")) || (tag === "select" && stack.at(-1) === "ds-select") || (tag === "textarea" && stack.at(-1) === "ds-composer");
+      const parent = stack.at(-1)?.tag ?? "";
+      const frame = (tag === "dialog" && parent === "ds-dialog") || (tag === "input" && ["ds-checkbox", "ds-radio", "ds-color", "ds-token-field", "ds-file-picker"].includes(parent)) || (tag === "button" && ["ds-switch", "ds-button"].includes(parent)) || (tag === "select" && parent === "ds-select") || (tag === "textarea" && parent === "ds-composer");
       const attributes = clean.slice(match.index! + match[0].length).split(">")[0]!;
-      if (!/\/\s*$/.test(attributes) && !/^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/.test(tag)) stack.push(tag);
+      const inProse = proseTags.has(tag) && [...stack].reverse().find(open => open.prose !== undefined)?.prose === true;
+      const prose = /(?:^|\s)data-ds-not-prose(?=[\s=/]|$)/.test(attributes) ? false : /(?:^|\s)data-ds-prose(?=[\s=/]|$)/.test(attributes) ? true : undefined;
+      if (!/\/\s*$/.test(attributes) && !/^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/.test(tag)) stack.push({ tag, prose });
       if (frame) continue;
       const className = /\bclass\s*=\s*["']([^"']*)["']/.exec(attributes)?.[1] ?? /\bclass\s*=\s*["']([^"']*)$/.exec(attributes)?.[1] ?? "";
       const dialogRole = /\brole\s*=\s*["'](?:alertdialog|dialog)["']/.test(attributes);
       const controlKind = /\brole\s*=\s*["']switch["']/.test(attributes) ? "switch" : tag === "input" && /\btype\s*=\s*["']checkbox["']/.test(attributes) ? "checkbox" : tag === "input" && /\btype\s*=\s*["']radio["']/.test(attributes) ? "radio" : tag === "input" && /\btype\s*=\s*["']color["']/.test(attributes) ? "color" : tag === "input" && /\btype\s*=\s*["']file["']/.test(attributes) ? "file-picker" : undefined;
-      found.push({ tag, line: line(offset + match.index!), nativeStyle: nativeStyle(tag, className), ...(dialogRole ? { dialogRole } : {}), ...(controlKind ? { controlKind } : {}) });
+      found.push({ tag, line: line(offset + match.index!), nativeStyle: nativeStyle(tag, className), ...(inProse ? { prose: true } : {}), ...(dialogRole ? { dialogRole } : {}), ...(controlKind ? { controlKind } : {}) });
     }
   };
   if (/\.(html|astro)$/.test(file)) {
@@ -144,7 +154,17 @@ export function sourceSites(file: string, source: string): TagSite[] {
     ts.forEachChild(scope, findFrames);
   };
   findFrames(ast);
-  const templateStacks = new Map<ts.Node, string[]>();
+  const templateStacks = new Map<ts.Node, OpenElement[]>();
+  /** The nearest JSX ancestor marked data-ds-prose or data-ds-not-prose decides. */
+  const jsxInProse = (node: ts.Node) => {
+    for (let parent = node.parent; parent; parent = parent.parent) {
+      if (!ts.isJsxElement(parent) || parent.openingElement === node) continue;
+      const names = parent.openingElement.attributes.properties.filter(ts.isJsxAttribute).map(p => p.name.getText(ast));
+      if (names.includes("data-ds-not-prose")) return false;
+      if (names.includes("data-ds-prose")) return true;
+    }
+    return false;
+  };
   const walk = (node: ts.Node) => {
     if (ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) {
       const tag = node.tagName.getText(ast);
@@ -160,7 +180,8 @@ export function sourceSites(file: string, source: string): TagSite[] {
       const type = node.attributes.properties.find(p => ts.isJsxAttribute(p) && p.name.getText(ast) === "type");
       const typeValue = type && ts.isJsxAttribute(type) ? type.initializer : undefined;
       const controlKind = roleValue && ts.isStringLiteral(roleValue) && roleValue.text === "switch" ? "switch" : tag === "input" && typeValue && ts.isStringLiteral(typeValue) && typeValue.text === "checkbox" ? "checkbox" : tag === "input" && typeValue && ts.isStringLiteral(typeValue) && typeValue.text === "radio" ? "radio" : tag === "input" && typeValue && ts.isStringLiteral(typeValue) && typeValue.text === "color" ? "color" : tag === "input" && typeValue && ts.isStringLiteral(typeValue) && typeValue.text === "file" ? "file-picker" : undefined;
-      if (!sharedFrame) found.push({ tag, line: line(node.getStart(ast)), nativeStyle: nativeStyle(tag, className), ...(dialogRole ? { dialogRole: true } : {}), ...(controlKind ? { controlKind } : {}) });
+      const prose = proseTags.has(tag) && jsxInProse(node);
+      if (!sharedFrame) found.push({ tag, line: line(node.getStart(ast)), nativeStyle: nativeStyle(tag, className), ...(prose ? { prose } : {}), ...(dialogRole ? { dialogRole: true } : {}), ...(controlKind ? { controlKind } : {}) });
     }
     if (ts.isCallExpression(node) && ((ts.isPropertyAccessExpression(node.expression) && ["createElement", "createElementNS"].includes(node.expression.name.text)) || (ts.isIdentifier(node.expression) && (reactFactories.has(node.expression.text) || domFactories.has(node.expression.text))))) {
       const arg = node.arguments[ts.isPropertyAccessExpression(node.expression) && node.expression.name.text === "createElementNS" ? 1 : 0];
@@ -197,9 +218,11 @@ export function sourceSites(file: string, source: string): TagSite[] {
 function emptyCell(): ComponentCell { return { shared: 0, styled: 0, local: 0, unverified: 0, sites: [], snapshot: "none", current: null, issues: [] }; }
 interface Manifest { commit: string; components: string[]; files: Record<string, string> }
 
-export function checkSnapshots(root: string, manifestPath: string | undefined, dsRoot: string): { commit: string | null; cells: Record<string, ComponentCell>; controls: ComponentCell; reactInput: ComponentCell; reactButton: ComponentCell; reactDialog: ComponentCell; reactChoice: ComponentCell; reactSplit: ComponentCell; reactComposer: ComponentCell; reactMenu: ComponentCell; reactAccordion: ComponentCell; reactAvatar: ComponentCell; reactAvatarGroup: ComponentCell; reactToken: ComponentCell; reactFilePicker: ComponentCell; reactContextMenu: ComponentCell; reactBadge: ComponentCell } {
+export function checkSnapshots(root: string, manifestPath: string | undefined, dsRoot: string): { commit: string | null; cells: Record<string, ComponentCell>; controls: ComponentCell; text: ComponentCell; prose: ComponentCell; reactInput: ComponentCell; reactButton: ComponentCell; reactDialog: ComponentCell; reactChoice: ComponentCell; reactSplit: ComponentCell; reactComposer: ComponentCell; reactMenu: ComponentCell; reactAccordion: ComponentCell; reactAvatar: ComponentCell; reactAvatarGroup: ComponentCell; reactToken: ComponentCell; reactFilePicker: ComponentCell; reactContextMenu: ComponentCell; reactBadge: ComponentCell } {
   const cells = Object.fromEntries(IMPLEMENTATION_COLUMNS.map(c => [c.id, emptyCell()]));
   const controls = emptyCell();
+  const text = emptyCell();
+  const prose = emptyCell();
   const reactInput = emptyCell();
   const reactButton = emptyCell();
   const reactDialog = emptyCell();
@@ -214,7 +237,7 @@ export function checkSnapshots(root: string, manifestPath: string | undefined, d
   const reactBadge = emptyCell();
   const reactFilePicker = emptyCell();
   const reactContextMenu = emptyCell();
-  if (!manifestPath || !existsSync(join(root, manifestPath))) return { commit: null, cells, controls, reactInput, reactButton, reactDialog, reactChoice, reactSplit, reactComposer, reactMenu, reactAccordion, reactAvatar, reactAvatarGroup, reactToken, reactFilePicker, reactContextMenu, reactBadge };
+  if (!manifestPath || !existsSync(join(root, manifestPath))) return { commit: null, cells, controls, text, prose, reactInput, reactButton, reactDialog, reactChoice, reactSplit, reactComposer, reactMenu, reactAccordion, reactAvatar, reactAvatarGroup, reactToken, reactFilePicker, reactContextMenu, reactBadge };
   const manifest = JSON.parse(readFileSync(join(root, manifestPath), "utf8")) as Manifest;
   if (!/^[a-f0-9]{40}$/.test(manifest.commit) || !Array.isArray(manifest.components) || !manifest.files) throw new Error("Invalid component manifest");
   const snapshot = dirname(join(root, manifestPath));
@@ -226,10 +249,10 @@ export function checkSnapshots(root: string, manifestPath: string | undefined, d
     }
     return historical.get(file)!;
   };
-  for (const component of [...manifest.components, "@controls", ...(manifest.files["react/badge.ts"] ? ["@react-badge"] : []), ...(manifest.files["react/context-menu.ts"] ? ["@react-context-menu"] : []), ...(manifest.files["react/file-picker.ts"] ? ["@react-file-picker"] : []), ...(manifest.files["react/token-field.ts"] ? ["@react-token-field"] : []), ...(manifest.files["react/avatar-group.ts"] ? ["@react-avatar-group"] : []), ...(manifest.files["react/avatar.ts"] ? ["@react-avatar"] : []), ...(manifest.files["react/accordion.ts"] ? ["@react-accordion"] : []), ...(manifest.files["react/menu.ts"] ? ["@react-menu"] : []), ...(manifest.files['react/composer.ts'] ? ['@react-composer'] : []), ...(manifest.files['react/split.ts'] ? ['@react-split'] : []), ...(manifest.files['react/input.ts'] ? ['@react-input'] : []), ...(manifest.files['react/button.ts'] ? ['@react-button'] : []), ...(manifest.files['react/dialog.ts'] ? ['@react-dialog'] : []), ...(manifest.files['react/choice.ts'] ? ['@react-choice'] : [])]) {
-    const cell = component === "@react-badge" ? reactBadge : component === "@react-context-menu" ? reactContextMenu : component === "@react-file-picker" ? reactFilePicker : component === "@react-token-field" ? reactToken : component === "@react-avatar-group" ? reactAvatarGroup : component === "@react-avatar" ? reactAvatar : component === "@react-accordion" ? reactAccordion : component === "@controls" ? controls : component === "@react-menu" ? reactMenu : component === "@react-composer" ? reactComposer : component === '@react-input' ? reactInput : component === '@react-button' ? reactButton : component === '@react-dialog' ? reactDialog : component === '@react-choice' ? reactChoice : component === '@react-split' ? reactSplit : cells[component];
+  for (const component of [...manifest.components, "@controls", ...(manifest.files["1-root/text.css"] ? ["@text"] : []), ...(manifest.files["1-root/prose.css"] ? ["@prose"] : []), ...(manifest.files["react/badge.ts"] ? ["@react-badge"] : []), ...(manifest.files["react/context-menu.ts"] ? ["@react-context-menu"] : []), ...(manifest.files["react/file-picker.ts"] ? ["@react-file-picker"] : []), ...(manifest.files["react/token-field.ts"] ? ["@react-token-field"] : []), ...(manifest.files["react/avatar-group.ts"] ? ["@react-avatar-group"] : []), ...(manifest.files["react/avatar.ts"] ? ["@react-avatar"] : []), ...(manifest.files["react/accordion.ts"] ? ["@react-accordion"] : []), ...(manifest.files["react/menu.ts"] ? ["@react-menu"] : []), ...(manifest.files['react/composer.ts'] ? ['@react-composer'] : []), ...(manifest.files['react/split.ts'] ? ['@react-split'] : []), ...(manifest.files['react/input.ts'] ? ['@react-input'] : []), ...(manifest.files['react/button.ts'] ? ['@react-button'] : []), ...(manifest.files['react/dialog.ts'] ? ['@react-dialog'] : []), ...(manifest.files['react/choice.ts'] ? ['@react-choice'] : [])]) {
+    const cell = component === "@text" ? text : component === "@prose" ? prose : component === "@react-badge" ? reactBadge : component === "@react-context-menu" ? reactContextMenu : component === "@react-file-picker" ? reactFilePicker : component === "@react-token-field" ? reactToken : component === "@react-avatar-group" ? reactAvatarGroup : component === "@react-avatar" ? reactAvatar : component === "@react-accordion" ? reactAccordion : component === "@controls" ? controls : component === "@react-menu" ? reactMenu : component === "@react-composer" ? reactComposer : component === '@react-input' ? reactInput : component === '@react-button' ? reactButton : component === '@react-dialog' ? reactDialog : component === '@react-choice' ? reactChoice : component === '@react-split' ? reactSplit : cells[component];
     if (!cell) continue;
-    const entry = component === "@react-badge" ? "react/badge.ts" : component === "@react-context-menu" ? "react/context-menu.ts" : component === "@react-file-picker" ? "react/file-picker.ts" : component === "@react-token-field" ? "react/token-field.ts" : component === "@react-avatar-group" ? "react/avatar-group.ts" : component === "@react-avatar" ? "react/avatar.ts" : component === "@react-accordion" ? "react/accordion.ts" : component === "@controls" ? "1-root/controls.css" : component === "@react-menu" ? "react/menu.ts" : component === "@react-composer" ? "react/composer.ts" : component === '@react-input' ? 'react/input.ts' : component === '@react-button' ? 'react/button.ts' : component === '@react-dialog' ? 'react/dialog.ts' : component === '@react-choice' ? 'react/choice.ts' : component === '@react-split' ? 'react/split.ts' : Object.keys(manifest.files).find(f => f.endsWith(`/ds-${component}.ts`));
+    const entry = component === "@text" ? "1-root/text.css" : component === "@prose" ? "1-root/prose.css" : component === "@react-badge" ? "react/badge.ts" : component === "@react-context-menu" ? "react/context-menu.ts" : component === "@react-file-picker" ? "react/file-picker.ts" : component === "@react-token-field" ? "react/token-field.ts" : component === "@react-avatar-group" ? "react/avatar-group.ts" : component === "@react-avatar" ? "react/avatar.ts" : component === "@react-accordion" ? "react/accordion.ts" : component === "@controls" ? "1-root/controls.css" : component === "@react-menu" ? "react/menu.ts" : component === "@react-composer" ? "react/composer.ts" : component === '@react-input' ? 'react/input.ts' : component === '@react-button' ? 'react/button.ts' : component === '@react-dialog' ? 'react/dialog.ts' : component === '@react-choice' ? 'react/choice.ts' : component === '@react-split' ? 'react/split.ts' : Object.keys(manifest.files).find(f => f.endsWith(`/ds-${component}.ts`));
     const visited = new Set<string>();
     let modified = false, unverifiable = false, current = true;
     const visit = (file: string) => {
@@ -255,7 +278,7 @@ export function checkSnapshots(root: string, manifestPath: string | undefined, d
     cell.snapshot = modified ? "modified" : unverifiable ? "unverified" : "verified";
     cell.current = current && !unverifiable;
   }
-  return { commit: manifest.commit, cells, controls, reactInput, reactButton, reactDialog, reactChoice, reactSplit, reactComposer, reactMenu, reactAccordion, reactAvatar, reactAvatarGroup, reactToken, reactFilePicker, reactContextMenu, reactBadge };
+  return { commit: manifest.commit, cells, controls, text, prose, reactInput, reactButton, reactDialog, reactChoice, reactSplit, reactComposer, reactMenu, reactAccordion, reactAvatar, reactAvatarGroup, reactToken, reactFilePicker, reactContextMenu, reactBadge };
 }
 
 /**
@@ -264,8 +287,13 @@ export function checkSnapshots(root: string, manifestPath: string | undefined, d
  * revision and each copied file's hash: the copy is verified when the files on
  * disk match the lock and the lock matches DS1 at that revision.
  */
-const lockedControlStyles = ["controls.css", "component-tokens.css", "component-metrics.css", "component-appearance.css"];
-export function checkLockedControls(root: string, dsRoot: string): ComponentCell | undefined {
+const componentStyles = ["component-tokens.css", "component-metrics.css", "component-appearance.css"];
+const lockedControlStyles = ["controls.css", ...componentStyles];
+/** The sheets that draw native text: text.css today, or one.css from before it, which held .ds-text itself. */
+const lockedTextStyles: LockedStyles[] = [{ names: ["text.css", ...componentStyles] }, { names: ["one.css", ...componentStyles], defines: { "one.css": /\.ds-text\s*\{/ } }];
+const lockedProseStyles = ["prose.css", ...componentStyles];
+type LockedStyles = { names: string[]; defines?: Record<string, RegExp> };
+export function checkLockedStyles(root: string, dsRoot: string, { names, defines = {} }: LockedStyles): ComponentCell | undefined {
   const lockPath = join(root, "sync.lock.json");
   if (!existsSync(lockPath)) return undefined;
   const source = (JSON.parse(readFileSync(lockPath, "utf8")) as Record<string, { commit?: string; files?: Record<string, string> }>)["Design system 1"];
@@ -273,14 +301,14 @@ export function checkLockedControls(root: string, dsRoot: string): ComponentCell
   const copies = new Map<string, Record<string, string>>();
   for (const path of Object.keys(source.files)) {
     const name = basename(path);
-    if (lockedControlStyles.includes(name)) copies.set(dirname(path), { ...copies.get(dirname(path)), [name]: path });
+    if (names.includes(name)) copies.set(dirname(path), { ...copies.get(dirname(path)), [name]: path });
   }
   let best: ComponentCell | undefined;
   for (const found of copies.values()) {
-    if (!lockedControlStyles.every(name => found[name])) continue;
+    if (!names.every(name => found[name])) continue;
     const cell = emptyCell();
     let modified = false, unverifiable = false, current = true;
-    for (const name of lockedControlStyles) {
+    for (const name of names) {
       const path = found[name]!, full = resolve(root, path);
       if (!full.startsWith(resolve(root) + "/") || !existsSync(full)) { unverifiable = true; cell.issues.push(`Missing copy: ${path}`); continue; }
       const body = readFileSync(full);
@@ -288,6 +316,7 @@ export function checkLockedControls(root: string, dsRoot: string): ComponentCell
       let original: Buffer | null = null;
       try { original = execFileSync("git", ["show", `${source.commit}:DS1/1-root/${name}`], { cwd: dsRoot, stdio: ["ignore", "pipe", "ignore"] }); } catch { original = null; }
       if (!original || hash(original) !== source.files[path]) { unverifiable = true; cell.issues.push(`Source revision not verified: ${path}`); }
+      if (defines[name] && !defines[name]!.test(body.toString("utf8"))) { unverifiable = true; cell.issues.push(`No DS1 rule for these sites in ${path}`); }
       const latest = join(dsRoot, "DS1/1-root", name);
       if (!existsSync(latest) || hash(readFileSync(latest)) !== hash(body)) current = false;
     }
@@ -298,6 +327,18 @@ export function checkLockedControls(root: string, dsRoot: string): ComponentCell
   }
   return best;
 }
+export const checkLockedControls = (root: string, dsRoot: string) => checkLockedStyles(root, dsRoot, { names: lockedControlStyles });
+/** The first verified of the text sheets, else the closest attempt. */
+export function checkLockedText(root: string, dsRoot: string): ComponentCell | undefined {
+  let best: ComponentCell | undefined;
+  for (const styles of lockedTextStyles) {
+    const cell = checkLockedStyles(root, dsRoot, styles);
+    if (cell?.snapshot === "verified") return cell;
+    best ??= cell;
+  }
+  return best;
+}
+export const checkLockedProse = (root: string, dsRoot: string) => checkLockedStyles(root, dsRoot, { names: lockedProseStyles });
 
 /**
  * Design system 1's own app and site import DS1/ directly, at the same commit:
@@ -311,7 +352,7 @@ function directSnapshots(dsRoot: string): ReturnType<typeof checkSnapshots> {
     : { ...emptyCell(), snapshot: "verified", current: true };
   const files = git(dsRoot, "ls-files", "--", "DS1").split("\n");
   const cells = Object.fromEntries(IMPLEMENTATION_COLUMNS.map(c => [c.id, files.some(f => f.endsWith(`/ds-${c.id}.ts`)) ? source() : emptyCell()]));
-  return { commit: git(dsRoot, "rev-parse", "HEAD"), cells, controls: source(), reactInput: source(), reactButton: source(), reactDialog: source(), reactChoice: source(), reactSplit: source(), reactComposer: source(), reactMenu: source(), reactAccordion: source(), reactAvatar: source(), reactAvatarGroup: source(), reactToken: source(), reactFilePicker: source(), reactContextMenu: source(), reactBadge: source() };
+  return { commit: git(dsRoot, "rev-parse", "HEAD"), cells, controls: source(), text: source(), prose: source(), reactInput: source(), reactButton: source(), reactDialog: source(), reactChoice: source(), reactSplit: source(), reactComposer: source(), reactMenu: source(), reactAccordion: source(), reactAvatar: source(), reactAvatarGroup: source(), reactToken: source(), reactFilePicker: source(), reactContextMenu: source(), reactBadge: source() };
 }
 /** Where a direct-source app's shared adapters live, as if DS1/ were its snapshot. */
 const directManifest = "DS1/components-manifest.json";
@@ -420,9 +461,13 @@ export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): Ado
     if (spec.source === "direct" && resolve(root) !== resolve(dsRoot)) throw new Error("Only Design system 1 itself can be scanned as direct source.");
     const manifest = spec.source === "direct" ? directManifest : spec.manifest;
     const snapshots = spec.source === "direct" ? directSnapshots(dsRoot) : checkSnapshots(root, spec.manifest, dsRoot);
-    if (spec.source !== "direct" && snapshots.controls.snapshot === "none") {
-      const locked = checkLockedControls(root, dsRoot);
-      if (locked) snapshots.controls = locked;
+    if (spec.source !== "direct") {
+      // Without a manifest copy, a product's sync.lock.json can still show its native class sheets.
+      for (const [name, check] of [["controls", checkLockedControls], ["text", checkLockedText], ["prose", checkLockedProse]] as const) {
+        if (snapshots[name].snapshot !== "none") continue;
+        const locked = check(root, dsRoot);
+        if (locked) snapshots[name] = locked;
+      }
     }
     app.snapshotCommit = spec.source === "direct" ? null : snapshots.commit;
     app.cells = snapshots.cells;
@@ -454,11 +499,13 @@ export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): Ado
           cell.issues = [...new Set([...cell.issues, ...evidence.issues])];
           cell.current = cell.current === true && evidence.current === true;
         }
+        // Native classes are verified by the sheet that draws them: controls.css, text.css, or prose.css for writing marked data-ds-prose.
+        const styled = site.nativeStyle === "ds-text" ? snapshots.text : site.nativeStyle ? snapshots.controls : site.prose ? snapshots.prose : undefined;
         const kind: UsageSite["kind"] = ds ? cell.snapshot === "verified" && evidence.snapshot === "verified" ? "shared" : "unverified"
-          : site.nativeStyle ? snapshots.controls.snapshot === "verified" ? "styled" : "unverified" : "local";
-        if (site.nativeStyle && snapshots.controls.snapshot !== "verified") cell.issues = [...new Set([...cell.issues, ...snapshots.controls.issues, "Native DS1 styles could not be verified."])];
+          : styled ? styled.snapshot === "verified" ? "styled" : "unverified" : "local";
+        if (styled && styled.snapshot !== "verified") cell.issues = [...new Set([...cell.issues, ...styled.issues, site.nativeStyle === "ds-text" ? "Native DS1 text styles could not be verified." : site.nativeStyle ? "Native DS1 styles could not be verified." : "DS1 prose styles could not be verified."])];
         cell[kind]++;
-        cell.sites.push({ file, line: site.line, tag: site.tag + (site.nativeStyle ? `.${site.nativeStyle}` : ""), kind });
+        cell.sites.push({ file, line: site.line, tag: site.tag + (site.nativeStyle ? `.${site.nativeStyle}` : site.prose ? "[data-ds-prose]" : ""), kind });
       }
     }
     app.status = "scanned";
@@ -481,6 +528,7 @@ export function scanReport(studio = resolve(repository, "..")): AdoptionReport {
       "Counts are authored source sites in tracked web files, read from the current working tree. A loop counts once. This is not a runtime or production audit; unused tracked source can be included.",
       "DS1 means the component and its imported dependencies match a recorded DS1 Git revision. An older verified snapshot still counts as DS1; the detail view shows whether it matches today's source. Modified or unverifiable DS1 is counted separately.",
       "DS1 styles counts native controls with literal ds-button, ds-switch, ds-input, ds-textarea, ds-select, ds-checkbox, ds-radio or ds-dialog classes and verified shared control styles: from a component manifest, or for a product that copies only the tokens and controls.css, from its sync.lock.json (the files match the lock and the lock matches DS1 at its revision). These are not Lit components. Dynamic class expressions are not inferred.",
+      "DS1 styles also counts native p and h1-h6 with a literal ds-text class (ds-text or a ds-text-- size or tone), verified through text.css (or, in an older copy, the one.css that held .ds-text), and native p, h1-h6, ul, ol and table inside an element marked data-ds-prose, verified through prose.css. The nearest data-ds-prose or data-ds-not-prose ancestor in the same markup or JSX decides; prose is not inferred across components or from DOM creation.",
       "Design system 1's own app and site import DS1/ directly at the same commit, so their DS1 sites count as DS1 when DS1/ has no uncommitted changes; there is no copied snapshot to verify. A checkout is dirty when the app's own folder has uncommitted changes, not the repository around it.",
       "Local means recognized ezo-/c9y- components or native button, input/select/textarea, p/headings, ul/ol, table, form and dialog, plus literal dialog/alertdialog roles, including explicit setAttribute sites. Native semantics can be intentional; these counts are review leads, not automatic defects.",
       "Tests, demos in preview/dev directories, generated files, vendored implementations and shared sign-in internals are excluded. Link's inspected TabPill, TabPillRow and Tooltip/Tooltop adapters and DS1's verified React FilePicker, Input, Textarea, Composer, Menu, ContextMenuContent/SubContent and their Button, Text and FilePicker entries, Checkbox, Radio, Switch, Select, ColorInput, Button, ButtonLink, Token, TokenField, Avatar, Logo, AvatarGroup, Accordion, Split and DialogContent adapters count at imported JSX uses, without counting their inner DS1 tags again.",

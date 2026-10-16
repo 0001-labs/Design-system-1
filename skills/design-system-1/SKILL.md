@@ -27,7 +27,7 @@ Everything is counted in **squares**: one square is 20px (`--unit`, `--1`), mult
 | A wider item ("double the length") | 8 squares: 160px pitch, 159px drawn | twice the item width |
 | A list column | 4 squares (`--quad`) | Ezo `--column-width` |
 | Gaps and margins | whole squares, or half a square (`--half`) at most | `grid.css` |
-| Text | 14px (`--type-size-default`), 10px small; padded 4px from the item's edge | `one.css`, Ezo `--item-text-padding` |
+| Text | 14px (`--type-size-default`) on a one-square line; 10px small, 13px heading, a 20px display title on two squares; padded 4px from the item's edge | `one.css`, `text.css`, Ezo `--item-text-padding` |
 | Lines | 1px, centred on the grid line | Ezo `--outline-stroke` |
 | Corners | square for items and rows; 4px (`--radius`) only on pictures, buttons and fields | Peer and Ins follow this |
 | An avatar (a person, a workspace) | **always round**, 16px (one control high) with small type; overlapping 3px in a group. Coloured by a fill (`color`) or an ink (`ink`). Only a logo keeps its corners | `ds-avatar` |
@@ -37,6 +37,14 @@ Everything is counted in **squares**: one square is 20px (`--unit`, `--1`), mult
 | A page's columns | **Whole squares**: navigation 12, a list beside its detail 16, an inspector 12, a reading or settings column 32, a single task 16, overview tiles 12. Two squares between columns, one between areas, one around the page; one column below 30 squares of width. A `column` or `centered` page stands on a whole square (the room beside it rounds down to squares) and `measure="N"` sets its width in squares | `ds-page` layouts `sidebar`, `split`, `inspector`, `column`, `centered`, `tiles` |
 
 Items stack edge to edge with no gap, as an Ezo list does. Lists, table rows, cells and their headers use neutral or transparent backgrounds by default, never automatic accent fills. Colour is opt-in for a meaningful state, not decoration across an entire list or table. Positions snap to the grid: anything a person can move lands on whole squares. Before calling a design done, measure it in the browser (an element's width and height must be whole squares minus the 1px correction) instead of judging by eye.
+
+## Text and prose
+
+- **Interface copy** (labels, messages, titles in an app) is `ds-text`: `tone` (`muted`, `title`, `danger`), `size` (`small`, `heading`, `display`), `strong` and `wrap` work for a translation key as for `literal` text. A heading is `role="heading"` with `aria-level`. A page without scripts uses the classes in `DS1/1-root/text.css` on native text: `ds-text`, `ds-text--small`, `--heading`, `--display`, `--strong`, `--muted`, `--title`, `--danger`. `one.css` and `controls.css` both import it.
+- **Long-form and marketing writing** stays native headings, paragraphs, lists and tables inside an element marked `data-ds-prose`, drawn by `DS1/1-root/prose.css`; a part that draws itself inside it carries `data-ds-not-prose`. Never restyle prose elements by hand, and never wrap each paragraph in `ds-text`. Both count as Design system 1's styles.
+- Every line of text is one square (`--ds-unit`); a display title (`h1` in prose) takes two. One square stands between two blocks of writing and two before a heading. Code is 13px in the code face on the same lines.
+- Failure and warning text is `--ds-danger-color` (Red for blood on light paper, Tuned red on dark), never a raw red.
+- A page made only of plain HTML can take the classless sheet, `DS1/1-root/one.semantic.css`, on the same measures. Sync 1 copies `prose.css` and `one.semantic.css` with `"prose": true` and `"classless": true` on the `root` or `tokens` export.
 
 ## The rest of the language
 

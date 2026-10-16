@@ -9,7 +9,7 @@ const colours = readPalette().map(c => ({ ...c, darkPastel: c.dim }));
 const palette = colours.filter(c => !c.ink);
 const inks = colours.filter(c => c.ink);
 ---
-    <div class="colours not-content">
+    <div class="colours not-content" data-ds-not-prose>
       <div class="colours-bar"><ds-tabs class="mode-tabs" aria-label="Mode"><ds-button control="host" role="tab" id="tab-light" aria-controls="light" aria-selected="true" active>Light</ds-button><ds-button control="host" role="tab" id="tab-dark" aria-controls="dark" aria-selected="false" tabindex="-1">Dark</ds-button></ds-tabs></div>
       {[['light', 'Light'], ['dark', 'Dark']].map(([mode]) => (
         <div id={mode} class={`mode ${mode}`} role="tabpanel" aria-labelledby={`tab-${mode}`} hidden={mode === 'dark'}>

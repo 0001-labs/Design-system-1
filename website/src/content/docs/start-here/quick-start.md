@@ -35,7 +35,7 @@ The [examples](/start-here/examples/) include an article, a form, a report and a
 
 ## Internet and offline use
 
-The HTML loads the stylesheet and fonts over HTTPS. The native stylesheet also imports Inter from Google Fonts for some controls. To use it entirely offline, save both stylesheets, the font files and that imported CSS/fonts, and change every external URL to a local path. Otherwise, keep the network references and describe the page as online-dependent.
+The HTML loads the stylesheet and fonts over HTTPS; the native stylesheet itself imports nothing. To use it entirely offline, save both stylesheets and the font files, and change every external URL to a local path. Otherwise, keep the network references and describe the page as online-dependent.
 
 ## When JavaScript is needed
 

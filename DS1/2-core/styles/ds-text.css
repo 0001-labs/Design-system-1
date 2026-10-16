@@ -1,7 +1,9 @@
 @import "../../1-root/component-metrics.css";
 
 /* ds-text.css */
-/* Text component styles for displaying translations */
+/* Text component styles for displaying translations. Without attributes the
+   element is one control high, for a row; text.css draws the same words as
+   classes on native text. */
 
 :host {
   display: inline-flex;
@@ -18,7 +20,7 @@
   text-decoration: var(--text-decoration-default);
   vertical-align: middle;
   white-space: nowrap;
-  color: inherit;
+  color: var(--ds-text-tone, inherit);
 }
 
 :host([data-language="ja"]) {
@@ -40,8 +42,7 @@
   color: inherit;
 }
 
-/* ds-text.css */
-
+/* Text someone wrote: shown as it stands, cut with an ellipsis at its width. */
 :host([literal]) {
   height: auto;
   min-height: var(--ds-control-height);
@@ -49,7 +50,6 @@
   min-width: 0;
   max-width: 100%;
   overflow: var(--ds-text-overflow, hidden);
-  color: var(--ds-text-tone, inherit);
   font-family: var(--ds-typeface-regular);
   font-feature-settings: var(--ds-font-features);
   font-size: var(--ds-type-size-default);
@@ -60,28 +60,54 @@
   white-space: nowrap;
 }
 
-:host([literal][strong]) {
+/*
+ * Tone, size, strength and wrapping work alike for a translation key and for
+ * literal text. They follow the rules above, at the same specificity.
+ */
+
+:host([strong]) {
   font-weight: var(--ds-type-weight-bold);
 }
 
-:host([literal][wrap]) {
+/* Several lines, each one square. */
+:host([wrap]) {
+  display: inline-block;
+  height: auto;
+  min-height: var(--ds-control-height);
+  max-width: 100%;
   overflow: visible;
+  line-height: var(--ds-unit);
   white-space: normal;
 }
 
-:host([literal][tone="muted"]) {
+:host([tone="muted"]) {
   --ds-text-tone: var(--ds-text-color-muted);
 }
 
-:host([literal][tone="title"]) {
+:host([tone="title"]) {
   --ds-text-tone: var(--ds-title-color);
 }
 
-:host([literal][size="small"]) {
+:host([tone="danger"]) {
+  --ds-text-tone: var(--ds-danger-color);
+}
+
+:host([size="small"]) {
   font-size: var(--ds-type-size-small);
 }
 
-:host([literal][size="heading"]) {
+:host([size="heading"]) {
+  height: auto;
   font-size: var(--ds-type-size-heading);
   line-height: var(--ds-row-height);
+}
+
+/* A title on two squares. */
+:host([size="display"]) {
+  display: inline-block;
+  height: auto;
+  min-height: calc(2 * var(--ds-unit));
+  font-size: var(--ds-type-size-display);
+  line-height: calc(2 * var(--ds-unit));
+  letter-spacing: calc(var(--ds-display-text-tracking, -0.4px) * var(--ds-sf, 1));
 }

@@ -2,6 +2,7 @@
 
 @import "./grid.css";
 @import "./component-tokens.css";
+@import "./text.css";
 
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@350&display=swap");
@@ -231,27 +232,8 @@ body {
 /* ----------------------------------------------------------
    CSS-ONLY COMPONENTS
    Native HTML classes that do not require the JavaScript bundle.
+   The text classes (.ds-text, its sizes and tones) are text.css.
    ---------------------------------------------------------- */
-
-.ds-text {
-  margin: 0;
-  color: var(--text-color);
-  font-family: var(--typeface-regular);
-  font-size: var(--type-size-default);
-  font-weight: var(--type-weight-default);
-  line-height: var(--type-lineheight-default);
-  letter-spacing: var(--type-letterspacing-default);
-}
-
-.ds-text--heading {
-  font-family: var(--typeface-medium);
-  font-size: var(--type-size-heading);
-  font-weight: var(--type-weight-heading);
-}
-
-.ds-text--small {
-  font-size: var(--type-size-small);
-}
 
 .ds-button {
   appearance: none;
