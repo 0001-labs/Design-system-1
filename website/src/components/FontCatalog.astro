@@ -24,13 +24,12 @@ const systemFonts = [
     </div>
     <p>A dot-matrix alphabet with round marks and proportional spacing. One empty column separates the letters.</p>
     <div class="specimen-tools" hidden data-specimen-tools>
-      <label for="olivetti-size">Specimen size</label>
-      <select class="ds-select" id="olivetti-size" aria-controls="olivetti-specimen">
-        <option value="20">20 px</option>
-        <option value="40" selected>40 px</option>
-        <option value="60">60 px</option>
-        <option value="80">80 px</option>
-      </select>
+      <label id="olivetti-size-label" for="olivetti-size">Specimen size</label>
+      <ds-button secondary control="slotted" class="specimen-size-cycle">
+        <button type="button" id="olivetti-size" aria-controls="olivetti-specimen" aria-labelledby="olivetti-size-label olivetti-size-value">
+          <span id="olivetti-size-value">40 px</span>
+        </button>
+      </ds-button>
       <span id="specimen-help">Click the text to try your own words.</span>
     </div>
     <p data-font-status role="status">Loading the Olivetti Dot specimen…</p>
@@ -76,13 +75,20 @@ const systemFonts = [
 </div>
 
 <script>
+  import '../../../DS1/2-core/ds-button';
   const samples = document.querySelector<HTMLElement>('[data-olivetti-samples]');
   const status = document.querySelector<HTMLElement>('[data-font-status]');
   const tools = document.querySelector<HTMLElement>('[data-specimen-tools]');
-  const size = document.querySelector<HTMLSelectElement>('#olivetti-size');
+  const size = document.querySelector<HTMLButtonElement>('#olivetti-size');
   const specimen = document.querySelector<HTMLElement>('#olivetti-specimen');
-  size?.addEventListener('change', () => {
-    specimen?.style.setProperty('--specimen-size', `${size.value}px`);
+  const sizeValue = document.querySelector<HTMLElement>('#olivetti-size-value');
+  const sizes = [20, 40, 60, 80];
+  let sizeIndex = 1;
+  size?.addEventListener('click', () => {
+    sizeIndex = (sizeIndex + 1) % sizes.length;
+    const pixels = sizes[sizeIndex];
+    if (sizeValue) sizeValue.textContent = `${pixels} px`;
+    specimen?.style.setProperty('--specimen-size', `${pixels}px`);
   });
   document.fonts.load('40px "Olivetti Dot"').then(faces => {
     if (!faces.length) throw new Error('Font unavailable');
@@ -125,7 +131,7 @@ const systemFonts = [
   .family-heading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0 var(--square); }
   .family-heading span, .family-detail { color: var(--ds1-docs-header-text-secondary); }
   .specimen-tools { display: flex; flex-wrap: wrap; align-items: center; gap: calc(var(--square) / 2); margin-top: var(--square); }
-  .specimen-tools select { width: calc(4 * var(--square)); }
+  .specimen-size-cycle { width: calc(4 * var(--square)); }
   .dot-specimen, .alphabet, .alphabet div { font-family: 'Inter Arrows', 'Olivetti Dot', sans-serif; font-weight: 400; letter-spacing: 0; }
   .dot-specimen {
     --specimen-size: 40px;
@@ -146,7 +152,7 @@ const systemFonts = [
   .face-canon { font-family: var(--typeface-canon); }
   .face-mono { font-family: var(--typeface-mono); }
   .medium-sample { font-family: var(--typeface-medium); font-size: var(--type-size-default); line-height: var(--square); }
-  .font-catalog :is(a, select, [contenteditable]):focus-visible { outline: 2px solid currentColor; outline-offset: calc(4px * var(--sf)); }
+  .font-catalog :is(a, button, [contenteditable]):focus-visible { outline: 2px solid currentColor; outline-offset: calc(4px * var(--sf)); }
   @media (max-width: 50rem) {
     .development-details > div { grid-template-columns: 1fr; margin-bottom: var(--square); }
   }
