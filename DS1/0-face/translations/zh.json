@@ -59,6 +59,10 @@
     "Swedish": "瑞典语",
     "Chinese": "中文",
     "Show password": "显示密码",
-    "Hide password": "隐藏密码"
+    "Hide password": "隐藏密码",
+    "OK": "确定",
+    "Copied": "已复制",
+    "Could not copy": "无法复制",
+    "Notifications": "通知"
   }
 }

@@ -26,98 +26,32 @@
  * and `opacity` animate (a toast stacked behind takes the front one's height at
  * once instead of animating it). `toast()` also adds a `<ds-toast>` to the page
  * when there is none, and moving the element keeps its toasts and their time.
+ * An error is announced assertively unless it says `important: false`.
+ *
+ * `toast()` and its queue are framework-free (`0-face/toast-queue.ts`). On a
+ * page without Lit, the page toaster (`0-face/toaster.ts`) draws the same stack
+ * with this component's stylesheet; where a `<ds-toast>` is in the page, it
+ * takes every toast, so a page never shows two stacks.
  */
 import { LitElement, html, nothing, unsafeCSS } from "lit";
 import { repeat } from "lit/directives/repeat.js";
 import { define } from "../0-face/define";
+import {
+  SWIPE_THRESHOLD,
+  SWIPE_VELOCITY,
+  TIME_BEFORE_UNMOUNT,
+  TOAST_DURATION as DURATION,
+  TOAST_ICONS as ICONS,
+  VISIBLE_TOASTS,
+  listenForToasts,
+} from "../0-face/toast-queue";
+import type { ToastButton, ToastData, ToastId, ToastPosition, ToastSignal as Signal } from "../0-face/toast-queue";
 import "./ds-icon";
 import styles from "./styles/ds-toast.css?inline";
 
-export type ToastId = string | number;
-export type ToastType = "default" | "success" | "info" | "warning" | "error" | "loading";
-export type ToastPosition = "top-left" | "top-center" | "top-right" | "bottom-left" | "bottom-center" | "bottom-right";
-/**
- * A button in a toast. Clicking it closes the toast unless `onClick` calls
- * `preventDefault()`, as in Sonner. With `href` it is a link instead (not in
- * Sonner), which still closes the toast as the page follows it.
- */
-export interface ToastButton { label: string; onClick?: (event: MouseEvent) => void; href?: string }
-export interface ToastOptions {
-  /** Reuse an id to update a toast in place, as Sonner does. */
-  id?: ToastId;
-  description?: string;
-  /** Milliseconds; `Infinity` keeps the toast until it is dismissed. */
-  duration?: number;
-  /** A Design system 1 icon name, replacing the type's icon. */
-  icon?: string;
-  action?: ToastButton;
-  cancel?: ToastButton;
-  /** False keeps the toast from being swiped or closed by a person. */
-  dismissible?: boolean;
-  closeButton?: boolean;
-  /** Announced assertively instead of politely. */
-  important?: boolean;
-  onDismiss?: (toast: ToastData) => void;
-  onAutoClose?: (toast: ToastData) => void;
-}
-export interface ToastData extends ToastOptions { id: ToastId; title: string; type: ToastType }
-type Message<T> = string | ((value: T) => string);
-export interface ToastPromiseMessages<T> extends ToastOptions {
-  loading: string;
-  success: Message<T>;
-  error: Message<unknown>;
-  finally?: () => void;
-}
-
-/* Sonner's state: one observer that every toaster listens to. */
-type Signal = { toast: ToastData } | { dismiss: ToastId | undefined };
-const listeners = new Set<(signal: Signal) => void>();
-let lastId = 0;
-
-function show(title: string, type: ToastType, options: ToastOptions = {}): ToastId {
-  const id = options.id ?? ++lastId;
-  if (!listeners.size && typeof document !== "undefined" && document.body) document.body.append(document.createElement("ds-toast"));
-  for (const listener of listeners) listener({ toast: { ...options, id, title, type } });
-  return id;
-}
-
-/** Show a toast, as Sonner's `toast()`. Returns its id. */
-export const toast = Object.assign(
-  (title: string, options?: ToastOptions): ToastId => show(title, "default", options),
-  {
-    message: (title: string, options?: ToastOptions): ToastId => show(title, "default", options),
-    success: (title: string, options?: ToastOptions): ToastId => show(title, "success", options),
-    info: (title: string, options?: ToastOptions): ToastId => show(title, "info", options),
-    warning: (title: string, options?: ToastOptions): ToastId => show(title, "warning", options),
-    error: (title: string, options?: ToastOptions): ToastId => show(title, "error", options),
-    loading: (title: string, options?: ToastOptions): ToastId => show(title, "loading", options),
-    /** A loading toast that becomes a success or an error when the promise settles. */
-    promise<T>(promise: Promise<T> | (() => Promise<T>), messages: ToastPromiseMessages<T>): ToastId {
-      const { loading, success, error, finally: done, ...options } = messages;
-      const id = show(loading, "loading", options);
-      Promise.resolve(typeof promise === "function" ? promise() : promise)
-        .then(
-          value => { show(typeof success === "function" ? success(value) : success, "success", { ...options, id }); },
-          reason => { show(typeof error === "function" ? error(reason) : error, "error", { ...options, id }); },
-        )
-        .finally(() => done?.());
-      return id;
-    },
-    /** Dismiss one toast, or every toast without an id. */
-    dismiss(id?: ToastId): ToastId | undefined {
-      for (const listener of listeners) listener({ dismiss: id });
-      return id;
-    },
-  },
-);
-
-/* Sonner's constants, with its gap and offset rounded to Design system 1's squares in CSS. */
-const DURATION = 4000;
-const VISIBLE_TOASTS = 3;
-const TIME_BEFORE_UNMOUNT = 200;
-const SWIPE_THRESHOLD = 45;
-const SWIPE_VELOCITY = 0.11;
-const ICONS: Partial<Record<ToastType, string>> = { success: "check", info: "notifications", warning: "warning", error: "warning" };
+/* Sonner's calls and their queue are framework-free (`0-face/toast-queue.ts`), shared with the page toaster. */
+export { toast } from "../0-face/toast-queue";
+export type { ToastButton, ToastData, ToastId, ToastOptions, ToastPosition, ToastPromiseMessages, ToastType } from "../0-face/toast-queue";
 
 interface Item { data: ToastData; mounted: boolean; removed: boolean; swipeOut: boolean; index: number; offset: number }
 interface Timer { remaining: number; started: number; handle?: ReturnType<typeof setTimeout> }
@@ -159,6 +93,7 @@ export class Toaster extends LitElement {
   private interacting = false;
   private swipe?: { id: ToastId; start: number; time: number; amount: number };
   private resizes = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(() => this.measure());
+  private stopListening?: () => void;
 
   constructor() {
     super();
@@ -178,7 +113,8 @@ export class Toaster extends LitElement {
 
   connectedCallback(): void {
     super.connectedCallback();
-    listeners.add(this.receive);
+    this.stopListening?.();
+    this.stopListening = listenForToasts(this.receive);
     document.addEventListener("keydown", this.hotkey);
     document.addEventListener("visibilitychange", this.syncTimers);
     // Moved to another parent: carry on with the time each toast had left.
@@ -187,7 +123,8 @@ export class Toaster extends LitElement {
 
   disconnectedCallback(): void {
     super.disconnectedCallback();
-    listeners.delete(this.receive);
+    this.stopListening?.();
+    this.stopListening = undefined;
     document.removeEventListener("keydown", this.hotkey);
     document.removeEventListener("visibilitychange", this.syncTimers);
     const now = Date.now();

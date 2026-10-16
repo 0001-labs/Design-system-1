@@ -41,6 +41,10 @@ toast.promise(save(), { loading: "Saving", success: "Saved", error: "Could not s
 toast.dismiss(id); // one toast; toast.dismiss() for all of them
 ```
 
+On a page without Lit, import `toast()` from the [feedback module](/1-root/feedback/)
+instead: its page toaster draws the same stack with this element's stylesheet, and where a
+`<ds-toast>` is in the page, the element takes every toast.
+
 In React, import Sonner's names from the adapter:
 
 ```tsx
@@ -69,7 +73,8 @@ import { Toaster, toast } from "@0001-labs/design-system-1/DS1/react/toast";
 icon name), `action` and `cancel` (`{ label, onClick }`; the toast closes after
 the click unless `onClick` calls `preventDefault()`; with `href`, not in Sonner,
 the button is a link and closes the toast as it is followed), `dismissible`,
-`closeButton`, `important` (announced assertively), `onDismiss` and
+`closeButton`, `important` (announced assertively; an error is unless it says
+`false`), `onDismiss` and
 `onAutoClose`. `toast.promise()` also takes `loading`, `success`, `error` (text,
 or a function of the result) and `finally`.
 
@@ -92,7 +97,8 @@ toast, a control and the rest of the square, and stands one square clear of
 the edge and the phone's safe area. Only `transform` and `opacity` animate; a
 toast stacked behind takes the front one's height at once. Swiping works
 towards the vertical edge only. Moving the element to another parent keeps its
-toasts and the time each had left.
+toasts and the time each had left. An error is announced assertively unless it
+says `important: false`.
 
 Set `--ds-toast-width`, `--ds-toast-background` and `--ds-toast-color` on
 `ds-toast` with shared tokens to fit a surface. Copy `toast` through Sync 1.
@@ -100,4 +106,5 @@ Set `--ds-toast-width`, `--ds-toast-background` and `--ds-toast-color` on
 ## Related components
 
 [Banner](/2-core/banner/) holds a message that stays. [Button](/2-core/button/)
-draws a toast's action.
+draws a toast's action. [Feedback](/1-root/feedback/) brings toasts, dialogs and
+copying text to pages without Lit.

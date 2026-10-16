@@ -59,6 +59,10 @@
     "Swedish": "Svedese",
     "Chinese": "Cinese",
     "Show password": "Mostra password",
-    "Hide password": "Nascondi password"
+    "Hide password": "Nascondi password",
+    "OK": "OK",
+    "Copied": "Copiato",
+    "Could not copy": "Impossibile copiare",
+    "Notifications": "Notifiche"
   }
 }

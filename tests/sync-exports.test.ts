@@ -85,3 +85,11 @@ test('the languages export carries formatting with every module the language run
     for (const [, path] of String(content).matchAll(/(?:from|import\()\s*["'](\.\/[^"']+)["']/g)) expect(copy, `${file} imports ${path}`).toHaveProperty([`0-face/${path.slice(2)}${/\.\w+$/.test(path) ? '' : '.ts'}`]);
   }
 });
+
+test('the feedback export carries the module with everything it imports, by its paths in DS1', () => {
+  const copy = files('feedback');
+  for (const file of ['0-face/feedback.ts', '0-face/toaster.ts', '0-face/toast-queue.ts', '0-face/dialogs.ts', '0-face/copy-text.ts', '0-face/i18n.ts', '0-face/shared-words.ts', '0-face/translations/da.json', '2-core/styles/ds-toast.css', '1-root/component-metrics.css', 'x-icon/check.svg', 'x-icon/close.svg']) expect(copy).toHaveProperty([file]);
+  // No Lit and no component comes with it.
+  expect(Object.keys(copy).some((file) => /^2-core\/ds-|^3-unit|^4-page/.test(file))).toBe(false);
+  expect(Object.values(copy).some((content) => /from\s+["']lit/.test(String(content)))).toBe(false);
+});

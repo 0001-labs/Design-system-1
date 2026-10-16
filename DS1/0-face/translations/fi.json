@@ -59,6 +59,10 @@
     "Swedish": "Ruotsi",
     "Chinese": "Kiina",
     "Show password": "Näytä salasana",
-    "Hide password": "Piilota salasana"
+    "Hide password": "Piilota salasana",
+    "OK": "OK",
+    "Copied": "Kopioitu",
+    "Could not copy": "Kopiointi epäonnistui",
+    "Notifications": "Ilmoitukset"
   }
 }

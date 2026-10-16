@@ -1,6 +1,7 @@
 /**
  * The interface words every product shares: common buttons, sign-in, empty
- * states, dates, the settings ds-cycle shows, ds-banner's words and the
+ * states, dates, the settings ds-cycle shows, ds-banner's words, the
+ * feedback module's (OK, Copied, Could not copy, Notifications) and the
  * names of the languages. Keyed by the English sentence, in the translations
  * file format, one file per language in `./translations/`.
  *

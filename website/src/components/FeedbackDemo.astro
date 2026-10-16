@@ -1,0 +1,55 @@
+---
+import '../../../DS1/1-root/controls.css';
+---
+
+<div class="feedback-demo not-content" data-ds-surface>
+  <div class="feedback-actions" role="group" aria-label="Try feedback">
+    <button type="button" class="ds-button ds-button--secondary" data-feedback="toast">Toast</button>
+    <button type="button" class="ds-button ds-button--secondary" data-feedback="error">Error</button>
+    <button type="button" class="ds-button ds-button--secondary" data-feedback="confirm">Confirm</button>
+    <button type="button" class="ds-button ds-button--secondary ds-button--danger" data-feedback="danger">Delete</button>
+    <button type="button" class="ds-button ds-button--secondary" data-feedback="prompt">Prompt</button>
+    <button type="button" class="ds-button ds-button--secondary" data-feedback="alert">Alert</button>
+    <button type="button" class="ds-button ds-button--secondary" data-feedback="copy">Copy text</button>
+  </div>
+  <output class="feedback-answer" aria-live="polite" data-feedback-answer>Each button calls the module. Nothing is saved or sent.</output>
+</div>
+
+<script>
+  import { alert, confirm, copyText, prompt, toast } from '../../../DS1/0-face/feedback';
+
+  const answer = document.querySelector<HTMLOutputElement>('[data-feedback-answer]');
+  const say = (text: string) => { if (answer) answer.textContent = text; };
+  const actions: Record<string, () => Promise<void> | void> = {
+    toast: () => { toast('Event created', { description: 'Monday at 9:00' }); },
+    error: () => { toast.error('Could not save', { description: 'Announced assertively.' }); },
+    confirm: async () => { say(`confirm: ${await confirm({ title: 'Archive this list?', text: 'It can be restored from the archive.' })}`); },
+    danger: async () => { say(`confirm: ${await confirm({ title: 'Delete this list?', text: 'This cannot be undone.', confirm: 'Delete', danger: true })}`); },
+    prompt: async () => { say(`prompt: ${JSON.stringify(await prompt({ title: 'Rename the list', label: 'Name', value: 'Reading list' }))}`); },
+    alert: async () => { await alert({ title: 'Saved', text: 'The example saved nothing.' }); say('alert: dismissed'); },
+    copy: async () => { say(`copyText: ${await copyText('https://designsystem1.com/1-root/feedback/')}`); },
+  };
+  document.querySelectorAll<HTMLButtonElement>('[data-feedback]').forEach(button => {
+    button.addEventListener('click', () => { void actions[button.dataset.feedback!]?.(); });
+  });
+</script>
+
+<style>
+  .feedback-demo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-unit);
+    margin-block: var(--ds-unit);
+  }
+  .feedback-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: calc(var(--ds-unit) / 2);
+  }
+  .feedback-answer {
+    min-height: var(--ds-row-height);
+    color: var(--ds-text-color-muted);
+    font-size: var(--ds-type-size-default);
+    line-height: var(--ds-row-height);
+  }
+</style>
