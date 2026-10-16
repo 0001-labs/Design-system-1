@@ -218,6 +218,11 @@ document.querySelectorAll('[data-grid-option]').forEach(control => {
     html: '<ds-layout mode="company" view>\n  <ds-text style="grid-area: header">Page header</ds-text>\n  <ds-text style="grid-area: content">Content on the grid</ds-text>\n  <ds-text style="grid-area: footer">Page footer</ds-text>\n</ds-layout>',
     height: 460,
   },
+  'page': {
+    title: 'A standard page', hint: 'The sidebar layout: navigation on the left, a header and the work on the right. Every area is named.',
+    html: '<ds-page layout="sidebar" divided view>\n  <ds-list slot="nav">\n    <ds-row><ds-text>Inbox</ds-text></ds-row>\n    <ds-row><ds-text>Projects</ds-text></ds-row>\n  </ds-list>\n  <ds-row slot="header" fill>\n    <ds-text literal strong>Projects</ds-text>\n    <ds-button primary>New item</ds-button>\n  </ds-row>\n  <ds-list>\n    <ds-row fill><ds-text>Write the brief</ds-text><ds-badge>Done</ds-badge></ds-row>\n    <ds-row fill><ds-text>Sketch the home page</ds-text><ds-badge>Next</ds-badge></ds-row>\n  </ds-list>\n</ds-page>',
+    height: 200,
+  },
 };
 
 export const PAGE_EXAMPLES: Record<string, string[]> = {
@@ -236,5 +241,5 @@ export const PAGE_EXAMPLES: Record<string, string[]> = {
   '3-unit/accordion': ['accordion'], '3-unit/form': ['form'],
   '3-unit/table': ['table'],
   '4-page/container': ['container'], '4-page/grid': ['grid'],
-  '4-page/layout': ['layout'],
+  '4-page/layout': ['layout'], '4-page/layouts': ['page'],
 };

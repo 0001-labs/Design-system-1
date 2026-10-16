@@ -127,6 +127,7 @@ export default defineConfig({
             { label: "Container", slug: "4-page/container" },
             { label: "Grid", slug: "4-page/grid" },
             { label: "Layout", slug: "4-page/layout" },
+            { label: "Layouts", slug: "4-page/layouts" },
           ],
         },
         {

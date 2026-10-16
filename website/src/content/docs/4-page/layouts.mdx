@@ -1,0 +1,86 @@
+---
+title: Layouts
+description: Six standard pages, each filled with the core and unit components a real page holds.
+---
+
+import LayoutExample from "../../../components/LayoutExample.astro";
+
+A page is built in three layers. **Core** pieces do one thing each: a button, a text, a badge. **Units** put core pieces together: a row, a list, a sidebar, a form. The **Page** decides where the units stand. `<ds-page>` is that last layer: pick a layout and drop your units into its areas.
+
+Each example below is a real page with sample content. Press **Show layers** to colour it by layer: core pieces in green, units in blue, the page's areas in pink. Point at anything to read what it is and what it sits in. **Phone** shows how the layout stacks on a narrow screen.
+
+## Sidebar
+
+An app with places to go: navigation stays on the left while the work changes on the right.
+
+<LayoutExample layout="sidebar" />
+
+## List and detail
+
+Many things of one kind: pick one from the list and read it in full beside it. The list column is 16 squares, wide enough for a name and a date.
+
+<LayoutExample layout="split" />
+
+## Inspector
+
+Making something: pages on the left, the work in the middle, its settings on the right. Below 48 squares of width the settings move under the work.
+
+<LayoutExample layout="inspector" />
+
+## Column
+
+Something read or filled in from top to bottom: settings, an article, a long form. The column is 32 squares wide and sits in the middle.
+
+<LayoutExample layout="column" />
+
+## Centred
+
+One task and nothing else on the screen: signing in, confirming, a single question. The column is 16 squares and sits in the middle of the height too.
+
+<LayoutExample layout="centered" />
+
+## Tiles
+
+An overview of many numbers at once. Each tile is 12 squares wide and the row fills with as many as fit; `data-tile="wide"` takes two, `data-tile="full"` the whole row.
+
+<LayoutExample layout="tiles" />
+
+## Areas
+
+Every layout has the same five areas, so content moves between layouts without being rewritten. An area with nothing in it takes no room.
+
+| Area | Put it there with | Holds |
+| --- | --- | --- |
+| Header | `slot="header"` | The page's title and its main actions, along the top of the main area. |
+| Nav | `slot="nav"` | Navigation, or the list in List and detail. The leading column. |
+| Main | No slot | The work itself. |
+| Aside | `slot="aside"` | Properties or related things. Its own column in Inspector, under the main area elsewhere. |
+| Footer | `slot="footer"` | Closing actions such as Save, along the bottom of the main area. |
+
+## Widths
+
+Every column is a whole number of squares. Between columns there are two squares, between areas down the page one, and one around the page.
+
+| Layout | Leading column | Main | Trailing column |
+| --- | --- | --- | --- |
+| `sidebar` | 12 squares | The rest | — |
+| `split` | 16 squares | The rest | — |
+| `inspector` | 12 squares | The rest | 12 squares |
+| `column` | — | 32 squares, centred | — |
+| `centered` | — | 16 squares, centred both ways | — |
+| `tiles` | — | 12-square tiles | — |
+
+Below 30 squares of width every layout becomes one column, navigation first. The layout follows the width of its own container, not the window, so a page inside a panel stacks when the panel is narrow.
+
+## Attributes
+
+| Attribute | Default | What it does |
+| --- | --- | --- |
+| `layout` | `sidebar` | `sidebar`, `split`, `inspector`, `column`, `centered` or `tiles`. |
+| `divided` | false | Draws a hairline between the columns. |
+| `fill` | false | Takes its container's full height; each column scrolls on its own. |
+| `view` | false | Outlines each area and names it, for inspection. |
+
+Change a width with `--ds-page-nav`, `--ds-page-aside`, `--ds-page-measure` or `--ds-page-tile` on the element. Keep them whole squares: `calc(16 * var(--ds-unit))`.
+
+[Grid](/4-page/grid/) · [Container](/4-page/container/) · [Sidebar](/3-unit/sidebar/) · [List](/3-unit/list/) · [Row](/3-unit/row/)

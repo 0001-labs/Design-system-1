@@ -1,0 +1,31 @@
+---
+import { LAYOUT_EXAMPLES } from '../../../lib/layout-examples';
+import { TAG_LAYERS } from '../../../lib/component-layers';
+import '../../../../../DS1/1-root/one.css';
+export function getStaticPaths() {
+  return Object.keys(LAYOUT_EXAMPLES).map(layout => ({ params: { layout } }));
+}
+const layout = Astro.params.layout!;
+const sample = LAYOUT_EXAMPLES[layout];
+const layers = JSON.stringify(Object.fromEntries(Object.entries(TAG_LAYERS).map(([tag, info]) => [tag, info.layer])));
+---
+<!doctype html>
+<html lang="en" class="light-theme">
+  <head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="robots" content="noindex" /><title>{sample.name} layout — example</title></head>
+  <body data-layout={layout} data-layers={layers}>
+    <main id="sample"></main>
+    <div id="layers" aria-hidden="true"></div>
+    <script>import '../../../lib/layout-runtime';</script>
+  </body>
+</html>
+<style is:global>
+  :root { color-scheme: light; --sf: 1; }
+  html, body { height: 100%; margin: 0; background: var(--background); color: var(--text-color); font-family: var(--typeface-regular); font-size: 14px; line-height: 20px; }
+  #sample { height: 100%; }
+  #sample section { min-width: 0; }
+  #layers { position: absolute; inset: 0; pointer-events: none; }
+  #layers .mark { position: absolute; box-sizing: border-box; outline: 1px solid var(--layer-line); outline-offset: -1px; background: color-mix(in srgb, var(--layer) 14%, transparent); }
+  #layers .mark[data-layer='2'] { --layer: var(--apple-green); --layer-line: color-mix(in srgb, var(--apple-green) 70%, var(--text-color)); }
+  #layers .mark[data-layer='3'] { --layer: var(--zenith-blue); --layer-line: color-mix(in srgb, var(--sharp-blue) 70%, var(--text-color)); background: none; }
+  #layers .mark span { position: absolute; left: -1px; bottom: 100%; height: 16px; padding: 0 4px; font-size: 10px; line-height: 16px; white-space: nowrap; color: var(--black); background: var(--zenith-blue); }
+</style>

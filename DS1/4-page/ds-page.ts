@@ -1,0 +1,90 @@
+import { LitElement, html, unsafeCSS } from "lit";
+import { define } from "../0-face/define";
+import styles from "./styles/ds-page.css?inline";
+
+export type PageLayout = "sidebar" | "split" | "inspector" | "column" | "centered" | "tiles";
+export const PAGE_LAYOUTS: readonly PageLayout[] = ["sidebar", "split", "inspector", "column", "centered", "tiles"];
+
+/**
+ * A standard page: where units stand on the grid. Every layout uses the same
+ * five areas, so content can move between layouts without being rewritten.
+ *
+ * - `slot="header"` runs along the top of the main area
+ * - `slot="nav"` is the leading column: navigation, or the list in `split`
+ * - the default slot is the main area
+ * - `slot="aside"` is the trailing column, shown by `inspector`
+ * - `slot="footer"` runs along the bottom of the main area
+ *
+ * Columns are whole squares: `sidebar` and `inspector` lead with 12, `split`
+ * with 16; `column` is 32 wide and `centered` 16. `tiles` places each main
+ * child in a 12-square tile. Below 30 squares of width every layout stacks.
+ *
+ * @element ds-page
+ * @attr layout - `sidebar`, `split`, `inspector`, `column`, `centered` or `tiles`.
+ * @attr divided - Draws a hairline between the columns.
+ * @attr fill - Takes its container's height; each column scrolls on its own.
+ * @attr view - Labels each area with its slot name, for inspection.
+ *
+ * @example
+ * <ds-page layout="sidebar">
+ *   <ds-sidebar slot="nav" label="Projects"></ds-sidebar>
+ *   <ds-row slot="header" fill>…</ds-row>
+ *   <ds-list>…</ds-list>
+ * </ds-page>
+ */
+export class Page extends LitElement {
+  static properties = {
+    layout: { type: String, reflect: true },
+    divided: { type: Boolean, reflect: true },
+    fill: { type: Boolean, reflect: true },
+    view: { type: Boolean, reflect: true },
+  };
+
+  declare layout: PageLayout;
+  declare divided: boolean;
+  declare fill: boolean;
+  declare view: boolean;
+
+  static styles = unsafeCSS(styles);
+
+  constructor() {
+    super();
+    this.layout = "sidebar";
+    this.divided = false;
+    this.fill = false;
+    this.view = false;
+  }
+
+  render() {
+    return html`
+      <div class="page" part="page">
+        <div class="area nav" part="nav" data-area="nav"><slot name="nav"></slot></div>
+        <div class="area header" part="header" data-area="header"><slot name="header"></slot></div>
+        <div class="area main" part="main" data-area="main"><slot></slot></div>
+        <div class="area aside" part="aside" data-area="aside"><slot name="aside"></slot></div>
+        <div class="area footer" part="footer" data-area="footer"><slot name="footer"></slot></div>
+      </div>
+    `;
+  }
+
+  firstUpdated() {
+    // An area with nothing in it takes no room, so a header or footer is optional.
+    this.renderRoot.querySelectorAll("slot").forEach(slot => {
+      const sync = () => slot.parentElement?.toggleAttribute("data-empty", slot.assignedNodes({ flatten: true }).every(empty));
+      slot.addEventListener("slotchange", sync);
+      sync();
+    });
+  }
+}
+
+function empty(node: Node): boolean {
+  return node.nodeType === Node.TEXT_NODE ? !node.textContent?.trim() : node.nodeType !== Node.ELEMENT_NODE;
+}
+
+define("ds-page", Page);
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "ds-page": Page;
+  }
+}

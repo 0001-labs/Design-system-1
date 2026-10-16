@@ -1,0 +1,116 @@
+---
+import { LAYOUT_EXAMPLES } from '../lib/layout-examples';
+import { layersIn } from '../lib/component-layers';
+interface Props { layout: string; }
+const { layout } = Astro.props;
+const sample = LAYOUT_EXAMPLES[layout];
+if (!sample) throw new Error(`Unknown layout example: ${layout}`);
+const inside = layersIn(sample.html);
+---
+<section class="layout-example not-content" data-layout-example={layout} aria-label={`${sample.name} layout`}>
+  <div class="layout-toolbar">
+    <div role="group" aria-label="Preview width">
+      <button type="button" data-preview-width="computer" aria-pressed="true">Computer</button>
+      <button type="button" data-preview-width="phone" aria-pressed="false">Phone</button>
+    </div>
+    <div role="group" aria-label="Preview appearance">
+      <button type="button" data-preview-theme="light" aria-pressed="true">Light</button>
+      <button type="button" data-preview-theme="dark" aria-pressed="false">Dark</button>
+    </div>
+    <div>
+      <button type="button" data-preview-layers aria-pressed="false">Show layers</button>
+      <a href={`/examples/layouts/${layout}/`} target="_blank" rel="noopener">Open full size</a>
+    </div>
+  </div>
+  <div class="layout-stage">
+    <iframe src={`/examples/layouts/${layout}/`} title={`${sample.name} layout — interactive preview`} loading="lazy" style={`height: ${sample.height}px;`}></iframe>
+  </div>
+  <p class="layout-readout" aria-live="polite" data-readout>Point at any part of the page to see what it is made of.</p>
+  <dl class="layout-inside">
+    {inside.map(group => (
+      <div data-layer={group.layer}>
+        <dt><span class="layer-swatch" aria-hidden="true"></span>{group.name}</dt>
+        <dd>{group.tags.map((item, index) => <>{index > 0 && ', '}{item.href ? <a href={item.href}><code>{item.tag}</code></a> : <code>{item.tag}</code>}</>)}</dd>
+      </div>
+    ))}
+  </dl>
+  <details class="layout-source">
+    <summary>Code</summary>
+    <div class="layout-code"><button type="button" data-copy="html">Copy HTML</button><pre><code>{sample.html}</code></pre><textarea hidden data-source="html">{sample.html}</textarea></div>
+    {sample.script && <div class="layout-code"><button type="button" data-copy="script">Copy JavaScript</button><pre><code>{sample.script}</code></pre><textarea hidden data-source="script">{sample.script}</textarea></div>}
+  </details>
+  <span class="layout-status" role="status" aria-live="polite"></span>
+</section>
+<script>
+  document.querySelectorAll<HTMLElement>('[data-layout-example]').forEach(example => {
+    const frame = example.querySelector<HTMLIFrameElement>('iframe')!;
+    const readout = example.querySelector<HTMLElement>('[data-readout]')!;
+    const resting = readout.textContent;
+    let theme = 'light';
+    let layers = false;
+    const send = () => {
+      frame.contentWindow?.postMessage({ type: 'ds1-example-theme', theme }, location.origin);
+      frame.contentWindow?.postMessage({ type: 'ds1-layout-layers', on: layers }, location.origin);
+    };
+    frame.addEventListener('load', send);
+    window.addEventListener('message', event => {
+      if (event.origin !== location.origin || event.source !== frame.contentWindow) return;
+      if (event.data?.type === 'ds1-example-ready') send();
+      if (event.data?.type === 'ds1-layout-inspect') readout.textContent = event.data.text || resting;
+    });
+    const press = (selector: string, chosen: HTMLElement) => example.querySelectorAll<HTMLElement>(selector).forEach(option => option.setAttribute('aria-pressed', String(option === chosen)));
+    example.querySelectorAll<HTMLButtonElement>('[data-preview-theme]').forEach(button => button.addEventListener('click', () => {
+      theme = button.dataset.previewTheme!;
+      press('[data-preview-theme]', button);
+      send();
+    }));
+    example.querySelectorAll<HTMLButtonElement>('[data-preview-width]').forEach(button => button.addEventListener('click', () => {
+      example.toggleAttribute('data-phone', button.dataset.previewWidth === 'phone');
+      press('[data-preview-width]', button);
+    }));
+    const layersButton = example.querySelector<HTMLButtonElement>('[data-preview-layers]')!;
+    layersButton.addEventListener('click', () => {
+      layers = !layers;
+      layersButton.setAttribute('aria-pressed', String(layers));
+      example.toggleAttribute('data-layers', layers);
+      send();
+    });
+    example.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach(button => button.addEventListener('click', async () => {
+      const status = example.querySelector<HTMLElement>('.layout-status')!;
+      try {
+        await navigator.clipboard.writeText(example.querySelector<HTMLTextAreaElement>(`[data-source="${button.dataset.copy}"]`)!.value);
+        status.textContent = 'Copied';
+      } catch { status.textContent = 'Select the code to copy it.'; }
+    }));
+  });
+</script>
+<style is:global>
+  .layout-example { --layout-unit: calc(20px * var(--sf, 1)); margin-block: var(--layout-unit) calc(2 * var(--layout-unit)); color: var(--text-color); font-size: 14px; line-height: var(--layout-unit); }
+  .layout-example .layout-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: calc(10px * var(--sf, 1)) var(--layout-unit); padding-block: calc(10px * var(--sf, 1)); }
+  .layout-example .layout-toolbar > div { display: flex; gap: calc(4px * var(--sf, 1)); }
+  .layout-example .layout-toolbar > :last-child { margin-inline-start: auto; align-items: center; }
+  .layout-example .layout-toolbar a { padding: 0 4px; color: inherit; }
+  .layout-example button { font: inherit; color: inherit; background: transparent; border: 0; padding: 0 4px; line-height: var(--layout-unit); cursor: pointer; border-radius: 4px; }
+  .layout-example button[aria-pressed='true'] { background: var(--accent-color); color: var(--black); }
+  .layout-example [data-preview-layers][aria-pressed='true'] { background: var(--pink); }
+  .layout-example :is(button, summary, a):focus-visible { outline: 1px solid currentColor; outline-offset: 2px; }
+  .layout-example .layout-stage { border: 1px solid var(--slate-light); }
+  .layout-example iframe { display: block; width: 100%; margin-inline: auto; border: 0; background: var(--background); }
+  .layout-example[data-phone] iframe { width: calc(375px * var(--sf, 1)); max-width: 100%; border-inline: 1px solid var(--slate-light); }
+  .layout-example .layout-readout { min-height: calc(2 * var(--layout-unit)); margin: calc(10px * var(--sf, 1)) 0 0; }
+  .layout-example .layout-inside { display: grid; gap: 0; margin: 0 0 calc(10px * var(--sf, 1)); }
+  .layout-example .layout-inside > div { display: grid; grid-template-columns: calc(4 * var(--layout-unit)) minmax(0, 1fr); }
+  .layout-example .layout-inside dt { display: flex; align-items: center; gap: calc(4px * var(--sf, 1)); margin: 0; font-weight: inherit; }
+  .layout-example .layout-inside dd { margin: 0; }
+  .layout-example .layout-inside code { font-size: 13px; }
+  .layout-example .layer-swatch { width: 10px; height: 10px; border-radius: 2px; background: var(--swatch); }
+  .layout-example [data-layer='4'] { --swatch: var(--pink); }
+  .layout-example [data-layer='3'] { --swatch: var(--zenith-blue); }
+  .layout-example [data-layer='2'] { --swatch: var(--apple-green); }
+  .layout-example .layout-source summary { cursor: pointer; line-height: var(--layout-unit); }
+  .layout-example .layout-code { margin-block: calc(10px * var(--sf, 1)); }
+  .layout-example .layout-code > button { display: block; margin-left: auto; }
+  .layout-example pre { margin: 0; padding: var(--layout-unit); overflow-x: auto; border-radius: 4px; font-size: 13px; line-height: var(--layout-unit); }
+  .layout-example .layout-status { display: block; min-height: var(--layout-unit); font-size: 10px; }
+  @media (prefers-color-scheme: dark) { .layout-example :is(.layout-stage, iframe) { border-color: var(--slate-dark); } }
+</style>
