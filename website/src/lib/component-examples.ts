@@ -14,6 +14,28 @@ export const TABLE_DATA = [
 // The preview and the copyable code use the same source. These are local
 // examples only; no sample sends a request to a product's backend.
 export const EXAMPLES: Record<string, ComponentExample> = {
+  'sidebar': {
+    title: 'Compact document navigation', hint: 'Open a section, choose a document, or navigate with the arrow keys.', height: 240,
+    html: '<ds-sidebar label="Library"></ds-sidebar>',
+    script: `const sidebar = document.querySelector('ds-sidebar');
+let expanded = true;
+let selected = 'overview';
+function render() {
+  sidebar.items = [
+    { id: 'overview', label: 'Overview', current: selected === 'overview' },
+    { id: 'projects', label: 'Projects', expanded, meta: '3' },
+    ...(expanded ? [
+      { id: 'atlas', label: 'Atlas', depth: 1, current: selected === 'atlas' },
+      { id: 'harbor', label: 'Harbor', depth: 1, current: selected === 'harbor' },
+      { id: 'studio', label: 'Studio', depth: 1, disabled: true, meta: 'Unavailable' },
+    ] : []),
+    { id: 'guidelines', label: 'Guidelines', current: selected === 'guidelines' },
+  ];
+}
+sidebar.addEventListener('sidebar-toggle', event => { expanded = event.detail.expanded; render(); });
+sidebar.addEventListener('sidebar-activate', event => { selected = event.detail.id; render(); });
+render();`,
+  },
   'split': {
     title: 'Choices and repeated actions', hint: 'Choose a view or step through the date.',
     html: '<ds-split aria-label="View" options="day:Day,week:Week,month:Month" value="week"></ds-split>\n<ds-split actions aria-label="Date" options="back:@left:Back,today:Today,next:@right:Next"></ds-split>',

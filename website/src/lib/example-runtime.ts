@@ -51,6 +51,26 @@ for (const name of ['change', 'press']) sample.addEventListener(name, event => {
     output.textContent = `${name}: ${(event as CustomEvent).detail.value}`;
 });
 
+const sidebar = sample.querySelector('ds-sidebar');
+if (sidebar) {
+  let expanded = true;
+  let selected = 'overview';
+  const render = () => {
+    sidebar.items = [
+      { id: 'overview', label: 'Overview', current: selected === 'overview' },
+      { id: 'projects', label: 'Projects', expanded, meta: '3' },
+      ...(expanded ? [
+        { id: 'atlas', label: 'Atlas', depth: 1, current: selected === 'atlas' },
+        { id: 'harbor', label: 'Harbor', depth: 1, current: selected === 'harbor' },
+        { id: 'studio', label: 'Studio', depth: 1, disabled: true, meta: 'Unavailable' },
+      ] : []),
+      { id: 'guidelines', label: 'Guidelines', current: selected === 'guidelines' },
+    ];
+  };
+  sidebar.addEventListener('sidebar-toggle', event => { expanded = (event as CustomEvent).detail.expanded; render(); });
+  sidebar.addEventListener('sidebar-activate', event => { selected = (event as CustomEvent).detail.id; render(); output.textContent = `Selected: ${selected}`; });
+  render();
+}
 const table = sample.querySelector<DsTable>('ds-table');
 if (table) table.data = TABLE_DATA;
 // A tooltip example should show the label on first sight, before someone

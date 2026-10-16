@@ -84,3 +84,5 @@ export * from "./4-page/ds-dialog";
 
 export * from "./2-core/ds-token";
 export * from "./3-unit/ds-token-field";
+
+export * from "./3-unit/ds-sidebar";

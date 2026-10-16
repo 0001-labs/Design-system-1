@@ -11,3 +11,5 @@ export * from "./3-unit/ds-list";
 export * from "./3-unit/ds-menu";
 export * from "./3-unit/ds-tabs";
 export * from "./4-page/ds-panel";
+
+export * from "./3-unit/ds-sidebar";

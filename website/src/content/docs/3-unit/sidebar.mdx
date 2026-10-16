@@ -1,0 +1,30 @@
+---
+title: Sidebar
+description: Compact, nested navigation built from Row, Button and Icon.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+The Sidebar is twelve squares wide. Each row is one square high, with half a square of indentation per level. Labels use regular text; counts and supporting information use small text. Selection fills the whole row with square corners.
+
+## Try it
+
+<ComponentExample example="sidebar" />
+
+## Data and behaviour
+
+Set the `items` property to an array of visible rows. Each row has a unique `id` and a `label`; optional fields are `depth`, `href`, `expanded`, `current`, `disabled`, `meta`, and `action: { id, label }`. Omit `expanded` for a leaf. Collapsed children must be omitted from the array.
+
+The application owns the hierarchy, filtering, selected destination and saved expansion state. The Unit owns the row layout, disclosure controls, focus and keyboard navigation. Supply a `label` for the navigation landmark and `empty` for its empty state. The `header` and `footer` slots hold optional search and supporting controls.
+
+| Event | Detail | Application response |
+| --- | --- | --- |
+| `sidebar-activate` | `{ id }` | Cancel with `preventDefault()` to handle routing or guard unsaved changes. |
+| `sidebar-toggle` | `{ id, expanded }` | Update the visible items if expansion is accepted. |
+| `sidebar-action` | `{ id, action }` | Run the independent trailing action. |
+
+Links retain their native destinations, context menus and modified clicks. Buttons support Enter and Space. Up and Down move between available rows; Home and End move to the first and last. Right expands a closed section or enters its children; Left collapses an open section or moves to its parent. Tab also reaches disclosure and trailing actions.
+
+Call `focusItem(id)` after `updateComplete` to focus a row, or `scrollToCurrent()` to reveal the current destination. `--ds-sf` scales the width, rows, text, icons and indentation. A containing layout may set the host width to another whole number of squares.
+
+[Row](/3-unit/row/) · [Button](/2-core/button/) · [Icon](/2-core/icon/)

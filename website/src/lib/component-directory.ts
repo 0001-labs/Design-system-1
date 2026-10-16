@@ -59,6 +59,7 @@ export const LAYERS: DirectoryLayer[] = [
       { name: 'Navigation', href: '/3-unit/navigation/' },
       { name: 'Panel', href: '/3-unit/panel/' },
       { name: 'Row', href: '/3-unit/row/', tag: 'ds-row' },
+      { name: 'Sidebar', href: '/3-unit/sidebar/', tag: 'ds-sidebar' },
       { name: 'Table', href: '/3-unit/table/', tag: 'ds-table' },
     ],
   },

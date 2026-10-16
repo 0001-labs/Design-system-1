@@ -119,6 +119,7 @@ export default defineConfig({
             { label: "Navigation", slug: "3-unit/navigation" },
             { label: "Panel", slug: "3-unit/panel" },
             { label: "Row", slug: "3-unit/row" },
+            { label: "Sidebar", slug: "3-unit/sidebar" },
             { label: "Table", slug: "3-unit/table" },
           ],
         },
