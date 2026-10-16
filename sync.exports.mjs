@@ -16,6 +16,8 @@ const rootModules = {
   'grid-fit': ['grid-fit.ts'],
   'layout-inspector': ['layout-inspector.ts'],
   scaling: ['scaling.ts'],
+  /** The classic head script that puts the theme on before the first paint; also a root `modules` choice. */
+  'theme-bootstrap': ['theme-bootstrap.js'],
   tooltips: ['tooltips.ts'],
 };
 /** The component stylesheets in the order they import each other. */

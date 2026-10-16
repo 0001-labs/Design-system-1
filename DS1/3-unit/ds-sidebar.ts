@@ -2,6 +2,7 @@ import { LitElement, html, nothing, unsafeCSS } from "lit";
 import { repeat } from "lit/directives/repeat.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { define } from "../0-face/define";
+import "../0-face/tooltips";
 import "../2-core/ds-button";
 import "../2-core/ds-icon";
 import "./ds-row";
@@ -22,7 +23,12 @@ export interface SidebarItem {
   action?: { id: string; label: string };
 }
 
-/** Compact navigation composed from Row, Button and Icon. */
+/**
+ * Compact navigation composed from Row, Button and Icon. A label cut short by
+ * the column's width shows in full in the shared tooltip (`data-tooltip`, drawn
+ * by `0-face/tooltips.ts`); a label that fits carries none, and no row carries
+ * the browser's `title`.
+ */
 export class Sidebar extends LitElement {
   static properties = {
     items: { attribute: false },
@@ -39,6 +45,40 @@ export class Sidebar extends LitElement {
     this.items = [];
     this.label = "Navigation";
     this.empty = "No items";
+  }
+
+  private resizeObserver?: ResizeObserver;
+  private fontsReady = false;
+
+  connectedCallback() {
+    super.connectedCallback();
+    if (typeof ResizeObserver !== "undefined") {
+      this.resizeObserver ??= new ResizeObserver(() => this.markCutLabels());
+      this.resizeObserver.observe(this);
+    }
+    // Labels measured before the typeface arrives are measured again once it has.
+    const fonts = this.fontsReady ? undefined : document.fonts?.ready;
+    if (fonts) void fonts.then(() => { this.fontsReady = true; this.markCutLabels(); });
+  }
+
+  disconnectedCallback() {
+    this.resizeObserver?.disconnect();
+    super.disconnectedCallback();
+  }
+
+  updated() {
+    this.markCutLabels();
+  }
+
+  /** Only a label that does not fit its row gets a tooltip, holding the whole label. */
+  private markCutLabels() {
+    const labels = new Map(this.items.map(item => [item.id, item.label]));
+    this.renderRoot.querySelectorAll<HTMLElement>("[data-item]").forEach(control => {
+      const name = control.querySelector<HTMLElement>(".name");
+      const label = labels.get(control.dataset.item ?? "");
+      if (label && name && name.scrollWidth > name.clientWidth) control.dataset.tooltip = label;
+      else delete control.dataset.tooltip;
+    });
   }
 
   private request(name: string, detail: object): boolean {
@@ -103,11 +143,11 @@ export class Sidebar extends LitElement {
           <ds-button control="slotted" class="choice" ?disabled=${item.disabled}>
             ${item.href && !item.disabled ? html`
               <a href=${item.href} data-item=${item.id} aria-current=${ifDefined(item.current ? "page" : undefined)}
-                title=${item.label} @click=${(event: MouseEvent) => this.activate(event, item)}
+                @click=${(event: MouseEvent) => this.activate(event, item)}
                 @keydown=${(event: KeyboardEvent) => this.navigate(event, item)}><span class="name">${item.icon ? html`<ds-icon type=${item.icon} aria-hidden="true"></ds-icon>` : nothing}${item.label}</span></a>` : html`
               <button type="button" data-item=${item.id} ?disabled=${item.disabled}
                 aria-expanded=${ifDefined(item.expanded === undefined ? undefined : String(item.expanded))}
-                aria-current=${ifDefined(item.current ? "page" : undefined)} title=${item.label}
+                aria-current=${ifDefined(item.current ? "page" : undefined)}
                 @click=${(event: MouseEvent) => this.activate(event, item)}
                 @keydown=${(event: KeyboardEvent) => this.navigate(event, item)}><span class="name">${item.icon ? html`<ds-icon type=${item.icon} aria-hidden="true"></ds-icon>` : nothing}${item.label}</span></button>`}
           </ds-button>

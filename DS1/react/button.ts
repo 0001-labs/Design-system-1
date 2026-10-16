@@ -59,14 +59,22 @@ export const Button = ButtonControl as unknown as {
   displayName?: string;
 };
 
-/** A real link: browser navigation, context menus and modifier clicks survive. */
+/**
+ * A real link: browser navigation, context menus and modifier clicks survive.
+ * As `<ds-button href>`: `target="_blank"` gets `rel="noopener noreferrer"`
+ * unless `rel` is given, and a disabled link loses its `href` and `target`, is
+ * left out of the tab order and stays a link (`role="link"`, `aria-disabled`).
+ */
 export type ButtonLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> &
   Partial<Pick<ButtonElement, "primary" | "secondary" | "active" | "choice" | "icon" | "wide" | "fixed" | "fit" | "danger" | "menuItem">> & {disabled?: boolean};
 export const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(function ButtonLink(
-  {children, className, style, primary, secondary, active, choice, icon, wide, fixed, fit, danger, menuItem, disabled, hidden, href, onClick, onAuxClick, tabIndex, ...props}, ref,
+  {children, className, style, primary, secondary, active, choice, icon, wide, fixed, fit, danger, menuItem, disabled, hidden, href, target, rel, role, onClick, onAuxClick, tabIndex, ...props}, ref,
 ) {
   return createElement("ds-button", {control: "slotted", primary, secondary, active, choice, icon, wide, fixed, fit, danger, menuItem, disabled, hidden, className, style},
     createElement("a", {...props, ref, href: disabled ? undefined : href, hidden,
+      target: disabled ? undefined : target,
+      rel: disabled ? undefined : rel ?? (target === "_blank" ? "noopener noreferrer" : undefined),
+      role: role ?? (disabled ? "link" : undefined),
       "aria-disabled": disabled || undefined, tabIndex: disabled ? -1 : tabIndex,
       onClick: event => { if (disabled) { event.preventDefault(); event.stopPropagation(); } else onClick?.(event); },
       onAuxClick: event => { if (disabled) { event.preventDefault(); event.stopPropagation(); } else onAuxClick?.(event); },

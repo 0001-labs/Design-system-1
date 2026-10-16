@@ -73,6 +73,7 @@ export default defineConfig({
             { label: "Theming", slug: "1-root/theming" },
             { label: "Native controls", slug: "1-root/native-controls" },
             { label: "Device", slug: "1-root/device" },
+            { label: "Scaling", slug: "1-root/scaling" },
             { label: "Preferences", slug: "1-root/preferences" },
             { label: "Pricing", slug: "1-root/pricing" },
           ],

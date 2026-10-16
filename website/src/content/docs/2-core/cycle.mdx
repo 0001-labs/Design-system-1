@@ -15,7 +15,7 @@ A button that advances through a built-in setting or a list of its own.
 
 | `type` | Values |
 | --- | --- |
-| `theme` | Light and dark. |
+| `theme` | Light, dark and system, which follows the system's appearance as it changes. |
 | `language` | The configured languages. Prefer `ds-language` for a language picker. |
 | `accent-color` | The system’s eight accent colours. |
 | `page-style` | Note and page. |
@@ -44,7 +44,7 @@ a redundant change.
 
 Products retaining existing browser storage names set `window.DS_ONE_PREFERENCES`
 before importing these modules. `storageKey` names the merged preference object
-and `themeStorageKey` names the saved light/dark value. Defaults remain
+and `themeStorageKey` names the saved `light`, `dark` or `system` choice. Defaults remain
 `ds-one:preferences` and `ds-one:theme`; the language runtime's `storageKey` is
 configured separately through `configureI18n`.
 

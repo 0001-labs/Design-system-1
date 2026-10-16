@@ -8,7 +8,6 @@ import type { Sidebar, SidebarItem } from '../../../DS1/3-unit/ds-sidebar';
 import { Button } from '../../../DS1/react/button';
 import { Page } from '../../../DS1/react/page';
 import '../../../DS1/1-root/controls.css';
-import { calculateScalingFactor } from '../../../DS1/0-face/scaling';
 import { SignIn } from './SignIn';
 import './font-workspace.css';
 
@@ -22,10 +21,7 @@ function Control({ children, ...props }: ButtonHTMLAttributes<HTMLButtonElement>
 export function FontWorkspace() {
   const { isLoading, isAuthenticated } = useConvexAuth();
   useEffect(() => {
-    const scale = () => document.documentElement.style.setProperty('--sf', String(window.innerWidth <= 768 ? calculateScalingFactor(window.innerWidth) : 1));
-    scale(); window.addEventListener('resize', scale);
     document.title = 'Fonts · Design system 1';
-    return () => window.removeEventListener('resize', scale);
   }, []);
   if (isLoading) return <main className="fonts-status" role="status">Opening your fonts…</main>;
   if (!isAuthenticated) return <div className="app-shell fonts-sign-in"><SignIn fontsOnly redirectTo="/fonts" /></div>;

@@ -14,6 +14,7 @@ Root establishes the common ground for the system: the square, colours, type, sc
 | [Languages](/1-root/languages/) | Supported languages, shared words and translation lookup. |
 | [Theming](/1-root/theming/) | Appearance tokens and light/dark behavior. |
 | [Device](/1-root/device/) | Device detection and responsive scale. |
+| [Scaling](/1-root/scaling/) | The phone and tablet scale, `--sf`, put on the page. |
 | [Preferences](/1-root/preferences/) | Remembering supported user choices. |
 | [Pricing](/1-root/pricing/) | Currency and localized price-formatting utilities. |
 

@@ -1,7 +1,6 @@
 import { useAuthActions, useAuthToken } from '@convex-dev/auth/react';
 import { useConvexAuth } from 'convex/react';
 import { useEffect, useState } from 'react';
-import { calculateScalingFactor } from '../../../DS1/0-face/scaling';
 import '../../../DS1/2-core/ds-button';
 import { Button } from '../../../DS1/react/button';
 import { SignIn } from './SignIn';
@@ -20,9 +19,6 @@ export function useOwnerSession(title: string) {
   const [error, setError] = useState('');
   useEffect(() => {
     document.title = title;
-    const scale = () => document.documentElement.style.setProperty('--sf', String(window.innerWidth <= 768 ? calculateScalingFactor(window.innerWidth) : 1));
-    scale(); window.addEventListener('resize', scale);
-    return () => window.removeEventListener('resize', scale);
   }, [title]);
   useEffect(() => {
     setReady(false); setError('');

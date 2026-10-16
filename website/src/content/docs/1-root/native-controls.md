@@ -7,7 +7,8 @@ description: The components' look as plain classes on native elements, and the s
 
 | Class | On | Draws |
 | --- | --- | --- |
-| `ds-button`, with `ds-button--primary`, `--secondary`, `--icon`, `--fixed`, `--wide` | `<button>` | The Button: hugs its label, one control high; `fixed` is four squares, `wide` fills its row. |
+| `ds-button`, with `ds-button--primary`, `--secondary`, `--icon`, `--fixed`, `--wide` | `<button>`, or `<a href>` for a link drawn as a button | The Button: hugs its label, one control high; `fixed` is four squares, `wide` fills its row. On a link it never takes the link's underline or colours; a disabled link has no `href` and carries `aria-disabled="true"`. |
+| `ds-link` | `<a href>` in text | A [text link](/2-core/link/): the text's ink, a hairline underline that darkens under the pointer, a muted visited ink and the focus ring. |
 | `ds-input` | `<input>` | A field one control high. |
 | `ds-textarea` | `<textarea>` | A field of whole rows; `--ds-textarea-rows` sets how many, three by default. |
 | `ds-select` | `<select>` | A field with the chevron drawn in its text colour. |
@@ -34,7 +35,7 @@ description: The components' look as plain classes on native elements, and the s
 Products copy these files with Sync 1, from the exports in `sync.exports.mjs`:
 
 - `tokens` copies the component tokens; `"nativeControls": true` adds `controls.css`, and `"bundle": true` writes them all as one `bundle.css` with their imports resolved, for a page that can carry only one stylesheet or inlines its styles.
-- `root` copies `one.css` with `grid.css` and the component tokens it imports, and the faces it loads into `fonts/`. `"styles"` names the stylesheets to copy when a product loads only some (`["grid.css"]`, or `[]` for scripts alone), `"fonts": false` leaves the faces to the product, `"nativeControls": true` adds `controls.css`, and `"modules"` adds page scripts from `0-face/` (`grid`, `grid-fit`, `layout-inspector`, `scaling`, `tooltips`) with the modules they import.
+- `root` copies `one.css` with `grid.css` and the component tokens it imports, and the faces it loads into `fonts/`. `"styles"` names the stylesheets to copy when a product loads only some (`["grid.css"]`, or `[]` for scripts alone), `"fonts": false` leaves the faces to the product, `"nativeControls": true` adds `controls.css`, and `"modules"` adds page scripts from `0-face/` (`grid`, `grid-fit`, `layout-inspector`, `scaling`, `theme-bootstrap`, `tooltips`) with the modules they import. `scaling` puts the phone scale on the page ([Scaling](/1-root/scaling/)); `theme-bootstrap` is the classic script that puts the theme on before the first paint ([Theming](/1-root/theming/#before-the-first-paint)).
 - `fonts` copies named faces, including the root faces such as `GT-America-Standard-Regular.woff2` and `Iosevka-Regular.woff2`.
 
 ```json

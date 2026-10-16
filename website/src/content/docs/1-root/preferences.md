@@ -37,7 +37,7 @@ savePreferences({
 
 ```javascript
 savePreferences({
-  theme: 'dark' // or 'light'
+  theme: 'dark' // or 'light' or 'system'
 });
 ```
 

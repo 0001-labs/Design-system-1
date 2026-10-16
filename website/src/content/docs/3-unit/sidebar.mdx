@@ -25,6 +25,8 @@ The application owns the hierarchy, filtering, selected destination and saved ex
 
 Links retain their native destinations, context menus and modified clicks. Buttons support Enter and Space. Up and Down move between available rows; Home and End move to the first and last. Right expands a closed section or enters its children; Left collapses an open section or moves to its parent. Tab also reaches disclosure and trailing actions.
 
+A label too long for its row ends in an ellipsis and shows in full in the shared [tooltip](/2-core/tooltip/) on hover or focus; a label that fits has none, and no row carries the browser's `title`. The Sidebar loads the tooltip module itself.
+
 Call `focusItem(id)` after `updateComplete` to focus a row, or `scrollToCurrent()` to reveal the current destination. `--ds-sf` scales the width, rows, text, icons and indentation. A containing layout may set the host width to another whole number of squares.
 
 [Row](/3-unit/row/) · [Button](/2-core/button/) · [Icon](/2-core/icon/)

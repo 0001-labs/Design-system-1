@@ -47,7 +47,9 @@ Items stack edge to edge with no gap, as an Ezo list does. Lists, table rows, ce
 - Code is Iosevka Extended (`--typeface-mono`), loaded from `fonts/Iosevka-Regular.woff2`, with a monospace fallback, never the browser's serif.
 - Motion animates `transform` and `opacity` only.
 - A page without Lit draws the components with `DS1/1-root/controls.css` classes on native elements (`ds-button`, `ds-input`, `ds-textarea`, `ds-select`, `ds-checkbox`, `ds-radio`, `ds-switch`, `ds-tabs`, `ds-dialog`, `ds-menu`), copied through Sync 1's `tokens` or `root` export; never restyle native controls by hand. See https://designsystem1.com/1-root/native-controls/.
-- On phones and tablets every measure is multiplied by `--sf` (1 on a computer; the screen width over 280 on a phone, between 0.75 and 2). Write lengths as units or `calc(Npx * var(--sf))`, never bare pixels, except hairlines.
+- On phones and tablets every measure is multiplied by `--sf` (1 on a computer; the screen width over 280 on a phone, between 0.75 and 2). Write lengths as units or `calc(Npx * var(--sf))`, never bare pixels, except hairlines. A computer stays at 1 however narrow its window; a phone or tablet is a mobile browser or a touch screen whose shorter side is at most 820px. Put the scale on with `startScaling()` from `DS1/0-face/scaling.ts` before the first render (`snap: "layout"` or `"pixel"` where rows must stay on drawn lines), never a hand-written setter or a width breakpoint. https://designsystem1.com/1-root/scaling/
+- A destination is a link, an action a button. Every link is a real `<a href>`, never navigation from a click handler: `.ds-link` in running text (the text's ink, a hairline underline, sentence case), and a link drawn as a button is `<ds-button href>`, React `ButtonLink` or `a.ds-button`, identical to the button in every face and state. A disabled link has no `href` and keeps `role="link"` and `aria-disabled="true"`. https://designsystem1.com/2-core/link/
+- Offer Light, Dark and System (the default, following the system live), stored as one choice. Inline `DS1/0-face/theme-bootstrap.js` in the head so the first paint is already themed; it marks the root with the `light-theme` or `dark-theme` class (canonical; `data-theme` mirrors it) and `color-scheme`. Change it with `setThemeMode()` or `<ds-cycle type="theme">`, never a page's own pre-paint script. https://designsystem1.com/1-root/theming/
 
 ## Toasts
 
@@ -55,7 +57,7 @@ A toast is `<ds-toast>` and `toast()` from `DS1/2-core/ds-toast.ts`, based on So
 
 ## Tooltips
 
-A tooltip is Ezo's label, never the browser's `title`: 16px high on 16px lines, 14px regular, 2.5px at the sides, 4px corners, black with white text (white on black in dark mode), two pixels above the element, shown at once; `data-tooltip-colour` gives it a colour (an accent, a column's colour) lettered in the ink. Wrap one element in `<ds-tooltip>`, or give any number of elements `data-tooltip="…"` and load `DS1/0-face/tooltips.ts`, which shows one shared label for them all; a text longer than 320px wraps.
+A tooltip is Ezo's label, never the browser's `title`: 16px high on 16px lines, 14px regular, 2.5px at the sides, 4px corners, black with white text (white on black in dark mode), two pixels above the element, shown at once; `data-tooltip-colour` gives it a colour (an accent, a column's colour) lettered in the ink. Wrap one element in `<ds-tooltip>`, or give any number of elements `data-tooltip="…"` and load `DS1/0-face/tooltips.ts`, which shows one shared label for them all, inside open shadow roots too; a text longer than 320px wraps. Give one only where it adds something, such as a cut-short or icon-only label, never to every row.
 
 ## Colours
 

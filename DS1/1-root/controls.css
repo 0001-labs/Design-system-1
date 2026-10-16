@@ -13,6 +13,7 @@
  * for a button inside a drag handle. The drag library recognises only native
  * controls: inside a handle it would lift the row on Space where a
  * `ds-button` was meant to be pressed. Both read the same custom properties.
+ * On an `<a href>` it is a link drawn as a button (see `a.ds-button` below).
  */
 
 .ds-button {
@@ -48,7 +49,7 @@
   color: var(--ds-button-color, var(--ds-text-color-muted));
 }
 
-.ds-button--icon:hover:not(:disabled) {
+.ds-button--icon:hover:not(:disabled, [aria-disabled="true"]) {
   --ds-button-color: var(--ds-text-color);
 }
 
@@ -74,6 +75,65 @@
 
 .ds-button:active:not(:disabled, [aria-disabled="true"]) {
   transform: none;
+}
+
+/*
+ * `a.ds-button` is a link drawn as a button. The browser keeps the link:
+ * middle-click, a new tab, Copy link and Enter. It never takes the link's
+ * underline or colours, in any state, so every face (primary, secondary,
+ * icon, tabs) looks as it does on a `<button>`. A disabled link has no `href`
+ * and carries `aria-disabled="true"` and `role="link"`.
+ */
+a.ds-button,
+a.ds-button:is(:hover, :focus, :active) {
+  text-decoration: none;
+}
+
+a.ds-button:is(:link, :visited) {
+  color: var(--ds-button-color, var(--ds-button-text-color));
+}
+
+a.ds-button.ds-button--icon:is(:link, :visited) {
+  color: var(--ds-button-color, var(--ds-text-color-muted));
+}
+
+a.ds-button[aria-disabled="true"] {
+  pointer-events: none;
+}
+
+/*
+ * `.ds-link` is a link in running text: the text's ink, underlined by a
+ * hairline 2px below the letters (as a toast's actions are), which turns to the full ink under
+ * the pointer. A visited link is drawn in the muted ink. Words keep their
+ * sentence case. Tokens: `--ds-link-color`, `--ds-link-visited-color`,
+ * `--ds-link-line-color`, `--ds-link-hover-line-color`.
+ */
+.ds-link {
+  color: var(--ds-link-color, currentColor);
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--ds-link-line-color, color-mix(in srgb, currentColor 40%, transparent));
+  text-underline-offset: calc(2px * var(--ds-sf));
+  cursor: pointer;
+}
+
+.ds-link:visited {
+  color: var(--ds-link-visited-color, var(--ds-text-color-muted));
+}
+
+.ds-link:hover {
+  text-decoration-color: var(--ds-link-hover-line-color, currentColor);
+}
+
+.ds-link:focus-visible {
+  outline: 2px solid var(--ds-focus-ring);
+  outline-offset: 1px;
+}
+
+.ds-link[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 .ds-input,
@@ -252,7 +312,7 @@
   min-width: 0;
 }
 
-.ds-tabs[role="group"] > .ds-button:hover:not(:disabled) {
+.ds-tabs[role="group"] > .ds-button:hover:not(:disabled, [aria-disabled="true"]) {
   --ds-button-background: var(--ds-fill-hover);
 }
 
@@ -361,7 +421,7 @@ dialog.ds-dialog::backdrop {
   --ds-button-background: var(--ds-button-background-color-secondary);
 }
 
-.ds-button--secondary:hover:not(:disabled) {
+.ds-button--secondary:hover:not(:disabled, [aria-disabled="true"]) {
   --ds-button-background: var(--ds-fill-hover);
 }
 

@@ -1,24 +1,55 @@
 ---
 title: Links
-description: Accessible links using native HTML or the button component.
+description: Text links and links drawn as buttons, always real links the browser navigates.
 ---
 
-Use a native HTML link for navigation in text. There is no `ds-link` custom element in the current source.
+A destination is a link and an action is a button. Every link here is a real `<a href>`: the browser navigates, so middle-click, ⌘- or Ctrl-click, a new tab, Copy link and Enter all work. Nothing navigates from a click handler.
 
 ## A text link
 
-<a href="/icons/">Browse the icons</a>
+`.ds-link` (from `controls.css`) is a link in running text: the text's own ink, underlined by a hairline 2px below the letters. The line turns to the full ink under the pointer, a visited link is drawn in the muted ink, and keyboard focus shows the shared focus ring. Its words keep their sentence case.
+
+<a class="ds-link" href="/icons/">Browse the icons</a>
 
 ```html
-<a href="/icons/">Browse the icons</a>
+<a class="ds-link" href="/icons/">Browse the icons</a>
 ```
 
-For a link that opens another tab, use `target="_blank" rel="noopener noreferrer"`.
+| Token | Default | What it sets |
+| --- | --- | --- |
+| `--ds-link-color` | The text's colour | The link's ink. |
+| `--ds-link-visited-color` | `--ds-text-color-muted` | The ink of a visited link. |
+| `--ds-link-line-color` | The ink at 40% | The underline at rest. |
+| `--ds-link-hover-line-color` | The ink | The underline under the pointer. |
 
-## A button that navigates
+## A link that looks like a button
+
+Give `ds-button` an `href` and its face becomes a link (`<a part="control">`) drawn exactly as the button, in every variant and state:
 
 ```html
 <ds-button secondary href="/icons/">Icons</ds-button>
+<ds-button href="https://example.com/" blank>Example</ds-button>
 ```
+
+On a page without Lit, put `ds-button` on the `<a>` itself. `a.ds-button` never takes the link's underline or colours, so `ds-button--primary`, `--secondary`, `--icon` and the tabs row look as they do on a `<button>`:
+
+```html
+<a class="ds-button ds-button--secondary" href="/icons/">Icons</a>
+```
+
+React products use `ButtonLink` from the button adapter; the anchor is the light-DOM control, and refs and handlers reach it:
+
+```tsx
+import { ButtonLink } from './design/react/button';
+<ButtonLink secondary href="/icons/">Icons</ButtonLink>
+```
+
+## New tabs
+
+`blank` on `ds-button` is `target="_blank"`. A new tab gets `rel="noopener noreferrer"` unless `rel` says otherwise, on the element and in `ButtonLink` alike. `target` and `rel` are passed to the link as written.
+
+## Disabled links
+
+A disabled link has no `href` (and no `target`), so it cannot navigate, and it is left out of the tab order. It stays a link to assistive technology with `role="link"` and `aria-disabled="true"`, dimmed like a disabled button. For `a.ds-button` and `.ds-link`, remove the `href` yourself and set `aria-disabled="true"`.
 
 See [Button](/2-core/button/) for a working preview and [Icon](/2-core/icon/) for the library.
