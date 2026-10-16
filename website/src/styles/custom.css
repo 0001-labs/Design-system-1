@@ -206,14 +206,7 @@ body.sidebar-open {
   letter-spacing: var(--docs-tracking);
 }
 
-/* The page's title, on two squares. */
-h1#_top {
-  font-family: var(--typeface-medium, var(--typeface-regular));
-  font-size: var(--docs-type-title-1);
-  font-weight: 400;
-  line-height: calc(2 * var(--grid));
-  letter-spacing: -0.4px;
-}
+/* The page's title is .ds-text--display (src/components/Heading.astro): 20 on two squares. */
 
 /* The writing itself is drawn by Design system 1's prose sheet
    (DS1/1-root/prose.css), on data-ds-prose (src/components/MarkdownContent.astro).

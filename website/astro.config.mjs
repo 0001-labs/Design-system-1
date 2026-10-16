@@ -62,8 +62,8 @@ export default defineConfig({
         PageFrame: "./src/layouts/Layout.astro",
         // Mark the Markdown body as prose for Design system 1's prose sheet
         MarkdownContent: "./src/components/MarkdownContent.astro",
-        // Override h1 to use ds-one text component
-        h1: "./src/components/Heading.astro",
+        // The page's title, drawn as Design system 1's display text
+        PageTitle: "./src/components/Heading.astro",
       },
       customCss: [
         // Custom CSS file

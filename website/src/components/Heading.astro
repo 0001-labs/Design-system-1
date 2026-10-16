@@ -1,12 +1,7 @@
 ---
-interface Props {
-  id?: string;
-  [key: string]: any;
-}
-
-const { id, ...rest } = Astro.props;
+// The page's title, in place of Starlight's PageTitle: Design system 1's display
+// text, 20px on two squares. Starlight's "On this page" links to it as #_top.
+const { title } = Astro.locals.starlightRoute.entry.data;
 ---
 
-<ds-text variant="heading" id={id} {...rest}>
-  <slot />
-</ds-text>
+<h1 id="_top" class="ds-text ds-text--display">{title}</h1>
