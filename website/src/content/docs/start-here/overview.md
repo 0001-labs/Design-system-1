@@ -20,7 +20,7 @@ Native browser behavior still works: links navigate, inputs accept typing and va
 
 ## Four layers
 
-**1 Root** holds tokens, fonts and styles. **2 Core** holds individual components such as buttons and charts. **3 Unit** combines components into navigation, rows and other reusable groups. **4 Page** arranges them into page layouts. [Browse the components](/components/).
+**1 Root** holds tokens, fonts and styles. **2 Core** holds individual components such as buttons and charts. **3 Unit** combines components into navigation, rows and other reusable groups. **4 Page** arranges them into page layouts. [Browse the components](/2-core/overview/#component-overview).
 
 ## Files you can keep
 

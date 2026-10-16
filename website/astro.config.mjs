@@ -61,16 +61,7 @@ export default defineConfig({
             { label: "Overview", slug: "start-here/overview" },
             { label: "Use with HTML", slug: "start-here/quick-start" },
             { label: "Examples", slug: "start-here/examples" },
-            { label: "Component examples", link: "/components/" },
             { label: "Email design", slug: "email" },
-          ],
-        },
-        {
-          label: "My libraries",
-          items: [
-            { label: "About My libraries", slug: "libraries" },
-            { label: "Open My libraries", link: "/app/libraries" },
-            { label: "API and tools", slug: "libraries/api" },
           ],
         },
         {
@@ -133,6 +124,14 @@ export default defineConfig({
         {
           label: "Advanced",
           items: [
+            {
+              label: "My libraries",
+              items: [
+                { label: "About My libraries", slug: "libraries" },
+                { label: "Open My libraries", link: "/app/libraries" },
+                { label: "API and tools", slug: "libraries/api" },
+              ],
+            },
           ],
         },
       ],

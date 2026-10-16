@@ -46,6 +46,7 @@ export default {
     }
 
     const docsRedirects: Record<string, string> = {
+      '/components': '/2-core/overview/',
       '/icons': '/2-core/icon/collection/',
       '/1-root/styling': '/1-root/overview/',
       '/built-ins/languages': '/1-root/languages/',

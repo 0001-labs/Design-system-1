@@ -57,7 +57,7 @@ Keep application data, submission logic and routing in your page. A stylesheet d
 
 ## Interactive components
 
-The `ds-*` components have their own scoped tokens and JavaScript implementations. Follow the API on each [component page](/components/) rather than assuming a native HTML token controls a shadow-root component. CSS-only setup does not register custom elements.
+The `ds-*` components have their own scoped tokens and JavaScript implementations. Follow the API on each [component page](/2-core/overview/#component-overview) rather than assuming a native HTML token controls a shadow-root component. CSS-only setup does not register custom elements.
 
 ## Dependencies
 

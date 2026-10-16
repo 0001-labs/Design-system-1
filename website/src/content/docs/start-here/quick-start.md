@@ -39,4 +39,4 @@ The HTML loads the stylesheet and fonts over HTTPS. The native stylesheet also i
 
 ## When JavaScript is needed
 
-The [Web Component examples](/components/) demonstrate interactive elements such as `ds-sidebar` and `ds-chart`. Those elements need their JavaScript implementation; adding a custom tag to a CSS-only page is not enough. Application data, submissions and sign-in are separate from visual styling.
+The [Web Component examples](/2-core/overview/#component-overview) demonstrate interactive elements such as `ds-sidebar` and `ds-chart`. Those elements need their JavaScript implementation; adding a custom tag to a CSS-only page is not enough. Application data, submissions and sign-in are separate from visual styling.

@@ -3,6 +3,8 @@ title: Core
 description: Individual reusable controls built on the shared foundations.
 ---
 
+import ComponentCatalog from "../../../components/ComponentCatalog.astro";
+
 Core contains the individual pieces you place in an interface. Each component has one focused job, a public API and states that can be understood on their own. They use Root’s type, colour and scale rather than introducing a separate design language.
 
 ## Choose a piece
@@ -23,4 +25,11 @@ Import and register the component before using its custom element. Configure doc
 
 ## Compose upwards
 
-Use [Root](/1-root/overview/) for shared foundations. Combine Core pieces into a [Unit](/3-unit/overview/) when they need a common interaction or layout, then arrange units in a [Page](/4-page/overview/). The [component examples](/components/) show the public catalogue; built-in internal controls remain excluded.
+Use [Root](/1-root/overview/) for shared foundations. Combine Core pieces into a [Unit](/3-unit/overview/) when they need a common interaction or layout, then arrange units in a [Page](/4-page/overview/). The catalogue below includes the public components and compositions; built-in internal controls remain excluded.
+
+
+## Component overview
+
+Browse examples, names or elements, then open a component’s usage guide.
+
+<ComponentCatalog />

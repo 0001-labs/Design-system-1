@@ -29,6 +29,7 @@ describe("combined website routes", () => {
 
   it("redirects reorganized docs without losing query parameters or redirecting icon assets", async () => {
     const moves = {
+      '/components/': '/2-core/overview/',
       '/icons/': '/2-core/icon/collection/',
       '/1-root/styling/': '/1-root/overview/',
       '/built-ins/languages/': '/1-root/languages/',
