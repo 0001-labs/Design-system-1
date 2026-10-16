@@ -1,4 +1,5 @@
 ---
+import MyHeader from "../components/MyHeader.astro";
 import InterfaceIcons from '../components/InterfaceIcons.astro';
 import interfaceIcons from '../lib/icons/interface-catalog.json';
 import { PRODUCTS, drawingSvg } from '../lib/icons/studio';
@@ -17,10 +18,7 @@ import '../styles/icons/studio.css';
     <script is:inline src="/google-analytics.js" defer></script>
   </head>
   <body>
-    <header class="studio-header">
-      <a href="/" class="wordmark"><span class="brand-mark" set:html={drawingSvg(PRODUCTS[0], 24, 'brand')} />Design system 1</a>
-      <nav aria-label="Main"><a href="/getting-started/installation/">Documentation</a><a href="/classless/editor/">CLASSless</a><a href="/icons" aria-current="page">Icons <span class="nav-dot"></span></a><a href="/colours">Colours</a></nav>
-    </header>
+    <MyHeader landing />
     <main id="icon-studio">
       <section class="intro">
         <div><p class="eyebrow">A LITTLE TOOL FOR SMALL THINGS</p><h1>Icons<span class="green-dot">.</span></h1></div>

@@ -1,4 +1,5 @@
 ---
+import Search from '@astrojs/starlight/components/Search.astro';
 // Get the sidebar data from Starlight
 // No need for githubUrl, SVG will be inlined directly
 const { sidebar } = Astro.locals.starlightRoute;
@@ -42,6 +43,7 @@ const entryTranslationKeys: Record<string, string> = {
     </svg>
   </button>
 
+  <div class="sidebar-search"><Search /></div>
   <div class="sidebar-content">
     {sidebar.map((group) => {
       const groupKey = groupTranslationKeys[group.label];

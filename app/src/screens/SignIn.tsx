@@ -3,7 +3,7 @@ import { useConvex } from "convex/react";
 import { useEffect, useRef } from "react";
 
 import { api } from "../../../convex/_generated/api";
-import { navigate } from "../router";
+import { Link, navigate } from "../router";
 import { signInAdapter } from "../signIn/adapter";
 import { defineSignInScreen, type SignInScreen as SignInScreenElement } from "../signIn/sign-in";
 import "../signIn/sign-in.css";
@@ -38,10 +38,14 @@ export function SignIn({ redirectTo }: { redirectTo?: string } = {}) {
   return (
     <main className="auth-screen" data-ds-area="Sign in" data-testid="signin">
       <h1>Sign in to Design system 1</h1>
+      <p className="auth-intro">{redirectTo === "/reports/components"
+        ? "Sign in with an authorised account to view component reports."
+        : "Save, edit and publish your design libraries."}</p>
       <div ref={host} />
-      <p>
-        <a href="/app/playground">Try the workbench without an account</a>
-      </p>
+      <div className="auth-alternative">
+        <p>Just exploring? No account needed.</p>
+        <Link to="/playground">Try the editor</Link>
+      </div>
     </main>
   );
 }

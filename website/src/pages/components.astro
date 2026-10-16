@@ -1,4 +1,5 @@
 ---
+import MyHeader from "../components/MyHeader.astro";
 import ComponentExample from '../components/ComponentExample.astro';
 import { PAGE_EXAMPLES } from '../lib/component-examples';
 import '../../../DS1/1-root/one.css';
@@ -26,22 +27,16 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
     </script>
   </head>
   <body>
-    <header class="directory-header">
-      <a class="directory-wordmark" href="/">Design system 1</a>
-      <nav aria-label="Main">
-        <a href="/getting-started/installation/">Documentation</a>
-        <a href="/components/" aria-current="page">Components</a>
-        <a href="/icons/#builder">Icon builder</a>
-      </nav>
+    <MyHeader landing />
+
+    <main class="directory">
+      <h1>Components</h1>
       <div class="directory-toggle" role="group" aria-label="Show components as">
         <button type="button" data-view-option="examples" aria-pressed="true">Examples</button>
         <button type="button" data-view-option="names" aria-pressed="false">Name</button>
         <button type="button" data-view-option="tags" aria-pressed="false">&lt;element&gt;</button>
       </div>
-    </header>
 
-    <main class="directory">
-      <h1>Components</h1>
       <div class="gallery-intro">
         <p>See the actual components. Try their controls, switch the preview’s theme, then copy the code.</p>
         <label for="component-search">Find a component</label>
@@ -170,21 +165,7 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
       a { color: inherit; text-decoration: none; }
       :is(a, button):focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 
-      .directory-header {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 12px 28px;
-        padding: 12px var(--directory-edge);
-        border-bottom: 1px solid var(--directory-line);
-        background: var(--directory-bg);
-      }
-      .directory-header nav { display: flex; gap: 20px; color: var(--directory-muted); }
-      .directory-header nav a:hover, .directory-header nav a[aria-current] { color: var(--directory-ink); }
-      .directory-toggle { display: flex; margin-inline-start: auto; border: 1px solid var(--directory-ink); }
+      .directory-toggle { display: flex; width: fit-content; margin-block: var(--site-unit); border: 1px solid var(--directory-ink); }
       .directory-toggle button {
         min-height: 40px;
         padding: 0 16px;
@@ -259,7 +240,6 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
       @media (max-width: 720px) {
         .directory-layer { grid-template-columns: 1fr; }
         .directory-layer-head { position: static; }
-        .directory-header nav { order: 3; width: 100%; }
       }
       @media (prefers-reduced-motion: reduce) {
         .directory-layer li a { transition: none; }

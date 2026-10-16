@@ -9,39 +9,13 @@
 body { min-width: 0; overflow: auto; background: var(--workbench-panel); }
 .app-shell {
   width: 100%;
-  width: round(down, 100vw, var(--app-cell));
   min-height: 100dvh;
   font-size: calc(.65 * var(--app-cell));
   line-height: var(--app-cell);
 }
-.app-navigation {
-  display: grid;
-  grid-template-columns: calc(12 * var(--app-cell)) 1fr auto auto;
-  align-items: center;
-  gap: var(--app-cell);
-  min-height: calc(3 * var(--app-cell));
-  padding-right: var(--app-cell);
-  box-shadow: inset 0 -1px var(--workbench-line);
-  background: var(--workbench-panel);
-}
-.app-navigation a { color: inherit; text-decoration: none; }
-.app-home { display: flex; align-items: center; gap: calc(.5 * var(--app-cell)); padding-left: var(--app-cell); }
-.app-home span { font-family: Inter, sans-serif; }
-.app-name { font-size: calc(.8 * var(--app-cell)); white-space: nowrap; }
-.app-links, .app-inspect { display: flex; align-items: center; gap: var(--app-cell); }
-.app-links a { min-height: calc(2 * var(--app-cell)); display: inline-flex; align-items: center; }
-.app-links a[aria-current="page"] { box-shadow: inset 0 -2px currentColor; }
-.app-inspect { gap: calc(.5 * var(--app-cell)); }
-.app-inspect button {
-  border: 0; border-radius: 0; padding: 0 4px; background: transparent;
-  min-height: var(--app-cell); font-size: inherit; line-height: var(--app-cell); cursor: pointer;
-}
-.app-inspect button[aria-pressed="true"] { background: #e9e2f5; }
-.app-navigation a:hover, .app-inspect button:hover { color: var(--workbench-muted); }
-.app-shell a:focus-visible, .app-shell button:focus-visible { outline: 2px solid #77715f; outline-offset: 3px; }
 .app-shell .workbench {
-  height: calc(100dvh - 3 * var(--app-cell));
-  height: round(down, calc(100dvh - 3 * var(--app-cell)), var(--app-cell));
+  height: calc(100dvh - var(--site-header-height));
+  height: round(down, calc(100dvh - var(--site-header-height)), var(--app-cell));
   min-height: calc(30 * var(--app-cell));
   grid-template: 'header header' auto 'design code' minmax(0, 1fr) / minmax(0, 1fr) calc(22 * var(--app-cell));
 }
@@ -92,7 +66,7 @@ body { min-width: 0; overflow: auto; background: var(--workbench-panel); }
 .app-shell .auth-screen form { gap: var(--app-cell); }
 .app-shell .auth-screen label { font-size: calc(.65 * var(--app-cell)); line-height: var(--app-cell); }
 .app-shell .auth-screen input[type="email"] { min-height: calc(2 * var(--app-cell)); border-radius: 0; font-size: calc(.75 * var(--app-cell)); }
-.app-shell .dashboard { height: auto; min-height: calc(100dvh - 3 * var(--app-cell)); padding-bottom: calc(3 * var(--app-cell)); }
+.app-shell .dashboard { height: auto; min-height: calc(100dvh - var(--site-header-height)); padding-bottom: calc(3 * var(--app-cell)); }
 .app-shell .dashboard > section, .app-shell .dashboard > p, .app-shell .dashboard > .library-grid { max-width: none; margin: calc(2 * var(--app-cell)) calc(3 * var(--app-cell)); padding: 0; }
 .app-shell .library-grid { grid-template-columns: repeat(auto-fill, minmax(calc(14 * var(--app-cell)), 1fr)); gap: var(--app-cell); }
 .app-shell .library-card { border-radius: 0; min-height: calc(10 * var(--app-cell)); padding: var(--app-cell); gap: var(--app-cell); }
@@ -100,16 +74,10 @@ body { min-width: 0; overflow: auto; background: var(--workbench-panel); }
 .app-shell .library-card dl { font-size: calc(.65 * var(--app-cell)); line-height: var(--app-cell); gap: 0 var(--app-cell); }
 .app-shell .library-card__state { border: 0; border-radius: 0; padding: 0; font-size: calc(.6 * var(--app-cell)); line-height: var(--app-cell); }
 @media (max-width: 1200px) {
-  .app-navigation { grid-template-columns: calc(12 * var(--app-cell)) 1fr auto; }
-  .app-name { display: none; }
   .app-shell .workbench { height: auto; grid-template: 'header' auto 'design' calc(28 * var(--app-cell)) 'code' calc(20 * var(--app-cell)) / minmax(0, 1fr); }
   .app-shell .controls-panel { max-height: calc(14 * var(--app-cell)); }
 }
 @media (max-width: 768px) {
-  .app-navigation { grid-template-columns: 1fr auto; gap: 0; padding: 0 var(--app-cell); min-height: calc(4 * var(--app-cell)); }
-  .app-home { padding: 0; min-height: calc(2 * var(--app-cell)); }
-  .app-inspect { grid-row: 1; grid-column: 2; }
-  .app-links { grid-row: 2; grid-column: 1 / -1; }
   .app-shell .workbench { grid-template: 'header' auto 'design' auto 'code' calc(20 * var(--app-cell)) / minmax(0, 1fr); }
   .app-shell .design-pane { grid-template-columns: minmax(0, 1fr); }
   .app-shell .library-panel { grid-template-rows: auto auto; }
@@ -172,7 +140,24 @@ body { min-width: 0; overflow: auto; background: var(--workbench-panel); }
   padding-left: calc(.5 * var(--app-cell));
 }
 .app-shell .auth-screen > p { margin-top: var(--app-cell); color: var(--text-color); }
-.app-navigation { color: var(--text-color); background: var(--background); }
 body:has(.auth-screen), body:has(.adoption) { background: var(--background); color: var(--text-color); }
 .app-shell .auth-screen sign-in-screen input::placeholder { color: color-mix(in srgb, var(--text-color) 65%, var(--background)); }
 .app-shell .auth-screen > p a { white-space: normal; overflow-wrap: anywhere; }
+
+/* The sign-in introduction shares the form's column and scale. */
+.app-shell .auth-screen { margin-inline: auto; width: calc(20 * var(--app-cell)); }
+.app-shell .auth-screen .auth-intro { margin-block: var(--app-cell); color: var(--text-color); }
+.app-shell .auth-screen .auth-alternative { margin-top: calc(2 * var(--app-cell)); }
+.app-shell .auth-screen .auth-alternative p { margin-bottom: calc(.5 * var(--app-cell)); }
+.app-shell .auth-screen .auth-alternative a { color: var(--text-color); }
+.app-shell .auth-screen sign-in-screen .sign-in-row button[type="submit"] {
+  height: var(--app-cell);
+  min-width: calc(4 * var(--app-cell));
+  padding-inline: calc(4px * var(--sf, 1));
+  border-radius: calc(4px * var(--sf, 1));
+  background: var(--text-color);
+  color: var(--background);
+}
+.app-shell .auth-screen sign-in-screen button:focus-visible { outline: 2px solid var(--text-color); outline-offset: 2px; }
+.app-shell .auth-screen sign-in-screen .sign-in-row:focus-within { box-shadow: 0 1px var(--text-color); }
+.app-shell .auth-screen sign-in-screen button:disabled { opacity: .5; }
