@@ -23,13 +23,15 @@ Use `primary` for the main action, `secondary` for a supporting action, and no a
 | --- | --- | --- | --- |
 | `primary` | boolean | false | Accent background. |
 | `secondary` | boolean | false | Quiet background. |
-| `disabled` | boolean | false | Disables the inner button and its action. |
+| `disabled` | boolean | false | Disables the inner button and its action; a link loses its destination. |
 | `fixed` | boolean | false | Four-square width instead of hugging the label. |
 | `wide` | boolean | false | Eight-square width. |
 | `fit` | boolean | false | Explicit alias for the default label-hugging width. |
 | `text` | string | Empty | Translation key; otherwise use slot content. |
-| `href` | string | Empty | Navigate on click. |
-| `blank` | boolean | false | Open `href` in a new tab. |
+| `href` | string | Empty | Makes the face a real link (`<a>`) to this address. |
+| `target` | string | Empty | The link's target. |
+| `rel` | string | Empty | The link's `rel`; a new tab gets `noopener noreferrer` without it. |
+| `blank` | boolean | false | Opens `href` in a new tab (`target="_blank"`). |
 
 `variant="primary"` is not supported. Use `<ds-button primary>`.
 
@@ -46,7 +48,10 @@ The native click crosses the shadow boundary once. A disabled button does not tr
 
 ## Navigation and forms
 
-Use `href="/icons/"` to navigate. For forms, use `control="slotted"`. A native light-DOM button supplies submission,
+With `href="/icons/"` the face is a real link drawn as the button: the browser navigates, so middle-click,
+⌘- or Ctrl-click, Copy link and Enter work as on any link, and nothing navigates from a click handler. A
+disabled link has no `href`. A page without Lit uses `a.ds-button`, and React `ButtonLink`; see
+[Links](/2-core/link/). For forms, use `control="slotted"`. A native light-DOM button supplies submission,
 reset, focus, validation and disabled-fieldset behavior; DS1 owns its visual
 appearance. Keep button attributes on the native control and visual options on
 `ds-button`.

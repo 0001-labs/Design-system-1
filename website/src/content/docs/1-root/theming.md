@@ -22,7 +22,19 @@ The document stylesheet uses `--accent-color`; shared components use the scoped 
 
 ### Theme modes
 
-The document stylesheet follows the system scheme by default. Explicit `light-theme` and `dark-theme` classes on the root select a scheme. Components use `light-dark()` tokens and inherit the CSS `color-scheme` of their surface.
+A person chooses Light, Dark or System; System, the default, follows the system's appearance as it changes. The choice is one stored value, `light`, `dark` or `system`, under `ds-one:theme` (or the product's `themeStorageKey`).
+
+The theme is marked on the root element. Key styles on the class:
+
+| Mark | Values | What it is for |
+| --- | --- | --- |
+| `light-theme` or `dark-theme` class | One of the two | The canonical mark. `one.css` keys `color-scheme` on it; write `:root.dark-theme` for a rule of your own. |
+| `data-theme` | `light`, `dark` | The same theme, kept for pages that key on the attribute. |
+| `color-scheme` | `light`, `dark` | `light-dark()` tokens and the browser's controls follow it. Components inherit the `color-scheme` of their surface. |
+| `--lightningcss-light`, `--lightningcss-dark` | `initial` or empty | CSS compiled with Lightning CSS's `light-dark()` fallback follows the choice, not the system. |
+| The canvas and `<meta name="theme-color">` | The paper | No white flash behind a dark page, and the browser's bars in the paper. |
+
+Without any mark, the document stylesheet follows the system scheme.
 
 <span id="css-variables"></span>
 ## CSS custom properties
@@ -54,9 +66,47 @@ Use the shared grid: `--1` is one 20px square scaled by `--sf`; `--half` is half
 <span id="dark-mode-support"></span>
 ## Dark mode
 
-The runtime module exposes `currentTheme`, `setTheme('light' | 'dark')` and `followSystemTheme()`. `setTheme` updates root classes and the stored theme unless system mode is active. `followSystemTheme()` follows system changes and returns a cleanup function; it also updates `color-scheme` and compiled light/dark fallback properties.
+### Before the first paint
 
-For an application with Light, Dark and System choices, keep one preference, apply it before first paint, and synchronize it on storage changes and page restoration. Account persistence, the theme picker and canvas redraws belong to the application. See [Preferences](/1-root/preferences/) for the related storage topic.
+`DS1/0-face/theme-bootstrap.js` is a classic script with no imports. Inline it in the `<head>`, before the stylesheets, so the first paint is already in the chosen theme. Set any options on `window.DS_ONE_PREFERENCES` before it:
+
+```html
+<head>
+  <script>window.DS_ONE_PREFERENCES = { themeStorageKey: 'product:theme' };</script>
+  <script>/* the text of 0-face/theme-bootstrap.js */</script>
+  <link rel="stylesheet" href="/ds1/one.css" />
+</head>
+```
+
+A build can inline the file's text (in Vite, import it with `?raw`). A page that cannot inline loads it with a plain `<script src="/ds1/0-face/theme-bootstrap.js"></script>`, not a module, so rendering waits for it. Sync 1's `root` export copies it with `"modules": ["theme-bootstrap"]`.
+
+| Option | Default | What it does |
+| --- | --- | --- |
+| `themeStorageKey` | `ds-one:theme` | Where the choice is stored. Keep a product's existing key so saved choices carry over. |
+| `themeMode: 'system'` | Off | Follow the system and never read or write a stored choice, for surfaces such as documentation. |
+| `themePaper` | `{ light: '#ffffff', dark: '#2a2a2a' }` | The canvas and theme-color in each theme; `false` leaves both to the page. |
+
+The script also sets `lang` on the root from the language module's stored choice (`window.DS_ONE_I18N`: `storageKey`, `persist: false` to skip it, `languages` to allow only those).
+
+After the first paint it keeps the page right: in System mode it follows `prefers-color-scheme` as it changes, and it applies the choice again when another tab stores one and when a page returns from the back-forward cache. A change crosses from one theme to the other in a view transition of the root; with reduced motion it changes at once.
+
+### Changing the theme
+
+The theme module (`DS1/0-face/theme.ts`) runs the same script, so a page that did not inline it still gets it, and mirrors it in signals:
+
+```js
+import { setThemeMode, getThemeMode, currentTheme, currentThemeMode } from './ds1/0-face/theme';
+
+setThemeMode('system'); // or 'light', 'dark'
+```
+
+- `setThemeMode(mode)` stores the choice and puts it on the page; `getThemeMode()` reads it.
+- `currentTheme` is the theme on the page, `light` or `dark`; `currentThemeMode` is the choice, which may be `system`.
+- `setTheme('light' | 'dark')` chooses a theme, as before. `followSystemTheme()` makes the page follow the system without touching the stored choice, and returns a function that hands it back.
+- A change emits `theme-changed` on `window`, with `detail.theme` and `detail.mode`.
+- On a page without the module, `window.DS_ONE_THEME` has `mode()`, `theme()`, `set(mode)` and `apply()`.
+
+[Cycle](/2-core/cycle/) with `type="theme"` steps through Light, Dark and System. Keeping the choice on an account, the favicon and redrawing canvases belong to the application. See [Preferences](/1-root/preferences/) for the related storage topic.
 
 CSS-only documents can use `color-scheme: light dark` and the existing `light-dark()` tokens. A preview pinned to one scheme must set its own paper, ink and line tokens as well as its scheme: inherited token values may already have resolved at the root.
 

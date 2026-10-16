@@ -104,7 +104,7 @@ This prevents:
 
 ## Integration with Scaling
 
-Device detection and scaling are unified. Desktop always uses `--sf: 1`, while mobile devices calculate a scaling factor based on viewport width. See Scaling for details.
+Device detection and scaling are unified: this module puts the scale on the page with the scaling module's rule, setting `--sf` and `data-mobile` on the root and emitting `scaling-changed`. A computer always uses `--sf: 1`, however narrow its window, while phones and tablets calculate a scaling factor based on the page's width. A page that needs only the scale calls `startScaling()` from the scaling module instead. See [Scaling](/1-root/scaling/) for details.
 
 ## Best Practices
 
