@@ -77,3 +77,66 @@ test("a badge with more words than room stays inside it and cuts them short", as
   expect(badge.width).toBeLessThanOrEqual(50);
   expect(badge.cut).toBe(true);
 });
+
+const FIELDS = [
+  '<ds-input label="Email" error="Enter a valid email address"></ds-input>',
+  '<ds-input error="Enter a valid email address"></ds-input>',
+  '<ds-input variant="field" label="Email" error="Enter a valid email address"></ds-input>',
+  '<ds-input variant="field" error-text="Enter a valid email address"></ds-input>',
+  '<ds-input variant="row" error="Enter a valid email address"></ds-input>',
+  '<ds-input variant="plain" label="Email" error="Enter a valid email address"></ds-input>',
+  '<ds-input variant="outlined" label="Email" error="Enter a valid email address"></ds-input>',
+  '<ds-input variant="filled" label="Email" error="Enter a valid email address"></ds-input>',
+  '<ds-input type="password" revealable label="Password" error="Wrong password"></ds-input>',
+  '<ds-input variant="field" label="Email" style="width: 120px" error-text="Enter a valid email address"></ds-input>',
+  '<ds-input label="Email" style="--ds-sf: 1.5" error="Enter a valid email address"></ds-input>',
+  '<ds-input variant="row" style="--ds-sf: 1.5" error="Enter a valid email address"></ds-input>',
+  '<ds-textarea label="Notes" error="Check this description"></ds-textarea>',
+  '<ds-textarea variant="default" error="Check this description"></ds-textarea>',
+];
+
+test("an input's error starts on the square below its control, on one-square lines in the native field's danger colour", async () => {
+  for (const scheme of SCHEMES) {
+    const page = pages[scheme];
+    await stage(page, '<label class="ds-field"><span class="ds-field__label">Email</span><input class="ds-input"><span class="ds-field__error">Enter a valid email address</span></label>');
+    const native = await page.evaluate(() => {
+      const field = document.querySelector(".ds-field")!.getBoundingClientRect();
+      const error = document.querySelector(".ds-field__error")!;
+      return { top: error.getBoundingClientRect().top - field.top, color: getComputedStyle(error).color };
+    });
+    expect(native.top).toBe(2 * UNIT);
+    expect(native.color).toBe(scheme === "light" ? "rgb(222, 3, 49)" : "rgb(255, 95, 95)");
+    for (const markup of FIELDS) {
+      await stage(page, markup);
+      const field = await page.evaluate(() => {
+        const element = document.getElementById("stage")!.firstElementChild as HTMLElement;
+        const square = 20 * (parseFloat(getComputedStyle(element).getPropertyValue("--ds-sf")) || 1);
+        const host = element.getBoundingClientRect();
+        const control = element.shadowRoot!.querySelector("input, textarea")!.getBoundingClientRect();
+        const error = element.shadowRoot!.querySelector<HTMLElement>(".error-message")!;
+        const box = error.getBoundingClientRect();
+        const label = element.shadowRoot!.querySelector("label");
+        return { square, host: host.height, controlEnd: control.bottom - host.top, top: box.top - host.top, height: box.height, color: getComputedStyle(error).color,
+          lineHeight: parseFloat(getComputedStyle(error).lineHeight), label: label ? label.getBoundingClientRect().height : 0 };
+      });
+      const where = `${markup} (${scheme})`;
+      expect(field.top % field.square, `${where}: error on a square`).toBe(0);
+      expect(field.top, `${where}: error on the square below the control`).toBe(Math.ceil(field.controlEnd / field.square) * field.square);
+      expect(field.lineHeight, `${where}: one-square lines`).toBe(field.square);
+      expect(field.height % field.square, `${where}: whole lines`).toBe(0);
+      expect(field.host % field.square, `${where}: the field on whole squares`).toBe(0);
+      expect(field.color, `${where}: danger colour`).toBe(native.color);
+    }
+  }
+});
+
+test("a required field's mark is the danger colour", async () => {
+  for (const scheme of SCHEMES) {
+    await stage(pages[scheme], '<ds-input variant="field" label="Email" required></ds-input><span class="ds-field__error">x</span>');
+    const [mark, danger] = await pages[scheme].evaluate(() => [
+      getComputedStyle(document.querySelector("ds-input")!.shadowRoot!.querySelector("label")!, "::after").color,
+      getComputedStyle(document.querySelector(".ds-field__error")!).color,
+    ]);
+    expect(mark, scheme).toBe(danger);
+  }
+});

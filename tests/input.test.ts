@@ -1,4 +1,6 @@
 // @vitest-environment happy-dom
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { afterEach, expect, test, vi } from 'vite-plus/test';
 vi.stubGlobal('fetch', vi.fn(async () => new Response('{}')));
 const { Input } = await import('../DS1/2-core/ds-input');
@@ -165,4 +167,39 @@ test('a field without suggestions names no list', async () => {
   const { control, input } = await field();
   expect(input.hasAttribute('list')).toBe(false);
   expect(control.shadowRoot!.querySelector('datalist')).toBeNull();
+});
+
+const inputCss = readFileSync(join(import.meta.dirname, '../DS1/2-core/styles/ds-input.css'), 'utf8');
+const cssRule = (selector: string) => {
+  const start = inputCss.indexOf(`${selector} {`);
+  expect(start, selector).toBeGreaterThanOrEqual(0);
+  return inputCss.slice(start, inputCss.indexOf('}', start));
+};
+
+test('the error line is the danger colour on one-square lines, as the native field error is, and no raw red is left', () => {
+  const error = cssRule('.error-message');
+  expect(error).toContain('color: var(--ds-danger-color)');
+  expect(error).toContain('line-height: var(--ds-unit)');
+  expect(error).toContain('margin: 0');
+  expect(error).not.toContain('--025');
+  expect(cssRule(':host([required]) label::after')).toContain('color: var(--ds-danger-color)');
+  expect(cssRule('.input-wrapper.has-error')).toContain('grid-auto-rows: minmax(var(--ds-input-control-row, var(--ds-row-height)), auto)');
+  expect(inputCss).not.toMatch(/#ff3b30|255,\s*59,\s*48|--error-color/i);
+});
+
+test.each(['ds-input', 'ds-textarea'])('%s marks its rows while an error shows, and a translated error wraps', async (tag) => {
+  await import('../DS1/2-core/ds-textarea');
+  document.body.innerHTML = `<${tag} label="Email"></${tag}>`;
+  const control = document.querySelector(tag) as InstanceType<typeof Input>;
+  await control.updateComplete;
+  const wrapper = () => control.shadowRoot!.querySelector('.input-wrapper')!;
+  expect(wrapper().classList.contains('has-error')).toBe(false);
+  control.errorText = 'Enter a valid email address';
+  await control.updateComplete;
+  expect(wrapper().classList.contains('has-error')).toBe(true);
+  expect(control.shadowRoot!.querySelector('.error-message > ds-text')!.hasAttribute('wrap')).toBe(true);
+  control.errorText = '';
+  await control.updateComplete;
+  expect(wrapper().classList.contains('has-error')).toBe(false);
+  expect(control.shadowRoot!.querySelector('.error-message')).toBeNull();
 });
