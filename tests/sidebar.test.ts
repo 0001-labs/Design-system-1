@@ -70,3 +70,38 @@ test("a linked parent navigates independently of its disclosure", async () => {
   expect(toggle.mock.calls[0][0].detail).toEqual({ id: 'core', expanded: false });
   expect(activate).toHaveBeenCalledOnce();
 });
+
+test("rows carry no browser title; only a label cut short shows the whole label in the shared tooltip", async () => {
+  const { initTooltips } = await import("../DS1/0-face/tooltips");
+  document.documentElement.removeAttribute("data-ds-tooltips-ready");
+  initTooltips();
+  // happy-dom has no layout: a label is as wide as eight pixels a letter, its row 100.
+  vi.spyOn(HTMLElement.prototype, "scrollWidth", "get").mockImplementation(function (this: HTMLElement) { return this.classList.contains("name") ? (this.textContent ?? "").length * 8 : 0; });
+  vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockImplementation(function (this: HTMLElement) { return this.classList.contains("name") ? 100 : 0; });
+  try {
+    const long = "A label far longer than its column", folder = "A folder too long for its row";
+    const sidebar = await setup([
+      { id: "short", label: "Short", href: "#short" },
+      { id: "long", label: long, href: "#long" },
+      { id: "folder", label: folder, expanded: false },
+    ]);
+    expect(sidebar.shadowRoot!.querySelector("[title]")).toBeNull();
+    expect(control(sidebar, "short").hasAttribute("data-tooltip")).toBe(false);
+    expect(control(sidebar, "long").dataset.tooltip).toBe(long);
+    expect(control(sidebar, "folder").dataset.tooltip).toBe(folder);
+
+    // The page's one tooltip finds the mark inside the shadow root, without a broken id reference.
+    const link = control(sidebar, "long");
+    link.querySelector(".name")!.dispatchEvent(new PointerEvent("pointerover", { bubbles: true, composed: true }));
+    const bubble = document.querySelector<HTMLElement>("[data-ds-tooltip]")!;
+    expect(bubble.textContent).toBe(long);
+    expect(bubble.classList.contains("is-visible")).toBe(true);
+    expect(link.hasAttribute("aria-describedby")).toBe(false);
+    expect(link.textContent?.trim()).toBe(long);
+
+    // A label that fits again loses its tooltip.
+    sidebar.items = [{ id: "long", label: "Fits", href: "#long" }];
+    await sidebar.updateComplete;
+    expect(control(sidebar, "long").hasAttribute("data-tooltip")).toBe(false);
+  } finally { vi.restoreAllMocks(); }
+});

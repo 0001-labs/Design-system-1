@@ -3,6 +3,9 @@
  * a small label: 16px high, black with white text (white on black in dark mode), 4px corners, 14px regular, 2.5px at
  * the sides, two pixels above the element, shown at once. `data-tooltip-colour` gives it a colour of its own. The same look as `<ds-tooltip>`, without wrapping each element in a component, so a table of
  * hundreds of cells can carry one each. Long text wraps at 320px on 20px lines.
+ * Elements inside a component's open shadow root are found as well (`ds-sidebar`
+ * marks its cut-short labels this way); the description link is set only on
+ * elements in the document itself, since an id cannot reach across a shadow root.
  */
 export function initTooltips(): void {
   if (typeof document === "undefined") return;
@@ -54,7 +57,7 @@ export function initTooltips(): void {
     // One line; a long text wraps at 320px instead of running off the page.
     bubble.classList.remove("is-wide");
     if (bubble.scrollWidth > 320) bubble.classList.add("is-wide");
-    target.setAttribute("aria-describedby", bubble.id);
+    if (target.getRootNode() === document) target.setAttribute("aria-describedby", bubble.id);
     place(target);
     bubble.classList.add("is-visible");
   };
@@ -63,7 +66,14 @@ export function initTooltips(): void {
     current = null;
     bubble.classList.remove("is-visible");
   };
-  const find = (event: Event) => (event.target as Element | null)?.closest?.<HTMLElement>("[data-tooltip]") ?? null;
+  // The composed path crosses open shadow roots, where `closest` stops at the host.
+  const find = (event: Event): HTMLElement | null => {
+    for (const node of event.composedPath()) {
+      if (node === document || node === window) break;
+      if ((node as Element).hasAttribute?.("data-tooltip")) return node as HTMLElement;
+    }
+    return (event.target as Element | null)?.closest?.<HTMLElement>("[data-tooltip]") ?? null;
+  };
 
   document.addEventListener("pointerover", (event) => {
     const target = find(event);
