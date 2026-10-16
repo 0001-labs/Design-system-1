@@ -35,7 +35,7 @@ The packages give native controls Design system 1's measures and colours rather 
 
 ## Settle before generating
 
-- **One set of values.** The Root tokens in `one.css` and the component tokens in `component-tokens.css` and `component-metrics.css` disagree on a few values: black, light slate, the accent colour, the heading size and the line height. The native packages follow the component tokens, since those are what the components draw with; the differences are settled at the source first, so the generator reads one answer.
+- **One set of values (settled).** The Root tokens in `one.css` and the component tokens in `component-tokens.css` and `component-metrics.css` now agree. Colours follow the palette: black #2a2a2a, light slate #e6e6e6, dark slate #3c3c3c, grey #797979, and Apple green as the accent. Type follows the component tokens: 14 text on 16 lines, 13 headings, −0.3 letter spacing and weight 400. The native packages take the same values.
 - **Measures in one file.** The square, control and row heights, type sizes, letter spacing, line heights and corners move into a small TypeScript file in `DS1/1-root`, like `palette.ts`. The CSS keeps its values, and a test fails when the CSS and that file disagree.
 - **System text size.** Whether type follows the system's text size setting (Dynamic Type on Apple platforms, font scale on Android) or stays on the grid. Following it keeps text accessible but can push a row past one square, so rows then grow by whole squares.
 

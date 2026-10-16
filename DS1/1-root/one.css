@@ -112,9 +112,10 @@ input {
 
   --type-size-default: calc(14px * var(--sf));
   --type-size-small: calc(10px * var(--sf));
-  --type-weight-default: 500;
-  --type-lineheight-default: calc(15px * var(--sf));
-  --type-size-heading: calc(15px * var(--sf));
+  --type-weight-default: 400;
+  --type-lineheight-default: calc(16px * var(--sf));
+  --type-size-heading: calc(13px * var(--sf));
+  --type-letterspacing-default: calc(-0.3px * var(--sf));
   --type-weight-bold: 500;
 
   --type-size-japanese-default: calc(12px * var(--sf));
@@ -239,6 +240,7 @@ body {
   font-size: var(--type-size-default);
   font-weight: var(--type-weight-default);
   line-height: var(--type-lineheight-default);
+  letter-spacing: var(--type-letterspacing-default);
 }
 
 .ds-text--heading {
@@ -266,6 +268,7 @@ body {
   font-family: var(--typeface-regular);
   font-size: var(--type-size-default);
   line-height: var(--type-lineheight-default);
+  letter-spacing: var(--type-letterspacing-default);
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
 }
@@ -313,6 +316,7 @@ body {
   font-family: var(--typeface-regular);
   font-size: var(--type-size-default);
   line-height: var(--type-lineheight-default);
+  letter-spacing: var(--type-letterspacing-default);
 }
 
 .ds-input::placeholder {

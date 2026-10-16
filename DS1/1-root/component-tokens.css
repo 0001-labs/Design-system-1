@@ -23,14 +23,15 @@
 
   /* ----------------------------------------------------------
    PALETTE
+   The same values as palette.ts and one.css; the accent is Apple green.
    ---------------------------------------------------------- */
 
   --ds-white: #ffffff;
-  --ds-black: #1f1f1f;
+  --ds-black: #2a2a2a;
   --ds-slate: #1e1e1e;
-  --ds-slate-light: #ececec;
-  --ds-slate-dark: #363636;
-  --ds-grey: #7a7a7a;
+  --ds-slate-light: #e6e6e6;
+  --ds-slate-dark: #3c3c3c;
+  --ds-grey: #797979;
 
   --ds-tuned-red: #ff5f5f;
   --ds-pink: #f5aad1;
@@ -42,7 +43,7 @@
   --ds-yellow: #eaff00;
   --ds-orange: #fec20d;
 
-  --ds-accent-color: light-dark(var(--ds-yellow), #bbcc00);
+  --ds-accent-color: var(--ds-apple-green);
 
   /* ----------------------------------------------------------
    TYPE
