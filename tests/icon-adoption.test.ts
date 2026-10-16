@@ -184,3 +184,14 @@ export const App = () => <><XIcon /><Trash2 size={16} /><Close /><Up /><A /><One
   expect(icons.cells.up).toMatchObject({ uses: 1, sites: [{ kind: "component" }] });
   expect(Object.keys(icons.cells).sort()).toEqual(["Trash2", "X", "close", "up"]);
 });
+
+test("an inline SVG that pastes a DS1 drawing is named after it", () => {
+  const root = app({ "src/view.tsx": `export const Close = () => <svg width="16" height="16" viewBox="0 0 16 16" {...props}><path d="m3 3 10 10M3 13l10-10" /></svg>;
+export const Own = () => <svg viewBox="0 0 16 16"><path d="M2 2L14 2" /></svg>;
+const wrapped = '<svg viewBox="0 0 16 16"><svg viewBox="0 0 16 16"><path d="M3 3L13 13M3 13L13 3"/></svg></svg>';
+export const Drawn = ({ d }) => <svg viewBox="0 0 16 16"><path d={d} /></svg>;` });
+  const icons = scanIcons(root, undefined, ["src/view.tsx"], ds1Drawings);
+  expect(icons.cells.close).toMatchObject({ uses: 2, status: "shared" });
+  expect(icons.cells.close!.sites.map(site => [site.kind, site.line])).toEqual([["inline", 1], ["inline", 3]]);
+  expect(icons.inline.map(site => site.line)).toEqual([2, 4]);
+});

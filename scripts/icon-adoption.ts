@@ -214,7 +214,7 @@ export function imageIcons(source: string): { url: string; line: number }[] {
 // ---------------------------------------------------------------------------
 // ds-icon elements, icon set packages and SVG imports.
 
-export interface IconUse { name: string | null; line: number; inline?: boolean; svg?: string }
+export interface IconUse { name: string | null; line: number; inline?: boolean; svg?: string; offset?: number }
 /** The markup of the `<svg>` that opens at `start`, up to its own closing tag. */
 function svgElement(source: string, start: number): string {
   const tag = /<(\/?)svg\b(?:[^>"'{]|"[^"]*"|'[^']*'|\{[^}]*\})*?(\/?)>/gi;
@@ -256,7 +256,7 @@ export function iconSites(source: string): IconUse[] {
     const name = literal?.[1] ?? literal?.[2];
     uses.push({ name: name && NAME.test(name) ? name : null, line: line(match.index!) });
   }
-  for (const match of source.matchAll(/<svg\b/g)) uses.push({ name: null, line: line(match.index!), inline: true, svg: svgElement(source, match.index!) });
+  for (const match of source.matchAll(/<svg\b/g)) uses.push({ name: null, line: line(match.index!), inline: true, svg: svgElement(source, match.index!), offset: match.index! });
   return uses;
 }
 
@@ -812,9 +812,16 @@ export function scanIcons(root: string, manifest: string | undefined, files: str
       else inline.push({ ...site, kind: "script", status: "local" });
     }
     for (const use of glyphSites(file, source)) add(GLYPHS[use.glyph]!, { file, line: use.line, name: use.glyph }, "glyph", "differs");
+    let named = -1;
     for (const use of iconSites(source)) {
       const site = { file, line: use.line, name: use.name ?? (use.inline ? "svg" : "ds-icon") };
-      if (use.inline) inline.push({ ...site, kind: "inline", status: "local" });
+      if (use.inline) {
+        // An inline drawing that is a DS1 drawing, pasted, is named; the <svg> wrapped inside it is the same drawing.
+        if (use.offset! < named) continue;
+        const match = use.svg ? drawings.match(use.svg) : undefined;
+        if (match) { add(match, site, "inline", "shared"); named = use.offset! + use.svg!.length; }
+        else inline.push({ ...site, kind: "inline", status: "local" });
+      }
       else if (!use.name) dynamic.push({ ...site, kind: "element" });
       else add(use.name, site, "element");
     }
