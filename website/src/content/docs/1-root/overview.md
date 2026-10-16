@@ -3,7 +3,7 @@ title: Root
 description: Shared visual foundations and behavior used by every layer.
 ---
 
-Root establishes the common ground for the system: the square, colours, type, scale and the behavior every component can share. Configure these foundations before composing a page; a change here can affect many controls at once.
+Root establishes the common ground for the system: the square, colours, type, scale and the built-in behavior and utilities available across the system. Configure these foundations before composing a page; a change here can affect many controls at once.
 
 ## What belongs here
 
@@ -15,8 +15,9 @@ Root establishes the common ground for the system: the square, colours, type, sc
 | [Theming](/1-root/theming/) | Appearance tokens and light/dark behavior. |
 | [Device](/1-root/device/) | Device detection and responsive scale. |
 | [Preferences](/1-root/preferences/) | Remembering supported user choices. |
+| [Pricing](/1-root/pricing/) | Currency and localized price-formatting utilities. |
 
-These are foundations, not individual interface controls. The language module belongs here; the visible [Language control](/2-core/language/) belongs in Core. The docs group runtime foundations here even when their implementation lives in `DS1/0-face/`; this does not move their source or change import paths.
+All built-ins are grouped here alongside the visual foundations: Languages, Theming, Device, Preferences and Pricing. Pricing is a formatting utility; it does not implement billing or payments. These topics support interface controls rather than being controls themselves. The language module belongs here; the visible [Language control](/2-core/language/) belongs in Core. The docs group runtime foundations here even when their implementation lives in `DS1/0-face/`; this does not move their source or change import paths.
 
 ## How the layers fit
 

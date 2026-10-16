@@ -52,6 +52,7 @@ export default {
       '/built-ins/theming': '/1-root/theming/',
       '/built-ins/device': '/1-root/device/',
       '/built-ins/preferences': '/1-root/preferences/',
+      '/built-ins/pricing': '/1-root/pricing/',
     };
     const docsTarget = docsRedirects[url.pathname.replace(/\/$/, '')];
     if (docsTarget && (request.method === 'GET' || request.method === 'HEAD')) {

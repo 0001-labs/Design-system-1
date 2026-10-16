@@ -9,6 +9,7 @@ export const LAYERS = COMPONENT_LAYERS.map(layer => layer.number !== 1 ? layer :
     { name: 'Theming', href: '/1-root/theming/' },
     { name: 'Device', href: '/1-root/device/' },
     { name: 'Preferences', href: '/1-root/preferences/' },
+    { name: 'Pricing', href: '/1-root/pricing/' },
   ],
 });
 import { isSharedInterfaceIcon, sharedIconName } from './icons/icon-scope';

@@ -35,6 +35,7 @@ describe("combined website routes", () => {
       '/built-ins/theming/': '/1-root/theming/',
       '/built-ins/device/': '/1-root/device/',
       '/built-ins/preferences/': '/1-root/preferences/',
+      '/built-ins/pricing/': '/1-root/pricing/',
     };
     for (const [from, to] of Object.entries(moves)) {
       const response = await site.fetch(from + '?view=example', { redirect: 'manual' });
