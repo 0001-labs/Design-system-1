@@ -81,6 +81,13 @@
     "Saved": "Lagret",
     "Saving…": "Lagrer…",
     "Untitled": "Uten tittel",
-    "Account": "Konto"
+    "Account": "Konto",
+    "Carousel": "Karusell",
+    "Slide": "Lysbilde",
+    "Slides": "Lysbilder",
+    "Slide {index}": "Lysbilde {index}",
+    "{index} of {count}": "{index} av {count}",
+    "Previous slide": "Forrige lysbilde",
+    "Next slide": "Neste lysbilde"
   }
 }

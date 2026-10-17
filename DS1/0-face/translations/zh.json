@@ -81,6 +81,13 @@
     "Saved": "已保存",
     "Saving…": "正在保存…",
     "Untitled": "未命名",
-    "Account": "账户"
+    "Account": "账户",
+    "Carousel": "轮播",
+    "Slide": "幻灯片",
+    "Slides": "幻灯片",
+    "Slide {index}": "幻灯片 {index}",
+    "{index} of {count}": "第 {index} 张，共 {count} 张",
+    "Previous slide": "上一张",
+    "Next slide": "下一张"
   }
 }

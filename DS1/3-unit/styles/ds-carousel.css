@@ -1,0 +1,25 @@
+/* ds-carousel.css */
+/* The element only places the parts; 1-root/carousel.css draws them and
+   controls.css the buttons. The slides are the element's children, so the
+   track's rules for its children are said again for slotted ones. */
+
+:host {
+  display: block;
+  min-width: 0;
+}
+
+:host([hidden]) {
+  display: none !important;
+}
+
+::slotted(*) {
+  box-sizing: border-box;
+  min-width: 0;
+  margin: 0;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+:host(:dir(rtl)) :is(.ds-carousel__previous, .ds-carousel__next) > ds-icon {
+  transform: scaleX(-1);
+}

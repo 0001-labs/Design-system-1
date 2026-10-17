@@ -104,6 +104,13 @@ enum DS1SharedWords {
         "Saving…": "Gemmer…",
         "Untitled": "Uden titel",
         "Account": "Konto",
+        "Carousel": "Karrusel",
+        "Slide": "Dias",
+        "Slides": "Dias",
+        "Slide {index}": "Dias {index}",
+        "{index} of {count}": "{index} af {count}",
+        "Previous slide": "Forrige dias",
+        "Next slide": "Næste dias",
     ]
 
     private static let deWords: [String: String] = [
@@ -189,6 +196,13 @@ enum DS1SharedWords {
         "Saving…": "Wird gespeichert …",
         "Untitled": "Ohne Titel",
         "Account": "Konto",
+        "Carousel": "Karussell",
+        "Slide": "Folie",
+        "Slides": "Folien",
+        "Slide {index}": "Folie {index}",
+        "{index} of {count}": "{index} von {count}",
+        "Previous slide": "Vorherige Folie",
+        "Next slide": "Nächste Folie",
     ]
 
     private static let enWords: [String: String] = [
@@ -274,6 +288,13 @@ enum DS1SharedWords {
         "Saving…": "Saving…",
         "Untitled": "Untitled",
         "Account": "Account",
+        "Carousel": "Carousel",
+        "Slide": "Slide",
+        "Slides": "Slides",
+        "Slide {index}": "Slide {index}",
+        "{index} of {count}": "{index} of {count}",
+        "Previous slide": "Previous slide",
+        "Next slide": "Next slide",
     ]
 
     private static let esWords: [String: String] = [
@@ -359,6 +380,13 @@ enum DS1SharedWords {
         "Saving…": "Guardando…",
         "Untitled": "Sin título",
         "Account": "Cuenta",
+        "Carousel": "Carrusel",
+        "Slide": "Diapositiva",
+        "Slides": "Diapositivas",
+        "Slide {index}": "Diapositiva {index}",
+        "{index} of {count}": "{index} de {count}",
+        "Previous slide": "Diapositiva anterior",
+        "Next slide": "Diapositiva siguiente",
     ]
 
     private static let fiWords: [String: String] = [
@@ -444,6 +472,13 @@ enum DS1SharedWords {
         "Saving…": "Tallennetaan…",
         "Untitled": "Nimetön",
         "Account": "Tili",
+        "Carousel": "Karuselli",
+        "Slide": "Dia",
+        "Slides": "Diat",
+        "Slide {index}": "Dia {index}",
+        "{index} of {count}": "{index}/{count}",
+        "Previous slide": "Edellinen dia",
+        "Next slide": "Seuraava dia",
     ]
 
     private static let frWords: [String: String] = [
@@ -529,6 +564,13 @@ enum DS1SharedWords {
         "Saving…": "Enregistrement…",
         "Untitled": "Sans titre",
         "Account": "Compte",
+        "Carousel": "Carrousel",
+        "Slide": "Diapositive",
+        "Slides": "Diapositives",
+        "Slide {index}": "Diapositive {index}",
+        "{index} of {count}": "{index} sur {count}",
+        "Previous slide": "Diapositive précédente",
+        "Next slide": "Diapositive suivante",
     ]
 
     private static let isWords: [String: String] = [
@@ -607,6 +649,13 @@ enum DS1SharedWords {
         "Saving…": "Vistar…",
         "Untitled": "Ónefnt",
         "Account": "Aðgangur",
+        "Carousel": "Hringekja",
+        "Slide": "Glæra",
+        "Slides": "Glærur",
+        "Slide {index}": "Glæra {index}",
+        "{index} of {count}": "{index} af {count}",
+        "Previous slide": "Fyrri glæra",
+        "Next slide": "Næsta glæra",
     ]
 
     private static let itWords: [String: String] = [
@@ -692,6 +741,13 @@ enum DS1SharedWords {
         "Saving…": "Salvataggio…",
         "Untitled": "Senza titolo",
         "Account": "Account",
+        "Carousel": "Carosello",
+        "Slide": "Slide",
+        "Slides": "Slide",
+        "Slide {index}": "Slide {index}",
+        "{index} of {count}": "{index} di {count}",
+        "Previous slide": "Slide precedente",
+        "Next slide": "Slide successiva",
     ]
 
     private static let jaWords: [String: String] = [
@@ -777,6 +833,13 @@ enum DS1SharedWords {
         "Saving…": "保存中…",
         "Untitled": "名称未設定",
         "Account": "アカウント",
+        "Carousel": "カルーセル",
+        "Slide": "スライド",
+        "Slides": "スライド",
+        "Slide {index}": "スライド {index}",
+        "{index} of {count}": "{count} 枚中 {index} 枚目",
+        "Previous slide": "前のスライド",
+        "Next slide": "次のスライド",
     ]
 
     private static let koWords: [String: String] = [
@@ -862,6 +925,13 @@ enum DS1SharedWords {
         "Saving…": "저장 중…",
         "Untitled": "제목 없음",
         "Account": "계정",
+        "Carousel": "캐러셀",
+        "Slide": "슬라이드",
+        "Slides": "슬라이드",
+        "Slide {index}": "슬라이드 {index}",
+        "{index} of {count}": "{count}개 중 {index}번째",
+        "Previous slide": "이전 슬라이드",
+        "Next slide": "다음 슬라이드",
     ]
 
     private static let nbWords: [String: String] = [
@@ -947,6 +1017,13 @@ enum DS1SharedWords {
         "Saving…": "Lagrer…",
         "Untitled": "Uten tittel",
         "Account": "Konto",
+        "Carousel": "Karusell",
+        "Slide": "Lysbilde",
+        "Slides": "Lysbilder",
+        "Slide {index}": "Lysbilde {index}",
+        "{index} of {count}": "{index} av {count}",
+        "Previous slide": "Forrige lysbilde",
+        "Next slide": "Neste lysbilde",
     ]
 
     private static let ptBRWords: [String: String] = [
@@ -1032,6 +1109,13 @@ enum DS1SharedWords {
         "Saving…": "Salvando…",
         "Untitled": "Sem título",
         "Account": "Conta",
+        "Carousel": "Carrossel",
+        "Slide": "Slide",
+        "Slides": "Slides",
+        "Slide {index}": "Slide {index}",
+        "{index} of {count}": "{index} de {count}",
+        "Previous slide": "Slide anterior",
+        "Next slide": "Próximo slide",
     ]
 
     private static let ptWords: [String: String] = [
@@ -1117,6 +1201,13 @@ enum DS1SharedWords {
         "Saving…": "A guardar…",
         "Untitled": "Sem título",
         "Account": "Conta",
+        "Carousel": "Carrossel",
+        "Slide": "Diapositivo",
+        "Slides": "Diapositivos",
+        "Slide {index}": "Diapositivo {index}",
+        "{index} of {count}": "{index} de {count}",
+        "Previous slide": "Diapositivo anterior",
+        "Next slide": "Diapositivo seguinte",
     ]
 
     private static let svWords: [String: String] = [
@@ -1202,6 +1293,13 @@ enum DS1SharedWords {
         "Saving…": "Sparar…",
         "Untitled": "Namnlös",
         "Account": "Konto",
+        "Carousel": "Karusell",
+        "Slide": "Bild",
+        "Slides": "Bilder",
+        "Slide {index}": "Bild {index}",
+        "{index} of {count}": "{index} av {count}",
+        "Previous slide": "Föregående bild",
+        "Next slide": "Nästa bild",
     ]
 
     private static let zhWords: [String: String] = [
@@ -1287,6 +1385,13 @@ enum DS1SharedWords {
         "Saving…": "正在保存…",
         "Untitled": "未命名",
         "Account": "账户",
+        "Carousel": "轮播",
+        "Slide": "幻灯片",
+        "Slides": "幻灯片",
+        "Slide {index}": "幻灯片 {index}",
+        "{index} of {count}": "第 {index} 张，共 {count} 张",
+        "Previous slide": "上一张",
+        "Next slide": "下一张",
     ]
 
 }

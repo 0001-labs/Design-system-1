@@ -81,6 +81,13 @@
     "Saved": "保存しました",
     "Saving…": "保存中…",
     "Untitled": "名称未設定",
-    "Account": "アカウント"
+    "Account": "アカウント",
+    "Carousel": "カルーセル",
+    "Slide": "スライド",
+    "Slides": "スライド",
+    "Slide {index}": "スライド {index}",
+    "{index} of {count}": "{count} 枚中 {index} 枚目",
+    "Previous slide": "前のスライド",
+    "Next slide": "次のスライド"
   }
 }

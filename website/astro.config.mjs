@@ -115,6 +115,7 @@ export default defineConfig({
             { label: "Language", slug: "2-core/language" },
             { label: "Link", slug: "2-core/link" },
             { label: "Notice", slug: "2-core/notice" },
+            { label: "Page dots", slug: "2-core/pagedots" },
             { label: "Text", slug: "2-core/text" },
             { label: "Toast", slug: "2-core/toast" },
             { label: "Toggle", slug: "2-core/toggle" },
@@ -126,6 +127,7 @@ export default defineConfig({
           items: [
             { label: "Accordion", slug: "3-unit/accordion" },
             { label: "Card", slug: "3-unit/card" },
+            { label: "Carousel", slug: "3-unit/carousel" },
             { label: "Form", slug: "3-unit/form" },
             { label: "List", slug: "3-unit/list" },
             { label: "Navigation", slug: "3-unit/navigation" },

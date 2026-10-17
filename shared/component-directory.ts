@@ -47,6 +47,7 @@ export const ALL_LAYERS: DirectoryLayer[] = [
       { name: 'Language', href: '/2-core/language/', tag: 'ds-language' },
       { name: 'Link', href: '/2-core/link/' },
       { name: 'Notice', href: '/2-core/notice/', tag: 'ds-notice' },
+      { name: 'Page dots', href: '/2-core/pagedots/', tag: 'ds-pagedots' },
       { name: 'Text', href: '/2-core/text/', tag: 'ds-text' },
       { name: 'Toast', href: '/2-core/toast/', tag: 'ds-toast' },
       { name: 'Toggle', href: '/2-core/toggle/', tag: 'ds-toggle' },
@@ -61,6 +62,7 @@ export const ALL_LAYERS: DirectoryLayer[] = [
     entries: [
       { name: 'Accordion', href: '/3-unit/accordion/', tag: 'ds-accordion' },
       { name: 'Card', href: '/3-unit/card/' },
+      { name: 'Carousel', href: '/3-unit/carousel/', tag: 'ds-carousel' },
       { name: 'Form', href: '/3-unit/form/', tag: 'ds-form' },
       { name: 'List', href: '/3-unit/list/', tag: 'ds-list' },
       { name: 'Navigation', href: '/3-unit/navigation/' },

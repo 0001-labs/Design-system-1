@@ -81,6 +81,13 @@
     "Saved": "저장됨",
     "Saving…": "저장 중…",
     "Untitled": "제목 없음",
-    "Account": "계정"
+    "Account": "계정",
+    "Carousel": "캐러셀",
+    "Slide": "슬라이드",
+    "Slides": "슬라이드",
+    "Slide {index}": "슬라이드 {index}",
+    "{index} of {count}": "{count}개 중 {index}번째",
+    "Previous slide": "이전 슬라이드",
+    "Next slide": "다음 슬라이드"
   }
 }

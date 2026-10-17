@@ -81,6 +81,13 @@
     "Saved": "Sparat",
     "Saving…": "Sparar…",
     "Untitled": "Namnlös",
-    "Account": "Konto"
+    "Account": "Konto",
+    "Carousel": "Karusell",
+    "Slide": "Bild",
+    "Slides": "Bilder",
+    "Slide {index}": "Bild {index}",
+    "{index} of {count}": "{index} av {count}",
+    "Previous slide": "Föregående bild",
+    "Next slide": "Nästa bild"
   }
 }

@@ -81,6 +81,13 @@
     "Saved": "Tallennettu",
     "Saving…": "Tallennetaan…",
     "Untitled": "Nimetön",
-    "Account": "Tili"
+    "Account": "Tili",
+    "Carousel": "Karuselli",
+    "Slide": "Dia",
+    "Slides": "Diat",
+    "Slide {index}": "Dia {index}",
+    "{index} of {count}": "{index}/{count}",
+    "Previous slide": "Edellinen dia",
+    "Next slide": "Seuraava dia"
   }
 }

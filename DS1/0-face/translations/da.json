@@ -81,6 +81,13 @@
     "Saved": "Gemt",
     "Saving…": "Gemmer…",
     "Untitled": "Uden titel",
-    "Account": "Konto"
+    "Account": "Konto",
+    "Carousel": "Karrusel",
+    "Slide": "Dias",
+    "Slides": "Dias",
+    "Slide {index}": "Dias {index}",
+    "{index} of {count}": "{index} af {count}",
+    "Previous slide": "Forrige dias",
+    "Next slide": "Næste dias"
   }
 }
