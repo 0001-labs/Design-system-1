@@ -8,6 +8,7 @@ import { join, posix } from 'node:path';
 import { componentGraph } from './scripts/component-graph.mjs';
 import { applePackage } from './scripts/native-apple.mjs';
 import { androidPackage } from './scripts/native-android.mjs';
+import { libraryPin, pinnedFiles, pinnedLibrary } from './scripts/library-pin.mjs';
 
 const rootStyles = ['one.css', 'grid.css', 'text.css', 'component-tokens.css', 'component-metrics.css', 'component-appearance.css', 'fonts.css', 'palette.css'];
 /** one.css and controls.css both import the text classes. */
@@ -71,8 +72,25 @@ function moduleGraph(read, entry) {
 
 export default {
   exports: {
+    /**
+     * Published design libraries. `library-styles.ts` connects one by address at run time. `id` and
+     * `version` pin a published version instead: its stylesheet as
+     * `ds1-library/<id>/v/<version>.css`, unchanged, and `ds1-library/library-manifest.json` with
+     * its address, the DS1 library revision it was prepared by and its sha256, all hashed in
+     * sync.lock.json (scripts/library-pin.mjs verifies it first). `sha256` also checks it against
+     * a hash the product names; `styles: false` leaves library-styles.ts out, as for a `to` in
+     * `public/`.
+     */
     library: {
-      files({ read }) { return { 'library-styles.ts': read('DS1/0-face/library-styles.ts') }; },
+      async files({ read, options }) {
+        const files = options.styles === false ? {} : { 'library-styles.ts': read('DS1/0-face/library-styles.ts') };
+        const pin = libraryPin(options);
+        if (!pin) {
+          if (options.styles === false) throw new Error('Name the library to pin ("id" and "version"), or copy library-styles.ts');
+          return files;
+        }
+        return { ...files, ...pinnedFiles(pin, await pinnedLibrary(pin)) };
+      },
     },
     /**
      * Faces copied as local assets by consumers: `fonts` names them by file. `stylesheet: true`

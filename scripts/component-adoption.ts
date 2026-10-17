@@ -1021,7 +1021,7 @@ export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): Ado
         if (adapterTags.has(site.tag) || site.nativeStyle === "block-part") continue;
         // A published library's controls are needs review; a wrapper's own face counts at its uses.
         const viaLibrary = libraryFile?.site(site);
-        if (viaLibrary !== undefined) { if (viaLibrary) countLibrarySite(app.cells[viaLibrary.component]!, file, site, library!.connection); continue; }
+        if (viaLibrary !== undefined) { if (viaLibrary) countLibrarySite(app.cells[viaLibrary.component]!, file, site, library!); continue; }
         // DS1 has no range control: a range is recorded as a known gap, outside the matrix.
         if (site.controlKind === "range") { ((app.gaps ??= {}).range ??= []).push({ file, line: site.line, tag: site.tag, kind: "local" }); continue; }
         if (site.column && !site.nativeStyle) {
