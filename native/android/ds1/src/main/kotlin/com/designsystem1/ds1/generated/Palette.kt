@@ -128,6 +128,8 @@ object DS1Colors {
     val title = DS1Color(light = 0x797979, dark = 0x9a9a9a)
     /** Text that reports a failure or warns of a loss. `--ds-danger-color`. */
     val danger = DS1Color(light = 0xde0331, dark = 0xff5f5f)
+    /** Text that asks for care before something goes wrong. `--ds-warning-color`. */
+    val warning = DS1Color(light = 0x4c3f1a, dark = 0xfec20d)
     /** Outlines. `--ds-border-color`. */
     val border = DS1Color(light = 0xd8d8d8, dark = 0x3d3d3d)
     /** A control on the paper. `--ds-fill`. */

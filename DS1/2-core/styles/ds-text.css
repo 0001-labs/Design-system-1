@@ -93,6 +93,10 @@
   --ds-text-tone: var(--ds-danger-color);
 }
 
+:host([tone="warning"]) {
+  --ds-text-tone: var(--ds-warning-color);
+}
+
 :host([size="small"]) {
   font-size: var(--ds-type-size-small);
 }

@@ -76,6 +76,11 @@
   /* Text that reports a failure or warns of a loss. Red for blood on light
      paper and Tuned red on dark: both palette colours, legible as 14px text. */
   --ds-danger-color: light-dark(var(--ds-red-for-blood), var(--ds-tuned-red));
+  /* Text that asks for care before something goes wrong. Orange is too light
+     for text on light paper and so is its dark-mode version, so light paper
+     takes Orange's dim (#4c3f1a, its pastel in dark mode); dark paper takes
+     Orange itself. Both read above 4.5:1 as 14px text. */
+  --ds-warning-color: light-dark(#4c3f1a, var(--ds-orange));
   --ds-border-color: light-dark(#d8d8d8, #3d3d3d);
   --ds-fill: light-dark(var(--ds-slate-light), var(--ds-slate-dark));
   --ds-fill-hover: light-dark(#e2e2e2, #404040);
