@@ -18,6 +18,9 @@
     "Password": "Password",
     "Nothing here yet": "Nothing here yet",
     "Loading": "Loading",
+    "{value} of {max}": "{value} of {max}",
+    "{value} of {max}, over by {over}": "{value} of {max}, over by {over}",
+    "Failed": "Failed",
     "Today": "Today",
     "Yesterday": "Yesterday",
     "Tomorrow": "Tomorrow",
@@ -81,6 +84,13 @@
     "Saved": "Saved",
     "Saving…": "Saving…",
     "Untitled": "Untitled",
-    "Account": "Account"
+    "Account": "Account",
+    "Carousel": "Carousel",
+    "Slide": "Slide",
+    "Slides": "Slides",
+    "Slide {index}": "Slide {index}",
+    "{index} of {count}": "{index} of {count}",
+    "Previous slide": "Previous slide",
+    "Next slide": "Next slide"
   }
 }

@@ -59,6 +59,12 @@ sample.addEventListener('ds-banner-action', event => {
   output.textContent = `ds-banner-action: ${(event as CustomEvent).detail.action}`;
 });
 for (const name of ['ds-banner-dismiss', 'ds-notice-dismiss']) sample.addEventListener(name, () => { output.textContent = name; });
+sample.addEventListener('select', event => {
+  if ((event.target as HTMLElement).localName === 'ds-pagedots') output.textContent = `select: ${(event as CustomEvent).detail.index}`;
+});
+sample.addEventListener('change', event => {
+  if ((event.target as HTMLElement).localName === 'ds-carousel') output.textContent = `change: ${(event as CustomEvent).detail.index}`;
+});
 sample.addEventListener('form-invalid', () => { output.textContent = 'form-invalid: fill in the required field.'; });
 for (const name of ['change', 'press']) sample.addEventListener(name, event => {
   if (((event.target as HTMLElement).localName === 'ds-split' || (event.target as HTMLElement).matches('ds-button[split]')))

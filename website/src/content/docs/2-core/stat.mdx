@@ -1,0 +1,106 @@
+---
+title: Stat
+description: A figure with its label and a line for its change or caption, written in the reader's language.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+A stat shows one figure: what it is on a line above it, the figure itself on two squares, and under it a line for how it has changed or what it is measured against. The figure is written by [Formatting](/1-root/formatting/) in the current language, as a number, a short number, a percentage or money, in tabular numerals so figures in a row line up. Stats stand on the paper with no box; a group of them stands on whole squares.
+
+For a value against a target, put a [Meter](/2-core/meter/) between the figure and the caption. For many figures in rows and columns, use a [Table](/3-unit/table/).
+
+## Try it
+
+<ComponentExample example="stat" />
+
+## Use it
+
+```html
+<div class="ds-stats">
+  <ds-stat label="Members" value="12840"></ds-stat>
+  <ds-stat label="Revenue" value="1234.5" format="money" currency="EUR"
+    change="0.12" change-format="percent" caption="Since last month"></ds-stat>
+  <ds-stat label="Over budget" value="18200" format="money" currency="JPY" tone="danger">
+    <ds-meter label="Spent" value="118200" max="100000" format="money" currency="JPY"></ds-meter>
+    <span slot="caption">Of ¥100,000 planned</span>
+  </ds-stat>
+</div>
+```
+
+| `format` | `value` | Shows (English) |
+| --- | --- | --- |
+| `number` (the default) | `12840` | 12,840 |
+| `compact` | `12840` | 12.8K |
+| `percent` | `0.25` (a fraction) | 25% |
+| `money`, with `currency` | `1234.5` | €1,234.50; with `minor`, `123450` is the same; with `whole`, €1,235 |
+
+`digits` fixes the decimals. Where there is no figure to show, `figure` gives words in its place ("Incomplete", "No budget yet"). `label`, `figure` and `caption` are translation keys unless `literal` is set, and the figure follows a language change.
+
+## Change and tone
+
+`change` is written with its sign, in the value's format or `change-format`, with an `up` or `down` icon before it, at the start of the caption line: `+12% Since last month`. The change is in the text colour and the caption muted. Whether a rise is good depends on the figure, so colour is the page's call: `change-tone="danger"` or `"warning"` colours the change, and `tone` the figure itself, such as an amount over budget.
+
+## A group of stats
+
+`.ds-stats` lays stats out on whole squares: columns eight squares wide (`--ds-stats-width`, in squares), one square between them and between rows, as many to a row as fit, and one column as wide as the group where it is narrower than eight. It works around `ds-stat` elements and `.ds-stat` blocks alike, and on a list (`<ul class="ds-stats">`).
+
+## Faces without tabular numerals
+
+The figure is set in the medium face with tabular numerals. A product that sets figures in a face whose digits differ in width, a dot-matrix face whose 1 is narrower, say, gives the stat `cells`: every digit is drawn in a cell of one width (`--ds-stat-digit`, the face's zero by default), and the figure is still read once, whole. `--ds-stat-typeface` names the face; `--ds-stat-size` (20px) and `--ds-stat-lines` (2) set a larger figure, on whole squares, before the scale.
+
+## API
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `label` | string | Empty | What the figure is, on the first line. |
+| `value` | number | None | The figure. |
+| `figure` | string | Empty | Words in place of the value. |
+| `format` | `number`, `compact`, `percent`, `money` | `number` | How the value is written. |
+| `currency` | string | None | The ISO 4217 code for money. |
+| `minor`, `whole` | boolean | `false` | Money in minor units; money in whole units. |
+| `digits` | number | The format's | Decimals, at least and at most. |
+| `change` | number | None | The change, signed, with an icon. |
+| `change-format` | as `format` | The value's | How the change is written. |
+| `change-tone` | `danger`, `warning` | None | The change in that colour. |
+| `caption` | string | Empty | The line under the figure. |
+| `icon` | string | None | An icon from the [library](/2-core/icon/) on its own square before the label. |
+| `tone` | `danger`, `warning` | None | The figure in that colour. |
+| `cells` | boolean | `false` | Each digit in a cell of one width. |
+| `literal` | boolean | `false` | Show the words as written, never looked up. |
+
+| Slot | What it holds |
+| --- | --- |
+| `label`, `figure`, `caption` | The page's own content for that line. |
+| Default | Anything between the figure and the caption, such as a meter, as wide as the stat. |
+
+## Measures
+
+The label is one square, the figure two (20px in the medium face, as a display title), the caption one: a stat with a caption is four squares high, without one three. A meter between them adds its square. An icon stands on its own square before the label.
+
+## React
+
+```tsx
+import { Stat } from "@0001-labs/design-system-1/DS1/react/stat";
+
+<Stat label="Received" value={120000} format="money" currency="JPY" caption="Of ¥300,000 planned">
+  <Meter label="Received" value={120000} max={300000} format="money" currency="JPY" />
+</Stat>
+```
+
+`Stat` writes the label, the figure (already formatted, in `language` when a server names the request's) and the caption in the light DOM, so the server's HTML shows the figure. Register `ds-stat` in the browser before hydration.
+
+## Without JavaScript
+
+```html
+<ul class="ds-stats">
+  <li class="ds-stat">
+    <p class="ds-stat__label">Revenue</p>
+    <p class="ds-stat__figure">€1,234.50</p>
+    <p class="ds-stat__caption"><span class="ds-stat__change">+12%</span>Since last month</p>
+  </li>
+</ul>
+```
+
+`ds-stat--danger` and `--warning` colour the figure, `ds-stat__change--danger` and `--warning` the change, and `ds-stat__icon` holds an icon before the label. The page writes the figure itself, through `format.ts` where it can. From `figures.css`, which `controls.css` imports.
+
+[Meter](/2-core/meter/) · [Formatting](/1-root/formatting/) · [Table](/3-unit/table/)

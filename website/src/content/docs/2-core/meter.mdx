@@ -1,0 +1,76 @@
+---
+title: Meter
+description: How much of a range a value fills, one square high, as a bar or in squares, with an over state.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+A meter shows how much of a range a value fills: money spent of a budget, seats taken, a goal saved towards. It is one square high, drawn as a bar half a square high across its middle (as a chart's ratio is), or as the range in squares, one square each. A value past the end is over: the meter fills whole in the danger colour, and its words say by how much.
+
+A meter shows a measurement, not progress through a task that will finish; it takes no keys and no focus. For a sequence of steps, use [Steps](/2-core/steps/).
+
+## Try it
+
+<ComponentExample example="meter" />
+
+## Use it
+
+```html
+<ds-meter label="Spent" value="7400" max="10000" format="money" currency="DKK"></ds-meter>
+<ds-meter label="Seats" value="7" max="10" squares="10"></ds-meter>
+<ds-meter label="Spent" value="118" max="100"></ds-meter>
+```
+
+The element is `role="meter"` with `aria-valuenow`, `aria-valuemin`, `aria-valuemax` and `aria-valuetext`. `aria-valuenow` stays inside the range, as ARIA requires, so the words carry what the number cannot: "7 of 10", or "12 of 10, over by 2", in the shared words of the current language, the figures written as `format` says. `valuetext` gives words of the page's own, and `label` names the meter. `over` shows the over state whatever the value, where the page decides it.
+
+A native `<meter>` keeps its value inside its range and cannot say it is over, and its bar is drawn differently in each browser, so the meter is a `role="meter"` element instead.
+
+## In squares
+
+`squares="10"` draws the range as ten squares, each one square wide and drawn one pixel short, as an item on the grid is; as many are filled as the value fills, rounded. Choose a count that means something: ten tenths, the seats in a room. A meter draws at most a hundred.
+
+## API
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `value` | number | `0` | The value. |
+| `min`, `max` | number | `0`, `1` | The range. |
+| `squares` | number | None | Draw the range in this many squares instead of a bar. |
+| `over` | boolean | `false` | Show the over state whatever the value. |
+| `label` | string | None | The meter's name. |
+| `valuetext` | string | "7 of 10" | What the value says. |
+| `format`, `currency`, `minor`, `whole`, `digits` | | `number` | How the figures in the words are written, as for a [Stat](/2-core/stat/). |
+| `literal` | boolean | `false` | Show `label` and `valuetext` as written. |
+
+## Measures
+
+One square high. The bar is half a square high, a quarter of a square from the top, the filled part in the ink (`--ds-meter-color`) on the grey fill (`--ds-meter-track`); it grows with a transform, still for reduced motion. In squares, each square is one square wide and one pixel short. Over, everything is `--ds-danger-color`. The bar is as wide as its place; give it whole squares.
+
+## React
+
+```tsx
+import { Meter } from "@0001-labs/design-system-1/DS1/react/meter";
+
+<Meter label="Spent" value={spent} max={budget} format="money" currency="JPY" />
+```
+
+`Meter` puts the role and the values in the markup from the first render, on the server too.
+
+## Without JavaScript
+
+```html
+<span class="ds-meter" role="meter" aria-label="Spent" aria-valuenow="74" aria-valuemin="0" aria-valuemax="100"
+  aria-valuetext="74 of 100" style="--ds-meter-value: 0.74"><span class="ds-meter__fill"></span></span>
+
+<span class="ds-meter ds-meter--squares" role="meter" aria-valuenow="2" aria-valuemin="0" aria-valuemax="3" aria-valuetext="2 of 3">
+  <span class="ds-meter__square ds-meter__square--on"></span><span class="ds-meter__square ds-meter__square--on"></span><span class="ds-meter__square"></span>
+</span>
+```
+
+`ds-meter--over` fills it in the danger colour; the page writes its ARIA values and words. From `figures.css`, which `controls.css` imports.
+
+## Bars and charts
+
+A meter is one value against its range, on one line, in a row, a tile or a table cell. Several values against each other are [Chart](/2-core/chart/)'s bars (`ds-bars`), and two shares of a whole its ratio (`ds-ratio`).
+
+[Stat](/2-core/stat/) · [Chart](/2-core/chart/) · [Steps](/2-core/steps/)

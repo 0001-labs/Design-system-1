@@ -18,6 +18,9 @@
     "Password": "Password",
     "Nothing here yet": "Ancora niente qui",
     "Loading": "Caricamento",
+    "{value} of {max}": "{value} su {max}",
+    "{value} of {max}, over by {over}": "{value} su {max}, {over} in più",
+    "Failed": "Non riuscito",
     "Today": "Oggi",
     "Yesterday": "Ieri",
     "Tomorrow": "Domani",
@@ -81,6 +84,13 @@
     "Saved": "Salvato",
     "Saving…": "Salvataggio…",
     "Untitled": "Senza titolo",
-    "Account": "Account"
+    "Account": "Account",
+    "Carousel": "Carosello",
+    "Slide": "Slide",
+    "Slides": "Slide",
+    "Slide {index}": "Slide {index}",
+    "{index} of {count}": "{index} di {count}",
+    "Previous slide": "Slide precedente",
+    "Next slide": "Slide successiva"
   }
 }

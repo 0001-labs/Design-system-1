@@ -1,0 +1,131 @@
+---
+title: Carousel
+description: Slides side by side that snap sideways, one to a stop, with page dots and optional buttons.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+A carousel shows one thing several ways in the space of one: tall cards side by side, one in view and the next cut at the edge, or one slide at a time across the whole width. The slides snap sideways, one to a stop, under a finger, a trackpad or the keyboard, and a row of [page dots](/2-core/pagedots/) one square below says which slide you are on and takes you to any other. Previous and next buttons can stand beside the dots.
+
+Everything a carousel holds is in the page and reachable without it: never put the only copy of something important in a slide.
+
+## Try it
+
+<ComponentExample example="carousel" />
+
+<ComponentExample example="carousel-full" compact />
+
+## Use it
+
+```html
+<ds-carousel label="Colours" slide-width="12" buttons>
+  <figure>…</figure>
+  <figure>…</figure>
+  <figure>…</figure>
+</ds-carousel>
+```
+
+Each element inside is a slide. Name the carousel for what the slides show with `label`, a translation key or, with `literal`, the words as written.
+
+| Width | Slides |
+| --- | --- |
+| No `slide-width` | The carousel's own width, one at a time. |
+| `slide-width="12"` | Twelve squares each, as many in view as fit; the next one is cut at the edge. |
+
+`gap` sets the squares between slides, one by default and `0` for none. A slide is as tall as the tallest one.
+
+```js
+carousel.addEventListener("change", event => {
+  console.log(event.detail.index); // the slide a person moved to
+});
+carousel.current = 2; // goes there, smoothly unless the reader asks for less motion
+```
+
+`change` fires when a person moves to another slide: by swiping, scrolling, a dot or a button. Setting `current`, or calling `goTo()`, `next()` or `previous()`, moves the carousel without firing it.
+
+## Accessibility
+
+- The element is a region described as a carousel and named by `label`. Each slide is a group described as a slide and labelled "2 of 5", unless the page labels it.
+- The dots are a group of buttons, the current one marked `aria-current`; the arrow keys, Home and End move between them. The buttons are named "Previous slide" and "Next slide" and stop at the ends.
+- When the slide in view changes, a hidden live region says "3 of 5" politely.
+- The track is an ordinary scroller: swiping and trackpads move it, and so do the arrow keys where the browser lets a scroller take focus.
+- With reduced motion, a dot or a button jumps to its slide at once and the dots do not grow.
+- Previous and next point back and on along the reading direction, right to left too.
+
+All the words are the shared words, in every language.
+
+## No autoplay
+
+A carousel never moves on its own. A slide that leaves while someone reads it, or that moves the page under a screen reader, costs more than it shows; a moving carousel also needs a pause control, a stop on hover and on focus, and a live region that falls silent while it moves (WCAG 2.2.2). Everything in the system moves only because a person asked it to, so autoplay is not offered.
+
+## API
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `label` | string | The shared word "Carousel" | The region's name. |
+| `literal` | boolean | `false` | Show `label` as written, never looked up. |
+| `current` | number | `0` | The slide in view, from 0. |
+| `buttons` | boolean | `false` | Previous and next buttons beside the dots. |
+| `no-dots` | boolean | `false` | Leave the dots out. |
+| `end` | boolean | `false` | Draw the last dot as an end marker. |
+| `slide-width` | number | The carousel's width | Each slide's width in whole squares. |
+| `gap` | number | `1` | Whole squares between slides. |
+
+| Event | Detail | What it means |
+| --- | --- | --- |
+| `change` | `{ index, previous }` | A person moved to another slide. |
+
+| Part | What it is |
+| --- | --- |
+| `track` | The scroller holding the slides. |
+| `controls` | The row of buttons and dots. |
+| `previous`, `next` | The buttons. |
+| `dots` | The [page dots](/2-core/pagedots/). |
+
+## Measures
+
+Slides are the carousel's width or whole squares wide, a whole number of squares apart. The controls stand one square below the track, a row one square high starting at its edge: each button in a one-square cell (the icon button is one control high), each dot one square. A carousel of one slide has no controls. Snapping is mandatory, one slide to a stop.
+
+`--ds-carousel-slide` and `--ds-carousel-gap` hold the widths, for a product that sets them for a narrower screen, such as the column less two squares so the next slide shows at the edge.
+
+## React
+
+```tsx
+import { Carousel } from "@0001-labs/design-system-1/DS1/react/carousel";
+
+<Carousel label={t("Colours")} slideWidth={12} buttons onChange={index => setColour(index)}>
+  {colours.map(colour => <Card key={colour.key} colour={colour} />)}
+</Carousel>
+```
+
+`Carousel` renders `ds-carousel` with the slides in the light DOM and the region and its name in the markup, so the server's HTML is already a named region. `label` is shown as given. `dots={false}` leaves the dots out. Register `ds-carousel` in the browser before hydration.
+
+## Without JavaScript
+
+A page without Lit writes the same carousel with the classes in `carousel.css`, which `controls.css` imports. The slides snap without any script; the dots, the buttons and the announcement come from the carousel script.
+
+```html
+<section class="ds-carousel" aria-label="Colours" style="--ds-carousel-slide: calc(var(--ds-unit) * 12)">
+  <div class="ds-carousel__track">
+    <figure>…</figure>
+    <figure>…</figure>
+  </div>
+  <div class="ds-carousel__controls">
+    <button class="ds-button ds-button--icon ds-carousel__previous" type="button">
+      <span class="ds-icon ds-icon--large" style="--ds-icon: url(./ds1/icons/left.svg)" aria-hidden="true"></span>
+    </button>
+    <div class="ds-pagedots"></div>
+    <button class="ds-button ds-button--icon ds-carousel__next" type="button">
+      <span class="ds-icon ds-icon--large" style="--ds-icon: url(./ds1/icons/right.svg)" aria-hidden="true"></span>
+    </button>
+  </div>
+</section>
+<script type="module">
+  import { startCarousels } from "./ds1/0-face/carousel.js";
+  startCarousels();
+</script>
+```
+
+`startCarousels()` starts every `.ds-carousel` on the page with what the element does: the region and slide labels, a dot for each slide in the `.ds-pagedots` (`data-end` on it marks the end), the buttons' names and their stops at the ends, the keyboard, the polite announcement and `change` on the block. It needs no framework and imports nothing; Sync 1 copies it with the `root` export's `"modules": ["carousel"]`. The words read English, or the shared words in the page's language where the page loads the language module; `setCarouselWords()` gives the page's own.
+
+[Page dots](/2-core/pagedots/) · [Button](/2-core/button/) · [Icon](/2-core/icon/)
