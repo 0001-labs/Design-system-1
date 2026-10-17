@@ -31,6 +31,28 @@ test('the root export can leave the faces to the product and add controls and pa
   expect(() => files('root', { modules: ['nothing'] })).toThrow(/Unknown page script/);
 });
 
+test('every root page script travels with what it imports', () => {
+  const modules = ['grid', 'grid-fit', 'layout-inspector', 'scaling', 'theme', 'theme-bootstrap', 'tooltips'];
+  for (const name of modules) {
+    const copy = files('root', { styles: [], fonts: false, modules: [name] });
+    for (const [file, content] of Object.entries(copy)) {
+      for (const [, path] of String(content).matchAll(/(?:\bfrom\s*|\bimport\s*\(\s*|^\s*import\s*)["'](\.\/[^"']+)["']/gm)) {
+        const base = join('0-face', path!.slice(2));
+        expect([base, `${base}.ts`].some((candidate) => candidate in copy), `${name}: ${file} imports ${path}`).toBe(true);
+      }
+    }
+  }
+  expect(Object.keys(files('root', { styles: [], fonts: false, modules: ['theme'] }))).toEqual(['0-face/theme.ts', '0-face/theme-bootstrap.js', '0-face/preference-options.ts']);
+});
+
+test('scriptsTo puts the page scripts apart from the stylesheets', () => {
+  const copy = files('root', { styles: ['grid.css'], fonts: false, modules: ['scaling', 'tooltips'], scriptsTo: '../../src/ds1' });
+  expect(Object.keys(copy)).toEqual(['grid.css', '../../src/ds1/0-face/scaling.ts', '../../src/ds1/0-face/tooltips.ts']);
+  expect(Object.keys(files('root', { styles: [], fonts: false, modules: ['scaling'], scriptsTo: 'scripts' }))).toEqual(['scripts/0-face/scaling.ts']);
+  // Without it, one folder as before.
+  expect(Object.keys(files('root', { styles: [], fonts: false, modules: ['scaling'] }))).toEqual(['0-face/scaling.ts']);
+});
+
 test('bundled tokens are one stylesheet with no local imports left', () => {
   const copy = files('tokens', { nativeControls: true, bundle: true });
   expect(Object.keys(copy)).toEqual(['bundle.css']);
