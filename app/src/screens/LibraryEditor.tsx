@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import "../../../DS1/2-core/ds-button";
 import { Button } from "../../../DS1/react/button";
+import { LoadingIndicator } from "../../../DS1/react/loading";
 import "../../../DS1/2-core/ds-input";
 import { Input } from "../../../DS1/react/input";
 import "../../../DS1/2-core/ds-notice";
@@ -178,7 +179,7 @@ export function LibraryEditor({ libraryId }: { libraryId: string }) {
   if (library === undefined) {
     return (
       <main className="route-splash" data-testid="editor-loading">
-        <p>Loading…</p>
+        <LoadingIndicator label="Loading the library" />
       </main>
     );
   }
@@ -186,7 +187,7 @@ export function LibraryEditor({ libraryId }: { libraryId: string }) {
   if (library === null) {
     return (
       <main className="route-splash">
-        <p>That library does not exist.</p>
+        <p className="ds-text">That library does not exist.</p>
         <Button secondary onClick={() => navigate("/libraries")} type="button">
           Back to your libraries
         </Button>

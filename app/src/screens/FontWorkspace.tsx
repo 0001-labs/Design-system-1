@@ -1,13 +1,16 @@
 import { useAuthActions, useAuthToken } from '@convex-dev/auth/react';
 import { useConvexAuth } from 'convex/react';
-import { useEffect, useRef, useState, type ButtonHTMLAttributes, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import '../../../DS1/2-core/ds-button';
+import '../../../DS1/2-core/ds-cycle';
+import '../../../DS1/3-unit/ds-tabs';
 import '../../../DS1/2-core/ds-empty';
 import '../../../DS1/3-unit/ds-sidebar';
 import '../../../DS1/4-page/ds-page';
 import type { Sidebar, SidebarItem } from '../../../DS1/3-unit/ds-sidebar';
 import { Button } from '../../../DS1/react/button';
 import { Empty } from '../../../DS1/react/empty';
+import { LoadingIndicator } from '../../../DS1/react/loading';
 import { Page } from '../../../DS1/react/page';
 import '../../../DS1/1-root/controls.css';
 import { SignIn } from './SignIn';
@@ -15,9 +18,26 @@ import './font-workspace.css';
 
 type FontEntry = { id: string; name: string; detail: string; available: boolean; fileName?: string };
 const sizes = [20, 40, 60, 80, 100, 120];
+const spacings = [0, 1, 2, 3, 4];
 const alphabets = ['ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz', '0123456789', '.,:;!?—–“”‘’()[]{}@&', 'ÅÆØåæø'];
 function Control({ children, ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { children: ReactNode }) {
   return <Button secondary {...props}>{children}</Button>;
+}
+
+type CycleElement = HTMLElement & { values: string[]; value: string };
+/** Design system 1's cycle through the workspace's own values; each click moves to the next. */
+function Cycle({ setting, values, value, onChange }: { setting: string; values: string[]; value: string; onChange: (value: string) => void }) {
+  const cycle = useRef<CycleElement>(null);
+  const latest = useRef(onChange); latest.current = onChange;
+  useLayoutEffect(() => { if (cycle.current) { cycle.current.values = values; cycle.current.value = value; } });
+  useEffect(() => {
+    const element = cycle.current;
+    if (!element) return;
+    const change = (event: Event) => latest.current((event as CustomEvent<{ value: string }>).detail.value);
+    element.addEventListener('change', change);
+    return () => element.removeEventListener('change', change);
+  }, []);
+  return <ds-cycle ref={cycle} secondary data-setting={setting} />;
 }
 
 export function FontWorkspace() {
@@ -25,7 +45,7 @@ export function FontWorkspace() {
   useEffect(() => {
     document.title = 'Fonts · Design system 1';
   }, []);
-  if (isLoading) return <main className="fonts-status" role="status">Opening your fonts…</main>;
+  if (isLoading) return <main className="fonts-status"><LoadingIndicator label="Opening your fonts" /></main>;
   if (!isAuthenticated) return <div className="app-shell fonts-sign-in"><SignIn fontsOnly redirectTo="/fonts" /></div>;
   return <PrivateFonts />;
 }
@@ -143,9 +163,9 @@ function PrivateFonts() {
       <header slot="header" className="font-heading"><h2>{active?.name}</h2><span>{active?.detail}</span></header>
       <section className="font-desk" aria-label={active?.name}>
         <div className="font-toolbar">
-          <div role="group" aria-label="View"><Control aria-pressed={mode === 'specimen'} onClick={() => setMode('specimen')}>Specimen</Control><Control aria-pressed={mode === 'glyphs'} onClick={() => setMode('glyphs')}>Glyphs</Control></div>
-          <Control aria-label={`Size: ${size} pixels. Change size`} onClick={() => setSize(sizes[(sizes.indexOf(size) + 1) % sizes.length]!)}>{size} px</Control>
-          <Control aria-label={`Letter spacing: ${spacing} pixels. Change spacing`} onClick={() => setSpacing(n => n === 4 ? 0 : n + 1)}>Spacing {spacing}</Control>
+          <ds-tabs role="group" aria-label="View"><Button active={mode === 'specimen'} aria-pressed={mode === 'specimen'} onClick={() => setMode('specimen')}>Specimen</Button><Button active={mode === 'glyphs'} aria-pressed={mode === 'glyphs'} onClick={() => setMode('glyphs')}>Glyphs</Button></ds-tabs>
+          <Cycle setting="size" values={sizes.map(n => `Size ${n}`)} value={`Size ${size}`} onChange={value => setSize(Number(value.slice(5)))} />
+          <Cycle setting="spacing" values={spacings.map(n => `Spacing ${n}`)} value={`Spacing ${spacing}`} onChange={value => setSpacing(Number(value.slice(8)))} />
           <Control aria-pressed={dark} onClick={() => setDark(value => !value)}>Dark paper</Control>
           {selected === 'supernatural' && <><input ref={picker} className="font-file" type="file" accept=".woff2,.woff,.ttf,.otf" onChange={event => void openFont(event.target.files?.[0])} /><Control disabled={busy} onClick={() => picker.current?.click()}>Open font</Control>{local && <Control disabled={busy} onClick={() => void saveFont()}>Save font</Control>}</>}
         </div>

@@ -3,7 +3,6 @@ import {
   createElement,
   Fragment,
   type CSSProperties,
-  type PointerEvent as ReactPointerEvent,
   type ReactNode,
   useEffect,
   useMemo,
@@ -18,6 +17,16 @@ const paletteSuggestions = palette()
   .filter((colour) => !colour.ink)
   .flatMap((colour) => [colour.hex, colour.pastel]);
 import { readCustomProperty, replaceCustomProperty } from "./lib/cssText";
+import { ComponentTree, type TreeNode } from "./ComponentTree";
+import { SpacingHandle as DsSpacingHandle } from "../../DS1/react/spacing-handle";
+import "../../DS1/2-core/ds-button";
+import "../../DS1/2-core/ds-color";
+import "../../DS1/2-core/ds-composer";
+import "../../DS1/2-core/ds-input";
+import { Button } from "../../DS1/react/button";
+import { ColorInput } from "../../DS1/react/choice";
+import { Input } from "../../DS1/react/input";
+import { Composer, type TextHighlight } from "../../DS1/react/composer";
 
 type ComponentKind =
   | "a"
@@ -240,6 +249,20 @@ const componentLibrary: Array<{
     semantic: "<textarea>",
   },
 ];
+
+/** The library's tree: Button opens onto its families; each component row names the element it styles. */
+const componentTreeNodes: TreeNode[] = componentLibrary.map((item) =>
+  item.kind === "button"
+    ? {
+        id: "button",
+        label: item.label,
+        children: BUTTON_FAMILIES.map((family) => ({
+          id: `button:${family.key}`,
+          label: family.label,
+        })),
+      }
+    : { id: item.kind, label: item.label, meta: item.semantic },
+);
 
 const copyExamples: Record<
   ComponentKind,
@@ -600,9 +623,6 @@ const initialConfigs: ConfigByKind = {
 
 const SNAP_GRID = 4;
 const DRAG_THRESHOLD = 3;
-const CSS_EDITOR_LINE_HEIGHT = 20;
-const CSS_EDITOR_CHAR_WIDTH = 7.32;
-const CSS_EDITOR_PADDING = 20;
 const SPACING_KEYS = ["paddingX", "paddingY", "gap"] as const;
 
 const componentCssTargets: Record<ComponentKind, string> = {
@@ -707,10 +727,6 @@ function clampSpacing(value: number) {
 
 function clampBorder(value: number) {
   return Math.min(24, Math.max(0, value));
-}
-
-function snapSpacing(value: number) {
-  return clampSpacing(Math.round(value / SNAP_GRID) * SNAP_GRID);
 }
 
 function borderRuleMarker(kind: ComponentKind) {
@@ -922,6 +938,11 @@ function cssTextPosition(css: string, index: number) {
   };
 }
 
+/**
+ * A box-model handle on the preview: Design system 1's spacing handle (its
+ * slider role, pointer and keyboard controller and face), placed on the side
+ * it edits. Dragging away from the box grows the value.
+ */
 function SpacingHandle({
   axis,
   label,
@@ -940,114 +961,35 @@ function SpacingHandle({
   onCommit: (value: number) => void;
 }) {
   const [isDragging, setIsDragging] = useState(false);
-  const [liveValue, setLiveValue] = useState(value);
-  const cleanupRef = useRef<(() => void) | null>(null);
-
-  const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!event.isPrimary || event.button !== 0) return;
-
-    event.preventDefault();
-    event.stopPropagation();
-    cleanupRef.current?.();
-
-    const target = event.currentTarget;
-    const pointerId = event.pointerId;
-    const startPoint = axis === "x" ? event.clientX : event.clientY;
-    const startValue = value;
-    const direction = side === "left" || side === "top" ? -1 : 1;
-    let didDrag = false;
-    let latestValue = startValue;
-
-    const finish = (
-      finishEvent: PointerEvent,
-      reason: "pointerup" | "pointercancel" | "lostpointercapture",
-    ) => {
-      if (finishEvent.pointerId !== pointerId) return;
-      window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerup", onPointerUp);
-      window.removeEventListener("pointercancel", onPointerCancel);
-      target.removeEventListener("lostpointercapture", onLostCapture);
-      cleanupRef.current = null;
-      document.body.classList.remove("spacing-resize-x", "spacing-resize-y");
-      setIsDragging(false);
-
-      if (didDrag && reason === "pointerup") {
-        const committed =
-          layer === "border"
-            ? Math.round(clampBorder(latestValue))
-            : snapSpacing(latestValue);
-        setLiveValue(committed);
-        onPreview(committed);
-        onCommit(committed);
-      } else if (didDrag) {
-        setLiveValue(startValue);
-        onPreview(startValue);
-      }
-    };
-
-    const onMove = (moveEvent: PointerEvent) => {
-      if (moveEvent.pointerId !== pointerId) return;
-      const point = axis === "x" ? moveEvent.clientX : moveEvent.clientY;
-      const delta = (point - startPoint) * direction;
-      if (!didDrag && Math.abs(delta) < DRAG_THRESHOLD) return;
-
-      if (!didDrag) {
-        didDrag = true;
-        setIsDragging(true);
-        document.body.classList.add(
-          axis === "x" ? "spacing-resize-x" : "spacing-resize-y",
-        );
-      }
-
-      latestValue =
-        layer === "border"
-          ? clampBorder(startValue + delta)
-          : clampSpacing(startValue + delta);
-      setLiveValue(latestValue);
-      onPreview(latestValue);
-    };
-
-    const onPointerUp = (upEvent: PointerEvent) => finish(upEvent, "pointerup");
-    const onPointerCancel = (cancelEvent: PointerEvent) =>
-      finish(cancelEvent, "pointercancel");
-    const onLostCapture = (lostEvent: PointerEvent) =>
-      finish(lostEvent, "lostpointercapture");
-
-    window.addEventListener("pointermove", onMove);
-    window.addEventListener("pointerup", onPointerUp);
-    window.addEventListener("pointercancel", onPointerCancel);
-    target.addEventListener("lostpointercapture", onLostCapture);
-
-    try {
-      target.setPointerCapture(pointerId);
-    } catch {
-      // Window listeners keep the interaction working without pointer capture.
-    }
-
-    cleanupRef.current = () => {
-      window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerup", onPointerUp);
-      window.removeEventListener("pointercancel", onPointerCancel);
-      target.removeEventListener("lostpointercapture", onLostCapture);
-    };
-  };
+  const rounded = Math.round(value);
+  const border = layer === "border";
 
   return (
-    <div
-      aria-label={`${label}: ${Math.round(isDragging ? liveValue : value)} pixels`}
+    <DsSpacingHandle
+      axis={axis === "x" ? "horizontal" : "vertical"}
       className={`spacing-handle spacing-handle--${layer} spacing-handle--${side}${
         isDragging ? " is-dragging" : ""
       }`}
-      data-axis={axis}
-      onPointerDown={handlePointerDown}
-      role="slider"
-      tabIndex={0}
-    >
-      <span className="spacing-handle__line" />
-      <span className="spacing-handle__label">
-        {Math.round(isDragging ? liveValue : value)}
-      </span>
-    </div>
+      gain={side === "left" || side === "top" ? -1 : 1}
+      label={label}
+      max={border ? 24 : 96}
+      min={0}
+      onCommit={onCommit}
+      onEnd={() => {
+        setIsDragging(false);
+        document.body.classList.remove("spacing-resize-x", "spacing-resize-y");
+      }}
+      onPreview={onPreview}
+      onStart={(kind) => {
+        if (kind !== "pointer") return;
+        setIsDragging(true);
+        document.body.classList.add(axis === "x" ? "spacing-resize-x" : "spacing-resize-y");
+      }}
+      step={border ? 1 : SNAP_GRID}
+      threshold={DRAG_THRESHOLD}
+      value={rounded}
+      valueText={`${rounded} pixels`}
+    />
   );
 }
 
@@ -1302,7 +1244,6 @@ export function App({ initialCss, initialConfig, onDirty, headerSlot }: AppProps
     end: number;
     start: number;
   } | null>(null);
-  const [editorScroll, setEditorScroll] = useState({ left: 0, top: 0 });
   const [contentSize, setContentSize] = useState({ height: 0, width: 0 });
   const [hoverRegion, setHoverRegion] = useState<BoxRegion | null>(null);
   const cssEditorRef = useRef<HTMLTextAreaElement>(null);
@@ -1366,18 +1307,22 @@ export function App({ initialCss, initialConfig, onDirty, headerSlot }: AppProps
       const editor = cssEditorRef.current;
       if (!editor) return;
 
+      // The composer draws the code on one-square lines in the code face, so
+      // a position is its line times the line height and its column times the
+      // width of one character.
+      const style = getComputedStyle(editor);
+      const lineHeight = Number.parseFloat(style.lineHeight) || 20;
+      const context = document.createElement("canvas").getContext("2d");
+      if (context) context.font = `${style.fontSize} ${style.fontFamily}`;
+      const charWidth = context?.measureText("0").width || lineHeight / 2;
       editor.scrollTop = Math.max(
         0,
-        position.line * CSS_EDITOR_LINE_HEIGHT - editor.clientHeight * 0.3,
+        position.line * lineHeight - editor.clientHeight * 0.3,
       );
       editor.scrollLeft = Math.max(
         0,
-        position.column * CSS_EDITOR_CHAR_WIDTH - editor.clientWidth * 0.75,
+        position.column * charWidth - editor.clientWidth * 0.75,
       );
-      setEditorScroll({
-        left: editor.scrollLeft,
-        top: editor.scrollTop,
-      });
     });
   };
 
@@ -1562,62 +1507,24 @@ export function App({ initialCss, initialConfig, onDirty, headerSlot }: AppProps
     });
   };
 
-  const cssHighlightStyle = useMemo<CSSProperties | undefined>(() => {
-    if (!cssHighlight) return undefined;
-
-    const start = cssTextPosition(cssSource, cssHighlight.start);
-    const width = Math.max(
-      8,
-      (cssHighlight.end - cssHighlight.start) * CSS_EDITOR_CHAR_WIDTH,
-    );
-
-    return {
-      height: CSS_EDITOR_LINE_HEIGHT,
-      left:
-        CSS_EDITOR_PADDING +
-        start.column * CSS_EDITOR_CHAR_WIDTH -
-        editorScroll.left,
-      top:
-        CSS_EDITOR_PADDING +
-        start.line * CSS_EDITOR_LINE_HEIGHT -
-        editorScroll.top,
-      width,
-    };
-  }, [cssHighlight, cssSource, editorScroll]);
-
-  const cssColorSwatches = useMemo(() => {
-    const swatches: Array<{
-      color: string;
-      key: string;
-      left: number;
-      top: number;
-    }> = [];
+  /**
+   * The composer tints what changed last in the accent, and every colour token's
+   * value in its own colour, on the same text as the native field.
+   */
+  const cssHighlights = useMemo<TextHighlight[]>(() => {
+    const highlights: TextHighlight[] = cssHighlight ? [{ ...cssHighlight }] : [];
     const tokenColorPattern =
       /^\s*--[\w-]+:\s{3,}(#[\da-f]{6}(?:[\da-f]{2})?)\s*;/gim;
 
     for (const match of cssSource.matchAll(tokenColorPattern)) {
       const color = match[1];
       if (!color || match.index === undefined) continue;
-
-      const colorIndex = match.index + match[0].indexOf(color);
-      const position = cssTextPosition(cssSource, colorIndex);
-      swatches.push({
-        color,
-        key: `${colorIndex}-${color}`,
-        left:
-          CSS_EDITOR_PADDING +
-          (position.column - 2) * CSS_EDITOR_CHAR_WIDTH -
-          editorScroll.left,
-        top:
-          CSS_EDITOR_PADDING +
-          position.line * CSS_EDITOR_LINE_HEIGHT +
-          3 -
-          editorScroll.top,
-      });
+      const start = match.index + match[0].indexOf(color);
+      highlights.push({ color, end: start + color.length, start });
     }
 
-    return swatches;
-  }, [cssSource, editorScroll]);
+    return highlights;
+  }, [cssHighlight, cssSource]);
 
   const handleDefinitions = [
     {
@@ -1735,59 +1642,23 @@ export function App({ initialCss, initialConfig, onDirty, headerSlot }: AppProps
         <aside className="library-panel">
           <div className="library-scroll" data-ds-area="Components">
             <h2 className="app-panel-label">Components</h2>
-            <nav aria-label="Component library" className="component-tree">
-              {componentLibrary.map((item) =>
-                item.kind === "button" ? (
-                  <div className="component-tree__group" key={item.kind}>
-                    <span className="component-tree__group-label">
-                      {item.label}
-                    </span>
-                    <div className="component-tree__submenu">
-                      {BUTTON_FAMILIES.map((family) => (
-                        <button
-                          aria-current={
-                            selectedKind === "button" &&
-                            selectedButtonFamily === family.key
-                              ? "page"
-                              : undefined
-                          }
-                          className={
-                            selectedKind === "button" &&
-                            selectedButtonFamily === family.key
-                              ? "is-selected"
-                              : ""
-                          }
-                          data-semantic={family.semantic}
-                          key={family.key}
-                          onClick={() => {
-                            setSelectedButtonFamily(family.key);
-                            selectComponent("button");
-                          }}
-                          title={family.semantic}
-                          type="button"
-                        >
-                          {family.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <button
-                    aria-current={
-                      selectedKind === item.kind ? "page" : undefined
-                    }
-                    className={selectedKind === item.kind ? "is-selected" : ""}
-                    data-semantic={item.semantic}
-                    key={item.kind}
-                    onClick={() => selectComponent(item.kind)}
-                    title={item.semantic}
-                    type="button"
-                  >
-                    {item.label}
-                  </button>
-                ),
-              )}
-            </nav>
+            <ComponentTree
+              current={
+                selectedKind === "button"
+                  ? `button:${selectedButtonFamily}`
+                  : selectedKind
+              }
+              label="Component library"
+              nodes={componentTreeNodes}
+              onSelect={(id) => {
+                if (id.startsWith("button:")) {
+                  setSelectedButtonFamily(id.slice("button:".length) as ButtonFamily);
+                  selectComponent("button");
+                } else if (id !== "button") {
+                  selectComponent(id as ComponentKind);
+                }
+              }}
+            />
           </div>
 
           <div className="controls-panel" data-ds-area="Properties">
@@ -1799,20 +1670,20 @@ export function App({ initialCss, initialConfig, onDirty, headerSlot }: AppProps
                     aria-label="Example copy length"
                     className="copy-length-control"
                   >
-                    <button
+                    <Button
                       disabled={config.copyLength === "short"}
                       onClick={() => changeCopyLength(-1)}
-                      type="button"
+                      secondary
                     >
                       Shorter
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       disabled={config.copyLength === "long"}
                       onClick={() => changeCopyLength(1)}
-                      type="button"
+                      secondary
                     >
                       Longer
-                    </button>
+                    </Button>
                   </div>
                 </section>
               )}
@@ -1835,7 +1706,7 @@ export function App({ initialCss, initialConfig, onDirty, headerSlot }: AppProps
                 {supportsGap && (
                   <ControlField label="Content gap">
                     <div className="number-input">
-                      <input
+                      <Input
                         aria-label="Content gap px"
                         max="48"
                         min="0"
@@ -1858,11 +1729,11 @@ export function App({ initialCss, initialConfig, onDirty, headerSlot }: AppProps
                 <h2>Theme</h2>
                 <ControlField label="Accent">
                   <div className="color-input">
-                    <input
+                    <ColorInput
+                      aria-label="Accent"
                       data-testid="accent-input"
                       list="ds1-palette"
                       onChange={(event) => updateAccent(event.target.value)}
-                      type="color"
                       value={accent}
                     />
                     <datalist id="ds1-palette">
@@ -2128,34 +1999,16 @@ export function App({ initialCss, initialConfig, onDirty, headerSlot }: AppProps
       <section aria-label="Live CSS file" className="css-file-panel" data-ds-area="Stylesheet">
         <div className="app-panel-heading"><h2>Stylesheet</h2><span>Editable CSS</span></div>
         <div className="css-editor-shell">
-          {cssHighlightStyle && (
-            <span
-              aria-hidden="true"
-              className="css-editor-highlight"
-              style={cssHighlightStyle}
-            />
-          )}
-          {cssColorSwatches.map(({ color, key, left, top }) => (
-            <span
-              aria-hidden="true"
-              className="css-color-swatch"
-              key={key}
-              style={{ "--swatch-color": color, left, top } as CSSProperties}
-            />
-          ))}
-          <textarea
+          <Composer
             aria-label="Editable CSS source"
             data-testid="live-css-source"
+            highlights={cssHighlights}
             onChange={(event) => updateCanvasFromCss(event.target.value)}
-            onScroll={(event) =>
-              setEditorScroll({
-                left: event.currentTarget.scrollLeft,
-                top: event.currentTarget.scrollTop,
-              })
-            }
             ref={cssEditorRef}
             spellCheck={false}
             value={cssSource}
+            variant="plain"
+            wrap="off"
           />
         </div>
       </section>

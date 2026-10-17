@@ -37,8 +37,13 @@ describe('font workspace', () => {
     const specimen = host.querySelector('textarea')!;
     expect(specimen).not.toBeNull();
     const words = specimen.value;
+    // Size is Design system 1's cycle: its face is a shared button inside the cycle's shadow root.
+    const cycle = host.querySelector<HTMLElement & { updateComplete: Promise<unknown> }>('ds-cycle[data-setting="size"]')!;
+    await cycle.updateComplete;
+    const face = cycle.shadowRoot!.querySelector<HTMLElement & { updateComplete: Promise<unknown> }>('ds-button')!;
+    await face.updateComplete;
     for (const size of [60, 80, 100, 120, 20, 40]) {
-      await act(async () => (host.querySelector('button[aria-label^="Size:"]') as HTMLButtonElement).click());
+      await act(async () => { face.shadowRoot!.querySelector('button')!.click(); await cycle.updateComplete; });
       expect(specimen.style.fontSize).toContain(`${size}px`);
       expect(specimen.value).toBe(words);
     }

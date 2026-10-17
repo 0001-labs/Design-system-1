@@ -2,7 +2,10 @@ import { useAuthActions, useAuthToken } from '@convex-dev/auth/react';
 import { useConvexAuth } from 'convex/react';
 import { useEffect, useState } from 'react';
 import '../../../DS1/2-core/ds-button';
+import '../../../DS1/2-core/ds-notice';
 import { Button } from '../../../DS1/react/button';
+import { LoadingIndicator } from '../../../DS1/react/loading';
+import { Notice } from '../../../DS1/react/notice';
 import { SignIn } from './SignIn';
 import { ComponentAdoption } from './ComponentAdoption';
 
@@ -46,9 +49,9 @@ export function useOwnerSession(title: string) {
 /** The Worker independently gates the page, session bridge and every report read. */
 export function AdoptionDashboard() {
   const { isLoading, isAuthenticated, ready, error, leave } = useOwnerSession('Component adoption · Design system 1');
-  if (isLoading) return <main className="adoption" role="status">Checking your session…</main>;
+  if (isLoading) return <main className="adoption"><LoadingIndicator label="Checking your session" /></main>;
   if (!isAuthenticated) return <div className="app-shell"><SignIn dashboardOnly redirectTo="/reports/components" /></div>;
-  if (error) return <main className="adoption" role="alert"><p>{error}</p><Button secondary onClick={() => void leave()}>Sign out</Button></main>;
-  if (!ready) return <main className="adoption" role="status">Checking dashboard access…</main>;
+  if (error) return <main className="adoption"><Notice tone="danger" actions={<Button secondary onClick={() => void leave()}>Sign out</Button>}>{error}</Notice></main>;
+  if (!ready) return <main className="adoption"><LoadingIndicator label="Checking dashboard access" /></main>;
   return <ComponentAdoption onSignOut={leave} />;
 }

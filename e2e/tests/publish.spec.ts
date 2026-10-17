@@ -178,8 +178,8 @@ test.describe("publishing", () => {
     await waitForEdge();
     expect(await (await request.get(installUrl)).text()).toContain("#00aa00");
 
-    page.once("dialog", (dialog) => void dialog.accept());
     await page.getByTestId("rollback-1").click();
+    await page.getByRole("alertdialog").getByRole("button", { name: "Roll back" }).click();
     await expect(page.getByTestId("state-pill")).toContainText("v1", { timeout: 90_000 });
 
     await waitForEdge();

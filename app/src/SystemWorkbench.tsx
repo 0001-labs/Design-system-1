@@ -11,6 +11,12 @@ import { libraryTokenValues, setLibraryToken } from './lib/libraryTokens';
 import componentTokens from '../../DS1/1-root/component-tokens.css?raw';
 import componentMetrics from '../../DS1/1-root/component-metrics.css?raw';
 import './system-workbench.css';
+import { ComponentTree, type TreeNode } from './ComponentTree';
+import '../../DS1/2-core/ds-composer';
+import { Composer } from '../../DS1/react/composer';
+
+/** The public catalogue as a tree: each layer opens onto its components, each row naming its element. */
+const treeNodes: TreeNode[] = LAYERS.map(layer => ({ id: `layer-${layer.number}`, label: `${layer.number} ${layer.name}`, children: layer.entries.map(item => ({ id: item.href, label: item.name, meta: item.tag })) }));
 
 export type LibraryWorkbenchConfig = { schema: number; [key: string]: unknown };
 export const libraryTemplate = `/* Design system 1 component library */\n${componentMetrics}\n${componentTokens.replace(/^@import[^;]+;\s*/gm, '')}`;
@@ -82,12 +88,7 @@ export function SystemWorkbench({ initialCss, initialConfig, onDirty, headerSlot
     <div className="system-workbench-panes">
       <aside className="library-panel system-library-panel">
         <h2 className="app-panel-label">Components</h2>
-        <nav className="component-tree" aria-label="Component library">
-          {LAYERS.map(layer => <div key={layer.number}>
-            <h3 className="component-tree__group-label">{layer.number} {layer.name}</h3>
-            {layer.entries.map(item => <button key={item.href} type="button" className={selected === item.href ? 'is-selected' : ''} aria-current={selected === item.href ? 'page' : undefined} onClick={() => setSelected(item.href)}>{item.name}<small>{item.tag}</small></button>)}
-          </div>)}
-        </nav>
+        <ComponentTree label="Component library" nodes={treeNodes} current={selected} onSelect={id => { if (!id.startsWith('layer-')) setSelected(id); }} />
       </aside>
       <main className="system-workbench-preview">
         <div className="app-panel-heading"><h1>{entry.name}</h1><a className="system-workbench-docs" href={entry.href} target="_blank" rel="noreferrer">Documentation<ds-icon type="up-right" aria-hidden="true"></ds-icon></a></div>
@@ -107,7 +108,7 @@ export function SystemWorkbench({ initialCss, initialConfig, onDirty, headerSlot
     </div>
     <section aria-label="Live CSS file" className="css-file-panel">
       <div className="app-panel-heading"><h2>Stylesheet</h2><span>Editable CSS</span></div>
-      <div className="css-editor-shell"><textarea aria-label="Editable CSS source" data-testid="live-css-source" spellCheck={false} value={css} onChange={event => update(event.target.value)} /></div>
+      <div className="css-editor-shell"><Composer variant="plain" wrap="off" aria-label="Editable CSS source" data-testid="live-css-source" spellCheck={false} value={css} onChange={event => update(event.target.value)} /></div>
     </section>
   </div>;
 }

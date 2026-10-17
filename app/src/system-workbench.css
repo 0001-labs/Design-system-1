@@ -1,8 +1,5 @@
 .system-workbench-panes { display: grid; grid-template-columns: calc(12 * var(--site-unit)) minmax(0, 1fr) calc(20 * var(--site-unit)); min-height: calc(20 * var(--site-unit)); max-height: calc(32 * var(--site-unit)); }
 .system-workbench-panes > * { overflow: auto; min-width: 0; }
-.system-workbench .component-tree button { display: flex; justify-content: space-between; gap: var(--site-unit); }
-.system-workbench .component-tree small { font-size: calc(10px * var(--sf, 1)); color: var(--text-color); opacity: .6; }
-.system-workbench .component-tree__group-label { font-size: inherit; margin: 0; padding: calc(var(--site-unit) / 2) var(--site-unit); }
 .system-workbench-preview section { padding: var(--site-unit); }
 .system-workbench-preview section h2 { font-size: inherit; margin: 0 0 var(--site-unit); }
 .system-workbench-preview iframe { width: 100%; border: 0; background: transparent; }
@@ -15,8 +12,6 @@
    The catalogue now has one scrolling flow, with a heading above its sections. */
 .app-shell .system-workbench .system-library-panel { display: block; overflow: auto; }
 .system-workbench .system-library-panel > .app-panel-label { position: sticky; top: 0; z-index: 1; flex-shrink: 0; background: var(--workbench-panel); }
-.system-workbench .system-library-panel .component-tree { display: block; }
-.system-workbench .system-library-panel .component-tree > div { display: block; }
 .system-workbench .library-button-properties { padding: var(--site-unit) 0; }
 .system-workbench .library-button-properties > h2 { margin: 0; font-size: inherit; line-height: var(--site-unit); }
 .system-workbench .library-button-properties label { display: flex; align-items: center; justify-content: space-between; gap: var(--site-unit); }

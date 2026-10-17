@@ -3,10 +3,15 @@ import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 
 import { api } from "../../../convex/_generated/api";
+import "../../../DS1/2-core/ds-badge";
 import "../../../DS1/2-core/ds-button";
 import "../../../DS1/2-core/ds-empty";
 import "../../../DS1/2-core/ds-notice";
+import "../../../DS1/3-unit/ds-list";
+import "../../../DS1/3-unit/ds-row";
+import { Badge } from "../../../DS1/react/badge";
 import { Button } from "../../../DS1/react/button";
+import { LoadingIndicator } from "../../../DS1/react/loading";
 import { Empty } from "../../../DS1/react/empty";
 import { Notice } from "../../../DS1/react/notice";
 import { libraryTemplate } from "../SystemWorkbench";
@@ -68,7 +73,7 @@ export function LibraryList() {
   if (libraries === undefined) {
     return (
       <main className="dashboard" data-ds-area="Libraries" data-testid="library-list-loading">
-        <p>Loading your libraries…</p>
+        <LoadingIndicator label="Loading your libraries" />
       </main>
     );
   }
@@ -101,18 +106,18 @@ export function LibraryList() {
           site then loads it from one link.
         </Empty>
       ) : (
-        <ul className="library-grid">
+        <ds-list role="list" className="library-grid">
           {libraries.map((library) => (
-            <li key={library._id}>
+            <ds-row auto role="listitem" key={library._id}>
               <article className="library-card" data-ds-area="Library" data-testid="library-card">
                 <h2>
                   <Link to={`/l/${library._id}`}>{library.name}</Link>
                 </h2>
 
-                <p className="library-card__state" data-testid="state-pill" data-state={library.state}>
+                <Badge className="library-card__state" data-testid="state-pill" data-state={library.state}>
                   {STATE_LABEL[library.state] ?? library.state}
                   {library.publishedVersion === null ? null : ` · v${library.publishedVersion}`}
-                </p>
+                </Badge>
 
                 <dl>
                   <dt>Edited</dt>
@@ -121,9 +126,9 @@ export function LibraryList() {
                   <dd>{(library.draftBytes / 1024).toFixed(1)} KB</dd>
                 </dl>
               </article>
-            </li>
+            </ds-row>
           ))}
-        </ul>
+        </ds-list>
       )}
     </main>
   );

@@ -14,13 +14,6 @@
 [data-docs-embed] .workbench { height: 100dvh; }
 [data-docs-embed] .design-pane { border-color: var(--workbench-line); }
 [data-docs-embed] .library-panel { background: var(--workbench-panel); }
-[data-docs-embed] .component-tree,
-[data-docs-embed] .component-tree__submenu { border-color: var(--workbench-line); }
-[data-docs-embed] .component-tree button:hover { background: var(--docs-hover); }
-[data-docs-embed] .component-tree button.is-selected {
-  background: var(--docs-selected);
-  border-left-color: #dfff00;
-}
 
 [data-docs-embed] .controls-panel,
 [data-docs-embed] .workbench-header,
@@ -28,9 +21,6 @@
 [data-docs-embed] .library-card,
 [data-docs-embed] .publish-panel { background: var(--workbench-panel); }
 
-[data-docs-embed] .copy-length-control button,
-[data-docs-embed] .number-input,
-[data-docs-embed] .color-input,
 [data-docs-embed] .control-field > input,
 [data-docs-embed] .control-field > select,
 [data-docs-embed] .control-field > textarea,

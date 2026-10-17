@@ -1,6 +1,9 @@
 import { Fragment, useState } from "react";
 import type { AdoptionReport, IconAdoption as AppIcons, IconCell, IconKind, IconSite, IconStatus } from "../../../shared/component-adoption";
+import "../../../DS1/1-root/controls.css";
+import "../../../DS1/2-core/ds-button";
 import "../../../DS1/2-core/ds-icon";
+import "../../../DS1/3-unit/ds-tabs";
 
 type View = "all" | "differs" | "local";
 type Kind = "all" | IconKind;
@@ -74,18 +77,18 @@ export function IconMatrix({ report }: { report: AdoptionReport }) {
     <h2 id="icon-adoption-title">Icon adoption</h2>
     <p className="adoption-intro">One row per icon. One column per app. Numbers are places in the web source where an icon is named or drawn: {tally("shared")} draw the DS1 drawing, {tally("differs")} need it and {tally("local")} are local only.</p>
     <div className="adoption-controls">
-      <div className="adoption-views" role="group" aria-label="Icons to show">
-        {views.map(option => <ds-button key={option.id} control="host" choice active={view === option.id} aria-pressed={view === option.id} onClick={() => setView(option.id)}>{option.name}</ds-button>)}
-      </div>
-      <div className="adoption-views" role="group" aria-label="How the icon is drawn">
-        {[{ id: "all" as Kind, name: "Every kind" }, ...presentKinds].map(option => <ds-button key={option.id} control="host" choice active={kind === option.id} aria-pressed={kind === option.id} onClick={() => setKind(option.id)}>{option.name}</ds-button>)}
-      </div>
+      <ds-tabs className="adoption-views" role="group" aria-label="Icons to show" wrap>
+        {views.map(option => <ds-button key={option.id} control="host" active={view === option.id} aria-pressed={view === option.id} onClick={() => setView(option.id)}>{option.name}</ds-button>)}
+      </ds-tabs>
+      <ds-tabs className="adoption-views" role="group" aria-label="How the icon is drawn" wrap>
+        {[{ id: "all" as Kind, name: "Every kind" }, ...presentKinds].map(option => <ds-button key={option.id} control="host" active={kind === option.id} aria-pressed={kind === option.id} onClick={() => setKind(option.id)}>{option.name}</ds-button>)}
+      </ds-tabs>
     </div>
-    <div className="adoption-scroll" tabIndex={0} role="region" aria-label="Icon adoption matrix">
-      <table className="adoption-matrix" style={{ width: `calc(${apps.length + 12} * var(--report-unit))` }}>
+    <div className="adoption-scroll ds-table-scroll" tabIndex={0} role="region" aria-label="Icon adoption matrix">
+      <table className="adoption-matrix ds-table" data-sticky style={{ width: `calc(${apps.length + 12} * var(--report-unit))` }}>
         <caption className="adoption-sr">Icons by app. Counts are source sites{kind === "all" ? "" : `, ${kindName(kind)} only`}.</caption>
         <colgroup><col style={{ width: "calc(8 * var(--report-unit))" }} />{apps.map(app => <col key={app.id} style={{ width: "var(--report-unit)" }} />)}<col style={{ width: "calc(4 * var(--report-unit))" }} /></colgroup>
-        <thead><tr className="adoption-column-names"><th className="adoption-app-column" scope="col">Icon</th>{apps.map(app => <th key={app.id} scope="col"><span>{app.name}</span></th>)}<th className="adoption-total" scope="col">Total</th></tr></thead>
+        <thead><tr className="adoption-column-names"><th className="adoption-app-column" scope="col">Icon</th>{apps.map(app => <th key={app.id} scope="col"><span>{app.name}</span></th>)}<th className="adoption-total" scope="col" data-numeric>Total</th></tr></thead>
         <tbody>{groups.map(group => <Fragment key={group.name}>
           <tr className="adoption-app-group"><th colSpan={apps.length + 2} scope="rowgroup">{group.name}</th></tr>
           {group.rows.map(name => {
@@ -99,14 +102,14 @@ export function IconMatrix({ report }: { report: AdoptionReport }) {
                 const status = worst(sites, cell);
                 return <td key={app.id} className={statusClass[status]}><button type="button" aria-label={`${app.name}, ${name}: ${sites.length} sites, ${statusName[status].toLowerCase()}`} aria-pressed={selection?.app === app.id && selection.icon === name} onClick={() => setSelection({ app: app.id, icon: name })}>{sites.length || (cell.status === "differs" ? "≠" : "+")}</button></td>;
               })}
-              <td className="adoption-total">{apps.reduce((sum, app) => sum + counted(app.icons!.cells[name]).length, 0)}</td>
+              <td className="adoption-total" data-numeric>{apps.reduce((sum, app) => sum + counted(app.icons!.cells[name]).length, 0)}</td>
             </tr>;
           })}
         </Fragment>)}</tbody>
         {extraRows.length > 0 && <tfoot>{extraRows.map(extra => <tr key={extra.id}>
           <th className="adoption-app-column" scope="row">{extra.name}</th>
           {apps.map(app => { const n = extraCount(app.icons!, extra.id); return <td key={app.id} className={n ? extra.className : "empty"}>{n ? <button type="button" aria-label={`${app.name}, ${extra.name}: ${n} sites`} aria-pressed={selection?.app === app.id && selection.extra === extra.id} onClick={() => setSelection({ app: app.id, extra: extra.id })}>{n}</button> : "–"}</td>; })}
-          <td className="adoption-total">{apps.reduce((sum, app) => sum + extraCount(app.icons!, extra.id), 0)}</td>
+          <td className="adoption-total" data-numeric>{apps.reduce((sum, app) => sum + extraCount(app.icons!, extra.id), 0)}</td>
         </tr>)}</tfoot>}
       </table>
     </div>
@@ -120,7 +123,7 @@ export function IconMatrix({ report }: { report: AdoptionReport }) {
       <div className="adoption-detail-heading"><h2>{selectedApp.name} · {selection.icon ?? selectedExtra!.name}</h2><ds-button onClick={() => setSelection(null)}>Close details</ds-button></div>
       {selected ? <p>{selected.uses} sites. {drawsThroughMap ? copyText[selected.copy] : `${statusName[selected.status]}.`}{selected.ds1 ? ` It stands for DS1's ${selected.ds1}.` : ""}{drawsThroughMap && selectedApp.icons!.copy ? ` Icon map copy: ${selectedApp.icons!.copy}.` : ""}</p>
         : <p>{selectedSites.length} sites. {selectedExtra!.about}</p>}
-      {selectedSites.length ? <div className="adoption-evidence"><table><thead><tr><th>Source</th><th>Kind</th><th>Written as</th><th>Drawing</th><th>Status</th></tr></thead><tbody>{selectedSites.map((site, i) => <tr key={`${site.file}:${site.line}:${i}`}>
+      {selectedSites.length ? <div className="adoption-evidence"><table className="ds-table"><thead><tr><th>Source</th><th>Kind</th><th>Written as</th><th>Drawing</th><th>Status</th></tr></thead><tbody>{selectedSites.map((site, i) => <tr key={`${site.file}:${site.line}:${i}`}>
         <td><code>{site.file}:{site.line}</code></td><td>{kindName(siteKind(site))}</td><td><code>{site.name}</code></td><td>{site.drawing ? <code>{site.drawing}</code> : "–"}</td><td>{statusName[siteStatus(site, selected)]}</td>
       </tr>)}</tbody></table></div> : <p>Named in the app's copy only, not in its source.</p>}
     </section> : null}

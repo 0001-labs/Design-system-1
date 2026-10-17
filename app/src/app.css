@@ -186,87 +186,9 @@ button:not([data-preview-component]) {
   font-size: 8px;
 }
 
-.component-tree {
-  display: grid;
-  border-left: 2px solid #d2d4d5;
-}
-
-.component-tree button {
+/* The component trees are Design system 1's sidebar, filling the panel. */
+ds-sidebar.component-tree {
   width: 100%;
-  min-height: 36px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  border: 0;
-  border-left: 3px solid transparent;
-  padding: 0 14px;
-  background: transparent;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1;
-  text-align: left;
-}
-
-.component-tree button::after {
-  content: attr(data-semantic);
-  position: absolute;
-  right: 7px;
-  top: 50%;
-  z-index: 2;
-  border-radius: 3px;
-  padding: 4px 5px;
-  background: #171717;
-  color: #fff;
-  font:
-    8px/1 var(--typeface-mono),
-    monospace;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(-50%);
-  transition: opacity 100ms ease-out;
-  white-space: nowrap;
-}
-
-.component-tree button:hover::after,
-.component-tree button:focus-visible::after {
-  opacity: 1;
-}
-
-.component-tree button:hover {
-  background: #e4e7e8;
-}
-
-.component-tree button.is-selected {
-  border-left-color: #19b56b;
-  background: #d3d7da;
-  font-weight: 600;
-}
-
-.component-tree__group {
-  display: grid;
-}
-
-.component-tree__group-label {
-  min-height: 36px;
-  display: flex;
-  align-items: center;
-  padding: 0 14px;
-  color: var(--workbench-muted);
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.component-tree__submenu {
-  display: grid;
-  border-left: 1px solid #d2d4d5;
-  margin-left: 14px;
-}
-
-.component-tree__submenu button {
-  min-height: 32px;
-  padding-left: 18px;
-  font-size: 11px;
 }
 
 .story-workspace {
@@ -476,210 +398,58 @@ button:not([data-preview-component]) {
   gap: 14px;
 }
 
+/*
+ * Box-model handles: Design system 1's spacing handle (one square, its line
+ * drawn in --ds-handle-ink), placed on the side it edits. The line shows on
+ * hover, while its region is highlighted, and while it is dragged.
+ */
 .spacing-handle {
   position: absolute;
   z-index: 6;
-  display: grid;
-  place-items: center;
-  touch-action: none;
-  user-select: none;
+  --spacing-half: calc(10px * var(--ds-sf, 1));
+  --ds-handle-ink: transparent;
+  --ds-handle-label-paper: var(--spacing-handle-color);
+  --ds-handle-label-ink: var(--ds-slate);
 }
 
-.spacing-handle--top,
-.spacing-handle--bottom {
-  width: 22px;
-  height: 22px;
-  cursor: ns-resize;
-}
-
-.spacing-handle--padding.spacing-handle--top {
-  top: calc(var(--mg-top) + var(--bd-top) + var(--pad-y) / 2 - 11px);
-}
-
-.spacing-handle--padding.spacing-handle--bottom {
-  bottom: calc(
-    var(--mg-bottom) + var(--bd-bottom) + var(--pad-y) / 2 - 11px
-  );
-}
-
-.spacing-handle--left,
-.spacing-handle--right {
-  width: 22px;
-  height: 22px;
-  cursor: ew-resize;
-}
-
-.spacing-handle--padding.spacing-handle--left {
-  left: calc(var(--mg-left) + var(--bd-left) + var(--pad-x) / 2 - 11px);
-}
-
-.spacing-handle--padding.spacing-handle--right {
-  right: calc(
-    var(--mg-right) + var(--bd-right) + var(--pad-x) / 2 - 11px
-  );
-}
-
-.spacing-handle--border.spacing-handle--top {
-  top: calc(var(--mg-top) + var(--bd-top) / 2 - 11px);
-}
-
-.spacing-handle--border.spacing-handle--right {
-  right: calc(var(--mg-right) + var(--bd-right) / 2 - 11px);
-}
-
-.spacing-handle--border.spacing-handle--bottom {
-  bottom: calc(var(--mg-bottom) + var(--bd-bottom) / 2 - 11px);
-}
-
-.spacing-handle--border.spacing-handle--left {
-  left: calc(var(--mg-left) + var(--bd-left) / 2 - 11px);
-}
-
-.spacing-handle--margin.spacing-handle--top {
-  top: calc(var(--mg-top) / 2 - 11px);
-}
-
-.spacing-handle--margin.spacing-handle--right {
-  right: calc(var(--mg-right) / 2 - 11px);
-}
-
-.spacing-handle--margin.spacing-handle--bottom {
-  bottom: calc(var(--mg-bottom) / 2 - 11px);
-}
-
-.spacing-handle--margin.spacing-handle--left {
-  left: calc(var(--mg-left) / 2 - 11px);
-}
-
-.spacing-handle--top,
-.spacing-handle--bottom {
-  left: calc(50% - 11px);
-}
-
-.spacing-handle--left,
-.spacing-handle--right {
-  top: calc(50% - 11px);
-}
-
+.spacing-handle--padding.spacing-handle--top { top: calc(var(--mg-top) + var(--bd-top) + var(--pad-y) / 2 - var(--spacing-half)); }
+.spacing-handle--padding.spacing-handle--bottom { bottom: calc(var(--mg-bottom) + var(--bd-bottom) + var(--pad-y) / 2 - var(--spacing-half)); }
+.spacing-handle--padding.spacing-handle--left { left: calc(var(--mg-left) + var(--bd-left) + var(--pad-x) / 2 - var(--spacing-half)); }
+.spacing-handle--padding.spacing-handle--right { right: calc(var(--mg-right) + var(--bd-right) + var(--pad-x) / 2 - var(--spacing-half)); }
+.spacing-handle--border.spacing-handle--top { top: calc(var(--mg-top) + var(--bd-top) / 2 - var(--spacing-half)); }
+.spacing-handle--border.spacing-handle--right { right: calc(var(--mg-right) + var(--bd-right) / 2 - var(--spacing-half)); }
+.spacing-handle--border.spacing-handle--bottom { bottom: calc(var(--mg-bottom) + var(--bd-bottom) / 2 - var(--spacing-half)); }
+.spacing-handle--border.spacing-handle--left { left: calc(var(--mg-left) + var(--bd-left) / 2 - var(--spacing-half)); }
+.spacing-handle--margin.spacing-handle--top { top: calc(var(--mg-top) / 2 - var(--spacing-half)); }
+.spacing-handle--margin.spacing-handle--right { right: calc(var(--mg-right) / 2 - var(--spacing-half)); }
+.spacing-handle--margin.spacing-handle--bottom { bottom: calc(var(--mg-bottom) / 2 - var(--spacing-half)); }
+.spacing-handle--margin.spacing-handle--left { left: calc(var(--mg-left) / 2 - var(--spacing-half)); }
+.spacing-handle--top, .spacing-handle--bottom { left: calc(50% - var(--spacing-half)); }
+.spacing-handle--left, .spacing-handle--right { top: calc(50% - var(--spacing-half)); }
 .spacing-handle--padding.spacing-handle--top,
 .spacing-handle--padding.spacing-handle--bottom,
 .spacing-handle--border.spacing-handle--top,
-.spacing-handle--border.spacing-handle--bottom {
-  left: calc(
-    50% + (var(--mg-left) - var(--mg-right)) / 2 - 11px
-  );
-}
-
+.spacing-handle--border.spacing-handle--bottom { left: calc(50% + (var(--mg-left) - var(--mg-right)) / 2 - var(--spacing-half)); }
 .spacing-handle--padding.spacing-handle--left,
 .spacing-handle--padding.spacing-handle--right,
 .spacing-handle--border.spacing-handle--left,
-.spacing-handle--border.spacing-handle--right {
-  top: calc(
-    50% + (var(--mg-top) - var(--mg-bottom)) / 2 - 11px
-  );
+.spacing-handle--border.spacing-handle--right { top: calc(50% + (var(--mg-top) - var(--mg-bottom)) / 2 - var(--spacing-half)); }
+
+.component-selection:hover:not(:has(.spacing-handle--border:hover, .spacing-handle--margin:hover)) .spacing-handle--padding,
+.component-selection:has(.spacing-handle--border:hover) .spacing-handle--border,
+.component-selection:has(.spacing-handle--margin:hover) .spacing-handle--margin,
+.story-preview-area[data-hover-region="padding"] .spacing-handle--padding,
+.story-preview-area[data-hover-region="border"] .spacing-handle--border,
+.story-preview-area[data-hover-region="margin"] .spacing-handle--margin,
+.spacing-handle.is-dragging,
+.spacing-handle:focus-visible {
+  --ds-handle-ink: var(--spacing-handle-color);
 }
 
-.spacing-handle__line {
-  position: absolute;
-  opacity: 0;
-  transition: opacity 120ms ease-out;
-}
-
-.spacing-handle--top .spacing-handle__line,
-.spacing-handle--bottom .spacing-handle__line {
-  width: 20px;
-  height: 1px;
-  background: var(--workbench-handle);
-  outline: 1px solid #fff;
-}
-
-.spacing-handle--left .spacing-handle__line,
-.spacing-handle--right .spacing-handle__line {
-  width: 1px;
-  height: 20px;
-  background: var(--workbench-handle);
-  outline: 1px solid #fff;
-}
-
-.component-selection:hover:not(
-    :has(.spacing-handle--border:hover, .spacing-handle--margin:hover)
-  )
-  .spacing-handle--padding
-  .spacing-handle__line,
-.component-selection:has(.spacing-handle--border:hover)
-  .spacing-handle--border
-  .spacing-handle__line,
-.component-selection:has(.spacing-handle--margin:hover)
-  .spacing-handle--margin
-  .spacing-handle__line,
-.story-preview-area[data-hover-region="padding"]
-  .spacing-handle--padding
-  .spacing-handle__line,
-.story-preview-area[data-hover-region="border"]
-  .spacing-handle--border
-  .spacing-handle__line,
-.story-preview-area[data-hover-region="margin"]
-  .spacing-handle--margin
-  .spacing-handle__line,
-.spacing-handle.is-dragging .spacing-handle__line {
-  opacity: 1;
-}
-
-.spacing-handle--padding .spacing-handle__line {
-  background: var(--spacing-handle-color);
-}
-
-.spacing-handle--border .spacing-handle__line {
-  background: var(--spacing-handle-color);
-}
-
-.spacing-handle--margin .spacing-handle__line {
-  background: var(--spacing-handle-color);
-}
-
-.spacing-handle--padding {
-  --spacing-handle-color: #c3ce8c;
-}
-
-.spacing-handle--border {
-  --spacing-handle-color: #fcdd9b;
-}
-
-.spacing-handle--margin {
-  --spacing-handle-color: #f7cb9e;
-}
-
-.spacing-handle__label {
-  position: absolute;
-  display: none;
-  min-width: 28px;
-  border-radius: 4px;
-  padding: 4px 5px;
-  background: var(--spacing-handle-color);
-  box-shadow: 0 2px 6px rgb(0 0 0 / 28%);
-  color: #171717;
-  font: 600 12px/1 Inter, Arial, sans-serif;
-  font-variant-numeric: tabular-nums;
-  text-align: center;
-  white-space: nowrap;
-}
-
-.spacing-handle--top .spacing-handle__label,
-.spacing-handle--bottom .spacing-handle__label {
-  left: calc(50% + 13px);
-  top: calc(50% - 18px);
-}
-
-.spacing-handle--left .spacing-handle__label,
-.spacing-handle--right .spacing-handle__label {
-  left: calc(50% + 8px);
-  top: calc(50% - 22px);
-}
-
-.spacing-handle:hover .spacing-handle__label,
-.spacing-handle.is-dragging .spacing-handle__label {
-  display: block;
-}
+.spacing-handle--padding { --spacing-handle-color: #c3ce8c; }
+.spacing-handle--border { --spacing-handle-color: #fcdd9b; }
+.spacing-handle--margin { --spacing-handle-color: #f7cb9e; }
+.spacing-handle.is-dragging > .ds-spacing-label { display: block; }
 
 .story-preview-area:has(.spacing-handle.is-dragging)
   [data-preview-component] {
@@ -829,33 +599,21 @@ body.spacing-resize-y * {
   gap: 8px;
 }
 
+/* The content gap and accent are Design system 1's number field and colour field. */
 .number-input,
 .color-input {
-  display: grid;
+  display: flex;
   align-items: center;
-  border: 1px solid var(--workbench-line);
-  border-radius: 3px;
-  background: #fff;
+  gap: calc(var(--ds-unit) / 2);
 }
 
-.number-input {
-  grid-template-columns: 1fr 24px;
-}
-
-.number-input input {
-  width: 100%;
-  min-width: 0;
-  height: 30px;
-  border: 0;
-  padding: 0 7px;
-  background: transparent;
-  outline: none;
-  font-size: 9px;
+.number-input ds-input {
+  width: calc(4 * var(--ds-unit));
 }
 
 .number-input span {
-  color: var(--workbench-muted);
-  font-size: 8px;
+  color: var(--ds-text-color-muted);
+  font-size: var(--ds-type-size-small);
 }
 
 .controls-note {
@@ -882,47 +640,12 @@ body.spacing-resize-y * {
 }
 
 .copy-length-control {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-}
-
-.copy-length-control button {
-  min-height: 27px;
-  border: 1px solid var(--workbench-line);
-  border-radius: 3px;
-  background: #fff;
-  color: var(--workbench-ink);
-  cursor: pointer;
-  font-size: 8px;
-}
-
-.copy-length-control button:hover:not(:disabled) {
-  border-color: var(--workbench-ink);
-}
-
-.copy-length-control button:disabled {
-  color: #aaa;
-  cursor: not-allowed;
-}
-
-.color-input {
-  grid-template-columns: 34px 1fr;
-  padding: 3px;
-}
-
-.color-input input {
-  width: 28px;
-  height: 24px;
-  border: 0;
-  padding: 0;
-  background: transparent;
+  display: flex;
+  gap: calc(var(--ds-unit) / 2);
 }
 
 .color-input code {
-  font:
-    8px var(--typeface-mono),
-    monospace;
+  font: var(--ds-type-size-small) / var(--ds-unit) var(--ds-typeface-mono);
 }
 
 .box-model {
@@ -1336,63 +1059,32 @@ body.box-value-scrubbing * {
   min-width: 0;
   min-height: 0;
   grid-area: code;
-  background: #202020;
-  color: #e9e9e9;
+  background: var(--ds-slate);
+  color: var(--ds-slate-light);
 }
 
+/*
+ * The stylesheet is a plain Design system 1 composer on the ink: code in the
+ * code face on one-square lines, its highlights drawn by the composer.
+ */
 .css-editor-shell {
   width: 100%;
   height: 100%;
   position: relative;
   overflow: hidden;
-  background: #202020;
+  box-sizing: border-box;
+  padding: var(--ds-unit);
+  background: var(--ds-slate);
 }
 
-.css-editor-highlight {
-  position: absolute;
-  z-index: 0;
-  border-radius: 2px;
-  background: #875d2a;
-  box-shadow: 0 0 0 1px #b07835;
-  pointer-events: none;
-}
-
-.css-color-swatch {
-  width: 10px;
-  height: 10px;
-  position: absolute;
-  z-index: 2;
-  border: 1px solid #050505;
-  background: var(--swatch-color);
-  box-shadow: 0 0 0 1px rgb(255 255 255 / 18%);
-  pointer-events: none;
-}
-
-.css-editor-shell textarea {
-  width: 100%;
+.css-editor-shell ds-composer {
   height: 100%;
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  overflow: auto;
-  margin: 0;
-  border: 0;
-  padding: 14px;
-  resize: none;
-  background: transparent;
-  color: #d7d7d7;
-  caret-color: #fff;
-  outline: none;
-  font:
-    10px/16px var(--typeface-mono),
-    monospace;
-  tab-size: 2;
-  white-space: pre;
-}
-
-.css-editor-shell textarea::selection {
-  background: #745026;
-  color: #fff;
+  --composer-height: 100%;
+  --ds-typeface-regular: var(--ds-typeface-mono);
+  --ds-text-size: 13px;
+  --ds-text-leading: 20px;
+  --ds-text-tracking: 0px;
+  --ds-text-color: var(--ds-slate-light);
 }
 
 .export-backdrop {
@@ -1698,7 +1390,11 @@ body.box-value-scrubbing * {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 12px;
-  list-style: none;
+}
+
+.library-grid > ds-row > .library-card {
+  flex: 1;
+  min-width: 0;
 }
 
 .library-card {
@@ -1727,29 +1423,24 @@ body.box-value-scrubbing * {
   text-underline-offset: 0.2em;
 }
 
+/* A library's state is Design system 1's badge, coloured only where the state means something. */
 .library-card__state {
   justify-self: start;
-  margin: 0;
-  border: 1px solid var(--workbench-line);
-  border-radius: 999px;
-  padding: 2px 8px;
-  font-size: 10px;
-  color: var(--workbench-muted);
 }
 
-.library-card__state[data-state="published"] {
-  border-color: #43a52e;
-  color: #2f7420;
+.library-card__state[data-state="published"],
+.version-live {
+  --ds-badge-background: var(--ds-apple-green);
+  --ds-badge-color: var(--ds-slate);
 }
 
 .library-card__state[data-state="unpublished-changes"] {
-  border-color: var(--workbench-handle);
-  color: var(--workbench-handle);
+  --ds-badge-background: var(--ds-orange);
+  --ds-badge-color: var(--ds-slate);
 }
 
 .library-card__state[data-state="failed-validation"] {
-  border-color: #900b09;
-  color: #900b09;
+  --ds-badge-color: var(--ds-danger-color);
 }
 
 .library-card dl {
@@ -1841,124 +1532,54 @@ body.box-value-scrubbing * {
 
 /* Publish panel ------------------------------------------------------------ */
 
+/*
+ * The publish panel is Design system 1's panel: a header row, then blocks one
+ * square apart on the paper. Lists are its rows.
+ */
 .publish-panel {
   flex-basis: 100%;
-  display: grid;
-  gap: 16px;
   max-height: 62vh;
   overflow: auto;
-  border-top: 1px solid var(--workbench-line);
-  padding: 16px 0;
-  font-size: 12px;
+  border-top: 1px solid var(--ds-border-color);
+  padding: var(--ds-unit) 0;
 }
 
-.publish-panel header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.publish-panel > ds-row[slot="header"] {
+  margin-bottom: var(--ds-unit);
 }
 
-.publish-panel h2 {
+.publish-panel :is(h2, h3, p) {
   margin: 0;
-  font-size: 14px;
-  font-weight: 500;
 }
 
-.publish-panel h3 {
-  margin: 0 0 6px;
-  color: var(--workbench-muted);
-  font-size: 10px;
-  font-weight: 500;
+.publish-panel > :not([slot]) + :not([slot]) {
+  margin-top: var(--ds-unit);
 }
 
-.publish-panel section {
-  display: grid;
-  justify-items: start;
-  gap: 6px;
-}
-
-.publish-panel p {
-  margin: 0;
-  color: var(--workbench-muted);
+.publish-panel section > * + * {
+  margin-top: calc(var(--ds-unit) / 2);
 }
 
 .publish-panel pre {
+  box-sizing: border-box;
   width: 100%;
   overflow-x: auto;
   margin: 0;
-  border: 1px solid var(--workbench-line);
-  border-radius: 3px;
-  padding: 10px;
-  background: #fff;
-  font-size: 11px;
+  padding: 0 calc(4px * var(--ds-sf));
+  background: var(--ds-fill);
+  font: var(--ds-type-size-small) / var(--ds-unit) var(--ds-typeface-mono);
 }
 
-.publish-issues ul,
-.version-list,
-.event-list {
-  display: grid;
-  gap: 6px;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.publish-issues li {
-  border-left: 2px solid #900b09;
-  padding: 4px 0 4px 10px;
+.publish-issues ds-row {
+  padding-bottom: calc(var(--ds-unit) / 2);
 }
 
 .publish-issues code {
-  color: #900b09;
-  font-size: 10px;
+  color: var(--ds-danger-color);
+  font-family: var(--ds-typeface-mono);
 }
 
-.publish-issues span {
-  color: var(--workbench-muted);
-  font-size: 10px;
+.version-list > ds-row {
+  border-bottom: 1px solid var(--ds-border-color);
 }
 
-.publish-issues p {
-  margin: 2px 0 0;
-  color: var(--workbench-ink);
-}
-
-.publish-issues small {
-  color: var(--workbench-muted);
-  font-size: 10px;
-  word-break: break-all;
-}
-
-.version-list li {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  border-bottom: 1px solid var(--workbench-line);
-  padding-bottom: 6px;
-}
-
-.version-list div {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-}
-
-.version-list small {
-  color: var(--workbench-muted);
-  font-size: 10px;
-}
-
-.version-live {
-  border: 1px solid #43a52e;
-  border-radius: 999px;
-  padding: 1px 6px;
-  color: #2f7420;
-  font-size: 9px;
-}
-
-.event-list li {
-  color: #900b09;
-  font-size: 10px;
-}

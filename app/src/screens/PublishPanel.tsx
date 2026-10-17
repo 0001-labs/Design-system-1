@@ -3,11 +3,19 @@ import { useAction, useQuery } from "convex/react";
 import { useMemo, useState } from "react";
 
 import { api } from "../../../convex/_generated/api";
+import "../../../DS1/1-root/controls.css";
+import "../../../DS1/2-core/ds-badge";
 import "../../../DS1/2-core/ds-button";
 import "../../../DS1/2-core/ds-empty";
 import "../../../DS1/2-core/ds-notice";
+import "../../../DS1/3-unit/ds-list";
+import "../../../DS1/3-unit/ds-row";
+import "../../../DS1/4-page/ds-panel";
+import { confirm, copyText } from "../../../DS1/0-face/feedback";
+import { Badge } from "../../../DS1/react/badge";
 import { Button } from "../../../DS1/react/button";
 import { Empty } from "../../../DS1/react/empty";
+import { LoadingIndicator } from "../../../DS1/react/loading";
 import { Notice } from "../../../DS1/react/notice";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { downloadCss } from "../lib/download";
@@ -55,7 +63,6 @@ export function PublishPanel(props: Props) {
 
   const [stage, setStage] = useState<Stage>("idle");
   const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
 
   /**
    * Client-side validation is advisory — the deployment re-runs it and is
@@ -92,40 +99,44 @@ export function PublishPanel(props: Props) {
     }
   }
 
-  async function onCopy() {
-    if (!snippet) return;
-    await navigator.clipboard.writeText(snippet);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1400);
+  async function onRollback(version: number) {
+    const sure = await confirm({
+      title: `Roll back to v${version}?`,
+      text: "The live stylesheet goes back to this version. Every version stays published at its own address.",
+      confirm: "Roll back",
+    });
+    if (!sure) return;
+    void rollback({ id: props.libraryId as Id<"libraries">, version });
   }
 
   return (
-    <aside className="publish-panel" data-testid="publish-panel">
-      <header>
-        <h2>Publish</h2>
+    <ds-panel className="publish-panel" data-testid="publish-panel">
+      <ds-row slot="header" fill>
+        <h2 className="ds-text ds-text--heading">Publish</h2>
         <Button secondary onClick={props.onClose} type="button">
           Close
         </Button>
-      </header>
+      </ds-row>
 
-      <p className="library-card__state" data-state={props.state} data-testid="state-pill">
+      <Badge className="library-card__state" data-state={props.state} data-testid="state-pill">
         {STATE_LABEL[props.state] ?? props.state}
         {props.publishedVersion !== null ? ` · v${props.publishedVersion}` : ""}
-      </p>
+      </Badge>
 
       {blocking.length > 0 ? (
         <section className="publish-issues">
-          <h3>{blocking.length === 1 ? "1 problem" : `${blocking.length} problems`}</h3>
-          <ul>
+          <h3 className="ds-text ds-text--danger">{blocking.length === 1 ? "1 problem" : `${blocking.length} problems`}</h3>
+          <ds-list role="list">
             {blocking.map((issue, index) => (
-              <li data-testid="validation-issue" key={`${issue.code}-${index}`}>
-                <code>{issue.code}</code>
-                {issue.line !== undefined ? <span> line {issue.line}</span> : null}
-                <p>{issue.message}</p>
-                {issue.detail ? <small>{issue.detail}</small> : null}
-              </li>
+              <ds-row auto role="listitem" data-testid="validation-issue" key={`${issue.code}-${index}`}>
+                <div>
+                  <p className="ds-text ds-text--small"><code>{issue.code}</code>{issue.line !== undefined ? <span className="ds-text--muted"> line {issue.line}</span> : null}</p>
+                  <p className="ds-text">{issue.message}</p>
+                  {issue.detail ? <p className="ds-text ds-text--small ds-text--muted">{issue.detail}</p> : null}
+                </div>
+              </ds-row>
             ))}
-          </ul>
+          </ds-list>
         </section>
       ) : null}
 
@@ -146,12 +157,12 @@ export function PublishPanel(props: Props) {
       </Button>
 
       <section>
-        <h3>Install</h3>
+        <h3 className="ds-text ds-text--muted">Install</h3>
         {snippet ? (
           <>
             <pre data-testid="install-snippet">{snippet}</pre>
-            <Button secondary data-testid="install-link" onClick={() => void onCopy()} type="button">
-              {copied ? "Copied" : "Copy install link"}
+            <Button secondary data-testid="install-link" onClick={() => void copyText(snippet)} type="button">
+              Copy install link
             </Button>
           </>
         ) : (
@@ -161,81 +172,78 @@ export function PublishPanel(props: Props) {
       </section>
 
       <section>
-        <h3>Download</h3>
-        <Button
-          secondary
-          onClick={() => downloadCss(props.css, `${props.slug}-draft.css`)}
-          type="button"
-        >
-          Download draft
-        </Button>
-        {props.installUrl ? (
+        <h3 className="ds-text ds-text--muted">Download</h3>
+        <ds-row>
           <Button
             secondary
-            onClick={() => {
-              // Fetched from the public URL, so it is byte-identical to what
-              // customers receive rather than to what the editor happens to hold.
-              void fetch(props.installUrl!)
-                .then((response) => response.text())
-                .then((text) => downloadCss(text, `${props.slug}-v${props.publishedVersion}.css`));
-            }}
+            onClick={() => downloadCss(props.css, `${props.slug}-draft.css`)}
             type="button"
           >
-            Download published
+            Download draft
           </Button>
-        ) : null}
+          {props.installUrl ? (
+            <Button
+              secondary
+              onClick={() => {
+                // Fetched from the public URL, so it is byte-identical to what
+                // customers receive rather than to what the editor happens to hold.
+                void fetch(props.installUrl!)
+                  .then((response) => response.text())
+                  .then((text) => downloadCss(text, `${props.slug}-v${props.publishedVersion}.css`));
+              }}
+              type="button"
+            >
+              Download published
+            </Button>
+          ) : null}
+        </ds-row>
       </section>
 
       <section>
-        <h3>History</h3>
+        <h3 className="ds-text ds-text--muted">History</h3>
         {history === undefined ? (
-          <p>Loading…</p>
+          <LoadingIndicator label="Loading the history" />
         ) : history.versions.length === 0 ? (
           <Empty heading="Nothing published yet" text="Each version you publish is listed here." />
         ) : (
-          <ol className="version-list" data-testid="version-list">
+          <ds-list role="list" className="version-list" data-testid="version-list">
             {history.versions.map((version) => (
-              <li key={version.version}>
-                <div>
-                  <strong>v{version.version}</strong>
-                  {version.isLive ? <span className="version-live">Live</span> : null}
-                  <small>{version.byteSize} bytes</small>
-                </div>
+              <ds-row fill role="listitem" key={version.version}>
+                <ds-row>
+                  <strong className="ds-text ds-text--strong">v{version.version}</strong>
+                  {version.isLive ? <Badge className="version-live">Live</Badge> : null}
+                  <span className="ds-text ds-text--small ds-text--muted">{version.byteSize} bytes</span>
+                </ds-row>
                 {!version.isLive && version.status === "published" ? (
                   <Button
                     secondary
                     data-testid={`rollback-${version.version}`}
-                    onClick={() => {
-                      if (!confirm(`Roll the live stylesheet back to v${version.version}?`)) return;
-                      void rollback({
-                        id: props.libraryId as Id<"libraries">,
-                        version: version.version,
-                      });
-                    }}
+                    onClick={() => void onRollback(version.version)}
                     type="button"
                   >
                     Roll back
                   </Button>
                 ) : null}
-              </li>
+              </ds-row>
             ))}
-          </ol>
+          </ds-list>
         )}
 
         {history?.events.some((event) => event.status === "failed") ? (
-          <ul className="event-list" data-testid="failed-events">
+          <ds-list role="list" className="event-list" data-testid="failed-events">
             {history.events
               .filter((event) => event.status === "failed")
               .slice(0, 5)
               .map((event) => (
-                <li key={event._id}>
-                  Failed at {event.failureStage ?? "unknown"} ·{" "}
-                  {new Date(event.startedAt).toLocaleString()}
-                </li>
+                <ds-row role="listitem" key={event._id}>
+                  <span className="ds-text ds-text--small ds-text--danger">
+                    Failed at {event.failureStage ?? "unknown"} · {new Date(event.startedAt).toLocaleString()}
+                  </span>
+                </ds-row>
               ))}
-          </ul>
+          </ds-list>
         ) : null}
       </section>
-    </aside>
+    </ds-panel>
   );
 }
