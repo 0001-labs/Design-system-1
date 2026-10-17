@@ -22,7 +22,7 @@ promise and are drawn on the same native frame. Never the browser's own.
 
 Set the host's `open` property to open or close it. `closeOnEscape` and
 `closeOnBackdrop` default to true. The cancelable `ds-close-request` event has
-a `detail.reason` of `escape`, `backdrop`, `outside`, `button` or `native`. Prevent its
+a `detail.reason` of `escape`, `backdrop`, `outside`, `button`, `native` or `swipe`. Prevent its
 default action when the application must decide whether closing is allowed.
 Nested dialogs retain the background scroll lock until the last one closes.
 The lock fixes the body at its current offset, then restores its original inline
@@ -69,6 +69,73 @@ keeping its normal margins. Applications decide when to offer rotation.
 
 Aa mounts its floating toolbar, menus, find controls and link field inside the
 closest native dialog. Sync Aa before placing an older editor copy in a modal.
+
+## Placement: sheets and drawers
+
+`placement` stands the dialog in the centre (`"center"`, the default), as a
+sheet from the bottom of the screen (`"sheet"`), or as a drawer at the end or
+the start of the line (`"end"`, `"start"`; the end is the right of a
+left-to-right page). Phones take a sheet first; a side panel beside a list
+takes a drawer. The modal behaviour is the dialog's own in each: the focus
+trap, Escape, the backdrop and the scroll lock.
+
+```html
+<ds-dialog placement="sheet">
+  <dialog aria-labelledby="trade-title">
+    <h2 id="trade-title" data-ds-dialog="title">Buy</h2>
+  </dialog>
+</ds-dialog>
+```
+
+- **A sheet** is as wide as the screen up to 32 squares (`--ds-dialog-sheet-width`)
+  and centred beyond that, as high as its content up to two squares below the
+  top (`--ds-dialog-sheet-gap`), then it scrolls. It has no line at its foot;
+  its line at the top is drawn inside its first square (`--ds-dialog-line`),
+  so its rows stay on whole squares. A handle two squares wide and 4px high
+  stands in the middle of that square and stays there while the content
+  scrolls; `--ds-dialog-handle: none` hides it, `--ds-dialog-handle-color`
+  colours it.
+- **A drawer** is the screen's height and 16 squares wide (`--ds-dialog-width`),
+  leaving at least two squares of the page beside it, with one line on the side
+  facing the page. It has no handle.
+- Each keeps its square of padding inside the safe area of a phone's notch and
+  home indicator (`env(safe-area-inset-*)`); give the page
+  `<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">`.
+- Each slides in from its edge and back out to it, in transform alone, while
+  the backdrop fades (`--ds-dialog-enter` 380ms, `--ds-dialog-exit` 260ms,
+  `--ds-dialog-easing`). With reduced motion it fades where it stands.
+
+**Swiping it away.** On a touch screen a finger that drags a sheet down, or a
+drawer towards its edge, moves it one to one after ten pixels, and the backdrop
+fades as it goes. Dragged the other way it gives a little and pulls back. On
+release DS1 projects where the throw would come to rest and dismisses when that
+is past half its size and the finger is not moving back; otherwise it settles
+home. Content scrolled down scrolls back up before the sheet moves, a strip
+that scrolls sideways keeps its touches, and so do a slider, a range input and
+anything marked `data-ds-dialog-no-swipe`. Dismissing sends `ds-close-request`
+with the reason `swipe`: prevent it (unsaved changes, say) and the sheet
+settles home. A mouse or trackpad closes it with Escape or the close button.
+
+In React, `DialogContent placement="sheet"` keeps the dialog on the page while
+it slides out, then removes it. An anchored panel ignores `placement`.
+
+On a page without Lit, the native frame takes the same placements as classes,
+with the swipe from `0-face/dialog-swipe.ts` (Sync 1: `root` with
+`"modules": ["dialog-swipe"]`):
+
+```html
+<dialog class="ds-dialog ds-dialog--sheet" aria-labelledby="menu-title">…</dialog>
+<script type="module">
+  import { bindDialogSwipe } from "./ds1/0-face/dialog-swipe.js";
+  const sheet = document.querySelector("dialog");
+  bindDialogSwipe(sheet); // a swipe sends ds-close-request on the dialog, then closes it
+  sheet.showModal();
+</script>
+```
+
+`.ds-dialog--end` and `.ds-dialog--start` are the drawers. The page behind a
+modal native sheet or drawer does not scroll while it is open. The feedback
+module's confirmations and prompts stay centred.
 
 ## Modeless panels
 

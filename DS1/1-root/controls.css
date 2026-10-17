@@ -4,6 +4,7 @@
 @import "./empty.css";
 @import "./notice.css";
 @import "./kbd.css";
+@import "./dialog-placement.css";
 
 /*
  * Native controls in shared dress.

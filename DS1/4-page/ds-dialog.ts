@@ -2,11 +2,17 @@ import { LitElement, css, html, unsafeCSS } from "lit";
 import { define } from "../0-face/define";
 import "../2-core/ds-button";
 import "../2-core/ds-icon";
+import { bindDialogSwipe, type DialogPlacement } from "../0-face/dialog-swipe";
 import "./styles/ds-dialog.css";
-import dialogStyles from "./styles/ds-dialog.css?inline";
+import "../1-root/dialog-placement.css";
+import frameStyles from "./styles/ds-dialog.css?inline";
+import placementStyles from "../1-root/dialog-placement.css?inline";
 import metrics from "../1-root/component-metrics.css?inline";
 
-export type DialogCloseReason = "escape" | "backdrop" | "outside" | "button" | "native";
+export type { DialogPlacement } from "../0-face/dialog-swipe";
+export type DialogCloseReason = "escape" | "backdrop" | "outside" | "button" | "native" | "swipe";
+const dialogStyles = `${frameStyles}\n${placementStyles}`;
+const PLACEMENTS = new Set<string>(["sheet", "end", "start"]);
 const openDialogs = new WeakMap<Document, Set<Dialog>>();
 type SavedStyle = { style: CSSStyleDeclaration; name: string; value: string; priority: string; locked: string };
 const scrollStyles = new WeakMap<Document, { declarations: SavedStyle[]; x: number; y: number }>();
@@ -60,6 +66,9 @@ function styleRoot(root: Node) {
 /** A native light-DOM dialog keeps forms and accessible ID references together.
  * The browser owns the top layer, inert background and modal focus navigation.
  * Listen to ds-close-request and preventDefault to control whether it closes.
+ * `placement` stands it in the centre (the default), as a sheet from the
+ * bottom (`"sheet"`) or as a drawer at the end or start (`"end"`, `"start"`),
+ * which slide in and out and a finger swipes away (reason `"swipe"`).
  */
 export class Dialog extends LitElement {
   static properties = {
@@ -70,6 +79,7 @@ export class Dialog extends LitElement {
     holdScroll: { type: Boolean, attribute: "hold-scroll" },
     closeOnEscape: { type: Boolean, attribute: "close-on-escape" },
     closeOnBackdrop: { type: Boolean, attribute: "close-on-backdrop" },
+    placement: { type: String, reflect: true },
     anchor: { attribute: false },
     returnFocus: { attribute: false },
   };
@@ -81,6 +91,8 @@ export class Dialog extends LitElement {
   declare holdScroll: boolean;
   declare closeOnEscape: boolean;
   declare closeOnBackdrop: boolean;
+  /** Where it stands: `"center"`, a `"sheet"` from the bottom, or a drawer at the `"end"` or `"start"`. An anchored panel ignores it. */
+  declare placement: DialogPlacement;
   /** A viewport point for a floating panel; null uses ordinary dialog layout. */
   declare anchor: { x: number; y: number } | null;
   /** Resolve a replacement opener after the product has rendered its closed state. */
@@ -92,6 +104,7 @@ export class Dialog extends LitElement {
   private outsidePress: boolean | null = null;
   private observer = new MutationObserver(() => this.bindDialog());
   private sizeObserver: ResizeObserver | null = null;
+  private unbindSwipe: (() => void) | null = null;
 
   constructor() {
     super();
@@ -102,6 +115,7 @@ export class Dialog extends LitElement {
     this.holdScroll = false;
     this.closeOnEscape = true;
     this.closeOnBackdrop = true;
+    this.placement = "center";
     this.anchor = null;
     this.returnFocus = null;
   }
@@ -119,7 +133,25 @@ export class Dialog extends LitElement {
     super.disconnectedCallback();
   }
 
-  protected updated() { this.syncOpen(); this.place(); }
+  protected updated() { this.syncPlacement(); this.syncOpen(); this.place(); }
+
+  /** Mark the native frame with its placement before it opens, so it slides in from its edge, and let a finger swipe it away. */
+  private syncPlacement() {
+    const dialog = this.dialog;
+    if (!dialog) return;
+    const placement = !this.anchor && PLACEMENTS.has(this.placement) ? this.placement : null;
+    if (placement) dialog.setAttribute("data-ds-placement", placement);
+    else dialog.removeAttribute("data-ds-placement");
+    if (placement && !this.unbindSwipe) {
+      this.unbindSwipe = bindDialogSwipe(dialog, {
+        placement: () => (!this.anchor && PLACEMENTS.has(this.placement) ? this.placement : "center"),
+        onDismiss: () => this.requestClose("swipe"),
+      });
+    } else if (!placement && this.unbindSwipe) {
+      this.unbindSwipe();
+      this.unbindSwipe = null;
+    }
+  }
 
   /** Keep an anchored panel inside the visible viewport as its content or keyboard changes. */
   place = () => {
@@ -147,6 +179,7 @@ export class Dialog extends LitElement {
     dialog?.addEventListener("close", this.onNativeClose);
     dialog?.addEventListener("pointerdown", this.onPointerDown);
     dialog?.addEventListener("click", this.onClick);
+    this.syncPlacement();
     this.syncOpen();
   };
 
@@ -156,6 +189,9 @@ export class Dialog extends LitElement {
     dialog?.removeEventListener("close", this.onNativeClose);
     dialog?.removeEventListener("pointerdown", this.onPointerDown);
     dialog?.removeEventListener("click", this.onClick);
+    this.unbindSwipe?.();
+    this.unbindSwipe = null;
+    dialog?.removeAttribute("data-ds-placement");
     if (dialog?.open) dialog.close();
     this.release();
     this.dialog = null;

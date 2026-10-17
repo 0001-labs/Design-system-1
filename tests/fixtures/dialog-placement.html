@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Dialog placement measurements</title>
+    <link rel="stylesheet" href="/DS1/1-root/one.css" />
+    <link rel="stylesheet" href="/DS1/1-root/controls.css" />
+    <style>
+      body { margin: 0; padding: 0; }
+      .row { display: block; height: calc(20px * var(--ds-sf, 1)); margin: 0; }
+      .tall { display: block; height: 2000px; }
+    </style>
+    <script type="module">
+      import "/DS1/4-page/ds-dialog.ts";
+      import "/DS1/2-core/ds-kbd.ts";
+      import { bindDialogSwipe } from "/DS1/0-face/dialog-swipe.ts";
+      window.bindDialogSwipe = bindDialogSwipe;
+      await document.fonts.ready;
+      document.documentElement.dataset.ready = "true";
+    </script>
+  </head>
+  <body>
+    <div id="stage"></div>
+  </body>
+</html>

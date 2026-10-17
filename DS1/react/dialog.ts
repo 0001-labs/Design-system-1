@@ -1,7 +1,7 @@
 /** Optional React composition; behavior and appearance belong to ds-dialog. */
-import { createContext, createElement, useContext, useId, useLayoutEffect, useRef, useState, type HTMLAttributes, type ReactNode, type Ref } from "react";
+import { createContext, createElement, useContext, useEffect, useId, useLayoutEffect, useRef, useState, type HTMLAttributes, type ReactNode, type Ref } from "react";
 import { createPortal } from "react-dom";
-import type { Dialog as DialogElement, DialogCloseReason } from "../4-page/ds-dialog";
+import type { Dialog as DialogElement, DialogCloseReason, DialogPlacement } from "../4-page/ds-dialog";
 
 const DialogContext = createContext<{ open: boolean; change: (open: boolean, reason?: DialogCloseReason) => void; title: string; description: string } | null>(null);
 const useDialog = () => {
@@ -40,11 +40,41 @@ export interface DialogContentProps extends HTMLAttributes<HTMLDialogElement> {
   flush?: boolean;
   /** Rotate a document frame while keeping it within the viewport. */
   rotated?: boolean;
+  /**
+   * Where it stands: `"center"` (the default), a `"sheet"` from the bottom, or
+   * a drawer at the `"end"` or `"start"`. These slide out before they leave
+   * the page, and a finger swipes them away (reason `"swipe"`).
+   */
+  placement?: DialogPlacement;
 }
-export function DialogContent({ children, portal = true, nonModal = false, closeOnOutside = false, blockOutside = false, holdScroll = false, anchor = null, returnFocus = null, closeLabel = "Close", showClose = true, closeOnEscape = true, closeOnBackdrop = true, fullScreen = false, flush = false, rotated = false, ...props }: DialogContentProps) {
+
+/** The longest a sliding dialog stays on the page after closing, should its transition never end. */
+const LEAVING = 600;
+export function DialogContent({ children, portal = true, nonModal = false, closeOnOutside = false, blockOutside = false, holdScroll = false, anchor = null, returnFocus = null, closeLabel = "Close", showClose = true, closeOnEscape = true, closeOnBackdrop = true, fullScreen = false, flush = false, rotated = false, placement = "center", ...props }: DialogContentProps) {
   const context = useDialog();
   const host = useRef<DialogElement>(null);
   const [mounted, setMounted] = useState(false);
+  // A sheet or drawer stays on the page while it slides out, then leaves.
+  const sliding = placement !== "center";
+  const [leaving, setLeaving] = useState(false);
+  const [wasOpen, setWasOpen] = useState(context.open);
+  if (wasOpen !== context.open) {
+    setWasOpen(context.open);
+    setLeaving(!context.open && sliding && mounted);
+  }
+  useEffect(() => {
+    if (!leaving) return;
+    const native = host.current?.querySelector("dialog");
+    const done = () => setLeaving(false);
+    const ended = (event: Event) => {
+      const { propertyName, pseudoElement } = event as TransitionEvent;
+      if (event.target === native && !pseudoElement && (propertyName === "transform" || propertyName === "opacity")) done();
+    };
+    native?.addEventListener("transitionend", ended);
+    native?.addEventListener("transitioncancel", ended);
+    const timer = setTimeout(done, LEAVING);
+    return () => { clearTimeout(timer); native?.removeEventListener("transitionend", ended); native?.removeEventListener("transitioncancel", ended); };
+  }, [leaving]);
   // A portal has no server location. Keep the server and first client render
   // identical, including when the application initially requests an open modal.
   useLayoutEffect(() => { setMounted(true); }, []);
@@ -77,10 +107,11 @@ export function DialogContent({ children, portal = true, nonModal = false, close
     element.holdScroll = holdScroll;
     element.anchor = anchor;
     element.returnFocus = returnFocus;
+    element.placement = placement;
     element.open = context.open;
     return () => element.removeEventListener("ds-close-request", close);
   });
-  if (!mounted || !context.open) return null;
+  if (!mounted || (!context.open && !leaving)) return null;
   const content = createElement("ds-dialog", { ref: host },
     createElement("dialog", { ...props, "data-ds-dialog-fullscreen": fullScreen || undefined, "data-ds-dialog-flush": flush || undefined, "data-ds-dialog-rotated": rotated || undefined }, children,
       showClose && createElement("ds-button", { control: "slotted", icon: true, "data-ds-dialog": "close" },

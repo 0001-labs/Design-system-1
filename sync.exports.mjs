@@ -14,8 +14,8 @@ const rootStyles = ['one.css', 'grid.css', 'text.css', 'component-tokens.css', '
 const importsText = ['one.css', 'controls.css'];
 /** one.css also imports the faces with their typeface tokens, and the palette. */
 const oneImports = ['fonts.css', 'palette.css'];
-/** The sheets controls.css imports besides the text classes: tables, empty states, notices and shortcut hints. */
-const controlSheets = ['table.css', 'empty.css', 'notice.css', 'kbd.css'];
+/** The sheets controls.css imports besides the text classes: tables, empty states, notices, shortcut hints and the dialog's placements. */
+const controlSheets = ['table.css', 'empty.css', 'notice.css', 'kbd.css', 'dialog-placement.css'];
 /** Sheets for writing that a product asks for by name, as a flag or in `styles`. */
 const writingSheets = { prose: 'prose.css', classless: 'one.semantic.css', cjk: 'cjk.css' };
 const askedSheets = options => Object.entries(writingSheets).filter(([flag]) => options[flag]).map(([, file]) => file);
@@ -34,6 +34,8 @@ const rootModules = {
   tooltips: ['tooltips.ts'],
   /** Keyboard shortcuts: the command key, the typing guard, labels and onShortcut; its key names read the shared words where `languages` is copied beside it. */
   keys: ['keys.ts'],
+  /** Swiping a native sheet or drawer (dialog.ds-dialog--sheet, --end, --start) away; its look is controls.css's. */
+  'dialog-swipe': ['dialog-swipe.ts'],
   /** The theme module (light, dark, system in signals) with the head script it runs and its options' type; needs @lit-labs/signals. */
   theme: ['theme.ts', 'theme-bootstrap.js', 'preference-options.ts'],
 };
@@ -105,8 +107,8 @@ export default {
      * Component tokens for static stylesheets that import them by URL, with
      * the named palette colours (palette.css, the --one-* tokens).
      * `nativeControls` adds controls.css with the table, text, empty-state,
-     * notice and shortcut classes it imports (table.css, text.css, empty.css,
-     * notice.css, kbd.css);
+     * notice and shortcut classes and the dialog's placements it imports
+     * (table.css, text.css, empty.css, notice.css, kbd.css, dialog-placement.css);
      * `prose` adds the prose sheet (prose.css, for writing marked data-ds-prose) and `classless` the classless sheet
      * (one.semantic.css, which styles a whole page of plain HTML) and `cjk` Noto Sans
      * for Japanese and Chinese (cjk.css); `bundle` writes them all as one
@@ -117,7 +119,7 @@ export default {
       files({ read, options }) {
         const files = options.bundle ? [...tokenStyles] : ['component-tokens.css', 'component-metrics.css', 'component-appearance.css'];
         files.push('palette.css');
-        if (options.nativeControls) files.push('table.css', 'text.css', 'empty.css', 'notice.css', 'kbd.css', 'controls.css');
+        if (options.nativeControls) files.push('table.css', 'text.css', 'empty.css', 'notice.css', 'kbd.css', 'dialog-placement.css', 'controls.css');
         files.push(...askedSheets(options));
         if (options.bundle) {
           const sheets = files.map(file => withoutImports(read(`DS1/1-root/${file}`)));
@@ -135,12 +137,12 @@ export default {
      * `["fonts.css"]` for the faces alone, or `[]` for scripts alone); `fonts:
      * false` leaves the faces to the product;
      * `nativeControls` adds controls.css and the table.css, empty.css,
-     * notice.css and kbd.css it imports; `prose`
+     * notice.css, kbd.css and dialog-placement.css it imports; `prose`
      * adds the prose sheet (prose.css) and `classless` the classless sheet
      * (one.semantic.css) and `cjk` Noto Sans for Japanese and Chinese (cjk.css,
      * from Google Fonts), which `styles` may also name; `modules` names page scripts
      * from 0-face/ (grid, grid-fit, layout-inspector, scaling, theme,
-     * theme-bootstrap, tooltips, keys), copied with what they import, into 0-face/;
+     * theme-bootstrap, tooltips, keys, dialog-swipe), copied with what they import, into 0-face/;
      * `scriptsTo` puts that 0-face/ folder elsewhere, a path from `to`
      * (`"../../src/ds1"` puts the stylesheets in `public/ds1` and the scripts
      * in `src/ds1/0-face`). one.css and controls.css bring text.css, and
