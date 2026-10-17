@@ -38,4 +38,6 @@ A page without Lit masks the icon file in the text colour with the `ds-icon` cla
 
 The source files live in `DS1/x-icon/`. Add missing drawings to that library first, then generate the runtime map and public collection. Products carry the icons they use as local files.
 
+`ds-icon` draws the most common icons at once and loads the rest in one deferred chunk the first time one is asked for. A component that always draws one icon ships that drawing with itself through `provideIcons({ name: svg })`, as `ds-avatar` does with its person, so it never waits for the chunk.
+
 [Button](/2-core/button/) · [Tooltip](/2-core/tooltip/) · [All components](/2-core/overview/#component-overview)

@@ -86,9 +86,11 @@ Selecting `input` in a product's component copy also copies the shared `react/in
 ```tsx
 import { Input, type InputElement } from './design/react/input';
 
-<Input name="name" value={name} onChange={event => setName(event.target.value)}
-  aria-label="Name" required />
+<Input name="name" label="Name" value={name} onChange={event => setName(event.target.value)}
+  required />
 ```
+
+The adapter types the element's words as props: `label` (as written) and `labelText` (a translation key) draw the label row, `placeholderKey` and `errorText` are the translated hint and error beside `placeholder` and `error`. The keys reach the element as `label-text`, `placeholder-key` and `error-text`. `Textarea` takes the same.
 
 The React adapter defaults to `variant="field"`. It supports controlled `value`, uncontrolled `defaultValue`, native hints such as `autoComplete`, keyboard and focus handlers, and refs typed as `InputElement`. Event `target` and `currentTarget` refer to the shared element. Controlled values are restored when an application rejects an edit or a form resets. React remains an optional peer dependency.
 

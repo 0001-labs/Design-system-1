@@ -87,7 +87,7 @@ shared inputs. The adapter does not import browser globals during SSR.
 
 [Form](/3-unit/form/) · [Icon](/2-core/icon/) · [Tooltip](/2-core/tooltip/)
 
-Use `danger` for destructive actions. It uses the shared tuned red token and can be combined with `secondary`.
+Use `danger` for destructive actions: the words are in the danger colour (`--ds-danger-color`) on every face, the default one included, as `.ds-button--danger` draws them on a native button. It can be combined with `secondary`.
 
 The native control exposes `::part(control)` for a library’s authored box model. Use the host for margins. The library editor measures the real control and writes opt-in padding, border, corner and gap rules; without these rules, standard button geometry stays unchanged.
 
