@@ -479,6 +479,32 @@ describe("empty states and notices", () => {
     expect(sourceSites("view.ts", 'import { h } from "./dom"; h("div", { class: "ds-notice ds-notice--warning" });')[0]).toMatchObject({ tag: "div", nativeStyle: "ds-notice" });
   });
 
+  it("recognizes .ds-carousel and .ds-pagedots, keeps page dots in their block and the buttons as buttons", () => {
+    const sites = sourceSites("page.html", '<section class="ds-carousel" aria-label="Colours"><div class="ds-carousel__track"><figure>One</figure></div><div class="ds-carousel__controls"><button class="ds-button ds-button--icon ds-carousel__previous">Back</button><div class="ds-pagedots"><button class="ds-pagedots__dot"></button></div></div></section><div class="gallery"></div>');
+    expect(sites.filter(site => site.nativeStyle).map(site => [site.tag, site.nativeStyle])).toEqual([["section", "ds-carousel"], ["button", "ds-button"], ["div", "ds-pagedots"], ["button", "block-part"]]);
+  });
+
+  it("verifies ds-carousel, its page dots and the React adapter through the manifest", () => {
+    const { studio, ds, app } = fixture();
+    const files = {
+      "3-unit/ds-carousel.ts": 'import "../2-core/ds-pagedots"; export class Carousel {}',
+      "2-core/ds-pagedots.ts": "export class Pagedots {}",
+      "1-root/carousel.css": ".ds-carousel { display: grid; }",
+      "react/carousel.ts": 'import type { Carousel as C } from "../3-unit/ds-carousel"; export const Carousel = () => null;',
+    };
+    for (const [file, body] of Object.entries(files)) { write(ds, `DS1/${file}`, body); write(app, `design/${file}`, body); }
+    commit(ds, "Add carousels");
+    const path = join(app, "design/components-manifest.json"), manifest = JSON.parse(readFileSync(path, "utf8"));
+    manifest.commit = git(ds, "rev-parse", "HEAD"); manifest.components.push("carousel", "pagedots");
+    for (const [file, body] of Object.entries(files)) manifest.files[file] = sha(body);
+    writeFileSync(path, JSON.stringify(manifest));
+    write(app, "src/view.tsx", 'import { Carousel } from "../design/react/carousel";\nexport const view = <><Carousel label="Colours"><figure /></Carousel><ds-carousel label="Reviews"></ds-carousel><section className="ds-carousel" /><ds-pagedots count={3}></ds-pagedots></>;\n');
+    commit(app, "Use carousels");
+    const report = scanApp({ id: "example", name: "Example", directory: "Example", roots: ["src"], manifest: "design/components-manifest.json" }, studio, ds);
+    expect(report.cells.carousel).toMatchObject({ shared: 2, styled: 1, unverified: 0, local: 0 });
+    expect(report.cells.pagedots).toMatchObject({ shared: 1, unverified: 0 });
+  });
+
   it("verifies the native classes through the sheet that draws each, from the lock", () => {
     const studio = mkdtempSync(join(tmpdir(), "component-adoption-")); temporary.push(studio);
     const ds = join(studio, "Design system 1"), app = join(studio, "Pages");
@@ -751,5 +777,58 @@ describe("tooltips, disclosures, browser dialogs, ranges and table roles", () =>
     expect(scan().cells.dialog!.issues).toContain("Locally modified: web/ds1/0-face/dialogs.ts");
     write(app, "sync.lock.json", JSON.stringify({ "Design system 1": { commit: git(ds, "rev-parse", "HEAD"), files: {} } }));
     expect(scan().cells.tooltip).toMatchObject({ shared: 0, unverified: 1 });
+  });
+});
+
+describe("stats, meters and steps", () => {
+  const sha = (body: string) => createHash("sha256").update(body).digest("hex");
+  const commit = (root: string, message: string) => { git(root, "add", "."); git(root, "-c", "user.name=Test", "-c", "user.email=test@example.com", "commit", "-m", message); };
+
+  it("recognizes .ds-stat, .ds-meter and .ds-steps on any element, keeps their text parts in the block and counts a native meter as local", () => {
+    for (const file of ["page.html", "view.tsx"]) {
+      const attribute = file.endsWith("x") ? "className" : "class";
+      const sites = sourceSites(file, `<><div ${attribute}="ds-stats"><div ${attribute}="ds-stat"><p ${attribute}="ds-stat__label">Users</p><p ${attribute}="ds-stat__figure">12</p></div></div><span ${attribute}="ds-meter ds-meter--over" role="meter"><span ${attribute}="ds-meter__fill"></span></span><ol ${attribute}="ds-steps"><li ${attribute}="ds-steps__step">Apply</li></ol><meter value="0.5"></meter></>`);
+      expect(sites.filter(site => site.nativeStyle).map(site => [site.tag, site.nativeStyle]), file).toEqual([["div", "ds-stat"], ["p", "block-part"], ["p", "block-part"], ["span", "ds-meter"], ["ol", "ds-steps"]]);
+      expect(sites.some(site => site.tag === "meter" && !site.nativeStyle), file).toBe(true);
+    }
+  });
+
+  it("verifies the classes through figures.css from the lock, and the React adapters through the manifest", () => {
+    const studio = mkdtempSync(join(tmpdir(), "component-adoption-")); temporary.push(studio);
+    const ds = join(studio, "Design system 1"), app = join(studio, "Pages");
+    for (const root of [ds, app]) { mkdirSync(root); git(root, "init", "-b", "main"); }
+    const sheets = { "figures.css": ".ds-stat { display: flex; }", "component-tokens.css": ":root { --t: 1; }", "component-metrics.css": ":root { --m: 1; }", "component-appearance.css": ":root { --a: 1; }" };
+    for (const [file, body] of Object.entries(sheets)) write(ds, `DS1/1-root/${file}`, body);
+    commit(ds, "Sheets");
+    for (const [file, body] of Object.entries(sheets)) write(app, `web/ds1/${file}`, body);
+    write(app, "sync.lock.json", JSON.stringify({ "Design system 1": { commit: git(ds, "rev-parse", "HEAD"), files: Object.fromEntries(Object.entries(sheets).map(([file, body]) => [`web/ds1/${file}`, sha(body)])) } }));
+    write(app, "web/index.html", '<div class="ds-stat"><p class="ds-stat__figure">12</p></div>\n<ol class="ds-steps"><li class="ds-steps__step">Apply</li></ol>\n<meter value="1"></meter>');
+    commit(app, "Page");
+    const scan = () => scanApp({ id: "pages", name: "Pages", directory: "Pages", roots: ["web"] }, studio, ds);
+    expect(scan().cells.stat).toMatchObject({ styled: 1, unverified: 0 });
+    expect(scan().cells.steps).toMatchObject({ styled: 1, unverified: 0 });
+    expect(scan().cells.meter).toMatchObject({ styled: 0, local: 1 });
+    expect(scan().cells.text).toMatchObject({ styled: 0, local: 0 });
+    write(app, "web/ds1/figures.css", ".ds-stat { display: block; }");
+    expect(scan().cells.stat).toMatchObject({ styled: 0, unverified: 1 });
+
+    const { studio: studio2, ds: ds2, app: app2 } = fixture();
+    const files = {
+      "2-core/ds-meter.ts": "export class Meter {}",
+      "1-root/figures.css": ".ds-meter { display: block; }",
+      "react/meter.ts": 'import type { Meter as M } from "../2-core/ds-meter"; export const Meter = () => null;',
+    };
+    for (const [file, body] of Object.entries(files)) { write(ds2, `DS1/${file}`, body); write(app2, `design/${file}`, body); }
+    commit(ds2, "Add meters");
+    const path = join(app2, "design/components-manifest.json"), manifest = JSON.parse(readFileSync(path, "utf8"));
+    manifest.commit = git(ds2, "rev-parse", "HEAD"); manifest.components.push("meter");
+    for (const [file, body] of Object.entries(files)) manifest.files[file] = sha(body);
+    writeFileSync(path, JSON.stringify(manifest));
+    write(app2, "src/view.tsx", 'import { Meter } from "../design/react/meter";\nexport const view = <><Meter value={1} /><ds-meter value="2"></ds-meter></>;\n');
+    commit(app2, "Use meters");
+    const scanned = () => scanApp({ id: "example", name: "Example", directory: "Example", roots: ["src"], manifest: "design/components-manifest.json" }, studio2, ds2);
+    expect(scanned().cells.meter).toMatchObject({ shared: 2, unverified: 0, local: 0 });
+    write(app2, "design/react/meter.ts", files["react/meter.ts"] + "\n// Local modification");
+    expect(scanned().cells.meter).toMatchObject({ shared: 1, unverified: 1 });
   });
 });

@@ -89,8 +89,8 @@ export interface AdoptionReport {
 
 /** Implementation IDs remain distinct for provenance checks and source drilldowns. */
 export const IMPLEMENTATION_COLUMNS: ComponentColumn[] = [
-  ...["button", "split", "checkbox", "radio", "switch", "text", "badge", "token", "avatar", "icon", "input", "file-picker", "color", "swatch", "select", "textarea", "composer", "tooltip", "cycle", "date", "language", "gap", "banner", "empty", "notice", "card", "pagedots", "chart", "toast", "toggle", "loading", "spacing-handle"].map(id => ({ id, name: id, group: "Core" })),
-  ...["token-field", "avatar-group", "row", "list", "tabs", "menu", "accordion", "form", "table", "sidebar", "navigation", "unit-card"].map(id => ({ id, name: id, group: "Unit" })),
+  ...["button", "split", "checkbox", "radio", "switch", "text", "badge", "token", "avatar", "icon", "input", "file-picker", "color", "swatch", "select", "textarea", "composer", "tooltip", "cycle", "date", "language", "gap", "banner", "empty", "notice", "stat", "meter", "steps", "card", "pagedots", "chart", "toast", "toggle", "loading", "spacing-handle"].map(id => ({ id, name: id, group: "Core" })),
+  ...["token-field", "avatar-group", "carousel", "row", "list", "tabs", "menu", "accordion", "form", "table", "sidebar", "tree", "navigation", "unit-card"].map(id => ({ id, name: id, group: "Unit" })),
   ...["dialog", "panel", "container", "layout", "grid", "page", "header", "footer", "document"].map(id => ({ id, name: id, group: "Page" })),
 ];
 const family = (id: string) => id === "split" ? "button" : id === "switch" ? "toggle" : id;

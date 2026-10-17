@@ -1,0 +1,90 @@
+---
+title: Steps
+description: A numbered sequence, one square high, with done, current and upcoming steps.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+Steps show where someone is in a sequence: signing up, setting up an account, a checkout. Each step is a number in a mark one control high and its name, on one square; the steps before the current one are done, the current one is marked, and the rest are still to come. A line joins each step to the next.
+
+## Try it
+
+<ComponentExample example="steps" />
+
+## Use it
+
+```html
+<ds-steps current="2" label="Getting started"
+  steps='["Apply", "Approval", "Connect payouts", "Start earning"]'></ds-steps>
+```
+
+`steps` is a list of names (translation keys unless `literal` is set), set as a property or as a JSON array in the attribute. `current` is the number of the current step, counted from 1; past the last, every step is done, and `0` means none has started.
+
+| State | Mark | Name | Said |
+| --- | --- | --- | --- |
+| Done (before `current`) | `check` on the grey fill | The text colour | "Done" |
+| Current | The number in the paper colour on the ink | The medium face | `aria-current="step"` |
+| Upcoming (after `current`) | The number in a 1px line, muted | Muted | |
+| Failed | `warning` on the danger colour | The danger colour | "Failed" |
+
+A step names its own state with `{ "label": "Approval", "state": "failed" }`, where something went wrong and the sequence stops there.
+
+## Links and keys
+
+The steps are an ordered list, so assistive technology reads how many there are and where each stands; the hidden words "Done" and "Failed" are the shared words in the current language. A step with `href` (`{ "label": "Details", "href": "/details" }`) is a link around its mark and name, reached with Tab and opened with Enter, for going back to a step already done. Steps without one take no focus. Keep links to steps someone can go to.
+
+## Vertical
+
+`vertical` puts one step on each square, with what belongs under a step in its `step-N` slot, indented one square to line up with the names: a line of text, a form, the buttons that finish the step.
+
+```html
+<ds-steps vertical current="3" steps='["Apply", "Approval", "Connect payouts", "Start earning"]'>
+  <p slot="step-3">Connect a payout account to get paid.</p>
+</ds-steps>
+```
+
+## API
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `steps` | `Step[]` | `[]` | Names, or `{ label, state, href }`. |
+| `current` | number | `1` | The current step, counted from 1. |
+| `vertical` | boolean | `false` | One step to a row, with `step-N` slots. |
+| `label` | string | None | The sequence's name. |
+| `literal` | boolean | `false` | Show the names as written. |
+
+## Measures
+
+One square high. Each step's mark is one control (16px) in its own square, the name follows with 4px at its end, and the step rounds its width up to whole squares, the line to the next step filling at least one square of it. Vertical steps stand one to a square, their bodies one square in. Everything follows `--ds-sf`.
+
+## React
+
+```tsx
+import { Steps } from "@0001-labs/design-system-1/DS1/react/steps";
+
+<Steps steps={[t("Apply"), t("Approval"), t("Connect payouts")]} current={2} vertical
+  bodies={[null, null, <StripeActions />]} />
+```
+
+`Steps` writes the names as given (it is `literal` by default) and puts each of `bodies` under its step. Register `ds-steps` in the browser before hydration, so the steps arrive as a property.
+
+## Without JavaScript
+
+```html
+<ol class="ds-steps" aria-label="Getting started">
+  <li class="ds-steps__step ds-steps__step--done">
+    <span class="ds-steps__mark" aria-hidden="true"><!-- the check icon --></span>
+    <span class="ds-steps__label">Apply</span><span class="ds-steps__state">Done</span>
+  </li>
+  <li class="ds-steps__step ds-steps__step--current" aria-current="step">
+    <span class="ds-steps__mark" aria-hidden="true">2</span><span class="ds-steps__label">Approval</span>
+  </li>
+  <li class="ds-steps__step">
+    <span class="ds-steps__mark" aria-hidden="true">3</span><span class="ds-steps__label">Connect payouts</span>
+  </li>
+</ol>
+```
+
+`ds-steps--vertical` stacks them, with a `ds-steps__body` in a step; `ds-steps__link` is an `<a href>` around a step's mark and name. From `figures.css`, which `controls.css` imports.
+
+[Meter](/2-core/meter/) · [Stat](/2-core/stat/)

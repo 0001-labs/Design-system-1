@@ -6,6 +6,9 @@
 @import "./header.css";
 @import "./footer.css";
 @import "./document.css";
+@import "./carousel.css";
+@import "./figures.css";
+@import "./row.css";
 
 /*
  * Native controls in shared dress.

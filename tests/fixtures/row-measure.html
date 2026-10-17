@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Row measurements</title>
+    <link rel="stylesheet" href="/DS1/1-root/one.css" />
+    <link rel="stylesheet" href="/DS1/1-root/controls.css" />
+    <style>
+      body { margin: 0; padding: 0; }
+      #stage { position: absolute; top: 0; left: 0; width: 480px; }
+      #stage > * { margin: 0; }
+    </style>
+    <script type="module">
+      import "/DS1/3-unit/ds-row.ts";
+      import "/DS1/3-unit/ds-tree.ts";
+      import "/DS1/3-unit/ds-sidebar.ts";
+      import { connectTree } from "/DS1/0-face/tree.ts";
+      window.connectTree = connectTree;
+      await document.fonts.ready;
+      document.documentElement.dataset.ready = "true";
+    </script>
+  </head>
+  <body>
+    <div id="stage"></div>
+  </body>
+</html>

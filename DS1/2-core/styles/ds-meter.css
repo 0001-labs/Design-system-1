@@ -1,0 +1,12 @@
+/* ds-meter.css */
+/* The element only places the row; 1-root/figures.css draws it. */
+
+:host {
+  display: block;
+  min-width: 0;
+}
+
+:host([hidden]),
+[hidden] {
+  display: none !important;
+}

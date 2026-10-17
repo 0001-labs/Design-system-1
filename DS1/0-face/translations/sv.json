@@ -18,6 +18,9 @@
     "Password": "Lösenord",
     "Nothing here yet": "Inget här än",
     "Loading": "Läser in",
+    "{value} of {max}": "{value} av {max}",
+    "{value} of {max}, over by {over}": "{value} av {max}, {over} för mycket",
+    "Failed": "Misslyckades",
     "Today": "I dag",
     "Yesterday": "I går",
     "Tomorrow": "I morgon",
@@ -82,6 +85,13 @@
     "Saving…": "Sparar…",
     "Untitled": "Namnlös",
     "Account": "Konto",
+    "Carousel": "Karusell",
+    "Slide": "Bild",
+    "Slides": "Bilder",
+    "Slide {index}": "Bild {index}",
+    "{index} of {count}": "{index} av {count}",
+    "Previous slide": "Föregående bild",
+    "Next slide": "Nästa bild",
     "Menu": "Meny",
     "Contents": "Innehåll"
   }

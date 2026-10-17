@@ -30,9 +30,10 @@ nav {
   padding-inline: calc(4px * var(--ds-sf));
   padding-inline-start: calc(4px * var(--ds-sf) + var(--depth) * var(--ds-unit) / 2);
 }
-.row:hover { background: var(--ds-fill); }
-.row[data-current] { background: var(--ds-fill-hover); }
-.row[data-current] .choice { --ds-type-weight-default: 500; }
+/* The look of every pressable row (ds-row, .ds-row, ds-tree): the same tokens, the same fallbacks. */
+.row:hover { background: var(--ds-row-fill-hover, var(--ds-fill)); }
+.row[data-current] { background: var(--ds-row-fill-current, var(--ds-fill-hover)); }
+.row[data-current] .choice { --ds-type-weight-default: var(--ds-row-current-weight, 500); }
 ds-button { --ds-corner-size: 0px; --ds-button-padding: 0; }
 .disclosure { flex: 0 0 var(--ds-unit); width: var(--ds-unit); }
 .spacer { flex: 1; }

@@ -18,6 +18,9 @@
     "Password": "Salasana",
     "Nothing here yet": "Täällä ei ole vielä mitään",
     "Loading": "Ladataan",
+    "{value} of {max}": "{value}/{max}",
+    "{value} of {max}, over by {over}": "{value}/{max}, {over} yli",
+    "Failed": "Epäonnistui",
     "Today": "Tänään",
     "Yesterday": "Eilen",
     "Tomorrow": "Huomenna",
@@ -82,6 +85,13 @@
     "Saving…": "Tallennetaan…",
     "Untitled": "Nimetön",
     "Account": "Tili",
+    "Carousel": "Karuselli",
+    "Slide": "Dia",
+    "Slides": "Diat",
+    "Slide {index}": "Dia {index}",
+    "{index} of {count}": "{index}/{count}",
+    "Previous slide": "Edellinen dia",
+    "Next slide": "Seuraava dia",
     "Menu": "Valikko",
     "Contents": "Sisällys"
   }

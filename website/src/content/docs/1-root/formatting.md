@@ -163,7 +163,7 @@ Any other `Intl.NumberFormat` option applies too (`signDisplay: "exceptZero"` fo
 - `currencyDigits(currency)` gives the minor unit's decimals: `0` for JPY.
 - `fromMinorUnits(1999, "USD")` gives `19.99`; `toMinorUnits(19.99, "USD")` gives `1999`, rounded.
 - `currencySymbol(currency, options?)` gives the symbol alone: `kr.` in Danish.
-- `formatMoneyToParts(amount, currency, options?)` gives the text in parts (`currency`, `integer`, `group`, `decimal`, `fraction`), for drawing each digit in a cell of its own width so amounts line up.
+- `formatMoneyToParts(amount, currency, options?)` gives the text in parts (`currency`, `integer`, `group`, `decimal`, `fraction`), for drawing each digit in a cell of its own width so amounts line up. A [Stat](/2-core/stat/) with `cells` does this for any figure, and writes its value through these functions.
 
 The reader's likely currency, from their language or country, is on [Pricing](/1-root/pricing/).
 

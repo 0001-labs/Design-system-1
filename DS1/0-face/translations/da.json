@@ -18,6 +18,9 @@
     "Password": "Adgangskode",
     "Nothing here yet": "Intet her endnu",
     "Loading": "Indlæser",
+    "{value} of {max}": "{value} af {max}",
+    "{value} of {max}, over by {over}": "{value} af {max}, {over} for meget",
+    "Failed": "Mislykkedes",
     "Today": "I dag",
     "Yesterday": "I går",
     "Tomorrow": "I morgen",
@@ -82,6 +85,13 @@
     "Saving…": "Gemmer…",
     "Untitled": "Uden titel",
     "Account": "Konto",
+    "Carousel": "Karrusel",
+    "Slide": "Dias",
+    "Slides": "Dias",
+    "Slide {index}": "Dias {index}",
+    "{index} of {count}": "{index} af {count}",
+    "Previous slide": "Forrige dias",
+    "Next slide": "Næste dias",
     "Menu": "Menu",
     "Contents": "Indhold"
   }
