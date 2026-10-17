@@ -1,0 +1,46 @@
+/*
+ * `.ds-kbd` is a keyboard shortcut's hint, the `ds-kbd` element's look on a
+ * native `<kbd>`: one control high (16px) on a one-square line, at least as
+ * wide as it is high, padded 4px at the sides, with the system's 4px corners
+ * and the fill a control stands on; in the code face at 13px, as `<kbd>` is in
+ * prose, so a shortcut reads the same in an interface and in writing. Write
+ * its words with `shortcutLabel()` from `0-face/keys.ts` (⇧⌘D, Ctrl+Shift+D).
+ * Arrows are Inter's, through the Inter Arrows face that leads the typeface.
+ *
+ * `.ds-kbd--plain` is the words alone in the title grey, with no fill, as a
+ * menu entry writes its shortcut at the row's end.
+ */
+
+.ds-kbd {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Two pixels above and below: the hint stands in its one-square line. */
+  vertical-align: top;
+  height: var(--ds-control-height);
+  min-width: var(--ds-control-height);
+  margin: calc((var(--ds-row-height) - var(--ds-control-height)) / 2) 0;
+  padding: 0 calc(4px * var(--ds-sf, 1));
+  border: 0;
+  border-radius: var(--ds-radius);
+  background: var(--ds-kbd-background, var(--ds-fill));
+  color: var(--ds-kbd-color, var(--ds-text-color));
+  font-family: var(--ds-typeface-mono);
+  font-size: calc(var(--ds-code-text-size, 13px) * var(--ds-sf, 1));
+  font-style: normal;
+  font-weight: var(--ds-type-weight-default);
+  line-height: var(--ds-control-height);
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.ds-kbd--plain {
+  min-width: 0;
+  padding: 0;
+  background: none;
+  color: var(--ds-kbd-color, var(--ds-title-color));
+  font-family: var(--ds-typeface-regular);
+  font-size: var(--ds-type-size-default);
+  letter-spacing: var(--ds-type-letterspacing-default);
+}

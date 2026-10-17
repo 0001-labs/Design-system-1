@@ -1,0 +1,71 @@
+---
+title: Keyboard shortcut
+description: A shortcut's hint, written as the reader's platform writes it, one control high on the grid.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+`ds-kbd` shows a keyboard shortcut beside the action it presses: written once
+(`mod+shift+d`) and drawn as the reader's platform writes it, `⇧⌘D` on a Mac,
+iPhone or iPad and `Ctrl+Shift+D` elsewhere, with the key names in the page's
+language. The words come from [Keys](/1-root/keys/).
+
+## Try it
+
+<ComponentExample example="kbd" />
+
+## Use it
+
+```html
+<ds-kbd shortcut="mod+k"></ds-kbd>
+<ds-kbd shortcut="escape" plain></ds-kbd>
+<ds-kbd>Fn</ds-kbd>
+```
+
+Give the control the shortcut presses its `aria-keyshortcuts`
+(`ariaKeyShortcuts("mod+k")`), and bind it with `onShortcut()`. Show a hint
+where it teaches something, a menu entry or a tooltip, never on every button.
+A menu entry's shortcut is `plain`, at the row's end.
+
+## API
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `shortcut` | string | Empty | The shortcut, written once for every platform. Unset, the slotted words show as written. |
+| `plain` | boolean | `false` | The words alone in the title grey, with no fill. |
+| `platform` | `"apple"` or `"other"` | The reader's | Write it for this platform. |
+
+The element follows `language-changed`, so Ctrl, Shift and the other words
+change with the page.
+
+## Measures
+
+One control high (16px) in its one-square line, two pixels above and below;
+at least as wide as it is high, padded 4px at the sides, with 4px corners on
+the fill a control stands on. The words are the code face at 13px, as `<kbd>`
+is in [prose](/1-root/prose/), so a shortcut reads the same in an interface and
+in writing; `plain` is the text face at 14px. Every measure follows `--ds-sf`.
+Arrows are Inter's, through the Inter Arrows face that leads both faces.
+
+## Without Lit
+
+`kbd.ds-kbd` (and `ds-kbd--plain`) is the same look on a native `<kbd>`, from
+`kbd.css`, which controls.css imports. Write its words with `shortcutLabel()`:
+
+```html
+<kbd class="ds-kbd" data-shortcut="mod+k"></kbd>
+<script type="module">
+  import { shortcutLabel } from "./ds1/0-face/keys.js";
+  for (const hint of document.querySelectorAll("kbd[data-shortcut]")) hint.textContent = shortcutLabel(hint.dataset.shortcut);
+</script>
+```
+
+## React
+
+```tsx
+import { Kbd } from "@0001-labs/design-system-1/DS1/react/kbd";
+
+<Kbd shortcut="mod+shift+d" plain />
+```
+
+`Kbd` renders `ds-kbd`; register it in the browser before hydration.

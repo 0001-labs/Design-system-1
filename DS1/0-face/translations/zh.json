@@ -81,6 +81,19 @@
     "Saved": "已保存",
     "Saving…": "正在保存…",
     "Untitled": "未命名",
-    "Account": "账户"
+    "Account": "账户",
+    "key.ctrl": "Ctrl",
+    "key.shift": "Shift",
+    "key.alt": "Alt",
+    "key.enter": "Enter",
+    "key.escape": "Esc",
+    "key.tab": "Tab",
+    "key.space": "空格",
+    "key.backspace": "Backspace",
+    "key.delete": "Delete",
+    "key.home": "Home",
+    "key.end": "End",
+    "key.pageup": "Page Up",
+    "key.pagedown": "Page Down"
   }
 }

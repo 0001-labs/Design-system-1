@@ -559,8 +559,37 @@ describe("empty states and notices", () => {
   });
 });
 
+describe("keyboard shortcut hints", () => {
+  const sha = (body: string) => createHash("sha256").update(body).digest("hex");
+  const commit = (root: string, message: string) => { git(root, "add", "."); git(root, "-c", "user.name=Test", "-c", "user.email=test@example.com", "commit", "-m", message); };
+
+  it("recognizes kbd.ds-kbd, a menu's shortcut class and kbd in prose, and counts a bare kbd as local", () => {
+    for (const file of ["page.html", "view.tsx"]) {
+      const attribute = file.endsWith("x") ? "className" : "class";
+      const sites = sourceSites(file, `<><kbd ${attribute}="ds-kbd ds-kbd--plain">⌘K</kbd><kbd ${attribute}="ds-menu__shortcut">⌘R</kbd><kbd>Esc</kbd><div data-ds-prose><kbd>Tab</kbd></div><ds-kbd shortcut="mod+k"></ds-kbd></>`);
+      expect(sites.filter(site => site.tag !== "div").map(site => [site.tag, site.nativeStyle, site.prose ?? false]), file).toEqual([["kbd", "ds-kbd", false], ["kbd", "ds-menu__shortcut", false], ["kbd", undefined, false], ["kbd", undefined, true], ["ds-kbd", undefined, false]]);
+    }
+  });
+
+  it("counts them in Keyboard shortcut, verified through kbd.css and controls.css from the lock", () => {
+    const studio = mkdtempSync(join(tmpdir(), "component-adoption-")); temporary.push(studio);
+    const ds = join(studio, "Design system 1"), app = join(studio, "Pages");
+    for (const root of [ds, app]) { mkdirSync(root); git(root, "init", "-b", "main"); }
+    const sheets = { "kbd.css": ".ds-kbd { display: inline-flex; }", "controls.css": '@import "./kbd.css";\n.ds-menu__shortcut { margin-left: auto; }', "component-tokens.css": ":root { --t: 1; }", "component-metrics.css": ":root { --m: 1; }", "component-appearance.css": ":root { --a: 1; }" };
+    for (const [file, body] of Object.entries(sheets)) write(ds, `DS1/1-root/${file}`, body);
+    commit(ds, "Sheets");
+    for (const [file, body] of Object.entries(sheets)) write(app, `web/ds1/${file}`, body);
+    write(app, "sync.lock.json", JSON.stringify({ "Design system 1": { commit: git(ds, "rev-parse", "HEAD"), files: Object.fromEntries(Object.entries(sheets).map(([file, body]) => [`web/ds1/${file}`, sha(body)])) } }));
+    write(app, "web/index.html", '<p><kbd class="ds-kbd">⌘K</kbd> <kbd>Esc</kbd></p>');
+    commit(app, "Page");
+    const report = scanApp({ id: "pages", name: "Pages", directory: "Pages", roots: ["web"] }, studio, ds);
+    expect(report.cells.kbd).toMatchObject({ styled: 1, local: 1, unverified: 0 });
+    expect(report.cells.kbd!.sites.map(site => site.tag)).toEqual(["kbd.ds-kbd", "kbd"]);
+  });
+});
+
 /** Tags the scanner places in a column: custom elements and the recognized native elements. */
-const counted = (tag: string) => tag.includes("-") || ["button", "input", "select", "textarea", "p", "h1", "h2", "h3", "h4", "h5", "h6", "ul", "ol", "table", "form", "dialog", "details"].includes(tag);
+const counted = (tag: string) => tag.includes("-") || ["button", "input", "select", "textarea", "p", "h1", "h2", "h3", "h4", "h5", "h6", "ul", "ol", "table", "form", "dialog", "details", "kbd"].includes(tag);
 
 describe("classes written in code and local DOM builders", () => {
   const styles = (source: string) => sourceSites("view.ts", source).map(site => [site.tag, site.nativeStyle]);

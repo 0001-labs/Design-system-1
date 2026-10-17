@@ -30,6 +30,7 @@ export * from "./0-face/format";
 export * from "./0-face/preferences";
 export * from "./0-face/pricing";
 export * from "./0-face/theme";
+export * from "./0-face/keys";
 
 // ============================================================================
 // 2-core: Core Components
@@ -53,6 +54,7 @@ export * from "./2-core/ds-empty";
 export * from "./2-core/ds-gap";
 export * from "./2-core/ds-icon";
 export * from "./2-core/ds-input";
+export * from "./2-core/ds-kbd";
 export * from "./2-core/ds-file-picker";
 export * from "./2-core/ds-textarea";
 export * from "./2-core/ds-composer";

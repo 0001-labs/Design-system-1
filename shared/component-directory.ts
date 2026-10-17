@@ -44,6 +44,7 @@ export const ALL_LAYERS: DirectoryLayer[] = [
       { name: 'Gap', href: '/2-core/gap/', tag: 'ds-gap' },
       { name: 'Icon', href: '/2-core/icon/', tag: 'ds-icon' },
       { name: 'Input', href: '/2-core/input/', tag: 'ds-input' },
+      { name: 'Keyboard shortcut', href: '/2-core/kbd/', tag: 'ds-kbd' },
       { name: 'Language', href: '/2-core/language/', tag: 'ds-language' },
       { name: 'Link', href: '/2-core/link/' },
       { name: 'Notice', href: '/2-core/notice/', tag: 'ds-notice' },

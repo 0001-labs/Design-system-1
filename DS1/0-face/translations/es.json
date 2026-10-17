@@ -81,6 +81,19 @@
     "Saved": "Guardado",
     "Saving…": "Guardando…",
     "Untitled": "Sin título",
-    "Account": "Cuenta"
+    "Account": "Cuenta",
+    "key.ctrl": "Ctrl",
+    "key.shift": "Mayús",
+    "key.alt": "Alt",
+    "key.enter": "Entrar",
+    "key.escape": "Esc",
+    "key.tab": "Tab",
+    "key.space": "Espacio",
+    "key.backspace": "Retroceso",
+    "key.delete": "Supr",
+    "key.home": "Inicio",
+    "key.end": "Fin",
+    "key.pageup": "Re Pág",
+    "key.pagedown": "Av Pág"
   }
 }

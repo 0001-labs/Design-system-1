@@ -81,6 +81,19 @@
     "Saved": "Saved",
     "Saving…": "Saving…",
     "Untitled": "Untitled",
-    "Account": "Account"
+    "Account": "Account",
+    "key.ctrl": "Ctrl",
+    "key.shift": "Shift",
+    "key.alt": "Alt",
+    "key.enter": "Enter",
+    "key.escape": "Esc",
+    "key.tab": "Tab",
+    "key.space": "Space",
+    "key.backspace": "Backspace",
+    "key.delete": "Del",
+    "key.home": "Home",
+    "key.end": "End",
+    "key.pageup": "PgUp",
+    "key.pagedown": "PgDn"
   }
 }

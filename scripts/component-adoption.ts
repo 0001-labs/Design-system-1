@@ -30,14 +30,14 @@ export function loadAppSpecs(studio: string, configPath = process.env.ADOPTION_C
 }
 const known = new Set(IMPLEMENTATION_COLUMNS.map(c => c.id));
 /** Blocks a native class draws on any element, each with the sheet that draws it. Text marked as one of their parts is the block's own. */
-const blockClasses: Record<string, { component: string; sheet: string }> = { "ds-empty": { component: "empty", sheet: "1-root/empty.css" }, "ds-notice": { component: "notice", sheet: "1-root/notice.css" }, "ds-table": { component: "table", sheet: "1-root/table.css" } };
+const blockClasses: Record<string, { component: string; sheet: string }> = { "ds-empty": { component: "empty", sheet: "1-root/empty.css" }, "ds-notice": { component: "notice", sheet: "1-root/notice.css" }, "ds-table": { component: "table", sheet: "1-root/table.css" }, "ds-kbd": { component: "kbd", sheet: "1-root/kbd.css" } };
 const blockPart = /^ds-(?:empty|notice)__/;
 /**
- * Files verified on their own: the block sheets, the React adapters for empty states and notices, and the page
+ * Files verified on their own: the block sheets, the React adapters for empty states, notices and shortcut hints, and the page
  * scripts that draw DS1 without a component: the tooltip script and the feedback dialogs.
  */
-const entryFiles = ["1-root/empty.css", "1-root/notice.css", "1-root/table.css", "react/empty.ts", "react/notice.ts", "0-face/tooltips.ts", "0-face/feedback.ts", "0-face/dialogs.ts"];
-const native: Record<string, string> = { button: "button", input: "input", select: "select", textarea: "textarea", p: "text", h1: "text", h2: "text", h3: "text", h4: "text", h5: "text", h6: "text", ul: "list", ol: "list", table: "table", form: "form", dialog: "dialog", details: "accordion" };
+const entryFiles = ["1-root/empty.css", "1-root/notice.css", "1-root/table.css", "1-root/kbd.css", "react/empty.ts", "react/notice.ts", "react/kbd.ts", "0-face/tooltips.ts", "0-face/feedback.ts", "0-face/dialogs.ts"];
+const native: Record<string, string> = { button: "button", input: "input", select: "select", textarea: "textarea", p: "text", h1: "text", h2: "text", h3: "text", h4: "text", h5: "text", h6: "text", ul: "list", ol: "list", table: "table", form: "form", dialog: "dialog", details: "accordion", kbd: "kbd" };
 /**
  * `prose` marks native text, a list or a table inside an element marked data-ds-prose, which DS1's prose sheet draws.
  * `column` places a site that is not an element of its own kind: a title or data-tooltip attribute (Tooltip), a
@@ -90,7 +90,7 @@ function staticClasses(expression: ts.Expression | undefined): string | undefine
   }
   return undefined;
 }
-const proseTags = new Set([...textTags, "ul", "ol", "table"]);
+const proseTags = new Set([...textTags, "ul", "ol", "table", "kbd"]);
 /**
  * The pieces controls.css draws on any element, and the column each counts in:
  * a field's label row counts with forms, a drop zone as a file picker.
@@ -112,7 +112,7 @@ function nativeStyle(tag: string, className: string): string | undefined {
   if (textTags.has(tag) && classes.some(name => blockPart.test(name))) return "block-part";
   // Native text with a literal .ds-text class or one of its sizes and tones, or a field's part.
   if (textTags.has(tag)) return classes.some(name => name === "ds-text" || name.startsWith("ds-text--")) ? "ds-text" : fieldParts.find(name => classes.includes(name));
-  const supported = tag === "button" ? ["ds-toggle", "ds-button", "ds-switch"] : ["input", "select", "textarea"].includes(tag) ? ["ds-input", "ds-textarea", "ds-select", "ds-checkbox", "ds-radio"] : tag === "dialog" ? ["ds-dialog"] : [];
+  const supported = tag === "button" ? ["ds-toggle", "ds-button", "ds-switch"] : ["input", "select", "textarea"].includes(tag) ? ["ds-input", "ds-textarea", "ds-select", "ds-checkbox", "ds-radio"] : tag === "dialog" ? ["ds-dialog"] : tag === "kbd" ? ["ds-menu__shortcut"] : [];
   return supported.find(name => classes.includes(name)) ?? (native[tag] ? undefined : Object.keys(nativePieces).find(name => classes.includes(name)));
 }
 /** A file input directly inside a label drawn as a drop zone or a button is that file picker's frame. */
@@ -853,6 +853,7 @@ function importedSharedAdapters(root: string, file: string, source: string, mani
     [resolve(root, dirname(manifestPath), "react/badge.ts")]: { Badge: "badge" },
     [resolve(root, dirname(manifestPath), "react/empty.ts")]: { Empty: "empty" },
     [resolve(root, dirname(manifestPath), "react/notice.ts")]: { Notice: "notice" },
+    [resolve(root, dirname(manifestPath), "react/kbd.ts")]: { Kbd: "kbd" },
     [resolve(root, dirname(manifestPath), "react/avatar.ts")]: { Avatar: "avatar", Logo: "avatar" },
     [resolve(root, dirname(manifestPath), "react/accordion.ts")]: { Accordion: "accordion" },
     [resolve(root, dirname(manifestPath), "react/menu.ts")]: { Menu: "menu" },
@@ -1093,10 +1094,10 @@ export function scanReport(studio = resolve(repository, "..")): AdoptionReport {
       "DS1 means the component and its imported dependencies match a recorded DS1 Git revision. An older verified snapshot still counts as DS1; the detail view shows whether it matches today's source. Modified or unverifiable DS1 is counted separately.",
       "DS1 styles counts native controls with literal ds-button, ds-switch, ds-input, ds-textarea, ds-select, ds-checkbox, ds-radio or ds-dialog classes and verified shared control styles: from a component manifest, or for a product that copies only the tokens and controls.css, from its sync.lock.json (the files match the lock and the lock matches DS1 at its revision). These are not Lit components. Dynamic class expressions are not inferred.",
       "DS1 styles also counts the pieces controls.css draws on any element: ds-field in Form (with ds-field__label, ds-field__hint and ds-field__error on native text in Text), ds-avatar in Avatar, ds-badge in Badge, ds-icon in Icon and the ds-drop zone in File picker, and a button with ds-toggle in Toggle. Each counts only when the verified copy of controls.css defines its class; an older copy that does not is needs review. A native input type=file directly inside label.ds-drop or label.ds-button is that label's frame: the label counts once as a DS1-styled file picker and the input is not counted again.",
-      "DS1 styles also counts any element with a literal ds-empty or ds-notice class in Empty state or Notice, and a native table with a literal ds-table class in Table, verified through the sheet that draws it (empty.css, notice.css or table.css with the component tokens), from a component manifest or the sync.lock.json. Native p and h1-h6 marked with one of their ds-empty__ or ds-notice__ parts belong to the block and are not counted again as text; buttons and links inside stay their own sites.",
-      "DS1 styles also counts native p and h1-h6 with a literal ds-text class (ds-text or a ds-text-- size or tone), verified through text.css (or, in an older copy, the one.css that held .ds-text), and native p, h1-h6, ul, ol and table inside an element marked data-ds-prose, verified through prose.css. The nearest data-ds-prose or data-ds-not-prose ancestor in the same markup or JSX decides; prose is not inferred across components or from DOM creation.",
+      "DS1 styles also counts any element with a literal ds-empty or ds-notice class in Empty state or Notice, a native table with a literal ds-table class in Table, and a literal ds-kbd class in Keyboard shortcut, verified through the sheet that draws it (empty.css, notice.css, table.css or kbd.css with the component tokens), from a component manifest or the sync.lock.json. Native p and h1-h6 marked with one of their ds-empty__ or ds-notice__ parts belong to the block and are not counted again as text; buttons and links inside stay their own sites.",
+      "DS1 styles also counts native p and h1-h6 with a literal ds-text class (ds-text or a ds-text-- size or tone), verified through text.css (or, in an older copy, the one.css that held .ds-text), and native p, h1-h6, ul, ol, table and kbd inside an element marked data-ds-prose, verified through prose.css. The nearest data-ds-prose or data-ds-not-prose ancestor in the same markup or JSX decides; prose is not inferred across components or from DOM creation.",
       "Design system 1's own app and site import DS1/ directly at the same commit, so their DS1 sites count as DS1 when DS1/ has no uncommitted changes; there is no copied snapshot to verify. A checkout is dirty when the app's own folder has uncommitted changes, not the repository around it.",
-      "Local means recognized ezo-/c9y- components or native button, input/select/textarea, p/headings, ul/ol, table, form, details and dialog, plus literal dialog/alertdialog roles, including explicit setAttribute sites, title tooltips, table and grid roles and the browser's dialogs. Native semantics can be intentional; these counts are review leads, not automatic defects.",
+      "Local means recognized ezo-/c9y- components or native button, input/select/textarea, p/headings, ul/ol, table, form, details, dialog and kbd (a kbd with the menu's ds-menu__shortcut class counts as DS1 styles), plus literal dialog/alertdialog roles, including explicit setAttribute sites, title tooltips, table and grid roles and the browser's dialogs. Native semantics can be intentional; these counts are review leads, not automatic defects.",
       "Tests, demos in preview/dev directories, generated files, vendored implementations and shared sign-in internals are excluded. Link's inspected TabPill, TabPillRow and Tooltip/Tooltop adapters and DS1's verified React FilePicker, Input, Textarea, Composer, Menu, ContextMenuContent/SubContent and their Button, Text and FilePicker entries, Checkbox, Radio, Switch, Select, ColorInput, Button, ButtonLink, Token, TokenField, Avatar, Logo, AvatarGroup, Accordion, Split, DialogContent, Empty and Notice adapters count at imported JSX uses, without counting their inner DS1 tags again.",
       "Icons: ds-icon with a literal type in markup, Lit, JSX or h/createElement calls counts as a use of that name; a type set by an expression is a dynamic use, and inline <svg> drawings are counted apart. An app with a copied icon map beside its DS1 snapshot is compared drawing by drawing with today's DS1 map: Differs marks a copy that is not DS1's drawing, or a DS1 name missing from the copy; Local only is a name DS1 does not draw. Apps without a copy resolve names from DS1 itself. Icons drawn other ways count too, each as its own kind: SVG files used as CSS masks or backgrounds, imported or in <img>, compared with DS1 by geometry; icon-font classes (local only); a control whose whole text is one symbol glyph, mapped to the DS1 icon it stands for; SVG built with createElementNS; components from a product's own icon set, recognised by shape; and inline drawings that match a DS1 icon, named after it.",
       "Native dialog/input/button/select/textarea children directly inside ds-dialog/ds-file-picker/ds-checkbox/ds-radio/ds-color/ds-switch/ds-select/ds-composer count as their shared frames, not as extra local controls. Literal file, color, checkbox and radio types have their own columns; switch roles are grouped as Toggle; dynamic types stay in Input. Direct const document.createElement plus append composition, statically imported h factories from inspected DOM helpers and local builders are also recognized. Other React abstractions, dynamic tag names, CSS-only controls, spans and inline SVGs are not inferred. Native apps are outside this scan. A zero means no recognized source site, not that a capability is absent.",

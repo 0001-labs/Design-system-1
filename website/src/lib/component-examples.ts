@@ -174,6 +174,11 @@ render();`,
     html: '<ds-empty icon="search" heading="No results" text="Try another word, or clear the search." literal centered>\n  <ds-button slot="actions" secondary>Clear the search</ds-button>\n</ds-empty>',
     height: 200,
   },
+  'kbd': {
+    title: 'Shortcut hints', hint: 'Written as your platform writes them: symbols on a Mac, iPhone or iPad, words elsewhere.',
+    html: '<p class="ds-text"><ds-kbd shortcut="mod+k"></ds-kbd> Search</p>\n<p class="ds-text"><ds-kbd shortcut="mod+shift+d"></ds-kbd> Duplicate</p>\n<p class="ds-text"><ds-kbd shortcut="alt+arrowup"></ds-kbd> Move up</p>\n<p class="ds-text">Close <ds-kbd shortcut="escape" plain></ds-kbd></p>',
+    height: 120,
+  },
   'notice': {
     title: 'Four tones', hint: 'Danger is an alert, the others a status. The close button fires ds-notice-dismiss and hides the notice.',
     html: `<ds-notice text="Changes from an earlier session are stored on this device." literal></ds-notice>
@@ -285,7 +290,7 @@ export const PAGE_EXAMPLES: Record<string, string[]> = {
   '2-core/input': ['input', 'input-states'],
   '2-core/text': ['text'], '2-core/date': ['date'],
   '2-core/banner': ['banner', 'banner-dismiss'], '2-core/card': ['card'],
-  '2-core/empty': ['empty', 'empty-search'], '2-core/notice': ['notice'],
+  '2-core/empty': ['empty', 'empty-search'], '2-core/notice': ['notice'], '2-core/kbd': ['kbd'],
   '2-core/cycle': ['cycle'], '2-core/language': ['language'],
   '2-core/gap': ['gap'],
   '3-unit/row': ['row', 'row-centered'], '3-unit/list': ['list'],

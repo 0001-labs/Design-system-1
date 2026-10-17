@@ -81,6 +81,19 @@
     "Saved": "Gespeichert",
     "Saving…": "Wird gespeichert …",
     "Untitled": "Ohne Titel",
-    "Account": "Konto"
+    "Account": "Konto",
+    "key.ctrl": "Strg",
+    "key.shift": "Umschalt",
+    "key.alt": "Alt",
+    "key.enter": "Eingabe",
+    "key.escape": "Esc",
+    "key.tab": "Tab",
+    "key.space": "Leertaste",
+    "key.backspace": "Rücktaste",
+    "key.delete": "Entf",
+    "key.home": "Pos1",
+    "key.end": "Ende",
+    "key.pageup": "Bild auf",
+    "key.pagedown": "Bild ab"
   }
 }

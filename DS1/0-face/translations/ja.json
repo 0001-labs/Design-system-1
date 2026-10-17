@@ -81,6 +81,19 @@
     "Saved": "保存しました",
     "Saving…": "保存中…",
     "Untitled": "名称未設定",
-    "Account": "アカウント"
+    "Account": "アカウント",
+    "key.ctrl": "Ctrl",
+    "key.shift": "Shift",
+    "key.alt": "Alt",
+    "key.enter": "Enter",
+    "key.escape": "Esc",
+    "key.tab": "Tab",
+    "key.space": "スペース",
+    "key.backspace": "Backspace",
+    "key.delete": "Delete",
+    "key.home": "Home",
+    "key.end": "End",
+    "key.pageup": "Page Up",
+    "key.pagedown": "Page Down"
   }
 }

@@ -81,6 +81,19 @@
     "Saved": "Salvato",
     "Saving…": "Salvataggio…",
     "Untitled": "Senza titolo",
-    "Account": "Account"
+    "Account": "Account",
+    "key.ctrl": "Ctrl",
+    "key.shift": "Maiusc",
+    "key.alt": "Alt",
+    "key.enter": "Invio",
+    "key.escape": "Esc",
+    "key.tab": "Tab",
+    "key.space": "Spazio",
+    "key.backspace": "Backspace",
+    "key.delete": "Canc",
+    "key.home": "Home",
+    "key.end": "Fine",
+    "key.pageup": "Pag su",
+    "key.pagedown": "Pag giù"
   }
 }

@@ -81,6 +81,19 @@
     "Saved": "Enregistré",
     "Saving…": "Enregistrement…",
     "Untitled": "Sans titre",
-    "Account": "Compte"
+    "Account": "Compte",
+    "key.ctrl": "Ctrl",
+    "key.shift": "Maj",
+    "key.alt": "Alt",
+    "key.enter": "Entrée",
+    "key.escape": "Échap",
+    "key.tab": "Tab",
+    "key.space": "Espace",
+    "key.backspace": "Retour arrière",
+    "key.delete": "Suppr",
+    "key.home": "Origine",
+    "key.end": "Fin",
+    "key.pageup": "Page préc.",
+    "key.pagedown": "Page suiv."
   }
 }

@@ -44,6 +44,7 @@ export function componentGraph(ds1, names) {
   if (components.includes('badge')) visit('react/badge.ts');
   if (components.includes('empty')) visit('react/empty.ts');
   if (components.includes('notice')) visit('react/notice.ts');
+  if (components.includes('kbd')) visit('react/kbd.ts');
   if (components.includes('toast')) visit('react/toast.ts');
   if (components.includes('file-picker')) visit('react/file-picker.ts');
   if (components.includes('split')) visit('react/split.ts');
