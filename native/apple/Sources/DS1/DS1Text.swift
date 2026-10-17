@@ -195,7 +195,9 @@ private struct DS1Baseline: ViewModifier {
     let style: DS1TextStyle
     func body(content: Content) -> some View {
         let line = style.line(scale)
-        let baseline = DS1Font.baseline(size: style.size(scale), line: line)
+        // A title rests on the grid's line at its foot, so what stands beside it shares its square;
+        // other text stands where the web's half-leading puts GT America.
+        let baseline = style == .display ? line : DS1Font.baseline(size: style.size(scale), line: line)
         content
             .alignmentGuide(VerticalAlignment.top) { d in d[.firstTextBaseline] - baseline }
             .frame(height: line, alignment: .top)
