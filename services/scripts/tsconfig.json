@@ -1,0 +1,16 @@
+{
+  // The scripts here run on Node (`vp run smoke`, through tsx) against the deployed Worker, so
+  // they take Node's types, not the Worker's, and each file is a module with top-level await.
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "moduleDetection": "force",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "types": ["node"]
+  },
+  "include": ["*.ts"]
+}

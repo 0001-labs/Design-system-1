@@ -20,7 +20,7 @@ describe('canonical adoption catalogue', () => {
     expect(new Set(COMPONENT_COLUMNS.map(c => c.id)).size).toBe(COMPONENT_COLUMNS.length);
   });
   it('combines compatibility modes without losing counts or original evidence', () => {
-    const cells = Object.fromEntries(IMPLEMENTATION_COLUMNS.map(c => [c.id, { ...cell('unused', 0), sites: [] }]));
+    const cells: Record<string, ComponentCell> = Object.fromEntries(IMPLEMENTATION_COLUMNS.map(c => [c.id, { ...cell('unused', 0), sites: [] }]));
     cells.button = cell('ds-button', 2); cells.split = cell('ds-split', 3); cells.switch = cell('ds-switch', 4); cells.toggle = cell('ds-toggle', 5);
     const result = catalogueApp({ id: 'example', name: 'Example', status: 'scanned', commit: null, dirty: false, files: 1, scope: ['src'], snapshotCommit: null, cells, otherCustomElements: {}, migration: 'deferred' } as AdoptionApp);
     expect(result.cells.button.shared).toBe(5); expect(result.cells.toggle.shared).toBe(9);

@@ -1,0 +1,22 @@
+{
+  // The Vitest suite: Node and Vite's types (import.meta.glob), the DOM for happy-dom and
+  // React for the adapters and screens it renders.
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowImportingTsExtensions": true,
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+    "types": ["node", "vite/client"]
+  },
+  "include": ["./**/*"]
+}

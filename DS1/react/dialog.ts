@@ -10,7 +10,7 @@ const useDialog = () => {
   return context;
 };
 
-export interface DialogProps { open?: boolean; defaultOpen?: boolean; onOpenChange?: (open: boolean, reason?: DialogCloseReason) => void; children: ReactNode }
+export interface DialogProps { open?: boolean; defaultOpen?: boolean; onOpenChange?: (open: boolean, reason?: DialogCloseReason) => void; children?: ReactNode }
 export function Dialog({ open, defaultOpen = false, onOpenChange, children }: DialogProps) {
   const [internal, setInternal] = useState(defaultOpen);
   const id = useId();

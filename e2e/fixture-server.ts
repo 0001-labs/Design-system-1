@@ -50,7 +50,7 @@ serve({
       });
     }
 
-    return new Response(file, {
+    return new Response(new Uint8Array(file), {
       headers: { "cache-control": "no-store" },
     });
   },

@@ -2,9 +2,8 @@ import { resolve } from 'node:path';
 import { mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { expect, test } from 'vite-plus/test';
-// @ts-expect-error A plain module, read by Sync 1 through sync.exports.mjs.
+// Plain modules, read by Sync 1 through sync.exports.mjs; tests/tsconfig.json reads their JavaScript.
 import { componentGraph } from '../scripts/component-graph.mjs';
-// @ts-expect-error The same.
 import exported from '../sync.exports.mjs';
 
 const ds1 = resolve('DS1');

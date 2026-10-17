@@ -85,7 +85,7 @@ test('a modeless panel returns focus to a launcher remounted by React', async ()
     return h('div', null,
       !open && h('button', { 'data-launcher': '', onClick: () => setOpen(true) }, 'Open tools'),
       h(Dialog, { open, onOpenChange: setOpen },
-        h(DialogContent, { nonModal: true, portal: false, returnFocus: () => mount.querySelector('[data-launcher]'), 'aria-label': 'Tools' },
+        h(DialogContent, { nonModal: true, portal: false, returnFocus: () => mount.querySelector<HTMLElement>('[data-launcher]'), 'aria-label': 'Tools' },
           h('button', null, 'Tool action'))));
   }
   try {

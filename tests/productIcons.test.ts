@@ -10,7 +10,7 @@ test('imported product drawings are in the library under neutral names, with onl
   for (const source of sources) {
     const svg = readFileSync(new URL(`../DS1/x-icon/${source.name}.svg`, import.meta.url), 'utf8');
     expect(createHash('sha256').update(svg).digest('hex'), source.source).toBe(source.iconHash);
-    expect(iconNameToSvgMap[source.name], source.source).toBe(svg.trim());
+    expect(iconNameToSvgMap[source.name as keyof typeof iconNameToSvgMap], source.source).toBe(svg.trim());
     expect(catalog.some(icon => icon.key === source.name), source.source).toBe(isSharedInterfaceIcon(source.name));
     expect(source.name, source.source).not.toMatch(new RegExp(`^${source.product.toLowerCase()}-`));
   }
