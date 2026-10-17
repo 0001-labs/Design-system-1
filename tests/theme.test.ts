@@ -17,11 +17,12 @@ type PageOptions = {
   head?: string;
   blocked?: boolean;
   transition?: (callback: () => void) => unknown;
+  url?: string;
 };
 
 /** A fresh page that runs the head script, as a browser would before the first paint. */
-function page({ dark = false, reduced = false, storage = {}, preferences, i18n, head = "", blocked = false, transition }: PageOptions = {}) {
-  const window = new Window({ url: "https://example.test/" });
+function page({ dark = false, reduced = false, storage = {}, preferences, i18n, head = "", blocked = false, transition, url = "https://example.test/" }: PageOptions = {}) {
+  const window = new Window({ url });
   opened.push(window);
   const scheme = Object.assign(new window.EventTarget(), { matches: dark });
   Object.assign(window, { matchMedia: (query: string) => query.includes("color-scheme") ? scheme : { matches: reduced } });
@@ -147,6 +148,42 @@ test("the stored language goes on the root before the first paint, within the pr
   expect(page({ storage: { language: "ja" }, i18n: { persist: false } }).root.lang).toBe("");
   expect(page({ storage: { language: "de" }, i18n: { languages: ["en", "ja"] } }).root.lang).toBe("");
   expect(page({ storage: { language: "<script>" } }).root.lang).toBe("");
+});
+
+test("themeDefault keeps light (or dark) for a first visit, a stored choice still wins", () => {
+  const first = page({ dark: true, preferences: { themeDefault: "light" } });
+  expect(first.runtime.mode()).toBe("light");
+  expect(first.root.classList.contains("light-theme")).toBe(true);
+  expect(first.window.localStorage.getItem("ds-one:theme")).toBeNull();
+  first.system(false);
+  first.system(true);
+  expect(first.runtime.theme()).toBe("light");
+  expect(page({ dark: false, preferences: { themeDefault: "dark" } }).runtime.theme()).toBe("dark");
+  expect(page({ dark: true, storage: { "ds-one:theme": "system" }, preferences: { themeDefault: "light" } }).runtime.theme()).toBe("dark");
+  expect(page({ dark: true, preferences: { themeDefault: "light", themeMode: "system" } }).runtime.theme()).toBe("dark");
+  expect(page({ dark: true, preferences: { themeDefault: "sepia" } }).runtime.mode()).toBe("system");
+});
+
+test("an address's language goes on the root before the first paint when the product takes it from there", () => {
+  const i18n = { languages: ["en", "da", "ja", "pt-BR"], languageFromAddress: true };
+  expect(page({ url: "https://example.test/ja/pricing", storage: { language: "da" }, i18n }).root.lang).toBe("ja");
+  expect(page({ url: "https://example.test/pt-br/", storage: { language: "da" }, i18n }).root.lang).toBe("pt-BR");
+  expect(page({ url: "https://example.test/pricing", storage: { language: "da" }, i18n }).root.lang).toBe("da");
+  expect(page({ url: "https://example.test/ja/pricing", storage: { language: "da" }, i18n: { ...i18n, routing: { languages: ["da"] } } }).root.lang).toBe("da");
+  expect(page({ url: "https://example.test/ja/pricing", storage: { language: "da" }, i18n: { languages: i18n.languages } }).root.lang).toBe("da");
+  // Without languages, an address may carry any of Design system 1's.
+  expect(page({ url: "https://example.test/ko/", i18n: { languageFromAddress: true } }).root.lang).toBe("ko");
+  expect(page({ url: "https://example.test/app/", i18n: { languageFromAddress: true } }).root.lang).toBe("");
+});
+
+test("langTarget leaves the root's lang to the page", () => {
+  expect(page({ storage: { language: "ja" }, i18n: { langTarget: false } }).root.lang).toBe("");
+});
+
+test("the head script knows Design system 1's languages", async () => {
+  const { LANGUAGES } = await import("../DS1/0-face/languages");
+  const listed = /var LANGUAGES = (\[[^\]]+\]);/.exec(source)?.[1];
+  expect(JSON.parse(listed ?? "[]")).toEqual([...LANGUAGES]);
 });
 
 test("a change after the first paint crosses over, a skipped crossing still lands, and reduced motion jumps", async () => {

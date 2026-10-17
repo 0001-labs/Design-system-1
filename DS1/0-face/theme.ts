@@ -10,10 +10,17 @@
  * The theme is marked on the root element by the class `light-theme` or
  * `dark-theme` (canonical), `data-theme="light|dark"` (for pages that key on
  * the attribute) and `color-scheme`. In system mode it follows
- * prefers-color-scheme as it changes.
+ * prefers-color-scheme as it changes. A visitor who has chosen nothing sees
+ * `themeDefault` from `window.DS_ONE_PREFERENCES` (system unless the product
+ * says light or dark).
+ *
+ * A page without the components copies it with Sync 1's `root` export,
+ * `"modules": ["theme"]` (this file, the head script and the options type);
+ * it needs `@lit-labs/signals`.
  */
 import { signal } from "@lit-labs/signals";
 import "./theme-bootstrap.js";
+import type { PreferenceOptions } from "./preference-options";
 
 /** The theme on the page. */
 export type ThemeType = "light" | "dark";
@@ -79,7 +86,8 @@ export function setTheme(theme: ThemeType): void {
 export function followSystemTheme(): () => void {
   if (typeof window === "undefined") return () => {};
   const previous = window.DS_ONE_PREFERENCES?.themeMode;
-  window.DS_ONE_PREFERENCES = { ...window.DS_ONE_PREFERENCES, themeMode: "system" };
+  const following: PreferenceOptions = { ...window.DS_ONE_PREFERENCES, themeMode: "system" };
+  window.DS_ONE_PREFERENCES = following;
   setThemeMode("system");
   return () => {
     const options = { ...window.DS_ONE_PREFERENCES };
