@@ -1,6 +1,7 @@
 import { mountChartExample } from './chart-example';
 import { EXAMPLES, TABLE_DATA, TABLE_FOOTER } from './component-examples';
 import type { DsTable } from '../../../DS1/3-unit/ds-table';
+import type { TreeItem } from '../../../DS1/3-unit/ds-tree';
 
 // A preview has its own preferences. Trying a language or theme must not
 // overwrite the reader's choice in the surrounding documentation.
@@ -94,6 +95,35 @@ if (sidebar) {
   sidebar.addEventListener('sidebar-activate', event => { selected = (event as CustomEvent).detail.id; render(); output.textContent = `Selected: ${selected}`; });
   render();
 }
+// The tree and row examples do what their published scripts show.
+const tree = sample.querySelector('ds-tree');
+if (tree) {
+  type File = { id: string; label: string; icon: string; meta?: string; children?: File[] };
+  const files: File[] = [
+    { id: 'projects', label: 'Projects', icon: 'folder', children: [
+      { id: 'atlas', label: 'Atlas', icon: 'folder', children: [{ id: 'intro', label: 'intro.mp4', icon: 'video', meta: '12 MB' }, { id: 'notes', label: 'notes.md', icon: 'page', meta: '2 KB' }] },
+      { id: 'harbor', label: 'Harbor', icon: 'folder', children: [{ id: 'plan', label: 'plan.pdf', icon: 'pdf', meta: '340 KB' }] },
+    ] },
+    { id: 'trash', label: 'Trash', icon: 'delete', children: [] },
+  ];
+  const open = new Set(['projects', 'atlas']);
+  let selected = 'notes';
+  const rows = (nodes: File[], depth = 0): TreeItem[] => nodes.flatMap(node => [
+    { id: node.id, label: node.label, icon: node.icon, meta: node.meta, depth, selected: node.id === selected, expanded: node.children ? open.has(node.id) : undefined },
+    ...(node.children && open.has(node.id) ? rows(node.children, depth + 1) : []),
+  ]);
+  const render = () => { tree.items = rows(files); };
+  tree.addEventListener('ds-tree-toggle', event => { const { id, expanded } = (event as CustomEvent<{ id: string; expanded: boolean }>).detail; if (expanded) open.add(id); else open.delete(id); render(); });
+  tree.addEventListener('ds-tree-select', event => { selected = (event as CustomEvent<{ id: string }>).detail.id; render(); output.textContent = `ds-tree-select: ${selected}`; });
+  tree.addEventListener('ds-tree-activate', event => { output.textContent = `ds-tree-activate: ${(event as CustomEvent<{ id: string }>).detail.id}`; });
+  render();
+}
+sample.addEventListener('ds-row-press', event => {
+  event.preventDefault();
+  const row = event.target as HTMLElement & { current?: string | null };
+  if (row.hasAttribute('nav')) sample.querySelectorAll<HTMLElement & { current?: string | null }>('ds-row[nav]').forEach(other => { other.current = other === row ? 'page' : null; });
+  output.textContent = `ds-row-press: ${row.querySelector('ds-text')?.textContent ?? ''}`;
+});
 const grid = sample.querySelector('ds-grid');
 if (grid) sample.querySelectorAll<HTMLSelectElement>('[data-grid-option]').forEach(control => {
   control.addEventListener('change', () => {

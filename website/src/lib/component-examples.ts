@@ -213,6 +213,59 @@ render();`,
     title: 'A centred group', hint: 'An icon and its label share one row.',
     html: '<ds-row centered>\n  <ds-icon type="check"></ds-icon>\n  <ds-text>Completed</ds-text>\n</ds-row>',
   },
+  'row-pressable': {
+    title: 'Rows a person presses', hint: 'Press a row, or its own action at the end. The event appears below.', height: 220,
+    html: `<ds-list style="width:calc(12 * var(--ds-unit))">
+  <ds-row href="#atlas"><ds-text literal>Atlas</ds-text><ds-text tone="muted" literal style="margin-inline-start:auto">12 items</ds-text></ds-row>
+  <ds-row interactive><ds-text literal>Harbor</ds-text><ds-text tone="muted" literal style="margin-inline-start:auto">4 items</ds-text>
+    <ds-button slot="end" label="Add to Harbor"><ds-icon type="plus"></ds-icon></ds-button></ds-row>
+  <ds-row interactive disabled><ds-text literal>Meadow</ds-text></ds-row>
+</ds-list>
+<ds-row interactive stacked style="width:calc(4 * var(--ds-unit))"><ds-text size="small" tone="muted" literal>Cash</ds-text><ds-text literal>¥1,200</ds-text></ds-row>`,
+    script: `document.addEventListener('ds-row-press', event => {
+  event.preventDefault();
+  document.querySelector('#event-output').textContent = 'Pressed: ' + event.target.querySelector('ds-text').textContent;
+});`,
+  },
+  'row-nav': {
+    title: 'Navigation rows', hint: 'The page being shown is the current row. Choose another.', height: 160,
+    html: `<nav aria-label="Account" style="width:calc(12 * var(--ds-unit))">
+  <ds-row href="#profile" nav current><ds-text literal>Profile</ds-text></ds-row>
+  <ds-row href="#billing" nav><ds-text literal>Billing</ds-text></ds-row>
+  <ds-row href="#members" nav><ds-text literal>Members</ds-text></ds-row>
+</nav>`,
+    script: `const rows = document.querySelectorAll('nav ds-row');
+document.addEventListener('ds-row-press', event => {
+  event.preventDefault();
+  rows.forEach(row => { row.current = row === event.target ? 'page' : null; });
+});`,
+  },
+  'tree': {
+    title: 'Folders and files', hint: 'Open a folder, choose a file, or move with the arrow keys. Enter or a double click opens a file.', height: 220,
+    html: '<ds-tree label="Files" style="width:calc(12 * var(--ds-unit))"></ds-tree>',
+    script: `const tree = document.querySelector('ds-tree');
+const files = [
+  { id: 'projects', label: 'Projects', icon: 'folder', children: [
+    { id: 'atlas', label: 'Atlas', icon: 'folder', children: [{ id: 'intro', label: 'intro.mp4', icon: 'video', meta: '12 MB' }, { id: 'notes', label: 'notes.md', icon: 'page', meta: '2 KB' }] },
+    { id: 'harbor', label: 'Harbor', icon: 'folder', children: [{ id: 'plan', label: 'plan.pdf', icon: 'pdf', meta: '340 KB' }] },
+  ] },
+  { id: 'trash', label: 'Trash', icon: 'delete', children: [] },
+];
+const open = new Set(['projects', 'atlas']);
+let selected = 'notes';
+function rows(nodes, depth = 0) {
+  return nodes.flatMap(node => [
+    { id: node.id, label: node.label, icon: node.icon, meta: node.meta, depth, selected: node.id === selected,
+      expanded: node.children ? open.has(node.id) : undefined },
+    ...(node.children && open.has(node.id) ? rows(node.children, depth + 1) : []),
+  ]);
+}
+function render() { tree.items = rows(files); }
+tree.addEventListener('ds-tree-toggle', event => { event.detail.expanded ? open.add(event.detail.id) : open.delete(event.detail.id); render(); });
+tree.addEventListener('ds-tree-select', event => { selected = event.detail.id; render(); });
+tree.addEventListener('ds-tree-activate', event => { document.querySelector('#event-output').textContent = 'Opened ' + event.detail.id; });
+render();`,
+  },
   'list': {
     title: 'Rows in a list', hint: 'Use actual rows; there is no ds-list-item element.',
     html: '<ds-list>\n  <ds-row fill><ds-text>Design</ds-text><ds-text>Ready</ds-text></ds-row>\n  <ds-row fill><ds-text>Build</ds-text><ds-text>In progress</ds-text></ds-row>\n  <ds-row fill><ds-text>Review</ds-text><ds-text>Next</ds-text></ds-row>\n</ds-list>',

@@ -1,0 +1,81 @@
+---
+title: Tree
+description: Nested rows a person opens, closes and chooses from, one square high and one square further in per level.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+A tree shows things inside other things: folders and files, groups and their samples, a page's parts. Each row is one square high and each level stands one square further in, so a row's disclosure arrow stands under its parent's label. The arrow and an optional icon each take a square of their own; a leaf keeps the arrow's square empty, so labels at one level line up.
+
+## Try it
+
+<ComponentExample example="tree" />
+
+## Data and behaviour
+
+Set the `items` property to the visible rows, in order. Each row has a unique `id` and a `label`; optional fields are `depth` (0 at the root), `expanded` (`true` open, `false` closed, left out for a leaf), `selected`, `disabled`, `icon` (a name from the [icon library](/icons/)) and `meta` (small muted words at the row's end, a count or a size). Leave the children of a closed row out of the array. Labels are shown as written, never translated. Give the tree a `label`, its accessible name.
+
+The application owns the hierarchy, the expansion and the selection. The tree owns the rows' layout, their roles, the focus and the keyboard.
+
+| Event | Detail | Application response |
+| --- | --- | --- |
+| `ds-tree-toggle` | `{ id, expanded }` | Show or hide the row's children and set its `expanded`. |
+| `ds-tree-select` | `{ id }` | Set `selected` on that row, and show what it holds. |
+| `ds-tree-activate` | `{ id }` | Open the row's thing: a file in its editor, a sample played. |
+
+A click on the arrow opens or closes the row; a click anywhere else selects it, and a double click activates it. `itemFromEvent(event)` names the row under a context menu or a drag of the application's own. `focusItem(id)` moves the focus to a row and `scrollToSelected()` brings the selected row into view.
+
+## Keyboard
+
+The tree is one stop for Tab: the selected row, or the row last focused. Then, as in the tree pattern:
+
+| Key | What it does |
+| --- | --- |
+| Down, Up | The next or previous row, skipping unavailable ones. |
+| Home, End | The first or last row. |
+| Right | Opens a closed row; on an open row, moves to its first child. |
+| Left | Closes an open row; otherwise moves to its parent. |
+| Space | Selects the row. |
+| Enter | Selects and activates the row. |
+| A letter or digit | The next row whose label starts with it. |
+
+## Roles
+
+The rows are `role="treeitem"` inside a `role="tree"`, each with `aria-level`, `aria-setsize` and `aria-posinset`, `aria-expanded` on a parent and `aria-selected` on every row. The arrow is drawn, not announced: the row says whether it is open.
+
+## Look
+
+The pointer over a row fills it as any pressable [row](/3-unit/row/), and the selected row is drawn as the current destination in the [Sidebar](/3-unit/sidebar/): `--ds-row-fill-current`, in the medium weight. Keyboard focus draws the focus ring inside the row. A label too long for the row ends in an ellipsis. The tree fills its container's width and scrolls its rows when its height is constrained. `--ds-sf` scales the rows, indentation, arrows, icons and text.
+
+## Without Lit
+
+A page without Lit draws the same tree with the classes in `row.css`, which `controls.css` imports, and takes the keyboard from `connectTree()` in `0-face/tree.ts` (Sync 1's `root` export, `"modules": ["tree"]`). The rows are flat, in order, each with its `aria-level`; the classes indent them by it, up to twelve levels (`--ds-tree-indent` sets a row's depth in squares beyond that).
+
+```html
+<ul class="ds-tree" role="tree" aria-label="Files">
+  <li class="ds-tree__item" role="treeitem" aria-level="1" aria-expanded="true" data-id="src">
+    <span class="ds-tree__disclosure" aria-hidden="true"></span>
+    <span class="ds-icon" style="--ds-icon: url(icons/folder.svg)" aria-hidden="true"></span>
+    <span class="ds-tree__label">src</span>
+  </li>
+  <li class="ds-tree__item" role="treeitem" aria-level="2" aria-selected="true" data-id="main">
+    <span class="ds-tree__disclosure" aria-hidden="true"></span>
+    <span class="ds-tree__label">main.ts</span>
+    <span class="ds-tree__meta">2 KB</span>
+  </li>
+</ul>
+<script type="module">
+  import { connectTree } from "./ds1/0-face/tree.ts";
+  connectTree(document.querySelector(".ds-tree"));
+</script>
+```
+
+`connectTree` sends the same three events, named by each row's `data-id` (or its `id`). Unless the page cancels one, it does what the event asks: it opens or closes the row and hides or shows the rows inside it, keeping a closed row's rows hidden, or moves `aria-selected` to the row. It returns a function that takes the keyboard away again. The arrow is the library's `right` icon, turned down on an open row; `--ds-tree-disclosure` names another drawing.
+
+In React, `Tree` from `react/tree.ts` takes `items`, `label`, `onToggle`, `onSelect` and `onActivate`.
+
+## Tree or sidebar
+
+A [Sidebar](/3-unit/sidebar/) is navigation: every row is a link or a button of its own, each a stop for Tab, and the current destination is the page being shown. A tree is a chooser: one stop for Tab, a selection that stays within the page, and the tree pattern's keyboard. Use the sidebar for the places of an application and a tree for the things inside one of them.
+
+[Row](/3-unit/row/) · [Sidebar](/3-unit/sidebar/) · [List](/3-unit/list/) · [Icon](/2-core/icon/)

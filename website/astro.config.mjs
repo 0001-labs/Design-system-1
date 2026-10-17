@@ -133,6 +133,7 @@ export default defineConfig({
             { label: "Row", slug: "3-unit/row" },
             { label: "Sidebar", slug: "3-unit/sidebar" },
             { label: "Table", slug: "3-unit/table" },
+            { label: "Tree", slug: "3-unit/tree" },
           ],
         },
         {
