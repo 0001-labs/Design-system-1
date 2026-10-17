@@ -91,6 +91,8 @@
     "Slide {index}": "Slide {index}",
     "{index} of {count}": "{index} di {count}",
     "Previous slide": "Slide precedente",
-    "Next slide": "Slide successiva"
+    "Next slide": "Slide successiva",
+    "Menu": "Menu",
+    "Contents": "Indice"
   }
 }

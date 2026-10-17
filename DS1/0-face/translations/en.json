@@ -91,6 +91,8 @@
     "Slide {index}": "Slide {index}",
     "{index} of {count}": "{index} of {count}",
     "Previous slide": "Previous slide",
-    "Next slide": "Next slide"
+    "Next slide": "Next slide",
+    "Menu": "Menu",
+    "Contents": "Contents"
   }
 }

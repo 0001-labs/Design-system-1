@@ -1,0 +1,78 @@
+---
+title: Footer
+description: A site footer with the brand, columns of links, the language and theme, and the copyright.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+A site footer stands its brand and a line about the site at the start, in twelve squares; columns of links beside it, eight squares each, two squares apart; and two squares below, the legal line at the start and the preferences, language and theme, at the end. Every line is one square. Column headings are in the title grey, links in the text's ink with a faint hairline under the pointer, and a hairline runs along the top. Columns that do not fit beside the brand go below it; on a narrow screen the brand stands above the columns and the preferences come before the legal line.
+
+## Try it
+
+<ComponentExample example="footer" />
+
+## Use it
+
+```html
+<ds-footer brand="Name" tagline="What it does" preferences literal
+  columns='[{"heading":"Product","links":[{"label":"Download","href":"/download"},{"label":"Help","href":"/help"}]},
+            {"heading":"Elsewhere","links":[{"label":"Instagram","href":"https://instagram.com/name","external":true}]}]'>
+</ds-footer>
+```
+
+`columns` is a list of `{ heading, links }`, each link `{ label, href, external, current }`: `external` opens in a new tab with no referrer, `current` marks the page being read. Words are translation keys unless `literal`. The copyright reads `© <year> <owner>`, this year and the brand by default. `preferences` puts a [`ds-cycle`](/2-core/cycle/) for each setting it names at the end of the last row: `language`, `theme`, or both when it is present and empty.
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `brand` | string | Empty | The site's name, a link home. |
+| `href` | string | `/` | Where the brand links. |
+| `tagline` | string | Empty | A line about the site under the brand, muted. |
+| `columns` | `FooterColumn[]` | `[]` | The columns of links. |
+| `label` | string | Empty | Names the columns as a navigation; without it they are plain lists. |
+| `owner` | string | The brand | Who holds the copyright. |
+| `year` | number | This year | The copyright's year. |
+| `preferences` | string | None | `language`, `theme`, or both. |
+| `literal` | boolean | `false` | Show the words as written. |
+
+| Slot | What it holds |
+| --- | --- |
+| `brand` | A brand of the page's own: a logo, one square high. |
+| `preferences` | Controls of the page's own beside the cycles, such as a currency. |
+| `legal` | The last line, in place of the copyright. |
+
+## Without Lit
+
+`footer.css`, which `controls.css` imports, draws the same footer on native elements. A page that must render its links on the server writes these classes; the element draws them from data.
+
+```html
+<footer class="ds-footer">
+  <div class="ds-footer__brand">
+    <a class="ds-footer__mark" href="/">Name</a>
+    <p class="ds-footer__tagline">What it does</p>
+  </div>
+  <nav class="ds-footer__columns" aria-label="Footer">
+    <div class="ds-footer__column">
+      <h2 class="ds-footer__heading">Product</h2>
+      <ul class="ds-footer__links"><li><a href="/download">Download</a></li><li><a href="/help">Help</a></li></ul>
+    </div>
+  </nav>
+  <div class="ds-footer__base">
+    <p class="ds-footer__legal">© 2026 Name</p>
+    <div class="ds-footer__preferences"><ds-cycle type="language"></ds-cycle><ds-cycle type="theme"></ds-cycle></div>
+  </div>
+</footer>
+```
+
+Without the components, the preferences are `.ds-button--secondary` buttons the page wires to `setThemeMode()` and its language. Token: `--ds-footer-line` (the hairline along the top; `transparent` leaves it out).
+
+## In React
+
+```tsx
+import { Footer } from "./design/react/footer";
+
+<Footer brand="Name" literal preferences="" columns={[{ heading: "Product", links: [{ label: "Help", href: "/help" }] }]} />
+```
+
+`columns` is set as a property. The adapter does not register the element: import `4-page/ds-footer` once in the browser entry.
+
+[Header](/4-page/header/) · [Document](/4-page/document/) · [Cycle](/2-core/cycle/)

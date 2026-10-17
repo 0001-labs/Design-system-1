@@ -91,6 +91,8 @@
     "Slide {index}": "Lysbilde {index}",
     "{index} of {count}": "{index} av {count}",
     "Previous slide": "Forrige lysbilde",
-    "Next slide": "Neste lysbilde"
+    "Next slide": "Neste lysbilde",
+    "Menu": "Meny",
+    "Contents": "Innhold"
   }
 }

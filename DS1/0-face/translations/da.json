@@ -91,6 +91,8 @@
     "Slide {index}": "Dias {index}",
     "{index} of {count}": "{index} af {count}",
     "Previous slide": "Forrige dias",
-    "Next slide": "Næste dias"
+    "Next slide": "Næste dias",
+    "Menu": "Menu",
+    "Contents": "Indhold"
   }
 }

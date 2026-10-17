@@ -84,6 +84,8 @@
     "Slide {index}": "Glæra {index}",
     "{index} of {count}": "{index} af {count}",
     "Previous slide": "Fyrri glæra",
-    "Next slide": "Næsta glæra"
+    "Next slide": "Næsta glæra",
+    "Menu": "Valmynd",
+    "Contents": "Efnisyfirlit"
   }
 }

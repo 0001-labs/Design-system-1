@@ -114,6 +114,8 @@ enum DS1SharedWords {
         "{index} of {count}": "{index} af {count}",
         "Previous slide": "Forrige dias",
         "Next slide": "Næste dias",
+        "Menu": "Menu",
+        "Contents": "Indhold",
     ]
 
     private static let deWords: [String: String] = [
@@ -209,6 +211,8 @@ enum DS1SharedWords {
         "{index} of {count}": "{index} von {count}",
         "Previous slide": "Vorherige Folie",
         "Next slide": "Nächste Folie",
+        "Menu": "Menü",
+        "Contents": "Inhalt",
     ]
 
     private static let enWords: [String: String] = [
@@ -304,6 +308,8 @@ enum DS1SharedWords {
         "{index} of {count}": "{index} of {count}",
         "Previous slide": "Previous slide",
         "Next slide": "Next slide",
+        "Menu": "Menu",
+        "Contents": "Contents",
     ]
 
     private static let esWords: [String: String] = [
@@ -399,6 +405,8 @@ enum DS1SharedWords {
         "{index} of {count}": "{index} de {count}",
         "Previous slide": "Diapositiva anterior",
         "Next slide": "Diapositiva siguiente",
+        "Menu": "Menú",
+        "Contents": "Contenido",
     ]
 
     private static let fiWords: [String: String] = [
@@ -494,6 +502,8 @@ enum DS1SharedWords {
         "{index} of {count}": "{index}/{count}",
         "Previous slide": "Edellinen dia",
         "Next slide": "Seuraava dia",
+        "Menu": "Valikko",
+        "Contents": "Sisällys",
     ]
 
     private static let frWords: [String: String] = [
@@ -589,6 +599,8 @@ enum DS1SharedWords {
         "{index} of {count}": "{index} sur {count}",
         "Previous slide": "Diapositive précédente",
         "Next slide": "Diapositive suivante",
+        "Menu": "Menu",
+        "Contents": "Sommaire",
     ]
 
     private static let isWords: [String: String] = [
@@ -677,6 +689,8 @@ enum DS1SharedWords {
         "{index} of {count}": "{index} af {count}",
         "Previous slide": "Fyrri glæra",
         "Next slide": "Næsta glæra",
+        "Menu": "Valmynd",
+        "Contents": "Efnisyfirlit",
     ]
 
     private static let itWords: [String: String] = [
@@ -772,6 +786,8 @@ enum DS1SharedWords {
         "{index} of {count}": "{index} di {count}",
         "Previous slide": "Slide precedente",
         "Next slide": "Slide successiva",
+        "Menu": "Menu",
+        "Contents": "Indice",
     ]
 
     private static let jaWords: [String: String] = [
@@ -867,6 +883,8 @@ enum DS1SharedWords {
         "{index} of {count}": "{count} 枚中 {index} 枚目",
         "Previous slide": "前のスライド",
         "Next slide": "次のスライド",
+        "Menu": "メニュー",
+        "Contents": "目次",
     ]
 
     private static let koWords: [String: String] = [
@@ -962,6 +980,8 @@ enum DS1SharedWords {
         "{index} of {count}": "{count}개 중 {index}번째",
         "Previous slide": "이전 슬라이드",
         "Next slide": "다음 슬라이드",
+        "Menu": "메뉴",
+        "Contents": "목차",
     ]
 
     private static let nbWords: [String: String] = [
@@ -1057,6 +1077,8 @@ enum DS1SharedWords {
         "{index} of {count}": "{index} av {count}",
         "Previous slide": "Forrige lysbilde",
         "Next slide": "Neste lysbilde",
+        "Menu": "Meny",
+        "Contents": "Innhold",
     ]
 
     private static let ptBRWords: [String: String] = [
@@ -1152,6 +1174,8 @@ enum DS1SharedWords {
         "{index} of {count}": "{index} de {count}",
         "Previous slide": "Slide anterior",
         "Next slide": "Próximo slide",
+        "Menu": "Menu",
+        "Contents": "Sumário",
     ]
 
     private static let ptWords: [String: String] = [
@@ -1247,6 +1271,8 @@ enum DS1SharedWords {
         "{index} of {count}": "{index} de {count}",
         "Previous slide": "Diapositivo anterior",
         "Next slide": "Diapositivo seguinte",
+        "Menu": "Menu",
+        "Contents": "Índice",
     ]
 
     private static let svWords: [String: String] = [
@@ -1342,6 +1368,8 @@ enum DS1SharedWords {
         "{index} of {count}": "{index} av {count}",
         "Previous slide": "Föregående bild",
         "Next slide": "Nästa bild",
+        "Menu": "Meny",
+        "Contents": "Innehåll",
     ]
 
     private static let zhWords: [String: String] = [
@@ -1437,6 +1465,8 @@ enum DS1SharedWords {
         "{index} of {count}": "第 {index} 张，共 {count} 张",
         "Previous slide": "上一张",
         "Next slide": "下一张",
+        "Menu": "菜单",
+        "Contents": "目录",
     ]
 
 }

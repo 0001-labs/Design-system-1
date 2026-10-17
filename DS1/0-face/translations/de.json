@@ -91,6 +91,8 @@
     "Slide {index}": "Folie {index}",
     "{index} of {count}": "{index} von {count}",
     "Previous slide": "Vorherige Folie",
-    "Next slide": "Nächste Folie"
+    "Next slide": "Nächste Folie",
+    "Menu": "Menü",
+    "Contents": "Inhalt"
   }
 }

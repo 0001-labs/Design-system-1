@@ -91,6 +91,8 @@
     "Slide {index}": "スライド {index}",
     "{index} of {count}": "{count} 枚中 {index} 枚目",
     "Previous slide": "前のスライド",
-    "Next slide": "次のスライド"
+    "Next slide": "次のスライド",
+    "Menu": "メニュー",
+    "Contents": "目次"
   }
 }

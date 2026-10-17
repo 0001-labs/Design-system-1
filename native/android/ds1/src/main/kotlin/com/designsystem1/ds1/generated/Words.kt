@@ -118,6 +118,8 @@ internal object DS1SharedWords {
         "{index} of {count}" to "{index} af {count}",
         "Previous slide" to "Forrige dias",
         "Next slide" to "Næste dias",
+        "Menu" to "Menu",
+        "Contents" to "Indhold",
     )
 
     private fun deWords() = mapOf(
@@ -213,6 +215,8 @@ internal object DS1SharedWords {
         "{index} of {count}" to "{index} von {count}",
         "Previous slide" to "Vorherige Folie",
         "Next slide" to "Nächste Folie",
+        "Menu" to "Menü",
+        "Contents" to "Inhalt",
     )
 
     private fun enWords() = mapOf(
@@ -308,6 +312,8 @@ internal object DS1SharedWords {
         "{index} of {count}" to "{index} of {count}",
         "Previous slide" to "Previous slide",
         "Next slide" to "Next slide",
+        "Menu" to "Menu",
+        "Contents" to "Contents",
     )
 
     private fun esWords() = mapOf(
@@ -403,6 +409,8 @@ internal object DS1SharedWords {
         "{index} of {count}" to "{index} de {count}",
         "Previous slide" to "Diapositiva anterior",
         "Next slide" to "Diapositiva siguiente",
+        "Menu" to "Menú",
+        "Contents" to "Contenido",
     )
 
     private fun fiWords() = mapOf(
@@ -498,6 +506,8 @@ internal object DS1SharedWords {
         "{index} of {count}" to "{index}/{count}",
         "Previous slide" to "Edellinen dia",
         "Next slide" to "Seuraava dia",
+        "Menu" to "Valikko",
+        "Contents" to "Sisällys",
     )
 
     private fun frWords() = mapOf(
@@ -593,6 +603,8 @@ internal object DS1SharedWords {
         "{index} of {count}" to "{index} sur {count}",
         "Previous slide" to "Diapositive précédente",
         "Next slide" to "Diapositive suivante",
+        "Menu" to "Menu",
+        "Contents" to "Sommaire",
     )
 
     private fun isWords() = mapOf(
@@ -681,6 +693,8 @@ internal object DS1SharedWords {
         "{index} of {count}" to "{index} af {count}",
         "Previous slide" to "Fyrri glæra",
         "Next slide" to "Næsta glæra",
+        "Menu" to "Valmynd",
+        "Contents" to "Efnisyfirlit",
     )
 
     private fun itWords() = mapOf(
@@ -776,6 +790,8 @@ internal object DS1SharedWords {
         "{index} of {count}" to "{index} di {count}",
         "Previous slide" to "Slide precedente",
         "Next slide" to "Slide successiva",
+        "Menu" to "Menu",
+        "Contents" to "Indice",
     )
 
     private fun jaWords() = mapOf(
@@ -871,6 +887,8 @@ internal object DS1SharedWords {
         "{index} of {count}" to "{count} 枚中 {index} 枚目",
         "Previous slide" to "前のスライド",
         "Next slide" to "次のスライド",
+        "Menu" to "メニュー",
+        "Contents" to "目次",
     )
 
     private fun koWords() = mapOf(
@@ -966,6 +984,8 @@ internal object DS1SharedWords {
         "{index} of {count}" to "{count}개 중 {index}번째",
         "Previous slide" to "이전 슬라이드",
         "Next slide" to "다음 슬라이드",
+        "Menu" to "메뉴",
+        "Contents" to "목차",
     )
 
     private fun nbWords() = mapOf(
@@ -1061,6 +1081,8 @@ internal object DS1SharedWords {
         "{index} of {count}" to "{index} av {count}",
         "Previous slide" to "Forrige lysbilde",
         "Next slide" to "Neste lysbilde",
+        "Menu" to "Meny",
+        "Contents" to "Innhold",
     )
 
     private fun ptBRWords() = mapOf(
@@ -1156,6 +1178,8 @@ internal object DS1SharedWords {
         "{index} of {count}" to "{index} de {count}",
         "Previous slide" to "Slide anterior",
         "Next slide" to "Próximo slide",
+        "Menu" to "Menu",
+        "Contents" to "Sumário",
     )
 
     private fun ptWords() = mapOf(
@@ -1251,6 +1275,8 @@ internal object DS1SharedWords {
         "{index} of {count}" to "{index} de {count}",
         "Previous slide" to "Diapositivo anterior",
         "Next slide" to "Diapositivo seguinte",
+        "Menu" to "Menu",
+        "Contents" to "Índice",
     )
 
     private fun svWords() = mapOf(
@@ -1346,6 +1372,8 @@ internal object DS1SharedWords {
         "{index} of {count}" to "{index} av {count}",
         "Previous slide" to "Föregående bild",
         "Next slide" to "Nästa bild",
+        "Menu" to "Meny",
+        "Contents" to "Innehåll",
     )
 
     private fun zhWords() = mapOf(
@@ -1441,6 +1469,8 @@ internal object DS1SharedWords {
         "{index} of {count}" to "第 {index} 张，共 {count} 张",
         "Previous slide" to "上一张",
         "Next slide" to "下一张",
+        "Menu" to "菜单",
+        "Contents" to "目录",
     )
 
 }

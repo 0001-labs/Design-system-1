@@ -91,6 +91,8 @@
     "Slide {index}": "Dia {index}",
     "{index} of {count}": "{index}/{count}",
     "Previous slide": "Edellinen dia",
-    "Next slide": "Seuraava dia"
+    "Next slide": "Seuraava dia",
+    "Menu": "Valikko",
+    "Contents": "Sisällys"
   }
 }

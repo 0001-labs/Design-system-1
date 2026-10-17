@@ -1,0 +1,83 @@
+@import "./component-metrics.css";
+
+/*
+ * A drawer: navigation folded away on a narrow screen, opened over the page.
+ *
+ * The panel is the dialog frame (`dialog.ds-dialog`) laid over the whole
+ * screen, on the page's own paper, a square of room on every side. Its first
+ * row holds the close button where the menu button stood; what the page
+ * folded away (its navigation and actions) follows, every link one square
+ * high. The page script `0-face/drawer.ts` opens it: it moves the folded parts
+ * into the panel and back, keeps focus inside, closes on Escape, on a link and
+ * when the screen widens, and holds the page's scroll while it is open.
+ * `ds-header` and `ds-page drawer` use the same script and these rules.
+ *
+ *   ds-drawer                  on a <dialog class="ds-dialog">, the panel
+ *   ds-drawer__bar             the first row: the close button at its end
+ *   ds-drawer__close           the close button, an icon button
+ *   ds-drawer__toggle          the button that opens the drawer: it carries
+ *                              two icons, the first shown while closed and the
+ *                              second (close) while open
+ *
+ * Tokens: `--ds-drawer-paper` (the page's paper by default).
+ */
+
+dialog.ds-dialog.ds-drawer {
+  --ds-dialog-width: 100vw;
+  width: 100vw;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: var(--ds-unit);
+  gap: 0;
+  border: 0;
+  background: var(--ds-drawer-paper, var(--background, Canvas));
+  overflow-y: auto;
+}
+
+dialog.ds-dialog.ds-drawer[open] {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--ds-unit);
+}
+
+dialog.ds-dialog.ds-drawer::backdrop {
+  background: transparent;
+}
+
+/* It arrives by fading in and settling half a square, and leaves at once. */
+@media (prefers-reduced-motion: no-preference) {
+  dialog.ds-dialog.ds-drawer[open] {
+    transition: opacity 160ms ease-out, transform 160ms ease-out;
+  }
+
+  @starting-style {
+    dialog.ds-dialog.ds-drawer[open] {
+      opacity: 0;
+      transform: translateY(calc(var(--ds-unit) / -2));
+    }
+  }
+}
+
+.ds-drawer__bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: var(--ds-row-height);
+}
+
+/* Centred in the last square of the row, as the menu button is. Two classes,
+   so the button's own margin does not undo it. */
+.ds-drawer__bar > .ds-drawer__close {
+  margin-inline-end: calc((var(--ds-unit) - var(--ds-control-height)) / 2);
+}
+
+/* The toggle shows its first icon while closed and its second while open; the
+   close button, a copy of it, shows the second. */
+.ds-drawer__toggle:not([aria-expanded="true"]) > :nth-child(2),
+.ds-drawer__toggle[aria-expanded="true"] > :first-child:not(:only-child),
+.ds-drawer__close > :first-child:not(:only-child) {
+  display: none;
+}
