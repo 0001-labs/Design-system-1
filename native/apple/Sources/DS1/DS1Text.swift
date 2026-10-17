@@ -91,9 +91,10 @@ extension DS1Font {
         return box.maxY > 0 ? CTFontGetCapHeight(gt) / box.maxY : 1
     }
 
-    /// Where the baseline of a line `line` tall stands, measured from its top, as the web sets
+    /// Where the baseline of a line box `line` tall stands, measured from its top, as the web sets
     /// GT America in a line of that height (CSS half-leading): the spare height split above
-    /// and below the regular face's ascent and descent.
+    /// and below the regular face's ascent and descent. A row's text takes a 16-point box at
+    /// the foot of its square (`DS1Metrics.leading`), so `ds1Baseline` adds the spare four.
     public static func baseline(size: CGFloat, line: CGFloat) -> CGFloat {
         let gt = ctFont(.regular, size: size)
         let ascent = CTFontGetAscent(gt), descent = CTFontGetDescent(gt)
@@ -196,8 +197,10 @@ private struct DS1Baseline: ViewModifier {
     func body(content: Content) -> some View {
         let line = style.line(scale)
         // A title rests on the grid's line at its foot, so what stands beside it shares its square;
-        // other text stands where the web's half-leading puts GT America.
-        let baseline = style == .display ? line : DS1Font.baseline(size: style.size(scale), line: line)
+        // other text takes the lower sixteen of its square with the spare four above, as Ezo
+        // sets it (a 16px line box at the foot of the row): GT America stands where the web's
+        // half-leading puts it in that sixteen, its capitals centred on a 16-point icon beside it.
+        let baseline = style == .display ? line : line - scale.leading + DS1Font.baseline(size: style.size(scale), line: scale.leading)
         content
             .alignmentGuide(VerticalAlignment.top) { d in d[.firstTextBaseline] - baseline }
             .frame(height: line, alignment: .top)
