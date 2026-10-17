@@ -43,10 +43,8 @@ test("hover with a mouse shows the tooltip at once, and leaving hides it", () =>
 test("focus shows the tooltip only when it is the keyboard's", () => {
   const first = element("Backwards");
   let keyboard = false;
-  const matches = Element.prototype.matches;
-  vi.spyOn(Element.prototype, "matches").mockImplementation(function (this: Element, selector: string) {
-    return selector === ":focus-visible" ? keyboard : matches.call(this, selector);
-  });
+  // happy-dom cannot tell a keyboard's focus from a pointer's; the browser does through :focus-visible.
+  vi.spyOn(first, "matches").mockImplementation((selector: string) => selector === ":focus-visible" && keyboard);
   // A menu opened by a press moves focus into its first row: no tooltip.
   first.dispatchEvent(new FocusEvent("focusin", { bubbles: true, composed: true }));
   expect(visible()).toBe(false);
