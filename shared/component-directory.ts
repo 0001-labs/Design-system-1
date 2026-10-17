@@ -68,6 +68,7 @@ export const ALL_LAYERS: DirectoryLayer[] = [
       { name: 'Row', href: '/3-unit/row/', tag: 'ds-row' },
       { name: 'Sidebar', href: '/3-unit/sidebar/', tag: 'ds-sidebar' },
       { name: 'Table', href: '/3-unit/table/', tag: 'ds-table' },
+      { name: 'Tree', href: '/3-unit/tree/', tag: 'ds-tree' },
     ],
   },
   {

@@ -92,6 +92,13 @@
   --ds-fill: light-dark(var(--ds-slate-light), var(--ds-slate-dark));
   --ds-fill-hover: light-dark(#e2e2e2, #404040);
   --ds-focus-ring: var(--ds-sharp-blue);
+  /* A row a person presses (ds-row, .ds-row, a tree's rows, ds-sidebar): under
+     the pointer, pressed, and the current destination or selected row, which
+     also takes the medium weight. */
+  --ds-row-fill-hover: var(--ds-fill);
+  --ds-row-fill-press: color-mix(in srgb, var(--ds-fill-hover) 92%, var(--ds-text-color));
+  --ds-row-fill-current: var(--ds-fill-hover);
+  --ds-row-current-weight: var(--ds-type-weight-bold);
 
   --ds-button-text-color: var(--ds-text-color);
   --ds-button-background-color-primary: var(--ds-accent-color);
