@@ -37,9 +37,13 @@ extension DS1Font {
     /// Text drawn as Design system 1 draws it: in `face` with the style's size and tracking,
     /// arrows in Inter, and with `figures`, digits and the signs of numbers in Olivetti Dot,
     /// each digit centred in a cell of the same width (the face's 1 is narrower than its 0).
-    public static func attributed(_ string: String, style: DS1TextStyle = .text, scale: DS1Scale, face: Face = .regular, figures: Bool = false) -> AttributedString {
-        let size = style.size(scale)
-        let tracking = style.tracking(scale)
+    /// `cells: false` sets the figures in Olivetti Dot at their own widths, as a date reads.
+    public static func attributed(_ string: String, style: DS1TextStyle = .text, scale: DS1Scale, face: Face = .regular, figures: Bool = false, cells: Bool = true) -> AttributedString {
+        attributed(string, size: style.size(scale), tracking: style.tracking(scale), face: face, figures: figures, cells: cells)
+    }
+
+    /// The same at a size of the product's own, already scaled, such as a figure set large.
+    public static func attributed(_ string: String, size: CGFloat, tracking: CGFloat, face: Face = .regular, figures: Bool = false, cells: Bool = true) -> AttributedString {
         let text = font(face, size: size)
         let arrow = font(.arrows, size: size)
         let figure = font(.figures, size: size)
@@ -51,7 +55,7 @@ extension DS1Font {
             let scalar = character.unicodeScalars.count == 1 ? character.unicodeScalars.first : nil
             if let scalar, arrowCharacters.contains(scalar) { return (character, .arrow, tracking) }
             if figures, let scalar, figureCharacters.contains(scalar) {
-                return (character, CharacterSet.decimalDigits.contains(scalar) ? .digit : .figure, tracking)
+                return (character, cells && CharacterSet.decimalDigits.contains(scalar) ? .digit : .figure, tracking)
             }
             return (character, .text, tracking)
         }
@@ -72,6 +76,12 @@ extension DS1Font {
         return result
     }
 
+    /// The height one line of a face takes when nothing spaces it: ascent, descent and gap.
+    public static func lineHeight(_ face: Face, size: CGFloat) -> CGFloat {
+        let font = ctFont(face, size: size)
+        return CTFontGetAscent(font) + CTFontGetDescent(font) + CTFontGetLeading(font)
+    }
+
     static func advance(of character: Character, in font: CTFont) -> CGFloat {
         let utf16 = Array(String(character).utf16)
         var glyphs = [CGGlyph](repeating: 0, count: utf16.count)
@@ -80,7 +90,8 @@ extension DS1Font {
     }
 }
 
-/// One line of text standing on its square (`ds-text`): never wraps, cut short at its end.
+/// Text standing on its square (`ds-text`): one line, cut short at its end, or with `wrap`
+/// as many lines as it needs, each one square tall.
 public struct DS1LineText: View {
     @Environment(\.ds1Scale) private var scale
     let string: String
@@ -88,22 +99,40 @@ public struct DS1LineText: View {
     let tone: DS1Tone
     let strong: Bool
     let figures: Bool
+    let cells: Bool
+    let wrap: Bool
 
-    public init(_ string: String, style: DS1TextStyle = .text, tone: DS1Tone = .text, strong: Bool = false, figures: Bool = false) {
+    public init(_ string: String, style: DS1TextStyle = .text, tone: DS1Tone = .text, strong: Bool = false, figures: Bool = false, cells: Bool = true, wrap: Bool = false) {
         self.string = string
         self.style = style
         self.tone = tone
         self.strong = strong
         self.figures = figures
+        self.cells = cells
+        self.wrap = wrap
     }
 
     public var body: some View {
-        Text(DS1Font.attributed(string, style: style, scale: scale, face: strong || style == .heading ? .medium : .regular, figures: figures))
+        let face: DS1Font.Face = strong || style == .heading ? .medium : .regular
+        let line = style.line(scale)
+        let text = Text(DS1Font.attributed(string, style: style, scale: scale, face: face, figures: figures, cells: cells))
             .foregroundStyle(tone.colour)
-            .lineLimit(1)
-            .truncationMode(.tail)
-            .frame(height: style.line(scale))
             .accessibilityLabel(string)
+        if wrap {
+            // SwiftUI spaces lines apart; the spare height of the first and last line goes
+            // above and below, so every line stands on its own square as on the web.
+            let glyphs = DS1Font.lineHeight(face, size: style.size(scale))
+            text
+                .lineSpacing(max(0, line - glyphs))
+                .padding(.vertical, max(0, line - glyphs) / 2)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, minHeight: line, alignment: .leading)
+        } else {
+            text
+                .lineLimit(1)
+                .truncationMode(.tail)
+                .frame(height: line)
+        }
     }
 }
 
@@ -120,7 +149,10 @@ public struct DS1Figures: View {
         self.tone = tone
     }
 
+    /// A figure is never cut short: it keeps its width and the words beside it give way.
     public var body: some View {
         DS1LineText(string, style: style, tone: tone, figures: true)
+            .fixedSize(horizontal: true, vertical: false)
+            .layoutPriority(1)
     }
 }
