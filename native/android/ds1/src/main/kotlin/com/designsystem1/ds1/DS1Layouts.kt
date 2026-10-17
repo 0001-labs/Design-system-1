@@ -53,7 +53,7 @@ fun DS1PageLayout(
 ) {
     val scale = LocalDS1Scale.current
     val border = DS1Colors.border.current
-    BoxWithConstraints(modifier.fillMaxSize().background(DS1Colors.paper.current).padding(scale.unit)) {
+    BoxWithConstraints(modifier.fillMaxSize().background(LocalDS1Paper.current.current).padding(scale.unit)) {
         val narrow = maxWidth < scale.squares(30f)
         val gap = scale.squares(2f)
         val line: Modifier = if (divided) Modifier.drawBehind {

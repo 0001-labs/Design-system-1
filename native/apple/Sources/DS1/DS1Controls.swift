@@ -86,6 +86,7 @@ public struct DS1Radio: View {
 /// `ds-radio choice`: a labelled tile four squares by one (one with `compact`) on the field's
 /// ground; the chosen tile's outline turns the text colour. With a `preview`, four by three.
 public struct DS1Choice<Preview: View>: View {
+    @Environment(\.ds1Paper) private var paper
     @Environment(\.ds1Scale) private var scale
     @Environment(\.isEnabled) private var enabled
     let label: String
@@ -108,7 +109,7 @@ public struct DS1Choice<Preview: View>: View {
                     .frame(height: preview == nil ? scale.unit : scale(19))
             }
             .frame(width: compact ? scale.unit : scale.squares(4), height: preview == nil ? scale.unit : scale.squares(3))
-            .background(enabled ? AnyShapeStyle(DS1Color.inputBackground) : AnyShapeStyle(DS1Color.paper.withOpacity(0.6)), in: shape)
+            .background(enabled ? AnyShapeStyle(DS1Color.inputBackground) : AnyShapeStyle(paper.withOpacity(0.6)), in: shape)
             .overlay(shape.strokeBorder(selected ? DS1Color.text : DS1Color(0, opacity: 0), lineWidth: DS1Metrics.line))
             .opacity(enabled ? 1 : 0.5)
         }

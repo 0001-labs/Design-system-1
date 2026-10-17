@@ -82,7 +82,7 @@ fun DS1List(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -
 /** `ds-panel`: a column on the paper with a pinned [header] and [footer] around a body that takes the rest. */
 @Composable
 fun DS1Panel(modifier: Modifier = Modifier, header: (@Composable () -> Unit)? = null, footer: (@Composable () -> Unit)? = null, body: @Composable ColumnScope.() -> Unit) {
-    Column(modifier.background(DS1Colors.paper.current)) {
+    Column(modifier.background(LocalDS1Paper.current.current)) {
         header?.invoke()
         Column(Modifier.weight(1f).fillMaxWidth(), content = body)
         footer?.invoke()

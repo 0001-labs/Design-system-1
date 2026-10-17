@@ -70,7 +70,7 @@ fun DS1Menu(
                 modifier
                     .widthIn(min = maxOf(scale.squares(8f), anchorWidth ?: 0.dp))
                     .heightIn(max = scale.squares(16f))
-                    .background(DS1Colors.paper.current, RoundedCornerShape(scale.radius))
+                    .background(LocalDS1Paper.current.current, RoundedCornerShape(scale.radius))
                     .border(DS1Metrics.line.dp, DS1Colors.border.current, RoundedCornerShape(scale.radius))
                     .verticalScroll(rememberScrollState())
                     .padding(scale(4f)),

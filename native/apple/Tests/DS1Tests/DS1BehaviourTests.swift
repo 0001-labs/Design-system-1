@@ -16,6 +16,13 @@ final class DS1BehaviourTests: XCTestCase {
         XCTAssertEqual(words.text("Save", language: .da), "Gem nu")
     }
 
+    func testPaperIsTheSurfaceUntilAViewSetsAnother() {
+        var environment = EnvironmentValues()
+        XCTAssertEqual(environment.ds1Paper, DS1Color.paper)
+        environment.ds1Paper = DS1Color.white
+        XCTAssertEqual(environment.ds1Paper, DS1Color.white)
+    }
+
     func testLanguagesNormalizeAsTheWebDoes() {
         XCTAssertEqual(DS1Words.normalize("da-DK"), .da)
         XCTAssertEqual(DS1Words.normalize("nb_NO"), .nb)

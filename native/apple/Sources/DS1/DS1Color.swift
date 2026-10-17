@@ -72,3 +72,26 @@ public struct DS1PaletteEntry: Hashable, Sendable {
     /// An ink (a grey, white or black) rather than a colour.
     public let ink: Bool
 }
+
+// MARK: The paper
+
+private struct DS1PaperKey: EnvironmentKey {
+    static let defaultValue = DS1Color.paper
+}
+
+extension EnvironmentValues {
+    /// The paper everything stands on (`--ds-paper`): pages, page layouts, panels, dialogs,
+    /// menus and fields fill with it. Design system 1's `paper` unless a view above sets another.
+    public var ds1Paper: DS1Color {
+        get { self[DS1PaperKey.self] }
+        set { self[DS1PaperKey.self] = newValue }
+    }
+}
+
+extension View {
+    /// Sets the paper for everything inside, as a stylesheet sets `--ds-paper` on the page:
+    /// `.ds1Paper(.white)` on the root view puts every page, dialog and menu on white.
+    public func ds1Paper(_ paper: DS1Color) -> some View {
+        environment(\.ds1Paper, paper)
+    }
+}

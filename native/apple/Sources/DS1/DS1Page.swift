@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// A page on the paper (`ds-page` `column`): it puts the device scale on, scrolls, keeps one
+/// A page on the paper (`ds-page` `column`, on `.ds1Paper`): it puts the device scale on, scrolls, keeps one
 /// square around its content and stands its column on whole squares, at most `measure`
 /// squares wide (`measure="N"`), centred in the room beside it.
 public struct DS1Page<Content: View>: View {
@@ -20,6 +20,7 @@ public struct DS1Page<Content: View>: View {
 
     struct Column: View {
         @Environment(\.ds1Scale) private var scale
+        @Environment(\.ds1Paper) private var paper
         let measure: CGFloat
         let grid: Bool
         let content: Content
@@ -44,7 +45,7 @@ public struct DS1Page<Content: View>: View {
                             if grid { DS1PaperGrid(origin: CGPoint(x: inset, y: 0)) }
                         }
                 }
-                .background { Rectangle().fill(DS1Color.paper).ignoresSafeArea() }
+                .background { Rectangle().fill(paper).ignoresSafeArea() }
             }
         }
     }

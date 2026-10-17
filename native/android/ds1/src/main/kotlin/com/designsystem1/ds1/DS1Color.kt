@@ -9,6 +9,14 @@ import androidx.compose.ui.graphics.Color
 val LocalDS1Dark = staticCompositionLocalOf { false }
 
 /**
+ * The paper everything stands on (`--ds-paper`): pages, page layouts, panels, dialogs, menus and
+ * fields fill with it. [DS1Colors.paper] unless a composable above provides another, as a
+ * stylesheet sets `--ds-paper` on the page:
+ * `CompositionLocalProvider(LocalDS1Paper provides DS1Colors.white) { … }`.
+ */
+val LocalDS1Paper = staticCompositionLocalOf { DS1Colors.paper }
+
+/**
  * A colour with its light and dark values, as a `light-dark()` token on the web. Read it with
  * [current] inside a composition, or [color] for either mode.
  */

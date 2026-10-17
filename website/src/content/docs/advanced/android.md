@@ -20,6 +20,7 @@ A Kotlin library that gives Jetpack Compose apps on Android Design system 1's co
 ## What it contains
 
 - **`DS1Colors`**: every palette colour with its pastel, and the surfaces of the component tokens, each a `DS1Color` with a light and a dark value. Read one with `.current` in a composition. Generated; never edited by hand.
+- **`LocalDS1Paper`**: the paper everything inside stands on (`--ds-paper`), read by pages, page layouts, panels, dialogs, menus and fields. `DS1Colors.paper` unless a composable above provides another: `CompositionLocalProvider(LocalDS1Paper provides DS1Colors.white) { … }`.
 - **`DS1Metrics`** and **`DS1Scale`**: the measures from `measures.ts`, and the device scale (the width over 280 between 0.75 and 2) from `LocalDS1Scale`. Every length is `scale.unit`, `scale.squares(4f)` or `scale(16f)`; lines stay one dp.
 - **`DS1Font`**: the typefaces as font resources, built from the web's woff2 files. Text sets arrows in Inter and, with `figures`, digits in Olivetti Dot in cells of one width. Type does not follow the system font scale.
 - **`DS1IconName`** and **`DS1Icon`**: the whole icon collection as vector drawables, tinted by the text colour.

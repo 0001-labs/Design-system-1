@@ -98,7 +98,7 @@ fun DS1Choice(
     val scale = LocalDS1Scale.current
     val interaction = remember { MutableInteractionSource() }
     val shape = RoundedCornerShape(scale.radius)
-    val ground = if (enabled) DS1Colors.inputBackground.current else DS1Colors.paper.current.copy(alpha = 0.6f)
+    val ground = if (enabled) DS1Colors.inputBackground.current else LocalDS1Paper.current.current.copy(alpha = 0.6f)
     Column(
         modifier
             .width(if (compact) scale.unit else scale.squares(4f))

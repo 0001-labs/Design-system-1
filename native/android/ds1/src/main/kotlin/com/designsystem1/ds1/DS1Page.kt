@@ -32,7 +32,7 @@ fun DS1Page(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val scale = LocalDS1Scale.current
-    BoxWithConstraints(modifier.fillMaxSize().background(DS1Colors.paper.current)) {
+    BoxWithConstraints(modifier.fillMaxSize().background(LocalDS1Paper.current.current)) {
         if (grid) DS1PaperGrid(Modifier.fillMaxSize())
         val width = min(scale.squares(measure), scale.wholeSquares(maxWidth - scale.unit * 2))
         Column(

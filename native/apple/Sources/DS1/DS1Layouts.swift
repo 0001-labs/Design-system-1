@@ -9,6 +9,7 @@ public enum DS1PageLayoutKind: Sendable { case sidebar, split, inspector, column
 /// A page in one of the standard layouts: a square of padding, two squares between columns
 /// (a 1-point line in the middle when `divided`), every layout one column below 30 squares.
 public struct DS1PageLayout<Nav: View, Main: View, Aside: View>: View {
+    @Environment(\.ds1Paper) private var paper
     @Environment(\.ds1Scale) private var scale
     let kind: DS1PageLayoutKind
     let measure: CGFloat?
@@ -44,7 +45,7 @@ public struct DS1PageLayout<Nav: View, Main: View, Aside: View>: View {
             }
             .padding(scale.unit)
         }
-        .background(DS1Color.paper)
+        .background(paper)
     }
 
     private var line: some View { Rectangle().fill(DS1Color.border).frame(width: DS1Metrics.line).offset(x: scale.unit) }

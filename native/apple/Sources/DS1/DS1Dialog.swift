@@ -5,6 +5,7 @@ import SwiftUI
 /// between its parts. Its `title` in the medium face, its `description` muted, the content,
 /// then `footer` at the end. Show it with `.ds1Dialog(isPresented:)`.
 public struct DS1DialogBox<Content: View, Footer: View>: View {
+    @Environment(\.ds1Paper) private var paper
     @Environment(\.ds1Scale) private var scale
     let title: String?
     let description: String?
@@ -31,7 +32,7 @@ public struct DS1DialogBox<Content: View, Footer: View>: View {
             }
             .padding(scale.unit)
             .frame(width: min(scale.squares(20), g.size.width - 2 * scale.unit), alignment: .leading)
-            .background(DS1Color.paper)
+            .background(paper)
             .overlay(Rectangle().strokeBorder(DS1Color.border, lineWidth: DS1Metrics.line))
             .overlay(alignment: .topTrailing) {
                 if let onClose {

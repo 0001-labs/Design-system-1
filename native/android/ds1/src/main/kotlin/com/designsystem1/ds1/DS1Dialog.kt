@@ -71,7 +71,7 @@ fun DS1Dialog(
                 Box(
                     modifier
                         .width(minOf(scale.squares(20f), maxWidth))
-                        .background(DS1Colors.paper.current)
+                        .background(LocalDS1Paper.current.current)
                         .border(DS1Metrics.line.dp, DS1Colors.border.current)
                         .semantics { if (title != null) paneTitle = title },
                 ) {

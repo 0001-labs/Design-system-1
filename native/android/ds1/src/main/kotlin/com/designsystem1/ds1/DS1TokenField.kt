@@ -62,7 +62,7 @@ fun DS1TokenField(
     Box(modifier) {
         FlowRow(
             Modifier.fillMaxWidth().heightIn(min = scale.unit)
-                .background(DS1Colors.paper.current, shape)
+                .background(LocalDS1Paper.current.current, shape)
                 .border(DS1Metrics.line.dp, (if (focused) DS1Colors.focusRing else DS1Colors.border).current, shape),
             horizontalArrangement = Arrangement.spacedBy(scale.half),
             verticalArrangement = Arrangement.Center,

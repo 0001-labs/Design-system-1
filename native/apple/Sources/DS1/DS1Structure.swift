@@ -41,6 +41,7 @@ public struct DS1List<Content: View>: View {
 
 /// `ds-panel`: a column on the paper with a pinned `header` and `footer` around a body that takes the rest.
 public struct DS1Panel<Header: View, Body: View, Footer: View>: View {
+    @Environment(\.ds1Paper) private var paper
     let header: Header
     let content: Body
     let footer: Footer
@@ -53,7 +54,7 @@ public struct DS1Panel<Header: View, Body: View, Footer: View>: View {
             content.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             footer
         }
-        .background(DS1Color.paper)
+        .background(paper)
     }
 }
 
@@ -177,6 +178,7 @@ public struct DS1Table<Row>: View {
 /// square at a time inside a 1-point outline on the paper. Return or a `separators` character
 /// asks to commit the text; deleting in an empty field asks to remove the last token.
 public struct DS1TokenField<Tokens: View>: View {
+    @Environment(\.ds1Paper) private var paper
     @Environment(\.ds1Scale) private var scale
     @FocusState private var focused: Bool
     @Binding var text: String
@@ -208,7 +210,7 @@ public struct DS1TokenField<Tokens: View>: View {
                 }
         }
         .frame(maxWidth: .infinity, minHeight: scale.unit, alignment: .leading)
-        .background(DS1Color.paper, in: RoundedRectangle(cornerRadius: scale.radius, style: .continuous))
+        .background(paper, in: RoundedRectangle(cornerRadius: scale.radius, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: scale.radius, style: .continuous).strokeBorder(focused ? DS1Color.focusRing : DS1Color.border, lineWidth: DS1Metrics.line))
     }
 

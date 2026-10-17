@@ -20,6 +20,7 @@ A Swift package that gives SwiftUI apps on iPhone, iPad and Mac Design system 1'
 ## What it contains
 
 - **`DS1Color`**: every palette colour with its pastel, and the surfaces of the component tokens (paper, text, muted text, titles, danger, borders, fills, the accent), as a `ShapeStyle` that switches between its light and dark values with the colour scheme. Generated from `palette.ts` and `component-tokens.css`; never edited by hand.
+- **`.ds1Paper(_:)`**: the paper everything inside stands on (`--ds-paper`), read from the environment as `\.ds1Paper` by pages, page layouts, panels, dialogs, menus and fields. `DS1Color.paper` unless a view above sets another, for example `.ds1Paper(DS1Color.white)` on the root view.
 - **`DS1Metrics`**: the square, half a square, the control and row heights, item sizes, type sizes, letter spacing, line heights, the line and the corner, as `CGFloat` constants generated from `DS1/1-root/measures.ts`. A test holds that file to the stylesheets.
 - **`DS1Scale`**: the device scale, the width over 280 between 0.75 and 2 on iPhone and iPad and 1 on a Mac, put in the environment by `.ds1Scaled()`. Every measure multiplies by it; lines stay one point. The corner is one value an app may change.
 - **`DS1Font`**: the typefaces, as the same woff2 files the web loads (Core Text reads them), registered by the package. `DS1LineText` sets arrows in Inter; `figures: true` sets digits and the signs of numbers in Olivetti Dot, each digit in a cell of one width. Type stays on the grid.

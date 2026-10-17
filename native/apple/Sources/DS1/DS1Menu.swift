@@ -98,6 +98,7 @@ struct DS1MenuItemStyle: ButtonStyle {
 /// at least eight squares wide and at most 16 tall, scrolling. Floating menus use the
 /// system's `Menu`, as `DS1Select` does.
 public struct DS1Menu<Content: View>: View {
+    @Environment(\.ds1Paper) private var paper
     @Environment(\.ds1Scale) private var scale
     let content: Content
     public init(@ViewBuilder content: () -> Content) { self.content = content() }
@@ -106,7 +107,7 @@ public struct DS1Menu<Content: View>: View {
             .padding(scale(4))
             .frame(minWidth: scale.squares(8), maxHeight: scale.squares(16))
             .fixedSize(horizontal: false, vertical: true)
-            .background(DS1Color.paper, in: RoundedRectangle(cornerRadius: scale.radius, style: .continuous))
+            .background(paper, in: RoundedRectangle(cornerRadius: scale.radius, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: scale.radius, style: .continuous).strokeBorder(DS1Color.border, lineWidth: DS1Metrics.line))
     }
 }
