@@ -547,6 +547,20 @@
     "shapes": 1
   },
   {
+    "key": "eye-off",
+    "name": "Eye",
+    "source": "Library",
+    "url": "/icons/library/eye-off.svg",
+    "shapes": 3
+  },
+  {
+    "key": "eye",
+    "name": "Eye",
+    "source": "Library",
+    "url": "/icons/library/eye.svg",
+    "shapes": 2
+  },
+  {
     "key": "facebook",
     "name": "Facebook",
     "source": "Library",

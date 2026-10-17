@@ -622,6 +622,22 @@
     "shapes": 1
   },
   {
+    "key": "eye-off",
+    "name": "Eye",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<g stroke=\"currentColor\" stroke-width=\"0.92\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M1.75 8C2.52 6.61 3.45 5.55 4.5 4.83M6.64 3.95C7.08 3.82 7.53 3.75 8 3.75C10.5 3.75 12.7 5.2 14.25 8C13.6 9.17 12.85 10.1 12.02 10.8M10.28 11.78C9.56 12.09 8.8 12.25 8 12.25C5.5 12.25 3.3 10.8 1.75 8\"/><path d=\"M6.59 6.59C5.81 7.37 5.81 8.63 6.59 9.41C7.37 10.19 8.63 10.19 9.41 9.41\"/><path d=\"M2.25 2.25L13.75 13.75\"/></g>\n</svg>",
+    "url": "/icons/library/eye-off.svg",
+    "shapes": 3
+  },
+  {
+    "key": "eye",
+    "name": "Eye",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<g stroke=\"currentColor\" stroke-width=\"0.92\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M1.75 8C3.3 5.2 5.5 3.75 8 3.75C10.5 3.75 12.7 5.2 14.25 8C12.7 10.8 10.5 12.25 8 12.25C5.5 12.25 3.3 10.8 1.75 8Z\"/><circle cx=\"8\" cy=\"8\" r=\"2\"/></g>\n</svg>",
+    "url": "/icons/library/eye.svg",
+    "shapes": 2
+  },
+  {
     "key": "facebook",
     "name": "Facebook",
     "source": "Library",
