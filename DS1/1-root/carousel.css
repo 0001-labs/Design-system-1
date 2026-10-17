@@ -1,0 +1,174 @@
+@import "./component-metrics.css";
+
+/*
+ * A carousel and its page dots, as plain classes on native elements.
+ *
+ * A carousel is a row of slides that snaps sideways, one slide to a stop,
+ * with a row of controls one square high under it: optional previous and
+ * next buttons and a dot for each slide. Slides are the track's width, or
+ * whole squares wide, a whole number of squares apart (one by default). The
+ * controls stand one square below the track, on the grid from its start.
+ * The `ds-carousel` and `ds-pagedots` elements draw the same parts, and
+ * `0-face/carousel.ts` gives the native markup its behaviour.
+ *
+ *   ds-carousel                    the region: track, controls, status
+ *   ds-carousel__track             the scroller; every child is a slide
+ *   ds-carousel__controls          the row of buttons and dots
+ *   ds-carousel__previous, __next  icon buttons, on `.ds-button.ds-button--icon`
+ *   ds-carousel__status            the polite announcement, kept out of sight
+ *
+ *   ds-pagedots                    a group of dots, one square each
+ *   ds-pagedots__dot               a button; `data-state` is `past`, `current`
+ *                                  (with `aria-current="true"`), `next`, `future`,
+ *                                  or `end` for a last dot marked as an end
+ *
+ * Tokens: `--ds-carousel-slide` (a slide's width, the track's by default),
+ * `--ds-carousel-gap` (between slides, one square by default) and the dot
+ * colours `--ds-pagedots-past` and `-future` (the muted text colour by
+ * default), `-current`, `-next` and `-end` (the text colour), set on the
+ * dots or any element around them. Past, current and next dots are filled;
+ * future dots and the end marker are rings.
+ */
+
+.ds-carousel {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: var(--ds-unit);
+  position: relative;
+  min-width: 0;
+  margin: 0;
+}
+
+.ds-carousel__track {
+  box-sizing: border-box;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: var(--ds-carousel-slide, 100%);
+  column-gap: var(--ds-carousel-gap, var(--ds-unit));
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.ds-carousel__track::-webkit-scrollbar {
+  display: none;
+}
+
+.ds-carousel__track:focus-visible {
+  outline: 2px solid var(--ds-focus-ring);
+  outline-offset: 1px;
+}
+
+.ds-carousel__track > * {
+  box-sizing: border-box;
+  min-width: 0;
+  margin: 0;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.ds-carousel__controls {
+  display: flex;
+  align-items: center;
+  height: var(--ds-row-height);
+  min-width: 0;
+}
+
+/* The buttons take a one-square cell each, as the dots do. Two classes, so
+   the button's own reset of its margin does not undo it. */
+.ds-carousel .ds-carousel__previous,
+.ds-carousel .ds-carousel__next {
+  flex: none;
+  margin: calc((var(--ds-unit) - var(--ds-control-height)) / 2);
+}
+
+/* Previous points back along the reading direction. */
+.ds-carousel:dir(rtl) :is(.ds-carousel__previous, .ds-carousel__next) > * {
+  transform: scaleX(-1);
+}
+
+.ds-carousel__status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.ds-pagedots {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  height: var(--ds-row-height);
+  margin: 0;
+  padding: 0;
+}
+
+.ds-pagedots__dot {
+  --ds-pagedots-color: var(--ds-pagedots-future, var(--ds-text-color-muted));
+  appearance: none;
+  box-sizing: border-box;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--ds-unit);
+  height: var(--ds-unit);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--ds-radius);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* The dot itself: 4px, scaled with the surface, a fifth of the square. */
+.ds-pagedots__dot::before {
+  content: "";
+  box-sizing: border-box;
+  width: calc(4px * var(--ds-sf, 1));
+  height: calc(4px * var(--ds-sf, 1));
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--ds-pagedots-color);
+  transition: transform 160ms ease-out;
+}
+
+.ds-pagedots__dot[data-state="past"] { --ds-pagedots-color: var(--ds-pagedots-past, var(--ds-text-color-muted)); }
+.ds-pagedots__dot[data-state="next"] { --ds-pagedots-color: var(--ds-pagedots-next, var(--ds-text-color)); }
+.ds-pagedots__dot[data-state="end"] { --ds-pagedots-color: var(--ds-pagedots-end, var(--ds-text-color)); }
+.ds-pagedots__dot[aria-current="true"] { --ds-pagedots-color: var(--ds-pagedots-current, var(--ds-text-color)); }
+
+.ds-pagedots__dot:is([data-state="past"], [data-state="next"], [aria-current="true"])::before {
+  background: var(--ds-pagedots-color);
+}
+
+/* The current dot is half again as large. */
+.ds-pagedots__dot[aria-current="true"]::before {
+  transform: scale(1.5);
+}
+
+.ds-pagedots__dot:hover:not([aria-current="true"])::before {
+  transform: scale(1.25);
+}
+
+.ds-pagedots__dot:focus-visible {
+  outline: 2px solid var(--ds-focus-ring);
+  outline-offset: -2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-pagedots__dot::before {
+    transition: none;
+  }
+}

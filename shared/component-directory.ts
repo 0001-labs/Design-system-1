@@ -47,7 +47,11 @@ export const ALL_LAYERS: DirectoryLayer[] = [
       { name: 'Keyboard shortcut', href: '/2-core/kbd/', tag: 'ds-kbd' },
       { name: 'Language', href: '/2-core/language/', tag: 'ds-language' },
       { name: 'Link', href: '/2-core/link/' },
+      { name: 'Meter', href: '/2-core/meter/', tag: 'ds-meter' },
       { name: 'Notice', href: '/2-core/notice/', tag: 'ds-notice' },
+      { name: 'Page dots', href: '/2-core/pagedots/', tag: 'ds-pagedots' },
+      { name: 'Stat', href: '/2-core/stat/', tag: 'ds-stat' },
+      { name: 'Steps', href: '/2-core/steps/', tag: 'ds-steps' },
       { name: 'Text', href: '/2-core/text/', tag: 'ds-text' },
       { name: 'Toast', href: '/2-core/toast/', tag: 'ds-toast' },
       { name: 'Toggle', href: '/2-core/toggle/', tag: 'ds-toggle' },
@@ -62,6 +66,7 @@ export const ALL_LAYERS: DirectoryLayer[] = [
     entries: [
       { name: 'Accordion', href: '/3-unit/accordion/', tag: 'ds-accordion' },
       { name: 'Card', href: '/3-unit/card/' },
+      { name: 'Carousel', href: '/3-unit/carousel/', tag: 'ds-carousel' },
       { name: 'Form', href: '/3-unit/form/', tag: 'ds-form' },
       { name: 'List', href: '/3-unit/list/', tag: 'ds-list' },
       { name: 'Navigation', href: '/3-unit/navigation/' },
@@ -69,6 +74,7 @@ export const ALL_LAYERS: DirectoryLayer[] = [
       { name: 'Row', href: '/3-unit/row/', tag: 'ds-row' },
       { name: 'Sidebar', href: '/3-unit/sidebar/', tag: 'ds-sidebar' },
       { name: 'Table', href: '/3-unit/table/', tag: 'ds-table' },
+      { name: 'Tree', href: '/3-unit/tree/', tag: 'ds-tree' },
     ],
   },
   {

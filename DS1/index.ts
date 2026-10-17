@@ -31,6 +31,7 @@ export * from "./0-face/preferences";
 export * from "./0-face/pricing";
 export * from "./0-face/theme";
 export * from "./0-face/keys";
+export * from "./0-face/tree";
 
 // ============================================================================
 // 2-core: Core Components
@@ -59,7 +60,11 @@ export * from "./2-core/ds-file-picker";
 export * from "./2-core/ds-textarea";
 export * from "./2-core/ds-composer";
 export * from "./2-core/ds-language";
+export * from "./2-core/ds-meter";
 export * from "./2-core/ds-notice";
+export * from "./2-core/ds-pagedots";
+export * from "./2-core/ds-stat";
+export * from "./2-core/ds-steps";
 export * from "./2-core/ds-text";
 export * from "./2-core/ds-toast";
 export * from "./2-core/ds-tooltip";
@@ -71,6 +76,7 @@ export * from "./2-core/ds-tooltip";
 export * from "./3-unit/ds-accordion";
 export * from "./2-core/ds-avatar";
 export * from "./3-unit/ds-avatar-group";
+export * from "./3-unit/ds-carousel";
 export * from "./3-unit/ds-form";
 export * from "./3-unit/ds-list";
 export * from "./3-unit/ds-row";
@@ -94,6 +100,7 @@ export * from "./2-core/ds-token";
 export * from "./3-unit/ds-token-field";
 
 export * from "./3-unit/ds-sidebar";
+export * from "./3-unit/ds-tree";
 
 export * from "./2-core/ds-chart";
 

@@ -1,11 +1,11 @@
 ---
 title: Row
-description: Arrange pieces horizontally with one of three alignments.
+description: "Arrange pieces on one square, or make the whole row one press target: a link, a button, a tile or a navigation row."
 ---
 
 import ComponentExample from "../../../components/ComponentExample.astro";
 
-Arrange pieces horizontally with one of three alignments.
+A row is one square high. It arranges pieces horizontally with one of three alignments, and with `href` or `interactive` the whole row becomes one press target.
 
 ## Try it
 
@@ -20,7 +20,69 @@ Arrange pieces horizontally with one of three alignments.
 | `fill` | boolean | false | Pushes content to opposite ends. |
 | `centered` | boolean | false | Centres the group with small gaps. |
 | `end` | boolean | false | Places the group at the end. |
+| `auto` | boolean | false | Takes the content's height instead of one square. |
+| `stacked` | boolean | false | Stacks the content, each line one square: a tile or a card. |
+| `href` | string | | Makes the whole row one link to this address. |
+| `interactive` | boolean | false | Makes the whole row one button. |
+| `disabled` | boolean | false | Keeps the row from being pressed and dims it. A disabled link has no `href` and stays a link with `aria-disabled="true"`. |
+| `current` | string | | Marks the destination being shown: `aria-current="page"`, or the value given (`step`, `location`, `date`, `time`). |
+| `nav` | boolean | false | Draws a navigation row, with the sidebar's two-pixel corners. |
+| `label` | string | | The press target's accessible name, when the row's words do not say what it does. |
+| `target`, `rel` | string | | Passed to the link. |
 
 Use one alignment at a time. Slot children can be ordinary HTML or components. The standard row is twelve squares wide and one square high for these alignments.
 
-[List](/3-unit/list/) · [Text](/2-core/text/) · [Icon](/2-core/icon/)
+## A row a person presses
+
+<ComponentExample example="row-pressable" />
+
+With `href` the row renders one link around its content; with `interactive`, one button. The pointer over the row fills it with `--ds-row-fill-hover`, a press with `--ds-row-fill-press`, and keyboard focus draws the focus ring two pixels inside the row, so rows stacked edge to edge never overlap each other's ring. The content keeps the row's layout: alignment, gap and `stacked` apply inside the press target as they would outside it. The words stand 4px from the row's edges (`--ds-row-padding`).
+
+A control of its own, such as a quick action or a menu, goes in the `end` slot. It stands outside the press target and above it, so pressing it never presses the row; pressing anywhere else does. Do not put links or buttons in the default slot: they would be nested inside the row's own link or button.
+
+`ds-row-press` fires when the row is pressed, with `{ href }`. Cancel it with `preventDefault()` to route a link yourself; a link pressed with a modifier key or the middle button is left to the browser, so new tabs and downloads keep working. `row.focus()` focuses the press target.
+
+A tile or a card is a row with `stacked` and a width in whole squares: each child takes its own line of one square.
+
+```html
+<ds-row interactive stacked style="width: calc(4 * var(--ds-unit))">
+  <ds-text size="small" tone="muted" literal>Cash</ds-text>
+  <ds-text literal>¥1,200</ds-text>
+</ds-row>
+```
+
+## Navigation rows
+
+<ComponentExample example="row-nav" />
+
+A list of destinations is a `<nav>` of rows with `href` and `nav`; the page being shown takes `current`. The current row is drawn as the [Sidebar](/3-unit/sidebar/)'s: filled with `--ds-row-fill-current` and in the medium weight (`--ds-row-current-weight`), on two-pixel corners. Never mark the current page with the accent or a colour of its own.
+
+## Without Lit
+
+A page without Lit draws the same rows with the classes in `row.css`, which `controls.css` imports.
+
+| Class | On | Draws |
+| --- | --- | --- |
+| `ds-row` | any element | A row one square high, its content on one line. |
+| `ds-row` | `<a href>` or `<button>` | The whole row as one press target, with the pointer, press, focus ring and `aria-current` states. |
+| `ds-row` with one `ds-row__target` inside | `<li>`, `<div>` or `<tr>` | A row that also holds controls of its own: the target (a link or a button) takes the press anywhere on the row, and every other control inside stays separately pressable. |
+| `ds-row--auto`, `ds-row--stacked`, `ds-row--nav` | with `ds-row` | As `auto`, `stacked` and `nav` above. |
+
+```html
+<nav aria-label="Account">
+  <a class="ds-row ds-row--nav" href="/profile/" aria-current="page">Profile</a>
+  <a class="ds-row ds-row--nav" href="/billing/">Billing</a>
+</nav>
+
+<table class="ds-table">
+  <tr class="ds-row">
+    <td><button class="ds-row__target" type="button">Order 1042</button></td>
+    <td>Paid</td>
+    <td><a href="/invoices/1042.pdf">Invoice</a></td>
+  </tr>
+</table>
+```
+
+The cells of a row with a target must not be positioned themselves, or the target's press stops at its own cell. A disabled native row is a `<button disabled>`, or a link without `href` with `aria-disabled="true"`. In React, put the classes on the `<a>` or `<button>` directly.
+
+[List](/3-unit/list/) · [Tree](/3-unit/tree/) · [Sidebar](/3-unit/sidebar/) · [Text](/2-core/text/) · [Icon](/2-core/icon/)

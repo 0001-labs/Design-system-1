@@ -29,4 +29,6 @@ A label too long for its row ends in an ellipsis and shows in full in the shared
 
 Call `focusItem(id)` after `updateComplete` to focus a row, or `scrollToCurrent()` to reveal the current destination. `--ds-sf` scales the width, rows, text, icons and indentation. A containing layout may set the host width to another whole number of squares.
 
-[Row](/3-unit/row/) · [Button](/2-core/button/) · [Icon](/2-core/icon/)
+The rows' fills and the current row's weight are the shared row tokens (`--ds-row-fill-hover`, `--ds-row-fill-current`, `--ds-row-current-weight`), so a [navigation row](/3-unit/row/#navigation-rows) and a [tree](/3-unit/tree/)'s selected row look the same. For a chooser of nested things inside a page, with one Tab stop and a selection, use the [Tree](/3-unit/tree/).
+
+[Row](/3-unit/row/) · [Tree](/3-unit/tree/) · [Button](/2-core/button/) · [Icon](/2-core/icon/)

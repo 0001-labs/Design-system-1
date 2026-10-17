@@ -192,6 +192,58 @@ render();`,
 </ds-notice>`,
     height: 340,
   },
+  'pagedots': {
+    title: 'Where you are, and where you can go', hint: 'Click a dot, or focus one and use the arrow keys, Home and End. Each pick fires select.',
+    html: `<ds-pagedots count="6" active="2"></ds-pagedots>
+<ds-pagedots count="4" active="0" end></ds-pagedots>`,
+    height: 140,
+  },
+  'carousel': {
+    title: 'Slides twelve squares wide', hint: 'Swipe or scroll sideways, or use the buttons and the dots. Moving to another slide fires change.',
+    html: `<ds-carousel label="Colours" literal slide-width="12" buttons>
+  <figure style="margin:0;height:calc(var(--ds-unit) * 8);background:var(--ds-apple-green)"></figure>
+  <figure style="margin:0;height:calc(var(--ds-unit) * 8);background:var(--ds-zenith-blue)"></figure>
+  <figure style="margin:0;height:calc(var(--ds-unit) * 8);background:var(--ds-pink)"></figure>
+  <figure style="margin:0;height:calc(var(--ds-unit) * 8);background:var(--ds-orange)"></figure>
+</ds-carousel>`,
+    height: 300,
+  },
+  'carousel-full': {
+    title: 'One slide at a time', hint: 'Without a slide width each slide is the carousel\'s own width. The last dot marks an end.',
+    html: `<ds-carousel label="What people say" literal end>
+  <blockquote style="margin:0;height:calc(var(--ds-unit) * 4)">It reads the way I think.</blockquote>
+  <blockquote style="margin:0;height:calc(var(--ds-unit) * 4)">Everything lines up, on every screen.</blockquote>
+  <blockquote style="margin:0;height:calc(var(--ds-unit) * 4)">The keyboard reaches every slide.</blockquote>
+</ds-carousel>`,
+    height: 200,
+  },
+  'stat': {
+    title: 'Figures in the language', hint: 'Money, a change with its sign and a meter between figure and caption. The group stands on columns of eight squares.',
+    html: `<div class="ds-stats">
+  <ds-stat label="Members" value="12840" literal></ds-stat>
+  <ds-stat label="Revenue" value="1234.5" format="money" currency="EUR" change="0.12" change-format="percent" caption="Since last month" literal></ds-stat>
+  <ds-stat label="Over budget" value="18200" format="money" currency="JPY" tone="danger" literal>
+    <ds-meter label="Spent" value="118200" max="100000" format="money" currency="JPY" literal></ds-meter>
+    <span slot="caption">Of ¥100,000 planned</span>
+  </ds-stat>
+</div>`,
+    height: 220,
+  },
+  'meter': {
+    title: 'A bar, squares and over', hint: 'The words say the value and when it is past the end: 12 of 10, over by 2.',
+    html: `<ds-meter label="Spent" value="7400" max="10000" literal></ds-meter>
+<ds-meter label="Seats" value="7" max="10" squares="10" literal></ds-meter>
+<ds-meter label="Tickets" value="12" max="10" squares="10" literal></ds-meter>`,
+    height: 120,
+  },
+  'steps': {
+    title: 'Where someone is', hint: 'The current step is aria-current="step"; done steps say so in hidden words. The vertical sequence has room under each step.',
+    html: `<ds-steps current="2" label="Getting started" steps='["Apply", "Approval", "Connect payouts", "Start earning"]' literal></ds-steps>
+<ds-steps vertical current="3" steps='["Apply", "Approval", "Connect payouts", "Start earning"]' literal>
+  <ds-text slot="step-3" literal tone="muted">Connect a payout account to get paid.</ds-text>
+</ds-steps>`,
+    height: 200,
+  },
   'card': {
     title: 'A container for content', hint: 'Card is an optional component. Ordinary writing sits directly on the paper.',
     html: '<ds-card variant="outlined" padding="small">\n  <ds-text>A little content</ds-text>\n  <ds-button primary>Continue</ds-button>\n</ds-card>',
@@ -217,6 +269,59 @@ render();`,
   'row-centered': {
     title: 'A centred group', hint: 'An icon and its label share one row.',
     html: '<ds-row centered>\n  <ds-icon type="check"></ds-icon>\n  <ds-text>Completed</ds-text>\n</ds-row>',
+  },
+  'row-pressable': {
+    title: 'Rows a person presses', hint: 'Press a row, or its own action at the end. The event appears below.', height: 220,
+    html: `<ds-list style="width:calc(12 * var(--ds-unit))">
+  <ds-row href="#atlas"><ds-text literal>Atlas</ds-text><ds-text tone="muted" literal style="margin-inline-start:auto">12 items</ds-text></ds-row>
+  <ds-row interactive><ds-text literal>Harbor</ds-text><ds-text tone="muted" literal style="margin-inline-start:auto">4 items</ds-text>
+    <ds-button slot="end" label="Add to Harbor"><ds-icon type="plus"></ds-icon></ds-button></ds-row>
+  <ds-row interactive disabled><ds-text literal>Meadow</ds-text></ds-row>
+</ds-list>
+<ds-row interactive stacked style="width:calc(4 * var(--ds-unit))"><ds-text size="small" tone="muted" literal>Cash</ds-text><ds-text literal>¥1,200</ds-text></ds-row>`,
+    script: `document.addEventListener('ds-row-press', event => {
+  event.preventDefault();
+  document.querySelector('#event-output').textContent = 'Pressed: ' + event.target.querySelector('ds-text').textContent;
+});`,
+  },
+  'row-nav': {
+    title: 'Navigation rows', hint: 'The page being shown is the current row. Choose another.', height: 160,
+    html: `<nav aria-label="Account" style="width:calc(12 * var(--ds-unit))">
+  <ds-row href="#profile" nav current><ds-text literal>Profile</ds-text></ds-row>
+  <ds-row href="#billing" nav><ds-text literal>Billing</ds-text></ds-row>
+  <ds-row href="#members" nav><ds-text literal>Members</ds-text></ds-row>
+</nav>`,
+    script: `const rows = document.querySelectorAll('nav ds-row');
+document.addEventListener('ds-row-press', event => {
+  event.preventDefault();
+  rows.forEach(row => { row.current = row === event.target ? 'page' : null; });
+});`,
+  },
+  'tree': {
+    title: 'Folders and files', hint: 'Open a folder, choose a file, or move with the arrow keys. Enter or a double click opens a file.', height: 220,
+    html: '<ds-tree label="Files" style="width:calc(12 * var(--ds-unit))"></ds-tree>',
+    script: `const tree = document.querySelector('ds-tree');
+const files = [
+  { id: 'projects', label: 'Projects', icon: 'folder', children: [
+    { id: 'atlas', label: 'Atlas', icon: 'folder', children: [{ id: 'intro', label: 'intro.mp4', icon: 'video', meta: '12 MB' }, { id: 'notes', label: 'notes.md', icon: 'page', meta: '2 KB' }] },
+    { id: 'harbor', label: 'Harbor', icon: 'folder', children: [{ id: 'plan', label: 'plan.pdf', icon: 'pdf', meta: '340 KB' }] },
+  ] },
+  { id: 'trash', label: 'Trash', icon: 'delete', children: [] },
+];
+const open = new Set(['projects', 'atlas']);
+let selected = 'notes';
+function rows(nodes, depth = 0) {
+  return nodes.flatMap(node => [
+    { id: node.id, label: node.label, icon: node.icon, meta: node.meta, depth, selected: node.id === selected,
+      expanded: node.children ? open.has(node.id) : undefined },
+    ...(node.children && open.has(node.id) ? rows(node.children, depth + 1) : []),
+  ]);
+}
+function render() { tree.items = rows(files); }
+tree.addEventListener('ds-tree-toggle', event => { event.detail.expanded ? open.add(event.detail.id) : open.delete(event.detail.id); render(); });
+tree.addEventListener('ds-tree-select', event => { selected = event.detail.id; render(); });
+tree.addEventListener('ds-tree-activate', event => { document.querySelector('#event-output').textContent = 'Opened ' + event.detail.id; });
+render();`,
   },
   'list': {
     title: 'Rows in a list', hint: 'Use actual rows; there is no ds-list-item element.',
@@ -290,11 +395,12 @@ export const PAGE_EXAMPLES: Record<string, string[]> = {
   '2-core/input': ['input', 'input-states'],
   '2-core/text': ['text'], '2-core/date': ['date'],
   '2-core/banner': ['banner', 'banner-dismiss'], '2-core/card': ['card'],
-  '2-core/empty': ['empty', 'empty-search'], '2-core/notice': ['notice'], '2-core/kbd': ['kbd'],
+  '2-core/empty': ['empty', 'empty-search'], '2-core/notice': ['notice'], '2-core/kbd': ['kbd'], '2-core/pagedots': ['pagedots'],
+  '2-core/stat': ['stat'], '2-core/meter': ['meter'], '2-core/steps': ['steps'],
   '2-core/cycle': ['cycle'], '2-core/language': ['language'],
   '2-core/gap': ['gap'],
   '3-unit/row': ['row', 'row-centered'], '3-unit/list': ['list'],
-  '3-unit/accordion': ['accordion'], '3-unit/form': ['form'],
+  '3-unit/accordion': ['accordion'], '3-unit/form': ['form'], '3-unit/carousel': ['carousel', 'carousel-full'],
   '3-unit/table': ['table'],
   '4-page/container': ['container'], '4-page/grid': ['grid'],
   '4-page/layout': ['layout'], '4-page/layouts': ['page'],

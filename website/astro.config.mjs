@@ -116,7 +116,11 @@ export default defineConfig({
             { label: "Keyboard shortcut", slug: "2-core/kbd" },
             { label: "Language", slug: "2-core/language" },
             { label: "Link", slug: "2-core/link" },
+            { label: "Meter", slug: "2-core/meter" },
             { label: "Notice", slug: "2-core/notice" },
+            { label: "Page dots", slug: "2-core/pagedots" },
+            { label: "Stat", slug: "2-core/stat" },
+            { label: "Steps", slug: "2-core/steps" },
             { label: "Text", slug: "2-core/text" },
             { label: "Toast", slug: "2-core/toast" },
             { label: "Toggle", slug: "2-core/toggle" },
@@ -128,6 +132,7 @@ export default defineConfig({
           items: [
             { label: "Accordion", slug: "3-unit/accordion" },
             { label: "Card", slug: "3-unit/card" },
+            { label: "Carousel", slug: "3-unit/carousel" },
             { label: "Form", slug: "3-unit/form" },
             { label: "List", slug: "3-unit/list" },
             { label: "Navigation", slug: "3-unit/navigation" },
@@ -135,6 +140,7 @@ export default defineConfig({
             { label: "Row", slug: "3-unit/row" },
             { label: "Sidebar", slug: "3-unit/sidebar" },
             { label: "Table", slug: "3-unit/table" },
+            { label: "Tree", slug: "3-unit/tree" },
           ],
         },
         {

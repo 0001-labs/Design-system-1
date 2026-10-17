@@ -14,6 +14,7 @@ export * from "./4-page/ds-panel";
 export * from "./4-page/ds-page";
 
 export * from "./3-unit/ds-sidebar";
+export * from "./3-unit/ds-tree";
 
 export * from "./4-page/ds-grid";
 
