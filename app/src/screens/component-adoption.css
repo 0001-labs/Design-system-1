@@ -23,7 +23,7 @@
 /* Both matrices and every evidence list are Design system 1 tables (.ds-table):
    one-square rows on a hairline, title-grey headers, a sticky first column.
    The matrices keep their 20px count cells, ruled on every side. */
-.adoption .adoption-matrix { border-collapse: separate; table-layout: fixed; width: max-content; }
+.adoption .adoption-matrix { border-collapse: separate; table-layout: fixed; width: max-content; min-width: 0; }
 .adoption-matrix th, .adoption-matrix td { box-sizing: border-box; border: 0; padding: 0; font-weight: 400; text-align: center; }
 .adoption-matrix td { font-size: calc(10px * var(--sf, 1)); width: var(--report-unit); min-width: var(--report-unit); max-width: var(--report-unit); height: var(--report-unit); box-shadow: inset -1px -1px var(--report-line); font-family: var(--typeface-compressed); font-variant-numeric: tabular-nums; }
 .adoption-matrix .adoption-app-column { width: calc(8 * var(--report-unit)); min-width: calc(8 * var(--report-unit)); padding-right: calc(.5 * var(--report-unit)); text-align: right; z-index: 2; }
@@ -92,3 +92,5 @@
 
 .adoption-groups .group-root { background: var(--report-paper); color: var(--report-ink); }
 .adoption-column-names .group-root { background: var(--report-paper); }
+
+.adoption-icons .adoption-matrix .adoption-total { width: var(--report-unit); min-width: var(--report-unit); max-width: var(--report-unit); padding: 0; text-align: center; white-space: nowrap; }

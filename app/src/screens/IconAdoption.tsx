@@ -85,10 +85,10 @@ export function IconMatrix({ report }: { report: AdoptionReport }) {
       </ds-tabs>
     </div>
     <div className="adoption-scroll ds-table-scroll" tabIndex={0} role="region" aria-label="Icon adoption matrix">
-      <table className="adoption-matrix ds-table" data-sticky style={{ width: `calc(${apps.length + 12} * var(--report-unit))` }}>
+      <table className="adoption-matrix ds-table" data-sticky style={{ width: `calc(${apps.length + 9} * var(--report-unit))` }}>
         <caption className="adoption-sr">Icons by app. Counts are source sites{kind === "all" ? "" : `, ${kindName(kind)} only`}.</caption>
-        <colgroup><col style={{ width: "calc(8 * var(--report-unit))" }} />{apps.map(app => <col key={app.id} style={{ width: "var(--report-unit)" }} />)}<col style={{ width: "calc(4 * var(--report-unit))" }} /></colgroup>
-        <thead><tr className="adoption-column-names"><th className="adoption-app-column" scope="col">Icon</th>{apps.map(app => <th key={app.id} scope="col"><span>{app.name}</span></th>)}<th className="adoption-total" scope="col" data-numeric>Total</th></tr></thead>
+        <colgroup><col style={{ width: "calc(8 * var(--report-unit))" }} />{apps.map(app => <col key={app.id} style={{ width: "var(--report-unit)" }} />)}<col style={{ width: "var(--report-unit)" }} /></colgroup>
+        <thead><tr className="adoption-column-names"><th className="adoption-app-column" scope="col" aria-label="Icon" />{apps.map(app => <th key={app.id} scope="col"><span>{app.name}</span></th>)}<th className="adoption-total" scope="col" data-numeric>Total</th></tr></thead>
         <tbody>{groups.map(group => <Fragment key={group.name}>
           <tr className="adoption-app-group"><th colSpan={apps.length + 2} scope="rowgroup">{group.name}</th></tr>
           {group.rows.map(name => {
