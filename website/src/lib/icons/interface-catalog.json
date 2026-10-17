@@ -408,6 +408,86 @@
     "shapes": 1
   },
   {
+    "key": "dot-bank",
+    "name": "Dot",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<g fill=\"currentColor\"><circle cx=\"8\" cy=\"2\" r=\"0.91\"/><circle cx=\"4\" cy=\"4\" r=\"0.91\"/><circle cx=\"6\" cy=\"4\" r=\"0.91\"/><circle cx=\"10\" cy=\"4\" r=\"0.91\"/><circle cx=\"12\" cy=\"4\" r=\"0.91\"/><circle cx=\"2\" cy=\"6\" r=\"0.91\"/><circle cx=\"4\" cy=\"6\" r=\"0.91\"/><circle cx=\"6\" cy=\"6\" r=\"0.91\"/><circle cx=\"8\" cy=\"6\" r=\"0.91\"/><circle cx=\"10\" cy=\"6\" r=\"0.91\"/><circle cx=\"12\" cy=\"6\" r=\"0.91\"/><circle cx=\"14\" cy=\"6\" r=\"0.91\"/><circle cx=\"4\" cy=\"8\" r=\"0.91\"/><circle cx=\"8\" cy=\"8\" r=\"0.91\"/><circle cx=\"12\" cy=\"8\" r=\"0.91\"/><circle cx=\"4\" cy=\"10\" r=\"0.91\"/><circle cx=\"8\" cy=\"10\" r=\"0.91\"/><circle cx=\"12\" cy=\"10\" r=\"0.91\"/><circle cx=\"4\" cy=\"12\" r=\"0.91\"/><circle cx=\"8\" cy=\"12\" r=\"0.91\"/><circle cx=\"12\" cy=\"12\" r=\"0.91\"/><circle cx=\"2\" cy=\"14\" r=\"0.91\"/><circle cx=\"4\" cy=\"14\" r=\"0.91\"/><circle cx=\"6\" cy=\"14\" r=\"0.91\"/><circle cx=\"8\" cy=\"14\" r=\"0.91\"/><circle cx=\"10\" cy=\"14\" r=\"0.91\"/><circle cx=\"12\" cy=\"14\" r=\"0.91\"/><circle cx=\"14\" cy=\"14\" r=\"0.91\"/></g>\n</svg>",
+    "url": "/icons/library/dot-bank.svg",
+    "shapes": 28
+  },
+  {
+    "key": "dot-banknote",
+    "name": "Dot",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<g fill=\"currentColor\"><circle cx=\"2\" cy=\"4\" r=\"0.91\"/><circle cx=\"4\" cy=\"4\" r=\"0.91\"/><circle cx=\"6\" cy=\"4\" r=\"0.91\"/><circle cx=\"8\" cy=\"4\" r=\"0.91\"/><circle cx=\"10\" cy=\"4\" r=\"0.91\"/><circle cx=\"12\" cy=\"4\" r=\"0.91\"/><circle cx=\"14\" cy=\"4\" r=\"0.91\"/><circle cx=\"2\" cy=\"6\" r=\"0.91\"/><circle cx=\"8\" cy=\"6\" r=\"0.91\"/><circle cx=\"14\" cy=\"6\" r=\"0.91\"/><circle cx=\"2\" cy=\"8\" r=\"0.91\"/><circle cx=\"6\" cy=\"8\" r=\"0.91\"/><circle cx=\"10\" cy=\"8\" r=\"0.91\"/><circle cx=\"14\" cy=\"8\" r=\"0.91\"/><circle cx=\"2\" cy=\"10\" r=\"0.91\"/><circle cx=\"8\" cy=\"10\" r=\"0.91\"/><circle cx=\"14\" cy=\"10\" r=\"0.91\"/><circle cx=\"2\" cy=\"12\" r=\"0.91\"/><circle cx=\"4\" cy=\"12\" r=\"0.91\"/><circle cx=\"6\" cy=\"12\" r=\"0.91\"/><circle cx=\"8\" cy=\"12\" r=\"0.91\"/><circle cx=\"10\" cy=\"12\" r=\"0.91\"/><circle cx=\"12\" cy=\"12\" r=\"0.91\"/><circle cx=\"14\" cy=\"12\" r=\"0.91\"/></g>\n</svg>",
+    "url": "/icons/library/dot-banknote.svg",
+    "shapes": 24
+  },
+  {
+    "key": "dot-banknotes",
+    "name": "Dot",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<g fill=\"currentColor\"><circle cx=\"4\" cy=\"2\" r=\"0.91\"/><circle cx=\"6\" cy=\"2\" r=\"0.91\"/><circle cx=\"8\" cy=\"2\" r=\"0.91\"/><circle cx=\"10\" cy=\"2\" r=\"0.91\"/><circle cx=\"12\" cy=\"2\" r=\"0.91\"/><circle cx=\"14\" cy=\"2\" r=\"0.91\"/><circle cx=\"14\" cy=\"4\" r=\"0.91\"/><circle cx=\"2\" cy=\"6\" r=\"0.91\"/><circle cx=\"4\" cy=\"6\" r=\"0.91\"/><circle cx=\"6\" cy=\"6\" r=\"0.91\"/><circle cx=\"8\" cy=\"6\" r=\"0.91\"/><circle cx=\"10\" cy=\"6\" r=\"0.91\"/><circle cx=\"12\" cy=\"6\" r=\"0.91\"/><circle cx=\"2\" cy=\"8\" r=\"0.91\"/><circle cx=\"8\" cy=\"8\" r=\"0.91\"/><circle cx=\"12\" cy=\"8\" r=\"0.91\"/><circle cx=\"2\" cy=\"10\" r=\"0.91\"/><circle cx=\"6\" cy=\"10\" r=\"0.91\"/><circle cx=\"10\" cy=\"10\" r=\"0.91\"/><circle cx=\"12\" cy=\"10\" r=\"0.91\"/><circle cx=\"2\" cy=\"12\" r=\"0.91\"/><circle cx=\"8\" cy=\"12\" r=\"0.91\"/><circle cx=\"12\" cy=\"12\" r=\"0.91\"/><circle cx=\"2\" cy=\"14\" r=\"0.91\"/><circle cx=\"4\" cy=\"14\" r=\"0.91\"/><circle cx=\"6\" cy=\"14\" r=\"0.91\"/><circle cx=\"8\" cy=\"14\" r=\"0.91\"/><circle cx=\"10\" cy=\"14\" r=\"0.91\"/><circle cx=\"12\" cy=\"14\" r=\"0.91\"/></g>\n</svg>",
+    "url": "/icons/library/dot-banknotes.svg",
+    "shapes": 29
+  },
+  {
+    "key": "dot-card",
+    "name": "Dot",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<g fill=\"currentColor\"><circle cx=\"2\" cy=\"4\" r=\"0.91\"/><circle cx=\"4\" cy=\"4\" r=\"0.91\"/><circle cx=\"6\" cy=\"4\" r=\"0.91\"/><circle cx=\"8\" cy=\"4\" r=\"0.91\"/><circle cx=\"10\" cy=\"4\" r=\"0.91\"/><circle cx=\"12\" cy=\"4\" r=\"0.91\"/><circle cx=\"14\" cy=\"4\" r=\"0.91\"/><circle cx=\"2\" cy=\"6\" r=\"0.91\"/><circle cx=\"14\" cy=\"6\" r=\"0.91\"/><circle cx=\"2\" cy=\"8\" r=\"0.91\"/><circle cx=\"4\" cy=\"8\" r=\"0.91\"/><circle cx=\"6\" cy=\"8\" r=\"0.91\"/><circle cx=\"8\" cy=\"8\" r=\"0.91\"/><circle cx=\"10\" cy=\"8\" r=\"0.91\"/><circle cx=\"12\" cy=\"8\" r=\"0.91\"/><circle cx=\"14\" cy=\"8\" r=\"0.91\"/><circle cx=\"2\" cy=\"10\" r=\"0.91\"/><circle cx=\"14\" cy=\"10\" r=\"0.91\"/><circle cx=\"2\" cy=\"12\" r=\"0.91\"/><circle cx=\"6\" cy=\"12\" r=\"0.91\"/><circle cx=\"8\" cy=\"12\" r=\"0.91\"/><circle cx=\"14\" cy=\"12\" r=\"0.91\"/><circle cx=\"2\" cy=\"14\" r=\"0.91\"/><circle cx=\"4\" cy=\"14\" r=\"0.91\"/><circle cx=\"6\" cy=\"14\" r=\"0.91\"/><circle cx=\"8\" cy=\"14\" r=\"0.91\"/><circle cx=\"10\" cy=\"14\" r=\"0.91\"/><circle cx=\"12\" cy=\"14\" r=\"0.91\"/><circle cx=\"14\" cy=\"14\" r=\"0.91\"/></g>\n</svg>",
+    "url": "/icons/library/dot-card.svg",
+    "shapes": 29
+  },
+  {
+    "key": "dot-coin",
+    "name": "Dot",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<g fill=\"currentColor\"><circle cx=\"6\" cy=\"2\" r=\"0.91\"/><circle cx=\"8\" cy=\"2\" r=\"0.91\"/><circle cx=\"10\" cy=\"2\" r=\"0.91\"/><circle cx=\"4\" cy=\"4\" r=\"0.91\"/><circle cx=\"12\" cy=\"4\" r=\"0.91\"/><circle cx=\"2\" cy=\"6\" r=\"0.91\"/><circle cx=\"6\" cy=\"6\" r=\"0.91\"/><circle cx=\"8\" cy=\"6\" r=\"0.91\"/><circle cx=\"14\" cy=\"6\" r=\"0.91\"/><circle cx=\"2\" cy=\"8\" r=\"0.91\"/><circle cx=\"8\" cy=\"8\" r=\"0.91\"/><circle cx=\"14\" cy=\"8\" r=\"0.91\"/><circle cx=\"2\" cy=\"10\" r=\"0.91\"/><circle cx=\"8\" cy=\"10\" r=\"0.91\"/><circle cx=\"14\" cy=\"10\" r=\"0.91\"/><circle cx=\"4\" cy=\"12\" r=\"0.91\"/><circle cx=\"12\" cy=\"12\" r=\"0.91\"/><circle cx=\"6\" cy=\"14\" r=\"0.91\"/><circle cx=\"8\" cy=\"14\" r=\"0.91\"/><circle cx=\"10\" cy=\"14\" r=\"0.91\"/></g>\n</svg>",
+    "url": "/icons/library/dot-coin.svg",
+    "shapes": 20
+  },
+  {
+    "key": "dot-coins",
+    "name": "Dot",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<g fill=\"currentColor\"><circle cx=\"4\" cy=\"2\" r=\"0.91\"/><circle cx=\"6\" cy=\"2\" r=\"0.91\"/><circle cx=\"8\" cy=\"2\" r=\"0.91\"/><circle cx=\"10\" cy=\"2\" r=\"0.91\"/><circle cx=\"12\" cy=\"2\" r=\"0.91\"/><circle cx=\"2\" cy=\"4\" r=\"0.91\"/><circle cx=\"14\" cy=\"4\" r=\"0.91\"/><circle cx=\"4\" cy=\"6\" r=\"0.91\"/><circle cx=\"6\" cy=\"6\" r=\"0.91\"/><circle cx=\"8\" cy=\"6\" r=\"0.91\"/><circle cx=\"10\" cy=\"6\" r=\"0.91\"/><circle cx=\"12\" cy=\"6\" r=\"0.91\"/><circle cx=\"2\" cy=\"8\" r=\"0.91\"/><circle cx=\"14\" cy=\"8\" r=\"0.91\"/><circle cx=\"4\" cy=\"10\" r=\"0.91\"/><circle cx=\"6\" cy=\"10\" r=\"0.91\"/><circle cx=\"8\" cy=\"10\" r=\"0.91\"/><circle cx=\"10\" cy=\"10\" r=\"0.91\"/><circle cx=\"12\" cy=\"10\" r=\"0.91\"/><circle cx=\"2\" cy=\"12\" r=\"0.91\"/><circle cx=\"14\" cy=\"12\" r=\"0.91\"/><circle cx=\"4\" cy=\"14\" r=\"0.91\"/><circle cx=\"6\" cy=\"14\" r=\"0.91\"/><circle cx=\"8\" cy=\"14\" r=\"0.91\"/><circle cx=\"10\" cy=\"14\" r=\"0.91\"/><circle cx=\"12\" cy=\"14\" r=\"0.91\"/></g>\n</svg>",
+    "url": "/icons/library/dot-coins.svg",
+    "shapes": 26
+  },
+  {
+    "key": "dot-receipt",
+    "name": "Dot",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<g fill=\"currentColor\"><circle cx=\"4\" cy=\"2\" r=\"0.91\"/><circle cx=\"6\" cy=\"2\" r=\"0.91\"/><circle cx=\"8\" cy=\"2\" r=\"0.91\"/><circle cx=\"10\" cy=\"2\" r=\"0.91\"/><circle cx=\"12\" cy=\"2\" r=\"0.91\"/><circle cx=\"4\" cy=\"4\" r=\"0.91\"/><circle cx=\"12\" cy=\"4\" r=\"0.91\"/><circle cx=\"4\" cy=\"6\" r=\"0.91\"/><circle cx=\"8\" cy=\"6\" r=\"0.91\"/><circle cx=\"12\" cy=\"6\" r=\"0.91\"/><circle cx=\"4\" cy=\"8\" r=\"0.91\"/><circle cx=\"12\" cy=\"8\" r=\"0.91\"/><circle cx=\"4\" cy=\"10\" r=\"0.91\"/><circle cx=\"8\" cy=\"10\" r=\"0.91\"/><circle cx=\"12\" cy=\"10\" r=\"0.91\"/><circle cx=\"4\" cy=\"12\" r=\"0.91\"/><circle cx=\"12\" cy=\"12\" r=\"0.91\"/><circle cx=\"4\" cy=\"14\" r=\"0.91\"/><circle cx=\"8\" cy=\"14\" r=\"0.91\"/><circle cx=\"12\" cy=\"14\" r=\"0.91\"/></g>\n</svg>",
+    "url": "/icons/library/dot-receipt.svg",
+    "shapes": 20
+  },
+  {
+    "key": "dot-safe",
+    "name": "Dot",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<g fill=\"currentColor\"><circle cx=\"2\" cy=\"2\" r=\"0.91\"/><circle cx=\"4\" cy=\"2\" r=\"0.91\"/><circle cx=\"6\" cy=\"2\" r=\"0.91\"/><circle cx=\"8\" cy=\"2\" r=\"0.91\"/><circle cx=\"10\" cy=\"2\" r=\"0.91\"/><circle cx=\"12\" cy=\"2\" r=\"0.91\"/><circle cx=\"14\" cy=\"2\" r=\"0.91\"/><circle cx=\"2\" cy=\"4\" r=\"0.91\"/><circle cx=\"14\" cy=\"4\" r=\"0.91\"/><circle cx=\"2\" cy=\"6\" r=\"0.91\"/><circle cx=\"6\" cy=\"6\" r=\"0.91\"/><circle cx=\"8\" cy=\"6\" r=\"0.91\"/><circle cx=\"10\" cy=\"6\" r=\"0.91\"/><circle cx=\"14\" cy=\"6\" r=\"0.91\"/><circle cx=\"2\" cy=\"8\" r=\"0.91\"/><circle cx=\"6\" cy=\"8\" r=\"0.91\"/><circle cx=\"10\" cy=\"8\" r=\"0.91\"/><circle cx=\"12\" cy=\"8\" r=\"0.91\"/><circle cx=\"14\" cy=\"8\" r=\"0.91\"/><circle cx=\"2\" cy=\"10\" r=\"0.91\"/><circle cx=\"6\" cy=\"10\" r=\"0.91\"/><circle cx=\"8\" cy=\"10\" r=\"0.91\"/><circle cx=\"10\" cy=\"10\" r=\"0.91\"/><circle cx=\"14\" cy=\"10\" r=\"0.91\"/><circle cx=\"2\" cy=\"12\" r=\"0.91\"/><circle cx=\"14\" cy=\"12\" r=\"0.91\"/><circle cx=\"2\" cy=\"14\" r=\"0.91\"/><circle cx=\"4\" cy=\"14\" r=\"0.91\"/><circle cx=\"6\" cy=\"14\" r=\"0.91\"/><circle cx=\"8\" cy=\"14\" r=\"0.91\"/><circle cx=\"10\" cy=\"14\" r=\"0.91\"/><circle cx=\"12\" cy=\"14\" r=\"0.91\"/><circle cx=\"14\" cy=\"14\" r=\"0.91\"/></g>\n</svg>",
+    "url": "/icons/library/dot-safe.svg",
+    "shapes": 33
+  },
+  {
+    "key": "dot-transfer",
+    "name": "Dot",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<g fill=\"currentColor\"><circle cx=\"10\" cy=\"2\" r=\"0.91\"/><circle cx=\"2\" cy=\"4\" r=\"0.91\"/><circle cx=\"4\" cy=\"4\" r=\"0.91\"/><circle cx=\"6\" cy=\"4\" r=\"0.91\"/><circle cx=\"8\" cy=\"4\" r=\"0.91\"/><circle cx=\"10\" cy=\"4\" r=\"0.91\"/><circle cx=\"12\" cy=\"4\" r=\"0.91\"/><circle cx=\"10\" cy=\"6\" r=\"0.91\"/><circle cx=\"6\" cy=\"10\" r=\"0.91\"/><circle cx=\"4\" cy=\"12\" r=\"0.91\"/><circle cx=\"6\" cy=\"12\" r=\"0.91\"/><circle cx=\"8\" cy=\"12\" r=\"0.91\"/><circle cx=\"10\" cy=\"12\" r=\"0.91\"/><circle cx=\"12\" cy=\"12\" r=\"0.91\"/><circle cx=\"14\" cy=\"12\" r=\"0.91\"/><circle cx=\"6\" cy=\"14\" r=\"0.91\"/></g>\n</svg>",
+    "url": "/icons/library/dot-transfer.svg",
+    "shapes": 16
+  },
+  {
+    "key": "dot-wallet",
+    "name": "Dot",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<g fill=\"currentColor\"><circle cx=\"6\" cy=\"2\" r=\"0.91\"/><circle cx=\"8\" cy=\"2\" r=\"0.91\"/><circle cx=\"10\" cy=\"2\" r=\"0.91\"/><circle cx=\"12\" cy=\"2\" r=\"0.91\"/><circle cx=\"4\" cy=\"4\" r=\"0.91\"/><circle cx=\"14\" cy=\"4\" r=\"0.91\"/><circle cx=\"2\" cy=\"6\" r=\"0.91\"/><circle cx=\"4\" cy=\"6\" r=\"0.91\"/><circle cx=\"6\" cy=\"6\" r=\"0.91\"/><circle cx=\"8\" cy=\"6\" r=\"0.91\"/><circle cx=\"10\" cy=\"6\" r=\"0.91\"/><circle cx=\"12\" cy=\"6\" r=\"0.91\"/><circle cx=\"14\" cy=\"6\" r=\"0.91\"/><circle cx=\"2\" cy=\"8\" r=\"0.91\"/><circle cx=\"12\" cy=\"8\" r=\"0.91\"/><circle cx=\"14\" cy=\"8\" r=\"0.91\"/><circle cx=\"2\" cy=\"10\" r=\"0.91\"/><circle cx=\"10\" cy=\"10\" r=\"0.91\"/><circle cx=\"14\" cy=\"10\" r=\"0.91\"/><circle cx=\"2\" cy=\"12\" r=\"0.91\"/><circle cx=\"12\" cy=\"12\" r=\"0.91\"/><circle cx=\"14\" cy=\"12\" r=\"0.91\"/><circle cx=\"2\" cy=\"14\" r=\"0.91\"/><circle cx=\"4\" cy=\"14\" r=\"0.91\"/><circle cx=\"6\" cy=\"14\" r=\"0.91\"/><circle cx=\"8\" cy=\"14\" r=\"0.91\"/><circle cx=\"10\" cy=\"14\" r=\"0.91\"/><circle cx=\"12\" cy=\"14\" r=\"0.91\"/><circle cx=\"14\" cy=\"14\" r=\"0.91\"/></g>\n</svg>",
+    "url": "/icons/library/dot-wallet.svg",
+    "shapes": 29
+  },
+  {
     "key": "2xdots",
     "name": "Dots",
     "source": "Figma",

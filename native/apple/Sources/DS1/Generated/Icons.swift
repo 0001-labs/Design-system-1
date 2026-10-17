@@ -125,6 +125,16 @@ public enum DS1IconName: String, CaseIterable, Sendable {
     case dictate
     case dislike
     case divider
+    case dotBank = "dot-bank"
+    case dotBanknote = "dot-banknote"
+    case dotBanknotes = "dot-banknotes"
+    case dotCard = "dot-card"
+    case dotCoin = "dot-coin"
+    case dotCoins = "dot-coins"
+    case dotReceipt = "dot-receipt"
+    case dotSafe = "dot-safe"
+    case dotTransfer = "dot-transfer"
+    case dotWallet = "dot-wallet"
     case down
     case download
     case drive
