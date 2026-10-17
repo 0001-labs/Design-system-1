@@ -187,6 +187,31 @@ render();`,
 </ds-notice>`,
     height: 340,
   },
+  'pagedots': {
+    title: 'Where you are, and where you can go', hint: 'Click a dot, or focus one and use the arrow keys, Home and End. Each pick fires select.',
+    html: `<ds-pagedots count="6" active="2"></ds-pagedots>
+<ds-pagedots count="4" active="0" end></ds-pagedots>`,
+    height: 140,
+  },
+  'carousel': {
+    title: 'Slides twelve squares wide', hint: 'Swipe or scroll sideways, or use the buttons and the dots. Moving to another slide fires change.',
+    html: `<ds-carousel label="Colours" literal slide-width="12" buttons>
+  <figure style="margin:0;height:calc(var(--ds-unit) * 8);background:var(--ds-apple-green)"></figure>
+  <figure style="margin:0;height:calc(var(--ds-unit) * 8);background:var(--ds-zenith-blue)"></figure>
+  <figure style="margin:0;height:calc(var(--ds-unit) * 8);background:var(--ds-pink)"></figure>
+  <figure style="margin:0;height:calc(var(--ds-unit) * 8);background:var(--ds-orange)"></figure>
+</ds-carousel>`,
+    height: 300,
+  },
+  'carousel-full': {
+    title: 'One slide at a time', hint: 'Without a slide width each slide is the carousel\'s own width. The last dot marks an end.',
+    html: `<ds-carousel label="What people say" literal end>
+  <blockquote style="margin:0;height:calc(var(--ds-unit) * 4)">It reads the way I think.</blockquote>
+  <blockquote style="margin:0;height:calc(var(--ds-unit) * 4)">Everything lines up, on every screen.</blockquote>
+  <blockquote style="margin:0;height:calc(var(--ds-unit) * 4)">The keyboard reaches every slide.</blockquote>
+</ds-carousel>`,
+    height: 200,
+  },
   'card': {
     title: 'A container for content', hint: 'Card is an optional component. Ordinary writing sits directly on the paper.',
     html: '<ds-card variant="outlined" padding="small">\n  <ds-text>A little content</ds-text>\n  <ds-button primary>Continue</ds-button>\n</ds-card>',
@@ -285,11 +310,11 @@ export const PAGE_EXAMPLES: Record<string, string[]> = {
   '2-core/input': ['input', 'input-states'],
   '2-core/text': ['text'], '2-core/date': ['date'],
   '2-core/banner': ['banner', 'banner-dismiss'], '2-core/card': ['card'],
-  '2-core/empty': ['empty', 'empty-search'], '2-core/notice': ['notice'],
+  '2-core/empty': ['empty', 'empty-search'], '2-core/notice': ['notice'], '2-core/pagedots': ['pagedots'],
   '2-core/cycle': ['cycle'], '2-core/language': ['language'],
   '2-core/gap': ['gap'],
   '3-unit/row': ['row', 'row-centered'], '3-unit/list': ['list'],
-  '3-unit/accordion': ['accordion'], '3-unit/form': ['form'],
+  '3-unit/accordion': ['accordion'], '3-unit/form': ['form'], '3-unit/carousel': ['carousel', 'carousel-full'],
   '3-unit/table': ['table'],
   '4-page/container': ['container'], '4-page/grid': ['grid'],
   '4-page/layout': ['layout'], '4-page/layouts': ['page'],
