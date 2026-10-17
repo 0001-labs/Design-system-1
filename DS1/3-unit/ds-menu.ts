@@ -353,11 +353,15 @@ export class Menu extends LitElement {
     const left = viewport?.offsetLeft ?? 0, top = viewport?.offsetTop ?? 0;
     const width = viewport?.width ?? view.innerWidth, height = viewport?.height ?? view.innerHeight;
     const gap = parseFloat(view.getComputedStyle(this).scrollPaddingTop) || 10, unit = gap * 2;
-    const room = Math.max(0, width - 2 * gap);
+    // Whole squares: the room and the height a menu may take round down to
+    // them, and a menu as wide as its anchor rounds that width up.
+    const squares = (length: number, round: typeof Math.floor) =>
+      round(Math.max(0, length) / unit + (round === Math.floor ? 0.001 : -0.001)) * unit;
+    const room = squares(width - 2 * gap, Math.floor);
     this.style.maxWidth = `${room}px`;
-    this.style.setProperty("--ds-menu-anchor-width", `${Math.min(room, Math.max(4 * unit, rect.width))}px`);
+    this.style.setProperty("--ds-menu-anchor-width", `${Math.min(room, Math.max(4 * unit, squares(rect.width, Math.ceil)))}px`);
     if (this.placement === "right" || this.placement === "left" || this.triggerMode === "submenu") {
-      this.style.setProperty("--ds-menu-available-height", `${Math.max(0, height - 2 * gap)}px`);
+      this.style.setProperty("--ds-menu-available-height", `${squares(height - 2 * gap, Math.floor)}px`);
       const box = this.getBoundingClientRect();
       const preferLeft = this.placement === "left" || view.getComputedStyle(this).direction === "rtl";
       const toRight = left + width - rect.right, toLeft = rect.left - left;
@@ -370,7 +374,7 @@ export class Menu extends LitElement {
     const frame = this.shadowRoot?.querySelector<HTMLElement>(".frame");
     const needed = Math.min(frame?.scrollHeight ?? this.scrollHeight, 8 * unit);
     const up = this.placement === "top" ? above >= needed || above >= below : below < needed && above > below;
-    this.style.setProperty("--ds-menu-available-height", `${Math.max(0, Math.min(height - 2 * gap, up ? above : below))}px`);
+    this.style.setProperty("--ds-menu-available-height", `${squares(Math.min(height - 2 * gap, up ? above : below), Math.floor)}px`);
     const box = this.getBoundingClientRect();
     this.style.left = `${Math.max(left + gap, Math.min(rect.left, left + width - gap - box.width))}px`;
     this.style.top = `${Math.max(top + gap, up ? rect.top - gap - box.height : rect.bottom + gap)}px`;
