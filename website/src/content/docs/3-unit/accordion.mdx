@@ -17,7 +17,14 @@ A native details and summary disclosure composed from a row, text and an icon.
 | --- | --- | --- | --- |
 | `summary` | string | Empty | The summary text or translation key. |
 | `details` | string | Empty | Detail text when no named-slot content is supplied. |
+| `literal` | boolean | false | The summary and details are what someone wrote, such as a template's name: shown as they stand and never translated. |
 | `open` | boolean | false | Initially expands the disclosure. |
+
+Without `literal`, `summary` and `details` are translation keys, as in [Text](/2-core/text/):
+
+```html
+<ds-accordion literal summary="Ideas for spring" details="Plant the bulbs in October"></ds-accordion>
+```
 
 For rich detail content, use `slot="details"` as in the example. The summary can be activated with the pointer, Enter or Space. Native `<details>` owns opening and closing.
 
