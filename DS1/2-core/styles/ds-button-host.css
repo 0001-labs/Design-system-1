@@ -181,7 +181,9 @@
 :host([control="slotted"]) {
   /* The native focus ring extends beyond the face; only its text is clipped. */
   overflow: visible;
-  --ds-button-height: var(--ds-row-height);
+  /* One control high, as the host and native faces are, so its words stand on
+     the lower sixteen of their square in a row or at the foot of a line. */
+  vertical-align: bottom;
   width: var(--ds-button-width, max-content);
 }
 :host([control="slotted"][fixed]) {
@@ -208,6 +210,11 @@
   --ds-button-height: var(--ds-row-height);
   --ds-button-align: flex-start;
   --ds-button-padding: 0 calc(4px * var(--ds-sf));
+}
+/* A row-high entry's words and icon stand on the lower sixteen, the spare four above. */
+:host([menu-item][control="host"]),
+:host([menu-item][control="slotted"]) ::slotted(:is(button, a)) {
+  align-items: flex-end !important;
 }
 :host([menu-item]:is(:hover, :focus-within):not([disabled])) {
   --ds-button-background: var(--ds-fill);

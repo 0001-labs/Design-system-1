@@ -200,3 +200,53 @@ test("a native range stands one control high on the sixteen, eight squares wide,
     expect(above, `${scheme} above the line`).toBe(paper);
   }
 });
+
+test("every button face stands one control high on the lower sixteen, in a row and at the foot of a line", async () => {
+  const page = pages.light;
+  // A zero-size inline-block marks the words' baseline: its bottom edge sits on it.
+  const words = `<span>Save<i class="probe" style="display:inline-block;width:0;height:0"></i></span>`;
+  const faces = {
+    host: `<ds-button control="host">${words}</ds-button>`,
+    slotted: `<ds-button control="slotted"><button type="button">${words}</button></ds-button>`,
+    "slotted primary": `<ds-button control="slotted" primary><button type="button">${words}</button></ds-button>`,
+    native: `<button type="button" class="ds-button">${words}</button>`,
+  };
+  for (const [name, face] of Object.entries(faces)) {
+    for (const [context, markup] of [
+      ["row", `<div style="display:flex;align-items:flex-end;height:${UNIT}px">${face}</div>`],
+      ["line", `<p style="margin:0;line-height:${UNIT}px">Words ${face}</p>`],
+    ] as const) {
+      await stage(page, markup);
+      const measured = await page.evaluate(() => {
+        const stage = document.getElementById("stage")!;
+        const face = stage.querySelector<HTMLElement>("ds-button[control='slotted'] > button, ds-button[control='host'], button.ds-button")!;
+        const box = face.getBoundingClientRect();
+        return { top: box.top, bottom: box.bottom, baseline: stage.querySelector(".probe")!.getBoundingClientRect().bottom };
+      });
+      expect(measured.bottom, `${name} in a ${context} stands on the square's foot`).toBeCloseTo(UNIT, 1);
+      expect(measured.bottom - measured.top, `${name} in a ${context} is one control high`).toBeCloseTo(16, 1);
+      expect(measured.baseline, `${name} in a ${context} has its baseline 3px above the foot`).toBeCloseTo(UNIT - 3, 0);
+    }
+  }
+});
+
+test("a menu entry is a row high with its words on the lower sixteen", async () => {
+  const page = pages.light;
+  const words = `<span>Rename<i class="probe" style="display:inline-block;width:0;height:0"></i></span>`;
+  for (const face of [
+    `<ds-button control="host" menu-item>${words}</ds-button>`,
+    `<ds-button control="slotted" menu-item><button type="button">${words}</button></ds-button>`,
+    `<ds-button menu-item>${words}</ds-button>`,
+  ]) {
+    await stage(page, `<div style="width:${8 * UNIT}px">${face}</div>`);
+    const measured = await page.evaluate(() => {
+      const stage = document.getElementById("stage")!;
+      const host = stage.querySelector<HTMLElement>("ds-button")!;
+      const face = host.querySelector<HTMLElement>(":scope > button") ?? host.shadowRoot?.querySelector<HTMLElement>("[part='control']") ?? host;
+      const box = face.getBoundingClientRect();
+      return { top: box.top, bottom: box.bottom, baseline: stage.querySelector(".probe")!.getBoundingClientRect().bottom };
+    });
+    expect(measured.bottom - measured.top, `${face} is one row high`).toBeCloseTo(UNIT, 1);
+    expect(measured.baseline - measured.top, `${face} has its baseline 3px above the foot`).toBeCloseTo(UNIT - 3, 0);
+  }
+});

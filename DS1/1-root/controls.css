@@ -31,6 +31,8 @@
   appearance: none;
   box-sizing: border-box;
   display: inline-flex;
+  /* At the foot of a line, so the 16px face takes the lower sixteen of the square. */
+  vertical-align: bottom;
   flex: 0 0 auto;
   width: var(--ds-button-width, max-content);
   align-items: center;
