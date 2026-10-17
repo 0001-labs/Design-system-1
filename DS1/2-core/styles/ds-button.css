@@ -95,6 +95,23 @@
   padding: 0 calc(var(--ds-button-inset, 4px) * var(--ds-sf));
 }
 
+/* An entry in a menu or a list of options is one row high on this face too,
+   as on the host and slotted faces: the menu's --ds-button-height (one
+   square, or a compact row), its words at the start, padded 4px. */
+:host(:is([menu-item], [role="option"], [role^="menuitem"])) :is(button, a) {
+  height: var(--ds-button-height, var(--ds-row-height));
+  min-height: var(--ds-button-height, var(--ds-row-height));
+  max-height: var(--ds-button-height, var(--ds-row-height));
+  justify-content: var(--ds-button-align, flex-start);
+  padding: 0 calc(var(--ds-button-inset, 4px) * var(--ds-sf));
+}
+
+/* `danger`: a destructive action's words in the danger colour, on this face
+   as on the host and slotted faces and `.ds-button--danger`. */
+:host([danger]) :is(button, a) {
+  color: var(--ds-danger-color, var(--ds-tuned-red));
+}
+
 /* Disabled, as in the slotted and host modes. A disabled link has no href. */
 :is(button:disabled, a[aria-disabled="true"]) {
   cursor: default;

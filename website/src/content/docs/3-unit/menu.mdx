@@ -47,6 +47,16 @@ Keep the menu mounted when it owns a `trigger`, including while closed.
 `activeId` and `onActiveChange`
 similarly keep selection controlled. Classes and styles place the host only.
 Use shared buttons, text and icons inside it, with each entry one row high.
+
+The menu stands on whole squares. Its line and the padding inside it make half
+a square on each side, so n entries are n + 1 squares high, and a floating menu
+half a square below its anchor puts its entries on the anchor's grid lines. It
+has no shadow. A separator takes one square with its line. Every entry is one
+square high whatever button styles surround it: shared buttons through their
+entry role or `menu-item`, a library's own `<button>` or `<a>` held by the
+menu. A floating menu rounds its anchor's width up, and the height it may take
+down, to whole squares. `compact` entries are filled rows on a square's pitch,
+19px with the 1px between them.
 For a palette, set `columns` and place shared Button choices directly in the
 menu. Each cell is one square. `data-ds-menu-start` on a Button starts a new
 section after a short row. Separators span the grid; mark the first choice

@@ -2,8 +2,13 @@ import { LitElement, html, nothing, unsafeCSS, type PropertyValues } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 import { keyed } from "lit/directives/keyed.js";
 import { define } from "../0-face/define";
-import "./ds-icon";
+import { provideIcons } from "./ds-icon";
+import { avatarIcon } from "./generated/icon-avatar";
 import styles from "./styles/ds-avatar.css?inline";
+
+// The person drawing (`icon="avatar"`) comes with the avatar, so it draws in
+// the first frame instead of the initial while the deferred icons load.
+provideIcons({ avatar: avatarIcon });
 
 /** Saved identity colours are hex; their ink must stay legible in either theme. */
 export function avatarInk(color: string): string | undefined {

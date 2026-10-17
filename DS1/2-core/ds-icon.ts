@@ -7,6 +7,15 @@ import { define } from "../0-face/define";
 
 const iconNameToSvgMap: Record<string, string> = { ...immediateIcons }
 const deferred = new Set<string>(deferredIconNames)
+
+/**
+ * Make library drawings available at once, outside the immediate set: a
+ * component that always draws one icon (ds-avatar's person) ships that
+ * drawing with itself, so it never waits for the deferred chunk.
+ */
+export function provideIcons(icons: Readonly<Record<string, string>>): void {
+  for (const [name, svg] of Object.entries(icons)) iconNameToSvgMap[name.toLowerCase()] ??= svg
+}
 let extraReady = false
 let extraLoading: Promise<void> | undefined
 function loadExtraIcons(): Promise<void> {

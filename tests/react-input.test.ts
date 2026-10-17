@@ -143,3 +143,10 @@ test('removing validation descriptions and external labels keeps the field usabl
   expect(native.getAttribute('aria-describedby')).toBeNull();
   expect(native.value).toBe('#ffffff');
 });
+
+test('the label prop is the field\'s own label row, typed on the adapter', async () => {
+  await act(async () => root.render(createElement(Input, { label: 'Amount', name: 'amount' })));
+  const { field } = await input();
+  expect(field.label).toBe('Amount');
+  expect(field.shadowRoot!.textContent).toContain('Amount');
+});

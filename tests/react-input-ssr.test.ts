@@ -40,3 +40,24 @@ test("the multiline adapter also renders without browser globals", () => {
   expect(markup).toContain('rows="2"');
   expect(markup).toContain('max-rows="6"');
 });
+
+test("the label, its translation key and the other words reach the element as its own attributes", () => {
+  const markup = renderToString(
+    createElement(Input, {
+      name: "amount",
+      label: "Amount",
+      labelText: "Amount",
+      placeholderKey: "Amount, in kroner",
+      error: "Too much",
+      errorText: "Too much",
+    }),
+  );
+  expect(markup).toContain('label="Amount"');
+  expect(markup).toContain('label-text="Amount"');
+  expect(markup).toContain('placeholder-key="Amount, in kroner"');
+  expect(markup).toContain('error-text="Too much"');
+  expect(markup).not.toMatch(/labelText|placeholderKey|errorText/i);
+  const multiline = renderToString(createElement(Textarea, { label: "Notes", labelText: "Notes" }));
+  expect(multiline).toContain('label="Notes"');
+  expect(multiline).toContain('label-text="Notes"');
+});

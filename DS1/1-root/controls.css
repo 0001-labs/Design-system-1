@@ -464,23 +464,27 @@ dialog.ds-dialog::backdrop {
  * `.ds-menu` is the `ds-menu` element's look on a menu a library draws:
  * the context menu's items come from Radix, which owns their roles, focus and
  * keys, so they stay Radix's and take shared's paper, rows and type.
+ * On whole squares, as the element: the line and the padding inside it make
+ * half a square on each side, entries are one square each with nothing
+ * between them, a separator is one square with its line, and there is no
+ * shadow. n entries make a menu n + 1 squares high.
  */
 
 .ds-menu {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 0;
   min-width: calc(8 * var(--ds-unit));
   max-width: calc(12 * var(--ds-unit));
   max-height: var(--ds-menu-max-height, calc(16 * var(--ds-unit)));
   overflow-y: auto;
-  padding: calc(4px * var(--ds-sf));
+  padding: calc(var(--ds-unit) / 2 - 1px);
   border: 1px solid var(--ds-border-color);
   border-radius: var(--ds-radius-card);
   background: var(--ds-paper);
   color: var(--ds-text-color);
-  box-shadow: 0 8px 24px color-mix(in srgb, #000000 18%, transparent);
+  box-shadow: none;
   font-family: var(--ds-typeface-regular);
   font-feature-settings: var(--ds-font-features);
   font-size: var(--ds-type-size-default);
@@ -506,6 +510,20 @@ dialog.ds-dialog::backdrop {
   cursor: default;
   user-select: none;
   outline: none;
+}
+
+/* An entry a library draws as its own button or link is one square high too,
+ * whatever that library's button styles say. */
+.ds-menu > :is(button, a, [role="option"], [role^="menuitem"]),
+.ds-menu > [role="group"] > :is(button, a, [role="option"], [role^="menuitem"]) {
+  box-sizing: border-box !important;
+  flex: 0 0 auto !important;
+  height: var(--ds-row-height) !important;
+  min-height: var(--ds-row-height) !important;
+  max-height: var(--ds-row-height) !important;
+  margin-block: 0 !important;
+  padding-block: 0 !important;
+  line-height: var(--ds-type-lineheight-default) !important;
 }
 
 /* A menu item may be a native button: it keeps the row's look, not a button's. */
@@ -563,14 +581,18 @@ dialog.ds-dialog::backdrop {
 }
 
 .ds-menu__label {
+  box-sizing: border-box;
+  min-height: var(--ds-row-height);
   padding: calc(2px * var(--ds-sf)) calc(6px * var(--ds-sf));
   color: var(--ds-title-color);
   font-size: var(--ds-type-size-small);
 }
 
 .ds-menu__separator {
+  flex: 0 0 auto;
   height: 1px;
-  margin: calc(4px * var(--ds-sf)) calc(6px * var(--ds-sf));
+  /* One square with its line. */
+  margin: calc(var(--ds-unit) / 2 - 1px) calc(6px * var(--ds-sf)) calc(var(--ds-unit) / 2);
   background: var(--ds-border-color);
 }
 
