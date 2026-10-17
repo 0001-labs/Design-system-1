@@ -108,6 +108,13 @@ internal object DS1SharedWords {
         "Saving…" to "Gemmer…",
         "Untitled" to "Uden titel",
         "Account" to "Konto",
+        "Carousel" to "Karrusel",
+        "Slide" to "Dias",
+        "Slides" to "Dias",
+        "Slide {index}" to "Dias {index}",
+        "{index} of {count}" to "{index} af {count}",
+        "Previous slide" to "Forrige dias",
+        "Next slide" to "Næste dias",
     )
 
     private fun deWords() = mapOf(
@@ -193,6 +200,13 @@ internal object DS1SharedWords {
         "Saving…" to "Wird gespeichert …",
         "Untitled" to "Ohne Titel",
         "Account" to "Konto",
+        "Carousel" to "Karussell",
+        "Slide" to "Folie",
+        "Slides" to "Folien",
+        "Slide {index}" to "Folie {index}",
+        "{index} of {count}" to "{index} von {count}",
+        "Previous slide" to "Vorherige Folie",
+        "Next slide" to "Nächste Folie",
     )
 
     private fun enWords() = mapOf(
@@ -278,6 +292,13 @@ internal object DS1SharedWords {
         "Saving…" to "Saving…",
         "Untitled" to "Untitled",
         "Account" to "Account",
+        "Carousel" to "Carousel",
+        "Slide" to "Slide",
+        "Slides" to "Slides",
+        "Slide {index}" to "Slide {index}",
+        "{index} of {count}" to "{index} of {count}",
+        "Previous slide" to "Previous slide",
+        "Next slide" to "Next slide",
     )
 
     private fun esWords() = mapOf(
@@ -363,6 +384,13 @@ internal object DS1SharedWords {
         "Saving…" to "Guardando…",
         "Untitled" to "Sin título",
         "Account" to "Cuenta",
+        "Carousel" to "Carrusel",
+        "Slide" to "Diapositiva",
+        "Slides" to "Diapositivas",
+        "Slide {index}" to "Diapositiva {index}",
+        "{index} of {count}" to "{index} de {count}",
+        "Previous slide" to "Diapositiva anterior",
+        "Next slide" to "Diapositiva siguiente",
     )
 
     private fun fiWords() = mapOf(
@@ -448,6 +476,13 @@ internal object DS1SharedWords {
         "Saving…" to "Tallennetaan…",
         "Untitled" to "Nimetön",
         "Account" to "Tili",
+        "Carousel" to "Karuselli",
+        "Slide" to "Dia",
+        "Slides" to "Diat",
+        "Slide {index}" to "Dia {index}",
+        "{index} of {count}" to "{index}/{count}",
+        "Previous slide" to "Edellinen dia",
+        "Next slide" to "Seuraava dia",
     )
 
     private fun frWords() = mapOf(
@@ -533,6 +568,13 @@ internal object DS1SharedWords {
         "Saving…" to "Enregistrement…",
         "Untitled" to "Sans titre",
         "Account" to "Compte",
+        "Carousel" to "Carrousel",
+        "Slide" to "Diapositive",
+        "Slides" to "Diapositives",
+        "Slide {index}" to "Diapositive {index}",
+        "{index} of {count}" to "{index} sur {count}",
+        "Previous slide" to "Diapositive précédente",
+        "Next slide" to "Diapositive suivante",
     )
 
     private fun isWords() = mapOf(
@@ -611,6 +653,13 @@ internal object DS1SharedWords {
         "Saving…" to "Vistar…",
         "Untitled" to "Ónefnt",
         "Account" to "Aðgangur",
+        "Carousel" to "Hringekja",
+        "Slide" to "Glæra",
+        "Slides" to "Glærur",
+        "Slide {index}" to "Glæra {index}",
+        "{index} of {count}" to "{index} af {count}",
+        "Previous slide" to "Fyrri glæra",
+        "Next slide" to "Næsta glæra",
     )
 
     private fun itWords() = mapOf(
@@ -696,6 +745,13 @@ internal object DS1SharedWords {
         "Saving…" to "Salvataggio…",
         "Untitled" to "Senza titolo",
         "Account" to "Account",
+        "Carousel" to "Carosello",
+        "Slide" to "Slide",
+        "Slides" to "Slide",
+        "Slide {index}" to "Slide {index}",
+        "{index} of {count}" to "{index} di {count}",
+        "Previous slide" to "Slide precedente",
+        "Next slide" to "Slide successiva",
     )
 
     private fun jaWords() = mapOf(
@@ -781,6 +837,13 @@ internal object DS1SharedWords {
         "Saving…" to "保存中…",
         "Untitled" to "名称未設定",
         "Account" to "アカウント",
+        "Carousel" to "カルーセル",
+        "Slide" to "スライド",
+        "Slides" to "スライド",
+        "Slide {index}" to "スライド {index}",
+        "{index} of {count}" to "{count} 枚中 {index} 枚目",
+        "Previous slide" to "前のスライド",
+        "Next slide" to "次のスライド",
     )
 
     private fun koWords() = mapOf(
@@ -866,6 +929,13 @@ internal object DS1SharedWords {
         "Saving…" to "저장 중…",
         "Untitled" to "제목 없음",
         "Account" to "계정",
+        "Carousel" to "캐러셀",
+        "Slide" to "슬라이드",
+        "Slides" to "슬라이드",
+        "Slide {index}" to "슬라이드 {index}",
+        "{index} of {count}" to "{count}개 중 {index}번째",
+        "Previous slide" to "이전 슬라이드",
+        "Next slide" to "다음 슬라이드",
     )
 
     private fun nbWords() = mapOf(
@@ -951,6 +1021,13 @@ internal object DS1SharedWords {
         "Saving…" to "Lagrer…",
         "Untitled" to "Uten tittel",
         "Account" to "Konto",
+        "Carousel" to "Karusell",
+        "Slide" to "Lysbilde",
+        "Slides" to "Lysbilder",
+        "Slide {index}" to "Lysbilde {index}",
+        "{index} of {count}" to "{index} av {count}",
+        "Previous slide" to "Forrige lysbilde",
+        "Next slide" to "Neste lysbilde",
     )
 
     private fun ptBRWords() = mapOf(
@@ -1036,6 +1113,13 @@ internal object DS1SharedWords {
         "Saving…" to "Salvando…",
         "Untitled" to "Sem título",
         "Account" to "Conta",
+        "Carousel" to "Carrossel",
+        "Slide" to "Slide",
+        "Slides" to "Slides",
+        "Slide {index}" to "Slide {index}",
+        "{index} of {count}" to "{index} de {count}",
+        "Previous slide" to "Slide anterior",
+        "Next slide" to "Próximo slide",
     )
 
     private fun ptWords() = mapOf(
@@ -1121,6 +1205,13 @@ internal object DS1SharedWords {
         "Saving…" to "A guardar…",
         "Untitled" to "Sem título",
         "Account" to "Conta",
+        "Carousel" to "Carrossel",
+        "Slide" to "Diapositivo",
+        "Slides" to "Diapositivos",
+        "Slide {index}" to "Diapositivo {index}",
+        "{index} of {count}" to "{index} de {count}",
+        "Previous slide" to "Diapositivo anterior",
+        "Next slide" to "Diapositivo seguinte",
     )
 
     private fun svWords() = mapOf(
@@ -1206,6 +1297,13 @@ internal object DS1SharedWords {
         "Saving…" to "Sparar…",
         "Untitled" to "Namnlös",
         "Account" to "Konto",
+        "Carousel" to "Karusell",
+        "Slide" to "Bild",
+        "Slides" to "Bilder",
+        "Slide {index}" to "Bild {index}",
+        "{index} of {count}" to "{index} av {count}",
+        "Previous slide" to "Föregående bild",
+        "Next slide" to "Nästa bild",
     )
 
     private fun zhWords() = mapOf(
@@ -1291,6 +1389,13 @@ internal object DS1SharedWords {
         "Saving…" to "正在保存…",
         "Untitled" to "未命名",
         "Account" to "账户",
+        "Carousel" to "轮播",
+        "Slide" to "幻灯片",
+        "Slides" to "幻灯片",
+        "Slide {index}" to "幻灯片 {index}",
+        "{index} of {count}" to "第 {index} 张，共 {count} 张",
+        "Previous slide" to "上一张",
+        "Next slide" to "下一张",
     )
 
 }

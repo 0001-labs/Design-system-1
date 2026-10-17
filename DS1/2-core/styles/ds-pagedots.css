@@ -1,32 +1,12 @@
 /* ds-pagedots.css */
-/* Page dots indicator component styles for carousels and pagination */
+/* The element only places the dots; 1-root/carousel.css draws them. */
 
 :host {
-  display: flex;
-  gap: calc(11.2px * var(--sf, 1));
-  justify-content: center;
-  align-items: center;
-  height: calc(28px * var(--sf, 1));
-}
-:host([hidden]) { display: none !important; }
-
-.dot {
-  width: calc(2.8px * var(--sf, 1));
-  height: calc(2.8px * var(--sf, 1));
-  border-radius: 50%;
-  background: white;
-  border: calc(0.7px * var(--sf, 1)) solid #696969;
-  transition: background 0.2s ease, border 0.2s ease;
+  display: inline-flex;
+  vertical-align: top;
+  min-width: 0;
 }
 
-.dot.active {
-  background: #666;
-  border: none;
+:host([hidden]) {
+  display: none !important;
 }
-
-
-
-
-
-
-

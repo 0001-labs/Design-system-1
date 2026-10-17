@@ -81,6 +81,13 @@
     "Saved": "Guardado",
     "Saving…": "A guardar…",
     "Untitled": "Sem título",
-    "Account": "Conta"
+    "Account": "Conta",
+    "Carousel": "Carrossel",
+    "Slide": "Diapositivo",
+    "Slides": "Diapositivos",
+    "Slide {index}": "Diapositivo {index}",
+    "{index} of {count}": "{index} de {count}",
+    "Previous slide": "Diapositivo anterior",
+    "Next slide": "Diapositivo seguinte"
   }
 }

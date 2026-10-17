@@ -37,6 +37,15 @@ test('empty states and notices carry their React adapters and the classes that d
   expect(componentGraph(ds1, ['text']).files.has('react/notice.ts')).toBe(false);
 });
 
+test('a carousel carries its page dots, its React adapter, the shared script and the sheet that draws them', () => {
+  const { files } = componentGraph(ds1, ['carousel']);
+  for (const file of ['3-unit/ds-carousel.ts', '2-core/ds-pagedots.ts', 'react/carousel.ts', '0-face/carousel.ts', '1-root/carousel.css', '2-core/ds-icon.ts']) expect(files.has(file)).toBe(true);
+  const dots = componentGraph(ds1, ['pagedots']).files;
+  expect(dots.has('0-face/carousel.ts')).toBe(true);
+  expect(dots.has('react/carousel.ts')).toBe(false);
+  expect(componentGraph(ds1, ['text']).files.has('1-root/carousel.css')).toBe(true);
+});
+
 test('every component resolves everything it imports, so any selection can be copied', () => {
   const names = ['2-core', '3-unit', '4-page'].flatMap(layer =>
     readdirSync(resolve(ds1, layer)).flatMap(file => /^ds-([a-z-]+)\.ts$/.exec(file)?.[1] ?? []));

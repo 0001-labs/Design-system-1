@@ -81,6 +81,13 @@
     "Saved": "Guardado",
     "Saving…": "Guardando…",
     "Untitled": "Sin título",
-    "Account": "Cuenta"
+    "Account": "Cuenta",
+    "Carousel": "Carrusel",
+    "Slide": "Diapositiva",
+    "Slides": "Diapositivas",
+    "Slide {index}": "Diapositiva {index}",
+    "{index} of {count}": "{index} de {count}",
+    "Previous slide": "Diapositiva anterior",
+    "Next slide": "Diapositiva siguiente"
   }
 }

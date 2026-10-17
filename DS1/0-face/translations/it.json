@@ -81,6 +81,13 @@
     "Saved": "Salvato",
     "Saving…": "Salvataggio…",
     "Untitled": "Senza titolo",
-    "Account": "Account"
+    "Account": "Account",
+    "Carousel": "Carosello",
+    "Slide": "Slide",
+    "Slides": "Slide",
+    "Slide {index}": "Slide {index}",
+    "{index} of {count}": "{index} di {count}",
+    "Previous slide": "Slide precedente",
+    "Next slide": "Slide successiva"
   }
 }

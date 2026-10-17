@@ -74,6 +74,13 @@
     "Saved": "Vistað",
     "Saving…": "Vistar…",
     "Untitled": "Ónefnt",
-    "Account": "Aðgangur"
+    "Account": "Aðgangur",
+    "Carousel": "Hringekja",
+    "Slide": "Glæra",
+    "Slides": "Glærur",
+    "Slide {index}": "Glæra {index}",
+    "{index} of {count}": "{index} af {count}",
+    "Previous slide": "Fyrri glæra",
+    "Next slide": "Næsta glæra"
   }
 }

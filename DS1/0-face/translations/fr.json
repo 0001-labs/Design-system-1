@@ -81,6 +81,13 @@
     "Saved": "Enregistré",
     "Saving…": "Enregistrement…",
     "Untitled": "Sans titre",
-    "Account": "Compte"
+    "Account": "Compte",
+    "Carousel": "Carrousel",
+    "Slide": "Diapositive",
+    "Slides": "Diapositives",
+    "Slide {index}": "Diapositive {index}",
+    "{index} of {count}": "{index} sur {count}",
+    "Previous slide": "Diapositive précédente",
+    "Next slide": "Diapositive suivante"
   }
 }
