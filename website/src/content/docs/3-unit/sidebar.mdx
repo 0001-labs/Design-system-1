@@ -5,7 +5,7 @@ description: Compact, nested navigation built from Row, Button and Icon.
 
 import ComponentExample from "../../../components/ComponentExample.astro";
 
-The Sidebar is twelve squares wide. Each row is one square high, with half a square of indentation per level. Labels use regular text; counts and supporting information use small text. Selection fills the whole row with square corners.
+The Sidebar is twelve squares wide. Each row is one square high, with half a square of indentation per level. Labels use regular text; counts and supporting information use small text. Disclosure arrows follow their labels. Selection fills the whole row with 2px corners, scaled with the surface.
 
 ## Try it
 
@@ -15,7 +15,7 @@ The Sidebar is twelve squares wide. Each row is one square high, with half a squ
 
 Set the `items` property to an array of visible rows. Each row has a unique `id` and a `label`; optional fields are `depth`, `href`, `expanded`, `current`, `disabled`, `meta`, and `action: { id, label }`. Omit `expanded` for a leaf. Collapsed children must be omitted from the array.
 
-The application owns the hierarchy, filtering, selected destination and saved expansion state. The Unit owns the row layout, disclosure controls, focus and keyboard navigation. Supply a `label` for the navigation landmark and `empty` for its empty state. The `header` and `footer` slots hold optional search and supporting controls.
+The application owns the hierarchy, filtering, selected destination and saved expansion state. The Unit owns the row layout, disclosure controls, focus and keyboard navigation. Supply a `label` for the navigation landmark and `empty` for its empty state. The `header` and `footer` slots hold optional search and supporting controls. When the host has a constrained height, only the navigation rows scroll; header and footer controls stay visible.
 
 | Event | Detail | Application response |
 | --- | --- | --- |

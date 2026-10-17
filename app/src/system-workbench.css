@@ -19,3 +19,6 @@
 .system-workbench .library-button-properties .box-model input { width: var(--site-unit); height: calc(16px * var(--sf, 1)); padding: 0; background: transparent; border: 0; border-radius: 0; font: inherit; }
 .system-workbench .library-button-mode { padding-top: var(--site-unit); }
 .system-workbench-docs { display: inline-flex; align-items: center; }
+
+.system-workbench-panes--external-navigation { grid-template-columns: minmax(0, 1fr) calc(20 * var(--site-unit)); }
+@media (max-width: 1100px) { .system-workbench-panes--external-navigation { grid-template-columns: minmax(0, 1fr); } }

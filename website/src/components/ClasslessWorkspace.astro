@@ -13,7 +13,7 @@ const appPath = mode === 'editor' ? '/app/playground' : '/app/libraries';
       <h1 id="classless-title">Design system 1</h1>
       <p>Native HTML. Your design. One stylesheet.</p>
     </div>
-    <a href={appPath} target="_blank" rel="noopener">Open full screen</a>
+    <a href={`${appPath}?standalone=1`} target="_blank" rel="noopener">Open full screen</a>
   </div>
   <nav class="classless-tabs" aria-label="Design system 1">
     <a href="/start-here/overview/">Overview</a>
@@ -28,8 +28,17 @@ const appPath = mode === 'editor' ? '/app/playground' : '/app/libraries';
 </section>
 
 <script>
+  import { libraryHeading, libraryHref, libraryWorkspaceHref, readLibraryNavigation, type LibraryNavigation } from '../../../shared/library-navigation';
   const frame = document.querySelector<HTMLIFrameElement>('#classless-app');
   if (frame) {
+    // The docs are static: read the current library from the browser URL, not build-time Astro.url.
+    const query = new URLSearchParams(location.search);
+    const libraryId = query.get('library');
+    if (libraryId) {
+      const appQuery = new URLSearchParams({ embed: 'docs' });
+      if (query.has('component')) appQuery.set('component', query.get('component')!);
+      frame.src = `/app/l/${encodeURIComponent(libraryId)}?${appQuery}`;
+    }
     const sendTheme = () => {
       const root = document.documentElement;
       const theme = root.classList.contains('dark-theme') ? 'dark'
@@ -37,11 +46,31 @@ const appPath = mode === 'editor' ? '/app/playground' : '/app/libraries';
         : root.dataset.theme === 'light' ? 'light' : 'dark';
       frame.contentWindow?.postMessage({ type: 'ds1:docs-theme', theme }, window.location.origin);
     };
-    frame.addEventListener('load', sendTheme);
+    const requestLibrary = () => frame.contentWindow?.postMessage({ type: 'ds1:library-navigation-request' }, location.origin);
+    frame.addEventListener('load', () => { sendTheme(); requestLibrary(); });
+    requestLibrary();
     window.addEventListener('theme-changed', sendTheme);
+    const renderLibrary = (library: LibraryNavigation | null) => {
+      document.documentElement.toggleAttribute('data-library-workspace', library !== null);
+      window.dispatchEvent(new CustomEvent('ds1-library-navigation', { detail: { library } }));
+      const heading = document.querySelector('#classless-title');
+      if (heading) heading.textContent = library ? libraryHeading(library) : 'Design system 1';
+      const fullScreen = document.querySelector<HTMLAnchorElement>('.classless-heading > a');
+      if (fullScreen) fullScreen.href = library ? `${libraryHref(library)}&standalone=1` : '/app/libraries?standalone=1';
+      frame.title = library ? libraryHeading(library) : 'My libraries';
+      if (library) history.replaceState({}, '', libraryWorkspaceHref(library));
+    };
+    window.addEventListener('ds1-navigation-auth', event => {
+      if ((event as CustomEvent).detail.authenticated) requestLibrary();
+      else renderLibrary(null);
+    });
     window.addEventListener('message', (event) => {
       if (event.origin === window.location.origin && event.source === frame.contentWindow
-        && event.data?.type === 'ds1:docs-ready') sendTheme();
+        && event.data?.type === 'ds1:docs-ready') { sendTheme(); requestLibrary(); }
+      if (event.origin !== location.origin || event.source !== frame.contentWindow || event.data?.type !== 'ds1:library-navigation') return;
+      const library = document.documentElement.hasAttribute('data-signed-in') ? readLibraryNavigation(event.data.library) : null;
+      renderLibrary(library);
+      if (event.data.libraryId === null && location.search) history.replaceState({}, '', location.pathname);
     });
     new MutationObserver(sendTheme).observe(document.documentElement, {
       attributes: true, attributeFilter: ['class', 'data-theme'],
@@ -127,4 +156,9 @@ const appPath = mode === 'editor' ? '/app/playground' : '/app/libraries';
     .classless-heading > a { font-size: 11px; }
     .classless-tabs { padding-inline: 20px; gap: 20px; }
   }
+</style>
+
+<style is:global>
+  html[data-library-workspace] .classless-workspace { grid-template-rows: minmax(0, 1fr); }
+  html[data-library-workspace] :is(.classless-heading, .classless-tabs, .right-sidebar-container) { display: none; }
 </style>

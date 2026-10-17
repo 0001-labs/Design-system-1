@@ -133,13 +133,6 @@ export class Sidebar extends LitElement {
       ${repeat(this.items, item => item.id, item => html`
         <ds-row class="row" ?data-current=${item.current} ?data-disabled=${item.disabled}
           style=${`--depth:${Math.max(0, item.depth ?? 0)}`}>
-          ${item.expanded !== undefined ? html`
-            <ds-button control="slotted" icon class="disclosure">
-              <button type="button" aria-label=${`${item.expanded ? "Collapse" : "Expand"} ${item.label}`}
-                aria-expanded=${item.expanded} @click=${() => this.toggle(item)}>
-                <ds-icon type="right" aria-hidden="true" ?data-open=${item.expanded}></ds-icon>
-              </button>
-            </ds-button>` : html`<span class="spacer" aria-hidden="true"></span>`}
           <ds-button control="slotted" class="choice" ?disabled=${item.disabled}>
             ${item.href && !item.disabled ? html`
               <a href=${item.href} data-item=${item.id} aria-current=${ifDefined(item.current ? "page" : undefined)}
@@ -151,6 +144,14 @@ export class Sidebar extends LitElement {
                 @click=${(event: MouseEvent) => this.activate(event, item)}
                 @keydown=${(event: KeyboardEvent) => this.navigate(event, item)}><span class="name">${item.icon ? html`<ds-icon type=${item.icon} aria-hidden="true"></ds-icon>` : nothing}${item.label}</span></button>`}
           </ds-button>
+          ${item.expanded !== undefined ? html`
+            <ds-button control="slotted" icon class="disclosure">
+              <button type="button" aria-label=${`${item.expanded ? "Collapse" : "Expand"} ${item.label}`}
+                aria-expanded=${item.expanded} @click=${() => this.toggle(item)}>
+                <ds-icon type="right" aria-hidden="true" ?data-open=${item.expanded}></ds-icon>
+              </button>
+            </ds-button>` : nothing}
+          <span class="spacer" aria-hidden="true"></span>
           ${item.meta ? html`<span class="meta">${item.meta}</span>` : nothing}
           ${item.action ? html`<ds-button control="slotted" fit class="action"><button type="button"
             aria-label=${`${item.action.label}: ${item.label}`}

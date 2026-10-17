@@ -10,6 +10,7 @@ import { Button } from "../../DS1/react/button";
 import { LoadingIndicator } from "../../DS1/react/loading";
 import { App } from "./App";
 import { AppShell } from "./AppShell";
+import { libraryWorkspaceRedirect } from "../../shared/library-navigation";
 import { convex } from "./lib/convex";
 import { navigate, RouterProvider, useLocation, useRoute } from "./router";
 import { LibraryEditor } from "./screens/LibraryEditor";
@@ -31,6 +32,13 @@ function Routes() {
   const { path } = useLocation();
   const { isAuthenticated, isLoading } = useConvexAuth();
   const editor = useRoute("/l/:id");
+
+  useEffect(() => {
+    const query = new URLSearchParams(window.location.search);
+    if (query.get('standalone') === '1') document.documentElement.setAttribute('data-standalone-workspace', '');
+    const destination = libraryWorkspaceRedirect(path, query, document.documentElement.hasAttribute('data-docs-embed'), document.documentElement.hasAttribute('data-standalone-workspace'));
+    if (destination) window.location.replace(destination);
+  }, [path]);
 
   if (path === "/" || path === "/playground") return <App />;
 

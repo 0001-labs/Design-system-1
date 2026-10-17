@@ -14,6 +14,8 @@ import './system-workbench.css';
 import { ComponentTree, type TreeNode } from './ComponentTree';
 import '../../DS1/2-core/ds-composer';
 import { Composer } from '../../DS1/react/composer';
+import { libraryComponent } from '../../shared/library-navigation';
+import { navigate, useLocation } from './router';
 
 /** The public catalogue as a tree: each layer opens onto its components, each row naming its element. */
 const treeNodes: TreeNode[] = LAYERS.map(layer => ({ id: `layer-${layer.number}`, label: `${layer.number} ${layer.name}`, children: layer.entries.map(item => ({ id: item.href, label: item.name, meta: item.tag })) }));
@@ -55,7 +57,14 @@ export function SystemWorkbench({ initialCss, initialConfig, onDirty, headerSlot
   onDirty?: (state: { css: string; config: LibraryWorkbenchConfig }) => void;
   headerSlot?: ReactNode;
 }) {
-  const [selected, setSelected] = useState('/2-core/button/');
+  const { path, search: routeSearch } = useLocation();
+  const selected = libraryComponent(routeSearch.get('component'));
+  const setSelected = (component: string) => {
+    const query = new URLSearchParams(routeSearch);
+    query.set('component', component);
+    navigate(`${path}?${query}`);
+  };
+  const embeddedLibrary = document.documentElement.hasAttribute('data-docs-embed') && path.startsWith('/l/');
   const [buttonMode, setButtonMode] = useState<'single' | 'split'>('single');
   const [css, setCss] = useState(initialCss ?? libraryTemplate);
   const [search, setSearch] = useState('');
@@ -85,11 +94,11 @@ export function SystemWorkbench({ initialCss, initialConfig, onDirty, headerSlot
   const commitBox = (patch: Partial<BoxModelConfig> & { gap?: number }) => update(writeButtonBox(css, { ...shownBox, ...patch }, buttonMode));
   return <div className="workbench system-workbench" data-testid="workbench">
     {headerSlot}
-    <div className="system-workbench-panes">
-      <aside className="library-panel system-library-panel">
+    <div className={`system-workbench-panes${embeddedLibrary ? " system-workbench-panes--external-navigation" : ""}`}>
+      {!embeddedLibrary && <aside className="library-panel system-library-panel">
         <h2 className="app-panel-label">Components</h2>
         <ComponentTree label="Component library" nodes={treeNodes} current={selected} onSelect={id => { if (!id.startsWith('layer-')) setSelected(id); }} />
-      </aside>
+      </aside>}
       <main className="system-workbench-preview">
         <div className="app-panel-heading"><h1>{entry.name}</h1><a className="system-workbench-docs" href={entry.href} target="_blank" rel="noreferrer">Documentation<ds-icon type="up-right" aria-hidden="true"></ds-icon></a></div>
         {examples.length ? examples.map((example, index) => <section key={example}><h2>{EXAMPLES[example]!.title}</h2><Preview example={example} css={previewCss} hoverRegion={buttonSelected ? hoverRegion : null} onMetrics={buttonSelected && index === 0 ? metrics => setButtonMetrics(previous => JSON.stringify(previous) === JSON.stringify(metrics) ? previous : metrics) : undefined} /></section>) : <p>This composition is described in the <a href={entry.href} target="_blank" rel="noreferrer">documentation</a>.</p>}

@@ -15,7 +15,15 @@ const { landing = false } = Astro.props;
 
 <script>
   import '../lib/public-preferences';
+  import { libraryHeading, libraryWorkspaceHref, type LibraryNavigation } from '../../../shared/library-navigation';
   import '../../../DS1/0-face/device';
+  function renderLibrary(library: LibraryNavigation | null) {
+    document.querySelectorAll<HTMLElement>('.docs-header .site-brand').forEach(brand => {
+      brand.textContent = library ? libraryHeading(library) : 'Design system 1';
+      if (brand instanceof HTMLAnchorElement) brand.href = library ? libraryWorkspaceHref(library) : '/';
+    });
+  }
+  window.addEventListener('ds1-library-navigation', event => renderLibrary((event as CustomEvent).detail.library));
   const frame = document.querySelector<HTMLIFrameElement>('#navigation-auth');
   const requestStatus = () => frame?.contentWindow?.postMessage({ type: 'ds1:navigation-auth-request' }, location.origin);
   frame?.addEventListener('load', requestStatus);
@@ -26,6 +34,7 @@ const { landing = false } = Astro.props;
     if (event.origin !== location.origin || event.source !== frame?.contentWindow || event.data?.type !== 'ds1:navigation-auth') return;
     const authenticated = event.data.authenticated === true;
     document.documentElement.toggleAttribute('data-signed-in', authenticated);
+    if (!authenticated) renderLibrary(null);
     window.dispatchEvent(new CustomEvent('ds1-navigation-auth', { detail: { authenticated } }));
   });
 </script>
