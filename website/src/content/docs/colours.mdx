@@ -7,3 +7,7 @@ tableOfContents: false
 import Tool from "../../components/ColourPalette.astro";
 
 <Tool />
+
+## Using the colours
+
+Every colour here is a token: `--one-<colour>` and `--one-<colour>-pastel` (`--one-apple-green`, `--one-purple-pastel`), each written `light-dark(light, dark)`, plus `--one-zenith-blue` and `--one-comfortable-green` for the two named pastels. They live in `palette.css` (`DS1/1-root/palette.css`), which `one.css` imports and Sync 1's `root` and `tokens` exports copy, so a page has them without the classless sheet. `light-dark()` follows the page's `color-scheme`, which `one.css` sets. Both `palette.css` and the classless sheet's palette are written from `DS1/1-root/palette.ts` by `vp exec tsx scripts/write-palette-css.ts`; never edit them by hand.

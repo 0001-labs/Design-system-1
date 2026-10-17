@@ -3,54 +3,10 @@
 @import "./grid.css";
 @import "./component-tokens.css";
 @import "./text.css";
-
-@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@350&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@350&display=swap");
-
-@font-face {
-  font-family: GT-America-Standard-Regular;
-  src: url("./fonts/GT-America-Standard-Regular.woff2") format("woff2");
-  font-display: swap;
-}
-
-@font-face {
-  font-family: GT-America-Standard-Medium;
-  src: url("./fonts/GT-America-Standard-Medium.woff2") format("woff2");
-  font-display: swap;
-}
-
-@font-face {
-  font-family: GT-America-Compressed-Regular;
-  src: url("./fonts/GT-America-Compressed-Regular.woff2") format("woff2");
-  font-display: swap;
-}
-
-@font-face {
-  font-family: GT-Canon-M-Standard-Medium;
-  src: url("./fonts/GT-Canon-M-Standard-Medium-Trial.woff2") format("woff2");
-  font-display: swap;
-}
-
-/* Arrows are always Inter: its arrows alone (fonts/Inter-LICENSE.md), first in
-   every typeface token, so the unicode-range draws only arrows with it. */
-@font-face {
-  font-family: "Inter Arrows";
-  src: url("./fonts/Inter-Arrows.woff2") format("woff2");
-  unicode-range: U+2190-21FF, U+27F0-27FF, U+2900-297F, U+2B00-2BFF;
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* The code font: Iosevka Extended, subset for code (fonts/Iosevka-LICENSE.md). */
-@font-face {
-  font-family: Iosevka;
-  src: url("./fonts/Iosevka-Regular.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
+/* The faces and typeface tokens (fonts.css), and the named palette colours as
+   --one-* tokens (palette.css, written from palette.ts). */
+@import "./fonts.css";
+@import "./palette.css";
 
 input {
   padding: 0;
@@ -95,19 +51,7 @@ input {
   --grid-color-light: #1e1e1e2b;
   --grid-color-dark: var(--white);
 
-  /* typefaces */
-  --typeface-regular: "Inter Arrows", "GT-America-Standard-Regular";
-  --typeface-medium: "Inter Arrows", "GT-America-Standard-Medium";
-  --typeface-compressed: "Inter Arrows", "GT-America-Compressed-Regular";
-  --typeface-mono: "Inter Arrows", "Iosevka", ui-monospace, "SF Mono", Menlo, monospace;
-  --typeface-canon: "Inter Arrows", "GT-Canon-M-Standard-Medium";
-
-  /* language specific typefaces */
-
-  --typeface-regular-jp: "Inter Arrows", "Noto Sans JP";
-  --typeface-regular-zh-hans: "Inter Arrows", "Noto Sans SC";
-  --typeface-regular-zh-hant: "Inter Arrows", "Noto Sans TC";
-  --typeface-regular-zh: var(--typeface-regular-zh-hant);
+  /* typefaces: fonts.css */
 
   /* typefaces sizes and weight */
 

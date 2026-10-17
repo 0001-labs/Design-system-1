@@ -1,0 +1,23 @@
+/* version 0.3.0-alpha.13 */
+
+/* Noto Sans for Japanese and Chinese, for a product that shows them. Opt in:
+   link it beside one.css or fonts.css, or ask Sync 1 for "cjk": true. Without
+   it the typeface tokens fall back to the reader's own face (Hiragino and
+   PingFang on Apple systems, Yu Gothic, Microsoft YaHei and JhengHei on
+   Windows, Noto Sans CJK on Android and Linux).
+
+   The faces come from Google Fonts (SIL Open Font License), which cuts each
+   one into unicode-range slices, so a page downloads only the characters it
+   shows. A page whose security policy keeps other hosts out leaves this sheet
+   out, or serves Noto Sans itself under the same family names. */
+
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@350&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@350&display=swap");
+
+/* One weight of each face: a heavier weight is drawn in the same face, never
+   thickened by the browser. Latin changes weight by changing family. */
+:lang(ja),
+:lang(zh) {
+  font-synthesis-weight: none;
+}

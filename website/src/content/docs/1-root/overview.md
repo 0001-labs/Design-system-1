@@ -64,4 +64,4 @@ The `ds-*` components have their own scoped tokens and JavaScript implementation
 
 ## Dependencies
 
-The public stylesheets and fonts need network access unless you save and re-link them locally. The native stylesheet imports no fonts of its own: the font companion, `one.css` or Sync 1's `fonts` export bring the faces. [Use with HTML](/start-here/quick-start/) explains the distinction between one authored HTML file and an offline bundle.
+The public stylesheets and fonts need network access unless you save and re-link them locally. The native stylesheet imports no fonts of its own: the font companion, `one.css` or `fonts.css` (the faces on their own, which `one.css` imports) bring them. None of them loads anything from another host; Noto Sans for Japanese and Chinese is the opt-in `cjk.css` ([Fonts](/1-root/fonts/#japanese-and-chinese)). [Use with HTML](/start-here/quick-start/) explains the distinction between one authored HTML file and an offline bundle.

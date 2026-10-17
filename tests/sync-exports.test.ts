@@ -14,12 +14,45 @@ const files = (name: string, options: Record<string, unknown> = {}) => {
 
 test('the root export carries one.css, what it imports and every face it loads', () => {
   const copy = files('root');
-  for (const file of ['one.css', 'grid.css', 'text.css', 'component-tokens.css', 'component-metrics.css', 'component-appearance.css']) expect(copy).toHaveProperty([file]);
-  for (const [, file] of String(copy['one.css']).matchAll(/@import "\.\/([^"]+)";/g)) expect(copy).toHaveProperty([file!]);
-  const faces = [...String(copy['one.css']).matchAll(/url\("\.\/(fonts\/[^"]+)"\)/g)].map((match) => match[1]);
-  expect(faces.length).toBeGreaterThan(0);
-  for (const face of faces) expect(copy).toHaveProperty([face]);
+  for (const file of ['one.css', 'grid.css', 'text.css', 'component-tokens.css', 'component-metrics.css', 'component-appearance.css', 'fonts.css', 'palette.css']) expect(copy).toHaveProperty([file]);
+  const imported = [...String(copy['one.css']).matchAll(/@import "\.\/([^"]+)";/g)].map((match) => match[1]!);
+  for (const file of imported) expect(copy).toHaveProperty([file]);
+  const faces = ['one.css', ...imported].flatMap((file) => [...String(copy[file]).matchAll(/url\("\.\/(fonts\/[^"]+)"\)/g)].map((match) => match[1]));
+  expect(faces).toContain('fonts/Iosevka-Regular.woff2');
+  for (const face of faces) expect(copy).toHaveProperty([face!]);
   expect(copy).not.toHaveProperty(['controls.css']);
+  expect(copy).not.toHaveProperty(['cjk.css']);
+});
+
+test('one.css always arrives with the faces and the palette it imports', () => {
+  expect(Object.keys(files('root', { styles: ['one.css', 'grid.css'], fonts: false }))).toEqual(['one.css', 'grid.css', 'text.css', 'fonts.css', 'palette.css']);
+});
+
+test('fonts.css travels on its own: through root with its faces in fonts/, or through fonts beside them', () => {
+  const root = files('root', { styles: ['fonts.css'] });
+  expect(Object.keys(root)).toEqual(['fonts.css', ...['GT-America-Standard-Regular.woff2', 'GT-America-Standard-Medium.woff2', 'GT-America-Compressed-Regular.woff2', 'GT-Canon-M-Standard-Medium-Trial.woff2', 'Inter-Arrows.woff2', 'Iosevka-Regular.woff2', 'Inter-LICENSE.md', 'Iosevka-LICENSE.md'].map((font) => `fonts/${font}`)]);
+  const flat = files('fonts', { stylesheet: true });
+  const css = String(flat['fonts.css']);
+  expect(css).not.toContain('./fonts/');
+  const urls = [...css.matchAll(/url\("\.\/([^"]+)"\)/g)].map((match) => match[1]!);
+  expect(urls).toContain('Iosevka-Regular.woff2');
+  for (const url of urls) expect(flat).toHaveProperty([url]);
+  expect(css).toContain('--typeface-mono:');
+  // Named faces with the stylesheet: those, and always the arrows and the code face with their licences.
+  expect(Object.keys(files('fonts', { stylesheet: true, fonts: ['GT-America-Standard-Regular.woff2', 'Iosevka-Regular.woff2'] }))).toEqual(['GT-America-Standard-Regular.woff2', 'Iosevka-Regular.woff2', 'Inter-Arrows.woff2', 'Inter-LICENSE.md', 'Iosevka-LICENSE.md', 'fonts.css']);
+  expect(() => files('fonts')).toThrow(/Name the fonts/);
+});
+
+test('the tokens export carries the palette, and Noto Sans only when asked for', () => {
+  expect(Object.keys(files('tokens'))).toEqual(['component-tokens.css', 'component-metrics.css', 'component-appearance.css', 'palette.css']);
+  expect(String(files('tokens', { bundle: true })['bundle.css'])).toContain('--one-purple: light-dark(');
+  expect(files('root', { cjk: true, fonts: false })).toHaveProperty(['cjk.css']);
+  expect(Object.keys(files('root', { styles: ['cjk.css'], fonts: false }))).toEqual(['cjk.css']);
+  const bundle = String(files('tokens', { cjk: true, bundle: true })['bundle.css']);
+  // A stylesheet from another host is imported before any rule, or the browser drops it.
+  const firstRule = bundle.search(/^[^@/\s*][^\n]*{/m);
+  expect(bundle.indexOf('@import url("https://fonts.googleapis.com')).toBeGreaterThan(0);
+  expect(bundle.lastIndexOf('@import url(')).toBeLessThan(firstRule);
 });
 
 test('the root export can leave the faces to the product and add controls and page scripts', () => {
@@ -61,7 +94,7 @@ test('the classless sheet is copied when a product asks for it, and keeps its pa
 });
 
 test('controls.css always arrives with the table, text, empty-state and notice classes it imports', () => {
-  expect(Object.keys(files('tokens', { nativeControls: true }))).toEqual(['component-tokens.css', 'component-metrics.css', 'component-appearance.css', 'table.css', 'text.css', 'empty.css', 'notice.css', 'controls.css']);
+  expect(Object.keys(files('tokens', { nativeControls: true }))).toEqual(['component-tokens.css', 'component-metrics.css', 'component-appearance.css', 'palette.css', 'table.css', 'text.css', 'empty.css', 'notice.css', 'controls.css']);
   expect(Object.keys(files('tokens'))).not.toContain('text.css');
   expect(Object.keys(files('root', { styles: ['grid.css'], fonts: false, nativeControls: true }))).toEqual(['grid.css', 'table.css', 'empty.css', 'notice.css', 'controls.css', 'text.css']);
   // Every sheet controls.css imports is copied beside it, by either export.
