@@ -173,6 +173,7 @@ public enum DS1IconName: String, CaseIterable, Sendable {
     case instagram
     case italic
     case item
+    case jpbank
     case key
     case keyboard
     case left
