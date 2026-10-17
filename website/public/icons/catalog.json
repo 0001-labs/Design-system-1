@@ -781,6 +781,13 @@
     "shapes": 1
   },
   {
+    "key": "jpbank",
+    "name": "Jpbank",
+    "source": "Library",
+    "url": "/icons/library/jpbank.svg",
+    "shapes": 2
+  },
+  {
     "key": "key",
     "name": "Key",
     "source": "Library",

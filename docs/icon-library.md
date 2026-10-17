@@ -27,7 +27,7 @@ An arrow drawn inside an icon keeps the form of the Inter arrows the type uses: 
 
 ## Brand marks
 
-Third-party brand marks are monochrome outlines in `currentColor`, named after the brand in one word (`figma`, `drive`, `github`). Fourteen of them (airtable, drive, dropbox, facebook, figma, github, instagram, linkedin, loom, notion, slack, vimeo, x-brand, youtube) are adapted from Tabler Icons' MIT outlines, drawn in a 24-unit inner frame at a 1.5 stroke so they render at the library's one-unit weight; the licence is in `DS1/x-icon/Tabler-LICENSE.md`. The X mark's key is `x-brand`, because `close` is the cross and a bare `x` would read as one. `google` and `apple` keep their own drawings.
+Third-party brand marks are monochrome outlines in `currentColor`, named after the brand in one word (`figma`, `drive`, `github`). Fourteen of them (airtable, drive, dropbox, facebook, figma, github, instagram, linkedin, loom, notion, slack, vimeo, x-brand, youtube) are adapted from Tabler Icons' MIT outlines, drawn in a 24-unit inner frame at a 1.5 stroke so they render at the library's one-unit weight; the licence is in `DS1/x-icon/Tabler-LICENSE.md`. The X mark's key is `x-brand`, because `close` is the cross and a bare `x` would read as one. `google` and `apple` keep their own drawings. `jpbank` is drawn here on the 16-unit grid: the bold JP of Japan Post Bank's mark, as filled outlines meant to stand in white on its green.
 
 ## Source collection
 
