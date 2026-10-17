@@ -65,5 +65,5 @@
   --typeface-regular-jp: "Inter Arrows", "Noto Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", Meiryo, "Noto Sans CJK JP", sans-serif;
   --typeface-regular-zh-hans: "Inter Arrows", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
   --typeface-regular-zh-hant: "Inter Arrows", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", "Noto Sans CJK TC", sans-serif;
-  --typeface-regular-zh: var(--typeface-regular-zh-hant);
+  --typeface-regular-zh: var(--typeface-regular-zh-hans);
 }

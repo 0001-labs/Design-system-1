@@ -66,3 +66,11 @@ test('cjk.css is the one opt-in sheet that loads Noto Sans, and keeps the browse
   expect(css).toMatch(/:lang\(ja\),\s*:lang\(zh\)\s*{\s*font-synthesis-weight: none;\s*}/);
   expect(code('one.css')).not.toContain('cjk.css');
 });
+
+test('plain Chinese takes the Simplified face, as the shared words are written; Traditional only when the page says so', () => {
+  const tokens = readFileSync(new URL('../DS1/1-root/component-tokens.css', import.meta.url), 'utf8');
+  expect(tokens).toMatch(/:root:lang\(zh\)\s*{\s*--ds-typeface-regular: var\(--ds-typeface-regular-zh-hans\);/);
+  expect(tokens).toMatch(/:root:lang\(zh-Hant\),[\s\S]*?:root:lang\(zh-TW\)[\s\S]*?--ds-typeface-regular: var\(--ds-typeface-regular-zh-hant\);/);
+  const fonts = readFileSync(new URL('../DS1/1-root/fonts.css', import.meta.url), 'utf8');
+  expect(fonts).toContain('--typeface-regular-zh: var(--typeface-regular-zh-hans);');
+});

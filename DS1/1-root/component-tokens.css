@@ -108,17 +108,19 @@
 }
 
 /* A page written in Japanese or Chinese sets its labels in that language's
-   face: Chinese in Traditional characters unless it says Simplified. */
+   face: Chinese in Simplified characters, as the shared words are written,
+   unless it says Traditional. */
 :root:lang(ja) {
   --ds-typeface-regular: var(--ds-typeface-regular-jp);
 }
 
 :root:lang(zh) {
-  --ds-typeface-regular: var(--ds-typeface-regular-zh-hant);
+  --ds-typeface-regular: var(--ds-typeface-regular-zh-hans);
 }
 
-:root:lang(zh-Hans),
-:root:lang(zh-CN),
-:root:lang(zh-SG) {
-  --ds-typeface-regular: var(--ds-typeface-regular-zh-hans);
+:root:lang(zh-Hant),
+:root:lang(zh-TW),
+:root:lang(zh-HK),
+:root:lang(zh-MO) {
+  --ds-typeface-regular: var(--ds-typeface-regular-zh-hant);
 }
