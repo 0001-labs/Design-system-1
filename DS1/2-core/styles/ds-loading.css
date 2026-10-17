@@ -1,8 +1,13 @@
 /* Internal automatic busy feedback; never represents elapsed time as progress. */
 .ds-loading { display: inline-block; position: relative; overflow: hidden; vertical-align: middle; width: var(--ds-loading-width, calc(60px * var(--ds-sf, var(--sf, 1)))); height: 2px; border-radius: 1px; background: color-mix(in srgb, currentColor 16%, transparent); }
 .ds-loading__fill { display: block; width: 100%; height: 100%; background: var(--ds-loading-fill, currentColor); transform: translateX(-100%); animation: ds-loading-slide var(--ds-loading-duration, 1.8s) ease-in-out infinite; }
-.ds-loading[data-variant="spinner"] { width: calc(20px * var(--ds-sf, var(--sf, 1))); height: calc(20px * var(--ds-sf, var(--sf, 1))); border: 2px solid color-mix(in srgb, currentColor 18%, transparent); border-top-color: currentColor; border-radius: 50%; background: none; box-sizing: border-box; animation: ds-loading-spin .72s linear infinite; }
+/* A spinner is one square on its own and one control high (16px), the size of
+   the icon it stands in for, inside a button or a field. --ds-loading-size
+   sets it outright. The control list matches LOADING_CONTROLS in ds-loading.ts. */
+.ds-loading[data-variant="spinner"] { --ds-loading-box: var(--ds-loading-size, var(--ds-loading-context-size, calc(20px * var(--ds-sf, var(--sf, 1))))); width: var(--ds-loading-box); height: var(--ds-loading-box); border: 2px solid color-mix(in srgb, currentColor 18%, transparent); border-top-color: currentColor; border-radius: 50%; background: none; box-sizing: border-box; animation: ds-loading-spin .72s linear infinite; }
 .ds-loading[data-variant="spinner"] > .ds-loading__fill { display: none; }
+:where(button, [role="button"], ds-button, .ds-button, ds-input, ds-textarea, ds-select, .ds-field, .ds-input, .ds-textarea, .ds-select) .ds-loading[data-variant="spinner"],
+.ds-loading[data-variant="spinner"][data-context="control"] { --ds-loading-context-size: var(--ds-control-height, calc(16px * var(--ds-sf, var(--sf, 1)))); }
 @keyframes ds-loading-slide { to { transform: translateX(100%); } }
 @keyframes ds-loading-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .ds-loading, .ds-loading__fill { animation: none !important; } .ds-loading__fill { transform: none; opacity: .65; } }

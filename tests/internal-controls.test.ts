@@ -9,6 +9,8 @@ import { isPublicComponent } from '../DS1/0-face/component-visibility';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { createElement } from 'react';
 import { LoadingIndicator as Loading } from '../DS1/react/loading';
+// The language runtime asks for a translations file as it loads.
+vi.hoisted(() => { globalThis.fetch = async () => new Response('{}'); });
 let dispose: (() => void) | undefined;
 afterEach(() => { dispose?.(); document.body.replaceChildren(); });
 function setup(extra: Partial<SpacingOptions> = {}) {
