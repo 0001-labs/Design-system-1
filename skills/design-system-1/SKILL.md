@@ -27,7 +27,7 @@ Everything is counted in **squares**: one square is 20px (`--unit`, `--1`), mult
 | A wider item ("double the length") | 8 squares: 160px pitch, 159px drawn | twice the item width |
 | A list column | 4 squares (`--quad`) | Ezo `--column-width` |
 | Gaps and margins | whole squares, or half a square (`--half`) at most | `grid.css` |
-| Text | 14px (`--type-size-default`) on a one-square line; 10px small, 13px heading, a 20px display title on two squares; padded 4px from the item's edge | `one.css`, `text.css`, Ezo `--item-text-padding` |
+| Text | 14px (`--type-size-default`), one square a line, standing on the lower sixteen of its square with the spare four above (see *the sixteen* below); 10px small, 13px heading, a 20px display title on two squares; padded 4px from a pressed item's edge | `one.css`, `text.css`, Ezo `--type-lineheight-default`, `--item-text-padding` |
 | Lines | 1px, centred on the grid line | Ezo `--outline-stroke` |
 | Corners | square for items and rows; 4px (`--radius`) only on pictures, buttons and fields | Peer and Ins follow this |
 | An avatar (a person, a workspace) | **round**, 16px (one control high) with small type, 40px (two squares) large; overlapping 3px in a group. `shape="square"` (`.ds-avatar--square`) gives a mark the product chooses a picture's 4px corners. Coloured by a fill (`color`) or an ink (`ink`). A logo has no corners | `ds-avatar`, `.ds-avatar` |
@@ -48,6 +48,18 @@ Everything is counted in **squares**: one square is 20px (`--unit`, `--1`), mult
 | Page dots | **One square per dot**, the row one square high; a 4px dot (scaled), the current one half again as large and filled in the ink, past dots filled muted, the next filled in the ink, the rest rings; `end` makes the last a ring in the ink | `ds-pagedots`, `.ds-pagedots` |
 | A carousel | **Slides the track's width or whole squares wide** (`slide-width`), a whole number of squares apart (one by default), mandatory snapping one slide to a stop; the controls one square below, one square high, from the start: previous and next in one-square cells, then a dot each | `ds-carousel`, `.ds-carousel` |
 | A page's columns | **Whole squares**: navigation 12, a list beside its detail 16, an inspector 12, a reading or settings column 32, a single task 16, overview tiles 12. Two squares between columns, one between areas, one around the page; one column below 30 squares of width. A `column` or `centered` page stands on a whole square (the room beside it rounds down to squares) and `measure="N"` sets its width in squares | `ds-page` layouts `sidebar`, `split`, `inspector`, `column`, `centered`, `tiles` |
+
+### Where words and pictures stand in a square (the sixteen)
+
+Ezo's rule, the one to apply before any other alignment, so text and icons never have to be corrected afterwards. **In a square, words, pictures and controls take the lower sixteen, with the spare four above them.** A 14px line of text is set on a 16px line box (`--ds-type-lineheight-default`, Ezo `--type-lineheight-default`), and that box stands against the foot of its 20px square: the capitals are then 3px inside the sixteen at both ends (cap top 7px below the square's top line, baseline 3px above its bottom line), and descenders hang over the bottom line. A 16px icon stands on the same sixteen, so the capitals are centred on it. A control (a button, a chip, a switch, 16px high, `--ds-control-height`) stands there too. Centring in the twenty instead is wrong: the words sit 2px higher than in every Ezo row, and an icon placed at the foot is then 2px lower than the words.
+
+- **A row** (flex or grid, one square high): `align-items: flex-end` (grid: `end`) and `line-height: calc(16px * var(--sf))` on the row; a `min-height` of one square keeps a 16px control from shrinking the row. Everything in it, words, amount, icon, button, lands on the sixteen.
+- **A block line** (a heading, a date, a total, a label on its own): `padding-top: 4px` (scaled) and `line-height: 16px` (scaled), so the line is still one square.
+- **A square with a rule at its foot** (a table cell, a day heading, a tab bar): three spare above the sixteen, then the 1px rule: `padding-top: 3px` with the 16px line, or `align-items: flex-end` in the 19px content box. Never `line-height: 19px`.
+- **Two lines in two squares** (a name over a small second line): each line is its own four and sixteen; the second line's spare drops to three when the pair ends on a rule.
+- **Across:** a picture takes the first sixteen of its square (flush with the square's edge, not centred in it), and the words begin on the next square, so the square's spare four stand between the picture and the words. Words without a picture begin on the square's edge too (a pressed row pads them 4px, see the table).
+- `ds-text` already sets the 16px line box, so a `ds-text` in a flex-end row needs nothing more; a native `span` needs the row's `line-height`. Small type (10px) inline in a line keeps `line-height: 1`. Prose that wraps stays on 20px lines (one square a line) and is the exception to the sixteen.
+- Check it as Ezo does: a 14px capital's top is 7px below the row's top grid line and its baseline 3px above the next; a 16px icon's bottom edge is on that next line.
 
 Items stack edge to edge with no gap, as an Ezo list does. Lists, table rows, cells and their headers use neutral or transparent backgrounds by default, never automatic accent fills. Colour is opt-in for a meaningful state, not decoration across an entire list or table. Positions snap to the grid: anything a person can move lands on whole squares. Before calling a design done, measure it in the browser (an element's width and height must be whole squares minus the 1px correction) instead of judging by eye.
 
@@ -212,7 +224,7 @@ Only three of these are Design system 1 colours (#99ff73, #ccff4d, #ccccff); the
 
 ## Icons
 
-- Every icon comes from Design system 1's library, `DS1/x-icon/` (catalogue at https://designsystem1.com/icons): 16 × 16, drawn in the text colour. Never use a Unicode or emoji glyph as an icon: no ↗, →, ✓, ×, ⌕ or ★ in an interface.
+- Every icon comes from Design system 1's library, `DS1/x-icon/` (catalogue at https://designsystem1.com/icons): 16 × 16, drawn in the text colour. Beside words it stands on the row's sixteen and takes the first sixteen of its square across, the words starting on the next square (see *the sixteen* under Measures). Never use a Unicode or emoji glyph as an icon: no ↗, →, ✓, ×, ⌕ or ★ in an interface.
 - The common ones: `up-right` for a link that goes somewhere (where ↗ would have been), `right`, `left`, `up`, `down` for direction, `open` to expand, `close`, `check`, `plus`, `search`, `more`, `star`.
 - The editing ones, for Aa's toolbar and menus: `bold`, `italic`, `underline`, `strike`, `code`, `link`, `equation`, `mention`, `comment`; the block kinds `text`, `h1`, `h2`, `h3`, `bullet`, `numbered`, `todo`, `toggle`, `quote`, `divider`, `code-block`, `callout`, `table`, `image`; and `handle` (the block's grip), `slash` (the `/` menu), `indent`, `outdent`, `undo`, `redo`, `duplicate`, `delete`, `change` (turn into).
 - A product carries the icons it uses as files (Sync 1's `icons` export) and, without Lit, draws one with the `.ds-icon` class from `controls.css`: the file named in `--ds-icon` as a mask in `currentColor`, 14px, 12px (`--small`) or 16px (`--large`), so it follows the text. Never write a product's own icon-mask rule.
@@ -257,4 +269,4 @@ Every text is sentence case, in every language.
 
 ## Checking a design
 
-Measure, do not eyeball: in the browser, read each element's rendered width and height and its position. Widths and heights are whole squares (minus the 1px correction for items), and positions fall on the 20px grid. A row that is 32 or 36px tall, or a gap of 12px, is wrong.
+Measure, do not eyeball: in the browser, read each element's rendered width and height and its position. Widths and heights are whole squares (minus the 1px correction for items), and positions fall on the 20px grid. A row that is 32 or 36px tall, or a gap of 12px, is wrong. Then the sixteen: in any row, a 16px icon's bottom edge sits on the row's bottom grid line and the 14px capitals beside it start 7px below the row's top line (measure the baseline with a zero-height inline-block, the cap height from `measureText('H').actualBoundingBoxAscent`); words centred in the twenty, or an icon centred in its square, are wrong.
