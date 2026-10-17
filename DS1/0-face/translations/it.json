@@ -63,6 +63,23 @@
     "OK": "OK",
     "Copied": "Copiato",
     "Could not copy": "Impossibile copiare",
-    "Notifications": "Notifiche"
+    "Notifications": "Notifiche",
+    "Try again": "Riprova",
+    "Undo": "Annulla",
+    "Redo": "Ripeti",
+    "Copy": "Copia",
+    "Copy link": "Copia link",
+    "Remove": "Rimuovi",
+    "Rename": "Rinomina",
+    "Duplicate": "Duplica",
+    "Download": "Scarica",
+    "Refresh": "Aggiorna",
+    "Open": "Apri",
+    "Send": "Invia",
+    "Clear": "Cancella",
+    "Saved": "Salvato",
+    "Saving…": "Salvataggio…",
+    "Untitled": "Senza titolo",
+    "Account": "Account"
   }
 }

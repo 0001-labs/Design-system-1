@@ -63,6 +63,23 @@
     "OK": "确定",
     "Copied": "已复制",
     "Could not copy": "无法复制",
-    "Notifications": "通知"
+    "Notifications": "通知",
+    "Try again": "重试",
+    "Undo": "撤销",
+    "Redo": "重做",
+    "Copy": "复制",
+    "Copy link": "复制链接",
+    "Remove": "移除",
+    "Rename": "重命名",
+    "Duplicate": "创建副本",
+    "Download": "下载",
+    "Refresh": "刷新",
+    "Open": "打开",
+    "Send": "发送",
+    "Clear": "清除",
+    "Saved": "已保存",
+    "Saving…": "正在保存…",
+    "Untitled": "未命名",
+    "Account": "账户"
   }
 }

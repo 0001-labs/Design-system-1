@@ -63,6 +63,23 @@
     "OK": "OK",
     "Copied": "Kopierat",
     "Could not copy": "Kunde inte kopiera",
-    "Notifications": "Aviseringar"
+    "Notifications": "Aviseringar",
+    "Try again": "Försök igen",
+    "Undo": "Ångra",
+    "Redo": "Gör om",
+    "Copy": "Kopiera",
+    "Copy link": "Kopiera länk",
+    "Remove": "Ta bort",
+    "Rename": "Byt namn",
+    "Duplicate": "Duplicera",
+    "Download": "Hämta",
+    "Refresh": "Uppdatera",
+    "Open": "Öppna",
+    "Send": "Skicka",
+    "Clear": "Rensa",
+    "Saved": "Sparat",
+    "Saving…": "Sparar…",
+    "Untitled": "Namnlös",
+    "Account": "Konto"
   }
 }

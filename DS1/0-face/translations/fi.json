@@ -63,6 +63,23 @@
     "OK": "OK",
     "Copied": "Kopioitu",
     "Could not copy": "Kopiointi epäonnistui",
-    "Notifications": "Ilmoitukset"
+    "Notifications": "Ilmoitukset",
+    "Try again": "Yritä uudelleen",
+    "Undo": "Kumoa",
+    "Redo": "Tee uudelleen",
+    "Copy": "Kopioi",
+    "Copy link": "Kopioi linkki",
+    "Remove": "Poista",
+    "Rename": "Nimeä uudelleen",
+    "Duplicate": "Monista",
+    "Download": "Lataa",
+    "Refresh": "Päivitä",
+    "Open": "Avaa",
+    "Send": "Lähetä",
+    "Clear": "Tyhjennä",
+    "Saved": "Tallennettu",
+    "Saving…": "Tallennetaan…",
+    "Untitled": "Nimetön",
+    "Account": "Tili"
   }
 }

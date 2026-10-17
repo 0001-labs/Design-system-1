@@ -190,7 +190,7 @@ iPhone, iPad and Mac apps take Design system 1 from its Swift package, `native/a
 
 ## Languages
 
-Design system 1 owns languages for every product: the list, choosing and remembering one, the shared words, language-aware addresses, the Convex check and the picker. A product brings only its own words. The full guide is the Languages page (`website/src/content/docs/1-root/languages.md`, https://designsystem1.com/1-root/languages/).
+Design system 1 owns languages for every product: the list, choosing and remembering one, the shared words, language-aware addresses, the Convex check and the picker. A product brings only its own words: the common buttons and actions (Save, Cancel, Close, Try again, Undo, Redo, Copy, Copy link, Remove, Rename, Duplicate, Download, Refresh, Open, Send, Clear) and Saved, Saving…, Untitled and Account are shared words, never a product's own; "Try again", not "Retry", and Close for a dismiss. The full guide is the Languages page (`website/src/content/docs/1-root/languages.md`, https://designsystem1.com/1-root/languages/).
 
 1. **Import** from the `ds-one` package, or from the product's vendored copy of `DS1/` (Ezo's `client/design/0-face/i18n.ts`). Change the module in Design system 1 and sync the copy; a vendored copy is edited only by the sync.
 2. **Configure at startup**, straight after the import: `configureI18n({ languages: [...], sharedWords: true })`. `languages` is the product's subset of `LANGUAGES` (`DS1/0-face/languages.ts`); the picker, the browser's language and the address prefixes all follow it.

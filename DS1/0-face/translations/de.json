@@ -63,6 +63,23 @@
     "OK": "OK",
     "Copied": "Kopiert",
     "Could not copy": "Kopieren fehlgeschlagen",
-    "Notifications": "Mitteilungen"
+    "Notifications": "Mitteilungen",
+    "Try again": "Erneut versuchen",
+    "Undo": "Widerrufen",
+    "Redo": "Wiederholen",
+    "Copy": "Kopieren",
+    "Copy link": "Link kopieren",
+    "Remove": "Entfernen",
+    "Rename": "Umbenennen",
+    "Duplicate": "Duplizieren",
+    "Download": "Herunterladen",
+    "Refresh": "Aktualisieren",
+    "Open": "Öffnen",
+    "Send": "Senden",
+    "Clear": "Leeren",
+    "Saved": "Gespeichert",
+    "Saving…": "Wird gespeichert …",
+    "Untitled": "Ohne Titel",
+    "Account": "Konto"
   }
 }
