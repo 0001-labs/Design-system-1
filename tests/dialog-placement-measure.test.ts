@@ -54,8 +54,15 @@ async function open(tab: Page, markup: string, { scale = 1, native = false } = {
       (window as unknown as { unbind?: () => void }).unbind = (window as unknown as { bindDialogSwipe: (dialog: HTMLDialogElement) => () => void }).bindDialogSwipe(dialog);
       dialog.showModal();
     } else await (stage.querySelector("ds-dialog") as HTMLElement & { show(): Promise<void> }).show();
-    await Promise.all(document.getAnimations().map(animation => animation.finished.catch(() => {})));
+    // The slide in starts a frame after opening; wait until it has come to rest, however busy the machine.
+    const dialog = stage.querySelector("dialog")!;
+    const rest = (value: string) => value === "none" || new DOMMatrixReadOnly(value).isIdentity;
     for (let i = 0; i < 2; i++) await new Promise(requestAnimationFrame);
+    const until = performance.now() + 3000;
+    while (performance.now() < until && (document.getAnimations().length || !rest(getComputedStyle(dialog).transform))) {
+      await Promise.all(document.getAnimations().map(animation => animation.finished.catch(() => {})));
+      await new Promise(requestAnimationFrame);
+    }
   }, { markup, scale, native });
 }
 
