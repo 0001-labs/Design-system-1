@@ -66,7 +66,7 @@ export function createLayoutInspector() {
     }
     @media print { :host { display: none !important; } }
   </style><div class="veil"></div><div class="areas"></div>`;
-  document.body.append(overlay);
+  document.body.appendChild(overlay);
   const layer = shadow.querySelector<HTMLDivElement>('.areas')!;
   const colors = ['#efc9dc', '#d5c9ef', '#c2d9eb', '#bfe0cd', '#eee3b7', '#efcfb8'];
   let frame = 0;
@@ -124,7 +124,7 @@ export function createLayoutInspector() {
       const dimensions = document.createElement('span');
       dimensions.className = 'dimensions';
       dimensions.textContent = `${Number(rect.width.toFixed(1))} × ${Number(rect.height.toFixed(1))} px`;
-      label.append(dimensions);
+      label.appendChild(dimensions);
       const ratio = document.createElement('span');
       ratio.className = 'dimensions';
       // Reduce dimensions measured to a tenth of a CSS pixel; use a decimal
@@ -141,9 +141,9 @@ export function createLayoutInspector() {
       ratio.textContent = horizontal <= 100 && vertical <= 100
         ? `${horizontal}:${vertical}`
         : `≈ ${Number((rect.width / rect.height).toFixed(2))}:1`;
-      label.append(ratio);
-      panel.append(label);
-      fragments.append(panel);
+      label.appendChild(ratio);
+      panel.appendChild(label);
+      fragments.appendChild(panel);
     });
     layer.replaceChildren(fragments);
   };

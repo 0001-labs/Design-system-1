@@ -41,7 +41,7 @@ export function initGridShortcut(): void {
     }
     @media print { :host { display: none !important; } }
   </style><div class="grid"></div>`;
-  document.body.append(overlay);
+  document.body.appendChild(overlay);
   const layout = createLayoutInspector();
 
   const updatePosition = () => {
