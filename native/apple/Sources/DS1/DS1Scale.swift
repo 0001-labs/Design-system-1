@@ -11,9 +11,16 @@ public struct DS1Scale: Equatable, Sendable {
 
     public init(factor: CGFloat) { self.factor = factor }
 
-    /// The scale for a screen `width` points wide, as DS1/0-face/scaling.ts computes it.
-    public static func device(width: CGFloat) -> DS1Scale {
+    /// The scale for a screen `width` points wide, as DS1/0-face/scaling.ts computes it. With the
+    /// screen's `pixels` per point it snaps as scaling.ts's `"pixel"` does (`toDevicePixel`): a
+    /// square is a whole number of the screen's pixels, rounded down, so every grid line falls on
+    /// a pixel, stays sharp and even, and rows meet the lines exactly. Without, three decimals.
+    public static func device(width: CGFloat, pixels: CGFloat? = nil) -> DS1Scale {
         let clamped = min(DS1Metrics.scaleMax, max(DS1Metrics.scaleMin, width / DS1Metrics.scaleBase))
+        if let pixels, pixels > 0 {
+            let perSquare = DS1Metrics.square * pixels
+            return DS1Scale(factor: (clamped * perSquare).rounded(.down) / perSquare)
+        }
         let step = pow(10, CGFloat(DS1Metrics.scaleDecimals))
         return DS1Scale(factor: (clamped * step).rounded() / step)
     }
@@ -59,6 +66,7 @@ extension EnvironmentValues {
 }
 
 private struct DS1Scaled: ViewModifier {
+    @Environment(\.displayScale) private var pixels
     let corner: CGFloat
     func body(content: Content) -> some View {
         GeometryReader { geometry in
@@ -69,7 +77,8 @@ private struct DS1Scaled: ViewModifier {
         #if os(macOS)
         var scale = DS1Scale.desktop
         #else
-        var scale = DS1Scale.device(width: width)
+        // Snapped to the screen's pixels, as the web's `"pixel"` scaling.
+        var scale = DS1Scale.device(width: width, pixels: pixels)
         #endif
         scale.corner = corner
         return scale

@@ -19,6 +19,11 @@ final class DS1Tests: XCTestCase {
         XCTAssertEqual(DS1Scale.device(width: 402).factor, 1.436)
         XCTAssertEqual(DS1Scale.device(width: 200).factor, 0.75)
         XCTAssertEqual(DS1Scale.device(width: 1024).factor, 2)
+        // Snapped to the screen's pixels, a square is a whole number of them (scaling.ts's "pixel").
+        XCTAssertEqual(DS1Scale.device(width: 393, pixels: 3).unit * 3, 84)
+        XCTAssertEqual(DS1Scale.device(width: 402, pixels: 3).unit * 3, 86)
+        XCTAssertEqual(DS1Scale.device(width: 440, pixels: 3).unit * 3, 94)
+        XCTAssertEqual(DS1Scale.device(width: 1024, pixels: 2).factor, 2)
         let scale = DS1Scale.device(width: 393)
         XCTAssertEqual(scale.unit, 20 * 1.404, accuracy: 0.0001)
         XCTAssertEqual(scale.line, 1)

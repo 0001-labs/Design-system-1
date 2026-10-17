@@ -24,19 +24,24 @@ public struct DS1Page<Content: View>: View {
         let grid: Bool
         let content: Content
 
+        @Environment(\.displayScale) private var pixels
+
         var body: some View {
             GeometryReader { geometry in
                 let width = min(scale.squares(measure), scale.wholeSquares(in: geometry.size.width - 2 * scale.unit))
+                // Centred, on a whole pixel, so the column's edge and the grid's lines meet exactly.
+                let inset = ((geometry.size.width - width) / 2 * pixels).rounded(.down) / pixels
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) { content }
                         .frame(width: width, alignment: .leading)
                         .padding(.vertical, scale.unit)
-                        .frame(maxWidth: .infinity)
+                        .padding(.leading, inset)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .frame(minHeight: geometry.size.height, alignment: .top)
                         // The grid scrolls with the content and starts at the column's edge and
                         // its first square, so every row and every edge stands on its lines.
                         .background(alignment: .topLeading) {
-                            if grid { DS1PaperGrid(origin: CGPoint(x: (geometry.size.width - width) / 2, y: 0)) }
+                            if grid { DS1PaperGrid(origin: CGPoint(x: inset, y: 0)) }
                         }
                 }
                 .background { Rectangle().fill(DS1Color.paper).ignoresSafeArea() }
