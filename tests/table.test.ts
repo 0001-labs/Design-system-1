@@ -18,7 +18,9 @@ test("a row is one square on a hairline, with no box and no column lines", () =>
   expect(cell).toContain("height: var(--ds-table-row)");
   expect(cell).toContain("border: 0");
   expect(cell).toContain("border-bottom: 1px solid var(--ds-table-rule)");
-  expect(cell).toContain("line-height: calc(var(--ds-table-row) - 1px)");
+  // The words' sixteen stands against the rule at the cell's foot.
+  expect(cell).toContain("line-height: var(--ds-type-lineheight-default)");
+  expect(cell).toContain("vertical-align: bottom");
   expect(cell).toContain("font-weight: inherit");
   expect(css).not.toMatch(/border-(left|right|top)|outline:/);
 });
