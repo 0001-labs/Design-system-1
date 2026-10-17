@@ -13,10 +13,14 @@ A vertical container for rows or other content.
 
 ## Compose rows
 
-Put `ds-row` elements directly in the list. `ds-list` supplies the containing layout; each row supplies its alignment and content. Use semantic `<ul>` and `<li>` elements when the content needs native list semantics.
+Put `ds-row` elements directly in the list. `ds-list` supplies the containing layout; each row supplies its alignment and content.
+
+## Roles
+
+The element is a list: it takes `role="list"`, and every element directly inside it `role="listitem"`, including rows added later. A row taken out of the list loses the role the list gave it. Roles the page writes are left alone: a list with a role of its own (such as `listbox`, or `none` for a list used only for layout) gives its children no role, and a child with a role keeps it. Screen readers then announce the list and its number of items, as for `<ul>` and `<li>`.
 
 ## API
 
-The component has a default slot and no public attributes. There is no `ds-list-item` custom element, sorting API or selection state built into it.
+The component has a default slot and the `columns` attribute, which lays the items out in that many equal columns. There is no `ds-list-item` custom element, sorting API or selection state built into it.
 
 [Row](/3-unit/row/) · [Text](/2-core/text/)
