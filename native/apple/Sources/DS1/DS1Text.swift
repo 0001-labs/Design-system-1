@@ -101,6 +101,14 @@ extension DS1Font {
         return (line - ascent - descent) / 2 + ascent
     }
 
+    /// Where the baseline stands in a line box `line` tall when the regular face's capitals are
+    /// centred in it, measured from its top: on the row's sixteen the capitals are then centred
+    /// on a 16-point icon beside them, as the web's GT America falls in its 16px line box
+    /// (cap top 7px below a row's top line, baseline 3px above the next).
+    public static func capBaseline(size: CGFloat, line: CGFloat) -> CGFloat {
+        (line + CTFontGetCapHeight(ctFont(.regular, size: size))) / 2
+    }
+
     /// The height one line of a face takes when nothing spaces it: ascent, descent and gap.
     public static func lineHeight(_ face: Face, size: CGFloat) -> CGFloat {
         let font = ctFont(face, size: size)
@@ -200,7 +208,7 @@ private struct DS1Baseline: ViewModifier {
         // other text takes the lower sixteen of its square with the spare four above, as Ezo
         // sets it (a 16px line box at the foot of the row): GT America stands where the web's
         // half-leading puts it in that sixteen, its capitals centred on a 16-point icon beside it.
-        let baseline = style == .display ? line : line - scale.leading + DS1Font.baseline(size: style.size(scale), line: scale.leading)
+        let baseline = style == .display ? line : line - scale.leading + DS1Font.capBaseline(size: style.size(scale), line: scale.leading)
         content
             .alignmentGuide(VerticalAlignment.top) { d in d[.firstTextBaseline] - baseline }
             .frame(height: line, alignment: .top)
