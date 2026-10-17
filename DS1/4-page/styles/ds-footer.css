@@ -1,0 +1,29 @@
+/* ds-footer.css */
+/* The element places the block; 1-root/footer.css draws it and controls.css
+   the buttons. */
+
+:host {
+  display: block;
+  min-width: 0;
+}
+
+:host([hidden]),
+[hidden] {
+  display: none !important;
+}
+
+/* A brand of the page's own takes the mark's line; a slotted legal line its words. */
+::slotted([slot="brand"]) {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--ds-unit) / 2);
+  align-self: flex-start;
+  height: var(--ds-unit);
+  color: inherit;
+  text-decoration: none;
+}
+
+::slotted([slot="legal"]) {
+  margin: 0;
+  font: inherit;
+}
