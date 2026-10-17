@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Carousel measurements</title>
+    <link rel="stylesheet" href="/DS1/1-root/one.css" />
+    <link rel="stylesheet" href="/DS1/1-root/controls.css" />
+    <style>
+      body { margin: 0; padding: 0; }
+      #stage { position: absolute; top: 0; left: 0; width: 600px; }
+      .slide { height: calc(var(--ds-unit) * 6); background: var(--ds-fill); }
+      #probe { color: var(--ds-text-color); }
+    </style>
+    <script type="module">
+      import "/DS1/3-unit/ds-carousel.ts";
+      import { startCarousels } from "/DS1/0-face/carousel.ts";
+      window.startCarousels = startCarousels;
+      await document.fonts.ready;
+      document.documentElement.dataset.ready = "true";
+    </script>
+  </head>
+  <body>
+    <span id="probe"></span>
+    <div id="stage"></div>
+  </body>
+</html>

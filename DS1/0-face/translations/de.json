@@ -18,6 +18,9 @@
     "Password": "Passwort",
     "Nothing here yet": "Hier ist noch nichts",
     "Loading": "Wird geladen",
+    "{value} of {max}": "{value} von {max}",
+    "{value} of {max}, over by {over}": "{value} von {max}, {over} darüber",
+    "Failed": "Fehlgeschlagen",
     "Today": "Heute",
     "Yesterday": "Gestern",
     "Tomorrow": "Morgen",
@@ -81,6 +84,13 @@
     "Saved": "Gespeichert",
     "Saving…": "Wird gespeichert …",
     "Untitled": "Ohne Titel",
-    "Account": "Konto"
+    "Account": "Konto",
+    "Carousel": "Karussell",
+    "Slide": "Folie",
+    "Slides": "Folien",
+    "Slide {index}": "Folie {index}",
+    "{index} of {count}": "{index} von {count}",
+    "Previous slide": "Vorherige Folie",
+    "Next slide": "Nächste Folie"
   }
 }

@@ -18,6 +18,9 @@
     "Password": "Passord",
     "Nothing here yet": "Ingenting her ennå",
     "Loading": "Laster inn",
+    "{value} of {max}": "{value} av {max}",
+    "{value} of {max}, over by {over}": "{value} av {max}, {over} for mye",
+    "Failed": "Mislyktes",
     "Today": "I dag",
     "Yesterday": "I går",
     "Tomorrow": "I morgen",
@@ -81,6 +84,13 @@
     "Saved": "Lagret",
     "Saving…": "Lagrer…",
     "Untitled": "Uten tittel",
-    "Account": "Konto"
+    "Account": "Konto",
+    "Carousel": "Karusell",
+    "Slide": "Lysbilde",
+    "Slides": "Lysbilder",
+    "Slide {index}": "Lysbilde {index}",
+    "{index} of {count}": "{index} av {count}",
+    "Previous slide": "Forrige lysbilde",
+    "Next slide": "Neste lysbilde"
   }
 }

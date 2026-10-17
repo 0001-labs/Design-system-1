@@ -18,6 +18,9 @@
     "Password": "Lykilorð",
     "Nothing here yet": "Ekkert hér enn",
     "Loading": "Hleður",
+    "{value} of {max}": "{value} af {max}",
+    "{value} of {max}, over by {over}": "{value} af {max}, {over} umfram",
+    "Failed": "Mistókst",
     "Today": "Í dag",
     "Yesterday": "Í gær",
     "Tomorrow": "Á morgun",
@@ -74,6 +77,13 @@
     "Saved": "Vistað",
     "Saving…": "Vistar…",
     "Untitled": "Ónefnt",
-    "Account": "Aðgangur"
+    "Account": "Aðgangur",
+    "Carousel": "Hringekja",
+    "Slide": "Glæra",
+    "Slides": "Glærur",
+    "Slide {index}": "Glæra {index}",
+    "{index} of {count}": "{index} af {count}",
+    "Previous slide": "Fyrri glæra",
+    "Next slide": "Næsta glæra"
   }
 }

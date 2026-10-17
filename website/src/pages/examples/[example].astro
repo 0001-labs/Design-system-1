@@ -1,6 +1,7 @@
 ---
 import { EXAMPLES } from '../../lib/component-examples';
 import '../../../../DS1/1-root/one.css';
+import '../../../../DS1/1-root/figures.css';
 export function getStaticPaths() {
   return Object.keys(EXAMPLES).map(example => ({ params: { example } }));
 }
@@ -21,7 +22,8 @@ const sample = EXAMPLES[example];
   html, body { margin: 0; background: var(--background); color: var(--text-color); font-family: var(--typeface-regular); font-size: 14px; line-height: 20px; }
   body { padding: 40px 20px 20px; }
   #sample { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; }
-  #sample > :is(ds-input, ds-card, ds-accordion, ds-table, ds-form, ds-list, ds-container, ds-layout, ds-page, ds-notice, ds-empty) { flex-basis: 100%; }
+  #sample > :is(ds-input, ds-card, ds-accordion, ds-table, ds-form, ds-list, ds-container, ds-layout, ds-page, ds-notice, ds-empty, ds-meter, ds-steps, .ds-stats) { flex-basis: 100%; }
+  #sample > ds-carousel { flex-basis: 100%; min-width: 0; }
   body[data-example-id='gap'] #sample { display: block; }
   .grid-controls { display: flex; flex-wrap: wrap; gap: calc(10px * var(--ds-sf, 1)); width: 100%; }
   .grid-controls label { display: flex; flex-direction: column; gap: calc(4px * var(--ds-sf, 1)); font-size: var(--ds-type-size-small); }

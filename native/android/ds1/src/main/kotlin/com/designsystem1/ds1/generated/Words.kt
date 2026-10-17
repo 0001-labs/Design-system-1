@@ -44,6 +44,9 @@ internal object DS1SharedWords {
         "Password" to "Adgangskode",
         "Nothing here yet" to "Intet her endnu",
         "Loading" to "Indlæser",
+        "{value} of {max}" to "{value} af {max}",
+        "{value} of {max}, over by {over}" to "{value} af {max}, {over} for meget",
+        "Failed" to "Mislykkedes",
         "Today" to "I dag",
         "Yesterday" to "I går",
         "Tomorrow" to "I morgen",
@@ -108,6 +111,13 @@ internal object DS1SharedWords {
         "Saving…" to "Gemmer…",
         "Untitled" to "Uden titel",
         "Account" to "Konto",
+        "Carousel" to "Karrusel",
+        "Slide" to "Dias",
+        "Slides" to "Dias",
+        "Slide {index}" to "Dias {index}",
+        "{index} of {count}" to "{index} af {count}",
+        "Previous slide" to "Forrige dias",
+        "Next slide" to "Næste dias",
     )
 
     private fun deWords() = mapOf(
@@ -129,6 +139,9 @@ internal object DS1SharedWords {
         "Password" to "Passwort",
         "Nothing here yet" to "Hier ist noch nichts",
         "Loading" to "Wird geladen",
+        "{value} of {max}" to "{value} von {max}",
+        "{value} of {max}, over by {over}" to "{value} von {max}, {over} darüber",
+        "Failed" to "Fehlgeschlagen",
         "Today" to "Heute",
         "Yesterday" to "Gestern",
         "Tomorrow" to "Morgen",
@@ -193,6 +206,13 @@ internal object DS1SharedWords {
         "Saving…" to "Wird gespeichert …",
         "Untitled" to "Ohne Titel",
         "Account" to "Konto",
+        "Carousel" to "Karussell",
+        "Slide" to "Folie",
+        "Slides" to "Folien",
+        "Slide {index}" to "Folie {index}",
+        "{index} of {count}" to "{index} von {count}",
+        "Previous slide" to "Vorherige Folie",
+        "Next slide" to "Nächste Folie",
     )
 
     private fun enWords() = mapOf(
@@ -214,6 +234,9 @@ internal object DS1SharedWords {
         "Password" to "Password",
         "Nothing here yet" to "Nothing here yet",
         "Loading" to "Loading",
+        "{value} of {max}" to "{value} of {max}",
+        "{value} of {max}, over by {over}" to "{value} of {max}, over by {over}",
+        "Failed" to "Failed",
         "Today" to "Today",
         "Yesterday" to "Yesterday",
         "Tomorrow" to "Tomorrow",
@@ -278,6 +301,13 @@ internal object DS1SharedWords {
         "Saving…" to "Saving…",
         "Untitled" to "Untitled",
         "Account" to "Account",
+        "Carousel" to "Carousel",
+        "Slide" to "Slide",
+        "Slides" to "Slides",
+        "Slide {index}" to "Slide {index}",
+        "{index} of {count}" to "{index} of {count}",
+        "Previous slide" to "Previous slide",
+        "Next slide" to "Next slide",
     )
 
     private fun esWords() = mapOf(
@@ -299,6 +329,9 @@ internal object DS1SharedWords {
         "Password" to "Contraseña",
         "Nothing here yet" to "Aún no hay nada aquí",
         "Loading" to "Cargando",
+        "{value} of {max}" to "{value} de {max}",
+        "{value} of {max}, over by {over}" to "{value} de {max}, {over} de más",
+        "Failed" to "Fallido",
         "Today" to "Hoy",
         "Yesterday" to "Ayer",
         "Tomorrow" to "Mañana",
@@ -363,6 +396,13 @@ internal object DS1SharedWords {
         "Saving…" to "Guardando…",
         "Untitled" to "Sin título",
         "Account" to "Cuenta",
+        "Carousel" to "Carrusel",
+        "Slide" to "Diapositiva",
+        "Slides" to "Diapositivas",
+        "Slide {index}" to "Diapositiva {index}",
+        "{index} of {count}" to "{index} de {count}",
+        "Previous slide" to "Diapositiva anterior",
+        "Next slide" to "Diapositiva siguiente",
     )
 
     private fun fiWords() = mapOf(
@@ -384,6 +424,9 @@ internal object DS1SharedWords {
         "Password" to "Salasana",
         "Nothing here yet" to "Täällä ei ole vielä mitään",
         "Loading" to "Ladataan",
+        "{value} of {max}" to "{value}/{max}",
+        "{value} of {max}, over by {over}" to "{value}/{max}, {over} yli",
+        "Failed" to "Epäonnistui",
         "Today" to "Tänään",
         "Yesterday" to "Eilen",
         "Tomorrow" to "Huomenna",
@@ -448,6 +491,13 @@ internal object DS1SharedWords {
         "Saving…" to "Tallennetaan…",
         "Untitled" to "Nimetön",
         "Account" to "Tili",
+        "Carousel" to "Karuselli",
+        "Slide" to "Dia",
+        "Slides" to "Diat",
+        "Slide {index}" to "Dia {index}",
+        "{index} of {count}" to "{index}/{count}",
+        "Previous slide" to "Edellinen dia",
+        "Next slide" to "Seuraava dia",
     )
 
     private fun frWords() = mapOf(
@@ -469,6 +519,9 @@ internal object DS1SharedWords {
         "Password" to "Mot de passe",
         "Nothing here yet" to "Rien ici pour l’instant",
         "Loading" to "Chargement",
+        "{value} of {max}" to "{value} sur {max}",
+        "{value} of {max}, over by {over}" to "{value} sur {max}, dépassé de {over}",
+        "Failed" to "Échec",
         "Today" to "Aujourd’hui",
         "Yesterday" to "Hier",
         "Tomorrow" to "Demain",
@@ -533,6 +586,13 @@ internal object DS1SharedWords {
         "Saving…" to "Enregistrement…",
         "Untitled" to "Sans titre",
         "Account" to "Compte",
+        "Carousel" to "Carrousel",
+        "Slide" to "Diapositive",
+        "Slides" to "Diapositives",
+        "Slide {index}" to "Diapositive {index}",
+        "{index} of {count}" to "{index} sur {count}",
+        "Previous slide" to "Diapositive précédente",
+        "Next slide" to "Diapositive suivante",
     )
 
     private fun isWords() = mapOf(
@@ -554,6 +614,9 @@ internal object DS1SharedWords {
         "Password" to "Lykilorð",
         "Nothing here yet" to "Ekkert hér enn",
         "Loading" to "Hleður",
+        "{value} of {max}" to "{value} af {max}",
+        "{value} of {max}, over by {over}" to "{value} af {max}, {over} umfram",
+        "Failed" to "Mistókst",
         "Today" to "Í dag",
         "Yesterday" to "Í gær",
         "Tomorrow" to "Á morgun",
@@ -611,6 +674,13 @@ internal object DS1SharedWords {
         "Saving…" to "Vistar…",
         "Untitled" to "Ónefnt",
         "Account" to "Aðgangur",
+        "Carousel" to "Hringekja",
+        "Slide" to "Glæra",
+        "Slides" to "Glærur",
+        "Slide {index}" to "Glæra {index}",
+        "{index} of {count}" to "{index} af {count}",
+        "Previous slide" to "Fyrri glæra",
+        "Next slide" to "Næsta glæra",
     )
 
     private fun itWords() = mapOf(
@@ -632,6 +702,9 @@ internal object DS1SharedWords {
         "Password" to "Password",
         "Nothing here yet" to "Ancora niente qui",
         "Loading" to "Caricamento",
+        "{value} of {max}" to "{value} su {max}",
+        "{value} of {max}, over by {over}" to "{value} su {max}, {over} in più",
+        "Failed" to "Non riuscito",
         "Today" to "Oggi",
         "Yesterday" to "Ieri",
         "Tomorrow" to "Domani",
@@ -696,6 +769,13 @@ internal object DS1SharedWords {
         "Saving…" to "Salvataggio…",
         "Untitled" to "Senza titolo",
         "Account" to "Account",
+        "Carousel" to "Carosello",
+        "Slide" to "Slide",
+        "Slides" to "Slide",
+        "Slide {index}" to "Slide {index}",
+        "{index} of {count}" to "{index} di {count}",
+        "Previous slide" to "Slide precedente",
+        "Next slide" to "Slide successiva",
     )
 
     private fun jaWords() = mapOf(
@@ -717,6 +797,9 @@ internal object DS1SharedWords {
         "Password" to "パスワード",
         "Nothing here yet" to "まだ何もありません",
         "Loading" to "読み込み中",
+        "{value} of {max}" to "{max}中{value}",
+        "{value} of {max}, over by {over}" to "{max}中{value}、{over}超過",
+        "Failed" to "失敗",
         "Today" to "今日",
         "Yesterday" to "昨日",
         "Tomorrow" to "明日",
@@ -781,6 +864,13 @@ internal object DS1SharedWords {
         "Saving…" to "保存中…",
         "Untitled" to "名称未設定",
         "Account" to "アカウント",
+        "Carousel" to "カルーセル",
+        "Slide" to "スライド",
+        "Slides" to "スライド",
+        "Slide {index}" to "スライド {index}",
+        "{index} of {count}" to "{count} 枚中 {index} 枚目",
+        "Previous slide" to "前のスライド",
+        "Next slide" to "次のスライド",
     )
 
     private fun koWords() = mapOf(
@@ -802,6 +892,9 @@ internal object DS1SharedWords {
         "Password" to "비밀번호",
         "Nothing here yet" to "아직 아무것도 없습니다",
         "Loading" to "불러오는 중",
+        "{value} of {max}" to "{max} 중 {value}",
+        "{value} of {max}, over by {over}" to "{max} 중 {value}, {over} 초과",
+        "Failed" to "실패",
         "Today" to "오늘",
         "Yesterday" to "어제",
         "Tomorrow" to "내일",
@@ -866,6 +959,13 @@ internal object DS1SharedWords {
         "Saving…" to "저장 중…",
         "Untitled" to "제목 없음",
         "Account" to "계정",
+        "Carousel" to "캐러셀",
+        "Slide" to "슬라이드",
+        "Slides" to "슬라이드",
+        "Slide {index}" to "슬라이드 {index}",
+        "{index} of {count}" to "{count}개 중 {index}번째",
+        "Previous slide" to "이전 슬라이드",
+        "Next slide" to "다음 슬라이드",
     )
 
     private fun nbWords() = mapOf(
@@ -887,6 +987,9 @@ internal object DS1SharedWords {
         "Password" to "Passord",
         "Nothing here yet" to "Ingenting her ennå",
         "Loading" to "Laster inn",
+        "{value} of {max}" to "{value} av {max}",
+        "{value} of {max}, over by {over}" to "{value} av {max}, {over} for mye",
+        "Failed" to "Mislyktes",
         "Today" to "I dag",
         "Yesterday" to "I går",
         "Tomorrow" to "I morgen",
@@ -951,6 +1054,13 @@ internal object DS1SharedWords {
         "Saving…" to "Lagrer…",
         "Untitled" to "Uten tittel",
         "Account" to "Konto",
+        "Carousel" to "Karusell",
+        "Slide" to "Lysbilde",
+        "Slides" to "Lysbilder",
+        "Slide {index}" to "Lysbilde {index}",
+        "{index} of {count}" to "{index} av {count}",
+        "Previous slide" to "Forrige lysbilde",
+        "Next slide" to "Neste lysbilde",
     )
 
     private fun ptBRWords() = mapOf(
@@ -972,6 +1082,9 @@ internal object DS1SharedWords {
         "Password" to "Senha",
         "Nothing here yet" to "Nada aqui ainda",
         "Loading" to "Carregando",
+        "{value} of {max}" to "{value} de {max}",
+        "{value} of {max}, over by {over}" to "{value} de {max}, {over} acima",
+        "Failed" to "Falhou",
         "Today" to "Hoje",
         "Yesterday" to "Ontem",
         "Tomorrow" to "Amanhã",
@@ -1036,6 +1149,13 @@ internal object DS1SharedWords {
         "Saving…" to "Salvando…",
         "Untitled" to "Sem título",
         "Account" to "Conta",
+        "Carousel" to "Carrossel",
+        "Slide" to "Slide",
+        "Slides" to "Slides",
+        "Slide {index}" to "Slide {index}",
+        "{index} of {count}" to "{index} de {count}",
+        "Previous slide" to "Slide anterior",
+        "Next slide" to "Próximo slide",
     )
 
     private fun ptWords() = mapOf(
@@ -1057,6 +1177,9 @@ internal object DS1SharedWords {
         "Password" to "Palavra-passe",
         "Nothing here yet" to "Ainda não há nada aqui",
         "Loading" to "A carregar",
+        "{value} of {max}" to "{value} de {max}",
+        "{value} of {max}, over by {over}" to "{value} de {max}, {over} acima",
+        "Failed" to "Falhou",
         "Today" to "Hoje",
         "Yesterday" to "Ontem",
         "Tomorrow" to "Amanhã",
@@ -1121,6 +1244,13 @@ internal object DS1SharedWords {
         "Saving…" to "A guardar…",
         "Untitled" to "Sem título",
         "Account" to "Conta",
+        "Carousel" to "Carrossel",
+        "Slide" to "Diapositivo",
+        "Slides" to "Diapositivos",
+        "Slide {index}" to "Diapositivo {index}",
+        "{index} of {count}" to "{index} de {count}",
+        "Previous slide" to "Diapositivo anterior",
+        "Next slide" to "Diapositivo seguinte",
     )
 
     private fun svWords() = mapOf(
@@ -1142,6 +1272,9 @@ internal object DS1SharedWords {
         "Password" to "Lösenord",
         "Nothing here yet" to "Inget här än",
         "Loading" to "Läser in",
+        "{value} of {max}" to "{value} av {max}",
+        "{value} of {max}, over by {over}" to "{value} av {max}, {over} för mycket",
+        "Failed" to "Misslyckades",
         "Today" to "I dag",
         "Yesterday" to "I går",
         "Tomorrow" to "I morgon",
@@ -1206,6 +1339,13 @@ internal object DS1SharedWords {
         "Saving…" to "Sparar…",
         "Untitled" to "Namnlös",
         "Account" to "Konto",
+        "Carousel" to "Karusell",
+        "Slide" to "Bild",
+        "Slides" to "Bilder",
+        "Slide {index}" to "Bild {index}",
+        "{index} of {count}" to "{index} av {count}",
+        "Previous slide" to "Föregående bild",
+        "Next slide" to "Nästa bild",
     )
 
     private fun zhWords() = mapOf(
@@ -1227,6 +1367,9 @@ internal object DS1SharedWords {
         "Password" to "密码",
         "Nothing here yet" to "这里还没有内容",
         "Loading" to "正在加载",
+        "{value} of {max}" to "{value}/{max}",
+        "{value} of {max}, over by {over}" to "{value}/{max}，超出 {over}",
+        "Failed" to "失败",
         "Today" to "今天",
         "Yesterday" to "昨天",
         "Tomorrow" to "明天",
@@ -1291,6 +1434,13 @@ internal object DS1SharedWords {
         "Saving…" to "正在保存…",
         "Untitled" to "未命名",
         "Account" to "账户",
+        "Carousel" to "轮播",
+        "Slide" to "幻灯片",
+        "Slides" to "幻灯片",
+        "Slide {index}" to "幻灯片 {index}",
+        "{index} of {count}" to "第 {index} 张，共 {count} 张",
+        "Previous slide" to "上一张",
+        "Next slide" to "下一张",
     )
 
 }
