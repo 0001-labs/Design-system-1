@@ -212,6 +212,33 @@ render();`,
 </ds-carousel>`,
     height: 200,
   },
+  'stat': {
+    title: 'Figures in the language', hint: 'Money, a change with its sign and a meter between figure and caption. The group stands on columns of eight squares.',
+    html: `<div class="ds-stats">
+  <ds-stat label="Members" value="12840" literal></ds-stat>
+  <ds-stat label="Revenue" value="1234.5" format="money" currency="EUR" change="0.12" change-format="percent" caption="Since last month" literal></ds-stat>
+  <ds-stat label="Over budget" value="18200" format="money" currency="JPY" tone="danger" literal>
+    <ds-meter label="Spent" value="118200" max="100000" format="money" currency="JPY" literal></ds-meter>
+    <span slot="caption">Of ¥100,000 planned</span>
+  </ds-stat>
+</div>`,
+    height: 220,
+  },
+  'meter': {
+    title: 'A bar, squares and over', hint: 'The words say the value and when it is past the end: 12 of 10, over by 2.',
+    html: `<ds-meter label="Spent" value="7400" max="10000" literal></ds-meter>
+<ds-meter label="Seats" value="7" max="10" squares="10" literal></ds-meter>
+<ds-meter label="Tickets" value="12" max="10" squares="10" literal></ds-meter>`,
+    height: 120,
+  },
+  'steps': {
+    title: 'Where someone is', hint: 'The current step is aria-current="step"; done steps say so in hidden words. The vertical sequence has room under each step.',
+    html: `<ds-steps current="2" label="Getting started" steps='["Apply", "Approval", "Connect payouts", "Start earning"]' literal></ds-steps>
+<ds-steps vertical current="3" steps='["Apply", "Approval", "Connect payouts", "Start earning"]' literal>
+  <ds-text slot="step-3" literal tone="muted">Connect a payout account to get paid.</ds-text>
+</ds-steps>`,
+    height: 200,
+  },
   'card': {
     title: 'A container for content', hint: 'Card is an optional component. Ordinary writing sits directly on the paper.',
     html: '<ds-card variant="outlined" padding="small">\n  <ds-text>A little content</ds-text>\n  <ds-button primary>Continue</ds-button>\n</ds-card>',
@@ -311,6 +338,7 @@ export const PAGE_EXAMPLES: Record<string, string[]> = {
   '2-core/text': ['text'], '2-core/date': ['date'],
   '2-core/banner': ['banner', 'banner-dismiss'], '2-core/card': ['card'],
   '2-core/empty': ['empty', 'empty-search'], '2-core/notice': ['notice'], '2-core/pagedots': ['pagedots'],
+  '2-core/stat': ['stat'], '2-core/meter': ['meter'], '2-core/steps': ['steps'],
   '2-core/cycle': ['cycle'], '2-core/language': ['language'],
   '2-core/gap': ['gap'],
   '3-unit/row': ['row', 'row-centered'], '3-unit/list': ['list'],

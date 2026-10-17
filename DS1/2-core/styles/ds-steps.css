@@ -1,0 +1,20 @@
+/* ds-steps.css */
+/* The element only places the list; 1-root/figures.css draws it. */
+
+:host {
+  display: block;
+  min-width: 0;
+}
+
+:host([hidden]),
+[hidden] {
+  display: none !important;
+}
+
+/* What a page slots under a step takes the step's lines, not its own margins,
+   and stands at least a square high, so text drawn one control high (a
+   ds-text) keeps the steps under it on the grid. */
+::slotted(*) {
+  min-height: var(--ds-unit);
+  margin: 0;
+}
