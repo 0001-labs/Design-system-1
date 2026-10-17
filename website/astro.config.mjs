@@ -139,7 +139,10 @@ export default defineConfig({
           label: "4 Page",
           items: [
             { label: "Container", slug: "4-page/container" },
+            { label: "Document", slug: "4-page/document" },
+            { label: "Footer", slug: "4-page/footer" },
             { label: "Grid", slug: "4-page/grid" },
+            { label: "Header", slug: "4-page/header" },
             { label: "Layout", slug: "4-page/layout" },
             { label: "Layouts", slug: "4-page/layouts" },
           ],

@@ -1,0 +1,96 @@
+---
+title: Header
+description: A site header with its navigation, the page you are on and its actions, folding into a drawer on a narrow screen.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+A site header is one row of one square with a square of room around it: the brand at the start, in twelve squares as a page's navigation column is, so the links stand over the work; the navigation two squares after it; the actions at the end. Every link is one square high, a square apart, in the text's ink. The page you are on (`aria-current="page"`) stands on a hairline of the full ink, the others show a faint one under the pointer.
+
+Below thirty squares of width the navigation and actions fold away. A menu button, an icon button in the row's last square, opens them in a drawer over the page: the dialog frame on the page's paper, its close button where the menu button stood, the links one square each. While it is open, Tab and Shift+Tab go round its controls and never leave it, Escape, the close button, a link or the screen widening close it, and the page behind holds its scroll and gets it back as it was. Closing returns focus to the menu button.
+
+## Try it
+
+<ComponentExample example="header" />
+
+## Use it
+
+```html
+<ds-header brand="Name" literal>
+  <a href="/">Home</a>
+  <a href="/help">Help</a>
+  <ds-button slot="actions" primary href="/download">Download</ds-button>
+</ds-header>
+```
+
+The links are the page's own `<a href>` elements, in the page, so they render without scripts and a search engine reads them. Unless one is marked, the link to the address being read gets `aria-current="page"`. The menu button is named with the shared word "Menu" and the drawer's close button with "Close", in the page's language. `ds-header-menu` reports the drawer opening and closing (`detail.open`); `openMenu()` and `closeMenu()` work it from code.
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `brand` | string | Empty | The site's name, a link home: a translation key, or the words with `literal`. |
+| `href` | string | `/` | Where the brand links. |
+| `label` | string | Empty | The navigation's accessible name, when a page has more than one. |
+| `literal` | boolean | `false` | Show `brand` and `label` as written. |
+| `sticky` | boolean | `false` | Stay at the top of the page as it scrolls, on the paper. |
+
+| Slot | What it holds |
+| --- | --- |
+| Default | The navigation's links. |
+| `brand` | A brand of the page's own: a logo, one square high. |
+| `actions` | Buttons or links at the end of the row. |
+
+## Without Lit
+
+`header.css`, which `controls.css` imports, draws the same header on native elements, and the page script `0-face/header.ts` starts every one on the page when it loads (`startHeaders()` starts one added later). The page writes the menu button's name in its own language, and the close button's in `data-close-label`. The toggle carries two icons: the first shows while the drawer is closed, the second while it is open, and the close button shows the second.
+
+```html
+<header class="ds-header">
+  <a class="ds-header__brand" href="/">Name</a>
+  <nav class="ds-header__nav" id="site-nav" aria-label="Main">
+    <a href="/">Home</a>
+    <a href="/help">Help</a>
+  </nav>
+  <div class="ds-header__actions"><a class="ds-button ds-button--primary" href="/download">Download</a></div>
+  <button class="ds-button ds-button--icon ds-header__toggle" type="button" aria-label="Menu" aria-controls="site-nav" data-close-label="Close">
+    <span class="ds-icon" style="--ds-icon: url(/ds1/icons/menu.svg)" aria-hidden="true"></span>
+    <span class="ds-icon" style="--ds-icon: url(/ds1/icons/close.svg)" aria-hidden="true"></span>
+  </button>
+</header>
+<script type="module">import "/ds1/0-face/header.ts";</script>
+```
+
+| Class | What it is |
+| --- | --- |
+| `ds-header` | The row, a `<header>`; `ds-header--sticky` keeps it at the top. |
+| `ds-header__brand` | The brand, a link home; a picture in it is one square high. |
+| `ds-header__nav` | The links, a `<nav>`. |
+| `ds-header__actions` | Buttons or links at the end. |
+| `ds-header__toggle` | The menu button, shown only on a narrow screen. |
+
+Tokens: `--ds-header-brand` (the brand's width, at least twelve squares), `--ds-header-paper` and `--ds-header-line` (a sticky header's paper and the hairline under it).
+
+Sync 1 copies the script with the `root` export's `"modules": ["header"]` (it brings `drawer.ts`, plain TypeScript with no Lit), and the sheets with `"nativeControls": true`.
+
+## The drawer
+
+`attachDrawer()` from `0-face/drawer.ts` is the mechanism the header and [`ds-page drawer`](/4-page/layouts/#a-drawer-on-a-narrow-page) share. Give it the toggle and the parts it folds away; it opens them in a `dialog.ds-dialog.ds-drawer` (drawn by `drawer.css`) and puts them back on closing.
+
+```js
+import { attachDrawer } from "/ds1/0-face/drawer.ts";
+const drawer = attachDrawer({ toggle, content: [nav], closeLabel: "Close" });
+```
+
+## In React
+
+```tsx
+import { Header } from "./design/react/header";
+
+<Header brand="Name" literal>
+  <a href="/">Home</a>
+  <a slot="actions" className="ds-button ds-button--primary" href="/download">Download</a>
+</Header>
+```
+
+The adapter does not register the element: import `4-page/ds-header` once in the browser entry. Sync 1 copies `react/header.ts` when a product names `header` in its `components`.
+
+[Footer](/4-page/footer/) · [Document](/4-page/document/) · [Layouts](/4-page/layouts/) · [Dialog](/4-page/dialog/)

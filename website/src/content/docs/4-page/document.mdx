@@ -1,0 +1,86 @@
+---
+title: Document
+description: A page of terms, privacy, a legal notice or help, with contents and a definition table.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+A document page holds writing people read through or look things up in: terms, a privacy policy, a legal notice such as 特定商取引法に基づく表記, a help article. The contents stand at the start, twelve squares wide, and stay in view as the writing scrolls past; the writing, two squares after them, is a reading column of at most thirty-two squares, drawn by the [prose sheet](/1-root/prose/). Where the two do not fit side by side the contents stand above the writing and scroll away with it.
+
+## Try it
+
+<ComponentExample example="document" />
+
+## Use it
+
+```html
+<ds-document>
+  <h1>Terms</h1>
+  <p>These terms apply when you use the service.</p>
+  <h2>Using the service</h2>
+  <p>…</p>
+  <h2>Payments</h2>
+  <p>…</p>
+</ds-document>
+```
+
+The writing stays in the page as native headings, paragraphs, lists and tables. The element marks itself `data-ds-prose` and brings the prose sheet. Its contents list the headings at `levels` (`2` by default; `2 3` adds a third level half a square in), under the shared word "Contents". A heading without an id gets one from its words, in any script. A link scrolls to its heading and focuses it; the section in view is marked `aria-current="location"`. With fewer than two headings there are no contents.
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `levels` | string | `2` | The heading levels the contents list. |
+| `label` | string | `Contents` | The contents' title: a translation key, or the words with `literal`. |
+| `literal` | boolean | `false` | Show `label` as written. |
+| `hide-contents` | boolean | `false` | Leave the contents out. |
+
+A slot named `contents` takes the built list's place. A part of the writing that draws itself takes `data-ds-not-prose`, and its headings stay out of the contents.
+
+## A definition table
+
+`ds-definitions` on a `<dl>` sets terms beside what they mean, as a 特定商取引法に基づく表記 does: the term eight squares wide in the muted ink, its definition beside it, each pair on a hairline at its foot with half a square above and below, as a prose table's rows are. Each pair may stand in a `<div>`. Below 480 pixels the definition goes under its term. It works inside or outside prose.
+
+```html
+<dl class="ds-definitions" lang="ja">
+  <dt>販売業者</dt><dd>Name</dd>
+  <dt>販売価格</dt><dd>各商品ページに表示します。</dd>
+  <dt>お問い合わせ</dt><dd><a href="mailto:hello@example.com">hello@example.com</a></dd>
+</dl>
+```
+
+Token: `--ds-definitions-term` (the term column, eight squares).
+
+## Without Lit
+
+`document.css`, which `controls.css` imports, draws the same page. The page writes its contents itself and marks the section it opens on.
+
+```html
+<div class="ds-document">
+  <nav class="ds-document__toc" aria-label="Contents">
+    <div class="ds-document__contents">
+      <p class="ds-document__toc-title">Contents</p>
+      <ol class="ds-document__toc-list">
+        <li><a href="#using">Using the service</a></li>
+        <li class="ds-document__toc-sub"><a href="#accounts">Accounts</a></li>
+      </ol>
+    </div>
+  </nav>
+  <article class="ds-document__body" data-ds-prose>…</article>
+</div>
+```
+
+The contents column stretches to the writing's height, so `ds-document__contents` inside it stays in view; standing above the writing it is only as tall as itself and nothing sticks. Token: `--ds-document-top`, where the contents stop below the top of the view (one square; add a sticky header's height).
+
+## In React
+
+```tsx
+import { DocumentPage } from "./design/react/document";
+
+<DocumentPage levels="2 3">
+  <h1>Privacy</h1>
+  …
+</DocumentPage>
+```
+
+The writing is the children, so it renders on the server. The adapter does not register the element: import `4-page/ds-document` once in the browser entry.
+
+[Header](/4-page/header/) · [Footer](/4-page/footer/) · [Prose](/1-root/prose/) · [Table](/3-unit/table/)
