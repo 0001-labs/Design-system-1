@@ -108,6 +108,8 @@ internal object DS1SharedWords {
         "Saving…" to "Gemmer…",
         "Untitled" to "Uden titel",
         "Account" to "Konto",
+        "Menu" to "Menu",
+        "Contents" to "Indhold",
     )
 
     private fun deWords() = mapOf(
@@ -193,6 +195,8 @@ internal object DS1SharedWords {
         "Saving…" to "Wird gespeichert …",
         "Untitled" to "Ohne Titel",
         "Account" to "Konto",
+        "Menu" to "Menü",
+        "Contents" to "Inhalt",
     )
 
     private fun enWords() = mapOf(
@@ -278,6 +282,8 @@ internal object DS1SharedWords {
         "Saving…" to "Saving…",
         "Untitled" to "Untitled",
         "Account" to "Account",
+        "Menu" to "Menu",
+        "Contents" to "Contents",
     )
 
     private fun esWords() = mapOf(
@@ -363,6 +369,8 @@ internal object DS1SharedWords {
         "Saving…" to "Guardando…",
         "Untitled" to "Sin título",
         "Account" to "Cuenta",
+        "Menu" to "Menú",
+        "Contents" to "Contenido",
     )
 
     private fun fiWords() = mapOf(
@@ -448,6 +456,8 @@ internal object DS1SharedWords {
         "Saving…" to "Tallennetaan…",
         "Untitled" to "Nimetön",
         "Account" to "Tili",
+        "Menu" to "Valikko",
+        "Contents" to "Sisällys",
     )
 
     private fun frWords() = mapOf(
@@ -533,6 +543,8 @@ internal object DS1SharedWords {
         "Saving…" to "Enregistrement…",
         "Untitled" to "Sans titre",
         "Account" to "Compte",
+        "Menu" to "Menu",
+        "Contents" to "Sommaire",
     )
 
     private fun isWords() = mapOf(
@@ -611,6 +623,8 @@ internal object DS1SharedWords {
         "Saving…" to "Vistar…",
         "Untitled" to "Ónefnt",
         "Account" to "Aðgangur",
+        "Menu" to "Valmynd",
+        "Contents" to "Efnisyfirlit",
     )
 
     private fun itWords() = mapOf(
@@ -696,6 +710,8 @@ internal object DS1SharedWords {
         "Saving…" to "Salvataggio…",
         "Untitled" to "Senza titolo",
         "Account" to "Account",
+        "Menu" to "Menu",
+        "Contents" to "Indice",
     )
 
     private fun jaWords() = mapOf(
@@ -781,6 +797,8 @@ internal object DS1SharedWords {
         "Saving…" to "保存中…",
         "Untitled" to "名称未設定",
         "Account" to "アカウント",
+        "Menu" to "メニュー",
+        "Contents" to "目次",
     )
 
     private fun koWords() = mapOf(
@@ -866,6 +884,8 @@ internal object DS1SharedWords {
         "Saving…" to "저장 중…",
         "Untitled" to "제목 없음",
         "Account" to "계정",
+        "Menu" to "메뉴",
+        "Contents" to "목차",
     )
 
     private fun nbWords() = mapOf(
@@ -951,6 +971,8 @@ internal object DS1SharedWords {
         "Saving…" to "Lagrer…",
         "Untitled" to "Uten tittel",
         "Account" to "Konto",
+        "Menu" to "Meny",
+        "Contents" to "Innhold",
     )
 
     private fun ptBRWords() = mapOf(
@@ -1036,6 +1058,8 @@ internal object DS1SharedWords {
         "Saving…" to "Salvando…",
         "Untitled" to "Sem título",
         "Account" to "Conta",
+        "Menu" to "Menu",
+        "Contents" to "Sumário",
     )
 
     private fun ptWords() = mapOf(
@@ -1121,6 +1145,8 @@ internal object DS1SharedWords {
         "Saving…" to "A guardar…",
         "Untitled" to "Sem título",
         "Account" to "Conta",
+        "Menu" to "Menu",
+        "Contents" to "Índice",
     )
 
     private fun svWords() = mapOf(
@@ -1206,6 +1232,8 @@ internal object DS1SharedWords {
         "Saving…" to "Sparar…",
         "Untitled" to "Namnlös",
         "Account" to "Konto",
+        "Menu" to "Meny",
+        "Contents" to "Innehåll",
     )
 
     private fun zhWords() = mapOf(
@@ -1291,6 +1319,8 @@ internal object DS1SharedWords {
         "Saving…" to "正在保存…",
         "Untitled" to "未命名",
         "Account" to "账户",
+        "Menu" to "菜单",
+        "Contents" to "目录",
     )
 
 }

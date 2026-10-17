@@ -104,6 +104,8 @@ enum DS1SharedWords {
         "Saving…": "Gemmer…",
         "Untitled": "Uden titel",
         "Account": "Konto",
+        "Menu": "Menu",
+        "Contents": "Indhold",
     ]
 
     private static let deWords: [String: String] = [
@@ -189,6 +191,8 @@ enum DS1SharedWords {
         "Saving…": "Wird gespeichert …",
         "Untitled": "Ohne Titel",
         "Account": "Konto",
+        "Menu": "Menü",
+        "Contents": "Inhalt",
     ]
 
     private static let enWords: [String: String] = [
@@ -274,6 +278,8 @@ enum DS1SharedWords {
         "Saving…": "Saving…",
         "Untitled": "Untitled",
         "Account": "Account",
+        "Menu": "Menu",
+        "Contents": "Contents",
     ]
 
     private static let esWords: [String: String] = [
@@ -359,6 +365,8 @@ enum DS1SharedWords {
         "Saving…": "Guardando…",
         "Untitled": "Sin título",
         "Account": "Cuenta",
+        "Menu": "Menú",
+        "Contents": "Contenido",
     ]
 
     private static let fiWords: [String: String] = [
@@ -444,6 +452,8 @@ enum DS1SharedWords {
         "Saving…": "Tallennetaan…",
         "Untitled": "Nimetön",
         "Account": "Tili",
+        "Menu": "Valikko",
+        "Contents": "Sisällys",
     ]
 
     private static let frWords: [String: String] = [
@@ -529,6 +539,8 @@ enum DS1SharedWords {
         "Saving…": "Enregistrement…",
         "Untitled": "Sans titre",
         "Account": "Compte",
+        "Menu": "Menu",
+        "Contents": "Sommaire",
     ]
 
     private static let isWords: [String: String] = [
@@ -607,6 +619,8 @@ enum DS1SharedWords {
         "Saving…": "Vistar…",
         "Untitled": "Ónefnt",
         "Account": "Aðgangur",
+        "Menu": "Valmynd",
+        "Contents": "Efnisyfirlit",
     ]
 
     private static let itWords: [String: String] = [
@@ -692,6 +706,8 @@ enum DS1SharedWords {
         "Saving…": "Salvataggio…",
         "Untitled": "Senza titolo",
         "Account": "Account",
+        "Menu": "Menu",
+        "Contents": "Indice",
     ]
 
     private static let jaWords: [String: String] = [
@@ -777,6 +793,8 @@ enum DS1SharedWords {
         "Saving…": "保存中…",
         "Untitled": "名称未設定",
         "Account": "アカウント",
+        "Menu": "メニュー",
+        "Contents": "目次",
     ]
 
     private static let koWords: [String: String] = [
@@ -862,6 +880,8 @@ enum DS1SharedWords {
         "Saving…": "저장 중…",
         "Untitled": "제목 없음",
         "Account": "계정",
+        "Menu": "메뉴",
+        "Contents": "목차",
     ]
 
     private static let nbWords: [String: String] = [
@@ -947,6 +967,8 @@ enum DS1SharedWords {
         "Saving…": "Lagrer…",
         "Untitled": "Uten tittel",
         "Account": "Konto",
+        "Menu": "Meny",
+        "Contents": "Innhold",
     ]
 
     private static let ptBRWords: [String: String] = [
@@ -1032,6 +1054,8 @@ enum DS1SharedWords {
         "Saving…": "Salvando…",
         "Untitled": "Sem título",
         "Account": "Conta",
+        "Menu": "Menu",
+        "Contents": "Sumário",
     ]
 
     private static let ptWords: [String: String] = [
@@ -1117,6 +1141,8 @@ enum DS1SharedWords {
         "Saving…": "A guardar…",
         "Untitled": "Sem título",
         "Account": "Conta",
+        "Menu": "Menu",
+        "Contents": "Índice",
     ]
 
     private static let svWords: [String: String] = [
@@ -1202,6 +1228,8 @@ enum DS1SharedWords {
         "Saving…": "Sparar…",
         "Untitled": "Namnlös",
         "Account": "Konto",
+        "Menu": "Meny",
+        "Contents": "Innehåll",
     ]
 
     private static let zhWords: [String: String] = [
@@ -1287,6 +1315,8 @@ enum DS1SharedWords {
         "Saving…": "正在保存…",
         "Untitled": "未命名",
         "Account": "账户",
+        "Menu": "菜单",
+        "Contents": "目录",
     ]
 
 }

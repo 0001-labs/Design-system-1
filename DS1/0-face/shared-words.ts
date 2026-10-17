@@ -3,9 +3,10 @@
  * again, Undo, Redo, Copy, Copy link, Remove, Rename, Duplicate, Download,
  * Refresh, Open, Send, Clear), Saved, Saving…, Untitled, Account, sign-in,
  * empty states, dates, the settings ds-cycle shows, ds-banner's words, the
- * feedback module's (OK, Copied, Could not copy, Notifications) and the
- * names of the languages. Keyed by the English sentence, in the translations
- * file format, one file per language in `./translations/`.
+ * feedback module's (OK, Copied, Could not copy, Notifications), the site
+ * chrome's (Menu, Contents) and the names of the languages. Keyed by the
+ * English sentence, in the translations file format, one file per language
+ * in `./translations/`.
  *
  * A product turns them on with `configureI18n({ sharedWords: true })`; they
  * sit beneath the product's own words, so the product's text wins. `nn` and
