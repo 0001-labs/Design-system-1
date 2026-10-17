@@ -898,6 +898,10 @@ export function translate(key: string, params?: TranslationParams): string {
   return textInLanguage(key, currentLanguage.value, params);
 }
 
+// The feedback module (`./feedback-words.ts`) reads its default words through
+// this when the page loads the language module, and English without it.
+(globalThis as unknown as Record<symbol, unknown>)[Symbol.for("design-system-1.translate")] = translate;
+
 /**
  * A key's text in a given language, whatever the page's own language is (a
  * drawing made for one language, say). The fallback order: the language, its

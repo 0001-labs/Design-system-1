@@ -6,7 +6,8 @@
  * (which the page loads) with its native buttons, `.ds-button--primary`,
  * `--secondary` and `--danger`, and opened with `showModal()`, so the browser
  * keeps the rest of the page inert behind it. Their words default to the
- * shared words (OK, Cancel) in the page's language.
+ * shared words (OK, Cancel) in the page's language where the page loads the
+ * language module, and English otherwise (`./feedback-words.ts`).
  *
  * - Focus moves into the dialog when it opens, and back to what had it when it
  *   closes.
@@ -18,7 +19,7 @@
  * - A dialog asked for in a click opens within that click, so a phone shows
  *   its keyboard for a prompt's field.
  */
-import { translate } from "./i18n";
+import { feedbackWord } from "./feedback-words";
 
 export interface AlertOptions {
   title: string;
@@ -105,12 +106,12 @@ function show(spec: Spec): Promise<boolean | string | null> {
       "data-ds-feedback": spec.kind,
     });
     const header = element("div", { "data-ds-dialog": "header" });
-    header.append(element("h2", { id: `${id}-title`, "data-ds-dialog": "title" }, spec.title));
+    header.appendChild(element("h2", { id: `${id}-title`, "data-ds-dialog": "title" }, spec.title));
     if (spec.text) {
-      header.append(element("p", { id: `${id}-text`, "data-ds-dialog": "description" }, spec.text));
+      header.appendChild(element("p", { id: `${id}-text`, "data-ds-dialog": "description" }, spec.text));
       dialog.setAttribute("aria-describedby", `${id}-text`);
     }
-    dialog.append(header);
+    dialog.appendChild(header);
 
     let input: HTMLInputElement | undefined;
     if (spec.field) {
@@ -118,18 +119,18 @@ function show(spec: Spec): Promise<boolean | string | null> {
       input = element("input", { id: `${id}-field`, class: "ds-input", type: "text", autocomplete: "off" });
       input.value = spec.field.value;
       if (spec.field.placeholder) input.placeholder = spec.field.placeholder;
-      if (spec.field.label) field.append(element("label", { for: input.id, "data-ds-dialog": "label" }, spec.field.label));
+      if (spec.field.label) field.appendChild(element("label", { for: input.id, "data-ds-dialog": "label" }, spec.field.label));
       else input.setAttribute("aria-labelledby", `${id}-title`);
-      field.append(input);
-      dialog.append(field);
+      field.appendChild(input);
+      dialog.appendChild(field);
     }
 
     const footer = element("div", { "data-ds-dialog": "footer" });
     const cancel = spec.cancel === undefined ? undefined : element("button", { type: "button", class: "ds-button ds-button--secondary", value: "cancel" }, spec.cancel);
     const confirm = element("button", { type: "button", class: spec.danger ? "ds-button ds-button--secondary ds-button--danger" : "ds-button ds-button--primary", value: "confirm" }, spec.confirm);
-    if (cancel) footer.append(cancel);
-    footer.append(confirm);
-    dialog.append(footer);
+    if (cancel) footer.appendChild(cancel);
+    footer.appendChild(confirm);
+    dialog.appendChild(footer);
 
     const declined = spec.kind === "prompt" ? null : false;
     let settled = false;
@@ -170,7 +171,7 @@ function show(spec: Spec): Promise<boolean | string | null> {
 
     const first = input ?? (spec.danger ? cancel : undefined) ?? confirm;
     first.setAttribute("autofocus", "");
-    document.body.append(dialog);
+    document.body.appendChild(dialog);
     try {
       dialog.showModal();
     } catch {
@@ -185,14 +186,14 @@ function show(spec: Spec): Promise<boolean | string | null> {
 export function alert(options: AlertOptions | string): Promise<void> {
   const { title, text, confirm } = typeof options === "string" ? { title: options } as AlertOptions : options;
   if (typeof document === "undefined") return Promise.resolve();
-  return inLine(() => show({ kind: "alert", title, text, confirm: confirm ?? translate("OK") })).then(() => undefined);
+  return inLine(() => show({ kind: "alert", title, text, confirm: confirm ?? feedbackWord("OK") })).then(() => undefined);
 }
 
 /** In place of `confirm()`: resolves to `true` when confirmed, `false` otherwise. */
 export function confirm(options: ConfirmOptions | string): Promise<boolean> {
   const { title, text, confirm: yes, cancel, danger } = typeof options === "string" ? { title: options } as ConfirmOptions : options;
   if (typeof document === "undefined") return Promise.resolve(false);
-  return inLine(() => show({ kind: "confirm", title, text, confirm: yes ?? translate("OK"), cancel: cancel ?? translate("Cancel"), danger })).then(answer => answer === true);
+  return inLine(() => show({ kind: "confirm", title, text, confirm: yes ?? feedbackWord("OK"), cancel: cancel ?? feedbackWord("Cancel"), danger })).then(answer => answer === true);
 }
 
 /** In place of `prompt()`: resolves to the text written, or `null` when cancelled. */
@@ -201,7 +202,7 @@ export function prompt(options: PromptOptions | string): Promise<string | null> 
   if (typeof document === "undefined") return Promise.resolve(null);
   return inLine(() => show({
     kind: "prompt", title, text,
-    confirm: yes ?? translate("OK"), cancel: cancel ?? translate("Cancel"),
+    confirm: yes ?? feedbackWord("OK"), cancel: cancel ?? feedbackWord("Cancel"),
     field: { label, value, placeholder },
   })).then(answer => typeof answer === "string" ? answer : null);
 }

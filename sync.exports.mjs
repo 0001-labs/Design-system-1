@@ -163,13 +163,19 @@ export default {
     /**
      * Feedback without Lit (`0-face/feedback.ts`): toasts drawn by the page
      * toaster, the promise dialogs and copyText, with everything they import
-     * (the language module and shared words, the toast's stylesheet and icons),
-     * by their paths inside DS1/. Copied to the same `to` as `languages` or
-     * `components`, the page keeps one language runtime; the dialogs need
-     * controls.css (`nativeControls` on `root` or `tokens`).
+     * (the toast's stylesheet and icons as a generated module), by their paths
+     * inside DS1/: plain TypeScript, with no language runtime. Its words are
+     * English unless the page loads the language module, so copy it to the
+     * same `to` as `languages` or `components` for words in the page's
+     * language; `languages: true` brings the runtime with it instead. The
+     * dialogs need controls.css (`nativeControls` on `root` or `tokens`).
      */
     feedback: {
-      files({ read }) { return moduleGraph(read, '0-face/feedback.ts'); },
+      files({ read, options }) {
+        const files = moduleGraph(read, '0-face/feedback.ts');
+        if (options.languages) for (const [file, content] of moduleGraph(read, '0-face/i18n.ts')) files.set(file, content);
+        return files;
+      },
     },
     /** The email renderer and its font: `email` and `font` say where they go, from "to". */
     email: {

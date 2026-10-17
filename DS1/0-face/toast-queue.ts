@@ -97,6 +97,15 @@ export function listenForToasts(listener: Listener, { fallback = false }: { fall
   return () => { listeners.delete(listener); };
 }
 
+/**
+ * Whether a toast shown now is drawn: a toaster listens, the page toaster is
+ * loaded, or `<ds-toast>` is registered (and so is added to the page).
+ */
+export function toasterListening(): boolean {
+  const state = queue();
+  return state.toasters.size > 0 || state.fallbacks.size > 0 || !!state.mountFallback || (typeof customElements !== "undefined" && !!customElements.get("ds-toast"));
+}
+
 /** How the page toaster mounts itself when a toast arrives and nothing draws it. */
 export function setFallbackToaster(mount: () => void): void {
   queue().mountFallback = mount;
@@ -106,7 +115,7 @@ function show(title: string, type: ToastType, options: ToastOptions = {}): Toast
   const state = queue();
   const id = options.id ?? ++state.lastId;
   if (!state.toasters.size && typeof document !== "undefined" && document.body) {
-    if (typeof customElements !== "undefined" && customElements.get("ds-toast")) document.body.append(document.createElement("ds-toast"));
+    if (typeof customElements !== "undefined" && customElements.get("ds-toast")) document.body.appendChild(document.createElement("ds-toast"));
     else if (!state.fallbacks.size) state.mountFallback?.();
   }
   const important = options.important ?? (type === "error" ? true : undefined);

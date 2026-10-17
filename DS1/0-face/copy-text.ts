@@ -7,9 +7,14 @@
  * instead. The toast is the shared word "Copied" in the page's language,
  * shown by `<ds-toast>` where the page has one and by the page toaster
  * otherwise; a failure says "Could not copy".
+ *
+ * It is small on its own: the page toaster (`./toaster.ts`) loads only when a
+ * toast is shown and nothing in the page draws toasts yet, so a page that
+ * copies with `toast: false`, or has `<ds-toast>`, never loads it. Import it
+ * from here, not from `./feedback.ts`, where the page needs nothing else.
  */
-import { translate } from "./i18n";
-import { toast } from "./toaster";
+import { feedbackWord } from "./feedback-words";
+import { toast, toasterListening } from "./toast-queue";
 
 export interface CopyTextOptions {
   /** The toast's words when it is copied; `false` shows no toast at all. "Copied" by default. */
@@ -37,7 +42,7 @@ function copyFromField(text: string): boolean {
   field.setAttribute("aria-hidden", "true");
   field.tabIndex = -1;
   field.style.cssText = "position:fixed;top:0;left:0;width:1px;height:1px;margin:0;padding:0;border:0;opacity:0;pointer-events:none";
-  (modalDialog() ?? document.body).append(field);
+  (modalDialog() ?? document.body).appendChild(field);
   field.focus({ preventScroll: true });
   field.select();
   field.setSelectionRange(0, text.length);
@@ -73,9 +78,19 @@ export async function copyText(text: string, options: CopyTextOptions = {}): Pro
     }
   }
   if (!copied) copied = copyFromField(text);
-  if (options.toast !== false) {
-    if (copied) toast.success(options.toast ?? translate("Copied"));
-    else toast.error(translate("Could not copy"));
-  }
+  if (options.toast !== false) await say(copied, copied ? options.toast ?? feedbackWord("Copied") : feedbackWord("Could not copy"));
   return copied;
+}
+
+/** The toast, with the page toaster loaded first where nothing in the page draws toasts yet. */
+async function say(copied: boolean, words: string): Promise<void> {
+  if (!toasterListening()) {
+    try {
+      (await import("./load-toaster")).pageToaster();
+    } catch {
+      // No toaster could load: the copy itself still answers.
+    }
+  }
+  if (copied) toast.success(words);
+  else toast.error(words);
 }

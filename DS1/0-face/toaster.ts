@@ -10,8 +10,11 @@
  *
  * It shares the look rather than wrapping the element: it draws the element's
  * markup in a shadow root of its own with the element's stylesheet
- * (`2-core/styles/ds-toast.css`), so the two cannot drift apart, and it needs
- * no Lit, which a page without Lit does not have. It shares the queue too
+ * (`2-core/styles/ds-toast.css`, as plain text in `./generated/toast-assets.ts`,
+ * which `scripts/toast-assets.mjs` writes from it), so the two cannot drift
+ * apart, and it needs no Lit, which a page without Lit does not have. It is
+ * plain TypeScript: no `?inline` or `?raw` import, so any bundler and type
+ * check reads it. It shares the queue too
  * (`0-face/toast-queue.ts`): where a `<ds-toast>` is in the page, that element
  * takes every toast and this one stays quiet, so a page never shows two stacks.
  *
@@ -19,12 +22,8 @@
  * region in which each toast is announced, and an error assertively. Only
  * `transform` and `opacity` animate, and nothing moves with reduced motion.
  */
-import styles from "../2-core/styles/ds-toast.css?inline";
-import checkIcon from "../x-icon/check.svg?raw";
-import closeIcon from "../x-icon/close.svg?raw";
-import notificationsIcon from "../x-icon/notifications.svg?raw";
-import warningIcon from "../x-icon/warning.svg?raw";
-import { translate } from "./i18n";
+import { feedbackWord } from "./feedback-words";
+import { toastIcons, toastStyles } from "./generated/toast-assets";
 import {
   SWIPE_THRESHOLD,
   SWIPE_VELOCITY,
@@ -63,7 +62,7 @@ export interface ToasterOptions {
 /** The icons the page carries: the types' own and the close button's, in the text's colour. */
 const INK = /(fill|stroke)=("|')(#1E1E1E|#2A2A2A|#000000|#000|black)\2/gi;
 const SVGS: Record<string, string> = Object.fromEntries(
-  Object.entries({ check: checkIcon, close: closeIcon, notifications: notificationsIcon, warning: warningIcon })
+  Object.entries(toastIcons)
     .map(([name, svg]) => [name, svg.replace(INK, '$1="currentColor"')]),
 );
 
@@ -112,8 +111,9 @@ class PageToaster {
 
   constructor() {
     const root = this.host.attachShadow({ mode: "open" });
-    root.append(element("style", {}, styles), this.section);
-    this.section.append(this.list);
+    root.appendChild(element("style", {}, toastStyles));
+    root.appendChild(this.section);
+    this.section.appendChild(this.list);
     this.list.addEventListener("pointerenter", () => { this.hovered = true; this.render(); });
     this.list.addEventListener("pointerleave", () => { if (!this.interacting) { this.hovered = false; this.render(); } });
     this.list.addEventListener("focusin", () => { this.focused = true; this.render(); });
@@ -130,7 +130,7 @@ class PageToaster {
 
   /** Back in the page if something took it out, at the end of the body. */
   attach() {
-    if (!this.host.isConnected && document.body) document.body.append(this.host);
+    if (!this.host.isConnected && document.body) document.body.appendChild(this.host);
   }
 
   private get live(): Item[] { return this.items.filter(item => !item.removed); }
@@ -235,7 +235,7 @@ class PageToaster {
     const { data } = item;
     const dismissible = data.dismissible !== false;
     const closeButton = (data.closeButton ?? settings.closeButton ?? false) && dismissible;
-    const closeLabel = settings.closeLabel ?? translate("Close");
+    const closeLabel = settings.closeLabel ?? feedbackWord("Close");
     const key = JSON.stringify([data.title, data.description, data.type, data.icon, data.action?.label, data.action?.href, data.cancel?.label, data.cancel?.href, closeButton, closeLabel]);
     const previous = item.element?.querySelector<HTMLElement>(".body");
     if (item.drawn === key && previous) return;
@@ -243,18 +243,19 @@ class PageToaster {
     if (previous) this.resizes?.unobserve(previous);
     const body = element("div", { class: "body", "data-id": String(data.id) });
     const symbol = data.type === "loading" ? element("span", { class: "icon", "aria-hidden": "true" }) : icon(data.icon ?? TOAST_ICONS[data.type] ?? "", "icon");
-    if (data.type === "loading") symbol!.append(element("span", { class: "spinner" }));
+    if (data.type === "loading") symbol!.appendChild(element("span", { class: "spinner" }));
     const content = element("div", { class: "content" });
-    content.append(element("div", { class: "title" }, data.title));
-    if (data.description) content.append(element("div", { class: "description" }, data.description));
-    body.append(...[symbol, content].filter((node): node is HTMLElement => !!node));
-    if (data.cancel) body.append(this.button(data.id, data.cancel, "cancel"));
-    if (data.action) body.append(this.button(data.id, data.action, "action"));
+    content.appendChild(element("div", { class: "title" }, data.title));
+    if (data.description) content.appendChild(element("div", { class: "description" }, data.description));
+    if (symbol) body.appendChild(symbol);
+    body.appendChild(content);
+    if (data.cancel) body.appendChild(this.button(data.id, data.cancel, "cancel"));
+    if (data.action) body.appendChild(this.button(data.id, data.action, "action"));
     if (closeButton) {
       const close = element("button", { class: "close", type: "button", "aria-label": closeLabel });
       close.innerHTML = SVGS.close!;
       close.addEventListener("click", () => this.removeToast(data.id));
-      body.append(close);
+      body.appendChild(close);
     }
     item.element!.replaceChildren(body);
     this.resizes?.observe(body);
@@ -299,7 +300,7 @@ class PageToaster {
   /** Draw the stack: every toast's place, and each toast's words where they changed. */
   render() {
     if (!this.live.length) { this.hovered = false; this.focused = false; }
-    this.section.setAttribute("aria-label", `${settings.label ?? translate("Notifications")} alt+T`);
+    this.section.setAttribute("aria-label", `${settings.label ?? feedbackWord("Notifications")} alt+T`);
     this.host.toggleAttribute("rich-colors", !!settings.richColors);
     for (const item of this.items) {
       item.element ??= this.create(item);
