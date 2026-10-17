@@ -12,6 +12,7 @@ import "../../../DS1/3-unit/ds-list";
 import "../../../DS1/3-unit/ds-row";
 import "../../../DS1/4-page/ds-panel";
 import { confirm, copyText } from "../../../DS1/0-face/feedback";
+import { formatDateTime } from "../../../DS1/0-face/format";
 import { Badge } from "../../../DS1/react/badge";
 import { Button } from "../../../DS1/react/button";
 import { Empty } from "../../../DS1/react/empty";
@@ -237,7 +238,7 @@ export function PublishPanel(props: Props) {
               .map((event) => (
                 <ds-row role="listitem" key={event._id}>
                   <span className="ds-text ds-text--small ds-text--danger">
-                    Failed at {event.failureStage ?? "unknown"} · {new Date(event.startedAt).toLocaleString()}
+                    Failed at {event.failureStage ?? "unknown"} · {formatDateTime(event.startedAt)}
                   </span>
                 </ds-row>
               ))}

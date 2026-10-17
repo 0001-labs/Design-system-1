@@ -9,6 +9,7 @@ import "../../../DS1/2-core/ds-empty";
 import "../../../DS1/2-core/ds-notice";
 import "../../../DS1/3-unit/ds-list";
 import "../../../DS1/3-unit/ds-row";
+import { formatDateTime } from "../../../DS1/0-face/format";
 import { Badge } from "../../../DS1/react/badge";
 import { Button } from "../../../DS1/react/button";
 import { LoadingIndicator } from "../../../DS1/react/loading";
@@ -121,7 +122,7 @@ export function LibraryList() {
 
                 <dl>
                   <dt>Edited</dt>
-                  <dd>{new Date(library.draftUpdatedAt).toLocaleString()}</dd>
+                  <dd>{formatDateTime(library.draftUpdatedAt)}</dd>
                   <dt>Size</dt>
                   <dd>{(library.draftBytes / 1024).toFixed(1)} KB</dd>
                 </dl>
