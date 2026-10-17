@@ -24,7 +24,16 @@ export type InputProps = Omit<
   variant?: InputElement["variant"];
   revealable?: boolean;
   quietFocus?: boolean;
+  /** The label on the row above the field, as written. */
+  label?: string;
+  /** The label as a translation key, shown in the page's language. */
+  labelText?: string;
+  /** The placeholder as a translation key; `placeholder` is as written. */
+  placeholderKey?: string;
+  /** The error under the field, as written, in the danger colour. */
   error?: string;
+  /** The error as a translation key. */
+  errorText?: string;
   /** Suggestions offered while typing; `list` names a `<datalist>` instead. */
   suggestions?: InputElement["suggestions"];
 };
@@ -83,6 +92,9 @@ function fieldAdapter<Props extends FieldProps>(tag: "ds-input" | "ds-textarea")
       quietFocus,
       autoGrow,
       maxRows,
+      labelText,
+      placeholderKey,
+      errorText,
       ...props
     },
     forwardedRef,
@@ -177,6 +189,9 @@ function fieldAdapter<Props extends FieldProps>(tag: "ds-input" | "ds-textarea")
       step: step == null ? undefined : String(step),
       spellcheck: spellCheck === undefined ? undefined : String(spellCheck),
       "quiet-focus": quietFocus,
+      "label-text": labelText,
+      "placeholder-key": placeholderKey,
+      "error-text": errorText,
       "auto-grow": autoGrow,
       "max-rows": maxRows,
     });
