@@ -7,7 +7,7 @@ import {
   normalizeLanguage,
 } from "./languages";
 import type { Language } from "./languages";
-import { configureLanguageRouting } from "./language-routing";
+import { configureLanguageRouting, parseLanguagePath } from "./language-routing";
 import type { LanguageRoutingOptions } from "./language-routing";
 import { readLanguageFile, resolveText } from "./translations-format";
 import type {
@@ -83,6 +83,31 @@ export type I18nOptions = {
    * here, the product's `languages` get a prefix.
    */
   routing?: LanguageRoutingOptions;
+  /**
+   * Take the language from the address: on a page whose path starts with a
+   * language prefix (`/ja/…`, by `routing`), that language is the current one
+   * from the start, and it is not stored, so following a link to `/ja/…`
+   * never overwrites the choice a person made. `setLanguage` still stores
+   * what a person chooses. The theme bootstrap reads it too, so `lang` is
+   * right before the first paint. Off by default.
+   */
+  languageFromAddress?: boolean;
+  /**
+   * Where the language is written as `lang`: the document's root element by
+   * default; an element (an embedded surface, such as a prototype in another
+   * language than the page around it) to keep it there; `false` to write it
+   * nowhere. The theme bootstrap writes the root's `lang` only by default.
+   */
+  langTarget?: HTMLElement | false;
+};
+
+/** What `setLanguage` does besides changing the language. */
+export type SetLanguageOptions = {
+  /**
+   * Store the choice, so the next visit opens in it. On by default; `false`
+   * keeps it to this page (a language an address names, a preview).
+   */
+  remember?: boolean;
 };
 
 // Bundled translations (keys.json may not exist - will use external translations if not available)
@@ -700,17 +725,42 @@ function dispatchLanguageChanged(language: LanguageCode): void {
   );
 }
 
+/** The language the address names (`/ja/…`), when the product takes it from there. */
+function addressLanguage(): LanguageCode | null {
+  if (!i18nOptions.languageFromAddress || typeof window === "undefined") {
+    return null;
+  }
+  const path = window.location?.pathname;
+  // The product's routing, also before configureI18n has passed it on.
+  return path ? parseLanguagePath(path, routingOptions()).language : null;
+}
+
+/** The element whose `lang` follows the language, or null when none does. */
+function langElement(): HTMLElement | null {
+  const target = i18nOptions.langTarget;
+  if (target === false) {
+    return null;
+  }
+  if (target) {
+    return target;
+  }
+  return typeof document !== "undefined" ? (document.documentElement ?? null) : null;
+}
+
 // Create a reactive signal for the current language (Portfolio pattern)
 export const currentLanguage = {
-  value: readStoredLanguage() || getBrowserLanguage(),
-  set: function (lang: LanguageCode) {
+  value: addressLanguage() || readStoredLanguage() || getBrowserLanguage(),
+  set: function (lang: LanguageCode, options: SetLanguageOptions = {}) {
     this.value = lang;
-    storeLanguage(lang);
+    if (options.remember !== false) {
+      storeLanguage(lang);
+    }
     void loadLanguage(lang);
     // What reads the document's language (dates, screen readers, hyphenation)
     // follows too, rather than keeping the language the page was opened in.
-    if (typeof document !== "undefined" && document.documentElement) {
-      document.documentElement.lang = lang;
+    const element = langElement();
+    if (element) {
+      element.lang = lang;
     }
     dispatchLanguageChanged(lang);
   },
@@ -726,6 +776,8 @@ export function configureI18n(next: I18nOptions): void {
   const previousPersist = i18nOptions.persist;
   const previousKey = storageKey();
   const previousLanguages = i18nOptions.languages;
+  const previousAddress = i18nOptions.languageFromAddress;
+  const previousRouting = i18nOptions.routing;
   i18nOptions = { ...i18nOptions, ...next };
 
   applyRouting();
@@ -733,15 +785,18 @@ export function configureI18n(next: I18nOptions): void {
   if (
     i18nOptions.persist !== previousPersist ||
     storageKey() !== previousKey ||
-    i18nOptions.languages !== previousLanguages
+    i18nOptions.languages !== previousLanguages ||
+    i18nOptions.languageFromAddress !== previousAddress ||
+    (i18nOptions.languageFromAddress && i18nOptions.routing !== previousRouting)
   ) {
-    // The stored choice under the new key, or the browser's language, as one
-    // the product speaks
+    // The language the address names, else the stored choice under the new
+    // key, or the browser's language, as one the product speaks
     const stored = readStoredLanguage();
     let language: LanguageCode = stored || getBrowserLanguage();
     if (stored && configuredLanguages()) {
       language = resolvePreferredLanguage(stored) ?? defaultLanguage;
     }
+    language = addressLanguage() ?? language;
     if (language !== currentLanguage.value) {
       currentLanguage.value = language;
       dispatchLanguageChanged(language);
@@ -762,10 +817,14 @@ function applyRouting(): void {
   if (!i18nOptions.routing && !i18nOptions.languages) {
     return;
   }
-  configureLanguageRouting({
+  configureLanguageRouting(routingOptions());
+}
+
+function routingOptions(): LanguageRoutingOptions {
+  return {
     ...(i18nOptions.languages ? { languages: i18nOptions.languages } : {}),
     ...i18nOptions.routing,
-  });
+  };
 }
 
 let sharedWordsLoad: Promise<void> | null = null;
@@ -1022,8 +1081,11 @@ export function loadTranslations(
   }
 }
 
-// Set language (Portfolio pattern)
-export function setLanguage(language: LanguageCode): void {
+/**
+ * Change the language: store it (unless `remember: false`), fetch its words,
+ * write it as `lang` (see `langTarget`) and announce `language-changed`.
+ */
+export function setLanguage(language: LanguageCode, options?: SetLanguageOptions): void {
   // The signal owns persistence, loading, document language and notification.
-  currentLanguage.set(language);
+  currentLanguage.set(language, options);
 }

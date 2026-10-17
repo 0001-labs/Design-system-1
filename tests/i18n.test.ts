@@ -171,6 +171,74 @@ describe("setLanguage and currentLanguage", () => {
     i18n.setLanguage("da");
     expect(win.localStorage.getItem("app:language")).toBe("da");
   });
+
+  test("remember: false changes the language without storing it", async () => {
+    const win = stubPage({ stored: { language: "ja" }, translations: words });
+    const i18n = await loadModule();
+    i18n.setLanguage("da", { remember: false });
+    expect(i18n.currentLanguage.value).toBe("da");
+    expect(win.localStorage.getItem("language")).toBe("ja");
+    expect(document.documentElement.lang).toBe("da");
+  });
+
+  test("langTarget keeps the language on an element, or off the page", async () => {
+    stubPage({ translations: words });
+    const i18n = await loadModule();
+    const surface = { lang: "" } as HTMLElement;
+    i18n.configureI18n({ langTarget: surface });
+    i18n.setLanguage("ja");
+    expect(surface.lang).toBe("ja");
+    expect(document.documentElement.lang).toBe("en");
+
+    i18n.configureI18n({ langTarget: false });
+    i18n.setLanguage("da");
+    expect(surface.lang).toBe("ja");
+    expect(document.documentElement.lang).toBe("en");
+    expect(i18n.currentLanguage.value).toBe("da");
+  });
+});
+
+describe("languageFromAddress", () => {
+  function at(win: FakeWindow, pathname: string) {
+    Object.assign(win, { location: { pathname } });
+  }
+
+  test("an address's language wins over the stored choice and is not stored", async () => {
+    const win = stubPage({
+      stored: { language: "da" },
+      translations: words,
+      config: { languages: ["en", "da", "ja"], languageFromAddress: true },
+    });
+    at(win, "/ja/pricing");
+    const i18n = await loadModule();
+    expect(i18n.currentLanguage.value).toBe("ja");
+    expect(win.localStorage.getItem("language")).toBe("da");
+  });
+
+  test("an address without a prefix keeps the stored choice", async () => {
+    const win = stubPage({
+      stored: { language: "da" },
+      translations: words,
+      config: { languages: ["en", "da", "ja"], languageFromAddress: true },
+    });
+    at(win, "/pricing");
+    const i18n = await loadModule();
+    expect(i18n.currentLanguage.value).toBe("da");
+  });
+
+  test("follows the product's routing, and is off unless asked", async () => {
+    const win = stubPage({ stored: { language: "da" }, translations: words });
+    at(win, "/ja/pricing");
+    const i18n = await loadModule();
+    expect(i18n.currentLanguage.value).toBe("da");
+
+    i18n.configureI18n({ languages: ["en", "da", "ja"], routing: { languages: ["da"] }, languageFromAddress: true });
+    expect(i18n.currentLanguage.value).toBe("da");
+
+    i18n.configureI18n({ routing: { languages: ["da", "ja"] } });
+    expect(i18n.currentLanguage.value).toBe("ja");
+    expect(win.localStorage.getItem("language")).toBe("da");
+  });
 });
 
 describe("hasTranslation", () => {
