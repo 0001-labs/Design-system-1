@@ -84,6 +84,8 @@ test("a surface scales to its own width on a computer, with the same rule and sn
   const surface = surfaceOf(() => 390);
   expect(applyScaling({ surface })).toBe(calculateScalingFactor(390));
   expect(surface.style.getPropertyValue("--sf")).toBe(String(calculateScalingFactor(390)));
+  // Shared components inside take the same scale.
+  expect(surface.style.getPropertyValue("--ds-sf")).toBe(String(calculateScalingFactor(390)));
   // The page and data-mobile are left alone.
   expect(root.style.getPropertyValue("--sf")).toBe("");
   expect(surface.hasAttribute("data-mobile")).toBe(false);

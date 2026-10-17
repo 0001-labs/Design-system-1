@@ -17,7 +17,7 @@
  * A surface, such as a phone drawn on a page, scales to its own width
  * instead: `startScaling({ surface: element })`, or `surface: true` for every
  * `[data-ds-surface]` element. The same rule and snapping apply, on any
- * device, and `--sf` goes on the surface alone.
+ * device, and `--sf` and `--ds-sf` go on the surface alone.
  */
 export type ScalingMode = "auto" | "fixed" | "fluid";
 
@@ -50,8 +50,9 @@ export interface ScalingOptions extends Partial<ScalingConfig> {
    * phone drawn on a page), or `true` for every element marked
    * `data-ds-surface` in the document when the call is made. A surface is
    * measured by its `clientWidth` and scaled on any device, a computer too,
-   * with the same rule and snapping; `--sf` goes on the surface, the page and
-   * `data-mobile` are left alone. Its width must not depend on its own `--sf`.
+   * with the same rule and snapping; `--sf` and `--ds-sf` (for the shared
+   * components inside) go on the surface, the page and `data-mobile` are left
+   * alone. Its width must not depend on its own scale.
    */
   surface?: HTMLElement | boolean;
 }
@@ -123,7 +124,9 @@ function surfacesOf(surface: ScalingOptions["surface"]): HTMLElement[] {
 /** Scales one surface to its own width, whatever the device. */
 function applySurface(surface: HTMLElement, target: HTMLElement, config: Partial<ScalingConfig>): number {
   const factor = calculateScalingFactor(surface.clientWidth || 0, { ...defaultScalingConfig, ...config }, window.devicePixelRatio || 1);
+  // Shared components inside read --ds-sf, resolved at their own host, so they draw at the surface's scale too.
   target.style.setProperty("--sf", String(factor));
+  target.style.setProperty("--ds-sf", String(factor));
   return factor;
 }
 

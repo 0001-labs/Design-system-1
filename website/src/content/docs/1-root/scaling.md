@@ -49,7 +49,7 @@ startScaling({ surface: true });
 <div class="phone" data-ds-surface>…</div>
 ```
 
-The surface is measured by its `clientWidth` and scaled by the same rule (its width over 280, between 0.75 and 2) and the same `snap`. `--sf` goes on the surface; the page's `--sf` and `data-mobile` are left alone. `startScaling` follows each surface's size through a `ResizeObserver` as well as the window's resizes and turns, and finds the `data-ds-surface` elements once, when it is called. `applyScaling({ surface })` does it once and returns the first surface's factor.
+The surface is measured by its `clientWidth` and scaled by the same rule (its width over 280, between 0.75 and 2) and the same `snap`. `--sf` goes on the surface, and `--ds-sf` with it, so the shared components inside draw at the surface's scale; the page's `--sf` and `data-mobile` are left alone. Marked `data-ds-surface`, the surface's own `--ds-unit` spacing follows too. `startScaling` follows each surface's size through a `ResizeObserver` as well as the window's resizes and turns, and finds the `data-ds-surface` elements once, when it is called. `applyScaling({ surface })` does it once and returns the first surface's factor.
 
 The surface's width must not depend on its own `--sf`: give it a width of the page around it (a percentage, a fixed frame, the viewport), and draw everything inside it in squares.
 
