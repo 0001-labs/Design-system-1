@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { expect, test } from 'vite-plus/test';
-import { named } from '../DS1/1-root/palette';
+import { dim, named } from '../DS1/1-root/palette';
 
 const root = join(import.meta.dirname, '../DS1/1-root');
 const read = (file: string) => readFileSync(join(root, file), 'utf8');
@@ -60,4 +60,15 @@ test('the danger colour comes from the palette and reads as text on light and da
   expect(dark).toBe(hex('Tuned red'));
   for (const paper of ['#ffffff', '#f4f4f4']) expect(contrast(light, paper), paper).toBeGreaterThanOrEqual(4.5);
   for (const paper of ['#2a2a2a', '#2c2c2c']) expect(contrast(dark, paper), paper).toBeGreaterThanOrEqual(4.5);
+});
+
+test('the warning tone is a class, and its colour comes from the palette and reads on light and dark paper', () => {
+  expect(rule(text, '.ds-text--warning')).toContain('var(--ds-warning-color)');
+  expect(token('--ds-warning-color')).toBe('light-dark(#4c3f1a, var(--ds-orange))');
+  const orange = hex('Orange')!;
+  expect(token('--ds-orange')).toBe(orange);
+  const light = '#4c3f1a';
+  expect(light).toBe(dim(orange));
+  for (const paper of ['#ffffff', '#f4f4f4']) expect(contrast(light, paper), paper).toBeGreaterThanOrEqual(4.5);
+  for (const paper of ['#2a2a2a', '#2c2c2c']) expect(contrast(orange, paper), paper).toBeGreaterThanOrEqual(4.5);
 });

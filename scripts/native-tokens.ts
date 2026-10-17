@@ -73,6 +73,7 @@ export const surfaces: [string, string, string][] = [
   ['textMuted', '--ds-text-color-muted', 'Quieter text.'],
   ['title', '--ds-title-color', 'Titles and table headers.'],
   ['danger', '--ds-danger-color', 'Text that reports a failure or warns of a loss.'],
+  ['warning', '--ds-warning-color', 'Text that asks for care before something goes wrong.'],
   ['border', '--ds-border-color', 'Outlines.'],
   ['fill', '--ds-fill', 'A control on the paper.'],
   ['fillHover', '--ds-fill-hover', 'A control under the pointer.'],

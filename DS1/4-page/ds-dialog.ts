@@ -73,7 +73,7 @@ export class Dialog extends LitElement {
     anchor: { attribute: false },
     returnFocus: { attribute: false },
   };
-  static styles = [unsafeCSS(metrics), css`:host { display: contents; }`];
+  static styles = [unsafeCSS(metrics), css`:host { display: contents; } :host([hidden]) { display: none !important; }`];
   declare open: boolean;
   declare nonModal: boolean;
   declare closeOnOutside: boolean;

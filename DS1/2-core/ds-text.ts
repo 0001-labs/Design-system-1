@@ -10,8 +10,9 @@ import styles from "./styles/ds-text.css?inline";
  * @prop {string} text - The translation key (optional if using slot content)
  * @prop {boolean} literal - The text is what someone wrote, not a key: show it
  *   as it stands, never looked up, never translated
- * @prop {"muted" | "title" | "danger"} tone - A quieter colour, the title grey,
- *   or the danger colour for a failure or a warning
+ * @prop {"muted" | "title" | "warning" | "danger"} tone - A quieter colour, the
+ *   title grey, the warning colour for something that needs care, or the
+ *   danger colour for a failure or a loss
  * @prop {"small" | "heading" | "display"} size - 10px, a 13px heading on one
  *   square, or a 20px title on two squares
  * @prop {boolean} strong - The medium weight
@@ -48,7 +49,7 @@ export class Text extends LitElement {
 
   declare text: string;
   declare literal: boolean;
-  declare tone?: "muted" | "title" | "danger";
+  declare tone?: "muted" | "title" | "warning" | "danger";
   declare size?: "small" | "heading" | "display";
   declare strong: boolean;
   declare wrap: boolean;

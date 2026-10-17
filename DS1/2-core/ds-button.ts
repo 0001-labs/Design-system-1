@@ -38,6 +38,7 @@ export class Button extends Control {
     blank: { type: Boolean, reflect: true },
     language: { type: String },
     text: { type: String },
+    label: { type: String },
     href: { type: String },
     target: { type: String },
     rel: { type: String },
@@ -80,6 +81,12 @@ export class Button extends Control {
   declare language: string;
   declare text: string;
   /**
+   * The control's accessible name, as given, for a face that does not say
+   * what the button does on its own: a value, a number or an icon. Pass words
+   * already in the page's language.
+   */
+  declare label: string;
+  /**
    * With `href` the face is a real link (`<a part="control">`): the browser
    * navigates, so middle-click, ⌘- or Ctrl-click, Copy link and Enter work as
    * on any link. `target` and `rel` go on the link; `blank` is `target="_blank"`,
@@ -115,6 +122,7 @@ export class Button extends Control {
     this.blank = false;
     this.language = "en-US";
     this.text = "";
+    this.label = "";
     this.href = "";
     this.target = "";
     this.rel = "";
@@ -197,6 +205,7 @@ export class Button extends Control {
         rel=${ifDefined(disabled || !rel ? undefined : rel)}
         role=${ifDefined(disabled ? "link" : undefined)}
         aria-disabled=${ifDefined(disabled ? "true" : undefined)}
+        aria-label=${ifDefined(this.label || undefined)}
         @click=${this._handleClick}
       >${content}</a>`;
     }
@@ -208,6 +217,7 @@ export class Button extends Control {
         ?primary=${this.primary}
         ?secondary=${this.secondary}
         ?disabled=${this.splitDisabled}
+        aria-label=${ifDefined(this.label || undefined)}
         @click=${this._handleClick}
       >
         ${content}

@@ -56,6 +56,23 @@
     "OK": "Í lagi",
     "Copied": "Afritað",
     "Could not copy": "Ekki tókst að afrita",
-    "Notifications": "Tilkynningar"
+    "Notifications": "Tilkynningar",
+    "Try again": "Reyna aftur",
+    "Undo": "Afturkalla",
+    "Redo": "Endurgera",
+    "Copy": "Afrita",
+    "Copy link": "Afrita tengil",
+    "Remove": "Fjarlægja",
+    "Rename": "Endurnefna",
+    "Duplicate": "Tvítaka",
+    "Download": "Sækja",
+    "Refresh": "Endurnýja",
+    "Open": "Opna",
+    "Send": "Senda",
+    "Clear": "Hreinsa",
+    "Saved": "Vistað",
+    "Saving…": "Vistar…",
+    "Untitled": "Ónefnt",
+    "Account": "Aðgangur"
   }
 }

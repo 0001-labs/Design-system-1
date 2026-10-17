@@ -16,6 +16,19 @@ validation, selection and ARIA references to a mention list stay native.
 Set `highlights` to UTF-16 ranges: `[{ start: 3, end: 7, color: "var(--ds-sharp-blue)" }]`.
 Omit `color` for the shared accent. DS1 mixes the supplied hue with the surface
 ink so pale identity colours remain legible. Invalid and overlapping ranges are ignored.
+
+To show the colour itself, add `fill: true`: the colour lies behind the words,
+which keep the text colour, at half strength on light paper and under a third on
+dark. Every palette colour keeps the words at 4.5:1 or more, and a pale accent
+still shows. Use it for the accent on a change or a colour value in code;
+keep the tint for names in a message.
+
+```js
+composer.highlights = [
+  { start: 0, end: 7, color: "#594dff", fill: true },
+  { start: 12, end: 27, fill: true }, // the accent
+];
+```
 The layer renders the exact original text; it never inserts avatars, padding or
 extra characters that would separate highlights from the native caret.
 Mention matching, candidates and submission remain product data and actions.

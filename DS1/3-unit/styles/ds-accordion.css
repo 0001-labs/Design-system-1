@@ -8,6 +8,7 @@
   max-width: 100%;
   color: var(--ds-text-color);
 }
+:host([hidden]) { display: none !important; }
 
 details {
   width: 100%;

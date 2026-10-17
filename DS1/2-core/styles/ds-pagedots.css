@@ -8,6 +8,7 @@
   align-items: center;
   height: calc(28px * var(--sf, 1));
 }
+:host([hidden]) { display: none !important; }
 
 .dot {
   width: calc(2.8px * var(--sf, 1));

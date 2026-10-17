@@ -500,3 +500,25 @@ describe("shared words", () => {
     }
   });
 });
+
+describe("shared actions", () => {
+  const actions = ["Try again", "Undo", "Redo", "Copy", "Copy link", "Remove", "Rename", "Duplicate", "Download", "Refresh", "Open", "Send", "Clear", "Saved", "Saving…", "Untitled", "Account"];
+
+  test("every shared language has the common actions and states", async () => {
+    const { SHARED_WORDS } = await import("../DS1/0-face/shared-words");
+    for (const [language, table] of Object.entries(SHARED_WORDS)) {
+      for (const word of actions) expect(table?.[word], `${language}: ${word}`).toBeTruthy();
+    }
+    expect(Object.keys(SHARED_WORDS)).toHaveLength(15);
+  });
+
+  test("Try again reads in the page's language", async () => {
+    stubPage({ stored: { language: "da" } });
+    const i18n = await loadModule();
+    i18n.configureI18n({ sharedWords: true });
+    await i18n.loadSharedWords();
+    expect(i18n.translate("Try again")).toBe("Prøv igen");
+    expect(i18n.textInLanguage("Try again", "ja")).toBe("もう一度試す");
+    expect(i18n.textInLanguage("Undo", "nn")).toBe("Angre");
+  });
+});

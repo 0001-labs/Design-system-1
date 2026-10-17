@@ -9,6 +9,7 @@
   border: 0;
   background: transparent;
 }
+:host([hidden]) { display: none !important; }
 
 /* Keep the shared face inside the boundary: product resets can reach a host. */
 .frame {

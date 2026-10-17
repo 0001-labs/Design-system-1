@@ -63,6 +63,7 @@ export class Cycle extends LitElement {
       type: { type: String },
       values: { type: Array },
       value: { type: String },
+      label: { type: String, reflect: true },
       currentValue: { type: String, state: true }, // Make this a private state property
       translationsReady: { type: Boolean, state: true }, // Track if translations are loaded
       disabled: { type: Boolean, reflect: true },
@@ -83,6 +84,11 @@ export class Cycle extends LitElement {
   declare type: string;
   declare values: string[];
   declare value: string;
+  /**
+   * The setting's name, a translation key: the button is announced as
+   * "Size: 40" while its face shows the value alone.
+   */
+  declare label: string;
   declare currentValue: string;
   declare translationsReady: boolean;
   declare disabled: boolean;
@@ -111,6 +117,7 @@ export class Cycle extends LitElement {
     this.type = "";
     this.values = [];
     this.value = "";
+    this.label = "";
     this.currentValue = "";
     this.translationsReady = false;
     this.disabled = false;
@@ -565,10 +572,26 @@ export class Cycle extends LitElement {
     }
   }
 
+  /** The words the face shows for the current value, for the accessible name. */
+  valueText(): string {
+    const value = this.currentValue;
+    if (this.type === "language") return getLanguageDisplayName(value, { locale: currentLanguage.value });
+    if (this.type === "theme") return translate(value === "light" ? "Light" : value === "dark" ? "Dark" : "System");
+    if (this.type === "accent-color") return translate(this.getColorKey(value));
+    if (this.type === "page-style" || this.type === "icon-only") return translate(value === "note" ? "Note" : "Page");
+    return value;
+  }
+
+  /** "Size: 40" when the cycle has a label, so the control is named while its face shows the value alone. */
+  accessibleLabel(): string {
+    return this.label ? `${translate(this.label)}: ${this.valueText()}` : "";
+  }
+
   render() {
     return html`
       <div class="cycle">
         <ds-button fit
+          .label=${this.accessibleLabel()}
           ?primary=${this.primary && !this.secondary}
           ?secondary=${this.secondary}
           ?disabled=${this.disabled || this._fieldsetDisabled}

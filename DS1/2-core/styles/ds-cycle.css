@@ -9,6 +9,7 @@
   min-width: 0;
   max-width: 100%;
 }
+:host([hidden]) { display: none !important; }
 
 .cycle {
   display: inline-flex;

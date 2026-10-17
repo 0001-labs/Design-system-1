@@ -6,6 +6,7 @@
   position: relative;
   width: 100%;
 }
+:host([hidden]) { display: none !important; }
 
 slot {
   display: contents;

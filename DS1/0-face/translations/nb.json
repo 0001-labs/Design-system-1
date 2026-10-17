@@ -63,6 +63,23 @@
     "OK": "OK",
     "Copied": "Kopiert",
     "Could not copy": "Kunne ikke kopiere",
-    "Notifications": "Varsler"
+    "Notifications": "Varsler",
+    "Try again": "Prøv igjen",
+    "Undo": "Angre",
+    "Redo": "Gjør om",
+    "Copy": "Kopier",
+    "Copy link": "Kopier lenke",
+    "Remove": "Fjern",
+    "Rename": "Gi nytt navn",
+    "Duplicate": "Dupliser",
+    "Download": "Last ned",
+    "Refresh": "Oppdater",
+    "Open": "Åpne",
+    "Send": "Send",
+    "Clear": "Tøm",
+    "Saved": "Lagret",
+    "Saving…": "Lagrer…",
+    "Untitled": "Uten tittel",
+    "Account": "Konto"
   }
 }

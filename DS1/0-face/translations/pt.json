@@ -63,6 +63,23 @@
     "OK": "OK",
     "Copied": "Copiado",
     "Could not copy": "Não foi possível copiar",
-    "Notifications": "Notificações"
+    "Notifications": "Notificações",
+    "Try again": "Tentar novamente",
+    "Undo": "Desfazer",
+    "Redo": "Refazer",
+    "Copy": "Copiar",
+    "Copy link": "Copiar ligação",
+    "Remove": "Remover",
+    "Rename": "Mudar o nome",
+    "Duplicate": "Duplicar",
+    "Download": "Descarregar",
+    "Refresh": "Atualizar",
+    "Open": "Abrir",
+    "Send": "Enviar",
+    "Clear": "Limpar",
+    "Saved": "Guardado",
+    "Saving…": "A guardar…",
+    "Untitled": "Sem título",
+    "Account": "Conta"
   }
 }

@@ -63,6 +63,23 @@
     "OK": "OK",
     "Copied": "Copied",
     "Could not copy": "Could not copy",
-    "Notifications": "Notifications"
+    "Notifications": "Notifications",
+    "Try again": "Try again",
+    "Undo": "Undo",
+    "Redo": "Redo",
+    "Copy": "Copy",
+    "Copy link": "Copy link",
+    "Remove": "Remove",
+    "Rename": "Rename",
+    "Duplicate": "Duplicate",
+    "Download": "Download",
+    "Refresh": "Refresh",
+    "Open": "Open",
+    "Send": "Send",
+    "Clear": "Clear",
+    "Saved": "Saved",
+    "Saving…": "Saving…",
+    "Untitled": "Untitled",
+    "Account": "Account"
   }
 }

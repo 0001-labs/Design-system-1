@@ -63,6 +63,23 @@
     "OK": "확인",
     "Copied": "복사됨",
     "Could not copy": "복사하지 못했습니다",
-    "Notifications": "알림"
+    "Notifications": "알림",
+    "Try again": "다시 시도",
+    "Undo": "실행 취소",
+    "Redo": "다시 실행",
+    "Copy": "복사",
+    "Copy link": "링크 복사",
+    "Remove": "제거",
+    "Rename": "이름 변경",
+    "Duplicate": "복제",
+    "Download": "다운로드",
+    "Refresh": "새로 고침",
+    "Open": "열기",
+    "Send": "보내기",
+    "Clear": "지우기",
+    "Saved": "저장됨",
+    "Saving…": "저장 중…",
+    "Untitled": "제목 없음",
+    "Account": "계정"
   }
 }

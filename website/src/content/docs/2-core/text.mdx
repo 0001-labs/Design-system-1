@@ -23,7 +23,7 @@ Text a person wrote, such as a list's name or an item, is `literal`: it is shown
 | --- | --- | --- | --- |
 | `text` | string | Empty | Translation key. Without it, slot text supplies the key. |
 | `literal` | boolean | `false` | Show the text as written, cut with an ellipsis at its width. |
-| `tone` | `muted`, `title`, `danger` | None | A quieter grey, the title grey, or the danger colour (`--ds-danger-color`) for a failure or a warning. |
+| `tone` | `muted`, `title`, `warning`, `danger` | None | A quieter grey, the title grey, the warning colour (`--ds-warning-color`) for something that needs care, or the danger colour (`--ds-danger-color`) for a failure or a loss. |
 | `size` | `small`, `heading`, `display` | None | 10px; a 13px heading on one square; a 20px title on two squares. |
 | `strong` | boolean | `false` | The medium weight. |
 | `wrap` | boolean | `false` | Let the text run over several lines, each one square. |
@@ -44,6 +44,14 @@ A message that reports a failure is announced with `role="alert"`:
 <ds-text wrap tone="danger" role="alert">Could not save your changes</ds-text>
 ```
 
+A warning that asks for care before something goes wrong takes the warning tone: Orange on dark paper, and Orange's dim brown on light paper, where Orange itself is too light to read.
+
+```html
+<ds-text wrap tone="warning">Your trial ends in three days</ds-text>
+```
+
+Like any element, a hidden one stays out of the page: `<ds-text hidden>` is not drawn.
+
 ## Without JavaScript
 
 A page without Lit gives native text the same look with the text classes in `text.css`. `one.css` and `controls.css` both import it, so a page that copies either has them. The classes do not translate: the page supplies its own words.
@@ -55,7 +63,7 @@ A page without Lit gives native text the same look with the text classes in `tex
 | `ds-text--heading` | 13px in the medium face |
 | `ds-text--display` | 20px on two squares, in the medium face |
 | `ds-text--strong` | The medium face |
-| `ds-text--muted`, `ds-text--title`, `ds-text--danger` | The element's tones |
+| `ds-text--muted`, `ds-text--title`, `ds-text--warning`, `ds-text--danger` | The element's tones |
 
 ```html
 <h1 class="ds-text ds-text--display">Settings</h1>

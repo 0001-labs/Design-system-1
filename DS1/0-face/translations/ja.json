@@ -63,6 +63,23 @@
     "OK": "OK",
     "Copied": "コピーしました",
     "Could not copy": "コピーできませんでした",
-    "Notifications": "通知"
+    "Notifications": "通知",
+    "Try again": "もう一度試す",
+    "Undo": "取り消す",
+    "Redo": "やり直す",
+    "Copy": "コピー",
+    "Copy link": "リンクをコピー",
+    "Remove": "取り除く",
+    "Rename": "名前を変更",
+    "Duplicate": "複製",
+    "Download": "ダウンロード",
+    "Refresh": "更新",
+    "Open": "開く",
+    "Send": "送信",
+    "Clear": "クリア",
+    "Saved": "保存しました",
+    "Saving…": "保存中…",
+    "Untitled": "名称未設定",
+    "Account": "アカウント"
   }
 }

@@ -142,6 +142,8 @@ loadTranslations("da", { "settings.language": "Sprog" });
 Design system 1 carries the interface words every product shares, in `DS1/0-face/translations/<language>.json`, keyed by the English sentence:
 
 - buttons: Save, Cancel, Delete, Close, Back, Next, Done, Continue, Search, Edit, Yes, No;
+- actions: Try again, Undo, Redo, Copy, Copy link, Remove, Rename, Duplicate, Download, Refresh, Open, Send, Clear;
+- states and names: Saved, Saving…, Untitled, Account;
 - sign-in: Sign in, Sign out, Email, Password;
 - empty states: Nothing here yet;
 - dates: Today, Yesterday, Tomorrow;
@@ -149,7 +151,7 @@ Design system 1 carries the interface words every product shares, in `DS1/0-face
 - `ds-banner`'s words;
 - the language names (`translate("Japanese")`).
 
-They are translated into every language of the list except `nn` and `no`, which read `nb`'s; a word left out of a language reads English. Turn them on with `configureI18n({ sharedWords: true })` (or `await loadSharedWords()`). They arrive in a chunk of their own, so products that do not use them do not carry them, and they never change which languages a product offers.
+Use them rather than a word of the product's own: "Try again" after a failure, never a local "Retry", and Close for a dismiss button. They are translated into every language of the list except `nn` and `no`, which read `nb`'s; a word left out of a language reads English. Turn them on with `configureI18n({ sharedWords: true })` (or `await loadSharedWords()`). They arrive in a chunk of their own, so products that do not use them do not carry them, and they never change which languages a product offers.
 
 ## Language-aware addresses
 

@@ -45,6 +45,10 @@ export class Form extends LitElement {
       width: 100%;
     }
 
+    :host([hidden]) {
+      display: none !important;
+    }
+
     form {
       display: flex;
       flex-direction: column;

@@ -17,7 +17,7 @@ const rule = (selector: string) => {
 afterEach(() => document.body.replaceChildren());
 
 test('tone, size, strength and wrapping are not limited to literal text', () => {
-  for (const selector of [':host([strong])', ':host([wrap])', ':host([tone="muted"])', ':host([tone="title"])', ':host([tone="danger"])', ':host([size="small"])', ':host([size="heading"])', ':host([size="display"])']) rule(selector);
+  for (const selector of [':host([strong])', ':host([wrap])', ':host([tone="muted"])', ':host([tone="title"])', ':host([tone="danger"])', ':host([tone="warning"])', ':host([size="small"])', ':host([size="heading"])', ':host([size="display"])']) rule(selector);
   expect(css).not.toMatch(/:host\(\[literal\]\[(?:tone|size|strong|wrap)/);
   // The modifiers follow the literal rule at the same specificity, so they win.
   expect(css.indexOf(':host([literal]) {')).toBeLessThan(css.indexOf(':host([strong]) {'));
@@ -26,6 +26,7 @@ test('tone, size, strength and wrapping are not limited to literal text', () => 
 
 test('the danger tone, wrapped lines and a display title are on the grid', () => {
   expect(rule(':host([tone="danger"])')).toContain('var(--ds-danger-color)');
+  expect(rule(':host([tone="warning"])')).toContain('var(--ds-warning-color)');
   expect(rule(':host([wrap])')).toContain('line-height: var(--ds-unit)');
   expect(rule(':host([wrap])')).toContain('white-space: normal');
   expect(rule(':host([size="display"])')).toContain('font-size: var(--ds-type-size-display)');

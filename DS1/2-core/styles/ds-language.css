@@ -11,6 +11,7 @@
   max-width: 100%;
   min-width: 0;
 }
+:host([hidden]) { display: none !important; }
 
 /* Four squares, an ordinary item, when every label the product offers fits */
 :host([compact]) {

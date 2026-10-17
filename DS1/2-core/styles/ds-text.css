@@ -22,6 +22,7 @@
   white-space: nowrap;
   color: var(--ds-text-tone, inherit);
 }
+:host([hidden]) { display: none !important; }
 
 :host([data-language="ja"]) {
   font-family: var(--ds-typeface-regular-jp, var(--typeface-regular-jp));
@@ -90,6 +91,10 @@
 
 :host([tone="danger"]) {
   --ds-text-tone: var(--ds-danger-color);
+}
+
+:host([tone="warning"]) {
+  --ds-text-tone: var(--ds-warning-color);
 }
 
 :host([size="small"]) {
