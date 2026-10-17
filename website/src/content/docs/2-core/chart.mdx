@@ -45,6 +45,8 @@ For multiple series, use `createChart(canvas, options)`, `addSeries`, `setData`,
 - `ds-ratio`: `value` between zero and one; out-of-range values clamp.
 - `ds-range`: `min`, `max`, `from`, `to` and `marks` (`value`, optional `label`, `kind` of `dot` or `tick`). This is a display, not a range input.
 
+One value against its range on one line, spent of a budget or saved of a goal, is a [Meter](/2-core/meter/): a bar drawn as the ratio is, or the range in squares, with an over state and `role="meter"`. A row of such bars, one per category in a table, is a meter in each row rather than a chart.
+
 Every component has independent `unit` and `grid` settings. There are no global setters. Set `unit` when the containing surface scale changes. Call `refreshTheme()` after changing application theme classes or tokens; system colour-scheme changes redraw automatically.
 
 ## Appearance and accessible content
