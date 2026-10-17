@@ -72,11 +72,11 @@ A toast is `<ds-toast>` and `toast()` from `DS1/2-core/ds-toast.ts`, based on So
 
 ## Dialogs and copying text
 
-Never call the browser's `alert()`, `confirm()` or `prompt()`, and never write a product's own copy-to-clipboard helper. Import `confirm`, `prompt`, `alert` and `copyText` from `DS1/0-face/feedback.ts` (Sync 1's `feedback` export, copied to the same folder as `languages` so the page keeps one language runtime): no Lit and no framework, one import.
+Never call the browser's `alert()`, `confirm()` or `prompt()`, and never write a product's own copy-to-clipboard helper. Import `confirm`, `prompt`, `alert` and `copyText` from `DS1/0-face/feedback.ts` (Sync 1's `feedback` export): no Lit and no framework, one import, plain TypeScript with no `?inline` or `?raw` import and no language runtime. Its default words read English, and the shared words in the page's language where the page loads the language module (copy `feedback` to the same folder as `languages`, or set `"languages": true` on it); `setFeedbackWords()` gives a product's own. Never add a plugin, a type declaration or a tsconfig exclusion to make the copy build.
 
 - `confirm({ title, text, confirm, cancel, danger })` resolves to a boolean, `prompt({ title, label, value, placeholder, confirm, cancel })` to the text or `null`, `alert({ title, text })` once dismissed. They are drawn on the native `dialog.ds-dialog` frame from `controls.css`, with `.ds-button--secondary` Cancel and `.ds-button--primary` answer; their default words are the shared words (OK, Cancel) in the page's language.
 - A destructive action names itself and sets `danger` (`confirm: "Delete", danger: true`): its words in the danger colour (`.ds-button--danger`), Cancel focused, no backdrop dismissal.
-- `copyText(text, { toast })` copies with the Clipboard API (a hidden field where it is missing) and confirms with the shared word "Copied" in a toast; call it from the click that asks for it.
+- `copyText(text, { toast })` copies with the Clipboard API (a hidden field where it is missing) and confirms with the shared word "Copied" in a toast; call it from the click that asks for it. A page that only copies imports it from `DS1/0-face/copy-text.ts`, which loads the page toaster only when it shows a toast.
 - With Lit or React, `<ds-dialog>` (React `react/dialog`) is for a dialog with content of its own; a single question or a copy still uses the feedback module, whose toasts go to the page's `<ds-toast>`. https://designsystem1.com/1-root/feedback/
 
 ## Empty states and notices

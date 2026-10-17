@@ -72,7 +72,9 @@ configureToaster({ position: "top-center", closeButton: true });
 The page toaster shares `<ds-toast>`'s stylesheet rather than wrapping the element. It draws the
 element's markup in a shadow root of its own with the element's stylesheet
 (`2-core/styles/ds-toast.css`), so a toast looks the same whichever draws it and the two cannot
-drift apart. A layer that hands toasts to `<ds-toast>` would need Lit to draw anything, which is
+drift apart. It carries that stylesheet and its icons as plain strings in
+`0-face/generated/toast-assets.ts`, which `vp run generate:toast-assets` writes from the stylesheet,
+the sheets it imports and the icon files, and a test keeps it the same as them. A layer that hands toasts to `<ds-toast>` would need Lit to draw anything, which is
 exactly what these pages lack.
 
 Both read one queue of Sonner's calls (`0-face/toast-queue.ts`). Where a `<ds-toast>` is in the
@@ -127,22 +129,46 @@ resolves to whether it was copied, and says so in a toast: "Copied", or the word
 `toast: false` shows none. A failure says "Could not copy". Call it from the click or key press
 that asks for it: browsers allow writing to the clipboard only then.
 
+A page that only copies text imports it on its own, and the page toaster stays out of its code
+until a toast is shown:
+
+```js
+import { copyText } from "./ds1/0-face/copy-text";
+```
+
+The page toaster loads when `copyText` first shows a toast and nothing in the page draws toasts
+yet. With `toast: false`, or with a `<ds-toast>` in the page, it never loads.
+
 ## Words
 
-Every default word is a shared word in the page's language: OK, Cancel, Copied, Could not copy,
-Notifications and Close, in all fifteen [languages](/1-root/languages/). The module reads them
-through the language module, as the components do, so turn them on with
-`configureI18n({ sharedWords: true })`; without it they read English. A page with no words of its
-own can stop the language module's startup request with `configureI18n({ autoLoad: false })`.
+The default words are OK, Cancel, Copied, Could not copy, Notifications and Close. The module
+brings no language runtime of its own:
+
+- On a page without the [language module](/1-root/languages/), they read English, and no
+  translation file or request comes with them.
+- Where the page loads the language module, they are the shared words in the page's language, in
+  all fifteen languages, once `configureI18n({ sharedWords: true })` turns them on.
+- `setFeedbackWords()` gives words of the product's own: a table of the words it changes, or a
+  function that gives each word in the page's language. `setFeedbackWords(null)` goes back to the
+  defaults.
+
+```js
+import { setFeedbackWords } from "./ds1/0-face/feedback";
+
+setFeedbackWords({ OK: "Done" });
+setFeedbackWords(word => myWords[word]);
+```
+
 Pass a dialog's or a toast's own words where they say more than the shared ones.
 
 ## Copying the module
 
 Sync 1's `feedback` export copies the module with everything it imports, by their paths in
-`DS1/`: the toaster, the dialogs, `copyText`, the language module with the shared words, the
-toast's stylesheet and its icons. No Lit and no component comes with it. Copy it to the same
-folder as the `languages` or `components` export, so the page keeps one language runtime, and take
-`controls.css` for the dialogs (`"nativeControls": true` on `root` or `tokens`).
+`DS1/`: the toaster, the dialogs, `copyText`, its words and the toast's stylesheet and icons as a
+generated module. No Lit, no component and no language runtime comes with it. Take `controls.css`
+for the dialogs (`"nativeControls": true` on `root` or `tokens`). For words in the page's language,
+copy it to the same folder as the `languages` or `components` export, so the page keeps one
+language runtime; `"languages": true` on `feedback` brings the language module with it instead.
 
 ```json
 {
@@ -156,8 +182,9 @@ folder as the `languages` or `components` export, so the page keeps one language
 }
 ```
 
-The module is TypeScript for a Vite build, like the rest of `DS1/`: its stylesheet and icons are
-imported with `?inline` and `?raw`.
+The copy is plain TypeScript. It has no `?inline` or `?raw` import, so any bundler, runtime and
+type check reads it. It passes a strict type check with only the DOM's types, and in a Worker or
+backend project that checks shared code, with no special types.
 
 ## Related
 

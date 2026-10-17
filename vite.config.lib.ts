@@ -19,6 +19,8 @@ export default defineConfig({
     },
     minify: isMinified ? "esbuild" : false,
     sourcemap: true,
+    // The feedback module is one file: copyText's lazy toaster is in it already.
+    ...(isFeedback ? { rollupOptions: { output: { codeSplitting: false } } } : {}),
     // Target modern browsers
     target: "es2020",
   },
