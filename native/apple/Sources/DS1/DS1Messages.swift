@@ -45,7 +45,7 @@ public struct DS1Notice<Actions: View>: View {
             VStack(alignment: .leading, spacing: 0) {
                 if let heading { DS1LineText(heading, tone: tone == .danger ? .danger : .text, strong: true, wrap: true) }
                 if let text { DS1LineText(text, tone: tone == .danger ? .danger : .text, wrap: true) }
-                if Actions.self != EmptyView.self { HStack(spacing: scale.half) { actions }.frame(minHeight: scale.unit).padding(.top, scale.unit) }
+                if Actions.self != EmptyView.self { HStack(spacing: scale.half) { actions }.frame(minHeight: scale.unit) }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             if let onDismiss {

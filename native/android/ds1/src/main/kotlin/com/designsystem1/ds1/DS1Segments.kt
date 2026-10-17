@@ -99,7 +99,7 @@ fun <T> DS1Tabs(
     val scale = LocalDS1Scale.current
     Row(
         modifier.height(scale.unit).selectableGroup(),
-        horizontalArrangement = Arrangement.spacedBy(if (segmented) 1.dp else scale.half),
+        horizontalArrangement = Arrangement.spacedBy(scale.half),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         for (tab in tabs) {

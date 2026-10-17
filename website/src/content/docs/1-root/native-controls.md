@@ -12,7 +12,7 @@ description: The components' look as plain classes on native elements, and the s
 | `ds-input` | `<input>` | A field one control high. |
 | `ds-textarea` | `<textarea>` | A field of whole rows; `--ds-textarea-rows` sets how many, three by default. |
 | `ds-select` | `<select>` | A field with the chevron drawn in its text colour. |
-| `ds-checkbox`, `ds-radio` | `<input type="checkbox">`, `<input type="radio">` | 12px native choices in the text colour. |
+| `ds-checkbox`, `ds-radio` | `<input type="checkbox">`, `<input type="radio">` | The `ds-checkbox` and `ds-radio` faces: one square on the field's ground with a 1px line; the checkbox fills with the accent and shows the check, the radio a dot half a square across. |
 | `ds-switch`, with `ds-switch--rounded` | `<button role="switch" aria-checked>` | The Switch: two control heights wide, its thumb travelling one. The page toggles `aria-checked`. |
 | `ds-range` | `<input type="range">` | A slider one control high on the lower sixteen of its square, eight squares wide: a 1px line across its middle and a thumb one control high and half a control wide in the ink. See [Range](#range). |
 | `ds-tabs`, with `ds-tabs--fill` | a row of `.ds-button` | The Tabs row. With `role="group"` it is a segmented control: the choices grey, the chosen one (`aria-pressed`, `aria-selected` or `aria-current`) in the accent. |

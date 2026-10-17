@@ -218,13 +218,74 @@ a.ds-button[aria-disabled="true"] {
   resize: vertical;
 }
 
+/*
+ * `.ds-checkbox` and `.ds-radio` are the `ds-checkbox` and `ds-radio` elements'
+ * faces on a native `<input>`: one square on the field's ground with a 1px
+ * line. The checkbox has the corners of a control and fills with the accent,
+ * the check (`x-icon/check.svg`) in its ink; the radio is a circle with a dot
+ * half a square across in the text colour.
+ */
 .ds-checkbox,
 .ds-radio {
-  width: calc(12px * var(--ds-sf));
-  height: calc(12px * var(--ds-sf));
+  appearance: none;
+  box-sizing: border-box;
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  vertical-align: middle;
+  width: var(--ds-row-height);
+  height: var(--ds-row-height);
   margin: 0;
-  accent-color: var(--ds-text-color);
+  padding: 0;
+  border: 1px solid var(--ds-border-color);
+  background: var(--ds-input-background);
   cursor: pointer;
+}
+
+.ds-checkbox {
+  --ds-checkbox-mark: url("data:image/svg+xml,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Cpath%20d%3D%22M6.68649%2011.884L12.443%206.13601L11.736%205.42715L6.68835%2010.4827L4.26399%208.0501L3.55696%208.74525L6.68649%2011.884Z%22%20fill%3D%22currentColor%22%2F%3E%0A%3C%2Fsvg%3E");
+  border-radius: var(--ds-radius);
+  corner-shape: var(--ds-corner-shape, round);
+  color: var(--ds-button-text-color-on-accent);
+}
+
+.ds-checkbox:is(:checked, :indeterminate) {
+  background: var(--ds-accent-color);
+}
+
+.ds-checkbox::before,
+.ds-radio::before {
+  content: "";
+  opacity: 0;
+  background: currentColor;
+}
+
+.ds-checkbox::before {
+  width: calc(0.8 * var(--ds-row-height));
+  height: calc(0.8 * var(--ds-row-height));
+  mask: var(--ds-checkbox-mark) center / contain no-repeat;
+}
+
+.ds-checkbox:indeterminate::before {
+  width: calc(var(--ds-row-height) / 2);
+  height: calc(2px * var(--ds-sf));
+  mask: none;
+}
+
+.ds-radio {
+  border-radius: 50%;
+  color: var(--ds-text-color);
+}
+
+.ds-radio::before {
+  width: calc(var(--ds-row-height) / 2);
+  height: calc(var(--ds-row-height) / 2);
+  border-radius: 50%;
+}
+
+.ds-checkbox:is(:checked, :indeterminate)::before,
+.ds-radio:checked::before {
+  opacity: 1;
 }
 
 /*

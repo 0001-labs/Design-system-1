@@ -81,7 +81,6 @@ fun DS1Notice(
             if (heading != null) DS1LineText(heading, strong = true, tone = words, wrap = true)
             if (text != null) DS1LineText(text, tone = words, wrap = true)
             if (actions != null) {
-                Spacer(Modifier.height(scale.unit))
                 Row(Modifier.heightIn(min = scale.unit), horizontalArrangement = Arrangement.spacedBy(scale.half), verticalAlignment = Alignment.CenterVertically, content = actions)
             }
         }

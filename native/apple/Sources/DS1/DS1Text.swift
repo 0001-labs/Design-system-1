@@ -127,6 +127,7 @@ extension DS1Font {
 /// as many lines as it needs, each one square tall.
 public struct DS1LineText: View {
     @Environment(\.ds1Scale) private var scale
+    @Environment(\.multilineTextAlignment) private var textAlignment
     let string: String
     let style: DS1TextStyle
     let tone: DS1Tone
@@ -145,6 +146,14 @@ public struct DS1LineText: View {
         self.wrap = wrap
     }
 
+    private var alignment: HorizontalAlignment {
+        switch textAlignment {
+        case .center: .center
+        case .trailing: .trailing
+        default: .leading
+        }
+    }
+
     public var body: some View {
         let face: DS1Font.Face = strong || style == .heading ? .medium : .regular
         let line = style.line(scale)
@@ -152,14 +161,18 @@ public struct DS1LineText: View {
             .foregroundStyle(tone.colour)
             .accessibilityLabel(string)
         if wrap {
-            // SwiftUI spaces lines apart; the spare height of the first and last line goes
-            // above and below, so every line stands on its own square as on the web.
+            // The web centres the face's height in each line; the text system lays every line
+            // a whole point tall, so the lines are spaced from that and the first stands as the
+            // web's does, each on its own square. The block takes the alignment it is set in.
             let glyphs = DS1Font.lineHeight(face, size: style.size(scale))
+            let laid = glyphs.rounded(.up)
+            let above = max(0, line - glyphs) / 2
             text
-                .lineSpacing(max(0, line - glyphs))
-                .padding(.vertical, max(0, line - glyphs) / 2)
+                .lineSpacing(max(0, line - laid))
+                .padding(.top, above)
+                .padding(.bottom, max(0, line - laid - above))
                 .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: .infinity, minHeight: line, alignment: .leading)
+                .frame(maxWidth: .infinity, minHeight: line, alignment: Alignment(horizontal: alignment, vertical: .center))
         } else {
             text
                 .lineLimit(1)

@@ -143,7 +143,7 @@ public struct DS1DialogHost: View {
                     case .confirm(let danger):
                         Button(request.cancel) { dialogs.finish(request, nil) }.buttonStyle(.ds1(.secondary))
                         if danger {
-                            Button { dialogs.finish(request, "") } label: { DS1ControlText(request.confirm, colour: .danger) }.buttonStyle(.ds1(.secondary))
+                            DS1DangerButton(request.confirm) { dialogs.finish(request, "") }
                         } else {
                             Button(request.confirm) { dialogs.finish(request, "") }.buttonStyle(.ds1(.primary))
                         }
