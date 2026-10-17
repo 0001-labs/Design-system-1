@@ -167,14 +167,14 @@ export const rollback = action({
       id: args.id,
       eventId,
       version: args.version,
-      contentHash: target.contentHash,
+      sourceHash: target.sourceHash,
     });
   },
 });
 
 export const forRollback = internalQuery({
   args: { id: v.id("libraries"), version: v.number() },
-  returns: v.object({ publicId: v.string(), contentHash: v.string() }),
+  returns: v.object({ publicId: v.string(), contentHash: v.string(), sourceHash: v.string() }),
   handler: async (ctx, args) => {
     const library = await requireOwned(ctx, args.id);
 
@@ -193,7 +193,7 @@ export const forRollback = internalQuery({
       fail("already_live", "That version is already live.");
     }
 
-    return { publicId: library.publicId, contentHash: version.contentHash };
+    return { publicId: library.publicId, contentHash: version.contentHash, sourceHash: version.sourceHash };
   },
 });
 
@@ -232,7 +232,8 @@ export const finishRollback = internalMutation({
     id: v.id("libraries"),
     eventId: v.id("publishEvents"),
     version: v.number(),
-    contentHash: v.string(),
+    /** The hash of the draft the version was published from, as `publish` records it. */
+    sourceHash: v.string(),
   },
   returns: publishResultValidator,
   handler: async (ctx, args) => {
@@ -241,7 +242,7 @@ export const finishRollback = internalMutation({
 
     await ctx.db.patch(library._id, {
       publishedVersion: args.version,
-      publishedHash: args.contentHash,
+      publishedHash: args.sourceHash,
       publishedAt: now,
       lastPublishStatus: "succeeded",
       lastPublishError: undefined,
@@ -310,19 +311,20 @@ export const applyReconciliation = internalMutation({
   handler: async (ctx, args) => {
     const library = await requireOwned(ctx, args.id);
 
-    await ctx.db.patch(library._id, {
-      publishedVersion: args.version,
-      publishedHash: args.contentHash,
-      publishedAt: Date.now(),
-      lastPublishStatus: "succeeded",
-    });
-
     const version = await ctx.db
       .query("libraryVersions")
       .withIndex("by_library_version", (q) =>
         q.eq("libraryId", library._id).eq("version", args.version),
       )
       .unique();
+
+    // publishedHash names the live draft; R2 knows only the served bytes' hash.
+    await ctx.db.patch(library._id, {
+      publishedVersion: args.version,
+      publishedHash: version?.sourceHash ?? args.contentHash,
+      publishedAt: Date.now(),
+      lastPublishStatus: "succeeded",
+    });
 
     if (version !== null && version.status === "writing") {
       await ctx.db.patch(version._id, { status: "published" });

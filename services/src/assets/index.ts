@@ -82,6 +82,10 @@ function describe(object: R2Object, cacheControl: string): Headers {
   baseArtifactHeaders(headers);
   headers.set("cache-control", cacheControl);
   headers.set("ds1-version", object.customMetadata?.version ?? "");
+  // The sha256 the publish recorded and checked: a product that pins this version (Sync 1's
+  // `library` export) compares it with the bytes it received.
+  headers.set("ds1-content-hash", object.customMetadata?.contentHash ?? "");
+  headers.set("access-control-expose-headers", "ds1-version, ds1-content-hash");
   return headers;
 }
 

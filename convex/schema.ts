@@ -49,6 +49,7 @@ export default defineSchema({
     optimize: v.boolean(),
     nextVersion: v.number(),
     publishedVersion: v.optional(v.number()),
+    /** sha256 of the draft the live version was published from (its version row's sourceHash). */
     publishedHash: v.optional(v.string()),
     publishedAt: v.optional(v.number()),
     publishLockUntil: v.optional(v.number()),
@@ -72,9 +73,9 @@ export default defineSchema({
 
     /** sha256 of the published bytes. */
     contentHash: v.string(),
-    /** sha256 of the draft it came from; equal to contentHash while v1 ships untransformed. */
+    /** sha256 of the draft it came from; equal to contentHash for versions published untransformed. */
     sourceHash: v.string(),
-    /** 'none' | 'lightningcss@1.x' */
+    /** 'none' for early versions; 'ds1-library@sha256:…' for a draft prepared by that DS1 library revision. */
     transform: v.string(),
 
     byteSize: v.number(),

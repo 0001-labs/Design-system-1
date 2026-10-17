@@ -8,8 +8,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { LAYERS } from '../../shared/component-directory';
 import { EXAMPLES, PAGE_EXAMPLES } from '../../website/src/lib/component-examples';
 import { libraryTokenValues, setLibraryToken } from './lib/libraryTokens';
-import componentTokens from '../../DS1/1-root/component-tokens.css?raw';
-import componentMetrics from '../../DS1/1-root/component-metrics.css?raw';
+import { libraryTemplate } from './lib/libraryTemplate';
 import './system-workbench.css';
 import { ComponentTree, type TreeNode } from './ComponentTree';
 import '../../DS1/2-core/ds-composer';
@@ -21,7 +20,7 @@ import { navigate, useLocation } from './router';
 const treeNodes: TreeNode[] = LAYERS.map(layer => ({ id: `layer-${layer.number}`, label: `${layer.number} ${layer.name}`, children: layer.entries.map(item => ({ id: item.href, label: item.name, meta: item.tag })) }));
 
 export type LibraryWorkbenchConfig = { schema: number; [key: string]: unknown };
-export const libraryTemplate = `/* Design system 1 component library */\n${componentMetrics}\n${componentTokens.replace(/^@import[^;]+;\s*/gm, '')}`;
+export { libraryTemplate };
 const sources = import.meta.glob<string>('../../DS1/{2-core,3-unit,4-page}/**/*.css', { query: '?raw', import: 'default', eager: true });
 const properties = (text: string) => [...new Set([...text.matchAll(/(--[a-zA-Z0-9_-]+)\s*:/g)].map(match => match[1]!))].sort();
 const sharedTokens = properties(libraryTemplate);
