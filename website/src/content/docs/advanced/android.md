@@ -1,67 +1,79 @@
 ---
 title: Android
-description: The planned Kotlin package of Design system 1 for Android apps.
+description: Design system 1's Kotlin package for Android apps in Jetpack Compose.
 ---
 
-A Kotlin library that gives Jetpack Compose apps on Android Design system 1's colours, type, square, scale and icons. See [Native packages](/advanced/native/) for how it is generated and what carries over from the web.
+A Kotlin library that gives Jetpack Compose apps on Android Design system 1's colours, type, square, scale, icons, words and pieces. See [Native packages](/advanced/native/) for how it is generated and the whole list of pieces.
 
-**Status: in preparation.** The library is not published yet; the names below are the plan.
+**Status: first version.** The library builds, lints and tests on its own, and apps copy it with Sync 1.
 
 ## The library
 
 | | |
 | --- | --- |
-| Location | `native/android/` in the Design system 1 repository, a Gradle project in the Kotlin DSL |
+| Location | `native/android/` in the Design system 1 repository, a Gradle build in the Kotlin DSL |
 | Library | `ds1`, Kotlin package `com.designsystem1.ds1` |
 | Interface | Jetpack Compose foundation and UI, with no Material dependency |
-| Platform | Android, API level 26 or later proposed |
-| Checks | `./gradlew build` and `./gradlew test` in `native/android/` |
+| Platform | Android 8 (API level 26) and later |
+| Checks | `vp run native:test:android`: writes the generated files, then tests, lints and builds |
 
-## What it will contain
+## What it contains
 
-- **`DS1Colors`**: every palette colour with its pastel, in a light and a dark scheme. Generated from `palette.ts`; never edited by hand.
-- **`DS1Metrics`**: the square (`20.dp`), half a square, the control and row heights, type sizes (14 and 10), letter spacing, line heights, the 1 dp line and the 4 dp corner. The corner is also a composition local an app may change.
-- **`DS1Scale`**: the device scale, the screen width over 280 between 0.75 and 2, as on a phone or tablet on the web, provided through a composition local so every measure multiplies by it.
-- **`DS1Type`**: the typefaces as font resources, with a text helper that sets arrows in Inter and code in Iosevka Extended.
-- **`DS1Icons`**: the icon collection as vector drawables, generated from the SVG sources, tinted by the text colour.
-- **`DS1Theme`**: one composable that wraps an app, follows the system's dark theme and provides the colours, type, scale and shapes.
-- **Foundation composables**: `DS1Page`, `DS1Row`, `DS1LineText`, `DS1PaperGrid` and `DS1Button`, measured in squares and drawn square, with 4 dp corners only on buttons, fields and pictures.
+- **`DS1Colors`**: every palette colour with its pastel, and the surfaces of the component tokens, each a `DS1Color` with a light and a dark value. Read one with `.current` in a composition. Generated; never edited by hand.
+- **`DS1Metrics`** and **`DS1Scale`**: the measures from `measures.ts`, and the device scale (the width over 280 between 0.75 and 2) from `LocalDS1Scale`. Every length is `scale.unit`, `scale.squares(4f)` or `scale(16f)`; lines stay one dp.
+- **`DS1Font`**: the typefaces as font resources, built from the web's woff2 files. Text sets arrows in Inter and, with `figures`, digits in Olivetti Dot in cells of one width. Type does not follow the system font scale.
+- **`DS1IconName`** and **`DS1Icon`**: the whole icon collection as vector drawables, tinted by the text colour.
+- **`DS1Theme`**: one composable around the app. It follows the saved theme (the system's by default), puts the scale on, and shows the toast stack and the page's dialogs.
+- **`DS1Words`**, **`DS1Language`** and **`DS1Preferences`**: the shared words in every language, the product's own over them, and the saved theme and language.
+- **The pieces**: every control, message, structure and layout in the [list](/advanced/native/#the-pieces).
 
 ## Using it
 
-Apps will take the library in as a local module. Until the first release, Design system 1's sharing tool copies `native/android/` into the app's repository with a lock file recording the source commit, and the app includes it as a Gradle build.
+Sync 1 copies the library into the app's repository with a lock file recording the source commit, the same way web projects copy the CSS and components. The copy owns its folder.
+
+```json
+{ "sources": { "Design system 1": { "kotlin": { "to": "android/ds1", "fonts": ["GT-America-Standard-Regular.woff2", "OlivettiDot-Regular.woff2"] } } } }
+```
+
+Inter Arrows and Iosevka always travel; `fonts` names the other faces the app is licensed to carry. The app includes the copy as a build and depends on it:
 
 ```kotlin
 // settings.gradle.kts
 includeBuild("ds1")
+
+// app/build.gradle.kts
+dependencies { implementation("com.designsystem1:ds1") }
 ```
 
 ```kotlin
-import com.designsystem1.ds1.DS1Theme
-import com.designsystem1.ds1.DS1Row
-import com.designsystem1.ds1.DS1LineText
+import com.designsystem1.ds1.*
 
-@Composable
-fun ItemRow(title: String) {
-    DS1Row {
-        DS1LineText(title)
+class Main : ComponentActivity() {
+    override fun onCreate(state: Bundle?) {
+        super.onCreate(state)
+        DS1Preferences.load(this)
+        setContent { DS1Theme { App() } }
     }
 }
 
-// Wrap the app once
-setContent { DS1Theme { App() } }
-```
+@Composable
+fun ItemRow(title: String, amount: String) {
+    DS1Row(rule = true) {
+        DS1Icon(DS1IconName.receipt)
+        DS1LineText(title, Modifier.weight(1f))
+        DS1Figures(amount)
+    }
+}
 
-A published release will be a Maven artifact, `com.designsystem1:ds1`, so apps outside the repository can add it as an ordinary dependency.
+// Anywhere, after the work is done:
+DS1Toast.success("Saved")
+```
 
 ## Decisions still open
 
-1. **Fonts.** Inter Arrows and Iosevka may be redistributed under their licences and ship as resources. GT America is licensed per app: either each app supplies its own files, or the library includes them for licensed apps only.
-2. **Font format.** Android does not load `woff2`. The library carries the TrueType or OpenType builds, made from the same sources and cut to the same character sets.
-3. **Lowest API level.** API level 26 is proposed; the library goes no lower than the oldest app that uses it.
-4. **System font scale.** Whether text follows the system font size; see [Settle before generating](/advanced/native/#settle-before-generating).
-5. **Where it is published.** Maven Central under `com.designsystem1`, which needs the domain verified and releases signed, or a package registry until then.
+1. **System font scale.** Type stays on the grid for now; whether it should follow the system font size is open (see [Native packages](/advanced/native/#what-carries-over)).
+2. **Where it is published.** Maven Central under `com.designsystem1`, which needs the domain verified and releases signed, or a package registry until then.
 
 ## Release
 
-Versions follow the npm package: a release of `@0001-labs/design-system-1` tags the same version for the Kotlin library, and the release checks build and test it.
+Versions follow the npm package: a release of `@0001-labs/design-system-1` tags the same version for the Kotlin library.

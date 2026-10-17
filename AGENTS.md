@@ -61,6 +61,10 @@ One command publishes a new version (`scripts/release.mjs`, the same file in Aa,
 
 It refuses with uncommitted changes or when npm is signed out (`vp pm login`), writes the version into every `package.json` and the version references in the docs (`release:sync`, `scripts/versions.mjs`), runs `release:check` (the type check of the package, since `vp check` also covers the Worker, Convex and tests that are not published), `test` and `build`, publishes, then commits `Release @0001-labs/design-system-1 <version>` and tags `v<version>`. A failed step puts everything back.
 
+## Native packages
+
+The Swift package (`native/apple`) and the Kotlin package (`native/android`) are the native Design system 1; read the `design-system-1` skill's Native apps section and https://designsystem1.com/advanced/native/. Their generated files and resources come from DS1's sources (`vp run native:tokens`); never edit them by hand. `vp run native:test` builds and tests the Swift package; `vp run native:test:android` tests, lints and builds the Kotlin one through `scripts/gradle.sh`, which finds Homebrew's OpenJDK 21 and Android command-line tools when `JAVA_HOME` and `ANDROID_HOME` are not set. `native/android/sample` is a catalogue app that takes the library as a product does (`includeBuild`); run it on an emulator to see a change. Android's faces in `native/android/fonts` are written from the woff2 files by `vp run native:fonts`, which needs fontTools and brotli. Both packages copy into products through Sync 1's `swift` and `kotlin` exports.
+
 ## Integration
 
 The foundation 0001's products are built on; they copy it with Sync 1.

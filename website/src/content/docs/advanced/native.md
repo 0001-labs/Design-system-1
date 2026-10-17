@@ -1,50 +1,72 @@
 ---
 title: Native packages
-description: The plan for Design system 1 in Swift and Kotlin, generated from the same source as the CSS.
+description: Design system 1 in Swift and Kotlin, generated from the same sources as the CSS.
 ---
 
-Design system 1 is being prepared for native apps: a Swift package for iPhone, iPad and Mac, and a Kotlin package for Android. Both carry the same colours, type, square and scale as the stylesheet, so a native screen and a web page built from Design system 1 match to the pixel.
+Design system 1 comes as two native packages as well as the stylesheet: a Swift package for iPhone, iPad and Mac, and a Kotlin package for Android. Both carry the same colours, type, square, scale, icons and words as the web, and both offer the same pieces under the same names, so a screen built from Design system 1 matches on every platform.
 
-**Status: in preparation.** Nothing is published yet. This page and the [iOS](/advanced/ios/) and [Android](/advanced/android/) pages describe what the packages will contain and how they will be made. Names and APIs may still change before the first release.
+**Status: first version.** Both packages build and test on their own, and apps copy them with Sync 1. They are not published to a package registry yet. See [iOS](/advanced/ios/) and [Android](/advanced/android/) for each package's setup.
 
 ## One source, three outputs
 
-The stylesheet stays the reference. Nothing in the native packages is typed by hand: a script reads Design system 1's sources and writes the Swift and Kotlin files, and a test fails when a generated file and its source disagree.
+The stylesheet stays the reference, and nothing in the native packages is typed by hand. A script (`vp run native:tokens`) reads Design system 1's sources and writes the Swift and Kotlin files, and a test fails when a generated file and its source disagree.
 
 | Source | Web | Swift | Kotlin |
 | --- | --- | --- | --- |
-| `DS1/1-root/palette.ts`: every colour, its pastel, dark and dim versions | `one.semantic.css` tokens | `Color` values that follow light and dark mode | `Color` values in a light and a dark colour scheme |
-| Measures: the square, control height, type sizes, lines, corners | `grid.css`, `one.css` | `CGFloat` constants | `Dp` and `TextUnit` constants |
-| Typefaces in `DS1/1-root/fonts` | `@font-face` | Font files registered by the package | Font resources in the package |
+| `DS1/1-root/palette.ts` and the component tokens: every colour, its pastel, dark and dim versions, and the surfaces | `light-dark()` tokens | `DS1Color`, a `ShapeStyle` that follows light and dark | `DS1Colors`, read with `.current` |
+| `DS1/1-root/measures.ts`: the square, control and row heights, type, tracking, lines, corners, the scale | `grid.css`, `one.css`, `component-metrics.css` | `DS1Metrics` in points | `DS1Metrics` in dp |
+| Typefaces in `DS1/1-root/fonts` | `@font-face` | The woff2 files, which Core Text reads | TrueType and OpenType builds of them (`vp run native:fonts`) |
 | Icons in `DS1/x-icon` | SVG | Vector images in an asset catalogue | Vector drawables |
-
-The generator lives beside the existing palette script in `scripts/`, so changing a colour or a measure means running one command and committing the web and native outputs together.
+| `DS1/0-face/languages.ts` and the shared words in `DS1/0-face/translations` | `configureI18n`, `translate()` | `DS1Language`, `DS1Words` | `DS1Language`, `DS1Words` |
 
 ## What carries over
 
 - **The square.** One square is 20 points on Apple platforms and 20 dp on Android, the same as 20 CSS pixels. Rows, items and headers are one square high; widths and gaps are whole squares or half a square.
-- **The scale.** On a computer every measure is multiplied by 1. On a phone or tablet it is multiplied by the screen width over 280, between 0.75 and 2, rounded to three decimals, exactly as `--sf` does on the web. Each package exposes this scale as one value the whole interface reads.
-- **Type.** 14 text and 10 small, in the same typefaces, with the same letter spacing and line heights. Arrows are always Inter, in every typeface; code is Iosevka Extended.
-- **Lines and corners.** 1-point lines on the grid. Rows and items stay square; pictures, buttons and fields round their corners by 4. The corner is one value an app may change for its whole interface, as a stylesheet can override `--ds-radius`.
-- **Light and dark.** Colours switch with the system appearance, inks turn over, and pastels become their dim versions.
-- **Motion.** Only position, scale and opacity animate, and every animation respects the system's reduce motion setting.
+- **The scale.** On a computer every measure is multiplied by 1. On a phone or tablet it is multiplied by the screen width over 280, between 0.75 and 2, rounded to three decimals, exactly as `--sf` does on the web.
+- **Type.** 14 text on 16 lines, 10 small and 13 headings, with −0.3 letter spacing. Arrows are always Inter; figures can be Olivetti Dot, each digit in a cell of one width. Type stays on the grid rather than following the system text size.
+- **Lines and corners.** 1-point lines on the grid. Rows and items stay square; pictures, buttons and fields round their corners by 4, and an app may change that corner for its whole interface.
+- **Light and dark.** Colours switch with the appearance, inks turn over, and pastels become their dim versions. The theme a person chooses (light, dark or system) is saved on the device.
+- **Words.** The shared words in every language, looked up as the web does: the language, its primary subtag, its relatives, then English. A product registers its own words on top.
+- **Motion.** Only position, scale and opacity animate, and every animation stands still when the system asks for reduced motion.
+
+## The pieces
+
+Every public piece of the web library has a native counterpart with the same name on both platforms, except where noted.
+
+| Web | Swift | Kotlin |
+| --- | --- | --- |
+| Theme, scale, preferences | `.ds1Theme()`, `.ds1Scaled()`, `DS1Preferences` | `DS1Theme`, `DS1Scaled`, `DS1Preferences` |
+| `ds-text` | `DS1LineText`, `DS1Figures` | `DS1LineText`, `DS1Figures` |
+| `ds-icon` | `DS1Icon` | `DS1Icon` |
+| `ds-button`, icon button, danger | `DS1ButtonStyle` | `DS1Button`, `DS1IconButton`, `DS1DangerButton` |
+| `ds-button split` | `DS1SplitButton` | `DS1SplitButton` |
+| `ds-input`, `ds-textarea` | `DS1Field`, `DS1TextArea`, `DS1FieldStyle` | `DS1Field`, `DS1TextArea` |
+| `ds-checkbox`, `ds-radio`, choice tiles | `DS1CheckboxStyle`, `DS1Checkbox`, `DS1Radio`, `DS1Choice` | `DS1Checkbox`, `DS1Radio`, `DS1Choice` |
+| `ds-switch`, `ds-toggle` | `DS1SwitchStyle` (`.ds1Switch`, `.ds1Toggle`) | `DS1Switch`, `DS1Toggle` |
+| `ds-select` | `DS1Select` (the system's menu) | `DS1Select` |
+| `ds-tabs` | `DS1Tabs` | `DS1Tabs` |
+| `ds-badge`, `ds-token`, `ds-swatch`, link, `ds-gap` | `DS1Badge`, `DS1Token`, `DS1Swatch`, `DS1Link`, `DS1Gap` | `DS1Badge`, `DS1Token`, `DS1Swatch`, `DS1Link`, `DS1Gap` |
+| `ds-avatar`, `ds-avatar-group` | `DS1Avatar`, `DS1AvatarGroup` | `DS1Avatar`, `DS1AvatarGroup` |
+| `ds-notice`, `ds-banner`, `ds-empty`, `ds-loading` | `DS1Notice`, `DS1Banner`, `DS1Empty`, `DS1Loading` | `DS1Notice`, `DS1Banner`, `DS1Empty`, `DS1Loading` |
+| `ds-tooltip` | `.ds1Tooltip(_:)` | `DS1Tooltip` |
+| `ds-cycle`, `ds-language` | `DS1Cycle`, `DS1ThemeCycle`, `DS1LanguagePicker` | `DS1Cycle`, `DS1ThemeCycle`, `DS1LanguagePicker` |
+| `toast()` and its stack | `DS1Toast`, `DS1ToastHost` | `DS1Toast`, `DS1ToastHost` |
+| `ds-dialog`, `alert`, `confirm`, `prompt` | `DS1DialogBox`, `.ds1Dialog`, `DS1Dialogs` | `DS1Dialog`, `DS1Dialogs` |
+| `ds-menu` | `DS1Menu`, `DS1MenuItem` (floating menus are the system's) | `DS1Menu`, `DS1MenuItem` |
+| `ds-accordion`, `ds-list`, `ds-panel` | `DS1Accordion`, `DS1List`, `DS1Panel` | `DS1Accordion`, `DS1List`, `DS1Panel` |
+| `ds-sidebar`, `ds-table`, `ds-token-field` | `DS1Sidebar`, `DS1Table`, `DS1TokenField` | `DS1Sidebar`, `DS1Table`, `DS1TokenField` |
+| `ds-page` and its layouts, tiles | `DS1Page`, `DS1PageLayout`, `DS1Tiles` | `DS1Page`, `DS1PageLayout`, `DS1Tiles` |
+| `ds-row`, `ds-grid` | `DS1Row`, `DS1Rule`, `DS1PaperGrid` | `DS1Row`, `DS1Rule`, `DS1PaperGrid` |
+| `format.ts`, `pricing.ts`, `copyText` | `DS1Format`, `DS1Pricing`, `DS1Clipboard` | `DS1Format`, `DS1Pricing`, `DS1Clipboard` |
+
+Left out on purpose: the 2-core card (off the system: no boxes around content), the legacy `ds-layout` and `ds-form` (use `DS1PageLayout` and the platform's own forms), page dots, and the year in `ds-date` (use `DS1Format`). Charts and the composer follow later.
 
 ## What stays native
 
-The packages give native controls Design system 1's measures and colours rather than redrawing the platform. Navigation, sheets, menus, text selection, keyboard handling and accessibility come from SwiftUI and Jetpack Compose. Where the web has a component the platform lacks, the package adds a view of the same name and behaviour.
+The packages give native controls Design system 1's measures and colours rather than redrawing the platform. Navigation, sheets, text selection, keyboards, pickers for files and colours, and accessibility come from SwiftUI and Jetpack Compose. On Apple platforms, floating menus and a select's options are the system's own menus.
 
-## Settle before generating
+## Checks
 
-- **One set of values (settled).** The Root tokens in `one.css` and the component tokens in `component-tokens.css` and `component-metrics.css` now agree. Colours follow the palette: black #2a2a2a, light slate #e6e6e6, dark slate #3c3c3c, grey #797979, and Apple green as the accent. Type follows the component tokens: 14 text on 16 lines, 13 headings, −0.3 letter spacing and weight 400. The native packages take the same values.
-- **Measures in one file.** The square, control and row heights, type sizes, letter spacing, line heights and corners move into a small TypeScript file in `DS1/1-root`, like `palette.ts`. The CSS keeps its values, and a test fails when the CSS and that file disagree.
-- **System text size.** Whether type follows the system's text size setting (Dynamic Type on Apple platforms, font scale on Android) or stays on the grid. Following it keeps text accessible but can push a row past one square, so rows then grow by whole squares.
-
-## Order of work
-
-1. **Tokens.** Generate colours, measures and the scale for both platforms, with tests against their sources.
-2. **Fonts and icons.** Ship the typefaces that may be redistributed and the icon collection as vectors.
-3. **Foundation views.** Page, row, line text, button and paper grid in each package.
-4. **Core components.** Native versions of the Core controls, one at a time, each matched against its web version at the same scale.
-5. **Release.** A Swift package and a Kotlin library with version numbers that follow the npm package.
-
-See [iOS](/advanced/ios/) and [Android](/advanced/android/) for each platform's package, its requirements and the decisions still open.
+- `vp run native:test`: writes the generated files, then builds and tests the Swift package.
+- `vp run native:test:android`: writes the generated files, then tests, lints and builds the Kotlin package.
+- `vp test`: holds the generated files to their sources and the Sync 1 exports to the package folders.

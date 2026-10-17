@@ -1,0 +1,9 @@
+.gradle/
+build/
+local.properties
+# Laid out from DS1/ by `vp run native:tokens` and Sync 1's `kotlin` export.
+ds1/src/main/res/
+Licences/
+# GT America is licensed: its TrueType builds are written on this Mac by `vp run native:fonts`
+# and never committed, as the repository is public.
+fonts/GT-America-*.otf
