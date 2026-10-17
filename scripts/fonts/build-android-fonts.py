@@ -20,6 +20,8 @@ out.mkdir(parents=True, exist_ok=True)
 for name, source in faces.items():
     font = TTFont(root / source)
     font.flavor = None
+    # Keep the face's own dates, so building again writes the same bytes.
+    font.recalcTimestamp = False
     ext = ".otf" if "CFF " in font or "CFF2" in font else ".ttf"
     target = out / (Path(name).stem + ext)
     font.save(target)
