@@ -120,6 +120,7 @@ public enum DS1IconName: String, CaseIterable, Sendable {
     case connect
     case content
     case cursor
+    case curve
     case `default`
     case delete
     case dictate

@@ -321,6 +321,13 @@
     "shapes": 1
   },
   {
+    "key": "curve",
+    "name": "Curve",
+    "source": "Library",
+    "url": "/icons/library/curve.svg",
+    "shapes": 5
+  },
+  {
     "key": "default",
     "name": "Default",
     "source": "Figma",

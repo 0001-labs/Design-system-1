@@ -124,6 +124,7 @@ enum class DS1IconName(val fileName: String, @DrawableRes val drawable: Int) {
     connect("connect", R.drawable.ds1_icon_connect),
     content("content", R.drawable.ds1_icon_content),
     cursor("cursor", R.drawable.ds1_icon_cursor),
+    curve("curve", R.drawable.ds1_icon_curve),
     default("default", R.drawable.ds1_icon_default),
     delete("delete", R.drawable.ds1_icon_delete),
     dictate("dictate", R.drawable.ds1_icon_dictate),
