@@ -5,26 +5,24 @@ const { html, script, open = false } = Astro.props;
 const blocks = [{ id: 'html', label: 'Copy HTML', text: html }, ...(script ? [{ id: 'script', label: 'Copy JavaScript', text: script }] : [])];
 ---
 <div class="example-code-source" data-example-code>
-  <details open={open}>
-    <summary>Code</summary>
-    {blocks.map(block => (
-      <div class="example-code-block">
-        <ds-button control="slotted"><button type="button" data-copy={block.id}>{block.label}</button></ds-button>
-        <pre><code data-source={block.id}>{block.text}</code></pre>
-      </div>
-    ))}
-  </details>
-  <span class="example-code-status" role="status" aria-live="polite" data-copy-status></span>
+  <ds-accordion summary="Code" open={open}>
+    <div slot="details">
+      {blocks.map(block => (
+        <div class="example-code-block">
+          <ds-button control="slotted"><button type="button" data-copy={block.id}>{block.label}</button></ds-button>
+          <pre><code data-source={block.id}>{block.text}</code></pre>
+        </div>
+      ))}
+    </div>
+  </ds-accordion>
 </div>
 <script>
+  import '../../../DS1/3-unit/ds-accordion';
   import { wireCodeCopy } from '../lib/example-controls';
   document.querySelectorAll<HTMLElement>('[data-example-code]').forEach(wireCodeCopy);
 </script>
 <style is:global>
   .example-code-source { --example-code-unit: calc(20px * var(--sf, 1)); }
-  .example-code-source summary { cursor: pointer; line-height: var(--example-code-unit); }
-  .example-code-source summary:focus-visible { outline: 1px solid currentColor; outline-offset: 2px; }
   .example-code-block { display: flex; flex-direction: column; align-items: flex-end; gap: calc(var(--example-code-unit) / 2); margin-block: calc(var(--example-code-unit) / 2); }
   .example-code-block pre { align-self: stretch; margin: 0; padding: var(--example-code-unit); overflow-x: auto; border-radius: 4px; font-size: 13px; line-height: var(--example-code-unit); }
-  .example-code-status { display: block; min-height: var(--example-code-unit); font-size: 10px; }
 </style>

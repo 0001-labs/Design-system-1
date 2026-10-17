@@ -22,12 +22,17 @@ const themed = (svg: string) => svg
 <div class="icon-table not-content" data-ds-not-prose>
   <p class="icon-count">{icons.length} icons · 16 × 16 · click one to download its SVG</p>
   <ul class="icons">{icons.map(icon => (
-    <li><a href={icon.url} download={`${icon.key}.svg`} title={`${icon.name} · ${icon.key}.svg`}>
+    <li><a href={icon.url} download={`${icon.key}.svg`} data-tooltip={`${icon.key}.svg`}>
       <span class="icon-tile" set:html={scopedSvg(themed(icon.svg), 'table-' + icon.key)} />
       <span class="icon-name">{icon.name}</span>
     </a></li>
   ))}</ul>
 </div>
+
+<script>
+  // Each icon names the file it downloads in Design system 1's tooltip.
+  import '../../../DS1/0-face/tooltips';
+</script>
 
 <style>
   /* On the 20px square: a cell is four squares wide, a three-square tile and one line of 14px text. */

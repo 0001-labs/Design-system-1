@@ -17,15 +17,19 @@ const inks = colours.filter(c => c.ink);
             <h2>Palette</h2>
             <ul class="swatches">{palette.map(c => {
               const [main, soft] = mode === 'light' ? [c.hex, c.pastel] : [c.dark, c.darkPastel];
-              return <li class="swatch"><b>{c.name}</b><span class="swatch-pair"><i style={`background:${main}`} title={`${mode === 'light' ? c.name : `${c.name} dark`} ${main}`}></i><i style={`background:${soft}`} title={`${mode === 'light' ? c.pastelName : `${c.name} dim`} ${soft}`}></i></span></li>;
+              return <li class="swatch"><b>{c.name}</b><span class="swatch-pair"><i style={`background:${main}`} data-tooltip={`${mode === 'light' ? c.name : `${c.name} dark`} ${main}`}></i><i style={`background:${soft}`} data-tooltip={`${mode === 'light' ? c.pastelName : `${c.name} dim`} ${soft}`}></i></span></li>;
             })}</ul>
           </section>
           <section>
             <h2>Inks</h2>
-            <ul class="swatches inks">{inks.map(c => { const v = mode === 'light' ? c.hex : c.dark; return <li class="swatch"><b>{c.name}</b><span class="swatch-one"><i style={`background:${v}`} title={`${c.name} ${v}`}></i></span></li>; })}</ul>
+            <ul class="swatches inks">{inks.map(c => { const v = mode === 'light' ? c.hex : c.dark; return <li class="swatch"><b>{c.name}</b><span class="swatch-one"><i style={`background:${v}`} data-tooltip={`${c.name} ${v}`}></i></span></li>; })}</ul>
           </section>
         </div>
       ))}
+      <script>
+        // Each swatch names its colour and hex in Design system 1's tooltip.
+        import '../../../DS1/0-face/tooltips';
+      </script>
       <script is:inline>
         // ds-tabs moves between the tabs with the arrow keys; each tab shows its own panel.
         const tabs = [...document.querySelectorAll('.mode-tabs [role=tab]')];

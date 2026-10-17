@@ -9,7 +9,7 @@ const { landing = false } = Astro.props;
 <PublicPreferences />
 <header class:list={['site-navigation', 'docs-header', { 'docs-header--with-sidebar': !landing }]}>
   <a class="site-brand" href="/">Design system 1</a>
-  {!landing && <button id="mobile-menu-btn" class="site-brand docs-brand-menu" type="button" aria-label="Open documentation navigation" aria-controls="sidebar" aria-expanded="false">Design system 1</button>}
+  {!landing && <button id="mobile-menu-btn" class="site-brand docs-brand-menu" type="button" aria-label="Open documentation navigation" aria-controls="mobile-navigation-panel" aria-haspopup="dialog" aria-expanded="false">Design system 1</button>}
 </header>
 <iframe id="navigation-auth" src="/app/navigation-auth" title="Account status" hidden aria-hidden="true" tabindex="-1"></iframe>
 

@@ -30,15 +30,15 @@ const classlessMode = pathname === '/classless/editor' ? 'editor'
     <!-- Header -->
     <MyHeader landing={isHome} />
 
-    <!-- Mobile Sidebar Overlay -->
-    {!isHome && <div id="sidebar-overlay" class="sidebar-overlay"></div>}
-
     <!-- Main Container with Sidebar and Content -->
     <div class:list={['main-container', { 'main-container--home': isHome }]}>
       <!-- Sidebar -->
       {!isHome && <aside id="sidebar" class="sidebar" aria-label="Documentation navigation">
         <MySidebar />
       </aside>}
+
+      <!-- On a phone the same navigation opens in Design system 1's dialog, filling the screen. -->
+      {!isHome && <ds-dialog id="mobile-navigation"><dialog id="mobile-navigation-panel" aria-label="Documentation" data-ds-dialog-fullscreen data-ds-dialog-flush></dialog></ds-dialog>}
 
       <!-- Sidebar gap (desktop only) -->
       {!isHome && <div class="sidebar-gap"></div>}
@@ -121,23 +121,7 @@ const classlessMode = pathname === '/classless/editor' ? 'editor'
         overflow: visible;
       }
 
-      /* Sidebar overlay (mobile) */
-      .sidebar-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 99;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-      }
-
-      .sidebar-overlay.active {
-        opacity: 1;
-      }
+      #mobile-navigation { --ds-dialog-paper: var(--ds1-docs-sidebar-bg); }
 
       /* Keep scroll geometry stable; only the thumb changes while active. */
       :is(.sidebar, .main-content, .right-sidebar, .right-sidebar-panel) {
@@ -159,31 +143,11 @@ const classlessMode = pathname === '/classless/editor' ? 'editor'
         }
 
         .sidebar {
-          position: fixed;
-          top: var(--site-header-height);
-          left: 0;
-          height: calc(100dvh - var(--site-header-height));
-          transform: translateX(-100%);
-          transition: transform 0.3s ease;
-          box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .sidebar.open {
-          transform: translateX(0);
+          display: none;
         }
 
         .sidebar-gap {
           display: none;
-        }
-
-        .sidebar-overlay {
-          display: block;
-          pointer-events: none;
-          top: var(--site-header-height);
-        }
-
-        .sidebar-overlay.active {
-          pointer-events: auto;
         }
 
         .main-content {
@@ -200,93 +164,43 @@ const classlessMode = pathname === '/classless/editor' ? 'editor'
       }
     </style>
 
-    <script is:inline>
-      // Mobile sidebar toggle functionality
-      document.addEventListener('DOMContentLoaded', function() {
-        const scrollTimers = new WeakMap();
-        document.addEventListener('scroll', event => {
-          const panel = event.target;
-          if (!(panel instanceof HTMLElement) || !panel.matches('.sidebar, .main-content, .right-sidebar, .right-sidebar-panel')) return;
-          panel.setAttribute('data-scrolling', '');
-          clearTimeout(scrollTimers.get(panel));
-          scrollTimers.set(panel, setTimeout(() => panel.removeAttribute('data-scrolling'), 700));
-        }, true);
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebar-overlay');
-        const menuButton = document.getElementById('mobile-menu-btn');
+    <script>
+      import '../../../DS1/4-page/ds-dialog';
+      import type { Dialog } from '../../../DS1/4-page/ds-dialog';
+      const scrollTimers = new WeakMap<Element, ReturnType<typeof setTimeout>>();
+      document.addEventListener('scroll', event => {
+        const panel = event.target;
+        if (!(panel instanceof HTMLElement) || !panel.matches('.sidebar, .main-content, .right-sidebar, .right-sidebar-panel')) return;
+        panel.setAttribute('data-scrolling', '');
+        clearTimeout(scrollTimers.get(panel));
+        scrollTimers.set(panel, setTimeout(() => panel.removeAttribute('data-scrolling'), 700));
+      }, true);
 
-        function openSidebar() {
-          sidebar?.classList.add('open');
-          menuButton?.setAttribute('aria-expanded', 'true');
-          overlay?.classList.add('active');
-          document.body.style.overflow = 'hidden';
-          sidebar?.removeAttribute('inert');
-          sidebar?.setAttribute('role', 'dialog');
-          sidebar?.setAttribute('aria-modal', 'true');
-          sidebar?.setAttribute('aria-label', 'Documentation');
-          document.getElementById('sidebar-close-btn')?.focus();
-        }
+      // One navigation: it stands in the sidebar, and on a phone the menu button
+      // opens it in Design system 1's dialog, which owns the modal, its focus,
+      // Escape and the close button. Closing puts it back in the sidebar.
+      const sidebar = document.getElementById('sidebar');
+      const navigation = document.querySelector<Dialog>('ds-dialog#mobile-navigation');
+      const panel = navigation?.querySelector('dialog');
+      const shell = sidebar?.querySelector<HTMLElement>('.docs-sidebar-shell');
+      const menuButton = document.getElementById('mobile-menu-btn');
+      const phone = window.matchMedia('(max-width: 768px)');
+      document.getElementById('sidebar-close-btn')?.setAttribute('data-ds-dialog-dismiss', '');
 
-        function closeSidebar() {
-          sidebar?.classList.remove('open');
-          menuButton?.setAttribute('aria-expanded', 'false');
-          overlay?.classList.remove('active');
-          document.body.style.overflow = '';
-          sidebar?.toggleAttribute('inert', window.innerWidth <= 768);
-          sidebar?.removeAttribute('role');
-          sidebar?.removeAttribute('aria-modal');
-          menuButton?.focus();
-        }
-
-        document.getElementById('sidebar-close-btn')?.addEventListener('click', closeSidebar);
-
-        // Menu button click
-        menuButton?.addEventListener('click', function() {
-          if (sidebar?.classList.contains('open')) {
-            closeSidebar();
-          } else {
-            openSidebar();
-          }
-        });
-
-        // Close on overlay click
-        overlay?.addEventListener('click', closeSidebar);
-
-        sidebar?.addEventListener('sidebar-activate', () => {
-          if (window.innerWidth <= 768) closeSidebar();
-        });
-        sidebar?.toggleAttribute('inert', window.innerWidth <= 768);
-
-        function focusable(root) {
-          return [...root.querySelectorAll('*')].flatMap(element => [
-            ...(element.matches('a[href], button, input, select, textarea, [tabindex="0"]') && !element.disabled && element.getClientRects().length ? [element] : []),
-            ...(element.shadowRoot ? focusable(element.shadowRoot) : []),
-          ]);
-        }
-        sidebar?.addEventListener('keydown', event => {
-          if (event.key !== 'Tab' || !sidebar.classList.contains('open')) return;
-          const controls = focusable(sidebar);
-          const active = event.composedPath()[0];
-          const first = controls[0], last = controls[controls.length - 1];
-          if (event.shiftKey && active === first) { event.preventDefault(); last?.focus(); }
-          else if (!event.shiftKey && active === last) { event.preventDefault(); first?.focus(); }
-        });
-
-        // Close sidebar on escape key
-        document.addEventListener('keydown', function(e) {
-          if (e.key === 'Escape' && sidebar?.classList.contains('open')) {
-            closeSidebar();
-          }
-        });
-
-        // Handle resize - close mobile sidebar when switching to desktop
-        window.addEventListener('resize', function() {
-          sidebar?.toggleAttribute('inert', window.innerWidth <= 768 && !sidebar?.classList.contains('open'));
-          if (window.innerWidth > 768 && sidebar?.classList.contains('open')) {
-            closeSidebar();
-          }
-        });
+      function restore() {
+        if (shell && sidebar && shell.parentElement !== sidebar) sidebar.append(shell);
+        menuButton?.setAttribute('aria-expanded', 'false');
+      }
+      menuButton?.addEventListener('click', () => {
+        if (!navigation || !panel || !shell) return;
+        if (navigation.open) { navigation.requestClose('button'); return; }
+        panel.append(shell);
+        menuButton.setAttribute('aria-expanded', 'true');
+        void navigation.show({ immediate: true });
       });
+      panel?.addEventListener('close', restore);
+      shell?.addEventListener('sidebar-activate', () => { if (navigation?.open) navigation.requestClose('button'); });
+      phone.addEventListener('change', () => { if (!phone.matches && navigation?.open) navigation.close(); });
     </script>
   </body>
 </html>
