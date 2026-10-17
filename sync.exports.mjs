@@ -21,6 +21,8 @@ const writingSheets = { prose: 'prose.css', classless: 'one.semantic.css', cjk: 
 const askedSheets = options => Object.entries(writingSheets).filter(([flag]) => options[flag]).map(([, file]) => file);
 /** The faces fonts.css (and so one.css) loads, by the file names its @font-face rules use, and their licences. */
 const rootFonts = ['GT-America-Standard-Regular.woff2', 'GT-America-Standard-Medium.woff2', 'GT-America-Compressed-Regular.woff2', 'GT-Canon-M-Standard-Medium-Trial.woff2', 'Inter-Arrows.woff2', 'Iosevka-Regular.woff2', 'Inter-LICENSE.md', 'Iosevka-LICENSE.md'];
+/** The faces every typeface token leads with or codes in, which travel with fonts.css whatever else a product names. */
+const alwaysFonts = ['Inter-Arrows.woff2', 'Iosevka-Regular.woff2', 'Inter-LICENSE.md', 'Iosevka-LICENSE.md'];
 /** Page scripts in 0-face/, each with the modules it imports. */
 const rootModules = {
   grid: ['grid.ts', 'layout-inspector.ts', 'grid-fit.ts'],
@@ -73,7 +75,9 @@ export default {
     /**
      * Faces copied as local assets by consumers: `fonts` names them by file. `stylesheet: true`
      * adds fonts.css, the @font-face rules and typeface tokens one.css imports, pointed at the
-     * faces beside it, and every face it loads, for a page that does not load one.css.
+     * faces beside it, for a page that does not load one.css: with every face it loads, or with
+     * the faces `fonts` names and always Inter Arrows and Iosevka (a face left out is fetched
+     * only by a page that uses it, and then not found).
      */
     fonts: {
       files({ read, options }) {
@@ -83,7 +87,7 @@ export default {
         };
         if (options.fonts !== undefined && !Array.isArray(options.fonts)) throw new Error('Name the fonts to copy: "fonts": ["Iosevka-Regular.woff2", …]');
         const names = [...(options.fonts ?? [])];
-        if (options.stylesheet) for (const name of rootFonts) if (!names.includes(name)) names.push(name);
+        if (options.stylesheet) for (const name of options.fonts ? alwaysFonts : rootFonts) if (!names.includes(name)) names.push(name);
         if (!names.length) throw new Error('Name the fonts to copy, or ask for the stylesheet');
         const files = Object.fromEntries(names.map(name => {
           if (!Object.hasOwn(available, name)) throw new Error(`Unknown font: ${name}`);

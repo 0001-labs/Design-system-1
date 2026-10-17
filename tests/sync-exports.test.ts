@@ -38,9 +38,8 @@ test('fonts.css travels on its own: through root with its faces in fonts/, or th
   expect(urls).toContain('Iosevka-Regular.woff2');
   for (const url of urls) expect(flat).toHaveProperty([url]);
   expect(css).toContain('--typeface-mono:');
-  // Named fonts and the stylesheet together: no file twice, the extra face kept.
-  expect(Object.keys(files('fonts', { stylesheet: true, fonts: ['OlivettiDot-Regular.woff2', 'Iosevka-Regular.woff2'] })).filter((file) => file === 'Iosevka-Regular.woff2')).toHaveLength(1);
-  expect(files('fonts', { stylesheet: true, fonts: ['OlivettiDot-Regular.woff2'] })).toHaveProperty(['OlivettiDot-Regular.woff2']);
+  // Named faces with the stylesheet: those, and always the arrows and the code face with their licences.
+  expect(Object.keys(files('fonts', { stylesheet: true, fonts: ['GT-America-Standard-Regular.woff2', 'Iosevka-Regular.woff2'] }))).toEqual(['GT-America-Standard-Regular.woff2', 'Iosevka-Regular.woff2', 'Inter-Arrows.woff2', 'Inter-LICENSE.md', 'Iosevka-LICENSE.md', 'fonts.css']);
   expect(() => files('fonts')).toThrow(/Name the fonts/);
 });
 

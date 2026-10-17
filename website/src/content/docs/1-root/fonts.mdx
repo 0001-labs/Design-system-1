@@ -13,7 +13,7 @@ import FontCatalog from '../../../components/FontCatalog.astro';
 
 Use `--typeface-regular` for body text, `--typeface-medium` for emphasis, `--typeface-compressed` for narrow display text and `--typeface-mono` for code, which is Iosevka Extended with a system monospace after it. `--typeface-canon` uses the bundled trial face. The component tokens in `component-tokens.css` (`--ds-typeface-regular`, `--ds-typeface-medium`, `--ds-typeface-mono` and the rest) name the same families, so either set of tokens finds the faces `fonts.css` loads. Check the original foundry's licence before using a commercial or trial font in your own work.
 
-With Sync 1, `root` with `"styles": ["fonts.css"]` copies the sheet with its faces in `fonts/`; `fonts` with `"stylesheet": true` copies it beside the faces instead, pointed at them. `one.css` always arrives with `fonts.css`.
+With Sync 1, `root` with `"styles": ["fonts.css"]` copies the sheet with its faces in `fonts/`; `fonts` with `"stylesheet": true` copies it beside the faces instead, pointed at them: every face, or the ones `"fonts"` names with Inter Arrows and Iosevka always among them. `one.css` always arrives with `fonts.css`.
 
 ### Japanese and Chinese
 
