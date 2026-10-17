@@ -7,6 +7,7 @@ import { createHash } from 'node:crypto';
 import { join, posix } from 'node:path';
 import { componentGraph } from './scripts/component-graph.mjs';
 import { applePackage } from './scripts/native-apple.mjs';
+import { androidPackage } from './scripts/native-android.mjs';
 
 const rootStyles = ['one.css', 'grid.css', 'text.css', 'component-tokens.css', 'component-metrics.css', 'component-appearance.css'];
 /** one.css and controls.css both import the text classes. */
@@ -189,6 +190,17 @@ export default {
     swift: {
       owned: true,
       files({ read, tree, options }) { return applePackage({ read, tree, fonts: options.fonts ?? [] }); },
+    },
+    /**
+     * The Kotlin package (native/android, a Gradle build with the `ds1` library) as one folder
+     * the copy owns whole: its sources with the generated palette, measures, icons, languages
+     * and words, every icon as a vector drawable and the typefaces as font resources. Inter
+     * Arrows and Iosevka always travel; `fonts` names the others by their web file names. The
+     * product includes the folder with `includeBuild` and depends on `com.designsystem1:ds1`.
+     */
+    kotlin: {
+      owned: true,
+      files({ read, tree, options }) { return androidPackage({ read, tree, fonts: options.fonts ?? [] }); },
     },
     /** Icon files from DS1/x-icon: `icons` lists their names, or maps each name to the file it becomes. */
     icons: {

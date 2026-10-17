@@ -3,9 +3,9 @@ title: iOS
 description: Design system 1's Swift package for iPhone, iPad and Mac apps.
 ---
 
-A Swift package that gives SwiftUI apps on iPhone, iPad and Mac Design system 1's colours, type, square, scale and icons. See [Native packages](/advanced/native/) for how it is generated and what carries over from the web.
+A Swift package that gives SwiftUI apps on iPhone, iPad and Mac Design system 1's colours, type, square, scale, icons, words and pieces. See [Native packages](/advanced/native/) for how it is generated and the whole list of pieces.
 
-**Status: first version.** The package builds and tests on its own and apps copy it with Sync 1. Foundation views exist; native versions of the Core controls follow one at a time.
+**Status: first version.** The package builds and tests on its own for iOS and macOS, and apps copy it with Sync 1.
 
 ## The package
 
@@ -24,7 +24,9 @@ A Swift package that gives SwiftUI apps on iPhone, iPad and Mac Design system 1'
 - **`DS1Scale`**: the device scale, the width over 280 between 0.75 and 2 on iPhone and iPad and 1 on a Mac, put in the environment by `.ds1Scaled()`. Every measure multiplies by it; lines stay one point. The corner is one value an app may change.
 - **`DS1Font`**: the typefaces, as the same woff2 files the web loads (Core Text reads them), registered by the package. `DS1LineText` sets arrows in Inter; `figures: true` sets digits and the signs of numbers in Olivetti Dot, each digit in a cell of one width. Type stays on the grid.
 - **`DS1Icon`**: the whole icon collection as vector images in the package's asset catalogue, with template rendering so icons take the text colour.
-- **Foundation views**: `DS1Page`, `DS1Row`, `DS1Rule`, `DS1LineText`, `DS1Figures`, `DS1PaperGrid` and `DS1ButtonStyle`, measured in squares and drawn square, with 4-point corners only on buttons, fields and pictures.
+- **`.ds1Theme()`**: one modifier on the root view. It follows the saved theme (the system's by default), puts the scale on, sets the reader's language, and shows the toast stack and the page's dialogs.
+- **`DS1Words`**, **`DS1Language`** and **`DS1Preferences`**: the shared words in every language, the product's own over them, and the saved theme and language.
+- **The pieces**: every control, message, structure and layout in the [list](/advanced/native/#the-pieces), measured in squares and drawn square, with 4-point corners only on buttons, fields and pictures.
 
 ## Using it
 
@@ -54,13 +56,19 @@ struct ItemRow: View {
         .foregroundStyle(DS1Color.text)
     }
 }
+
+// The root, once:
+WindowGroup { ContentView().ds1Theme() }
+
+// Anywhere, after the work is done:
+DS1Toast.success("Saved")
 ```
 
 A published release will add the package by URL. Swift Package Manager reads `Package.swift` from the root of a repository, so that release needs either a manifest at the root that points to `native/apple/` or a separate repository for the package.
 
 ## Decisions still open
 
-1. **Dynamic Type.** Type stays on the grid for now; whether it should follow the system text size is open (see [Settle before generating](/advanced/native/#settle-before-generating)).
+1. **Dynamic Type.** Type stays on the grid for now; whether it should follow the system text size is open (see [Native packages](/advanced/native/#what-carries-over)).
 2. **Arrows in the main face.** `DS1LineText` sets arrows in Inter; text drawn without it keeps the main face's arrows.
 
 ## Release

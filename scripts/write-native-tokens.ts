@@ -1,12 +1,14 @@
-// Writes the Swift package's generated files (scripts/native-tokens.ts) and lays out its
-// resources (scripts/native-apple.mjs) for building and testing it here. The resources are
-// not committed: products receive them through Sync 1's `swift` export.
+// Writes the Swift and Kotlin packages' generated files (scripts/native-tokens.ts) and lays
+// out their resources (scripts/native-apple.mjs, scripts/native-android.mjs) for building and
+// testing them here. The resources are not committed: products receive them through Sync 1's
+// `swift` and `kotlin` exports.
 // Run: vp run native:tokens
 import { mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { appleTokenFiles } from './native-tokens';
+import { androidTokenFiles, appleTokenFiles } from './native-tokens';
 import { appleFonts, applePackage } from './native-apple.mjs';
+import { androidFonts, androidPackage } from './native-android.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const write = (path: string, content: string | Buffer) => {
@@ -14,7 +16,7 @@ const write = (path: string, content: string | Buffer) => {
   writeFileSync(join(root, path), content);
 };
 
-for (const [path, content] of Object.entries(appleTokenFiles())) write(path, content);
+for (const [path, content] of Object.entries({ ...appleTokenFiles(), ...androidTokenFiles() })) write(path, content);
 
 const walk = (dir: string, base = ''): string[] =>
   readdirSync(join(dir, base)).flatMap(name => {
@@ -30,3 +32,9 @@ rmSync(join(root, 'native/apple/Licences'), { recursive: true, force: true });
 const resources = applePackage({ read, tree, fonts: Object.keys(appleFonts), sources: false });
 for (const [path, content] of resources) write(`native/apple/${path}`, content);
 console.log(`Swift package: ${Object.keys(appleTokenFiles()).length} generated files, ${resources.size} resources`);
+
+rmSync(join(root, 'native/android/ds1/src/main/res'), { recursive: true, force: true });
+rmSync(join(root, 'native/android/Licences'), { recursive: true, force: true });
+const androidResources = androidPackage({ read, tree, fonts: Object.keys(androidFonts), sources: false });
+for (const [path, content] of androidResources) write(`native/android/${path}`, content);
+console.log(`Kotlin package: ${Object.keys(androidTokenFiles()).length} generated files, ${androidResources.size} resources`);
