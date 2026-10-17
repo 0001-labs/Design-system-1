@@ -44,3 +44,9 @@ test("entries are one row whatever button styles surround them", () => {
   expect(native).toMatch(/\.ds-menu > :is\(button, a, \[role="option"\], \[role\^="menuitem"\]\),[^{]*\{[^}]*height: var\(--ds-row-height\) !important;/);
   expect(button).toMatch(/:host\(:is\(\[menu-item\], \[role="option"\], \[role\^="menuitem"\]\)\) :is\(button, a\) \{[^}]*height: var\(--ds-button-height, var\(--ds-row-height\)\);/);
 });
+
+test("danger reads in the danger colour on every face of the button", () => {
+  expect(readFileSync("DS1/2-core/styles/ds-button.css", "utf8")).toMatch(/:host\(\[danger\]\) :is\(button, a\) \{\s*color: var\(--ds-danger-color/);
+  expect(readFileSync("DS1/2-core/styles/ds-button-host.css", "utf8")).toContain('[danger]) {\n  --ds-button-color: var(--ds-danger-color');
+  expect(readFileSync("DS1/1-root/controls.css", "utf8")).toMatch(/\.ds-button--danger \{\s*--ds-button-color: var\(--ds-danger-color/);
+});

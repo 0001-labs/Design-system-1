@@ -106,6 +106,12 @@
   padding: 0 calc(var(--ds-button-inset, 4px) * var(--ds-sf));
 }
 
+/* `danger`: a destructive action's words in the danger colour, on this face
+   as on the host and slotted faces and `.ds-button--danger`. */
+:host([danger]) :is(button, a) {
+  color: var(--ds-danger-color, var(--ds-tuned-red));
+}
+
 /* Disabled, as in the slotted and host modes. A disabled link has no href. */
 :is(button:disabled, a[aria-disabled="true"]) {
   cursor: default;
