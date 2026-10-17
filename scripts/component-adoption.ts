@@ -4,6 +4,7 @@ import { existsSync, readFileSync, mkdirSync, writeFileSync, statSync, realpathS
 import { basename, dirname, join, posix, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import ts from "typescript";
+import { rootConnections, historicalSource } from "./root-adoption";
 import { readIconMap, scanIcons } from "./icon-adoption";
 import { countLibrarySite, libraryMethod, publishedLibrary } from "./library-provenance";
 import { markdownMethod, markdownScope } from "./markdown-sites";
@@ -43,7 +44,7 @@ const rowPart = /^ds-(?:row|tree)__/;
  * scripts that draw DS1 without a component: the tooltip script and the feedback dialogs.
  */
 const entryFiles = ["1-root/empty.css", "1-root/notice.css", "1-root/table.css", "1-root/kbd.css", "1-root/carousel.css", "1-root/figures.css", "1-root/row.css", "react/empty.ts", "react/notice.ts", "react/kbd.ts", "react/carousel.ts", "react/stat.ts", "react/meter.ts", "react/steps.ts", "0-face/tooltips.ts", "0-face/feedback.ts", "0-face/dialogs.ts", ...siteChromeFiles];
-const native: Record<string, string> = { button: "button", input: "input", select: "select", textarea: "textarea", p: "text", h1: "text", h2: "text", h3: "text", h4: "text", h5: "text", h6: "text", ul: "list", ol: "list", table: "table", form: "form", dialog: "dialog", details: "accordion", meter: "meter", kbd: "kbd" };
+const native: Record<string, string> = { a: "link", button: "button", input: "input", select: "select", textarea: "textarea", p: "text", h1: "text", h2: "text", h3: "text", h4: "text", h5: "text", h6: "text", ul: "list", ol: "list", table: "table", form: "form", dialog: "dialog", details: "accordion", meter: "meter", kbd: "kbd" };
 /**
  * `prose` marks native text, a list or a table inside an element marked data-ds-prose, which DS1's prose sheet draws.
  * `column` places a site that is not an element of its own kind: a title or data-tooltip attribute (Tooltip), a
@@ -103,7 +104,7 @@ const proseTags = new Set([...textTags, "ul", "ol", "table", "kbd"]);
  */
 export const nativePieces: Record<string, string> = { "ds-field": "form", "ds-avatar": "avatar", "ds-badge": "badge", "ds-icon": "icon", "ds-drop": "file-picker" };
 /** The column a native class moves its element into: the pieces, and a toggle button. */
-const nativeColumns: Record<string, string> = { ...nativePieces, "ds-toggle": "toggle" };
+const nativeColumns: Record<string, string> = { ...nativePieces, "ds-toggle": "toggle", "ds-link": "link" };
 /** A field's label, hint and error, drawn by controls.css on native text. */
 const fieldParts = ["ds-field__label", "ds-field__hint", "ds-field__error"];
 /**
@@ -121,7 +122,7 @@ function nativeStyle(tag: string, className: string): string | undefined {
   if (tag === "button" && classes.includes("ds-pagedots__dot")) return "block-part";
   // Native text with a literal .ds-text class or one of its sizes and tones, or a field's part.
   if (textTags.has(tag)) return classes.some(name => name === "ds-text" || name.startsWith("ds-text--")) ? "ds-text" : fieldParts.find(name => classes.includes(name));
-  const supported = tag === "button" ? ["ds-toggle", "ds-button", "ds-switch"] : ["input", "select", "textarea"].includes(tag) ? ["ds-input", "ds-textarea", "ds-select", "ds-checkbox", "ds-radio"] : tag === "dialog" ? ["ds-dialog"] : tag === "kbd" ? ["ds-menu__shortcut"] : [];
+  const supported = tag === "a" ? ["ds-button", "ds-link"] : tag === "button" ? ["ds-toggle", "ds-button", "ds-switch"] : ["input", "select", "textarea"].includes(tag) ? ["ds-input", "ds-textarea", "ds-select", "ds-checkbox", "ds-radio"] : tag === "dialog" ? ["ds-dialog"] : tag === "kbd" ? ["ds-menu__shortcut"] : [];
   return supported.find(name => classes.includes(name)) ?? (native[tag] ? undefined : Object.keys(nativePieces).find(name => classes.includes(name)));
 }
 /** A file input directly inside a label drawn as a drop zone or a button is that file picker's frame. */
@@ -188,7 +189,7 @@ export function readSource(file: string, source: string, exported?: ReadonlySet<
       const parent = parentElement?.tag ?? "";
       const attributes = clean.slice(match.index! + match[0].length).split(">")[0]!;
       const fileFrame = tag === "input" && parent === "label" && /\btype\s*=\s*["']file["']/.test(attributes) ? fileFrameClass(parentElement!.className) : undefined;
-      const frame = (tag === "dialog" && parent === "ds-dialog") || (tag === "input" && ["ds-checkbox", "ds-radio", "ds-color", "ds-token-field", "ds-file-picker"].includes(parent)) || (tag === "button" && ["ds-switch", "ds-button"].includes(parent)) || (tag === "select" && parent === "ds-select") || (tag === "textarea" && parent === "ds-composer") || Boolean(fileFrame);
+      const frame = (tag === "a" && parent === "ds-button") || (tag === "dialog" && parent === "ds-dialog") || (tag === "input" && ["ds-checkbox", "ds-radio", "ds-color", "ds-token-field", "ds-file-picker"].includes(parent)) || (tag === "button" && ["ds-switch", "ds-button"].includes(parent)) || (tag === "select" && parent === "ds-select") || (tag === "textarea" && parent === "ds-composer") || Boolean(fileFrame);
       const inProse = proseTags.has(tag) && [...stack].reverse().find(open => open.prose !== undefined)?.prose === true;
       const prose = /(?:^|\s)data-ds-not-prose(?=[\s=/]|$)/.test(attributes) ? false : /(?:^|\s)data-ds-prose(?=[\s=/]|$)/.test(attributes) ? true : undefined;
       const className = /\bclass\s*=\s*["']([^"']*)["']/.exec(attributes)?.[1] ?? /\bclass\s*=\s*["']([^"']*)$/.exec(attributes)?.[1] ?? "";
@@ -382,7 +383,7 @@ export function readSource(file: string, source: string, exported?: ReadonlySet<
         if (!frameTag) continue;
         for (const arg of call.arguments) {
           const child = ts.isIdentifier(arg) ? creations.get(arg.text) : undefined;
-          if (child?.tag === frameTag) frameHosts.set(child.call, host);
+          if (child && (child.tag === frameTag || (host === "ds-button" && child.tag === "a"))) frameHosts.set(child.call, host);
         }
       }
     }
@@ -528,7 +529,7 @@ export function readSource(file: string, source: string, exported?: ReadonlySet<
       const role = jsxLiteral(jsxAttribute(node, "role"));
       const dialogRole = role === "dialog" || role === "alertdialog";
       const parentElement = ts.isJsxOpeningElement(node) ? node.parent.parent : node.parent;
-      const frameHostTags: Record<string, string> = { dialog: "ds-dialog", input: "ds-checkbox", button: "ds-switch", select: "ds-select", textarea: "ds-composer" };
+      const frameHostTags: Record<string, string> = { a: "ds-button", dialog: "ds-dialog", input: "ds-checkbox", button: "ds-switch", select: "ds-select", textarea: "ds-composer" };
       const sharedFrame = parentElement && ts.isJsxElement(parentElement) && (parentElement.openingElement.tagName.getText(ast) === frameHostTags[tag] || (tag === "input" && ["ds-radio", "ds-color", "ds-token-field", "ds-file-picker"].includes(parentElement.openingElement.tagName.getText(ast))));
       const type = jsxLiteral(jsxAttribute(node, "type"));
       const controlKind = role === "switch" ? "switch" : isRange(tag, role, type) ? "range" : tag === "input" && ["checkbox", "radio", "color"].includes(type ?? "") ? type as "checkbox" | "radio" | "color" : tag === "input" && type === "file" ? "file-picker" : undefined;
@@ -642,7 +643,7 @@ export function checkSnapshots(root: string, manifestPath: string | undefined, d
   const historical = new Map<string, string | null>();
   const readHistorical = (file: string) => {
     if (!historical.has(file)) {
-      try { historical.set(file, execFileSync("git", ["show", `${manifest.commit}:DS1/${file}`], { cwd: dsRoot, stdio: ["ignore", "pipe", "ignore"] }).toString()); }
+      try { historical.set(file, (historicalSource(dsRoot, manifest.commit, `DS1/${file}`)?.toString() ?? null)); }
       catch { historical.set(file, null); }
     }
     return historical.get(file)!;
@@ -716,7 +717,7 @@ export function checkLockedStyles(root: string, dsRoot: string, { names, defines
       const body = readFileSync(full);
       if (hash(body) !== source.files[path]) { modified = true; cell.issues.push(`Locally modified: ${path}`); }
       let original: Buffer | null = null;
-      try { original = execFileSync("git", ["show", `${source.commit}:DS1/1-root/${name}`], { cwd: dsRoot, stdio: ["ignore", "pipe", "ignore"] }); } catch { original = null; }
+      try { original = historicalSource(dsRoot, source.commit!, `DS1/1-root/${name}`) ?? null; } catch { original = null; }
       if (!original || hash(original) !== source.files[path]) { unverifiable = true; cell.issues.push(`Source revision not verified: ${path}`); }
       if (defines[name] && !defines[name]!.test(withoutComments(body.toString("utf8")))) { unverifiable = true; cell.issues.push(`No DS1 rule for these sites in ${path}`); }
       const latest = join(dsRoot, "DS1/1-root", name);
@@ -764,7 +765,7 @@ export function checkLockedModule(root: string, dsRoot: string, path: string): C
     const body = readFileSync(full);
     if (hash(body) !== files[copy]) { modified = true; cell.issues.push(`Locally modified: ${copy}`); }
     let original: Buffer | null = null;
-    try { original = execFileSync("git", ["show", `${source.commit}:DS1/${file}`], { cwd: dsRoot, stdio: ["ignore", "pipe", "ignore"] }); } catch { original = null; }
+    try { original = historicalSource(dsRoot, source.commit!, `DS1/${file}`) ?? null; } catch { original = null; }
     if (!original || hash(original) !== files[copy]) { unverifiable = true; cell.issues.push(`Source revision not verified: ${copy}`); }
     const latest = join(dsRoot, "DS1", file);
     if (!existsSync(latest) || hash(readFileSync(latest)) !== hash(body)) current = false;
@@ -1005,6 +1006,10 @@ export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): Ado
     };
     if (!files.length) throw new Error("No tracked web source was found in the configured scope.");
     app.icons = scanIcons(root, spec.source === "direct" ? undefined : spec.manifest, files, ds1Icons(dsRoot), join(dsRoot, "DS1/x-icon"), { roots: spec.roots, include: file => !excluded.test(file) && !(spec.excludes ?? []).some(prefix => file === prefix || file.startsWith(prefix + "/")) });
+    const roots = rootConnections(root, dsRoot, spec.manifest, spec.source === "direct");
+    for (const file of tracked.filter(f => /\.(css|tsx?|jsx?|[cm]js|html|astro)$/.test(f) && !excluded.test(f) && !(spec.excludes ?? []).some(prefix => f === prefix || f.startsWith(prefix + "/")) && existsSync(join(root, f)))) {
+      roots(file, readFileSync(join(root, file), "utf8"), app.cells);
+    }
     const sources = new Map(files.map(file => [file, readFileSync(join(root, file), "utf8")]));
     // Markdown is read per file below; the script and markup reader takes the rest.
     const reads = new Map(files.filter(file => !markdown.includes(file)).map(file => [file, readSource(file, sources.get(file)!)]));
@@ -1055,7 +1060,7 @@ export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): Ado
         const block = site.nativeStyle ? blockClasses[site.nativeStyle] : undefined;
         const custom = /^(ds|ezo|c9y)-(.+)$/.exec(site.tag);
         const chartPart = custom?.[1] === "ds" && ["bars", "range", "ratio", "spark"].includes(custom[2] ?? "") ? "chart" : undefined;
-        const component = chartPart ?? block?.component ?? (sharedAdapters.has(site.tag) ? sharedAdapters.get(site.tag)!.component : aliases[site.tag] ?? (custom && known.has(custom[2]!) ? custom[2]! : site.dialogRole ? "dialog" : (site.nativeStyle && nativeColumns[site.nativeStyle]) || (site.controlKind ?? native[site.tag])));
+        const component = (site.tag === "a" && site.nativeStyle === "ds-button" ? "button" : undefined) ?? chartPart ?? block?.component ?? (sharedAdapters.has(site.tag) ? sharedAdapters.get(site.tag)!.component : aliases[site.tag] ?? (custom && known.has(custom[2]!) ? custom[2]! : site.dialogRole ? "dialog" : (site.nativeStyle && nativeColumns[site.nativeStyle]) || (site.controlKind ?? native[site.tag])));
         if (!component) {
           if (site.tag.includes("-")) app.otherCustomElements[site.tag] = (app.otherCustomElements[site.tag] ?? 0) + 1;
           continue;
@@ -1098,7 +1103,8 @@ export function scanReport(studio = resolve(repository, "..")): AdoptionReport {
     icons: { names: [...ds1Icons(repository).keys()] },
     apps: loadAppSpecs(studio).map(app => catalogueApp(scanApp(app, studio))),
     method: [
-      "Names and layers follow the shared DS1 catalogue (Core, Unit and Page). Split compatibility uses are included under Button, and Switch uses under Toggle; original source tags remain in drilldowns. Specialist implementation components retain their source names. Internal Spacing handle and Loading are included in this private audit, not the public picker.",
+      "Root counts authored stylesheet connections to Styling, Colours and Fonts, including their local CSS imports. Each foundation sheet is verified against its recorded source; these are connections, not rendered elements or individual token uses.",
+      "Names and layers follow the shared DS1 catalogue (Root, Core, Unit and Page). Split compatibility uses are included under Button, and Switch uses under Toggle; original source tags remain in drilldowns. Specialist implementation components retain their source names. Internal Spacing handle and Loading are included in this private audit, not the public picker.",
       "Products and Clients have separate row groups. Deferred products remain measured but are excluded from migration recommendations. Only configured tracked web roots are scanned; native apps, libraries and film recreations remain outside this report.",
       "Counts are authored source sites in tracked web files, read from the current working tree. A loop counts once. This is not a runtime or production audit; unused tracked source can be included.",
       "Markup is read where it is markup: HTML and Astro files, JSX, Lit html templates, strings written into innerHTML, outerHTML, insertAdjacentHTML, React's __html or document.write, and strings that are a whole document. Markup assembled first is followed: a local name's value and later assignments, a function's returned strings, pieces pushed onto an array, and a function another file imports and writes into markup. A plain string or code sample (\"<button>\") is not a site. Markup written into an element created in the same block opens inside it.",

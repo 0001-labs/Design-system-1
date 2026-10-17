@@ -23,7 +23,7 @@ const views: { id: View; name: string }[] = [
   { id: "local", name: "Local" }, { id: "unverified", name: "Needs review" },
 ];
 const count = (cell: ComponentCell, view: View) => view === "all" ? totalSites(cell) : cell[view];
-const kindName = { shared: "DS1 component", styled: "DS1 styles (native)", local: "Local", unverified: "Needs review" };
+const kindName = { shared: "DS1 component", styled: "DS1 styles", local: "Local", unverified: "Needs review" };
 const cellClass = (cell: ComponentCell, view: View) => {
   if (!count(cell, view)) return "empty";
   if (view !== "all") return view;
@@ -63,7 +63,7 @@ export function ComponentAdoption({ onSignOut }: { onSignOut?: () => Promise<voi
 /** Kept separate from authentication so the evidence view can be verified with fixtures. */
 export function ComponentMatrix({ report }: { report: AdoptionReport }) {
   const [view, setView] = useState<View>("all");
-  const [showEmpty, setShowEmpty] = useState(false);
+  const [showEmpty, setShowEmpty] = useState(true);
   const [selection, setSelection] = useState<{ app: string; component: string } | null>(null);
   const [limit, setLimit] = useState(100);
   const appGroups = [...new Set(report.apps.map(app => app.group ?? "Products"))];
@@ -85,7 +85,7 @@ export function ComponentMatrix({ report }: { report: AdoptionReport }) {
   const old = Date.now() - scannedAt.getTime() > 7 * 24 * 60 * 60 * 1000;
 
   return <>
-    <p className="adoption-intro">One row per app. One column per component. Numbers are places in the web source where a component is used.</p>
+    <p className="adoption-intro">One row per app. One column per Root foundation or component. Numbers count authored source sites; Root counts stylesheet connections, including their imported foundations.</p>
     <p className="adoption-meta">Snapshot <time dateTime={report.generatedAt}>{scannedAt.toLocaleString()}</time>{old ? " · More than a week old" : ""} · {available.length} of {report.apps.length} apps scanned · Click a number to inspect it.</p>
     <div className="adoption-controls">
       <Button split className="adoption-views" label="Count to show" value={view} onPress={(next: View) => { setView(next); setLimit(100); }}
@@ -125,7 +125,7 @@ export function ComponentMatrix({ report }: { report: AdoptionReport }) {
     {selected && selectedApp && selectedColumn ? <section className="adoption-detail" aria-label="Selected component" aria-live="polite">
       <div className="adoption-detail-heading"><h2>{selectedApp.name} · {selectedColumn.name}</h2><ds-button onClick={() => setSelection(null)}>Close details</ds-button></div>
       {selectedApp.migrationReason && <p>{selectedApp.migrationReason}</p>}
-      <p>{selected.shared} DS1 components · {selected.styled} native controls with DS1 styles · {selected.local} local · {selected.unverified} need review. {selected.snapshot === "verified" ? selected.current ? "The shared component copy matches the current DS1 source." : "The shared component copy matches its recorded DS1 revision; a newer source is available." : selected.snapshot === "none" ? "No verified DS1 Lit component snapshot is recorded for this component." : "The DS1 copy could not be fully verified."}</p>
+      <p>{selected.shared} DS1 components · {selected.styled} sites with DS1 styles · {selected.local} local · {selected.unverified} need review. {selectedColumn.group === "Root" ? "Root counts stylesheet connections, including imported foundations; it does not count each element that inherits them." : selected.snapshot === "verified" ? selected.current ? "The shared component copy matches the current DS1 source." : "The shared component copy matches its recorded DS1 revision; a newer source is available." : selected.snapshot === "none" ? "No verified DS1 Lit component snapshot is recorded for this component." : "The DS1 copy could not be fully verified."}</p>
       {selected.issues.length > 0 && <ds-list role="list">{selected.issues.map(issue => <ds-row auto role="listitem" key={issue}><p>{issue}</p></ds-row>)}</ds-list>}
       {sites.length ? <><p className="adoption-meta">{sites.length} {view === "all" ? "source sites" : views.find(v => v.id === view)!.name.toLowerCase() + " sites"}. Paths are relative to {selectedApp.name}.</p>
         <div className="adoption-evidence"><table className="ds-table"><thead><tr><th>Source</th><th>Element</th><th>Implementation</th></tr></thead><tbody>{sites.slice(0, limit).map((site, i) => <tr key={`${site.file}:${site.line}:${i}`}><td><code>{site.file}:{site.line}</code></td><td><code>{site.tag}</code></td><td>{kindName[site.kind]}</td></tr>)}</tbody></table></div>

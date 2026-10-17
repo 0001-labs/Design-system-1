@@ -12,6 +12,13 @@ describe('canonical adoption catalogue', () => {
     expect(COMPONENT_COLUMNS.some(c => ['Composites', 'Layout'].includes(c.group))).toBe(false);
     expect(COMPONENT_COLUMNS.some(c => c.id === 'split' || c.id === 'switch')).toBe(false);
   });
+  it('includes Root and every current directory entry, even without an element tag', () => {
+    for (const layer of ALL_LAYERS) for (const entry of layer.entries) {
+      expect(COMPONENT_COLUMNS.some(c => c.name === entry.name && c.group === layer.name)).toBe(true);
+    }
+    expect(COMPONENT_COLUMNS.slice(0, 3).every(c => c.group === 'Root')).toBe(true);
+    expect(new Set(COMPONENT_COLUMNS.map(c => c.id)).size).toBe(COMPONENT_COLUMNS.length);
+  });
   it('combines compatibility modes without losing counts or original evidence', () => {
     const cells = Object.fromEntries(IMPLEMENTATION_COLUMNS.map(c => [c.id, { ...cell('unused', 0), sites: [] }]));
     cells.button = cell('ds-button', 2); cells.split = cell('ds-split', 3); cells.switch = cell('ds-switch', 4); cells.toggle = cell('ds-toggle', 5);

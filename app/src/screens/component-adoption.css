@@ -89,3 +89,6 @@
 .adoption-kinds div { display: flex; gap: calc(.5 * var(--report-unit)); height: var(--report-unit); }
 .adoption-kinds dt, .adoption-kinds dd { margin: 0; line-height: var(--report-unit); white-space: nowrap; }
 .adoption-kinds dd { color: var(--base-darker-grey); }
+
+.adoption-groups .group-root { background: var(--report-paper); color: var(--report-ink); }
+.adoption-column-names .group-root { background: var(--report-paper); }
