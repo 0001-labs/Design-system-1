@@ -54,3 +54,13 @@ test('a list with a role of its own gives its children none', async () => {
   await settle(list);
   expect(list.querySelector('ds-row')!.hasAttribute('role')).toBe(false);
 });
+
+test('a link or a button directly inside keeps its own role', async () => {
+  const list = document.createElement('ds-list');
+  list.innerHTML = '<a href="/help">Help</a><button>Open</button><ds-row>Row</ds-row>';
+  document.body.append(list);
+  await settle(list);
+  expect(list.querySelector('a')!.hasAttribute('role')).toBe(false);
+  expect(list.querySelector('button')!.hasAttribute('role')).toBe(false);
+  expect(list.querySelector('ds-row')!.getAttribute('role')).toBe('listitem');
+});

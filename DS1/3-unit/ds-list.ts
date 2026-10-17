@@ -4,12 +4,16 @@ import { define } from "../0-face/define";
 
 /** Children that are never items of the list. */
 const NOT_ITEMS = new Set(["template", "script", "style", "slot"]);
+/** Controls keep their own role: a link or a button that became a list item would no longer be announced as one. */
+const CONTROLS = new Set(["a", "button", "input", "select", "textarea", "summary", "details"]);
 
 /**
  * A vertical stack of rows.
  *
  * The element is a list (`role="list"`) and each element directly inside it an
  * item (`role="listitem"`), unless the page gives either a role of its own.
+ * A link, button or other control directly inside keeps its own role: wrap it
+ * in a row (or another element) to make it an item.
  *
  * @element ds-list
  * @attr columns - Lay the items out in this many equal columns.
@@ -50,7 +54,7 @@ export class List extends LitElement {
       this.ownItems.delete(item);
     }
     for (const item of items) {
-      if (item.hasAttribute("role")) continue;
+      if (item.hasAttribute("role") || CONTROLS.has(item.localName)) continue;
       item.setAttribute("role", "listitem");
       this.ownItems.add(item);
     }
