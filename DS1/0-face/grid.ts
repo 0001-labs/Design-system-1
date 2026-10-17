@@ -67,7 +67,8 @@ export function initGridShortcut(): void {
   if (preview.get('grid') === '1') setVisible(true);
   if (preview.get('layout') === '1') layout.toggle();
 
-  if (import.meta.env?.DEV) {
+  // A bundler's development flag (Vite's import.meta.env.DEV); absent elsewhere.
+  if ((import.meta as ImportMeta & { env?: { DEV?: boolean } }).env?.DEV) {
     const mobile = window.matchMedia('(max-width: 768px)');
     let taps = 0;
     let lastTap = 0;

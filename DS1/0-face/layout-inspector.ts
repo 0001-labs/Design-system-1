@@ -115,7 +115,7 @@ export function createLayoutInspector() {
       panel.style.top = `${rect.top}px`;
       panel.style.width = `${rect.width}px`;
       panel.style.height = `${rect.height}px`;
-      panel.style.setProperty('--pastel', colors[index % colors.length]);
+      panel.style.setProperty('--pastel', colors[index % colors.length] ?? null);
       const label = document.createElement('span');
       label.className = 'name';
       const areaName = element.dataset.dsArea || element.getAttribute('aria-label') ||
