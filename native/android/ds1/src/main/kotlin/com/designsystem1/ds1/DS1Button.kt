@@ -95,7 +95,7 @@ fun DS1Button(
     }
 }
 
-/** An icon alone on a square button (`ds-button icon`), labelled for assistive technology. */
+/** An icon alone on a square button (`ds-button icon`), labelled for assistive technology; on the paper the icon is in the muted ink, as the web draws it. */
 @Composable
 fun DS1IconButton(
     icon: DS1IconName,
@@ -107,7 +107,8 @@ fun DS1IconButton(
 ) {
     val scale = LocalDS1Scale.current
     DS1Button(onClick, modifier.width(scale.control), kind, DS1ButtonWidth.Hug, enabled) {
-        DS1Icon(icon, tint = (LocalDS1ContentColour.current ?: DS1Colors.text).current, contentDescription = contentDescription)
+        val ink = if (kind == DS1ButtonKind.Plain) DS1Colors.textMuted else LocalDS1ContentColour.current ?: DS1Colors.text
+        DS1Icon(icon, tint = ink.current, contentDescription = contentDescription)
     }
 }
 

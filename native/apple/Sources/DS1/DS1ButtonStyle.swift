@@ -48,7 +48,7 @@ extension ButtonStyle where Self == DS1ButtonStyle {
 }
 
 /// An icon alone on a square button (`ds-button icon`), one control across, labelled for
-/// VoiceOver.
+/// VoiceOver; on the paper the icon is in the muted ink, as the web draws it.
 public struct DS1IconButton: View {
     let icon: DS1IconName
     let label: String
@@ -59,7 +59,9 @@ public struct DS1IconButton: View {
     }
     public var body: some View {
         Button(action: action) {
-            DS1Icon(icon).frame(width: DS1Metrics.control)
+            DS1Icon(icon)
+                .foregroundStyle(kind == .plain ? DS1Color.textMuted : kind == .primary ? DS1Color.onAccent : DS1Color.text)
+                .frame(width: DS1Metrics.control)
         }
         .buttonStyle(.ds1(kind))
         .accessibilityLabel(label)
