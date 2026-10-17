@@ -181,10 +181,23 @@
 :host([control="slotted"]) {
   /* The native focus ring extends beyond the face; only its text is clipped. */
   overflow: visible;
-  /* One control high, as the host and native faces are, so its words stand on
-     the lower sixteen of their square in a row or at the foot of a line. */
+  /* The face is one control high, as the host and native faces are. Its box
+     stays one square, as before, with the face at its foot, so the words take
+     the lower sixteen of the square in a row or at the foot of a line and no
+     row around it changes height. */
+  align-items: flex-end;
+  min-height: var(--ds-row-height);
   vertical-align: bottom;
   width: var(--ds-button-width, max-content);
+}
+/* An icon's square: the face takes its first sixteen, the spare four above. */
+:host([control="slotted"][icon]) {
+  justify-content: flex-start !important;
+  width: max(var(--ds-row-height), var(--ds-button-height, var(--ds-control-height))) !important;
+  height: max(var(--ds-row-height), var(--ds-button-height, var(--ds-control-height))) !important;
+}
+:host([control="slotted"][icon]) ::slotted(:is(button, a)) {
+  width: var(--ds-button-height, var(--ds-control-height)) !important;
 }
 :host([control="slotted"][fixed]) {
   width: var(--ds-button-width, calc(4 * var(--ds-unit)));

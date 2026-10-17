@@ -250,3 +250,27 @@ test("a menu entry is a row high with its words on the lower sixteen", async () 
     expect(measured.baseline - measured.top, `${face} has its baseline 3px above the foot`).toBeCloseTo(UNIT - 3, 0);
   }
 });
+
+test("a slotted button keeps a one-square box with its face at the foot, an icon's face on the square's first sixteen", async () => {
+  const page = pages.light;
+  for (const icon of [false, true]) {
+    const face = icon
+      ? `<ds-button control="slotted" icon><button type="button" aria-label="Close"><ds-icon type="close"></ds-icon></button></ds-button>`
+      : `<ds-button control="slotted" primary><button type="button">Save</button></ds-button>`;
+    await stage(page, `<div style="display:flex;align-items:flex-start">${face}</div>`);
+    const measured = await page.evaluate(() => {
+      const host = document.querySelector<HTMLElement>("#stage ds-button")!;
+      const box = host.getBoundingClientRect();
+      const face = host.querySelector<HTMLElement>(":scope > button")!.getBoundingClientRect();
+      return { box: { width: box.width, height: box.height }, face: { left: face.left - box.left, top: face.top - box.top, width: face.width, height: face.height } };
+    });
+    expect(measured.box.height, `${icon ? "icon" : "words"}: box one square high`).toBeCloseTo(UNIT, 1);
+    expect(measured.face.height, `${icon ? "icon" : "words"}: face one control high`).toBeCloseTo(16, 1);
+    expect(measured.face.top, `${icon ? "icon" : "words"}: face at the foot`).toBeCloseTo(4, 1);
+    if (icon) {
+      expect(measured.box.width, "icon: box one square wide").toBeCloseTo(UNIT, 1);
+      expect(measured.face.width, "icon: face one control wide").toBeCloseTo(16, 1);
+      expect(measured.face.left, "icon: face on the square's first sixteen").toBeCloseTo(0, 1);
+    }
+  }
+});
