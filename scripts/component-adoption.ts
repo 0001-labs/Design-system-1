@@ -30,13 +30,13 @@ export function loadAppSpecs(studio: string, configPath = process.env.ADOPTION_C
 }
 const known = new Set(IMPLEMENTATION_COLUMNS.map(c => c.id));
 /** Blocks a native class draws on any element, each with the sheet that draws it. Text marked as one of their parts is the block's own. */
-const blockClasses: Record<string, { component: string; sheet: string }> = { "ds-empty": { component: "empty", sheet: "1-root/empty.css" }, "ds-notice": { component: "notice", sheet: "1-root/notice.css" }, "ds-table": { component: "table", sheet: "1-root/table.css" } };
-const blockPart = /^ds-(?:empty|notice)__/;
+const blockClasses: Record<string, { component: string; sheet: string }> = { "ds-empty": { component: "empty", sheet: "1-root/empty.css" }, "ds-notice": { component: "notice", sheet: "1-root/notice.css" }, "ds-table": { component: "table", sheet: "1-root/table.css" }, "ds-carousel": { component: "carousel", sheet: "1-root/carousel.css" }, "ds-pagedots": { component: "pagedots", sheet: "1-root/carousel.css" } };
+const blockPart = /^ds-(?:empty|notice|carousel|pagedots)__/;
 /**
- * Files verified on their own: the block sheets, the React adapters for empty states and notices, and the page
+ * Files verified on their own: the block sheets, the React adapters for empty states, notices and carousels, and the page
  * scripts that draw DS1 without a component: the tooltip script and the feedback dialogs.
  */
-const entryFiles = ["1-root/empty.css", "1-root/notice.css", "1-root/table.css", "react/empty.ts", "react/notice.ts", "0-face/tooltips.ts", "0-face/feedback.ts", "0-face/dialogs.ts"];
+const entryFiles = ["1-root/empty.css", "1-root/notice.css", "1-root/table.css", "1-root/carousel.css", "react/empty.ts", "react/notice.ts", "react/carousel.ts", "0-face/tooltips.ts", "0-face/feedback.ts", "0-face/dialogs.ts"];
 const native: Record<string, string> = { button: "button", input: "input", select: "select", textarea: "textarea", p: "text", h1: "text", h2: "text", h3: "text", h4: "text", h5: "text", h6: "text", ul: "list", ol: "list", table: "table", form: "form", dialog: "dialog", details: "accordion" };
 /**
  * `prose` marks native text, a list or a table inside an element marked data-ds-prose, which DS1's prose sheet draws.
@@ -110,6 +110,8 @@ function nativeStyle(tag: string, className: string): string | undefined {
   const block = classes.find(name => Object.hasOwn(blockClasses, name));
   if (block) return block;
   if (textTags.has(tag) && classes.some(name => blockPart.test(name))) return "block-part";
+  // A page dot is the dots' own button, counted with them.
+  if (tag === "button" && classes.includes("ds-pagedots__dot")) return "block-part";
   // Native text with a literal .ds-text class or one of its sizes and tones, or a field's part.
   if (textTags.has(tag)) return classes.some(name => name === "ds-text" || name.startsWith("ds-text--")) ? "ds-text" : fieldParts.find(name => classes.includes(name));
   const supported = tag === "button" ? ["ds-toggle", "ds-button", "ds-switch"] : ["input", "select", "textarea"].includes(tag) ? ["ds-input", "ds-textarea", "ds-select", "ds-checkbox", "ds-radio"] : tag === "dialog" ? ["ds-dialog"] : [];
@@ -853,6 +855,7 @@ function importedSharedAdapters(root: string, file: string, source: string, mani
     [resolve(root, dirname(manifestPath), "react/badge.ts")]: { Badge: "badge" },
     [resolve(root, dirname(manifestPath), "react/empty.ts")]: { Empty: "empty" },
     [resolve(root, dirname(manifestPath), "react/notice.ts")]: { Notice: "notice" },
+    [resolve(root, dirname(manifestPath), "react/carousel.ts")]: { Carousel: "carousel" },
     [resolve(root, dirname(manifestPath), "react/avatar.ts")]: { Avatar: "avatar", Logo: "avatar" },
     [resolve(root, dirname(manifestPath), "react/accordion.ts")]: { Accordion: "accordion" },
     [resolve(root, dirname(manifestPath), "react/menu.ts")]: { Menu: "menu" },
