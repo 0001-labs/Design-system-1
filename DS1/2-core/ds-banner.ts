@@ -4,21 +4,15 @@
 // ds-notice.
 
 import { LitElement, html, nothing, unsafeCSS } from "lit";
-import { getText } from "../0-face/i18n.js";
-import "./ds-text.js";
-import "./ds-button.js";
-import "./ds-icon.js";
+import { getText } from "../0-face/i18n";
+import { define } from "../0-face/define";
+import "./ds-text";
+import "./ds-button";
+import "./ds-icon";
 import styles from "./styles/ds-banner.css?inline";
 
 /** Detail of `ds-banner-action`: the destination the action follows, if it has one. */
 export interface BannerActionDetail { action: string; href: string | null }
-
-declare global {
-  interface CustomElementRegistry {
-    define(name: string, constructor: typeof LitElement): void;
-  }
-  var customElements: CustomElementRegistry;
-}
 
 export class Banner extends LitElement {
   static properties = {
@@ -152,7 +146,7 @@ export class Banner extends LitElement {
   }
 }
 
-customElements.define("ds-banner", Banner);
+define("ds-banner", Banner);
 
 declare global {
   interface HTMLElementTagNameMap {

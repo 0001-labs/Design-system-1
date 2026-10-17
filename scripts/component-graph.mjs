@@ -21,7 +21,10 @@ export function componentGraph(ds1, names) {
     const imports = /(?:\bfrom\s*|\bimport\s*\(\s*|^\s*import\s*|@import\s*)["'](\.[^"']+)["']/gm;
     for (const match of content.matchAll(imports)) {
       const base = resolve(dirname(path), match[1].split('?')[0]);
-      const dependency = [base, `${base}.ts`, `${base}.json`, join(base, 'index.ts')].find(existsSync);
+      // TypeScript's own spelling names a source by its output: `./ds-text.js`
+      // is `./ds-text.ts` when no such script sits beside it.
+      const compiled = base.endsWith('.js') ? [base.slice(0, -3) + '.ts'] : [];
+      const dependency = [base, ...compiled, `${base}.ts`, `${base}.json`, join(base, 'index.ts')].find(existsSync);
       if (!dependency) throw new Error(`Unresolved ${match[1]} in ${file}`);
       visit(relative(source, dependency));
     }
