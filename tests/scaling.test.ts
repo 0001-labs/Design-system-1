@@ -72,6 +72,72 @@ test("startScaling follows resizes and turns until stopped", () => {
   expect(root.style.getPropertyValue("--sf")).toBe("1");
 });
 
+function surfaceOf(width: () => number): HTMLElement {
+  const surface = document.createElement("div");
+  Object.defineProperty(surface, "clientWidth", { configurable: true, get: width });
+  document.body.append(surface);
+  return surface;
+}
+
+test("a surface scales to its own width on a computer, with the same rule and snapping", () => {
+  screen(COMPUTER, 1440, 3);
+  const surface = surfaceOf(() => 390);
+  expect(applyScaling({ surface })).toBe(calculateScalingFactor(390));
+  expect(surface.style.getPropertyValue("--sf")).toBe(String(calculateScalingFactor(390)));
+  // The page and data-mobile are left alone.
+  expect(root.style.getPropertyValue("--sf")).toBe("");
+  expect(surface.hasAttribute("data-mobile")).toBe(false);
+  const snapped = applyScaling({ surface, snap: "pixel" });
+  expect(snapped).toBe(toDevicePixel(390 / 280, 3));
+  expect(Math.round(snapped * 20 * 3 * 1e9) / 1e9).toBe(83);
+  const target = document.createElement("div");
+  applyScaling({ surface, root: target, snap: "layout" });
+  expect(target.style.getPropertyValue("--sf")).toBe(String(toLayoutStep(390 / 280)));
+  surface.remove();
+});
+
+test("surface: true scales every data-ds-surface element to its own width", () => {
+  screen(COMPUTER, 1440);
+  const phone = surfaceOf(() => 375);
+  const wide = surfaceOf(() => 560);
+  phone.setAttribute("data-ds-surface", "");
+  wide.setAttribute("data-ds-surface", "");
+  expect(applyScaling({ surface: true })).toBe(1.339);
+  expect(phone.style.getPropertyValue("--sf")).toBe("1.339");
+  expect(wide.style.getPropertyValue("--sf")).toBe("2");
+  expect(root.style.getPropertyValue("--sf")).toBe("");
+  phone.remove();
+  wide.remove();
+});
+
+test("startScaling follows a surface as its size changes, until stopped", () => {
+  screen(COMPUTER, 1440);
+  const observed: Array<() => void> = [];
+  const disconnect = vi.fn();
+  vi.stubGlobal("ResizeObserver", class {
+    constructor(callback: () => void) { observed.push(callback); }
+    observe() {}
+    disconnect() { disconnect(); }
+  });
+  let width = 375;
+  const surface = surfaceOf(() => width);
+  const stop = startScaling({ surface });
+  expect(surface.style.getPropertyValue("--sf")).toBe("1.339");
+  width = 280;
+  observed[0]?.();
+  expect(surface.style.getPropertyValue("--sf")).toBe("1");
+  width = 420;
+  window.dispatchEvent(new Event("resize"));
+  expect(surface.style.getPropertyValue("--sf")).toBe("1.5");
+  stop();
+  expect(disconnect).toHaveBeenCalled();
+  width = 560;
+  window.dispatchEvent(new Event("resize"));
+  expect(surface.style.getPropertyValue("--sf")).toBe("1.5");
+  vi.unstubAllGlobals();
+  surface.remove();
+});
+
 test("the device module applies the same rule and reports it", async () => {
   screen(PHONE, 420);
   const device = await import("../DS1/0-face/device");

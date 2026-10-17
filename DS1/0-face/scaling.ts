@@ -13,6 +13,11 @@
  * nothing, so a page without the components copies it alone (Sync 1's `root`
  * export with `"modules": ["scaling"]`). Call it before the page renders, and
  * the first paint is already to scale.
+ *
+ * A surface, such as a phone drawn on a page, scales to its own width
+ * instead: `startScaling({ surface: element })`, or `surface: true` for every
+ * `[data-ds-surface]` element. The same rule and snapping apply, on any
+ * device, and `--sf` goes on the surface alone.
  */
 export type ScalingMode = "auto" | "fixed" | "fluid";
 
@@ -34,8 +39,21 @@ export interface ScalingConfig {
 }
 
 export interface ScalingOptions extends Partial<ScalingConfig> {
-  /** The element that receives `--sf` and `data-mobile`; the document's root by default. */
+  /**
+   * The element that receives `--sf` and `data-mobile`; the document's root by
+   * default. With an element `surface`, the element that receives that
+   * surface's `--sf` (the surface itself by default).
+   */
   root?: HTMLElement;
+  /**
+   * Scale to a surface's own width rather than the page's: an element (a
+   * phone drawn on a page), or `true` for every element marked
+   * `data-ds-surface` in the document when the call is made. A surface is
+   * measured by its `clientWidth` and scaled on any device, a computer too,
+   * with the same rule and snapping; `--sf` goes on the surface, the page and
+   * `data-mobile` are left alone. Its width must not depend on its own `--sf`.
+   */
+  surface?: HTMLElement | boolean;
 }
 
 // ============================================================================
@@ -95,10 +113,36 @@ export function detectMobileDevice(): boolean {
 // Applying the scale
 // ============================================================================
 
-/** Puts the scale on the page once: `--sf`, and `data-mobile` on a phone or tablet. Returns the factor. */
+/** The surfaces a call scales: the element given, or every `[data-ds-surface]` for `true`. */
+function surfacesOf(surface: ScalingOptions["surface"]): HTMLElement[] {
+  if (!surface) return [];
+  if (surface === true) return Array.from(document.querySelectorAll<HTMLElement>("[data-ds-surface]"));
+  return [surface];
+}
+
+/** Scales one surface to its own width, whatever the device. */
+function applySurface(surface: HTMLElement, target: HTMLElement, config: Partial<ScalingConfig>): number {
+  const factor = calculateScalingFactor(surface.clientWidth || 0, { ...defaultScalingConfig, ...config }, window.devicePixelRatio || 1);
+  target.style.setProperty("--sf", String(factor));
+  return factor;
+}
+
+/**
+ * Puts the scale on the page once: `--sf`, and `data-mobile` on a phone or
+ * tablet. With `surface`, puts each surface's own scale on it instead. Returns
+ * the factor (the first surface's, or 1 when there is none).
+ */
 export function applyScaling(options: ScalingOptions = {}): number {
   if (typeof document === "undefined" || typeof window === "undefined") return 1;
-  const { root = document.documentElement, ...config } = options;
+  const { root, surface, ...config } = options;
+  if (surface) {
+    const factors = surfacesOf(surface).map(element => applySurface(element, (surface !== true && root) || element, config));
+    return factors[0] ?? 1;
+  }
+  return applyPage(root ?? document.documentElement, config);
+}
+
+function applyPage(root: HTMLElement, config: Partial<ScalingConfig>): number {
   const mobile = detectMobileDevice();
   // The page's width without its scroll bar.
   const width = document.documentElement.clientWidth || window.innerWidth || 0;
@@ -108,14 +152,26 @@ export function applyScaling(options: ScalingOptions = {}): number {
   return factor;
 }
 
-/** Puts the scale on the page now and again on every resize and turn. Returns a function that stops following. */
+/**
+ * Puts the scale on the page now and again on every resize and turn; a
+ * surface is followed as its own size changes. Returns a function that stops
+ * following.
+ */
 export function startScaling(options: ScalingOptions = {}): () => void {
-  if (typeof window === "undefined") return () => {};
-  const apply = () => { applyScaling(options); };
+  if (typeof window === "undefined" || typeof document === "undefined") return () => {};
+  const { root, surface, ...config } = options;
+  // Surfaces are found once, so the same ones are followed until stopped.
+  const surfaces = surfacesOf(surface);
+  const apply = surface
+    ? () => { for (const element of surfaces) applySurface(element, (surface !== true && root) || element, config); }
+    : () => { applyPage(root ?? document.documentElement, config); };
   apply();
+  const observer = surfaces.length && typeof ResizeObserver === "function" ? new ResizeObserver(apply) : null;
+  for (const element of surfaces) observer?.observe(element);
   window.addEventListener("resize", apply);
   window.addEventListener("orientationchange", apply);
   return () => {
+    observer?.disconnect();
     window.removeEventListener("resize", apply);
     window.removeEventListener("orientationchange", apply);
   };
