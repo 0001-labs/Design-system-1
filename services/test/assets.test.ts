@@ -58,6 +58,17 @@ describe("GET v/{n}.css", () => {
     expect(response.headers.get("ds1-version")).toBe("7");
   });
 
+  it("names the content hash the publish recorded, for a product that pins the version", async () => {
+    const id = await publishFixture("3");
+    const response = await mf.fetch(`/ds1/${id}/v/3.css`);
+    const body = await response.text();
+    const digest = [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(body)))].map(byte => byte.toString(16).padStart(2, "0")).join("");
+    expect(response.headers.get("ds1-content-hash")).toBe(digest);
+    expect(response.headers.get("access-control-expose-headers")).toContain("ds1-content-hash");
+    const head = await mf.fetch(`/ds1/${id}/v/3.css`, { method: "HEAD" });
+    expect(head.headers.get("ds1-content-hash")).toBe(digest);
+  });
+
   // The byte-copy design, asserted rather than assumed. If someone turns
   // latest.css into a redirect or a lookup, this is the test that fails.
   it("shares an ETag with latest.css when it is the live version", async () => {

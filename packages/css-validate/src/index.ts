@@ -7,6 +7,7 @@ import { MAX_ISSUES, type Issue, type ValidateOptions, type ValidateResult } fro
 export { DEFAULT_ALLOWED_HOSTS, ALLOWED_DATA_URL_TYPES } from "./hosts";
 export { ALLOWED_AT_RULES } from "./rules";
 export { MAX_ISSUES } from "./types";
+export { prepareLibrary, type PreparedLibrary } from "./library";
 export type { Issue, IssueCode, Severity, ValidateOptions, ValidateResult } from "./types";
 
 const DEFAULT_MAX_BYTES = 512 * 1024;
