@@ -713,7 +713,7 @@ export function getBrowserLanguage(): LanguageCode {
 // ============================================================================
 
 function dispatchLanguageChanged(language: LanguageCode): void {
-  if (typeof window === "undefined") {
+  if (typeof window === "undefined" || typeof window.dispatchEvent !== "function") {
     return;
   }
   window.dispatchEvent(
@@ -866,8 +866,11 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
   }
 }
 
-// Listen for external translations being loaded
-if (typeof window !== "undefined") {
+// Listen for external translations being loaded. Only where window takes events:
+// a server or worker runtime may define a window without them, and the timer
+// below would otherwise throw after the code that imported this has finished.
+const eventful = () => typeof window !== "undefined" && typeof window.addEventListener === "function" && typeof window.dispatchEvent === "function";
+if (eventful()) {
   window.addEventListener("translations-ready", () => {
     // Dispatch that translations are loaded
     window.dispatchEvent(new CustomEvent("translations-loaded"));
@@ -879,7 +882,7 @@ if (typeof window !== "undefined") {
   // Initialize translations on module load
   // Use setTimeout to give other parts of the app time to set up event listeners first
   setTimeout(() => {
-    if (typeof window === "undefined") {
+    if (!eventful()) {
       return;
     }
     window.dispatchEvent(new CustomEvent("translations-loaded"));
