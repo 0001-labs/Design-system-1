@@ -14,7 +14,13 @@ function styleRoot(root: Node) {
   styledRoots.add(root);
 }
 
-export type TextHighlight = { start: number; end: number; color?: string };
+/**
+ * A range of the text, in UTF-16 offsets. `color` is any CSS colour, the
+ * accent when left out. By default the words are tinted with it; with `fill`
+ * the colour itself lies behind the words, which stay in the text colour, so
+ * a pale colour shows and every palette colour keeps the words readable.
+ */
+export type TextHighlight = { start: number; end: number; color?: string; fill?: boolean };
 
 /** A native writing field with metric-preserving highlights. Products own the
  * text and mention data; DS1 owns its face, growth and synchronized overlay.
@@ -173,7 +179,7 @@ export class Composer extends LitElement {
     const parts = this.validHighlights().map(range => {
       const before = this.text.slice(cursor, range.start);
       cursor = range.end;
-      return html`${before}<mark style=${styleMap({ "--composer-highlight-color": range.color || undefined })}>${this.text.slice(range.start, range.end)}</mark>`;
+      return html`${before}<mark class=${range.fill ? "fill" : ""} style=${styleMap({ "--composer-highlight-color": range.color || undefined })}>${this.text.slice(range.start, range.end)}</mark>`;
     });
     return html`<span class="row-metric" aria-hidden="true"></span><slot @slotchange=${this.bindControl}></slot><div class="mirror" aria-hidden="true">${parts}${this.text.slice(cursor)}${"\n"}</div>`;
   }
