@@ -295,6 +295,89 @@ a.ds-button[aria-disabled="true"] {
 }
 
 /*
+ * `.ds-range` draws a native `<input type="range">`: one control high,
+ * standing on the lower sixteen of its square (the spare four above it as a
+ * margin, so it takes one square alone and in a row), eight squares wide.
+ * The track is a 1px line across the middle of the control, the thumb one
+ * control high and half a control wide with the shared corners, in the ink.
+ * The browser keeps the value, the keys, the form data and the events.
+ *
+ * Tokens: `--ds-range-width` (eight squares), `--ds-range-track` (the line,
+ * the title grey), `--ds-range-thumb` (the ink) and `--ds-range-thumb-width`.
+ * WebKit and Blink draw the parts as `::-webkit-slider-*`, Firefox as
+ * `::-moz-range-*`; both get the same track and thumb.
+ */
+
+.ds-range {
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+  display: inline-block;
+  vertical-align: bottom;
+  width: var(--ds-range-width, calc(8 * var(--ds-unit)));
+  min-width: 0;
+  height: var(--ds-control-height);
+  margin: calc(var(--ds-row-height) - var(--ds-control-height)) 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--ds-radius);
+  background: transparent;
+  color: var(--ds-range-thumb, var(--ds-text-color));
+  font: inherit;
+  cursor: pointer;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ds-range::-webkit-slider-runnable-track {
+  box-sizing: border-box;
+  height: var(--ds-control-height);
+  border: 0;
+  background: linear-gradient(var(--ds-range-track, var(--ds-title-color)) 0 0) 0 calc(var(--ds-control-height) / 2) / 100% 1px no-repeat;
+}
+
+.ds-range::-moz-range-track {
+  box-sizing: border-box;
+  height: var(--ds-control-height);
+  border: 0;
+  background: linear-gradient(var(--ds-range-track, var(--ds-title-color)) 0 0) 0 calc(var(--ds-control-height) / 2) / 100% 1px no-repeat;
+}
+
+.ds-range::-moz-range-progress {
+  background: transparent;
+}
+
+.ds-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+  width: var(--ds-range-thumb-width, calc(var(--ds-control-height) / 2));
+  height: var(--ds-control-height);
+  border: 0;
+  border-radius: var(--ds-radius);
+  background: currentColor;
+}
+
+.ds-range::-moz-range-thumb {
+  box-sizing: border-box;
+  width: var(--ds-range-thumb-width, calc(var(--ds-control-height) / 2));
+  height: var(--ds-control-height);
+  border: 0;
+  border-radius: var(--ds-radius);
+  background: currentColor;
+}
+
+.ds-range:focus-visible {
+  outline: 2px solid var(--ds-focus-ring);
+  outline-offset: 1px;
+}
+
+.ds-range:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+/*
  * `.ds-tabs` is the `ds-tabs` element's row on native buttons. As an option
  * group (role="group", a segmented control) its `.ds-button` choices are
  * grey and the chosen one, aria-pressed, aria-selected or aria-current, is in

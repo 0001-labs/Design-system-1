@@ -14,6 +14,7 @@ description: The components' look as plain classes on native elements, and the s
 | `ds-select` | `<select>` | A field with the chevron drawn in its text colour. |
 | `ds-checkbox`, `ds-radio` | `<input type="checkbox">`, `<input type="radio">` | 12px native choices in the text colour. |
 | `ds-switch`, with `ds-switch--rounded` | `<button role="switch" aria-checked>` | The Switch: two control heights wide, its thumb travelling one. The page toggles `aria-checked`. |
+| `ds-range` | `<input type="range">` | A slider one control high on the lower sixteen of its square, eight squares wide: a 1px line across its middle and a thumb one control high and half a control wide in the ink. See [Range](#range). |
 | `ds-tabs`, with `ds-tabs--fill` | a row of `.ds-button` | The Tabs row. With `role="group"` it is a segmented control: the choices grey, the chosen one (`aria-pressed`, `aria-selected` or `aria-current`) in the accent. |
 | `ds-dialog` | `<dialog>` | The Dialog's frame: twenty squares wide, a square of padding, a hairline, the paper and a dimmed backdrop. Mark its parts with `data-ds-dialog="header"`, `title`, `description`, `footer` and `close`, as inside the element, and a field with `field`, its label with `label`. The [feedback module](/1-root/feedback/) draws `confirm()`, `prompt()` and `alert()` on it. `ds-dialog--sheet` stands it at the foot of the screen with a handle, `--end` and `--start` as a drawer; `bindDialogSwipe()` from `0-face/dialog-swipe.ts` lets a finger swipe it away ([Placement](/4-page/dialog/#placement-sheets-and-drawers)). From `dialog-placement.css`, which controls.css imports. |
 | `ds-menu`, `ds-menu__item` and its parts | a menu a library draws | The Menu, on whole squares: half a square inside its line on each side, no shadow, entries one square high with nothing between them and a separator one square with its line, so n entries are n + 1 squares high. An item may be a `<button>`, which keeps the row's look; a library's own button or link directly in the menu (or in a `role="group"` in it) is held to one square whatever its styles say. |
@@ -132,6 +133,22 @@ The page flips `aria-pressed` when it is clicked. The words stay the same in bot
 | `ds-tabs` with `role="group"` | a row of `.ds-button` with `aria-pressed` | One of two or more choices: list or board; day, week or month. |
 
 The [Toggle](/2-core/toggle/) element, `<ds-toggle>`, is the rounded switch: on a page without Lit it is `ds-switch ds-switch--rounded`. The `ds-toggle` class is the toggle button.
+
+## Range
+
+A value picked along a line: a playhead, a size, an amount of blur. The browser keeps the value, the arrow keys, Home and End, the form data and the `input` and `change` events.
+
+```html
+<label class="ds-field ds-field--beside">
+  <span class="ds-field__label">Blur</span>
+  <input class="ds-range" type="range" name="blur" min="0" max="20" step="1" value="4" />
+</label>
+<input class="ds-range" type="range" min="0" max="240" value="0" aria-label="Playhead" style="--ds-range-width: 100%" />
+```
+
+The control is one control high and keeps the square's spare four above it as a margin, so it takes one square on its own and stands on the sixteen in a row. The track is a 1px line through the middle of the control in the title grey; the thumb is one control high, half a control wide, with the shared corners, in the ink. It takes the focus ring and dims to half when disabled, as the other controls do, and nothing in it animates. WebKit and Blink draw it through `::-webkit-slider-*` and Firefox through `::-moz-range-*`, the same in both.
+
+`--ds-range-width` sets its width (eight squares; `100%` fills its row), `--ds-range-track` the line's colour, `--ds-range-thumb` the thumb's and `--ds-range-thumb-width` the thumb's width. Name a range without a visible label with `aria-label`, and give it `aria-valuetext` when its number alone does not say what it means ("1.2 seconds").
 
 ## Icon
 

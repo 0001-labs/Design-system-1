@@ -10,7 +10,7 @@ const rule = (selector: string) => {
 };
 
 test('every native control class has a focus ring and a disabled state', () => {
-  for (const name of ['.ds-input', '.ds-textarea', '.ds-select', '.ds-checkbox', '.ds-radio', '.ds-switch']) {
+  for (const name of ['.ds-input', '.ds-textarea', '.ds-select', '.ds-checkbox', '.ds-radio', '.ds-switch', '.ds-range']) {
     expect(css).toMatch(new RegExp(`${name.replace('.', '\\.')}:focus-visible`));
     expect(css).toMatch(new RegExp(`${name.replace('.', '\\.')}:disabled`));
   }
@@ -36,4 +36,21 @@ test('a menu item that is a button loses only the button look, at no extra speci
   const reset = rule(':where(button).ds-menu__item');
   expect(reset).toContain('background: transparent');
   expect(css.indexOf(':where(button).ds-menu__item')).toBeLessThan(css.indexOf('.ds-menu__item:hover'));
+});
+
+test('a native range draws the same track and thumb in WebKit and Firefox', () => {
+  expect(rule('.ds-range')).toContain('margin: calc(var(--ds-row-height) - var(--ds-control-height)) 0 0');
+  expect(rule('.ds-range')).toContain('width: var(--ds-range-width, calc(8 * var(--ds-unit)))');
+  for (const engine of ['::-webkit-slider-runnable-track', '::-moz-range-track']) {
+    const track = rule(`.ds-range${engine}`);
+    expect(track, engine).toContain('height: var(--ds-control-height)');
+    expect(track, engine).toContain('/ 100% 1px no-repeat');
+  }
+  for (const engine of ['::-webkit-slider-thumb', '::-moz-range-thumb']) {
+    const thumb = rule(`.ds-range${engine}`);
+    expect(thumb, engine).toContain('height: var(--ds-control-height)');
+    expect(thumb, engine).toContain('width: var(--ds-range-thumb-width, calc(var(--ds-control-height) / 2))');
+    expect(thumb, engine).toContain('background: currentColor');
+    expect(thumb, engine).not.toContain('transition');
+  }
 });
