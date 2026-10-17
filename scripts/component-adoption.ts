@@ -29,14 +29,18 @@ export function loadAppSpecs(studio: string, configPath = process.env.ADOPTION_C
   return config.apps;
 }
 const known = new Set(IMPLEMENTATION_COLUMNS.map(c => c.id));
+/** The site chrome's native blocks: the header (its drawer drawn by drawer.css, which header.css imports), the footer, and the document page with its definition table. */
+/** The site chrome's sheets, React adapters and the header's page script, each verified on its own. */
+const siteChromeFiles = ["1-root/header.css", "1-root/footer.css", "1-root/document.css", "react/header.ts", "react/footer.ts", "react/document.ts", "0-face/header.ts"];
+const siteChromeBlocks: Record<string, { component: string; sheet: string }> = { "ds-header": { component: "header", sheet: "1-root/header.css" }, "ds-footer": { component: "footer", sheet: "1-root/footer.css" }, "ds-document": { component: "document", sheet: "1-root/document.css" }, "ds-definitions": { component: "document", sheet: "1-root/document.css" } };
 /** Blocks a native class draws on any element, each with the sheet that draws it. Text marked as one of their parts is the block's own. */
-const blockClasses: Record<string, { component: string; sheet: string }> = { "ds-empty": { component: "empty", sheet: "1-root/empty.css" }, "ds-notice": { component: "notice", sheet: "1-root/notice.css" }, "ds-table": { component: "table", sheet: "1-root/table.css" } };
-const blockPart = /^ds-(?:empty|notice)__/;
+const blockClasses: Record<string, { component: string; sheet: string }> = { "ds-empty": { component: "empty", sheet: "1-root/empty.css" }, "ds-notice": { component: "notice", sheet: "1-root/notice.css" }, "ds-table": { component: "table", sheet: "1-root/table.css" }, ...siteChromeBlocks };
+const blockPart = /^ds-(?:empty|notice|header|footer|document)__/;
 /**
  * Files verified on their own: the block sheets, the React adapters for empty states and notices, and the page
  * scripts that draw DS1 without a component: the tooltip script and the feedback dialogs.
  */
-const entryFiles = ["1-root/empty.css", "1-root/notice.css", "1-root/table.css", "react/empty.ts", "react/notice.ts", "0-face/tooltips.ts", "0-face/feedback.ts", "0-face/dialogs.ts"];
+const entryFiles = ["1-root/empty.css", "1-root/notice.css", "1-root/table.css", "react/empty.ts", "react/notice.ts", "0-face/tooltips.ts", "0-face/feedback.ts", "0-face/dialogs.ts", ...siteChromeFiles];
 const native: Record<string, string> = { button: "button", input: "input", select: "select", textarea: "textarea", p: "text", h1: "text", h2: "text", h3: "text", h4: "text", h5: "text", h6: "text", ul: "list", ol: "list", table: "table", form: "form", dialog: "dialog", details: "accordion" };
 /**
  * `prose` marks native text, a list or a table inside an element marked data-ds-prose, which DS1's prose sheet draws.
@@ -853,6 +857,9 @@ function importedSharedAdapters(root: string, file: string, source: string, mani
     [resolve(root, dirname(manifestPath), "react/badge.ts")]: { Badge: "badge" },
     [resolve(root, dirname(manifestPath), "react/empty.ts")]: { Empty: "empty" },
     [resolve(root, dirname(manifestPath), "react/notice.ts")]: { Notice: "notice" },
+    [resolve(root, dirname(manifestPath), "react/header.ts")]: { Header: "header" },
+    [resolve(root, dirname(manifestPath), "react/footer.ts")]: { Footer: "footer" },
+    [resolve(root, dirname(manifestPath), "react/document.ts")]: { DocumentPage: "document" },
     [resolve(root, dirname(manifestPath), "react/avatar.ts")]: { Avatar: "avatar", Logo: "avatar" },
     [resolve(root, dirname(manifestPath), "react/accordion.ts")]: { Accordion: "accordion" },
     [resolve(root, dirname(manifestPath), "react/menu.ts")]: { Menu: "menu" },

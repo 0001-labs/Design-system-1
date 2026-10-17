@@ -501,6 +501,29 @@ describe("empty states and notices", () => {
     expect(scan().cells.notice).toMatchObject({ styled: 0, unverified: 1 });
   });
 
+  it("recognizes the site chrome's classes on any element, keeping their text parts in the block, and counts the elements in their columns", () => {
+    const sites = sourceSites("page.html", '<header class="ds-header"><a class="ds-header__brand" href="/">Name</a><nav class="ds-header__nav"><a href="/">Home</a></nav><button class="ds-button ds-button--icon ds-header__toggle">Menu</button></header><div class="ds-document"><article class="ds-document__body" data-ds-prose><h2>Notice</h2><dl class="ds-definitions"><dt>Seller</dt><dd>Name</dd></dl></article></div><footer class="ds-footer"><h2 class="ds-footer__heading">Product</h2><p class="ds-footer__legal">© Name</p></footer><ds-header></ds-header><ds-footer></ds-footer><ds-document></ds-document>');
+    expect(sites.filter(site => site.nativeStyle).map(site => [site.tag, site.nativeStyle])).toEqual([["header", "ds-header"], ["button", "ds-button"], ["div", "ds-document"], ["dl", "ds-definitions"], ["footer", "ds-footer"], ["h2", "block-part"], ["p", "block-part"]]);
+    expect(sites.filter(site => site.tag.startsWith("ds-")).map(site => site.tag)).toEqual(["ds-header", "ds-footer", "ds-document"]);
+    const studio = mkdtempSync(join(tmpdir(), "component-adoption-")); temporary.push(studio);
+    const ds = join(studio, "Design system 1"), app = join(studio, "Pages");
+    for (const root of [ds, app]) { mkdirSync(root); git(root, "init", "-b", "main"); }
+    const sheets = { "header.css": ".ds-header { display: flex; }", "footer.css": ".ds-footer { display: flex; }", "document.css": ".ds-document { display: flex; }", "component-tokens.css": ":root { --t: 1; }", "component-metrics.css": ":root { --m: 1; }", "component-appearance.css": ":root { --a: 1; }" };
+    for (const [file, body] of Object.entries(sheets)) write(ds, `DS1/1-root/${file}`, body);
+    commit(ds, "Sheets");
+    // The product copied every sheet but the footer's.
+    const copied = Object.fromEntries(Object.entries(sheets).filter(([file]) => file !== "footer.css"));
+    for (const [file, body] of Object.entries(copied)) write(app, `web/ds1/${file}`, body);
+    write(app, "sync.lock.json", JSON.stringify({ "Design system 1": { commit: git(ds, "rev-parse", "HEAD"), files: Object.fromEntries(Object.entries(copied).map(([file, body]) => [`web/ds1/${file}`, sha(body)])) } }));
+    write(app, "web/index.html", '<header class="ds-header"><a class="ds-header__brand" href="/">Name</a></header>\n<div class="ds-document"><dl class="ds-definitions"><dt>Seller</dt><dd>Name</dd></dl></div>\n<footer class="ds-footer"><p class="ds-footer__legal">© Name</p></footer>');
+    commit(app, "Page");
+    const scan = scanApp({ id: "pages", name: "Pages", directory: "Pages", roots: ["web"] }, studio, ds);
+    expect(scan.cells.header).toMatchObject({ styled: 1, unverified: 0 });
+    expect(scan.cells.document).toMatchObject({ styled: 2, unverified: 0 });
+    expect(scan.cells.footer).toMatchObject({ styled: 0, unverified: 1 });
+    expect(scan.cells.text).toMatchObject({ local: 0, styled: 0, unverified: 0 });
+  });
+
   it("counts a native table with the ds-table class as DS1 styles, verified through table.css", () => {
     expect(sourceSites("view.html", '<div class="ds-table-scroll"><table class="ds-table"><tr><td data-numeric>1</td></tr></table></div><table><tr><td>2</td></tr></table>').filter(site => site.tag === "table").map(site => site.nativeStyle)).toEqual(["ds-table", undefined]);
     const studio = mkdtempSync(join(tmpdir(), "component-adoption-")); temporary.push(studio);
