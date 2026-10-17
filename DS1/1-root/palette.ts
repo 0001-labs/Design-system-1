@@ -89,3 +89,22 @@ export function paletteCss(): string {
   lines.push(paletteEnd);
   return lines.join('\n');
 }
+
+/**
+ * The palette on its own, for a page that does not take the classless sheet: palette.css,
+ * imported by one.css and copied by Sync 1's `root` and `tokens` exports.
+ */
+export function paletteSheet(): string {
+  return [
+    '/* Design system 1\'s named colours as tokens: --one-<colour> and --one-<colour>-pastel,',
+    '   each light-dark(light, dark), and the named pastels (--one-zenith-blue,',
+    '   --one-comfortable-green). light-dark() follows the page\'s color-scheme, which',
+    '   one.css sets. Written by scripts/write-palette-css.ts from palette.ts; never edit it',
+    '   by hand. */',
+    '',
+    ':root {',
+    paletteCss(),
+    '}',
+    '',
+  ].join('\n');
+}

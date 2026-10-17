@@ -9,15 +9,17 @@ import { componentGraph } from './scripts/component-graph.mjs';
 import { applePackage } from './scripts/native-apple.mjs';
 import { androidPackage } from './scripts/native-android.mjs';
 
-const rootStyles = ['one.css', 'grid.css', 'text.css', 'component-tokens.css', 'component-metrics.css', 'component-appearance.css'];
+const rootStyles = ['one.css', 'grid.css', 'text.css', 'component-tokens.css', 'component-metrics.css', 'component-appearance.css', 'fonts.css', 'palette.css'];
 /** one.css and controls.css both import the text classes. */
 const importsText = ['one.css', 'controls.css'];
+/** one.css also imports the faces with their typeface tokens, and the palette. */
+const oneImports = ['fonts.css', 'palette.css'];
 /** The sheets controls.css imports besides the text classes: tables, empty states and notices. */
 const controlSheets = ['table.css', 'empty.css', 'notice.css'];
 /** Sheets for writing that a product asks for by name, as a flag or in `styles`. */
-const writingSheets = { prose: 'prose.css', classless: 'one.semantic.css' };
+const writingSheets = { prose: 'prose.css', classless: 'one.semantic.css', cjk: 'cjk.css' };
 const askedSheets = options => Object.entries(writingSheets).filter(([flag]) => options[flag]).map(([, file]) => file);
-/** The faces one.css loads, by the file names its @font-face rules use. */
+/** The faces fonts.css (and so one.css) loads, by the file names its @font-face rules use, and their licences. */
 const rootFonts = ['GT-America-Standard-Regular.woff2', 'GT-America-Standard-Medium.woff2', 'GT-America-Compressed-Regular.woff2', 'GT-Canon-M-Standard-Medium-Trial.woff2', 'Inter-Arrows.woff2', 'Iosevka-Regular.woff2', 'Inter-LICENSE.md', 'Iosevka-LICENSE.md'];
 /** Page scripts in 0-face/, each with the modules it imports. */
 const rootModules = {
@@ -32,6 +34,8 @@ const rootModules = {
 /** The component stylesheets in the order they import each other. */
 const tokenStyles = ['component-appearance.css', 'component-metrics.css', 'component-tokens.css'];
 const withoutImports = css => css.replace(/^@import\s+"\.\/[^"]+";\s*\n/gm, '');
+/** Stylesheets fetched from another host (cjk.css's faces), which a bundle must import before any rule. */
+const remoteImport = /^@import\s+url\([^)]*\)[^;]*;\s*\n/gm;
 
 const languageFiles = ['i18n.ts', 'languages.ts', 'language-routing.ts', 'translations-format.ts', 'language-validator.ts', 'shared-words.ts', 'format.ts', 'pricing.ts'];
 
@@ -66,50 +70,69 @@ export default {
     library: {
       files({ read }) { return { 'library-styles.ts': read('DS1/0-face/library-styles.ts') }; },
     },
-    /** Optional display faces, copied as local assets by consumers. */
+    /**
+     * Faces copied as local assets by consumers: `fonts` names them by file. `stylesheet: true`
+     * adds fonts.css, the @font-face rules and typeface tokens one.css imports, pointed at the
+     * faces beside it, and every face it loads, for a page that does not load one.css.
+     */
     fonts: {
       files({ read, options }) {
         const available = {
           'OlivettiDot-Regular.woff2': 'website/src/assets/fonts/OlivettiDot-Regular.woff2',
           ...Object.fromEntries(rootFonts.map(name => [name, `DS1/1-root/fonts/${name}`])),
         };
-        if (!Array.isArray(options.fonts) || !options.fonts.length) throw new Error('Name the fonts to copy');
-        return Object.fromEntries(options.fonts.map(name => {
+        if (options.fonts !== undefined && !Array.isArray(options.fonts)) throw new Error('Name the fonts to copy: "fonts": ["Iosevka-Regular.woff2", …]');
+        const names = [...(options.fonts ?? [])];
+        if (options.stylesheet) for (const name of rootFonts) if (!names.includes(name)) names.push(name);
+        if (!names.length) throw new Error('Name the fonts to copy, or ask for the stylesheet');
+        const files = Object.fromEntries(names.map(name => {
           if (!Object.hasOwn(available, name)) throw new Error(`Unknown font: ${name}`);
           return [name, read(available[name])];
         }));
+        if (options.stylesheet) files['fonts.css'] = String(read('DS1/1-root/fonts.css')).replaceAll('url("./fonts/', 'url("./');
+        return files;
       },
     },
     /**
-     * Component tokens for static stylesheets that import them by URL.
+     * Component tokens for static stylesheets that import them by URL, with
+     * the named palette colours (palette.css, the --one-* tokens).
      * `nativeControls` adds controls.css with the table, text, empty-state and
      * notice classes it imports (table.css, text.css, empty.css, notice.css);
      * `prose` adds the prose sheet (prose.css, for writing marked data-ds-prose) and `classless` the classless sheet
-     * (one.semantic.css, which styles a whole page of plain HTML); `bundle` writes them all as one
+     * (one.semantic.css, which styles a whole page of plain HTML) and `cjk` Noto Sans
+     * for Japanese and Chinese (cjk.css); `bundle` writes them all as one
      * bundle.css with the imports resolved, for a page that can carry only one
      * stylesheet or inlines its styles.
      */
     tokens: {
       files({ read, options }) {
         const files = options.bundle ? [...tokenStyles] : ['component-tokens.css', 'component-metrics.css', 'component-appearance.css'];
+        files.push('palette.css');
         if (options.nativeControls) files.push('table.css', 'text.css', 'empty.css', 'notice.css', 'controls.css');
         files.push(...askedSheets(options));
-        if (options.bundle) return { 'bundle.css': `/* Generated from Design system 1/DS1/1-root: ${files.join(', ')}. Change Design system 1 and sync. */\n` + files.map(file => withoutImports(read(`DS1/1-root/${file}`))).join('\n') };
+        if (options.bundle) {
+          const sheets = files.map(file => withoutImports(read(`DS1/1-root/${file}`)));
+          const remote = sheets.flatMap(css => css.match(remoteImport) ?? []).join('');
+          return { 'bundle.css': `/* Generated from Design system 1/DS1/1-root: ${files.join(', ')}. Change Design system 1 and sync. */\n` + remote + sheets.map(css => css.replace(remoteImport, '')).join('\n') };
+        }
         return Object.fromEntries(files.map(file => [file, read(`DS1/1-root/${file}`)]));
       },
     },
     /**
-     * The root stylesheet (one.css with grid.css, the text classes and the
-     * component tokens) and the faces it loads, in fonts/. `styles` names the
-     * stylesheets to copy when a product loads only some (`["grid.css"]`, or
-     * `[]` for scripts alone); `fonts: false` leaves the faces to the product;
+     * The root stylesheet (one.css with grid.css, the text classes, the
+     * component tokens, the faces and typeface tokens in fonts.css and the
+     * palette in palette.css) and the faces it loads, in fonts/. `styles` names the
+     * stylesheets to copy when a product loads only some (`["grid.css"]`,
+     * `["fonts.css"]` for the faces alone, or `[]` for scripts alone); `fonts:
+     * false` leaves the faces to the product;
      * `nativeControls` adds controls.css and the table.css, empty.css and
      * notice.css it imports; `prose`
      * adds the prose sheet (prose.css) and `classless` the classless sheet
-     * (one.semantic.css), which `styles` may also name; `modules` names page scripts
+     * (one.semantic.css) and `cjk` Noto Sans for Japanese and Chinese (cjk.css,
+     * from Google Fonts), which `styles` may also name; `modules` names page scripts
      * from 0-face/ (grid, grid-fit, layout-inspector, scaling, tooltips), copied
-     * with what they import. one.css and controls.css bring text.css, which
-     * they import.
+     * with what they import. one.css and controls.css bring text.css, and
+     * one.css fonts.css and palette.css, which they import.
      */
     root: {
       files({ read, options }) {
@@ -121,6 +144,7 @@ export default {
         }
         if (options.nativeControls) for (const file of [...controlSheets, 'controls.css']) files[file] = read(`DS1/1-root/${file}`);
         if (Object.keys(files).some(file => importsText.includes(file))) files['text.css'] = read('DS1/1-root/text.css');
+        if (files['one.css']) for (const file of oneImports) files[file] ??= read(`DS1/1-root/${file}`);
         if (options.fonts !== false) for (const font of rootFonts) files[`fonts/${font}`] = read(`DS1/1-root/fonts/${font}`);
         for (const name of options.modules ?? []) {
           if (!Object.hasOwn(rootModules, name)) throw new Error(`Unknown page script: ${name}`);

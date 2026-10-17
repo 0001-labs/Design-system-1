@@ -98,7 +98,7 @@ The App parity list in Ezo (`29iiBs`, in the 0001 folder) shows where Ezo, Consi
 
 The exact measures and rules of the system (the 20px square, items one square high, widths in whole squares, type, lines, corners, motion) are the `design-system-1` skill in `skills/design-system-1/SKILL.md`. It is linked into `~/.agents/skills`, so every agent loads it for interface work in any 0001 project. Change the rules there, in this repository.
 
-Two type rules every product keeps, here and in Aa: **arrows are always Inter**, in every typeface, code included, through the "Inter Arrows" face (`DS1/1-root/fonts/Inter-Arrows.woff2`, Inter's arrows alone, `unicode-range`) that leads every `--typeface-*` token in `one.css` and `component-tokens.css`; a new typeface token or font stack starts with it. And **code is Iosevka Extended** (`--typeface-mono`, `fonts/Iosevka-Regular.woff2`, cut to what code uses), falling back to a system monospace, never a serif.
+Two type rules every product keeps, here and in Aa: **arrows are always Inter**, in every typeface, code included, through the "Inter Arrows" face (`DS1/1-root/fonts/Inter-Arrows.woff2`, Inter's arrows alone, `unicode-range`) that leads every `--typeface-*` token in `fonts.css` (imported by `one.css`) and `component-tokens.css`; a new typeface token or font stack starts with it. `fonts.css` is the one definition of the faces; nothing a page always loads fetches from another host, and Noto Sans for Japanese and Chinese is the opt-in `cjk.css`. And **code is Iosevka Extended** (`--typeface-mono`, `fonts/Iosevka-Regular.woff2`, cut to what code uses), falling back to a system monospace, never a serif.
 
 ## Private icon builder
 

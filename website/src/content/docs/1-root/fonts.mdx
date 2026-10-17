@@ -9,8 +9,16 @@ import FontCatalog from '../../../components/FontCatalog.astro';
 
 ## Using the system fonts
 
-The system stylesheet loads GT America Standard Regular and Medium, GT America Compressed Regular, the GT Canon trial, and Iosevka Extended. The wider code face sits alongside GT America while keeping a fixed character width. Noto Sans provides Japanese, Simplified Chinese and Traditional Chinese text through the language-specific tokens. Inter Arrows leads every typeface token and supplies the arrows.
+`fonts.css` (`DS1/1-root/fonts.css`) holds the faces and the typeface tokens that name them: GT America Standard Regular and Medium, GT America Compressed Regular, the GT Canon trial, Inter Arrows and Iosevka Extended, loaded from `fonts/` beside it. `one.css` imports it, so a page that links `one.css` has them; a page that does not links `fonts.css` on its own. Neither loads anything from another host. Inter Arrows leads every typeface token and supplies the arrows.
 
-Use `--typeface-regular` for body text, `--typeface-medium` for emphasis, `--typeface-compressed` for narrow display text and `--typeface-mono` for code. `--typeface-canon` uses the bundled trial face. Check the original foundry's licence before using a commercial or trial font in your own work.
+Use `--typeface-regular` for body text, `--typeface-medium` for emphasis, `--typeface-compressed` for narrow display text and `--typeface-mono` for code, which is Iosevka Extended with a system monospace after it. `--typeface-canon` uses the bundled trial face. The component tokens in `component-tokens.css` (`--ds-typeface-regular`, `--ds-typeface-medium`, `--ds-typeface-mono` and the rest) name the same families, so either set of tokens finds the faces `fonts.css` loads. Check the original foundry's licence before using a commercial or trial font in your own work.
+
+With Sync 1, `root` with `"styles": ["fonts.css"]` copies the sheet with its faces in `fonts/`; `fonts` with `"stylesheet": true` copies it beside the faces instead, pointed at them. `one.css` always arrives with `fonts.css`.
+
+### Japanese and Chinese
+
+The language tokens (`--typeface-regular-jp`, `--typeface-regular-zh-hans`, `--typeface-regular-zh-hant`, and `--ds-typeface-regular-jp` and its Chinese pair for the components) name Noto Sans first and then the reader's own faces: Hiragino and PingFang on Apple systems, Yu Gothic, Microsoft YaHei and JhengHei on Windows, Noto Sans CJK on Android and Linux. A page in Japanese or Chinese (`lang="ja"`, `lang="zh"`, Simplified with `zh-Hans`) sets its labels in that language's face. Without anything more, Japanese and Chinese text is drawn in those system faces and nothing is downloaded.
+
+A product that shows Japanese or Chinese and wants Noto Sans everywhere adds `cjk.css` (`DS1/1-root/cjk.css`, Sync 1's `"cjk": true` on `root` or `tokens`). It loads Noto Sans JP, SC and TC from Google Fonts, which cuts each into `unicode-range` slices so a page downloads only the characters it shows, and stops the browser from thickening their one weight (`font-synthesis-weight: none`). Noto Sans is under the SIL Open Font License. A page whose security policy keeps other hosts out leaves `cjk.css` out, or serves Noto Sans itself under the same family names, which the tokens then find.
 
 Olivetti Dot is available here as a specimen; it is not loaded by the system stylesheet. Supernatural has no font asset or typeface token yet.
