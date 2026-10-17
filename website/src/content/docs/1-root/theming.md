@@ -22,7 +22,7 @@ The document stylesheet uses `--accent-color`; shared components use the scoped 
 
 ### Theme modes
 
-A person chooses Light, Dark or System; System, the default, follows the system's appearance as it changes. The choice is one stored value, `light`, `dark` or `system`, under `ds-one:theme` (or the product's `themeStorageKey`).
+A person chooses Light, Dark or System; System follows the system's appearance as it changes. The choice is one stored value, `light`, `dark` or `system`, under `ds-one:theme` (or the product's `themeStorageKey`). A visitor who has chosen nothing sees System, unless the product sets `themeDefault` to `light` or `dark` (see the options below).
 
 The theme is marked on the root element. Key styles on the class:
 
@@ -83,10 +83,23 @@ A build can inline the file's text (in Vite, import it with `?raw`). A page that
 | Option | Default | What it does |
 | --- | --- | --- |
 | `themeStorageKey` | `ds-one:theme` | Where the choice is stored. Keep a product's existing key so saved choices carry over. |
+| `themeDefault` | `'system'` | What a visitor who has chosen nothing sees: `'light'` or `'dark'` keeps that theme, whatever the system, until they choose. Nothing is stored until they do, and a stored choice always wins. |
 | `themeMode: 'system'` | Off | Follow the system and never read or write a stored choice, for surfaces such as documentation. |
 | `themePaper` | `{ light: '#ffffff', dark: '#2a2a2a' }` | The canvas and theme-color in each theme; `false` leaves both to the page. |
 
-The script also sets `lang` on the root from the language module's stored choice (`window.DS_ONE_I18N`: `storageKey`, `persist: false` to skip it, `languages` to allow only those).
+A site that has always been light keeps it for first visits:
+
+```html
+<script>window.DS_ONE_PREFERENCES = { themeStorageKey: 'theme', themeDefault: 'light' };</script>
+```
+
+The script also sets `lang` on the root, from `window.DS_ONE_I18N`:
+
+- On a page whose address names its language (`/ja/…`), with `languageFromAddress: true`, the address's language, matched against `routing.languages`, then `languages`, then every language of the list. The stored choice is not changed.
+- Otherwise the language module's stored choice (`storageKey`, `persist: false` to skip it, `languages` to allow only those).
+- With `langTarget` set, the root's `lang` is left to the page.
+
+See [Languages](/1-root/languages/#choosing-and-remembering-a-language).
 
 After the first paint it keeps the page right: in System mode it follows `prefers-color-scheme` as it changes, and it applies the choice again when another tab stores one and when a page returns from the back-forward cache. A change crosses from one theme to the other in a view transition of the root; with reduced motion it changes at once.
 
@@ -105,6 +118,9 @@ setThemeMode('system'); // or 'light', 'dark'
 - `setTheme('light' | 'dark')` chooses a theme, as before. `followSystemTheme()` makes the page follow the system without touching the stored choice, and returns a function that hands it back.
 - A change emits `theme-changed` on `window`, with `detail.theme` and `detail.mode`.
 - On a page without the module, `window.DS_ONE_THEME` has `mode()`, `theme()`, `set(mode)` and `apply()`.
+
+<span id="copying-it"></span>
+A page without the components copies the module with Sync 1's `root` export, `"modules": ["theme"]`: `0-face/theme.ts`, the head script it runs and `preference-options.ts`, the type of `window.DS_ONE_PREFERENCES`. It needs `@lit-labs/signals`. `"modules": ["theme-bootstrap"]` copies the head script alone, for a page that uses `window.DS_ONE_THEME`.
 
 [Cycle](/2-core/cycle/) with `type="theme"` steps through Light, Dark and System. Keeping the choice on an account, the favicon and redrawing canvases belong to the application. See [Preferences](/1-root/preferences/) for the related storage topic.
 

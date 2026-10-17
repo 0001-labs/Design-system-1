@@ -59,6 +59,18 @@ currentLanguage.value; // "da"
 
 `setLanguage` remembers the choice in `localStorage` (under `language`, or the `storageKey` the product configures), sets the document's `lang`, fetches the language's words when they come a file at a time, and announces `language-changed` on `window` with `{ language }` as its detail.
 
+`setLanguage(language, { remember: false })` changes the language for this page alone, without storing it: a preview, or a language the page was asked for.
+
+### Where `lang` goes
+
+`lang` follows the language on the document's root by default. A page that embeds a surface in another language than its own, such as a prototype in Japanese on a page written in English, keeps it on that surface:
+
+```javascript
+configureI18n({ langTarget: document.querySelector(".prototype") });
+```
+
+`langTarget: false` writes `lang` nowhere. With either, the [theme head script](/1-root/theming/#before-the-first-paint) leaves the root's `lang` alone too.
+
 On a first visit the language is the browser's, as one the product speaks: the first of the browser's languages that fits, a relative standing in. A stored choice is read the same way, so a saved `pt` becomes `pt-BR` in a product that speaks only Brazilian Portuguese.
 
 ## Translating
@@ -161,18 +173,25 @@ import {
   withLanguagePrefix,
   stripLanguagePrefix,
   isLanguageSlug,
-  setLanguage,
 } from "@0001-labs/design-system-1";
 
 parseLanguagePath("/ja/pricing"); // { language: "ja", restPath: "/pricing" }
 withLanguagePrefix("/pricing", "pt-BR"); // "/pt-br/pricing"
 withLanguagePrefix("/ja/pricing", "en"); // "/pricing"
 stripLanguagePrefix("/ja/pricing"); // "/pricing"
-
-// At startup, before anything reads the language
-const { language } = parseLanguagePath(location.pathname);
-if (language) setLanguage(language);
 ```
+
+### The language an address names
+
+A page at `/ja/…` speaks Japanese, whatever the reader chose before. Take the language from the address, and the stored choice is left as it is, so following a link to `/ja/…` never overwrites what a person chose for the rest of the product:
+
+```javascript
+configureI18n({ languages: ["en", "da", "ja"], languageFromAddress: true });
+```
+
+With `languageFromAddress`, the language at startup is the address's prefix (by `routing`); an address without one keeps the stored choice or the browser's. A person's choice through `setLanguage` (or `ds-language`) is still stored; the product then goes to the address in that language with `withLanguagePrefix`. Set it on `window.DS_ONE_I18N` before the [theme head script](/1-root/theming/#before-the-first-paint), and `lang` is right before the first paint too.
+
+Calling `setLanguage(language)` with the address's language at startup instead stores it as the person's choice: pass `{ remember: false }` if a product does it that way.
 
 The languages that get a prefix are the product's `languages`; the default language (`en`) has none. Change either through `configureI18n({ routing: { … } })` or `configureLanguageRouting`:
 
@@ -222,6 +241,8 @@ Dates, times, relative time ("3 minutes ago"), numbers, money and lists follow t
 | `translationsFile` | `./translations.json` | The whole table |
 | `storageKey` | `language` | Where the choice is remembered |
 | `routing` | the product's languages, no default prefix | Which languages get an address prefix |
+| `languageFromAddress` | `false` | Start in the language the address's prefix names, without storing it |
+| `langTarget` | the document's root | The element that carries `lang`, or `false` for none |
 | `reportMissingKeys` | `false` | Report keys with no text on the console, each once (also `window.DS_ONE_I18N_DEBUG = true`) |
 
 Call `configureI18n` straight after importing the module, or set `window.DS_ONE_I18N` before it loads.

@@ -181,3 +181,21 @@ Products copy these files with Sync 1, from the exports in `sync.exports.mjs`:
   }
 }
 ```
+
+### Page scripts apart from the stylesheets
+
+`root`'s `"modules"` also takes `theme`: the theme module (`theme.ts`, light, dark and system in signals, for a page without the components) with the head script it runs and its options type; it needs `@lit-labs/signals`. See [Theming](/1-root/theming/#copying-it).
+
+The page scripts land in `0-face/` beside the stylesheets. A product that publishes its stylesheets from one folder and compiles its scripts from another names a second place with `"scriptsTo"`, a path from `"to"`: the scripts go to `<scriptsTo>/0-face/`. Without it, everything lands in one folder, as before.
+
+```json
+{
+  "sources": {
+    "Design system 1": {
+      "root": { "to": "public/ds1", "styles": ["one.css", "grid.css"], "modules": ["grid", "scaling"], "scriptsTo": "../../src/ds1" }
+    }
+  }
+}
+```
+
+Here the stylesheets and faces are copied to `public/ds1`, and `grid.ts`, `layout-inspector.ts`, `grid-fit.ts` and `scaling.ts` to `src/ds1/0-face`, where the page imports them.
