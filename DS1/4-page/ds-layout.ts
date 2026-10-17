@@ -18,9 +18,15 @@ export class Layout extends LitElement {
     view: { type: Boolean },
   };
 
-  mode: string = "portfolio";
-  align?: string;
-  view?: boolean;
+  // Declared, not class fields, so Lit's reactive accessors are not shadowed.
+  declare mode: string;
+  declare align?: string;
+  declare view?: boolean;
+
+  constructor() {
+    super();
+    this.mode = "portfolio";
+  }
 
   static styles = [
     unsafeCSS(styles),

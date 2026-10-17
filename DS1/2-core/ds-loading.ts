@@ -42,9 +42,16 @@ export class LoadingIndicator extends LitElement {
     inControl: { state: true },
   };
   static styles = unsafeCSS(styles);
-  label = "";
-  variant = "bar";
-  inControl = false;
+  // Declared, not class fields, so Lit's reactive accessors are not shadowed.
+  declare label: string;
+  declare variant: string;
+  declare inControl: boolean;
+  constructor() {
+    super();
+    this.label = "";
+    this.variant = "bar";
+    this.inControl = false;
+  }
   private readonly relabel = () => this.requestUpdate();
   connectedCallback() {
     super.connectedCallback();

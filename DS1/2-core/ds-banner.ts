@@ -29,18 +29,35 @@ export class Banner extends LitElement {
     _showVersion: { type: Boolean, state: true },
   };
 
-  text: string = "";
-  action: string = "";
-  href: string = "";
-  mailto: string = "";
-  subject: string = "";
-  describe: string = "";
-  appVersion: string = "";
-  variant: string = "warning"; // warning, info, success, error
-  version: string = "";
+  // Declared, not initialised as class fields, so Lit's reactive accessors are not shadowed.
+  declare text: string;
+  declare action: string;
+  declare href: string;
+  declare mailto: string;
+  declare subject: string;
+  declare describe: string;
+  declare appVersion: string;
+  /** warning, info, success or error. */
+  declare variant: string;
+  declare version: string;
   /** Show a close button at the end. Pressing it fires `ds-banner-dismiss`. */
-  dismissible: boolean = false;
-  _showVersion: boolean = false;
+  declare dismissible: boolean;
+  declare _showVersion: boolean;
+
+  constructor() {
+    super();
+    this.text = "";
+    this.action = "";
+    this.href = "";
+    this.mailto = "";
+    this.subject = "";
+    this.describe = "";
+    this.appVersion = "";
+    this.variant = "warning";
+    this.version = "";
+    this.dismissible = false;
+    this._showVersion = false;
+  }
 
   private _boundUpdate = () => this.requestUpdate();
 
