@@ -30,6 +30,16 @@ Leave out `type` and give `values` instead, as a JSON array in the attribute or 
 <ds-cycle values='["Line","Area","Bars"]'></ds-cycle>
 ```
 
+## Name the setting
+
+When the face shows only a value, give the cycle a `label`: the setting's name as a translation key. The face still shows the value alone, and the button is announced with the name before it, as "Size: 40". Without a label the button is named by its face.
+
+```html
+<ds-cycle label="Size" values='["20","40","60"]' value="40"></ds-cycle>
+```
+
+Use a label rather than writing the name into every value ("Size 40"). A built-in setting takes one too: `<ds-cycle type="theme" label="Theme">` is announced as "Theme: Dark".
+
 ## Behaviour
 
 These settings use the shared preferences module. Clicking a theme or accent cycle changes that setting for the document and remembers it in the browser. The preview above contains its own document, so trying a theme does not repaint the surrounding example list.

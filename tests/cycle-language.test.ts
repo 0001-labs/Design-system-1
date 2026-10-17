@@ -107,3 +107,49 @@ test("a cycle through its own values starts on value, steps on click and emits c
   expect(changes).toHaveLength(2);
   expect(localStorage.length).toBe(0);
 });
+
+test("a labelled cycle names its control while the face shows the value alone", async () => {
+  const { loadTranslations } = await import("../DS1/0-face/i18n");
+  loadTranslations("da", { Size: "Størrelse" });
+  setLanguage("en");
+  const cycle = new Cycle();
+  cycle.label = "Size";
+  cycle.values = ["20", "40"];
+  cycle.value = "20";
+  document.body.append(cycle);
+  await cycle.updateComplete;
+  const face = cycle.shadowRoot!.querySelector("ds-button")!;
+  await face.updateComplete;
+  const button = () => face.shadowRoot!.querySelector("button")!;
+  expect(cycle.getAttribute("label")).toBe("Size");
+  expect(button().getAttribute("aria-label")).toBe("Size: 20");
+  expect(cycle.shadowRoot!.querySelector("ds-text")!.getAttribute("text")).toBe("20");
+  face.dispatchEvent(new Event("click"));
+  await cycle.updateComplete; await face.updateComplete;
+  expect(button().getAttribute("aria-label")).toBe("Size: 40");
+  setLanguage("da");
+  await cycle.updateComplete; await face.updateComplete;
+  expect(button().getAttribute("aria-label")).toBe("Størrelse: 40");
+  setLanguage("en");
+});
+
+test("a cycle without a label leaves its control named by its face", async () => {
+  const cycle = new Cycle();
+  cycle.values = ["Line", "Area"];
+  document.body.append(cycle);
+  await cycle.updateComplete;
+  const face = cycle.shadowRoot!.querySelector("ds-button")!;
+  await face.updateComplete;
+  expect(face.shadowRoot!.querySelector("button")!.hasAttribute("aria-label")).toBe(false);
+});
+
+test("a labelled theme cycle reads the translated value after its name", async () => {
+  const cycle = new Cycle();
+  cycle.type = "theme";
+  cycle.label = "Theme";
+  document.body.append(cycle);
+  await cycle.updateComplete;
+  const face = cycle.shadowRoot!.querySelector("ds-button")!;
+  await face.updateComplete;
+  expect(face.shadowRoot!.querySelector("button")!.getAttribute("aria-label")).toMatch(/^Theme: (Light|Dark|System)$/);
+});
