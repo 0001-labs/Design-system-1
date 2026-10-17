@@ -46,8 +46,10 @@ extension DS1Font {
     public static func attributed(_ string: String, size: CGFloat, tracking: CGFloat, face: Face = .regular, figures: Bool = false, cells: Bool = true) -> AttributedString {
         let text = font(face, size: size)
         let arrow = font(.arrows, size: size)
-        let figure = font(.figures, size: size)
-        let figureFont = ctFont(.figures, size: size)
+        // Olivetti Dot's digits stand as tall as GT America's capitals on the same baseline.
+        let figureSize = size * figureScale
+        let figure = font(.figures, size: figureSize)
+        let figureFont = ctFont(.figures, size: figureSize)
         let cell = advance(of: "0", in: figureFont)
 
         enum Kind { case text, arrow, figure, digit }
@@ -74,6 +76,28 @@ extension DS1Font {
             result += piece
         }
         return result
+    }
+
+    /// How much smaller Olivetti Dot is set than the text beside it, so a digit is exactly as
+    /// tall as GT America's capital: the regular face's cap height over the dotted zero's.
+    public static var figureScale: CGFloat {
+        guard isAvailable(.figures), isAvailable(.regular) else { return 1 }
+        let gt = ctFont(.regular, size: 100), dots = ctFont(.figures, size: 100)
+        let utf16 = Array("0".utf16)
+        var glyph: [CGGlyph] = [0]
+        guard CTFontGetGlyphsForCharacters(dots, utf16, &glyph, 1) else { return 1 }
+        var box = CGRect.zero
+        CTFontGetBoundingRectsForGlyphs(dots, .horizontal, glyph, &box, 1)
+        return box.maxY > 0 ? CTFontGetCapHeight(gt) / box.maxY : 1
+    }
+
+    /// Where the baseline of a line `line` tall stands, measured from its top, as the web sets
+    /// GT America in a line of that height (CSS half-leading): the spare height split above
+    /// and below the regular face's ascent and descent.
+    public static func baseline(size: CGFloat, line: CGFloat) -> CGFloat {
+        let gt = ctFont(.regular, size: size)
+        let ascent = CTFontGetAscent(gt), descent = CTFontGetDescent(gt)
+        return (line - ascent - descent) / 2 + ascent
     }
 
     /// The height one line of a face takes when nothing spaces it: ascent, descent and gap.
@@ -131,7 +155,7 @@ public struct DS1LineText: View {
             text
                 .lineLimit(1)
                 .truncationMode(.tail)
-                .frame(height: line)
+                .ds1Baseline(style)
         }
     }
 }
@@ -154,5 +178,26 @@ public struct DS1Figures: View {
         DS1LineText(string, style: style, tone: tone, figures: true)
             .fixedSize(horizontal: true, vertical: false)
             .layoutPriority(1)
+    }
+}
+
+
+extension View {
+    /// Stands a line of text on its square at the web's baseline for `style`, whatever its
+    /// faces: GT America, Olivetti Dot or both sit on the same line, row after row.
+    public func ds1Baseline(_ style: DS1TextStyle = .text) -> some View {
+        modifier(DS1Baseline(style: style))
+    }
+}
+
+private struct DS1Baseline: ViewModifier {
+    @Environment(\.ds1Scale) private var scale
+    let style: DS1TextStyle
+    func body(content: Content) -> some View {
+        let line = style.line(scale)
+        let baseline = DS1Font.baseline(size: style.size(scale), line: line)
+        content
+            .alignmentGuide(VerticalAlignment.top) { d in d[.firstTextBaseline] - baseline }
+            .frame(height: line, alignment: .top)
     }
 }
