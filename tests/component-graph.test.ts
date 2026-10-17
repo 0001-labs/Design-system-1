@@ -37,6 +37,13 @@ test('empty states and notices carry their React adapters and the classes that d
   expect(componentGraph(ds1, ['text']).files.has('react/notice.ts')).toBe(false);
 });
 
+test('stats, meters and steps carry their React adapters, the figure words and the classes that draw them', () => {
+  const { files } = componentGraph(ds1, ['stat', 'meter', 'steps']);
+  for (const file of ['2-core/ds-stat.ts', '2-core/ds-meter.ts', '2-core/ds-steps.ts', '2-core/figures.ts', '0-face/format.ts', 'react/stat.ts', 'react/meter.ts', 'react/steps.ts', '1-root/figures.css', '2-core/ds-icon.ts']) expect(files.has(file), file).toBe(true);
+  expect(componentGraph(ds1, ['text']).files.has('1-root/figures.css')).toBe(true);
+  expect(componentGraph(ds1, ['meter']).files.has('react/stat.ts')).toBe(false);
+});
+
 test('every component resolves everything it imports, so any selection can be copied', () => {
   const names = ['2-core', '3-unit', '4-page'].flatMap(layer =>
     readdirSync(resolve(ds1, layer)).flatMap(file => /^ds-([a-z-]+)\.ts$/.exec(file)?.[1] ?? []));
