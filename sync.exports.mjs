@@ -148,7 +148,8 @@ export default {
         if (options.nativeControls) files.push('table.css', 'text.css', ...controlSheets.slice(1), 'controls.css');
         files.push(...askedSheets(options));
         if (options.bundle) {
-          const sheets = files.map(file => withoutImports(read(`DS1/1-root/${file}`)));
+          // Sync 1 reads files as buffers: the bundle joins their text.
+          const sheets = files.map(file => withoutImports(String(read(`DS1/1-root/${file}`))));
           const remote = sheets.flatMap(css => css.match(remoteImport) ?? []).join('');
           return { 'bundle.css': `/* Generated from Design system 1/DS1/1-root: ${files.join(', ')}. Change Design system 1 and sync. */\n` + remote + sheets.map(css => css.replace(remoteImport, '')).join('\n') };
         }

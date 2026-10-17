@@ -95,6 +95,12 @@ test('scriptsTo puts the page scripts apart from the stylesheets', () => {
   expect(Object.keys(files('root', { styles: [], fonts: false, modules: ['scaling'] }))).toEqual(['0-face/scaling.ts']);
 });
 
+test('the bundle reads its sheets as Sync 1 does, as buffers', () => {
+  const buffers = (path: string) => readFileSync(join(root, path));
+  const copy = exports.tokens.files({ read: buffers as unknown as typeof read, options: { nativeControls: true, bundle: true } }) as Record<string, unknown>;
+  expect(String(copy['bundle.css'])).toContain('.ds-button');
+});
+
 test('bundled tokens are one stylesheet with no local imports left', () => {
   const copy = files('tokens', { nativeControls: true, bundle: true });
   expect(Object.keys(copy)).toEqual(['bundle.css']);
