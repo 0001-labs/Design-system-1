@@ -48,9 +48,12 @@ final class DS1Tests: XCTestCase {
         let font = DS1Font.ctFont(.figures, size: 14)
         let cell = DS1Font.advance(of: "0", in: font)
         XCTAssertEqual(cell, 14 * 0.77, accuracy: 0.01)
+        // Figures are set at GT America's cap height (`figureScale`), so a 1 is centred in the
+        // cell of a 0 at that size, not at the text's 14.
+        let figures = DS1Font.ctFont(.figures, size: 14 * DS1Font.figureScale)
         let text = DS1Font.attributed("1", scale: .desktop, figures: true)
-        let one = DS1Font.advance(of: "1", in: font)
-        XCTAssertEqual(text.runs.first?.kern ?? 0, (cell - one) / 2, accuracy: 0.01)
+        let one = DS1Font.advance(of: "1", in: figures)
+        XCTAssertEqual(text.runs.first?.kern ?? 0, (DS1Font.advance(of: "0", in: figures) - one) / 2, accuracy: 0.01)
     }
 
     func testEveryIconIsInTheCatalogue() {
