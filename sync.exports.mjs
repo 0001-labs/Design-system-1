@@ -32,6 +32,8 @@ const rootModules = {
   /** The classic head script that puts the theme on before the first paint; also a root `modules` choice. */
   'theme-bootstrap': ['theme-bootstrap.js'],
   tooltips: ['tooltips.ts'],
+  /** The theme module (light, dark, system in signals) with the head script it runs and its options' type; needs @lit-labs/signals. */
+  theme: ['theme.ts', 'theme-bootstrap.js', 'preference-options.ts'],
 };
 /** The component stylesheets in the order they import each other. */
 const tokenStyles = ['component-appearance.css', 'component-metrics.css', 'component-tokens.css'];
@@ -134,8 +136,11 @@ export default {
      * adds the prose sheet (prose.css) and `classless` the classless sheet
      * (one.semantic.css) and `cjk` Noto Sans for Japanese and Chinese (cjk.css,
      * from Google Fonts), which `styles` may also name; `modules` names page scripts
-     * from 0-face/ (grid, grid-fit, layout-inspector, scaling, tooltips), copied
-     * with what they import. one.css and controls.css bring text.css, and
+     * from 0-face/ (grid, grid-fit, layout-inspector, scaling, theme,
+     * theme-bootstrap, tooltips), copied with what they import, into 0-face/;
+     * `scriptsTo` puts that 0-face/ folder elsewhere, a path from `to`
+     * (`"../../src/ds1"` puts the stylesheets in `public/ds1` and the scripts
+     * in `src/ds1/0-face`). one.css and controls.css bring text.css, and
      * one.css fonts.css and palette.css, which they import.
      */
     root: {
@@ -152,7 +157,7 @@ export default {
         if (options.fonts !== false) for (const font of rootFonts) files[`fonts/${font}`] = read(`DS1/1-root/fonts/${font}`);
         for (const name of options.modules ?? []) {
           if (!Object.hasOwn(rootModules, name)) throw new Error(`Unknown page script: ${name}`);
-          for (const file of rootModules[name]) files[`0-face/${file}`] = read(`DS1/0-face/${file}`);
+          for (const file of rootModules[name]) files[posix.join(options.scriptsTo ?? '.', '0-face', file)] = read(`DS1/0-face/${file}`);
         }
         return files;
       },

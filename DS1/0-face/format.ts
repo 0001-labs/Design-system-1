@@ -367,6 +367,22 @@ export function formatMonthDay(
   return formatMoment(value, { month: MONTH[length], day: "numeric" }, rest);
 }
 
+/**
+ * A day of a month at a time, without the year: `Oct 17, 2:30 PM` (medium,
+ * the default), `10/17, 2:30 PM` (short), `October 17 at 2:30 PM` (long).
+ */
+export function formatMonthDayTime(
+  value: DateInput,
+  options?: DateOptions | DateLength
+): string {
+  const { length, ...rest } = dateArguments(options, "medium");
+  return formatMoment(
+    value,
+    { month: MONTH[length], day: "numeric", hour: "numeric", minute: "2-digit" },
+    rest
+  );
+}
+
 // ============================================================================
 // Relative time
 // ============================================================================

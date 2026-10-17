@@ -7,23 +7,7 @@ export type Preferences = {
   [key: string]: unknown;
 };
 
-/** Product storage names are configuration; the implementation stays shared. */
-export interface PreferenceOptions {
-  storageKey?: string;
-  themeStorageKey?: string;
-  /** Follow system appearance without reading or writing a saved theme. */
-  themeMode?: "system";
-  /**
-   * The canvas behind the page and the browser's theme-color, per theme, set
-   * by the theme runtime before the first paint: Design system 1's paper
-   * (`--background`) by default. `false` leaves both to the page.
-   */
-  themePaper?: { light: string; dark: string } | false;
-}
-
-declare global {
-  interface Window { DS_ONE_PREFERENCES?: PreferenceOptions; }
-}
+export type { PreferenceOptions } from "./preference-options";
 
 export function preferenceStorageKey(kind: "preferences" | "theme"): string {
   const options = typeof window === "undefined" ? undefined : window.DS_ONE_PREFERENCES;

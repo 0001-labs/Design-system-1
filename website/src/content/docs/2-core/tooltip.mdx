@@ -32,6 +32,27 @@ The label appears above the trigger on hover or focus and disappears on mouse le
 
 For a collection of controls, the shared tooltip module also supports `data-tooltip="Save changes"`. Import `DS1/0-face/tooltips.ts` once; it draws a shared label for those elements, including marked elements inside a component's open shadow root, as the [Sidebar](/3-unit/sidebar/) marks its cut-short labels. Mark only what the label adds to: a cut-short or icon-only control, never every row.
 
+The shared label:
+
+- shows at once on hover with a mouse or pen;
+- shows on focus only when the focus is the keyboard's (`:focus-visible`), so a menu that moves focus into its first row on a press does not raise one;
+- follows its element's `data-tooltip` (and `data-tooltip-colour`) while it shows, so a play button that turns into a pause button says so, and goes when the text does;
+- on touch, shows from a long press (half a second), and the click that releasing the finger makes is held back; an element marked `data-tooltip-press` shows it from a tap as well, and still gets its click. A touch label goes at the next touch or after two seconds, and a finger that moves is scrolling, not pressing.
+
+From code, `showTooltip(element)` shows an element's label as a press would, until `hideTooltip()`; `showTooltip(element, { duration: 2000 })` hides it after that many milliseconds.
+
+```html
+<button data-tooltip="Size 40" data-tooltip-press>40</button>
+```
+
+```js
+import { showTooltip, hideTooltip } from './ds1/0-face/tooltips';
+
+showTooltip(button, { duration: 2000 });
+```
+
+Sync 1's `root` export copies the module with `"modules": ["tooltips"]`.
+
 ## Related components
 
 [Button](/2-core/button/) provides a focusable trigger. [Icon](/2-core/icon/) supplies a compact drawing. [Languages](/1-root/languages/) explains translation keys.

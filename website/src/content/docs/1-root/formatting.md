@@ -89,8 +89,9 @@ formatDate(at, { length: "short", timeZone: "UTC" }); // "10/17/26"
 | `formatDateTime` | medium | Oct 17, 2026, 2:30 PM | 17. okt. 2026, 14.30 | 2026/10/17 14:30 |
 | `formatMonthYear` | long | October 2026 | oktober 2026 | 2026年10月 |
 | `formatMonthDay` | medium | Oct 17 | 17. okt. | 10月17日 |
+| `formatMonthDayTime` | medium | Oct 17, 2:30 PM | 17. okt., 14.30 | 10月17日 14:30 |
 
-`formatDateTime` writes the date at the length given and the time to the minute. `formatTime` at `medium` adds seconds, at `long` the zone. `formatMonthYear` and `formatMonthDay` write the month as a number at `short` and in full at `long`.
+`formatDateTime` writes the date at the length given and the time to the minute. `formatTime` at `medium` adds seconds, at `long` the zone. `formatMonthYear`, `formatMonthDay` and `formatMonthDayTime` write the month as a number at `short` and in full at `long`. `formatMonthDay` and `formatMonthDayTime` leave the year out, for dates the reader places in the current year: a list of recent changes, a calendar's week.
 
 A date written without a time (`"2026-10-17"`) is that day wherever it is read: it is never shown as the day before in a zone behind UTC. A moment that is not one (`NaN`, `"soon"`) is written as an empty string.
 
@@ -205,3 +206,5 @@ Products that copy Design system 1 with Sync 1 get `format.ts` and `pricing.ts` 
 ```javascript
 import { formatMoney } from "./ds1/0-face/format";
 ```
+
+`format.ts` and every other module in `0-face/` type-check under `strict` with the DOM libraries alone (`dom` and `dom.iterable`, no bundler's types), so a strict product can check its copy as it is; a test in Design system 1 holds them to it.

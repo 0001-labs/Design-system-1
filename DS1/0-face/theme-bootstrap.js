@@ -5,8 +5,9 @@
  * there with a plain <script src> (not a module), which holds rendering until
  * it has run. It needs nothing else and waits for nothing.
  *
- * It reads the stored choice, light, dark or system (the default), and puts
- * the theme on the root element at once:
+ * It reads the stored choice, light, dark or system, and puts the theme on
+ * the root element at once (with nothing stored, `themeDefault`: system
+ * unless the product says light or dark):
  * - the class `light-theme` or `dark-theme`, the canonical mark the
  *   stylesheets key on;
  * - `data-theme="light"` or `"dark"`, the same, for pages that key on it;
@@ -14,7 +15,8 @@
  * - `--lightningcss-light` and `--lightningcss-dark`, so CSS compiled with
  *   Lightning CSS's light-dark() fallback follows the choice, not the system;
  * - the canvas behind the page and the theme-color meta, in the paper.
- * It also sets `lang` from the language module's stored choice.
+ * It also sets `lang` from the language module's stored choice, or from the
+ * address when the product takes the language from there.
  *
  * Then it keeps the page right: in system mode it follows
  * prefers-color-scheme as it changes, and it applies the choice again when
@@ -28,16 +30,22 @@
  * and a page without them share one implementation, whichever loads first.
  *
  * Set options before it on `window.DS_ONE_PREFERENCES`: `themeStorageKey`
- * (`"ds-one:theme"` by default), `themeMode: "system"` to follow the system
- * and never read or write a stored choice, and `themePaper` as
- * `{ light, dark }` colours for the canvas, or `false` to leave the background
- * and theme-color to the page. The language follows `window.DS_ONE_I18N`:
- * `storageKey` (`"language"`), `persist: false` and `languages`.
+ * (`"ds-one:theme"` by default), `themeDefault` (`"light"`, `"dark"` or
+ * `"system"`, the default) for a visitor who has chosen nothing yet,
+ * `themeMode: "system"` to follow the system and never read or write a stored
+ * choice, and `themePaper` as `{ light, dark }` colours for the canvas, or
+ * `false` to leave the background and theme-color to the page. The language
+ * follows `window.DS_ONE_I18N`: `storageKey` (`"language"`), `persist: false`,
+ * `languages`, `routing` with `languageFromAddress: true` (a prefix such as
+ * `/ja/…` wins over the stored choice), and `langTarget` (set, the root's
+ * `lang` is left alone).
  */
 (function () {
   if (typeof window === "undefined" || typeof document === "undefined" || window.DS_ONE_THEME) return;
   var root = document.documentElement;
   var MODES = ["light", "dark", "system"];
+  // Design system 1's languages (0-face/languages.ts), the prefixes an address may carry by default.
+  var LANGUAGES = ["da", "de", "en", "es", "fi", "fr", "is", "it", "ja", "ko", "nb", "nn", "no", "pt", "pt-BR", "sv", "zh"];
   var PAPER = { light: "#ffffff", dark: "#2a2a2a" };
   // A choice that cannot be stored, or one made while the page follows the system, lasts for this page.
   var session = null;
@@ -58,7 +66,8 @@
       var stored = window.localStorage.getItem(key());
       if (MODES.indexOf(stored) >= 0) return stored;
     } catch { /* Storage can be blocked. */ }
-    return "system";
+    var first = options().themeDefault;
+    return MODES.indexOf(first) >= 0 ? first : "system";
   }
 
   function resolve(choice) {
@@ -133,11 +142,30 @@
   }
 
   var i18n = window.DS_ONE_I18N || {};
-  if (i18n.persist !== false) {
+  // The language an address names in its first segment (`/pt-br/…` gives pt-BR), as the language module reads it.
+  function addressLanguage() {
+    if (!i18n.languageFromAddress) return null;
+    var routing = i18n.routing || {};
+    var prefixed = (routing.languages && routing.languages.length ? routing.languages : null) || (i18n.languages && i18n.languages.length ? i18n.languages : null) || LANGUAGES;
+    var segment = String((window.location && window.location.pathname) || "").split("/")[1] || "";
+    var slug = segment.toLowerCase().replace(/_/g, "-");
+    if (!slug) return null;
+    for (var index = 0; index < prefixed.length; index++) {
+      if (String(prefixed[index]).toLowerCase().replace(/_/g, "-") === slug) return String(prefixed[index]);
+    }
+    return null;
+  }
+  function storedLanguage() {
+    if (i18n.persist === false) return null;
     try {
       var language = window.localStorage.getItem(i18n.storageKey || "language");
-      if (language && /^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$/.test(language) && (!i18n.languages || i18n.languages.indexOf(language) >= 0)) root.lang = language;
+      if (language && (!i18n.languages || i18n.languages.indexOf(language) >= 0)) return language;
     } catch { /* Storage can be blocked. */ }
+    return null;
+  }
+  if (i18n.langTarget === undefined) {
+    var language = addressLanguage() || storedLanguage();
+    if (language && /^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$/.test(language)) root.lang = language;
   }
 
   window.DS_ONE_THEME = {

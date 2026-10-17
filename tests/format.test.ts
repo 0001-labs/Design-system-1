@@ -105,6 +105,15 @@ describe("dates and times", () => {
     expect(format.formatMonthDay(MOMENT, { language: "ja", ...UTC })).toBe("10月17日");
   });
 
+  test("write a day of a month at a time, without the year", () => {
+    expect(plain(format.formatMonthDayTime(MOMENT, { language: "en", ...UTC }))).toBe("Oct 17, 2:30 PM");
+    expect(plain(format.formatMonthDayTime(MOMENT, { language: "en", length: "short", ...UTC }))).toBe("10/17, 2:30 PM");
+    expect(plain(format.formatMonthDayTime(MOMENT, { language: "en", length: "long", ...UTC }))).toBe("October 17 at 2:30 PM");
+    expect(format.formatMonthDayTime(MOMENT, { language: "da", ...UTC })).toBe("17. okt., 14.30");
+    expect(format.formatMonthDayTime(MOMENT, { language: "ja", ...UTC })).toBe("10月17日 14:30");
+    expect(format.formatMonthDayTime(MOMENT, { language: "en", timeZone: "Asia/Tokyo" })).not.toMatch(/2026/);
+  });
+
   test("take a length alone as the second argument", () => {
     i18n.setLanguage("en");
     format.configureFormat({ timeZone: "UTC" });
