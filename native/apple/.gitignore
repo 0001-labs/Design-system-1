@@ -1,0 +1,5 @@
+# Laid out from DS1/ by scripts/write-native-tokens.ts; products receive them through Sync 1.
+Sources/DS1/Resources/
+Licences/
+.build/
+.swiftpm/

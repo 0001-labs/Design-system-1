@@ -575,7 +575,7 @@ export function currencyDigits(currency: string): number {
       "en",
       { currency: code },
       () => new Intl.NumberFormat("en", { style: "currency", currency: code })
-    ).resolvedOptions().maximumFractionDigits;
+    ).resolvedOptions().maximumFractionDigits ?? 2;
   } catch {
     return 2;
   }

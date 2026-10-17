@@ -55,6 +55,8 @@
     "build": "vp run build:bundle",
     "check": "sync1 check && vp check",
     "generate:icons": "vp exec tsx scripts/generate-icons.ts",
+    "native:tokens": "vp exec tsx scripts/write-native-tokens.ts",
+    "native:test": "vp run native:tokens && cd native/apple && swift test",
     "build:bundle": "vp run generate:icons && vp exec tsc && vp run build:vite && vp run build:vite:min && vp run build:vite:feedback",
     "build:vite": "vp build --config vite.config.lib.ts",
     "build:vite:min": "MINIFY=true vp build --config vite.config.lib.ts",
