@@ -56,11 +56,18 @@ export function prepareLibrary(draft: string): PreparedLibrary {
   } catch {
     ast = undefined;
   }
-  // The base rule comes before the owner's first rule, after @charset and the @imports that must lead.
-  let lead = 0;
+  // The base rule comes before the owner's first rule, after @charset, the @imports that must
+  // lead and the comments that head the sheet (which the parser does not keep).
+  const leading = new Map<number, number>();
   for (const node of ast?.children.toArray() ?? []) {
-    if (node.type === "Atrule" && /^(?:charset|import)$/i.test(node.name) && !node.block && node.loc) lead = node.loc.end.offset;
-    else if (node.type !== "Comment") break;
+    if (node.type === "Atrule" && /^(?:charset|import)$/i.test(node.name) && !node.block && node.loc) leading.set(node.loc.start.offset, node.loc.end.offset);
+  }
+  let lead = 0;
+  for (let at = 0; ; ) {
+    while (at < source.length && /\s/.test(source[at]!)) at++;
+    const end = source.startsWith("/*", at) ? source.indexOf("*/", at + 2) + 2 : leading.get(at);
+    if (!end || end < 2) break;
+    at = lead = end;
   }
   edits.push({ start: lead, end: lead, text: lead ? `\n${LIBRARY_BUTTON_LINK_BASE}` : `${LIBRARY_BUTTON_LINK_BASE}\n` });
   if (ast) {

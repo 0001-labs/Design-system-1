@@ -15,7 +15,7 @@ import { Button } from "../../../DS1/react/button";
 import { LoadingIndicator } from "../../../DS1/react/loading";
 import { Empty } from "../../../DS1/react/empty";
 import { Notice } from "../../../DS1/react/notice";
-import { libraryTemplate } from "../SystemWorkbench";
+import { libraryTemplate, templateVersion } from "../lib/libraryTemplate";
 import { failureCode } from "../lib/convex";
 import { Link, navigate } from "../router";
 
@@ -28,16 +28,6 @@ const STATE_LABEL: Record<string, string> = {
   publishing: "Publishing…",
   archived: "Archived",
 };
-
-/**
- * The template version is stamped per library so a later DS1 upgrade cannot
- * silently change what "new library" means, and so a bad template can be traced
- * to the libraries created from it.
- */
-function templateVersion(): string {
-  const stamped = /\/\* DS1 — version ([^*]+?) \*\//.exec(libraryTemplate);
-  return stamped?.[1]?.trim() ?? "components-1";
-}
 
 export function LibraryList() {
   const libraries = useQuery(api.libraries.list);
