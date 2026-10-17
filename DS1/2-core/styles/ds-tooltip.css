@@ -3,6 +3,7 @@
   display: inline-flex;
   align-items: center;
 }
+:host([hidden]) { display: none !important; }
 
 .bubble {
   box-sizing: border-box;

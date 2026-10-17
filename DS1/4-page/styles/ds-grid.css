@@ -11,7 +11,7 @@
   pointer-events: none;
   z-index: var(--ds-grid-z-index, 300);
 }
-:host([hidden]) { display: none; }
+:host([hidden]) { display: none !important; }
 :host([align="left"]) { left: 0; transform: none; }
 :host([align="right"]) { left: auto; right: 0; transform: none; }
 @media (max-width: 768px) {

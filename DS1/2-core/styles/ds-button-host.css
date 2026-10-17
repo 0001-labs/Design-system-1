@@ -199,7 +199,7 @@
   --ds-button-color: var(--ds-danger-color, var(--ds-tuned-red));
 }
 
-:host([control="slotted"][hidden]) { display: none !important; }
+:host([hidden]) { display: none !important; }
 
 /* Native actions in menus, including grouped and nested choices. */
 :host([menu-item]) {

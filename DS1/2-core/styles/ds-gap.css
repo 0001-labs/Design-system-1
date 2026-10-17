@@ -7,6 +7,7 @@
   width: 100%;
   height: calc(var(--ds-gap-size) * var(--ds-sf) + var(--ds-gap-rows, 1) * var(--ds-gap-row-space, 0px));
 }
+:host([hidden]) { display: none !important; }
 
 :host([size="025"]) {
   --ds-gap-size: var(--ds-025);

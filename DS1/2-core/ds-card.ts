@@ -39,6 +39,10 @@ export class Card extends LitElement {
         transform 0.2s ease;
     }
 
+    :host([hidden]) {
+      display: none !important;
+    }
+
     :host([variant="default"]) {
       background-color: var(--card-background, var(--surface-color, #fff));
       border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
