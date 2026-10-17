@@ -92,6 +92,8 @@
     "{index} of {count}": "{index}/{count}",
     "Previous slide": "Edellinen dia",
     "Next slide": "Seuraava dia",
+    "Menu": "Valikko",
+    "Contents": "Sisällys",
     "key.ctrl": "Ctrl",
     "key.shift": "Vaihto",
     "key.alt": "Alt",

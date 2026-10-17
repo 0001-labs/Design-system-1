@@ -92,6 +92,8 @@
     "{index} of {count}": "{index} of {count}",
     "Previous slide": "Previous slide",
     "Next slide": "Next slide",
+    "Menu": "Menu",
+    "Contents": "Contents",
     "key.ctrl": "Ctrl",
     "key.shift": "Shift",
     "key.alt": "Alt",

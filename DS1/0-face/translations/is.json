@@ -85,6 +85,8 @@
     "{index} of {count}": "{index} af {count}",
     "Previous slide": "Fyrri glæra",
     "Next slide": "Næsta glæra",
+    "Menu": "Valmynd",
+    "Contents": "Efnisyfirlit",
     "key.ctrl": "Ctrl",
     "key.shift": "Shift",
     "key.alt": "Alt",

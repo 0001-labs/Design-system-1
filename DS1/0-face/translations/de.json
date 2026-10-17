@@ -92,6 +92,8 @@
     "{index} of {count}": "{index} von {count}",
     "Previous slide": "Vorherige Folie",
     "Next slide": "Nächste Folie",
+    "Menu": "Menü",
+    "Contents": "Inhalt",
     "key.ctrl": "Strg",
     "key.shift": "Umschalt",
     "key.alt": "Alt",

@@ -84,7 +84,10 @@ export const ALL_LAYERS: DirectoryLayer[] = [
     summary: 'Where units stand on the grid.',
     entries: [
       { name: 'Container', href: '/4-page/container/', tag: 'ds-container' },
+      { name: 'Document', href: '/4-page/document/', tag: 'ds-document' },
+      { name: 'Footer', href: '/4-page/footer/', tag: 'ds-footer' },
       { name: 'Grid', href: '/4-page/grid/', tag: 'ds-grid' },
+      { name: 'Header', href: '/4-page/header/', tag: 'ds-header' },
       { name: 'Layout', href: '/4-page/layout/', tag: 'ds-layout' },
       { name: 'Layouts', href: '/4-page/layouts/', tag: 'ds-page' },
     ],

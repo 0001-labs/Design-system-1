@@ -6,11 +6,14 @@
  * wrappers of its own.
  *
  * Such a site claims DS1 styling through the library, not through controls.css.
- * The claim cannot be verified from source today: a published library's rules
- * are the owner's draft, stored in the library service rather than DS1's Git
- * history, and no lock records which published version and content hash a
- * product carries. Library sites therefore count as needs review, never as DS1
- * styles, and never as local.
+ * The claim verifies only for a pinned library: Sync 1's `library` export copied
+ * one published version (`ds1-library/<id>/v/<n>.css`) with its manifest, the
+ * lock records both hashes at a DS1 commit, the copy and manifest are unchanged,
+ * the stylesheet carries the stamp publishing writes (the DS1 library revision
+ * that prepared it), and the product loads that copy and no library address.
+ * Then its sites count as DS1 styles. A library loaded from its address
+ * (`latest.css` changes with every publish), a copy that was changed, or one
+ * without a lock or stamp, counts as needs review, never as local.
  *
  * Only literal evidence counts: a library address in the app's tracked source,
  * the marker on the element itself, or an imported JSX use of a wrapper whose
@@ -18,6 +21,7 @@
  * page-wide library sheet may also draw is not inferred.
  */
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import ts from "typescript";
@@ -28,6 +32,70 @@ const addressPattern = "designsystem1\\.com/ds1/[0-9a-hjkmnp-tv-z]{20}/(latest|v
 export const libraryAddress = new RegExp(addressPattern);
 export const libraryMarker = "data-library-control";
 export const libraryIssue = (connection: string) => `Drawn by a published design library (connected in ${connection}). Its rules are not verifiable against a DS1 revision: no lock records the published library version and content hash this product carries.`;
+/** A library loaded from its address: `latest.css` changes with every publish, and no address is locked. */
+const liveIssue = (connection: string, latest: boolean) => latest
+  ? `${libraryIssue(connection)} It is fetched from latest.css, which changes with every publish; pin a version through Sync 1's library export.`
+  : `${libraryIssue(connection)} It is loaded from its address rather than a pinned copy; pin the version through Sync 1's library export.`;
+
+/** What publishing stamps first (DS1/1-root/library-tokens.ts). */
+const stamp = /^(?:@charset "[^"]*";\s*)?\/\* Design system 1 library, revision (sha256:[0-9a-f]{12}) \*\//;
+const pinnedPath = /^(?:(.*)\/)?ds1-library\/([0-9a-hjkmnp-tv-z]{20})\/v\/([1-9][0-9]*)\.css$/;
+const sha256 = (body: string | Buffer) => createHash("sha256").update(body).digest("hex");
+
+/** A published library pinned through Sync 1's library export, and whether its copy verifies against the lock. */
+export interface PinnedLibrary {
+  id: string;
+  version: number;
+  /** The copy's path, relative to the app. */
+  path: string;
+  revision?: string;
+  verified: boolean;
+  issues: string[];
+}
+
+/** The libraries the app's sync.lock.json records as pinned, each checked against the lock, its manifest and its stamp. */
+export function pinnedLibraries(root: string): PinnedLibrary[] {
+  const lockPath = join(root, "sync.lock.json");
+  if (!existsSync(lockPath)) return [];
+  let lock: Record<string, { commit?: string; dirty?: boolean; files?: Record<string, string> }>;
+  try { lock = JSON.parse(readFileSync(lockPath, "utf8")); } catch { return []; }
+  const source = lock["Design system 1"];
+  const files = source?.files ?? {};
+  const pins: PinnedLibrary[] = [];
+  for (const path of Object.keys(files)) {
+    const match = pinnedPath.exec(path);
+    if (!match) continue;
+    const [, folder, id, number] = match;
+    const version = Number(number);
+    const issues: string[] = [];
+    let revision: string | undefined;
+    const at = (file: string) => resolve(root, file);
+    const inside = (file: string) => at(file).startsWith(resolve(root) + "/");
+    if (!/^[a-f0-9]{40}$/.test(source?.commit ?? "")) issues.push("sync.lock.json records no DS1 commit for the copy.");
+    if (source?.dirty) issues.push("The copy was taken from DS1 with uncommitted changes.");
+    if (!inside(path) || !existsSync(at(path))) issues.push(`Missing: ${path}`);
+    else {
+      const css = readFileSync(at(path));
+      if (sha256(css) !== files[path]) issues.push(`Locally modified: ${path}`);
+      revision = stamp.exec(css.toString("utf8"))?.[1];
+      if (!revision) issues.push(`${path} carries no DS1 library stamp: it was not prepared by publishing.`);
+    }
+    const manifestPath = `${folder ? `${folder}/` : ""}ds1-library/library-manifest.json`;
+    if (!files[manifestPath]) issues.push(`sync.lock.json records no ${manifestPath}.`);
+    else if (!inside(manifestPath) || !existsSync(at(manifestPath))) issues.push(`Missing: ${manifestPath}`);
+    else {
+      const body = readFileSync(at(manifestPath));
+      if (sha256(body) !== files[manifestPath]) issues.push(`Locally modified: ${manifestPath}`);
+      let manifest: Record<string, unknown> = {};
+      try { manifest = JSON.parse(body.toString("utf8")) as Record<string, unknown>; } catch { issues.push(`${manifestPath} is not JSON.`); }
+      if (manifest.library !== id || manifest.version !== version || manifest.file !== `${id}/v/${version}.css`) issues.push(`${manifestPath} names another library or version than ${path}.`);
+      if (manifest.sha256 !== files[path]) issues.push(`${manifestPath} records another hash than sync.lock.json for ${path}.`);
+      if (revision && manifest.revision !== revision) issues.push(`${manifestPath} records another revision than ${path} is stamped with.`);
+    }
+    pins.push({ id: id!, version, path, revision, verified: !issues.length, issues });
+  }
+  return pins.sort((a, b) => a.path.localeCompare(b.path));
+}
 
 /** A native element carrying the marker, at the line its site is recorded. */
 export type MarkedElement = { tag: string; line: number; component: string; start: number; end: number };
@@ -130,6 +198,10 @@ export type LibraryUse = { component: string };
 export interface PublishedLibrary {
   /** Where the app connects the library, relative to the app. */
   connection: string;
+  /** A pinned copy that verifies, loaded in place of any library address: its sites are DS1 styles. */
+  verified: boolean;
+  /** Why the library's sites need review, when they do. */
+  issue?: string;
   /** Per file: wrapper uses by binding name, marked native sites, and wrapper faces counted at their uses instead. */
   read(file: string, source: string): LibraryFile;
 }
@@ -140,12 +212,28 @@ export interface LibraryFile {
 
 /** The app's published library connection, from its tracked files. Without one, the marker means nothing. */
 export function publishedLibrary(root: string): PublishedLibrary | undefined {
-  let listed = "";
-  try { listed = execFileSync("git", ["grep", "-l", "-E", addressPattern, "--", "."], { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(); }
-  catch { return undefined; }
-  // Code and stylesheets connect a library; a brief or README that names its address does not.
-  const connection = listed.split("\n").filter(file => /\.(?:[cm]?[jt]sx?|css|html|astro)$/.test(file) && !/(?:^|\/)(?:tests?|__tests__|fixtures)\/|\.(?:test|spec)\.[^.]+$/.test(file)).sort()[0];
+  const pins = pinnedLibraries(root);
+  const pinnedFiles = new Set(pins.map(pin => pin.path));
+  // Code and stylesheets connect a library; a brief, README, manifest or test that names it does not.
+  const connecting = (args: string[]) => {
+    let listed = "";
+    try { listed = execFileSync("git", ["grep", "-l", ...args, "--", "."], { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(); }
+    catch { return []; }
+    return listed.split("\n").filter(file => file && !pinnedFiles.has(file) && /\.(?:[cm]?[jt]sx?|css|html|astro)$/.test(file) && !/(?:^|\/)(?:tests?|__tests__|fixtures)\/|\.(?:test|spec)\.[^.]+$/.test(file)).sort();
+  };
+  const remote = connecting(["-E", addressPattern])[0];
+  const loaded = pins.map(pin => ({ pin, file: connecting(["-F", `ds1-library/${pin.id}/v/${pin.version}.css`])[0] })).filter(entry => entry.file);
+  const connection = remote ?? loaded[0]?.file;
   if (!connection) return undefined;
+  let verified = false, issue: string;
+  if (remote) {
+    const latest = libraryAddress.exec(readFileSync(join(root, remote), "utf8"))?.[1] === "latest";
+    issue = liveIssue(remote, latest);
+  } else {
+    const failing = loaded.filter(({ pin }) => !pin.verified);
+    verified = !failing.length;
+    issue = failing.map(({ pin }) => `Pinned library ${pin.id} v${pin.version} (loaded in ${connection}) does not verify: ${pin.issues.join(" ")}`).join(" ");
+  }
   const modules = new Map<string, Map<string, MarkedElement>>();
   const wrappersIn = (path: string) => {
     if (!modules.has(path)) modules.set(path, exportedWrappers(path, readFileSync(path, "utf8")));
@@ -175,6 +263,8 @@ export function publishedLibrary(root: string): PublishedLibrary | undefined {
   };
   return {
     connection,
+    verified,
+    ...(verified ? {} : { issue }),
     read(file, source) {
       const path = resolve(root, file);
       const uses = new Map<string, string>();
@@ -205,14 +295,20 @@ export function publishedLibrary(root: string): PublishedLibrary | undefined {
   };
 }
 
-/** Record a library site as needs review, with the provenance issue. */
-export function countLibrarySite(cell: ComponentCell, file: string, site: Site, connection: string) {
+/** Record a library site: DS1 styles through a verified pinned library, else needs review with the provenance issue. */
+export function countLibrarySite(cell: ComponentCell, file: string, site: Site, library: Pick<PublishedLibrary, "connection" | "verified" | "issue">) {
+  const tag = /^[a-z]/.test(site.tag) ? `${site.tag}[${libraryMarker}]` : site.tag;
+  if (library.verified) {
+    cell.styled++;
+    cell.sites.push({ file, line: site.line, tag, kind: "styled" });
+    return;
+  }
   cell.unverified++;
-  cell.sites.push({ file, line: site.line, tag: /^[a-z]/.test(site.tag) ? `${site.tag}[${libraryMarker}]` : site.tag, kind: "unverified" });
-  const issue = libraryIssue(connection);
+  cell.sites.push({ file, line: site.line, tag, kind: "unverified" });
+  const issue = library.issue ?? libraryIssue(library.connection);
   if (!cell.issues.includes(issue)) cell.issues.push(issue);
 }
 
 export const libraryMethod = [
-  "Published design libraries: a native control marked with a literal data-library-control attribute, or an imported JSX use of a wrapper whose exported component renders exactly one such control, in an app whose tracked source connects a published library (a designsystem1.com/ds1/<id>/ address), counts as needs review in the control's column. A library's rules are its owner's draft, kept outside DS1's Git history, and no lock records the published version and hash a product carries, so these sites are never counted as DS1 styles. A wrapper's own face counts at its uses, not again. Native text a page-wide library sheet may draw is not inferred.",
+  "Published design libraries: a native control marked with a literal data-library-control attribute, or an imported JSX use of a wrapper whose exported component renders exactly one such control, in an app whose tracked source connects a published library, counts in the control's column. It is DS1 styles when the app loads a pinned copy (ds1-library/<id>/v/<n>.css from Sync 1's library export) and no library address, and the copy verifies: sync.lock.json records it and its manifest at a DS1 commit, both are unchanged, and the stylesheet carries the stamp publishing writes, naming the DS1 library revision that prepared it. A library loaded from its address (designsystem1.com/ds1/<id>/latest.css changes with every publish), or a copy that does not verify, counts as needs review. A wrapper's own face counts at its uses, not again. Native text a page-wide library sheet may draw is not inferred.",
 ];

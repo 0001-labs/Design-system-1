@@ -92,6 +92,8 @@
     "{index} of {count}": "{index} sur {count}",
     "Previous slide": "Diapositive précédente",
     "Next slide": "Diapositive suivante",
+    "Menu": "Menu",
+    "Contents": "Sommaire",
     "key.ctrl": "Ctrl",
     "key.shift": "Maj",
     "key.alt": "Alt",

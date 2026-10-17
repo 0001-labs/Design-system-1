@@ -29,16 +29,20 @@ export function loadAppSpecs(studio: string, configPath = process.env.ADOPTION_C
   return config.apps;
 }
 const known = new Set(IMPLEMENTATION_COLUMNS.map(c => c.id));
+/** The site chrome's native blocks: the header (its drawer drawn by drawer.css, which header.css imports), the footer, and the document page with its definition table. */
+/** The site chrome's sheets, React adapters and the header's page script, each verified on its own. */
+const siteChromeFiles = ["1-root/header.css", "1-root/footer.css", "1-root/document.css", "react/header.ts", "react/footer.ts", "react/document.ts", "0-face/header.ts"];
+const siteChromeBlocks: Record<string, { component: string; sheet: string }> = { "ds-header": { component: "header", sheet: "1-root/header.css" }, "ds-footer": { component: "footer", sheet: "1-root/footer.css" }, "ds-document": { component: "document", sheet: "1-root/document.css" }, "ds-definitions": { component: "document", sheet: "1-root/document.css" } };
 /** Blocks a native class draws on any element, each with the sheet that draws it. Text marked as one of their parts is the block's own. */
-const blockClasses: Record<string, { component: string; sheet: string }> = { "ds-empty": { component: "empty", sheet: "1-root/empty.css" }, "ds-notice": { component: "notice", sheet: "1-root/notice.css" }, "ds-table": { component: "table", sheet: "1-root/table.css" }, "ds-kbd": { component: "kbd", sheet: "1-root/kbd.css" }, "ds-carousel": { component: "carousel", sheet: "1-root/carousel.css" }, "ds-pagedots": { component: "pagedots", sheet: "1-root/carousel.css" }, "ds-stat": { component: "stat", sheet: "1-root/figures.css" }, "ds-meter": { component: "meter", sheet: "1-root/figures.css" }, "ds-steps": { component: "steps", sheet: "1-root/figures.css" }, "ds-row": { component: "row", sheet: "1-root/row.css" }, "ds-tree": { component: "tree", sheet: "1-root/row.css" } };
-const blockPart = /^ds-(?:empty|notice|carousel|pagedots|stat|meter|steps)__/;
+const blockClasses: Record<string, { component: string; sheet: string }> = { "ds-empty": { component: "empty", sheet: "1-root/empty.css" }, "ds-notice": { component: "notice", sheet: "1-root/notice.css" }, "ds-table": { component: "table", sheet: "1-root/table.css" }, "ds-kbd": { component: "kbd", sheet: "1-root/kbd.css" }, "ds-carousel": { component: "carousel", sheet: "1-root/carousel.css" }, "ds-pagedots": { component: "pagedots", sheet: "1-root/carousel.css" }, "ds-stat": { component: "stat", sheet: "1-root/figures.css" }, "ds-meter": { component: "meter", sheet: "1-root/figures.css" }, "ds-steps": { component: "steps", sheet: "1-root/figures.css" }, "ds-row": { component: "row", sheet: "1-root/row.css" }, "ds-tree": { component: "tree", sheet: "1-root/row.css" }, ...siteChromeBlocks };
+const blockPart = /^ds-(?:empty|notice|carousel|pagedots|stat|meter|steps|header|footer|document)__/;
 /** A row's press target and a tree's rows and parts belong to the row or tree that counts them, on any element. */
 const rowPart = /^ds-(?:row|tree)__/;
 /**
  * Files verified on their own: the block sheets, the React adapters for empty states, notices, shortcut hints, carousels, stats, meters and steps, and the page
  * scripts that draw DS1 without a component: the tooltip script and the feedback dialogs.
  */
-const entryFiles = ["1-root/empty.css", "1-root/notice.css", "1-root/table.css", "1-root/kbd.css", "1-root/carousel.css", "1-root/figures.css", "1-root/row.css", "react/empty.ts", "react/notice.ts", "react/kbd.ts", "react/carousel.ts", "react/stat.ts", "react/meter.ts", "react/steps.ts", "0-face/tooltips.ts", "0-face/feedback.ts", "0-face/dialogs.ts"];
+const entryFiles = ["1-root/empty.css", "1-root/notice.css", "1-root/table.css", "1-root/kbd.css", "1-root/carousel.css", "1-root/figures.css", "1-root/row.css", "react/empty.ts", "react/notice.ts", "react/kbd.ts", "react/carousel.ts", "react/stat.ts", "react/meter.ts", "react/steps.ts", "0-face/tooltips.ts", "0-face/feedback.ts", "0-face/dialogs.ts", ...siteChromeFiles];
 const native: Record<string, string> = { button: "button", input: "input", select: "select", textarea: "textarea", p: "text", h1: "text", h2: "text", h3: "text", h4: "text", h5: "text", h6: "text", ul: "list", ol: "list", table: "table", form: "form", dialog: "dialog", details: "accordion", meter: "meter", kbd: "kbd" };
 /**
  * `prose` marks native text, a list or a table inside an element marked data-ds-prose, which DS1's prose sheet draws.
@@ -859,6 +863,9 @@ function importedSharedAdapters(root: string, file: string, source: string, mani
     [resolve(root, dirname(manifestPath), "react/empty.ts")]: { Empty: "empty" },
     [resolve(root, dirname(manifestPath), "react/notice.ts")]: { Notice: "notice" },
     [resolve(root, dirname(manifestPath), "react/kbd.ts")]: { Kbd: "kbd" },
+    [resolve(root, dirname(manifestPath), "react/header.ts")]: { Header: "header" },
+    [resolve(root, dirname(manifestPath), "react/footer.ts")]: { Footer: "footer" },
+    [resolve(root, dirname(manifestPath), "react/document.ts")]: { DocumentPage: "document" },
     [resolve(root, dirname(manifestPath), "react/carousel.ts")]: { Carousel: "carousel" },
     [resolve(root, dirname(manifestPath), "react/stat.ts")]: { Stat: "stat" },
     [resolve(root, dirname(manifestPath), "react/meter.ts")]: { Meter: "meter" },
@@ -1031,7 +1038,7 @@ export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): Ado
         if (adapterTags.has(site.tag) || site.nativeStyle === "block-part") continue;
         // A published library's controls are needs review; a wrapper's own face counts at its uses.
         const viaLibrary = libraryFile?.site(site);
-        if (viaLibrary !== undefined) { if (viaLibrary) countLibrarySite(app.cells[viaLibrary.component]!, file, site, library!.connection); continue; }
+        if (viaLibrary !== undefined) { if (viaLibrary) countLibrarySite(app.cells[viaLibrary.component]!, file, site, library!); continue; }
         // DS1 has no range control: a range is recorded as a known gap, outside the matrix.
         if (site.controlKind === "range") { ((app.gaps ??= {}).range ??= []).push({ file, line: site.line, tag: site.tag, kind: "local" }); continue; }
         if (site.column && !site.nativeStyle) {

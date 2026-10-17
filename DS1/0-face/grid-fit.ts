@@ -7,7 +7,7 @@ export function initGridFit(): void {
   const measure = document.createElement('div');
   measure.setAttribute('aria-hidden', 'true');
   measure.style.cssText = 'position:fixed;left:0;top:0;width:0;height:var(--ds-grid-unit,20px);visibility:hidden;pointer-events:none;contain:strict';
-  document.body.append(measure);
+  document.body.appendChild(measure);
   const originalMinimums = new Map<HTMLElement, string>();
   const observed = new Set<HTMLElement>();
   let frame = 0;

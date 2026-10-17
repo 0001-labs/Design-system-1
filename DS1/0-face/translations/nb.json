@@ -92,6 +92,8 @@
     "{index} of {count}": "{index} av {count}",
     "Previous slide": "Forrige lysbilde",
     "Next slide": "Neste lysbilde",
+    "Menu": "Meny",
+    "Contents": "Innhold",
     "key.ctrl": "Ctrl",
     "key.shift": "Skift",
     "key.alt": "Alt",

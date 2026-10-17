@@ -80,6 +80,10 @@ export function PublishPanel(props: Props) {
   const snippet = props.installUrl
     ? `<link rel="stylesheet" href="${props.installUrl}">`
     : null;
+  // A product that pins the live version copies it with Sync 1, which records its hash.
+  const pin = props.publishedVersion !== null
+    ? JSON.stringify({ library: { to: "src/design", id: props.publicId, version: props.publishedVersion } }, null, 2)
+    : null;
 
   async function onPublish() {
     setStage("publishing");
@@ -169,6 +173,23 @@ export function PublishPanel(props: Props) {
         ) : (
           // A copied link to a 404 is the obvious top support ticket.
           <Empty heading="No install link yet" text="Publish once to get an install link." />
+        )}
+      </section>
+
+      <section>
+        <h3 className="ds-text ds-text--muted">Pin in a product</h3>
+        {pin ? (
+          <>
+            <p className="ds-text ds-text--small ds-text--muted">
+              Under Design system 1 in the product's sync.json. Sync 1 copies this version and records its hash, so the product keeps it until it pins another.
+            </p>
+            <pre data-testid="pin-snippet">{pin}</pre>
+            <Button secondary data-testid="pin-entry" onClick={() => void copyText(pin)} type="button">
+              Copy Sync 1 entry
+            </Button>
+          </>
+        ) : (
+          <Empty heading="Nothing to pin yet" text="Publish once to pin a version in a product." />
         )}
       </section>
 

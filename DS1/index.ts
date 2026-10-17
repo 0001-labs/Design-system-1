@@ -90,6 +90,9 @@ export * from "./4-page/ds-container";
 export * from "./4-page/ds-grid";
 export * from "./4-page/ds-layout";
 export * from "./4-page/ds-page";
+export * from "./4-page/ds-header";
+export * from "./4-page/ds-footer";
+export * from "./4-page/ds-document";
 
 export * from "./3-unit/ds-menu";
 export * from "./3-unit/ds-tabs";

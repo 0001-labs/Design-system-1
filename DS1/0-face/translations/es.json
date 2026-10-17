@@ -92,6 +92,8 @@
     "{index} of {count}": "{index} de {count}",
     "Previous slide": "Diapositiva anterior",
     "Next slide": "Diapositiva siguiente",
+    "Menu": "Menú",
+    "Contents": "Contenido",
     "key.ctrl": "Ctrl",
     "key.shift": "Mayús",
     "key.alt": "Alt",

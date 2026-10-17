@@ -8,14 +8,15 @@ import { join, posix } from 'node:path';
 import { componentGraph } from './scripts/component-graph.mjs';
 import { applePackage } from './scripts/native-apple.mjs';
 import { androidPackage } from './scripts/native-android.mjs';
+import { libraryPin, pinnedFiles, pinnedLibrary } from './scripts/library-pin.mjs';
 
 const rootStyles = ['one.css', 'grid.css', 'text.css', 'component-tokens.css', 'component-metrics.css', 'component-appearance.css', 'fonts.css', 'palette.css'];
 /** one.css and controls.css both import the text classes. */
 const importsText = ['one.css', 'controls.css'];
 /** one.css also imports the faces with their typeface tokens, and the palette. */
 const oneImports = ['fonts.css', 'palette.css'];
-/** The sheets controls.css imports besides the text classes: tables, empty states, notices, shortcut hints, the dialog's placements, carousels, stats, meters and steps, and rows. */
-const controlSheets = ['table.css', 'empty.css', 'notice.css', 'kbd.css', 'dialog-placement.css', 'carousel.css', 'figures.css', 'row.css'];
+/** The sheets controls.css imports besides the text classes: tables, empty states, notices, shortcut hints, the dialog's placements, the site chrome (header with its drawer, footer, document), carousels, stats, meters and steps, and rows. */
+const controlSheets = ['table.css', 'empty.css', 'notice.css', 'kbd.css', 'dialog-placement.css', 'header.css', 'drawer.css', 'footer.css', 'document.css', 'carousel.css', 'figures.css', 'row.css'];
 /** Sheets for writing that a product asks for by name, as a flag or in `styles`. */
 const writingSheets = { prose: 'prose.css', classless: 'one.semantic.css', cjk: 'cjk.css' };
 const askedSheets = options => Object.entries(writingSheets).filter(([flag]) => options[flag]).map(([, file]) => file);
@@ -36,6 +37,8 @@ const rootModules = {
   keys: ['keys.ts'],
   /** Swiping a native sheet or drawer (dialog.ds-dialog--sheet, --end, --start) away; its look is controls.css's. */
   'dialog-swipe': ['dialog-swipe.ts'],
+  /** The site header's menu for pages without Lit, and the drawer it opens. */
+  header: ['header.ts', 'drawer.ts'],
   /** Carousels and page dots on native markup (.ds-carousel, .ds-pagedots). */
   carousel: ['carousel.ts'],
   /** The keyboard and pointer of a native tree (`connectTree`, for `.ds-tree` in row.css). */
@@ -79,8 +82,25 @@ function moduleGraph(read, entry) {
 
 export default {
   exports: {
+    /**
+     * Published design libraries. `library-styles.ts` connects one by address at run time. `id` and
+     * `version` pin a published version instead: its stylesheet as
+     * `ds1-library/<id>/v/<version>.css`, unchanged, and `ds1-library/library-manifest.json` with
+     * its address, the DS1 library revision it was prepared by and its sha256, all hashed in
+     * sync.lock.json (scripts/library-pin.mjs verifies it first). `sha256` also checks it against
+     * a hash the product names; `styles: false` leaves library-styles.ts out, as for a `to` in
+     * `public/`.
+     */
     library: {
-      files({ read }) { return { 'library-styles.ts': read('DS1/0-face/library-styles.ts') }; },
+      async files({ read, options }) {
+        const files = options.styles === false ? {} : { 'library-styles.ts': read('DS1/0-face/library-styles.ts') };
+        const pin = libraryPin(options);
+        if (!pin) {
+          if (options.styles === false) throw new Error('Name the library to pin ("id" and "version"), or copy library-styles.ts');
+          return files;
+        }
+        return { ...files, ...pinnedFiles(pin, await pinnedLibrary(pin)) };
+      },
     },
     /**
      * Faces copied as local assets by consumers: `fonts` names them by file. `stylesheet: true`
@@ -111,9 +131,10 @@ export default {
      * Component tokens for static stylesheets that import them by URL, with
      * the named palette colours (palette.css, the --one-* tokens).
      * `nativeControls` adds controls.css with the table, text, empty-state,
-     * notice, shortcut, dialog placement, carousel, figure and row classes it
-     * imports (table.css, text.css, empty.css, notice.css, kbd.css,
-     * dialog-placement.css, carousel.css, figures.css, row.css);
+     * notice, shortcut, dialog placement, site chrome, carousel, figure and row
+     * classes it imports (table.css, text.css, empty.css, notice.css, kbd.css,
+     * dialog-placement.css, header.css, drawer.css, footer.css, document.css,
+     * carousel.css, figures.css, row.css);
      * `prose` adds the prose sheet (prose.css, for writing marked data-ds-prose) and `classless` the classless sheet
      * (one.semantic.css, which styles a whole page of plain HTML) and `cjk` Noto Sans
      * for Japanese and Chinese (cjk.css); `bundle` writes them all as one
@@ -124,7 +145,7 @@ export default {
       files({ read, options }) {
         const files = options.bundle ? [...tokenStyles] : ['component-tokens.css', 'component-metrics.css', 'component-appearance.css'];
         files.push('palette.css');
-        if (options.nativeControls) files.push('table.css', 'text.css', 'empty.css', 'notice.css', 'kbd.css', 'dialog-placement.css', 'carousel.css', 'figures.css', 'row.css', 'controls.css');
+        if (options.nativeControls) files.push('table.css', 'text.css', ...controlSheets.slice(1), 'controls.css');
         files.push(...askedSheets(options));
         if (options.bundle) {
           const sheets = files.map(file => withoutImports(read(`DS1/1-root/${file}`)));
@@ -142,13 +163,13 @@ export default {
      * `["fonts.css"]` for the faces alone, or `[]` for scripts alone); `fonts:
      * false` leaves the faces to the product;
      * `nativeControls` adds controls.css and the table.css, empty.css,
-     * notice.css, kbd.css, dialog-placement.css, carousel.css, figures.css and
-     * row.css it imports; `prose`
+     * notice.css, kbd.css, dialog-placement.css, header.css, drawer.css,
+     * footer.css, document.css, carousel.css, figures.css and row.css it imports; `prose`
      * adds the prose sheet (prose.css) and `classless` the classless sheet
      * (one.semantic.css) and `cjk` Noto Sans for Japanese and Chinese (cjk.css,
      * from Google Fonts), which `styles` may also name; `modules` names page scripts
      * from 0-face/ (carousel, grid, grid-fit, layout-inspector, scaling, theme,
-     * theme-bootstrap, tooltips, tree, keys, dialog-swipe), copied with what they import, into 0-face/;
+     * theme-bootstrap, tooltips, tree, header, keys, dialog-swipe), copied with what they import, into 0-face/;
      * `scriptsTo` puts that 0-face/ folder elsewhere, a path from `to`
      * (`"../../src/ds1"` puts the stylesheets in `public/ds1` and the scripts
      * in `src/ds1/0-face`). one.css and controls.css bring text.css, and

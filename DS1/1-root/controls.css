@@ -5,6 +5,9 @@
 @import "./notice.css";
 @import "./kbd.css";
 @import "./dialog-placement.css";
+@import "./header.css";
+@import "./footer.css";
+@import "./document.css";
 @import "./carousel.css";
 @import "./figures.css";
 @import "./row.css";

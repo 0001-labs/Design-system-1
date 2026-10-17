@@ -92,6 +92,8 @@
     "{index} of {count}": "{count}개 중 {index}번째",
     "Previous slide": "이전 슬라이드",
     "Next slide": "다음 슬라이드",
+    "Menu": "메뉴",
+    "Contents": "목차",
     "key.ctrl": "Ctrl",
     "key.shift": "Shift",
     "key.alt": "Alt",

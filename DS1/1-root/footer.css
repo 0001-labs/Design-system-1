@@ -1,0 +1,186 @@
+@import "./component-metrics.css";
+
+/*
+ * A site footer, as plain classes on native elements.
+ *
+ * The brand and its line at the start, twelve squares wide; the columns of
+ * links beside it, eight squares each, two squares apart; then, two squares
+ * below, the legal line at the start and the preferences (language and theme,
+ * as `ds-cycle` or native buttons) at the end. Every line is one square, the
+ * column headings in the title grey, the links in the text's ink with a faint
+ * hairline under the pointer. A hairline runs along its top. Columns that do
+ * not fit beside the brand go below it, and on a narrow screen everything
+ * stands in one column. The `ds-footer` element draws the same parts from data.
+ *
+ *   ds-footer                    the block, a <footer>
+ *   ds-footer__brand             the mark and its line
+ *   ds-footer__mark              the mark or name, a link home; a picture in it is one square high
+ *   ds-footer__tagline           a line about the site, muted
+ *   ds-footer__columns           the columns, a <nav> or <div>
+ *   ds-footer__column            one column: a heading and its links
+ *   ds-footer__heading           the column's heading, one line in the title grey
+ *   ds-footer__links             the links, a <ul> with one link per <li>
+ *   ds-footer__base              the last row, two squares below
+ *   ds-footer__legal             in it, the copyright and legal line, muted
+ *   ds-footer__preferences       in it, the language and theme controls, at its end
+ *
+ * Tokens: `--ds-footer-line` (the hairline along the top).
+ */
+
+.ds-footer {
+  box-sizing: border-box;
+  container-type: inline-size;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: calc(2 * var(--ds-unit));
+  min-width: 0;
+  margin: 0;
+  padding: calc(2 * var(--ds-unit)) var(--ds-unit) var(--ds-unit);
+  box-shadow: inset 0 1px var(--ds-footer-line, var(--ds-border-color));
+  color: var(--ds-text-color);
+  font-family: var(--ds-typeface-regular);
+  font-feature-settings: var(--ds-font-features);
+  font-size: var(--ds-type-size-default);
+  font-weight: var(--ds-type-weight-default);
+  line-height: var(--ds-unit);
+  letter-spacing: var(--ds-type-letterspacing-default);
+  text-transform: none;
+}
+
+.ds-footer :is(p, h2, h3, h4, ul) {
+  margin: 0;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+.ds-footer__brand {
+  display: flex;
+  flex: 0 0 calc(12 * var(--ds-unit));
+  flex-direction: column;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.ds-footer__mark {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--ds-unit) / 2);
+  align-self: flex-start;
+  height: var(--ds-unit);
+  color: inherit;
+  font-family: var(--ds-typeface-medium);
+  font-weight: var(--ds-type-weight-bold);
+  text-decoration: none;
+}
+
+.ds-footer__mark :is(img, svg) {
+  display: block;
+  width: auto;
+  height: var(--ds-unit);
+}
+
+.ds-footer__tagline,
+.ds-footer__legal {
+  color: var(--ds-text-color-muted);
+}
+
+.ds-footer__columns {
+  display: flex;
+  /* Never narrower than one column: below that the columns go under the brand. */
+  flex: 1 1 calc(8 * var(--ds-unit));
+  flex-wrap: wrap;
+  gap: var(--ds-unit) calc(2 * var(--ds-unit));
+  min-width: min(100%, calc(8 * var(--ds-unit)));
+}
+
+.ds-footer__column {
+  display: flex;
+  flex: 0 0 calc(8 * var(--ds-unit));
+  flex-direction: column;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.ds-footer .ds-footer__heading {
+  color: var(--ds-title-color);
+}
+
+.ds-footer .ds-footer__links {
+  padding: 0;
+  list-style: none;
+}
+
+.ds-footer__links li {
+  margin: 0;
+  padding: 0;
+}
+
+.ds-footer__links a {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  color: inherit;
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: transparent;
+  text-overflow: ellipsis;
+  text-underline-offset: calc(2px * var(--ds-sf));
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.ds-footer__links a:hover {
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+}
+
+.ds-footer__links a[aria-current]:not([aria-current="false"]) {
+  text-decoration-color: currentColor;
+}
+
+:is(.ds-footer__links a, .ds-footer__mark):focus-visible {
+  outline: 2px solid var(--ds-focus-ring);
+  outline-offset: 1px;
+}
+
+/* The last row, two squares below: the legal line at the start, the
+   preferences at the end; on a narrow screen the preferences go first. */
+.ds-footer__base {
+  display: flex;
+  flex: 0 0 100%;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--ds-unit) calc(2 * var(--ds-unit));
+  min-width: 0;
+}
+
+.ds-footer__legal {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ds-footer__preferences {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 calc(var(--ds-unit) / 2);
+  min-height: var(--ds-unit);
+  margin-inline-start: auto;
+}
+
+@container (max-width: 599px) {
+  .ds-footer__brand,
+  .ds-footer__columns {
+    flex-basis: 100%;
+  }
+
+  .ds-footer__base {
+    flex-direction: column;
+  }
+
+  .ds-footer__preferences {
+    order: -1;
+    margin-inline-start: 0;
+  }
+}

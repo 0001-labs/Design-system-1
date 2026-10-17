@@ -92,6 +92,8 @@
     "{index} of {count}": "第 {index} 张，共 {count} 张",
     "Previous slide": "上一张",
     "Next slide": "下一张",
+    "Menu": "菜单",
+    "Contents": "目录",
     "key.ctrl": "Ctrl",
     "key.shift": "Shift",
     "key.alt": "Alt",

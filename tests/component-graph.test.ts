@@ -82,6 +82,13 @@ test('a specifier written with .js reads its TypeScript source, and a real scrip
   expect(files.has('0-face/boot.js')).toBe(true);
 });
 
+test('the site chrome carries its React adapters, the drawer script and the sheets that draw it', () => {
+  const { files } = componentGraph(ds1, ['header', 'footer', 'document', 'page']);
+  for (const file of ['4-page/ds-header.ts', '4-page/ds-footer.ts', '4-page/ds-document.ts', 'react/header.ts', 'react/footer.ts', 'react/document.ts', '0-face/drawer.ts', '0-face/header.ts', '1-root/header.css', '1-root/drawer.css', '1-root/footer.css', '1-root/document.css', '1-root/prose.css', '2-core/ds-cycle.ts', '0-face/translations/en.json']) expect(files.has(file), file).toBe(true);
+  // The page's drawer is the header's: selecting the page alone brings the script.
+  expect(componentGraph(ds1, ['page']).files.has('0-face/drawer.ts')).toBe(true);
+});
+
 test('unknown and malformed names are refused', () => {
   expect(() => componentGraph(ds1, ['nothing'])).toThrow(/Unknown component/);
   expect(() => componentGraph(ds1, ['../x'])).toThrow(/Invalid component/);

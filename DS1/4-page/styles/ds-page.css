@@ -46,6 +46,9 @@
 :host([fill]) .page { height: 100%; }
 
 .area { position: relative; min-width: 0; }
+/* The drawer's menu button: shown only on a narrow page with `drawer`. */
+.bar { display: none; grid-area: bar; }
+.bar[hidden] { display: none !important; }
 .area[data-empty] { display: none; }
 .nav { grid-area: nav; }
 .header { grid-area: header; margin-block-end: var(--ds-unit); }
@@ -155,6 +158,34 @@
   :host([fill]) :is(.nav, .main, .aside) { overflow: visible; }
   :host([fill]) .page { height: auto; }
   :host([layout="tiles"]) .main { display: flex; flex-direction: column; align-items: stretch; }
+}
+
+/* Phone width with a drawer: the navigation folds away and the menu button
+ * stands in a one-square column before the header. In the drawer the
+ * navigation takes the panel's width, with none of the page's margins. */
+@container (max-width: 599px) {
+  :host([drawer]) .page,
+  :host([drawer][layout="inspector"]) .page {
+    grid-template-columns: var(--ds-unit) minmax(0, 1fr);
+    column-gap: var(--ds-unit);
+    grid-template-areas: "bar header" "main main" "aside aside" "footer footer";
+  }
+  :host([drawer]) .bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--ds-unit);
+    margin-block-end: var(--ds-unit);
+  }
+  :host([drawer]) .page > .nav { display: none; }
+}
+/* Important, as the layouts' own margins and hairlines for the navigation
+ * reach it by more specific selectors. */
+.ds-drawer > .nav {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  overflow: visible !important;
 }
 
 /* Inspection: each area outlined and named by its slot, in the corner its

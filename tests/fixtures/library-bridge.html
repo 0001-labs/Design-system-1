@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Library bridge</title>
+    <!-- DS1 as a product loads it, then its published library: ?sheets=one for one.css, else the component tokens alone. -->
+    <script>
+      const sheets = new URLSearchParams(location.search).get("sheets") === "one" ? ["one.css", "controls.css"] : ["component-tokens.css", "controls.css"];
+      for (const sheet of sheets) document.write(`<link rel="stylesheet" href="/DS1/1-root/${sheet}">`);
+    </script>
+    <style id="library"></style>
+    <style>
+      /* The page follows the reader's scheme, as a product page does. */
+      :root { color-scheme: light dark; }
+      body { margin: 0; padding: 0; }
+      #stage { position: absolute; top: 0; left: 0; width: 600px; }
+      #stage > * { display: block; margin: 0; }
+    </style>
+    <script type="module">
+      import "/DS1/2-core/ds-button.ts";
+      import "/DS1/2-core/ds-input.ts";
+      import "/DS1/3-unit/ds-menu.ts";
+      await document.fonts.ready;
+      document.documentElement.dataset.ready = "true";
+    </script>
+  </head>
+  <body>
+    <div id="stage"></div>
+  </body>
+</html>

@@ -179,6 +179,41 @@ render();`,
     html: '<p class="ds-text"><ds-kbd shortcut="mod+k"></ds-kbd> Search</p>\n<p class="ds-text"><ds-kbd shortcut="mod+shift+d"></ds-kbd> Duplicate</p>\n<p class="ds-text"><ds-kbd shortcut="alt+arrowup"></ds-kbd> Move up</p>\n<p class="ds-text">Close <ds-kbd shortcut="escape" plain></ds-kbd></p>',
     height: 120,
   },
+  'header': {
+    title: 'A site header', hint: 'Make the preview narrower than thirty squares to fold the links into the drawer: Escape, the close button or a link closes it.',
+    height: 140,
+    html: `<ds-header brand="Studio" literal style="flex-basis:100%">
+  <a href="#work" aria-current="page">Work</a>
+  <a href="#about">About</a>
+  <a href="#contact">Contact</a>
+  <ds-button slot="actions" primary>Get in touch</ds-button>
+</ds-header>`,
+  },
+  'footer': {
+    title: 'A site footer', hint: 'The cycles change this preview\'s language and theme. Columns that do not fit go under the brand.',
+    height: 260,
+    html: `<ds-footer brand="Studio" tagline="Tools for working on the grid" literal preferences year="2026" style="flex-basis:100%"
+  columns='[{"heading":"Product","links":[{"label":"Download","href":"#download"},{"label":"Help","href":"#help"}]},{"heading":"Company","links":[{"label":"About","href":"#about"},{"label":"Terms","href":"#terms"}]}]'>
+</ds-footer>`,
+  },
+  'document': {
+    title: 'A legal notice', hint: 'The contents are built from the headings; the section in view is marked as you scroll.',
+    height: 420,
+    html: `<ds-document style="flex-basis:100%">
+  <h1>Terms</h1>
+  <p>These terms apply when you use the service.</p>
+  <h2>Using the service</h2>
+  <p>Keep your account to yourself, and tell us if someone else uses it.</p>
+  <h2>特定商取引法に基づく表記</h2>
+  <dl class="ds-definitions" lang="ja">
+    <dt>販売業者</dt><dd>Studio</dd>
+    <dt>販売価格</dt><dd>各商品ページに表示します。</dd>
+    <dt>お問い合わせ</dt><dd><a href="mailto:hello@example.com">hello@example.com</a></dd>
+  </dl>
+  <h2>Changes</h2>
+  <p>When these terms change, the new ones apply from the date at the top.</p>
+</ds-document>`,
+  },
   'notice': {
     title: 'Four tones', hint: 'Danger is an alert, the others a status. The close button fires ds-notice-dismiss and hides the notice.',
     html: `<ds-notice text="Changes from an earlier session are stored on this device." literal></ds-notice>
@@ -404,4 +439,5 @@ export const PAGE_EXAMPLES: Record<string, string[]> = {
   '3-unit/table': ['table'],
   '4-page/container': ['container'], '4-page/grid': ['grid'],
   '4-page/layout': ['layout'], '4-page/layouts': ['page'],
+  '4-page/header': ['header'], '4-page/footer': ['footer'], '4-page/document': ['document'],
 };

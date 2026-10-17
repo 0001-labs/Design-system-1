@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Site chrome measurements</title>
+    <link rel="stylesheet" href="/DS1/1-root/one.css" />
+    <link rel="stylesheet" href="/DS1/1-root/controls.css" />
+    <link rel="stylesheet" href="/DS1/1-root/prose.css" />
+    <style>
+      body { margin: 0; padding: 0; }
+      #stage { position: absolute; top: 0; left: 0; width: 1000px; }
+      .ds-icon { --ds-icon: url(/DS1/x-icon/menu.svg); }
+      .ds-icon + .ds-icon { --ds-icon: url(/DS1/x-icon/close.svg); }
+    </style>
+    <script type="module">
+      const { startHeaders } = await import("/DS1/0-face/header.ts");
+      window.startHeaders = startHeaders;
+      await import("/DS1/4-page/ds-header.ts");
+      await import("/DS1/4-page/ds-footer.ts");
+      await import("/DS1/4-page/ds-document.ts");
+      await import("/DS1/4-page/ds-page.ts");
+      await document.fonts.ready;
+      document.documentElement.dataset.ready = "true";
+    </script>
+  </head>
+  <body>
+    <div id="stage"></div>
+  </body>
+</html>
