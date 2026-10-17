@@ -9,6 +9,7 @@
     "outDir": "./dist",
     "rootDir": "./DS1",
     "strict": false,
+    "strictNullChecks": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,

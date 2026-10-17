@@ -5,7 +5,9 @@ import { createRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { TokenField, Token } from "../DS1/react/token-field";
 import "../DS1/3-unit/ds-token-field";
-const setValue = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!;
+// The native value setter, as a browser sets the value, so React sees the change.
+const nativeValue = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!;
+const setValue = (element: HTMLInputElement, value: string) => nativeValue.set!.call(element, value);
 afterEach(() => document.body.replaceChildren());
 async function settle() { await Promise.all(Array.from(document.querySelectorAll<any>('ds-token-field, ds-token, ds-menu, ds-button'), node => node.updateComplete)); }
 function key(input: HTMLInputElement, key: string, options = {}) { const event = new KeyboardEvent('keydown', {key, bubbles: true, cancelable: true, ...options}); input.dispatchEvent(event); return event; }
@@ -49,8 +51,8 @@ test('controlled edits, token removal, paste, refs and SSR preserve product owne
   }
   try {
     await act(async()=>root.render(h(Example))); await settle();
-    await act(async()=>{setValue.call(ref.current,'reject');ref.current!.dispatchEvent(new Event('input',{bubbles:true}));}); expect(ref.current!.value).toBe('');
-    await act(async()=>{setValue.call(ref.current,'one,two');ref.current!.dispatchEvent(new Event('input',{bubbles:true}));});
+    await act(async()=>{setValue(ref.current!,'reject');ref.current!.dispatchEvent(new Event('input',{bubbles:true}));}); expect(ref.current!.value).toBe('');
+    await act(async()=>{setValue(ref.current!,'one,two');ref.current!.dispatchEvent(new Event('input',{bubbles:true}));});
     expect(commit).toHaveBeenCalledWith({text:'one,two',reason:'input'}); expect(ref.current!.value).toBe('');
     await act(async()=>key(ref.current!,'Backspace')); expect(mount.querySelector('ds-token')).toBeNull(); expect(document.activeElement).toBe(ref.current);
     expect(renderToString(h(TokenField,{name:'draft',defaultValue:'Server'}))).toContain('<input name="draft" value="Server"');

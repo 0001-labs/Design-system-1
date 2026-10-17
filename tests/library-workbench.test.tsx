@@ -21,7 +21,7 @@ it('uses the public catalogue and examples, preserving saved CSS until an edit',
   expect(dirty).not.toHaveBeenCalled();
   expect(container.querySelector<HTMLTextAreaElement>('[data-testid="live-css-source"]')?.value).toContain('--brand: pink');
   const avatar = [...sidebar.shadowRoot!.querySelectorAll<HTMLButtonElement>('button[data-item]')].find(button => button.textContent?.startsWith('Avatar'))!;
-  act(() => avatar.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true })));
+  act(() => { avatar.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true })); });
   expect(container.querySelector('iframe')?.getAttribute('src')).toBe('/examples/avatar/');
   expect(new URLSearchParams(window.location.search).get('component')).toBe('/2-core/avatar/');
   act(() => root.unmount()); container.remove();

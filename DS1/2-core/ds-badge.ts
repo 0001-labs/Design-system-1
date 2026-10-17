@@ -20,7 +20,7 @@ export class Badge extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    this.updateComplete.then(() => {
+    void this.updateComplete.then(() => {
       if (!this.isConnected) return;
       this.contentObserver?.disconnect();
       this.contentObserver = new MutationObserver(this.scheduleMeasure);
@@ -31,7 +31,7 @@ export class Badge extends LitElement {
         this.observer.observe(this);
         this.observer.observe(this.shadowRoot!.querySelector(".label")!);
       }
-      document.fonts?.ready.then(this.scheduleMeasure);
+      void document.fonts?.ready.then(this.scheduleMeasure);
       document.fonts?.addEventListener("loadingdone", this.scheduleMeasure);
       this.scheduleMeasure();
     });

@@ -56,9 +56,9 @@ export class LanguagePicker extends Cycle {
   }
 
   // The product's languages can change after the picker is drawn
-  async setupInitialValue() {
+  setupInitialValue(): void {
     this.values = getAvailableLanguagesSync();
-    await super.setupInitialValue();
+    super.setupInitialValue();
   }
 
   getValueDisplay(value: string): string {

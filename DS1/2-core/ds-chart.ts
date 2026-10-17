@@ -17,7 +17,7 @@ export class ChartElement extends LitElement {
     super.connectedCallback();
     this.media = globalThis.matchMedia?.("(prefers-color-scheme: dark)");
     this.media?.addEventListener("change", this.themeChanged);
-    this.updateComplete.then(() => {
+    void this.updateComplete.then(() => {
       if (!this.isConnected) return;
       this.initialize();
       this.refreshTheme();
@@ -98,7 +98,7 @@ export class GridLineChart extends ChartElement {
       this.chart?.resize(width, this.rows * this.unit);
       this.placeDot();
     });
-    document.fonts?.ready.then(() => this.chart?.draw());
+    void document.fonts?.ready.then(() => this.chart?.draw());
     this.resizeToUnit();
     this.sync(true);
   }

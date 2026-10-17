@@ -6,7 +6,9 @@ import { renderToString } from "react-dom/server";
 import { Composer } from "../DS1/react/composer";
 import "../DS1/2-core/ds-composer";
 afterEach(() => document.body.replaceChildren());
-const setValue = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, "value")!.set!;
+// The native value setter, as a browser sets the value, so React sees the change.
+const nativeValue = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, "value")!;
+const setValue = (element: HTMLTextAreaElement, value: string) => nativeValue.set!.call(element, value);
 
 test("highlights preserve every original character, escape markup and reject invalid or overlapping ranges", async () => {
   document.body.innerHTML = '<ds-composer><textarea name="message" rows="2"></textarea></ds-composer>';
@@ -45,10 +47,10 @@ test("React preserves native refs, labels, ARIA links, forms, rejected edits and
     expect(document.getElementById(input.getAttribute("aria-activedescendant")!)?.textContent).toBe("Snow");
     input.focus(); input.setSelectionRange(3, 7);
     expect(document.activeElement).toBe(input); expect(input.selectionEnd).toBe(7);
-    await act(async () => { setValue.call(input, "Hi Snow\nAgain"); input.dispatchEvent(new Event("input", {bubbles: true})); });
+    await act(async () => { setValue(input, "Hi Snow\nAgain"); input.dispatchEvent(new Event("input", {bubbles: true})); });
     expect(changed).toHaveBeenLastCalledWith("Hi Snow\nAgain");
     expect(new FormData(mount.querySelector("form")!).getAll("body")).toEqual(["Hi Snow\nAgain"]);
-    await act(async () => { setValue.call(input, "reject"); input.dispatchEvent(new Event("input", {bubbles: true})); });
+    await act(async () => { setValue(input, "reject"); input.dispatchEvent(new Event("input", {bubbles: true})); });
     expect(input.value).toBe("Hi Snow\nAgain");
     await host.updateComplete;
     expect(host.shadowRoot!.querySelector(".mirror")!.textContent).toBe(input.value + "\n");
@@ -86,9 +88,9 @@ test("a filled highlight lies behind the words in its own colour, the accent inc
 
 test("a filled highlight keeps the words readable over every palette colour, on light and dark", async () => {
   const { readFileSync } = await import("node:fs");
-  const { join } = await import("node:path");
+  const path = await import("node:path");
   const { named, isInk, toHsl } = await import("../DS1/1-root/palette");
-  const css = readFileSync(join(import.meta.dirname, "../DS1/2-core/styles/ds-composer.css"), "utf8");
+  const css = readFileSync(path.join(import.meta.dirname, "../DS1/2-core/styles/ds-composer.css"), "utf8");
   const fill = css.slice(css.indexOf("mark.fill {"), css.indexOf("}", css.indexOf("mark.fill {")));
   expect(fill).toContain("color: var(--ds-text-color)");
   const [light, dark] = [...fill.matchAll(/var\(--ds-accent-color\)\) (\d+)%, transparent/g)].map(match => Number(match[1]) / 100);

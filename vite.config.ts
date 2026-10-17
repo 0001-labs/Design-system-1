@@ -38,6 +38,15 @@ export default defineConfig({
     rules: {
       "vite-plus/prefer-vite-plus-imports": "error",
     },
+    overrides: [
+      {
+        // A component's template listeners (@click=${this.handle}) are called by Lit with the
+        // element as `this` (lit-html's EventPart calls them on options.host), so they are
+        // bound; anywhere else a method passed on its own is still flagged.
+        files: ["DS1/**/ds-*.ts"],
+        rules: { "typescript/unbound-method": "off" },
+      },
+    ],
     options: {
       typeAware: true,
       typeCheck: true,

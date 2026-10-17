@@ -168,7 +168,8 @@ export class Cycle extends LitElement {
     this.initializeValues();
   }
 
-  async initializeValues() {
+  // Synchronous: nothing here waits, and a thrown error should surface where it happens.
+  initializeValues(): void {
     if (this.type === "language") {
       // Dynamically get available languages from translation data
       const availableLanguages = getAvailableLanguagesSync();
@@ -236,7 +237,7 @@ export class Cycle extends LitElement {
     }
   }
 
-  async setupInitialValue() {
+  setupInitialValue(): void {
     if (this.type === "language") {
       // Get current language
       const currentLang = currentLanguage.value;

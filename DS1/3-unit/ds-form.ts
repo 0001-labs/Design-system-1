@@ -227,48 +227,52 @@ export class Form extends LitElement {
     }
 
     this._isSubmitting = true;
-    const formData = this.getFormData();
+    // Whatever throws on the way (reading the fields, a listener), the form can submit again.
+    try {
+      const formData = this.getFormData();
 
-    this.dispatchEvent(
-      new CustomEvent("form-submit", {
-        detail: { data: formData },
-        bubbles: true,
-      })
-    );
+      this.dispatchEvent(
+        new CustomEvent("form-submit", {
+          detail: { data: formData },
+          bubbles: true,
+        })
+      );
 
-    // If action is provided, submit to the server
-    if (this.action) {
-      try {
-        const response = await fetch(this.action, {
-          method: this.method.toUpperCase(),
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        });
+      // If action is provided, submit to the server
+      if (this.action) {
+        try {
+          const response = await fetch(this.action, {
+            method: this.method.toUpperCase(),
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+          });
 
-        this.dispatchEvent(
-          new CustomEvent("form-response", {
-            detail: { response, data: formData },
-            bubbles: true,
-          })
-        );
-      } catch (error) {
-        this.dispatchEvent(
-          new CustomEvent("form-error", {
-            detail: { error, data: formData },
-            bubbles: true,
-          })
-        );
+          this.dispatchEvent(
+            new CustomEvent("form-response", {
+              detail: { response, data: formData },
+              bubbles: true,
+            })
+          );
+        } catch (error) {
+          this.dispatchEvent(
+            new CustomEvent("form-error", {
+              detail: { error, data: formData },
+              bubbles: true,
+            })
+          );
+        }
       }
+    } finally {
+      this._isSubmitting = false;
     }
-
-    this._isSubmitting = false;
   }
 
   private _handleSubmit(e: Event): void {
     e.preventDefault();
-    this.submit();
+    // submit() reports a failed request itself, as form-error.
+    void this.submit();
   }
 
   private _handleKeydown(e: KeyboardEvent): void {
@@ -277,7 +281,7 @@ export class Form extends LitElement {
       // Don't submit if in a textarea
       if (target.tagName.toLowerCase() !== "textarea") {
         e.preventDefault();
-        this.submit();
+        void this.submit();
       }
     }
   }
