@@ -146,6 +146,8 @@ public enum DS1IconName: String, CaseIterable, Sendable {
     case equation
     case exercise
     case expand
+    case eye
+    case eyeOff = "eye-off"
     case facebook
     case figma
     case flame

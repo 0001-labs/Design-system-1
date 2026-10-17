@@ -150,6 +150,8 @@ enum class DS1IconName(val fileName: String, @DrawableRes val drawable: Int) {
     equation("equation", R.drawable.ds1_icon_equation),
     exercise("exercise", R.drawable.ds1_icon_exercise),
     expand("expand", R.drawable.ds1_icon_expand),
+    eye("eye", R.drawable.ds1_icon_eye),
+    eyeOff("eye-off", R.drawable.ds1_icon_eye_off),
     facebook("facebook", R.drawable.ds1_icon_facebook),
     figma("figma", R.drawable.ds1_icon_figma),
     flame("flame", R.drawable.ds1_icon_flame),
