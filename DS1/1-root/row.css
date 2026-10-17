@@ -4,8 +4,12 @@
  * Rows, as plain classes on native elements: the `ds-row` and `ds-tree`
  * elements' look without the elements.
  *
- * A row is one square high. On an `<a href>` or a `<button>` the whole row
- * is one press target, a row, a tile or a card: the pointer over it, the
+ * A row is one square high, and what it holds stands on the lower sixteen of
+ * the square with the spare four above, as Ezo sets every row: a line of
+ * words on a 16px line box, a 16px icon and a 16px control all end on the
+ * row's bottom line, so the capitals (7px below the top line, baseline 3px
+ * above the next) are centred on an icon beside them. On an `<a href>` or a
+ * `<button>` the whole row is one press target, a row, a tile or a card: the pointer over it, the
  * press and the focus ring cover the row, and its content keeps the row's
  * layout. A row that also holds controls of its own (a quick action, a link
  * in another cell) is any element, a `<li>`, a `<div>` or a `<tr>`, with one
@@ -43,11 +47,12 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-end;
   gap: calc(4px * var(--ds-sf));
   min-width: 0;
   height: var(--ds-row-height);
   margin: 0;
+  line-height: var(--ds-type-lineheight-default);
 }
 
 :where(.ds-row--auto):not(tr) {
@@ -95,7 +100,8 @@ button.ds-row {
   padding: 0;
 }
 
-/* Each line of a tile one square, over the inherited font of a native link or button. */
+/* Each line of a tile one square, over the inherited font of a native link or button:
+   a tile's lines wrap, so they stay on whole squares rather than the sixteen. */
 .ds-row.ds-row--stacked {
   line-height: var(--ds-row-height);
 }
@@ -190,7 +196,7 @@ button.ds-row[aria-disabled="true"]:hover {
 .ds-tree__item {
   box-sizing: border-box;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   height: var(--ds-row-height);
   min-width: 0;
   margin: 0;
@@ -230,7 +236,8 @@ button.ds-row[aria-disabled="true"]:hover {
   opacity: 0.5;
 }
 
-/* The arrow and an icon each stand on a whole square; a leaf keeps the arrow's square empty. */
+/* The arrow and an icon each stand on a whole square, drawn on the row's sixteen (two
+   pixels below the square's middle); a leaf keeps the arrow's square empty. */
 .ds-tree__disclosure,
 .ds-tree__item > .ds-icon {
   flex: 0 0 var(--ds-unit);
@@ -238,14 +245,16 @@ button.ds-row[aria-disabled="true"]:hover {
   height: var(--ds-unit);
   -webkit-mask-size: var(--ds-icon-box, calc(14px * var(--ds-sf)));
   mask-size: var(--ds-icon-box, calc(14px * var(--ds-sf)));
+  -webkit-mask-position: center calc(50% + 2px * var(--ds-sf));
+  mask-position: center calc(50% + 2px * var(--ds-sf));
 }
 .ds-tree__disclosure {
   --ds-icon-box: calc(14px * var(--ds-sf));
   display: inline-block;
   color: var(--ds-text-color-muted);
   background-color: currentColor;
-  -webkit-mask: var(--ds-tree-disclosure, url("data:image/svg+xml,%3Csvg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' viewBox='0 0 16 16'%3E%3Cpath d='M13.1566 8.60594H0V9.61651L13.1562 9.61791L10.249 12.5251L10.9558 13.219L15.0636 9.11123L10.9524 5L10.245 5.70734L13.1566 8.60594Z'/%3E%3C/svg%3E")) center / var(--ds-icon-box) no-repeat;
-  mask: var(--ds-tree-disclosure, url("data:image/svg+xml,%3Csvg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' viewBox='0 0 16 16'%3E%3Cpath d='M13.1566 8.60594H0V9.61651L13.1562 9.61791L10.249 12.5251L10.9558 13.219L15.0636 9.11123L10.9524 5L10.245 5.70734L13.1566 8.60594Z'/%3E%3C/svg%3E")) center / var(--ds-icon-box) no-repeat;
+  -webkit-mask: var(--ds-tree-disclosure, url("data:image/svg+xml,%3Csvg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' viewBox='0 0 16 16'%3E%3Cpath d='M13.1566 8.60594H0V9.61651L13.1562 9.61791L10.249 12.5251L10.9558 13.219L15.0636 9.11123L10.9524 5L10.245 5.70734L13.1566 8.60594Z'/%3E%3C/svg%3E")) center calc(50% + 2px * var(--ds-sf)) / var(--ds-icon-box) no-repeat;
+  mask: var(--ds-tree-disclosure, url("data:image/svg+xml,%3Csvg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' viewBox='0 0 16 16'%3E%3Cpath d='M13.1566 8.60594H0V9.61651L13.1562 9.61791L10.249 12.5251L10.9558 13.219L15.0636 9.11123L10.9524 5L10.245 5.70734L13.1566 8.60594Z'/%3E%3C/svg%3E")) center calc(50% + 2px * var(--ds-sf)) / var(--ds-icon-box) no-repeat;
   transform: rotate(0deg);
   transition: transform 120ms ease-out;
 }

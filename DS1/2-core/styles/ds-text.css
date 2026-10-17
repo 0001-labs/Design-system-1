@@ -104,7 +104,7 @@
 :host([size="heading"]) {
   height: auto;
   font-size: var(--ds-type-size-heading);
-  line-height: var(--ds-row-height);
+  line-height: var(--ds-type-lineheight-default);
 }
 
 /* A title on two squares. */

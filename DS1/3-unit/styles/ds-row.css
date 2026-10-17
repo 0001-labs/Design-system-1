@@ -1,15 +1,18 @@
 @import "../../1-root/component-metrics.css";
 
-/* ds-row.css: the same rows as the native .ds-row in 1-root/row.css. */
+/* ds-row.css: the same rows as the native .ds-row in 1-root/row.css. What a row holds
+   stands on the lower sixteen of its square with the spare four above, as Ezo sets every
+   row: words on a 16px line box, a 16px icon and a 16px control all end on the bottom line. */
 
 :host {
   box-sizing: border-box;
   display: flex;
   flex-direction: row;
-  align-items: var(--ds-row-align, center);
+  align-items: var(--ds-row-align, flex-end);
   gap: var(--ds-row-gap, calc(4px * var(--ds-sf)));
   min-width: 0;
   height: var(--ds-row-default-height, var(--ds-row-height));
+  line-height: var(--ds-type-lineheight-default);
 }
 :host([hidden]) { display: none !important; }
 
@@ -37,7 +40,8 @@
   gap: var(--ds-row-packed-gap, var(--ds-row-gap, calc(4px * var(--ds-sf))));
 }
 
-/* A tile or a card: the children stacked, each line one square, sized to them. */
+/* A tile or a card: the children stacked, each line one square, sized to them; its lines
+   wrap, so they stay on whole squares rather than the sixteen. */
 :host([stacked]) {
   flex-direction: column;
   line-height: var(--ds-row-height);

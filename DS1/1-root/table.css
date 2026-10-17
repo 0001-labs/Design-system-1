@@ -1,7 +1,8 @@
 /*
  * A table: words straight on the paper, one square a row. No box and no
  * column lines: each row stands on a hairline at its foot, its words set on
- * that line like a caption (19px of words and 1px of line, a 20px pitch).
+ * that line like a caption: the sixteen of words against the 1px line, three
+ * spare above, a 20px pitch, as Ezo sets every row.
  * Column headers keep the text's weight in the title grey; the first column
  * of a body row is a row header in the text colour. Nothing is filled with
  * the accent except a cell someone has selected.
@@ -39,7 +40,7 @@
   border: 0;
   border-bottom: 1px solid var(--ds-table-rule);
   background: transparent;
-  line-height: calc(var(--ds-table-row) - 1px);
+  line-height: var(--ds-type-lineheight-default);
   text-align: start;
   vertical-align: bottom;
   font-weight: inherit;
@@ -79,8 +80,10 @@
 }
 
 .ds-table caption {
+  box-sizing: border-box;
   height: var(--ds-table-row);
-  line-height: var(--ds-table-row);
+  padding-top: calc(var(--ds-table-row) - var(--ds-type-lineheight-default));
+  line-height: var(--ds-type-lineheight-default);
   text-align: start;
   color: var(--ds-title-color, light-dark(#797979, #9a9a9a));
 }
