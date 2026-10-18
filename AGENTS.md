@@ -127,7 +127,7 @@ The public Fonts catalogue uses Aa's `createPlainEditor` for plain specimen text
 
 ## Product code
 
-Canonical short code: `DS1`. Use this three-character code for product-owned libraries and other compact ownership labels. Keep the full product name for prose and the existing commit-prefix convention.
+Canonical short code: `DS1`. Use this three-character code for product-owned libraries and other compact ownership labels. Use this code followed by a colon for commit subjects; keep the full product name in prose.
 
 ## Feature flags
 
