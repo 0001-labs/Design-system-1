@@ -66,7 +66,11 @@ export type AtomSyntax = {
     name: string;
     /** How many characters an atom of this kind takes at `at` in a line, or 0 when none starts there. */
     match(line: string, at: number): number;
+    /** A fenced code block in this language is drawn whole as this atom, fences and all: `diagram` for ```diagram. */
+    fence?: string;
 };
+/** The atom a closed code block is drawn as, by its fence's language, if any is given one. */
+export declare function fencedAtom<T extends AtomSyntax>(block: Block, atoms: readonly T[]): T | undefined;
 /** An atom found by a pattern, optionally only where `accept` agrees. */
 export declare function atomPattern(name: string, pattern: RegExp, accept?: (match: RegExpExecArray) => boolean): AtomSyntax;
 /** A Markdown picture, `![name](address)`. */

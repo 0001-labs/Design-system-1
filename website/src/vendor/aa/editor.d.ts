@@ -16,6 +16,13 @@ import { type Command, type ToolbarAction } from './controls';
  */
 export type Atom = AtomSyntax & {
     draw?(element: HTMLElement, source: string): void | (() => void);
+    /** A block that starts one, offered in the toolbar and the slash menu: its name, icon and first source. */
+    insert?: {
+        label: string;
+        icon: string;
+        source: string;
+        keywords?: string;
+    };
 };
 /** A picture drawn as itself. */
 export declare const imageAtom: Atom;
