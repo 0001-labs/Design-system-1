@@ -241,7 +241,7 @@ export class Calendar extends CalendarBase {
       aria-label=${this.words(which === "previous" ? "Previous month" : "Next month")}
       ?disabled=${which === "previous" ? before : after}
       @click=${() => (which === "previous" ? this.previousMonth() : this.nextMonth())}
-    ><ds-icon type=${which === "previous" ? "left" : "right"} aria-hidden="true"></ds-icon></button>`;
+    ><ds-icon type=${which === "previous" ? "chevron-left" : "chevron-right"} size="large" aria-hidden="true"></ds-icon></button>`;
     const title = monthTitle(month, this.compact ? "short" : "long");
     return html`<div class="header" part="header">
       <span class="title" id="title" aria-live="polite">${title}</span>

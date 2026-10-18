@@ -58,11 +58,18 @@
   display: flex;
   flex: 0 0 auto;
   align-items: flex-end;
-  gap: 1px;
+  gap: 0;
 }
-/* An arrow takes its own square: its 16px face on the square's sixteen. */
-.nav { flex: 0 0 auto; }
-:host([compact]) .controls { gap: calc(var(--ds-unit) - var(--ds-control-height)); }
+/* Each arrow is a chevron on its own square, one control high at the square's foot,
+ * in the title grey; the pointer fills it with the system's corners and inks it. */
+.nav {
+  flex: 0 0 auto;
+  width: var(--ds-unit);
+  height: var(--ds-control-height);
+  border-radius: var(--ds-radius);
+  color: var(--ds-title-color);
+}
+.nav:hover:not(:disabled) { background: var(--ds-fill); color: var(--ds-text-color); }
 :host(:dir(rtl)) .nav > ds-icon { transform: scaleX(-1); }
 
 .grid { outline: none; }

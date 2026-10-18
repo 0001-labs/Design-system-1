@@ -49,7 +49,10 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.controls { display: flex; flex: 0 0 auto; align-items: flex-end; gap: 1px; }
+.controls { display: flex; flex: 0 0 auto; align-items: flex-end; gap: 0; }
+/* Each arrow is a chevron on its own square, as in a month. */
+.nav { flex: 0 0 auto; width: var(--ds-unit); height: var(--ds-control-height); border-radius: var(--ds-radius); color: var(--ds-title-color); }
+.nav:hover:not(:disabled) { background: var(--ds-fill); color: var(--ds-text-color); }
 :host(:dir(rtl)) .nav > ds-icon { transform: scaleX(-1); }
 
 .body {

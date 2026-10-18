@@ -185,6 +185,13 @@ test("a date picker opens its month, takes a day and gives it to its form", asyn
   picker.addEventListener("change", event => changes.push((event as CustomEvent).detail.value));
   cell(calendar, "2026-10-21").click();
   await picker.updateComplete;
+  // The first press starts a range and the panel waits for its end.
+  expect(picker.value).toBe("2026-10-21");
+  expect(picker.open).toBe(true);
+  // The same day again ends it as one day, and the panel closes.
+  await calendar.updateComplete;
+  cell(calendar, "2026-10-21").click();
+  await picker.updateComplete;
   expect(picker.value).toBe("2026-10-21");
   expect(picker.open).toBe(false);
   expect(changes).toEqual(["2026-10-21"]);
@@ -233,18 +240,18 @@ test("outside days are drawn in a compact month and take it to their month", asy
 test("the picker's values read and write ISO 8601, and a typed date is understood", async () => {
   const { readDateValue, writeDateValue, parseTypedDay } = await import("../DS1/3-unit/ds-date-picker");
   expect(readDateValue("2026-10-24T10:00/2026-10-21T09:30")).toEqual({ start: { day: "2026-10-21", time: "09:30" }, end: { day: "2026-10-24", time: "10:00" } });
-  expect(writeDateValue({ day: "2026-10-21", time: "09:30" }, { day: "2026-10-24", time: "" }, { range: true, time: false })).toBe("2026-10-21/2026-10-24");
-  expect(writeDateValue({ day: "2026-10-21", time: "09:30" }, undefined, { range: false, time: true })).toBe("2026-10-21T09:30");
+  expect(writeDateValue({ day: "2026-10-21", time: "09:30" }, { day: "2026-10-24", time: "" }, { time: false })).toBe("2026-10-21/2026-10-24");
+  expect(writeDateValue({ day: "2026-10-21", time: "09:30" }, undefined, { time: true })).toBe("2026-10-21T09:30");
+  expect(writeDateValue({ day: "2026-10-21", time: "" }, { day: "2026-10-21", time: "" }, { time: false })).toBe("2026-10-21");
   expect(parseTypedDay("2026-10-21")).toBe("2026-10-21");
   expect(parseTypedDay("Oct 21, 2026")).toBe("2026-10-21");
   expect(parseTypedDay("not a day")).toBeNull();
 });
 
-test("a range picker keeps both ends, writes them as one range, and the switches turn on with the value", async () => {
+test("the picker always collects a range: a first and a last day, written as one value", async () => {
   document.body.innerHTML = `<form><ds-date-picker name="trip" label="Trip" literal value="2026-10-21/2026-10-24"></ds-date-picker></form>`;
   const picker = document.querySelector("ds-date-picker") as Picker;
   await picker.updateComplete;
-  expect(picker.range).toBe(true);
   expect(picker.time).toBe(false);
   const trigger = picker.shadowRoot!.querySelector<HTMLButtonElement>(".trigger")!;
   expect(trigger.textContent).toMatch(/Oct 21\s*–\s*24, 2026/);
@@ -254,24 +261,27 @@ test("a range picker keeps both ends, writes them as one range, and the switches
   const calendar = picker.shadowRoot!.querySelector("ds-calendar") as Calendar;
   await calendar.updateComplete;
   expect(calendar.range).toBe(true);
-  cell(calendar, "2026-10-10").click();
-  await picker.updateComplete;
+  // A whole range is there, so the first press starts a new one.
   cell(calendar, "2026-10-12").click();
   await picker.updateComplete;
+  expect(picker.value).toBe("2026-10-12");
+  await calendar.updateComplete;
+  cell(calendar, "2026-10-10").click();
+  await picker.updateComplete;
   expect(picker.value).toBe("2026-10-10/2026-10-12");
-  expect(picker.open).toBe(true);
+  expect(picker.open).toBe(false);
   expect(new FormData(picker.closest("form")!).get("trip") ?? picker.value).toBe("2026-10-10/2026-10-12");
 });
 
-test("turning on a time gives each end one, and Clear empties the value", async () => {
+test("turning on a time gives each end one, an hour apart, and Clear empties the value", async () => {
   const picker = await mount<Picker>(`<ds-date-picker value="2026-10-21"></ds-date-picker>`);
   picker.open = true;
   await picker.updateComplete;
-  const [, timeSwitch] = [...picker.shadowRoot!.querySelectorAll<HTMLButtonElement>(".ds-switch")];
+  const timeSwitch = picker.shadowRoot!.querySelector<HTMLButtonElement>(".ds-switch")!;
   timeSwitch.click();
   await picker.updateComplete;
-  expect(picker.value).toBe("2026-10-21T09:00");
-  expect(picker.shadowRoot!.querySelector<HTMLInputElement>(".clock")!.value).toBe("09:00");
+  expect(picker.value).toBe("2026-10-21T09:00/2026-10-21T10:00");
+  expect([...picker.shadowRoot!.querySelectorAll<HTMLInputElement>(".clock")].map(clock => clock.value)).toEqual(["09:00", "10:00"]);
   expect(timeSwitch.getAttribute("aria-checked")).toBe("true");
   picker.shadowRoot!.querySelector<HTMLButtonElement>(".clear")!.click();
   await picker.updateComplete;

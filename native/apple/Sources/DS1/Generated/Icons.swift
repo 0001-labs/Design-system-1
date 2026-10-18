@@ -106,6 +106,8 @@ public enum DS1IconName: String, CaseIterable, Sendable {
     case categories
     case check
     case checkAlt = "check-alt"
+    case chevronLeft = "chevron-left"
+    case chevronRight = "chevron-right"
     case close
     case cloud
     case code

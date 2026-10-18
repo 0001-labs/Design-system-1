@@ -38,7 +38,7 @@ calendar.addEventListener("change", event => console.log(event.detail.value));
 | Measure | Size |
 | --- | --- |
 | A day | Four squares wide (`day-width`), its date's square, `lines` squares of events (two), and one square to spare. |
-| The title and arrows | One square, one square above the days. The arrows and Today stand at the end, the arrows a square each. |
+| The title and arrows | One square, one square above the days. Today and the arrows stand at the end: each arrow a chevron on a square of its own, one control high, in the title grey until the pointer fills it. |
 | The weekday names | One square, in the title grey, at the start of each day. |
 | A date | At the end of its first square, in the title grey, tabular figures. |
 | Today | A disc nine tenths of a square across, in red for blood, the date in white. |
@@ -53,7 +53,7 @@ A day outside the month is an empty box. `fixed` always draws six weeks, so movi
 
 ### Compact
 
-`compact` makes every day a square, one square across by default: the date centred in it, the weekday names a letter each, the month's name shortened, and no events written out. With `day-width="2"` each day is two squares each way, the weekday names take two letters, Today stands beside the arrows and the marks grow to a square and two thirds, as a date picker's month is drawn. `outside-days` writes the days of the months before and after in the title grey; pressing one goes there. When the calendar has events, a day with one keeps the ink and a day without falls back to the title grey, so a year of small months shows where things happened.
+`compact` makes every day a square, one square across by default: the date centred in it, the weekday names a letter each, the month's name shortened, and no events written out. With `day-width="2"` each day is two squares each way, the weekday names take two letters, Today stands beside the arrows and the marks grow to a square and two thirds, for a month with more room. `outside-days` writes the days of the months before and after in the title grey; pressing one goes there. When the calendar has events, a day with one keeps the ink and a day without falls back to the title grey, so a year of small months shows where things happened.
 
 ## Months in squares
 

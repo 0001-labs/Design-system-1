@@ -341,12 +341,12 @@ calendar.events = [
     height: 420,
   },
   'date-picker': {
-    title: 'Pick a date, a range or a time', hint: 'Open it with a click, Enter or the down arrow. Type a date, press one in the month, or turn on End date and press two. Escape closes it.',
+    title: 'Pick a day or a range', hint: 'Open it with a click, Enter or the down arrow. Press a first day and a last; press one day twice, or leave, for a single day. Escape closes it.',
     html: `<div style="display:flex;flex-wrap:wrap;gap:var(--ds-unit)">
-  <ds-date-picker label="Due" literal name="due"></ds-date-picker>
+  <ds-date-picker label="When" literal name="when"></ds-date-picker>
   <ds-date-picker label="Trip" literal name="trip" value="2026-10-21/2026-10-24"></ds-date-picker>
 </div>`,
-    height: 520,
+    height: 460,
   },
   'matrix': {
     title: 'Products against their parts', hint: 'Hover or move with the arrow keys: the row and the column light up. Pressing a square fires cell-press.',

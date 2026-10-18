@@ -110,6 +110,8 @@ enum class DS1IconName(val fileName: String, @DrawableRes val drawable: Int) {
     categories("categories", R.drawable.ds1_icon_categories),
     check("check", R.drawable.ds1_icon_check),
     checkAlt("check-alt", R.drawable.ds1_icon_check_alt),
+    chevronLeft("chevron-left", R.drawable.ds1_icon_chevron_left),
+    chevronRight("chevron-right", R.drawable.ds1_icon_chevron_right),
     close("close", R.drawable.ds1_icon_close),
     cloud("cloud", R.drawable.ds1_icon_cloud),
     code("code", R.drawable.ds1_icon_code),

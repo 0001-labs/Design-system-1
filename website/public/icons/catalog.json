@@ -217,6 +217,20 @@
     "shapes": 1
   },
   {
+    "key": "chevron-left",
+    "name": "Chevron",
+    "source": "Library",
+    "url": "/icons/library/chevron-left.svg",
+    "shapes": 1
+  },
+  {
+    "key": "chevron-right",
+    "name": "Chevron",
+    "source": "Library",
+    "url": "/icons/library/chevron-right.svg",
+    "shapes": 1
+  },
+  {
     "key": "close",
     "name": "Close",
     "source": "Figma",

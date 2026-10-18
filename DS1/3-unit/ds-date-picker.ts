@@ -1,9 +1,10 @@
 // ds-date-picker.ts
-// A field that opens a panel below it: the date written out where it can be
-// typed, a small month to press a day in, and switches for an end date and a
-// time. The month takes two squares a day where the screen has room and one
-// on a narrow phone. A form takes the value as ISO 8601: a day, a day and a
-// time, or two of them joined by a slash for a range.
+// A field that opens a panel below it: the first and last day written out
+// where they can be typed, a small month one square a day, a switch for a
+// time, and Clear. It always collects a range: the first day pressed starts
+// it and the second ends it; leaving after the first keeps that one day. A
+// form takes the value as ISO 8601: a day, a day and a time, or two of them
+// joined by a slash.
 
 import { LitElement, html, nothing, unsafeCSS, type PropertyValues } from "lit";
 import { define } from "../0-face/define";
@@ -45,11 +46,14 @@ export function readDateValue(value: string | null | undefined): { start?: DateP
   return { start, end };
 }
 
-/** Writes a value from its ends: the time only with `time`, the end only with `range`. */
-export function writeDateValue(start: DatePickerEnd | undefined, end: DatePickerEnd | undefined, options: { range: boolean; time: boolean }): string {
+/**
+ * Writes a value from its ends, the times only with `time`. An end that is
+ * the same moment as the start leaves the value one day.
+ */
+export function writeDateValue(start: DatePickerEnd | undefined, end: DatePickerEnd | undefined, options: { time: boolean }): string {
   if (!start) return "";
   const part = (side: DatePickerEnd) => (options.time && side.time ? `${side.day}T${side.time}` : side.day);
-  return options.range && end ? `${part(start)}/${part(end)}` : part(start);
+  return end && part(end) !== part(start) ? `${part(start)}/${part(end)}` : part(start);
 }
 
 /** Reads what a person typed: a day written `YYYY-MM-DD`, or a date the browser can read ("Oct 21, 2026"). */
@@ -74,10 +78,9 @@ const openPickers = new Set<DatePicker>();
  *   "Choose a date" by default.
  * @prop {string} length - How a day is written: `short`, `medium` (the
  *   default) or `long`.
- * @prop {boolean} range - Choose a first and a last day (the End date switch).
  * @prop {boolean} time - Choose a time with each day (the Include time switch).
- * @prop {boolean} noOptions - Leave the End date and Include time switches
- *   out (`no-options`); `range` and `time` still apply.
+ * @prop {boolean} noOptions - Leave the Include time switch out (`no-options`);
+ *   `time` still applies.
  * @prop {string} min - The first day a person may choose.
  * @prop {string} max - The last day a person may choose.
  * @prop {string} weekStart - The week's first day (`week-start`); the
@@ -92,8 +95,7 @@ const openPickers = new Set<DatePicker>();
  * @fires ds-date-picker-toggle - The panel opened or closed; `{ open }`.
  *
  * @example
- * <ds-date-picker label="Due" literal name="due" value="2026-10-21"></ds-date-picker>
- * <ds-date-picker label="Trip" literal range value="2026-10-21/2026-10-24"></ds-date-picker>
+ * <ds-date-picker label="When" literal name="when" value="2026-10-21/2026-10-24"></ds-date-picker>
  */
 export class DatePicker extends LitElement {
   static formAssociated = true;
@@ -105,7 +107,6 @@ export class DatePicker extends LitElement {
     literal: { type: Boolean, reflect: true },
     placeholder: { type: String },
     length: { type: String },
-    range: { type: Boolean, reflect: true },
     time: { type: Boolean, reflect: true },
     noOptions: { type: Boolean, attribute: "no-options", reflect: true },
     min: { type: String },
@@ -115,6 +116,7 @@ export class DatePicker extends LitElement {
     required: { type: Boolean, reflect: true },
     disabled: { type: Boolean, reflect: true },
     open: { type: Boolean, reflect: true },
+    awaitingEnd: { state: true },
   };
 
   static styles = [unsafeCSS(metrics), unsafeCSS(controls), unsafeCSS(styles)];
@@ -125,7 +127,6 @@ export class DatePicker extends LitElement {
   declare literal: boolean;
   declare placeholder: string | undefined;
   declare length: DateLength | undefined;
-  declare range: boolean;
   declare time: boolean;
   declare noOptions: boolean;
   declare min: string | undefined;
@@ -135,6 +136,8 @@ export class DatePicker extends LitElement {
   declare required: boolean;
   declare disabled: boolean;
   declare open: boolean;
+  /** A first day has been pressed in this opening and the last is still to come. */
+  declare awaitingEnd: boolean;
 
   private readonly internals = typeof this.attachInternals === "function" ? this.attachInternals() : null;
   /** The value the field started with, for a form's reset. */
@@ -148,12 +151,12 @@ export class DatePicker extends LitElement {
     super();
     this.value = "";
     this.literal = false;
-    this.range = false;
     this.time = false;
     this.noOptions = false;
     this.required = false;
     this.disabled = false;
     this.open = false;
+    this.awaitingEnd = false;
   }
 
   connectedCallback() {
@@ -207,12 +210,9 @@ export class DatePicker extends LitElement {
     super.willUpdate(changed);
     if (changed.has("value") && this.value) {
       const { start, end } = this.ends;
-      // A value with an end or a time turns the matching switch on.
+      // A value with a time turns the switch on.
       if (!start) this.value = "";
-      else {
-        if (end) this.range = true;
-        if (start.time || end?.time) this.time = true;
-      }
+      else if (start.time || end?.time) this.time = true;
     }
     if (changed.has("disabled") && this.disabled) this.open = false;
   }
@@ -239,18 +239,12 @@ export class DatePicker extends LitElement {
     openPickers.add(this);
     this.shown = true;
     this.open = true;
+    this.awaitingEnd = false;
     const calendar = this.calendar;
     if (calendar) calendar.month = (this.ends.start?.day || this.today || todayDay()).slice(0, 7);
     panel.showPopover?.();
-    if (calendar) {
-      // Two squares a day where the screen holds the month that wide (fifteen squares and its
-      // margins), one square on a narrow phone.
-      const unit = ((parseFloat(getComputedStyle(panel).paddingTop) || 9) + 1) * 2;
-      const view = this.ownerDocument.defaultView!;
-      calendar.dayWidth = (view.visualViewport?.width ?? view.innerWidth) >= 17 * unit ? 2 : 1;
-      void calendar.updateComplete.then(this.place);
-    }
     this.place();
+    if (calendar) void calendar.updateComplete.then(this.place);
     this.ownerDocument.addEventListener("pointerdown", this.onOutside, true);
     this.ownerDocument.addEventListener("scroll", this.place, true);
     window.addEventListener("resize", this.place);
@@ -263,6 +257,7 @@ export class DatePicker extends LitElement {
     if (!this.shown) return;
     this.shown = false;
     openPickers.delete(this);
+    this.awaitingEnd = false;
     const panel = this.panel;
     const within = panel?.matches(":focus-within");
     if (panel?.matches(":popover-open")) panel.hidePopover?.();
@@ -291,7 +286,7 @@ export class DatePicker extends LitElement {
     const left = viewport?.offsetLeft ?? 0, top = viewport?.offsetTop ?? 0;
     const width = viewport?.width ?? view.innerWidth, height = viewport?.height ?? view.innerHeight;
     const box = panel.getBoundingClientRect();
-    const gap = ((parseFloat(getComputedStyle(panel).paddingTop) || 9) + 1);
+    const gap = (parseFloat(getComputedStyle(panel).paddingTop) || 9) + 1;
     // The face is one control high at the foot of its square: measure from that square.
     const square = Math.max(rect.height, gap * 2);
     const foot = rect.bottom, head = rect.bottom - square;
@@ -346,27 +341,27 @@ export class DatePicker extends LitElement {
   }
 
   private write(start: DatePickerEnd | undefined, end: DatePickerEnd | undefined) {
-    this.commit(writeDateValue(start, end, { range: this.range, time: this.time }));
+    this.commit(writeDateValue(start, end, { time: this.time }));
   }
 
-  /** A day pressed in the month: kept with its time; a lone day without a time closes the panel. */
+  /**
+   * A day pressed in the month. The first press of an opening starts the range
+   * (the value is that day until another is pressed); the second ends it and,
+   * without times to set, closes the panel.
+   */
   private picked = (event: CustomEvent<CalendarChangeDetail>) => {
     event.stopPropagation();
     const { start, end } = this.ends;
-    const day = (side: "start" | "end", fallback: string): DatePickerEnd | undefined => {
-      const chosen = event.detail[side];
-      if (!chosen) return undefined;
-      return { day: chosen, time: (side === "start" ? start : end)?.time || fallback };
-    };
-    const next = day("start", this.time ? "09:00" : "");
-    const last = this.range ? day("end", this.time ? "10:00" : "") : undefined;
-    this.write(next, last);
-    if (!this.range && !this.time) this.open = false;
-  };
-
-  private pressedChosen = (event: CustomEvent<{ day: Day }>) => {
-    // Pressing the chosen day again closes the panel, as choosing it did.
-    if (!this.range && !this.time && event.detail.day === this.ends.start?.day) this.open = false;
+    const first: DatePickerEnd = { day: event.detail.start, time: start?.time || (this.time ? "09:00" : "") };
+    if (!event.detail.end) {
+      this.awaitingEnd = true;
+      this.write(first, undefined);
+      return;
+    }
+    this.awaitingEnd = false;
+    const last: DatePickerEnd = { day: event.detail.end, time: end?.time || (this.time ? "10:00" : "") };
+    this.write(first, last);
+    if (!this.time) this.open = false;
   };
 
   /** A day typed in a field, read when the person leaves it or presses Enter. */
@@ -387,6 +382,7 @@ export class DatePicker extends LitElement {
     const next = { day, time: current?.time || (this.time ? (side === "start" ? "09:00" : "10:00") : "") };
     if (side === "start") this.write(next, end);
     else this.write(start ?? next, next);
+    this.awaitingEnd = false;
     const calendar = this.calendar;
     if (calendar) calendar.month = day.slice(0, 7);
   }
@@ -395,24 +391,17 @@ export class DatePicker extends LitElement {
     const { start, end } = this.ends;
     const clock = TIME.test(input.value) ? input.value : "";
     if (side === "start" && start) this.write({ ...start, time: clock }, end);
-    if (side === "end" && end) this.write(start, { ...end, time: clock });
+    if (side === "end" && start) this.write(start, { day: (end ?? start).day, time: clock });
   }
-
-  private setRange = () => {
-    this.range = !this.range;
-    const { start, end } = this.ends;
-    // Turning the end on starts it on the first day; turning it off drops it.
-    this.write(start, this.range && start ? end ?? { ...start, time: start.time ? "10:00" : "" } : undefined);
-  };
 
   private setTime = () => {
     this.time = !this.time;
     const { start, end } = this.ends;
     const timed = (side: DatePickerEnd | undefined, clock: string) => (side ? { ...side, time: this.time ? side.time || clock : "" } : undefined);
-    this.write(timed(start, "09:00"), timed(end, "10:00"));
+    this.write(timed(start, "09:00"), timed(end ?? (this.time ? start : undefined), "10:00"));
   };
 
-  /** Pressing a switch's row presses the switch, as a label would. */
+  /** Pressing the switch's row presses the switch, as a label would. */
   private passPress = (event: MouseEvent) => {
     const row = event.currentTarget as HTMLElement;
     const control = row.querySelector<HTMLButtonElement>(".ds-switch");
@@ -424,66 +413,65 @@ export class DatePicker extends LitElement {
     this.open = false;
   };
 
-  /** A day (and time) as words: "Oct 21, 2026", "Oct 21, 2026, 2:30 PM". */
-  private format(side: DatePickerEnd): string {
+  private moment(side: DatePickerEnd) {
     const [year, month, date] = side.day.split("-").map(Number);
     const [hours, minutes] = (side.time || "12:00").split(":").map(Number);
-    const formatter = dateFormatter({ dateStyle: this.length ?? "medium", ...(side.time ? { timeStyle: "short" } : {}), timeZone: "UTC" });
-    return formatter.format(Date.UTC(year, month - 1, date, hours, minutes));
+    return Date.UTC(year, month - 1, date, hours, minutes);
+  }
+
+  private formatter(withTime: boolean) {
+    return dateFormatter({ dateStyle: this.length ?? "medium", ...(withTime ? { timeStyle: "short" } : {}), timeZone: "UTC" }) as Intl.DateTimeFormat & {
+      formatRange?: (from: number, to: number) => string;
+    };
   }
 
   private fieldText(side: DatePickerEnd | undefined) {
-    return side ? this.format({ day: side.day, time: "" }) : "";
+    return side ? this.formatter(false).format(this.moment(side)) : "";
   }
 
   /** The face's words: one day, or a range written as the language writes one ("Oct 21 – 24, 2026"). */
   private faceText(): string {
     const { start, end } = this.ends;
     if (!start) return this.words(this.placeholder, "Choose a date");
-    if (!this.range || !end) return this.format(start);
-    const moment = (side: DatePickerEnd) => {
-      const [year, month, date] = side.day.split("-").map(Number);
-      const [hours, minutes] = (side.time || "12:00").split(":").map(Number);
-      return Date.UTC(year, month - 1, date, hours, minutes);
-    };
-    const formatter = dateFormatter({ dateStyle: this.length ?? "medium", ...(start.time || end.time ? { timeStyle: "short" } : {}), timeZone: "UTC" }) as Intl.DateTimeFormat & {
-      formatRange?: (from: number, to: number) => string;
-    };
-    return formatter.formatRange ? formatter.formatRange(moment(start), moment(end)) : `${this.format(start)} – ${this.format(end)}`;
+    const formatter = this.formatter(Boolean(start.time || end?.time));
+    if (!end) return formatter.format(this.moment(start));
+    return formatter.formatRange ? formatter.formatRange(this.moment(start), this.moment(end)) : `${formatter.format(this.moment(start))} – ${formatter.format(this.moment(end))}`;
   }
 
-  private renderField(side: "start" | "end", value: DatePickerEnd | undefined, name: string) {
+  private renderEnd(side: "start" | "end", value: DatePickerEnd | undefined, name: string) {
     const label = side === "start" ? name : `${name}, ${this.words(undefined, "End date")}`;
     return html`<div class="field-row" part="field">
-      <input
-        class="ds-input field"
-        type="text"
-        inputmode="text"
-        autocomplete="off"
-        aria-label=${label}
-        placeholder=${side === "start" ? this.words(this.placeholder, "Choose a date") : this.words(undefined, "End date")}
-        .value=${this.fieldText(value)}
-        @change=${(event: Event) => this.typed(side, event.target as HTMLInputElement)}
-        @keydown=${(event: KeyboardEvent) => { if (event.key === "Enter") { event.preventDefault(); this.typed(side, event.target as HTMLInputElement); } }}
-      />
+        <input
+          class="ds-input field"
+          type="text"
+          autocomplete="off"
+          aria-label=${label}
+          placeholder=${side === "start" ? this.words(this.placeholder, "Choose a date") : this.words(undefined, "End date")}
+          .value=${this.fieldText(value)}
+          @change=${(event: Event) => this.typed(side, event.target as HTMLInputElement)}
+          @keydown=${(event: KeyboardEvent) => { if (event.key === "Enter") { event.preventDefault(); this.typed(side, event.target as HTMLInputElement); } }}
+        />
+      </div>
       ${this.time
-        ? html`<input
-            class="ds-input clock"
-            type="time"
-            aria-label=${`${label}, ${this.words(undefined, "Time")}`}
-            .value=${value?.time ?? ""}
-            ?disabled=${!value}
-            @change=${(event: Event) => this.timed(side, event.target as HTMLInputElement)}
-          />`
-        : nothing}
-    </div>`;
+        ? html`<div class="field-row" part="field">
+            <input
+              class="ds-input clock"
+              type="time"
+              aria-label=${`${label}, ${this.words(undefined, "Time")}`}
+              .value=${value?.time ?? ""}
+              ?disabled=${!this.ends.start}
+              @change=${(event: Event) => this.timed(side, event.target as HTMLInputElement)}
+            />
+          </div>`
+        : nothing}`;
   }
 
   render() {
     const { start, end } = this.ends;
     const text = this.faceText();
     const name = this.label ? this.words(this.label, this.label) : this.words(undefined, "Date");
-    const days = start ? (this.range && end ? `${start.day}/${end.day}` : start.day) : "";
+    // While the end is still to come the month holds the start alone; otherwise the range is whole (one day is a range of one).
+    const days = start ? (this.awaitingEnd ? start.day : `${start.day}/${(end ?? start).day}`) : "";
     return html`<button
         class="ds-select trigger"
         part="trigger"
@@ -510,31 +498,26 @@ export class DatePicker extends LitElement {
         @focusout=${this.onFocusOut}
       >
         <div class="fields">
-          ${this.renderField("start", start, name)}
-          ${this.range ? this.renderField("end", end, name) : nothing}
+          ${this.renderEnd("start", start, name)}
+          ${this.renderEnd("end", start ? end ?? start : undefined, name)}
         </div>
         <ds-calendar
           compact
           selectable
+          range
           fixed
           outside-days
-          ?range=${this.range}
           .value=${days}
           .min=${this.min}
           .max=${this.max}
           .weekStart=${this.weekStart}
           .today=${this.today}
           @change=${this.picked}
-          @day-press=${this.pressedChosen}
         ></ds-calendar>
         <div class="options" part="options">
           ${this.noOptions
             ? nothing
             : html`<div class="separator" aria-hidden="true"></div>
-                <div class="option" @click=${this.passPress}>
-                  <span>${this.words(undefined, "End date")}</span>
-                  <button class="ds-switch" type="button" role="switch" aria-label=${this.words(undefined, "End date")} aria-checked=${String(this.range)} @click=${this.setRange}></button>
-                </div>
                 <div class="option" @click=${this.passPress}>
                   <span>${this.words(undefined, "Include time")}</span>
                   <button class="ds-switch" type="button" role="switch" aria-label=${this.words(undefined, "Include time")} aria-checked=${String(this.time)} @click=${this.setTime}></button>

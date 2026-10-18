@@ -1,15 +1,16 @@
 /* ds-date-picker.css
  * The field is the select's face: one control high at the foot of its
- * square, eight squares wide by default, the calendar icon at its start and
+ * square, ten squares wide by default, the calendar icon at its start and
  * the down arrow at its end. The panel opens on the menu's frame, half a
- * square from the field: a 1px line, half a square inside it, no shadow.
- * Inside, on whole squares: the date to type (a row for each end of a
- * range), one square spare, the compact month two squares a day (fourteen
- * squares wide), then the End date and Include time switches and Clear, each
- * one square, set off by one-square separators with a line through them. */
+ * square from the field: a 1px line, half a square inside it, no shadow, so
+ * eight squares wide. Inside, on whole squares: the first and last day to
+ * type (each with its time below when times are on), one square spare, the
+ * compact month one square a day with 18px marks, then Include time and
+ * Clear, each one square, set off by one-square separators with a line
+ * through them. */
 
 :host {
-  --ds-date-picker-width: calc(8 * var(--ds-unit));
+  --ds-date-picker-width: calc(10 * var(--ds-unit));
   box-sizing: border-box;
   display: inline-flex;
   align-items: flex-end;
@@ -21,7 +22,6 @@
   line-height: var(--ds-type-lineheight-default);
 }
 :host([hidden]) { display: none !important; }
-:host([range]) { --ds-date-picker-width: calc(12 * var(--ds-unit)); }
 
 .trigger {
   display: inline-flex;
@@ -61,7 +61,7 @@
 }
 .popover:not(:popover-open) { display: none; }
 
-/* The date to type: a row of one square for each end, the time beside it; one square spare below. */
+/* The days to type: a row of one square for each end, its time on the row below; one square spare after. */
 .fields { margin-block-end: var(--ds-unit); }
 .field-row {
   display: flex;
@@ -70,7 +70,8 @@
   height: var(--ds-unit);
 }
 .field { flex: 1 1 auto; min-width: 0; }
-.clock { flex: 0 0 calc(5 * var(--ds-unit)); }
+.clock { flex: 1 1 auto; min-width: 0; }
+.fields, .options { width: calc(7 * var(--ds-unit)); }
 
 /* The switches and Clear, each one square, the words on the sixteen. */
 .option {

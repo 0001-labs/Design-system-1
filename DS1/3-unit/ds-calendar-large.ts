@@ -245,7 +245,7 @@ export class CalendarLarge extends CalendarBase {
       type="button"
       aria-label=${this.words(which === "previous" ? "Previous month" : "Next month")}
       @click=${() => (which === "previous" ? this.previousMonth() : this.nextMonth())}
-    ><ds-icon type=${which === "previous" ? "left" : "right"} aria-hidden="true"></ds-icon></button>`;
+    ><ds-icon type=${which === "previous" ? "chevron-left" : "chevron-right"} size="large" aria-hidden="true"></ds-icon></button>`;
     return html`<div class="header" part="header">
       <span class="title" aria-live="polite">${monthTitle(this.visible ?? this.firstMonth)}</span>
       <span class="controls">
