@@ -48,7 +48,7 @@ Every public piece of the web library has a native counterpart with the same nam
 | `ds-tabs` | `DS1Tabs` | `DS1Tabs` |
 | `ds-badge`, `ds-token`, `ds-swatch`, link, `ds-gap` | `DS1Badge`, `DS1Token`, `DS1Swatch`, `DS1Link`, `DS1Gap` | `DS1Badge`, `DS1Token`, `DS1Swatch`, `DS1Link`, `DS1Gap` |
 | `ds-avatar`, `ds-avatar-group` | `DS1Avatar`, `DS1AvatarGroup` | `DS1Avatar`, `DS1AvatarGroup` |
-| `ds-notice`, `ds-banner`, `ds-empty`, `ds-loading` | `DS1Notice`, `DS1Banner`, `DS1Empty`, `DS1Loading` | `DS1Notice`, `DS1Banner`, `DS1Empty`, `DS1Loading` |
+| `ds-notice` (`banner`), `ds-empty`, `ds-loading` | `DS1Notice` (`banner:`), `DS1Empty`, `DS1Loading` | `DS1Notice(banner)`, `DS1Empty`, `DS1Loading` |
 | `ds-tooltip` | `.ds1Tooltip(_:)` | `DS1Tooltip` |
 | `ds-cycle`, its language picker | `DS1Cycle`, `DS1ThemeCycle`, `DS1LanguageCycle` | `DS1Cycle`, `DS1ThemeCycle`, `DS1LanguageCycle` |
 | `toast()` and its stack | `DS1Toast`, `DS1ToastHost` | `DS1Toast`, `DS1ToastHost` |

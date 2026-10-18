@@ -18,6 +18,8 @@ export type NoticeProps = Omit<HTMLAttributes<NoticeElement>, "title"> & {
   actions?: ReactNode;
   /** Show the close button. On by default when `onDismiss` is given. */
   dismissible?: boolean;
+  /** A strip across the top of its positioning context instead of a block in the flow. */
+  banner?: boolean;
   /** The close button was pressed. The product removes the notice; without
    * this callback the element hides itself. */
   onDismiss?: () => void;
@@ -28,7 +30,7 @@ const title = (content: ReactNode) =>
   content == null || content === false || content === "" ? null : h("span", { slot: "heading" }, content);
 
 export const Notice = forwardRef<NoticeElement, NoticeProps>(function Notice(
-  { tone, heading, text, icon, actions, dismissible, onDismiss, children, ...props }, ref,
+  { tone, heading, text, icon, actions, dismissible, banner, onDismiss, children, ...props }, ref,
 ) {
   const host = useRef<NoticeElement | null>(null);
   useCommitEffect(() => {
@@ -45,7 +47,7 @@ export const Notice = forwardRef<NoticeElement, NoticeProps>(function Notice(
   // The live region is in the markup from the first render, on the server too.
   return h("ds-notice", {
     role: tone === "danger" ? "alert" : "status",
-    ...props, tone, icon, dismissible: (dismissible ?? Boolean(onDismiss)) || undefined,
+    ...props, tone, icon, banner: banner || undefined, dismissible: (dismissible ?? Boolean(onDismiss)) || undefined,
     ref: (element: NoticeElement | null) => {
       host.current = element;
       if (typeof ref === "function") ref(element); else if (ref) ref.current = element;

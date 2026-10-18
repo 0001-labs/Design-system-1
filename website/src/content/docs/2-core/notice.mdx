@@ -7,7 +7,7 @@ import ComponentExample from "../../../components/ComponentExample.astro";
 
 A notice stands where its words apply: the failure beside the form that failed, the warning above the list it is about. It is not positioned and takes no box or shadow. A square mark, one control high and filled in the tone's colour, carries the tone; the words sit on the paper beside it, each line one square, with the actions on the row below.
 
-For a message across the top of a page, use the [Banner](/2-core/banner/); for a short confirmation that leaves on its own, a [Toast](/2-core/toast/).
+For a message across the top of a page, the same notice is a [banner](#across-the-top); for a short confirmation that leaves on its own, use a [Toast](/2-core/toast/).
 
 ## Try it
 
@@ -43,6 +43,22 @@ notice.addEventListener("ds-notice-dismiss", event => {
 });
 ```
 
+## Across the top
+
+`banner` makes the notice a strip one square high across the top of its positioning context: put it in a positioned container, or at the page root. It is filled in the tone's colour, with the mark, the title and the text on one line, the actions at the end of the line and the close button last. It uses absolute positioning and reserves no room in the flow; leave a square for it where words stand under it.
+
+<ComponentExample example="banner" />
+
+<ComponentExample example="banner-dismiss" compact />
+
+```html
+<ds-notice banner tone="success" text="Your changes are saved" literal>
+  <a slot="actions" class="ds-link" href="/icons/">Browse icons</a>
+</ds-notice>
+```
+
+An action is a real link or button in the `actions` slot; a page without Lit writes `ds-notice--banner` beside the tone.
+
 ## API
 
 | Attribute | Type | Default | What it does |
@@ -53,6 +69,7 @@ notice.addEventListener("ds-notice-dismiss", event => {
 | `literal` | boolean | `false` | Show `heading` and `text` as written, never looked up. |
 | `icon` | string | The tone's | Another icon for the mark. |
 | `dismissible` | boolean | `false` | Show the close button. |
+| `banner` | boolean | `false` | A strip across the top of its positioning context. |
 
 | Slot | What it holds |
 | --- | --- |
@@ -96,4 +113,4 @@ A page without Lit draws the same notice with the classes in `notice.css`, which
 
 `ds-notice--success` and `ds-notice--warning` are the other tones; without one the notice is neutral. See [Native controls](/1-root/native-controls/).
 
-[Banner](/2-core/banner/) · [Toast](/2-core/toast/) · [Empty state](/2-core/empty/)
+[Toast](/2-core/toast/) · [Empty state](/2-core/empty/)

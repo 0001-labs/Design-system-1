@@ -160,7 +160,7 @@ Design system 1 carries the interface words every product shares, in `DS1/0-face
 - empty states: Nothing here yet;
 - dates: Today, Yesterday, Tomorrow;
 - settings: Settings, Language, Theme, Light, Dark, Note, Page and the accent colours `ds-cycle` shows;
-- `ds-banner`'s words;
+- `ds-notice`'s words;
 - the language names (`translate("Japanese")`).
 
 Use them rather than a word of the product's own: "Try again" after a failure, never a local "Retry", and Close for a dismiss button. They are translated into every language of the list except `nn` and `no`, which read `nb`'s; a word left out of a language reads English. Turn them on with `configureI18n({ sharedWords: true })` (or `await loadSharedWords()`). They arrive in a chunk of their own, so products that do not use them do not carry them, and they never change which languages a product offers.

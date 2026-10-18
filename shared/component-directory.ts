@@ -40,7 +40,6 @@ export const ALL_LAYERS: DirectoryLayer[] = [
       { name: 'Spacing handle', href: '/2-core/spacing-handle/', tag: 'ds-spacing-handle' },
       { name: 'Loading', href: '/2-core/loading/', tag: 'ds-loading' },
       { name: 'Avatar', href: '/2-core/avatar/', tag: 'ds-avatar' },
-      { name: 'Banner', href: '/2-core/banner/', tag: 'ds-banner' },
       { name: 'Button', href: '/2-core/button/', tag: 'ds-button' },
       { name: 'Card', href: '/2-core/card/', tag: 'ds-card' },
       { name: 'Checkbox and switch', href: '/2-core/choice/' },

@@ -18,6 +18,9 @@
  *   ds-notice__actions              buttons or links on one row
  *   ds-notice__dismiss              an icon button at the end of the first line
  *   ds-notice--success, --warning, --danger     tones; neutral without one
+ *   ds-notice--banner               a strip across the top of its positioning
+ *                                   context instead: one square high, filled in
+ *                                   the tone's colour, everything on one line
  *
  * Give the block role="status", or role="alert" for danger, so assistive
  * technology reads it when it appears.
@@ -113,4 +116,50 @@
   grid-row: 1;
   margin-block: calc((var(--ds-unit) - var(--ds-control-height)) / 2);
   margin-inline-start: calc(var(--ds-unit) - var(--ds-control-height));
+}
+
+/* A banner: the same parts on one line, one square high, across the top of
+   the nearest positioned ancestor (or the page), on a fill of the tone's
+   colour. It takes no room in the flow; leave a square for it where words
+   stand under it. The actions stand at the end of the line, half a square
+   apart; danger words keep the text colour on the danger fill. */
+.ds-notice--banner {
+  position: absolute;
+  top: 0;
+  inset-inline: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--ds-unit) / 2);
+  height: var(--ds-unit);
+  padding-inline: var(--ds-unit);
+  background: color-mix(in srgb, var(--ds-notice-mark) 40%, transparent);
+  --ds-notice-ink: var(--ds-text-color);
+}
+
+.ds-notice--banner .ds-notice__mark {
+  flex: none;
+  margin-block: 0;
+}
+
+.ds-notice--banner .ds-notice__title,
+.ds-notice--banner .ds-notice__text {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-notice--banner .ds-notice__text {
+  flex: 1;
+}
+
+.ds-notice--banner .ds-notice__actions {
+  flex: none;
+  min-height: 0;
+}
+
+.ds-notice--banner .ds-notice__dismiss {
+  margin-block: 0;
+  margin-inline-start: 0;
 }

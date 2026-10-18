@@ -37,7 +37,6 @@ export * from "./0-face/tree";
 // 2-core: Core Components
 // ============================================================================
 
-export * from "./2-core/ds-banner";
 export * from "./2-core/ds-badge";
 export * from "./2-core/ds-button";
 export * from "./2-core/ds-checkbox";

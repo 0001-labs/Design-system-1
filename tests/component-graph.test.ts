@@ -60,10 +60,10 @@ test('stats, meters and steps carry their React adapters, the figure words and t
 test('every component resolves everything it imports, so any selection can be copied', () => {
   const names = ['2-core', '3-unit', '4-page'].flatMap(layer =>
     readdirSync(resolve(ds1, layer)).flatMap(file => /^ds-([a-z-]+)\.ts$/.exec(file)?.[1] ?? []));
-  expect(names).toContain('banner');
+  expect(names).toContain('notice');
   for (const name of names) expect(() => componentGraph(ds1, [name]), name).not.toThrow();
-  const { files } = componentGraph(ds1, ['banner']);
-  for (const file of ['2-core/ds-banner.ts', '0-face/i18n.ts', '2-core/ds-text.ts', '2-core/ds-button.ts', '2-core/ds-icon.ts']) expect(files.has(file)).toBe(true);
+  const { files } = componentGraph(ds1, ['notice']);
+  for (const file of ['2-core/ds-notice.ts', '0-face/i18n.ts', '1-root/notice.css', '2-core/ds-icon.ts']) expect(files.has(file)).toBe(true);
 });
 
 test('a specifier written with .js reads its TypeScript source, and a real script keeps its own', () => {

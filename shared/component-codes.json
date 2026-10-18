@@ -48,14 +48,6 @@
     "url": "https://designsystem1.com/2-core/avatar/"
   },
   {
-    "id": "component:/2-core/banner/",
-    "code": "BANN",
-    "label": "Banner",
-    "kind": "component",
-    "summary": "Design system 1 2-core.",
-    "url": "https://designsystem1.com/2-core/banner/"
-  },
-  {
     "id": "component:/2-core/button/",
     "code": "BTN",
     "label": "Button",

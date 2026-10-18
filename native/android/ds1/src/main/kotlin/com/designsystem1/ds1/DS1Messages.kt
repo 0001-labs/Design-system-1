@@ -49,7 +49,9 @@ enum class DS1NoticeTone(internal val icon: DS1IconName) { Neutral(DS1IconName.i
 /**
  * `ds-notice`: a message in the flow, beside what it is about. A one-square mark in its tone,
  * then the [heading] in the medium face and the [text], every line one square, and [actions]
- * a square below. [onDismiss] adds a close button. Danger is announced as an alert.
+ * a square below. [onDismiss] adds a close button. Danger is announced as an alert. With
+ * [banner] it is a strip one square high across the top instead, on a fill of the tone's
+ * colour, everything on one line, the actions at the line's end.
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -59,6 +61,7 @@ fun DS1Notice(
     heading: String? = null,
     text: String? = null,
     icon: DS1IconName = tone.icon,
+    banner: Boolean = false,
     onDismiss: (() -> Unit)? = null,
     closeLabel: String = DS1Words.text("Close"),
     actions: (@Composable RowScope.() -> Unit)? = null,
@@ -71,7 +74,26 @@ fun DS1Notice(
         DS1NoticeTone.Danger -> DS1Colors.danger to DS1Color(light = 0xffffff, dark = 0x2a2a2a)
     }
     val words = if (tone == DS1NoticeTone.Danger) DS1Tone.Danger else DS1Tone.Text
-    Row(modifier.fillMaxWidth().semantics(mergeDescendants = true) { liveRegion = if (tone == DS1NoticeTone.Danger) LiveRegionMode.Assertive else LiveRegionMode.Polite }) {
+    val live = if (tone == DS1NoticeTone.Danger) LiveRegionMode.Assertive else LiveRegionMode.Polite
+    if (banner) {
+        val line = ds1TextStyle().copy(color = DS1Colors.text.current, lineHeight = androidx.compose.ui.unit.TextUnit.Unspecified)
+        Row(
+            modifier.fillMaxWidth().height(scale.unit).background(mark.current.copy(alpha = 0.4f)).padding(horizontal = scale.unit)
+                .semantics(mergeDescendants = true) { liveRegion = live },
+            horizontalArrangement = Arrangement.spacedBy(scale(4f)),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(Modifier.size(scale.control).background(mark.current), contentAlignment = Alignment.Center) {
+                DS1Icon(icon, size = DS1IconSize.Large, tint = markInk.current)
+            }
+            if (heading != null) androidx.compose.foundation.text.BasicText(heading, style = line, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+            if (text != null) androidx.compose.foundation.text.BasicText(text, Modifier.weight(1f), style = line, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+            if (actions != null) Row(horizontalArrangement = Arrangement.spacedBy(scale.half), verticalAlignment = Alignment.CenterVertically, content = actions)
+            if (onDismiss != null) DS1IconButton(DS1IconName.close, closeLabel, onDismiss)
+        }
+        return
+    }
+    Row(modifier.fillMaxWidth().semantics(mergeDescendants = true) { liveRegion = live }) {
         Box(Modifier.size(scale.unit), contentAlignment = Alignment.Center) {
             Box(Modifier.size(scale.control).background(mark.current), contentAlignment = Alignment.Center) {
                 DS1Icon(icon, size = DS1IconSize.Large, tint = markInk.current)
@@ -89,44 +111,6 @@ fun DS1Notice(
         }
     }
 }
-
-/** `ds-banner`'s variants. */
-enum class DS1BannerVariant { Warning, Info, Success, Error }
-
-/**
- * `ds-banner`: a strip one square high across the top of the screen, its words a square in
- * from each side, an optional [action], and with [onDismiss] a close button.
- */
-@Composable
-fun DS1Banner(
-    text: String,
-    modifier: Modifier = Modifier,
-    variant: DS1BannerVariant = DS1BannerVariant.Warning,
-    action: String? = null,
-    onAction: (() -> Unit)? = null,
-    onDismiss: (() -> Unit)? = null,
-    closeLabel: String = DS1Words.text("Close"),
-) {
-    val scale = LocalDS1Scale.current
-    val (ground, ink, actionInk) = when (variant) {
-        DS1BannerVariant.Warning -> Triple(Color(0x80EAFF00), Color(0x80000000), DS1Colors.slate.current)
-        DS1BannerVariant.Info -> Triple(Color(0xB3007AFF), Color.White, Color.White)
-        DS1BannerVariant.Success -> Triple(Color(0xB334C759), Color.White, Color.White)
-        DS1BannerVariant.Error -> Triple(Color(0xB3FF3B30), Color.White, DS1Colors.slate.current)
-    }
-    Row(
-        modifier.fillMaxWidth().height(scale.unit).background(ground).padding(horizontal = scale.unit)
-            .semantics(mergeDescendants = true) { liveRegion = LiveRegionMode.Polite },
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        androidx.compose.foundation.text.BasicText(text, Modifier.weight(1f), style = ds1TextStyle().copy(color = ink, lineHeight = androidx.compose.ui.unit.TextUnit.Unspecified), maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
-        if (action != null && onAction != null) DS1Link(action, onAction, ink = DS1Color(actionInk.toArgbRgb()))
-        if (onDismiss != null) Box(Modifier.padding(start = scale(4f))) { DS1IconButton(DS1IconName.close, closeLabel, onDismiss) }
-    }
-}
-
-private fun Color.toArgbRgb(): Int = (((red * 255).toInt() and 0xff) shl 16) or (((green * 255).toInt() and 0xff) shl 8) or ((blue * 255).toInt() and 0xff)
 
 /**
  * `ds-empty`: an empty place saying what fills it. An optional [icon] on its own square, the

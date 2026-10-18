@@ -1,6 +1,7 @@
 // ds-notice.ts
 // An inline notice in the flow of the page: a tone, a title and/or text,
-// actions and an optional dismiss. Drawn by 1-root/notice.css, the same
+// actions and an optional dismiss; with `banner`, a strip across the top of
+// its positioning context instead. Drawn by 1-root/notice.css, the same
 // classes a page without scripts writes.
 
 import { LitElement, html, nothing, unsafeCSS, type PropertyValues } from "lit";
@@ -33,6 +34,9 @@ export interface NoticeDismissDetail { tone: NoticeTone }
  * @prop {boolean} literal - Show `heading` and `text` as written, never looked up.
  * @prop {string} icon - An icon from the library in place of the tone's own.
  * @prop {boolean} dismissible - Show a close button at the end of the first line.
+ * @prop {boolean} banner - A strip one square high across the top of its
+ *   positioning context, filled in the tone's colour, its words, actions and
+ *   close button on one line; it reserves no room in the flow.
  *
  * @slot - The text, when it needs more than words: a link, a strong word.
  * @slot heading - The title, as inline content.
@@ -59,6 +63,7 @@ export class Notice extends LitElement {
     literal: { type: Boolean, reflect: true },
     icon: { type: String },
     dismissible: { type: Boolean, reflect: true },
+    banner: { type: Boolean, reflect: true },
   };
 
   static styles = [unsafeCSS(metrics), unsafeCSS(controls), unsafeCSS(styles)];
@@ -69,6 +74,7 @@ export class Notice extends LitElement {
   declare literal: boolean;
   declare icon: string | undefined;
   declare dismissible: boolean;
+  declare banner: boolean;
 
   /** The role this element last set, so a role the page wrote is left alone. */
   private ownRole: string | null = null;
@@ -79,6 +85,7 @@ export class Notice extends LitElement {
     this.tone = "neutral";
     this.literal = false;
     this.dismissible = false;
+    this.banner = false;
   }
 
   /** The tone in effect: an unknown value reads as neutral. */
@@ -148,7 +155,7 @@ export class Notice extends LitElement {
     const hasText = Boolean(text) || slottedText;
     const hasActions = this.slotted("actions");
     const changed = () => this.requestUpdate();
-    return html`<div class="ds-notice${tone === "neutral" ? "" : ` ds-notice--${tone}`}" part="notice">
+    return html`<div class="ds-notice${tone === "neutral" ? "" : ` ds-notice--${tone}`}${this.banner ? " ds-notice--banner" : ""}" part="notice">
       <span class="ds-notice__mark" part="mark" aria-hidden="true">
         <slot name="icon" @slotchange=${changed}><ds-icon size="large" .type=${this.icon || NOTICE_ICONS[tone]}></ds-icon></slot>
       </span>

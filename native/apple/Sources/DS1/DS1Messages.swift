@@ -23,21 +23,46 @@ public enum DS1NoticeTone: Sendable {
 
 /// `ds-notice`: a message in the flow, beside what it is about. A one-square mark in its tone,
 /// the `heading` in the medium face and the `text`, every line one square, and `actions` a
-/// square below. `onDismiss` adds a close button.
+/// square below. `onDismiss` adds a close button. With `banner` it is a strip one square high
+/// across the top instead, on a fill of the tone's colour, everything on one line, the actions
+/// at the line's end.
 public struct DS1Notice<Actions: View>: View {
     @Environment(\.ds1Scale) private var scale
     let tone: DS1NoticeTone
     let heading: String?
     let text: String?
     let icon: DS1IconName?
+    let banner: Bool
     let onDismiss: (() -> Void)?
     let actions: Actions
 
-    public init(tone: DS1NoticeTone = .neutral, heading: String? = nil, text: String? = nil, icon: DS1IconName? = nil, onDismiss: (() -> Void)? = nil, @ViewBuilder actions: () -> Actions) {
-        self.tone = tone; self.heading = heading; self.text = text; self.icon = icon; self.onDismiss = onDismiss; self.actions = actions()
+    public init(tone: DS1NoticeTone = .neutral, heading: String? = nil, text: String? = nil, icon: DS1IconName? = nil, banner: Bool = false, onDismiss: (() -> Void)? = nil, @ViewBuilder actions: () -> Actions) {
+        self.tone = tone; self.heading = heading; self.text = text; self.icon = icon; self.banner = banner; self.onDismiss = onDismiss; self.actions = actions()
     }
 
     public var body: some View {
+        if banner { strip } else { block }
+    }
+
+    private var strip: some View {
+        HStack(spacing: scale(4)) {
+            DS1Icon(icon ?? tone.icon, size: .large).foregroundStyle(tone.markInk)
+                .frame(width: scale.control, height: scale.control).background(tone.mark)
+            if let heading { DS1ControlText(heading, colour: .text) }
+            if let text { DS1ControlText(text, colour: .text).frame(maxWidth: .infinity, alignment: .leading) }
+            if Actions.self != EmptyView.self { HStack(spacing: scale.half) { actions } }
+            if let onDismiss {
+                Button(action: onDismiss) { DS1Icon(.close, size: .large).foregroundStyle(DS1Color.text) }.buttonStyle(.plain)
+                    .accessibilityLabel(DS1Words.shared.text("Close"))
+            }
+        }
+        .padding(.horizontal, scale.unit)
+        .frame(height: scale.unit)
+        .background(tone.mark.color.opacity(0.4))
+        .accessibilityElement(children: .combine)
+    }
+
+    private var block: some View {
         HStack(alignment: .top, spacing: 0) {
             DS1Icon(icon ?? tone.icon, size: .large).foregroundStyle(tone.markInk)
                 .frame(width: scale.control, height: scale.control).background(tone.mark)
@@ -59,46 +84,8 @@ public struct DS1Notice<Actions: View>: View {
 }
 
 extension DS1Notice where Actions == EmptyView {
-    public init(tone: DS1NoticeTone = .neutral, heading: String? = nil, text: String? = nil, icon: DS1IconName? = nil, onDismiss: (() -> Void)? = nil) {
-        self.init(tone: tone, heading: heading, text: text, icon: icon, onDismiss: onDismiss) { EmptyView() }
-    }
-}
-
-/// `ds-banner`'s variants.
-public enum DS1BannerVariant: Sendable { case warning, info, success, error }
-
-/// `ds-banner`: a strip one square high across the top, its words a square in from each
-/// side, an optional `action`, and with `onDismiss` a close button.
-public struct DS1Banner: View {
-    @Environment(\.ds1Scale) private var scale
-    let text: String
-    let variant: DS1BannerVariant
-    let action: String?
-    let onAction: (() -> Void)?
-    let onDismiss: (() -> Void)?
-
-    public init(_ text: String, variant: DS1BannerVariant = .warning, action: String? = nil, onAction: (() -> Void)? = nil, onDismiss: (() -> Void)? = nil) {
-        self.text = text; self.variant = variant; self.action = action; self.onAction = onAction; self.onDismiss = onDismiss
-    }
-
-    public var body: some View {
-        let (ground, ink, actionInk): (DS1Color, DS1Color, DS1Color) = switch variant {
-        case .warning: (DS1Color(0xeaff00, opacity: 0.5), DS1Color(0x000000, opacity: 0.5), .slate)
-        case .info: (DS1Color(0x007aff, opacity: 0.7), DS1Color(0xffffff), DS1Color(0xffffff))
-        case .success: (DS1Color(0x34c759, opacity: 0.7), DS1Color(0xffffff), DS1Color(0xffffff))
-        case .error: (DS1Color(0xff3b30, opacity: 0.7), DS1Color(0xffffff), .slate)
-        }
-        HStack(spacing: scale(4)) {
-            DS1ControlText(text, colour: ink).frame(maxWidth: .infinity, alignment: .leading)
-            if let action, let onAction { DS1Link(action, ink: actionInk, action: onAction) }
-            if let onDismiss {
-                Button(action: onDismiss) { DS1Icon(.close, size: .large).foregroundStyle(ink) }.buttonStyle(.plain)
-                    .accessibilityLabel(DS1Words.shared.text("Close"))
-            }
-        }
-        .padding(.horizontal, scale.unit)
-        .frame(height: scale.unit)
-        .background(ground)
+    public init(tone: DS1NoticeTone = .neutral, heading: String? = nil, text: String? = nil, icon: DS1IconName? = nil, banner: Bool = false, onDismiss: (() -> Void)? = nil) {
+        self.init(tone: tone, heading: heading, text: text, icon: icon, banner: banner, onDismiss: onDismiss) { EmptyView() }
     }
 }
 

@@ -12,6 +12,17 @@
   display: none !important;
 }
 
+/* The banner is placed by the host; its block then fills the host. */
+:host([banner]) {
+  position: absolute;
+  top: 0;
+  inset-inline: 0;
+  z-index: 9999;
+}
+:host([banner]) .ds-notice--banner {
+  position: static;
+}
+
 /* Slotted words take the notice's lines rather than their own margins. */
 ::slotted([slot="heading"]),
 ::slotted(:not([slot])) {

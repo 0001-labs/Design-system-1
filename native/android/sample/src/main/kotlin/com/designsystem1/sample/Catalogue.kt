@@ -142,7 +142,7 @@ private fun CatalogueScreen() {
                 DS1Button("Try again", {}, kind = DS1ButtonKind.Secondary)
             }
             DS1Gap(size = DS1GapSize.Half)
-            DS1Banner("A new version is ready", variant = DS1BannerVariant.Info, action = "Update", onAction = {})
+            DS1Notice(banner = true, text = "A new version is ready", actions = { DS1Link("Update", {}) })
             DS1Gap(size = DS1GapSize.Half)
             DS1Empty(text = "Lists you make show here.", icon = DS1IconName.notifications) { DS1Button("Make a list", {}, kind = DS1ButtonKind.Primary) }
             DS1Gap(size = DS1GapSize.Half)

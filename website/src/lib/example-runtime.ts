@@ -54,11 +54,7 @@ sample.addEventListener('input-change', event => {
 sample.addEventListener('form-submit', event => {
   output.textContent = `form-submit: ${JSON.stringify((event as CustomEvent).detail.data)}`;
 });
-sample.addEventListener('ds-banner-action', event => {
-  event.preventDefault();
-  output.textContent = `ds-banner-action: ${(event as CustomEvent).detail.action}`;
-});
-for (const name of ['ds-banner-dismiss', 'ds-notice-dismiss']) sample.addEventListener(name, () => { output.textContent = name; });
+sample.addEventListener('ds-notice-dismiss', () => { output.textContent = 'ds-notice-dismiss'; });
 sample.addEventListener('select', event => {
   if ((event.target as HTMLElement).localName === 'ds-pagedots') output.textContent = `select: ${(event as CustomEvent).detail.index}`;
 });
