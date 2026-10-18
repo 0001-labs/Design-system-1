@@ -1,6 +1,6 @@
 import { useAuthActions, useAuthToken } from '@convex-dev/auth/react';
 import { useConvexAuth } from 'convex/react';
-import { useEffect, useLayoutEffect, useRef, useState, type ButtonHTMLAttributes, type ReactNode } from 'react';
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import '../../../DS1/2-core/ds-button';
 import '../../../DS1/2-core/ds-cycle';
 import '../../../DS1/3-unit/ds-tabs';
@@ -12,11 +12,15 @@ import { Button } from '../../../DS1/react/button';
 import { Empty } from '../../../DS1/react/empty';
 import { LoadingIndicator } from '../../../DS1/react/loading';
 import { Page } from '../../../DS1/react/page';
+import { confirm } from '../../../DS1/0-face/feedback';
 import '../../../DS1/1-root/controls.css';
 import { SignIn } from './SignIn';
 import './font-workspace.css';
 
-type FontEntry = { id: string; name: string; detail: string; available: boolean; fileName?: string | null; development?: boolean };
+// The workbench, with its font reader and writer, loads only when a drawing is opened.
+const Workbench = lazy(() => import('./fontWorkbench/Workbench').then(module => ({ default: module.Workbench })));
+
+type FontEntry = { id: string; name: string; detail: string; available: boolean; fileName?: string | null; development?: boolean; drawing?: boolean };
 const sizes = [20, 40, 60, 80, 100, 120];
 const spacings = [0, 1, 2, 3, 4];
 const alphabets = ['ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz', '0123456789', '.,:;!?—–“”‘’()[]{}@&', 'ÅÆØåæø'];
@@ -60,7 +64,10 @@ function PrivateFonts() {
   const { signOut } = useAuthActions();
   const [fonts, setFonts] = useState<FontEntry[] | null>(null);
   const [selected, setSelected] = useState('supernatural');
-  const [mode, setMode] = useState<'specimen' | 'glyphs'>('specimen');
+  const [mode, setMode] = useState<'specimen' | 'glyphs' | 'draw'>('specimen');
+  // The face whose drawing is open: it stays open behind Specimen and Glyphs until another face is chosen.
+  const [drawFor, setDrawFor] = useState<string | null>(null);
+  const drawingDirty = useRef(false);
   const [text, setText] = useState('a little of the natural.\nevery letter a little different.');
   const [size, setSize] = useState(40);
   const [spacing, setSpacing] = useState(0);
@@ -83,7 +90,7 @@ function PrivateFonts() {
     if (!response.ok) {
       const body = await response.json().catch(() => ({})) as { error?: string };
       if (response.status === 401 || response.status === 403) setFonts(null);
-      throw new Error(body.error || 'The font workspace could not be opened. Try again.');
+      throw Object.assign(new Error(body.error || 'The font workspace could not be opened. Try again.'), { status: response.status });
     }
     return response;
   }
@@ -146,7 +153,16 @@ function PrivateFonts() {
   }
 
   // The shared sidebar owns rows, focus and arrow keys; the workspace owns which font is open.
-  choosing.current = { busy, choose: id => { setMessage(''); setSelected(id); } };
+  choosing.current = { busy, choose: id => void (async () => {
+    if (id === selected) return;
+    if (drawingDirty.current && !(await confirm({ title: 'Leave the drawing without saving?', text: 'Changes since the last save are lost.', confirm: 'Leave', danger: true }))) return;
+    drawingDirty.current = false;
+    const drawn = Boolean(fonts?.find(font => font.id === id)?.drawing);
+    setMessage(''); setError(''); setDrawFor(mode === 'draw' && drawn ? id : null);
+    if (mode === 'draw' && !drawn) setMode('specimen');
+    setSelected(id);
+  })() };
+  const openDrawing = () => { setMode('draw'); setDrawFor(selected); setMessage(''); };
   const listItems: SidebarItem[] | null = fonts && fonts.map(font => ({ id: font.id, label: font.name, current: selected === font.id, disabled: busy }));
   useEffect(() => { if (list.current && listItems) list.current.items = listItems; }, [fonts, selected, busy]);
   useEffect(() => {
@@ -169,19 +185,30 @@ function PrivateFonts() {
       <header slot="header" className="font-heading"><h2>{active?.name}</h2><span>{active?.detail}</span></header>
       <section className="font-desk" aria-label={active?.name}>
         <div className="font-toolbar">
-          <ds-tabs role="group" aria-label="View"><Button active={mode === 'specimen'} aria-pressed={mode === 'specimen'} onClick={() => setMode('specimen')}>Specimen</Button><Button active={mode === 'glyphs'} aria-pressed={mode === 'glyphs'} onClick={() => setMode('glyphs')}>Glyphs</Button></ds-tabs>
-          <Cycle setting="size" values={sizes.map(n => `Size ${n}`)} value={`Size ${size}`} onChange={value => setSize(Number(value.slice(5)))} />
-          <Cycle setting="spacing" values={spacings.map(n => `Spacing ${n}`)} value={`Spacing ${spacing}`} onChange={value => setSpacing(Number(value.slice(8)))} />
+          <ds-tabs role="group" aria-label="View"><Button active={mode === 'specimen'} aria-pressed={mode === 'specimen'} onClick={() => setMode('specimen')}>Specimen</Button><Button active={mode === 'glyphs'} aria-pressed={mode === 'glyphs'} onClick={() => setMode('glyphs')}>Glyphs</Button>{active?.drawing && <Button active={mode === 'draw'} aria-pressed={mode === 'draw'} onClick={openDrawing}>Draw</Button>}</ds-tabs>
+          {mode !== 'draw' && <><Cycle setting="size" values={sizes.map(n => `Size ${n}`)} value={`Size ${size}`} onChange={value => setSize(Number(value.slice(5)))} />
+          <Cycle setting="spacing" values={spacings.map(n => `Spacing ${n}`)} value={`Spacing ${spacing}`} onChange={value => setSpacing(Number(value.slice(8)))} /></>}
           <Control aria-pressed={dark} onClick={() => setDark(value => !value)}>Dark paper</Control>
-          {active?.development && <><input ref={picker} className="font-file" type="file" accept=".woff2,.woff,.ttf,.otf" onChange={event => void openFont(event.target.files?.[0])} /><Control disabled={busy} onClick={() => picker.current?.click()}>Open font</Control>{local && <Control disabled={busy} onClick={() => void saveFont()}>Save font</Control>}</>}
+          {active?.development && mode !== 'draw' && <><input ref={picker} className="font-file" type="file" accept=".woff2,.woff,.ttf,.otf" onChange={event => void openFont(event.target.files?.[0])} /><Control disabled={busy} onClick={() => picker.current?.click()}>Open font</Control>{local && <Control disabled={busy} onClick={() => void saveFont()}>Save font</Control>}</>}
         </div>
         <div className="font-stage" aria-busy={busy}>
-          {family ? mode === 'specimen' ? <textarea aria-label={`${active?.name} specimen text`} spellCheck={false} value={text} onChange={event => setText(event.target.value)} style={{ fontFamily: `"${family}"`, fontSize: `calc(${size}px * var(--sf, 1))`, letterSpacing: `calc(${spacing}px * var(--sf, 1))` }} />
+          {active?.drawing && drawFor === active.id && <Suspense fallback={mode === 'draw' ? <LoadingIndicator label="Opening the workbench" /> : null}>
+            <Workbench
+              face={active}
+              request={request}
+              hidden={mode !== 'draw'}
+              onMessage={text => { setError(''); setMessage(text); }}
+              onError={text => setError(text)}
+              onDirtyChange={dirty => { drawingDirty.current = dirty; }}
+              onBuildSaved={fileName => setFonts(values => values?.map(font => font.id === active.id ? { ...font, available: true, fileName } : font) ?? null)}
+            />
+          </Suspense>}
+          {mode === 'draw' ? null : family ? mode === 'specimen' ? <textarea aria-label={`${active?.name} specimen text`} spellCheck={false} value={text} onChange={event => setText(event.target.value)} style={{ fontFamily: `"${family}"`, fontSize: `calc(${size}px * var(--sf, 1))`, letterSpacing: `calc(${spacing}px * var(--sf, 1))` }} />
             : <div className="font-glyphs" style={{ fontFamily: `"${family}"`, fontSize: `calc(${size}px * var(--sf, 1))` }}>{alphabets.flatMap(line => [...line]).map((letter, index) => <div key={`${letter}-${index}`}><span>{letter}</span><small>U+{letter.codePointAt(0)!.toString(16).toUpperCase().padStart(4, '0')}</small></div>)}</div>
           : <Empty className="font-empty" heading={busy ? 'Loading the font…' : active?.development ? studies[active.id]?.heading ?? `${active.name} is in development.` : 'No specimen loaded.'}>{active?.development ? studies[active.id]?.text ?? 'Open a font build to try it here.' : 'Select a font to view it, or try again if it could not load.'}</Empty>}
         </div>
       </section>
-      <footer slot="footer" className="font-footer"><p role={error ? 'alert' : 'status'}>{error || message || (family ? active?.development ? 'Development study. Missing characters use a fallback.' : mode === 'glyphs' ? 'Unsupported characters use a fallback.' : 'Edit the specimen text. Size changes stay inside the specimen.' : 'No substitute handwriting font is shown.')}</p>{error && <Control onClick={() => setRetry(n => n + 1)}>Try again</Control>}</footer>
+      <footer slot="footer" className="font-footer"><p role={error ? 'alert' : 'status'}>{error || message || (mode === 'draw' ? 'Drag points and handles; double-click the outline to add a point. References are drawn behind, never copied.' : family ? active?.development ? 'Development study. Missing characters use a fallback.' : mode === 'glyphs' ? 'Unsupported characters use a fallback.' : 'Edit the specimen text. Size changes stay inside the specimen.' : 'No substitute handwriting font is shown.')}</p>{error && <Control onClick={() => setRetry(n => n + 1)}>Try again</Control>}</footer>
     </Page>
   </main>;
 }

@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vite-plus/test';
 import { fontWorkspace } from '../src/fonts';
 import type { ReportsEnv } from '../src/reports';
+import { emptySource, type FontSource } from '../../shared/font-source';
 
 const origin = 'https://fonts.designsystem1.com';
 const woff2 = () => new Uint8Array([119, 79, 70, 50, 0, 0, 0, 0, 0, 0, 0, 0]);
@@ -52,8 +53,8 @@ describe('private font workspace', () => {
     const { fonts } = (await response.json()) as { fonts: Listed[] };
     // The faces in development come first, each honest about whether a build exists, then the references.
     expect(fonts.slice(0, 2)).toEqual([
-      expect.objectContaining({ id: 'supernatural', name: 'Supernatural', development: true, available: false, fileName: null }),
-      expect.objectContaining({ id: '0001-sans', name: '0001 Sans', development: true, available: false, fileName: null }),
+      expect.objectContaining({ id: 'supernatural', name: 'Supernatural', development: true, drawing: false, available: false, fileName: null }),
+      expect.objectContaining({ id: '0001-sans', name: '0001 Sans', development: true, drawing: true, available: false, fileName: null }),
     ]);
     expect(fonts.slice(2).map(font => font.id)).toEqual(['olivetti', 'america', 'iosevka']);
     expect(fonts.slice(2).every(font => font.available && !font.development)).toBe(true);
@@ -101,5 +102,79 @@ describe('private font workspace', () => {
     }
     expect((await fontWorkspace(request('/api/fonts/file/../../reports'), env, send)).status).toBe(404);
     expect(put).not.toHaveBeenCalled();
+  });
+  describe('drawings', () => {
+    const drawing = (): FontSource => {
+      const source = emptySource('0001 Sans');
+      source.glyphs.push({ unicode: 0x48, advance: 718, contours: [[
+        { x: 80, y: 0, type: 'line' }, { x: 170, y: 0, type: 'line' }, { x: 170, y: 710, type: 'line' }, { x: 80, y: 710, type: 'line' },
+      ], [
+        { x: 359, y: -10, type: 'curve', smooth: true }, { x: 500, y: -10, type: 'offcurve' }, { x: 600, y: 100, type: 'offcurve' }, { x: 600, y: 250, type: 'curve' },
+        { x: 600, y: 400, type: 'offcurve' }, { x: 500, y: 510, type: 'offcurve' },
+      ]] });
+      return source;
+    };
+    const put = (body: string, headers: Record<string, string> = {}) => ({ method: 'PUT', body, headers: { 'content-type': 'application/json', ...headers } });
+
+    it('keeps drawings private to the owner', async () => {
+      const { env, send, request, get, put: write } = setup();
+      send.mockImplementation(async () => Response.json({ status: 'success', value: { _id: 'another', email: 'jaa90@icloud.com' } }));
+      expect((await fontWorkspace(request('/api/fonts/0001-sans/source'), env, send)).status).toBe(403);
+      expect((await fontWorkspace(request('/api/fonts/0001-sans/source', put(JSON.stringify(drawing()))), env, send)).status).toBe(403);
+      expect((await fontWorkspace(new Request(origin + '/api/fonts/0001-sans/source'), env, send)).status).toBe(401);
+      expect(get).not.toHaveBeenCalled(); expect(write).not.toHaveBeenCalled();
+    });
+    it('saves a drawing by content hash, keeps earlier ones and reads the latest back', async () => {
+      const { env, send, request, objects } = setup();
+      const empty = await fontWorkspace(request('/api/fonts/0001-sans/source'), env, send);
+      expect(empty.status).toBe(404);
+      expect(((await empty.json()) as { error: string }).error).toBe('Nothing has been drawn yet.');
+      const first = drawing();
+      const saved = await fontWorkspace(request('/api/fonts/0001-sans/source', put(JSON.stringify(first))), env, send);
+      expect(saved.status).toBe(200);
+      expect(saved.headers.get('cache-control')).toBe('private, no-store');
+      const pointer = JSON.parse(String(objects.get('fonts/0001-sans/source/current.json')));
+      expect(pointer).toMatchObject({ key: expect.stringMatching(/^fonts\/0001-sans\/source\/[a-f0-9]{64}$/), glyphs: 1 });
+      const read = await fontWorkspace(request('/api/fonts/0001-sans/source'), env, send);
+      expect(read.headers.get('content-type')).toBe('application/json');
+      expect(JSON.parse(new TextDecoder().decode(await read.arrayBuffer()))).toEqual(first);
+      const second = drawing(); second.glyphs[0]!.advance = 720;
+      await fontWorkspace(request('/api/fonts/0001-sans/source', put(JSON.stringify(second))), env, send);
+      expect(objects.has(pointer.key)).toBe(true);
+      expect(JSON.parse(String(objects.get('fonts/0001-sans/source/current.json'))).key).not.toBe(pointer.key);
+      // A drawing is not a build: the face still has no font to show.
+      expect(objects.has('fonts/0001-sans/current.json')).toBe(false);
+    });
+    it('stores only the fields it knows, in character order', async () => {
+      const { env, send, request } = setup();
+      const source = drawing() as FontSource & { note?: string };
+      source.note = 'not kept';
+      source.glyphs.unshift({ unicode: 0x6e, advance: 569, contours: [] });
+      (source.glyphs[1]!.contours[0]![0] as { label?: string }).label = 'not kept';
+      await fontWorkspace(request('/api/fonts/0001-sans/source', put(JSON.stringify(source))), env, send);
+      const stored = JSON.parse(new TextDecoder().decode(await (await fontWorkspace(request('/api/fonts/0001-sans/source'), env, send)).arrayBuffer()));
+      expect(stored.note).toBeUndefined();
+      expect(stored.glyphs.map((glyph: { unicode: number }) => glyph.unicode)).toEqual([0x48, 0x6e]);
+      expect(stored.glyphs[0].contours[0][0]).toEqual({ x: 80, y: 0, type: 'line' });
+    });
+    it('refuses drawings that are not well formed, too large, sent from elsewhere or for a face not drawn here', async () => {
+      const { env, send, request, put: write } = setup();
+      const status = async (path: string, init: RequestInit) => (await fontWorkspace(request(path, init), env, send)).status;
+      expect(await status('/api/fonts/0001-sans/source', put('{not json'))).toBe(400);
+      const oneHandle = drawing(); oneHandle.glyphs[0]!.contours[1]!.splice(1, 1);
+      const response = await fontWorkspace(request('/api/fonts/0001-sans/source', put(JSON.stringify(oneHandle))), env, send);
+      expect(response.status).toBe(400);
+      expect(((await response.json()) as { error: string }).error).toBe('A curve point follows exactly two control points.');
+      const twice = drawing(); twice.glyphs.push({ ...twice.glyphs[0]! });
+      expect(await status('/api/fonts/0001-sans/source', put(JSON.stringify(twice)))).toBe(400);
+      const fraction = drawing(); fraction.glyphs[0]!.contours[0]![0]!.x = 80.5;
+      expect(await status('/api/fonts/0001-sans/source', put(JSON.stringify(fraction)))).toBe(400);
+      expect(await status('/api/fonts/0001-sans/source', put(JSON.stringify(drawing()), { origin: 'https://other.example' }))).toBe(403);
+      expect(await status('/api/fonts/0001-sans/source', put('x', { 'content-length': String(4 * 1024 * 1024 + 1) }))).toBe(413);
+      expect(await status('/api/fonts/supernatural/source', put(JSON.stringify(drawing())))).toBe(404);
+      expect(await status('/api/fonts/olivetti/source', put(JSON.stringify(drawing())))).toBe(404);
+      expect(await status('/api/fonts/supernatural/source', { method: 'GET' })).toBe(404);
+      expect(write).not.toHaveBeenCalled();
+    });
   });
 });

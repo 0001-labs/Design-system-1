@@ -10,13 +10,15 @@ import { FontWorkspace } from './FontWorkspace';
 let root: Root;
 let host: HTMLDivElement;
 const settle = () => act(async () => { await new Promise(resolve => setTimeout(resolve, 10)); });
+/** Wait for something that loads on its own time, such as a lazily loaded module. */
+const until = async (ready: () => boolean) => { for (let tries = 0; tries < 200 && !ready(); tries += 1) await settle(); };
 beforeEach(() => {
   vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   vi.stubGlobal('FontFace', class { family: string; constructor(family: string) { this.family = family; } async load() { return this; } });
   Object.defineProperty(document, 'fonts', { configurable: true, value: new Set() });
-  vi.stubGlobal('fetch', vi.fn(async (path: string) => path === '/api/fonts' ? Response.json({ fonts: [
+  vi.stubGlobal('fetch', vi.fn(async (path: string) => path === '/api/fonts/0001-sans/source' ? Response.json({ error: 'Nothing has been drawn yet.' }, { status: 404 }) : path === '/api/fonts' ? Response.json({ fonts: [
     { id: 'supernatural', name: 'Supernatural', detail: 'In development', development: true, available: false },
-    { id: '0001-sans', name: '0001 Sans', detail: 'Sans · In development', development: true, available: false },
+    { id: '0001-sans', name: '0001 Sans', detail: 'Sans · In development', development: true, drawing: true, available: false },
     { id: 'olivetti', name: 'Olivetti Dot', detail: 'Regular', available: true },
   ] }) : new Response(new Uint8Array([1, 2, 3]))));
   host = document.createElement('div'); document.body.append(host); root = createRoot(host);
@@ -62,6 +64,26 @@ describe('font workspace', () => {
     expect(open()).toBe(true);
     await act(async () => rows()[2]!.click()); await settle();
     expect(open()).toBe(false);
+  });
+  it('offers Draw only for a face drawn here, and keeps the drawing open behind the other views', async () => {
+    await act(async () => root.render(createElement(FontWorkspace))); await settle();
+    const list = host.querySelector('ds-page[layout="sidebar"] > ds-sidebar[slot="nav"]')!;
+    const rows = () => [...list.shadowRoot!.querySelectorAll<HTMLButtonElement>('button[data-item]')];
+    const tab = (label: string) => [...host.querySelectorAll<HTMLButtonElement>('ds-tabs button')].find(button => button.textContent === label);
+    expect(tab('Draw')).toBeUndefined();
+    await act(async () => rows()[1]!.click()); await settle();
+    await act(async () => tab('Draw')!.click());
+    await until(() => Boolean(host.querySelector('.workbench-tools')));
+    const workbench = host.querySelector('.workbench')!;
+    expect(workbench).not.toBeNull();
+    expect(workbench.hasAttribute('hidden')).toBe(false);
+    expect(host.querySelector('ds-cycle[data-setting="size"]')).toBeNull();
+    expect(host.textContent).toContain('References are drawn behind, never copied.');
+    await act(async () => tab('Specimen')!.click()); await settle();
+    expect(host.querySelector('.workbench')!.hasAttribute('hidden')).toBe(true);
+    await act(async () => rows()[2]!.click()); await settle();
+    expect(host.querySelector('.workbench')).toBeNull();
+    expect(tab('Draw')).toBeUndefined();
   });
   it('does not render the font workspace when the server denies access', async () => {
     vi.mocked(fetch).mockImplementation(async () => Response.json({ error: 'This font workspace is private.' }, { status: 403 }));

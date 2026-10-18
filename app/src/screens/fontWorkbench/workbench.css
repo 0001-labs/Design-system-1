@@ -1,0 +1,118 @@
+/* The workbench fills the font desk's stage: tools on one-square rows, the
+   characters in a column eight squares wide, the drawing beside them, and the
+   drawing tried as text below. Every measure is in squares (--font-unit,
+   scaled with the surface). */
+.font-stage:has(> .workbench:not([hidden])) { overflow: hidden; }
+.workbench {
+  --wb-unit: var(--font-unit, calc(20px * var(--sf, 1)));
+  display: grid;
+  grid-template-columns: calc(8 * var(--wb-unit)) minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100%;
+  min-height: calc(20 * var(--wb-unit));
+}
+.workbench[hidden] { display: none; }
+.workbench-loading { margin: 0; padding-top: calc(4px * var(--sf, 1)); line-height: calc(16px * var(--sf, 1)); opacity: .6; }
+
+/* Tools: buttons one control high at the foot of one-square rows (the sixteen). */
+.workbench-tools {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0 calc(var(--wb-unit) / 2);
+  min-height: var(--wb-unit);
+  line-height: calc(16px * var(--sf, 1));
+  padding-bottom: var(--wb-unit);
+}
+.workbench-tools > ds-tabs { margin-right: calc(var(--wb-unit) / 2); }
+.workbench-tools > ds-button > button[aria-pressed="true"] { text-decoration: underline; text-underline-offset: calc(3px * var(--sf, 1)); }
+.workbench-file { display: none; }
+
+/* Characters: cells two squares wide and three high, the drawing on two and its name on the last. */
+.workbench-glyphs {
+  display: grid;
+  grid-template-columns: repeat(4, calc(2 * var(--wb-unit)));
+  grid-auto-rows: calc(3 * var(--wb-unit));
+  align-content: start;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border-top: 1px solid var(--grid-color);
+  border-right: 1px solid var(--grid-color);
+}
+.workbench-glyph {
+  appearance: none;
+  display: grid;
+  grid-template-rows: calc(2 * var(--wb-unit)) var(--wb-unit);
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.workbench-glyph:hover { background: var(--ds-row-fill-hover); }
+.workbench-glyph[aria-pressed="true"] { background: var(--ds-row-fill-current); }
+.workbench-glyph:focus-visible { outline: 2px solid currentColor; outline-offset: -2px; }
+.workbench-glyph svg { display: block; width: 100%; height: 100%; }
+.workbench-glyph path { fill: currentColor; }
+.workbench-glyph span { padding-top: calc(4px * var(--sf, 1)); font-size: calc(10px * var(--sf, 1)); line-height: calc(16px * var(--sf, 1)); text-align: center; opacity: .6; }
+
+/* The drawing: a one-square line naming the glyph, then the canvas. */
+.workbench-main { display: grid; grid-template-rows: var(--wb-unit) minmax(0, 1fr); min-width: 0; min-height: 0; border-top: 1px solid var(--grid-color); }
+.workbench-glyph-info {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--wb-unit);
+  padding-left: calc(var(--wb-unit) / 2);
+  line-height: calc(16px * var(--sf, 1));
+}
+.workbench-glyph-name { font-family: var(--typeface-medium); }
+.workbench-glyph-info label { display: flex; align-items: flex-end; gap: calc(var(--wb-unit) / 2); }
+.workbench-width { width: calc(3 * var(--wb-unit)); }
+.workbench-reference-width { opacity: .6; }
+.workbench-canvas { display: block; width: 100%; height: 100%; min-height: 0; touch-action: none; user-select: none; -webkit-user-select: none; outline-offset: -2px; }
+.workbench-canvas[data-tool="pen"] { cursor: crosshair; }
+
+.workbench-guide { stroke: var(--grid-color); stroke-width: 1px; vector-effect: non-scaling-stroke; }
+.workbench-guide-label { fill: var(--text-color); opacity: .5; font-family: var(--typeface-regular); pointer-events: none; }
+.workbench-side { stroke: var(--text-color); stroke-opacity: .35; stroke-width: 1px; vector-effect: non-scaling-stroke; }
+.workbench-advance { stroke: transparent; cursor: ew-resize; }
+.workbench-reference { fill: var(--sharp-blue); fill-opacity: .2; pointer-events: none; }
+.workbench-reference-file { fill: var(--tuned-red); fill-opacity: .16; }
+.workbench-outline { fill: var(--text-color); fill-opacity: .08; stroke: var(--text-color); stroke-width: 1px; vector-effect: non-scaling-stroke; }
+.workbench-handle { stroke: var(--text-color); stroke-opacity: .45; stroke-width: 1px; vector-effect: non-scaling-stroke; pointer-events: none; }
+.workbench-point { fill: var(--background); stroke: var(--text-color); stroke-width: 1px; vector-effect: non-scaling-stroke; cursor: move; }
+.workbench-canvas[data-tool="pen"] .workbench-point { cursor: crosshair; }
+.workbench-point[data-first] { stroke-width: 2px; }
+.workbench-point[data-selected] { fill: var(--text-color); }
+.workbench-marquee { fill: var(--text-color); fill-opacity: .05; stroke: var(--text-color); stroke-width: 1px; stroke-dasharray: 4 4; vector-effect: non-scaling-stroke; pointer-events: none; }
+
+/* The drawing as text: 14px on a one-square line (the sixteen), then large on three squares. */
+.workbench-preview { grid-column: 1 / -1; border-top: 1px solid var(--grid-color); min-width: 0; }
+.workbench-preview-line {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--wb-unit);
+  margin: 0;
+  padding: calc(4px * var(--sf, 1)) 0 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font-size: calc(14px * var(--sf, 1));
+  line-height: calc(16px * var(--sf, 1));
+  outline-offset: -2px;
+}
+.workbench-preview-large { font-size: calc(40px * var(--sf, 1)); line-height: calc(60px * var(--sf, 1)); white-space: pre; overflow: hidden; }
+
+@media (max-width: 599px) {
+  .workbench { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto calc(6 * var(--wb-unit)) calc(16 * var(--wb-unit)) auto; }
+  .workbench-glyphs { grid-template-columns: repeat(auto-fill, calc(2 * var(--wb-unit))); border-right: 0; }
+}

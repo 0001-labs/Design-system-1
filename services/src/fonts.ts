@@ -1,15 +1,40 @@
 /** Private font workspace. Every data and font request verifies the existing owner session. */
 import type { ReportsEnv } from './reports';
+import { SOURCE_LIMITS, validateSource } from '../../shared/font-source';
 
 const OWNER_EMAIL = 'jaa90@icloud.com';
 const MAX_FONT_BYTES = 10 * 1024 * 1024;
-/** The faces in development. Each build is stored by content hash under fonts/<id>/, and fonts/<id>/current.json names the one shown. */
-const DEVELOPMENT: Record<string, { name: string; detail: string }> = {
+/**
+ * The faces in development. Each build is stored by content hash under fonts/<id>/, and
+ * fonts/<id>/current.json names the one shown. A face that is drawn in the workspace
+ * (`drawing`) also keeps its outlines, by content hash under fonts/<id>/source/, with
+ * fonts/<id>/source/current.json naming the latest.
+ */
+const DEVELOPMENT: Record<string, { name: string; detail: string; drawing?: true }> = {
   supernatural: { name: 'Supernatural', detail: 'Handwriting · In development' },
-  '0001-sans': { name: '0001 Sans', detail: 'Sans · In development' },
+  '0001-sans': { name: '0001 Sans', detail: 'Sans · In development', drawing: true },
 };
 const isDevelopment = (id: string) => Object.hasOwn(DEVELOPMENT, id);
 const currentKey = (id: string) => `fonts/${id}/current.json`;
+const sourceKey = (id: string) => `fonts/${id}/source/current.json`;
+const hex = async (bytes: Uint8Array) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))].map(n => n.toString(16).padStart(2, '0')).join('');
+/** Read a request's body up to `limit` bytes, or answer why not. */
+async function readBody(request: Request, limit: number, tooLarge: string): Promise<Uint8Array | Response> {
+  if (Number(request.headers.get('content-length')) > limit) return json({ error: tooLarge }, 413);
+  const reader = request.body?.getReader();
+  if (!reader) return json({ error: 'Nothing was sent.' }, 400);
+  const chunks: Uint8Array[] = []; let length = 0;
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    length += value.byteLength;
+    if (length > limit) { await reader.cancel(); return json({ error: tooLarge }, 413); }
+    chunks.push(value);
+  }
+  const bytes = new Uint8Array(length); let offset = 0;
+  for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.length; }
+  return bytes;
+}
 const headers = { 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow', 'X-Content-Type-Options': 'nosniff', Vary: 'Authorization' };
 const json = (value: unknown, status = 200) => Response.json(value, { status, headers });
 type SavedFont = { key: string; name: string; format: string };
@@ -44,7 +69,7 @@ export async function fontWorkspace(request: Request, env: ReportsEnv, send: typ
     if (path === '/api/fonts' && request.method === 'GET') {
       const development = await Promise.all(Object.entries(DEVELOPMENT).map(async ([id, face]) => {
         const saved = await savedFont(env, id);
-        return { id, ...face, development: true, available: Boolean(saved), fileName: saved?.name ?? null };
+        return { id, name: face.name, detail: face.detail, development: true, drawing: Boolean(face.drawing), available: Boolean(saved), fileName: saved?.name ?? null };
       }));
       return json({ fonts: [
         ...development,
@@ -62,27 +87,44 @@ export async function fontWorkspace(request: Request, env: ReportsEnv, send: typ
       if (!font) return json({ error: 'This font is not available yet.' }, 404);
       return new Response(font.body, { headers: { ...headers, 'Content-Type': 'application/octet-stream' } });
     }
+    const drawing = /^\/api\/fonts\/([^/]+)\/source$/.exec(path);
+    if (drawing && (request.method === 'GET' || request.method === 'PUT')) {
+      const id = drawing[1]!;
+      if (!isDevelopment(id) || !DEVELOPMENT[id]?.drawing) return json({ error: 'This font is not drawn here.' }, 404);
+      if (request.method === 'GET') {
+        const pointer = await env.LIBRARIES.get(sourceKey(id));
+        if (!pointer) return json({ error: 'Nothing has been drawn yet.' }, 404);
+        const { key } = await pointer.json<{ key: string }>();
+        const prefix = `fonts/${id}/source/`;
+        if (typeof key !== 'string' || !key.startsWith(prefix) || !/^[a-f0-9]{64}$/.test(key.slice(prefix.length))) throw new Error('Invalid drawing reference');
+        const saved = await env.LIBRARIES.get(key);
+        if (!saved) return json({ error: 'Nothing has been drawn yet.' }, 404);
+        return new Response(saved.body, { headers: { ...headers, 'Content-Type': 'application/json' } });
+      }
+      if (request.headers.get('origin') !== new URL(request.url).origin) return json({ error: 'Use the font workspace to save a drawing.' }, 403);
+      const body = await readBody(request, SOURCE_LIMITS.bytes, 'The drawing is larger than 4 MB.');
+      if (body instanceof Response) return body;
+      let source;
+      try { source = validateSource(JSON.parse(new TextDecoder().decode(body))); }
+      catch (problem) { return json({ error: problem instanceof SyntaxError ? 'This is not a drawing the workspace can read.' : problem instanceof Error ? problem.message : 'The drawing could not be read.' }, 400); }
+      const bytes = new TextEncoder().encode(JSON.stringify(source));
+      const key = `fonts/${id}/source/${await hex(bytes)}`;
+      const savedAt = new Date().toISOString();
+      await env.LIBRARIES.put(key, bytes, { httpMetadata: { contentType: 'application/json' } });
+      await env.LIBRARIES.put(sourceKey(id), JSON.stringify({ key, savedAt, glyphs: source.glyphs.length }));
+      return json({ saved: true, savedAt });
+    }
     if (path.startsWith('/api/fonts/') && request.method === 'PUT') {
       const id = path.slice('/api/fonts/'.length);
       if (!isDevelopment(id)) return json({ error: 'This font is not in development here.' }, 404);
       if (request.headers.get('origin') !== new URL(request.url).origin) return json({ error: 'Use the font workspace to save a font.' }, 403);
-      if (Number(request.headers.get('content-length')) > MAX_FONT_BYTES) return json({ error: 'Choose a font smaller than 10 MB.' }, 413);
-      const reader = request.body?.getReader();
-      if (!reader) return json({ error: 'Choose a font file.' }, 400);
-      const chunks: Uint8Array[] = []; let length = 0;
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-        length += value.byteLength;
-        if (length > MAX_FONT_BYTES) { await reader.cancel(); return json({ error: 'Choose a font smaller than 10 MB.' }, 413); }
-        chunks.push(value);
-      }
-      const bytes = new Uint8Array(length); let offset = 0;
-      for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.length; }
+      const bytes = await readBody(request, MAX_FONT_BYTES, 'Choose a font smaller than 10 MB.');
+      if (bytes instanceof Response) return bytes;
+      const length = bytes.length;
       const signature = String.fromCharCode(...bytes.slice(0, 4));
       const format = ({ wOF2: 'woff2', wOFF: 'woff', OTTO: 'opentype', '\u0000\u0001\u0000\u0000': 'truetype' } as Record<string, string>)[signature];
       if (!format || length < 12) return json({ error: 'Choose a WOFF2, WOFF, OTF or TTF font.' }, 400);
-      const hash = [...new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))].map(n => n.toString(16).padStart(2, '0')).join('');
+      const hash = await hex(bytes);
       const name = (request.headers.get('x-font-name') ?? DEVELOPMENT[id]?.name ?? 'Font').replace(/[\x00-\x1f\x7f]/g, '').slice(0, 160);
       const key = `fonts/${id}/${hash}`;
       await env.LIBRARIES.put(key, bytes, { httpMetadata: { contentType: 'application/octet-stream' } });
