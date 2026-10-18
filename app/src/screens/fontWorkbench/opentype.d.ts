@@ -22,4 +22,6 @@ declare module 'opentype.js' {
     });
     toArrayBuffer(): ArrayBuffer;
   }
+  const opentype: { Font: typeof Font; Glyph: typeof Glyph; Path: typeof Path };
+  export default opentype;
 }

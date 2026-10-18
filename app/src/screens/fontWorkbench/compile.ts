@@ -6,7 +6,9 @@ import { glyphName, type FontSource } from '../../../../shared/font-source';
 import { segments } from './geometry';
 
 export async function compileSource(source: FontSource): Promise<ArrayBuffer> {
-  const { Font, Glyph, Path } = await import('opentype.js');
+  // A bundler gives the ES module's named exports; plain Node gives the CommonJS build, its classes on the default export.
+  const loaded = await import('opentype.js');
+  const { Font, Glyph, Path } = 'Font' in loaded && loaded.Font ? loaded : loaded.default;
   const { metrics } = source;
   const glyphs = [new Glyph({ name: '.notdef', advanceWidth: Math.round(metrics.unitsPerEm / 2), path: new Path() })];
   const space = source.glyphs.find(glyph => glyph.unicode === 0x20);
