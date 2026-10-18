@@ -30,6 +30,31 @@ describe('a drawn face as a font', () => {
     expect(Math.round(o.bbox.minY)).toBe(-10);
     expect(font.hasGlyphForCodePoint(0x61)).toBe(false);
   });
+  it('gives every figure a tabular copy in one width, which tnum swaps in', async () => {
+    const source = emptySource('Workbench Test');
+    source.metrics.figureWidth = 620;
+    source.glyphs.push(
+      { unicode: 0x30, advance: 676, contours: [oval(70, -17, 606, 727), reverseContour(oval(162, 63, 514, 647))] },
+      { unicode: 0x31, advance: 354, contours: [rectangle(174, 0, 269, 710)] },
+      { unicode: 0x48, advance: 718, contours: [rectangle(80, 0, 170, 710)] },
+    );
+    const loaded = await import('opentype.js');
+    // Under Node the CommonJS build puts the parser on the default export.
+    const parse = ('parse' in loaded ? loaded.parse : undefined) ?? loaded.default.parse;
+    const font = parse(await compileSource(source));
+    for (const script of ['DFLT', 'latn']) {
+      const pairs = font.substitution.getSingle('tnum', script, 'dflt');
+      expect(pairs.map(pair => font.glyphs.get(pair.sub).name)).toEqual(['uni0030', 'uni0031']);
+      expect(pairs.map(pair => font.glyphs.get(pair.by).name)).toEqual(['uni0030.tnum', 'uni0031.tnum']);
+      expect(pairs.map(pair => font.glyphs.get(pair.by).advanceWidth)).toEqual([620, 620]);
+    }
+    // The proportional figures keep their own widths.
+    expect(font.glyphs.get(font.charToGlyphIndex('1')).advanceWidth).toBe(354);
+    // Without a figure width the widest figure's is used.
+    delete source.metrics.figureWidth;
+    const widest = parse(await compileSource(source));
+    expect(widest.substitution.getSingle('tnum', 'latn', 'dflt').map(pair => widest.glyphs.get(pair.by).advanceWidth)).toEqual([676, 676]);
+  });
   it('reads a reference face in the drawing’s units', () => {
     const file = fileURLToPath(new URL('../../../../DS1/1-root/fonts/GT-America-Standard-Regular.woff2', import.meta.url));
     const reference = readReference(new Uint8Array(readFileSync(file)), 1000);

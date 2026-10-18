@@ -21,7 +21,14 @@ declare module 'opentype.js' {
       tables?: { os2?: Record<string, number> };
     });
     toArrayBuffer(): ArrayBuffer;
+    substitution: {
+      addSingle(feature: string, substitution: { sub: number; by: number }, script?: string, language?: string): void;
+      getSingle(feature: string, script?: string, language?: string): { sub: number; by: number }[];
+    };
+    glyphs: { get(index: number): { name: string; advanceWidth: number } };
+    charToGlyphIndex(character: string): number;
   }
-  const opentype: { Font: typeof Font; Glyph: typeof Glyph; Path: typeof Path };
+  export function parse(buffer: ArrayBuffer): Font;
+  const opentype: { Font: typeof Font; Glyph: typeof Glyph; Path: typeof Path; parse: typeof parse };
   export default opentype;
 }

@@ -28,6 +28,8 @@ export type SourceMetrics = {
   /** The line box a browser builds from the face (hhea and win metrics). */
   lineAscent: number;
   lineDescent: number;
+  /** The width each figure takes when tabular figures are asked for (tnum); unset, the widest figure's. */
+  figureWidth?: number;
 };
 export type FontSource = {
   format: 'font-source';
@@ -109,6 +111,7 @@ export function validateSource(value: unknown): FontSource {
   const unitsPerEm = measures.unitsPerEm as number;
   if (unitsPerEm < 16 || unitsPerEm > 4000) fail('Units per em is from 16 to 4000.');
   if ((measures.lineAscent as number) <= 0 || (measures.lineDescent as number) > 0) fail('The line rises above the baseline and falls below it.');
+  if (measures.figureWidth !== undefined && (!wholeNumber(measures.figureWidth) || (measures.figureWidth as number) <= 0)) fail('The tabular figure width is a whole number of units above zero.');
   if (!Array.isArray(source.glyphs) || source.glyphs.length > SOURCE_LIMITS.glyphs) fail(`A drawing holds at most ${SOURCE_LIMITS.glyphs} glyphs.`);
   const seen = new Set<number>();
   const glyphs = (source.glyphs as unknown[]).map((glyph): SourceGlyph => {
@@ -140,7 +143,10 @@ export function validateSource(value: unknown): FontSource {
   return {
     format: 'font-source', version: 1,
     family: source.family as string, style: source.style as string, weight: source.weight as number,
-    metrics: Object.fromEntries(names.map(name => [name, measures[name] as number])) as SourceMetrics,
+    metrics: {
+      ...Object.fromEntries(names.map(name => [name, measures[name] as number])),
+      ...(measures.figureWidth === undefined ? {} : { figureWidth: measures.figureWidth as number }),
+    } as SourceMetrics,
     glyphs,
   };
 }

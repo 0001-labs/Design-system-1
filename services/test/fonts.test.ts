@@ -157,6 +157,17 @@ describe('private font workspace', () => {
       expect(stored.glyphs.map((glyph: { unicode: number }) => glyph.unicode)).toEqual([0x48, 0x6e]);
       expect(stored.glyphs[0].contours[0][0]).toEqual({ x: 80, y: 0, type: 'line' });
     });
+    it('keeps a tabular figure width and refuses one that is not a positive whole number', async () => {
+      const { env, send, request } = setup();
+      const source = drawing(); source.metrics.figureWidth = 620;
+      expect((await fontWorkspace(request('/api/fonts/0001-sans/source', put(JSON.stringify(source))), env, send)).status).toBe(200);
+      const stored = JSON.parse(new TextDecoder().decode(await (await fontWorkspace(request('/api/fonts/0001-sans/source'), env, send)).arrayBuffer()));
+      expect(stored.metrics.figureWidth).toBe(620);
+      for (const width of [0, -10, 12.5, 'wide']) {
+        const bad = drawing() as unknown as { metrics: Record<string, unknown> }; bad.metrics.figureWidth = width;
+        expect((await fontWorkspace(request('/api/fonts/0001-sans/source', put(JSON.stringify(bad))), env, send)).status).toBe(400);
+      }
+    });
     it('refuses drawings that are not well formed, too large, sent from elsewhere or for a face not drawn here', async () => {
       const { env, send, request, put: write } = setup();
       const status = async (path: string, init: RequestInit) => (await fontWorkspace(request(path, init), env, send)).status;

@@ -1,6 +1,8 @@
 /**
  * Write a drawn face as an OpenType font in the browser, so it can be tried as
  * text and kept as a build. opentype.js loads only when a build is written.
+ * Figures are drawn proportional; each also gets a tabular copy, centred in
+ * the face's figure width, that the tnum feature swaps in (tables, stats).
  */
 import { glyphName, type FontSource } from '../../../../shared/font-source';
 import { segments } from './geometry';
@@ -13,24 +15,39 @@ export async function compileSource(source: FontSource): Promise<ArrayBuffer> {
   const glyphs = [new Glyph({ name: '.notdef', advanceWidth: Math.round(metrics.unitsPerEm / 2), path: new Path() })];
   const space = source.glyphs.find(glyph => glyph.unicode === 0x20);
   glyphs.push(new Glyph({ name: 'space', unicode: 0x20, advanceWidth: space?.advance ?? Math.round(metrics.unitsPerEm / 4), path: new Path() }));
-  for (const glyph of source.glyphs) {
-    if (glyph.unicode === 0x20) continue;
+  const pathOf = (contours: FontSource['glyphs'][number]['contours'], dx = 0) => {
     const path = new Path();
-    for (const contour of glyph.contours) {
+    for (const contour of contours) {
       const parts = segments(contour);
       if (!parts.length) continue;
       const first = contour[parts[0]!.end]!;
-      path.moveTo(first.x, first.y);
+      path.moveTo(first.x + dx, first.y);
       for (const part of [...parts.slice(1), parts[0]!]) {
         const end = contour[part.end]!;
         if (part.controls.length === 2) {
           const a = contour[part.controls[0]!]!, b = contour[part.controls[1]!]!;
-          path.curveTo(a.x, a.y, b.x, b.y, end.x, end.y);
-        } else if (part !== parts[0]) path.lineTo(end.x, end.y);
+          path.curveTo(a.x + dx, a.y, b.x + dx, b.y, end.x + dx, end.y);
+        } else if (part !== parts[0]) path.lineTo(end.x + dx, end.y);
       }
       path.close();
     }
-    glyphs.push(new Glyph({ name: glyphName(glyph.unicode), unicode: glyph.unicode, advanceWidth: glyph.advance, path }));
+    return path;
+  };
+  const index = new Map<number, number>();
+  for (const glyph of source.glyphs) {
+    if (glyph.unicode === 0x20) continue;
+    index.set(glyph.unicode, glyphs.length);
+    glyphs.push(new Glyph({ name: glyphName(glyph.unicode), unicode: glyph.unicode, advanceWidth: glyph.advance, path: pathOf(glyph.contours) }));
+  }
+  // Tabular copies of the figures, each centred on its ink in one width.
+  const figures = source.glyphs.filter(glyph => glyph.unicode >= 0x30 && glyph.unicode <= 0x39);
+  const figureWidth = metrics.figureWidth ?? Math.max(0, ...figures.map(glyph => glyph.advance));
+  const tabular: [number, number][] = [];
+  for (const glyph of figures) {
+    const xs = glyph.contours.flat().map(point => point.x);
+    const dx = xs.length ? Math.round((figureWidth - Math.min(...xs) - Math.max(...xs)) / 2) : Math.round((figureWidth - glyph.advance) / 2);
+    tabular.push([index.get(glyph.unicode)!, glyphs.length]);
+    glyphs.push(new Glyph({ name: `${glyphName(glyph.unicode)}.tnum`, advanceWidth: figureWidth, path: pathOf(glyph.contours, dx) }));
   }
   const font = new Font({
     familyName: source.family,
@@ -53,5 +70,6 @@ export async function compileSource(source: FontSource): Promise<ArrayBuffer> {
       },
     },
   });
+  for (const script of ['DFLT', 'latn']) for (const [sub, by] of tabular) font.substitution.addSingle('tnum', { sub, by }, script, 'dflt');
   return font.toArrayBuffer();
 }
