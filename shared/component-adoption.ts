@@ -95,7 +95,7 @@ const directoryColumns: ComponentColumn[] = ALL_LAYERS.flatMap(layer => layer.en
 export const IMPLEMENTATION_COLUMNS: ComponentColumn[] = [
   ...directoryColumns,
   ...["button", "split", "checkbox", "radio", "switch", "text", "badge", "token", "avatar", "icon", "input", "file-picker", "color", "swatch", "select", "textarea", "composer", "tooltip", "cycle", "date", "language", "gap", "banner", "empty", "notice", "kbd", "stat", "meter", "steps", "card", "pagedots", "chart", "toast", "toggle", "loading", "spacing-handle"].map(id => ({ id, name: id, group: "Core" })),
-  ...["token-field", "avatar-group", "calendar", "calendar-large", "date-picker", "carousel", "row", "list", "tabs", "menu", "accordion", "form", "table", "sidebar", "tree", "navigation", "unit-card"].map(id => ({ id, name: id, group: "Unit" })),
+  ...["token-field", "avatar-group", "calendar", "calendar-large", "date-picker", "matrix", "carousel", "row", "list", "tabs", "menu", "accordion", "form", "table", "sidebar", "tree", "navigation", "unit-card"].map(id => ({ id, name: id, group: "Unit" })),
   ...["dialog", "panel", "container", "layout", "grid", "page", "header", "footer", "document"].map(id => ({ id, name: id, group: "Page" })),
 ].filter((column, index, columns) => columns.findIndex(other => other.id === column.id) === index);
 const family = (id: string) => id === "split" ? "button" : id === "switch" ? "toggle" : id;

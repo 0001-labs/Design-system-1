@@ -134,6 +134,7 @@ export default defineConfig({
             { label: "Date picker", slug: "3-unit/date-picker" },
             { label: "Form", slug: "3-unit/form" },
             { label: "List", slug: "3-unit/list" },
+            { label: "Matrix", slug: "3-unit/matrix" },
             { label: "Navigation", slug: "3-unit/navigation" },
             { label: "Panel", slug: "3-unit/panel" },
             { label: "Row", slug: "3-unit/row" },

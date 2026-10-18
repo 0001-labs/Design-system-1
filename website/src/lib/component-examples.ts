@@ -14,6 +14,18 @@ export const TABLE_DATA = [
 ];
 export const TABLE_FOOTER = { product: "Total", users: 264 };
 
+/** The matrix example's items: two headed columns and an item further down. */
+export const MATRIX_ITEMS = [
+  { id: 'fruit', title: 'Fruit', column: 0, row: 0, header: true },
+  { id: 'apples', title: 'Apples', column: 0, row: 1, starred: true },
+  { id: 'pears', title: 'Pears', column: 0, row: 2 },
+  { id: 'plums', title: 'Plums', column: 0, row: 3, completed: true },
+  { id: 'bakery', title: 'Bakery', column: 1, row: 0, header: true, color: 'var(--ds-zenith-blue)' },
+  { id: 'rye', title: 'Rye bread', column: 1, row: 1 },
+  { id: 'buns', title: 'Cinnamon buns for Sunday', column: 1, row: 2 },
+  { id: 'later', title: 'Later', column: 2, row: 4 },
+];
+
 /** The examples' events, in the month being read so a calendar always has some. */
 export function calendarEvents(kind: 'month' | 'large') {
   const now = new Date();
@@ -299,6 +311,21 @@ calendar.events = [
 </div>`,
     height: 420,
   },
+  'matrix': {
+    title: 'Items on whole squares', hint: 'Drag an item to another square, or focus one and press Alt with an arrow; it swaps with what is there. Shift-click selects several. Pressing a free square fires cell-press.',
+    html: `<ds-matrix label="Groceries" literal rows="6"></ds-matrix>`,
+    script: `const matrix = document.querySelector('ds-matrix');
+matrix.items = [
+  { id: 'fruit', title: 'Fruit', column: 0, row: 0, header: true },
+  { id: 'apples', title: 'Apples', column: 0, row: 1, starred: true },
+  { id: 'pears', title: 'Pears', column: 0, row: 2 },
+  { id: 'plums', title: 'Plums', column: 0, row: 3, completed: true },
+  { id: 'bakery', title: 'Bakery', column: 1, row: 0, header: true, color: 'var(--ds-zenith-blue)' },
+  { id: 'rye', title: 'Rye bread', column: 1, row: 1 },
+];
+matrix.addEventListener('move', event => console.log(event.detail.moves));`,
+    height: 260,
+  },
   'carousel': {
     title: 'Slides twelve squares wide', hint: 'Swipe or scroll sideways, or use the buttons and the dots. Moving to another slide fires change.',
     html: `<ds-carousel label="Colours" literal slide-width="12" buttons>
@@ -502,7 +529,7 @@ export const PAGE_EXAMPLES: Record<string, string[]> = {
   '2-core/gap': ['gap'],
   '3-unit/row': ['row', 'row-centered'], '3-unit/list': ['list'],
   '3-unit/accordion': ['accordion'], '3-unit/form': ['form'], '3-unit/carousel': ['carousel', 'carousel-full'],
-  '3-unit/calendar': ['calendar', 'calendar-compact', 'calendar-large'], '3-unit/date-picker': ['date-picker'],
+  '3-unit/calendar': ['calendar', 'calendar-compact', 'calendar-large'], '3-unit/date-picker': ['date-picker'], '3-unit/matrix': ['matrix'],
   '3-unit/table': ['table'],
   '4-page/container': ['container'], '4-page/grid': ['grid'],
   '4-page/layout': ['layout', 'page'], '4-page/layouts': ['page'],

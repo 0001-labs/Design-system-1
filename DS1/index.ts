@@ -82,6 +82,7 @@ export * from "./3-unit/ds-carousel";
 export * from "./3-unit/ds-date-picker";
 export * from "./3-unit/ds-form";
 export * from "./3-unit/ds-list";
+export * from "./3-unit/ds-matrix";
 export * from "./3-unit/ds-row";
 export * from "./3-unit/ds-table";
 

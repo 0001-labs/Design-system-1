@@ -3,8 +3,9 @@
  * square, eight squares wide by default, the calendar icon on its first
  * sixteen and the down arrow at its end. The month opens on the menu's frame:
  * a 1px line, half a square inside it, no shadow, half a square from the
- * field. Inside, the compact month (seven squares wide, eight high) and one
- * square of Today and Clear: eight squares by ten in all. */
+ * field. Inside, the compact month two squares a day (fourteen squares wide,
+ * eight high; seven wide on a narrow phone) and one square of Today and
+ * Clear: fifteen squares by ten in all. */
 
 :host {
   --ds-date-picker-width: calc(8 * var(--ds-unit));

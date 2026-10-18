@@ -1,0 +1,134 @@
+/* ds-matrix.css
+ * A board of whole squares: columns four squares wide (--ds-matrix-column-
+ * squares), rows one square high, nothing between them. An item is a box of
+ * 1px lines centred on the grid lines; where two boxes touch they share one
+ * line. Its words stand on the lower sixteen, 4px from its edge, and fade out
+ * over the last 12px instead of being cut. */
+
+:host {
+  --ds-matrix-cell: calc(var(--ds-unit) * var(--ds-matrix-column-squares, 4));
+  --ds-matrix-line-color: var(--ds-border-color);
+  --ds-matrix-header-fill: var(--ds-accent-color);
+  --ds-matrix-pad: calc(4px * var(--ds-sf, 1));
+  --ds-matrix-fade: calc(12px * var(--ds-sf, 1));
+  box-sizing: border-box;
+  display: block;
+  min-width: 0;
+  color: var(--ds-text-color);
+  font-family: var(--ds-typeface-regular);
+  font-feature-settings: var(--ds-font-features);
+  font-size: var(--ds-type-size-default);
+  font-weight: var(--ds-type-weight-default);
+  line-height: var(--ds-type-lineheight-default);
+  letter-spacing: var(--ds-type-letterspacing-default);
+}
+:host([hidden]) { display: none !important; }
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(var(--ds-matrix-columns, 3), var(--ds-matrix-cell));
+  grid-template-rows: repeat(var(--ds-matrix-rows, 8), var(--ds-unit));
+  width: max-content;
+  outline: none;
+  touch-action: pan-y;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.row { display: contents; }
+
+.cell {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-end;
+  min-width: 0;
+  height: var(--ds-unit);
+  outline: none;
+}
+.cell:focus-visible { z-index: 3; outline: 2px solid var(--ds-focus-ring); outline-offset: -2px; }
+
+/* An item: its own box, the shared edges drawn once, by the box before. */
+.item { background: var(--ds-paper); cursor: default; }
+:host(:not([readonly])) .item { cursor: grab; }
+.item::after {
+  position: absolute;
+  inset: -0.5px;
+  box-sizing: border-box;
+  border: 1px solid var(--ds-matrix-line-color);
+  border-radius: inherit;
+  content: "";
+  pointer-events: none;
+}
+.item[data-shared-end]::after { border-inline-end-width: 0; }
+.item[data-shared-bottom]::after { border-block-end-width: 0; }
+
+.title {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-inline: var(--ds-matrix-pad);
+  overflow: hidden;
+  white-space: nowrap;
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-matrix-fade)), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-matrix-fade)), transparent);
+}
+:host(:dir(rtl)) .title {
+  -webkit-mask-image: linear-gradient(to left, #000 calc(100% - var(--ds-matrix-fade)), transparent);
+  mask-image: linear-gradient(to left, #000 calc(100% - var(--ds-matrix-fade)), transparent);
+}
+
+/* A header is filled with the accent and lettered in the ink. */
+.item[data-header] { background: var(--ds-matrix-header-fill); color: var(--ds-slate); }
+
+/* A star takes the item's first square, filled with the accent, its icon on the sixteen. */
+.star {
+  box-sizing: border-box;
+  display: flex;
+  flex: 0 0 var(--ds-unit);
+  align-items: flex-end;
+  align-self: stretch;
+  border-inline-end: 1px solid var(--ds-matrix-line-color);
+  background: var(--ds-accent-color);
+  color: var(--ds-slate);
+}
+
+/* Done: struck through and faded. */
+.item[data-completed] .title { text-decoration: line-through; opacity: 0.55; }
+
+/* Selected: a tint of the accent, its whole box in the accent above its neighbours. */
+.item[aria-selected="true"] {
+  z-index: 2;
+  background: color-mix(in srgb, var(--ds-accent-color) 22%, var(--ds-paper));
+}
+.item[aria-selected="true"]::after { border-width: 1px; border-color: var(--ds-accent-color); }
+.item[data-header][aria-selected="true"] { background: var(--ds-matrix-header-fill); }
+
+/* A free square shows a plus once the pointer has rested on it. */
+.free::before {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(currentColor, currentColor) center / calc(10px * var(--ds-sf, 1)) 1px no-repeat,
+    linear-gradient(currentColor, currentColor) center / 1px calc(10px * var(--ds-sf, 1)) no-repeat;
+  color: var(--ds-title-color);
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+}
+:host(:not([readonly])) .board:not([data-dragging]) .free:is(:hover, :focus-visible)::before { opacity: 1; }
+:host(:not([readonly])) .free { cursor: pointer; }
+
+/* Dragging: the items carried follow the pointer; the squares they would land on are tinted. */
+.board[data-dragging] { cursor: grabbing; }
+.item[data-carried] { z-index: 4; cursor: grabbing; opacity: 0.9; }
+.cell[data-landing]:not([data-carried]) { background: color-mix(in srgb, var(--ds-accent-color) 22%, var(--ds-paper)); }
+
+/* Rounded: the corners a box does not share take the system's 4px. */
+:host([rounded]) .item:not([data-shared-top], [data-shared-start]) { border-start-start-radius: var(--ds-radius); }
+:host([rounded]) .item:not([data-shared-top], [data-shared-end]) { border-start-end-radius: var(--ds-radius); }
+:host([rounded]) .item:not([data-shared-bottom], [data-shared-start]) { border-end-start-radius: var(--ds-radius); }
+:host([rounded]) .item:not([data-shared-bottom], [data-shared-end]) { border-end-end-radius: var(--ds-radius); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .free::before { transition: opacity 60ms ease; }
+  :host(:not([readonly])) .board:not([data-dragging]) .free:hover::before { transition: opacity 120ms ease 300ms; }
+}

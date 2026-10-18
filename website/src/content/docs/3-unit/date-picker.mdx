@@ -28,9 +28,9 @@ picker.addEventListener("change", event => {
 | Measure | Size |
 | --- | --- |
 | The field | The select's face: one control high at the foot of its square, eight squares wide (`--ds-date-picker-width`). |
-| The month | Seven squares wide and eight high: the month and arrows, the weekday letters, six weeks. |
+| The month | Two squares a day, fourteen squares wide and eight high: the month and arrows, the weekday names, six weeks. On a screen narrower than seventeen squares, one square a day and seven wide. |
 | Below it | Today and, once a day is chosen, Clear, on one square. |
-| The frame | A 1px line with half a square inside it, no shadow: eight squares by ten. |
+| The frame | A 1px line with half a square inside it, no shadow: fifteen squares by ten (eight by ten on a phone). |
 | Its place | Half a square below the field, or above it when there is more room there, kept on screen. |
 
 The month opens on the chosen day's month, or today's. `length` writes the day `short`, `medium` (the default) or `long`; before a day is chosen the field reads `placeholder`, the shared words "Choose a date" by default, in the title grey.

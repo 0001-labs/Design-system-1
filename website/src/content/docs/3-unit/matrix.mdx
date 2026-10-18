@@ -1,0 +1,112 @@
+---
+title: Matrix
+description: Items on a board of whole squares, one square high and four wide, moved a square at a time.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+A matrix lays items out the way squared paper would: columns four squares wide, each item one square high, standing edge to edge with nothing between them. Every item is a box of hairlines centred on the grid lines, and where two boxes touch they share one line, so a column of items reads as one strip. A free square stays paper until the pointer rests on it, when a plus appears.
+
+Items move a square at a time: dragged, they land on the nearest whole square; an item that lands on another swaps places with it.
+
+## Try it
+
+<ComponentExample example="matrix" />
+
+## Use it
+
+```html
+<ds-matrix label="Groceries" literal columns="3" rows="8"></ds-matrix>
+```
+
+```js
+const matrix = document.querySelector("ds-matrix");
+matrix.items = [
+  { id: "fruit", title: "Fruit", column: 0, row: 0, header: true },
+  { id: "apples", title: "Apples", column: 0, row: 1, starred: true },
+  { id: "plums", title: "Plums", column: 0, row: 2, completed: true },
+];
+matrix.addEventListener("move", event => save(event.detail.moves));
+matrix.addEventListener("cell-press", event => add(event.detail)); // { column, row }
+```
+
+`move` comes before the items move and can be cancelled; once it has passed, `items` holds the new places. Keep the page's own copy in step from `event.detail.moves`, each `{ id, from, to }`, the swapped item included.
+
+| Measure | Size |
+| --- | --- |
+| A column | Four squares (`column-width`), with nothing between columns. |
+| An item | One square high, the column's width; its box a 1px line centred on the grid lines, shared with the item beside or below. |
+| Words | On the lower sixteen, 4px from the item's start, fading over its last 12px instead of being cut. |
+| A header | Filled with the accent (or its `color`), lettered in the ink. |
+| A star | The item's first square, filled with the accent, the star icon on its sixteen, a line after it. |
+| Done | Struck through and at 55%. |
+| Selected | A tint of the accent (22%), its whole box in the accent. |
+| A free square | Paper; a plus of two 10px lines in the title grey after the pointer rests 300ms. |
+| Rows | At least `rows` (eight), and always one spare below the last item. |
+
+`rounded` gives the corners a box does not share the system's 4px, so a strip of items rounds only at its ends.
+
+## Items
+
+| Field | What it is |
+| --- | --- |
+| `id` | The item's own name, given back in every event. |
+| `title` | Its words. |
+| `column`, `row` | Where it stands, from 0. Columns are named A, B, C… and rows from 1 to people (`B3`). |
+| `header` | It heads what is below it. |
+| `starred` | Marked with a star. |
+| `completed` | Done. |
+| `color` | A token or colour for a header's fill. Take it from the palette. |
+
+`planMove(items, ids, by, columns)` and `columnName(column)` are exported for a page that moves items itself.
+
+## Selecting and moving
+
+- Shift-click or ⌘-click (Ctrl-click) adds an item to the selection or takes it out; ⌘A selects every item and Escape clears the selection.
+- Dragging a selected item carries the whole selection. A mouse or pen starts after 4px; a finger holds still for 400ms first, so a board can still be scrolled.
+- A group moves only onto free squares; a lone item swaps with the item where it lands. Nothing leaves the board's columns or goes above its first row.
+
+## Accessibility
+
+- The board is a grid named by `label`, with one Tab stop. The arrow keys move between squares, Home and End to a column's first and last row, and with ⌘ (Ctrl) to the board's first and last square.
+- Enter or Space presses an item (`item-press`) or a free square (`cell-press`); Shift or ⌘ with Space selects. Alt with an arrow moves the selection, or the item in focus, a square, and the focus with it.
+- Each item is a grid cell named by its words, with `aria-selected`; a free square is named by its place, `B3`.
+- `readonly` leaves only the arrows and pressing.
+
+## API
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `columns` | number | `3` | Columns on the board. |
+| `rows` | number | `8` | Rows drawn at least. |
+| `column-width` | number | `4` | Squares per column. |
+| `label` | string | — | The board's name; `literal` shows it as written. |
+| `readonly` | boolean | `false` | Nothing moves, is selected or added. |
+| `rounded` | boolean | `false` | Rounds the corners a box does not share. |
+
+| Property | Type | What it is |
+| --- | --- | --- |
+| `items` | `MatrixItem[]` | The items and where they stand. |
+| `selected` | `string[]` | The ids of the selected items. |
+
+| Event | Detail | What it means |
+| --- | --- | --- |
+| `item-press` | `{ item }` | An item was pressed. |
+| `cell-press` | `{ column, row }` | A free square was pressed. |
+| `select` | `{ ids }` | The selection changed. |
+| `move` | `{ moves }` | Items are about to move. Cancel it to keep them. |
+
+| Method | What it does |
+| --- | --- |
+| `moveItems(ids, by)` | Moves items `by` `{ column, row }` squares, as a drag does. |
+
+| Part | What it is |
+| --- | --- |
+| `board` | The grid. |
+| `item` | An item; also `header`, `starred` and `completed`. |
+| `free` | A free square. |
+
+| Custom property | Default | What it sets |
+| --- | --- | --- |
+| `--ds-matrix-line-color` | `var(--ds-border-color)` | The items' lines. |
+| `--ds-matrix-header-fill` | `var(--ds-accent-color)` | A header without a colour. |

@@ -1,7 +1,8 @@
 // ds-date-picker.ts
 // A field that opens a small month below it: the field's face shows the date
 // in the current language, the month opens half a square from it on the
-// menu's frame, and choosing a day closes it. A form takes the day as
+// menu's frame (two squares a day where the screen has room, one on a narrow
+// phone), and choosing a day closes it. A form takes the day as
 // `YYYY-MM-DD`, as a native date field would send it.
 
 import { LitElement, html, nothing, unsafeCSS, type PropertyValues } from "lit";
@@ -177,6 +178,14 @@ export class DatePicker extends LitElement {
     const calendar = this.calendar;
     if (calendar) calendar.month = (this.value || this.today || todayDay()).slice(0, 7);
     popover.showPopover?.();
+    if (calendar) {
+      // Two squares a day where the screen holds the month that wide (fifteen squares and its
+      // margins), one square on a narrow phone.
+      const unit = ((parseFloat(getComputedStyle(popover).paddingTop) || 9) + 1) * 2;
+      const view = this.ownerDocument.defaultView!;
+      calendar.dayWidth = (view.visualViewport?.width ?? view.innerWidth) >= 17 * unit ? 2 : 1;
+      void calendar.updateComplete.then(this.place);
+    }
     this.place();
     this.ownerDocument.addEventListener("pointerdown", this.onOutside, true);
     this.ownerDocument.addEventListener("scroll", this.place, true);

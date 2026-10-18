@@ -1,5 +1,5 @@
 import { mountChartExample } from './chart-example';
-import { EXAMPLES, TABLE_DATA, TABLE_FOOTER, calendarEvents } from './component-examples';
+import { EXAMPLES, MATRIX_ITEMS, TABLE_DATA, TABLE_FOOTER, calendarEvents } from './component-examples';
 import type { DsTable } from '../../../DS1/3-unit/ds-table';
 import type { TreeItem } from '../../../DS1/3-unit/ds-tree';
 
@@ -68,6 +68,10 @@ sample.addEventListener('change', event => {
 // The calendars hold the events their published scripts show, in the month being read.
 sample.querySelectorAll('ds-calendar:not([compact])').forEach(calendar => { (calendar as HTMLElement & { events: unknown }).events = calendarEvents('month'); });
 sample.querySelectorAll('ds-calendar-large').forEach(calendar => { (calendar as HTMLElement & { events: unknown }).events = calendarEvents('large'); });
+sample.querySelectorAll('ds-matrix').forEach(matrix => { (matrix as HTMLElement & { items: unknown }).items = MATRIX_ITEMS; });
+sample.addEventListener('move', event => { output.textContent = `move: ${(event as CustomEvent).detail.moves.map((move: { id: string; to: { column: number; row: number } }) => `${move.id} to ${String.fromCharCode(65 + move.to.column)}${move.to.row + 1}`).join(', ')}`; });
+sample.addEventListener('item-press', event => { output.textContent = `item-press: ${(event as CustomEvent).detail.item.title}`; });
+sample.addEventListener('cell-press', event => { const { column, row } = (event as CustomEvent).detail; output.textContent = `cell-press: ${String.fromCharCode(65 + column)}${row + 1}`; });
 for (const name of ['day-press', 'event-press', 'navigate']) sample.addEventListener(name, event => {
   const detail = (event as CustomEvent).detail;
   output.textContent = `${name}: ${detail.day ?? detail.month ?? ''}${detail.event ? ` ${detail.event.title}` : ''}`;
