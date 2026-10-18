@@ -10,7 +10,7 @@ describe('canonical adoption catalogue', () => {
       expect(column).toMatchObject({ name: entry.name, group: layer.name });
     }
     expect(COMPONENT_COLUMNS.some(c => ['Composites', 'Layout'].includes(c.group))).toBe(false);
-    expect(COMPONENT_COLUMNS.some(c => c.id === 'split' || c.id === 'switch')).toBe(false);
+    expect(COMPONENT_COLUMNS.some(c => ['split', 'toggle', 'textarea', 'meter', 'steps', 'pagedots', 'tree', 'slide', 'banner', 'language', 'layout', 'date'].includes(c.id))).toBe(false);
   });
   it('includes Root and every current directory entry, even without an element tag', () => {
     for (const layer of ALL_LAYERS) for (const entry of layer.entries) {
@@ -23,7 +23,7 @@ describe('canonical adoption catalogue', () => {
     const cells: Record<string, ComponentCell> = Object.fromEntries(IMPLEMENTATION_COLUMNS.map(c => [c.id, { ...cell('unused', 0), sites: [] }]));
     cells.button = cell('ds-button', 2); cells.split = cell('ds-split', 3); cells.switch = cell('ds-switch', 4); cells.toggle = cell('ds-toggle', 5);
     const result = catalogueApp({ id: 'example', name: 'Example', status: 'scanned', commit: null, dirty: false, files: 1, scope: ['src'], snapshotCommit: null, cells, otherCustomElements: {}, migration: 'deferred' } as AdoptionApp);
-    expect(result.cells.button.shared).toBe(5); expect(result.cells.toggle.shared).toBe(9);
+    expect(result.cells.button.shared).toBe(5); expect(result.cells.switch.shared).toBe(9);
     expect(result.cells.button.sites.map(s => s.tag)).toEqual(['ds-button', 'ds-split']);
     expect(result.migration).toBe('deferred');
     expect(Object.values(result.cells).reduce((n,c) => n+c.shared,0)).toBe(14);

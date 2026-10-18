@@ -38,7 +38,7 @@ const native = (scale: number, width = "calc(var(--ds-unit) * 12)") => `<section
   <div class="ds-carousel__track">${slides(4)}</div>
   <div class="ds-carousel__controls">
     <button class="ds-button ds-button--icon ds-carousel__previous" type="button"><span class="ds-icon"></span></button>
-    <div class="ds-pagedots"></div>
+    <div class="ds-progress ds-progress--dots"></div>
     <button class="ds-button ds-button--icon ds-carousel__next" type="button"><span class="ds-icon"></span></button>
   </div>
 </section>`;
@@ -51,7 +51,7 @@ async function stage(page: Page, markup: string) {
     (window as unknown as { stopCarousels?: () => void; startCarousels: (root: ParentNode) => () => void }).stopCarousels?.();
     (window as unknown as { stopCarousels?: () => void }).stopCarousels = (window as unknown as { startCarousels: (root: ParentNode) => () => void }).startCarousels(stage);
     for (const element of stage.querySelectorAll<HTMLElement & { updateComplete?: Promise<unknown> }>("*")) await element.updateComplete;
-    for (const element of stage.querySelectorAll<HTMLElement & { updateComplete?: Promise<unknown> }>("ds-carousel")) await element.shadowRoot?.querySelector<HTMLElement & { updateComplete?: Promise<unknown> }>("ds-pagedots")?.updateComplete;
+    for (const element of stage.querySelectorAll<HTMLElement & { updateComplete?: Promise<unknown> }>("ds-carousel")) await element.shadowRoot?.querySelector<HTMLElement & { updateComplete?: Promise<unknown> }>("ds-progress")?.updateComplete;
     for (let i = 0; i < 3; i++) await new Promise(requestAnimationFrame);
   }, markup);
 }
@@ -65,8 +65,8 @@ async function measure(page: Page) {
     const box = (element: Element) => { const rect = element.getBoundingClientRect(); return { left: rect.left - origin.left, top: rect.top - origin.top, width: rect.width, height: rect.height }; };
     const track = root.querySelector(".ds-carousel__track")!;
     const slideElements = block.shadowRoot ? [...block.children] : [...track.children];
-    const dotsHost = root.querySelector(".ds-pagedots, ds-pagedots")!;
-    const dots = [...(dotsHost.shadowRoot ?? dotsHost).querySelectorAll(".ds-pagedots__dot")];
+    const dotsHost = root.querySelector(".ds-progress--dots, ds-progress")!;
+    const dots = [...(dotsHost.shadowRoot ?? dotsHost).querySelectorAll(".ds-progress__dot")];
     const current = dots.find(dot => dot.getAttribute("aria-current") === "true")!;
     const drawn = getComputedStyle(current, "::before");
     const future = getComputedStyle(dots.at(-1)!, "::before");
@@ -140,8 +140,8 @@ async function state(page: Page) {
   return page.evaluate(() => {
     const block = document.getElementById("stage")!.firstElementChild as HTMLElement;
     const root = block.shadowRoot ?? block;
-    const dotsHost = root.querySelector(".ds-pagedots, ds-pagedots")!;
-    const dots = [...(dotsHost.shadowRoot ?? dotsHost).querySelectorAll(".ds-pagedots__dot")];
+    const dotsHost = root.querySelector(".ds-progress--dots, ds-progress")!;
+    const dots = [...(dotsHost.shadowRoot ?? dotsHost).querySelectorAll(".ds-progress__dot")];
     const track = root.querySelector<HTMLElement>(".ds-carousel__track")!;
     let focused: Element | null = document.activeElement;
     while (focused?.shadowRoot?.activeElement) focused = focused.shadowRoot.activeElement;
@@ -171,7 +171,7 @@ test("buttons, dots, keys and the reader's own scrolling move the same carousel,
     await page.evaluate(() => {
       const block = document.getElementById("stage")!.firstElementChild as HTMLElement;
       const root = block.shadowRoot ?? block;
-      const host = root.querySelector(".ds-pagedots, ds-pagedots")!;
+      const host = root.querySelector(".ds-progress--dots, ds-progress")!;
       (host.shadowRoot ?? host).querySelector<HTMLButtonElement>('[aria-current="true"]')!.focus();
     });
     await page.keyboard.press("End");

@@ -1,9 +1,14 @@
-/* ds-steps.css */
-/* The element only places the list; 1-root/figures.css draws it. */
+/* ds-progress.css */
+/* The element only places the row; 1-root/progress.css draws it. */
 
 :host {
   display: block;
   min-width: 0;
+}
+
+:host([dots]) {
+  display: inline-flex;
+  vertical-align: top;
 }
 
 :host([hidden]),

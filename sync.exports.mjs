@@ -15,8 +15,8 @@ const rootStyles = ['one.css', 'grid.css', 'text.css', 'component-tokens.css', '
 const importsText = ['one.css', 'controls.css'];
 /** one.css also imports the faces with their typeface tokens, and the palette. */
 const oneImports = ['fonts.css', 'palette.css'];
-/** The sheets controls.css imports besides the text classes: tables, empty states, notices, shortcut hints, the dialog's placements, the site chrome (header with its drawer, footer, document), carousels, cards, stats, meters and steps, and rows. */
-const controlSheets = ['table.css', 'empty.css', 'notice.css', 'kbd.css', 'dialog-placement.css', 'header.css', 'drawer.css', 'footer.css', 'document.css', 'carousel.css', 'card.css', 'figures.css', 'row.css'];
+/** The sheets controls.css imports besides the text classes: tables, empty states, notices, shortcut hints, the dialog's placements, the site chrome (header with its drawer, footer, document), carousels, cards, stats, progress, and rows. */
+const controlSheets = ['table.css', 'empty.css', 'notice.css', 'kbd.css', 'dialog-placement.css', 'header.css', 'drawer.css', 'footer.css', 'document.css', 'carousel.css', 'card.css', 'figures.css', 'progress.css', 'row.css'];
 /** Sheets for writing that a product asks for by name, as a flag or in `styles`. */
 const writingSheets = { prose: 'prose.css', classless: 'one.semantic.css', cjk: 'cjk.css' };
 const askedSheets = options => Object.entries(writingSheets).filter(([flag]) => options[flag]).map(([, file]) => file);
@@ -39,7 +39,7 @@ const rootModules = {
   'dialog-swipe': ['dialog-swipe.ts'],
   /** The site header's menu for pages without Lit, and the drawer it opens. */
   header: ['header.ts', 'drawer.ts'],
-  /** Carousels and page dots on native markup (.ds-carousel, .ds-pagedots). */
+  /** Carousels and their dots on native markup (.ds-carousel, .ds-progress--dots). */
   carousel: ['carousel.ts'],
   /** The keyboard and pointer of a native sidebar tree (`connectSidebar`, for `.ds-sidebar` in row.css). */
   sidebar: ['sidebar.ts'],
@@ -134,7 +134,7 @@ export default {
      * notice, shortcut, dialog placement, site chrome, carousel, figure and row
      * classes it imports (table.css, text.css, empty.css, notice.css, kbd.css,
      * dialog-placement.css, header.css, drawer.css, footer.css, document.css,
-     * carousel.css, figures.css, row.css);
+     * carousel.css, figures.css, progress.css, row.css);
      * `prose` adds the prose sheet (prose.css, for writing marked data-ds-prose) and `classless` the classless sheet
      * (one.semantic.css, which styles a whole page of plain HTML) and `cjk` Noto Sans
      * for Japanese and Chinese (cjk.css); `bundle` writes them all as one
@@ -165,7 +165,7 @@ export default {
      * false` leaves the faces to the product;
      * `nativeControls` adds controls.css and the table.css, empty.css,
      * notice.css, kbd.css, dialog-placement.css, header.css, drawer.css,
-     * footer.css, document.css, carousel.css, figures.css and row.css it imports; `prose`
+     * footer.css, document.css, carousel.css, figures.css, progress.css and row.css it imports; `prose`
      * adds the prose sheet (prose.css) and `classless` the classless sheet
      * (one.semantic.css) and `cjk` Noto Sans for Japanese and Chinese (cjk.css,
      * from Google Fonts), which `styles` may also name; `modules` names page scripts
@@ -210,10 +210,10 @@ export default {
     /**
      * The Lit components named in `components`, with everything they import and
      * their React adapters (`empty` brings react/empty.ts, `notice`
-     * react/notice.ts, `carousel` react/carousel.ts, `stat`, `meter` and `steps`
+     * react/notice.ts, `carousel` react/carousel.ts, `stat` and `progress`
      * theirs, `sidebar` react/sidebar.ts). controls.css always travels with them, and
      * with it the native classes it imports, `.ds-empty`, `.ds-notice`,
-     * `.ds-carousel`, `.ds-stat`, `.ds-meter`, `.ds-steps` and `.ds-row` among them.
+     * `.ds-carousel`, `.ds-stat`, `.ds-progress` and `.ds-row` among them.
      * components-manifest.json records them for the component adoption report,
      * at the last commit that changed them.
      */

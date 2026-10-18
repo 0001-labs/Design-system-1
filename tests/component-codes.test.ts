@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test } from 'vite-plus/test';
 import codes from '../shared/component-codes.json';
 import { ALL_LAYERS } from '../shared/component-directory';
 describe('component glossary', () => {

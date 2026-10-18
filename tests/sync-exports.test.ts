@@ -114,8 +114,8 @@ test('bundled tokens are one stylesheet with no local imports left', () => {
   expect(css).toContain('.ds-empty {');
   expect(css).toContain('.ds-notice {');
   expect(css).toContain('.ds-stat {');
-  expect(css).toContain('.ds-meter {');
-  expect(css).toContain('.ds-steps {');
+  expect(css).toContain('.ds-progress {');
+  expect(css).toContain('.ds-progress--steps {');
 });
 
 test('the prose sheet is copied when a product asks for it', () => {
@@ -133,11 +133,11 @@ test('the classless sheet is copied when a product asks for it, and keeps its pa
   expect(Object.keys(files('root', { classless: true, prose: true, fonts: false }))).toEqual(expect.arrayContaining(['one.css', 'prose.css', 'one.semantic.css']));
 });
 
-test('controls.css always arrives with the table, text, empty-state, notice, shortcut, dialog placement, site chrome, carousel, card, figure and row classes it imports', () => {
+test('controls.css always arrives with the table, text, empty-state, notice, shortcut, dialog placement, site chrome, carousel, card, figure, progress and row classes it imports', () => {
   const chrome = ['header.css', 'drawer.css', 'footer.css', 'document.css'];
-  expect(Object.keys(files('tokens', { nativeControls: true }))).toEqual(['component-tokens.css', 'component-metrics.css', 'component-appearance.css', 'palette.css', 'table.css', 'text.css', 'empty.css', 'notice.css', 'kbd.css', 'dialog-placement.css', ...chrome, 'carousel.css', 'card.css', 'figures.css', 'row.css', 'controls.css']);
+  expect(Object.keys(files('tokens', { nativeControls: true }))).toEqual(['component-tokens.css', 'component-metrics.css', 'component-appearance.css', 'palette.css', 'table.css', 'text.css', 'empty.css', 'notice.css', 'kbd.css', 'dialog-placement.css', ...chrome, 'carousel.css', 'card.css', 'figures.css', 'progress.css', 'row.css', 'controls.css']);
   expect(Object.keys(files('tokens'))).not.toContain('text.css');
-  expect(Object.keys(files('root', { styles: ['grid.css'], fonts: false, nativeControls: true }))).toEqual(['grid.css', 'table.css', 'empty.css', 'notice.css', 'kbd.css', 'dialog-placement.css', ...chrome, 'carousel.css', 'card.css', 'figures.css', 'row.css', 'controls.css', 'text.css']);
+  expect(Object.keys(files('root', { styles: ['grid.css'], fonts: false, nativeControls: true }))).toEqual(['grid.css', 'table.css', 'empty.css', 'notice.css', 'kbd.css', 'dialog-placement.css', ...chrome, 'carousel.css', 'card.css', 'figures.css', 'progress.css', 'row.css', 'controls.css', 'text.css']);
   // Every sheet controls.css imports, and every sheet those import, is copied beside it, by either export.
   for (const copy of [files('tokens', { nativeControls: true }), files('root', { fonts: false, nativeControls: true })]) {
     for (const sheet of Object.keys(copy).filter(name => name.endsWith('.css'))) {

@@ -6,15 +6,14 @@ import { afterEach, expect, test, vi } from "vite-plus/test";
 vi.stubGlobal("fetch", vi.fn(async () => new Response("{}")));
 const { loadSharedWords, loadTranslations, setLanguage } = await import("../DS1/0-face/i18n");
 const { figureCells, formatFigure, meterAria } = await import("../DS1/2-core/figures");
-const { stepStates } = await import("../DS1/2-core/ds-steps");
+const { stepStates } = await import("../DS1/2-core/ds-progress");
 await import("../DS1/2-core/ds-stat");
-await import("../DS1/2-core/ds-meter");
-await import("../DS1/2-core/ds-steps");
+await import("../DS1/2-core/ds-progress");
 
 await loadSharedWords();
 afterEach(() => { document.body.replaceChildren(); setLanguage("en"); });
 
-async function mount<K extends "ds-stat" | "ds-meter" | "ds-steps">(tag: K, markup: string): Promise<HTMLElementTagNameMap[K]> {
+async function mount<K extends "ds-stat" | "ds-progress">(tag: K, markup: string): Promise<HTMLElementTagNameMap[K]> {
   document.body.innerHTML = markup;
   const element = document.querySelector(tag)!;
   await element.updateComplete;
@@ -99,12 +98,12 @@ test("with cells, every digit has a cell of one width and the figure is read who
 });
 
 test("a stat takes its label, figure and caption as slotted content, and anything else between figure and caption", async () => {
-  const stat = await mount("ds-stat", '<ds-stat><span slot="label">Received</span><span slot="figure">¥12,000</span><ds-meter value="0.4"></ds-meter><span slot="caption">of ¥30,000 planned</span></ds-stat>');
+  const stat = await mount("ds-stat", '<ds-stat><span slot="label">Received</span><span slot="figure">¥12,000</span><ds-progress value="0.4"></ds-progress><span slot="caption">of ¥30,000 planned</span></ds-stat>');
   expect(part(stat, "label").hasAttribute("hidden")).toBe(false);
   expect(part(stat, "caption").hasAttribute("hidden")).toBe(false);
   const order = [...part(stat, "stat").children].map(child => child.getAttribute("part") ?? child.tagName.toLowerCase());
   expect(order).toEqual(["label", "figure", "slot", "caption"]);
-  expect(stat.shadowRoot!.querySelector<HTMLSlotElement>("slot:not([name])")!.assignedElements()[0]!.tagName).toBe("DS-METER");
+  expect(stat.shadowRoot!.querySelector<HTMLSlotElement>("slot:not([name])")!.assignedElements()[0]!.tagName).toBe("DS-PROGRESS");
 });
 
 test("a stat is not focusable and has no role of its own", async () => {
@@ -125,15 +124,15 @@ test("a meter's values stay inside its range and its words say when it is over",
 
 test("a meter is role=meter with its values and the words in the current language", async () => {
   loadTranslations("da", { Spent: "Brugt" });
-  const meter = await mount("ds-meter", '<ds-meter label="Spent" value="7" max="10"></ds-meter>');
+  const meter = await mount("ds-progress", '<ds-progress label="Spent" value="7" max="10"></ds-progress>');
   expect(meter.getAttribute("role")).toBe("meter");
   expect(meter.getAttribute("aria-valuenow")).toBe("7");
   expect(meter.getAttribute("aria-valuemin")).toBe("0");
   expect(meter.getAttribute("aria-valuemax")).toBe("10");
   expect(meter.getAttribute("aria-valuetext")).toBe("7 of 10");
   expect(meter.getAttribute("aria-label")).toBe("Spent");
-  expect(part(meter, "meter").style.getPropertyValue("--ds-meter-value")).toBe("0.7");
-  expect(part(meter, "meter").classList.contains("ds-meter--over")).toBe(false);
+  expect(part(meter, "progress").style.getPropertyValue("--ds-progress-value")).toBe("0.7");
+  expect(part(meter, "progress").classList.contains("ds-progress--over")).toBe(false);
 
   setLanguage("da"); await meter.updateComplete;
   expect(meter.getAttribute("aria-valuetext")).toBe("7 af 10");
@@ -143,7 +142,7 @@ test("a meter is role=meter with its values and the words in the current languag
   expect(meter.getAttribute("aria-valuenow")).toBe("10");
   expect(meter.getAttribute("aria-valuetext")).toBe("12 af 10, 2 for meget");
   expect(meter.hasAttribute("data-over")).toBe(true);
-  expect(part(meter, "meter").classList.contains("ds-meter--over")).toBe(true);
+  expect(part(meter, "progress").classList.contains("ds-progress--over")).toBe(true);
 
   meter.valuetext = "¥118,200 of ¥100,000"; meter.literal = true; await meter.updateComplete;
   expect(meter.getAttribute("aria-valuetext")).toBe("¥118,200 of ¥100,000");
@@ -152,20 +151,20 @@ test("a meter is role=meter with its values and the words in the current languag
 });
 
 test("a meter in squares fills whole squares, all of them in the danger state when over", async () => {
-  const meter = await mount("ds-meter", '<ds-meter value="7" max="10" squares="10"></ds-meter>');
-  const squares = () => [...meter.shadowRoot!.querySelectorAll(".ds-meter__square")];
+  const meter = await mount("ds-progress", '<ds-progress value="7" max="10" squares="10"></ds-progress>');
+  const squares = () => [...meter.shadowRoot!.querySelectorAll(".ds-progress__square")];
   expect(squares()).toHaveLength(10);
-  expect(squares().filter(square => square.classList.contains("ds-meter__square--on"))).toHaveLength(7);
+  expect(squares().filter(square => square.classList.contains("ds-progress__square--on"))).toHaveLength(7);
   meter.value = 0.66; meter.max = 1; meter.squares = 3; await meter.updateComplete;
-  expect(squares().filter(square => square.classList.contains("ds-meter__square--on"))).toHaveLength(2);
+  expect(squares().filter(square => square.classList.contains("ds-progress__square--on"))).toHaveLength(2);
   meter.value = 4; await meter.updateComplete;
-  expect(part(meter, "meter").classList.contains("ds-meter--over")).toBe(true);
+  expect(part(meter, "progress").classList.contains("ds-progress--over")).toBe(true);
   meter.squares = 1000; await meter.updateComplete;
   expect(squares()).toHaveLength(100);
 });
 
 test("a meter is not focusable: it shows a value and takes no keys", async () => {
-  const meter = await mount("ds-meter", '<ds-meter value="0.5"></ds-meter>');
+  const meter = await mount("ds-progress", '<ds-progress value="0.5"></ds-progress>');
   expect(meter.tabIndex).toBe(-1);
   expect(meter.shadowRoot!.querySelectorAll("a, button, input, [tabindex]")).toHaveLength(0);
   meter.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
@@ -182,58 +181,58 @@ test("steps before the current one are done, the current one is aria-current=ste
 
 test("steps are an ordered list, numbered in the language, with the state said in words", async () => {
   loadTranslations("da", { Apply: "Ansøg", "Getting started": "Kom i gang" });
-  const steps = await mount("ds-steps", `<ds-steps current="2" label="Getting started" steps='["Apply", "Approval", "Connect payouts", "Start earning"]'></ds-steps>`);
+  const steps = await mount("ds-progress", `<ds-progress current="2" label="Getting started" steps='["Apply", "Approval", "Connect payouts", "Start earning"]'></ds-progress>`);
   const list = steps.shadowRoot!.querySelector("ol")!;
   expect(list.getAttribute("aria-label")).toBe("Getting started");
   const items = [...list.querySelectorAll("li")];
   expect(items.map(item => item.dataset.state)).toEqual(["done", "current", "upcoming", "upcoming"]);
   expect(items.map(item => item.getAttribute("aria-current"))).toEqual([null, "step", null, null]);
-  expect(items[0]!.querySelector(".ds-steps__mark ds-icon")!.getAttribute("type")).toBe("check");
-  expect(items[0]!.querySelector(".ds-steps__mark")!.getAttribute("aria-hidden")).toBe("true");
-  expect(words(items[0]!.querySelector(".ds-steps__state"))).toBe("Done");
-  expect(words(items[1]!.querySelector(".ds-steps__mark"))).toBe("2");
-  expect(items[1]!.querySelector(".ds-steps__state")).toBeNull();
-  expect(items[1]!.classList.contains("ds-steps__step--current")).toBe(true);
-  expect(items[2]!.className).toBe("ds-steps__step");
+  expect(items[0]!.querySelector(".ds-progress__mark ds-icon")!.getAttribute("type")).toBe("check");
+  expect(items[0]!.querySelector(".ds-progress__mark")!.getAttribute("aria-hidden")).toBe("true");
+  expect(words(items[0]!.querySelector(".ds-progress__state"))).toBe("Done");
+  expect(words(items[1]!.querySelector(".ds-progress__mark"))).toBe("2");
+  expect(items[1]!.querySelector(".ds-progress__state")).toBeNull();
+  expect(items[1]!.classList.contains("ds-progress__step--current")).toBe(true);
+  expect(items[2]!.className).toBe("ds-progress__step");
 
   setLanguage("da"); await steps.updateComplete;
   expect(list.getAttribute("aria-label")).toBe("Kom i gang");
-  expect(words(items[0]!.querySelector(".ds-steps__label"))).toBe("Ansøg");
-  expect(words(items[0]!.querySelector(".ds-steps__state"))).toBe("Færdig");
+  expect(words(items[0]!.querySelector(".ds-progress__label"))).toBe("Ansøg");
+  expect(words(items[0]!.querySelector(".ds-progress__state"))).toBe("Færdig");
 
   steps.steps = ["Apply", { label: "Approval", state: "failed" }]; await steps.updateComplete;
   const failed = steps.shadowRoot!.querySelectorAll("li")[1]!;
-  expect(failed.classList.contains("ds-steps__step--failed")).toBe(true);
-  expect(failed.querySelector(".ds-steps__mark ds-icon")!.getAttribute("type")).toBe("warning");
-  expect(words(failed.querySelector(".ds-steps__state"))).toBe("Mislykkedes");
+  expect(failed.classList.contains("ds-progress__step--failed")).toBe(true);
+  expect(failed.querySelector(".ds-progress__mark ds-icon")!.getAttribute("type")).toBe("warning");
+  expect(words(failed.querySelector(".ds-progress__state"))).toBe("Mislykkedes");
   expect(failed.hasAttribute("aria-current")).toBe(false);
 });
 
 test("a step with href is a link reached with Tab; the others take no focus", async () => {
-  const steps = await mount("ds-steps", `<ds-steps current="3" literal steps='[{"label": "Details", "href": "/details"}, {"label": "Address", "href": "/address"}, "Payment"]'></ds-steps>`);
+  const steps = await mount("ds-progress", `<ds-progress current="3" literal steps='[{"label": "Details", "href": "/details"}, {"label": "Address", "href": "/address"}, "Payment"]'></ds-progress>`);
   const focusable = [...steps.shadowRoot!.querySelectorAll<HTMLElement>("a[href], button, [tabindex]")];
   expect(focusable.map(element => element.getAttribute("href"))).toEqual(["/details", "/address"]);
   expect(focusable.every(link => link.closest("li")!.dataset.state === "done")).toBe(true);
   focusable[0]!.focus();
   expect(steps.shadowRoot!.activeElement).toBe(focusable[0]);
   // The link holds the step's mark and name, so its accessible name is the step's.
-  expect(words(focusable[1]!.querySelector(".ds-steps__label"))).toBe("Address");
+  expect(words(focusable[1]!.querySelector(".ds-progress__label"))).toBe("Address");
   expect(steps.shadowRoot!.querySelectorAll("li")[2]!.querySelector("a")).toBeNull();
 });
 
 test("a vertical sequence puts each step's slotted body under it, and hides the bodies it has not been given", async () => {
-  const steps = await mount("ds-steps", `<ds-steps vertical current="2" literal steps='["Apply", "Connect payouts"]'><p slot="step-2">Connect an account to get paid.</p></ds-steps>`);
+  const steps = await mount("ds-progress", `<ds-progress vertical current="2" literal steps='["Apply", "Connect payouts"]'><p slot="step-2">Connect an account to get paid.</p></ds-progress>`);
   const bodies = [...steps.shadowRoot!.querySelectorAll<HTMLElement>('[part="body"]')];
   expect(bodies.map(body => body.hasAttribute("hidden"))).toEqual([true, false]);
   expect(bodies[1]!.querySelector("slot")!.assignedElements()[0]!.textContent).toBe("Connect an account to get paid.");
-  expect(steps.shadowRoot!.querySelector("ol")!.classList.contains("ds-steps--vertical")).toBe(true);
+  expect(steps.shadowRoot!.querySelector("ol")!.classList.contains("ds-progress--vertical")).toBe(true);
   steps.vertical = false; await steps.updateComplete;
   expect(steps.shadowRoot!.querySelectorAll('[part="body"]')).toHaveLength(0);
 });
 
 test("the elements hide with hidden, and every element declares its properties rather than shadowing them", async () => {
   const css = (name: string) => readFileSync(join(import.meta.dirname, `../DS1/2-core/styles/${name}`), "utf8");
-  for (const sheet of ["ds-stat.css", "ds-meter.css", "ds-steps.css"]) expect(css(sheet)).toContain(":host([hidden])");
+  for (const sheet of ["ds-stat.css", "ds-progress.css"]) expect(css(sheet)).toContain(":host([hidden])");
   const stat = await mount("ds-stat", '<ds-stat value="1"></ds-stat>');
   expect(Object.hasOwn(stat, "value")).toBe(false);
 });
@@ -241,10 +240,15 @@ test("the elements hide with hidden, and every element declares its properties r
 test("the native classes are imported by controls.css and draw every part the elements use", () => {
   const sheet = (name: string) => readFileSync(join(import.meta.dirname, `../DS1/1-root/${name}`), "utf8");
   expect(sheet("controls.css")).toContain('@import "./figures.css";');
+  expect(sheet("controls.css")).toContain('@import "./progress.css";');
   const figures = sheet("figures.css");
-  for (const selector of [".ds-stat", ".ds-stat__label", ".ds-stat__figure", ".ds-stat__digit", ".ds-stat__caption", ".ds-stat__change", ".ds-stats", ".ds-meter", ".ds-meter__fill", ".ds-meter--squares", ".ds-meter__square", ".ds-meter--over", ".ds-steps", ".ds-steps__step", ".ds-steps__mark", ".ds-steps__label", ".ds-steps__state", ".ds-steps__link", ".ds-steps__body", ".ds-steps--vertical"]) {
+  for (const selector of [".ds-stat", ".ds-stat__label", ".ds-stat__figure", ".ds-stat__digit", ".ds-stat__caption", ".ds-stat__change", ".ds-stats"]) {
     expect(figures, selector).toMatch(new RegExp(`${selector.replace(/[.-]/g, m => `\\${m}`)}[\\s,{:.]`));
   }
+  const progress = sheet("progress.css");
+  for (const selector of [".ds-progress", ".ds-progress__fill", ".ds-progress--squares", ".ds-progress__square", ".ds-progress--over", ".ds-progress--steps", ".ds-progress__step", ".ds-progress__mark", ".ds-progress__label", ".ds-progress__state", ".ds-progress__link", ".ds-progress__body", ".ds-progress--vertical", ".ds-progress--dots", ".ds-progress__dot"]) {
+    expect(progress, selector).toMatch(new RegExp(`${selector.replace(/[.-]/g, m => `\\${m}`)}[\\s,{:.]`));
+  }
   // Motion only on transform.
-  for (const [, value] of figures.matchAll(/transition:\s*([^;]+);/g)) expect(value).toMatch(/^(transform\b|none$)/);
+  for (const [, value] of [...figures.matchAll(/transition:\s*([^;]+);/g), ...progress.matchAll(/transition:\s*([^;]+);/g)]) expect(value).toMatch(/^(transform\b|none$)/);
 });

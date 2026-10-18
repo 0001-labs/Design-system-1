@@ -136,14 +136,6 @@
     "url": "https://designsystem1.com/2-core/link/"
   },
   {
-    "id": "component:/2-core/meter/",
-    "code": "MTR",
-    "label": "Meter",
-    "kind": "component",
-    "summary": "Design system 1 2-core.",
-    "url": "https://designsystem1.com/2-core/meter/"
-  },
-  {
     "id": "component:/2-core/notice/",
     "code": "NOTE",
     "label": "Notice",
@@ -152,12 +144,12 @@
     "url": "https://designsystem1.com/2-core/notice/"
   },
   {
-    "id": "component:/2-core/pagedots/",
-    "code": "DOTS",
-    "label": "Page dots",
+    "id": "component:/2-core/progress/",
+    "code": "PROG",
+    "label": "Progress",
     "kind": "component",
     "summary": "Design system 1 2-core.",
-    "url": "https://designsystem1.com/2-core/pagedots/"
+    "url": "https://designsystem1.com/2-core/progress/"
   },
   {
     "id": "component:/2-core/stat/",
@@ -166,14 +158,6 @@
     "kind": "component",
     "summary": "Design system 1 2-core.",
     "url": "https://designsystem1.com/2-core/stat/"
-  },
-  {
-    "id": "component:/2-core/steps/",
-    "code": "STEP",
-    "label": "Steps",
-    "kind": "component",
-    "summary": "Design system 1 2-core.",
-    "url": "https://designsystem1.com/2-core/steps/"
   },
   {
     "id": "component:/2-core/text/",

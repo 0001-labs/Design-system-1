@@ -11,8 +11,8 @@ import { getText } from "../0-face/i18n";
 import { define } from "../0-face/define";
 import { COPY, autoplayInterval, bleedOf, driveCarousel, nearestSlide, prefersReducedMotion, scrollToSlide, type CarouselDrive } from "../0-face/carousel";
 import "../2-core/ds-icon";
-import "../2-core/ds-pagedots";
-import type { PagedotsSelectDetail } from "../2-core/ds-pagedots";
+import "../2-core/ds-progress";
+import type { ProgressSelectDetail } from "../2-core/ds-progress";
 import metrics from "../1-root/component-metrics.css?inline";
 import controls from "../1-root/controls.css?inline";
 import carousel from "../1-root/carousel.css?inline";
@@ -79,7 +79,11 @@ export class Carousel extends LitElement {
     buttons: { type: Boolean, reflect: true },
     noDots: { type: Boolean, reflect: true, attribute: "no-dots" },
     end: { type: Boolean, reflect: true },
-    slideWidth: { attribute: "slide-width", reflect: true },
+    // A number of squares, or "auto" for slides of their own width.
+    slideWidth: { attribute: "slide-width", reflect: true, converter: {
+      fromAttribute: (value: string | null) => (value === null ? undefined : value === "auto" ? "auto" : Number(value)),
+      toAttribute: (value: number | string | undefined) => (value === undefined ? null : String(value)),
+    } },
     gap: { type: Number },
     bleed: { type: String, reflect: true },
     loop: { type: Boolean, reflect: true },
@@ -306,7 +310,7 @@ export class Carousel extends LitElement {
 
   private readonly ended = () => { this.pending = undefined; };
 
-  private readonly picked = (event: CustomEvent<PagedotsSelectDetail>) => {
+  private readonly picked = (event: CustomEvent<ProgressSelectDetail>) => {
     // The dots are this carousel's own; their pick becomes its change.
     event.stopPropagation();
     event.preventDefault();
@@ -346,7 +350,7 @@ export class Carousel extends LitElement {
                 ><ds-icon type=${this.paused ? "play-alt" : "pause"} aria-hidden="true"></ds-icon></button>`
               : nothing}
             ${this.buttons ? button("previous") : nothing}
-            ${dots ? html`<ds-pagedots part="dots" .count=${this.count} .active=${index} ?end=${this.end} @select=${this.picked}></ds-pagedots>` : nothing}
+            ${dots ? html`<ds-progress part="dots" .dots=${this.count} .active=${index} ?end=${this.end} @select=${this.picked}></ds-progress>` : nothing}
             ${this.buttons ? button("next") : nothing}
           </div>`
         : nothing}

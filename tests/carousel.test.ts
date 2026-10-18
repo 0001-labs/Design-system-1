@@ -6,22 +6,22 @@ import { afterEach, expect, test, vi } from "vite-plus/test";
 vi.stubGlobal("fetch", vi.fn(async () => new Response("{}")));
 const { configureI18n, loadSharedWords, setLanguage } = await import("../DS1/0-face/i18n");
 const script = await import("../DS1/0-face/carousel");
-await import("../DS1/2-core/ds-pagedots");
+await import("../DS1/2-core/ds-progress");
 await import("../DS1/3-unit/ds-carousel");
-type Dots = HTMLElementTagNameMap["ds-pagedots"];
+type Dots = HTMLElementTagNameMap["ds-progress"];
 type Carousel = HTMLElementTagNameMap["ds-carousel"];
 
 afterEach(() => { document.body.replaceChildren(); setLanguage("en"); script.setCarouselWords(null); vi.restoreAllMocks(); });
 
 const sheet = (name: string) => readFileSync(join(import.meta.dirname, `../DS1/${name}`), "utf8");
 const settle = async (element: { updateComplete: Promise<unknown> }) => { await element.updateComplete; await new Promise(resolve => setTimeout(resolve)); await element.updateComplete; };
-const dotsOf = (host: Element) => [...(host.shadowRoot ?? host).querySelectorAll<HTMLButtonElement>(".ds-pagedots__dot")];
+const dotsOf = (host: Element) => [...(host.shadowRoot ?? host).querySelectorAll<HTMLButtonElement>(".ds-progress__dot")];
 const states = (host: Element) => dotsOf(host).map(dot => dot.dataset.state);
 const key = (target: Element, name: string) => target.dispatchEvent(new KeyboardEvent("keydown", { key: name, bubbles: true, composed: true, cancelable: true }));
 
 async function pagedots(attributes = "") {
-  document.body.innerHTML = `<ds-pagedots ${attributes}></ds-pagedots>`;
-  const dots = document.querySelector("ds-pagedots") as Dots;
+  document.body.innerHTML = `<ds-progress ${attributes}></ds-progress>`;
+  const dots = document.querySelector("ds-progress") as Dots;
   await dots.updateComplete;
   return dots;
 }
@@ -51,8 +51,8 @@ test("arrow keys follow the reading direction; Home and End go to the ends", () 
   expect(script.dotForKey("Enter", 0, 4)).toBeUndefined();
 });
 
-test("today's page dots still draw from count and active, now as buttons in a labelled group", async () => {
-  const dots = await pagedots('count="3" active="0"');
+test("dots draw from dots and active, as buttons in a labelled group", async () => {
+  const dots = await pagedots('dots="3" active="0"');
   expect(dotsOf(dots)).toHaveLength(3);
   expect(dots.getAttribute("role")).toBe("group");
   expect(dots.getAttribute("aria-label")).toBe("Slides");
@@ -61,17 +61,17 @@ test("today's page dots still draw from count and active, now as buttons in a la
   expect(states(dots)).toEqual(["current", "next", "future"]);
   dots.active = 2; await dots.updateComplete;
   expect(states(dots)).toEqual(["past", "past", "current"]);
-  dots.count = 0; await dots.updateComplete;
+  dots.dots = 0; await dots.updateComplete;
   expect(dotsOf(dots)).toHaveLength(0);
 });
 
 test("only the current dot is in the tab order", async () => {
-  const dots = await pagedots('count="4" active="1"');
+  const dots = await pagedots('dots="4" active="1"');
   expect(dotsOf(dots).map(dot => dot.tabIndex)).toEqual([-1, 0, -1, -1]);
 });
 
 test("a click fires a cancelable select with the dot and the one before it, and makes it current", async () => {
-  const dots = await pagedots('count="4" end');
+  const dots = await pagedots('dots="4" end');
   const picks: unknown[] = [];
   dots.addEventListener("select", event => picks.push((event as CustomEvent).detail));
   dotsOf(dots)[2]!.click(); await dots.updateComplete;
@@ -84,7 +84,7 @@ test("a click fires a cancelable select with the dot and the one before it, and 
 });
 
 test("the arrow keys, Home and End move between the dots and pick them, focus following", async () => {
-  const dots = await pagedots('count="4"');
+  const dots = await pagedots('dots="4"');
   const picks: number[] = [];
   dots.addEventListener("select", event => picks.push((event as CustomEvent).detail.index));
   dotsOf(dots)[0]!.focus();
@@ -103,7 +103,7 @@ test("the dots' words are the shared words in the page's language, or the page's
   configureI18n({ languages: ["en", "da"], sharedWords: true });
   await loadSharedWords();
   setLanguage("da");
-  const dots = await pagedots('count="2"');
+  const dots = await pagedots('dots="2"');
   expect(dots.getAttribute("aria-label")).toBe("Dias");
   expect(dotsOf(dots)[1]!.getAttribute("aria-label")).toBe("Dias 2");
   dots.label = "Pages"; dots.dotLabel = "Page {index}"; dots.literal = true; await dots.updateComplete;
@@ -131,7 +131,7 @@ test("a carousel is a named region of labelled slides with a dot each", async ()
   expect(slides.map(slide => slide.getAttribute("role"))).toEqual(["group", "group", "group", "group"]);
   expect(slides.map(slide => slide.getAttribute("aria-roledescription"))).toEqual(["Slide", "Slide", "Slide", "Slide"]);
   expect(slides.map(slide => slide.getAttribute("aria-label"))).toEqual(["1 of 4", "2 of 4", "3 of 4", "4 of 4"]);
-  const dots = element.shadowRoot!.querySelector("ds-pagedots")!;
+  const dots = element.shadowRoot!.querySelector("ds-progress")!;
   expect(dotsOf(dots)).toHaveLength(4);
   expect(element.shadowRoot!.querySelector(".ds-carousel__previous")).toBeNull();
   expect(element.shadowRoot!.querySelector('[aria-live="polite"]')!.textContent).toBe("");
@@ -148,7 +148,7 @@ test("labels the page wrote are kept, and slides added later are counted", async
   element.append(Object.assign(document.createElement("figure"), { textContent: "Three" }));
   await settle(element);
   expect(second!.getAttribute("aria-label")).toBe("2 of 3");
-  expect(dotsOf(element.shadowRoot!.querySelector("ds-pagedots")!)).toHaveLength(3);
+  expect(dotsOf(element.shadowRoot!.querySelector("ds-progress")!)).toHaveLength(3);
 });
 
 test("previous and next take the left and right icons, are named, and stop at the ends", async () => {
@@ -175,7 +175,7 @@ test("a dot inside the carousel moves it; its select stays inside and comes out 
   const outside: string[] = [];
   document.body.addEventListener("select", () => outside.push("select"));
   element.addEventListener("change", event => outside.push(`change ${(event as CustomEvent).detail.index}`));
-  const dots = element.shadowRoot!.querySelector("ds-pagedots")!;
+  const dots = element.shadowRoot!.querySelector("ds-progress")!;
   dotsOf(dots)[3]!.click(); await element.updateComplete; await dots.updateComplete;
   expect(outside).toEqual(["change 3"]);
   expect(element.current).toBe(3);
@@ -185,11 +185,11 @@ test("a dot inside the carousel moves it; its select stays inside and comes out 
 
 test("setting current moves the carousel without a change event", async () => {
   const element = await carousel('current="2"');
-  expect(element.shadowRoot!.querySelector("ds-pagedots")!.active).toBe(2);
+  expect(element.shadowRoot!.querySelector("ds-progress")!.active).toBe(2);
   const changes: unknown[] = [];
   element.addEventListener("change", event => changes.push(event));
   element.goTo(0); await element.updateComplete;
-  expect(element.shadowRoot!.querySelector("ds-pagedots")!.active).toBe(0);
+  expect(element.shadowRoot!.querySelector("ds-progress")!.active).toBe(0);
   expect(changes).toEqual([]);
 });
 
@@ -257,7 +257,7 @@ test("the script gives native markup the same region, slides, dots, buttons and 
     <div class="ds-carousel__track"><figure>One</figure><figure aria-label="Two, blue">Two</figure><figure>Three</figure></div>
     <div class="ds-carousel__controls">
       <button class="ds-button ds-button--icon ds-carousel__previous" type="button"></button>
-      <div class="ds-pagedots" data-end></div>
+      <div class="ds-progress ds-progress--dots" data-end></div>
       <button class="ds-button ds-button--icon ds-carousel__next" type="button"></button>
     </div>
   </section>`;
@@ -267,7 +267,7 @@ test("the script gives native markup the same region, slides, dots, buttons and 
   expect(block.getAttribute("aria-roledescription")).toBe("Carousel");
   expect(block.getAttribute("aria-label")).toBe("Colours");
   expect([...block.querySelectorAll("figure")].map(slide => slide.getAttribute("aria-label"))).toEqual(["1 of 3", "Two, blue", "3 of 3"]);
-  const dots = block.querySelector<HTMLElement>(".ds-pagedots")!;
+  const dots = block.querySelector<HTMLElement>(".ds-progress--dots")!;
   expect(dots.getAttribute("role")).toBe("group");
   expect(states(dots)).toEqual(["current", "next", "end"]);
   expect(dotsOf(dots).map(dot => dot.tabIndex)).toEqual([0, -1, -1]);
@@ -288,7 +288,7 @@ test("the script gives native markup the same region, slides, dots, buttons and 
 });
 
 test("the script's words follow the language module, or the page's own", async () => {
-  document.body.innerHTML = '<div class="ds-carousel"><div class="ds-carousel__track"><p>One</p><p>Two</p></div><div class="ds-pagedots"></div></div>';
+  document.body.innerHTML = '<div class="ds-carousel"><div class="ds-carousel__track"><p>One</p><p>Two</p></div><div class="ds-progress ds-progress--dots"></div></div>';
   configureI18n({ languages: ["en", "ja"], sharedWords: true });
   await loadSharedWords();
   const stop = script.startCarousels();
@@ -298,22 +298,25 @@ test("the script's words follow the language module, or the page's own", async (
   setLanguage("ja");
   expect(block.getAttribute("aria-roledescription")).toBe("カルーセル");
   expect(block.querySelector("p")!.getAttribute("aria-label")).toBe("2 枚中 1 枚目");
-  expect(block.querySelector(".ds-pagedots__dot")!.getAttribute("aria-label")).toBe("スライド 1");
+  expect(block.querySelector(".ds-progress__dot")!.getAttribute("aria-label")).toBe("スライド 1");
   stop();
   script.setCarouselWords({ "Slide {index}": "Card {index}" });
-  document.body.innerHTML = '<div class="ds-pagedots"></div>';
-  script.startPagedots(document.querySelector<HTMLElement>(".ds-pagedots")!, { count: 2 });
-  expect(dotsOf(document.querySelector(".ds-pagedots")!)[1]!.getAttribute("aria-label")).toBe("Card 2");
+  document.body.innerHTML = '<div class="ds-progress ds-progress--dots"></div>';
+  script.startDots(document.querySelector<HTMLElement>(".ds-progress--dots")!, { count: 2 });
+  expect(dotsOf(document.querySelector(".ds-progress--dots")!)[1]!.getAttribute("aria-label")).toBe("Card 2");
 });
 
 test("the dots and the carousel are drawn on the square, autoplay is opt-in, and motion is only on transform", () => {
   const css = sheet("1-root/carousel.css").replace(/\/\*[\s\S]*?\*\//g, "");
-  expect(css).toMatch(/\.ds-pagedots__dot \{[^}]*width: var\(--ds-unit\);[^}]*height: var\(--ds-unit\);/);
+  const dots = sheet("1-root/progress.css").replace(/\/\*[\s\S]*?\*\//g, "");
+  expect(dots).toMatch(/\.ds-progress__dot \{[^}]*width: var\(--ds-unit\);[^}]*height: var\(--ds-unit\);/);
   expect(css).toMatch(/\.ds-carousel__controls \{[^}]*height: var\(--ds-row-height\);/);
   expect(css).toMatch(/\.ds-carousel__track \{[^}]*scroll-snap-type: x mandatory;/);
   expect(css).toMatch(/column-gap: var\(--ds-carousel-gap, var\(--ds-unit\)\);/);
   for (const [, value] of css.matchAll(/transition: ([^;]+);/g)) expect(value).toMatch(/^(transform [^,]+|none)$/);
-  expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\) \{\s*\.ds-pagedots__dot::before \{\s*transition: none;/);
+  // The dots share progress.css with the bar, whose fill grows along an easing curve: still transform alone.
+  for (const [, value] of dots.matchAll(/transition: ([^;]+);/g)) expect(value).toMatch(/^(transform\b|none$)/);
+  expect(dots).toMatch(/@media \(prefers-reduced-motion: reduce\) \{\s*\.ds-progress__dot::before \{\s*transition: none;/);
   expect(sheet("1-root/controls.css")).toContain('@import "./carousel.css";');
   expect(script.autoplayInterval(null)).toBe(0);
   expect(sheet("3-unit/ds-carousel.ts")).toContain("this.autoplay = null;");

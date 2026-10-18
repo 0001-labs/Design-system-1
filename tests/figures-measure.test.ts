@@ -113,15 +113,15 @@ test("a meter is one square high with a bar half a square high across its middle
   for (const { scheme, scale, unit } of each) {
     const page = pages[scheme];
     await stage(page, scale, `
-      <ds-meter value="0.25" style="width: ${8 * unit}px"></ds-meter>
-      <div class="ds-meter" role="meter" aria-valuenow="0.25" aria-valuemin="0" aria-valuemax="1" style="--ds-meter-value: 0.25; width: ${8 * unit}px"><span class="ds-meter__fill"></span></div>
-      <ds-meter value="12" max="10" style="width: ${8 * unit}px"></ds-meter>`);
+      <ds-progress value="0.25" style="width: ${8 * unit}px"></ds-progress>
+      <div class="ds-progress" role="meter" aria-valuenow="0.25" aria-valuemin="0" aria-valuemax="1" style="--ds-progress-value: 0.25; width: ${8 * unit}px"><span class="ds-progress__fill"></span></div>
+      <ds-progress value="12" max="10" style="width: ${8 * unit}px"></ds-progress>`);
     const meters = await page.evaluate(() => [...document.getElementById("surface")!.children].map(host => {
       const root = host.shadowRoot ?? host;
       const r = host.getBoundingClientRect();
-      const fill = root.querySelector(".ds-meter__fill")!;
+      const fill = root.querySelector(".ds-progress__fill")!;
       const f = fill.getBoundingClientRect();
-      const track = getComputedStyle(host.shadowRoot ? root.querySelector(".ds-meter")! : host, "::before");
+      const track = getComputedStyle(host.shadowRoot ? root.querySelector(".ds-progress")! : host, "::before");
       return { height: r.height, width: f.width, left: f.left - r.left, top: f.top - r.top, barHeight: f.height, color: getComputedStyle(fill).backgroundColor, trackTop: parseFloat(track.top), trackHeight: parseFloat(track.height) };
     }));
     for (const meter of meters.slice(0, 2)) {
@@ -136,13 +136,13 @@ test("a meter in squares draws one square per step of its range, each on the gri
   for (const { scheme, scale, unit } of each) {
     const page = pages[scheme];
     await stage(page, scale, `
-      <ds-meter value="7" max="10" squares="10"></ds-meter>
-      <div class="ds-meter ds-meter--squares" role="meter" aria-valuenow="2" aria-valuemin="0" aria-valuemax="3"><span class="ds-meter__square ds-meter__square--on"></span><span class="ds-meter__square ds-meter__square--on"></span><span class="ds-meter__square"></span></div>
-      <ds-meter value="4" max="3" squares="3"></ds-meter>`);
+      <ds-progress value="7" max="10" squares="10"></ds-progress>
+      <div class="ds-progress ds-progress--squares" role="meter" aria-valuenow="2" aria-valuemin="0" aria-valuemax="3"><span class="ds-progress__square ds-progress__square--on"></span><span class="ds-progress__square ds-progress__square--on"></span><span class="ds-progress__square"></span></div>
+      <ds-progress value="4" max="3" squares="3"></ds-progress>`);
     const meters = await page.evaluate(() => [...document.getElementById("surface")!.children].map(host => {
       const root = host.shadowRoot ?? host;
       const r = host.getBoundingClientRect();
-      return { height: r.height, squares: [...root.querySelectorAll(".ds-meter__square")].map(square => {
+      return { height: r.height, squares: [...root.querySelectorAll(".ds-progress__square")].map(square => {
         const s = square.getBoundingClientRect();
         return { left: s.left - r.left, top: s.top - r.top, width: s.width, height: s.height, color: getComputedStyle(square).backgroundColor };
       }) };
@@ -161,16 +161,16 @@ test("steps stand one square high, each step on whole squares with its mark one 
   for (const { scheme, scale, unit } of each) {
     const page = pages[scheme];
     await stage(page, scale, `
-      <ds-steps current="2" steps='["Apply", "Approval", "Connect payouts", "Start earning"]' literal></ds-steps>
-      <ol class="ds-steps"><li class="ds-steps__step ds-steps__step--done"><span class="ds-steps__mark">1</span><span class="ds-steps__label">Apply</span></li><li class="ds-steps__step ds-steps__step--current" aria-current="step"><span class="ds-steps__mark">2</span><span class="ds-steps__label">Approval</span></li><li class="ds-steps__step"><span class="ds-steps__mark">3</span><span class="ds-steps__label">Connect payouts</span></li><li class="ds-steps__step"><span class="ds-steps__mark">4</span><span class="ds-steps__label">Start earning</span></li></ol>`);
+      <ds-progress current="2" steps='["Apply", "Approval", "Connect payouts", "Start earning"]' literal></ds-progress>
+      <ol class="ds-progress ds-progress--steps"><li class="ds-progress__step ds-progress__step--done"><span class="ds-progress__mark">1</span><span class="ds-progress__label">Apply</span></li><li class="ds-progress__step ds-progress__step--current" aria-current="step"><span class="ds-progress__mark">2</span><span class="ds-progress__label">Approval</span></li><li class="ds-progress__step"><span class="ds-progress__mark">3</span><span class="ds-progress__label">Connect payouts</span></li><li class="ds-progress__step"><span class="ds-progress__mark">4</span><span class="ds-progress__label">Start earning</span></li></ol>`);
     const [element, native] = await page.evaluate(() => [...document.getElementById("surface")!.children].map(host => {
       const root = host.shadowRoot ?? host;
       const list = (host.shadowRoot ? root.querySelector("ol")! : host).getBoundingClientRect();
       return { height: list.height, steps: [...root.querySelectorAll("li")].map(step => {
         const s = step.getBoundingClientRect();
-        const mark = step.querySelector(".ds-steps__mark")!;
+        const mark = step.querySelector(".ds-progress__mark")!;
         const m = mark.getBoundingClientRect();
-        const label = getComputedStyle(step.querySelector(".ds-steps__label")!);
+        const label = getComputedStyle(step.querySelector(".ds-progress__label")!);
         return { left: s.left - list.left, top: s.top - list.top, width: s.width, height: s.height, markLeft: m.left - s.left, markTop: m.top - s.top, mark: m.width, markHeight: m.height,
           markColor: getComputedStyle(mark).backgroundColor, labelFamily: label.fontFamily, labelColor: label.color };
       }) };
@@ -196,14 +196,14 @@ test("steps stand one square high, each step on whole squares with its mark one 
 test("a failed step is in the danger colour, and a vertical sequence puts a step on each square with its body under it", async () => {
   for (const { scheme, scale, unit } of each) {
     const page = pages[scheme];
-    await stage(page, scale, `<ds-steps vertical current="3" literal steps='["Apply", {"label": "Approval", "state": "failed"}, "Connect payouts", "Start earning"]'><ds-text slot="step-3" literal tone="muted">Connect an account to get paid.</ds-text></ds-steps>`);
+    await stage(page, scale, `<ds-progress vertical current="3" literal steps='["Apply", {"label": "Approval", "state": "failed"}, "Connect payouts", "Start earning"]'><ds-text slot="step-3" literal tone="muted">Connect an account to get paid.</ds-text></ds-progress>`);
     const layout = await page.evaluate(() => {
-      const root = document.querySelector("ds-steps")!.shadowRoot!;
+      const root = document.querySelector("ds-progress")!.shadowRoot!;
       const list = root.querySelector("ol")!.getBoundingClientRect();
       const failed = root.querySelectorAll("li")[1]!;
-      const body = document.querySelector('ds-steps [slot="step-3"]')!.getBoundingClientRect();
+      const body = document.querySelector('ds-progress [slot="step-3"]')!.getBoundingClientRect();
       return { height: list.height, tops: [...root.querySelectorAll("li")].map(step => step.getBoundingClientRect().top - list.top),
-        failedMark: getComputedStyle(failed.querySelector(".ds-steps__mark")!).backgroundColor, failedLabel: getComputedStyle(failed.querySelector(".ds-steps__label")!).color,
+        failedMark: getComputedStyle(failed.querySelector(".ds-progress__mark")!).backgroundColor, failedLabel: getComputedStyle(failed.querySelector(".ds-progress__label")!).color,
         body: { left: body.left - list.left, top: body.top - list.top, height: body.height } };
     });
     expect(layout.tops, `${scheme} ${scale}`).toEqual([0, unit, 2 * unit, 4 * unit]);

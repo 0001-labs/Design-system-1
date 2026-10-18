@@ -37,7 +37,7 @@ test("a native strip copies nothing without loop", () => {
 });
 
 test("a native loop holds the slides three times over, the copies inert, hidden and without ids, and stopping removes them", () => {
-  document.body.innerHTML = `<section class="ds-carousel" aria-label="Work" data-slides="auto" data-loop><div class="ds-carousel__track">${items(3)}</div><div class="ds-pagedots"></div></section>`;
+  document.body.innerHTML = `<section class="ds-carousel" aria-label="Work" data-slides="auto" data-loop><div class="ds-carousel__track">${items(3)}</div><div class="ds-progress ds-progress--dots"></div></section>`;
   const stop = script.startCarousels();
   const track = document.querySelector(".ds-carousel__track")!;
   const copies = [...track.querySelectorAll<HTMLElement>(`[${script.COPY}]`)];
@@ -46,7 +46,7 @@ test("a native loop holds the slides three times over, the copies inert, hidden 
   expect(copies.every(copy => copy.getAttribute("aria-hidden") === "true" && copy.inert && !copy.id)).toBe(true);
   expect([...track.children].slice(3, 6).map(item => item.id)).toEqual(["card-0", "card-1", "card-2"]);
   // A looping strip has no place to point to, so its dots stay empty.
-  expect(document.querySelectorAll(".ds-pagedots__dot")).toHaveLength(0);
+  expect(document.querySelectorAll(".ds-progress__dot")).toHaveLength(0);
   stop();
   expect(track.children).toHaveLength(3);
 });
@@ -97,7 +97,7 @@ test("a looping ds-carousel keeps its slides, counts no copies among them and dr
   await settle(strip);
   expect(strip.children).toHaveLength(9);
   expect(strip.slides).toHaveLength(3);
-  expect(strip.shadowRoot!.querySelector("ds-pagedots")).toBeNull();
+  expect(strip.shadowRoot!.querySelector("ds-progress")).toBeNull();
   expect(strip.shadowRoot!.querySelector<HTMLButtonElement>(".ds-carousel__previous")!.disabled).toBe(false);
 });
 

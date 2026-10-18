@@ -94,14 +94,21 @@ const directoryColumns: ComponentColumn[] = ALL_LAYERS.flatMap(layer => layer.en
 })));
 export const IMPLEMENTATION_COLUMNS: ComponentColumn[] = [
   ...directoryColumns,
-  ...["button", "split", "checkbox", "radio", "switch", "text", "badge", "token", "avatar", "icon", "input", "file-picker", "color", "swatch", "select", "textarea", "composer", "tooltip", "cycle", "date", "language", "gap", "banner", "empty", "notice", "kbd", "stat", "meter", "steps", "card", "pagedots", "chart", "toast", "toggle", "loading", "spacing-handle"].map(id => ({ id, name: id, group: "Core" })),
+  ...["button", "split", "checkbox", "radio", "switch", "text", "badge", "token", "avatar", "icon", "input", "file-picker", "color", "swatch", "select", "textarea", "composer", "tooltip", "cycle", "date", "language", "gap", "banner", "empty", "notice", "kbd", "stat", "meter", "steps", "progress", "card", "pagedots", "chart", "toast", "toggle", "loading", "spacing-handle"].map(id => ({ id, name: id, group: "Core" })),
   ...["token-field", "avatar-group", "calendar", "calendar-large", "date-picker", "matrix", "carousel", "slide", "row", "list", "tabs", "menu", "accordion", "form", "table", "sidebar", "tree", "navigation", "unit-card"].map(id => ({ id, name: id, group: "Unit" })),
   ...["dialog", "panel", "container", "layout", "grid", "page", "header", "footer", "document"].map(id => ({ id, name: id, group: "Page" })),
 ].filter((column, index, columns) => columns.findIndex(other => other.id === column.id) === index);
-const family = (id: string) => id === "split" ? "button" : id === "switch" ? "toggle" : id;
-const specialistNames: Record<string, string> = { "file-picker": "File picker", textarea: "Text area", pagedots: "Page dots", "token-field": "Token field", "avatar-group": "Avatar group", "spacing-handle": "Spacing handle" };
+/** Retired names fold into the component that took them over, so a product's older copy still counts there. */
+const FAMILY: Record<string, string> = {
+  split: "button", toggle: "switch", textarea: "input", language: "cycle", banner: "notice",
+  meter: "progress", steps: "progress", pagedots: "progress", slide: "carousel", tree: "sidebar", layout: "page",
+};
+/** Retired with nothing taking their place. */
+const RETIRED = new Set(["date"]);
+const family = (id: string) => FAMILY[id] ?? id;
+const specialistNames: Record<string, string> = { "file-picker": "File picker", "token-field": "Token field", "avatar-group": "Avatar group", "spacing-handle": "Spacing handle" };
 /** Names and layers come from the same catalogue as the documentation and editor. */
-export const COMPONENT_COLUMNS: ComponentColumn[] = IMPLEMENTATION_COLUMNS.filter(column => family(column.id) === column.id).map(column => {
+export const COMPONENT_COLUMNS: ComponentColumn[] = IMPLEMENTATION_COLUMNS.filter(column => family(column.id) === column.id && !RETIRED.has(column.id)).map(column => {
   const layer = ALL_LAYERS.find(layer => layer.number > 1 && layer.entries.some(entry => entry.tag === `ds-${column.id}` || (column.id === "unit-card" ? entry.href === "/3-unit/card/" : !entry.tag && entry.href.split("/").filter(Boolean).at(-1) === column.id)));
   const entry = layer?.entries.find(entry => entry.tag === `ds-${column.id}` || (column.id === "unit-card" ? entry.href === "/3-unit/card/" : !entry.tag && entry.href.split("/").filter(Boolean).at(-1) === column.id));
   return { id: column.id, name: directoryColumns.find(c => c.id === column.id)?.name ?? entry?.name ?? specialistNames[column.id] ?? column.id[0]!.toUpperCase() + column.id.slice(1), group: layer?.name ?? column.group };

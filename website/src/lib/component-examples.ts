@@ -298,8 +298,8 @@ render();`,
   },
   'pagedots': {
     title: 'Where you are, and where you can go', hint: 'Click a dot, or focus one and use the arrow keys, Home and End. Each pick fires select.',
-    html: `<ds-pagedots count="6" active="2"></ds-pagedots>
-<ds-pagedots count="4" active="0" end></ds-pagedots>`,
+    html: `<ds-progress dots="6" active="2"></ds-progress>
+<ds-progress dots="4" active="0" end></ds-progress>`,
     height: 140,
   },
   'calendar': {
@@ -446,7 +446,7 @@ matrix.marks = [
   <ds-stat label="Members" value="12840" literal></ds-stat>
   <ds-stat label="Revenue" value="1234.5" format="money" currency="EUR" change="0.12" change-format="percent" caption="Since last month" literal></ds-stat>
   <ds-stat label="Over budget" value="18200" format="money" currency="JPY" tone="danger" literal>
-    <ds-meter label="Spent" value="118200" max="100000" format="money" currency="JPY" literal></ds-meter>
+    <ds-progress label="Spent" value="118200" max="100000" format="money" currency="JPY" literal></ds-progress>
     <span slot="caption">Of ¥100,000 planned</span>
   </ds-stat>
 </div>`,
@@ -454,17 +454,17 @@ matrix.marks = [
   },
   'meter': {
     title: 'A bar, squares and over', hint: 'The words say the value and when it is past the end: 12 of 10, over by 2.',
-    html: `<ds-meter label="Spent" value="7400" max="10000" literal></ds-meter>
-<ds-meter label="Seats" value="7" max="10" squares="10" literal></ds-meter>
-<ds-meter label="Tickets" value="12" max="10" squares="10" literal></ds-meter>`,
+    html: `<ds-progress label="Spent" value="7400" max="10000" literal></ds-progress>
+<ds-progress label="Seats" value="7" max="10" squares="10" literal></ds-progress>
+<ds-progress label="Tickets" value="12" max="10" squares="10" literal></ds-progress>`,
     height: 120,
   },
   'steps': {
     title: 'Where someone is', hint: 'The current step is aria-current="step"; done steps say so in hidden words. The vertical sequence has room under each step.',
-    html: `<ds-steps current="2" label="Getting started" steps='["Apply", "Approval", "Connect payouts", "Start earning"]' literal></ds-steps>
-<ds-steps vertical current="3" steps='["Apply", "Approval", "Connect payouts", "Start earning"]' literal>
+    html: `<ds-progress current="2" label="Getting started" steps='["Apply", "Approval", "Connect payouts", "Start earning"]' literal></ds-progress>
+<ds-progress vertical current="3" steps='["Apply", "Approval", "Connect payouts", "Start earning"]' literal>
   <ds-text slot="step-3" literal tone="muted">Connect a payout account to get paid.</ds-text>
-</ds-steps>`,
+</ds-progress>`,
     height: 200,
   },
   'card': {
@@ -626,8 +626,8 @@ export const PAGE_EXAMPLES: Record<string, string[]> = {
   '2-core/input': ['input', 'input-states'],
   '2-core/text': ['text'],
   '2-core/card': ['card', 'card-outlined'],
-  '2-core/empty': ['empty', 'empty-search'], '2-core/notice': ['notice', 'banner', 'banner-dismiss'], '2-core/kbd': ['kbd'], '2-core/pagedots': ['pagedots'],
-  '2-core/stat': ['stat'], '2-core/meter': ['meter'], '2-core/steps': ['steps'],
+  '2-core/empty': ['empty', 'empty-search'], '2-core/notice': ['notice', 'banner', 'banner-dismiss'], '2-core/kbd': ['kbd'],
+  '2-core/stat': ['stat'], '2-core/progress': ['meter', 'steps', 'pagedots'],
   '2-core/cycle': ['cycle', 'language'],
   '2-core/gap': ['gap'],
   '3-unit/row': ['row', 'row-centered'], '3-unit/list': ['list'], '3-unit/sidebar': ['sidebar', 'tree'],

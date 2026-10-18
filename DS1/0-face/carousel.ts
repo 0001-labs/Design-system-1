@@ -1,7 +1,8 @@
 /**
- * Carousels without Lit: the behaviour of `.ds-carousel` and `.ds-pagedots`
- * (drawn by `1-root/carousel.css`) on a page's own markup, and the pieces
- * `ds-carousel` and `ds-pagedots` share with it. No framework and no imports.
+ * Carousels without Lit: the behaviour of `.ds-carousel` (drawn by
+ * `1-root/carousel.css`) and its dots (`.ds-progress--dots`, from
+ * `progress.css`) on a page's own markup, and the pieces `ds-carousel` and
+ * `ds-progress` share with it. No framework and no imports.
  *
  * ```html
  * <section class="ds-carousel" aria-label="Colours">
@@ -11,7 +12,7 @@
  *   </div>
  *   <div class="ds-carousel__controls">
  *     <button class="ds-button ds-button--icon ds-carousel__previous" type="button">…</button>
- *     <div class="ds-pagedots"></div>
+ *     <div class="ds-progress ds-progress--dots"></div>
  *     <button class="ds-button ds-button--icon ds-carousel__next" type="button">…</button>
  *   </div>
  * </section>
@@ -23,7 +24,7 @@
  *
  * `startCarousels()` starts every `.ds-carousel` on the page: it makes the
  * block a region described as a carousel, each slide a group labelled "2 of
- * 5" (unless the page labels it), fills `.ds-pagedots` with a dot for each
+ * 5" (unless the page labels it), fills `.ds-progress--dots` with a dot for each
  * slide, keeps the dots and the buttons on the slide in view, and announces
  * the current slide politely in a `.ds-carousel__status` it adds. Dots take
  * the arrow keys, Home and End. Scrolling is instant when the reader asks for
@@ -366,8 +367,8 @@ function drawIcon(button: HTMLButtonElement, icon: string, base: string) {
   if (base) mark.style.setProperty("--ds-icon", `url("${base}${icon}.svg")`);
 }
 
-/** What `startPagedots` is given: the number of dots, the current one and the end marker. */
-export interface PagedotsOptions {
+/** What `startDots` is given: the number of dots, the current one and the end marker. */
+export interface DotsOptions {
   count: number;
   current?: number;
   /** Draw the last dot as an end marker. */
@@ -377,7 +378,7 @@ export interface PagedotsOptions {
 }
 
 /** A running set of native dots. */
-export interface PagedotsHandle {
+export interface DotsHandle {
   /** Draw `count` dots, `current` among them. */
   set(count: number, current: number): void;
   stop(): void;
@@ -402,23 +403,23 @@ function onLanguage(relabel: () => void): () => void {
 }
 
 /**
- * Fills a `.ds-pagedots` element with a button for each dot and keeps its
- * states: a group labelled "Slides", each dot "Slide 2", the current one
+ * Fills a `.ds-progress--dots` element with a button for each dot and keeps
+ * its states: a group labelled "Slides", each dot "Slide 2", the current one
  * `aria-current` and the only one in the tab order, arrows, Home and End
  * moving between them.
  */
-export function startPagedots(element: HTMLElement, options: PagedotsOptions): PagedotsHandle {
+export function startDots(element: HTMLElement, options: DotsOptions): DotsHandle {
   let count = Math.max(0, Math.floor(options.count));
   let current = options.current ?? 0;
   const draw = () => {
     own(element, "role", "group");
     if (!named(element)) own(element, "aria-label", carouselWord("Slides"));
-    const dots = [...element.querySelectorAll<HTMLButtonElement>(":scope > .ds-pagedots__dot")];
+    const dots = [...element.querySelectorAll<HTMLButtonElement>(":scope > .ds-progress__dot")];
     for (const extra of dots.splice(count)) extra.remove();
     while (dots.length < count) {
       const dot = document.createElement("button");
       dot.type = "button";
-      dot.className = "ds-pagedots__dot";
+      dot.className = "ds-progress__dot";
       element.append(dot);
       dots.push(dot);
     }
@@ -430,13 +431,13 @@ export function startPagedots(element: HTMLElement, options: PagedotsOptions): P
       dot.tabIndex = state === "current" ? 0 : -1;
     });
   };
-  const dotList = () => [...element.querySelectorAll<HTMLButtonElement>(":scope > .ds-pagedots__dot")];
+  const dotList = () => [...element.querySelectorAll<HTMLButtonElement>(":scope > .ds-progress__dot")];
   const pick = (index: number, focus: boolean) => {
     options.onSelect?.(index);
     if (focus) dotList()[index]?.focus();
   };
   const click = (event: MouseEvent) => {
-    const index = dotList().indexOf((event.target as Element).closest?.(".ds-pagedots__dot") as HTMLButtonElement);
+    const index = dotList().indexOf((event.target as Element).closest?.(".ds-progress__dot") as HTMLButtonElement);
     if (index >= 0) pick(index, false);
   };
   const keydown = (event: KeyboardEvent) => {
@@ -521,8 +522,8 @@ export function startCarousel(element: HTMLElement, options: StartCarouselOption
     if (nextButton && !named(nextButton)) own(nextButton, "aria-label", carouselWord("Next slide"));
   };
   // A looping strip has no place to point to, so it draws no dots.
-  const dotsElement = loop ? null : element.querySelector<HTMLElement>(".ds-pagedots");
-  const dots = dotsElement ? startPagedots(dotsElement, { count: slides().length, end: dotsElement.hasAttribute("data-end"), onSelect: index => go(index, true) }) : undefined;
+  const dotsElement = loop ? null : element.querySelector<HTMLElement>(".ds-progress--dots");
+  const dots = dotsElement ? startDots(dotsElement, { count: slides().length, end: dotsElement.hasAttribute("data-end"), onSelect: index => go(index, true) }) : undefined;
 
   const show = (index: number, announce: boolean) => {
     const count = slides().length;

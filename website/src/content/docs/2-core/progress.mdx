@@ -1,0 +1,135 @@
+---
+title: Progress
+description: "How far something has come, one square high: a value against its range, a sequence of steps, or a dot for each page."
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+Progress shows how far something has come, as HTML's `<progress>` names it. It is one square high and takes three shapes: a value against its range (money spent of a budget, seats taken, a goal saved towards), a numbered sequence of steps (signing up, a checkout), or a dot for each slide or page. One element, `ds-progress`, draws all three; which one, it reads from what it is given.
+
+## Try it
+
+<ComponentExample example="meter" />
+
+<ComponentExample example="steps" compact />
+
+<ComponentExample example="pagedots" compact />
+
+## A value against its range
+
+```html
+<ds-progress label="Spent" value="7400" max="10000" format="money" currency="DKK"></ds-progress>
+<ds-progress label="Seats" value="7" max="10" squares="10"></ds-progress>
+<ds-progress label="Spent" value="118" max="100"></ds-progress>
+```
+
+A bar half a square high across the middle of the row (as a chart's ratio is drawn), or, with `squares="10"`, the range in ten squares, each one square wide and drawn one pixel short, as an item on the grid is, as many filled as the value fills. A value past the end is over: it fills whole in the danger colour, and its words say by how much. It shows a measurement, takes no keys and no focus.
+
+The element is `role="meter"` with `aria-valuenow`, `aria-valuemin`, `aria-valuemax` and `aria-valuetext`. `aria-valuenow` stays inside the range, as ARIA requires, so the words carry what the number cannot: "7 of 10", or "12 of 10, over by 2", in the shared words of the current language, the figures written as `format` says. `valuetext` gives words of the page's own, `label` names it, and `over` shows the over state whatever the value. A native `<meter>` or `<progress>` cannot say it is over and is drawn differently in each browser, so this is a `role="meter"` element instead.
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `value` | number | `0` | The value. |
+| `min`, `max` | number | `0`, `1` | The range. |
+| `squares` | number | None | Draw the range in this many squares instead of a bar (at most a hundred). |
+| `over` | boolean | `false` | Show the over state whatever the value. |
+| `valuetext` | string | "7 of 10" | What the value says. |
+| `format`, `currency`, `minor`, `whole`, `digits` | | `number` | How the figures in the words are written, as for a [Stat](/2-core/stat/). |
+
+## Steps
+
+```html
+<ds-progress current="2" label="Getting started"
+  steps='["Apply", "Approval", "Connect payouts", "Start earning"]'></ds-progress>
+```
+
+`steps` makes it a sequence: each step a number in a mark one control high and its name, on one square, joined to the next by a line. `steps` is a list of names (translation keys unless `literal` is set), set as a property or as a JSON array in the attribute; `current` is the number of the current step, counted from 1. Past the last, every step is done; `0` means none has started.
+
+| State | Mark | Name | Said |
+| --- | --- | --- | --- |
+| Done (before `current`) | `check` on the grey fill | The text colour | "Done" |
+| Current | The number in the paper colour on the ink | The medium face | `aria-current="step"` |
+| Upcoming (after `current`) | The number in a 1px line, muted | Muted | |
+| Failed | `warning` on the danger colour | The danger colour | "Failed" |
+
+A step names its own state with `{ "label": "Approval", "state": "failed" }`, where something went wrong and the sequence stops there. The steps are an ordered list, so assistive technology reads how many there are and where each stands; the hidden words are the shared words in the current language. A step with `href` (`{ "label": "Details", "href": "/details" }`) is a link around its mark and name, reached with Tab, for going back to a step already done; the others take no focus.
+
+`vertical` puts one step on each square, with what belongs under a step in its `step-N` slot, indented one square to line up with the names: a line of text, a form, the buttons that finish the step.
+
+```html
+<ds-progress vertical current="3" steps='["Apply", "Approval", "Connect payouts", "Start earning"]'>
+  <p slot="step-3">Connect a payout account to get paid.</p>
+</ds-progress>
+```
+
+## Dots
+
+```html
+<ds-progress dots="5" active="1"></ds-progress>
+```
+
+`dots` makes it a dot for each slide or page: one square apart, the current one filled and half again as large, those before it filled in the muted colour, the next in the text colour, the rest rings, so the row reads as how far you have come and where you go next. Each dot is a button that takes you to its page. A [Carousel](/3-unit/carousel/) draws its own; use them alone for pages that move some other way.
+
+Pressing a dot fires `select` with `{ index, previous }`; unless a listener cancels it, the dot becomes current. Cancel it when the page decides, and set `active` once it has moved. `end` draws the last dot as a ring in the text colour, an end marker, unless it is current: the way on to something past the slides.
+
+The dots are a group named "Slides", each a button named "Slide 2", the current one marked `aria-current` and the only one in the tab order. The arrow keys move to the dot before or after and pick it (following the reading direction), Home and End go to the first and last, and focus follows.
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `dots` | number | None | How many dots. |
+| `active` | number | `0` | The current dot, from 0. |
+| `end` | boolean | `false` | Draw the last dot as an end marker. |
+| `dot-label` | string | The shared words' "Slide &#123;index&#125;" | Each dot's name, `{index}` its number from 1. |
+
+Shared by every shape: `label`, the element's name (the dots' group is the shared word "Slides" by default), and `literal`, which shows the words as written, never looked up.
+
+## Measures
+
+One square high. The bar is half a square high, a quarter of a square from the top, the filled part in the ink (`--ds-progress-color`) on the grey fill (`--ds-progress-track`); it grows with a transform, still for reduced motion. In squares, each square is one square wide and one pixel short; over, everything is `--ds-danger-color`. Each step's mark is one control (16px) in its own square, the name follows with 4px at its end, and the step rounds its width up to whole squares, the line to the next step filling at least one square of it; vertical steps stand one to a square, their bodies one square in. Each dot is a button one square wide and high; the dot itself is 4px, scaled with the surface, the current one half again as large, and only its size moves, not at all under reduced motion. The dot colours are `--ds-progress-dot-past`, `-current`, `-next`, `-future` and `-end`.
+
+## React
+
+```tsx
+import { Progress } from "@0001-labs/design-system-1/DS1/react/progress";
+
+<Progress label="Spent" value={spent} max={budget} format="money" currency="JPY" />
+<Progress steps={[t("Apply"), t("Approval"), t("Connect payouts")]} current={2} vertical bodies={[null, null, <StripeActions />]} />
+<Progress dots={pages.length} active={page} onSelect={setPage} />
+```
+
+A value puts the role and the values in the markup from the first render, on the server too. Steps arrive as a property, with each of `bodies` under its step; the words are written as given. Register `ds-progress` in the browser before hydration.
+
+## Without JavaScript
+
+```html
+<span class="ds-progress" role="meter" aria-label="Spent" aria-valuenow="74" aria-valuemin="0" aria-valuemax="100"
+  aria-valuetext="74 of 100" style="--ds-progress-value: 0.74"><span class="ds-progress__fill"></span></span>
+
+<span class="ds-progress ds-progress--squares" role="meter" aria-valuenow="2" aria-valuemin="0" aria-valuemax="3" aria-valuetext="2 of 3">
+  <span class="ds-progress__square ds-progress__square--on"></span><span class="ds-progress__square ds-progress__square--on"></span><span class="ds-progress__square"></span>
+</span>
+
+<ol class="ds-progress ds-progress--steps" aria-label="Getting started">
+  <li class="ds-progress__step ds-progress__step--done">
+    <span class="ds-progress__mark" aria-hidden="true"><!-- the check icon --></span>
+    <span class="ds-progress__label">Apply</span><span class="ds-progress__state">Done</span>
+  </li>
+  <li class="ds-progress__step ds-progress__step--current" aria-current="step">
+    <span class="ds-progress__mark" aria-hidden="true">2</span><span class="ds-progress__label">Approval</span>
+  </li>
+</ol>
+
+<div class="ds-progress ds-progress--dots" role="group" aria-label="Slides">
+  <button class="ds-progress__dot" type="button" data-state="past" aria-label="Slide 1" tabindex="-1"></button>
+  <button class="ds-progress__dot" type="button" data-state="current" aria-current="true" aria-label="Slide 2"></button>
+  <button class="ds-progress__dot" type="button" data-state="next" aria-label="Slide 3" tabindex="-1"></button>
+</div>
+```
+
+`ds-progress--over` fills a value in the danger colour; `ds-progress--vertical` stacks the steps, with a `ds-progress__body` in a step, and `ds-progress__link` is an `<a href>` around a step's mark and name; a dot's `data-state` is `past`, `current`, `next`, `future` or `end`, and `startDots(element, { count, current, end, onSelect })` from `0-face/carousel.ts` fills and keeps them, with the keyboard. All from `progress.css`, which `controls.css` imports; the page writes its ARIA values and words.
+
+## Bars and charts
+
+A value against its range is one value on one line, in a row, a tile or a table cell. Several values against each other are [Chart](/2-core/chart/)'s bars (`ds-bars`), and two shares of a whole its ratio (`ds-ratio`).
+
+[Stat](/2-core/stat/) · [Chart](/2-core/chart/) · [Carousel](/3-unit/carousel/)

@@ -2,9 +2,8 @@
 import { createElement } from "react";
 import { renderToString } from "react-dom/server";
 import { expect, test } from "vite-plus/test";
-import { Meter } from "../DS1/react/meter";
+import { Progress } from "../DS1/react/progress";
 import { Stat } from "../DS1/react/stat";
-import { Steps } from "../DS1/react/steps";
 
 const plain = (text: string) => text.replace(/[  ]/g, " ");
 
@@ -24,20 +23,20 @@ test("the stat adapter writes its label, figure and caption in the light DOM wit
   expect(cells.match(/display:inline-block/g)).toHaveLength(4);
 });
 
-test("the meter adapter puts its role and values in the markup from the first render", () => {
-  const meter = renderToString(createElement(Meter, { label: "Spent", value: 12, max: 10 }));
+test("the progress adapter puts a value's role and values in the markup from the first render", () => {
+  const meter = renderToString(createElement(Progress, { label: "Spent", value: 12, max: 10 }));
   expect(meter).toContain('role="meter"');
   expect(meter).toContain('aria-valuenow="10"');
   expect(meter).toContain('aria-valuemin="0"');
   expect(meter).toContain('aria-valuemax="10"');
   expect(meter).toContain('aria-valuetext="12 of 10, over by 2"');
   expect(meter).toContain('aria-label="Spent"');
-  expect(renderToString(createElement(Meter, { value: 3, max: 4, valuetext: "Three of four" }))).toContain('aria-valuetext="Three of four"');
+  expect(renderToString(createElement(Progress, { value: 3, max: 4, valuetext: "Three of four" }))).toContain('aria-valuetext="Three of four"');
 });
 
 test("the steps adapter slots each step's body under it in a vertical sequence", () => {
-  const steps = renderToString(createElement(Steps, { steps: ["Apply", "Connect"], current: 2, vertical: true, bodies: [null, createElement("p", null, "Connect an account.")] }));
-  expect(steps).toContain("<ds-steps");
+  const steps = renderToString(createElement(Progress, { steps: ["Apply", "Connect"], current: 2, vertical: true, bodies: [null, createElement("p", null, "Connect an account.")] }));
+  expect(steps).toContain("<ds-progress");
   expect(steps).toContain('<div slot="step-2" style="display:contents"><p>Connect an account.</p></div>');
   expect(steps).not.toContain('slot="step-1"');
 });

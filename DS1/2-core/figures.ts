@@ -1,5 +1,5 @@
 // figures.ts
-// The words of a figure, shared by ds-stat, ds-meter and their React
+// The words of a figure, shared by ds-stat, ds-progress and their React
 // adapters: a value written through 0-face/format.ts in the current language,
 // the digits cut into cells of one width, and a meter's ARIA values. No
 // browser code, so the adapters write the same words on the server.
