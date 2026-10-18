@@ -8,6 +8,27 @@ import type { ComponentCell } from '../shared/component-adoption';
 
 const sha = (body: Buffer) => createHash('sha256').update(body).digest('hex');
 const columns: Record<string, string> = { 'one.css': 'root-styling', 'grid.css': 'root-styling', 'palette.css': 'root-colours', 'fonts.css': 'root-fonts' };
+const modules: Record<string, string> = {
+  'languages.ts': 'root-languages', 'language-routing.ts': 'root-languages',
+  'language-validator.ts': 'root-languages', 'translations-format.ts': 'root-languages',
+  'format.ts': 'root-formatting', 'theme.ts': 'root-theming',
+  'theme-bootstrap.js': 'root-theming', 'device.ts': 'root-device',
+  'preferences.ts': 'root-preferences', 'preference-options.ts': 'root-preferences',
+  'pricing.ts': 'root-pricing',
+};
+function moduleImports(file: string, source: string): { address: string; at: number }[] {
+  const result: { address: string; at: number }[] = [];
+  const syntax = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, file.endsWith('x') ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
+  const walk = (node: ts.Node) => {
+    if ((ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) && node.moduleSpecifier && ts.isStringLiteral(node.moduleSpecifier)) {
+      result.push({ address: node.moduleSpecifier.text, at: node.getStart(syntax) });
+    }
+    ts.forEachChild(node, walk);
+  };
+  walk(syntax);
+  return result;
+}
+
 const imports = /(?:\bimport\s*(?:[^;'"\n]*?\bfrom\s*)?|@import\s*(?:url\(\s*)?|\bhref\s*=\s*)["']([^"']+\.css(?:\?[^"']*)?)["']/g;
 const cssImports = /@import\s*(?:url\(\s*)?["']([^"']+)["']/g;
 const uncomment = (body: string) => body.replace(/\/\*[\s\S]*?\*\/|<!--[\s\S]*?-->/g, match => match.replace(/[^\n]/g, ' '));
@@ -29,10 +50,11 @@ export function rootConnections(root: string, dsRoot: string, manifestPath?: str
   const cache = new Map<string, { column: string; verified: boolean; issues: string[] }[]>();
   const directClean = direct && !execFileSync('git', ['status', '--porcelain', '--', 'DS1'], { cwd: dsRoot, encoding: 'utf8' }).trim();
   const localPath = (from: string, address: string) => {
-    if (/^(?:https?:|data:|\/\/)/.test(address)) return undefined;
+    if (!address.startsWith('.') && !address.startsWith('/')) return undefined;
+    if (address.startsWith('//')) return undefined;
     const path = address.split('?')[0]!;
     const full = path.startsWith('/') ? resolve(root, 'public', '.' + path) : resolve(dirname(from), path);
-    return full.startsWith(resolve(root) + '/') && existsSync(full) && statSync(full).isFile() ? full : undefined;
+    return [full, full + '.ts', full + '.tsx', full + '.js', join(full, 'index.ts')].find(candidate => candidate.startsWith(resolve(root) + '/') && existsSync(candidate) && statSync(candidate).isFile());
   };
   const visit = (full: string, active = new Set<string>()): { column: string; verified: boolean; issues: string[] }[] => {
     if (active.has(full)) return [];
@@ -45,13 +67,15 @@ export function rootConnections(root: string, dsRoot: string, manifestPath?: str
     const own = direct && full.startsWith(resolve(dsRoot, 'DS1') + '/');
     const recognizable = own || Boolean(source) || /(?:^|\/)(?:ds1|design|design-system-1|1-root)(?:\/|$)/i.test(path);
     const result: { column: string; verified: boolean; issues: string[] }[] = [];
-    if (columns[name] && recognizable) {
-      const original = source?.commit && historicalSource(dsRoot, source.commit, `DS1/1-root/${name}`);
+    const column = columns[name] || modules[name];
+    if (column && recognizable) {
+      const original = source?.commit && historicalSource(dsRoot, source.commit, `DS1/${modules[name] ? '0-face' : '1-root'}/${name}`);
       const verified = own ? Boolean(directClean) : Boolean(!source?.dirty && original && sha(original) === source?.files?.[key] && sha(body) === source.files[key]);
-      result.push({ column: columns[name]!, verified, issues: verified ? [] : [`Root stylesheet not verified: ${path}`] });
+      result.push({ column, verified, issues: verified ? [] : [`Root source not verified: ${path}`] });
     }
-    for (const match of uncomment(body.toString()).matchAll(cssImports)) {
-      const next = localPath(full, match[1]!);
+    const dependencies = full.endsWith('.css') ? [...uncomment(body.toString()).matchAll(cssImports)].map(match => ({ address: match[1]! })) : moduleImports(full, body.toString());
+    for (const dependency of dependencies) {
+      const next = localPath(full, dependency.address);
       if (next) result.push(...visit(next, active));
     }
     active.delete(full);
@@ -64,12 +88,7 @@ export function rootConnections(root: string, dsRoot: string, manifestPath?: str
     if (lock?.files?.[file] || manifest?.files?.[manifestFile]) return;
     const connections: { address: string; at: number }[] = [];
     if (/\.[cm]?[jt]sx?$/.test(file)) {
-      const syntax = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, file.endsWith('x') ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
-      const visit = (node: ts.Node) => {
-        if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier) && /\.css(?:\?|$)/.test(node.moduleSpecifier.text)) connections.push({ address: node.moduleSpecifier.text, at: node.getStart(syntax) });
-        ts.forEachChild(node, visit);
-      };
-      visit(syntax);
+      connections.push(...moduleImports(file, source));
     } else {
       for (const match of uncomment(source).matchAll(file.endsWith('.css') ? cssImports : imports)) connections.push({ address: match[1]!, at: match.index });
     }
@@ -79,6 +98,7 @@ export function rootConnections(root: string, dsRoot: string, manifestPath?: str
       const found = visit(full);
       for (const column of new Set(found.map(item => item.column))) {
         const evidence = found.filter(item => item.column === column), cell = cells[column]!;
+        if (!cell) continue;
         const verified = evidence.every(item => item.verified), kind = verified ? 'styled' : 'unverified';
         cell[kind]++;
         cell.sites.push({ file, line: source.slice(0, at).split('\n').length, tag: address, kind });

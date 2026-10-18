@@ -90,7 +90,7 @@
 .adoption-kinds dt, .adoption-kinds dd { margin: 0; line-height: var(--report-unit); white-space: nowrap; }
 .adoption-kinds dd { color: var(--base-darker-grey); }
 
-.adoption-groups .group-root { background: var(--report-paper); color: var(--report-ink); }
-.adoption-column-names .group-root { background: var(--report-paper); }
+.adoption-groups .group-root { background: var(--one-drip-yellow); color: var(--base-slate); }
+.adoption-column-names .group-root { background: color-mix(in srgb, var(--one-drip-yellow) 16%, var(--report-paper)); }
 
 .adoption-icons .adoption-matrix .adoption-total { width: var(--report-unit); min-width: var(--report-unit); max-width: var(--report-unit); padding: 0; text-align: center; white-space: nowrap; }
