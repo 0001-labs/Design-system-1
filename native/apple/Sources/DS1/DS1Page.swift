@@ -2,20 +2,24 @@ import SwiftUI
 
 /// A page on the paper (`ds-page` `column`, on `.ds1Paper`): it puts the device scale on, scrolls, keeps one
 /// square around its content and stands its column on whole squares, at most `measure`
-/// squares wide (`measure="N"`), centred in the room beside it.
+/// squares wide (`measure="N"`), centred in the room beside it. `bleed` (points at the base
+/// scale, `--ds-page-bleed`) lets the content stand that far outside the column on each side,
+/// the column's place and the grid's lines kept.
 public struct DS1Page<Content: View>: View {
     let measure: CGFloat
     let grid: Bool
+    let bleed: CGFloat
     let content: Content
 
-    public init(measure: CGFloat = 32, grid: Bool = false, @ViewBuilder content: () -> Content) {
+    public init(measure: CGFloat = 32, grid: Bool = false, bleed: CGFloat = 0, @ViewBuilder content: () -> Content) {
         self.measure = measure
         self.grid = grid
+        self.bleed = bleed
         self.content = content()
     }
 
     public var body: some View {
-        Column(measure: measure, grid: grid, content: content).ds1Scaled()
+        Column(measure: measure, grid: grid, bleed: bleed, content: content).ds1Scaled()
     }
 
     struct Column: View {
@@ -23,6 +27,7 @@ public struct DS1Page<Content: View>: View {
         @Environment(\.ds1Paper) private var paper
         let measure: CGFloat
         let grid: Bool
+        let bleed: CGFloat
         let content: Content
 
         @Environment(\.displayScale) private var pixels
@@ -34,9 +39,9 @@ public struct DS1Page<Content: View>: View {
                 let inset = ((geometry.size.width - width) / 2 * pixels).rounded(.down) / pixels
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) { content }
-                        .frame(width: width, alignment: .leading)
+                        .frame(width: width + 2 * scale(bleed), alignment: .leading)
                         .padding(.vertical, scale.unit)
-                        .padding(.leading, inset)
+                        .padding(.leading, inset - scale(bleed))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .frame(minHeight: geometry.size.height, alignment: .top)
                         // The grid scrolls with the content and starts at the column's edge and

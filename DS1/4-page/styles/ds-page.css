@@ -13,6 +13,10 @@
   --ds-page-tile: calc(12 * var(--ds-unit));
   --ds-page-gap: calc(2 * var(--ds-unit));
   --ds-page-line: var(--ds-border-color, var(--ds-slate-light));
+  /* How far the content stands outside its column on each side, the column's place and the
+     grid's lines kept: a phone's lists take a little more width, their words a longer line
+     (Money sets 4px). Zero by default. */
+  --ds-page-bleed: 0px;
   box-sizing: border-box;
   display: block;
   container-type: inline-size;
@@ -40,7 +44,7 @@
     "nav aside"
     "nav footer";
   min-height: 100%;
-  padding: var(--ds-unit);
+  padding: var(--ds-unit) calc(var(--ds-unit) - var(--ds-page-bleed));
 }
 
 :host([fill]) .page { height: 100%; }
@@ -82,13 +86,13 @@
  * the element; with less room than the measure needs, the padding stays one
  * square and the column takes what is left. */
 :host(:is([layout="column"], [layout="centered"], [layout="tiles"])) .page {
-  grid-template-columns: minmax(0, var(--ds-page-measure));
+  grid-template-columns: minmax(0, calc(var(--ds-page-measure) + 2 * var(--ds-page-bleed)));
   grid-template-rows: auto auto minmax(0, 1fr) auto auto;
   grid-template-areas: "header" "nav" "main" "aside" "footer";
 }
 :host(:is([layout="column"], [layout="centered"])) .page {
   justify-content: start;
-  padding-inline-start: calc(var(--ds-unit) + max(0px, round(down, calc((100% - 2 * var(--ds-unit) - var(--ds-page-measure)) / 2), var(--ds-unit))));
+  padding-inline-start: calc(var(--ds-unit) + max(0px, round(down, calc((100% - 2 * var(--ds-unit) - var(--ds-page-measure)) / 2), var(--ds-unit))) - var(--ds-page-bleed));
 }
 :host(:is([layout="column"], [layout="centered"], [layout="tiles"])) .nav { margin-block-end: var(--ds-unit); }
 
