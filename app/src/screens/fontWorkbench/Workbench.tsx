@@ -203,6 +203,12 @@ export function Workbench({ face, request, hidden = false, onMessage, onError, o
     pen.current = null;
     const current = sourceRef.current;
     if (!active || !current) return;
+    // A contour of one or two points left by the pen draws nothing: it goes.
+    if ((glyphOf(current, unicode).contours[active.contour]?.length ?? 0) < 3) {
+      apply(withGlyph(current, unicode, item => ({ ...item, contours: item.contours.filter((_, index) => index !== active.contour) })), false);
+      setSelection(new Set());
+      return;
+    }
     // Close the last segment as it was drawn: a curve when the first or last point was dragged out.
     if (!active.out && !active.firstIn) return;
     apply(withGlyph(current, unicode, item => ({

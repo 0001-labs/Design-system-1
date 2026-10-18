@@ -117,6 +117,22 @@ describe('font workbench', () => {
     expect(String.fromCharCode(...new Uint8Array(build[1].body as ArrayBuffer).slice(0, 4))).toBe('OTTO');
     expect(props.onBuildSaved).toHaveBeenCalledWith('0001-Sans-Regular.otf');
   });
+  it('drops a contour the pen left with too few points to draw anything', async () => {
+    await act(async () => root.render(createElement(Workbench, props))); await settle();
+    await act(async () => button('Pen').click());
+    const canvas = host.querySelector<SVGSVGElement>('.workbench-canvas')!;
+    const click = async (x: number, y: number) => {
+      await act(async () => { canvas.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0, clientX: x, clientY: y, pointerId: 1 })); });
+      await act(async () => { canvas.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, clientX: x, clientY: y, pointerId: 1 })); });
+    };
+    await click(100, 100);
+    expect(points()).toHaveLength(1);
+    await press('Escape');
+    expect(points()).toHaveLength(0);
+    await click(100, 100); await click(140, 100); await click(140, 60);
+    await press('Escape');
+    expect(points()).toHaveLength(3);
+  });
   it('rests its shortcuts while hidden', async () => {
     await act(async () => root.render(createElement(Workbench, { ...props, hidden: true }))); await settle();
     expect(host.querySelector('.workbench')!.hasAttribute('hidden')).toBe(true);
