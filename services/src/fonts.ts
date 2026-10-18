@@ -3,15 +3,22 @@ import type { ReportsEnv } from './reports';
 
 const OWNER_EMAIL = 'jaa90@icloud.com';
 const MAX_FONT_BYTES = 10 * 1024 * 1024;
-const CURRENT = 'fonts/supernatural/current.json';
+/** The faces in development. Each build is stored by content hash under fonts/<id>/, and fonts/<id>/current.json names the one shown. */
+const DEVELOPMENT: Record<string, { name: string; detail: string }> = {
+  supernatural: { name: 'Supernatural', detail: 'Handwriting · In development' },
+  '0001-sans': { name: '0001 Sans', detail: 'Sans · In development' },
+};
+const isDevelopment = (id: string) => Object.hasOwn(DEVELOPMENT, id);
+const currentKey = (id: string) => `fonts/${id}/current.json`;
 const headers = { 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow', 'X-Content-Type-Options': 'nosniff', Vary: 'Authorization' };
 const json = (value: unknown, status = 200) => Response.json(value, { status, headers });
 type SavedFont = { key: string; name: string; format: string };
-const savedFont = async (env: ReportsEnv): Promise<SavedFont | null> => {
-  const object = await env.LIBRARIES.get(CURRENT);
+const savedFont = async (env: ReportsEnv, id: string): Promise<SavedFont | null> => {
+  const object = await env.LIBRARIES.get(currentKey(id));
   if (!object) return null;
   const value = await object.json<SavedFont>();
-  if (!/^fonts\/supernatural\/[a-f0-9]{64}$/.test(value.key)) throw new Error('Invalid font reference');
+  const prefix = `fonts/${id}/`;
+  if (!value.key.startsWith(prefix) || !/^[a-f0-9]{64}$/.test(value.key.slice(prefix.length))) throw new Error('Invalid font reference');
   return value;
 };
 
@@ -35,9 +42,12 @@ export async function fontWorkspace(request: Request, env: ReportsEnv, send: typ
   const path = new URL(request.url).pathname;
   try {
     if (path === '/api/fonts' && request.method === 'GET') {
-      const saved = await savedFont(env);
+      const development = await Promise.all(Object.entries(DEVELOPMENT).map(async ([id, face]) => {
+        const saved = await savedFont(env, id);
+        return { id, ...face, development: true, available: Boolean(saved), fileName: saved?.name ?? null };
+      }));
       return json({ fonts: [
-        { id: 'supernatural', name: 'Supernatural', detail: 'Handwriting · In development', available: Boolean(saved), fileName: saved?.name ?? null },
+        ...development,
         { id: 'olivetti', name: 'Olivetti Dot', detail: 'Regular · Dot matrix', available: true },
         { id: 'america', name: 'GT America', detail: 'Standard Regular · Reference', available: true },
         { id: 'iosevka', name: 'Iosevka Extended', detail: 'Regular · Code reference', available: true },
@@ -46,14 +56,15 @@ export async function fontWorkspace(request: Request, env: ReportsEnv, send: typ
     if (path.startsWith('/api/fonts/file/') && request.method === 'GET') {
       const id = path.slice('/api/fonts/file/'.length);
       const builtins: Record<string, string> = { olivetti: 'fonts/reference/olivetti.woff2', america: 'fonts/reference/america.woff2', iosevka: 'fonts/reference/iosevka.woff2' };
-      const saved = id === 'supernatural' ? await savedFont(env) : null;
-      const key = id === 'supernatural' ? saved?.key : builtins[id];
+      const key = isDevelopment(id) ? (await savedFont(env, id))?.key : builtins[id];
       if (!key) return json({ error: 'This font is not available yet.' }, 404);
       const font = await env.LIBRARIES.get(key);
       if (!font) return json({ error: 'This font is not available yet.' }, 404);
       return new Response(font.body, { headers: { ...headers, 'Content-Type': 'application/octet-stream' } });
     }
-    if (path === '/api/fonts/supernatural' && request.method === 'PUT') {
+    if (path.startsWith('/api/fonts/') && request.method === 'PUT') {
+      const id = path.slice('/api/fonts/'.length);
+      if (!isDevelopment(id)) return json({ error: 'This font is not in development here.' }, 404);
       if (request.headers.get('origin') !== new URL(request.url).origin) return json({ error: 'Use the font workspace to save a font.' }, 403);
       if (Number(request.headers.get('content-length')) > MAX_FONT_BYTES) return json({ error: 'Choose a font smaller than 10 MB.' }, 413);
       const reader = request.body?.getReader();
@@ -72,10 +83,10 @@ export async function fontWorkspace(request: Request, env: ReportsEnv, send: typ
       const format = ({ wOF2: 'woff2', wOFF: 'woff', OTTO: 'opentype', '\u0000\u0001\u0000\u0000': 'truetype' } as Record<string, string>)[signature];
       if (!format || length < 12) return json({ error: 'Choose a WOFF2, WOFF, OTF or TTF font.' }, 400);
       const hash = [...new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))].map(n => n.toString(16).padStart(2, '0')).join('');
-      const name = (request.headers.get('x-font-name') ?? 'Supernatural').replace(/[\x00-\x1f\x7f]/g, '').slice(0, 160);
-      const key = `fonts/supernatural/${hash}`;
+      const name = (request.headers.get('x-font-name') ?? DEVELOPMENT[id]?.name ?? 'Font').replace(/[\x00-\x1f\x7f]/g, '').slice(0, 160);
+      const key = `fonts/${id}/${hash}`;
       await env.LIBRARIES.put(key, bytes, { httpMetadata: { contentType: 'application/octet-stream' } });
-      await env.LIBRARIES.put(CURRENT, JSON.stringify({ key, name, format }));
+      await env.LIBRARIES.put(currentKey(id), JSON.stringify({ key, name, format }));
       return json({ saved: true });
     }
     return json({ error: 'Not found.' }, 404);

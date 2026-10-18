@@ -16,10 +16,15 @@ import '../../../DS1/1-root/controls.css';
 import { SignIn } from './SignIn';
 import './font-workspace.css';
 
-type FontEntry = { id: string; name: string; detail: string; available: boolean; fileName?: string };
+type FontEntry = { id: string; name: string; detail: string; available: boolean; fileName?: string | null; development?: boolean };
 const sizes = [20, 40, 60, 80, 100, 120];
 const spacings = [0, 1, 2, 3, 4];
 const alphabets = ['ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz', '0123456789', '.,:;!?—–“”‘’()[]{}@&', 'ÅÆØåæø'];
+/** What a face in development says before a build is opened. The Worker lists the faces; a face without words of its own gets the plain ones. */
+const studies: Record<string, { heading: string; text: string }> = {
+  supernatural: { heading: 'Supernatural starts with your handwriting.', text: 'Open a font build to try it here. Handwriting scans and original letterforms are still needed to create the first version. English first. About ten forms per letter, with variation in shape, spacing and rhythm.' },
+  '0001-sans': { heading: '0001 Sans starts with the Regular.', text: 'Open a font build to try it here. The studio\u2019s own sans: Regular first, then Medium, on the metrics of the text face it replaces, so nothing on the grid shifts.' },
+};
 function Control({ children, ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { children: ReactNode }) {
   return <Button secondary {...props}>{children}</Button>;
 }
@@ -127,13 +132,14 @@ function PrivateFonts() {
   }
 
   async function saveFont() {
-    if (!local || selected !== 'supernatural') return;
+    if (!local || !active?.development) return;
+    const { id } = active;
     setBusy(true); setError('');
     try {
-      await request('/api/fonts/supernatural', { method: 'PUT', headers: { 'Content-Type': 'application/octet-stream', 'X-Font-Name': local.name.replace(/[^\x20-\x7e]/g, '_') }, body: local });
+      await request(`/api/fonts/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/octet-stream', 'X-Font-Name': local.name.replace(/[^\x20-\x7e]/g, '_') }, body: local });
       // Keep the loaded preview and text in place; the next visit reads the saved version.
       setMessage('Saved privately. Previous font versions are retained.');
-      setFonts(values => values?.map(font => font.id === 'supernatural' ? { ...font, available: true, fileName: local.name } : font) ?? null);
+      setFonts(values => values?.map(font => font.id === id ? { ...font, available: true, fileName: local.name } : font) ?? null);
       setLocal(null);
     } catch (problem) { setError(problem instanceof Error ? problem.message : 'The font could not be saved.'); }
     finally { setBusy(false); }
@@ -167,15 +173,15 @@ function PrivateFonts() {
           <Cycle setting="size" values={sizes.map(n => `Size ${n}`)} value={`Size ${size}`} onChange={value => setSize(Number(value.slice(5)))} />
           <Cycle setting="spacing" values={spacings.map(n => `Spacing ${n}`)} value={`Spacing ${spacing}`} onChange={value => setSpacing(Number(value.slice(8)))} />
           <Control aria-pressed={dark} onClick={() => setDark(value => !value)}>Dark paper</Control>
-          {selected === 'supernatural' && <><input ref={picker} className="font-file" type="file" accept=".woff2,.woff,.ttf,.otf" onChange={event => void openFont(event.target.files?.[0])} /><Control disabled={busy} onClick={() => picker.current?.click()}>Open font</Control>{local && <Control disabled={busy} onClick={() => void saveFont()}>Save font</Control>}</>}
+          {active?.development && <><input ref={picker} className="font-file" type="file" accept=".woff2,.woff,.ttf,.otf" onChange={event => void openFont(event.target.files?.[0])} /><Control disabled={busy} onClick={() => picker.current?.click()}>Open font</Control>{local && <Control disabled={busy} onClick={() => void saveFont()}>Save font</Control>}</>}
         </div>
         <div className="font-stage" aria-busy={busy}>
           {family ? mode === 'specimen' ? <textarea aria-label={`${active?.name} specimen text`} spellCheck={false} value={text} onChange={event => setText(event.target.value)} style={{ fontFamily: `"${family}"`, fontSize: `calc(${size}px * var(--sf, 1))`, letterSpacing: `calc(${spacing}px * var(--sf, 1))` }} />
             : <div className="font-glyphs" style={{ fontFamily: `"${family}"`, fontSize: `calc(${size}px * var(--sf, 1))` }}>{alphabets.flatMap(line => [...line]).map((letter, index) => <div key={`${letter}-${index}`}><span>{letter}</span><small>U+{letter.codePointAt(0)!.toString(16).toUpperCase().padStart(4, '0')}</small></div>)}</div>
-          : <Empty className="font-empty" heading={busy ? 'Loading the font…' : selected === 'supernatural' ? 'Supernatural starts with your handwriting.' : 'No specimen loaded.'}>{selected === 'supernatural' ? 'Open a font build to try it here. Handwriting scans and original letterforms are still needed to create the first version. English first. About ten forms per letter, with variation in shape, spacing and rhythm.' : 'Select a font to view it, or try again if it could not load.'}</Empty>}
+          : <Empty className="font-empty" heading={busy ? 'Loading the font…' : active?.development ? studies[active.id]?.heading ?? `${active.name} is in development.` : 'No specimen loaded.'}>{active?.development ? studies[active.id]?.text ?? 'Open a font build to try it here.' : 'Select a font to view it, or try again if it could not load.'}</Empty>}
         </div>
       </section>
-      <footer slot="footer" className="font-footer"><p role={error ? 'alert' : 'status'}>{error || message || (family ? selected === 'supernatural' ? 'Development study. Missing characters use a fallback.' : mode === 'glyphs' ? 'Unsupported characters use a fallback.' : 'Edit the specimen text. Size changes stay inside the specimen.' : 'No substitute handwriting font is shown.')}</p>{error && <Control onClick={() => setRetry(n => n + 1)}>Try again</Control>}</footer>
+      <footer slot="footer" className="font-footer"><p role={error ? 'alert' : 'status'}>{error || message || (family ? active?.development ? 'Development study. Missing characters use a fallback.' : mode === 'glyphs' ? 'Unsupported characters use a fallback.' : 'Edit the specimen text. Size changes stay inside the specimen.' : 'No substitute handwriting font is shown.')}</p>{error && <Control onClick={() => setRetry(n => n + 1)}>Try again</Control>}</footer>
     </Page>
   </main>;
 }

@@ -15,7 +15,8 @@ beforeEach(() => {
   vi.stubGlobal('FontFace', class { family: string; constructor(family: string) { this.family = family; } async load() { return this; } });
   Object.defineProperty(document, 'fonts', { configurable: true, value: new Set() });
   vi.stubGlobal('fetch', vi.fn(async (path: string) => path === '/api/fonts' ? Response.json({ fonts: [
-    { id: 'supernatural', name: 'Supernatural', detail: 'In development', available: false },
+    { id: 'supernatural', name: 'Supernatural', detail: 'In development', development: true, available: false },
+    { id: '0001-sans', name: '0001 Sans', detail: 'Sans · In development', development: true, available: false },
     { id: 'olivetti', name: 'Olivetti Dot', detail: 'Regular', available: true },
   ] }) : new Response(new Uint8Array([1, 2, 3]))));
   host = document.createElement('div'); document.body.append(host); root = createRoot(host);
@@ -30,10 +31,10 @@ describe('font workspace', () => {
     expect(list).not.toBeNull();
     expect(['divided', 'fill'].every(name => list.parentElement!.hasAttribute(name))).toBe(true);
     const rows = () => [...list.shadowRoot!.querySelectorAll<HTMLButtonElement>('button[data-item]')];
-    expect(rows().map(row => row.textContent?.trim())).toEqual(['Supernatural', 'Olivetti Dot']);
+    expect(rows().map(row => row.textContent?.trim())).toEqual(['Supernatural', '0001 Sans', 'Olivetti Dot']);
     expect(rows()[0]!.getAttribute('aria-current')).toBe('page');
-    await act(async () => rows()[1]!.click()); await settle();
-    expect(rows()[1]!.getAttribute('aria-current')).toBe('page');
+    await act(async () => rows()[2]!.click()); await settle();
+    expect(rows()[2]!.getAttribute('aria-current')).toBe('page');
     const specimen = host.querySelector('textarea')!;
     expect(specimen).not.toBeNull();
     const words = specimen.value;
@@ -48,6 +49,19 @@ describe('font workspace', () => {
       expect(specimen.value).toBe(words);
     }
     expect(fetch).toHaveBeenCalledWith('/api/fonts/file/olivetti', expect.objectContaining({ headers: expect.objectContaining({ Authorization: 'Bearer valid-session' }) }));
+  });
+  it('offers Open font for every face in development, each with its own empty state, and never for a reference', async () => {
+    await act(async () => root.render(createElement(FontWorkspace))); await settle();
+    const list = host.querySelector('ds-page[layout="sidebar"] > ds-sidebar[slot="nav"]')!;
+    const rows = () => [...list.shadowRoot!.querySelectorAll<HTMLButtonElement>('button[data-item]')];
+    const open = () => [...host.querySelectorAll('button')].some(button => button.textContent === 'Open font');
+    expect(open()).toBe(true);
+    await act(async () => rows()[1]!.click()); await settle();
+    expect(host.textContent).toContain('0001 Sans starts with the Regular.');
+    expect(host.textContent).not.toContain('Supernatural starts with your handwriting.');
+    expect(open()).toBe(true);
+    await act(async () => rows()[2]!.click()); await settle();
+    expect(open()).toBe(false);
   });
   it('does not render the font workspace when the server denies access', async () => {
     vi.mocked(fetch).mockImplementation(async () => Response.json({ error: 'This font workspace is private.' }, { status: 403 }));

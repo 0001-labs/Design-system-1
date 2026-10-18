@@ -1,4 +1,4 @@
-/** Seed only the three existing reference faces; private handwriting builds are uploaded through the owner workspace. */
+/** Seed only the three existing reference faces; builds of the faces in development (Supernatural, 0001 Sans) are uploaded through the owner workspace. */
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 const root = fileURLToPath(new URL('../', import.meta.url));
