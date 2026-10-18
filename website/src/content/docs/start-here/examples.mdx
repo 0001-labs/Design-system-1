@@ -1,11 +1,53 @@
 ---
-title: HTML examples
-description: View, download and edit complete HTML files using Design system 1.
+title: Examples
+description: Full pages built from the system’s components, plus downloadable HTML examples.
 ---
+
+import LayoutExample from "../../../components/LayoutExample.astro";
 
 import { HTML_EXAMPLES } from '../../../lib/html-examples';
 
-Each example is a complete HTML document. Open it to try the page, or download the file and edit it in any text editor. No framework, package install or build step is needed.
+These full-page examples compose Core and Unit components using [Layout](/4-page/layout/). Open one full size or use **Show layers** to inspect its composition.
+
+## Sidebar
+
+An app with places to go: navigation stays on the left while the work changes on the right.
+
+<LayoutExample layout="sidebar" />
+
+## List and detail
+
+Many things of one kind: pick one from the list and read it in full beside it. The list column is 16 squares, wide enough for a name and a date.
+
+<LayoutExample layout="split" />
+
+## Inspector
+
+Making something: pages on the left, the work in the middle, its settings on the right. Below 48 squares of width the settings move under the work.
+
+<LayoutExample layout="inspector" />
+
+## Column
+
+Something read or filled in from top to bottom: settings, an article, a long form. The column is 32 squares wide and sits in the middle, on a whole square.
+
+<LayoutExample layout="column" />
+
+## Centred
+
+One task and nothing else on the screen: signing in, confirming, a single question. The column is 16 squares and sits in the middle of the height too, on a whole square.
+
+<LayoutExample layout="centered" />
+
+## Tiles
+
+An overview of many numbers at once. Each tile is 12 squares wide and the row fills with as many as fit; `data-tile="wide"` takes two, `data-tile="full"` the whole row.
+
+<LayoutExample layout="tiles" />
+
+## HTML examples
+
+Each HTML example is a complete HTML document. Open it to try the page, or download the file and edit it in any text editor. No framework, package install or build step is needed.
 
 The files use the same native stylesheet as Design system 1's library workspace, served from this site's canonical source. The companion font stylesheet configures the supplied GT America and Iosevka fonts; the native stylesheet itself imports no fonts. These are online dependencies, not embedded files.
 

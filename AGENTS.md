@@ -124,3 +124,7 @@ Visibility is independent of the numbered layers. `DS1/0-face/component-visibili
 ## Public font specimens
 
 The public Fonts catalogue uses Aa's `createPlainEditor` for plain specimen text, copied through Sync 1 to `website/src/vendor/aa`. It inherits the specimen font and size, has no focus border or formatting controls, and uses Aa's rounded native-selection painter. This single-block specimen is an intentional exception to Markdown document storage/history in the `editing` guide; no specimen text is persisted. The selected parts for this interaction are `editing`, `design`, and `sharing`.
+
+## Product code
+
+Canonical short code: `DS1`. Use this three-character code for product-owned libraries and other compact ownership labels. Keep the full product name for prose and the existing commit-prefix convention.

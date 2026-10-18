@@ -21,7 +21,7 @@ for (const [path, source] of Object.entries(sources)) {
     TAG_LAYERS[tag] = { layer, href: docs.has(page) ? `/${page}/` : undefined };
   }
 }
-TAG_LAYERS['ds-page'].href = '/4-page/layouts/';
+TAG_LAYERS['ds-page'].href = '/4-page/layout/';
 
 /** The distinct elements a sample uses, grouped by layer, outermost layer first. */
 export function layersIn(html: string): { layer: Layer; name: string; tags: { tag: string; href?: string }[] }[] {

@@ -438,6 +438,6 @@ export const PAGE_EXAMPLES: Record<string, string[]> = {
   '3-unit/accordion': ['accordion'], '3-unit/form': ['form'], '3-unit/carousel': ['carousel', 'carousel-full'],
   '3-unit/table': ['table'],
   '4-page/container': ['container'], '4-page/grid': ['grid'],
-  '4-page/layout': ['layout'], '4-page/layouts': ['page'],
+  '4-page/layout': ['layout', 'page'], '4-page/layouts': ['page'],
   '4-page/header': ['header'], '4-page/footer': ['footer'], '4-page/document': ['document'],
 };

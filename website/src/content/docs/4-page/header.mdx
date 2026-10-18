@@ -73,7 +73,7 @@ Sync 1 copies the script with the `root` export's `"modules": ["header"]` (it br
 
 ## The drawer
 
-`attachDrawer()` from `0-face/drawer.ts` is the mechanism the header and [`ds-page drawer`](/4-page/layouts/#a-drawer-on-a-narrow-page) share. Give it the toggle and the parts it folds away; it opens them in a `dialog.ds-dialog.ds-drawer` (drawn by `drawer.css`) and puts them back on closing.
+`attachDrawer()` from `0-face/drawer.ts` is the mechanism the header and [`ds-page drawer`](/4-page/layout/#a-drawer-on-a-narrow-page) share. Give it the toggle and the parts it folds away; it opens them in a `dialog.ds-dialog.ds-drawer` (drawn by `drawer.css`) and puts them back on closing.
 
 ```js
 import { attachDrawer } from "/ds1/0-face/drawer.ts";
@@ -93,4 +93,4 @@ import { Header } from "./design/react/header";
 
 The adapter does not register the element: import `4-page/ds-header` once in the browser entry. Sync 1 copies `react/header.ts` when a product names `header` in its `components`.
 
-[Footer](/4-page/footer/) · [Document](/4-page/document/) · [Layouts](/4-page/layouts/) · [Dialog](/4-page/dialog/)
+[Footer](/4-page/footer/) · [Document](/4-page/document/) · [Layout](/4-page/layout/) · [Dialog](/4-page/dialog/)

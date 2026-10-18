@@ -75,7 +75,6 @@ export default defineConfig({
           items: [
             { label: "Overview", slug: "start-here/overview" },
             { label: "Use with HTML", slug: "start-here/quick-start" },
-            { label: "Examples", slug: "start-here/examples" },
             { label: "Email design", slug: "email" },
           ],
         },
@@ -109,9 +108,7 @@ export default defineConfig({
             { label: "Date", slug: "2-core/date" },
             { label: "Empty state", slug: "2-core/empty" },
             { label: "Gap", slug: "2-core/gap" },
-            { label: "Icon", items: [
-              { label: "Collection", slug: "2-core/icon/collection" },
-            ] },
+            { label: "Icon", slug: "2-core/icon" },
             { label: "Input", slug: "2-core/input" },
             { label: "Keyboard shortcut", slug: "2-core/kbd" },
             { label: "Language", slug: "2-core/language" },
@@ -152,8 +149,11 @@ export default defineConfig({
             { label: "Grid", slug: "4-page/grid" },
             { label: "Header", slug: "4-page/header" },
             { label: "Layout", slug: "4-page/layout" },
-            { label: "Layouts", slug: "4-page/layouts" },
           ],
+        },
+        {
+          label: "Examples",
+          slug: "start-here/examples",
         },
         {
           label: "Advanced",
