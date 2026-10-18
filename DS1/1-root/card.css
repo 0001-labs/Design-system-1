@@ -90,7 +90,14 @@
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ds-white) 8%, transparent);
 }
 
-/* Words: each line on the lower sixteen of its square. */
+/* Words: each line on the lower sixteen of its square. They keep their room
+   in a card of a set height; only the picture is cut at the foot. */
+.ds-card__label,
+.ds-card__title,
+.ds-card__body {
+  flex: none;
+}
+
 .ds-card__label {
   margin: 0;
   padding-top: calc(4px * var(--ds-sf, 1));
