@@ -1,81 +1,34 @@
 ---
-import PageGridIllustration from './PageGridIllustration.astro';
 import LandingHero from './LandingHero.astro';
 import LayerDiagram from './LayerDiagram.astro';
-import LayerBricks from './LayerBricks.astro';
-
-const example = `<link rel="stylesheet"
-  href="/my-styles.css" />
-
-<h1>Welcome</h1>
-<p>Make yourself at home</p>
-<button>Get started</button>`;
+import { LAYERS } from '../lib/component-directory';
 ---
 
 <article class="landing" aria-labelledby="landing-title" data-pagefind-body>
   <LandingHero />
-  <section id="learn-more" class="landing-layers" aria-label="Component list">
+  <section id="learn-more" class="landing-layers" aria-label="The four layers">
     <LayerDiagram />
   </section>
-  <section class="landing-layers" aria-labelledby="what-title">
-    <div class="landing-content">
-      <h2 id="what-title">What Design system 1 is</h2>
-      <p>A design system for ordinary HTML, shared CSS and fonts. Style a page without a framework or build step. Add JavaScript when you need the richer interactive components.</p>
-      <p>Start with semantic headings, links, tables and form fields. The component library adds reusable controls, charts and navigation when a page needs more behavior.</p>
-      <h2 id="layers-title" class="landing-layers-title">Four layers, one unit</h2>
-      <p>Root sets the unit. Core components are single pieces sized by it. Units put those pieces together, and pages place the units on the grid.</p>
-    </div>
-    <LayerBricks />
-  </section>
-  <div class="landing-layout">
-  <div class="landing-content">
-    <section class="landing-section landing-section--first" aria-labelledby="concept-title">
-      <h2 id="concept-title">A shared foundation</h2>
-      <p>Start with a square. Use it to size a button, place a heading, or give a panel room to breathe.</p>
-      <p>The grid adapts to the screen. On mobile, the squares scale while the column count stays consistent. The elements follow the same scale.</p>
-    </section>
-
-    <section class="landing-section" aria-labelledby="grid-demo-title">
-      <h2 id="grid-demo-title">Everything lines up</h2>
-      <p>The pastel areas show how a page takes shape. Its title, header, body, and navigation each occupy a place on the same grid.</p>
-    </section>
-
-    <section class="landing-section" aria-labelledby="classless-title">
-      <h2 id="classless-title">Your design, ordinary HTML</h2>
-      <p>Design system 1 styles native HTML. Headings, buttons, and forms take their appearance from a shared stylesheet.</p>
-      <p>Adjust the elements in the editor, then copy the CSS into your project. You can try it without an account.</p>
-      <pre aria-label="HTML with a custom stylesheet"><code>{example}</code></pre>
-      <p>Link your stylesheet and write your page. The playground is temporary, so copy your CSS to keep it.</p>
-    </section>
-
-    <section class="landing-section" aria-labelledby="components-title">
-      <h2 id="components-title">Components when you need them</h2>
-      <p>For interactive controls, use the Web Components with their stylesheet and JavaScript bundle. Themes, translations, and preferences are part of the system too.</p>
-    </section>
-
-    <nav class="landing-footer" aria-label="Explore Design system 1">
-      <a href="/start-here/overview/">Docs</a>
-    </nav>
-  </div>
-  <PageGridIllustration />
+  <div class="landing-directory" role="group" aria-label="Every component, by layer">
+    {LAYERS.map((layer) => (
+      <section class="directory-layer" data-color={layer.color} aria-labelledby={`layer-${layer.number}`}>
+        <div class="directory-layer-head">
+          <h2 id={`layer-${layer.number}`}><span class="directory-swatch" aria-hidden="true"></span>{layer.number} {layer.name}</h2>
+          <p>{layer.summary}</p>
+        </div>
+        <ul>
+          {layer.entries.map((entry) => (
+            <li><a href={entry.href}>{entry.name}</a></li>
+          ))}
+        </ul>
+      </section>
+    ))}
   </div>
 </article>
 
-
-
 <style>
-  @font-face {
-    font-family: 'Inter Arrows';
-    src: url('/fonts/InterArrows.woff2') format('woff2');
-    font-weight: 100 900;
-    font-style: normal;
-    font-display: swap;
-    unicode-range: U+2190-21FF, U+2794-27FF, U+2900-297F, U+2B00-2BFF, U+1F800-1F8FF;
-  }
-
   .landing {
     --landing-unit: min(calc(var(--unit, 20px) * var(--sf, 1)), calc(100vw / 57));
-    --landing-content-width: calc(12 * var(--landing-unit));
     --landing-type: calc(0.7 * var(--landing-unit));
     position: relative;
     isolation: isolate;
@@ -87,113 +40,104 @@ const example = `<link rel="stylesheet"
     padding-block: 0 calc(4 * var(--landing-unit));
     color: var(--ds1-docs-header-text);
   }
+  .landing :is(h2, p) { margin: 0; }
 
-  .landing-layout {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    grid-template-columns: var(--landing-content-width) calc(32 * var(--landing-unit));
-    gap: calc(7 * var(--landing-unit));
-    width: max-content;
-    margin-inline-start: calc(5 * var(--landing-unit));
-    margin-inline-end: auto;
-    align-items: start;
-  }
-
-  /* Keep the compact text column beside the portfolio layout illustration. */
-  .landing-content {
-    width: var(--landing-content-width);
-    font-family: var(--typeface-regular);
-    font-size: var(--landing-type);
-    font-weight: 400;
-    line-height: var(--landing-unit);
-  }
-
-  .landing :is(h1, h2, p, pre) { margin: 0; }
-  .landing :is(h1, h2) {
-    color: inherit;
-    font-family: var(--typeface-regular);
-    font-weight: 400;
-    letter-spacing: 0;
-    line-height: var(--landing-unit);
-  }
-  .landing h2 { font-size: var(--landing-type); font-family: var(--typeface-medium); }
-  .landing p { font-size: var(--landing-type); line-height: var(--landing-unit); }
-  .landing :is(p + p, h2 + p) { margin-top: var(--landing-unit); }
-  .landing-section { margin-top: calc(3 * var(--landing-unit)); }
-  .landing-section--first { margin-top: 0; }
-  .landing .landing-layers-title { margin-top: calc(2 * var(--landing-unit)); }
   .landing-layers {
     display: grid;
-    gap: calc(2 * var(--landing-unit));
     justify-items: start;
     margin-inline-start: calc(5 * var(--landing-unit));
     padding-block: calc(4 * var(--landing-unit));
     scroll-margin-top: 0;
   }
 
-  .landing a {
-    display: inline-flex;
-    align-items: center;
-    gap: calc(0.25 * var(--landing-unit));
-    max-width: 100%;
-    color: inherit;
-    font-size: var(--landing-type);
-    line-height: var(--landing-unit);
-    text-decoration: none;
-  }
-  .landing a > span[aria-hidden='true'] {
-    font-family: 'Inter Arrows', Inter, sans-serif;
-    font-weight: 400;
-    font-size: 1em;
-    line-height: 1;
-  }
-  .landing a:hover { text-decoration: underline; text-underline-offset: 3px; }
-  .landing :is(a, button):focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
-  .landing-actions, .landing-footer { display: flex; flex-wrap: wrap; align-items: center; gap: var(--landing-unit); margin-top: var(--landing-unit); }
-  .landing-footer { margin-top: calc(3 * var(--landing-unit)); }
-  .landing .landing-button {
-    width: auto;
-    padding: 0 calc(0.1 * var(--landing-unit));
-    border: 0;
-    border-radius: 0;
-    background: var(--button-background-color-secondary);
-    color: var(--button-text-color-secondary, var(--black));
+  /* Every component by layer: the layer's name and what it is beside its
+     list, staying in view while the names go by. The names are the links,
+     one a line, each six squares high. */
+  .landing-directory {
+    --directory-type: calc(6 * var(--landing-unit));
+    margin-inline: calc(5 * var(--landing-unit));
     font-family: var(--typeface-regular);
+  }
+  .directory-layer {
+    --layer-color: light-dark(#e6e6e6, #ffffff);
+    display: grid;
+    grid-template-columns: calc(10 * var(--landing-unit)) minmax(0, 1fr);
+    column-gap: calc(2 * var(--landing-unit));
+    row-gap: var(--landing-unit);
+    padding-block: var(--landing-unit) calc(4 * var(--landing-unit));
+    border-top: 1px solid var(--ds1-docs-divider, var(--ds1-docs-header-border));
+  }
+  .directory-layer[data-color='light-green'] { --layer-color: #99ff73; }
+  .directory-layer[data-color='light-blue'] { --layer-color: #ccccff; }
+  .directory-layer[data-color='pink'] { --layer-color: #f5aad1; }
+  .directory-layer[data-color='yellow'] { --layer-color: #eaff00; }
+
+  .directory-layer-head {
+    position: sticky;
+    top: calc(var(--site-header-height, 0px) + var(--landing-unit));
+    align-self: start;
+    font-size: var(--landing-type);
+  }
+  /* One square a line, the swatch and words on its lower sixteen. */
+  .directory-layer-head h2 {
+    display: flex;
+    align-items: flex-end;
+    gap: calc(0.2 * var(--landing-unit));
+    height: var(--landing-unit);
+    color: inherit;
+    font-family: var(--typeface-medium);
     font-size: var(--landing-type);
     font-weight: 400;
-    line-height: var(--landing-unit);
-    cursor: pointer;
+    letter-spacing: 0;
+    line-height: calc(0.8 * var(--landing-unit));
   }
-  .landing-section > a { margin-top: var(--landing-unit); }
+  .directory-swatch {
+    flex: none;
+    width: calc(0.8 * var(--landing-unit));
+    height: calc(0.8 * var(--landing-unit));
+    background: var(--layer-color);
+  }
+  .directory-layer-head p {
+    color: var(--ds1-docs-header-text-secondary);
+    line-height: var(--landing-unit);
+  }
 
-  .landing pre {
-    margin-block: var(--landing-unit);
-    overflow-x: auto;
-    padding: 0;
-    border: 0;
-    background: var(--ds1-docs-content-bg);
-    line-height: var(--landing-unit);
+  .directory-layer ul { margin: 0; padding: 0; list-style: none; }
+  .directory-layer li { margin: 0; }
+  .directory-layer li a {
+    display: block;
+    width: fit-content;
+    max-width: 100%;
+    padding: 0 0.08em;
+    margin-inline-start: -0.08em;
+    color: inherit;
+    font-size: var(--directory-type);
+    letter-spacing: -0.035em;
+    line-height: var(--directory-type);
+    text-decoration: none;
+    overflow-wrap: anywhere;
+    transition: background-color 120ms ease-out;
   }
-  .landing code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: var(--landing-type); color: inherit; }
+  .directory-layer li a:hover { background: var(--layer-color); color: #1e1e1e; }
+  .directory-layer li a:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 
   @media (max-width: 1100px) {
-    .landing {
-      --landing-unit: min(calc(var(--unit, 20px) * var(--sf, 1)), calc(100vw / 39));
-    }
-    .landing-layout { grid-template-columns: var(--landing-content-width) calc(16 * var(--landing-unit)); gap: calc(5 * var(--landing-unit)); }
+    .landing { --landing-unit: min(calc(var(--unit, 20px) * var(--sf, 1)), calc(100vw / 39)); }
+    .landing-directory { --directory-type: calc(4 * var(--landing-unit)); }
   }
   @media (max-width: 680px) {
-    .landing {
-      --landing-unit: min(calc(var(--unit, 20px) * var(--sf, 1)), calc(100vw / 21));
-    }
-    .landing-layout { grid-template-columns: var(--landing-content-width); gap: calc(3 * var(--landing-unit)); }
+    .landing { --landing-unit: min(calc(var(--unit, 20px) * var(--sf, 1)), calc(100vw / 21)); }
+    .landing-layers { margin-inline-start: var(--landing-unit); }
+    .landing-directory { --directory-type: calc(3 * var(--landing-unit)); margin-inline: var(--landing-unit); }
+    .directory-layer { grid-template-columns: minmax(0, 1fr); }
+    .directory-layer-head { position: static; }
   }
-  :global(html.mobile) .landing {
-    --landing-unit: min(calc(var(--unit, 20px) * var(--sf, 1)), calc(100vw / 21));
-  }
-  :global(html.mobile) .landing-layout {
-    grid-template-columns: var(--landing-content-width);
-    gap: calc(3 * var(--landing-unit));
+  :global(html.mobile) .landing { --landing-unit: min(calc(var(--unit, 20px) * var(--sf, 1)), calc(100vw / 21)); }
+  :global(html.mobile) .landing-layers { margin-inline-start: var(--landing-unit); }
+  :global(html.mobile) .landing-directory { --directory-type: calc(3 * var(--landing-unit)); margin-inline: var(--landing-unit); }
+  :global(html.mobile) .directory-layer { grid-template-columns: minmax(0, 1fr); }
+  :global(html.mobile) .directory-layer-head { position: static; }
+  @media (prefers-reduced-motion: reduce) {
+    .directory-layer li a { transition: none; }
   }
 </style>

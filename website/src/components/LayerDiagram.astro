@@ -1,7 +1,8 @@
 ---
 // The four layers drawn as a diagram of item cells: every box one cell,
 // four squares by one (80 by 20), stacked edge to edge under its group's name and what it is, groups
-// two squares apart with an arrow from each to the next.
+// two squares apart with an arrow from each to the next. Page is the last
+// layer, so its name has no arrow.
 import { LAYERS } from '../lib/component-directory';
 
 // What a box says under the pointer: the element as it is written in HTML.
@@ -12,10 +13,12 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
   {LAYERS.map((layer, index) => (
     <div class="layer-group" data-color={layer.color}>
       <p class="layer-name">
-        <a href={`/${layer.number}-${layer.name.toLowerCase()}/overview/`}>{layer.number} {layer.name}</a>
-        <span class="layer-arrow" aria-hidden="true">
-          <svg class="layer-arrow-head" viewBox="-0.17 -0.12 0.17 0.24"><polyline points="-0.164,-0.115 0,0 -0.164,0.115" /></svg>
-        </span>
+        <a class="ds-link" href={`/${layer.number}-${layer.name.toLowerCase()}/overview/`}>{layer.number} {layer.name}</a>
+        {index < LAYERS.length - 1 && (
+          <span class="layer-arrow" aria-hidden="true">
+            <svg class="layer-arrow-head" viewBox="-0.17 -0.12 0.17 0.24"><polyline points="-0.164,-0.115 0,0 -0.164,0.115" /></svg>
+          </span>
+        )}
       </p>
       <p class="layer-summary">{layer.summary}</p>
       <ul>
@@ -36,9 +39,6 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
 </div>
 
 <style>
-  .layer-name.icon-layer-name { display: flex; align-items: center; gap: calc(.2 * var(--landing-unit)); font-family: var(--typeface-regular); font-weight: 400; }
-  .section-cross { display: inline-flex; width: calc(.8 * var(--landing-unit)); height: calc(.8 * var(--landing-unit)); }
-  .section-cross :global(svg) { width: 100%; height: 100%; }
   .layer-diagram {
     --diagram-unit: var(--landing-unit);
     --diagram-ink: var(--ds1-docs-header-text);
@@ -60,6 +60,22 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
   .layer-group[data-color='grey'] { --box-fill: light-dark(#e6e6e6, #bdbdbd); }
 
   .layer-name { margin: 0; font-family: var(--typeface-medium); }
+  /* The name is a link in running text, as `.ds-link` in controls.css draws
+     it (the site does not load that sheet): the text's ink, a hairline
+     underline 2px below the letters that turns to the full ink under the
+     pointer, and the muted ink once visited. */
+  .layer-name .ds-link {
+    color: inherit;
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+    text-underline-offset: calc(2px * var(--sf, 1));
+    transition: none;
+  }
+  .layer-name .ds-link:visited { color: var(--ds1-docs-header-text-secondary); }
+  .layer-name .ds-link:hover { color: inherit; text-decoration-color: currentColor; }
+  .layer-name .ds-link:visited:hover { color: var(--ds1-docs-header-text-secondary); }
+  .layer-name .ds-link:focus-visible { outline: 2px solid currentColor; outline-offset: 1px; }
   .layer-group ul { margin: 0; padding: 0; list-style: none; }
   .layer-group li { margin: 0; }
   /* A box is an item cell, four squares by one (80 by 20). A stack wears

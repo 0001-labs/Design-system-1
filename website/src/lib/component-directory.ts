@@ -1,17 +1,9 @@
 import { LAYERS as COMPONENT_LAYERS } from '../../../shared/component-directory';
 export type { DirectoryEntry, DirectoryLayer } from '../../../shared/component-directory';
-// Documentation groups foundations without changing the private workbench catalogue.
+// Documentation leaves Styling out of Root without changing the private workbench catalogue.
 export const LAYERS = COMPONENT_LAYERS.map(layer => layer.number !== 1 ? layer : {
   ...layer,
-  entries: [
-    ...layer.entries.filter(entry => entry.name !== 'Styling'),
-    { name: 'Languages', href: '/1-root/languages/' },
-    { name: 'Formatting', href: '/1-root/formatting/' },
-    { name: 'Theming', href: '/1-root/theming/' },
-    { name: 'Device', href: '/1-root/device/' },
-    { name: 'Preferences', href: '/1-root/preferences/' },
-    { name: 'Pricing', href: '/1-root/pricing/' },
-  ],
+  entries: layer.entries.filter(entry => entry.name !== 'Styling'),
 });
 import { isSharedInterfaceIcon, sharedIconName } from './icons/icon-scope';
 
