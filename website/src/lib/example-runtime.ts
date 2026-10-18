@@ -27,7 +27,7 @@ const sample = document.querySelector<HTMLElement>('#sample')!;
 // and initial tooltip state are applied before the example becomes ready.
 const example = EXAMPLES[document.body.dataset.exampleId!];
 sample.innerHTML = example.html;
-sample.querySelectorAll<HTMLButtonElement>('ds-toggle button').forEach(button => {
+sample.querySelectorAll<HTMLButtonElement>('ds-switch button').forEach(button => {
   button.addEventListener('click', () => {
     const checked = button.getAttribute('aria-checked') !== 'true';
     button.setAttribute('aria-checked', String(checked));
@@ -81,7 +81,7 @@ sample.addEventListener('change', event => {
 });
 sample.addEventListener('form-invalid', () => { output.textContent = 'form-invalid: fill in the required field.'; });
 for (const name of ['change', 'press']) sample.addEventListener(name, event => {
-  if (((event.target as HTMLElement).localName === 'ds-split' || (event.target as HTMLElement).matches('ds-button[split]')))
+  if ((event.target as HTMLElement).matches('ds-button[split]'))
     output.textContent = `${name}: ${(event as CustomEvent).detail.value}`;
 });
 

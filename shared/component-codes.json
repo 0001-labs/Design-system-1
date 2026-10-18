@@ -72,6 +72,14 @@
     "url": "https://designsystem1.com/2-core/card/"
   },
   {
+    "id": "component:/2-core/choice/",
+    "code": "CHOI",
+    "label": "Checkbox and switch",
+    "kind": "component",
+    "summary": "Design system 1 2-core.",
+    "url": "https://designsystem1.com/2-core/choice/"
+  },
+  {
     "id": "component:/2-core/chart/",
     "code": "CHRT",
     "label": "Chart",
@@ -86,14 +94,6 @@
     "kind": "component",
     "summary": "Design system 1 2-core.",
     "url": "https://designsystem1.com/2-core/cycle/"
-  },
-  {
-    "id": "component:/2-core/date/",
-    "code": "DATE",
-    "label": "Date",
-    "kind": "component",
-    "summary": "Design system 1 2-core.",
-    "url": "https://designsystem1.com/2-core/date/"
   },
   {
     "id": "component:/2-core/empty/",
@@ -206,14 +206,6 @@
     "kind": "component",
     "summary": "Design system 1 2-core.",
     "url": "https://designsystem1.com/2-core/toast/"
-  },
-  {
-    "id": "component:/2-core/toggle/",
-    "code": "TGL",
-    "label": "Toggle",
-    "kind": "component",
-    "summary": "Design system 1 2-core.",
-    "url": "https://designsystem1.com/2-core/toggle/"
   },
   {
     "id": "component:/2-core/tooltip/",

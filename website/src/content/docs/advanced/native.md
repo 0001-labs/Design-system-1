@@ -43,7 +43,7 @@ Every public piece of the web library has a native counterpart with the same nam
 | `ds-button split` | `DS1SplitButton` | `DS1SplitButton` |
 | `ds-input`, `ds-textarea` | `DS1Field`, `DS1TextArea`, `DS1FieldStyle` | `DS1Field`, `DS1TextArea` |
 | `ds-checkbox`, `ds-radio`, choice tiles | `DS1CheckboxStyle`, `DS1Checkbox`, `DS1Radio`, `DS1Choice` | `DS1Checkbox`, `DS1Radio`, `DS1Choice` |
-| `ds-switch`, `ds-toggle` | `DS1SwitchStyle` (`.ds1Switch`, `.ds1Toggle`) | `DS1Switch`, `DS1Toggle` |
+| `ds-switch`, `rounded` | `DS1SwitchStyle` (`.ds1Switch`, `.ds1Switch(rounded:)`) | `DS1Switch(rounded)` |
 | `ds-select` | `DS1Select` (the system's menu) | `DS1Select` |
 | `ds-tabs` | `DS1Tabs` | `DS1Tabs` |
 | `ds-badge`, `ds-token`, `ds-swatch`, link, `ds-gap` | `DS1Badge`, `DS1Token`, `DS1Swatch`, `DS1Link`, `DS1Gap` | `DS1Badge`, `DS1Token`, `DS1Swatch`, `DS1Link`, `DS1Gap` |
@@ -60,7 +60,7 @@ Every public piece of the web library has a native counterpart with the same nam
 | `ds-row`, `ds-grid` | `DS1Row`, `DS1Rule`, `DS1PaperGrid` | `DS1Row`, `DS1Rule`, `DS1PaperGrid` |
 | `format.ts`, `pricing.ts`, `copyText` | `DS1Format`, `DS1Pricing`, `DS1Clipboard` | `DS1Format`, `DS1Pricing`, `DS1Clipboard` |
 
-Left out on purpose: the 2-core card (off the system: no boxes around content), the legacy `ds-layout` and `ds-form` (use `DS1PageLayout` and the platform's own forms), page dots, and the year in `ds-date` (use `DS1Format`). Charts, the composer, and `ds-stat`, `ds-meter` and `ds-steps` follow later; until then a native figure is `DS1Figures` on its lines.
+Left out on purpose: the 2-core card (off the system: no boxes around content), the legacy `ds-layout` and `ds-form` (use `DS1PageLayout` and the platform's own forms), and page dots. Charts, the composer, and `ds-stat`, `ds-meter` and `ds-steps` follow later; until then a native figure is `DS1Figures` on its lines.
 
 ## What stays native
 

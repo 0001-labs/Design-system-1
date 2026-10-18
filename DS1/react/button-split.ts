@@ -8,7 +8,7 @@ export interface SplitButtonProps<T extends string> {
   onPress: (value: T) => void; label: string; className?: string; style?: CSSProperties;
   disabled?: boolean; compact?: boolean;
 }
-export function SplitButton<T extends string>({ segments, value, onPress, label, className, style, disabled = false, compact = false, forwardedRef, tag = "ds-button" }: SplitButtonProps<T> & { forwardedRef?: Ref<ButtonElement>; tag?: "ds-button" | "ds-split" }): ReactNode {
+export function SplitButton<T extends string>({ segments, value, onPress, label, className, style, disabled = false, compact = false, forwardedRef }: SplitButtonProps<T> & { forwardedRef?: Ref<ButtonElement> }): ReactNode {
   const ref = useRef<ButtonElement | null>(null);
   useCommitEffect(() => {
     const element = ref.current; if (!element) return;
@@ -22,7 +22,7 @@ export function SplitButton<T extends string>({ segments, value, onPress, label,
     element.addEventListener("change", press); element.addEventListener("press", press);
     return () => { element.removeEventListener("change", press); element.removeEventListener("press", press); };
   });
-  return createElement(tag, { ref: (element: ButtonElement | null) => {
+  return createElement("ds-button", { ref: (element: ButtonElement | null) => {
     ref.current = element;
     if (typeof forwardedRef === "function") forwardedRef(element); else if (forwardedRef) forwardedRef.current = element;
   }, split: true, "aria-label": label, className, style });

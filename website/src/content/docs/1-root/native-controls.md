@@ -132,7 +132,7 @@ The page flips `aria-pressed` when it is clicked. The words stay the same in bot
 | `ds-toggle` | `<button class="ds-button" aria-pressed>` | An action that stays on: show the timeline, mute a track, bold. |
 | `ds-tabs` with `role="group"` | a row of `.ds-button` with `aria-pressed` | One of two or more choices: list or board; day, week or month. |
 
-The [Toggle](/2-core/toggle/) element, `<ds-toggle>`, is the rounded switch: on a page without Lit it is `ds-switch ds-switch--rounded`. The `ds-toggle` class is the toggle button.
+The rounded switch is [`<ds-switch rounded>`](/2-core/choice/#rounded): on a page without Lit it is `ds-switch ds-switch--rounded`. The `ds-toggle` class is the toggle button.
 
 ## Range
 

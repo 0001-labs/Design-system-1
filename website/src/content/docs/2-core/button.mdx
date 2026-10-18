@@ -141,4 +141,4 @@ import { Button } from './design/react/button';
 
 Supplying `value` keeps the choice controlled; omitting it selects repeated actions. `compact` keeps a single-character label square and gives longer numeric labels the compressed face. Outside corners follow the shared shape; interior joins stay square. The native segments retain Tab, Enter, Space and disabled-fieldset behavior. This mode groups choices or actions; it does not create a dropdown menu.
 
-Existing `<ds-split>` and React `Split` imports remain compatibility wrappers around Button's implementation. Existing `split` Sync 1 selections continue to work. New source consumers select `button` and use `<ds-button split>` or `<Button split>`. The old [Split guide](/2-core/split/) remains available as a compatibility URL.
+There is no separate split element: select `button` in Sync 1 and write `<ds-button split>` or `<Button split>`.

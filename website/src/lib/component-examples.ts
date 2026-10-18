@@ -89,8 +89,8 @@ export const EXAMPLES: Record<string, ComponentExample> = {
     title: 'Turn a setting on or off',
     hint: 'Click or press Space to change the local setting. No settings are saved.',
     height: 180,
-    html: `<label style="display:flex;align-items:center;gap:20px">Notifications <ds-toggle><button type="button" role="switch" aria-label="Notifications" aria-checked="true"></button></ds-toggle></label>
-<label style="display:flex;align-items:center;gap:20px">Unavailable <ds-toggle><button type="button" role="switch" aria-label="Unavailable" aria-checked="false" disabled></button></ds-toggle></label>`,
+    html: `<label style="display:flex;align-items:center;gap:20px">Notifications <ds-switch rounded><button type="button" role="switch" aria-label="Notifications" aria-checked="true"></button></ds-switch></label>
+<label style="display:flex;align-items:center;gap:20px">Unavailable <ds-switch rounded><button type="button" role="switch" aria-label="Unavailable" aria-checked="false" disabled></button></ds-switch></label>`,
     script: `document.querySelectorAll('ds-toggle button').forEach(button => {
   button.addEventListener('click', () => {
     button.setAttribute('aria-checked', String(button.getAttribute('aria-checked') !== 'true'));
@@ -224,10 +224,6 @@ render();`,
   'text': {
     title: 'Text and translation keys', hint: 'Slot text is the translation key and the fallback.',
     html: '<ds-text>Welcome to the app</ds-text>\n<ds-text text="Save" strong></ds-text>\n<ds-text tone="danger" wrap>Could not save your changes</ds-text>',
-  },
-  'date': {
-    title: 'The current year', hint: 'The year comes from the browser’s clock.',
-    html: '<span>Copyright <ds-date></ds-date> 0001</span>',
   },
   'banner': {
     title: 'A message with an action', hint: 'The banner sits at the top of this isolated preview.',
@@ -625,7 +621,7 @@ document.querySelectorAll('[data-grid-option]').forEach(control => {
 };
 
 export const PAGE_EXAMPLES: Record<string, string[]> = {
-  '2-core/toggle': ['toggle'],
+  '2-core/choice': ['toggle'],
   '2-core/toast': ['toast'],
   '2-core/chart': ['chart'],
   '2-core/avatar': ['avatar-borderless', 'avatar'],
@@ -633,7 +629,7 @@ export const PAGE_EXAMPLES: Record<string, string[]> = {
   '2-core/tooltip': ['tooltip', 'tooltip-fallback'],
   '2-core/icon': ['icon', 'icon-variants'],
   '2-core/input': ['input', 'input-states'],
-  '2-core/text': ['text'], '2-core/date': ['date'],
+  '2-core/text': ['text'],
   '2-core/banner': ['banner', 'banner-dismiss'], '2-core/card': ['card', 'card-outlined'],
   '2-core/empty': ['empty', 'empty-search'], '2-core/notice': ['notice'], '2-core/kbd': ['kbd'], '2-core/pagedots': ['pagedots'],
   '2-core/stat': ['stat'], '2-core/meter': ['meter'], '2-core/steps': ['steps'],

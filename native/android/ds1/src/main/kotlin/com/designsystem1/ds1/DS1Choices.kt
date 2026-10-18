@@ -120,7 +120,7 @@ fun DS1Choice(
 /**
  * `ds-switch`: a 32 by 16 track with a 12 dp thumb two dp in, both with the corner; on, the
  * track takes the accent and the thumb the ink on it, sliding one control height in 140 ms.
- * [rounded] is `ds-toggle`: a pill with a white round thumb on dark Apple green.
+ * [rounded] is the rounded switch: a pill with a white round thumb on dark Apple green.
  */
 @Composable
 fun DS1Switch(
@@ -157,11 +157,6 @@ fun DS1Switch(
         Box(Modifier.offset { androidx.compose.ui.unit.IntOffset(travel.roundToPx(), 0) }.size(scale(12f)).background(thumb.current, if (rounded) CircleShape else RoundedCornerShape(scale.radius)))
     }
 }
-
-/** `ds-toggle`: the rounded switch. */
-@Composable
-fun DS1Toggle(checked: Boolean, onCheckedChange: ((Boolean) -> Unit)?, modifier: Modifier = Modifier, enabled: Boolean = true) =
-    DS1Switch(checked, onCheckedChange, modifier, enabled, rounded = true)
 
 /** `--ds-switch-track-on`: Apple green's dark version, so a white thumb stays clear in both modes. */
 val SWITCH_TRACK_ON = DS1Color(0x529d36)

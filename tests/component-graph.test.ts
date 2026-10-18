@@ -9,8 +9,8 @@ import exported from '../sync.exports.mjs';
 const ds1 = resolve('DS1');
 
 test('a selection carries everything it imports, with its React adapter and the shared tokens', () => {
-  const { files } = componentGraph(ds1, ['button', 'panel', 'input', 'split']);
-  for (const file of ['2-core/ds-split.ts', 'react/split.ts', '2-core/ds-text.ts', 'react/button.ts', '0-face/translations/en.json', 'x-icon/password-see.svg', '1-root/component-tokens.css', '1-root/controls.css', '1-root/text.css']) {
+  const { files } = componentGraph(ds1, ['button', 'panel', 'input']);
+  for (const file of ['2-core/button-split.ts', 'react/button-split.ts', '2-core/ds-text.ts', 'react/button.ts', '0-face/translations/en.json', 'x-icon/password-see.svg', '1-root/component-tokens.css', '1-root/controls.css', '1-root/text.css']) {
     expect(files.has(file)).toBe(true);
   }
   expect(files.get('1-root/component-metrics.css')).toBe(readFileSync(resolve('DS1/1-root/component-metrics.css'), 'utf8'));
