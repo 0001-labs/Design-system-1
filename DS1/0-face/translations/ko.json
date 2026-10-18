@@ -111,6 +111,10 @@
     "Next month": "다음 달",
     "Choose a date": "날짜 선택",
     "Date": "날짜",
-    "W{week}": "{week}주"
+    "W{week}": "{week}주",
+    "Total": "합계",
+    "End date": "종료일",
+    "Include time": "시간 포함",
+    "Time": "시간"
   }
 }

@@ -20,7 +20,7 @@ import {
   type CalendarEvent,
   type Day,
 } from "../0-face/calendar";
-import { CalendarBase, readMonth } from "./calendar-base";
+import { CalendarBase, readMonth, readRange } from "./calendar-base";
 import "../2-core/ds-icon";
 import metrics from "../1-root/component-metrics.css?inline";
 import controls from "../1-root/controls.css?inline";
@@ -45,6 +45,10 @@ const whole = (value: number | undefined, least: number, most: number, fallback:
  * @prop {boolean} weekNumbers - Write the week's number (`week-numbers`) on
  *   its first day.
  * @prop {boolean} fixed - Always draw six weeks, so the month keeps its height.
+ * @prop {boolean} outsideDays - Draw the days of the months before and after
+ *   in the title grey (`outside-days`); pressing one moves there.
+ * @prop {boolean} range - A selectable calendar chooses a first and a last
+ *   day; `value` is then `YYYY-MM-DD/YYYY-MM-DD`.
  * @prop {boolean} noHeader - Leave out the title and arrows (`no-header`).
  * @prop {boolean} noToday - Leave out the Today button (`no-today`).
  * @prop {string} min - The first day a person may choose.
@@ -63,6 +67,7 @@ const whole = (value: number | undefined, least: number, most: number, fallback:
  * @example
  * <ds-calendar month="2026-10" week-numbers></ds-calendar>
  * <ds-calendar compact selectable value="2026-10-18"></ds-calendar>
+ * <ds-calendar compact selectable range value="2026-10-18/2026-10-24"></ds-calendar>
  */
 export class Calendar extends CalendarBase {
   static properties = {
@@ -73,6 +78,7 @@ export class Calendar extends CalendarBase {
     lines: { type: Number },
     weekNumbers: { type: Boolean, attribute: "week-numbers", reflect: true },
     fixed: { type: Boolean, reflect: true },
+    outsideDays: { type: Boolean, attribute: "outside-days", reflect: true },
     noHeader: { type: Boolean, attribute: "no-header", reflect: true },
     noToday: { type: Boolean, attribute: "no-today", reflect: true },
     open: { state: true },
@@ -86,6 +92,7 @@ export class Calendar extends CalendarBase {
   declare lines: number | undefined;
   declare weekNumbers: boolean;
   declare fixed: boolean;
+  declare outsideDays: boolean;
   declare noHeader: boolean;
   declare noToday: boolean;
   /** The day whose hidden events are unfolded. */
@@ -100,13 +107,14 @@ export class Calendar extends CalendarBase {
     this.compact = false;
     this.weekNumbers = false;
     this.fixed = false;
+    this.outsideDays = false;
     this.noHeader = false;
     this.noToday = false;
   }
 
   /** The first of the month shown. */
   get shownMonth(): Day {
-    return readMonth(this.month) ?? readMonth(this.value) ?? startOfMonth(this.todayDay);
+    return readMonth(this.month) ?? readMonth(readRange(this.value).start) ?? startOfMonth(this.todayDay);
   }
 
   private get squaresPerDay() {
@@ -127,6 +135,7 @@ export class Calendar extends CalendarBase {
     this.style.setProperty("--ds-calendar-lines", String(this.eventLines));
     // A compact month with events writes the days without any fainter.
     this.toggleAttribute("data-events", (this.events ?? []).length > 0);
+    this.toggleAttribute("data-roomy", this.squaresPerDay >= 2);
   }
 
   /** Shows another month and says so with `navigate`. */
@@ -157,7 +166,7 @@ export class Calendar extends CalendarBase {
   /** The day holding the Tab stop: the one moved to, the selected day, today, or the first. */
   private get tabDay(): Day {
     const month = this.shownMonth;
-    for (const day of [this.focusDay, this.value, this.todayDay]) if (day && sameMonth(day, month)) return day;
+    for (const day of [this.focusDay, this.chosen.start, this.todayDay]) if (day && sameMonth(day, month)) return day;
     return month;
   }
 
@@ -201,6 +210,18 @@ export class Calendar extends CalendarBase {
     }
     this.focusDay = day;
     this.press(day);
+    // A day of the month before or after takes the calendar there.
+    if (!sameMonth(day, this.shownMonth)) this.showMonth(day, true);
+  };
+
+  /** While a range waits for its end, the day under the pointer previews it. */
+  private onPointerOver = (event: PointerEvent) => {
+    if (!this.range || !this.selectable) return;
+    const { start, end } = readRange(this.value);
+    if (!start || end) return;
+    const cell = (event.composedPath() as HTMLElement[]).find(node => node instanceof HTMLElement && node.dataset?.day);
+    const day = cell?.dataset.day as Day | undefined;
+    if (day !== this.hoverDay && (!day || this.allowed(day))) this.hoverDay = day;
   };
 
   private onFocusOut = (event: FocusEvent) => {
@@ -221,12 +242,12 @@ export class Calendar extends CalendarBase {
       ?disabled=${which === "previous" ? before : after}
       @click=${() => (which === "previous" ? this.previousMonth() : this.nextMonth())}
     ><ds-icon type=${which === "previous" ? "left" : "right"} aria-hidden="true"></ds-icon></button>`;
-    const title = monthTitle(month, this.squaresPerDay < 2 ? "short" : "long");
+    const title = monthTitle(month, this.compact ? "short" : "long");
     return html`<div class="header" part="header">
       <span class="title" id="title" aria-live="polite">${title}</span>
       <span class="controls">
+        ${this.noToday || this.squaresPerDay < 2 ? nothing : html`<button class="ds-button today-button" part="today" type="button" @click=${() => this.showToday()}>${this.words("Today")}</button>`}
         ${arrow("previous")}
-        ${this.compact || this.noToday ? nothing : html`<button class="ds-button ds-button--secondary today-button" part="today" type="button" @click=${() => this.showToday()}>${this.words("Today")}</button>`}
         ${arrow("next")}
       </span>
     </div>`;
@@ -234,11 +255,12 @@ export class Calendar extends CalendarBase {
 
   private renderDay(day: Day, column: number) {
     const month = this.shownMonth;
-    if (!sameMonth(day, month)) return html`<div role="gridcell" class="day outside" part="day outside"></div>`;
+    const outside = !sameMonth(day, month);
+    if (outside && !this.outsideDays) return html`<div role="gridcell" class="day outside" part="day outside"></div>`;
     const events = this.eventsOn(day);
     const lines = this.eventLines;
     const isToday = day === this.todayDay;
-    const selected = day === this.value;
+    const { selected, inside, first, last } = this.selection(day);
     const allowed = this.allowed(day);
     const unfolded = this.open === day;
     const shown = unfolded || events.length <= lines ? events : events.slice(0, Math.max(0, lines - 1));
@@ -249,13 +271,17 @@ export class Calendar extends CalendarBase {
       class="day"
       part=${parts}
       data-day=${day}
-      tabindex=${day === this.tabDay ? 0 : -1}
+      tabindex=${!outside && day === this.tabDay ? 0 : -1}
       aria-label=${this.cellLabel(day, events)}
-      aria-selected=${this.selectable ? String(selected) : nothing}
+      aria-selected=${this.selectable ? String(selected || inside) : nothing}
       aria-current=${isToday ? "date" : nothing}
       aria-disabled=${allowed ? nothing : "true"}
       ?data-today=${isToday}
       ?data-selected=${selected}
+      ?data-inside=${inside}
+      ?data-first=${first}
+      ?data-last=${last}
+      ?data-outside=${outside}
       ?data-busy=${events.length > 0}
       ?data-open=${unfolded}
     >
@@ -282,16 +308,21 @@ export class Calendar extends CalendarBase {
     const first = this.firstDay;
     const weeks = monthWeeks(month, first, this.fixed);
     this.byDay = eventsByDay(this.events ?? [], weeks[0][0], weeks.at(-1)![6]);
-    const short = weekdayNames(first, this.compact && this.squaresPerDay < 2 ? "narrow" : "short");
+    // A compact month names its days in a letter (one square) or two (wider); a full month in short.
+    const short = this.compact
+      ? this.squaresPerDay < 2
+        ? weekdayNames(first, "narrow")
+        : weekdayNames(first, "short").map(name => (/^\p{Script=Latin}/u.test(name) ? name.replace(/\.$/, "").slice(0, 2) : name))
+      : weekdayNames(first, "short");
     const long = weekdayNames(first, "long");
-    return html`<div class="calendar" part="calendar" @focusout=${this.onFocusOut}>
+    return html`<div class="calendar" part="calendar" @focusout=${this.onFocusOut} @pointerover=${this.onPointerOver} @pointerleave=${() => (this.hoverDay = undefined)}>
       ${this.renderHeader()}
       <div
         class="grid"
         part="grid"
         role="grid"
         aria-label=${this.nameOr(monthTitle(month))}
-        aria-multiselectable=${this.selectable ? "false" : nothing}
+        aria-multiselectable=${this.selectable ? String(this.range) : nothing}
         @keydown=${this.onKeyDown}
         @click=${this.onClick}
       >

@@ -204,7 +204,7 @@ export class CalendarLarge extends CalendarBase {
 
   private get tabDay(): Day {
     const first = this.weekStarts[0], last = this.lastDay;
-    for (const day of [this.focusDay, this.value, this.todayDay]) if (day && day >= first && day <= last) return day;
+    for (const day of [this.focusDay, this.chosen.start, this.todayDay]) if (day && day >= first && day <= last) return day;
     return this.firstMonth;
   }
 
@@ -304,7 +304,7 @@ export class CalendarLarge extends CalendarBase {
                   const day = addDays(start, row);
                   const events = this.eventsOn(day);
                   const isToday = day === today;
-                  const selected = day === this.value;
+                  const { selected, inside } = this.selection(day);
                   const written = isToday || selected || (events.length > 0 && ends.has(day));
                   const fill = fillOf(events);
                   return html`<div
@@ -314,11 +314,12 @@ export class CalendarLarge extends CalendarBase {
                     data-day=${day}
                     tabindex=${day === tab ? 0 : -1}
                     aria-label=${this.cellLabel(day, events)}
-                    aria-selected=${this.selectable ? String(selected) : nothing}
+                    aria-selected=${this.selectable ? String(selected || inside) : nothing}
                     aria-current=${isToday ? "date" : nothing}
                     aria-disabled=${this.allowed(day) ? nothing : "true"}
                     ?data-today=${isToday}
                     ?data-selected=${selected}
+                    ?data-inside=${inside}
                     ?data-filled=${events.length > 0}
                     ?data-first-row=${row === 0}
                     ?data-first-column=${column === 0}

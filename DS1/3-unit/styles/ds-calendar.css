@@ -11,6 +11,9 @@
   --ds-calendar-line: 1px solid var(--ds-border-color);
   --ds-calendar-today: var(--ds-red-for-blood);
   --ds-calendar-today-ink: var(--ds-white, #fff);
+  --ds-calendar-selected: var(--ds-sharp-blue);
+  --ds-calendar-selected-ink: var(--ds-white, #fff);
+  --ds-calendar-band: color-mix(in srgb, var(--ds-calendar-selected) 16%, var(--ds-paper));
   --ds-calendar-mark: calc(var(--ds-unit) * 0.9);
   --ds-calendar-pad: calc(4px * var(--ds-sf, 1));
   box-sizing: border-box;
@@ -25,7 +28,11 @@
   letter-spacing: var(--ds-type-letterspacing-default);
 }
 :host([hidden]) { display: none !important; }
-:host([compact]) { --ds-calendar-day-height: var(--ds-unit); }
+/* A compact day is square: one square, or two where the month has room. Its marks grow with it. */
+:host([compact]) {
+  --ds-calendar-day-height: var(--ds-calendar-day);
+  --ds-calendar-mark: calc(var(--ds-unit) * (var(--ds-calendar-day-squares, 1) * 0.75 + 0.15));
+}
 
 .calendar { width: calc(7 * var(--ds-calendar-day)); }
 
@@ -147,8 +154,8 @@
 .day:not([data-today], [data-selected]) .date { min-width: 0; height: auto; }
 :host([compact]) .day .date { min-width: var(--ds-calendar-mark); height: var(--ds-calendar-mark); }
 .day[data-today] .date { background: var(--ds-calendar-today); color: var(--ds-calendar-today-ink); letter-spacing: 0; }
-.day[data-selected] .date { background: var(--ds-text-color); color: var(--ds-paper); letter-spacing: 0; }
-.day[data-today][data-selected] .date { box-shadow: 0 0 0 1px var(--ds-paper), 0 0 0 2px var(--ds-calendar-today); }
+/* The selected day, and each end of a range: a square with the system's corners in the selection's blue. */
+.day[data-selected] .date { border-radius: var(--ds-radius); background: var(--ds-calendar-selected); color: var(--ds-calendar-selected-ink); letter-spacing: 0; }
 
 .day[aria-disabled="true"] .date { color: var(--ds-title-color); opacity: 0.5; }
 
@@ -192,3 +199,33 @@
 @media (prefers-reduced-motion: no-preference) {
   .event, .more { transition: opacity 120ms ease; }
 }
+
+/* A compact day's date stands in the middle of its square once the square is two or more wide. */
+:host([compact][data-roomy]) .date-line { align-items: center; height: var(--ds-calendar-day-height); }
+
+/* The days of the months before and after, in the title grey. */
+.day[data-outside] .date { color: var(--ds-title-color); }
+:host([compact]) .day[data-outside] .date { color: var(--ds-title-color); }
+
+/* A range: the days between its ends on a band of the selection's blue; the band runs into each end's square. */
+.day[data-inside] { background: var(--ds-calendar-band); }
+:host(:not([compact])) .day:is([data-first], [data-last]) { background: var(--ds-calendar-band); }
+:host([compact]) .day[data-first] { background: linear-gradient(to right, transparent 50%, var(--ds-calendar-band) 50%); }
+:host([compact]) .day[data-last] { background: linear-gradient(to left, transparent 50%, var(--ds-calendar-band) 50%); }
+:host([compact]:dir(rtl)) .day[data-first] { background: linear-gradient(to left, transparent 50%, var(--ds-calendar-band) 50%); }
+:host([compact]:dir(rtl)) .day[data-last] { background: linear-gradient(to right, transparent 50%, var(--ds-calendar-band) 50%); }
+:host([compact][selectable]) .day[data-inside]:hover .date { background: transparent; }
+
+/* Today, as words in the title grey beside the arrows. */
+.today-button {
+  height: var(--ds-control-height);
+  padding-inline: calc(4px * var(--ds-sf, 1));
+  border: 0;
+  background: transparent;
+  color: var(--ds-title-color);
+}
+.today-button:hover { background: var(--ds-fill); color: var(--ds-text-color); }
+
+/* In a compact month the pointer's day and the chosen day take squares with the system's corners; today keeps its disc. */
+:host([compact]) .date { border-radius: var(--ds-radius); }
+:host([compact]) .day[data-today]:not([data-selected]) .date { border-radius: 999px; }

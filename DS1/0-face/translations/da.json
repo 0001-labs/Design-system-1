@@ -111,6 +111,10 @@
     "Next month": "Næste måned",
     "Choose a date": "Vælg en dato",
     "Date": "Dato",
-    "W{week}": "U{week}"
+    "W{week}": "U{week}",
+    "Total": "I alt",
+    "End date": "Slutdato",
+    "Include time": "Medtag klokkeslæt",
+    "Time": "Klokkeslæt"
   }
 }

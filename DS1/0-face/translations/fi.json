@@ -111,6 +111,10 @@
     "Next month": "Seuraava kuukausi",
     "Choose a date": "Valitse päivämäärä",
     "Date": "Päivämäärä",
-    "W{week}": "Vk{week}"
+    "W{week}": "Vk{week}",
+    "Total": "Yhteensä",
+    "End date": "Päättymispäivä",
+    "Include time": "Sisällytä kellonaika",
+    "Time": "Kellonaika"
   }
 }

@@ -15,16 +15,48 @@ export const TABLE_DATA = [
 export const TABLE_FOOTER = { product: "Total", users: 264 };
 
 /** The matrix example's items: two headed columns and an item further down. */
-export const MATRIX_ITEMS = [
-  { id: 'fruit', title: 'Fruit', column: 0, row: 0, header: true },
-  { id: 'apples', title: 'Apples', column: 0, row: 1, starred: true },
-  { id: 'pears', title: 'Pears', column: 0, row: 2 },
-  { id: 'plums', title: 'Plums', column: 0, row: 3, completed: true },
-  { id: 'bakery', title: 'Bakery', column: 1, row: 0, header: true, color: 'var(--ds-zenith-blue)' },
-  { id: 'rye', title: 'Rye bread', column: 1, row: 1 },
-  { id: 'buns', title: 'Cinnamon buns for Sunday', column: 1, row: 2 },
-  { id: 'later', title: 'Later', column: 2, row: 4 },
-];
+export const MATRIX_DATA = {
+  groups: [
+    { id: 'stack', label: 'Stack', color: 'var(--ds-orange)' },
+    { id: 'parts', label: 'Parts', color: 'var(--ds-pink)' },
+    { id: 'platforms', label: 'Platforms', color: 'var(--ds-zenith-blue)' },
+  ],
+  columns: [
+    { id: 'typescript', label: 'TypeScript', group: 'stack' },
+    { id: 'database', label: 'Database', group: 'stack' },
+    { id: 'hosting', label: 'Hosting', group: 'stack' },
+    { id: 'sign-in', label: 'Sign-in', group: 'parts' },
+    { id: 'billing', label: 'Billing', group: 'parts' },
+    { id: 'languages', label: 'Languages', group: 'parts' },
+    { id: 'search', label: 'Search', group: 'parts' },
+    { id: 'web', label: 'Web', group: 'platforms' },
+    { id: 'iphone', label: 'iPhone', group: 'platforms' },
+    { id: 'mac', label: 'Mac', group: 'platforms' },
+  ],
+  rows: [
+    { id: 'atlas', label: 'Atlas' },
+    { id: 'harbor', label: 'Harbor' },
+    { id: 'meadow', label: 'Meadow' },
+    { id: 'summit', label: 'Summit' },
+  ],
+  cells: [
+    ...['typescript', 'database', 'hosting', 'web', 'iphone'].map(column => ({ row: 'atlas', column, mark: 'fill' })),
+    { row: 'atlas', column: 'sign-in', mark: 'triangle' }, { row: 'atlas', column: 'billing', mark: 'triangle' }, { row: 'atlas', column: 'languages', mark: 'outline' },
+    ...['typescript', 'hosting', 'web'].map(column => ({ row: 'harbor', column, mark: 'fill' })),
+    { row: 'harbor', column: 'sign-in', mark: 'outline' }, { row: 'harbor', column: 'search', mark: 'stripes' }, { row: 'harbor', column: 'billing', mark: 'dash' },
+    ...['typescript', 'database', 'web', 'mac'].map(column => ({ row: 'meadow', column, mark: 'fill' })),
+    { row: 'meadow', column: 'sign-in', mark: 'triangle' }, { row: 'meadow', column: 'languages', mark: 'stripes' }, { row: 'meadow', column: 'search', mark: 'dot' },
+    { row: 'summit', column: 'typescript', mark: 'fill' }, { row: 'summit', column: 'web', mark: 'fill' }, { row: 'summit', column: 'database', mark: 'dot' }, { row: 'summit', column: 'billing', mark: 'outline' },
+  ],
+  marks: [
+    { mark: 'fill', label: 'Uses' },
+    { mark: 'triangle', label: 'Shares one copy' },
+    { mark: 'outline', label: 'Copied in' },
+    { mark: 'stripes', label: 'Planned' },
+    { mark: 'dot', label: 'Not yet checked' },
+    { mark: 'dash', label: 'Not applicable' },
+  ],
+};
 
 /** The examples' events, in the month being read so a calendar always has some. */
 export function calendarEvents(kind: 'month' | 'large') {
@@ -288,9 +320,14 @@ calendar.addEventListener('change', event => console.log(event.detail.value));`,
     height: 620,
   },
   'calendar-compact': {
-    title: 'A small month, one square a day', hint: 'compact draws the month a date picker opens. With events, the days that have one keep the ink.',
+    title: 'A small month, one square a day', hint: 'compact draws a month one square a day, as a year of months is drawn. With events, the days that have one keep the ink.',
     html: `<ds-calendar compact selectable fixed></ds-calendar>`,
     height: 280,
+  },
+  'calendar-range': {
+    title: 'A range, two squares a day', hint: 'Press a first day and a last; the pointer previews the end. A third press starts again. Each press fires change.',
+    html: `<ds-calendar compact selectable range fixed outside-days day-width="2"></ds-calendar>`,
+    height: 400,
   },
   'calendar-large': {
     title: 'Months in squares', hint: 'Weeks run sideways and the days down them. Scroll, or use the arrows and Today; a day several things share is split into bands.',
@@ -304,27 +341,37 @@ calendar.events = [
     height: 420,
   },
   'date-picker': {
-    title: 'Pick a date from a drop-down', hint: 'Open it with a click, Enter or the down arrow; the arrow keys move between days, Enter chooses one and Escape closes it.',
+    title: 'Pick a date, a range or a time', hint: 'Open it with a click, Enter or the down arrow. Type a date, press one in the month, or turn on End date and press two. Escape closes it.',
     html: `<div style="display:flex;flex-wrap:wrap;gap:var(--ds-unit)">
   <ds-date-picker label="Due" literal name="due"></ds-date-picker>
-  <ds-date-picker label="Starts" literal name="starts" value="2026-10-18" length="long"></ds-date-picker>
+  <ds-date-picker label="Trip" literal name="trip" value="2026-10-21/2026-10-24"></ds-date-picker>
 </div>`,
-    height: 420,
+    height: 520,
   },
   'matrix': {
-    title: 'Items on whole squares', hint: 'Drag an item to another square, or focus one and press Alt with an arrow; it swaps with what is there. Shift-click selects several. Pressing a free square fires cell-press.',
-    html: `<ds-matrix label="Groceries" literal rows="6"></ds-matrix>`,
+    title: 'Products against their parts', hint: 'Hover or move with the arrow keys: the row and the column light up. Pressing a square fires cell-press.',
+    html: `<ds-matrix label="Products and parts" literal totals totals-label="Products"></ds-matrix>`,
     script: `const matrix = document.querySelector('ds-matrix');
-matrix.items = [
-  { id: 'fruit', title: 'Fruit', column: 0, row: 0, header: true },
-  { id: 'apples', title: 'Apples', column: 0, row: 1, starred: true },
-  { id: 'pears', title: 'Pears', column: 0, row: 2 },
-  { id: 'plums', title: 'Plums', column: 0, row: 3, completed: true },
-  { id: 'bakery', title: 'Bakery', column: 1, row: 0, header: true, color: 'var(--ds-zenith-blue)' },
-  { id: 'rye', title: 'Rye bread', column: 1, row: 1 },
+matrix.groups = [
+  { id: 'stack', label: 'Stack', color: 'var(--ds-orange)' },
+  { id: 'parts', label: 'Parts', color: 'var(--ds-pink)' },
 ];
-matrix.addEventListener('move', event => console.log(event.detail.moves));`,
-    height: 260,
+matrix.columns = [
+  { id: 'typescript', label: 'TypeScript', group: 'stack' },
+  { id: 'sign-in', label: 'Sign-in', group: 'parts' },
+];
+matrix.rows = [{ id: 'atlas', label: 'Atlas' }, { id: 'harbor', label: 'Harbor' }];
+matrix.cells = [
+  { row: 'atlas', column: 'typescript', mark: 'fill' },
+  { row: 'atlas', column: 'sign-in', mark: 'triangle' },
+  { row: 'harbor', column: 'sign-in', mark: 'outline' },
+];
+matrix.marks = [
+  { mark: 'fill', label: 'Uses' },
+  { mark: 'triangle', label: 'Shares one copy' },
+  { mark: 'outline', label: 'Copied in' },
+];`,
+    height: 360,
   },
   'carousel': {
     title: 'Slides twelve squares wide', hint: 'Swipe or scroll sideways, or use the buttons and the dots. Moving to another slide fires change.',
@@ -529,7 +576,7 @@ export const PAGE_EXAMPLES: Record<string, string[]> = {
   '2-core/gap': ['gap'],
   '3-unit/row': ['row', 'row-centered'], '3-unit/list': ['list'],
   '3-unit/accordion': ['accordion'], '3-unit/form': ['form'], '3-unit/carousel': ['carousel', 'carousel-full'],
-  '3-unit/calendar': ['calendar', 'calendar-compact', 'calendar-large'], '3-unit/date-picker': ['date-picker'], '3-unit/matrix': ['matrix'],
+  '3-unit/calendar': ['calendar', 'calendar-compact', 'calendar-range', 'calendar-large'], '3-unit/date-picker': ['date-picker'], '3-unit/matrix': ['matrix'],
   '3-unit/table': ['table'],
   '4-page/container': ['container'], '4-page/grid': ['grid'],
   '4-page/layout': ['layout', 'page'], '4-page/layouts': ['page'],

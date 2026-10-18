@@ -111,6 +111,10 @@
     "Next month": "Nästa månad",
     "Choose a date": "Välj ett datum",
     "Date": "Datum",
-    "W{week}": "V{week}"
+    "W{week}": "V{week}",
+    "Total": "Totalt",
+    "End date": "Slutdatum",
+    "Include time": "Inkludera tid",
+    "Time": "Tid"
   }
 }

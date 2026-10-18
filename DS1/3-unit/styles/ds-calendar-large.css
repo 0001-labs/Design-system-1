@@ -151,6 +151,7 @@
 }
 .cell[data-today] .date { border-radius: 999px; background: var(--ds-calendar-today); color: var(--ds-calendar-today-ink); }
 .cell[data-selected] .date { background: var(--ds-calendar-ink); color: var(--ds-paper); }
+.cell[data-inside]:not([data-filled]) { background: color-mix(in srgb, var(--ds-calendar-ink) 12%, var(--ds-paper)); }
 .cell[data-today][data-selected] .date { border-radius: 999px; box-shadow: inset 0 0 0 var(--ds-calendar-stroke) var(--ds-calendar-today); }
 
 /* On a narrow screen the weekdays take one letter and one square. */

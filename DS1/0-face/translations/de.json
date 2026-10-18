@@ -111,6 +111,10 @@
     "Next month": "Nächster Monat",
     "Choose a date": "Datum wählen",
     "Date": "Datum",
-    "W{week}": "KW{week}"
+    "W{week}": "KW{week}",
+    "Total": "Gesamt",
+    "End date": "Enddatum",
+    "Include time": "Uhrzeit hinzufügen",
+    "Time": "Uhrzeit"
   }
 }

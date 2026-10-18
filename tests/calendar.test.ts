@@ -201,6 +201,84 @@ test("Escape closes the picker's month", async () => {
   expect(picker.open).toBe(false);
 });
 
+test("a range calendar takes a first and a last day, either way round, and draws the days between", async () => {
+  const calendar = await mount<Calendar>(`<ds-calendar month="2026-10" selectable range compact></ds-calendar>`);
+  const values: string[] = [];
+  calendar.addEventListener("change", event => values.push((event as CustomEvent).detail.value));
+  cell(calendar, "2026-10-20").click();
+  await calendar.updateComplete;
+  cell(calendar, "2026-10-14").click();
+  await calendar.updateComplete;
+  expect(values).toEqual(["2026-10-20", "2026-10-14/2026-10-20"]);
+  expect(cell(calendar, "2026-10-14").hasAttribute("data-first")).toBe(true);
+  expect(cell(calendar, "2026-10-17").hasAttribute("data-inside")).toBe(true);
+  expect(cell(calendar, "2026-10-17").getAttribute("aria-selected")).toBe("true");
+  expect(cell(calendar, "2026-10-20").hasAttribute("data-last")).toBe(true);
+  // A third press starts again.
+  cell(calendar, "2026-10-25").click();
+  expect(calendar.value).toBe("2026-10-25");
+});
+
+test("outside days are drawn in a compact month and take it to their month", async () => {
+  const calendar = await mount<Calendar>(`<ds-calendar month="2026-10" selectable compact outside-days fixed day-width="2" week-start="0"></ds-calendar>`);
+  expect(cell(calendar, "2026-09-27").hasAttribute("data-outside")).toBe(true);
+  expect(calendar.shadowRoot!.querySelector(".weekday")!.textContent).toBe("Su");
+  expect(calendar.shadowRoot!.querySelector(".today-button")).not.toBeNull();
+  cell(calendar, "2026-11-01").click();
+  await calendar.updateComplete;
+  expect(calendar.value).toBe("2026-11-01");
+  expect(calendar.month).toBe("2026-11");
+});
+
+test("the picker's values read and write ISO 8601, and a typed date is understood", async () => {
+  const { readDateValue, writeDateValue, parseTypedDay } = await import("../DS1/3-unit/ds-date-picker");
+  expect(readDateValue("2026-10-24T10:00/2026-10-21T09:30")).toEqual({ start: { day: "2026-10-21", time: "09:30" }, end: { day: "2026-10-24", time: "10:00" } });
+  expect(writeDateValue({ day: "2026-10-21", time: "09:30" }, { day: "2026-10-24", time: "" }, { range: true, time: false })).toBe("2026-10-21/2026-10-24");
+  expect(writeDateValue({ day: "2026-10-21", time: "09:30" }, undefined, { range: false, time: true })).toBe("2026-10-21T09:30");
+  expect(parseTypedDay("2026-10-21")).toBe("2026-10-21");
+  expect(parseTypedDay("Oct 21, 2026")).toBe("2026-10-21");
+  expect(parseTypedDay("not a day")).toBeNull();
+});
+
+test("a range picker keeps both ends, writes them as one range, and the switches turn on with the value", async () => {
+  document.body.innerHTML = `<form><ds-date-picker name="trip" label="Trip" literal value="2026-10-21/2026-10-24"></ds-date-picker></form>`;
+  const picker = document.querySelector("ds-date-picker") as Picker;
+  await picker.updateComplete;
+  expect(picker.range).toBe(true);
+  expect(picker.time).toBe(false);
+  const trigger = picker.shadowRoot!.querySelector<HTMLButtonElement>(".trigger")!;
+  expect(trigger.textContent).toMatch(/Oct 21\s*–\s*24, 2026/);
+  picker.open = true;
+  await picker.updateComplete;
+  expect(picker.shadowRoot!.querySelectorAll(".field")).toHaveLength(2);
+  const calendar = picker.shadowRoot!.querySelector("ds-calendar") as Calendar;
+  await calendar.updateComplete;
+  expect(calendar.range).toBe(true);
+  cell(calendar, "2026-10-10").click();
+  await picker.updateComplete;
+  cell(calendar, "2026-10-12").click();
+  await picker.updateComplete;
+  expect(picker.value).toBe("2026-10-10/2026-10-12");
+  expect(picker.open).toBe(true);
+  expect(new FormData(picker.closest("form")!).get("trip") ?? picker.value).toBe("2026-10-10/2026-10-12");
+});
+
+test("turning on a time gives each end one, and Clear empties the value", async () => {
+  const picker = await mount<Picker>(`<ds-date-picker value="2026-10-21"></ds-date-picker>`);
+  picker.open = true;
+  await picker.updateComplete;
+  const [, timeSwitch] = [...picker.shadowRoot!.querySelectorAll<HTMLButtonElement>(".ds-switch")];
+  timeSwitch.click();
+  await picker.updateComplete;
+  expect(picker.value).toBe("2026-10-21T09:00");
+  expect(picker.shadowRoot!.querySelector<HTMLInputElement>(".clock")!.value).toBe("09:00");
+  expect(timeSwitch.getAttribute("aria-checked")).toBe("true");
+  picker.shadowRoot!.querySelector<HTMLButtonElement>(".clear")!.click();
+  await picker.updateComplete;
+  expect(picker.value).toBe("");
+  expect(picker.open).toBe(false);
+});
+
 test("no calendar names a product", () => {
   for (const file of ["0-face/calendar.ts", "3-unit/calendar-base.ts", "3-unit/ds-calendar.ts", "3-unit/ds-calendar-large.ts", "3-unit/ds-date-picker.ts", "3-unit/styles/ds-calendar.css", "3-unit/styles/ds-calendar-large.css", "3-unit/styles/ds-date-picker.css"]) {
     expect(readFileSync(join(import.meta.dirname, "../DS1", file), "utf8")).not.toMatch(/\b(Ezo|Link|Consistency|Peer|Ins|tau99)\b/);

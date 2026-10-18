@@ -104,6 +104,10 @@
     "Next month": "Næsti mánuður",
     "Choose a date": "Veldu dagsetningu",
     "Date": "Dagsetning",
-    "W{week}": "V{week}"
+    "W{week}": "V{week}",
+    "Total": "Samtals",
+    "End date": "Lokadagur",
+    "Include time": "Taka með tíma",
+    "Time": "Tími"
   }
 }

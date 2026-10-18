@@ -16,6 +16,8 @@ There are two calendars, drawn from the same days and keys.
 
 <ComponentExample example="calendar-compact" compact />
 
+<ComponentExample example="calendar-range" compact />
+
 <ComponentExample example="calendar-large" />
 
 ## A month
@@ -40,7 +42,8 @@ calendar.addEventListener("change", event => console.log(event.detail.value));
 | The weekday names | One square, in the title grey, at the start of each day. |
 | A date | At the end of its first square, in the title grey, tabular figures. |
 | Today | A disc nine tenths of a square across, in red for blood, the date in white. |
-| The selected day | The same disc in the ink, the date in the paper. |
+| The selected day | A square of the same size with the system's 4px corners, in Sharp blue, the date in white. |
+| A range | Each end drawn as the selected day, the days between on a band of the blue at 16%. |
 | An event | One square, drawn one pixel short, its words 4px from its edges; the time first, fainter. Filled with its `color` or the fill. |
 | More events than lines | The last line says `+2`; pressing it lays the day's events over the days below. |
 | A week number | `W42` in the compressed face, at the start of the week's first day, with `week-numbers`. |
@@ -50,7 +53,7 @@ A day outside the month is an empty box. `fixed` always draws six weeks, so movi
 
 ### Compact
 
-`compact` makes every day one square: the date centred in its square, the weekday names a letter each, the month's name shortened, no Today button and no events written out. When the calendar has events, a day with one keeps the ink and a day without falls back to the title grey, so a year of small months shows where things happened.
+`compact` makes every day a square, one square across by default: the date centred in it, the weekday names a letter each, the month's name shortened, and no events written out. With `day-width="2"` each day is two squares each way, the weekday names take two letters, Today stands beside the arrows and the marks grow to a square and two thirds, as a date picker's month is drawn. `outside-days` writes the days of the months before and after in the title grey; pressing one goes there. When the calendar has events, a day with one keeps the ink and a day without falls back to the title grey, so a year of small months shows where things happened.
 
 ## Months in squares
 
@@ -70,6 +73,14 @@ A day outside the month is an empty box. `fixed` always draws six weeks, so movi
 | A filled day | The event's `color`, Apple green by default; days two or more events share are split into equal bands. |
 
 The title names the month at the start of the view as it scrolls. The arrows move a month at a time and Today scrolls to today's month; past the months drawn, `start` moves with them and `navigate` says so.
+
+## Ranges
+
+```html
+<ds-calendar compact selectable range day-width="2" value="2026-10-14/2026-10-20"></ds-calendar>
+```
+
+With `range`, a selectable calendar chooses a first and a last day. The first press starts the range and `value` holds that day alone; the second ends it, before or after the first, and `value` becomes `start/end` (ISO 8601's interval); a third starts again. While the end is still to come, the day under the pointer previews it. `change` carries `start` and `end` beside `value`.
 
 ## Events
 
@@ -96,7 +107,7 @@ The day arithmetic the calendars use is `DS1/0-face/calendar.ts`, plain TypeScri
 
 ## Accessibility
 
-- Each calendar is a grid named by its month (or `label`), with one Tab stop on a day: the one moved to, the selected day, today, or the first.
+- Each calendar is a grid named by its month (or `label`), with one Tab stop on a day: the one moved to, the selected day, today, or the first. A range calendar is `aria-multiselectable`, and every day of the range is `aria-selected`.
 - The arrow keys move a day, or a week across the weeks; Home and End go to the week's first and last day; Page Up and Page Down move a month, with Shift a year. A month moves on when the focus leaves it, and right to left the arrows turn round.
 - Enter or Space presses the day. Each day is labelled with its whole date and what happens on it, and today is `aria-current="date"`; a selectable calendar marks the selected day with `aria-selected`.
 - The arrows are named "Previous month" and "Next month", and the month's name is announced when it changes. All the words are the shared words, in every language.
@@ -115,6 +126,8 @@ The day arithmetic the calendars use is `DS1/0-face/calendar.ts`, plain TypeScri
 | `lines` | number | `2` | Lines of events under a date. |
 | `week-numbers` | boolean | `false` | The week's number on its first day. |
 | `fixed` | boolean | `false` | Always six weeks. |
+| `outside-days` | boolean | `false` | The days of the months before and after, in the title grey. |
+| `range` | boolean | `false` | Choose a first and a last day: `value` is `start/end`. |
 | `no-header` | boolean | `false` | Leave out the title and arrows. |
 | `no-today` | boolean | `false` | Leave out the Today button. |
 | `min`, `max` | string | — | The days a person may choose. |
@@ -134,7 +147,7 @@ The day arithmetic the calendars use is `DS1/0-face/calendar.ts`, plain TypeScri
 | Event | Detail | What it means |
 | --- | --- | --- |
 | `day-press` | `{ day, events }` | A day was pressed, or chosen with Enter or Space. Cancel it to keep a selectable calendar's value. |
-| `change` | `{ value, previous }` | A person selected a day. |
+| `change` | `{ value, previous, start, end }` | A person selected a day, or an end of a range. |
 | `event-press` | `{ event, day }` | An event was pressed (in a month). |
 | `navigate` | `{ month }` | A person moved to another month. |
 
@@ -154,6 +167,7 @@ The day arithmetic the calendars use is `DS1/0-face/calendar.ts`, plain TypeScri
 | Custom property | Default | What it sets |
 | --- | --- | --- |
 | `--ds-calendar-today` | `var(--ds-red-for-blood)` | Today's disc. |
+| `--ds-calendar-selected` | `var(--ds-sharp-blue)` | The selected day and a range's ends; the band between is it at 16%. |
 | `--ds-calendar-event-fill` | The fill (Apple green in the large calendar) | An event without a colour. |
 | `--ds-calendar-line` | `1px solid var(--ds-border-color)` | A month's lines. |
 | `--ds-calendar-ink` | `var(--ds-text-color)` | The large calendar's lines and selected day. |

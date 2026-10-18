@@ -111,6 +111,10 @@
     "Next month": "Mese successivo",
     "Choose a date": "Scegli una data",
     "Date": "Data",
-    "W{week}": "S{week}"
+    "W{week}": "S{week}",
+    "Total": "Totale",
+    "End date": "Data di fine",
+    "Include time": "Includi ora",
+    "Time": "Ora"
   }
 }

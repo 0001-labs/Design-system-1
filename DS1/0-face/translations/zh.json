@@ -111,6 +111,10 @@
     "Next month": "下个月",
     "Choose a date": "选择日期",
     "Date": "日期",
-    "W{week}": "第{week}周"
+    "W{week}": "第{week}周",
+    "Total": "合计",
+    "End date": "结束日期",
+    "Include time": "包含时间",
+    "Time": "时间"
   }
 }

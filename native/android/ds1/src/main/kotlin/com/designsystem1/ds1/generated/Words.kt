@@ -138,6 +138,10 @@ internal object DS1SharedWords {
         "Choose a date" to "Vælg en dato",
         "Date" to "Dato",
         "W{week}" to "U{week}",
+        "Total" to "I alt",
+        "End date" to "Slutdato",
+        "Include time" to "Medtag klokkeslæt",
+        "Time" to "Klokkeslæt",
     )
 
     private fun deWords() = mapOf(
@@ -253,6 +257,10 @@ internal object DS1SharedWords {
         "Choose a date" to "Datum wählen",
         "Date" to "Datum",
         "W{week}" to "KW{week}",
+        "Total" to "Gesamt",
+        "End date" to "Enddatum",
+        "Include time" to "Uhrzeit hinzufügen",
+        "Time" to "Uhrzeit",
     )
 
     private fun enWords() = mapOf(
@@ -368,6 +376,10 @@ internal object DS1SharedWords {
         "Choose a date" to "Choose a date",
         "Date" to "Date",
         "W{week}" to "W{week}",
+        "Total" to "Total",
+        "End date" to "End date",
+        "Include time" to "Include time",
+        "Time" to "Time",
     )
 
     private fun esWords() = mapOf(
@@ -483,6 +495,10 @@ internal object DS1SharedWords {
         "Choose a date" to "Elegir una fecha",
         "Date" to "Fecha",
         "W{week}" to "S{week}",
+        "Total" to "Total",
+        "End date" to "Fecha de fin",
+        "Include time" to "Incluir hora",
+        "Time" to "Hora",
     )
 
     private fun fiWords() = mapOf(
@@ -598,6 +614,10 @@ internal object DS1SharedWords {
         "Choose a date" to "Valitse päivämäärä",
         "Date" to "Päivämäärä",
         "W{week}" to "Vk{week}",
+        "Total" to "Yhteensä",
+        "End date" to "Päättymispäivä",
+        "Include time" to "Sisällytä kellonaika",
+        "Time" to "Kellonaika",
     )
 
     private fun frWords() = mapOf(
@@ -713,6 +733,10 @@ internal object DS1SharedWords {
         "Choose a date" to "Choisir une date",
         "Date" to "Date",
         "W{week}" to "S{week}",
+        "Total" to "Total",
+        "End date" to "Date de fin",
+        "Include time" to "Inclure l’heure",
+        "Time" to "Heure",
     )
 
     private fun isWords() = mapOf(
@@ -821,6 +845,10 @@ internal object DS1SharedWords {
         "Choose a date" to "Veldu dagsetningu",
         "Date" to "Dagsetning",
         "W{week}" to "V{week}",
+        "Total" to "Samtals",
+        "End date" to "Lokadagur",
+        "Include time" to "Taka með tíma",
+        "Time" to "Tími",
     )
 
     private fun itWords() = mapOf(
@@ -936,6 +964,10 @@ internal object DS1SharedWords {
         "Choose a date" to "Scegli una data",
         "Date" to "Data",
         "W{week}" to "S{week}",
+        "Total" to "Totale",
+        "End date" to "Data di fine",
+        "Include time" to "Includi ora",
+        "Time" to "Ora",
     )
 
     private fun jaWords() = mapOf(
@@ -1051,6 +1083,10 @@ internal object DS1SharedWords {
         "Choose a date" to "日付を選択",
         "Date" to "日付",
         "W{week}" to "第{week}週",
+        "Total" to "合計",
+        "End date" to "終了日",
+        "Include time" to "時刻を含める",
+        "Time" to "時刻",
     )
 
     private fun koWords() = mapOf(
@@ -1166,6 +1202,10 @@ internal object DS1SharedWords {
         "Choose a date" to "날짜 선택",
         "Date" to "날짜",
         "W{week}" to "{week}주",
+        "Total" to "합계",
+        "End date" to "종료일",
+        "Include time" to "시간 포함",
+        "Time" to "시간",
     )
 
     private fun nbWords() = mapOf(
@@ -1281,6 +1321,10 @@ internal object DS1SharedWords {
         "Choose a date" to "Velg en dato",
         "Date" to "Dato",
         "W{week}" to "U{week}",
+        "Total" to "Totalt",
+        "End date" to "Sluttdato",
+        "Include time" to "Ta med klokkeslett",
+        "Time" to "Klokkeslett",
     )
 
     private fun ptBRWords() = mapOf(
@@ -1396,6 +1440,10 @@ internal object DS1SharedWords {
         "Choose a date" to "Escolher uma data",
         "Date" to "Data",
         "W{week}" to "S{week}",
+        "Total" to "Total",
+        "End date" to "Data de término",
+        "Include time" to "Incluir horário",
+        "Time" to "Horário",
     )
 
     private fun ptWords() = mapOf(
@@ -1511,6 +1559,10 @@ internal object DS1SharedWords {
         "Choose a date" to "Escolher uma data",
         "Date" to "Data",
         "W{week}" to "S{week}",
+        "Total" to "Total",
+        "End date" to "Data de fim",
+        "Include time" to "Incluir hora",
+        "Time" to "Hora",
     )
 
     private fun svWords() = mapOf(
@@ -1626,6 +1678,10 @@ internal object DS1SharedWords {
         "Choose a date" to "Välj ett datum",
         "Date" to "Datum",
         "W{week}" to "V{week}",
+        "Total" to "Totalt",
+        "End date" to "Slutdatum",
+        "Include time" to "Inkludera tid",
+        "Time" to "Tid",
     )
 
     private fun zhWords() = mapOf(
@@ -1741,6 +1797,10 @@ internal object DS1SharedWords {
         "Choose a date" to "选择日期",
         "Date" to "日期",
         "W{week}" to "第{week}周",
+        "Total" to "合计",
+        "End date" to "结束日期",
+        "Include time" to "包含时间",
+        "Time" to "时间",
     )
 
 }

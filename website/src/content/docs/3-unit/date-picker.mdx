@@ -1,11 +1,13 @@
 ---
 title: Date picker
-description: A field that opens a small month below it; choosing a day closes it.
+description: A field that opens a panel below it — the date to type, a small month, an end date and a time.
 ---
 
 import ComponentExample from "../../../components/ComponentExample.astro";
 
-A date picker is a field one control high with the calendar icon at its start and the down arrow at its end. Pressing it opens the [compact month](/3-unit/calendar/#compact) half a square below, on the menu's frame; choosing a day writes it in the field, in the current language, and closes the month. A form takes the day as `YYYY-MM-DD`, as a native date field sends it.
+A date picker is a field one control high with the calendar icon at its start and the down arrow at its end. Pressing it opens a panel half a square below, on the menu's frame. At the top, the date is written out where it can be typed; below it, the [compact month](/3-unit/calendar/#compact), two squares a day, with Today and the arrows; then the switches **End date**, which makes it a range, and **Include time**, and **Clear**.
+
+Choosing one day without a time closes the panel. With an end date or a time it stays open until Escape, a press outside or the focus leaving, so both ends and their times can be set in one go.
 
 ## Try it
 
@@ -16,61 +18,83 @@ A date picker is a field one control high with the calendar icon at its start an
 ```html
 <form>
   <ds-date-picker name="due" label="Due" literal min="2026-10-01"></ds-date-picker>
+  <ds-date-picker name="trip" label="Trip" literal value="2026-10-21/2026-10-24"></ds-date-picker>
 </form>
 ```
 
 ```js
 picker.addEventListener("change", event => {
-  console.log(event.detail.value); // "2026-10-18", or "" when cleared
+  console.log(event.detail.value); // "2026-10-21", "2026-10-21T09:00", "2026-10-21/2026-10-24", or "" when cleared
 });
 ```
 
+The value is ISO 8601: a day, a day with its time, or two of them joined by a slash for a range, which is also what a form sends. A value with an end turns End date on, and one with a time turns Include time on; `range` and `time` set them from the page, and `no-options` leaves the two switches out.
+
+| Value | Face |
+| --- | --- |
+| `2026-10-21` | Oct 21, 2026 |
+| `2026-10-21T14:30` | Oct 21, 2026, 2:30 PM |
+| `2026-10-21/2026-10-24` | Oct 21 – 24, 2026 |
+
+The face writes the value in the current language, a range as the language writes one. `length` writes a day `short`, `medium` (the default) or `long`; before a day is chosen the face reads `placeholder`, the shared words "Choose a date" by default, in the title grey.
+
+## The panel
+
 | Measure | Size |
 | --- | --- |
-| The field | The select's face: one control high at the foot of its square, eight squares wide (`--ds-date-picker-width`). |
-| The month | Two squares a day, fourteen squares wide and eight high: the month and arrows, the weekday names, six weeks. On a screen narrower than seventeen squares, one square a day and seven wide. |
-| Below it | Today and, once a day is chosen, Clear, on one square. |
-| The frame | A 1px line with half a square inside it, no shadow: fifteen squares by ten (eight by ten on a phone). |
+| The field | The select's face: one control high at the foot of its square, eight squares wide, twelve for a range (`--ds-date-picker-width`). |
+| The date to type | A field one control high on each end's square, the time beside it five squares wide; one square spare below. |
+| The month | Two squares a day, fourteen squares wide: the month with Today and the arrows, the weekdays in two letters, six weeks with the neighbouring months' days in the title grey. Below seventeen squares of screen, one square a day. |
+| The chosen day | A square of a square and two thirds with 4px corners in Sharp blue; a range's days between on a band of it. Today is a red disc. |
+| End date, Include time, Clear | One square each, the switches at the end, set off by one-square separators with a line through them. |
+| The frame | A 1px line with half a square inside it, no shadow: fifteen squares wide. |
 | Its place | Half a square below the field, or above it when there is more room there, kept on screen. |
 
-The month opens on the chosen day's month, or today's. `length` writes the day `short`, `medium` (the default) or `long`; before a day is chosen the field reads `placeholder`, the shared words "Choose a date" by default, in the title grey.
+A typed date is read when the person presses Enter or leaves the field: `2026-10-21`, or a date the browser can read such as "Oct 21, 2026". Anything else puts the field back as it was.
 
-`required` leaves Clear out and tells the form a day is missing. `min` and `max` limit the days, which also turns off Today when it is outside them. A form's reset puts back the day the field started with.
+`required` leaves Clear out and tells the form a value is missing. `min` and `max` limit the days. A form's reset puts back the value the field started with.
 
 ## Accessibility
 
-- The field is a button with `aria-haspopup="dialog"` and `aria-expanded`, named by `label` and the chosen day.
-- Enter, Space or the down arrow opens the month with the focus on the chosen day (or today); a click opens it and leaves the focus on the field.
+- The field is a button with `aria-haspopup="dialog"` and `aria-expanded`, named by `label` and the value.
+- Enter, Space or the down arrow opens the panel with the focus on the chosen day (or today); a click opens it and leaves the focus on the field.
 - In the month, the arrow keys, Home, End, Page Up and Page Down move as in the [calendar](/3-unit/calendar/#accessibility); Enter or Space chooses a day.
-- Escape, a press outside, or the focus leaving closes the month, and the focus goes back to the field.
+- The typed fields and the times are named by the label and which end they are; the switches are `role="switch"`.
+- Escape, a press outside, or the focus leaving closes the panel, and the focus goes back to the field.
 
 ## API
 
 | Attribute | Type | Default | What it does |
 | --- | --- | --- | --- |
-| `value` | string | `""` | The chosen day, `YYYY-MM-DD`. |
+| `value` | string | `""` | A day, a day and a time, or a range, in ISO 8601. |
 | `name` | string | — | The form field's name. |
 | `label` | string | The shared word "Date" | The field's name; `literal` shows it as written. |
 | `placeholder` | string | "Choose a date" | The words before a day is chosen. |
-| `length` | string | `medium` | How the day is written. |
+| `length` | string | `medium` | How a day is written. |
+| `range` | boolean | `false` | Choose a first and a last day (End date). |
+| `time` | boolean | `false` | Choose a time with each day (Include time). |
+| `no-options` | boolean | `false` | Leave the End date and Include time switches out. |
 | `min`, `max` | string | — | The days a person may choose. |
 | `week-start` | string | The language's | The week's first day. |
 | `today` | string | The reader's today | The day drawn as today. |
-| `required` | boolean | `false` | A form needs a day. |
+| `required` | boolean | `false` | A form needs a value. |
 | `disabled` | boolean | `false` | The field cannot be opened. |
-| `open` | boolean | `false` | The month is open. |
+| `open` | boolean | `false` | The panel is open. |
 
 | Event | Detail | What it means |
 | --- | --- | --- |
-| `change`, `input` | `{ value, previous }` | A person chose or cleared a day. |
-| `ds-date-picker-toggle` | `{ open }` | The month opened or closed. |
+| `change`, `input` | `{ value, previous }` | A person changed the value. |
+| `ds-date-picker-toggle` | `{ open }` | The panel opened or closed. |
 
 | Method | What it does |
 | --- | --- |
-| `show()`, `hide()` | Opens or closes the month. |
+| `show()`, `hide()` | Opens or closes the panel. |
+
+`readDateValue`, `writeDateValue` and `parseTypedDay` are exported for a page that reads or writes the value itself.
 
 | Part | What it is |
 | --- | --- |
 | `trigger` | The field. |
-| `popover` | The frame around the month. |
-| `footer` | The row of Today and Clear. |
+| `popover` | The panel's frame. |
+| `field` | A row of the date to type. |
+| `options`, `clear` | The switches and Clear. |

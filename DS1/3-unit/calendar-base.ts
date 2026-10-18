@@ -36,10 +36,25 @@ export interface CalendarEventDetail {
   day: Day;
 }
 
-/** Detail of `change`: the day a person chose and the one before it. */
+/**
+ * Detail of `change`: the value a person chose and the one before it. In a
+ * range, `value` is `start/end` once both are chosen and the start alone
+ * while the end is still to come.
+ */
 export interface CalendarChangeDetail {
-  value: Day;
-  previous: Day;
+  value: string;
+  previous: string;
+  start: Day;
+  end: Day;
+}
+
+/** A value read as a range: `2026-10-21/2026-10-24`, or one day as both ends. Times after a `T` are left off. */
+export function readRange(value: string | null | undefined): { start: Day; end: Day } {
+  const [first = "", second = ""] = (value ?? "").split("/").map(part => part.trim().slice(0, 10));
+  const start = isDay(first) ? first : "";
+  const end = isDay(second) ? second : "";
+  if (start && end && end < start) return { start: end, end: start };
+  return { start, end };
 }
 
 /** Detail of `navigate`: the first month now shown, `YYYY-MM`. */
@@ -62,13 +77,15 @@ export abstract class CalendarBase extends LitElement {
     today: { type: String },
     weekStart: { type: String, attribute: "week-start" },
     selectable: { type: Boolean, reflect: true },
+    range: { type: Boolean, reflect: true },
     label: { type: String },
     literal: { type: Boolean, reflect: true },
     events: { attribute: false },
     focusDay: { state: true },
+    hoverDay: { state: true },
   };
 
-  /** The selected day, `YYYY-MM-DD`; empty for none. */
+  /** The selected day, `YYYY-MM-DD`, or with `range` the days `YYYY-MM-DD/YYYY-MM-DD`; empty for none. */
   declare value: string;
   /** The first day a person may choose. */
   declare min: string | undefined;
@@ -80,6 +97,8 @@ export abstract class CalendarBase extends LitElement {
   declare weekStart: string | undefined;
   /** Pressing a day selects it and fires `change`. */
   declare selectable: boolean;
+  /** A selectable calendar chooses a first and a last day. */
+  declare range: boolean;
   /** The grid's name: a translation key, or literal words. The month's name when left out. */
   declare label: string | undefined;
   /** Show `label` as written, never looked up. */
@@ -88,6 +107,8 @@ export abstract class CalendarBase extends LitElement {
   declare events: CalendarEvent[];
   /** The day that holds the grid's one Tab stop. */
   declare focusDay: Day | undefined;
+  /** The day under the pointer, which previews a range's end. */
+  declare hoverDay: Day | undefined;
 
   /** Weeks run along rows (a month) or along columns (the large calendar). */
   protected abstract readonly weeksRun: "rows" | "columns";
@@ -98,6 +119,7 @@ export abstract class CalendarBase extends LitElement {
     super();
     this.value = "";
     this.selectable = false;
+    this.range = false;
     this.literal = false;
     this.events = [];
   }
@@ -116,7 +138,7 @@ export abstract class CalendarBase extends LitElement {
 
   protected willUpdate(changed: PropertyValues<this>) {
     super.willUpdate(changed);
-    if (changed.has("value") && this.value && !isDay(this.value)) this.value = "";
+    if (changed.has("value") && this.value && !readRange(this.value).start) this.value = "";
   }
 
   /** Shared words, filled in: `words("Week {week}", { week: 42 })`. */
@@ -150,6 +172,22 @@ export abstract class CalendarBase extends LitElement {
   /** Whether a person may choose the day. */
   protected allowed(day: Day): boolean {
     return clampDay(day, this.minDay, this.maxDay) === day;
+  }
+
+  /** The chosen days: the first and the last of a range, or the one day twice. */
+  protected get chosen(): { start: Day; end: Day } {
+    const { start, end } = readRange(this.value);
+    return this.range ? { start, end } : { start, end: start };
+  }
+
+  /** How a day stands to the selection: an end of it, inside it, or neither; with the end still to come, the pointer previews it. */
+  protected selection(day: Day): { selected: boolean; inside: boolean; first: boolean; last: boolean } {
+    let { start, end } = this.chosen;
+    if (this.range && start && !end && this.hoverDay) end = this.hoverDay;
+    if (end && end < start) [start, end] = [end, start];
+    const selected = day === start || day === end;
+    const spans = Boolean(this.range && start && end && start !== end);
+    return { selected, inside: spans && day > start && day < end, first: spans && day === start, last: spans && day === end };
   }
 
   /** What a day's cell is called: the whole date, then what is on it. */
@@ -190,11 +228,20 @@ export abstract class CalendarBase extends LitElement {
       cancelable: true,
       detail: { day, events: this.eventsOn(day) },
     });
-    if (!this.dispatchEvent(pressed) || !this.selectable || !this.allowed(day) || day === this.value) return;
-    const previous = (this.value || "") as Day;
-    this.value = day;
+    if (!this.dispatchEvent(pressed) || !this.selectable || !this.allowed(day)) return;
+    const previous = this.value || "";
+    let value: string = day;
+    if (this.range) {
+      // The first press starts a range, the second ends it (either way round); a third starts again.
+      const { start, end } = readRange(previous);
+      if (start && !end) value = day < start ? `${day}/${start}` : `${start}/${day}`;
+    }
     this.focusDay = day;
-    this.dispatchEvent(new CustomEvent<CalendarChangeDetail>("change", { bubbles: true, composed: true, detail: { value: day, previous } }));
+    if (value === previous) return;
+    this.value = value;
+    this.hoverDay = undefined;
+    const { start, end } = readRange(value);
+    this.dispatchEvent(new CustomEvent<CalendarChangeDetail>("change", { bubbles: true, composed: true, detail: { value, previous, start, end: this.range ? end : start } }));
   }
 
   protected pressEvent(event: CalendarEvent, day: Day) {

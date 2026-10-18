@@ -111,6 +111,10 @@
     "Next month": "次の月",
     "Choose a date": "日付を選択",
     "Date": "日付",
-    "W{week}": "第{week}週"
+    "W{week}": "第{week}週",
+    "Total": "合計",
+    "End date": "終了日",
+    "Include time": "時刻を含める",
+    "Time": "時刻"
   }
 }

@@ -134,6 +134,10 @@ enum DS1SharedWords {
         "Choose a date": "Vælg en dato",
         "Date": "Dato",
         "W{week}": "U{week}",
+        "Total": "I alt",
+        "End date": "Slutdato",
+        "Include time": "Medtag klokkeslæt",
+        "Time": "Klokkeslæt",
     ]
 
     private static let deWords: [String: String] = [
@@ -249,6 +253,10 @@ enum DS1SharedWords {
         "Choose a date": "Datum wählen",
         "Date": "Datum",
         "W{week}": "KW{week}",
+        "Total": "Gesamt",
+        "End date": "Enddatum",
+        "Include time": "Uhrzeit hinzufügen",
+        "Time": "Uhrzeit",
     ]
 
     private static let enWords: [String: String] = [
@@ -364,6 +372,10 @@ enum DS1SharedWords {
         "Choose a date": "Choose a date",
         "Date": "Date",
         "W{week}": "W{week}",
+        "Total": "Total",
+        "End date": "End date",
+        "Include time": "Include time",
+        "Time": "Time",
     ]
 
     private static let esWords: [String: String] = [
@@ -479,6 +491,10 @@ enum DS1SharedWords {
         "Choose a date": "Elegir una fecha",
         "Date": "Fecha",
         "W{week}": "S{week}",
+        "Total": "Total",
+        "End date": "Fecha de fin",
+        "Include time": "Incluir hora",
+        "Time": "Hora",
     ]
 
     private static let fiWords: [String: String] = [
@@ -594,6 +610,10 @@ enum DS1SharedWords {
         "Choose a date": "Valitse päivämäärä",
         "Date": "Päivämäärä",
         "W{week}": "Vk{week}",
+        "Total": "Yhteensä",
+        "End date": "Päättymispäivä",
+        "Include time": "Sisällytä kellonaika",
+        "Time": "Kellonaika",
     ]
 
     private static let frWords: [String: String] = [
@@ -709,6 +729,10 @@ enum DS1SharedWords {
         "Choose a date": "Choisir une date",
         "Date": "Date",
         "W{week}": "S{week}",
+        "Total": "Total",
+        "End date": "Date de fin",
+        "Include time": "Inclure l’heure",
+        "Time": "Heure",
     ]
 
     private static let isWords: [String: String] = [
@@ -817,6 +841,10 @@ enum DS1SharedWords {
         "Choose a date": "Veldu dagsetningu",
         "Date": "Dagsetning",
         "W{week}": "V{week}",
+        "Total": "Samtals",
+        "End date": "Lokadagur",
+        "Include time": "Taka með tíma",
+        "Time": "Tími",
     ]
 
     private static let itWords: [String: String] = [
@@ -932,6 +960,10 @@ enum DS1SharedWords {
         "Choose a date": "Scegli una data",
         "Date": "Data",
         "W{week}": "S{week}",
+        "Total": "Totale",
+        "End date": "Data di fine",
+        "Include time": "Includi ora",
+        "Time": "Ora",
     ]
 
     private static let jaWords: [String: String] = [
@@ -1047,6 +1079,10 @@ enum DS1SharedWords {
         "Choose a date": "日付を選択",
         "Date": "日付",
         "W{week}": "第{week}週",
+        "Total": "合計",
+        "End date": "終了日",
+        "Include time": "時刻を含める",
+        "Time": "時刻",
     ]
 
     private static let koWords: [String: String] = [
@@ -1162,6 +1198,10 @@ enum DS1SharedWords {
         "Choose a date": "날짜 선택",
         "Date": "날짜",
         "W{week}": "{week}주",
+        "Total": "합계",
+        "End date": "종료일",
+        "Include time": "시간 포함",
+        "Time": "시간",
     ]
 
     private static let nbWords: [String: String] = [
@@ -1277,6 +1317,10 @@ enum DS1SharedWords {
         "Choose a date": "Velg en dato",
         "Date": "Dato",
         "W{week}": "U{week}",
+        "Total": "Totalt",
+        "End date": "Sluttdato",
+        "Include time": "Ta med klokkeslett",
+        "Time": "Klokkeslett",
     ]
 
     private static let ptBRWords: [String: String] = [
@@ -1392,6 +1436,10 @@ enum DS1SharedWords {
         "Choose a date": "Escolher uma data",
         "Date": "Data",
         "W{week}": "S{week}",
+        "Total": "Total",
+        "End date": "Data de término",
+        "Include time": "Incluir horário",
+        "Time": "Horário",
     ]
 
     private static let ptWords: [String: String] = [
@@ -1507,6 +1555,10 @@ enum DS1SharedWords {
         "Choose a date": "Escolher uma data",
         "Date": "Data",
         "W{week}": "S{week}",
+        "Total": "Total",
+        "End date": "Data de fim",
+        "Include time": "Incluir hora",
+        "Time": "Hora",
     ]
 
     private static let svWords: [String: String] = [
@@ -1622,6 +1674,10 @@ enum DS1SharedWords {
         "Choose a date": "Välj ett datum",
         "Date": "Datum",
         "W{week}": "V{week}",
+        "Total": "Totalt",
+        "End date": "Slutdatum",
+        "Include time": "Inkludera tid",
+        "Time": "Tid",
     ]
 
     private static let zhWords: [String: String] = [
@@ -1737,6 +1793,10 @@ enum DS1SharedWords {
         "Choose a date": "选择日期",
         "Date": "日期",
         "W{week}": "第{week}周",
+        "Total": "合计",
+        "End date": "结束日期",
+        "Include time": "包含时间",
+        "Time": "时间",
     ]
 
 }
