@@ -7,7 +7,9 @@ public enum DS1FieldVariant: Sendable { case field, row, plain }
 
 /// `ds-input`: one square high, text inset 4, with an optional `label` above (a required field
 /// adds " *" in the danger colour), an `error` below on its own lines, and for a `secure` field
-/// a button that shows and hides the password.
+/// a button that shows and hides the password. `rows` makes it the multiline field (`multiline`):
+/// the field's look across that many lines one square tall, growing with its text a line at a
+/// time up to `maxRows` with `autoGrow`, then scrolling.
 public struct DS1Field: View {
     @Environment(\.ds1Scale) private var scale
     @Environment(\.isEnabled) private var enabled
@@ -21,11 +23,16 @@ public struct DS1Field: View {
     let variant: DS1FieldVariant
     let secure: Bool
     let quietFocus: Bool
+    let rows: Int?
+    let maxRows: Int
+    let autoGrow: Bool
 
     public init(_ placeholder: String = "", text: Binding<String>, label: String? = nil, error: String? = nil, required: Bool = false,
-                variant: DS1FieldVariant = .field, secure: Bool = false, quietFocus: Bool = false) {
+                variant: DS1FieldVariant = .field, secure: Bool = false, quietFocus: Bool = false,
+                rows: Int? = nil, autoGrow: Bool = false, maxRows: Int = 10) {
         self.placeholder = placeholder; _text = text; self.label = label; self.error = error; self.required = required
         self.variant = variant; self.secure = secure; self.quietFocus = quietFocus
+        self.rows = rows.map { max(1, $0) }; self.autoGrow = autoGrow; self.maxRows = max(rows ?? 1, maxRows)
     }
 
     public var body: some View {
@@ -37,7 +44,11 @@ public struct DS1Field: View {
             }
             HStack(spacing: 0) {
                 Group {
-                    if secure && !revealed { SecureField(placeholder, text: $text) } else { TextField(placeholder, text: $text) }
+                    if let rows {
+                        TextField(placeholder, text: $text, axis: .vertical)
+                            .lineLimit(autoGrow ? rows ... maxRows : rows ... rows)
+                            .lineSpacing(max(0, scale.unit - DS1Font.lineHeight(.regular, size: scale.type)))
+                    } else if secure && !revealed { SecureField(placeholder, text: $text) } else { TextField(placeholder, text: $text) }
                 }
                 .focused($focused)
                 .font(DS1Font.font(.regular, size: scale.type))
@@ -55,7 +66,9 @@ public struct DS1Field: View {
             }
             .padding(.leading, variant == .plain ? 0 : scale(4))
             .padding(.trailing, variant == .plain || secure ? 0 : scale(4))
-            .frame(height: variant == .row ? scale(18) : scale.unit)
+            .padding(.vertical, rows == nil || variant == .plain ? 0 : scale(4))
+            .frame(height: rows == nil ? (variant == .row ? scale(18) : scale.unit) : nil)
+            .frame(minHeight: rows.map { scale.squares(CGFloat($0)) }, alignment: .topLeading)
             .background(ground, in: RoundedRectangle(cornerRadius: variant == .field ? scale.radius : 0, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: variant == .field ? scale.radius : 0, style: .continuous).strokeBorder(line, lineWidth: DS1Metrics.line))
             .padding(.top, variant == .row ? scale(2) : 0)
@@ -79,34 +92,5 @@ public struct DS1Field: View {
         if focused && !quietFocus { return variant == .row ? .accent : .focusRing }
         if error != nil { return .danger }
         return variant == .field ? .border : DS1Color(0, opacity: 0)
-    }
-}
-
-/// `ds-textarea`: the field's look across `rows` lines one square tall, growing with its text
-/// a line at a time up to `maxRows` with `autoGrow`, then scrolling.
-public struct DS1TextArea: View {
-    @Environment(\.ds1Scale) private var scale
-    @Binding var text: String
-    let placeholder: String
-    let rows: Int
-    let maxRows: Int
-    let autoGrow: Bool
-
-    public init(_ placeholder: String = "", text: Binding<String>, rows: Int = 3, autoGrow: Bool = false, maxRows: Int = 10) {
-        self.placeholder = placeholder; _text = text; self.rows = max(1, rows); self.autoGrow = autoGrow; self.maxRows = max(rows, maxRows)
-    }
-
-    public var body: some View {
-        TextField(placeholder, text: $text, axis: .vertical)
-            .lineLimit(autoGrow ? rows ... maxRows : rows ... rows)
-            .lineSpacing(max(0, scale.unit - DS1Font.lineHeight(.regular, size: scale.type)))
-            .font(DS1Font.font(.regular, size: scale.type))
-            .tracking(scale.tracking)
-            .foregroundStyle(DS1Color.text)
-            .textFieldStyle(.plain)
-            .padding(scale(4))
-            .frame(minHeight: scale.squares(CGFloat(rows)), alignment: .topLeading)
-            .background(DS1Color.fill, in: RoundedRectangle(cornerRadius: scale.radius, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: scale.radius, style: .continuous).strokeBorder(DS1Color.border, lineWidth: DS1Metrics.line))
     }
 }

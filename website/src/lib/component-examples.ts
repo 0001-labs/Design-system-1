@@ -491,7 +491,7 @@ matrix.marks = [
   },
   'language': {
     title: 'Choose a language', hint: 'Click to cycle through the configured languages in this preview.',
-    html: '<ds-language></ds-language>\n<ds-language chip primary></ds-language>\n<ds-text>Save</ds-text>',
+    html: '<ds-cycle type="language"></ds-cycle>\n<ds-cycle type="language" chip primary></ds-cycle>\n<ds-text>Save</ds-text>',
   },
   'gap': {
     title: 'One square of space', hint: 'The gap separates two lines by one 20px square.',
@@ -633,7 +633,7 @@ export const PAGE_EXAMPLES: Record<string, string[]> = {
   '2-core/banner': ['banner', 'banner-dismiss'], '2-core/card': ['card', 'card-outlined'],
   '2-core/empty': ['empty', 'empty-search'], '2-core/notice': ['notice'], '2-core/kbd': ['kbd'], '2-core/pagedots': ['pagedots'],
   '2-core/stat': ['stat'], '2-core/meter': ['meter'], '2-core/steps': ['steps'],
-  '2-core/cycle': ['cycle'], '2-core/language': ['language'],
+  '2-core/cycle': ['cycle', 'language'],
   '2-core/gap': ['gap'],
   '3-unit/row': ['row', 'row-centered'], '3-unit/list': ['list'],
   '3-unit/accordion': ['accordion'], '3-unit/form': ['form'], '3-unit/carousel': ['carousel', 'carousel-full'], '3-unit/slide': ['slide', 'slide-loop'],

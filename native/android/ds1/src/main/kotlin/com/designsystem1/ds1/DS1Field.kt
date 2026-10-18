@@ -59,7 +59,9 @@ enum class DS1FieldVariant { Field, Row, Plain }
  * `ds-input`: one square high, text inset 4 dp, with an optional [label] above (a required
  * field adds " *" in the danger colour), an [error] below on its own lines, and for a
  * [secure] field a button that shows and hides the password, named [showLabel] and
- * [hideLabel]. [quietFocus] draws no focus.
+ * [hideLabel]. [quietFocus] draws no focus. [rows] makes it the multiline field (`multiline`):
+ * the field's look across that many lines one square tall; with [autoGrow] it grows a whole
+ * square at a time with its text up to [maxRows], then scrolls.
  */
 @Composable
 fun DS1Field(
@@ -79,45 +81,20 @@ fun DS1Field(
     quietFocus: Boolean = false,
     keyboardOptions: KeyboardOptions = if (secure) KeyboardOptions(keyboardType = KeyboardType.Password) else KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
+    rows: Int? = null,
+    autoGrow: Boolean = false,
+    maxRows: Int = 10,
 ) {
     var revealed by rememberSaveable { mutableStateOf(false) }
+    val scale = LocalDS1Scale.current
+    val lines = rows?.coerceAtLeast(1)
+    val height = if (lines == null) Modifier else Modifier.heightIn(min = scale.squares(lines.toFloat()), max = if (autoGrow) scale.squares(maxOf(lines, maxRows).toFloat()) else scale.squares(lines.toFloat()))
     DS1FieldColumn(label, required, error, modifier) {
         DS1FieldFrame(
-            value, onValueChange, Modifier, placeholder, enabled, readOnly, singleLine = true, variant, quietFocus, error != null,
+            value, onValueChange, height, placeholder, enabled, readOnly, singleLine = lines == null, variant, quietFocus, error != null,
             keyboardOptions, keyboardActions,
             if (secure && !revealed) PasswordVisualTransformation() else VisualTransformation.None,
             trailing = if (secure) ({ DS1RevealButton(revealed, showLabel, hideLabel) { revealed = !revealed } }) else null,
-        )
-    }
-}
-
-/**
- * `ds-textarea`: the field's look across [rows] lines one square tall; with [autoGrow] it grows
- * a whole square at a time with its text up to [maxRows], then scrolls.
- */
-@Composable
-fun DS1TextArea(
-    value: String,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    placeholder: String = "",
-    label: String? = null,
-    error: String? = null,
-    required: Boolean = false,
-    rows: Int = 3,
-    autoGrow: Boolean = false,
-    maxRows: Int = 10,
-    variant: DS1FieldVariant = DS1FieldVariant.Field,
-    enabled: Boolean = true,
-    readOnly: Boolean = false,
-) {
-    val scale = LocalDS1Scale.current
-    val min = scale.squares(rows.coerceAtLeast(1).toFloat())
-    val max = if (autoGrow) scale.squares(maxOf(rows, maxRows).toFloat()) else min
-    DS1FieldColumn(label, required, error, modifier) {
-        DS1FieldFrame(
-            value, onValueChange, Modifier.heightIn(min = min, max = max), placeholder, enabled, readOnly, singleLine = false, variant, false, error != null,
-            KeyboardOptions.Default, KeyboardActions.Default, VisualTransformation.None, trailing = null,
         )
     }
 }

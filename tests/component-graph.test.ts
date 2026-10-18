@@ -18,9 +18,9 @@ test('a selection carries everything it imports, with its React adapter and the 
   expect(componentGraph(ds1, ['panel']).files.has('2-core/ds-button.ts')).toBe(false);
 });
 
-test('selecting multiline fields includes the shared input base and React binding', () => {
-  const { files } = componentGraph(ds1, ['textarea']);
-  for (const file of ['2-core/ds-textarea.ts', '2-core/ds-input.ts', '2-core/styles/ds-textarea.css', 'react/input.ts']) expect(files.has(file)).toBe(true);
+test('selecting the input brings its stylesheet and React binding, multiline fields included', () => {
+  const { files } = componentGraph(ds1, ['input']);
+  for (const file of ['2-core/ds-input.ts', '2-core/styles/ds-input.css', 'react/input.ts']) expect(files.has(file)).toBe(true);
 });
 
 test('selecting the page carries its React adapter, so a product needs no JSX typing of its own', () => {

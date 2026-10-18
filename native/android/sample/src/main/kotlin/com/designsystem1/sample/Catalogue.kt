@@ -67,7 +67,7 @@ private fun CatalogueScreen() {
         DS1LineText("Every piece of the Kotlin package.", tone = DS1Tone.Muted)
         Row(horizontalArrangement = Arrangement.spacedBy(scale(4f)), verticalAlignment = Alignment.CenterVertically) {
             DS1ThemeCycle()
-            DS1LanguagePicker(compact = true)
+            DS1LanguageCycle(compact = true)
         }
 
         Section("Buttons") {
@@ -110,7 +110,7 @@ private fun CatalogueScreen() {
             DS1Gap(size = DS1GapSize.Half)
             DS1Field(password, { password = it }, label = "Password", secure = true)
             DS1Gap(size = DS1GapSize.Half)
-            DS1TextArea(note, { note = it }, placeholder = "A note", autoGrow = true)
+            DS1Field(note, { note = it }, placeholder = "A note", rows = 3, autoGrow = true)
             DS1Gap(size = DS1GapSize.Half)
             DS1TokenField(entry, { entry = it }, { text, _ -> tokens.add(text); entry = "" }, placeholder = "Add a person", onRemoveLast = { tokens.removeLastOrNull() }) {
                 for (t in tokens) DS1Token(t, removeLabel = "Remove $t", onRemove = { tokens.remove(t) }, leading = { DS1Avatar(initial = t.take(1), colour = DS1Colors.zenithBlue.current) })

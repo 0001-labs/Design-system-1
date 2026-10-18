@@ -33,10 +33,10 @@ public struct DS1ThemeCycle: View {
     }
 }
 
-/// `ds-language`: the language picker. Eight squares by one less the 1-point correction (four
+/// the language cycle: the language picker. Eight squares by one less the 1-point correction (four
 /// with `compact`), on the fill, the current language named in itself; a press steps to the
 /// next of the product's languages and saves it. `chip` hugs the name.
-public struct DS1LanguagePicker: View {
+public struct DS1LanguageCycle: View {
     @Environment(\.ds1Scale) private var scale
     @ObservedObject private var words = DS1Words.shared
     let compact: Bool

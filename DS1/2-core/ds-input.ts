@@ -3,6 +3,7 @@
 
 import { LitElement, html, unsafeCSS, type CSSResultGroup, type PropertyDeclarations } from "lit";
 import { live } from "lit/directives/live.js";
+import { styleMap } from "lit/directives/style-map.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { define } from "../0-face/define";
 import seeIcon from "../x-icon/password-see.svg?url";
@@ -20,6 +21,12 @@ export class Input extends LitElement {
   private initialValue: string | undefined;
   static properties: PropertyDeclarations = {
     type: { type: String, reflect: true },
+    // A text area: the same field across whole rows.
+    multiline: { type: Boolean, reflect: true },
+    rows: { type: Number },
+    maxRows: { type: Number, attribute: "max-rows" },
+    autoGrow: { type: Boolean, attribute: "auto-grow", reflect: true },
+    wrap: { type: String },
     inputMode: { type: String, attribute: "inputmode" },
     enterKeyHint: { type: String, attribute: "enterkeyhint" },
     list: { type: String },
@@ -71,6 +78,15 @@ export class Input extends LitElement {
     | "week"
     | "time"
     | "datetime-local";
+  declare multiline: boolean;
+  declare rows: number;
+  declare maxRows: number;
+  declare autoGrow: boolean;
+  declare wrap: "soft" | "hard" | "off";
+  private resizeFrame = 0;
+  private measuredWidth = 0;
+  private resizeObserver?: ResizeObserver;
+  private readonly fontsChanged = () => this.resizeToContent();
   declare inputMode: string;
   /** The return key's label on a touch keyboard: enter, done, go, next, previous, search or send. */
   declare enterKeyHint: string;
@@ -119,6 +135,11 @@ export class Input extends LitElement {
   constructor() {
     super();
     this.type = "text";
+    this.multiline = false;
+    this.rows = 3;
+    this.maxRows = 10;
+    this.autoGrow = false;
+    this.wrap = "soft";
     this.inputMode = "";
     this.enterKeyHint = "";
     this.list = "";
@@ -179,6 +200,18 @@ export class Input extends LitElement {
 
     // Also listen for translations loaded event
     window.addEventListener("translations-loaded", this.boundHandlers.languageChanged);
+    if (typeof ResizeObserver !== "undefined") {
+      this.resizeObserver = new ResizeObserver((entries) => {
+        if (this.clientWidth !== this.measuredWidth || entries.some(entry => entry.target !== this)) {
+          this.measuredWidth = this.clientWidth;
+          this.resizeToContent();
+        }
+      });
+      this.resizeObserver.observe(this);
+      const metric = this.shadowRoot?.querySelector(".row-metric");
+      if (metric) this.resizeObserver.observe(metric);
+    }
+    document.fonts?.addEventListener("loadingdone", this.fontsChanged);
   }
 
   disconnectedCallback() {
@@ -188,10 +221,22 @@ export class Input extends LitElement {
     window.removeEventListener("translations-loaded", this.boundHandlers.languageChanged);
     this.listObserver?.disconnect();
     this.listObserver = undefined;
+    this.resizeObserver?.disconnect();
+    document.fonts?.removeEventListener("loadingdone", this.fontsChanged);
+    cancelAnimationFrame(this.resizeFrame);
   }
 
   firstUpdated(): void {
     if (this.autofocus) this.focus();
+    // A fixed-width field can change scale without changing its width. Measure
+    // one shared row separately from the content height that we set ourselves.
+    const metric = this.shadowRoot?.querySelector(".row-metric");
+    if (metric) this.resizeObserver?.observe(metric);
+  }
+
+  willUpdate(changed: Map<string, unknown>): void {
+    // A multiline field stands on its own by default, in the field treatment.
+    if (changed.has("multiline") && this.multiline && this.variant === "default" && !this.hasAttribute("variant")) this.variant = "field";
   }
 
   updated(changedProperties: Map<string, unknown>) {
@@ -202,6 +247,7 @@ export class Input extends LitElement {
     }
     if (this.initialValue === undefined) this.initialValue = this.value;
     if (changedProperties.has("type") && this.type !== "password") this._passwordVisible = false;
+    if (this.multiline) this.resizeToContent();
     if (changedProperties.has("list")) this.observeList();
     this.syncForm();
   }
@@ -239,7 +285,7 @@ export class Input extends LitElement {
     return this.shadowRoot?.querySelector("input, textarea") ?? null;
   }
   protected get isMultiline(): boolean {
-    return false;
+    return this.multiline;
   }
   get selectionStart(): number | null {
     return this.input?.selectionStart ?? null;
@@ -461,7 +507,67 @@ export class Input extends LitElement {
     this.input?.select();
   }
 
+  /** Grow on the row grid, bounded by maxRows; the remainder scrolls. */
+  private resizeToContent(): void {
+    cancelAnimationFrame(this.resizeFrame);
+    const control = this.input;
+    if (!control || !this.multiline) return;
+    if (!this.autoGrow) {
+      control.style.height = "";
+      control.style.overflowY = "";
+      return;
+    }
+    this.resizeFrame = requestAnimationFrame(() => {
+      if (!this.isConnected) return;
+      const computed = getComputedStyle(control);
+      const row =
+        parseFloat(computed.getPropertyValue("--ds-row-height")) ||
+        20 * (parseFloat(computed.getPropertyValue("--ds-sf")) || 1);
+      const minimum = Math.max(1, Math.floor(this.rows || 1)) * row;
+      const maximum = Math.max(minimum, Math.floor(this.maxRows || this.rows || 1) * row);
+      control.style.height = "0px";
+      const border = parseFloat(computed.borderTopWidth) + parseFloat(computed.borderBottomWidth);
+      const needed = Math.ceil((control.scrollHeight + border) / row) * row;
+      control.style.height = `${Math.max(minimum, Math.min(maximum, needed))}px`;
+      control.style.overflowY = needed > maximum ? "auto" : "hidden";
+    });
+  }
+
+  /** The multiline field: a native textarea across whole rows. */
+  protected renderMultiline(hasError: boolean, description: string) {
+    const rows = Math.max(1, Math.floor(this.rows || 1));
+    return html`<span class="row-metric" aria-hidden="true"></span><textarea
+      id="input"
+      part="input"
+      aria-label=${ifDefined(this.accessibleLabel())}
+      aria-invalid=${ifDefined(this.ariaInvalid || (hasError ? "true" : undefined))}
+      aria-describedby=${ifDefined([description ? "description" : "", hasError ? "error" : ""].filter(Boolean).join(" ") || undefined)}
+      inputmode=${ifDefined(this.inputMode || undefined)}
+      enterkeyhint=${ifDefined(this.enterKeyHint || undefined)}
+      spellcheck=${ifDefined(this.spellcheckHint || undefined)}
+      .name=${this.name}
+      .value=${live(this.value)}
+      .placeholder=${this._placeholder || this.placeholder}
+      ?disabled=${this.disabled || this._formDisabled}
+      ?readonly=${this.readonly}
+      ?required=${this.required}
+      ?autofocus=${this.autofocus}
+      autocomplete=${this.autocomplete}
+      minlength=${ifDefined(this.minlength || undefined)}
+      maxlength=${ifDefined(this.maxlength >= 0 ? this.maxlength : undefined)}
+      rows=${rows}
+      wrap=${this.wrap || "soft"}
+      style=${styleMap({ "--ds-textarea-rows": String(rows) })}
+      class=${hasError ? "has-error" : ""}
+      @input=${this._handleInput}
+      @change=${this.handleChange}
+      @focus=${this._handleFocus}
+      @blur=${this._handleBlur}
+    ></textarea>`;
+  }
+
   protected renderControl(hasError: boolean, description: string) {
+    if (this.multiline) return this.renderMultiline(hasError, description);
     const suggestions = this.suggestionOptions();
     return html`<input
       id="input"

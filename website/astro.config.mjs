@@ -111,7 +111,6 @@ export default defineConfig({
             { label: "Icon", slug: "2-core/icon" },
             { label: "Input", slug: "2-core/input" },
             { label: "Keyboard shortcut", slug: "2-core/kbd" },
-            { label: "Language", slug: "2-core/language" },
             { label: "Link", slug: "2-core/link" },
             { label: "Meter", slug: "2-core/meter" },
             { label: "Notice", slug: "2-core/notice" },

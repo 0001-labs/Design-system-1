@@ -8,6 +8,7 @@ import {
   setLanguage,
 } from "../0-face/i18n";
 import type { LanguageCode } from "../0-face/i18n";
+import { LANGUAGE_METADATA, isLanguage, normalizeLanguage } from "../0-face/languages";
 import { currentThemeMode, setThemeMode, THEME_MODES } from "../0-face/theme";
 import type { ThemeMode } from "../0-face/theme";
 import { savePreferences } from "../0-face/preferences";
@@ -52,6 +53,18 @@ const getPageStyle = (): string => {
 
 // The settings a cycle knows by name. Any other cycle steps through its own
 // `values` and reports each step as a `change` event.
+/**
+ * A language's name in the language itself (`Dansk`, `日本語`): from the
+ * language list, else from the browser, else the code.
+ */
+export function nativeLanguageName(code: string): string {
+  if (!code) return "";
+  if (isLanguage(code)) return LANGUAGE_METADATA[code].nativeLabel;
+  const member = normalizeLanguage(code, null);
+  if (member) return LANGUAGE_METADATA[member].nativeLabel;
+  return getLanguageDisplayName(code, { locale: code });
+}
+
 const SETTINGS = new Set(["language", "theme", "accent-color", "notes-style-medium", "page-style", "icon-only"]);
 
 // Use a regular class with proper TypeScript type declarations and JSDoc comments
@@ -60,7 +73,9 @@ export class Cycle extends LitElement {
   // Define reactive properties using Lit's property system
   static get properties() {
     return {
-      type: { type: String },
+      type: { type: String, reflect: true },
+      // The language picker as a chip, the cycle's button, instead of an item.
+      chip: { type: Boolean, reflect: true },
       values: { type: Array },
       value: { type: String },
       label: { type: String, reflect: true },
@@ -82,6 +97,7 @@ export class Cycle extends LitElement {
   // Add runtime properties using the any type
   // These are just for TypeScript and don't create shadowing fields
   declare type: string;
+  declare chip: boolean;
   declare values: string[];
   declare value: string;
   /**
@@ -115,6 +131,7 @@ export class Cycle extends LitElement {
 
     // Initialize properties with default values
     this.type = "";
+    this.chip = false;
     this.values = [];
     this.value = "";
     this.label = "";
@@ -449,9 +466,7 @@ export class Cycle extends LitElement {
 
   getValueDisplay(value: string): string | any {
     if (this.type === "language") {
-      return getLanguageDisplayName(value, {
-        locale: currentLanguage.value,
-      });
+      return nativeLanguageName(value);
     } else if (this.type === "theme") {
       // Try to get translated theme name
       if (this.translationsReady) {
@@ -576,7 +591,7 @@ export class Cycle extends LitElement {
   /** The words the face shows for the current value, for the accessible name. */
   valueText(): string {
     const value = this.currentValue;
-    if (this.type === "language") return getLanguageDisplayName(value, { locale: currentLanguage.value });
+    if (this.type === "language") return nativeLanguageName(value);
     if (this.type === "theme") return translate(value === "light" ? "Light" : value === "dark" ? "Dark" : "System");
     if (this.type === "accent-color") return translate(this.getColorKey(value));
     if (this.type === "page-style" || this.type === "icon-only") return translate(value === "note" ? "Note" : "Page");
@@ -585,10 +600,34 @@ export class Cycle extends LitElement {
 
   /** "Size: 40" when the cycle has a label, so the control is named while its face shows the value alone. */
   accessibleLabel(): string {
-    return this.label ? `${translate(this.label)}: ${this.valueText()}` : "";
+    if (this.label) return `${translate(this.label)}: ${this.valueText()}`;
+    // The language picker is always named: "Language: Dansk".
+    return this.type === "language" ? `${translate("Language")}: ${this.valueText()}` : "";
+  }
+
+  /**
+   * The language picker: a native button carrying the language's code as
+   * `lang`, so each name is set in its own typeface. An item on its own, eight
+   * squares wide (four with `compact`); with `chip`, the cycle's button around it.
+   */
+  private renderLanguagePicker() {
+    const code = this.currentValue || currentLanguage.value;
+    const button = html`<button
+      type="button"
+      lang=${code}
+      aria-label=${this.accessibleLabel()}
+      ?disabled=${this.disabled || this._fieldsetDisabled}
+      @click=${this.handleButtonClick}
+    >
+      ${nativeLanguageName(code)}
+    </button>`;
+    return this.chip ? html`<ds-button fit control="slotted"
+      ?primary=${this.primary && !this.secondary} ?secondary=${this.secondary}
+      ?disabled=${this.disabled || this._fieldsetDisabled}>${button}</ds-button>` : button;
   }
 
   render() {
+    if (this.type === "language") return this.renderLanguagePicker();
     return html`
       <div class="cycle">
         <ds-button fit

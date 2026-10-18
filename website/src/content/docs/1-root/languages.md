@@ -191,7 +191,7 @@ A page at `/ja/…` speaks Japanese, whatever the reader chose before. Take the 
 configureI18n({ languages: ["en", "da", "ja"], languageFromAddress: true });
 ```
 
-With `languageFromAddress`, the language at startup is the address's prefix (by `routing`); an address without one keeps the stored choice or the browser's. A person's choice through `setLanguage` (or `ds-language`) is still stored; the product then goes to the address in that language with `withLanguagePrefix`. Set it on `window.DS_ONE_I18N` before the [theme head script](/1-root/theming/#before-the-first-paint), and `lang` is right before the first paint too.
+With `languageFromAddress`, the language at startup is the address's prefix (by `routing`); an address without one keeps the stored choice or the browser's. A person's choice through `setLanguage` (or the language cycle) is still stored; the product then goes to the address in that language with `withLanguagePrefix`. Set it on `window.DS_ONE_I18N` before the [theme head script](/1-root/theming/#before-the-first-paint), and `lang` is right before the first paint too.
 
 Calling `setLanguage(language)` with the address's language at startup instead stores it as the person's choice: pass `{ remember: false }` if a product does it that way.
 
@@ -224,10 +224,10 @@ export const setLanguage = mutation({
 ## The picker
 
 ```html
-<ds-language></ds-language>
+<ds-cycle type="language"></ds-cycle>
 ```
 
-`ds-language` cycles through the product's languages, each shown by its own name, sets the language on a press and follows it when something else changes it. One square high and eight wide; `compact` makes it four. See [Language](/2-core/language/).
+The language cycle goes through the product's languages, each shown by its own name, sets the language on a press and follows it when something else changes it. One square high and eight wide; `compact` makes it four, `chip` a chip. See [Cycle](/2-core/cycle/#the-language-picker).
 
 ## Dates, numbers and money
 

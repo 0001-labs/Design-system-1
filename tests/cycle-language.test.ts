@@ -1,7 +1,6 @@
 // @vitest-environment happy-dom
 import { afterEach, expect, test, vi } from "vite-plus/test";
 import { Cycle } from "../DS1/2-core/ds-cycle";
-import { LanguagePicker } from "../DS1/2-core/ds-language";
 import { configureI18n, setLanguage, currentLanguage } from "../DS1/0-face/i18n";
 import { currentTheme, setTheme } from "../DS1/0-face/theme";
 import { savePreferences } from "../DS1/0-face/preferences";
@@ -13,7 +12,7 @@ afterEach(() => {
   configureI18n({ languages: ["en", "ja"], storageKey: "language" });
 });
 async function picker(chip = true) {
-  const element = new LanguagePicker(); element.chip = chip;
+  const element = new Cycle(); element.type = "language"; element.chip = chip;
   document.body.append(element); await element.updateComplete;
   await element.shadowRoot!.querySelector("ds-button")?.updateComplete;
   return element;

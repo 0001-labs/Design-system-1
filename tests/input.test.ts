@@ -109,9 +109,9 @@ test('form reset, restoration and fieldset disabling retain the public value con
   expect(input.disabled).toBe(true);
 });
 
-test.each(['ds-input', 'ds-textarea'])('a reflected disabled state can re-enable %s after native form reactions', async (tag) => {
-  await import('../DS1/2-core/ds-textarea');
-  const control = document.createElement(tag) as InstanceType<typeof Input>;
+test.each([false, true])('a reflected disabled state can re-enable the field after native form reactions (multiline: %s)', async (multiline) => {
+  const control = document.createElement('ds-input') as InstanceType<typeof Input>;
+  control.multiline = multiline;
   document.body.append(control);
   await control.updateComplete;
   // Browsers deliver this native reaction synchronously during Lit's attribute
@@ -187,10 +187,9 @@ test('the error line is the danger colour on one-square lines, as the native fie
   expect(inputCss).not.toMatch(/#ff3b30|255,\s*59,\s*48|--error-color/i);
 });
 
-test.each(['ds-input', 'ds-textarea'])('%s marks its rows while an error shows, and a translated error wraps', async (tag) => {
-  await import('../DS1/2-core/ds-textarea');
-  document.body.innerHTML = `<${tag} label="Email"></${tag}>`;
-  const control = document.querySelector(tag) as InstanceType<typeof Input>;
+test.each([false, true])('the field marks its rows while an error shows, and a translated error wraps (multiline: %s)', async (multiline) => {
+  document.body.innerHTML = `<ds-input label="Email" ${multiline ? 'multiline' : ''}></ds-input>`;
+  const control = document.querySelector('ds-input') as InstanceType<typeof Input>;
   await control.updateComplete;
   const wrapper = () => control.shadowRoot!.querySelector('.input-wrapper')!;
   expect(wrapper().classList.contains('has-error')).toBe(false);

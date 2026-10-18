@@ -10,7 +10,7 @@ description: The components' look as plain classes on native elements, and the s
 | `ds-button`, with `ds-button--primary`, `--secondary`, `--danger`, `--icon`, `--fixed`, `--wide` | `<button>`, or `<a href>` for a link drawn as a button | The Button: hugs its label, one control high; `fixed` is four squares, `wide` fills its row; `danger` puts a destructive action's words in the danger colour. On a link it never takes the link's underline or colours; a disabled link has no `href` and carries `aria-disabled="true"`. |
 | `ds-link` | `<a href>` in text | A [text link](/2-core/link/): the text's ink, a hairline underline that darkens under the pointer, a muted visited ink and the focus ring. |
 | `ds-input` | `<input>` | A field one control high. |
-| `ds-textarea` | `<textarea>` | A field of whole rows; `--ds-textarea-rows` sets how many, three by default. |
+| `ds-input` on a `<textarea>` | `<textarea>` | A multiline field of whole rows; `--ds-textarea-rows` sets how many, three by default. |
 | `ds-select` | `<select>` | A field with the chevron drawn in its text colour. |
 | `ds-checkbox`, `ds-radio` | `<input type="checkbox">`, `<input type="radio">` | The `ds-checkbox` and `ds-radio` faces: one square on the field's ground with a 1px line; the checkbox fills with the accent and shows the check, the radio a dot half a square across. |
 | `ds-switch`, with `ds-switch--rounded` | `<button role="switch" aria-checked>` | The Switch: two control heights wide, its thumb travelling one. The page toggles `aria-checked`. |
@@ -50,7 +50,7 @@ Writing that stays native, such as an article or a landing page's story, takes t
   <button class="ds-button" aria-pressed="false">Board</button>
 </div>
 <button class="ds-switch" role="switch" aria-checked="false" aria-label="Grid"></button>
-<textarea class="ds-textarea" name="description"></textarea>
+<textarea class="ds-input" name="description"></textarea>
 
 <div class="ds-notice ds-notice--warning" role="status">
   <span class="ds-notice__mark" aria-hidden="true"></span>

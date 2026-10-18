@@ -136,14 +136,6 @@
     "url": "https://designsystem1.com/2-core/kbd/"
   },
   {
-    "id": "component:/2-core/language/",
-    "code": "LNG",
-    "label": "Language",
-    "kind": "component",
-    "summary": "Design system 1 2-core.",
-    "url": "https://designsystem1.com/2-core/language/"
-  },
-  {
     "id": "component:/2-core/link/",
     "code": "LNK",
     "label": "Link",

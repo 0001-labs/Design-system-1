@@ -10,7 +10,7 @@ const rule = (selector: string) => {
 };
 
 test('every native control class has a focus ring and a disabled state', () => {
-  for (const name of ['.ds-input', '.ds-textarea', '.ds-select', '.ds-checkbox', '.ds-radio', '.ds-switch', '.ds-range']) {
+  for (const name of ['.ds-input', '.ds-select', '.ds-checkbox', '.ds-radio', '.ds-switch', '.ds-range']) {
     expect(css).toMatch(new RegExp(`${name.replace('.', '\\.')}:focus-visible`));
     expect(css).toMatch(new RegExp(`${name.replace('.', '\\.')}:disabled`));
   }
@@ -24,7 +24,7 @@ test('a native switch is two control heights wide and its thumb travels one', ()
 });
 
 test('a native text area spans whole rows and a dialog is twenty squares wide', () => {
-  expect(rule('.ds-textarea')).toContain('calc(var(--ds-textarea-rows, 3) * var(--ds-row-height))');
+  expect(rule('textarea.ds-input')).toContain('calc(var(--ds-textarea-rows, 3) * var(--ds-row-height))');
   expect(rule('dialog.ds-dialog')).toContain('calc(20 * var(--ds-unit))');
 });
 

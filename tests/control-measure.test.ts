@@ -91,8 +91,8 @@ const FIELDS = [
   '<ds-input variant="field" label="Email" style="width: 120px" error-text="Enter a valid email address"></ds-input>',
   '<ds-input label="Email" style="--ds-sf: 1.5" error="Enter a valid email address"></ds-input>',
   '<ds-input variant="row" style="--ds-sf: 1.5" error="Enter a valid email address"></ds-input>',
-  '<ds-textarea label="Notes" error="Check this description"></ds-textarea>',
-  '<ds-textarea variant="default" error="Check this description"></ds-textarea>',
+  '<ds-input multiline label="Notes" error="Check this description"></ds-input>',
+  '<ds-input multiline variant="default" error="Check this description"></ds-input>',
 ];
 
 test("an input's error starts on the square below its control, on one-square lines in the native field's danger colour", async () => {

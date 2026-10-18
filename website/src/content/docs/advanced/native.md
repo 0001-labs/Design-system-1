@@ -41,7 +41,7 @@ Every public piece of the web library has a native counterpart with the same nam
 | `ds-icon` | `DS1Icon` | `DS1Icon` |
 | `ds-button`, icon button, danger | `DS1ButtonStyle` (`.buttonStyle(.ds1(.primary))`), `DS1IconButton`, `DS1DangerButton` | `DS1Button`, `DS1IconButton`, `DS1DangerButton` |
 | `ds-button split` | `DS1SplitButton` | `DS1SplitButton` |
-| `ds-input`, `ds-textarea` | `DS1Field`, `DS1TextArea`, `DS1FieldStyle` | `DS1Field`, `DS1TextArea` |
+| `ds-input`, `multiline` | `DS1Field` (`rows:`), `DS1FieldStyle` | `DS1Field(rows)` |
 | `ds-checkbox`, `ds-radio`, choice tiles | `DS1CheckboxStyle`, `DS1Checkbox`, `DS1Radio`, `DS1Choice` | `DS1Checkbox`, `DS1Radio`, `DS1Choice` |
 | `ds-switch`, `rounded` | `DS1SwitchStyle` (`.ds1Switch`, `.ds1Switch(rounded:)`) | `DS1Switch(rounded)` |
 | `ds-select` | `DS1Select` (the system's menu) | `DS1Select` |
@@ -50,7 +50,7 @@ Every public piece of the web library has a native counterpart with the same nam
 | `ds-avatar`, `ds-avatar-group` | `DS1Avatar`, `DS1AvatarGroup` | `DS1Avatar`, `DS1AvatarGroup` |
 | `ds-notice`, `ds-banner`, `ds-empty`, `ds-loading` | `DS1Notice`, `DS1Banner`, `DS1Empty`, `DS1Loading` | `DS1Notice`, `DS1Banner`, `DS1Empty`, `DS1Loading` |
 | `ds-tooltip` | `.ds1Tooltip(_:)` | `DS1Tooltip` |
-| `ds-cycle`, `ds-language` | `DS1Cycle`, `DS1ThemeCycle`, `DS1LanguagePicker` | `DS1Cycle`, `DS1ThemeCycle`, `DS1LanguagePicker` |
+| `ds-cycle`, its language picker | `DS1Cycle`, `DS1ThemeCycle`, `DS1LanguageCycle` | `DS1Cycle`, `DS1ThemeCycle`, `DS1LanguageCycle` |
 | `toast()` and its stack | `DS1Toast`, `DS1ToastHost` | `DS1Toast`, `DS1ToastHost` |
 | `ds-dialog`, `alert`, `confirm`, `prompt` | `DS1DialogBox`, `.ds1Dialog`, `DS1Dialogs` | `DS1Dialog`, `DS1Dialogs` |
 | `ds-menu` | `DS1Menu`, `DS1MenuItem` (floating menus are the system's) | `DS1Menu`, `DS1MenuItem` |

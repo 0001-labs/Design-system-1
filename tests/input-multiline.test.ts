@@ -2,18 +2,18 @@
 import { afterEach, expect, test, vi } from "vite-plus/test";
 import React, { act, createElement, createRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Textarea, type InputElement } from "../DS1/react/input";
+import { Input, type InputElement } from "../DS1/react/input";
 vi.stubGlobal(
   "fetch",
   vi.fn(async () => new Response("{}")),
 );
-await import("../DS1/2-core/ds-textarea");
+await import("../DS1/2-core/ds-input");
 afterEach(() => document.body.replaceChildren());
 
 test("multiline fields inherit input form, selection, validation and reset behavior", async () => {
   document.body.innerHTML =
-    '<ds-textarea name="description" value="Initial" aria-label="Description" rows="4" maxlength="80" required></ds-textarea>';
-  const field = document.querySelector("ds-textarea")!;
+    '<ds-input multiline name="description" value="Initial" aria-label="Description" rows="4" maxlength="80" required></ds-input>';
+  const field = document.querySelector("ds-input")!;
   await field.updateComplete;
   const native = field.shadowRoot!.querySelector("textarea")!;
   expect(native.value).toBe("Initial");
@@ -54,7 +54,8 @@ test("React multiline edits, disabled state and Enter stay within the existing p
     return createElement(
       "form",
       { onSubmit: submit },
-      createElement(Textarea, {
+      createElement(Input, {
+        multiline: true,
         ref,
         value,
         rows: 2,
@@ -68,7 +69,7 @@ test("React multiline edits, disabled state and Enter stay within the existing p
   }
   try {
     await act(async () => root.render(createElement(Form)));
-    const field = host.querySelector("ds-textarea")!;
+    const field = host.querySelector("ds-input")!;
     await field.updateComplete;
     const native = field.shadowRoot!.querySelector("textarea")!;
     await act(async () => {

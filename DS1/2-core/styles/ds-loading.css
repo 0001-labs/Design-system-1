@@ -6,7 +6,7 @@
    sets it outright. The control list matches LOADING_CONTROLS in ds-loading.ts. */
 .ds-loading[data-variant="spinner"] { --ds-loading-box: var(--ds-loading-size, var(--ds-loading-context-size, calc(20px * var(--ds-sf, var(--sf, 1))))); width: var(--ds-loading-box); height: var(--ds-loading-box); border: 2px solid color-mix(in srgb, currentColor 18%, transparent); border-top-color: currentColor; border-radius: 50%; background: none; box-sizing: border-box; animation: ds-loading-spin .72s linear infinite; }
 .ds-loading[data-variant="spinner"] > .ds-loading__fill { display: none; }
-:where(button, [role="button"], ds-button, .ds-button, ds-input, ds-textarea, ds-select, .ds-field, .ds-input, .ds-textarea, .ds-select) .ds-loading[data-variant="spinner"],
+:where(button, [role="button"], ds-button, .ds-button, ds-input, ds-select, .ds-field, .ds-input, .ds-select) .ds-loading[data-variant="spinner"],
 .ds-loading[data-variant="spinner"][data-context="control"] { --ds-loading-context-size: var(--ds-control-height, calc(16px * var(--ds-sf, var(--sf, 1)))); }
 @keyframes ds-loading-slide { to { transform: translateX(100%); } }
 @keyframes ds-loading-spin { to { transform: rotate(360deg); } }

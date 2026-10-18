@@ -44,13 +44,13 @@ fun DS1ThemeCycle(modifier: Modifier = Modifier) {
 }
 
 /**
- * `ds-language`: the language picker. Eight squares by one, less the 1 dp correction (four
+ * the language cycle: the language picker. Eight squares by one, less the 1 dp correction (four
  * with [compact]), on the fill, the current language named in itself and in its own face;
  * a press steps to the next of the product's languages and saves it. [chip] hugs the name on
  * a control-high chip.
  */
 @Composable
-fun DS1LanguagePicker(modifier: Modifier = Modifier, compact: Boolean = false, chip: Boolean = false, primary: Boolean = false) {
+fun DS1LanguageCycle(modifier: Modifier = Modifier, compact: Boolean = false, chip: Boolean = false, primary: Boolean = false) {
     val scale = LocalDS1Scale.current
     val language = DS1Words.language
     val name = language.nativeLabel

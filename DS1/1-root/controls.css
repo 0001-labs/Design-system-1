@@ -152,7 +152,6 @@ a.ds-button[aria-disabled="true"] {
 }
 
 .ds-input,
-.ds-textarea,
 .ds-select {
   box-sizing: border-box;
   min-width: 0;
@@ -171,13 +170,11 @@ a.ds-button[aria-disabled="true"] {
   outline: none;
 }
 
-.ds-input::placeholder,
-.ds-textarea::placeholder {
+.ds-input::placeholder {
   color: var(--ds-title-color);
 }
 
 .ds-input:focus-visible,
-.ds-textarea:focus-visible,
 .ds-select:focus-visible,
 .ds-checkbox:focus-visible,
 .ds-radio:focus-visible,
@@ -187,7 +184,6 @@ a.ds-button[aria-disabled="true"] {
 }
 
 .ds-input:disabled,
-.ds-textarea:disabled,
 .ds-select:disabled,
 .ds-checkbox:disabled,
 .ds-radio:disabled,
@@ -212,8 +208,8 @@ a.ds-button[aria-disabled="true"] {
   cursor: pointer;
 }
 
-/* A text area spans whole rows: --ds-textarea-rows sets how many, three by default. */
-.ds-textarea {
+/* A multiline field, `ds-input` on a <textarea>, spans whole rows: --ds-textarea-rows sets how many, three by default. */
+textarea.ds-input {
   display: block;
   height: var(--ds-textarea-height, calc(var(--ds-textarea-rows, 3) * var(--ds-row-height)));
   min-height: var(--ds-row-height);
@@ -796,7 +792,7 @@ dialog.ds-dialog::backdrop {
   letter-spacing: var(--ds-type-letterspacing-default);
 }
 
-.ds-field > :is(.ds-input, .ds-select, .ds-textarea) {
+.ds-field > :is(.ds-input, .ds-select) {
   justify-self: stretch;
 }
 

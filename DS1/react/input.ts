@@ -36,6 +36,12 @@ export type InputProps = Omit<
   errorText?: string;
   /** Suggestions offered while typing; `list` names a `<datalist>` instead. */
   suggestions?: InputElement["suggestions"];
+  /** A text area: the field across whole rows. */
+  multiline?: boolean;
+  rows?: number;
+  wrap?: "soft" | "hard" | "off";
+  autoGrow?: boolean;
+  maxRows?: number;
 };
 const useCommitEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 /** Native listeners cross Lit's shadow boundary without React's input tracker.
@@ -59,18 +65,7 @@ function setRef(ref: Ref<InputElement> | undefined, field: InputElement | null) 
   if (ref) ref.current = field;
 }
 
-type FieldProps = InputProps & {
-  rows?: number;
-  wrap?: "soft" | "hard" | "off";
-  autoGrow?: boolean;
-  maxRows?: number;
-};
-export type TextareaProps = Omit<
-  FieldProps,
-  "type" | "revealable" | "min" | "max" | "step" | "pattern" | "suggestions" | "list"
-> & { variant?: "field" | "plain" };
-function fieldAdapter<Props extends FieldProps>(tag: "ds-input" | "ds-textarea") {
-  return forwardRef<InputElement, Props>(function Field(
+export const Input = forwardRef<InputElement, InputProps>(function Field(
     {
       value,
       defaultValue,
@@ -90,6 +85,7 @@ function fieldAdapter<Props extends FieldProps>(tag: "ds-input" | "ds-textarea")
       type = "text",
       variant = "field",
       quietFocus,
+      multiline,
       autoGrow,
       maxRows,
       labelText,
@@ -172,7 +168,7 @@ function fieldAdapter<Props extends FieldProps>(tag: "ds-input" | "ds-textarea")
           element.removeEventListener(name, callback, capture);
       };
     });
-    return createElement(tag, {
+    return createElement("ds-input", {
       ...attributes,
       ref,
       type,
@@ -192,10 +188,8 @@ function fieldAdapter<Props extends FieldProps>(tag: "ds-input" | "ds-textarea")
       "label-text": labelText,
       "placeholder-key": placeholderKey,
       "error-text": errorText,
+      multiline: multiline || undefined,
       "auto-grow": autoGrow,
       "max-rows": maxRows,
     });
-  });
-}
-export const Input = fieldAdapter<InputProps>("ds-input");
-export const Textarea = fieldAdapter<TextareaProps>("ds-textarea");
+});

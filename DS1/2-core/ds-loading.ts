@@ -12,7 +12,7 @@ export const LOADING_LABEL = "Loading";
  * `ds-loading.css` names the same controls for the light-DOM markup.
  */
 export const LOADING_CONTROLS =
-  "button, [role='button'], ds-button, .ds-button, ds-input, ds-textarea, ds-select, .ds-field, .ds-input, .ds-textarea, .ds-select";
+  "button, [role='button'], ds-button, .ds-button, ds-input, ds-select, .ds-field, .ds-input, .ds-select";
 
 /** Whether an element stands in a control, across shadow roots. */
 export function inLoadingControl(element: Element): boolean {
