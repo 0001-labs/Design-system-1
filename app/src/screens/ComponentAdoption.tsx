@@ -52,7 +52,7 @@ export function ComponentAdoption({ onSignOut }: { onSignOut?: () => Promise<voi
   }, [token, retry]);
   return <main className="adoption" data-testid="component-adoption">
     <header className="adoption-heading">
-      <div><p className="adoption-eyebrow">Reports · Private</p><h1>Component adoption</h1></div>
+      <div><p className="adoption-eyebrow">Reports · Private · <a href="#glossary">Glossary</a></p><h1>Component adoption</h1></div>
       <ds-button onClick={() => void (onSignOut ? onSignOut() : signOut())}>Sign out</ds-button>
     </header>
     {error ? <Notice tone="danger" actions={<Button secondary type="button" onClick={() => setRetry(value => value + 1)}>Try again</Button>}>{error}</Notice>

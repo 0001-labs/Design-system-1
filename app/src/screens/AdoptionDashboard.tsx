@@ -8,6 +8,7 @@ import { LoadingIndicator } from '../../../DS1/react/loading';
 import { Notice } from '../../../DS1/react/notice';
 import { SignIn } from './SignIn';
 import { ComponentAdoption } from './ComponentAdoption';
+import { ComponentGlossary } from './ComponentGlossary';
 
 /**
  * The owner's session on a private host: the Worker gates the page, this
@@ -48,10 +49,16 @@ export function useOwnerSession(title: string) {
 
 /** The Worker independently gates the page, session bridge and every report read. */
 export function AdoptionDashboard() {
+  const [glossary, setGlossary] = useState(() => window.location.hash === '#glossary');
+  useEffect(() => {
+    const update = () => setGlossary(window.location.hash === '#glossary');
+    window.addEventListener('hashchange', update);
+    return () => window.removeEventListener('hashchange', update);
+  }, []);
   const { isLoading, isAuthenticated, ready, error, leave } = useOwnerSession('Component adoption · Design system 1');
   if (isLoading) return <main className="adoption"><LoadingIndicator label="Checking your session" /></main>;
   if (!isAuthenticated) return <div className="app-shell"><SignIn dashboardOnly redirectTo="/reports/components" /></div>;
   if (error) return <main className="adoption"><Notice tone="danger" actions={<Button secondary onClick={() => void leave()}>Sign out</Button>}>{error}</Notice></main>;
   if (!ready) return <main className="adoption"><LoadingIndicator label="Checking dashboard access" /></main>;
-  return <ComponentAdoption onSignOut={leave} />;
+  return glossary ? <ComponentGlossary onSignOut={leave} /> : <ComponentAdoption onSignOut={leave} />;
 }
