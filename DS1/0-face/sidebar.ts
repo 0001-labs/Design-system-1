@@ -1,6 +1,6 @@
 /**
- * The keyboard and pointer of a tree, shared by `<ds-tree>` and the native
- * `.ds-tree` classes of `row.css`.
+ * The keyboard and pointer of a tree of rows, shared by `<ds-sidebar tree>`
+ * and the native `.ds-sidebar` classes of `row.css`.
  *
  * A tree is one stop for Tab: the row that has the focus (the selected row
  * at first, otherwise the first) carries `tabindex="0"` and every other row
@@ -10,11 +10,11 @@
  * the next row whose label starts with it. Space selects the row, Enter
  * selects and activates it, as a double click does.
  *
- * `treeStep()` is that model alone, on the visible rows. `connectTree()`
+ * `treeStep()` is that model alone, on the visible rows. `connectSidebar()`
  * puts it on a native tree: rows with `role="treeitem"` and `aria-level`,
  * flat, in order, inside an element with `role="tree"`. It dispatches the
- * same events as `<ds-tree>` (`ds-tree-toggle`, `ds-tree-select`,
- * `ds-tree-activate`, each with `{ id }`), and unless the page cancels one
+ * same events as `<ds-sidebar tree>` (`sidebar-toggle`, `sidebar-select`,
+ * `sidebar-activate`, each with `{ id }`), and unless the page cancels one
  * it does what the event asks: opens or closes the row, hiding the rows
  * inside it, or selects it.
  */
@@ -86,11 +86,11 @@ export function treeStep(rows: readonly TreeRow[], index: number, key: string): 
   }
 }
 
-/** The events a tree sends, the same from `<ds-tree>` and a native tree. */
-export interface TreeEvents {
-  "ds-tree-toggle": CustomEvent<{ id: string; expanded: boolean }>;
-  "ds-tree-select": CustomEvent<{ id: string }>;
-  "ds-tree-activate": CustomEvent<{ id: string }>;
+/** The events a tree sends, the same from `<ds-sidebar tree>` and a native tree. */
+export interface SidebarEvents {
+  "sidebar-toggle": CustomEvent<{ id: string; expanded: boolean }>;
+  "sidebar-select": CustomEvent<{ id: string }>;
+  "sidebar-activate": CustomEvent<{ id: string }>;
 }
 
 const ITEM = '[role="treeitem"]';
@@ -100,7 +100,7 @@ const expandedOf = (item: Element) => {
   return value === null ? undefined : value === "true";
 };
 const disabledOf = (item: Element) => item.getAttribute("aria-disabled") === "true";
-const labelOf = (item: Element) => (item.querySelector(".ds-tree__label") ?? item).textContent ?? "";
+const labelOf = (item: Element) => (item.querySelector(".ds-sidebar__label") ?? item).textContent ?? "";
 /** A row's name in the events: `data-id`, else its `id`. */
 const idOf = (item: HTMLElement) => item.dataset.id ?? item.id;
 
@@ -108,15 +108,15 @@ const idOf = (item: HTMLElement) => item.dataset.id ?? item.id;
  * Gives a native tree its keyboard and pointer. Returns a function that
  * takes them away again.
  *
- *   <ul class="ds-tree" role="tree" aria-label="Files">
- *     <li class="ds-tree__item" role="treeitem" aria-level="1" aria-expanded="true" data-id="src">
- *       <span class="ds-tree__disclosure" aria-hidden="true"></span>
- *       <span class="ds-tree__label">src</span>
+ *   <ul class="ds-sidebar" role="tree" aria-label="Files">
+ *     <li class="ds-sidebar__item" role="treeitem" aria-level="1" aria-expanded="true" data-id="src">
+ *       <span class="ds-sidebar__disclosure" aria-hidden="true"></span>
+ *       <span class="ds-sidebar__label">src</span>
  *     </li>
- *     <li class="ds-tree__item" role="treeitem" aria-level="2" data-id="main">…</li>
+ *     <li class="ds-sidebar__item" role="treeitem" aria-level="2" data-id="main">…</li>
  *   </ul>
  */
-export function connectTree(tree: HTMLElement): () => void {
+export function connectSidebar(tree: HTMLElement): () => void {
   const items = () => [...tree.querySelectorAll<HTMLElement>(ITEM)];
   const visible = () => items().filter(item => !item.hidden && !item.closest("[hidden]"));
 
@@ -128,12 +128,12 @@ export function connectTree(tree: HTMLElement): () => void {
     return current;
   };
 
-  const send = <K extends keyof TreeEvents>(name: K, detail: TreeEvents[K]["detail"]) =>
+  const send = <K extends keyof SidebarEvents>(name: K, detail: SidebarEvents[K]["detail"]) =>
     tree.dispatchEvent(new CustomEvent(name, { detail, bubbles: true, composed: true, cancelable: true }));
 
   /** Opens or closes a row and shows or hides the rows inside it, keeping closed rows inside it closed. */
   const toggle = (item: HTMLElement, expanded: boolean) => {
-    if (!send("ds-tree-toggle", { id: idOf(item), expanded })) return;
+    if (!send("sidebar-toggle", { id: idOf(item), expanded })) return;
     item.setAttribute("aria-expanded", String(expanded));
     const all = items();
     const own = level(item);
@@ -149,7 +149,7 @@ export function connectTree(tree: HTMLElement): () => void {
   };
 
   const select = (item: HTMLElement) => {
-    if (!send("ds-tree-select", { id: idOf(item) })) return;
+    if (!send("sidebar-select", { id: idOf(item) })) return;
     for (const row of items()) if (row.hasAttribute("aria-selected") || row === item) row.setAttribute("aria-selected", String(row === item));
   };
 
@@ -165,14 +165,14 @@ export function connectTree(tree: HTMLElement): () => void {
     event.preventDefault();
     if (step.toggle !== undefined) toggle(item, step.toggle);
     if (step.select) select(item);
-    if (step.activate) send("ds-tree-activate", { id: idOf(item) });
+    if (step.activate) send("sidebar-activate", { id: idOf(item) });
     if (step.focus !== undefined && rows[step.focus]) focus(rows[step.focus]!);
   };
 
   const click = (event: MouseEvent) => {
     const item = (event.target as Element | null)?.closest<HTMLElement>(ITEM);
     if (!item || !tree.contains(item) || disabledOf(item)) return;
-    const disclosure = (event.target as Element).closest(".ds-tree__disclosure");
+    const disclosure = (event.target as Element).closest(".ds-sidebar__disclosure");
     if (disclosure && expandedOf(item) !== undefined) toggle(item, !expandedOf(item));
     else select(item);
     focus(item);
@@ -180,8 +180,8 @@ export function connectTree(tree: HTMLElement): () => void {
 
   const dblclick = (event: MouseEvent) => {
     const item = (event.target as Element | null)?.closest<HTMLElement>(ITEM);
-    if (!item || !tree.contains(item) || disabledOf(item) || (event.target as Element).closest(".ds-tree__disclosure")) return;
-    send("ds-tree-activate", { id: idOf(item) });
+    if (!item || !tree.contains(item) || disabledOf(item) || (event.target as Element).closest(".ds-sidebar__disclosure")) return;
+    send("sidebar-activate", { id: idOf(item) });
   };
 
   if (!tree.hasAttribute("role")) tree.setAttribute("role", "tree");

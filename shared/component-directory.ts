@@ -82,7 +82,6 @@ export const ALL_LAYERS: DirectoryLayer[] = [
       { name: 'Row', href: '/3-unit/row/', tag: 'ds-row' },
       { name: 'Sidebar', href: '/3-unit/sidebar/', tag: 'ds-sidebar' },
       { name: 'Table', href: '/3-unit/table/', tag: 'ds-table' },
-      { name: 'Tree', href: '/3-unit/tree/', tag: 'ds-tree' },
     ],
   },
   {
@@ -94,7 +93,7 @@ export const ALL_LAYERS: DirectoryLayer[] = [
       { name: 'Container', href: '/4-page/container/', tag: 'ds-container' },
       { name: 'Document', href: '/4-page/document/', tag: 'ds-document' },
       { name: 'Grid', href: '/4-page/grid/', tag: 'ds-grid' },
-      { name: 'Layout', href: '/4-page/layout/', tag: 'ds-layout' },
+      { name: 'Page', href: '/4-page/page/', tag: 'ds-page' },
     ],
   },
 ];

@@ -137,7 +137,6 @@ export default defineConfig({
             { label: "Row", slug: "3-unit/row" },
             { label: "Sidebar", slug: "3-unit/sidebar" },
             { label: "Table", slug: "3-unit/table" },
-            { label: "Tree", slug: "3-unit/tree" },
           ],
         },
         {
@@ -148,7 +147,7 @@ export default defineConfig({
             { label: "Footer", slug: "4-page/footer" },
             { label: "Grid", slug: "4-page/grid" },
             { label: "Header", slug: "4-page/header" },
-            { label: "Layout", slug: "4-page/layout" },
+            { label: "Page", slug: "4-page/page" },
           ],
         },
         {

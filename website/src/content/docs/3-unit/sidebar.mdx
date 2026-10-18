@@ -1,11 +1,13 @@
 ---
 title: Sidebar
-description: Compact, nested navigation built from Row, Button and Icon.
+description: Compact, nested navigation built from Row, Button and Icon; with tree, a tree of the things inside a place.
 ---
 
 import ComponentExample from "../../../components/ComponentExample.astro";
 
 The Sidebar is twelve squares wide. Each row is one square high, with half a square of indentation per level. Labels use regular text; counts and supporting information use small text. Disclosure arrows follow their labels. Selection fills the whole row with 2px corners, scaled with the surface.
+
+A sidebar is navigation: the places of an application, every row a link or a button of its own and a stop for Tab, the current destination the page being shown. With `tree` it is a [tree](#tree) instead: the things inside one of those places, which a person opens, closes and chooses from.
 
 ## Try it
 
@@ -13,7 +15,7 @@ The Sidebar is twelve squares wide. Each row is one square high, with half a squ
 
 ## Data and behaviour
 
-Set the `items` property to an array of visible rows. Each row has a unique `id` and a `label`; optional fields are `depth`, `href`, `expanded`, `current`, `disabled`, `meta`, and `action: { id, label }`. Omit `expanded` for a leaf. Collapsed children must be omitted from the array.
+Set the `items` property to an array of visible rows. Each row has a unique `id` and a `label`; optional fields are `depth`, `href`, `expanded`, `current`, `disabled`, `icon` (a name from the [icon library](/icons/)), `meta`, and `action: { id, label }`. Omit `expanded` for a leaf. Collapsed children must be omitted from the array.
 
 The application owns the hierarchy, filtering, selected destination and saved expansion state. The Unit owns the row layout, disclosure controls, focus and keyboard navigation. Supply a `label` for the navigation landmark and `empty` for its empty state. The `header` and `footer` slots hold optional search and supporting controls. When the host has a constrained height, only the navigation rows scroll; header and footer controls stay visible.
 
@@ -29,6 +31,53 @@ A label too long for its row ends in an ellipsis and shows in full in the shared
 
 Call `focusItem(id)` after `updateComplete` to focus a row, or `scrollToCurrent()` to reveal the current destination. `--ds-sf` scales the width, rows, text, icons and indentation. A containing layout may set the host width to another whole number of squares.
 
-The rows' fills and the current row's weight are the shared row tokens (`--ds-row-fill-hover`, `--ds-row-fill-current`, `--ds-row-current-weight`), so a [navigation row](/3-unit/row/#navigation-rows) and a [tree](/3-unit/tree/)'s selected row look the same. For a chooser of nested things inside a page, with one Tab stop and a selection, use the [Tree](/3-unit/tree/).
+The rows' fills and the current row's weight are the shared row tokens (`--ds-row-fill-hover`, `--ds-row-fill-current`, `--ds-row-current-weight`), so a [navigation row](/3-unit/row/#navigation-rows) and a tree's selected row look the same.
 
-[Row](/3-unit/row/) · [Tree](/3-unit/tree/) · [Button](/2-core/button/) · [Icon](/2-core/icon/)
+In React, `Sidebar` from `react/sidebar.ts` takes `items`, `label`, `empty`, `tree`, `onToggle`, `onSelect`, `onActivate` and `onAction`.
+
+## Tree
+
+<ComponentExample example="tree" />
+
+`tree` makes the sidebar a tree: folders and files, groups and their samples, a page's parts. Each row is one square high and each level stands one square further in, so a row's disclosure arrow stands under its parent's label. The arrow and an optional `icon` each take a square of their own; a leaf keeps the arrow's square empty, so labels at one level line up. The rows are the same `items`, with `selected` for the row chosen instead of `current`; labels are shown as written, never translated.
+
+The application owns the hierarchy, the expansion and the selection. The tree owns the rows' layout, their roles, the focus and the keyboard.
+
+| Event | Detail | Application response |
+| --- | --- | --- |
+| `sidebar-toggle` | `{ id, expanded }` | Show or hide the row's children and set its `expanded`. |
+| `sidebar-select` | `{ id }` | Set `selected` on that row, and show what it holds. |
+| `sidebar-activate` | `{ id }` | Open the row's thing: a file in its editor, a sample played. |
+
+A click on the arrow opens or closes the row; a click anywhere else selects it, and a double click activates it. `itemFromEvent(event)` names the row under a context menu or a drag of the application's own. `focusItem(id)` moves the focus to a row and `scrollToCurrent()` brings the selected row into view.
+
+The tree is one stop for Tab: the selected row, or the row last focused. Then, as in the tree pattern: Down and Up move to the next or previous row, skipping unavailable ones; Home and End to the first and last; Right opens a closed row, or moves into an open one; Left closes an open row, or moves to its parent; Space selects; Enter selects and activates; a letter or digit moves to the next row whose label starts with it.
+
+The rows are `role="treeitem"` inside a `role="tree"`, each with `aria-level`, `aria-setsize` and `aria-posinset`, `aria-expanded` on a parent and `aria-selected` on every row. The arrow is drawn, not announced: the row says whether it is open. The pointer over a row fills it as any pressable [row](/3-unit/row/), and the selected row is drawn as the current destination. The tree scrolls its rows when its height is constrained.
+
+## Without Lit
+
+A page without Lit draws the tree with the classes in `row.css`, which `controls.css` imports, and takes the keyboard from `connectSidebar()` in `0-face/sidebar.ts` (Sync 1's `root` export, `"modules": ["sidebar"]`). The rows are flat, in order, each with its `aria-level`; the classes indent them by it, up to twelve levels (`--ds-sidebar-indent` sets a row's depth in squares beyond that).
+
+```html
+<ul class="ds-sidebar" role="tree" aria-label="Files">
+  <li class="ds-sidebar__item" role="treeitem" aria-level="1" aria-expanded="true" data-id="src">
+    <span class="ds-sidebar__disclosure" aria-hidden="true"></span>
+    <span class="ds-icon" style="--ds-icon: url(icons/folder.svg)" aria-hidden="true"></span>
+    <span class="ds-sidebar__label">src</span>
+  </li>
+  <li class="ds-sidebar__item" role="treeitem" aria-level="2" aria-selected="true" data-id="main">
+    <span class="ds-sidebar__disclosure" aria-hidden="true"></span>
+    <span class="ds-sidebar__label">main.ts</span>
+    <span class="ds-sidebar__meta">2 KB</span>
+  </li>
+</ul>
+<script type="module">
+  import { connectSidebar } from "./ds1/0-face/sidebar.ts";
+  connectSidebar(document.querySelector(".ds-sidebar"));
+</script>
+```
+
+`connectSidebar` sends the same three events, named by each row's `data-id` (or its `id`). Unless the page cancels one, it does what the event asks: it opens or closes the row and hides or shows the rows inside it, keeping a closed row's rows hidden, or moves `aria-selected` to the row. It returns a function that takes the keyboard away again. The arrow is the library's `right` icon, turned down on an open row; `--ds-sidebar-disclosure` names another drawing. Navigation rows without Lit are [`a.ds-row.ds-row--nav`](/3-unit/row/#navigation-rows).
+
+[Row](/3-unit/row/) · [Button](/2-core/button/) · [Icon](/2-core/icon/)

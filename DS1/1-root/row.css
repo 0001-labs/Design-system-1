@@ -1,7 +1,7 @@
 @import "./component-metrics.css";
 
 /*
- * Rows, as plain classes on native elements: the `ds-row` and `ds-tree`
+ * Rows, as plain classes on native elements: the `ds-row` and `ds-sidebar`
  * elements' look without the elements.
  *
  * A row is one square high, and what it holds stands on the lower sixteen of
@@ -24,23 +24,24 @@
  *   aria-current="page"    the destination being shown, filled and in the medium weight
  *   aria-disabled="true"   or `disabled` on a button: dimmed, not pressable
  *
- * A tree is a `role="tree"` list of `role="treeitem"` rows, flat, each with
- * its `aria-level`, one square further in per level. `0-face/tree.ts`
- * (`connectTree`) gives it the keyboard of the tree pattern.
+ * A sidebar of nested things (the `ds-sidebar tree` element without Lit) is a
+ * `role="tree"` list of `role="treeitem"` rows, flat, each with its
+ * `aria-level`, one square further in per level. `0-face/sidebar.ts`
+ * (`connectSidebar`) gives it the keyboard of the tree pattern.
  *
- *   ds-tree                the tree (`role="tree"`)
- *   ds-tree__item          a row (`role="treeitem"`, `aria-level`, `aria-expanded` on a parent, `aria-selected`)
- *   ds-tree__disclosure    the arrow on its own square, turned down when the row is open; empty on a leaf
- *   ds-tree__label         the words, cut short with an ellipsis
- *   ds-tree__meta          small muted words at the row's end
+ *   ds-sidebar             the tree (`role="tree"`)
+ *   ds-sidebar__item       a row (`role="treeitem"`, `aria-level`, `aria-expanded` on a parent, `aria-selected`)
+ *   ds-sidebar__disclosure the arrow on its own square, turned down when the row is open; empty on a leaf
+ *   ds-sidebar__label      the words, cut short with an ellipsis
+ *   ds-sidebar__meta       small muted words at the row's end
  *
  * An icon (`.ds-icon`) in a tree row takes a square of its own. Tokens:
  * `--ds-row-padding` (the words' distance from the row's edges, 4px),
  * `--ds-row-fill-hover`, `--ds-row-fill-press`, `--ds-row-fill-current` and
- * `--ds-row-current-weight` (component-tokens.css, shared with
- * `ds-sidebar`), `--ds-tree-disclosure` (the arrow's drawing, the library's
- * `right` icon) and `--ds-tree-indent` (a row's depth in squares, read from
- * `aria-level` up to twelve levels).
+ * `--ds-row-current-weight` (component-tokens.css, shared with the
+ * element), `--ds-sidebar-disclosure` (the arrow's drawing, the library's
+ * `right` icon) and `--ds-sidebar-indent` (a row's depth in squares, read
+ * from `aria-level` up to twelve levels).
  */
 
 :where(.ds-row):not(tr) {
@@ -174,9 +175,9 @@ button.ds-row[aria-disabled="true"]:hover {
   --ds-row-radius: calc(2px * var(--ds-sf));
 }
 
-/* Trees. */
+/* A sidebar of nested things: the tree. */
 
-.ds-tree {
+.ds-sidebar {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -193,7 +194,7 @@ button.ds-row[aria-disabled="true"]:hover {
   letter-spacing: var(--ds-type-letterspacing-default);
 }
 
-.ds-tree__item {
+.ds-sidebar__item {
   box-sizing: border-box;
   display: flex;
   align-items: flex-end;
@@ -201,45 +202,45 @@ button.ds-row[aria-disabled="true"]:hover {
   min-width: 0;
   margin: 0;
   padding-block: 0;
-  padding-inline: calc(var(--ds-tree-indent, 0) * var(--ds-unit)) var(--ds-row-padding, calc(4px * var(--ds-sf)));
+  padding-inline: calc(var(--ds-sidebar-indent, 0) * var(--ds-unit)) var(--ds-row-padding, calc(4px * var(--ds-sf)));
   white-space: nowrap;
   cursor: pointer;
   user-select: none;
   outline: none;
   -webkit-tap-highlight-color: transparent;
 }
-.ds-tree__item[hidden] { display: none; }
-.ds-tree__item[aria-level="2"] { --ds-tree-indent: 1; }
-.ds-tree__item[aria-level="3"] { --ds-tree-indent: 2; }
-.ds-tree__item[aria-level="4"] { --ds-tree-indent: 3; }
-.ds-tree__item[aria-level="5"] { --ds-tree-indent: 4; }
-.ds-tree__item[aria-level="6"] { --ds-tree-indent: 5; }
-.ds-tree__item[aria-level="7"] { --ds-tree-indent: 6; }
-.ds-tree__item[aria-level="8"] { --ds-tree-indent: 7; }
-.ds-tree__item[aria-level="9"] { --ds-tree-indent: 8; }
-.ds-tree__item[aria-level="10"] { --ds-tree-indent: 9; }
-.ds-tree__item[aria-level="11"] { --ds-tree-indent: 10; }
-.ds-tree__item[aria-level="12"] { --ds-tree-indent: 11; }
-.ds-tree__item:hover:not([aria-disabled="true"]) { background: var(--ds-row-fill-hover, var(--ds-fill)); }
-.ds-tree__item:active:not([aria-disabled="true"]) { background: var(--ds-row-fill-press, var(--ds-fill-hover)); }
-.ds-tree__item[aria-selected="true"] {
+.ds-sidebar__item[hidden] { display: none; }
+.ds-sidebar__item[aria-level="2"] { --ds-sidebar-indent: 1; }
+.ds-sidebar__item[aria-level="3"] { --ds-sidebar-indent: 2; }
+.ds-sidebar__item[aria-level="4"] { --ds-sidebar-indent: 3; }
+.ds-sidebar__item[aria-level="5"] { --ds-sidebar-indent: 4; }
+.ds-sidebar__item[aria-level="6"] { --ds-sidebar-indent: 5; }
+.ds-sidebar__item[aria-level="7"] { --ds-sidebar-indent: 6; }
+.ds-sidebar__item[aria-level="8"] { --ds-sidebar-indent: 7; }
+.ds-sidebar__item[aria-level="9"] { --ds-sidebar-indent: 8; }
+.ds-sidebar__item[aria-level="10"] { --ds-sidebar-indent: 9; }
+.ds-sidebar__item[aria-level="11"] { --ds-sidebar-indent: 10; }
+.ds-sidebar__item[aria-level="12"] { --ds-sidebar-indent: 11; }
+.ds-sidebar__item:hover:not([aria-disabled="true"]) { background: var(--ds-row-fill-hover, var(--ds-fill)); }
+.ds-sidebar__item:active:not([aria-disabled="true"]) { background: var(--ds-row-fill-press, var(--ds-fill-hover)); }
+.ds-sidebar__item[aria-selected="true"] {
   --ds-type-weight-default: var(--ds-row-current-weight, 500);
   background: var(--ds-row-fill-current, var(--ds-fill-hover));
   font-weight: var(--ds-row-current-weight, 500);
 }
-.ds-tree__item:focus-visible {
+.ds-sidebar__item:focus-visible {
   outline: 2px solid var(--ds-focus-ring);
   outline-offset: -2px;
 }
-.ds-tree__item[aria-disabled="true"] {
+.ds-sidebar__item[aria-disabled="true"] {
   cursor: default;
   opacity: 0.5;
 }
 
 /* The arrow and an icon each stand on a whole square, drawn on the row's sixteen (two
    pixels below the square's middle); a leaf keeps the arrow's square empty. */
-.ds-tree__disclosure,
-.ds-tree__item > .ds-icon {
+.ds-sidebar__disclosure,
+.ds-sidebar__item > .ds-icon {
   flex: 0 0 var(--ds-unit);
   width: var(--ds-unit);
   height: var(--ds-unit);
@@ -248,30 +249,30 @@ button.ds-row[aria-disabled="true"]:hover {
   -webkit-mask-position: center calc(50% + 2px * var(--ds-sf));
   mask-position: center calc(50% + 2px * var(--ds-sf));
 }
-.ds-tree__disclosure {
+.ds-sidebar__disclosure {
   --ds-icon-box: calc(14px * var(--ds-sf));
   display: inline-block;
   color: var(--ds-text-color-muted);
   background-color: currentColor;
-  -webkit-mask: var(--ds-tree-disclosure, url("data:image/svg+xml,%3Csvg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' viewBox='0 0 16 16'%3E%3Cpath d='M13.1566 8.60594H0V9.61651L13.1562 9.61791L10.249 12.5251L10.9558 13.219L15.0636 9.11123L10.9524 5L10.245 5.70734L13.1566 8.60594Z'/%3E%3C/svg%3E")) center calc(50% + 2px * var(--ds-sf)) / var(--ds-icon-box) no-repeat;
-  mask: var(--ds-tree-disclosure, url("data:image/svg+xml,%3Csvg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' viewBox='0 0 16 16'%3E%3Cpath d='M13.1566 8.60594H0V9.61651L13.1562 9.61791L10.249 12.5251L10.9558 13.219L15.0636 9.11123L10.9524 5L10.245 5.70734L13.1566 8.60594Z'/%3E%3C/svg%3E")) center calc(50% + 2px * var(--ds-sf)) / var(--ds-icon-box) no-repeat;
+  -webkit-mask: var(--ds-sidebar-disclosure, url("data:image/svg+xml,%3Csvg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' viewBox='0 0 16 16'%3E%3Cpath d='M13.1566 8.60594H0V9.61651L13.1562 9.61791L10.249 12.5251L10.9558 13.219L15.0636 9.11123L10.9524 5L10.245 5.70734L13.1566 8.60594Z'/%3E%3C/svg%3E")) center calc(50% + 2px * var(--ds-sf)) / var(--ds-icon-box) no-repeat;
+  mask: var(--ds-sidebar-disclosure, url("data:image/svg+xml,%3Csvg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' viewBox='0 0 16 16'%3E%3Cpath d='M13.1566 8.60594H0V9.61651L13.1562 9.61791L10.249 12.5251L10.9558 13.219L15.0636 9.11123L10.9524 5L10.245 5.70734L13.1566 8.60594Z'/%3E%3C/svg%3E")) center calc(50% + 2px * var(--ds-sf)) / var(--ds-icon-box) no-repeat;
   transform: rotate(0deg);
   transition: transform 120ms ease-out;
 }
-.ds-tree__item:not([aria-expanded]) > .ds-tree__disclosure {
+.ds-sidebar__item:not([aria-expanded]) > .ds-sidebar__disclosure {
   visibility: hidden;
 }
-.ds-tree__item[aria-expanded="true"] > .ds-tree__disclosure {
+.ds-sidebar__item[aria-expanded="true"] > .ds-sidebar__disclosure {
   transform: rotate(90deg);
 }
-.ds-tree__label {
+.ds-sidebar__label {
   flex: 1 1 auto;
   min-width: 0;
   padding-inline-start: calc(4px * var(--ds-sf));
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.ds-tree__meta {
+.ds-sidebar__meta {
   flex: none;
   padding-inline-start: calc(4px * var(--ds-sf));
   color: var(--ds-text-color-muted);
@@ -280,17 +281,17 @@ button.ds-row[aria-disabled="true"]:hover {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ds-tree__disclosure { transition: none; }
+  .ds-sidebar__disclosure { transition: none; }
 }
 
 @media (forced-colors: active) {
   .ds-row:is(a, button)[aria-current]:not([aria-current="false"]),
   .ds-row__target[aria-current]:not([aria-current="false"])::after,
-  .ds-tree__item[aria-selected="true"] {
+  .ds-sidebar__item[aria-selected="true"] {
     outline: 1px solid Highlight;
     outline-offset: -1px;
   }
-  .ds-tree__disclosure {
+  .ds-sidebar__disclosure {
     background-color: CanvasText;
   }
 }

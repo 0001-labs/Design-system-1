@@ -135,11 +135,11 @@ const TREES = `
   <ds-sidebar id="sidebar" label="Library"></ds-sidebar>
   <ds-row id="current" href="#atlas" current nav><span>Atlas</span></ds-row>
   <a id="native-current" class="ds-row ds-row--nav" href="#atlas" aria-current="page">Atlas</a>
-  <ds-tree id="tree" label="Files"></ds-tree>
-  <ul id="native-tree" class="ds-tree" role="tree" aria-label="Files">
-    <li class="ds-tree__item" role="treeitem" aria-level="1" aria-expanded="true" data-id="src"><span class="ds-tree__disclosure" aria-hidden="true"></span><span class="ds-tree__label">src</span></li>
-    <li class="ds-tree__item" role="treeitem" aria-level="2" aria-expanded="true" data-id="lib"><span class="ds-tree__disclosure" aria-hidden="true"></span><span class="ds-tree__label">lib</span></li>
-    <li class="ds-tree__item" role="treeitem" aria-level="3" data-id="deep" aria-selected="true"><span class="ds-tree__disclosure" aria-hidden="true"></span><span class="ds-tree__label">deep.ts</span></li>
+  <ds-sidebar tree id="tree" label="Files"></ds-sidebar>
+  <ul id="native-tree" class="ds-sidebar" role="tree" aria-label="Files">
+    <li class="ds-sidebar__item" role="treeitem" aria-level="1" aria-expanded="true" data-id="src"><span class="ds-sidebar__disclosure" aria-hidden="true"></span><span class="ds-sidebar__label">src</span></li>
+    <li class="ds-sidebar__item" role="treeitem" aria-level="2" aria-expanded="true" data-id="lib"><span class="ds-sidebar__disclosure" aria-hidden="true"></span><span class="ds-sidebar__label">lib</span></li>
+    <li class="ds-sidebar__item" role="treeitem" aria-level="3" data-id="deep" aria-selected="true"><span class="ds-sidebar__disclosure" aria-hidden="true"></span><span class="ds-sidebar__label">deep.ts</span></li>
   </ul>`;
 const TREE_SCRIPT = `
   document.getElementById('sidebar').items = [{ id: 'atlas', label: 'Atlas', current: true }, { id: 'harbor', label: 'Harbor' }];
@@ -148,7 +148,7 @@ const TREE_SCRIPT = `
     { id: 'lib', label: 'lib', depth: 1, expanded: true },
     { id: 'deep', label: 'deep.ts', depth: 2, selected: true },
   ];
-  window.connectTree(document.getElementById('native-tree'));`;
+  window.connectSidebar(document.getElementById('native-tree'));`;
 
 test("the current destination and a selected tree row are drawn as the sidebar's current row, in light and dark", async () => {
   const fills = {} as Record<Scheme, string>;
@@ -217,8 +217,8 @@ test("a tree's levels stand a whole square apart, its arrow and icon each on a s
         const root = inner ? document.querySelector(host!)!.shadowRoot! : document;
         const tree = (inner ? document.querySelector(host!)! : document.querySelector(host!)!).getBoundingClientRect();
         return [...root.querySelectorAll<HTMLElement>(inner ?? `${host} [role="treeitem"]`)].map((row) => {
-          const disclosure = row.querySelector<HTMLElement>(".disclosure, .ds-tree__disclosure")!.getBoundingClientRect();
-          const label = row.querySelector<HTMLElement>(".label, .ds-tree__label")!.getBoundingClientRect();
+          const disclosure = row.querySelector<HTMLElement>(".disclosure, .ds-sidebar__disclosure")!.getBoundingClientRect();
+          const label = row.querySelector<HTMLElement>(".label, .ds-sidebar__label")!.getBoundingClientRect();
           return { height: row.getBoundingClientRect().height, arrow: disclosure.left - tree.left, arrowWidth: disclosure.width, label: label.left - tree.left };
         });
       }, rows);
@@ -234,15 +234,15 @@ test("a tree's levels stand a whole square apart, its arrow and icon each on a s
         });
       }
       // The arrow turns down on an open row; a leaf keeps its square empty.
-      const turns = await page.evaluate(() => [...document.querySelectorAll("#native-tree .ds-tree__disclosure")].map((arrow) => getComputedStyle(arrow).transform));
+      const turns = await page.evaluate(() => [...document.querySelectorAll("#native-tree .ds-sidebar__disclosure")].map((arrow) => getComputedStyle(arrow).transform));
       expect(turns.slice(0, 2)).toEqual([expect.stringMatching(/^matrix\(/), expect.stringMatching(/^matrix\(/)]);
       expect(turns[0]).not.toBe("matrix(1, 0, 0, 1, 0, 0)");
-      expect(await page.evaluate(() => getComputedStyle(document.querySelector('#native-tree [data-id="deep"] .ds-tree__disclosure')!).visibility)).toBe("hidden");
+      expect(await page.evaluate(() => getComputedStyle(document.querySelector('#native-tree [data-id="deep"] .ds-sidebar__disclosure')!).visibility)).toBe("hidden");
     }
   }
 });
 
-test("a native tree takes the keyboard from connectTree", async () => {
+test("a native tree takes the keyboard from connectSidebar", async () => {
   const page = pages.light;
   await stage(page, TREES, 1, TREE_SCRIPT);
   await page.focus('#native-tree [data-id="deep"]');

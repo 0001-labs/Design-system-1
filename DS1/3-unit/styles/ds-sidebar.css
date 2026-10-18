@@ -30,7 +30,7 @@ nav {
   padding-inline: calc(4px * var(--ds-sf));
   padding-inline-start: calc(4px * var(--ds-sf) + var(--depth) * var(--ds-unit) / 2);
 }
-/* The look of every pressable row (ds-row, .ds-row, ds-tree): the same tokens, the same fallbacks. */
+/* The look of every pressable row (ds-row, .ds-row, the tree's rows): the same tokens, the same fallbacks. */
 .row:hover { background: var(--ds-row-fill-hover, var(--ds-fill)); }
 .row[data-current] { background: var(--ds-row-fill-current, var(--ds-fill-hover)); }
 .row[data-current] .choice { --ds-type-weight-default: var(--ds-row-current-weight, 500); }
@@ -47,3 +47,71 @@ ds-icon[data-open] { transform: rotate(90deg); }
 .action { margin-inline-start: calc(4px * var(--ds-sf)); --ds-text-size: 10px; --ds-button-color: var(--ds-text-color-muted); }
 .empty { margin: 0; padding: calc(var(--ds-unit) / 2); color: var(--ds-text-color-muted); }
 @media (forced-colors: active) { .row[data-current] { outline: 1px solid Highlight; outline-offset: -1px; } }
+
+/* ---- Tree: the same rows as the native .ds-sidebar tree in 1-root/row.css. ---- */
+.tree {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+/* One square high, its contents on the lower sixteen as every row's; each level one square
+   further in, so a row's arrow stands under its parent's label. */
+.tree .item {
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-end;
+  height: var(--ds-row-height);
+  min-width: 0;
+  padding-inline: calc(var(--depth, 0) * var(--ds-unit)) var(--ds-row-padding, calc(4px * var(--ds-sf)));
+  border-radius: 0;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+.tree .item:hover:not([aria-disabled="true"]) { background: var(--ds-row-fill-hover, var(--ds-fill)); }
+.tree .item:active:not([aria-disabled="true"]) { background: var(--ds-row-fill-press, var(--ds-fill-hover)); }
+.tree .item[aria-selected="true"] {
+  --ds-type-weight-default: var(--ds-row-current-weight, 500);
+  background: var(--ds-row-fill-current, var(--ds-fill-hover));
+  font-weight: var(--ds-row-current-weight, 500);
+}
+.tree .item:focus-visible { outline: 2px solid var(--ds-focus-ring); outline-offset: -2px; }
+.tree .item[aria-disabled="true"] { cursor: default; opacity: 0.5; }
+
+/* The arrow and the icon each take a whole square, drawn on the row's sixteen (the square's
+   spare four above); a leaf keeps an empty one so labels line up. */
+.tree .disclosure, .tree .icon {
+  box-sizing: border-box;
+  display: inline-flex;
+  flex: 0 0 var(--ds-unit);
+  justify-content: center;
+  align-items: center;
+  width: var(--ds-unit);
+  height: var(--ds-unit);
+  padding-top: calc(var(--ds-unit) - var(--ds-control-height));
+}
+.tree .disclosure { color: var(--ds-text-color-muted); }
+.tree .disclosure ds-icon { transition: transform 120ms ease-out; }
+.tree .label {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-inline-start: calc(4px * var(--ds-sf));
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tree .disclosure ds-icon { transition: none; }
+}
+@media (forced-colors: active) {
+  .tree .item[aria-selected="true"] { outline: 1px solid Highlight; outline-offset: -1px; }
+  .tree .item:focus-visible { outline-color: Highlight; }
+}

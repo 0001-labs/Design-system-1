@@ -535,8 +535,8 @@ document.addEventListener('ds-row-press', event => {
   },
   'tree': {
     title: 'Folders and files', hint: 'Open a folder, choose a file, or move with the arrow keys. Enter or a double click opens a file.', height: 220,
-    html: '<ds-tree label="Files" style="width:calc(12 * var(--ds-unit))"></ds-tree>',
-    script: `const tree = document.querySelector('ds-tree');
+    html: '<ds-sidebar tree label="Files"></ds-sidebar>',
+    script: `const tree = document.querySelector('ds-sidebar[tree]');
 const files = [
   { id: 'projects', label: 'Projects', icon: 'folder', children: [
     { id: 'atlas', label: 'Atlas', icon: 'folder', children: [{ id: 'intro', label: 'intro.mp4', icon: 'video', meta: '12 MB' }, { id: 'notes', label: 'notes.md', icon: 'page', meta: '2 KB' }] },
@@ -554,9 +554,9 @@ function rows(nodes, depth = 0) {
   ]);
 }
 function render() { tree.items = rows(files); }
-tree.addEventListener('ds-tree-toggle', event => { event.detail.expanded ? open.add(event.detail.id) : open.delete(event.detail.id); render(); });
-tree.addEventListener('ds-tree-select', event => { selected = event.detail.id; render(); });
-tree.addEventListener('ds-tree-activate', event => { document.querySelector('#event-output').textContent = 'Opened ' + event.detail.id; });
+tree.addEventListener('sidebar-toggle', event => { event.detail.expanded ? open.add(event.detail.id) : open.delete(event.detail.id); render(); });
+tree.addEventListener('sidebar-select', event => { selected = event.detail.id; render(); });
+tree.addEventListener('sidebar-activate', event => { document.querySelector('#event-output').textContent = 'Opened ' + event.detail.id; });
 render();`,
   },
   'list': {
@@ -608,11 +608,6 @@ document.querySelectorAll('[data-grid-option]').forEach(control => {
 });`,
     height: 360,
   },
-  'layout': {
-    title: 'Named page areas', hint: 'The company layout places content in named CSS grid areas.',
-    html: '<ds-layout mode="company" view>\n  <ds-text style="grid-area: header">Page header</ds-text>\n  <ds-text style="grid-area: content">Content on the grid</ds-text>\n  <ds-text style="grid-area: footer">Page footer</ds-text>\n</ds-layout>',
-    height: 460,
-  },
   'page': {
     title: 'A standard page', hint: 'The sidebar layout: navigation on the left, a header and the work on the right. Every area is named.',
     html: '<ds-page layout="sidebar" divided view>\n  <ds-list slot="nav">\n    <ds-row><ds-text>Inbox</ds-text></ds-row>\n    <ds-row><ds-text>Projects</ds-text></ds-row>\n  </ds-list>\n  <ds-row slot="header" fill>\n    <ds-text literal strong>Projects</ds-text>\n    <ds-button primary>New item</ds-button>\n  </ds-row>\n  <ds-list>\n    <ds-row fill><ds-text>Write the brief</ds-text><ds-badge>Done</ds-badge></ds-row>\n    <ds-row fill><ds-text>Sketch the home page</ds-text><ds-badge>Next</ds-badge></ds-row>\n  </ds-list>\n</ds-page>',
@@ -635,11 +630,11 @@ export const PAGE_EXAMPLES: Record<string, string[]> = {
   '2-core/stat': ['stat'], '2-core/meter': ['meter'], '2-core/steps': ['steps'],
   '2-core/cycle': ['cycle', 'language'],
   '2-core/gap': ['gap'],
-  '3-unit/row': ['row', 'row-centered'], '3-unit/list': ['list'],
+  '3-unit/row': ['row', 'row-centered'], '3-unit/list': ['list'], '3-unit/sidebar': ['sidebar', 'tree'],
   '3-unit/accordion': ['accordion'], '3-unit/form': ['form'], '3-unit/carousel': ['carousel', 'carousel-full', 'slide', 'slide-loop'],
   '3-unit/calendar': ['calendar', 'calendar-compact', 'calendar-range', 'calendar-large'], '3-unit/date-picker': ['date-picker'], '3-unit/matrix': ['matrix'],
   '3-unit/table': ['table'],
   '4-page/container': ['container'], '4-page/grid': ['grid'],
-  '4-page/layout': ['layout', 'page'], '4-page/layouts': ['page'],
+  '4-page/page': ['page'],
   '4-page/header': ['header'], '4-page/footer': ['footer'], '4-page/document': ['document'],
 };

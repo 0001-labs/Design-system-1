@@ -1,9 +1,9 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
-import { connectTree, treeStep, type TreeRow } from "../DS1/0-face/tree";
-import type { Tree, TreeItem } from "../DS1/3-unit/ds-tree";
+import { connectSidebar, treeStep, type TreeRow } from "../DS1/0-face/sidebar";
+import type { Sidebar, SidebarItem } from "../DS1/3-unit/ds-sidebar";
 
-await import("../DS1/3-unit/ds-tree");
+await import("../DS1/3-unit/ds-sidebar");
 afterEach(() => document.body.replaceChildren());
 
 const key = (element: Element, key: string, init: KeyboardEventInit = {}) => {
@@ -58,8 +58,8 @@ describe("treeStep, the keyboard of the tree pattern", () => {
   });
 });
 
-describe("ds-tree", () => {
-  const ITEMS: TreeItem[] = [
+describe("ds-sidebar tree", () => {
+  const ITEMS: SidebarItem[] = [
     { id: "projects", label: "Projects", expanded: true, icon: "folder" },
     { id: "atlas", label: "Atlas", depth: 1, expanded: false, meta: "3" },
     { id: "harbor", label: "Harbor", depth: 1, selected: true },
@@ -67,14 +67,15 @@ describe("ds-tree", () => {
     { id: "archive", label: "Archive" },
   ];
   async function setup(items = ITEMS) {
-    const tree = document.createElement("ds-tree") as Tree;
+    const tree = document.createElement("ds-sidebar") as Sidebar;
+    tree.tree = true;
     tree.label = "Files";
     tree.items = items;
     document.body.append(tree);
     await tree.updateComplete;
     return tree;
   }
-  const row = (tree: Tree, id: string) => tree.shadowRoot!.querySelector<HTMLElement>(`[data-item="${id}"]`)!;
+  const row = (tree: Sidebar, id: string) => tree.shadowRoot!.querySelector<HTMLElement>(`[data-item="${id}"]`)!;
 
   test("is a tree of treeitems with their level, place, state and one Tab stop on the selected row", async () => {
     const tree = await setup();
@@ -105,9 +106,9 @@ describe("ds-tree", () => {
   test("the keyboard moves the focus, opens, closes, selects and activates through events", async () => {
     const tree = await setup();
     const toggle = vi.fn(), select = vi.fn(), activate = vi.fn();
-    tree.addEventListener("ds-tree-toggle", toggle);
-    tree.addEventListener("ds-tree-select", select);
-    tree.addEventListener("ds-tree-activate", activate);
+    tree.addEventListener("sidebar-toggle", toggle);
+    tree.addEventListener("sidebar-select", select);
+    tree.addEventListener("sidebar-activate", activate);
     row(tree, "harbor").focus();
     expect(key(row(tree, "harbor"), "ArrowDown").defaultPrevented).toBe(true);
     expect(tree.shadowRoot!.activeElement).toBe(row(tree, "archive"));
@@ -135,9 +136,9 @@ describe("ds-tree", () => {
   test("a click on the arrow opens or closes, a click elsewhere selects, a double click activates", async () => {
     const tree = await setup();
     const toggle = vi.fn(), select = vi.fn(), activate = vi.fn();
-    tree.addEventListener("ds-tree-toggle", toggle);
-    tree.addEventListener("ds-tree-select", select);
-    tree.addEventListener("ds-tree-activate", activate);
+    tree.addEventListener("sidebar-toggle", toggle);
+    tree.addEventListener("sidebar-select", select);
+    tree.addEventListener("sidebar-activate", activate);
     row(tree, "atlas").querySelector<HTMLElement>(".disclosure")!.click();
     expect(toggle.mock.calls[0]![0].detail).toEqual({ id: "atlas", expanded: true });
     expect(select).not.toHaveBeenCalled();
@@ -152,7 +153,7 @@ describe("ds-tree", () => {
 
   test("the application keeps the rows: itemFromEvent names the row under a context menu", async () => {
     const tree = await setup();
-    let found: TreeItem | undefined;
+    let found: SidebarItem | undefined;
     tree.addEventListener("contextmenu", event => { found = tree.itemFromEvent(event); });
     row(tree, "harbor").querySelector(".label")!.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true, composed: true }));
     expect(found?.id).toBe("harbor");
@@ -163,17 +164,17 @@ describe("ds-tree", () => {
   });
 });
 
-describe("connectTree, the native tree", () => {
+describe("connectSidebar, the native tree", () => {
   function native() {
-    document.body.innerHTML = `<ul class="ds-tree" role="tree" aria-label="Files">
-      <li class="ds-tree__item" role="treeitem" aria-level="1" aria-expanded="true" data-id="src"><span class="ds-tree__disclosure" aria-hidden="true"></span><span class="ds-tree__label">src</span></li>
-      <li class="ds-tree__item" role="treeitem" aria-level="2" aria-expanded="false" data-id="lib"><span class="ds-tree__disclosure" aria-hidden="true"></span><span class="ds-tree__label">lib</span></li>
-      <li class="ds-tree__item" role="treeitem" aria-level="3" data-id="deep" hidden><span class="ds-tree__disclosure" aria-hidden="true"></span><span class="ds-tree__label">deep.ts</span></li>
-      <li class="ds-tree__item" role="treeitem" aria-level="2" data-id="main"><span class="ds-tree__disclosure" aria-hidden="true"></span><span class="ds-tree__label">main.ts</span></li>
-      <li class="ds-tree__item" role="treeitem" aria-level="1" data-id="readme" aria-selected="true"><span class="ds-tree__disclosure" aria-hidden="true"></span><span class="ds-tree__label">README.md</span></li>
+    document.body.innerHTML = `<ul class="ds-sidebar" role="tree" aria-label="Files">
+      <li class="ds-sidebar__item" role="treeitem" aria-level="1" aria-expanded="true" data-id="src"><span class="ds-sidebar__disclosure" aria-hidden="true"></span><span class="ds-sidebar__label">src</span></li>
+      <li class="ds-sidebar__item" role="treeitem" aria-level="2" aria-expanded="false" data-id="lib"><span class="ds-sidebar__disclosure" aria-hidden="true"></span><span class="ds-sidebar__label">lib</span></li>
+      <li class="ds-sidebar__item" role="treeitem" aria-level="3" data-id="deep" hidden><span class="ds-sidebar__disclosure" aria-hidden="true"></span><span class="ds-sidebar__label">deep.ts</span></li>
+      <li class="ds-sidebar__item" role="treeitem" aria-level="2" data-id="main"><span class="ds-sidebar__disclosure" aria-hidden="true"></span><span class="ds-sidebar__label">main.ts</span></li>
+      <li class="ds-sidebar__item" role="treeitem" aria-level="1" data-id="readme" aria-selected="true"><span class="ds-sidebar__disclosure" aria-hidden="true"></span><span class="ds-sidebar__label">README.md</span></li>
     </ul>`;
-    const tree = document.querySelector<HTMLElement>(".ds-tree")!;
-    const disconnect = connectTree(tree);
+    const tree = document.querySelector<HTMLElement>(".ds-sidebar")!;
+    const disconnect = connectSidebar(tree);
     const item = (id: string) => tree.querySelector<HTMLElement>(`[data-id="${id}"]`)!;
     return { tree, disconnect, item };
   }
@@ -201,20 +202,20 @@ describe("connectTree, the native tree", () => {
     expect(item("readme").hidden).toBe(false);
     key(item("src"), "ArrowRight");
     expect(["lib", "deep", "main"].map(id => item(id).hidden)).toEqual([false, true, false]);
-    item("lib").querySelector<HTMLElement>(".ds-tree__disclosure")!.click();
+    item("lib").querySelector<HTMLElement>(".ds-sidebar__disclosure")!.click();
     expect(item("lib").getAttribute("aria-expanded")).toBe("true");
     expect(item("deep").hidden).toBe(false);
   });
 
   test("selecting moves aria-selected; the page can cancel a toggle or a selection and keep its own", () => {
     const { tree, item } = native();
-    item("main").querySelector<HTMLElement>(".ds-tree__label")!.click();
+    item("main").querySelector<HTMLElement>(".ds-sidebar__label")!.click();
     expect(item("main").getAttribute("aria-selected")).toBe("true");
     expect(item("readme").getAttribute("aria-selected")).toBe("false");
-    tree.addEventListener("ds-tree-select", event => event.preventDefault());
-    tree.addEventListener("ds-tree-toggle", event => event.preventDefault());
+    tree.addEventListener("sidebar-select", event => event.preventDefault());
+    tree.addEventListener("sidebar-toggle", event => event.preventDefault());
     const activate = vi.fn();
-    tree.addEventListener("ds-tree-activate", activate);
+    tree.addEventListener("sidebar-activate", activate);
     item("readme").focus();
     key(item("readme"), "Enter");
     expect(item("readme").getAttribute("aria-selected")).toBe("false");

@@ -11,7 +11,7 @@ Page is the composition layer for the whole screen. It establishes regions, cont
 | --- | --- |
 | [Container](/4-page/container/) | Bound and align a region of content. |
 | [Grid](/4-page/grid/) | Place content using shared units and columns. |
-| [Layout](/4-page/layout/) | Combine regions into an overall page structure. |
+| [Page](/4-page/page/) | A standard page: navigation, content and supporting areas in six layouts. |
 
 A page can contain navigation, a working area and supporting content. Give each region a clear purpose, and let its contents determine which [Units](/3-unit/overview/) and [Core components](/2-core/overview/) belong there.
 

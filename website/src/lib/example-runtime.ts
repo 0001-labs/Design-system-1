@@ -1,7 +1,7 @@
 import { mountChartExample } from './chart-example';
 import { EXAMPLES, MATRIX_DATA, TABLE_DATA, TABLE_FOOTER, calendarEvents } from './component-examples';
 import type { DsTable } from '../../../DS1/3-unit/ds-table';
-import type { TreeItem } from '../../../DS1/3-unit/ds-tree';
+import type { SidebarItem } from '../../../DS1/3-unit/ds-sidebar';
 
 // A preview has its own preferences. Trying a language or theme must not
 // overwrite the reader's choice in the surrounding documentation.
@@ -112,7 +112,7 @@ if (sidebar) {
   render();
 }
 // The tree and row examples do what their published scripts show.
-const tree = sample.querySelector('ds-tree');
+const tree = sample.querySelector('ds-sidebar[tree]');
 if (tree) {
   type File = { id: string; label: string; icon: string; meta?: string; children?: File[] };
   const files: File[] = [
@@ -124,14 +124,14 @@ if (tree) {
   ];
   const open = new Set(['projects', 'atlas']);
   let selected = 'notes';
-  const rows = (nodes: File[], depth = 0): TreeItem[] => nodes.flatMap(node => [
+  const rows = (nodes: File[], depth = 0): SidebarItem[] => nodes.flatMap(node => [
     { id: node.id, label: node.label, icon: node.icon, meta: node.meta, depth, selected: node.id === selected, expanded: node.children ? open.has(node.id) : undefined },
     ...(node.children && open.has(node.id) ? rows(node.children, depth + 1) : []),
   ]);
   const render = () => { tree.items = rows(files); };
-  tree.addEventListener('ds-tree-toggle', event => { const { id, expanded } = (event as CustomEvent<{ id: string; expanded: boolean }>).detail; if (expanded) open.add(id); else open.delete(id); render(); });
-  tree.addEventListener('ds-tree-select', event => { selected = (event as CustomEvent<{ id: string }>).detail.id; render(); output.textContent = `ds-tree-select: ${selected}`; });
-  tree.addEventListener('ds-tree-activate', event => { output.textContent = `ds-tree-activate: ${(event as CustomEvent<{ id: string }>).detail.id}`; });
+  tree.addEventListener('sidebar-toggle', event => { const { id, expanded } = (event as CustomEvent<{ id: string; expanded: boolean }>).detail; if (expanded) open.add(id); else open.delete(id); render(); });
+  tree.addEventListener('sidebar-select', event => { selected = (event as CustomEvent<{ id: string }>).detail.id; render(); output.textContent = `sidebar-select: ${selected}`; });
+  tree.addEventListener('sidebar-activate', event => { output.textContent = `sidebar-activate: ${(event as CustomEvent<{ id: string }>).detail.id}`; });
   render();
 }
 sample.addEventListener('ds-row-press', event => {

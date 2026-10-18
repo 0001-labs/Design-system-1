@@ -41,8 +41,8 @@ const rootModules = {
   header: ['header.ts', 'drawer.ts'],
   /** Carousels and page dots on native markup (.ds-carousel, .ds-pagedots). */
   carousel: ['carousel.ts'],
-  /** The keyboard and pointer of a native tree (`connectTree`, for `.ds-tree` in row.css). */
-  tree: ['tree.ts'],
+  /** The keyboard and pointer of a native sidebar tree (`connectSidebar`, for `.ds-sidebar` in row.css). */
+  sidebar: ['sidebar.ts'],
   /** The theme module (light, dark, system in signals) with the head script it runs and its options' type; needs @lit-labs/signals. */
   theme: ['theme.ts', 'theme-bootstrap.js', 'preference-options.ts'],
 };
@@ -211,7 +211,7 @@ export default {
      * The Lit components named in `components`, with everything they import and
      * their React adapters (`empty` brings react/empty.ts, `notice`
      * react/notice.ts, `carousel` react/carousel.ts, `stat`, `meter` and `steps`
-     * theirs, `tree` react/tree.ts). controls.css always travels with them, and
+     * theirs, `sidebar` react/sidebar.ts). controls.css always travels with them, and
      * with it the native classes it imports, `.ds-empty`, `.ds-notice`,
      * `.ds-carousel`, `.ds-stat`, `.ds-meter`, `.ds-steps` and `.ds-row` among them.
      * components-manifest.json records them for the component adoption report,

@@ -13,10 +13,10 @@
     </style>
     <script type="module">
       import "/DS1/3-unit/ds-row.ts";
-      import "/DS1/3-unit/ds-tree.ts";
       import "/DS1/3-unit/ds-sidebar.ts";
-      import { connectTree } from "/DS1/0-face/tree.ts";
-      window.connectTree = connectTree;
+      import "/DS1/3-unit/ds-sidebar.ts";
+      import { connectSidebar } from "/DS1/0-face/sidebar.ts";
+      window.connectSidebar = connectSidebar;
       await document.fonts.ready;
       document.documentElement.dataset.ready = "true";
     </script>
