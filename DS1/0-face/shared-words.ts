@@ -3,7 +3,7 @@
  * again, Undo, Redo, Copy, Copy link, Remove, Rename, Duplicate, Download,
  * Refresh, Open, Send, Clear), Saved, Saving…, Untitled, Account, sign-in,
  * empty states, dates, the settings ds-cycle shows, ds-banner's words, the
- * carousel's (Carousel, Slide, Previous slide, Next slide…), the feedback module's (OK, Copied, Could not copy, Notifications), a meter's
+ * carousel's and slide's (Carousel, Slide, Previous slide, Next slide, Pause, Play…), the feedback module's (OK, Copied, Could not copy, Notifications), a meter's
  * words ("7 of 10") and a step's (Done, Failed), the site chrome's (Menu,
  * Contents), the key names keys.ts writes as words (`key.ctrl`, `key.shift` …)
  * and the names of the languages. Keyed by the English sentence,

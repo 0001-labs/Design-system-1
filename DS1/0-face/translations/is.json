@@ -85,6 +85,8 @@
     "{index} of {count}": "{index} af {count}",
     "Previous slide": "Fyrri glæra",
     "Next slide": "Næsta glæra",
+    "Pause": "Gera hlé",
+    "Play": "Spila",
     "Menu": "Valmynd",
     "Contents": "Efnisyfirlit",
     "key.ctrl": "Ctrl",

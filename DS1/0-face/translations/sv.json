@@ -92,6 +92,8 @@
     "{index} of {count}": "{index} av {count}",
     "Previous slide": "Föregående bild",
     "Next slide": "Nästa bild",
+    "Pause": "Pausa",
+    "Play": "Spela upp",
     "Menu": "Meny",
     "Contents": "Innehåll",
     "key.ctrl": "Ctrl",

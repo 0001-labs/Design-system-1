@@ -1,0 +1,184 @@
+@import "./component-metrics.css";
+
+/*
+ * A card, as plain classes on native elements.
+ *
+ * A card holds one thing on a fill of its own: its name in the muted ink on
+ * one square, a title in the display size on lines of two squares, writing,
+ * and a picture of it (`ds-card__media`) a square below, which can run off
+ * the card's foot and end edge and be cut there, never framed. Its size is
+ * given in whole squares, its padding one square, its corners a card's
+ * (`--ds-radius-card`). A card that opens something is one press target, an
+ * `<a class="ds-card" href>`: the pointer tints it, keyboard focus rings it
+ * 2px inside and its picture rises a little. Ordinary writing still sits
+ * straight on the paper; a card is for a thing shown among others, as in a
+ * slide. The `ds-card` element draws the same parts.
+ *
+ *   ds-card                      the card; `data-tone` names a palette colour
+ *                                for its fill (the colour's pastel, dim in dark
+ *                                mode, from palette.css, which one.css imports),
+ *                                `ink` for the ink with the paper's words
+ *   ds-card--outlined            a 1px line and no fill
+ *   ds-card__label               its name, muted, on one square
+ *   ds-card__title               the title, display size, two squares a line
+ *   ds-card__body                writing, one square a line
+ *   ds-card__media               the picture, a square below the words
+ *   ds-card__media--center       standing in the card's middle
+ *   ds-card__media--bleed        running on past the padding to the end edge
+ *
+ * Tokens: `--ds-card-width` and `--ds-card-height` (whole squares; the
+ * content's size by default), `--ds-card-padding` (one square), and
+ * `--ds-card-fill`, `--ds-card-ink` and `--ds-card-muted`.
+ */
+
+.ds-card {
+  --ds-card-fill: var(--ds-fill);
+  --ds-card-ink: var(--ds-text-color);
+  --ds-card-muted: var(--ds-text-color-muted);
+  --ds-card-padding: var(--ds-unit);
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: var(--ds-card-width, auto);
+  height: var(--ds-card-height, auto);
+  min-width: 0;
+  margin: 0;
+  padding: var(--ds-card-padding) var(--ds-card-padding) 0;
+  overflow: hidden;
+  border-radius: var(--ds-radius-card);
+  background: var(--ds-card-fill);
+  color: var(--ds-card-ink);
+  font-family: var(--ds-typeface-regular);
+  font-size: var(--ds-type-size-default);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ds-card[hidden] {
+  display: none;
+}
+
+.ds-card--outlined {
+  --ds-card-fill: transparent;
+  box-shadow: inset 0 0 0 1px var(--ds-border-color);
+}
+
+.ds-card[data-tone="apple-green"] { --ds-card-fill: var(--one-apple-green-pastel); }
+.ds-card[data-tone="chartreuse"] { --ds-card-fill: var(--one-chartreuse-pastel); }
+.ds-card[data-tone="every-green"] { --ds-card-fill: var(--one-every-green-pastel); }
+.ds-card[data-tone="yellow"] { --ds-card-fill: var(--one-yellow-pastel); }
+.ds-card[data-tone="orange"] { --ds-card-fill: var(--one-orange-pastel); }
+.ds-card[data-tone="tuned-red"] { --ds-card-fill: var(--one-tuned-red-pastel); }
+.ds-card[data-tone="pink"] { --ds-card-fill: var(--one-pink-pastel); }
+.ds-card[data-tone="sharp-blue"] { --ds-card-fill: var(--one-sharp-blue-pastel); }
+.ds-card[data-tone="winning-blue"] { --ds-card-fill: var(--one-winning-blue-pastel); }
+.ds-card[data-tone="hysteric-blue"] { --ds-card-fill: var(--one-hysteric-blue-pastel); }
+.ds-card[data-tone="purple"] { --ds-card-fill: var(--one-purple-pastel); }
+.ds-card[data-tone="metal-green"] { --ds-card-fill: var(--one-metal-green-pastel); }
+.ds-card[data-tone="drip-yellow"] { --ds-card-fill: var(--one-drip-yellow-pastel); }
+.ds-card[data-tone="sand"] { --ds-card-fill: var(--one-sand-pastel); }
+.ds-card[data-tone="old-gold"] { --ds-card-fill: var(--one-old-gold-pastel); }
+.ds-card[data-tone="red-for-blood"] { --ds-card-fill: var(--one-red-for-blood-pastel); }
+.ds-card[data-tone="dark-red-variant"] { --ds-card-fill: var(--one-dark-red-variant-pastel); }
+.ds-card[data-tone="signal-red"] { --ds-card-fill: var(--one-signal-red-pastel); }
+.ds-card[data-tone="ink"] {
+  --ds-card-fill: var(--ds-black);
+  --ds-card-ink: var(--ds-white);
+  --ds-card-muted: color-mix(in srgb, var(--ds-white) 60%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ds-white) 8%, transparent);
+}
+
+/* Words: each line on the lower sixteen of its square. */
+.ds-card__label {
+  margin: 0;
+  padding-top: calc(4px * var(--ds-sf, 1));
+  color: var(--ds-card-muted);
+  font: inherit;
+  line-height: var(--ds-type-lineheight-default, calc(16px * var(--ds-sf, 1)));
+}
+
+.ds-card__title {
+  margin: 0;
+  color: var(--ds-card-ink);
+  font-family: var(--ds-typeface-medium);
+  font-size: var(--ds-type-size-display);
+  font-weight: var(--ds-type-weight-bold);
+  line-height: calc(2 * var(--ds-unit));
+  letter-spacing: calc(var(--ds-display-text-tracking, -0.4px) * var(--ds-sf, 1));
+  text-wrap: balance;
+}
+
+.ds-card__body {
+  margin: 0;
+  line-height: var(--ds-unit);
+}
+
+.ds-card__media {
+  display: flex;
+  flex: none;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-width: 0;
+  margin-top: var(--ds-unit);
+}
+
+.ds-card__media--center {
+  justify-content: center;
+  margin-inline: calc(-1 * var(--ds-card-padding));
+}
+
+.ds-card__media--bleed {
+  margin-inline-end: calc(-1 * var(--ds-card-padding));
+}
+
+.ds-card__media > * {
+  flex: none;
+}
+
+/* A card that opens something. */
+a.ds-card,
+.ds-card[data-interactive] {
+  cursor: pointer;
+}
+
+a.ds-card::after,
+.ds-card[data-interactive]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: transparent;
+  pointer-events: none;
+}
+
+a.ds-card:focus-visible,
+.ds-card[data-interactive]:focus-visible {
+  outline: 2px solid var(--ds-focus-ring);
+  outline-offset: -2px;
+}
+
+@media (hover: hover) {
+  a.ds-card:hover::after,
+  .ds-card[data-interactive]:hover::after {
+    background: color-mix(in srgb, var(--ds-card-ink) 4%, transparent);
+  }
+}
+
+a.ds-card:active::after,
+.ds-card[data-interactive]:active::after {
+  background: color-mix(in srgb, var(--ds-card-ink) 8%, transparent);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  a.ds-card > .ds-card__media,
+  .ds-card[data-interactive] > .ds-card__media {
+    transition: transform 240ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  a.ds-card:hover > .ds-card__media,
+  .ds-card[data-interactive]:hover > .ds-card__media {
+    transform: translateY(calc(-0.25 * var(--ds-unit)));
+  }
+}

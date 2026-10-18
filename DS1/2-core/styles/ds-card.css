@@ -1,0 +1,34 @@
+/* ds-card.css */
+/* The element places the card; 1-root/card.css draws it. The host takes the
+   card's size, so a card is measured where it stands, in a slide too. */
+
+:host {
+  display: flex;
+  box-sizing: border-box;
+  width: var(--ds-card-width, auto);
+  height: var(--ds-card-height, auto);
+  min-width: 0;
+}
+
+:host([hidden]) {
+  display: none !important;
+}
+
+:host([disabled]) {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.ds-card {
+  flex: 1;
+  width: auto;
+  height: auto;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+::slotted([slot="media"]) {
+  flex: none;
+}

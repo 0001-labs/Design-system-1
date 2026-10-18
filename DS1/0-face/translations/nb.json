@@ -92,6 +92,8 @@
     "{index} of {count}": "{index} av {count}",
     "Previous slide": "Forrige lysbilde",
     "Next slide": "Neste lysbilde",
+    "Pause": "Pause",
+    "Play": "Spill av",
     "Menu": "Meny",
     "Contents": "Innhold",
     "key.ctrl": "Ctrl",

@@ -92,6 +92,8 @@
     "{index} of {count}": "{index} di {count}",
     "Previous slide": "Slide precedente",
     "Next slide": "Slide successiva",
+    "Pause": "Pausa",
+    "Play": "Riproduci",
     "Menu": "Menu",
     "Contents": "Indice",
     "key.ctrl": "Ctrl",

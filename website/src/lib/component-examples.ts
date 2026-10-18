@@ -392,6 +392,58 @@ matrix.marks = [
 </ds-carousel>`,
     height: 200,
   },
+  'slide': {
+    title: 'Cards of any width, sliding sideways', hint: 'Swipe or scroll sideways, or use the buttons. Each card stops at the start.',
+    html: `<ds-slide label="Features" literal buttons>
+  <ds-card href="#lists" tone="sharp-blue" width="12" height="16" media="center">
+    <span slot="label">Lists</span>
+    <span slot="title">Everything on one grid</span>
+    <span slot="media" style="display:block;width:calc(var(--ds-unit) * 8);height:calc(var(--ds-unit) * 10);border-radius:var(--ds-radius);background:var(--ds-zenith-blue)"></span>
+  </ds-card>
+  <ds-card href="#notes" tone="apple-green" width="20" height="16" media="bleed">
+    <span slot="label">Notes</span>
+    <span slot="title">Every item opens into a note</span>
+    <span slot="media" style="display:block;width:calc(var(--ds-unit) * 24);height:calc(var(--ds-unit) * 10);border-radius:var(--ds-radius);background:var(--ds-apple-green)"></span>
+  </ds-card>
+  <ds-card href="#people" tone="pink" width="12" height="16" media="center">
+    <span slot="label">People</span>
+    <span slot="title">Kept with others</span>
+    <span slot="media" style="display:block;width:calc(var(--ds-unit) * 8);height:calc(var(--ds-unit) * 10);border-radius:var(--ds-radius);background:var(--ds-pink)"></span>
+  </ds-card>
+  <ds-card href="#calendar" tone="ink" width="12" height="16" media="center">
+    <span slot="label">Calendar</span>
+    <span slot="title">Dates in the dark</span>
+    <span slot="media" style="display:block;width:calc(var(--ds-unit) * 8);height:calc(var(--ds-unit) * 10);border-radius:var(--ds-radius);background:var(--ds-sharp-blue)"></span>
+  </ds-card>
+</ds-slide>`,
+    height: 420,
+  },
+  'slide-loop': {
+    title: 'Without an end, moving on by itself', hint: 'loop holds the cards three times over; autoplay moves on every five seconds, holds while you point, touch or focus, and always has a pause button.',
+    html: `<ds-slide label="Features" literal loop autoplay>
+  <ds-card href="#lists" tone="sharp-blue" width="12" height="16" media="center">
+    <span slot="label">Lists</span>
+    <span slot="title">Everything on one grid</span>
+    <span slot="media" style="display:block;width:calc(var(--ds-unit) * 8);height:calc(var(--ds-unit) * 10);border-radius:var(--ds-radius);background:var(--ds-zenith-blue)"></span>
+  </ds-card>
+  <ds-card href="#notes" tone="apple-green" width="20" height="16" media="bleed">
+    <span slot="label">Notes</span>
+    <span slot="title">Every item opens into a note</span>
+    <span slot="media" style="display:block;width:calc(var(--ds-unit) * 24);height:calc(var(--ds-unit) * 10);border-radius:var(--ds-radius);background:var(--ds-apple-green)"></span>
+  </ds-card>
+  <ds-card href="#people" tone="pink" width="12" height="16" media="center">
+    <span slot="label">People</span>
+    <span slot="title">Kept with others</span>
+    <span slot="media" style="display:block;width:calc(var(--ds-unit) * 8);height:calc(var(--ds-unit) * 10);border-radius:var(--ds-radius);background:var(--ds-pink)"></span>
+  </ds-card>
+  <ds-card href="#calendar" tone="ink" width="12" height="16" media="center">
+    <span slot="label">Calendar</span>
+    <span slot="title">Dates in the dark</span>
+    <span slot="media" style="display:block;width:calc(var(--ds-unit) * 8);height:calc(var(--ds-unit) * 10);border-radius:var(--ds-radius);background:var(--ds-sharp-blue)"></span>
+  </ds-card>
+</ds-slide>`,
+    height: 420,
+  },
   'stat': {
     title: 'Figures in the language', hint: 'Money, a change with its sign and a meter between figure and caption. The group stands on columns of eight squares.',
     html: `<div class="ds-stats">
@@ -420,9 +472,22 @@ matrix.marks = [
     height: 200,
   },
   'card': {
-    title: 'A container for content', hint: 'Card is an optional component. Ordinary writing sits directly on the paper.',
-    html: '<ds-card variant="outlined" padding="small">\n  <ds-text>A little content</ds-text>\n  <ds-button primary>Continue</ds-button>\n</ds-card>',
-    height: 200,
+    title: 'A thing shown on its own fill', hint: 'Its name, a title and a picture that runs off the foot. With href the whole card is one link.',
+    html: `<ds-card href="#lists" tone="sharp-blue" width="14" height="18" media="center">
+  <span slot="label">Lists</span>
+  <span slot="title">Everything on one grid</span>
+  <span slot="media" style="display:block;width:calc(var(--ds-unit) * 10);height:calc(var(--ds-unit) * 10);border-radius:var(--ds-radius);background:var(--ds-zenith-blue)"></span>
+</ds-card>`,
+    height: 420,
+  },
+  'card-outlined': {
+    title: 'Outlined, with writing', hint: 'variant="outlined" draws a 1px line and no fill.',
+    html: `<ds-card variant="outlined" width="16">
+  <span slot="title">Plans</span>
+  <ds-text literal wrap>Start free. Upgrade when you need more room.</ds-text>
+  <ds-button primary>Continue</ds-button>
+</ds-card>`,
+    height: 240,
   },
   'cycle': {
     title: 'Cycle through a setting', hint: 'Click to switch light and dark inside this preview.',
@@ -569,13 +634,13 @@ export const PAGE_EXAMPLES: Record<string, string[]> = {
   '2-core/icon': ['icon', 'icon-variants'],
   '2-core/input': ['input', 'input-states'],
   '2-core/text': ['text'], '2-core/date': ['date'],
-  '2-core/banner': ['banner', 'banner-dismiss'], '2-core/card': ['card'],
+  '2-core/banner': ['banner', 'banner-dismiss'], '2-core/card': ['card', 'card-outlined'],
   '2-core/empty': ['empty', 'empty-search'], '2-core/notice': ['notice'], '2-core/kbd': ['kbd'], '2-core/pagedots': ['pagedots'],
   '2-core/stat': ['stat'], '2-core/meter': ['meter'], '2-core/steps': ['steps'],
   '2-core/cycle': ['cycle'], '2-core/language': ['language'],
   '2-core/gap': ['gap'],
   '3-unit/row': ['row', 'row-centered'], '3-unit/list': ['list'],
-  '3-unit/accordion': ['accordion'], '3-unit/form': ['form'], '3-unit/carousel': ['carousel', 'carousel-full'],
+  '3-unit/accordion': ['accordion'], '3-unit/form': ['form'], '3-unit/carousel': ['carousel', 'carousel-full'], '3-unit/slide': ['slide', 'slide-loop'],
   '3-unit/calendar': ['calendar', 'calendar-compact', 'calendar-range', 'calendar-large'], '3-unit/date-picker': ['date-picker'], '3-unit/matrix': ['matrix'],
   '3-unit/table': ['table'],
   '4-page/container': ['container'], '4-page/grid': ['grid'],

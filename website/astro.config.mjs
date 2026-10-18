@@ -131,6 +131,7 @@ export default defineConfig({
             { label: "Card", slug: "3-unit/card" },
             { label: "Calendar", slug: "3-unit/calendar" },
             { label: "Carousel", slug: "3-unit/carousel" },
+            { label: "Slide", slug: "3-unit/slide" },
             { label: "Date picker", slug: "3-unit/date-picker" },
             { label: "Form", slug: "3-unit/form" },
             { label: "List", slug: "3-unit/list" },

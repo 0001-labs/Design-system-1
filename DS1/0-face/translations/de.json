@@ -92,6 +92,8 @@
     "{index} of {count}": "{index} von {count}",
     "Previous slide": "Vorherige Folie",
     "Next slide": "Nächste Folie",
+    "Pause": "Pause",
+    "Play": "Abspielen",
     "Menu": "Menü",
     "Contents": "Inhalt",
     "key.ctrl": "Strg",

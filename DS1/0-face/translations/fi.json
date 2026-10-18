@@ -92,6 +92,8 @@
     "{index} of {count}": "{index}/{count}",
     "Previous slide": "Edellinen dia",
     "Next slide": "Seuraava dia",
+    "Pause": "Tauko",
+    "Play": "Toista",
     "Menu": "Valikko",
     "Contents": "Sisällys",
     "key.ctrl": "Ctrl",

@@ -35,7 +35,7 @@
  */
 
 /** The words a carousel says, keyed by the shared words' English. */
-export type CarouselWord = "Carousel" | "Slide" | "Slides" | "Slide {index}" | "{index} of {count}" | "Previous slide" | "Next slide";
+export type CarouselWord = "Carousel" | "Slide" | "Slides" | "Slide {index}" | "{index} of {count}" | "Previous slide" | "Next slide" | "Pause" | "Play";
 export type CarouselWords = Partial<Record<CarouselWord, string>> | ((word: CarouselWord, params: Record<string, string | number>) => string);
 
 /** Where the language module leaves its `translate()`, shared with the feedback module. */

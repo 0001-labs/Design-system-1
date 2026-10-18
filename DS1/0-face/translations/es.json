@@ -92,6 +92,8 @@
     "{index} of {count}": "{index} de {count}",
     "Previous slide": "Diapositiva anterior",
     "Next slide": "Diapositiva siguiente",
+    "Pause": "Pausar",
+    "Play": "Reproducir",
     "Menu": "Menú",
     "Contents": "Contenido",
     "key.ctrl": "Ctrl",

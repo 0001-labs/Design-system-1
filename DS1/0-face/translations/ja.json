@@ -92,6 +92,8 @@
     "{index} of {count}": "{count} 枚中 {index} 枚目",
     "Previous slide": "前のスライド",
     "Next slide": "次のスライド",
+    "Pause": "一時停止",
+    "Play": "再生",
     "Menu": "メニュー",
     "Contents": "目次",
     "key.ctrl": "Ctrl",

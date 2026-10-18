@@ -1,28 +1,63 @@
 ---
 title: Card
-description: An optional content container with an outline or elevation treatment.
+description: One thing shown on a fill of its own, with its name, a title and a picture that runs off its foot.
 ---
 
 import ComponentExample from "../../../components/ComponentExample.astro";
 
-An optional content container with an outline or elevation treatment.
+A card shows one thing among others: its name, a title, a line of writing and a picture of it that can run off the card's foot and end edge and be cut there, never framed. Cards stand side by side in a [slide](/3-unit/slide/) or a grid. Ordinary writing still sits straight on the paper; a card is not a box for a page's paragraphs.
 
 ## Try it
 
 <ComponentExample example="card" />
 
-## Usage
+<ComponentExample example="card-outlined" compact />
 
-Put ordinary HTML and components in the default slot. Keep ordinary writing directly on the page; use a card only when the content needs a distinct container.
+## Use it
 
-## Attributes
+```html
+<ds-card href="/lists" tone="sharp-blue" width="14" height="22" media="center">
+  <span slot="label">Lists</span>
+  <span slot="title">Everything on one grid</span>
+  <img slot="media" src="lists.webp" alt="A list on a phone" />
+</ds-card>
+```
 
-| Attribute | Type | Default | What it does |
-| --- | --- | --- | --- |
-| `variant` | string | `default` | `default`, `outlined` or `elevated`. |
-| `padding` | string | `medium` | `none`, `small`, `medium` or `large`. |
-| `elevation` | number | 1 | Elevation level for the elevated treatment. |
-| `interactive` | boolean | false | Enables the hover treatment. |
-| `disabled` | boolean | false | Disables interaction styling. |
+| Attribute | What it does |
+| --- | --- |
+| `href` | The whole card is one link. |
+| `interactive` | The whole card is one press target that fires `ds-card-press`; use `href` for a destination. |
+| `tone` | A palette colour for the fill (`sharp-blue`, `apple-green`, `pink`, `orange`…), drawn as its pastel and dim in dark mode, or `ink` for the ink with the paper's words. The quiet fill by default. |
+| `variant` | `filled` (the default) or `outlined`, a 1px line and no fill. |
+| `width`, `height` | The size in whole squares. |
+| `padding` | `none`, `small` (half a square), `medium` (one, the default) or `large` (two). |
+| `media` | Where the picture stands: `start`, `center` or `bleed` (on past the padding to the end edge). |
+| `disabled` | Neither pressed nor followed. |
 
-[Container](/4-page/container/) · [Row](/3-unit/row/)
+| Slot | Holds |
+| --- | --- |
+| `label` | The thing's name, muted, on one square. |
+| `title` | The title in the display size, two squares a line. |
+| (default) | Writing, one square a line. |
+| `media` | A picture, a square below the words. |
+
+The corners are a card's (`--ds-radius-card`, 4px by default); a product sets `--ds-card-corner-size` for rounder ones.
+
+## Without Lit
+
+```html
+<a class="ds-card" data-tone="sharp-blue" href="/lists" style="--ds-card-width: calc(var(--ds-unit) * 14); --ds-card-height: calc(var(--ds-unit) * 22)">
+  <span class="ds-card__label">Lists</span>
+  <span class="ds-card__title">Everything on one grid</span>
+  <span class="ds-card__media ds-card__media--center"><img src="lists.webp" alt="A list on a phone" /></span>
+</a>
+```
+
+`card.css` comes with `controls.css`. The tones read the palette's tokens from `palette.css`, which `one.css` imports.
+
+## Accessibility
+
+- A card with `href` is one link and a card with `interactive` one button: never put a second link or button inside either. Keyboard focus rings it 2px inside.
+- The pointer tints the card and its picture rises a little; with reduced motion the picture stays still.
+
+[Slide](/3-unit/slide/) · [Row](/3-unit/row/)
