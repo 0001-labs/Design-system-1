@@ -1,11 +1,13 @@
 ---
 title: Carousel
-description: Slides side by side that snap sideways, one to a stop, with page dots and optional buttons.
+description: Slides side by side that snap sideways, one to a stop, with page dots and optional buttons; or a strip of slides of their own width that can run to the window's edges, loop and move on by itself.
 ---
 
 import ComponentExample from "../../../components/ComponentExample.astro";
 
 A carousel shows one thing several ways in the space of one: tall cards side by side, one in view and the next cut at the edge, or one slide at a time across the whole width. The slides snap sideways, one to a stop, under a finger, a trackpad or the keyboard, and a row of [page dots](/2-core/pagedots/) one square below says which slide you are on and takes you to any other. Previous and next buttons can stand beside the dots.
+
+With `slide-width="auto"` it is a strip: [cards](/2-core/card/) of their own widths, tall ones and wide ones, a few in view and the next cut at the edge, each stopping at the strip's start. A strip can run on past its column to the window's edge while its first card keeps to the column, loop without an end, and, when asked, move on by itself.
 
 Everything a carousel holds is in the page and reachable without it: never put the only copy of something important in a slide.
 
@@ -31,6 +33,7 @@ Each element inside is a slide. Name the carousel for what the slides show with 
 | --- | --- |
 | No `slide-width` | The carousel's own width, one at a time. |
 | `slide-width="12"` | Twelve squares each, as many in view as fit; the next one is cut at the edge. |
+| `slide-width="auto"` | Each slide as wide as it is: a strip of cards to browse. |
 
 `gap` sets the squares between slides, one by default and `0` for none. A slide is as tall as the tallest one.
 
@@ -43,6 +46,29 @@ carousel.current = 2; // goes there, smoothly unless the reader asks for less mo
 
 `change` fires when a person moves to another slide: by swiping, scrolling, a dot or a button. Setting `current`, or calling `goTo()`, `next()` or `previous()`, moves the carousel without firing it.
 
+## A strip
+
+<ComponentExample example="slide" />
+
+<ComponentExample example="slide-loop" compact />
+
+```html
+<ds-carousel label="Work" slide-width="auto" no-dots bleed="end" buttons>
+  <ds-card href="/lists" tone="sharp-blue" width="14" height="22" media="center">…</ds-card>
+  <ds-card href="/portal" tone="ink" width="28" height="22" media="bleed">…</ds-card>
+  <ds-card href="/money" tone="apple-green" width="14" height="22" media="center">…</ds-card>
+</ds-carousel>
+```
+
+| Option | What it does |
+| --- | --- |
+| `bleed` | `none` (the default) keeps the strip in its box. `end` runs it on to the window's end edge, the first card still on the box's start, so nothing stands before the column. `both` runs it to both edges; cards slide out past the column's start. |
+| `loop` | Holds the slides three times over, so the strip has no end either way. The copies are hidden from assistive technology and never focused. A looping carousel draws no dots. |
+| `autoplay` | Moves on a slide at a time by itself: empty for every five seconds, or a number of milliseconds (at least 1000). Without `loop` it goes back to the first slide after the last. See [Autoplay](#autoplay). |
+| `free` | Slides freely, without stopping at slides. |
+
+`bleed`, `loop` and `autoplay` are read when the element first draws; put a new element in its place to change them.
+
 ## Accessibility
 
 - The element is a region described as a carousel and named by `label`. Each slide is a group described as a slide and labelled "2 of 5", unless the page labels it.
@@ -54,9 +80,9 @@ carousel.current = 2; // goes there, smoothly unless the reader asks for less mo
 
 All the words are the shared words, in every language.
 
-## No autoplay
+## Autoplay
 
-A carousel never moves on its own. A slide that leaves while someone reads it, or that moves the page under a screen reader, costs more than it shows; a moving carousel also needs a pause control, a stop on hover and on focus, and a live region that falls silent while it moves (WCAG 2.2.2). Everything in the system moves only because a person asked it to, so autoplay is not offered.
+A carousel moves on by itself only when asked to, with `autoplay`. Then it always shows a pause button (named "Pause", then "Play"), holds while the pointer is over it, a finger is on it or the keyboard is in it, holds while it is out of view or the page is hidden, and never moves for a reader who asks for reduced motion. That meets WCAG 2.2.2 (Pause, Stop, Hide). Use it for a strip that shows off, never for one that holds something a person must read or act on: a slide that leaves while someone reads it costs more than it shows.
 
 ## API
 
@@ -68,8 +94,12 @@ A carousel never moves on its own. A slide that leaves while someone reads it, o
 | `buttons` | boolean | `false` | Previous and next buttons beside the dots. |
 | `no-dots` | boolean | `false` | Leave the dots out. |
 | `end` | boolean | `false` | Draw the last dot as an end marker. |
-| `slide-width` | number | The carousel's width | Each slide's width in whole squares. |
+| `slide-width` | number or `auto` | The carousel's width | Each slide's width in whole squares; `auto` for slides of their own width. |
 | `gap` | number | `1` | Whole squares between slides. |
+| `bleed` | `none`, `end`, `both` | `none` | How far a strip runs past its box. |
+| `loop` | boolean | `false` | Hold the slides three times over, without an end. |
+| `autoplay` | empty or milliseconds | Off | Move on by itself, with a pause button. |
+| `free` | boolean | `false` | Slide freely, without stopping at slides. |
 
 | Event | Detail | What it means |
 | --- | --- | --- |
@@ -79,7 +109,7 @@ A carousel never moves on its own. A slide that leaves while someone reads it, o
 | --- | --- |
 | `track` | The scroller holding the slides. |
 | `controls` | The row of buttons and dots. |
-| `previous`, `next` | The buttons. |
+| `previous`, `next`, `pause` | The buttons. |
 | `dots` | The [page dots](/2-core/pagedots/). |
 
 ## Measures
@@ -98,7 +128,7 @@ import { Carousel } from "@0001-labs/design-system-1/DS1/react/carousel";
 </Carousel>
 ```
 
-`Carousel` renders `ds-carousel` with the slides in the light DOM and the region and its name in the markup, so the server's HTML is already a named region. `label` is shown as given. `dots={false}` leaves the dots out. Register `ds-carousel` in the browser before hydration.
+`Carousel` renders `ds-carousel` with the slides in the light DOM and the region and its name in the markup, so the server's HTML is already a named region. `label` is shown as given. `dots={false}` leaves the dots out; `slideWidth="auto"`, `bleed`, `loop`, `autoplay` and `free` make it a strip. Register `ds-carousel` in the browser before hydration.
 
 ## Without JavaScript
 
@@ -126,6 +156,6 @@ A page without Lit writes the same carousel with the classes in `carousel.css`, 
 </script>
 ```
 
-`startCarousels()` starts every `.ds-carousel` on the page with what the element does: the region and slide labels, a dot for each slide in the `.ds-pagedots` (`data-end` on it marks the end), the buttons' names and their stops at the ends, the keyboard, the polite announcement and `change` on the block. It needs no framework and imports nothing; Sync 1 copies it with the `root` export's `"modules": ["carousel"]`. The words read English, or the shared words in the page's language where the page loads the language module; `setCarouselWords()` gives the page's own.
+`startCarousels()` starts every `.ds-carousel` on the page with what the element does: the region and slide labels, a dot for each slide in the `.ds-pagedots` (`data-end` on it marks the end), the buttons' names and their stops at the ends, the keyboard, the polite announcement and `change` on the block. A strip is `data-slides="auto"` with `data-bleed`, `data-loop`, `data-autoplay` and `data-snap="none"`; the script measures the bleed's room, makes the loop's copies and adds the pause button for autoplay (`startCarousels(document, { icons: "/ds1/x-icon/" })` says where its icon is). It needs no framework and imports nothing; Sync 1 copies it with the `root` export's `"modules": ["carousel"]`. The words read English, or the shared words in the page's language where the page loads the language module; `setCarouselWords()` gives the page's own.
 
-[Page dots](/2-core/pagedots/) · [Button](/2-core/button/) · [Icon](/2-core/icon/)
+[Page dots](/2-core/pagedots/) · [Card](/2-core/card/) · [Button](/2-core/button/) · [Icon](/2-core/icon/)

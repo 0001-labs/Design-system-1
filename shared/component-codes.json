@@ -232,14 +232,6 @@
     "url": "https://designsystem1.com/3-unit/carousel/"
   },
   {
-    "id": "component:/3-unit/slide/",
-    "code": "SLID",
-    "label": "Slide",
-    "kind": "component",
-    "summary": "Design system 1 3-unit.",
-    "url": "https://designsystem1.com/3-unit/slide/"
-  },
-  {
     "id": "component:/3-unit/matrix/",
     "code": "MTRX",
     "label": "Matrix",

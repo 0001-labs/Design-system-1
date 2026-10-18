@@ -15,8 +15,8 @@ const rootStyles = ['one.css', 'grid.css', 'text.css', 'component-tokens.css', '
 const importsText = ['one.css', 'controls.css'];
 /** one.css also imports the faces with their typeface tokens, and the palette. */
 const oneImports = ['fonts.css', 'palette.css'];
-/** The sheets controls.css imports besides the text classes: tables, empty states, notices, shortcut hints, the dialog's placements, the site chrome (header with its drawer, footer, document), carousels, slides, cards, stats, meters and steps, and rows. */
-const controlSheets = ['table.css', 'empty.css', 'notice.css', 'kbd.css', 'dialog-placement.css', 'header.css', 'drawer.css', 'footer.css', 'document.css', 'carousel.css', 'slide.css', 'card.css', 'figures.css', 'row.css'];
+/** The sheets controls.css imports besides the text classes: tables, empty states, notices, shortcut hints, the dialog's placements, the site chrome (header with its drawer, footer, document), carousels, cards, stats, meters and steps, and rows. */
+const controlSheets = ['table.css', 'empty.css', 'notice.css', 'kbd.css', 'dialog-placement.css', 'header.css', 'drawer.css', 'footer.css', 'document.css', 'carousel.css', 'card.css', 'figures.css', 'row.css'];
 /** Sheets for writing that a product asks for by name, as a flag or in `styles`. */
 const writingSheets = { prose: 'prose.css', classless: 'one.semantic.css', cjk: 'cjk.css' };
 const askedSheets = options => Object.entries(writingSheets).filter(([flag]) => options[flag]).map(([, file]) => file);
@@ -41,8 +41,6 @@ const rootModules = {
   header: ['header.ts', 'drawer.ts'],
   /** Carousels and page dots on native markup (.ds-carousel, .ds-pagedots). */
   carousel: ['carousel.ts'],
-  /** Slides on native markup (.ds-slide): bleed, loop and autoplay; they scroll with the carousel's helpers. */
-  slide: ['slide.ts', 'carousel.ts'],
   /** The keyboard and pointer of a native tree (`connectTree`, for `.ds-tree` in row.css). */
   tree: ['tree.ts'],
   /** The theme module (light, dark, system in signals) with the head script it runs and its options' type; needs @lit-labs/signals. */

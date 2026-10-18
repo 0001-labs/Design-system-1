@@ -306,7 +306,7 @@ test("the script's words follow the language module, or the page's own", async (
   expect(dotsOf(document.querySelector(".ds-pagedots")!)[1]!.getAttribute("aria-label")).toBe("Card 2");
 });
 
-test("the dots and the carousel are drawn on the square, with no autoplay and motion only on transform", () => {
+test("the dots and the carousel are drawn on the square, autoplay is opt-in, and motion is only on transform", () => {
   const css = sheet("1-root/carousel.css").replace(/\/\*[\s\S]*?\*\//g, "");
   expect(css).toMatch(/\.ds-pagedots__dot \{[^}]*width: var\(--ds-unit\);[^}]*height: var\(--ds-unit\);/);
   expect(css).toMatch(/\.ds-carousel__controls \{[^}]*height: var\(--ds-row-height\);/);
@@ -315,5 +315,6 @@ test("the dots and the carousel are drawn on the square, with no autoplay and mo
   for (const [, value] of css.matchAll(/transition: ([^;]+);/g)) expect(value).toMatch(/^(transform [^,]+|none)$/);
   expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\) \{\s*\.ds-pagedots__dot::before \{\s*transition: none;/);
   expect(sheet("1-root/controls.css")).toContain('@import "./carousel.css";');
-  for (const file of ["0-face/carousel.ts", "3-unit/ds-carousel.ts"]) expect(sheet(file)).not.toMatch(/setInterval|autoplay="|autoplay:/);
+  expect(script.autoplayInterval(null)).toBe(0);
+  expect(sheet("3-unit/ds-carousel.ts")).toContain("this.autoplay = null;");
 });

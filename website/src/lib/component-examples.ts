@@ -389,8 +389,8 @@ matrix.marks = [
     height: 200,
   },
   'slide': {
-    title: 'Cards of any width, sliding sideways', hint: 'Swipe or scroll sideways, or use the buttons. Each card stops at the start.',
-    html: `<ds-slide label="Features" literal buttons>
+    title: 'A strip of cards of their own width', hint: 'slide-width="auto" gives each card its own width, several in view. Swipe or scroll sideways, or use the buttons; each card stops at the start.',
+    html: `<ds-carousel label="Features" literal slide-width="auto" no-dots buttons>
   <ds-card href="#lists" tone="sharp-blue" width="12" height="16" media="center">
     <span slot="label">Lists</span>
     <span slot="title">Everything on one grid</span>
@@ -411,12 +411,12 @@ matrix.marks = [
     <span slot="title">Dates in the dark</span>
     <span slot="media" style="display:block;width:calc(var(--ds-unit) * 8);height:calc(var(--ds-unit) * 10);border-radius:var(--ds-radius);background:var(--ds-sharp-blue)"></span>
   </ds-card>
-</ds-slide>`,
+</ds-carousel>`,
     height: 420,
   },
   'slide-loop': {
     title: 'Without an end, moving on by itself', hint: 'loop holds the cards three times over; autoplay moves on every five seconds, holds while you point, touch or focus, and always has a pause button.',
-    html: `<ds-slide label="Features" literal loop autoplay>
+    html: `<ds-carousel label="Features" literal slide-width="auto" loop autoplay>
   <ds-card href="#lists" tone="sharp-blue" width="12" height="16" media="center">
     <span slot="label">Lists</span>
     <span slot="title">Everything on one grid</span>
@@ -437,7 +437,7 @@ matrix.marks = [
     <span slot="title">Dates in the dark</span>
     <span slot="media" style="display:block;width:calc(var(--ds-unit) * 8);height:calc(var(--ds-unit) * 10);border-radius:var(--ds-radius);background:var(--ds-sharp-blue)"></span>
   </ds-card>
-</ds-slide>`,
+</ds-carousel>`,
     height: 420,
   },
   'stat': {
@@ -636,7 +636,7 @@ export const PAGE_EXAMPLES: Record<string, string[]> = {
   '2-core/cycle': ['cycle', 'language'],
   '2-core/gap': ['gap'],
   '3-unit/row': ['row', 'row-centered'], '3-unit/list': ['list'],
-  '3-unit/accordion': ['accordion'], '3-unit/form': ['form'], '3-unit/carousel': ['carousel', 'carousel-full'], '3-unit/slide': ['slide', 'slide-loop'],
+  '3-unit/accordion': ['accordion'], '3-unit/form': ['form'], '3-unit/carousel': ['carousel', 'carousel-full', 'slide', 'slide-loop'],
   '3-unit/calendar': ['calendar', 'calendar-compact', 'calendar-range', 'calendar-large'], '3-unit/date-picker': ['date-picker'], '3-unit/matrix': ['matrix'],
   '3-unit/table': ['table'],
   '4-page/container': ['container'], '4-page/grid': ['grid'],

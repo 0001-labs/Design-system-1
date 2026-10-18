@@ -14,9 +14,14 @@
 
 ::slotted(*) {
   box-sizing: border-box;
+  flex: none;
   min-width: 0;
   margin: 0;
   scroll-snap-align: start;
+}
+
+/* One slide to a stop; a strip of slides of their own width may pass a few. */
+:host(:not([slide-width="auto"])) ::slotted(*) {
   scroll-snap-stop: always;
 }
 
