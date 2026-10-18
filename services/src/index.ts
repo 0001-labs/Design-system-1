@@ -1,4 +1,5 @@
-import { featureFlags } from "./flags";
+import { WorkerEntrypoint } from "cloudflare:workers";
+import { featureFlags, manageFeatureFlags, setFeatureFlag } from "./flags";
 import { dashboard, DASHBOARD_HOST, ICON_HOST } from "./dashboard";
 import { libraryApi } from "./libraries";
 import { fontWorkspace } from "./fonts";
@@ -115,3 +116,9 @@ export default {
     return reportPage(response, url.pathname);
   },
 } satisfies ExportedHandler<Env>;
+
+/** Private RPC only. System authenticates the owner before calling this binding. */
+export class FeatureFlagsService extends WorkerEntrypoint<Env> {
+  async manage() { return manageFeatureFlags(this.env); }
+  async set(input: unknown) { return setFeatureFlag(this.env, input); }
+}

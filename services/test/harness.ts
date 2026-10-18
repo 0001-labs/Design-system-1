@@ -21,6 +21,7 @@ async function bundle(entry: string): Promise<string> {
   const result = await build({
     entryPoints: [fileURLToPath(new URL(entry, import.meta.url).href)],
     bundle: true,
+    external: ["cloudflare:workers"],
     platform: "browser",
     target: "es2022",
     format: "esm",
