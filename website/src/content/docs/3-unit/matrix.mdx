@@ -1,13 +1,13 @@
 ---
 title: Matrix
-description: Items on a board of whole squares, one square high and four wide, moved a square at a time.
+description: Rows against columns, one square where each pair meets, a mark in it saying how they meet.
 ---
 
 import ComponentExample from "../../../components/ComponentExample.astro";
 
-A matrix lays items out the way squared paper would: columns four squares wide, each item one square high, standing edge to edge with nothing between them. Every item is a box of hairlines centred on the grid lines, and where two boxes touch they share one line, so a column of items reads as one strip. A free square stays paper until the pointer rests on it, when a plus appears.
+A matrix sets one list against another: products against the parts they are made of, people against the projects they work on. Each pair meets in a square, and a mark in the square says how. Read across a row for what it has, and down a column for who has it.
 
-Items move a square at a time: dragged, they land on the nearest whole square; an item that lands on another swaps places with it.
+Columns stand in groups. A group's colour fills its bar and tints the squares below it, and each column's name rises at 45° from the middle of its square, so many narrow columns can still be named. Under the pointer or the keyboard, the row and the column light up as a crosshair.
 
 ## Try it
 
@@ -16,97 +16,94 @@ Items move a square at a time: dragged, they land on the nearest whole square; a
 ## Use it
 
 ```html
-<ds-matrix label="Groceries" literal columns="3" rows="8"></ds-matrix>
+<ds-matrix label="Products and parts" literal totals></ds-matrix>
 ```
 
 ```js
 const matrix = document.querySelector("ds-matrix");
-matrix.items = [
-  { id: "fruit", title: "Fruit", column: 0, row: 0, header: true },
-  { id: "apples", title: "Apples", column: 0, row: 1, starred: true },
-  { id: "plums", title: "Plums", column: 0, row: 2, completed: true },
+matrix.groups = [
+  { id: "stack", label: "Stack", color: "var(--ds-orange)" },
+  { id: "parts", label: "Parts", color: "var(--ds-pink)" },
 ];
-matrix.addEventListener("move", event => save(event.detail.moves));
-matrix.addEventListener("cell-press", event => add(event.detail)); // { column, row }
+matrix.columns = [
+  { id: "typescript", label: "TypeScript", group: "stack" },
+  { id: "sign-in", label: "Sign-in", group: "parts" },
+];
+matrix.rows = [{ id: "atlas", label: "Atlas" }, { id: "harbor", label: "Harbor" }];
+matrix.cells = [
+  { row: "atlas", column: "typescript", mark: "fill" },
+  { row: "atlas", column: "sign-in", mark: "triangle", note: "From the shared source" },
+];
+matrix.marks = [
+  { mark: "fill", label: "Uses" },
+  { mark: "triangle", label: "Shares one copy" },
+];
+matrix.addEventListener("cell-press", event => open(event.detail.row, event.detail.column));
 ```
 
-`move` comes before the items move and can be cancelled; once it has passed, `items` holds the new places. Keep the page's own copy in step from `event.detail.moves`, each `{ id, from, to }`, the swapped item included.
+A column without a group stands after the groups, untinted. `marks` names what each mark means: it is drawn as the legend below, and gives each square its name ("Atlas, Sign-in: Shares one copy").
 
-| Measure | Size |
+## Marks
+
+| Mark | Drawn as |
 | --- | --- |
-| A column | Four squares (`column-width`), with nothing between columns. |
-| An item | One square high, the column's width; its box a 1px line centred on the grid lines, shared with the item beside or below. |
-| Words | On the lower sixteen, 4px from the item's start, fading over its last 12px instead of being cut. |
-| A header | Filled with the accent (or its `color`), lettered in the ink. |
-| A star | The item's first square, filled with the accent, the star icon on its sixteen, a line after it. |
-| Done | Struck through and at 55%. |
-| Selected | A tint of the accent (22%), its whole box in the accent. |
-| A free square | Paper; a plus of two 10px lines in the title grey after the pointer rests 300ms. |
-| Rows | At least `rows` (eight), and always one spare below the last item. |
+| `fill` | The square filled with its column's colour. |
+| `outline` | A 1px outline in a darker shade of the colour, over a lighter fill. |
+| `stripes` | Diagonal stripes in the darker shade, on a 4px tile that runs on from square to square. |
+| `triangle` | A small triangle in the darker shade. |
+| `dot` | A small dot in the darker shade. |
+| `dash` | A short dash in the title grey: the pair does not apply. It is not counted. |
 
-`rounded` gives the corners a box does not share the system's 4px, so a strip of items rounds only at its ends.
+The darker shade is the column's colour mixed with the ink, so a column of marks stays calm instead of turning black.
 
-## Items
+## Measures
 
-| Field | What it is |
+| Thing | Size |
 | --- | --- |
-| `id` | The item's own name, given back in every event. |
-| `title` | Its words. |
-| `column`, `row` | Where it stands, from 0. Columns are named A, B, C… and rows from 1 to people (`B3`). |
-| `header` | It heads what is below it. |
-| `starred` | Marked with a star. |
-| `completed` | Done. |
-| `color` | A token or colour for a header's fill. Take it from the palette. |
-
-`planMove(items, ids, by, columns)` and `columnName(column)` are exported for a page that moves items itself.
-
-## Selecting and moving
-
-- Shift-click or ⌘-click (Ctrl-click) adds an item to the selection or takes it out; ⌘A selects every item and Escape clears the selection.
-- Dragging a selected item carries the whole selection. A mouse or pen starts after 4px; a finger holds still for 400ms first, so a board can still be scrolled.
-- A group moves only onto free squares; a lone item swaps with the item where it lands. Nothing leaves the board's columns or goes above its first row.
+| A square | One square: 19px inside and a 1px line at its end and foot, so a mark fills the inside exactly. |
+| The row names | Eight squares (`names`), ending 4px clear of the squares, cut short with an ellipsis. |
+| A group's bar | One square high over its columns, its name in the ink on the sixteen, fading over its last 12px. |
+| The column names | Six squares high, rising at 45° from the middle of their square. |
+| The tint | The group's colour at 22% under its column names and squares. |
+| The outline | One 1px line round the squares, with the system's 4px corners. |
+| The totals | With `totals`, a last row counting each column's marks, in small type. |
+| The legend | Small type on one-square lines, starting where the squares start, each mark in a 16px box. |
 
 ## Accessibility
 
-- The board is a grid named by `label`, with one Tab stop. The arrow keys move between squares, Home and End to a column's first and last row, and with ⌘ (Ctrl) to the board's first and last square.
-- Enter or Space presses an item (`item-press`) or a free square (`cell-press`); Shift or ⌘ with Space selects. Alt with an arrow moves the selection, or the item in focus, a square, and the focus with it.
-- Each item is a grid cell named by its words, with `aria-selected`; a free square is named by its place, `B3`.
-- `readonly` leaves only the arrows and pressing.
+- The matrix is a grid named by `label`, with the column names as column headers and the row names as row headers.
+- One square holds the Tab stop. The arrow keys move between squares, Home and End to a row's first and last square, and with ⌘ (Ctrl) to the matrix's first and last.
+- Each square is named by its row, its column, its mark's meaning and its `note`; the same words show as its tooltip when the page loads the tooltips.
+- Enter or Space presses the square. Pressing a row's or a column's name fires `row-press` or `column-press`.
 
 ## API
 
 | Attribute | Type | Default | What it does |
 | --- | --- | --- | --- |
-| `columns` | number | `3` | Columns on the board. |
-| `rows` | number | `8` | Rows drawn at least. |
-| `column-width` | number | `4` | Squares per column. |
-| `label` | string | — | The board's name; `literal` shows it as written. |
-| `readonly` | boolean | `false` | Nothing moves, is selected or added. |
-| `rounded` | boolean | `false` | Rounds the corners a box does not share. |
+| `label` | string | — | The grid's name; `literal` shows it as written. |
+| `totals` | boolean | `false` | A last row counting each column's marks. |
+| `totals-label` | string | The shared word "Total" | That row's name. |
+| `names` | number | `8` | Squares for the row names. |
 
 | Property | Type | What it is |
 | --- | --- | --- |
-| `items` | `MatrixItem[]` | The items and where they stand. |
-| `selected` | `string[]` | The ids of the selected items. |
+| `rows` | `{ id, label }[]` | The rows. |
+| `columns` | `{ id, label, group? }[]` | The columns. |
+| `groups` | `{ id, label, color }[]` | The column groups, in order. Take the colours from the palette. |
+| `cells` | `{ row, column, mark, note? }[]` | The marks. |
+| `marks` | `{ mark, label }[]` | The legend. |
 
 | Event | Detail | What it means |
 | --- | --- | --- |
-| `item-press` | `{ item }` | An item was pressed. |
-| `cell-press` | `{ column, row }` | A free square was pressed. |
-| `select` | `{ ids }` | The selection changed. |
-| `move` | `{ moves }` | Items are about to move. Cancel it to keep them. |
-
-| Method | What it does |
-| --- | --- |
-| `moveItems(ids, by)` | Moves items `by` `{ column, row }` squares, as a drag does. |
+| `cell-press` | `{ row, column, cell }` | A square was pressed; `cell` is undefined when it is empty. |
+| `row-press` | `{ row }` | A row's name was pressed. |
+| `column-press` | `{ column }` | A column's name was pressed. |
 
 | Part | What it is |
 | --- | --- |
-| `board` | The grid. |
-| `item` | An item; also `header`, `starred` and `completed`. |
-| `free` | A free square. |
+| `grid`, `group`, `column`, `name`, `cell`, `count`, `legend` | The pieces above. |
 
 | Custom property | Default | What it sets |
 | --- | --- | --- |
-| `--ds-matrix-line-color` | `var(--ds-border-color)` | The items' lines. |
-| `--ds-matrix-header-fill` | `var(--ds-accent-color)` | A header without a colour. |
+| `--ds-matrix-line` | `var(--ds-border-color)` | The squares' lines and the outline. |
+| `--ds-matrix-colour` | `var(--ds-accent-color)` | A column's colour when it has no group. |
