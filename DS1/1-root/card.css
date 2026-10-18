@@ -4,7 +4,7 @@
  * A card, as plain classes on native elements.
  *
  * A card holds one thing on a fill of its own: its name in the muted ink on
- * one square, a title in the display size on lines of two squares, writing,
+ * one square, a title in the display size on lines of a square and a half, writing,
  * and a picture of it (`ds-card__media`) a square below, which can run off
  * the card's foot and end edge and be cut there, never framed. Its size is
  * given in whole squares, its padding one square, its corners a card's
@@ -20,7 +20,7 @@
  *                                `ink` for the ink with the paper's words
  *   ds-card--outlined            a 1px line and no fill
  *   ds-card__label               its name, muted, on one square
- *   ds-card__title               the title, display size, two squares a line
+ *   ds-card__title               the title, display size, a square and a half a line
  *   ds-card__body                writing, one square a line
  *   ds-card__media               the picture, a square below the words
  *   ds-card__media--center       standing in the card's middle
@@ -105,7 +105,8 @@
   font-family: var(--ds-typeface-medium);
   font-size: var(--ds-type-size-display);
   font-weight: var(--ds-type-weight-bold);
-  line-height: calc(2 * var(--ds-unit));
+  /* A title that wraps keeps its lines together: a square and a half each. */
+  line-height: calc(1.5 * var(--ds-unit));
   letter-spacing: calc(var(--ds-display-text-tracking, -0.4px) * var(--ds-sf, 1));
   text-wrap: balance;
 }

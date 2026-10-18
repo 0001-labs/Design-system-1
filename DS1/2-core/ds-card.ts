@@ -41,7 +41,7 @@ type Slot = "label" | "title" | "media";
  * @prop {boolean} disabled - Neither pressed nor followed.
  *
  * @slot label - The thing's name, muted, on one square.
- * @slot title - The title, display size, two squares a line.
+ * @slot title - The title, display size, a square and a half a line.
  * @slot - Writing, one square a line.
  * @slot media - A picture of it, a square below the words; it may run off
  *   the card's foot and end edge and is cut there.
