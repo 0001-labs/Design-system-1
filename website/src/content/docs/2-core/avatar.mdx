@@ -5,6 +5,8 @@ description: A person's or workspace's mark, one control high, round or square.
 
 import ComponentExample from "../../../components/ComponentExample.astro";
 
+<ComponentExample example="avatar-borderless" />
+
 <ComponentExample example="avatar" />
 
 `ds-avatar` draws a person or a workspace: a picture, an initial or an icon in a
@@ -37,6 +39,9 @@ with the `ds-avatar` class and `ds-avatar--square`; see
 [Native controls](/1-root/native-controls/#avatar).
 
 ## Colour
+
+A filled avatar has no outline by default. Use `color` with a single initial
+for the solid circles above; add `outlined` only when a border is wanted.
 
 There are two ways to colour an avatar:
 
