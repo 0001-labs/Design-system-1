@@ -1,0 +1,76 @@
+---
+title: Date picker
+description: A field that opens a small month below it; choosing a day closes it.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+A date picker is a field one control high with the calendar icon at its start and the down arrow at its end. Pressing it opens the [compact month](/3-unit/calendar/#compact) half a square below, on the menu's frame; choosing a day writes it in the field, in the current language, and closes the month. A form takes the day as `YYYY-MM-DD`, as a native date field sends it.
+
+## Try it
+
+<ComponentExample example="date-picker" />
+
+## Use it
+
+```html
+<form>
+  <ds-date-picker name="due" label="Due" literal min="2026-10-01"></ds-date-picker>
+</form>
+```
+
+```js
+picker.addEventListener("change", event => {
+  console.log(event.detail.value); // "2026-10-18", or "" when cleared
+});
+```
+
+| Measure | Size |
+| --- | --- |
+| The field | The select's face: one control high at the foot of its square, eight squares wide (`--ds-date-picker-width`). |
+| The month | Seven squares wide and eight high: the month and arrows, the weekday letters, six weeks. |
+| Below it | Today and, once a day is chosen, Clear, on one square. |
+| The frame | A 1px line with half a square inside it, no shadow: eight squares by ten. |
+| Its place | Half a square below the field, or above it when there is more room there, kept on screen. |
+
+The month opens on the chosen day's month, or today's. `length` writes the day `short`, `medium` (the default) or `long`; before a day is chosen the field reads `placeholder`, the shared words "Choose a date" by default, in the title grey.
+
+`required` leaves Clear out and tells the form a day is missing. `min` and `max` limit the days, which also turns off Today when it is outside them. A form's reset puts back the day the field started with.
+
+## Accessibility
+
+- The field is a button with `aria-haspopup="dialog"` and `aria-expanded`, named by `label` and the chosen day.
+- Enter, Space or the down arrow opens the month with the focus on the chosen day (or today); a click opens it and leaves the focus on the field.
+- In the month, the arrow keys, Home, End, Page Up and Page Down move as in the [calendar](/3-unit/calendar/#accessibility); Enter or Space chooses a day.
+- Escape, a press outside, or the focus leaving closes the month, and the focus goes back to the field.
+
+## API
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `value` | string | `""` | The chosen day, `YYYY-MM-DD`. |
+| `name` | string | — | The form field's name. |
+| `label` | string | The shared word "Date" | The field's name; `literal` shows it as written. |
+| `placeholder` | string | "Choose a date" | The words before a day is chosen. |
+| `length` | string | `medium` | How the day is written. |
+| `min`, `max` | string | — | The days a person may choose. |
+| `week-start` | string | The language's | The week's first day. |
+| `today` | string | The reader's today | The day drawn as today. |
+| `required` | boolean | `false` | A form needs a day. |
+| `disabled` | boolean | `false` | The field cannot be opened. |
+| `open` | boolean | `false` | The month is open. |
+
+| Event | Detail | What it means |
+| --- | --- | --- |
+| `change`, `input` | `{ value, previous }` | A person chose or cleared a day. |
+| `ds-date-picker-toggle` | `{ open }` | The month opened or closed. |
+
+| Method | What it does |
+| --- | --- |
+| `show()`, `hide()` | Opens or closes the month. |
+
+| Part | What it is |
+| --- | --- |
+| `trigger` | The field. |
+| `popover` | The frame around the month. |
+| `footer` | The row of Today and Clear. |

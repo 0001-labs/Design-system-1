@@ -1,0 +1,78 @@
+/* ds-date-picker.css
+ * The field is the select's face: one control high at the foot of its
+ * square, eight squares wide by default, the calendar icon on its first
+ * sixteen and the down arrow at its end. The month opens on the menu's frame:
+ * a 1px line, half a square inside it, no shadow, half a square from the
+ * field. Inside, the compact month (seven squares wide, eight high) and one
+ * square of Today and Clear: eight squares by ten in all. */
+
+:host {
+  --ds-date-picker-width: calc(8 * var(--ds-unit));
+  --ds-date-picker-gap: calc(var(--ds-unit) / 2);
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: flex-end;
+  vertical-align: bottom;
+  height: var(--ds-unit);
+  color: var(--ds-text-color);
+  font-family: var(--ds-typeface-regular);
+  font-size: var(--ds-type-size-default);
+  line-height: var(--ds-type-lineheight-default);
+}
+:host([hidden]) { display: none !important; }
+
+.trigger {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: calc(4px * var(--ds-sf, 1));
+  width: var(--ds-date-picker-width);
+  padding-inline: 0 calc(4px * var(--ds-sf, 1));
+  text-align: start;
+  cursor: pointer;
+}
+.trigger:disabled { cursor: default; }
+.trigger .icon,
+.trigger .arrow { flex: 0 0 auto; }
+.trigger .text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.trigger[data-empty] .text { color: var(--ds-title-color); }
+.trigger[aria-expanded="true"] .arrow { transform: rotate(180deg); }
+
+/* The month, on the menu's frame. */
+.popover {
+  position: fixed;
+  inset: auto;
+  box-sizing: border-box;
+  margin: 0;
+  padding: calc(var(--ds-unit) / 2 - 1px);
+  border: 1px solid var(--ds-border-color);
+  border-radius: var(--ds-radius-card);
+  background: var(--ds-paper);
+  color: var(--ds-text-color);
+  box-shadow: none;
+  overflow: visible;
+}
+.popover:not(:popover-open) { display: none; }
+
+.footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: var(--ds-unit);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .popover:popover-open {
+    animation: ds-date-picker-in 140ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .trigger .arrow { transition: transform 140ms ease; }
+}
+@keyframes ds-date-picker-in {
+  from { opacity: 0; transform: translateY(calc(-4px * var(--ds-sf, 1))); }
+  to { opacity: 1; transform: none; }
+}

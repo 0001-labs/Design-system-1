@@ -1,0 +1,159 @@
+---
+title: Calendar
+description: Days on whole squares, two ways — a month four squares a day, or months side by side as squares — plus the small month a date picker opens.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+There are two calendars, drawn from the same days and keys.
+
+- **`ds-calendar`** draws a month the way a list draws its items: seven days across, a week to a row, each day a hairline box four squares wide and four high. Its date stands on the first square, two lines of events below it and one square to spare. With `compact`, a day is one square and the month becomes the small one a [date picker](/3-unit/date-picker/) opens, or one of twelve in a year.
+- **`ds-calendar-large`** draws months side by side as squares: a week to a column and the seven days down it, one and a half times the grid, in a rounded frame that scrolls sideways. A day on which something happens is filled with its colour, so a long piece of work reads as a band across the weeks.
+
+## Try it
+
+<ComponentExample example="calendar" />
+
+<ComponentExample example="calendar-compact" compact />
+
+<ComponentExample example="calendar-large" />
+
+## A month
+
+```html
+<ds-calendar month="2026-10" selectable week-numbers></ds-calendar>
+```
+
+```js
+const calendar = document.querySelector("ds-calendar");
+calendar.events = [
+  { title: "Design review", start: "2026-10-03", time: "10:00", color: "var(--ds-zenith-blue)" },
+  { title: "Launch", start: "2026-10-12", end: "2026-10-14", color: "var(--ds-apple-green)" },
+];
+calendar.addEventListener("change", event => console.log(event.detail.value));
+```
+
+| Measure | Size |
+| --- | --- |
+| A day | Four squares wide (`day-width`), its date's square, `lines` squares of events (two), and one square to spare. |
+| The title and arrows | One square, one square above the days. The arrows and Today stand at the end, the arrows a square each. |
+| The weekday names | One square, in the title grey, at the start of each day. |
+| A date | At the end of its first square, in the title grey, tabular figures. |
+| Today | A disc nine tenths of a square across, in red for blood, the date in white. |
+| The selected day | The same disc in the ink, the date in the paper. |
+| An event | One square, drawn one pixel short, its words 4px from its edges; the time first, fainter. Filled with its `color` or the fill. |
+| More events than lines | The last line says `+2`; pressing it lays the day's events over the days below. |
+| A week number | `W42` in the compressed face, at the start of the week's first day, with `week-numbers`. |
+| Lines | 1px in the line colour, centred on the grid lines. |
+
+A day outside the month is an empty box. `fixed` always draws six weeks, so moving between months never changes the calendar's height.
+
+### Compact
+
+`compact` makes every day one square: the date centred in its square, the weekday names a letter each, the month's name shortened, no Today button and no events written out. When the calendar has events, a day with one keeps the ink and a day without falls back to the title grey, so a year of small months shows where things happened.
+
+## Months in squares
+
+```html
+<ds-calendar-large start="2026-09" months="6"></ds-calendar-large>
+```
+
+| Measure | Size |
+| --- | --- |
+| A day | One square times `scale` (one and a half: 30px). |
+| Lines | 1px times the scale, inside a frame whose corners are four tenths of a day. |
+| Words | The heading size times the scale (19.5px). |
+| The weekday names | Down the start, outside the scroll, every other one named; a letter each on a narrow screen. |
+| The months | Each name over the week holding its first day; January and the first month carry the year. |
+| A date | Written only on today, the selected day, and where an event starts or ends. |
+| Today | A disc nine tenths of a day across in red for blood; the selected day a square of the ink. |
+| A filled day | The event's `color`, Apple green by default; days two or more events share are split into equal bands. |
+
+The title names the month at the start of the view as it scrolls. The arrows move a month at a time and Today scrolls to today's month; past the months drawn, `start` moves with them and `navigate` says so.
+
+## Events
+
+Both calendars take the same events, as a property:
+
+| Field | What it is |
+| --- | --- |
+| `title` | What happens. |
+| `start` | The first day, `YYYY-MM-DD`. |
+| `end` | The last day, for something over several days. |
+| `time` | When it starts, written before the title in a month. |
+| `color` | A token or colour for its fill. Take it from the palette. |
+| `id` | Anything the page needs back; the calendar leaves it alone. |
+
+A day lists its events longest first, then by time.
+
+## Days and weeks
+
+A day is written `YYYY-MM-DD` and stays on its date in every time zone. The week starts where the language starts it (Monday in most of Europe, Sunday in the United States and Japan); `week-start` sets it, `0`–`6` from Sunday or a day's English name. Month and weekday names come from the current language.
+
+`min` and `max` limit the days a person may choose: the days outside them are drawn faint and cannot be selected. `today` draws another day as today, for a preview or a test.
+
+The day arithmetic the calendars use is `DS1/0-face/calendar.ts`, plain TypeScript without Lit: `monthWeeks`, `addDays`, `addMonths`, `firstWeekday`, `weekdayNames`, `isoWeek`, `eventsByDay` and the rest.
+
+## Accessibility
+
+- Each calendar is a grid named by its month (or `label`), with one Tab stop on a day: the one moved to, the selected day, today, or the first.
+- The arrow keys move a day, or a week across the weeks; Home and End go to the week's first and last day; Page Up and Page Down move a month, with Shift a year. A month moves on when the focus leaves it, and right to left the arrows turn round.
+- Enter or Space presses the day. Each day is labelled with its whole date and what happens on it, and today is `aria-current="date"`; a selectable calendar marks the selected day with `aria-selected`.
+- The arrows are named "Previous month" and "Next month", and the month's name is announced when it changes. All the words are the shared words, in every language.
+
+## API
+
+### `ds-calendar`
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `month` | string | The value's month, or today's | The month shown, `YYYY-MM`. |
+| `value` | string | `""` | The selected day. |
+| `selectable` | boolean | `false` | Pressing a day selects it. |
+| `compact` | boolean | `false` | One square per day. |
+| `day-width` | number | `4` (`1` compact) | Squares per day. |
+| `lines` | number | `2` | Lines of events under a date. |
+| `week-numbers` | boolean | `false` | The week's number on its first day. |
+| `fixed` | boolean | `false` | Always six weeks. |
+| `no-header` | boolean | `false` | Leave out the title and arrows. |
+| `no-today` | boolean | `false` | Leave out the Today button. |
+| `min`, `max` | string | — | The days a person may choose. |
+| `week-start` | string | The language's | The week's first day. |
+| `today` | string | The reader's today | The day drawn as today. |
+| `label` | string | The month | The grid's name; `literal` shows it as written. |
+
+### `ds-calendar-large`
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `start` | string | The month before today's | The first month drawn, `YYYY-MM`. |
+| `months` | number | `6` | How many months are drawn. |
+| `scale` | number | `1.5` | How many times the grid it is drawn. |
+| `value`, `selectable`, `min`, `max`, `week-start`, `today`, `label`, `no-header` | | | As in a month. |
+
+| Event | Detail | What it means |
+| --- | --- | --- |
+| `day-press` | `{ day, events }` | A day was pressed, or chosen with Enter or Space. Cancel it to keep a selectable calendar's value. |
+| `change` | `{ value, previous }` | A person selected a day. |
+| `event-press` | `{ event, day }` | An event was pressed (in a month). |
+| `navigate` | `{ month }` | A person moved to another month. |
+
+| Method | What it does |
+| --- | --- |
+| `previousMonth()`, `nextMonth()` | Moves a month, as the arrows do. |
+| `showToday()` | Brings today's month into view. |
+| `showMonth(month)` | Shows a month (`ds-calendar`). |
+
+| Part | What it is |
+| --- | --- |
+| `header`, `previous`, `next`, `today` | The title row and its buttons. |
+| `grid`, `weekdays` | The grid and its weekday names. |
+| `day`, `week`, `event`, `more` | A month's days, weeks, events and the `+2` line; a day also carries `today` and `selected`. |
+| `cell`, `frame`, `scroller` | The large calendar's days, frame and scroller. |
+
+| Custom property | Default | What it sets |
+| --- | --- | --- |
+| `--ds-calendar-today` | `var(--ds-red-for-blood)` | Today's disc. |
+| `--ds-calendar-event-fill` | The fill (Apple green in the large calendar) | An event without a colour. |
+| `--ds-calendar-line` | `1px solid var(--ds-border-color)` | A month's lines. |
+| `--ds-calendar-ink` | `var(--ds-text-color)` | The large calendar's lines and selected day. |

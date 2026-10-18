@@ -1,5 +1,5 @@
 import { mountChartExample } from './chart-example';
-import { EXAMPLES, TABLE_DATA, TABLE_FOOTER } from './component-examples';
+import { EXAMPLES, TABLE_DATA, TABLE_FOOTER, calendarEvents } from './component-examples';
 import type { DsTable } from '../../../DS1/3-unit/ds-table';
 import type { TreeItem } from '../../../DS1/3-unit/ds-tree';
 
@@ -64,6 +64,17 @@ sample.addEventListener('select', event => {
 });
 sample.addEventListener('change', event => {
   if ((event.target as HTMLElement).localName === 'ds-carousel') output.textContent = `change: ${(event as CustomEvent).detail.index}`;
+});
+// The calendars hold the events their published scripts show, in the month being read.
+sample.querySelectorAll('ds-calendar:not([compact])').forEach(calendar => { (calendar as HTMLElement & { events: unknown }).events = calendarEvents('month'); });
+sample.querySelectorAll('ds-calendar-large').forEach(calendar => { (calendar as HTMLElement & { events: unknown }).events = calendarEvents('large'); });
+for (const name of ['day-press', 'event-press', 'navigate']) sample.addEventListener(name, event => {
+  const detail = (event as CustomEvent).detail;
+  output.textContent = `${name}: ${detail.day ?? detail.month ?? ''}${detail.event ? ` ${detail.event.title}` : ''}`;
+});
+sample.addEventListener('change', event => {
+  const target = (event.target as HTMLElement).localName;
+  if (target === 'ds-calendar' || target === 'ds-calendar-large' || target === 'ds-date-picker') output.textContent = `change: ${(event as CustomEvent).detail.value || '(cleared)'}`;
 });
 sample.addEventListener('form-invalid', () => { output.textContent = 'form-invalid: fill in the required field.'; });
 for (const name of ['change', 'press']) sample.addEventListener(name, event => {

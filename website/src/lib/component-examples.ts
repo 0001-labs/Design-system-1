@@ -14,6 +14,30 @@ export const TABLE_DATA = [
 ];
 export const TABLE_FOOTER = { product: "Total", users: 264 };
 
+/** The examples' events, in the month being read so a calendar always has some. */
+export function calendarEvents(kind: 'month' | 'large') {
+  const now = new Date();
+  const month = (offset: number) => {
+    const at = new Date(now.getFullYear(), now.getMonth() + offset, 1);
+    return `${at.getFullYear()}-${String(at.getMonth() + 1).padStart(2, '0')}`;
+  };
+  const m = month(0);
+  if (kind === 'large') return [
+    { title: 'Identity', start: `${month(-1)}-08`, end: `${m}-06`, color: 'var(--ds-zenith-blue)' },
+    { title: 'Website', start: `${m}-02`, end: `${month(1)}-13`, color: 'var(--ds-apple-green)' },
+    { title: 'Campaign', start: `${month(1)}-09`, end: `${month(2)}-04`, color: 'var(--ds-pink)' },
+    { title: 'Print run', start: `${month(2)}-16`, end: `${month(2)}-20`, color: 'var(--ds-orange)' },
+  ];
+  return [
+    { title: 'Design review', start: `${m}-03`, time: '10:00', color: 'var(--ds-zenith-blue)' },
+    { title: 'Launch', start: `${m}-12`, end: `${m}-14`, color: 'var(--ds-apple-green)' },
+    { title: 'Dentist', start: `${m}-12`, time: '08:30' },
+    { title: 'Dinner', start: `${m}-12`, time: '19:00', color: 'var(--ds-pink)' },
+    { title: 'Retreat', start: `${m}-21`, end: `${m}-24`, color: 'var(--ds-orange)' },
+    { title: 'Invoices', start: `${m}-27` },
+  ];
+}
+
 // The preview and the copyable code use the same source. These are local
 // examples only; no sample sends a request to a product's backend.
 export const EXAMPLES: Record<string, ComponentExample> = {
@@ -238,6 +262,43 @@ render();`,
 <ds-pagedots count="4" active="0" end></ds-pagedots>`,
     height: 140,
   },
+  'calendar': {
+    title: 'A month, four squares a day', hint: 'Press a day to select it, or move with the arrow keys and Page Up and Page Down. The third event on a day folds into +2; press it to unfold them.',
+    html: `<ds-calendar selectable week-numbers></ds-calendar>`,
+    script: `const calendar = document.querySelector('ds-calendar');
+calendar.events = [
+  { title: 'Design review', start: '2026-10-03', time: '10:00', color: 'var(--ds-zenith-blue)' },
+  { title: 'Launch', start: '2026-10-12', end: '2026-10-14', color: 'var(--ds-apple-green)' },
+  { title: 'Dentist', start: '2026-10-12', time: '08:30' },
+  { title: 'Dinner', start: '2026-10-12', time: '19:00', color: 'var(--ds-pink)' },
+];
+calendar.addEventListener('change', event => console.log(event.detail.value));`,
+    height: 620,
+  },
+  'calendar-compact': {
+    title: 'A small month, one square a day', hint: 'compact draws the month a date picker opens. With events, the days that have one keep the ink.',
+    html: `<ds-calendar compact selectable fixed></ds-calendar>`,
+    height: 280,
+  },
+  'calendar-large': {
+    title: 'Months in squares', hint: 'Weeks run sideways and the days down them. Scroll, or use the arrows and Today; a day several things share is split into bands.',
+    html: `<ds-calendar-large months="6" selectable></ds-calendar-large>`,
+    script: `const calendar = document.querySelector('ds-calendar-large');
+calendar.events = [
+  { title: 'Identity', start: '2026-09-08', end: '2026-10-06', color: 'var(--ds-zenith-blue)' },
+  { title: 'Website', start: '2026-10-02', end: '2026-11-13', color: 'var(--ds-apple-green)' },
+  { title: 'Campaign', start: '2026-11-09', end: '2026-12-04', color: 'var(--ds-pink)' },
+];`,
+    height: 420,
+  },
+  'date-picker': {
+    title: 'Pick a date from a drop-down', hint: 'Open it with a click, Enter or the down arrow; the arrow keys move between days, Enter chooses one and Escape closes it.',
+    html: `<div style="display:flex;flex-wrap:wrap;gap:var(--ds-unit)">
+  <ds-date-picker label="Due" literal name="due"></ds-date-picker>
+  <ds-date-picker label="Starts" literal name="starts" value="2026-10-18" length="long"></ds-date-picker>
+</div>`,
+    height: 420,
+  },
   'carousel': {
     title: 'Slides twelve squares wide', hint: 'Swipe or scroll sideways, or use the buttons and the dots. Moving to another slide fires change.',
     html: `<ds-carousel label="Colours" literal slide-width="12" buttons>
@@ -441,6 +502,7 @@ export const PAGE_EXAMPLES: Record<string, string[]> = {
   '2-core/gap': ['gap'],
   '3-unit/row': ['row', 'row-centered'], '3-unit/list': ['list'],
   '3-unit/accordion': ['accordion'], '3-unit/form': ['form'], '3-unit/carousel': ['carousel', 'carousel-full'],
+  '3-unit/calendar': ['calendar', 'calendar-compact', 'calendar-large'], '3-unit/date-picker': ['date-picker'],
   '3-unit/table': ['table'],
   '4-page/container': ['container'], '4-page/grid': ['grid'],
   '4-page/layout': ['layout', 'page'], '4-page/layouts': ['page'],

@@ -129,7 +129,9 @@ export default defineConfig({
           items: [
             { label: "Accordion", slug: "3-unit/accordion" },
             { label: "Card", slug: "3-unit/card" },
+            { label: "Calendar", slug: "3-unit/calendar" },
             { label: "Carousel", slug: "3-unit/carousel" },
+            { label: "Date picker", slug: "3-unit/date-picker" },
             { label: "Form", slug: "3-unit/form" },
             { label: "List", slug: "3-unit/list" },
             { label: "Navigation", slug: "3-unit/navigation" },

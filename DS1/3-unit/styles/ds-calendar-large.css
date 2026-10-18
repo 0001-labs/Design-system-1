@@ -1,0 +1,161 @@
+/* ds-calendar-large.css
+ * The grid drawn --ds-calendar-scale times (one and a half by default): a
+ * cell is a square of 30px, its lines 1.5px, its words the heading size
+ * times the scale (19.5px). Weeks run in columns and the days down them; the
+ * frame's corners are four tenths of a cell. Today is a red disc nine tenths
+ * of a cell across, the selected day an ink square of the same size. */
+
+:host {
+  --ds-calendar-cell: calc(var(--ds-unit) * var(--ds-calendar-scale, 1.5));
+  --ds-calendar-stroke: calc(1px * var(--ds-calendar-scale, 1.5));
+  --ds-calendar-ink: var(--ds-text-color);
+  --ds-calendar-event-fill: var(--ds-apple-green);
+  --ds-calendar-today: var(--ds-red-for-blood);
+  --ds-calendar-today-ink: var(--ds-white, #fff);
+  --ds-calendar-mark: calc(var(--ds-calendar-cell) * 0.9);
+  --ds-calendar-corner: calc(var(--ds-calendar-cell) * 0.4);
+  --ds-calendar-rail: calc(var(--ds-calendar-cell) * 2);
+  box-sizing: border-box;
+  display: block;
+  min-width: 0;
+  color: var(--ds-text-color);
+  font-family: var(--ds-typeface-regular);
+  font-feature-settings: var(--ds-font-features);
+  font-size: calc(var(--ds-type-size-heading) * var(--ds-calendar-scale, 1.5));
+  font-weight: var(--ds-type-weight-default);
+  line-height: 1;
+  letter-spacing: var(--ds-type-letterspacing-default);
+}
+:host([hidden]) { display: none !important; }
+
+.calendar { min-width: 0; }
+
+/* The title and the arrows: one cell high, over the months. */
+.header {
+  display: flex;
+  align-items: flex-end;
+  gap: calc(4px * var(--ds-sf, 1));
+  height: var(--ds-calendar-cell);
+  margin-inline-start: calc(var(--ds-calendar-rail) + var(--ds-unit) / 2);
+  font-size: var(--ds-type-size-default);
+  line-height: var(--ds-type-lineheight-default);
+}
+.title {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  font-size: calc(var(--ds-type-size-heading) * var(--ds-calendar-scale, 1.5));
+  line-height: var(--ds-calendar-cell);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.controls { display: flex; flex: 0 0 auto; align-items: flex-end; gap: 1px; }
+:host(:dir(rtl)) .nav > ds-icon { transform: scaleX(-1); }
+
+.body {
+  display: grid;
+  grid-template-columns: var(--ds-calendar-rail) minmax(0, 1fr);
+  column-gap: calc(var(--ds-unit) / 2);
+}
+
+/* The weekdays down the start, outside the scroll: every other one named. */
+.rail {
+  display: grid;
+  grid-template-rows: repeat(7, var(--ds-calendar-cell));
+  padding-block-start: var(--ds-calendar-cell);
+  color: var(--ds-title-color);
+  font-size: var(--ds-type-size-default);
+  line-height: var(--ds-type-lineheight-default);
+}
+.weekday {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  white-space: nowrap;
+}
+
+.scroller {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.scroller::-webkit-scrollbar { display: none; }
+
+/* The months over their weeks, one cell high, their names on its foot. */
+.months {
+  display: grid;
+  grid-template-columns: repeat(var(--ds-calendar-weeks), var(--ds-calendar-cell));
+  height: var(--ds-calendar-cell);
+}
+.month {
+  display: flex;
+  align-items: flex-end;
+  min-width: 0;
+  padding: 0 var(--ds-calendar-stroke) calc(3px * var(--ds-calendar-scale, 1.5));
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* The frame: a line all round with rounded corners; the cells draw the lines inside. */
+.frame {
+  box-sizing: border-box;
+  width: max-content;
+  border: var(--ds-calendar-stroke) solid var(--ds-calendar-ink);
+  border-radius: var(--ds-calendar-corner);
+  overflow: hidden;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--ds-calendar-weeks), var(--ds-calendar-cell));
+  grid-template-rows: repeat(7, var(--ds-calendar-cell));
+}
+.row { display: contents; }
+.hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.cell {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ds-calendar-cell);
+  height: var(--ds-calendar-cell);
+  border-block-start: var(--ds-calendar-stroke) solid var(--ds-calendar-ink);
+  border-inline-start: var(--ds-calendar-stroke) solid var(--ds-calendar-ink);
+  background: var(--ds-calendar-cell-fill, transparent);
+  font-variant-numeric: tabular-nums;
+  outline: none;
+}
+.cell[data-first-row] { border-block-start-width: 0; }
+.cell[data-first-column] { border-inline-start-width: 0; }
+.cell[data-filled] { color: var(--ds-slate); }
+:host([selectable]) .cell:not([aria-disabled="true"]) { cursor: pointer; }
+:host([selectable]) .cell:not([aria-disabled="true"], [data-filled]):hover { background: var(--ds-row-fill-hover, var(--ds-fill)); }
+.cell:focus-visible { outline: 2px solid var(--ds-focus-ring); outline-offset: -3px; }
+.cell[aria-disabled="true"] { color: var(--ds-title-color); }
+
+.date {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--ds-calendar-mark);
+  height: var(--ds-calendar-mark);
+  letter-spacing: 0;
+}
+.cell[data-today] .date { border-radius: 999px; background: var(--ds-calendar-today); color: var(--ds-calendar-today-ink); }
+.cell[data-selected] .date { background: var(--ds-calendar-ink); color: var(--ds-paper); }
+.cell[data-today][data-selected] .date { border-radius: 999px; box-shadow: inset 0 0 0 var(--ds-calendar-stroke) var(--ds-calendar-today); }
+
+/* On a narrow screen the weekdays take one letter and one square. */
+@media (max-width: 720px) {
+  :host { --ds-calendar-rail: var(--ds-unit); }
+  .rail .weekday:not(:empty) { font-size: 0; }
+  .rail .weekday:not(:empty)::after { content: attr(data-narrow); font-size: var(--ds-type-size-default); }
+}

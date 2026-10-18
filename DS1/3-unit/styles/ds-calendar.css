@@ -1,0 +1,194 @@
+/* ds-calendar.css
+ * A month on whole squares. A day is --ds-calendar-day-squares wide (four,
+ * one when compact) and, beside its date's square, holds --ds-calendar-lines
+ * one-square lines of events and one square to spare. Every line of words
+ * stands on the lower sixteen of its square. The boxes are hairlines centred
+ * on the grid lines; today is a red disc nine tenths of a square across. */
+
+:host {
+  --ds-calendar-day: calc(var(--ds-unit) * var(--ds-calendar-day-squares, 4));
+  --ds-calendar-day-height: calc(var(--ds-unit) * (var(--ds-calendar-lines, 2) + 2));
+  --ds-calendar-line: 1px solid var(--ds-border-color);
+  --ds-calendar-today: var(--ds-red-for-blood);
+  --ds-calendar-today-ink: var(--ds-white, #fff);
+  --ds-calendar-mark: calc(var(--ds-unit) * 0.9);
+  --ds-calendar-pad: calc(4px * var(--ds-sf, 1));
+  box-sizing: border-box;
+  display: inline-block;
+  vertical-align: top;
+  color: var(--ds-text-color);
+  font-family: var(--ds-typeface-regular);
+  font-feature-settings: var(--ds-font-features);
+  font-size: var(--ds-type-size-default);
+  font-weight: var(--ds-type-weight-default);
+  line-height: var(--ds-type-lineheight-default);
+  letter-spacing: var(--ds-type-letterspacing-default);
+}
+:host([hidden]) { display: none !important; }
+:host([compact]) { --ds-calendar-day-height: var(--ds-unit); }
+
+.calendar { width: calc(7 * var(--ds-calendar-day)); }
+
+/* The title and the arrows: one square, one square above the days (none when compact). */
+.header {
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--ds-calendar-pad);
+  height: var(--ds-unit);
+  margin-block-end: var(--ds-unit);
+}
+:host([compact]) .header { margin-block-end: 0; }
+.title {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  font-family: var(--ds-typeface-medium, var(--ds-typeface-regular));
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.controls {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: flex-end;
+  gap: 1px;
+}
+/* An arrow takes its own square: its 16px face on the square's sixteen. */
+.nav { flex: 0 0 auto; }
+:host([compact]) .controls { gap: calc(var(--ds-unit) - var(--ds-control-height)); }
+:host(:dir(rtl)) .nav > ds-icon { transform: scaleX(-1); }
+
+.grid { outline: none; }
+.weekdays,
+.week {
+  display: grid;
+  grid-template-columns: repeat(7, var(--ds-calendar-day));
+}
+
+/* The weekday names: a block line in the title grey, at the start of a wide day, centred on a compact one. */
+.weekday {
+  box-sizing: border-box;
+  height: var(--ds-unit);
+  padding: calc(4px * var(--ds-sf, 1)) var(--ds-calendar-pad) 0;
+  overflow: hidden;
+  color: var(--ds-title-color);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+:host([compact]) .weekday { padding-inline: 0; text-align: center; }
+
+/* A day's box: hairlines on the grid lines, top and start; the last column
+ * and the last week close it at the end and the foot. */
+.day {
+  position: relative;
+  box-sizing: border-box;
+  min-width: 0;
+  height: var(--ds-calendar-day-height);
+  outline: none;
+}
+.day::after {
+  position: absolute;
+  inset: -0.5px;
+  border-block-start: var(--ds-calendar-line);
+  border-inline-start: var(--ds-calendar-line);
+  content: "";
+  pointer-events: none;
+}
+.day:nth-child(7)::after { border-inline-end: var(--ds-calendar-line); }
+.week:last-child .day::after { border-block-end: var(--ds-calendar-line); }
+:host([compact]) .day::after { content: none; }
+
+.day[data-day] { cursor: default; }
+:host([selectable]) .day[data-day]:not([aria-disabled="true"]) { cursor: pointer; }
+:host([selectable]:not([compact])) .day[data-day]:not([aria-disabled="true"]):hover { background: var(--ds-row-fill-hover, var(--ds-fill)); }
+.day:focus-visible { outline: 2px solid var(--ds-focus-ring); outline-offset: -2px; }
+:host([compact]) .day:focus-visible { outline: none; }
+:host([compact]) .day:focus-visible .date { outline: 2px solid var(--ds-focus-ring); outline-offset: -1px; }
+
+/* The date: on the first square, at the end of a wide day, in the title grey. */
+.date-line {
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: var(--ds-calendar-pad);
+  height: var(--ds-unit);
+  padding-inline: var(--ds-calendar-pad);
+}
+.date {
+  color: var(--ds-title-color);
+  font-variant-numeric: tabular-nums;
+}
+.week-number {
+  margin-inline-end: auto;
+  color: var(--ds-title-color);
+  font-family: var(--ds-typeface-compressed);
+}
+
+/* A compact day: the date centred in its square, in the ink; with events,
+ * the empty days fall back to the title grey and the busy ones keep the ink. */
+:host([compact]) .date-line { justify-content: center; padding: 0; }
+:host([compact]) .date { color: var(--ds-text-color); }
+:host([compact][data-events]) .day:not([data-busy]) .date { color: var(--ds-title-color); }
+:host([compact][selectable]) .day[data-day]:not([aria-disabled="true"], [data-today], [data-selected]):hover .date { background: var(--ds-fill); }
+
+/* Today and the selected day: a disc nine tenths of a square, centred on the date's square. */
+.day:is([data-today], [data-selected]) .date-line { align-items: center; padding-inline-end: calc(var(--ds-unit) * 0.05); }
+:host([compact]) .day:is([data-today], [data-selected]) .date-line { padding: 0; }
+.date {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--ds-calendar-mark);
+  height: var(--ds-calendar-mark);
+  border-radius: 999px;
+}
+.day:not([data-today], [data-selected]) .date { min-width: 0; height: auto; }
+:host([compact]) .day .date { min-width: var(--ds-calendar-mark); height: var(--ds-calendar-mark); }
+.day[data-today] .date { background: var(--ds-calendar-today); color: var(--ds-calendar-today-ink); letter-spacing: 0; }
+.day[data-selected] .date { background: var(--ds-text-color); color: var(--ds-paper); letter-spacing: 0; }
+.day[data-today][data-selected] .date { box-shadow: 0 0 0 1px var(--ds-paper), 0 0 0 2px var(--ds-calendar-today); }
+
+.day[aria-disabled="true"] .date { color: var(--ds-title-color); opacity: 0.5; }
+
+/* Events: one square each, stacked edge to edge on the day's lines, drawn one pixel short. */
+.events {
+  display: flex;
+  flex-direction: column;
+}
+.event,
+.more {
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--ds-calendar-pad);
+  height: calc(var(--ds-unit) - 1px);
+  margin: 0.5px;
+  padding-inline: var(--ds-calendar-pad);
+  overflow: hidden;
+  white-space: nowrap;
+}
+.event {
+  background: var(--ds-calendar-event-fill, var(--ds-fill));
+  color: var(--ds-calendar-event-ink, var(--ds-text-color));
+  cursor: pointer;
+}
+.event .name { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.event .time { flex: 0 0 auto; opacity: 0.6; font-variant-numeric: tabular-nums; }
+.more { color: var(--ds-title-color); cursor: pointer; }
+.more:hover { color: var(--ds-text-color); }
+
+/* A day whose hidden events are unfolded lays them over the days below. */
+.day[data-open] { z-index: 1; }
+.day[data-open] .events {
+  position: absolute;
+  inset-block-start: var(--ds-unit);
+  inset-inline: 0;
+  background: var(--ds-paper);
+  box-shadow: 0 0 0 1px var(--ds-border-color);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .event, .more { transition: opacity 120ms ease; }
+}

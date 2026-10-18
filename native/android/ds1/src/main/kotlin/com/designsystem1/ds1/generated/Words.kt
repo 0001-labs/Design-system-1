@@ -133,6 +133,11 @@ internal object DS1SharedWords {
         "key.end" to "End",
         "key.pageup" to "Page Up",
         "key.pagedown" to "Page Down",
+        "Previous month" to "Forrige måned",
+        "Next month" to "Næste måned",
+        "Choose a date" to "Vælg en dato",
+        "Date" to "Dato",
+        "W{week}" to "U{week}",
     )
 
     private fun deWords() = mapOf(
@@ -243,6 +248,11 @@ internal object DS1SharedWords {
         "key.end" to "Ende",
         "key.pageup" to "Bild auf",
         "key.pagedown" to "Bild ab",
+        "Previous month" to "Vorheriger Monat",
+        "Next month" to "Nächster Monat",
+        "Choose a date" to "Datum wählen",
+        "Date" to "Datum",
+        "W{week}" to "KW{week}",
     )
 
     private fun enWords() = mapOf(
@@ -353,6 +363,11 @@ internal object DS1SharedWords {
         "key.end" to "End",
         "key.pageup" to "PgUp",
         "key.pagedown" to "PgDn",
+        "Previous month" to "Previous month",
+        "Next month" to "Next month",
+        "Choose a date" to "Choose a date",
+        "Date" to "Date",
+        "W{week}" to "W{week}",
     )
 
     private fun esWords() = mapOf(
@@ -463,6 +478,11 @@ internal object DS1SharedWords {
         "key.end" to "Fin",
         "key.pageup" to "Re Pág",
         "key.pagedown" to "Av Pág",
+        "Previous month" to "Mes anterior",
+        "Next month" to "Mes siguiente",
+        "Choose a date" to "Elegir una fecha",
+        "Date" to "Fecha",
+        "W{week}" to "S{week}",
     )
 
     private fun fiWords() = mapOf(
@@ -573,6 +593,11 @@ internal object DS1SharedWords {
         "key.end" to "End",
         "key.pageup" to "Page Up",
         "key.pagedown" to "Page Down",
+        "Previous month" to "Edellinen kuukausi",
+        "Next month" to "Seuraava kuukausi",
+        "Choose a date" to "Valitse päivämäärä",
+        "Date" to "Päivämäärä",
+        "W{week}" to "Vk{week}",
     )
 
     private fun frWords() = mapOf(
@@ -683,6 +708,11 @@ internal object DS1SharedWords {
         "key.end" to "Fin",
         "key.pageup" to "Page préc.",
         "key.pagedown" to "Page suiv.",
+        "Previous month" to "Mois précédent",
+        "Next month" to "Mois suivant",
+        "Choose a date" to "Choisir une date",
+        "Date" to "Date",
+        "W{week}" to "S{week}",
     )
 
     private fun isWords() = mapOf(
@@ -786,6 +816,11 @@ internal object DS1SharedWords {
         "key.end" to "End",
         "key.pageup" to "Page Up",
         "key.pagedown" to "Page Down",
+        "Previous month" to "Fyrri mánuður",
+        "Next month" to "Næsti mánuður",
+        "Choose a date" to "Veldu dagsetningu",
+        "Date" to "Dagsetning",
+        "W{week}" to "V{week}",
     )
 
     private fun itWords() = mapOf(
@@ -896,6 +931,11 @@ internal object DS1SharedWords {
         "key.end" to "Fine",
         "key.pageup" to "Pag su",
         "key.pagedown" to "Pag giù",
+        "Previous month" to "Mese precedente",
+        "Next month" to "Mese successivo",
+        "Choose a date" to "Scegli una data",
+        "Date" to "Data",
+        "W{week}" to "S{week}",
     )
 
     private fun jaWords() = mapOf(
@@ -1006,6 +1046,11 @@ internal object DS1SharedWords {
         "key.end" to "End",
         "key.pageup" to "Page Up",
         "key.pagedown" to "Page Down",
+        "Previous month" to "前の月",
+        "Next month" to "次の月",
+        "Choose a date" to "日付を選択",
+        "Date" to "日付",
+        "W{week}" to "第{week}週",
     )
 
     private fun koWords() = mapOf(
@@ -1116,6 +1161,11 @@ internal object DS1SharedWords {
         "key.end" to "End",
         "key.pageup" to "Page Up",
         "key.pagedown" to "Page Down",
+        "Previous month" to "이전 달",
+        "Next month" to "다음 달",
+        "Choose a date" to "날짜 선택",
+        "Date" to "날짜",
+        "W{week}" to "{week}주",
     )
 
     private fun nbWords() = mapOf(
@@ -1226,6 +1276,11 @@ internal object DS1SharedWords {
         "key.end" to "End",
         "key.pageup" to "Page Up",
         "key.pagedown" to "Page Down",
+        "Previous month" to "Forrige måned",
+        "Next month" to "Neste måned",
+        "Choose a date" to "Velg en dato",
+        "Date" to "Dato",
+        "W{week}" to "U{week}",
     )
 
     private fun ptBRWords() = mapOf(
@@ -1336,6 +1391,11 @@ internal object DS1SharedWords {
         "key.end" to "End",
         "key.pageup" to "Page Up",
         "key.pagedown" to "Page Down",
+        "Previous month" to "Mês anterior",
+        "Next month" to "Próximo mês",
+        "Choose a date" to "Escolher uma data",
+        "Date" to "Data",
+        "W{week}" to "S{week}",
     )
 
     private fun ptWords() = mapOf(
@@ -1446,6 +1506,11 @@ internal object DS1SharedWords {
         "key.end" to "End",
         "key.pageup" to "Page Up",
         "key.pagedown" to "Page Down",
+        "Previous month" to "Mês anterior",
+        "Next month" to "Mês seguinte",
+        "Choose a date" to "Escolher uma data",
+        "Date" to "Data",
+        "W{week}" to "S{week}",
     )
 
     private fun svWords() = mapOf(
@@ -1556,6 +1621,11 @@ internal object DS1SharedWords {
         "key.end" to "End",
         "key.pageup" to "Page Up",
         "key.pagedown" to "Page Down",
+        "Previous month" to "Föregående månad",
+        "Next month" to "Nästa månad",
+        "Choose a date" to "Välj ett datum",
+        "Date" to "Datum",
+        "W{week}" to "V{week}",
     )
 
     private fun zhWords() = mapOf(
@@ -1666,6 +1736,11 @@ internal object DS1SharedWords {
         "key.end" to "End",
         "key.pageup" to "Page Up",
         "key.pagedown" to "Page Down",
+        "Previous month" to "上个月",
+        "Next month" to "下个月",
+        "Choose a date" to "选择日期",
+        "Date" to "日期",
+        "W{week}" to "第{week}周",
     )
 
 }

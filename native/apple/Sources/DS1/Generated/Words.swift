@@ -129,6 +129,11 @@ enum DS1SharedWords {
         "key.end": "End",
         "key.pageup": "Page Up",
         "key.pagedown": "Page Down",
+        "Previous month": "Forrige måned",
+        "Next month": "Næste måned",
+        "Choose a date": "Vælg en dato",
+        "Date": "Dato",
+        "W{week}": "U{week}",
     ]
 
     private static let deWords: [String: String] = [
@@ -239,6 +244,11 @@ enum DS1SharedWords {
         "key.end": "Ende",
         "key.pageup": "Bild auf",
         "key.pagedown": "Bild ab",
+        "Previous month": "Vorheriger Monat",
+        "Next month": "Nächster Monat",
+        "Choose a date": "Datum wählen",
+        "Date": "Datum",
+        "W{week}": "KW{week}",
     ]
 
     private static let enWords: [String: String] = [
@@ -349,6 +359,11 @@ enum DS1SharedWords {
         "key.end": "End",
         "key.pageup": "PgUp",
         "key.pagedown": "PgDn",
+        "Previous month": "Previous month",
+        "Next month": "Next month",
+        "Choose a date": "Choose a date",
+        "Date": "Date",
+        "W{week}": "W{week}",
     ]
 
     private static let esWords: [String: String] = [
@@ -459,6 +474,11 @@ enum DS1SharedWords {
         "key.end": "Fin",
         "key.pageup": "Re Pág",
         "key.pagedown": "Av Pág",
+        "Previous month": "Mes anterior",
+        "Next month": "Mes siguiente",
+        "Choose a date": "Elegir una fecha",
+        "Date": "Fecha",
+        "W{week}": "S{week}",
     ]
 
     private static let fiWords: [String: String] = [
@@ -569,6 +589,11 @@ enum DS1SharedWords {
         "key.end": "End",
         "key.pageup": "Page Up",
         "key.pagedown": "Page Down",
+        "Previous month": "Edellinen kuukausi",
+        "Next month": "Seuraava kuukausi",
+        "Choose a date": "Valitse päivämäärä",
+        "Date": "Päivämäärä",
+        "W{week}": "Vk{week}",
     ]
 
     private static let frWords: [String: String] = [
@@ -679,6 +704,11 @@ enum DS1SharedWords {
         "key.end": "Fin",
         "key.pageup": "Page préc.",
         "key.pagedown": "Page suiv.",
+        "Previous month": "Mois précédent",
+        "Next month": "Mois suivant",
+        "Choose a date": "Choisir une date",
+        "Date": "Date",
+        "W{week}": "S{week}",
     ]
 
     private static let isWords: [String: String] = [
@@ -782,6 +812,11 @@ enum DS1SharedWords {
         "key.end": "End",
         "key.pageup": "Page Up",
         "key.pagedown": "Page Down",
+        "Previous month": "Fyrri mánuður",
+        "Next month": "Næsti mánuður",
+        "Choose a date": "Veldu dagsetningu",
+        "Date": "Dagsetning",
+        "W{week}": "V{week}",
     ]
 
     private static let itWords: [String: String] = [
@@ -892,6 +927,11 @@ enum DS1SharedWords {
         "key.end": "Fine",
         "key.pageup": "Pag su",
         "key.pagedown": "Pag giù",
+        "Previous month": "Mese precedente",
+        "Next month": "Mese successivo",
+        "Choose a date": "Scegli una data",
+        "Date": "Data",
+        "W{week}": "S{week}",
     ]
 
     private static let jaWords: [String: String] = [
@@ -1002,6 +1042,11 @@ enum DS1SharedWords {
         "key.end": "End",
         "key.pageup": "Page Up",
         "key.pagedown": "Page Down",
+        "Previous month": "前の月",
+        "Next month": "次の月",
+        "Choose a date": "日付を選択",
+        "Date": "日付",
+        "W{week}": "第{week}週",
     ]
 
     private static let koWords: [String: String] = [
@@ -1112,6 +1157,11 @@ enum DS1SharedWords {
         "key.end": "End",
         "key.pageup": "Page Up",
         "key.pagedown": "Page Down",
+        "Previous month": "이전 달",
+        "Next month": "다음 달",
+        "Choose a date": "날짜 선택",
+        "Date": "날짜",
+        "W{week}": "{week}주",
     ]
 
     private static let nbWords: [String: String] = [
@@ -1222,6 +1272,11 @@ enum DS1SharedWords {
         "key.end": "End",
         "key.pageup": "Page Up",
         "key.pagedown": "Page Down",
+        "Previous month": "Forrige måned",
+        "Next month": "Neste måned",
+        "Choose a date": "Velg en dato",
+        "Date": "Dato",
+        "W{week}": "U{week}",
     ]
 
     private static let ptBRWords: [String: String] = [
@@ -1332,6 +1387,11 @@ enum DS1SharedWords {
         "key.end": "End",
         "key.pageup": "Page Up",
         "key.pagedown": "Page Down",
+        "Previous month": "Mês anterior",
+        "Next month": "Próximo mês",
+        "Choose a date": "Escolher uma data",
+        "Date": "Data",
+        "W{week}": "S{week}",
     ]
 
     private static let ptWords: [String: String] = [
@@ -1442,6 +1502,11 @@ enum DS1SharedWords {
         "key.end": "End",
         "key.pageup": "Page Up",
         "key.pagedown": "Page Down",
+        "Previous month": "Mês anterior",
+        "Next month": "Mês seguinte",
+        "Choose a date": "Escolher uma data",
+        "Date": "Data",
+        "W{week}": "S{week}",
     ]
 
     private static let svWords: [String: String] = [
@@ -1552,6 +1617,11 @@ enum DS1SharedWords {
         "key.end": "End",
         "key.pageup": "Page Up",
         "key.pagedown": "Page Down",
+        "Previous month": "Föregående månad",
+        "Next month": "Nästa månad",
+        "Choose a date": "Välj ett datum",
+        "Date": "Datum",
+        "W{week}": "V{week}",
     ]
 
     private static let zhWords: [String: String] = [
@@ -1662,6 +1732,11 @@ enum DS1SharedWords {
         "key.end": "End",
         "key.pageup": "Page Up",
         "key.pagedown": "Page Down",
+        "Previous month": "上个月",
+        "Next month": "下个月",
+        "Choose a date": "选择日期",
+        "Date": "日期",
+        "W{week}": "第{week}周",
     ]
 
 }
