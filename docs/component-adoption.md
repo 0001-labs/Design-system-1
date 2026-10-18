@@ -8,7 +8,7 @@ Only `/app/signin` and its data-free static shell/assets are public on the dashb
 
 ## Component glossary
 
-Dash links to a searchable component glossary at `/#glossary`. `shared/component-codes.json` owns the existing uppercase codes, with at most four characters each. Preserve assigned codes when names change; add a unique code when adding a directory entry. Codes use the DS1 monospace font. The same owner gate protects both dashboard views.
+Dash links to a searchable component glossary at `/#glossary`, with Root, Core, Unit and Page tabs taken from the canonical component directory. Search and counts apply to the selected layer. `shared/component-codes.json` owns the existing uppercase codes, with at most four characters each. Preserve assigned codes when names change; add a unique code when adding a directory entry. Codes use the DS1 monospace font. The same owner gate protects both dashboard views.
 
 ## Catalogue and layout
 
