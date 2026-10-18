@@ -66,7 +66,6 @@ export const ALL_LAYERS: DirectoryLayer[] = [
     summary: 'Core pieces put together: a row, a list.',
     entries: [
       { name: 'Accordion', href: '/3-unit/accordion/', tag: 'ds-accordion' },
-      { name: 'Card', href: '/3-unit/card/' },
       { name: 'Calendar', href: '/3-unit/calendar/', tag: 'ds-calendar' },
       { name: 'Carousel', href: '/3-unit/carousel/', tag: 'ds-carousel' },
       { name: 'Date picker', href: '/3-unit/date-picker/', tag: 'ds-date-picker' },
@@ -75,8 +74,6 @@ export const ALL_LAYERS: DirectoryLayer[] = [
       { name: 'Header', href: '/4-page/header/', tag: 'ds-header' },
       { name: 'List', href: '/3-unit/list/', tag: 'ds-list' },
       { name: 'Matrix', href: '/3-unit/matrix/', tag: 'ds-matrix' },
-      { name: 'Navigation', href: '/3-unit/navigation/' },
-      { name: 'Panel', href: '/3-unit/panel/' },
       { name: 'Row', href: '/3-unit/row/', tag: 'ds-row' },
       { name: 'Sidebar', href: '/3-unit/sidebar/', tag: 'ds-sidebar' },
       { name: 'Table', href: '/3-unit/table/', tag: 'ds-table' },
@@ -92,6 +89,7 @@ export const ALL_LAYERS: DirectoryLayer[] = [
       { name: 'Document', href: '/4-page/document/', tag: 'ds-document' },
       { name: 'Grid', href: '/4-page/grid/', tag: 'ds-grid' },
       { name: 'Page', href: '/4-page/page/', tag: 'ds-page' },
+      { name: 'Panel', href: '/4-page/panel/', tag: 'ds-panel' },
     ],
   },
 ];

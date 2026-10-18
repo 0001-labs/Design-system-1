@@ -1,0 +1,35 @@
+---
+title: Panel
+description: "A panel of chrome on the paper: a header, a body that scrolls, a footer."
+---
+
+A panel is a column of chrome standing on the paper: a header pinned to its top, a body that scrolls on its own, and a footer pinned to its bottom. An application's list beside its detail, an inspector, a drawer's contents are panels.
+
+## Use it
+
+```html
+<ds-panel>
+  <ds-row slot="header" fill>
+    <ds-text literal strong>Projects</ds-text>
+    <ds-button primary>New</ds-button>
+  </ds-row>
+  <ds-list>…</ds-list>
+  <ds-row slot="footer"><ds-text tone="muted" literal>12 projects</ds-text></ds-row>
+</ds-panel>
+```
+
+Content goes to the default slot; `slot="header"` and `slot="footer"` pin to the top and bottom. Give the panel its height from the page's layout (a [page](/4-page/page/)'s columns, `fill`) and only the body scrolls. Rows inside it are one square high as everywhere; the panel adds no box or shadow of its own.
+
+| Slot | What it holds |
+| --- | --- |
+| `header` | A row at the top: the panel's title and its actions. |
+| Default | The body, which scrolls. |
+| `footer` | A row at the bottom: a count, closing actions. |
+
+| Part | What it is |
+| --- | --- |
+| `header`, `body`, `footer` | The three areas, for a product's own styles. |
+
+Select `panel` in Sync 1's components export.
+
+[Page](/4-page/page/) · [Row](/3-unit/row/) · [List](/3-unit/list/)

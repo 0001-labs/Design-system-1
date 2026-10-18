@@ -192,14 +192,6 @@
     "url": "https://designsystem1.com/3-unit/accordion/"
   },
   {
-    "id": "component:/3-unit/card/",
-    "code": "CRDU",
-    "label": "Card",
-    "kind": "component",
-    "summary": "Design system 1 3-unit.",
-    "url": "https://designsystem1.com/3-unit/card/"
-  },
-  {
     "id": "component:/3-unit/calendar/",
     "code": "CALR",
     "label": "Calendar",
@@ -248,20 +240,12 @@
     "url": "https://designsystem1.com/3-unit/list/"
   },
   {
-    "id": "component:/3-unit/navigation/",
-    "code": "NAV",
-    "label": "Navigation",
-    "kind": "component",
-    "summary": "Design system 1 3-unit.",
-    "url": "https://designsystem1.com/3-unit/navigation/"
-  },
-  {
-    "id": "component:/3-unit/panel/",
+    "id": "component:/4-page/panel/",
     "code": "PNL",
     "label": "Panel",
     "kind": "component",
-    "summary": "Design system 1 3-unit.",
-    "url": "https://designsystem1.com/3-unit/panel/"
+    "summary": "Design system 1 4-page.",
+    "url": "https://designsystem1.com/4-page/panel/"
   },
   {
     "id": "component:/3-unit/row/",

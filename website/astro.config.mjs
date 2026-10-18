@@ -123,15 +123,12 @@ export default defineConfig({
           label: "3 Unit",
           items: [
             { label: "Accordion", slug: "3-unit/accordion" },
-            { label: "Card", slug: "3-unit/card" },
             { label: "Calendar", slug: "3-unit/calendar" },
             { label: "Carousel", slug: "3-unit/carousel" },
             { label: "Date picker", slug: "3-unit/date-picker" },
             { label: "Form", slug: "3-unit/form" },
             { label: "List", slug: "3-unit/list" },
             { label: "Matrix", slug: "3-unit/matrix" },
-            { label: "Navigation", slug: "3-unit/navigation" },
-            { label: "Panel", slug: "3-unit/panel" },
             { label: "Row", slug: "3-unit/row" },
             { label: "Sidebar", slug: "3-unit/sidebar" },
             { label: "Table", slug: "3-unit/table" },
@@ -146,6 +143,7 @@ export default defineConfig({
             { label: "Grid", slug: "4-page/grid" },
             { label: "Header", slug: "4-page/header" },
             { label: "Page", slug: "4-page/page" },
+            { label: "Panel", slug: "4-page/panel" },
           ],
         },
         {

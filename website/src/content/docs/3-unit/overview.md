@@ -11,9 +11,9 @@ A Unit brings individual Core pieces together. It provides the shared structure 
 | --- | --- |
 | [List](/3-unit/list/), [Row](/3-unit/row/), [Table](/3-unit/table/) | Organize related items and comparable values. |
 | [Form](/3-unit/form/) | Coordinate fields and submission feedback. |
-| [Sidebar](/3-unit/sidebar/), [Navigation](/3-unit/navigation/) | Organize destinations and hierarchy. |
+| [Sidebar](/3-unit/sidebar/) | Organize destinations and hierarchy, as navigation or a tree. |
 | [Accordion](/3-unit/accordion/) | Reveal and hide related sections. |
-| [Panel](/3-unit/panel/), [Card](/3-unit/card/) | Group related content into a composition. |
+| [Panel](/4-page/panel/), [Card](/2-core/card/) | Group related content into a composition. |
 
 Some entries describe composition patterns rather than a custom element. Follow each page’s markup and API instead of assuming every pattern has a matching tag.
 
