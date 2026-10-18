@@ -1,3 +1,4 @@
+import { featureFlags } from "./flags";
 import { dashboard, DASHBOARD_HOST, ICON_HOST } from "./dashboard";
 import { libraryApi } from "./libraries";
 import { fontWorkspace } from "./fonts";
@@ -21,6 +22,16 @@ function reportPage(response: Response, path: string): Response {
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    if (url.pathname === "/api/flags") return featureFlags(request, env);
+    if (["/flags", "/flags/", "/app/flags"].includes(url.pathname)) {
+      if (!["GET", "HEAD"].includes(request.method)) return new Response(null, {status:405});
+      const asset = new URL(request.url); asset.pathname = "/app/";
+      const original = await env.ASSETS.fetch(new Request(asset, request));
+      const response = new Response(original.body, original);
+      response.headers.set("Cache-Control", "private, no-store");
+      response.headers.set("X-Robots-Tag", "noindex, nofollow");
+      return response;
+    }
     if (url.hostname === DASHBOARD_HOST && url.pathname !== "/api/reports/components") return dashboard(request, env);
     if (url.hostname === ICON_HOST) return dashboard(request, env);
     if (url.pathname === "/api/libraries" || url.pathname.startsWith("/api/libraries/") || url.pathname.startsWith("/api/library-auth/")) return libraryApi(request, env);

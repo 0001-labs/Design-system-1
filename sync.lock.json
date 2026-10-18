@@ -24,5 +24,15 @@
       "website/src/vendor/aa/selection.d.ts": "1905a85ad1aa7dd59667894d6cb78af31ed3dc4c3a7f1b9c38f4814ea6964fe4",
       "website/src/vendor/aa/table.d.ts": "cb642fdf6d8fcd3163d2832a9f0e4f18183e7c96144078bf0a20a6b60f798231"
     }
+  },
+  "Feature flags": {
+    "commit": "950b2edeb5b500f41da3279ff8a6ae1abd28e27d",
+    "version": null,
+    "owned": ["shared/feature-flags-runtime"],
+    "files": {
+      "shared/feature-flags-runtime/README.md": "0c9e8d80c6bcacd1675f5cb7e528b8cc9ed84c6bfe3489017e97ad39ee6f7e99",
+      "shared/feature-flags-runtime/index.ts": "34faa73a4b5434583abf9a22179b72148f54b7ecb546c0c509a7388b0cdb3eb9",
+      "shared/feature-flags-runtime/manage.ts": "dffb5821fc651e5008f34dc20a8b52c1146bbab26fdec1b1ee8652ddc17d87b0"
+    }
   }
 }

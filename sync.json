@@ -4,6 +4,11 @@
       "build": {
         "to": "website/src/vendor/aa"
       }
+    },
+    "Feature flags": {
+      "runtime": {
+        "to": "shared/feature-flags-runtime"
+      }
     }
   }
 }

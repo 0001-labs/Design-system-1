@@ -128,3 +128,7 @@ The public Fonts catalogue uses Aa's `createPlainEditor` for plain specimen text
 ## Product code
 
 Canonical short code: `DS1`. Use this three-character code for product-owned libraries and other compact ownership labels. Keep the full product name for prose and the existing commit-prefix convention.
+
+## Feature flags
+
+Selected System part: `feature-flags`. `/flags` serves standalone owner controls on the site's hosts. The Worker `/api/flags` handler reuses the pinned `REPORTS_OWNER_ID`, validated Convex session and verified owner identity; no browser-provided identity grants access. Release definitions are in `shared/feature-flags.ts`, initially empty. There are no declared release switches until a real unfinished feature selects one. Rules use the private R2 `feature-flags/` prefix; authenticated writes require same-origin requests. The shared evaluator and management controls are copied through Sync 1 into `shared/feature-flags-runtime`. When declaring a flag, gate its interface and every protected backend operation; published library visibility and existing access permissions remain separate.

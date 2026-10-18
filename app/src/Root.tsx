@@ -1,3 +1,4 @@
+import { FeatureFlags } from "./screens/FeatureFlags";
 import { AdoptionDashboard } from "./screens/AdoptionDashboard";
 import { FontWorkspace } from "./screens/FontWorkspace";
 import { IconBuilder } from "./screens/iconBuilder/IconBuilder";
@@ -101,7 +102,7 @@ function NavigationAuth() {
 export function Root({ children }: { children?: ReactNode }) {
   return (
     <ConvexAuthProvider client={convex}>
-      <RouterProvider>{window.location.pathname === "/app/navigation-auth" ? <NavigationAuth /> : window.location.hostname === "dash.designsystem1.com" ? <AdoptionDashboard /> : window.location.hostname === "fonts.designsystem1.com" ? <FontWorkspace /> : window.location.hostname === "icon.designsystem1.com" ? <IconBuilder /> : <AppShell>{children ?? <Routes />}</AppShell>}</RouterProvider>
+      <RouterProvider>{["/flags", "/flags/", "/app/flags"].includes(window.location.pathname) ? <FeatureFlags /> : window.location.pathname === "/app/navigation-auth" ? <NavigationAuth /> : window.location.hostname === "dash.designsystem1.com" ? <AdoptionDashboard /> : window.location.hostname === "fonts.designsystem1.com" ? <FontWorkspace /> : window.location.hostname === "icon.designsystem1.com" ? <IconBuilder /> : <AppShell>{children ?? <Routes />}</AppShell>}</RouterProvider>
     </ConvexAuthProvider>
   );
 }
