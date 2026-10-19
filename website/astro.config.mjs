@@ -75,7 +75,6 @@ export default defineConfig({
           items: [
             { label: "Overview", slug: "start-here/overview" },
             { label: "Use with HTML", slug: "start-here/quick-start" },
-            { label: "Email design", slug: "email" },
           ],
         },
         {
@@ -161,13 +160,14 @@ export default defineConfig({
               ],
             },
             {
-              label: "Native packages",
+              label: "Native",
               items: [
-                { label: "About native packages", slug: "advanced/native" },
+                { label: "Overview", slug: "advanced/native" },
                 { label: "iOS", slug: "advanced/ios" },
                 { label: "Android", slug: "advanced/android" },
               ],
             },
+            { label: "Email design", slug: "email" },
             { label: "Film kit", slug: "advanced/film-kit" },
           ],
         },
