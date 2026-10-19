@@ -33,7 +33,7 @@ Design system 1 is a general design system anyone can use. Never name 0001's pro
 
 ## Version
 
-0.3.0-alpha.27
+0.3.0-alpha.28
 
 ## Scripts
 
