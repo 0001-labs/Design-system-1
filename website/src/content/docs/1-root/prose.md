@@ -75,5 +75,3 @@ Products copy the sheet with Sync 1: `"prose": true` on the `root` export, which
   }
 }
 ```
-
-For a page made only of plain HTML, the classless sheet `one.semantic.css` draws every element without a mark, on the same measures: see [Style ordinary HTML](/1-root/overview/#style-ordinary-html). Sync 1 copies it with `"classless": true`.

@@ -126,12 +126,7 @@ test('the prose sheet is copied when a product asks for it', () => {
   expect(String(files('tokens', { prose: true, bundle: true })['bundle.css'])).toContain('[data-ds-prose] {');
 });
 
-test('the classless sheet is copied when a product asks for it, and keeps its palette', () => {
-  expect(files('root')).not.toHaveProperty(['one.semantic.css']);
-  expect(Object.keys(files('root', { styles: ['one.semantic.css'], fonts: false }))).toEqual(['one.semantic.css']);
-  expect(String(files('tokens', { classless: true })['one.semantic.css'])).toContain('--one-apple-green: light-dark(');
-  expect(Object.keys(files('root', { classless: true, prose: true, fonts: false }))).toEqual(expect.arrayContaining(['one.css', 'prose.css', 'one.semantic.css']));
-});
+
 
 test('controls.css always arrives with the table, text, empty-state, notice, dialog placement, site chrome, bento, carousel, card, figure, progress and row classes it imports', () => {
   const chrome = ['header.css', 'footer.css', 'document.css'];

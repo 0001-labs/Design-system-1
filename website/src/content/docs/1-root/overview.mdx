@@ -31,42 +31,8 @@ All built-ins are grouped here alongside the visual foundations: Languages, Form
 
 [Core](/2-core/overview/) uses these foundations for individual controls. [Unit](/3-unit/overview/) composes controls, and [Page](/4-page/overview/) arranges those compositions. Application state, permissions and persistence stay with the application. Internal component visibility is separate from these layers: an internal control does not become a Root topic merely because it is hidden from the catalogue.
 
-## Style ordinary HTML
+## Use the foundations
 
-Design system 1 styles native HTML through a shared stylesheet. Start with real elements: headings for structure, links for destinations, buttons for actions, labels for fields and tables for tabular data.
+Load the component library as shown in [Use with HTML](/start-here/quick-start/). Its stylesheet supplies fonts, tokens and shared measures; its JavaScript registers the Lit elements.
 
-```html
-<link rel="stylesheet" href="https://designsystem1.com/resources/vanilla.css">
-<link rel="stylesheet" href="https://designsystem1.com/resources/fonts.css">
-
-<main>
-  <h1>A clear starting point</h1>
-  <p>Ordinary HTML, with a shared appearance.</p>
-  <details><summary>Read more</summary><p>No JavaScript is needed here.</p></details>
-</main>
-```
-
-These native elements do not need a class on every node. CSS gives them an appearance; the browser supplies their native behavior. Use the [complete HTML downloads](/start-here/examples/) to inspect a working document.
-
-## Configure the stylesheet
-
-The native stylesheet is generated from the canonical `DS1/1-root/one.semantic.css`. The public `/resources/vanilla.css` route serves that source directly. The font companion sets the native font tokens to the shared font files. It draws on Design system 1's measures: 14px type on one-square lines, a 20px title on two squares, controls one control high with 4px corners, and hairlines that take no room. Products copy it with Sync 1's `"classless": true`.
-
-Set tokens on `:root` or a scoped region when a page needs a deliberate variation:
-
-```css
-:root {
-  --one-accent-color: var(--one-sharp-blue);
-  --one-font: "Inter Arrows", "GT America", sans-serif;
-}
-```
-
-Keep application data, submission logic and routing in your page. A stylesheet does not implement them. [My libraries](/libraries/) lets you save a stylesheet and publish a URL for consumers, while [the API](/libraries/api/) works on the same drafts and revisions.
-
-## Interactive components
-
-The `ds-*` components have their own scoped tokens and JavaScript implementations. Follow the API on each [component page](/2-core/overview/#component-overview) rather than assuming a native HTML token controls a shadow-root component. CSS-only setup does not register custom elements.
-
-## Dependencies
-
-The public stylesheets and fonts need network access unless you save and re-link them locally. The native stylesheet imports no fonts of its own: the font companion, `one.css` or `fonts.css` (the faces on their own, which `one.css` imports) bring them. None of them loads anything from another host; Noto Sans for Japanese and Chinese is the opt-in `cjk.css` ([Fonts](/1-root/fonts/#japanese-and-chinese)). [Use with HTML](/start-here/quick-start/) explains the distinction between one authored HTML file and an offline bundle.
+Customize public `--ds-*` tokens on the root or a scoped surface. [My libraries](/libraries/) saves and publishes those choices. Keep content, application data and routing in your page.

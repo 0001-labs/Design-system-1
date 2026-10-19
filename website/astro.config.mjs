@@ -89,7 +89,6 @@ export default defineConfig({
             { label: "Languages", slug: "1-root/languages" },
             { label: "Formatting", slug: "1-root/formatting" },
             { label: "Theming", slug: "1-root/theming" },
-            { label: "Native controls", slug: "1-root/native-controls" },
             { label: "Prose", slug: "1-root/prose" },
             { label: "Feedback", slug: "1-root/feedback" },
             { label: "Keys", slug: "1-root/keys" },

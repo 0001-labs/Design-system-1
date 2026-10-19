@@ -45,31 +45,6 @@ A site footer stands its brand and a line about the site at the start, in twelve
 | `preferences` | Controls of the page's own beside the cycles, such as a currency. |
 | `legal` | The last line, in place of the copyright. |
 
-## Without Lit
-
-`footer.css`, which `controls.css` imports, draws the same footer on native elements. A page that must render its links on the server writes these classes; the element draws them from data.
-
-```html
-<footer class="ds-footer">
-  <div class="ds-footer__brand">
-    <a class="ds-footer__mark" href="/">Name</a>
-    <p class="ds-footer__tagline">What it does</p>
-  </div>
-  <nav class="ds-footer__columns" aria-label="Footer">
-    <div class="ds-footer__column">
-      <h2 class="ds-footer__heading">Product</h2>
-      <ul class="ds-footer__links"><li><a href="/download">Download</a></li><li><a href="/help">Help</a></li></ul>
-    </div>
-  </nav>
-  <div class="ds-footer__base">
-    <p class="ds-footer__legal">© 2026 Name</p>
-    <div class="ds-footer__preferences"><ds-cycle type="language"></ds-cycle><ds-cycle type="theme"></ds-cycle></div>
-  </div>
-</footer>
-```
-
-Without the components, the preferences are `.ds-button--secondary` buttons the page wires to `setThemeMode()` and its language. Token: `--ds-footer-line` (the hairline along the top; `transparent` leaves it out).
-
 ## In React
 
 ```tsx

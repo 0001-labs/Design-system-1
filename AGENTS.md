@@ -4,6 +4,12 @@
 
 Component-based design system with Lit Web Components.
 
+## Web interface
+
+Lit components are the supported web interface, including in plain HTML: load the stylesheet and module script, then use `ds-*` elements. React adapters wrap those same components. Libraries customize component tokens. CLASSless and the vanilla stylesheet are retired; do not add parallel CSS-only control examples or entry points. Native HTML inside components, semantic prose, shared internal styles/helpers, Swift/Kotlin packages and email rendering retain their roles. Existing saved libraries and published versions keep their compatibility bridge.
+
+The public website uses the shared mobile scale, with `--ds-sf` following `--sf`; desktop stays at 1. Component internals and existing consumers still use some native-control styles and exports. Those remain compatibility dependencies, not a second supported web interface; their removal requires an explicit consumer migration.
+
 ## System parts
 
 System node: `ds1` ([map](https://system.0001.dev/system?focus=ds1)). Follow the studio’s Selecting System requirements workflow; inspect current edges for Stack dependencies and their evidence.
@@ -145,4 +151,4 @@ Selected System part: `feature-flags`. `/flags` serves standalone owner controls
 
 ## Company and library workspace
 
-The signed-in account's company name is stored in `accountProfiles`, indexed by its authenticated user ID. `/classless/libraries/` keeps the documentation shell with the fixed Design system 1 header. The signed-in sidebar workspace shows the company avatar/name, an expandable library chooser and an independent create button; sidebar components open the existing persistent editor. Documentation layer labels open their visual overview pages, with independent leading disclosure buttons. Root uses yellow, Core green, Unit blue and Page orange for these overview showcases. Base documentation remains at `/start-here/overview/`. Selected System parts: `auth`, `design`, `themes`, `platform-web`, `documentation`, and `sharing`; this is app-owned navigation using existing DS1 controls, with no shared component change to propagate. Publication history and install URLs come from existing library queries. Installation-location tracking and library font uploads remain unimplemented; the private font workspace is a separate feature. Stack nodes have no standalone guides; the scripts and checks here govern them.
+The signed-in account's company name is stored in `accountProfiles`, indexed by its authenticated user ID. `/libraries/workspace/` keeps the documentation shell with the fixed Design system 1 header. The signed-in sidebar workspace shows the company avatar/name, an expandable library chooser and an independent create button; sidebar components open the existing persistent editor. Documentation layer labels open their visual overview pages, with independent leading disclosure buttons. Root uses yellow, Core green, Unit blue and Page orange for these overview showcases. Base documentation remains at `/start-here/overview/`. Selected System parts: `auth`, `design`, `themes`, `platform-web`, `documentation`, and `sharing`; this is app-owned navigation using existing DS1 controls, with no shared component change to propagate. Publication history and install URLs come from existing library queries. Installation-location tracking and library font uploads remain unimplemented; the private font workspace is a separate feature. Stack nodes have no standalone guides; the scripts and checks here govern them.

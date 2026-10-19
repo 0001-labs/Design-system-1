@@ -14,7 +14,7 @@ vp run docs:dev
 ```
 
 Open the address printed by Astro, normally <http://localhost:4321>.
-For the embedded classless editor, run `vp run app:dev` in another terminal.
+For the embedded library editor, run `vp run app:dev` in another terminal.
 The documentation dev server proxies `/app` to `http://127.0.0.1:5173`;
 `DS1_APP_DEV_ORIGIN` can override that origin.
 

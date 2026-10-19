@@ -1,13 +1,11 @@
 ---
 title: Feedback
-description: Toasts, dialogs that answer with a promise, and copying text, for pages without Lit or any other framework.
+description: Toasts, dialogs that answer with a promise, and copying text, alongside Lit components.
 ---
 
 import FeedbackDemo from "../../../components/FeedbackDemo.astro";
 
-A page without Lit cannot use [`<ds-toast>`](/2-core/toast/) or [`<ds-overlay>`](/4-page/overlay/),
-and falls back on the browser's `alert()`, `confirm()` and `prompt()`, or builds a toast and a
-copy button of its own. The feedback module gives such a page the system's own, from one import and with no framework:
+Use the feedback helpers for short messages, a single question, or copying text. For a dialog with custom content, use [`<ds-overlay>`](/4-page/overlay/). For messages in markup, use [`<ds-message>`](/2-core/message/).
 
 ```js
 import { toast, confirm, prompt, alert, copyText } from "./ds1/0-face/feedback";
@@ -26,16 +24,6 @@ copy helper either.
 ## Try it
 
 <FeedbackDemo />
-
-This page also loads the Lit components, so its toasts are drawn by `<ds-toast>`; a page without
-Lit gets the same stack from the page toaster.
-
-## When to use which
-
-| The page | Toasts | Dialogs |
-| --- | --- | --- |
-| Uses Lit components, or React through the adapters | [`<ds-toast>`](/2-core/toast/) and `toast()`; the module's `toast()` reaches the same stack | [`<ds-overlay>`](/4-page/overlay/) for anything with a form or content of its own; `confirm()`, `prompt()` and `alert()` from this module for a single question |
-| Has no framework | This module's `toast()` | This module's `confirm()`, `prompt()` and `alert()`; a native `dialog.ds-overlay` of its own for more |
 
 ## Toasts
 
@@ -67,36 +55,9 @@ configureToaster({ position: "top-center", closeButton: true });
 | `label` | Notifications | The region's accessible name. |
 | `closeLabel` | Close | The close button's accessible name. |
 
-### How it shares the look
-
-The page toaster shares `<ds-toast>`'s stylesheet rather than wrapping the element. It draws the
-element's markup in a shadow root of its own with the element's stylesheet
-(`2-core/styles/ds-toast.css`), so a toast looks the same whichever draws it and the two cannot
-drift apart. It carries that stylesheet and its icons as plain strings in
-`0-face/generated/toast-assets.ts`, which `vp run generate:toast-assets` writes from the stylesheet,
-the sheets it imports and the icon files, and a test keeps it the same as them. A layer that hands toasts to `<ds-toast>` would need Lit to draw anything, which is
-exactly what these pages lack.
-
-Both read one queue of Sonner's calls (`0-face/toast-queue.ts`). Where a `<ds-toast>` is in the
-page, it takes every toast and the page toaster stays quiet, so a page that has both, or a Lit page
-that copies text with `copyText()`, shows one stack. `toast()` with nothing listening adds a
-`<ds-toast>` when the element is registered, and the page toaster otherwise.
-
-### Accessibility and motion
-
-The page toaster's region is in the page before the first toast arrives: a polite live region in
-which each toast is announced. An error is announced assertively unless it says
-`important: false`, here and in `<ds-toast>`. Only `transform` and `opacity` animate, and with
-reduced motion nothing moves.
-
-The page toaster carries the type icons (success, info, warning, error) and the close button. An
-`icon` of another name is drawn where `<ds-toast>` draws the toast.
-
 ## Dialogs
 
-Each dialog is drawn on the native [`dialog.ds-overlay`](/1-root/native-controls/) frame, with
-its native buttons, and opened with `showModal()`, so the browser keeps the rest of the page
-inert behind it. The page loads `controls.css`.
+The helpers manage focus, cancellation and the browser's modal dialog behavior.
 
 | Call | Options | Resolves to |
 | --- | --- | --- |
@@ -161,33 +122,6 @@ setFeedbackWords(word => myWords[word]);
 
 Pass a dialog's or a toast's own words where they say more than the shared ones.
 
-## Copying the module
-
-Sync 1's `feedback` export copies the module with everything it imports, by their paths in
-`DS1/`: the toaster, the dialogs, `copyText`, its words and the toast's stylesheet and icons as a
-generated module. No Lit, no component and no language runtime comes with it. Take `controls.css`
-for the dialogs (`"nativeControls": true` on `root` or `tokens`). For words in the page's language,
-copy it to the same folder as the `languages` or `components` export, so the page keeps one
-language runtime; `"languages": true` on `feedback` brings the language module with it instead.
-
-```json
-{
-  "sources": {
-    "Design system 1": {
-      "root": { "to": "web/ds1", "nativeControls": true },
-      "languages": { "to": "web/ds1" },
-      "feedback": { "to": "web/ds1" }
-    }
-  }
-}
-```
-
-The copy is plain TypeScript. It has no `?inline` or `?raw` import, so any bundler, runtime and
-type check reads it. It passes a strict type check with only the DOM's types, and in a Worker or
-backend project that checks shared code, with no special types.
-
 ## Related
 
-[Toast](/2-core/toast/) is the Lit element. [Overlay](/4-page/overlay/) is the Lit element for
-modals, sheets and drawers with content of their own; these dialogs are its modals. [Native controls](/1-root/native-controls/) draws the
-frame and its buttons.
+[Message](/2-core/message/) provides inline, banner and toast messages. [Overlay](/4-page/overlay/) provides modals, sheets and drawers. [Use with HTML](/start-here/quick-start/) loads the same components in an ordinary HTML file.

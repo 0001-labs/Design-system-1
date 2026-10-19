@@ -48,18 +48,6 @@ A card shows one thing among others: its name, a title, a line of writing and a 
 
 The corners are a card's (`--ds-radius-card`, 4px by default); a product sets `--ds-card-corner-size` for rounder ones.
 
-## Without Lit
-
-```html
-<a class="ds-card" data-tone="sharp-blue" href="/lists" style="--ds-card-width: calc(var(--ds-unit) * 14); --ds-card-height: calc(var(--ds-unit) * 22)">
-  <span class="ds-card__label">Lists</span>
-  <span class="ds-card__title">Everything on one grid</span>
-  <span class="ds-card__media ds-card__media--center"><img src="lists.webp" alt="A list on a phone" /></span>
-</a>
-```
-
-`card.css` comes with `controls.css`. The tones read the palette's tokens from `palette.css`, which `one.css` imports.
-
 ## Accessibility
 
 - A card with `href` is one link and a card with `interactive` one button: never put a second link or button inside either. Keyboard focus rings it 2px inside.

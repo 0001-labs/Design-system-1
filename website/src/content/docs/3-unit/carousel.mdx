@@ -134,33 +134,3 @@ import { Carousel } from "@0001-labs/design-system-1/DS1/react/carousel";
 ```
 
 `Carousel` renders `ds-carousel` with the slides in the light DOM and the region and its name in the markup, so the server's HTML is already a named region. `label` is shown as given. `dots={false}` leaves the dots out; `slideWidth="auto"`, `bleed`, `loop`, `autoplay` and `free` make it a strip. Register `ds-carousel` in the browser before hydration.
-
-## Without JavaScript
-
-A page without Lit writes the same carousel with the classes in `carousel.css`, which `controls.css` imports. The slides snap without any script; the dots, the buttons and the announcement come from the carousel script.
-
-```html
-<section class="ds-carousel" aria-label="Colours" style="--ds-carousel-slide: calc(var(--ds-unit) * 12)">
-  <div class="ds-carousel__track">
-    <figure>…</figure>
-    <figure>…</figure>
-  </div>
-  <div class="ds-carousel__controls">
-    <button class="ds-button ds-button--icon ds-carousel__previous" type="button">
-      <span class="ds-icon ds-icon--large" style="--ds-icon: url(./ds1/icons/left.svg)" aria-hidden="true"></span>
-    </button>
-    <div class="ds-pagedots"></div>
-    <button class="ds-button ds-button--icon ds-carousel__next" type="button">
-      <span class="ds-icon ds-icon--large" style="--ds-icon: url(./ds1/icons/right.svg)" aria-hidden="true"></span>
-    </button>
-  </div>
-</section>
-<script type="module">
-  import { startCarousels } from "./ds1/0-face/carousel.js";
-  startCarousels();
-</script>
-```
-
-`startCarousels()` starts every `.ds-carousel` on the page with what the element does: the region and slide labels, a dot for each slide in the `.ds-pagedots` (`data-end` on it marks the end), the buttons' names and their stops at the ends, the keyboard, the polite announcement and `change` on the block. A strip is `data-slides="auto"` with `data-bleed`, `data-loop`, `data-autoplay` and `data-snap="none"`; the script measures the bleed's room, makes the loop's copies and adds the pause button for autoplay (`startCarousels(document, { icons: "/ds1/x-icon/" })` says where its icon is). It needs no framework and imports nothing; Sync 1 copies it with the `root` export's `"modules": ["carousel"]`. The words read English, or the shared words in the page's language where the page loads the language module; `setCarouselWords()` gives the page's own.
-
-[Page dots](/2-core/pagedots/) · [Card](/2-core/card/) · [Button](/2-core/button/) · [Icon](/2-core/icon/)

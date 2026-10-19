@@ -54,20 +54,3 @@ Tokens: `--ds-bento-unit` (the square, `--ds-unit` unless a page draws at anothe
 ### Layouts and narrower measures
 
 A bento whose tiles stand differently on a phone gives each tile its phone place beside its own, `data-place-phone`, and the page sets the bento's `layout` (and its `columns`) when it changes: the places are read again. A squares bento in a measure narrower than its squares takes `fit`: the columns share the measure and the rows stay one square, each tile still reaching a quarter square, so the gap is a column less half a square. A page with no script and no inline styles sets `--ds-bento-x`, `--ds-bento-y`, `--ds-bento-w`, `--ds-bento-h` and the reach sides (`--ds-bento-start`, `-top`, `-end`, `-bottom`, 1 or 0) in its own stylesheet.
-
-## On native markup
-
-A page without Lit writes `.ds-bento` from the native controls stylesheet (`controls.css`, which imports `bento.css`), with `data-squares`, `data-fit` and `data-layout` in place of `squares`, `fit` and `layout`, and `--ds-bento-columns` for `columns`. A squares bento needs `placeBentos()` from `0-face/bento.ts` (Sync 1's root `"modules": ["bento"]`), which reads each tile's `data-place` and sets its reach; a flow bento needs no script.
-
-```html
-<div class="ds-bento" data-squares style="--ds-bento-columns: 32">
-  <a class="ds-card" href="/archive/" data-place="0 0 15 7">…</a>
-  <a class="ds-card" href="/lists/" data-place="16 0 16 15">…</a>
-</div>
-<script type="module">
-  import { placeBentos } from "/ds1/0-face/bento.js";
-  placeBentos();
-</script>
-```
-
-[Card](/2-core/card/) · [Carousel](/3-unit/carousel/) · [Grid](/4-page/grid/)

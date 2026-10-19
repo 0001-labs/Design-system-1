@@ -10,6 +10,7 @@ try {
   const files = execFileSync('tar', ['-tzf', archive], { encoding: 'utf8' }).trim().split('\n');
   const internal = /(?:ds-(?:kbd|loading|spacing-handle)|\/react\/(?:kbd|loading|spacing-handle)\.|\/spacing-handle\.|\/kbd\.css|packages\/app|\/app\/src|\/website\/)/;
   const leaked = files.filter(file => internal.test(file));
+  if (files.some(file => file.endsWith('/one.semantic.css'))) throw new Error('Retired classless stylesheet in public package.');
   if (leaked.length) throw new Error(`Internal App files in public package: ${leaked.join(', ')}`);
   for (const file of files.filter(file => /bundle.*\.js$/.test(file))) {
     const source = execFileSync('tar', ['-xOzf', archive, file], { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });

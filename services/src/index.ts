@@ -67,6 +67,11 @@ export default {
     }
 
     const docsRedirects: Record<string, string> = {
+      '/classless': '/start-here/quick-start/',
+      '/classless/libraries': '/libraries/workspace/',
+      '/classless/editor': '/libraries/playground/',
+      '/classless/library-api': '/libraries/api/',
+      '/1-root/native-controls': '/start-here/quick-start/',
       '/components': '/2-core/overview/',
       '/4-page/layouts': '/start-here/examples/',
       '/icons': '/2-core/icon/',

@@ -1,12 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, test } from 'vite-plus/test';
-import { palette, paletteCss, paletteSheet } from '../DS1/1-root/palette';
+import { palette, paletteSheet } from '../DS1/1-root/palette';
 
 describe('Palette', () => {
-  test('the CLASSless stylesheet carries the palette as written from palette.ts', () => {
-    const css = readFileSync(new URL('../DS1/1-root/one.semantic.css', import.meta.url), 'utf8');
-    expect(css).toContain(paletteCss());
-  });
   test('palette.css is the palette on its own, as written from palette.ts, and one.css imports it', () => {
     const sheet = readFileSync(new URL('../DS1/1-root/palette.css', import.meta.url), 'utf8');
     expect(sheet).toBe(paletteSheet());

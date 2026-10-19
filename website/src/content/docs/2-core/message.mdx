@@ -62,7 +62,7 @@ notice.addEventListener("ds-message-dismiss", event => {
 </ds-message>
 ```
 
-An action is a real link or button in the `actions` slot; a page without Lit writes `ds-notice--banner` beside the tone.
+An action is a real link or button in the `actions` slot.
 
 ## Leading to the app
 
@@ -99,18 +99,7 @@ Open is a link to the app's store address (`app-url`, or the App Store's own fro
 | `remember` | The name the close is remembered by. |
 | `preview` | Draw it on any device. |
 
-It is three squares high: half a square above and below two squares of content. The picture fills two squares with a picture's corners and a hairline; the name and the line take a square each on the sixteen, cut with an ellipsis; Open (the primary button, one control high) and the close each stand on the sixteen of the square in the middle of the two, the close in a one-square cell at the end; one square at each side. Every measure follows the scale. It is a region named by the app's name. A page without Lit writes the same row as `ds-notice--app` and calls `startAppBanners()` (Sync 1's root `"modules": ["app-banner"]`):
-
-```html
-<div class="ds-notice ds-notice--app" data-app-id="1234567890" data-open="https://example.com/notes" role="region" aria-label="Field notes" hidden>
-  <span class="ds-notice__picture" aria-hidden="true"><img src="/app-icon.png" alt=""></span>
-  <p class="ds-notice__title">Field notes</p>
-  <p class="ds-notice__text">Notes for the day, kept on your phone</p>
-  <a class="ds-button ds-button--primary ds-notice__open">Open</a>
-  <button class="ds-button ds-button--icon ds-notice__dismiss" type="button" aria-label="Close"><!-- the close icon --></button>
-</div>
-```
-
+It is three squares high: half a square above and below two squares of content. The picture fills two squares with a picture's corners and a hairline; the name and the line take a square each on the sixteen, cut with an ellipsis; Open (the primary button, one control high) and the close each stand on the sixteen of the square in the middle of the two, the close in a one-square cell at the end; one square at each side. Every measure follows the scale. It is a region named by the app's name.
 ## API
 
 | Attribute | Type | Default | What it does |
@@ -149,26 +138,6 @@ import { Message } from "@0001-labs/design-system-1/DS1/react/message";
 `Message` renders `ds-message` with its words and actions in the light DOM and its role in the markup, so the server's HTML is already a live region. `onDismiss` shows the close button and leaves removing the notice to the product. Register `ds-message` in the browser before hydration.
 
 The app banner takes the same props: `<Message form="app" heading="Field notes" text="Notes for the day, kept on your phone" src="/app-icon.png" appId="1234567890" open={deepLink} />`.
-
-## Without JavaScript
-
-A page without Lit draws the same notice with the classes in `notice.css`, which `controls.css` imports. The page writes its own words, its icon and its role.
-
-```html
-<div class="ds-notice ds-notice--danger" role="alert">
-  <span class="ds-notice__mark" aria-hidden="true"><!-- the warning icon --></span>
-  <p class="ds-notice__title">Couldn't save</p>
-  <p class="ds-notice__text">Check your connection and try again.</p>
-  <div class="ds-notice__actions">
-    <button class="ds-button ds-button--secondary" type="button">Try again</button>
-  </div>
-  <button class="ds-button ds-button--icon ds-notice__dismiss" type="button" aria-label="Close"><!-- the close icon --></button>
-</div>
-```
-
-`ds-notice--success` and `ds-notice--warning` are the other tones; without one the notice is neutral. See [Native controls](/1-root/native-controls/).
-
-[Empty state](/2-core/empty/)
 
 ## Assistant
 

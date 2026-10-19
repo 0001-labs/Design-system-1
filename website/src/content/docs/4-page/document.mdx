@@ -56,27 +56,6 @@ A slot named `contents` takes the built list's place. A part of the writing that
 
 Token: `--ds-definitions-term` (the term column, eight squares).
 
-## Without Lit
-
-`document.css`, which `controls.css` imports, draws the same page. The page writes its contents itself and marks the section it opens on.
-
-```html
-<div class="ds-document">
-  <nav class="ds-document__toc" aria-label="Contents">
-    <div class="ds-document__contents">
-      <p class="ds-document__toc-title">Contents</p>
-      <ol class="ds-document__toc-list">
-        <li><a href="#using">Using the service</a></li>
-        <li class="ds-document__toc-sub"><a href="#accounts">Accounts</a></li>
-      </ol>
-    </div>
-  </nav>
-  <article class="ds-document__body" data-ds-prose>…</article>
-</div>
-```
-
-The contents column stretches to the writing's height, so `ds-document__contents` inside it stays in view; standing above the writing it is only as tall as itself and nothing sticks. Token: `--ds-document-top`, where the contents stop below the top of the view (one square; add a sticky header's height).
-
 ## In React
 
 ```tsx

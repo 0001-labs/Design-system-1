@@ -2,7 +2,7 @@
 
 :root {
   /* Content layout */
-  --sl-content-width: 720px;
+  --sl-content-width: calc(720px * var(--sf, 1));
 
   /* Typography */
   --sl-text-5xl: 3.5rem;
@@ -14,7 +14,7 @@
   --sl-color-accent-high: #5568d3;
 
   /* Spacing */
-  --sl-nav-height: 60px;
+  --sl-nav-height: calc(60px * var(--sf, 1));
 
   /* Design system 1 Documentation Colors */
   --ds1-docs-header-bg: light-dark(var(--white), var(--slate-dark));
@@ -36,7 +36,7 @@
 
 .sidebar-content {
   padding: 0;
-  width: 280px;
+  width: calc(280px * var(--sf, 1));
 }
 
 
@@ -57,7 +57,7 @@ a:hover {
 }
 
 .card:hover {
-  transform: translateY(-2px);
+  transform: translateY(calc(-2px * var(--sf, 1)));
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
 }
 
@@ -75,13 +75,13 @@ h6 {
 /* Main content area */
 .main-pane {
   background: var(--ds1-docs-content-bg);
-  padding: 40px;
+  padding: calc(40px * var(--sf, 1));
 }
 
 /* Mobile responsive content padding */
 @media (max-width: 768px) {
   .main-pane {
-    padding: 20px;
+    padding: calc(20px * var(--sf, 1));
   }
 }
 
@@ -109,9 +109,9 @@ h6 {
 h1#_top {
   display: flex;
   align-items: center;
-  height: 40px;
-  max-height: 40px;
-  margin: 0 0 20px 0;
+  height: calc(40px * var(--sf, 1));
+  max-height: calc(40px * var(--sf, 1));
+  margin: 0 0 calc(20px * var(--sf, 1)) 0;
 }
 
 /* Header z-index */
@@ -144,7 +144,7 @@ table {
   h1#_top {
     height: auto;
     max-height: none;
-    margin: 0 0 20px 0;
+    margin: 0 0 calc(20px * var(--sf, 1)) 0;
   }
 
   .sidebar-content {
@@ -188,14 +188,14 @@ body.sidebar-open {
    A hairline is drawn as a shadow, so it takes no room from the squares.
    ------------------------------------------------------------------------ */
 :root {
-  --grid: 20px;
-  --docs-type: 14px;
-  --docs-type-small: 10px;
-  --docs-type-heading: 15px;
-  --docs-type-title-2: 17px;
-  --docs-type-title-1: 20px;
-  --docs-tracking: -0.28px;
-  --sl-text-code: 13px;
+  --grid: calc(20px * var(--sf, 1));
+  --docs-type: calc(14px * var(--sf, 1));
+  --docs-type-small: calc(10px * var(--sf, 1));
+  --docs-type-heading: calc(15px * var(--sf, 1));
+  --docs-type-title-2: calc(17px * var(--sf, 1));
+  --docs-type-title-1: calc(20px * var(--sf, 1));
+  --docs-tracking: calc(-0.28px * var(--sf, 1));
+  --sl-text-code: calc(13px * var(--sf, 1));
   --sl-line-height: 1.4286;
 }
 
@@ -217,7 +217,7 @@ body.sidebar-open {
 .sl-markdown-content .sl-heading-wrapper {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: calc(10px * var(--sf, 1));
   font-size: var(--docs-type);
   line-height: var(--grid);
 }
@@ -226,15 +226,15 @@ body.sidebar-open {
 
 /* Code frames: thirteen on the same rows, a square of room around it, its frame a shadow. */
 .expressive-code {
-  --ec-brdRad: 4px;
+  --ec-brdRad: calc(4px * var(--sf, 1));
   margin: var(--grid) 0;
-  font-size: 13px;
+  font-size: calc(13px * var(--sf, 1));
   line-height: var(--grid);
 }
 .expressive-code .frame { box-shadow: inset 0 0 0 1px var(--ds1-docs-divider); border-radius: 4px; }
 .expressive-code .frame pre { border: 0; background: transparent; }
-.expressive-code .frame pre > code { padding: var(--grid) 0; font-size: 13px; line-height: var(--grid); }
-.expressive-code .frame .ec-line { font-size: 13px; line-height: var(--grid); }
+.expressive-code .frame pre > code { padding: var(--grid) 0; font-size: calc(13px * var(--sf, 1)); line-height: var(--grid); }
+.expressive-code .frame .ec-line { font-size: calc(13px * var(--sf, 1)); line-height: var(--grid); }
 .expressive-code .frame .ec-line .code { padding-inline: var(--grid); }
 .expressive-code .frame.is-terminal .header,
 .expressive-code .frame.has-title .header {
@@ -288,10 +288,10 @@ body.sidebar-open {
 }
 
 /* On this page: twelve squares, its writing starting level with the page's. */
-.right-sidebar-container { width: 240px; flex: none; }
-.right-sidebar { width: 240px; box-shadow: inset 1px 0 var(--ds1-docs-header-border); border: 0; }
+.right-sidebar-container { width: calc(240px * var(--sf, 1)); flex: none; }
+.right-sidebar { width: calc(240px * var(--sf, 1)); box-shadow: inset 1px 0 var(--ds1-docs-header-border); border: 0; }
 .right-sidebar-panel { padding: calc(2 * var(--grid)) var(--grid); }
-.right-sidebar-panel .sl-container { width: 200px; max-width: 200px; }
+.right-sidebar-panel .sl-container { width: calc(200px * var(--sf, 1)); max-width: calc(200px * var(--sf, 1)); }
 .right-sidebar-panel h2 {
   margin: 0 0 var(--grid);
   font-family: var(--typeface-medium, var(--typeface-regular));
@@ -323,3 +323,4 @@ body.sidebar-open {
 .expressive-code pre {
   overflow: visible;
 }
+html:root { --ds-sf: var(--sf, 1); }

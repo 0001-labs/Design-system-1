@@ -18,6 +18,15 @@ const { landing = false } = Astro.props;
   import { connectCodeCopy } from '../lib/code-copy';
   connectCodeCopy();
   import '../../../DS1/0-face/device';
+  const updateLayout = () => {
+    const root = document.documentElement;
+    const scale = Number.parseFloat(getComputedStyle(root).getPropertyValue('--sf')) || 1;
+    root.toggleAttribute('data-docs-compact', root.clientWidth / scale <= 768);
+  };
+  updateLayout();
+  window.addEventListener('scaling-changed', updateLayout);
+  window.addEventListener('resize', updateLayout);
+
   const frame = document.querySelector<HTMLIFrameElement>('#navigation-auth');
   const requestStatus = () => frame?.contentWindow?.postMessage({ type: 'ds1:navigation-auth-request' }, location.origin);
   frame?.addEventListener('load', requestStatus);
@@ -27,7 +36,7 @@ const { landing = false } = Astro.props;
   window.addEventListener('message', (event) => {
     if (event.origin !== location.origin || event.source !== frame?.contentWindow) return;
     if (event.data?.type === 'ds1:library-created' && typeof event.data.id === 'string') {
-      location.href = `/classless/libraries/?${new URLSearchParams({ library: event.data.id, view: 'overview' })}`;
+      location.href = `/libraries/workspace/?${new URLSearchParams({ library: event.data.id, view: 'overview' })}`;
       return;
     }
     if (event.data?.type !== 'ds1:navigation-auth') return;
@@ -45,4 +54,6 @@ const { landing = false } = Astro.props;
     .docs-header .docs-brand-menu { display: inline-flex; width: var(--site-unit); overflow: hidden; font-size: 0; }
 
   }
+  :global(html[data-docs-compact]) .docs-header--with-sidebar .system-breadcrumb { flex: 1; min-width: 0; }
+  :global(html[data-docs-compact]) .docs-header .docs-brand-menu { display: inline-flex; width: var(--site-unit); overflow: hidden; font-size: 0; }
 </style>

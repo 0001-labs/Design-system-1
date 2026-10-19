@@ -25,7 +25,7 @@ import { LAYERS } from '../lib/component-directory';
 
 <style>
   .landing {
-    --landing-unit: min(calc(var(--unit, 20px) * var(--sf, 1)), calc(100vw / 57));
+    --landing-unit: var(--site-unit);
     --landing-type: calc(0.7 * var(--landing-unit));
     position: relative;
     isolation: isolate;
@@ -101,19 +101,19 @@ import { LAYERS } from '../lib/component-directory';
 
 
   @media (max-width: 1100px) {
-    .landing { --landing-unit: min(calc(var(--unit, 20px) * var(--sf, 1)), calc(100vw / 39)); }
+    .landing { --landing-unit: var(--site-unit); }
     .landing-directory { --directory-type: calc(4 * var(--landing-unit)); }
   }
   @media (max-width: 680px) {
-    .landing { --landing-unit: min(calc(var(--unit, 20px) * var(--sf, 1)), calc(100vw / 21)); }
+    .landing { --landing-unit: var(--site-unit); }
     .landing-layers { margin-inline-start: var(--landing-unit); }
     .landing-directory { --directory-type: calc(3 * var(--landing-unit)); margin-inline: var(--landing-unit); }
     .directory-layer { grid-template-columns: minmax(0, 1fr); }
     .directory-layer-head { position: static; }
   }
-  :global(html.mobile) .landing { --landing-unit: min(calc(var(--unit, 20px) * var(--sf, 1)), calc(100vw / 21)); }
+  :global(html.mobile) .landing { --landing-unit: var(--site-unit); }
   :global(html.mobile) .landing-layers { margin-inline-start: var(--landing-unit); }
-  :global(html.mobile) .landing-directory { --directory-type: calc(3 * var(--landing-unit)); margin-inline: var(--landing-unit); }
+  :global(html.mobile) .landing-directory { --directory-type: calc(2 * var(--landing-unit)); margin-inline: var(--landing-unit); }
   :global(html.mobile) .directory-layer { grid-template-columns: minmax(0, 1fr); }
   :global(html.mobile) .directory-layer-head { position: static; }
   @media (prefers-reduced-motion: reduce) {

@@ -78,7 +78,7 @@
 
 /* Private navigation stays hidden while the existing session is checked. */
 html:not([data-signed-in]) [data-requires-signin],
-html:not([data-signed-in]) .sidebar-content a[href="/classless/libraries/"] {
+html:not([data-signed-in]) .sidebar-content a[href="/libraries/workspace/"] {
   display: none !important;
 }
 

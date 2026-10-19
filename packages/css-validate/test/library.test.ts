@@ -72,11 +72,10 @@ describe("the component token bridge", () => {
     expect(libraryRevision(`:root {}\n${libraryStamp()}`), "only a first line counts").toBeUndefined();
   });
 
-  it("joins library tokens the classless sheet defines to component tokens the components read", () => {
-    const classless = read("DS1/1-root/one.semantic.css");
+  it("maps legacy library tokens to tokens the components read", () => {
     const components = componentSources();
     for (const [component, token] of LIBRARY_TOKENS) {
-      expect(classless, `${token} is a classless token`).toMatch(new RegExp(`${token}:`));
+      expect(token).toMatch(/^--one-/);
       expect(components, `${component} is read by a component`).toMatch(new RegExp(`var\\(${component}[,)]`));
     }
     expect(new Set(LIBRARY_TOKENS.map(([component]) => component)).size, "one source per component token").toBe(LIBRARY_TOKENS.length);
@@ -140,8 +139,8 @@ describe("preparing a library for publishing", () => {
     expect(charset.startsWith(`@charset "utf-8";\n${libraryStamp()}\n`)).toBe(true);
   });
 
-  it("prepares the classless sheet and a component library, both valid and stamped", () => {
-    for (const draft of [read("DS1/1-root/one.semantic.css"), `${read("DS1/1-root/component-metrics.css")}\n${read("DS1/1-root/component-tokens.css")}`.replace(/^@import[^;]+;\s*/gm, "")]) {
+  it("prepares a legacy draft and a component library, both valid and stamped", () => {
+    for (const draft of [':root { --one-radius: 4px; --one-accent-color: #99ff73; }', `${read("DS1/1-root/component-metrics.css")}\n${read("DS1/1-root/component-tokens.css")}`.replace(/^@import[^;]+;\s*/gm, "")]) {
       const { css } = prepareLibrary(draft);
       expect(validateCss(css).ok).toBe(true);
       expect(libraryRevision(css)).toBe(LIBRARY_REVISION);

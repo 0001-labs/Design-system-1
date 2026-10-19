@@ -52,12 +52,6 @@ Give `ds-button` an `href` and its face becomes a link (`<a part="control">`) dr
 <ds-button href="https://example.com/" blank>Example</ds-button>
 ```
 
-On a page without Lit, put `ds-button` on the `<a>` itself. `a.ds-button` never takes the link's underline or colours, so `ds-button--primary`, `--secondary`, `--icon` and the tabs row look as they do on a `<button>`:
-
-```html
-<a class="ds-button ds-button--secondary" href="/icons/">Icons</a>
-```
-
 React products use `ButtonLink` from the button adapter; the anchor is the light-DOM control, and refs and handlers reach it:
 
 ```tsx

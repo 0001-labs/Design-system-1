@@ -7,7 +7,7 @@ import LayoutExample from "../../../components/LayoutExample.astro";
 
 import { HTML_EXAMPLES } from '../../../lib/html-examples';
 
-These full-page examples compose Core and Unit components using [Layout](/4-page/layout/). Open one full size or use **Show layers** to inspect its composition.
+These full-page examples compose Core and Unit components using [Layout](/4-page/page/). Open one full size or use **Show layers** to inspect its composition.
 
 ## Shops and apps
 
@@ -58,7 +58,7 @@ An overview of many numbers at once. Each tile is 12 squares wide and the row fi
 
 Each HTML example is a complete HTML document. Open it to try the page, or download the file and edit it in any text editor. No framework, package install or build step is needed.
 
-The files use the same native stylesheet as Design system 1's library workspace, served from this site's canonical source. The companion font stylesheet configures the supplied GT America and Iosevka fonts; the native stylesheet itself imports no fonts. These are online dependencies, not embedded files.
+The files load the Design system 1 stylesheet and bundled Lit module from this site, then use `ds-*` elements alongside semantic HTML. Fonts load with the stylesheet. These are online dependencies.
 
 {HTML_EXAMPLES.map(example => <section>
   <h2>{example.title}</h2>
@@ -68,13 +68,11 @@ The files use the same native stylesheet as Design system 1's library workspace,
 
 ## What you download
 
-One authored HTML file, including any small example-specific script. The article, report and reference have no JavaScript. The form's script only shows local feedback and prevents submission; it has no backend.
+One authored HTML file, including any example-specific script. The Lit module registers the components. The form shows local feedback and prevents submission; it has no backend.
 
-The CSS and fonts load over the internet. To work offline, save both CSS files and the fonts the font stylesheet references, then change the paths in your copy. A file opened with no connection falls back to browser styling if those resources are unavailable.
+To work offline, serve a local copy of the library bundle, its chunks, CSS and fonts, then update the URLs in your HTML.
 
-## More behavior
-
-For custom charts, menus, sidebars and other interactive controls, use the [Web Component examples](/2-core/overview/#component-overview). Those components need JavaScript; a stylesheet alone does not implement them. Start with the [overview](/start-here/overview/) for the full map, or [My libraries](/libraries/) for saved stylesheets.
+For more components, see the [component examples](/2-core/overview/#component-overview), or start with [Use with HTML](/start-here/quick-start/).
 
 
 ## Photo credits

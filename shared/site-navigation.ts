@@ -4,11 +4,11 @@ export const siteNavigation: readonly { label: string; href: string }[] = [];
 export function isNavigationCurrent(href: string, pathname: string): boolean {
   const path = pathname.replace(/\/$/, "") || "/";
   if (href === "/app/libraries") {
-    return path === "/app/libraries" || path === "/classless/libraries" || path === "/app" || path === "/app/playground" || path.startsWith("/app/l/") || path === "/classless/editor";
+    return path === "/app/libraries" || path === "/libraries/workspace" || path === "/app" || path === "/app/playground" || path.startsWith("/app/l/") || path === "/libraries/playground";
   }
   if (["/components/", "/icons/", "/colours/", "/start-here/examples/"].includes(href)) return path === href.replace(/\/$/, "");
   if (href === "/start-here/overview/") {
-    return path !== "/" && !path.startsWith("/app") && !path.startsWith("/classless/editor") && !path.startsWith("/classless/libraries");
+    return path !== "/" && !path.startsWith("/app") && !path.startsWith("/libraries/playground") && !path.startsWith("/libraries/workspace");
   }
   return path === href;
 }

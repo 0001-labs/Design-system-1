@@ -69,4 +69,4 @@ Shared components read their own `--ds-sf`, which stays 1 so an embedded documen
 
 ## Copying it
 
-The module imports nothing. Sync 1's `root` export copies it alone with `"modules": ["scaling"]`, as `0-face/scaling.ts` (`"scriptsTo"` puts it in a folder apart from the stylesheets); see [Native controls](/1-root/native-controls/#copying-the-stylesheets).
+The module imports nothing. Sync 1's `root` export copies it alone with `"modules": ["scaling"]`, as `0-face/scaling.ts` (`"scriptsTo"` puts it in a folder apart from the stylesheets); see [Root](/1-root/overview/).

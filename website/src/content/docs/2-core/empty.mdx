@@ -43,7 +43,6 @@ A place can be empty because everything in it is finished: every receipt found, 
 </ds-empty>
 ```
 
-Without JavaScript, add `ds-empty--done` to the block and put the check in `ds-empty__icon`.
 
 ## API
 
@@ -79,21 +78,3 @@ import { Empty } from "@0001-labs/design-system-1/DS1/react/empty";
 ```
 
 `Empty` renders `ds-empty` with its heading, text and actions in the light DOM, so the words are in the server's HTML and in the product's tests. Register `ds-empty` in the browser before hydration.
-
-## Without JavaScript
-
-A page without Lit draws the same block with the classes in `empty.css`, which `controls.css` imports. The classes do not translate: the page writes its own words.
-
-```html
-<section class="ds-empty">
-  <h2 class="ds-empty__title">Nothing here yet</h2>
-  <p class="ds-empty__text">Lists you make or are given appear here.</p>
-  <div class="ds-empty__actions">
-    <button class="ds-button ds-button--primary" type="button">New list</button>
-  </div>
-</section>
-```
-
-`ds-empty__icon` holds an icon, and `ds-empty--centered` centres the block. See [Native controls](/1-root/native-controls/).
-
-[Notice](/2-core/notice/) · [Text](/2-core/text/) · [Button](/2-core/button/)

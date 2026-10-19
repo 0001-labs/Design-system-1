@@ -1,6 +1,9 @@
 ---
 import translations from '../../public/translations.json';
+import { readFileSync } from 'node:fs';
+import { transformSync } from 'esbuild';
 import themeBootstrap from '../../../DS1/0-face/theme-bootstrap.js?raw';
+const scalingBootstrap = transformSync(readFileSync(new URL('../../../DS1/0-face/scaling.ts', import.meta.url), 'utf8') + '\napplyScaling(); document.documentElement.style.setProperty("--ds-sf", "var(--sf)"); document.documentElement.toggleAttribute("data-docs-compact", document.documentElement.clientWidth / (parseFloat(document.documentElement.style.getPropertyValue("--sf")) || 1) <= 768);', { loader: 'ts', format: 'iife', minify: true }).code;
 const languages = [...new Set(['en', ...Object.keys(translations)])];
 ---
 <script is:inline define:vars={{ languages }}>
@@ -9,3 +12,5 @@ const languages = [...new Set(['en', ...Object.keys(translations)])];
   window.DS_ONE_PREFERENCES = { ...window.DS_ONE_PREFERENCES, themeMode: 'system', themePaper: false };
 </script>
 <script is:inline set:html={themeBootstrap}></script>
+
+<script is:inline set:html={scalingBootstrap}></script>

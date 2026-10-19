@@ -69,28 +69,6 @@ shortcut); `trigger-mode` is always `context`. For a gesture on a surface that
 opens something else, `bindContextMenuTrigger` from `DS1/3-unit/context-trigger`
 owns the same right click, keys and 500ms touch hold (`LONG_PRESS`).
 
-## Without Lit
-
-A page without Lit, or a menu a library draws, takes the same face from the
-native class `.ds-context` (`context.css`, which `controls.css` imports):
-
-```html
-<div class="ds-context" role="menu" aria-label="Track" popover>
-  <span class="ds-context__label">Track</span>
-  <button role="menuitem">Rename<span class="ds-context__shortcut">⌘R</span></button>
-  <button role="menuitem">Duplicate</button>
-  <hr>
-  <button role="menuitem" class="ds-context__item--danger">Delete</button>
-</div>
-```
-
-Its rows are its buttons, links and menu items (or `ds-context__item`); an
-`hr`, `role="separator"` or `ds-context__separator` is a group gap, and one
-first, last or after another is quiet. The page opens and places it (a popover
-at the pointer, say) and owns its keys; `aria-busy="true"` shows a pending
-menu's wait and `data-ds-refused` a refused row. A Select's menu is the light
-face, `.ds-menu`.
-
 ## React
 
 `DS1/react/context` composes it: `Context`, `ContextTrigger` (`asChild` keeps

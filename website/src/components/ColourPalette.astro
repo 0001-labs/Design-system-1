@@ -1,7 +1,7 @@
 ---
 // One palette, named by colour and sorted by hue, the inks after it; light and dark on two tabs.
 // The colours and their pastel, dark and dim versions come from DS1/1-root/palette.ts, which also writes them
-// into the CLASSless stylesheet. Where each colour is used is in the design-system-1 skill.
+// into the shared palette stylesheet. Where each colour is used is in the design-system-1 skill.
 
 
 import { palette as readPalette } from '../../../DS1/1-root/palette';
@@ -40,27 +40,26 @@ const inks = colours.filter(c => c.ink);
 
 <style>
       /* On the 20px square: a swatch is eight squares wide, light and dark halves of four, three squares high; 14px text on 20px lines. */
-      .colours { padding-bottom: 80px; }
-      .colours section { margin-top: 40px; }
-      .colours h2 { margin: 0 0 20px; font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: 0; }
-      .swatches { display: grid; grid-template-columns: repeat(auto-fill, 160px); gap: 20px; margin: 0; padding: 0; list-style: none; }
-      .swatch { font-size: 14px; line-height: 20px; }
-      .swatch-pair { display: grid; grid-template-columns: 1fr 1fr; height: 60px; margin: 4px 0; border-radius: 4px; overflow: hidden; }
+      .colours { padding-bottom: calc(80px * var(--sf, 1)); }
+      .colours section { margin-top: calc(40px * var(--sf, 1)); }
+      .colours h2 { margin: 0 0 calc(20px * var(--sf, 1)); font-size: calc(14px * var(--sf, 1)); line-height: calc(20px * var(--sf, 1)); font-weight: 500; letter-spacing: 0; }
+      .swatches { display: grid; grid-template-columns: repeat(auto-fill, calc(160px * var(--sf, 1))); gap: calc(20px * var(--sf, 1)); margin: 0; padding: 0; list-style: none; }
+      .swatch { font-size: calc(14px * var(--sf, 1)); line-height: calc(20px * var(--sf, 1)); }
+      .swatch-pair { display: grid; grid-template-columns: 1fr 1fr; height: calc(60px * var(--sf, 1)); margin: calc(4px * var(--sf, 1)) 0; border-radius: 4px; overflow: hidden; }
       .swatch b { display: block; font-weight: 500; }
-      .inks { grid-template-columns: repeat(auto-fill, 80px); }
+      .inks { grid-template-columns: repeat(auto-fill, calc(80px * var(--sf, 1))); }
       .inks .swatch b { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-      .swatch-one { display: block; height: 40px; margin: 4px 0; border-radius: 4px; overflow: hidden; }
+      .swatch-one { display: block; height: calc(40px * var(--sf, 1)); margin: calc(4px * var(--sf, 1)) 0; border-radius: 4px; overflow: hidden; }
       .swatch-one i, .swatch-pair i { display: block; height: 100%; }
-      .hexes { display: grid; grid-template-columns: 80px 80px; }
+      .hexes { display: grid; grid-template-columns: calc(80px * var(--sf, 1)) calc(80px * var(--sf, 1)); }
       /* The title small, and Light and Dark as one split button at the right, both on one 20px row. */
-      .colours-bar { display: flex; align-items: center; justify-content: space-between; height: 20px; margin-top: 40px; padding: 0 20px; }
-      .colours-bar h1 { margin: 0; font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: 0; }
-      .mode { margin-top: 20px; padding: 0 20px 40px; }
+      .colours-bar { display: flex; align-items: center; justify-content: space-between; height: calc(20px * var(--sf, 1)); margin-top: calc(40px * var(--sf, 1)); padding: 0 calc(20px * var(--sf, 1)); }
+      .colours-bar h1 { margin: 0; font-size: calc(14px * var(--sf, 1)); line-height: calc(20px * var(--sf, 1)); font-weight: 500; letter-spacing: 0; }
+      .mode { margin-top: calc(20px * var(--sf, 1)); padding: 0 calc(20px * var(--sf, 1)) calc(40px * var(--sf, 1)); }
       .mode.dark { background: #1e1e1e; color: #e6e6e6; }
       .mode.dark .swatch code { color: #b3b3b3; }
-      .mode section:first-child { padding-top: 20px; margin-top: 0; }
-      .swatch code { display: block; font-size: 12px; line-height: 20px; color: var(--muted); }
+      .mode section:first-child { padding-top: calc(20px * var(--sf, 1)); margin-top: 0; }
+      .swatch code { display: block; font-size: calc(12px * var(--sf, 1)); line-height: calc(20px * var(--sf, 1)); color: var(--muted); }
 
 .colours-bar { margin-top: 0; padding: 0; justify-content: flex-start; }
-.mode { padding-inline: 0; }
-</style>
+.mode { padding-inline: 0; }</style>

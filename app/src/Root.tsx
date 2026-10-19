@@ -9,7 +9,7 @@ import { useEffect, type ReactNode } from "react";
 import "../../DS1/2-core/ds-button";
 import { Button } from "../../DS1/react/button";
 import { LoadingIndicator } from "../../packages/app/src/react/loading";
-import { App } from "./App";
+import { SystemWorkbench } from "./SystemWorkbench";
 import { AppShell } from "./AppShell";
 import { libraryWorkspaceRedirect } from "../../shared/library-navigation";
 import { convex } from "./lib/convex";
@@ -43,7 +43,7 @@ function Routes() {
     if (destination) window.location.replace(destination);
   }, [path]);
 
-  if (path === "/" || path === "/playground") return <App />;
+  if (path === "/" || path === "/playground") return <SystemWorkbench />;
 
   if (isLoading) return <Splash />;
 

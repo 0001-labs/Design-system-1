@@ -18,7 +18,7 @@ const oneImports = ['fonts.css', 'palette.css'];
 /** The sheets controls.css imports besides the text classes: tables, empty states, notices, shortcut hints, the dialog's placements, the site chrome (header with its drawer, footer, document), carousels, cards, stats, progress, and rows. */
 const controlSheets = ['table.css', 'empty.css', 'notice.css', 'overlay.css', 'header.css', 'footer.css', 'document.css', 'bento.css', 'carousel.css', 'card.css', 'figures.css', 'progress.css', 'row.css', 'context.css'];
 /** Sheets for writing that a product asks for by name, as a flag or in `styles`. */
-const writingSheets = { prose: 'prose.css', classless: 'one.semantic.css', cjk: 'cjk.css' };
+const writingSheets = { prose: 'prose.css', cjk: 'cjk.css' };
 const askedSheets = options => Object.entries(writingSheets).filter(([flag]) => options[flag]).map(([, file]) => file);
 /** The faces fonts.css (and so one.css) loads, by the file names its @font-face rules use, and their licences. */
 const rootFonts = ['GT-America-Standard-Regular.woff2', 'GT-America-Standard-Medium.woff2', 'GT-America-Compressed-Regular.woff2', 'GT-Canon-M-Standard-Medium-Trial.woff2', 'Inter-Arrows.woff2', 'Iosevka-Regular.woff2', 'Inter-LICENSE.md', 'Iosevka-LICENSE.md'];
@@ -139,8 +139,7 @@ export default {
      * classes it imports (table.css, text.css, empty.css, notice.css, kbd.css,
      * overlay.css, header.css, footer.css, document.css,
      * carousel.css, figures.css, progress.css, row.css);
-     * `prose` adds the prose sheet (prose.css, for writing marked data-ds-prose) and `classless` the classless sheet
-     * (one.semantic.css, which styles a whole page of plain HTML) and `cjk` Noto Sans
+     * `prose` adds the prose sheet (prose.css, for writing marked data-ds-prose) and `cjk` Noto Sans
      * for Japanese and Chinese (cjk.css); `bundle` writes them all as one
      * bundle.css with the imports resolved, for a page that can carry only one
      * stylesheet or inlines its styles.
@@ -170,8 +169,7 @@ export default {
      * `nativeControls` adds controls.css and the table.css, empty.css,
      * notice.css, kbd.css, overlay.css, header.css,
      * footer.css, document.css, carousel.css, figures.css, progress.css and row.css it imports; `prose`
-     * adds the prose sheet (prose.css) and `classless` the classless sheet
-     * (one.semantic.css) and `cjk` Noto Sans for Japanese and Chinese (cjk.css,
+     * adds the prose sheet (prose.css) and `cjk` Noto Sans for Japanese and Chinese (cjk.css,
      * from Google Fonts), which `styles` may also name; `modules` names page scripts
      * from 0-face/ (app-banner, carousel, grid, grid-fit, layout-inspector, scaling, theme,
      * theme-bootstrap, tooltips, tree, header, keys, overlay-swipe), copied with what they import, into 0-face/;

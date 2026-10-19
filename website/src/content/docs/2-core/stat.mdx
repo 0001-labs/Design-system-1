@@ -95,19 +95,3 @@ import { Stat } from "@0001-labs/design-system-1/DS1/react/stat";
 ```
 
 `Stat` writes the label, the figure (already formatted, in `language` when a server names the request's) and the caption in the light DOM, so the server's HTML shows the figure. Register `ds-stat` in the browser before hydration.
-
-## Without JavaScript
-
-```html
-<ul class="ds-stats">
-  <li class="ds-stat">
-    <p class="ds-stat__label">Revenue</p>
-    <p class="ds-stat__figure">€1,234.50</p>
-    <p class="ds-stat__caption"><span class="ds-stat__change">+12%</span>Since last month</p>
-  </li>
-</ul>
-```
-
-`ds-stat--danger` and `--warning` colour the figure, `ds-stat__change--danger` and `--warning` the change, and `ds-stat__icon` holds an icon before the label. The page writes the figure itself, through `format.ts` where it can. From `figures.css`, which `controls.css` imports.
-
-[Meter](/2-core/meter/) · [Formatting](/1-root/formatting/) · [Table](/3-unit/table/)

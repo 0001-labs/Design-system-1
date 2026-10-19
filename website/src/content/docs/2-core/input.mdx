@@ -133,11 +133,3 @@ light-DOM frame. Preference changes do not animate corners or padding.
 ```
 
 `rows` sets the starting height in 20px rows, scaled by `--ds-sf`. `auto-grow` grows and shrinks with the content up to `max-rows` (default 10), then scrolls; it follows width, surface scale and loaded-font changes, so a product keeps no height measurements or resize handlers of its own. Without it, the field can be resized vertically. `wrap` accepts `soft`, `hard` or `off`. Enter inserts a newline and does not activate the surrounding form; a product's keyboard handler may implement a deliberate send action and cancel the event. The default `field` variant uses the standard control treatment; `variant="plain"` removes the field background and border for an inline editor. `--ds-textarea-height` and `--ds-textarea-padding` configure the field through public tokens, and automatic growth takes ownership of height. In React, `<Input multiline rows={3} autoGrow maxRows={8} />`.
-
-A page without Lit writes `ds-input` on a native `<textarea>`.
-
-## Without Lit
-
-A page without Lit sets a label, a hint and an error around a native
-`.ds-input` with the `ds-field` class; see
-[Native controls](/1-root/native-controls/#field).

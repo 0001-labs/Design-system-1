@@ -21,7 +21,7 @@ export function readLibraryNavigation(value: unknown): LibraryNavigation | null 
 }
 
 export function libraryWorkspaceHref(library: LibraryNavigation, component = library.component): string {
-  return `/classless/libraries/?${new URLSearchParams({ library: library.id, component, ...(library.view ? { view: library.view } : {}) })}`;
+  return `/libraries/workspace/?${new URLSearchParams({ library: library.id, component, ...(library.view ? { view: library.view } : {}) })}`;
 }
 
 /** Normal library links share the docs shell; embedded and explicit full-screen apps stay put. */
@@ -33,5 +33,5 @@ export function libraryWorkspaceRedirect(path: string, query: URLSearchParams, e
   if (match) destination.set('library', decodeURIComponent(match[1]!));
   if (query.get('view') === 'overview') destination.set('view', 'overview');
   if (query.has('component')) destination.set('component', libraryComponent(query.get('component')));
-  return `/classless/libraries/${destination.size ? `?${destination}` : ''}`;
+  return `/libraries/workspace/${destination.size ? `?${destination}` : ''}`;
 }

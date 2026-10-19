@@ -1,5 +1,5 @@
 // Design system 1's palette: one list, named by colour. The Colours page (website/src/pages/colours.astro)
-// draws it and the CLASSless stylesheet (one.semantic.css) carries it as tokens, written by
+// draws it and the shared stylesheet (palette.css) carries it as tokens, written by
 // scripts/write-palette-css.ts. Change a colour here, then run that script.
 //
 // Every palette colour has a pastel (its hue and saturation at 90% lightness) and a dark-mode version
@@ -77,7 +77,7 @@ export function palette(): PaletteColour[] {
 export const paletteStart = '  /* Palette: written by scripts/write-palette-css.ts from DS1/1-root/palette.ts. */';
 export const paletteEnd = '  /* Palette: end */';
 
-/** The CLASSless tokens: each colour and its pastel, both following the reader's light or dark mode. */
+/** The shared tokens: each colour and its pastel, both following the reader's light or dark mode. */
 export function paletteCss(): string {
   const lines = [paletteStart];
   for (const c of palette()) {
@@ -91,7 +91,7 @@ export function paletteCss(): string {
 }
 
 /**
- * The palette on its own, for a page that does not take the classless sheet: palette.css,
+ * The palette on its own, for a page that does not take the shared sheet: palette.css,
  * imported by one.css and copied by Sync 1's `root` and `tokens` exports.
  */
 export function paletteSheet(): string {

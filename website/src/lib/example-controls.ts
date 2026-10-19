@@ -23,7 +23,7 @@ export function followPageTheme(frame: HTMLIFrameElement): void {
   const send = () => {
     const selected = root.getAttribute('data-theme');
     const dark = selected === 'dark' || (selected !== 'light' && (root.classList.contains('dark-theme') || (!root.classList.contains('light-theme') && system.matches)));
-    frame.contentWindow?.postMessage({ type: 'ds1-example-theme', theme: dark ? 'dark' : 'light' }, location.origin);
+    frame.contentWindow?.postMessage({ type: 'ds1-example-theme', theme: dark ? 'dark' : 'light', scale: parseFloat(getComputedStyle(root).getPropertyValue('--sf')) || 1 }, location.origin);
   };
   frame.addEventListener('load', send);
   window.addEventListener('message', event => {
@@ -31,6 +31,8 @@ export function followPageTheme(frame: HTMLIFrameElement): void {
   });
   new MutationObserver(send).observe(root, { attributes: true, attributeFilter: ['class', 'data-theme'] });
   system.addEventListener('change', send);
+  window.addEventListener('scaling-changed', send);
+  window.addEventListener('resize', send);
   send();
 }
 

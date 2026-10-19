@@ -2,7 +2,7 @@
 
 A design system for building interfaces on a 20px grid. Typography, colour, spacing and components share the same rules.
 
-Use CSS to style ordinary HTML, or Lit web components for interactive controls. Change the design through CSS custom properties.
+Use Lit Web Components directly in HTML, or through the React adapters. Change the design through CSS custom properties.
 
 [Explore the system](https://designsystem1.com/) · [Try the workbench](https://designsystem1.com/app/) · [npm](https://www.npmjs.com/package/@0001-labs/design-system-1)
 
@@ -25,11 +25,15 @@ Then use the components in your HTML:
 <ds-button>Save</ds-button>
 ```
 
-For ordinary HTML without component JavaScript, import only the classless stylesheet:
+For a plain HTML page, load the stylesheet and component module:
 
-```js
-import "@0001-labs/design-system-1/DS1/1-root/one.semantic.css";
+```html
+<link rel="stylesheet" href="https://designsystem1.com/resources/design-system-1.css">
+<script type="module" src="https://designsystem1.com/resources/design-system-1.js"></script>
+<ds-button>Save</ds-button>
 ```
+
+The module includes Lit. No package install or build step is needed for this setup.
 
 The package is in alpha. APIs can change between releases.
 

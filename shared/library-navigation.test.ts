@@ -21,7 +21,7 @@ test('navigation stays within the selected library and public component catalogu
 test('direct links retain library/component selection without redirecting embedded or full-screen sessions', () => {
   const query = new URLSearchParams({ component: '/2-core/input/' });
   const destination = new URL(libraryWorkspaceRedirect('/l/library-one', query, false, false)!, 'https://designsystem1.com');
-  expect(destination.pathname).toBe('/classless/libraries/');
+  expect(destination.pathname).toBe('/libraries/workspace/');
   expect(destination.searchParams.get('library')).toBe('library-one');
   expect(destination.searchParams.get('component')).toBe('/2-core/input/');
   expect(libraryWorkspaceRedirect('/l/library-one', new URLSearchParams(), true, false)).toBeNull();

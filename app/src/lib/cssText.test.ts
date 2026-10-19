@@ -1,11 +1,9 @@
-import { readFileSync } from "node:fs";
 
 import { describe, expect, it } from "vite-plus/test";
 
 import { matchingBrace, readCustomProperty, replaceCustomProperty, rootBlockRange } from "./cssText";
 
-const STOCK_SHEET = new URL("../../../DS1/1-root/one.semantic.css", import.meta.url);
-const stock = () => readFileSync(STOCK_SHEET, "utf8");
+const stock = () => ':root {\n  --one-accent-color: #99ff73;\n  --one-radius: 4px;\n  --one-unit: 20px;\n  --one-font: Arial;\n  --one-page-width: 640px;\n}\nbody { box-sizing: border-box; }';
 
 /** A dark-mode override above `:root` — the shape that used to corrupt drafts. */
 const DARK_BLOCK_ABOVE_ROOT = [
@@ -136,7 +134,7 @@ describe("replaceCustomProperty", () => {
 });
 
 describe("readCustomProperty", () => {
-  it("reads every token the workbench binds to", () => {
+  it("reads the tokens in an existing library", () => {
     const css = stock();
     for (const token of ["--one-accent-color", "--one-radius", "--one-unit", "--one-page-width", "--one-font"]) {
       expect(readCustomProperty(css, token), token).toBeTruthy();

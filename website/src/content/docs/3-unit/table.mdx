@@ -41,27 +41,6 @@ table.data = [{ product: "Atlas", users: 120, status: "Active" }];
 table.footer = { product: "Total", users: 120 };
 ```
 
-## On a native table
-
-Give a `<table>` the `ds-table` class from the native controls stylesheet (`controls.css`, which imports `table.css`) for the same look with your own markup: column groups as header cells with `colspan`, row groups as `<th scope="rowgroup">`, totals in `<tfoot>`.
-
-| Markup | What it does |
-| --- | --- |
-| `<div class="ds-table-scroll">` around the table | Scrolls a wide table sideways. |
-| `data-sticky` on the table | Keeps the first column in place. |
-| `data-numeric` on a cell | Sets a number to the column's end in tabular figures. |
-| `aria-selected="true"` on a cell | Marks a selected cell with the accent. |
-
-```html
-<div class="ds-table-scroll">
-  <table class="ds-table" data-sticky>
-    <thead><tr><th scope="col">Product</th><th scope="col" data-numeric>Users</th></tr></thead>
-    <tbody><tr><th scope="row">Atlas</th><td data-numeric>120</td></tr></tbody>
-    <tfoot><tr><th scope="row">Total</th><td data-numeric>120</td></tr></tfoot>
-  </table>
-</div>
-```
-
 ## Sheet
 
 For a lot of data, as in a spreadsheet, give the table `sheet`. Every cell is four squares wide and one high, 80 by 20, with its 1px lines at its end and its foot, so its words have 79 by 19 and stand 4px in on the sixteen, as an Ezo item's do. Numbers keep to the column's end. A cell's words never widen it: what does not fit fades out over the cell's last square, never an ellipsis. The fade is on the words alone, so it fades into whatever is behind them, the paper or a selected or hovered cell's fill, and only where they are cut: words that fit stay whole. Words fade at their end; a number keeps its last digits against the column's end and fades its first ones, in either direction of writing. Above the column labels a row of letters (A, B … Z, AA …) names the columns, and a column two squares wide numbers the rows; both stay in place while the sheet scrolls both ways. A selected cell (`aria-selected="true"`) is ringed rather than filled. With `reorderable` the rows move by a grip on their number; see [Moving rows](#moving-rows).
@@ -121,7 +100,7 @@ const [rows, setRows] = useState(sales);
 
 The totals row stays where it is. Moving rows belongs to the element; a native `.ds-table[data-sheet]` has no grips.
 
-[Row](/3-unit/row/) · [Native controls](/1-root/native-controls/)
+[Row](/3-unit/row/) · [Use with HTML](/start-here/quick-start/)
 
 ## Open row details
 

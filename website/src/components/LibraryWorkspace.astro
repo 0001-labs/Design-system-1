@@ -7,21 +7,21 @@ const { mode } = Astro.props;
 const appPath = mode === 'editor' ? '/app/playground' : '/app/libraries';
 ---
 
-<section class="classless-workspace" aria-labelledby="classless-title" data-pagefind-body>
-  <div class="classless-heading">
+<section class="library-workspace" aria-labelledby="library-title" data-pagefind-body>
+  <div class="library-heading">
     <div>
-      <h1 id="classless-title">Design system 1</h1>
-      <p>Native HTML. Your design. One stylesheet.</p>
+      <h1 id="library-title">Design system 1</h1>
+      <p>Lit components. Your design. One library.</p>
     </div>
     <a href={`${appPath}?standalone=1`} target="_blank" rel="noopener">Open full screen</a>
   </div>
-  <nav class="classless-tabs" aria-label="Design system 1">
+  <nav class="library-tabs" aria-label="Design system 1">
     <a href="/start-here/overview/">Overview</a>
-    <a data-requires-signin href="/classless/libraries/" aria-current="page">My libraries</a>
+    <a data-requires-signin href="/libraries/workspace/" aria-current="page">My libraries</a>
     <span>{mode === 'editor' ? 'Playground · changes are temporary' : 'Saved stylesheets'}</span>
   </nav>
   <iframe
-    id="classless-app"
+    id="library-app"
     src={`${appPath}?embed=docs`}
     title={mode === 'editor' ? 'Design system 1 editor' : 'My libraries'}
   ></iframe>
@@ -29,7 +29,7 @@ const appPath = mode === 'editor' ? '/app/playground' : '/app/libraries';
 
 <script>
   import { libraryHeading, libraryHref, libraryWorkspaceHref, readLibraryNavigation, type LibraryNavigation } from '../../../shared/library-navigation';
-  const frame = document.querySelector<HTMLIFrameElement>('#classless-app');
+  const frame = document.querySelector<HTMLIFrameElement>('#library-app');
   if (frame) {
     // The docs are static: read the current library from the browser URL, not build-time Astro.url.
     const query = new URLSearchParams(location.search);
@@ -54,9 +54,9 @@ const appPath = mode === 'editor' ? '/app/playground' : '/app/libraries';
     const renderLibrary = (library: LibraryNavigation | null) => {
       document.documentElement.toggleAttribute('data-library-workspace', library !== null);
       window.dispatchEvent(new CustomEvent('ds1-library-navigation', { detail: { library } }));
-      const heading = document.querySelector('#classless-title');
+      const heading = document.querySelector('#library-title');
       if (heading) heading.textContent = library ? libraryHeading(library) : 'Design system 1';
-      const fullScreen = document.querySelector<HTMLAnchorElement>('.classless-heading > a');
+      const fullScreen = document.querySelector<HTMLAnchorElement>('.library-heading > a');
       if (fullScreen) fullScreen.href = library ? `${libraryHref(library)}&standalone=1` : '/app/libraries?standalone=1';
       frame.title = library ? libraryHeading(library) : 'My libraries';
       if (library) history.replaceState({}, '', libraryWorkspaceHref(library));
@@ -80,7 +80,7 @@ const appPath = mode === 'editor' ? '/app/playground' : '/app/libraries';
 </script>
 
 <style>
-  .classless-workspace {
+  .library-workspace {
     height: 100%;
     min-width: 0;
     display: grid;
@@ -88,32 +88,32 @@ const appPath = mode === 'editor' ? '/app/playground' : '/app/libraries';
     background: var(--ds1-docs-content-bg);
   }
 
-  .classless-heading {
+  .library-heading {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 24px;
-    padding: 28px 40px 24px;
+    gap: calc(24px * var(--sf, 1));
+    padding: calc(28px * var(--sf, 1)) calc(40px * var(--sf, 1)) calc(24px * var(--sf, 1));
   }
 
   h1 {
     margin: 0;
-    font-size: 28px;
+    font-size: calc(28px * var(--sf, 1));
     font-weight: 400;
     letter-spacing: -0.03em;
     line-height: 1.2;
   }
 
   p {
-    margin: 8px 0 0;
+    margin: calc(8px * var(--sf, 1)) 0 0;
     color: var(--ds1-docs-header-text-secondary);
-    font-size: 14px;
+    font-size: calc(14px * var(--sf, 1));
     line-height: 1.5;
   }
 
   a {
     color: var(--ds1-docs-header-text);
-    font-size: 13px;
+    font-size: calc(13px * var(--sf, 1));
     white-space: nowrap;
     text-decoration: none;
   }
@@ -121,45 +121,43 @@ const appPath = mode === 'editor' ? '/app/playground' : '/app/libraries';
   a:hover { text-decoration: underline; }
   a:focus-visible { outline: 2px solid var(--sl-color-accent); outline-offset: 4px; }
 
-  .classless-tabs {
+  .library-tabs {
     display: flex;
     align-items: center;
-    gap: 24px;
-    padding-inline: 40px;
+    gap: calc(24px * var(--sf, 1));
+    padding-inline: calc(40px * var(--sf, 1));
     border-bottom: 1px solid var(--ds1-docs-divider);
     background: var(--ds1-docs-sidebar-bg);
   }
 
-  .classless-tabs a {
-    padding-block: 14px;
+  .library-tabs a {
+    padding-block: calc(14px * var(--sf, 1));
     border-bottom: 2px solid transparent;
   }
 
-  .classless-tabs a[aria-current='page'] {
+  .library-tabs a[aria-current='page'] {
     border-color: var(--ds1-docs-accent-green);
   }
 
-  .classless-tabs span {
+  .library-tabs span {
     margin-left: auto;
     color: var(--ds1-docs-header-text-secondary);
-    font-size: 12px;
+    font-size: calc(12px * var(--sf, 1));
   }
 
   iframe { display: block; width: 100%; height: 100%; min-height: 0; border: 0; }
 
   @media (max-width: 1100px) {
-    .classless-tabs span { display: none; }
+    .library-tabs span { display: none; }
   }
 
   @media (max-width: 768px) {
-    .classless-heading { padding: 20px; gap: 12px; align-items: flex-start; }
-    h1 { font-size: 22px; }
-    .classless-heading > a { font-size: 11px; }
-    .classless-tabs { padding-inline: 20px; gap: 20px; }
-  }
-</style>
+    .library-heading { padding: calc(20px * var(--sf, 1)); gap: calc(12px * var(--sf, 1)); align-items: flex-start; }
+    h1 { font-size: calc(22px * var(--sf, 1)); }
+    .library-heading > a { font-size: calc(11px * var(--sf, 1)); }
+    .library-tabs { padding-inline: calc(20px * var(--sf, 1)); gap: calc(20px * var(--sf, 1)); }
+  }</style>
 
 <style is:global>
-  html[data-signed-in] .classless-workspace { grid-template-rows: minmax(0, 1fr); }
-  html[data-signed-in] :is(.classless-heading, .classless-tabs, .right-sidebar-container) { display: none; }
-</style>
+  html[data-signed-in] .library-workspace { grid-template-rows: minmax(0, 1fr); }
+  html[data-signed-in] :is(.library-heading, .library-tabs, .right-sidebar-container) { display: none; }</style>

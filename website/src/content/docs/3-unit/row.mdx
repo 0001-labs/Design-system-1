@@ -64,36 +64,6 @@ A tile or a card is a row with `stacked` and a width in whole squares: each chil
 
 A list of destinations is a `<nav>` of rows with `href` and `nav`; the page being shown takes `current`. The current row is drawn as the [Sidebar](/3-unit/sidebar/)'s: filled with `--ds-row-fill-current` and in the medium weight (`--ds-row-current-weight`), on two-pixel corners. Never mark the current page with the accent or a colour of its own.
 
-## Without Lit
-
-A page without Lit draws the same rows with the classes in `row.css`, which `controls.css` imports.
-
-| Class | On | Draws |
-| --- | --- | --- |
-| `ds-row` | any element | A row one square high, its content on one line. |
-| `ds-row` | `<a href>` or `<button>` | The whole row as one press target, with the pointer, press, focus ring and `aria-current` states. |
-| `ds-row` with one `ds-row__target` inside | `<li>`, `<div>` or `<tr>` | A row that also holds controls of its own: the target (a link or a button) takes the press anywhere on the row, and every other control inside stays separately pressable. |
-| `ds-row--auto`, `ds-row--stacked`, `ds-row--nav` | with `ds-row` | As `auto`, `stacked` and `nav` above. |
-
-```html
-<nav aria-label="Account">
-  <a class="ds-row ds-row--nav" href="/profile/" aria-current="page">Profile</a>
-  <a class="ds-row ds-row--nav" href="/billing/">Billing</a>
-</nav>
-
-<table class="ds-table">
-  <tr class="ds-row">
-    <td><button class="ds-row__target" type="button">Order 1042</button></td>
-    <td>Paid</td>
-    <td><a href="/invoices/1042.pdf">Invoice</a></td>
-  </tr>
-</table>
-```
-
-The cells of a row with a target must not be positioned themselves, or the target's press stops at its own cell. A disabled native row is a `<button disabled>`, or a link without `href` with `aria-disabled="true"`. In React, put the classes on the `<a>` or `<button>` directly.
-
-[List](/3-unit/list/) · [Sidebar](/3-unit/sidebar/) · [Text](/2-core/text/) · [Icon](/2-core/icon/)
-
 ## Rows with open details
 
 Set `open` on the row whose details are showing. This fills it with the current-row colour without changing its text weight. The component exposes `aria-expanded` on its press target; it does not toggle itself. Keep the property tied to the displayed record, update it when stepping between records, and set it to `false` when the details close. Leave it unset on rows that do not open details.

@@ -31,7 +31,7 @@ and the inert page behind. A popover, and any type with `non-modal`, opens with
 </ds-overlay>
 ```
 
-For a single question on a page without Lit, use `confirm()`, `prompt()` and
+For a single question, use `confirm()`, `prompt()` and
 `alert()` from the [feedback module](/1-root/feedback/): they answer with a
 promise and are drawn as modals on the same native frame. Never the browser's own.
 
@@ -149,18 +149,7 @@ row swaps what it shows.
 (`--ds-overlay-paper`), with a square of padding (none with `flush`). It
 arrives by fading in and settling half a square. `ds-header` and
 `ds-page drawer` fold their navigation into one on a narrow screen, through the
-page script `0-face/attach-overlay.ts`, which a page without Lit uses too:
-
-```ts
-import { attachOverlay } from "./ds1/0-face/attach-overlay.js";
-const menu = attachOverlay({ toggle, content: [nav, actions], closeLabel: "Close" });
-```
-
-It moves the parts into a `<dialog class="ds-overlay ds-overlay--screen">`,
-keeps focus inside, closes on Escape, a link and the screen widening, holds the
-page's scroll, and puts everything back on closing. Its first row
-(`ds-overlay__bar`) holds the close button (`ds-overlay__close`) where the
-toggle (`ds-overlay__toggle`) stood.
+shared overlay behavior. Focus stays inside, Escape closes it, and the page keeps its scroll position.
 
 ## Popovers
 
@@ -211,24 +200,3 @@ Configure a floating overlay with `--ds-overlay-inset`, `--ds-overlay-margin`,
 `--ds-overlay-layer`. Transparent media frames may set `--ds-overlay-paper` and
 `--ds-overlay-border`. Use `--ds-overlay-overflow: hidden` when a bounded layout
 provides its own scrolling regions.
-
-## Without Lit
-
-The native frame takes the same types as classes: `dialog.ds-overlay` is a
-modal, `ds-overlay--sheet` a sheet, `ds-overlay--drawer` a drawer at the end
-(with `ds-overlay--start` at the start), `ds-overlay--screen` the screen. The
-swipe comes from `0-face/overlay-swipe.ts` (Sync 1: `root` with
-`"modules": ["overlay-swipe"]`):
-
-```html
-<dialog class="ds-overlay ds-overlay--sheet" aria-labelledby="menu-title">…</dialog>
-<script type="module">
-  import { bindOverlaySwipe } from "./ds1/0-face/overlay-swipe.js";
-  const sheet = document.querySelector("dialog");
-  bindOverlaySwipe(sheet); // a swipe sends ds-close-request on the dialog, then closes it
-  sheet.showModal();
-</script>
-```
-
-The page behind a modal native sheet or drawer does not scroll while it is
-open. The feedback module's confirmations and prompts are modals.

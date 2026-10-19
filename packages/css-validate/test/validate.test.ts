@@ -4,7 +4,7 @@ import { describe, expect, it } from "vite-plus/test";
 
 import { DEFAULT_ALLOWED_HOSTS, validateCss, type IssueCode } from "../src/index";
 
-const STOCK_SHEET = new URL("../../../DS1/1-root/one.semantic.css", import.meta.url);
+const STOCK_SHEET = new URL("../../../DS1/1-root/component-tokens.css", import.meta.url);
 
 const NUL = String.fromCharCode(0);
 const LONE_HIGH_SURROGATE = String.fromCharCode(0xd800);
@@ -30,19 +30,20 @@ describe("the stock DS1 stylesheet", () => {
   // The regression that catches a DS1 change silently breaking publishing for
   // every existing library.
   it("validates clean", () => {
-    const result = validateCss(readFileSync(STOCK_SHEET, "utf8"));
+    const stock = readFileSync(STOCK_SHEET, "utf8").replace(/^@import[^;]+;\s*/gm, "");
+    const result = validateCss(stock);
 
     expect(result.issues).toEqual([]);
     expect(result.ok).toBe(true);
     expect(result.truncated).toBe(false);
-    expect(result.byteSize).toBeGreaterThan(10_000);
+    expect(result.byteSize).toBe(new TextEncoder().encode(stock).byteLength);
   });
 
   it("still validates once the workbench has rewritten token values", () => {
-    const css = readFileSync(STOCK_SHEET, "utf8")
-      .replace(/--one-accent-color:\s*[^;]+;/, "--one-accent-color: #ff0066;")
-      .replace(/--one-radius:\s*[^;]+;/, "--one-radius: 14px;")
-      .replace(/--one-unit:\s*[^;]+;/, "--one-unit: 24px;");
+    const css = readFileSync(STOCK_SHEET, "utf8").replace(/^@import[^;]+;\s*/gm, "")
+      .replace(/--ds-accent-color:\s*[^;]+;/, "--ds-accent-color: #ff0066;")
+      .replace(/--ds-radius:\s*[^;]+;/, "--ds-radius: 14px;")
+      .replace(/--ds-unit:\s*[^;]+;/, "--ds-unit: 24px;");
 
     expectAccepted(css);
   });
@@ -299,7 +300,7 @@ describe("script-execution constructs", () => {
 });
 
 describe("selectors are deliberately not policed", () => {
-  // A classless design system is supposed to restyle bare elements; any
+  // Existing custom libraries may restyle bare elements; any
   // broad-selector rule would fire on the stock sheet itself.
   it("accepts element, universal and :where() selectors", () => {
     expectAccepted("html,body,*{margin:0}");

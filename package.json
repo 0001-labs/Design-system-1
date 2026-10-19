@@ -77,7 +77,7 @@
     "clean": "rm -rf node_modules web/node_modules dist",
     "docs:dev": "cd website && vp run dev",
     "icons:build": "vp exec tsx scripts/build-icon-assets.ts",
-    "docs:build": "vp run icons:build && cd website && vp run build",
+    "docs:build": "vp run build:bundle && vp run icons:build && cd website && vp run build",
     "docs:preview": "cd website && vp run preview",
     "docs:deploy": "vp run site:deploy",
     "app:dev": "cd app && vp run dev",

@@ -101,7 +101,7 @@ function stripQuotes(value: string): string {
 /**
  * Walk the parsed stylesheet and report every rule violation.
  *
- * Selectors are deliberately not policed: a classless design system is supposed
+ * Selectors are deliberately not policed: a custom stylesheet is allowed
  * to restyle `html`, `body`, and every bare element, so any broad-selector rule
  * would fire on the stock DS1 sheet itself.
  */

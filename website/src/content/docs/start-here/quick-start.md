@@ -1,9 +1,11 @@
 ---
 title: Use with HTML
-description: Open an ordinary HTML file with the shared stylesheet and fonts.
+description: Load Design system 1 and write its Lit Web Components directly in HTML.
 ---
 
-Create `index.html`, paste this document, and open it in your browser:
+Design system 1 is a Lit Web Component library. A plain HTML page needs a stylesheet and a module script. The script includes Lit and registers the `ds-*` elements; you write them directly in HTML.
+
+Create `index.html`:
 
 ```html
 <!doctype html>
@@ -12,31 +14,53 @@ Create `index.html`, paste this document, and open it in your browser:
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>My first page</title>
-  <link rel="stylesheet" href="https://designsystem1.com/resources/vanilla.css">
-  <link rel="stylesheet" href="https://designsystem1.com/resources/fonts.css">
+  <link rel="stylesheet" href="https://designsystem1.com/resources/design-system-1.css">
+  <script type="module" src="https://designsystem1.com/resources/design-system-1.js"></script>
 </head>
 <body>
-  <main>
-    <h1>A place to begin</h1>
-    <p>This is ordinary HTML with Design system 1 styling.</p>
-    <details><summary>How it works</summary>
-      <p>The browser owns this disclosure. No JavaScript is needed.</p>
-    </details>
-  </main>
+  <ds-page layout="column">
+    <ds-text size="display" literal>A place to begin</ds-text>
+    <ds-text literal wrap>Write clean HTML with the system's components.</ds-text>
+    <ds-button primary>Save</ds-button>
+    <ds-accordion summary="How it works" literal>
+      The stylesheet loads the foundations. The module gives each element its appearance and behavior.
+    </ds-accordion>
+  </ds-page>
 </body>
 </html>
 ```
 
-No package install or build step is needed. These public asset URLs are served by the documentation site, not an assumed npm version. They follow the current documentation release.
+Open it in your browser. No package install, build step or Lit templates are needed. The stylesheet alone does not register components: keep both the `link` and `script`.
 
-## View, download, edit
+## Add behavior
 
-The [examples](/start-here/examples/) include an article, a form, a report and a reference page. Each has a complete description and an HTML download. Edit the words and semantic structure first; use CSS custom properties for your own type and colour choices.
+Components expose properties, slots and events. Ordinary JavaScript works with them:
 
-## Internet and offline use
+```js
+const button = document.querySelector('ds-button');
+button.addEventListener('click', () => console.log('Save requested'));
+```
 
-The HTML loads the stylesheet and fonts over HTTPS; the native stylesheet itself imports nothing. To use it entirely offline, save both stylesheets and the font files, and change every external URL to a local path. Otherwise, keep the network references and describe the page as online-dependent.
+For properties containing objects or arrays, wait for registration before assigning them:
 
-## When JavaScript is needed
+```js
+await customElements.whenDefined('ds-table');
+const table = document.querySelector('ds-table');
+// Set its columns and data as described on the Table page.
+```
 
-The [Web Component examples](/2-core/overview/#component-overview) demonstrate interactive elements such as `ds-sidebar` and `ds-chart`. Those elements need their JavaScript implementation; adding a custom tag to a CSS-only page is not enough. Application data, submissions and sign-in are separate from visual styling.
+[Browse the components](/2-core/overview/) and use each component's documented interface. Application data, submissions and routing remain yours.
+
+## Scale and theme
+
+The component module starts the shared device scale. Phones and tablets follow the page's width; desktop stays at scale 1. The hosted stylesheet connects component scale to the page scale. See [Scaling](/1-root/scaling/) for embedded surfaces and [Theming](/1-root/theming/) for setting the theme before first paint.
+
+## Examples and libraries
+
+The [HTML downloads](/start-here/examples/#html-examples) use this same component library. [My libraries](/libraries/) customizes the component tokens; load your library stylesheet after the base stylesheet.
+
+## Hosting the files yourself
+
+The URLs above follow the current documentation release and require a connection. For a pinned or offline copy, use the [package](/getting-started/installation/) and host its bundle, referenced JavaScript chunks, stylesheets and font files together. Preserve their relative paths.
+
+React apps use the adapters over these same Lit components. Server-rendered apps register the components in the browser.

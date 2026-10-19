@@ -44,38 +44,6 @@ The links are the page's own `<a href>` elements, in the page, so they render wi
 | `brand` | A brand of the page's own: a logo, one square high. |
 | `actions` | Buttons or links at the end of the row. |
 
-## Without Lit
-
-`header.css`, which `controls.css` imports, draws the same header on native elements, and the page script `0-face/header.ts` starts every one on the page when it loads (`startHeaders()` starts one added later). The page writes the menu button's name in its own language, and the close button's in `data-close-label`. The toggle carries two icons: the first shows while the overlay is closed, the second while it is open, and the close button shows the second.
-
-```html
-<header class="ds-header">
-  <a class="ds-header__brand" href="/">Name</a>
-  <nav class="ds-header__nav" id="site-nav" aria-label="Main">
-    <a href="/">Home</a>
-    <a href="/help">Help</a>
-  </nav>
-  <div class="ds-header__actions"><a class="ds-button ds-button--primary" href="/download">Download</a></div>
-  <button class="ds-button ds-button--icon ds-header__toggle" type="button" aria-label="Menu" aria-controls="site-nav" data-close-label="Close">
-    <span class="ds-icon" style="--ds-icon: url(/ds1/icons/menu.svg)" aria-hidden="true"></span>
-    <span class="ds-icon" style="--ds-icon: url(/ds1/icons/close.svg)" aria-hidden="true"></span>
-  </button>
-</header>
-<script type="module">import "/ds1/0-face/header.ts";</script>
-```
-
-| Class | What it is |
-| --- | --- |
-| `ds-header` | The row, a `<header>`; `ds-header--sticky` keeps it at the top. |
-| `ds-header__brand` | The brand, a link home; a picture in it is one square high. |
-| `ds-header__nav` | The links, a `<nav>`. |
-| `ds-header__actions` | Buttons or links at the end. |
-| `ds-header__toggle` | The menu button, shown only on a narrow screen. |
-
-Tokens: `--ds-header-brand` (the brand's width, at least twelve squares), `--ds-header-paper` and `--ds-header-line` (a sticky header's paper and the hairline under it).
-
-Sync 1 copies the script with the `root` export's `"modules": ["header"]` (it brings `attach-overlay.ts`, plain TypeScript with no Lit), and the sheets with `"nativeControls": true`.
-
 ## The screen overlay
 
 `attachOverlay()` from `0-face/attach-overlay.ts` is the mechanism the header and [`ds-page drawer`](/4-page/layout/#a-drawer-on-a-narrow-page) share. Give it the toggle and the parts it folds away; it opens them in a `dialog.ds-overlay.ds-overlay--screen` (drawn by `drawer.css`) and puts them back on closing.

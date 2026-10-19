@@ -65,7 +65,7 @@ async function draw(page: Page, library: string, scale = 1) {
   }, { library, scale, markup: MARKUP });
 }
 
-const classless = readFileSync(join(process.cwd(), "DS1/1-root/one.semantic.css"), "utf8");
+const legacyPage = ":root { --one-accent-color: #ff0000; --one-radius: 12px; } body { color: #2a2a2a; }";
 const library = prepareLibrary([
   ":root {",
   "  --one-accent-color: #d357fe;",
@@ -91,9 +91,9 @@ describe("without a library", () => {
         const defaults = await draw(page, "", scale);
         // A prepared library that sets no library token changes nothing.
         expect(await draw(page, prepareLibrary(":root { --brand: pink; }\n.brand { color: var(--brand); }").css, scale)).toEqual(defaults);
-        // The classless sheet declares every --one-* token itself; the components still never read them.
-        const beside = await draw(page, classless, scale);
-        // Colours a face leaves to the text around it (currentColor) follow the classless page's body.
+        // An older library declares its own --one-* tokens; the components still never read them.
+        const beside = await draw(page, legacyPage, scale);
+        // Colours a face leaves to the text around it (currentColor) follow the surrounding page body.
         for (const part of ["primary", "secondary", "field", "menu"] as const) {
           for (const property of ["background", "radius", "font", "size", "height"] as const) expect(beside[part][property], `${part} ${property} at ${scale}`).toBe(defaults[part][property]);
         }

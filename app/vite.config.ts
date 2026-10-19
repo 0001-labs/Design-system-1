@@ -33,8 +33,7 @@ export default defineConfig(({ command, mode }) => {
 
     server: {
       fs: {
-        // The app imports DS1/ sources directly (one.css, ds-icon, and the
-        // semantic stylesheet via ?raw).
+        // The app imports the shared DS1 styles and Lit components directly.
         allow: [resolve(__dirname, "..")],
       },
     },

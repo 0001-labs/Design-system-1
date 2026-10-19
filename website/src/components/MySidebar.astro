@@ -70,7 +70,7 @@ const { sidebar } = Astro.locals.starlightRoute;
     return entries.flatMap((entry, index) => {
       if (signedIn && (entry.label === 'Start Here' || hideSignedInLibraryEntry(entry))) return [];
       if (entry.href === '/app/libraries' && !signedIn) return [];
-      const href = (entry.href === "/app/libraries" ? "/classless/libraries/" : entry.href) ?? (entry.entries ? overviewPaths[entry.label] : undefined);
+      const href = (entry.href === "/app/libraries" ? "/libraries/workspace/" : entry.href) ?? (entry.entries ? overviewPaths[entry.label] : undefined);
       const id = href ?? `${parent}/group-${index}`;
       const item: SidebarItem = { id, label: label(entry.label), depth, href, current: href ? location.pathname.replace(/\/$/, "") === href.replace(/\/$/, "") : entry.isCurrent };
       if (!entry.entries) return [item];
@@ -97,7 +97,7 @@ const { sidebar } = Astro.locals.starlightRoute;
     document.querySelector('#workspace-chevron')!.setAttribute('type', workspaceOpen ? 'chevron-up' : 'chevron-down');
     workspaceLibraries.hidden = !workspaceOpen;
     workspaceLibraries.items = [
-      { id: 'workspace-all', label: 'My libraries', href: '/classless/libraries/' },
+      { id: 'workspace-all', label: 'My libraries', href: '/libraries/workspace/' },
       { id: 'workspace-base', label: 'Design system 1', meta: 'Built-in', href: '/start-here/overview/' },
       ...workspaceItems.map(item => ({ id: `workspace-${item.id}`, label: item.name, href: libraryWorkspaceHref({ ...item, component: '/2-core/button/', view: 'overview' }), current: item.id === library?.id })),
       ...(!librariesLoaded ? [{ id: 'workspace-loading', label: 'Loading libraries…', disabled: true }] : []),
@@ -150,7 +150,7 @@ const { sidebar } = Astro.locals.starlightRoute;
   navigation.addEventListener('sidebar-activate', event => {
     const id = (event as CustomEvent).detail.id;
     if (!library || (id !== 'library-overview' && !LAYERS.some(layer => layer.entries.some(entry => entry.href === id)))) return;
-    const frame = document.querySelector<HTMLIFrameElement>('#classless-app');
+    const frame = document.querySelector<HTMLIFrameElement>('#library-app');
     if (!frame?.contentWindow) return;
     event.preventDefault();
     frame.contentWindow.postMessage(id === 'library-overview' ? { type: 'ds1:library-overview' } : { type: 'ds1:library-component', component: id }, location.origin);
@@ -203,4 +203,5 @@ const { sidebar } = Astro.locals.starlightRoute;
   #docs-account:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
   #docs-account [hidden] { display: none !important; }
   @media (max-width: 768px) { .docs-sidebar-close { display: block; } }
+  :global(html[data-docs-compact]) .docs-sidebar-close { display: block; }
 </style>

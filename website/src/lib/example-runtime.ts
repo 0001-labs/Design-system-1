@@ -18,7 +18,17 @@ Object.defineProperty(window, 'localStorage', {
     clear: () => { preferences.clear(); },
   } satisfies Storage,
 });
+window.DS_ONE_I18N = { autoLoad: false, persist: false };
 await import('../../../DS1/index');
+const followDocumentScale = () => {
+  if (parent === window) return;
+  try { if (parent.location.origin !== location.origin) return; } catch { return; }
+  const scale = parseFloat(getComputedStyle(parent.document.documentElement).getPropertyValue('--sf')) || 1;
+  document.documentElement.style.setProperty('--sf', String(scale));
+  document.documentElement.style.setProperty('--ds-sf', String(scale));
+};
+followDocumentScale();
+window.addEventListener('resize', followDocumentScale);
 const { configureI18n, loadTranslations, setLanguage } = await import('../../../DS1/0-face/i18n');
 configureI18n({ languages: ['en', 'da', 'ja'], sharedWords: true });
 loadTranslations({ en: { Save: 'Save' }, da: { Save: 'Gem' }, ja: { Save: '保存' } });
@@ -39,6 +49,7 @@ sample.querySelectorAll<HTMLButtonElement>('ds-switch button').forEach(button =>
 
 window.addEventListener('message', event => {
   if (event.origin !== location.origin || event.source !== parent || event.data?.type !== 'ds1-example-theme') return;
+  followDocumentScale();
   const dark = event.data.theme === 'dark';
   document.documentElement.classList.toggle('dark-theme', dark);
   document.documentElement.classList.toggle('light-theme', !dark);

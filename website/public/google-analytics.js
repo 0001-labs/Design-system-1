@@ -20,7 +20,6 @@
     "4-page",
     "advanced",
     "built-ins",
-    "classless",
     "demo",
     "reference",
     "guides"

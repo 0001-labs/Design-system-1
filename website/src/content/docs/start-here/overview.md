@@ -1,31 +1,22 @@
 ---
 title: Overview
-description: Ordinary HTML, shared CSS and fonts, with JavaScript components when you need them.
+description: A Lit Web Component library for interfaces on the 20px grid.
 ---
 
-Design system 1 gives ordinary HTML a shared appearance. Link a stylesheet, write semantic HTML, and open the file in a browser. Styling does not require a framework, package manager or build step.
+Design system 1 is a Lit Web Component library. Load its stylesheet and module, then write `ds-button`, `ds-input`, `ds-table` and the other elements directly in HTML. React adapters use the same components.
 
 [Use with HTML](/start-here/quick-start/) · [View and download examples](/start-here/examples/)
 
-## What you use
-
-| Piece | What it provides | What it needs |
-| --- | --- | --- |
-| Native HTML styles | Headings, paragraphs, links, buttons, forms, tables and disclosures | HTML and CSS |
-| Fonts and tokens | Shared type, colours and configurable measures | CSS and font files |
-| Web Components | Interactive charts, menus, sidebars and other reusable controls | JavaScript as well as CSS |
-| My libraries | Saved drafts and published stylesheets for your pages | Sign-in for private work |
-
-Native browser behavior still works: links navigate, inputs accept typing and validation, and details elements expand. CSS does not save form submissions, load chart data or provide account logic. Add your own application behavior where needed.
-
 ## Four layers
 
-**1 Root** holds tokens, fonts and styles. **2 Core** holds individual components such as buttons and charts. **3 Unit** combines components into navigation, rows and other reusable groups. **4 Page** arranges them into page layouts. [Browse the components](/2-core/overview/#component-overview).
+**1 Root** supplies the shared colours, type, scale, theme and language. **2 Core** contains individual components. **3 Unit** composes them into calendars, tables, navigation and forms. **4 Page** arranges them into layouts.
 
-## Files you can keep
+[Browse the components](/2-core/overview/). Each page shows the component's properties, slots, events and examples. Components own their appearance and interaction; your application supplies data and actions.
 
-Each [HTML example](/start-here/examples/) is a complete file you can view, download and edit. The files load the current public stylesheet and fonts from this site. They need an internet connection for those assets; a single authored HTML file is not an offline bundle. For an offline copy, download the CSS and its font dependencies and update their paths.
+## One library, your design
 
-## Your own library
+Use [My libraries](/libraries/) to customize the component tokens, save a draft and publish a stylesheet. Load it after the system's base stylesheet. Public components, guides and examples need no account.
 
-Use [My libraries](/libraries/) to save and publish a stylesheet through your existing account. Public docs and examples remain available without signing in. Existing published CSS URLs and library APIs continue to work.
+## Other platforms
+
+The [native packages](/advanced/native/) bring the same system to Swift and Kotlin. The [email kit](/email/) renders the system for inboxes. Each uses the same design foundation with its platform's rendering model.

@@ -50,6 +50,11 @@ describe("combined website routes", () => {
 
   it("redirects reorganized docs without losing query parameters or redirecting icon assets", async () => {
     const moves = {
+      '/classless/': '/start-here/quick-start/',
+      '/classless/editor/': '/libraries/playground/',
+      '/classless/libraries/': '/libraries/workspace/',
+      '/classless/library-api/': '/libraries/api/',
+      '/1-root/native-controls/': '/start-here/quick-start/',
       '/components/': '/2-core/overview/',
       '/icons/': '/2-core/icon/',
       '/2-core/icon/collection/': '/2-core/icon/',

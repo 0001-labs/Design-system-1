@@ -1,6 +1,5 @@
 // How a published design library reaches Design system 1's components. A library is a stylesheet
-// its owner edits in the libraries app, written in the classless sheet's `--one-*` tokens
-// (one.semantic.css) and its native selectors. DS1's components draw from `--ds-*` tokens
+// its owner edits in the libraries app, including older `--one-*` tokens and native selectors. DS1's components draw from `--ds-*` tokens
 // (component-tokens.css, component-metrics.css) and, in some faces, one.css's own names
 // (`--accent-color`). Publishing prepares the library
 // (packages/css-validate/src/library.ts): after each `--one-*` token below that the library

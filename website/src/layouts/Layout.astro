@@ -2,7 +2,7 @@
 import MyHeader from '../components/MyHeader.astro';
 import MySidebar from '../components/MySidebar.astro';
 import MyHead from '../components/MyHead.astro';
-import ClasslessWorkspace from '../components/ClasslessWorkspace.astro';
+import LibraryWorkspace from '../components/LibraryWorkspace.astro';
 import LandingPage from '../components/LandingPage.astro';
 
 interface Props {
@@ -13,8 +13,8 @@ const { title } = Astro.props;
 const pathname = Astro.url.pathname.replace(/\/$/, '');
 const isHome = pathname === '';
 const isTool = ['/2-core/icon/collection', '/colours', '/components'].includes(pathname);
-const classlessMode = pathname === '/classless/editor' ? 'editor'
-  : pathname === '/classless/libraries' ? 'libraries' : null;
+const libraryMode = pathname === '/libraries/playground' ? 'editor'
+  : pathname === '/libraries/workspace' ? 'libraries' : null;
 ---
 
 <!DOCTYPE html>
@@ -44,8 +44,8 @@ const classlessMode = pathname === '/classless/editor' ? 'editor'
       {!isHome && <div class="sidebar-gap"></div>}
 
       <!-- Main Content -->
-      <main aria-label="Documentation content" class:list={['main-content', { 'main-content--app': classlessMode, 'main-content--home': isHome, 'main-content--tools': isTool }]}>
-        {isHome ? <LandingPage /> : classlessMode ? <ClasslessWorkspace mode={classlessMode} /> : <slot />}
+      <main aria-label="Documentation content" class:list={['main-content', { 'main-content--app': libraryMode, 'main-content--home': isHome, 'main-content--tools': isTool }]}>
+        {isHome ? <LandingPage /> : libraryMode ? <LibraryWorkspace mode={libraryMode} /> : <slot />}
       </main>
     </div>
 
@@ -76,8 +76,8 @@ const classlessMode = pathname === '/classless/editor' ? 'editor'
       /* Sidebar */
       .sidebar {
         /* Fourteen squares, its hairline inside the last one. */
-        width: 280px;
-        min-width: 280px;
+        width: calc(280px * var(--sf, 1));
+        min-width: calc(280px * var(--sf, 1));
         box-shadow: inset -1px 0 var(--ds1-docs-header-border);
         overflow-y: auto;
         background: var(--ds1-docs-sidebar-bg);
@@ -86,8 +86,8 @@ const classlessMode = pathname === '/classless/editor' ? 'editor'
 
       /* Sidebar gap */
       .sidebar-gap {
-        width: 20px;
-        min-width: 20px;
+        width: calc(20px * var(--sf, 1));
+        min-width: calc(20px * var(--sf, 1));
         height: 100%;
         background: var(--ds1-docs-sidebar-bg);
         box-shadow: inset -1px 0 var(--ds1-docs-header-border);
@@ -158,10 +158,13 @@ const classlessMode = pathname === '/classless/editor' ? 'editor'
       /* Tablet adjustments */
       @media (max-width: 1024px) and (min-width: 769px) {
         .sidebar {
-          width: 240px;
-          min-width: 240px;
+          width: calc(240px * var(--sf, 1));
+          min-width: calc(240px * var(--sf, 1));
         }
       }
+      html[data-docs-compact] :is(.sidebar, .sidebar-gap, .right-sidebar-container) { display: none; }
+      html[data-docs-compact] .main-content { width: 100%; }
+      html[data-docs-compact] .main-pane { padding: var(--site-unit); }
     </style>
 
     <script>
@@ -184,7 +187,7 @@ const classlessMode = pathname === '/classless/editor' ? 'editor'
       const panel = navigation?.querySelector('dialog');
       const shell = sidebar?.querySelector<HTMLElement>('.docs-sidebar-shell');
       const menuButton = document.getElementById('mobile-menu-btn');
-      const phone = window.matchMedia('(max-width: 768px)');
+
       document.getElementById('sidebar-close-btn')?.setAttribute('data-ds-overlay-dismiss', '');
 
       function restore() {
@@ -200,7 +203,9 @@ const classlessMode = pathname === '/classless/editor' ? 'editor'
       });
       panel?.addEventListener('close', restore);
       shell?.addEventListener('sidebar-activate', () => { if (navigation?.open) navigation.requestClose('button'); });
-      phone.addEventListener('change', () => { if (!phone.matches && navigation?.open) navigation.close(); });
+      const closeWideNavigation = () => { if (!document.documentElement.hasAttribute('data-docs-compact') && navigation?.open) navigation.close(); };
+      window.addEventListener('resize', closeWideNavigation);
+      window.addEventListener('scaling-changed', closeWideNavigation);
     </script>
   </body>
 </html>
