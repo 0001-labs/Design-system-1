@@ -153,6 +153,16 @@ test('the root export can copy only the stylesheets a product loads', () => {
   expect(() => files('root', { styles: ['other.css'] })).toThrow(/Unknown root stylesheet/);
 });
 
+test('the sheets export carries a native sheet with the root sheets it imports, drawn without the tokens', () => {
+  const copy = files('sheets', { sheets: ['context.css'] });
+  expect(Object.keys(copy)).toEqual(['context.css', 'component-metrics.css', 'component-appearance.css']);
+  for (const [, imported] of String(copy['context.css']).matchAll(/@import "\.\/([^"]+)";/g)) expect(copy).toHaveProperty([imported!]);
+  // The scale and the colours fall back to their values; the measures are the metrics'.
+  expect(String(copy['context.css'])).not.toMatch(/var\(--ds-(sf|black|slate|white|tuned-red|focus-ring)\)/);
+  expect(() => files('sheets')).toThrow(/Name the sheets/);
+  expect(() => files('sheets', { sheets: ['one.css'] })).toThrow(/Unknown sheet/);
+});
+
 test('the languages export carries formatting with every module the language runtime imports', () => {
   const tree = (dir: string, { only }: { only?: RegExp } = {}) => new Map(readdirSync(join(root, dir)).filter((file) => !only || only.test(file)).map((file) => [file, read(`${dir}/${file}`)]));
   const copy = Object.fromEntries(exports.languages.files({ read, tree, options: {} } as Parameters<Exported['files']>[0]) as Map<string, unknown>);

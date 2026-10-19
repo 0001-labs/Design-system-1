@@ -197,6 +197,28 @@ export default {
         return files;
       },
     },
+    /**
+     * Native sheets a library draws a face with on a page that may not load
+     * the root stylesheet: `sheets` names them (`["context.css"]`), each with
+     * the root sheets it imports (context.css brings component-metrics.css and
+     * component-appearance.css), beside it as it imports them.
+     */
+    sheets: {
+      files({ read, options }) {
+        if (!Array.isArray(options.sheets) || !options.sheets.length) throw new Error('Name the sheets to copy: "sheets": ["context.css"]');
+        const files = {};
+        const visit = file => {
+          if (Object.hasOwn(files, file)) return;
+          files[file] = read(`DS1/1-root/${file}`);
+          for (const [, imported] of String(files[file]).matchAll(/^@import\s+"\.\/([^"]+)";/gm)) visit(imported);
+        };
+        for (const file of options.sheets) {
+          if (!controlSheets.includes(file)) throw new Error(`Unknown sheet: ${file}; the sheets are ${controlSheets.join(', ')}`);
+          visit(file);
+        }
+        return files;
+      },
+    },
     /** The language runtime, the shared words, the Convex validator and formatting in the language (format.ts, pricing.ts), in 0-face/. `entries: true` adds a top-level re-export of each module. */
     languages: {
       files({ read, tree, options }) {
