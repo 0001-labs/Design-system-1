@@ -16,12 +16,18 @@ export class Bento extends LitElement {
   static properties = {
     columns: { type: Number, reflect: true },
     squares: { type: Boolean, reflect: true },
+    fit: { type: Boolean, reflect: true },
+    layout: { type: String, reflect: true },
   };
 
   /** The number of columns (flow, three by default), or the squares across (`squares`, 48 by default). */
   declare columns: number | undefined;
   /** Places every tile on whole squares by its `data-place`. */
   declare squares: boolean;
+  /** With `squares`, lets the columns share a measure other than the squares. */
+  declare fit: boolean;
+  /** Takes each tile's `data-place-<layout>` where it has one (say `phone`). */
+  declare layout: string | undefined;
 
   static styles = [unsafeCSS(metrics), unsafeCSS(styles)];
 
@@ -30,12 +36,13 @@ export class Bento extends LitElement {
   constructor() {
     super();
     this.squares = false;
+    this.fit = false;
   }
 
   connectedCallback() {
     super.connectedCallback();
     this.observer = new MutationObserver(() => this.place());
-    this.observer.observe(this, { childList: true, subtree: true, attributes: true, attributeFilter: ["data-place", "hidden"] });
+    this.observer.observe(this, { childList: true, subtree: true, attributes: true, attributeFilter: ["data-place", "hidden"], attributeOldValue: false });
   }
 
   disconnectedCallback() {

@@ -28,7 +28,7 @@ To keep the columns on whole squares, make the bento as wide as whole squares pl
 
 ## Squares
 
-With `squares`, the bento is `columns` squares wide (48 unless set) and every tile stands on whole squares, given as `data-place="x y w h"`: the square across and down it starts on, counted from 0, and its width and height in squares. Place tiles a square apart. Each tile's surface then reaches a quarter square towards every tile beside it, so the tiles stand half a square apart while what they hold stays on the squares, and the bento's own edges stay on the page's.
+With `squares`, the bento is exactly `columns` squares wide (48 unless set) and every tile stands on whole squares, given as `data-place="x y w h"`: the square across and down it starts on, counted from 0, and its width and height in squares. Place tiles a square apart. Each tile's surface then reaches a quarter square towards every tile beside it, so the tiles stand half a square apart while what they hold stays on the squares, and the bento's own edges stay on the page's.
 
 ```html
 <ds-bento squares columns="32">
@@ -45,12 +45,19 @@ With `squares`, the bento is `columns` squares wide (48 unless set) and every ti
 | `data-span` | a tile | Two to six columns wide (flow). |
 | `data-rows` | a tile | Two to six rows high (flow). |
 | `data-place` | a tile | `x y w h` in squares (`squares`). |
+| `fit` | the bento | With `squares`, the columns share the bento's measure instead of being one square each. |
+| `layout` | the bento | Takes each tile's `data-place-<layout>` where it has one: a place per layout. |
+| `data-place-phone` (any layout's name) | a tile | The tile's place while the bento's `layout` is `phone`. |
 
-Tokens: `--ds-bento-gap` (half a square), `--ds-bento-columns`, `--ds-bento-row`; on a tile `--ds-bento-span` and `--ds-bento-rows`.
+Tokens: `--ds-bento-unit` (the square, `--ds-unit` unless a page draws at another size), `--ds-bento-gap` (half of it), `--ds-bento-columns`, `--ds-bento-row`, `--ds-bento-padding` (a squares tile that is not a card, one square); on a tile `--ds-bento-span` and `--ds-bento-rows`.
+
+### Layouts and narrower measures
+
+A bento whose tiles stand differently on a phone gives each tile its phone place beside its own, `data-place-phone`, and the page sets the bento's `layout` (and its `columns`) when it changes: the places are read again. A squares bento in a measure narrower than its squares takes `fit`: the columns share the measure and the rows stay one square, each tile still reaching a quarter square, so the gap is a column less half a square. A page with no script and no inline styles sets `--ds-bento-x`, `--ds-bento-y`, `--ds-bento-w`, `--ds-bento-h` and the reach sides (`--ds-bento-start`, `-top`, `-end`, `-bottom`, 1 or 0) in its own stylesheet.
 
 ## On native markup
 
-A page without Lit writes `.ds-bento` from the native controls stylesheet (`controls.css`, which imports `bento.css`), with `data-squares` in place of `squares` and `--ds-bento-columns` for `columns`. A squares bento needs `placeBentos()` from `0-face/bento.ts` (Sync 1's root `"modules": ["bento"]`), which reads each tile's `data-place` and sets its reach; a flow bento needs no script.
+A page without Lit writes `.ds-bento` from the native controls stylesheet (`controls.css`, which imports `bento.css`), with `data-squares`, `data-fit` and `data-layout` in place of `squares`, `fit` and `layout`, and `--ds-bento-columns` for `columns`. A squares bento needs `placeBentos()` from `0-face/bento.ts` (Sync 1's root `"modules": ["bento"]`), which reads each tile's `data-place` and sets its reach; a flow bento needs no script.
 
 ```html
 <div class="ds-bento" data-squares style="--ds-bento-columns: 32">

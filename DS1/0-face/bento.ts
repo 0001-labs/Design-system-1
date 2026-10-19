@@ -19,7 +19,9 @@
  * A tile's `data-place` is its square across, its square down, its width and
  * its height, in whole squares counted from 0. Tiles are placed a square
  * apart; a tile a square away from another, with the two overlapping along
- * that side, reaches towards it.
+ * that side, reaches towards it. A tile can have a place per layout,
+ * `data-place-phone="0 0 12 7"`, taken while the bento says
+ * `data-layout="phone"`; the page sets the layout and the columns for it.
  */
 
 /** A tile's place in squares: across, down, wide, high. */
@@ -51,10 +53,17 @@ export function bentoReach(places: readonly BentoPlace[]): BentoReach[] {
   });
 }
 
-/** Places one squares bento's tiles: their squares and their reach, as custom properties. */
+/** A tile's place in the bento's layout: `data-place-<layout>` where the bento names one and the tile has it, else `data-place`. */
+export function tilePlace(tile: HTMLElement, layout = ""): BentoPlace | undefined {
+  const own = layout ? tile.getAttribute(`data-place-${layout}`) : null;
+  return bentoPlace(own ?? tile.dataset.place);
+}
+
+/** Places one squares bento's tiles: their squares and their reach, as custom properties. The bento's `data-layout` (or `layout`) picks each tile's place for that layout. */
 export function placeBento(bento: HTMLElement): void {
+  const layout = bento.dataset.layout ?? bento.getAttribute("layout") ?? "";
   const tiles = [...bento.children].filter((child): child is HTMLElement => child instanceof HTMLElement && !child.hidden);
-  const placed = tiles.map(tile => ({ tile, place: bentoPlace(tile.dataset.place) })).filter((entry): entry is { tile: HTMLElement; place: BentoPlace } => !!entry.place);
+  const placed = tiles.map(tile => ({ tile, place: tilePlace(tile, layout) })).filter((entry): entry is { tile: HTMLElement; place: BentoPlace } => !!entry.place);
   const reach = bentoReach(placed.map(entry => entry.place));
   placed.forEach(({ tile, place: [x, y, w, h] }, index) => {
     const sides = reach[index]!;
@@ -77,7 +86,7 @@ export function placeBentos(root: ParentNode = document): () => void {
   });
   for (const bento of bentos) {
     placeBento(bento);
-    observer.observe(bento, { childList: true, subtree: false, attributes: true, attributeFilter: ["data-place", "hidden"] });
+    observer.observe(bento, { childList: true, subtree: false, attributes: true, attributeFilter: ["data-place", "data-layout", "hidden"] });
     for (const tile of bento.children) observer.observe(tile, { attributes: true, attributeFilter: ["data-place", "hidden"] });
   }
   return () => observer.disconnect();

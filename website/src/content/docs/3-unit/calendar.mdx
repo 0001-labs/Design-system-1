@@ -23,6 +23,8 @@ There are two calendars, drawn from the same days and keys.
 
 <ComponentExample example="calendar-compact" compact />
 
+<ComponentExample example="calendar-heat" compact />
+
 <ComponentExample example="calendar-range" compact />
 
 <ComponentExample example="calendar-picker" />
@@ -63,6 +65,30 @@ A day outside the month is an empty box. `fixed` always draws six weeks, so movi
 ### Compact
 
 `compact` makes every day a square, one square across by default: the date centred in it, the weekday names a letter each, the month's name shortened, and no events written out. With `day-width="2"` each day is two squares each way, the weekday names take two letters, Today stands beside the arrows and the marks grow to a square and two thirds, for a month with more room. `outside-days` writes the days of the months before and after in the title grey; pressing one goes there. When the calendar has events, a day with one keeps the ink and a day without falls back to the title grey, so a year of small months shows where things happened.
+
+### Heat
+
+```html
+<ds-calendar compact heat fixed></ds-calendar>
+```
+
+```js
+calendar.events = [
+  { title: "3 changes", start: "2026-07-08", count: 3 },
+  { title: "12 changes", start: "2026-07-09", count: 12 },
+];
+```
+
+`heat` lights each day by how much happens on it, as a contribution graph does. A day's amount is its events' `count`s added up (an event without one counts once, an event over several days counts on each). The busiest day of the month shown sets the scale, and every other day takes one of four steps of it: up to a quarter, a half, three quarters, or more. `heat-max` fixes the amount that lights a day fully, so months stay comparable. A day with nothing stays plain, and when the month has events at all its date falls back to the title grey; the neighbouring months' days are never lit.
+
+| Step | Light paper | Dark paper | The date |
+| --- | --- | --- | --- |
+| 1 | The accent's pastel | Its dim | The ink; white on dark paper |
+| 2 | Halfway to the accent | Halfway to the accent's dark version | The ink; white on dark paper |
+| 3 | The accent (Apple green) | The accent's dark version | The ink |
+| 4 | The accent deepened with 40% of the ink | The full accent | The ink |
+
+The fill is the date's mark, the same size as today's disc and the selected square, with a picture's corners, so it stays inside the day's square and the grid; in a compact month the marks stand a pixel apart, as a contribution graph's squares do. Every step keeps its date at 4.5:1 or more. Today and the selection draw over the heat. The fills are the palette's tokens (`--one-apple-green-pastel`, `--one-apple-green`), each `light-dark()`; a page lights the month in another colour by setting `--ds-calendar-heat-1` … `-4` and their `--ds-calendar-heat-ink-1` … `-4` from the palette.
 
 ## Months in squares
 
@@ -148,6 +174,7 @@ Both calendars take the same events, as a property:
 | `end` | The last day, for something over several days. |
 | `time` | When it starts, written before the title in a month. |
 | `color` | A token or colour for its fill. Take it from the palette. |
+| `count` | How much it counts for in `heat`; one when left out. |
 | `id` | Anything the page needs back; the calendar leaves it alone. |
 
 A day lists its events longest first, then by time.
@@ -184,6 +211,8 @@ The day arithmetic the calendars use is `DS1/0-face/calendar.ts`, plain TypeScri
 | `week-numbers` | boolean | `false` | The week's number on its first day. |
 | `fixed` | boolean | `false` | Always six weeks. |
 | `outside-days` | boolean | `false` | The days of the months before and after, in the title grey. |
+| `heat` | boolean | `false` | Light each day by how much happens on it. |
+| `heat-max` | number | The busiest day shown | The amount that lights a day fully. |
 | `no-header` | boolean | `false` | Leave out the title and arrows. |
 | `no-today` | boolean | `false` | Leave out the Today button. |
 | `min`, `max` | string | — | The days a person may choose. |
@@ -227,7 +256,7 @@ The day arithmetic the calendars use is `DS1/0-face/calendar.ts`, plain TypeScri
 | --- | --- |
 | `header`, `previous`, `next`, `today` | The title row and its buttons. |
 | `grid`, `weekdays` | The grid and its weekday names. |
-| `day`, `week`, `event`, `more` | A month's days, weeks, events and the `+2` line; a day also carries `today` and `selected`. |
+| `day`, `week`, `event`, `more` | A month's days, weeks, events and the `+2` line; a day also carries `today`, `selected` and `heat`. |
 | `cell`, `frame`, `scroller` | The large calendar's days, frame and scroller. |
 | `trigger`, `popover`, `field`, `options`, `clear` | A picker's field, its panel, a row of a day or a time to type, and Include time and Clear. |
 
@@ -239,6 +268,8 @@ The day arithmetic the calendars use is `DS1/0-face/calendar.ts`, plain TypeScri
 | `--ds-calendar-line` | `1px solid var(--ds-border-color)` | A month's lines. |
 | `--ds-calendar-ink` | `var(--ds-text-color)` | The large calendar's lines and selected day. |
 | `--ds-calendar-picker-width` | Ten squares | A picker's field. |
+| `--ds-calendar-heat-1` … `-4` | The accent's four steps | Heat's fills. |
+| `--ds-calendar-heat-ink-1` … `-4` | The ink, or white on the dark steps | The date on each step. |
 
 ### Activity squares
 

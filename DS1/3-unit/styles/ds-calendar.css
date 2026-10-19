@@ -25,6 +25,17 @@
   --ds-calendar-band: color-mix(in srgb, var(--ds-calendar-selected) 16%, var(--ds-paper));
   --ds-calendar-mark: calc(var(--ds-unit) * 0.9);
   --ds-calendar-pad: calc(4px * var(--ds-sf, 1));
+  /* Heat, in four steps of the accent: its pastel, between, the colour, and
+     past it (deepened with the ink on light paper, the full colour on dark).
+     The words are the ink on every step but the two darkest on dark paper. */
+  --ds-calendar-heat-1: var(--one-apple-green-pastel, color-mix(in srgb, var(--ds-apple-green) 40%, var(--ds-paper)));
+  --ds-calendar-heat-3: var(--one-apple-green, var(--ds-apple-green));
+  --ds-calendar-heat-2: color-mix(in srgb, var(--ds-calendar-heat-1), var(--ds-calendar-heat-3));
+  --ds-calendar-heat-4: light-dark(color-mix(in srgb, var(--ds-apple-green) 60%, var(--ds-slate)), var(--ds-apple-green));
+  --ds-calendar-heat-ink-1: light-dark(var(--ds-slate), var(--ds-white));
+  --ds-calendar-heat-ink-2: light-dark(var(--ds-slate), var(--ds-white));
+  --ds-calendar-heat-ink-3: var(--ds-slate);
+  --ds-calendar-heat-ink-4: var(--ds-slate);
   box-sizing: border-box;
   display: inline-block;
   vertical-align: top;
@@ -174,6 +185,20 @@
 .day[data-selected] .date { border-radius: var(--ds-radius); background: var(--ds-calendar-selected); color: var(--ds-calendar-selected-ink); letter-spacing: 0; }
 
 .day[aria-disabled="true"] .date { color: var(--ds-title-color); opacity: 0.5; }
+
+/* Heat: the date's mark filled by its step, a picture's corners, inside the day's square; today and the selection draw over it. */
+.day[data-heat]:not([data-today], [data-selected]) .date-line { align-items: center; padding-inline-end: calc(var(--ds-unit) * 0.05); }
+.day[data-heat]:not([data-today], [data-selected]) .date {
+  min-width: var(--ds-calendar-mark);
+  height: var(--ds-calendar-mark);
+  border-radius: var(--ds-radius);
+  letter-spacing: 0;
+}
+.day[data-heat="1"]:not([data-today], [data-selected]) .date { background: var(--ds-calendar-heat-1); color: var(--ds-calendar-heat-ink-1); }
+.day[data-heat="2"]:not([data-today], [data-selected]) .date { background: var(--ds-calendar-heat-2); color: var(--ds-calendar-heat-ink-2); }
+.day[data-heat="3"]:not([data-today], [data-selected]) .date { background: var(--ds-calendar-heat-3); color: var(--ds-calendar-heat-ink-3); }
+.day[data-heat="4"]:not([data-today], [data-selected]) .date { background: var(--ds-calendar-heat-4); color: var(--ds-calendar-heat-ink-4); }
+:host([compact]) .day[data-heat]:not([data-today], [data-selected]) .date-line { padding: 0; }
 
 /* Events: one square each, stacked edge to edge on the day's lines, drawn one pixel short. */
 .events {
