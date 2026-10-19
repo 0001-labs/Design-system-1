@@ -13,7 +13,7 @@ const layers = JSON.stringify(Object.fromEntries(Object.entries(TAG_LAYERS).map(
 <html lang="en" class="light-theme">
   <head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="robots" content="noindex" /><title>{sample.name} layout — example</title></head>
   <body data-layout={layout} data-layers={layers}>
-    <main id="sample"></main>
+    <main id="sample" data-ds-surface></main>
     <div id="layers" aria-hidden="true"></div>
     <script>import '../../../lib/layout-runtime';</script>
   </body>

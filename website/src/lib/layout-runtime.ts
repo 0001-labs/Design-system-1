@@ -104,6 +104,7 @@ window.addEventListener('message', event => {
     document.documentElement.classList.toggle('dark-theme', dark);
     document.documentElement.classList.toggle('light-theme', !dark);
     document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+    document.querySelectorAll('ds-chart').forEach(chart => chart.refreshTheme());
   }
   if (event.data?.type === 'ds1-layout-layers') {
     stopScaling?.();
