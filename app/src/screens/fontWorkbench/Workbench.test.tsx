@@ -9,8 +9,8 @@ import { isApplePlatform } from '../../../../DS1/0-face/keys';
 import { SOURCE_CHARACTERS, validateSource } from '../../../../shared/font-source';
 import { Workbench, type WorkbenchProps } from './Workbench';
 
-// Tests run from the app's folder; the reference is the repository's own copy of the face.
-const america = readFileSync(resolve(process.cwd(), '../DS1/1-root/fonts/GT-America-Standard-Regular.woff2'));
+// Resolve the fixture from this file so root and app test runs use the same face.
+const america = readFileSync(resolve(__dirname, '../../../../DS1/1-root/fonts/GT-America-Standard-Regular.woff2'));
 let root: Root;
 let host: HTMLDivElement;
 let request: ReturnType<typeof vi.fn>;

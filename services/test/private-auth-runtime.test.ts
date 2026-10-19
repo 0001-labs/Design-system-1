@@ -9,7 +9,7 @@ let calls = 0;
 beforeAll(async () => {
   const bundle = await build({
     entryPoints: [fileURLToPath(new URL('../src/index.ts', import.meta.url).href)],
-    bundle: true, platform: 'browser', format: 'esm', write: false,
+    bundle: true, platform: 'browser', format: 'esm', write: false, external: ['cloudflare:workers'],
   });
   runtime = new Miniflare({
     modules: true, compatibilityDate: '2026-07-24', script: bundle.outputFiles[0]!.text,
@@ -28,7 +28,7 @@ beforeAll(async () => {
   await runtime.ready;
   await (await runtime.getR2Bucket('LIBRARIES')).put('reports/component-adoption.json', '{}');
 });
-afterAll(async () => { await runtime.dispose(); });
+afterAll(async () => { await runtime?.dispose(); });
 
 describe('private access in the Worker runtime', () => {
   it('verifies the owner, handles rejected sessions and refuses redirects without forwarding credentials', async () => {
