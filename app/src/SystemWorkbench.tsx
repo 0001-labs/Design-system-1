@@ -12,7 +12,7 @@ import { libraryTemplate } from './lib/libraryTemplate';
 import './system-workbench.css';
 import { ComponentTree, type TreeNode } from './ComponentTree';
 import '../../DS1/2-core/ds-composer';
-import { Composer } from '../../DS1/react/composer';
+import { AaStylesheet } from './AaStylesheet';
 import { libraryComponent } from '../../shared/library-navigation';
 import { navigate, useLocation } from './router';
 
@@ -66,6 +66,8 @@ export function SystemWorkbench({ initialCss, initialConfig, onDirty, headerSlot
   };
   const embeddedLibrary = document.documentElement.hasAttribute('data-docs-embed') && path.startsWith('/l/');
   const [buttonMode, setButtonMode] = useState<'single' | 'split'>('single');
+  const [stylesheetOpen, setStylesheetOpen] = useState(false);
+  const stylesheetToggle = useRef<HTMLButtonElement>(null);
   const [css, setCss] = useState(initialCss ?? libraryTemplate);
   const [search, setSearch] = useState('');
   const [buttonMetrics, setButtonMetrics] = useState<ButtonMetrics>({ box: defaultButtonBox, contentSize: { width: 0, height: 0 } });
@@ -92,7 +94,7 @@ export function SystemWorkbench({ initialCss, initialConfig, onDirty, headerSlot
   const shownBox = { ...buttonMetrics.box, ...boxPreview };
   const previewCss = boxPreview ? writeButtonBox(css, shownBox, buttonMode) : css;
   const commitBox = (patch: Partial<BoxModelConfig> & { gap?: number }) => update(writeButtonBox(css, { ...shownBox, ...patch }, buttonMode));
-  return <div className={`workbench system-workbench${routeSearch.get("view") === "overview" ? " system-workbench--overview" : ""}`} data-testid="workbench">
+  return <div className={`workbench system-workbench${stylesheetOpen ? "" : " system-workbench--no-stylesheet"}${routeSearch.get("view") === "overview" ? " system-workbench--overview" : ""}`} data-testid="workbench">
     {headerSlot}
     <div className={`system-workbench-panes${embeddedLibrary ? " system-workbench-panes--external-navigation" : ""}`}>
       {!embeddedLibrary && <aside className="library-panel system-library-panel">
@@ -100,7 +102,7 @@ export function SystemWorkbench({ initialCss, initialConfig, onDirty, headerSlot
         <ComponentTree label="Component library" nodes={treeNodes} current={selected} onSelect={id => { if (!id.startsWith('layer-')) setSelected(id); }} />
       </aside>}
       <main className="system-workbench-preview">
-        <div className="app-panel-heading"><h1>{entry.name}</h1><a className="system-workbench-docs" href={entry.href} target="_blank" rel="noreferrer">Documentation<ds-icon type="up-right" aria-hidden="true"></ds-icon></a></div>
+        <div className="app-panel-heading"><h1>{entry.name}</h1><ModeButton ref={stylesheetToggle} secondary aria-expanded={stylesheetOpen} aria-controls="library-stylesheet" onClick={() => setStylesheetOpen(open => !open)}>{stylesheetOpen ? "Hide stylesheet" : "Show stylesheet"}</ModeButton><a className="system-workbench-docs" href={entry.href} target="_blank" rel="noreferrer">Documentation<ds-icon type="up-right" aria-hidden="true"></ds-icon></a></div>
         {examples.length ? examples.map((example, index) => <section key={example}><h2>{EXAMPLES[example]!.title}</h2><Preview example={example} css={previewCss} hoverRegion={buttonSelected ? hoverRegion : null} onMetrics={buttonSelected && index === 0 ? metrics => setButtonMetrics(previous => JSON.stringify(previous) === JSON.stringify(metrics) ? previous : metrics) : undefined} /></section>) : <p>This composition is described in the <a href={entry.href} target="_blank" rel="noreferrer">documentation</a>.</p>}
       </main>
       <aside className="system-workbench-tokens">
@@ -115,9 +117,9 @@ export function SystemWorkbench({ initialCss, initialConfig, onDirty, headerSlot
         {tokens.map(name => <label key={name}><span>{name}</span><Input aria-label={name} placeholder={defaults.get(name) ?? 'Inherited'} value={values.get(name) ?? ''} onChange={event => setToken(name, event.target.value)} /></label>)}
       </aside>
     </div>
-    <section aria-label="Live CSS file" className="css-file-panel">
-      <div className="app-panel-heading"><h2>Stylesheet</h2><span>Editable CSS</span></div>
-      <div className="css-editor-shell"><Composer variant="plain" wrap="off" aria-label="Editable CSS source" data-testid="live-css-source" spellCheck={false} value={css} onChange={event => update(event.target.value)} /></div>
-    </section>
+    {stylesheetOpen && <section id="library-stylesheet" aria-label="Live CSS file" className="css-file-panel">
+      <div className="app-panel-heading"><h2>Stylesheet</h2><ModeButton secondary onClick={() => { setStylesheetOpen(false); stylesheetToggle.current?.focus(); }}>Close stylesheet</ModeButton></div>
+      <div className="css-editor-shell"><AaStylesheet value={css} onChange={update} /></div>
+    </section>}
   </div>;
 }

@@ -32,3 +32,8 @@
 [data-docs-embed] .app-shell > .site-navigation { display: none; }
 
 [data-docs-embed] .app-shell .workbench { height: 100dvh; }
+
+.system-workbench-panes { grid-area: design; }
+.app-shell .system-workbench--no-stylesheet { grid-template-columns: minmax(0, 1fr); grid-template-areas: "header" "design"; }
+.aa-stylesheet { height: 100%; overflow: auto; font-family: var(--ds-typeface-mono); font-size: calc(13px * var(--ds-sf)); line-height: var(--ds-unit); color: var(--ds-slate-light); }
+.aa-stylesheet > .aa-block { min-height: 100%; white-space: pre; outline: none; }
