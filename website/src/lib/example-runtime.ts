@@ -54,7 +54,7 @@ sample.addEventListener('input-change', event => {
 sample.addEventListener('form-submit', event => {
   output.textContent = `form-submit: ${JSON.stringify((event as CustomEvent).detail.data)}`;
 });
-sample.addEventListener('ds-notice-dismiss', () => { output.textContent = 'ds-notice-dismiss'; });
+sample.addEventListener('ds-message-dismiss', () => { output.textContent = 'ds-message-dismiss'; });
 sample.addEventListener('select', event => {
   if ((event.target as HTMLElement).localName === 'ds-pagedots') output.textContent = `select: ${(event as CustomEvent).detail.index}`;
 });

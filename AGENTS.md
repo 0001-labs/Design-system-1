@@ -43,7 +43,7 @@ Design system 1 is a general design system anyone can use. Never name 0001's pro
 
 - `0-face/` — Device detection, i18n, localStorage, themes
 - `1-root/` — CSS variables (design tokens), fonts
-- `2-core/` — Components: banner, buttons, text, cycle, date, icon, input, toast, tooltip. Toast (`ds-toast.ts`, and the page toaster `0-face/toaster.ts` that shares its queue and stylesheet for pages without Lit) is based on Sonner: keep its API and behaviour Sonner's and say so in its source and docs
+- `2-core/` — Components: Message (inline, banner, toast and assistant forms), buttons, text, cycle, date, icon, input, tooltip. Message is the public component; Notice and Toast remain compatibility entries. Toast (`ds-toast.ts`, and the page toaster `0-face/toaster.ts` that shares its queue and stylesheet for pages without Lit) is based on Sonner: keep its API and behaviour Sonner's and say so in its source and docs
 - `3-unit/` — Composite: list, row, table
 - `4-page/` — Page-level layouts
 - `x-icon/` — SVG icon library

@@ -136,12 +136,12 @@
     "url": "https://designsystem1.com/2-core/link/"
   },
   {
-    "id": "component:/2-core/notice/",
+    "id": "component:/2-core/message/",
     "code": "NOTE",
-    "label": "Notice",
+    "label": "Message",
     "kind": "component",
     "summary": "Design system 1 2-core.",
-    "url": "https://designsystem1.com/2-core/notice/"
+    "url": "https://designsystem1.com/2-core/message/"
   },
   {
     "id": "component:/2-core/progress/",
@@ -166,14 +166,6 @@
     "kind": "component",
     "summary": "Design system 1 2-core.",
     "url": "https://designsystem1.com/2-core/text/"
-  },
-  {
-    "id": "component:/2-core/toast/",
-    "code": "TST",
-    "label": "Toast",
-    "kind": "component",
-    "summary": "Design system 1 2-core.",
-    "url": "https://designsystem1.com/2-core/toast/"
   },
   {
     "id": "component:/2-core/tooltip/",

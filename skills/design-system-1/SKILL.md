@@ -106,7 +106,7 @@ The things in a strip are `<ds-card>` (`.ds-card`): `href` for one link, `tone` 
 
 ## Toasts
 
-A toast is `<ds-toast>` and `toast()` from `DS1/2-core/ds-toast.ts`, based on Sonner: Sonner's calls, options and stacking behaviour, drawn as the system's label: an ink chip one control high per line in the tooltip's colours, padded 4px, no line or shadow, actions as underlined words, as wide as its words up to sixteen squares, the pile advancing one square per toast and standing one square from the edge. An error is announced assertively. Never build a product's own toast or notification stack. On a page without Lit, import the same `toast()` from `DS1/0-face/feedback.ts`: its page toaster draws the same stack with `ds-toast`'s stylesheet, and a `<ds-toast>` in the page takes every toast, so a page never shows two stacks.
+Message is one component with inline, banner, toast and assistant forms (`ds-message`, React `Message` from `DS1/react/message`). A toast is `<ds-message form="toast">` and `message()` from `DS1/2-core/ds-message.ts`, based on Sonner: Sonner's calls, options and stacking behaviour, drawn as the system's label: an ink chip one control high per line in the tooltip's colours, padded 4px, no line or shadow, actions as underlined words, as wide as its words up to sixteen squares, the pile advancing one square per toast and standing one square from the edge. An error is announced assertively. Never build a product's own toast or notification stack. On a page without Lit, import the same `toast()` from `DS1/0-face/feedback.ts`: its page toaster draws the same stack with `ds-toast`'s stylesheet, and a `<ds-toast>` in the page takes every toast, so a page never shows two stacks.
 
 ## Dialogs and copying text
 
@@ -126,11 +126,11 @@ Write a shortcut once, `"mod+shift+d"`, and let `DS1/0-face/keys.ts` do the rest
 - `shortcutLabel(shortcut)` writes it as the platform does: `⇧⌘D` (⌃ ⌥ ⇧ ⌘, no space) or `Ctrl+Shift+D`; the word keys are the shared words `key.ctrl` … in the page's language (`Strg+Umschalt+D`). `modKey()` is ⌘ or Ctrl. Give the control `aria-keyshortcuts` from `ariaKeyShortcuts(shortcut)`.
 - A hint is `<ds-kbd shortcut="mod+k">` (React `react/kbd`), or `kbd.ds-kbd` filled with `shortcutLabel()`; `plain` in a menu entry. Arrows are written as arrows and set in Inter. https://designsystem1.com/1-root/keys/
 
-## Empty states and notices
+## Empty states and messages
 
 - **An empty place** is `<ds-empty>` (React `Empty`, `DS1/react/empty.ts`; native `.ds-empty` from `DS1/1-root/empty.css`): a title, a line of muted text, an optional icon on its own square and the action that fills it, one square below. Words on the paper, no box, no illustration, at most sixteen squares wide, every line one square. Without a heading its title is the shared words' "Nothing here yet" in the current language. Never build a product's own empty state. https://designsystem1.com/2-core/empty/
-- **A message in the flow** (a failure beside the form that failed, a warning above its list) is `<ds-notice tone>` (React `Notice`, `DS1/react/notice.ts`; native `.ds-notice` from `DS1/1-root/notice.css`): `neutral`, `success`, `warning` or `danger`, a 16px square mark filled in the tone's colour with its icon in the ink, a title and/or text on one-square lines, actions on the row below and an optional dismiss (`ds-notice-dismiss`, cancelable). It is `role="status"`, or `role="alert"` for danger. Danger words are `--ds-danger-color`. Never an emoji, a raw red, a coloured box or a ← glyph for a message. https://designsystem1.com/2-core/notice/
-- A message across the top of a page is the same notice with `banner` (`<ds-notice banner>`, native `ds-notice--banner`): a strip one square high on the tone's fill, its actions real links or buttons in the `actions` slot; a short confirmation that leaves on its own is a toast.
+- **A message in the flow** (a failure beside the form that failed, a warning above its list) is `<ds-message tone>` (React `Message`, `DS1/react/message.ts`; native `.ds-notice` from `DS1/1-root/notice.css`): `neutral`, `success`, `warning` or `danger`, a 16px square mark filled in the tone's colour with its icon in the ink, a title and/or text on one-square lines, actions on the row below and an optional dismiss (`ds-message-dismiss`, cancelable). It is `role="status"`, or `role="alert"` for danger. Danger words are `--ds-danger-color`. Never an emoji, a raw red, a coloured box or a ← glyph for a message. https://designsystem1.com/2-core/message/
+- A message across the top of a page is the same Message with `form="banner"` (`<ds-message form="banner">`, native `ds-notice--banner`): a strip one square high on the tone's fill, its actions real links or buttons in the `actions` slot; a short confirmation that leaves on its own is a toast.
 
 ## Site chrome
 
@@ -278,3 +278,5 @@ Every text is sentence case, in every language.
 ## Checking a design
 
 Measure, do not eyeball: in the browser, read each element's rendered width and height and its position. Widths and heights are whole squares (minus the 1px correction for items), and positions fall on the 20px grid. A row that is 32 or 36px tall, or a gap of 12px, is wrong. Then the sixteen: in any row, a 16px icon's bottom edge sits on the row's bottom grid line and the 14px capitals beside it start 7px below the row's top line (measure the baseline with a zero-height inline-block, the cap height from `measureText('H').actualBoundingBoxAscent`); words centred in the twenty, or an icon centred in its square, are wrong.
+
+Message compatibility: existing Notice/Toast APIs and native DS1Notice/DS1Toast remain supported. The assistant form uses the same message face with identity, content and actions supplied by the app; conversation state remains product-owned.

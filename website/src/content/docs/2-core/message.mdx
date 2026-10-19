@@ -1,0 +1,195 @@
+---
+title: Message
+description: A message in the flow of the page, in a tone, with actions and an optional dismiss.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+A notice stands where its words apply: the failure beside the form that failed, the warning above the list it is about. It is not positioned and takes no box or shadow. A square mark, one control high and filled in the tone's colour, carries the tone; the words sit on the paper beside it, each line one square, with the actions on the row below.
+
+Message shows information on an app or page. Set `form="inline"`, `form="banner"`, `form="toast"` or `form="assistant"`. The form describes where the message appears; tone describes what it means.
+
+## Try it
+
+<ComponentExample example="notice" />
+
+## Use it
+
+```html
+<ds-message tone="danger" heading="Couldn't save" text="Check your connection and try again." dismissible>
+  <ds-button slot="actions" secondary>Try again</ds-button>
+</ds-message>
+```
+
+Say what happened and what to do about it, in plain words. A notice needs a title, a text or both: a one-line message is a `text` alone.
+
+| Tone | Mark | Words | Role |
+| --- | --- | --- | --- |
+| `neutral` (the default) | The grey fill, with `info` | The text colour | `status` |
+| `success` | Apple green, with `check` | The text colour | `status` |
+| `warning` | Orange, with `warning` | The text colour | `status` |
+| `danger` | The danger colour, with `warning` | The danger colour (`--ds-danger-color`) | `alert` |
+
+The element is a live region: it gives itself `role="status"`, or `role="alert"` for danger, so a screen reader reads it when it appears. A `role` the page writes on the element is kept. `icon` names another icon from the [library](/2-core/icon/) for the mark, such as `lock` for something that cannot be changed.
+
+## Dismissing
+
+`dismissible` adds a close button at the end of the first line, labelled with the shared word "Close". Pressing it fires `ds-message-dismiss`, which bubbles and is cancelable: unless a listener cancels it, the notice hides itself. Cancel it to keep the notice, or to remove it from the page's own state. `dismiss()` asks in the same way.
+
+```js
+notice.addEventListener("ds-message-dismiss", event => {
+  event.preventDefault();
+  store.dismiss(id);
+});
+```
+
+## Across the top
+
+`banner` makes the notice a strip one square high across the top of its positioning context: put it in a positioned container, or at the page root. It is filled in the tone's colour, with the mark, the title and the text on one line, the actions at the end of the line and the close button last. It uses absolute positioning and reserves no room in the flow; leave a square for it where words stand under it.
+
+<ComponentExample example="banner" />
+
+<ComponentExample example="banner-dismiss" compact />
+
+```html
+<ds-message form="banner" tone="success" text="Your changes are saved" literal>
+  <a slot="actions" class="ds-link" href="/icons/">Browse icons</a>
+</ds-message>
+```
+
+An action is a real link or button in the `actions` slot; a page without Lit writes `ds-notice--banner` beside the tone.
+
+## API
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `tone` | `neutral`, `success`, `warning`, `danger` | `neutral` | The mark's colour and icon, and the role. |
+| `heading` | string | Empty | A title on the first line, in the medium face. |
+| `text` | string | Empty | The text. The default slot takes its place. |
+| `literal` | boolean | `false` | Show `heading` and `text` as written, never looked up. |
+| `icon` | string | The tone's | Another icon for the mark. |
+| `dismissible` | boolean | `false` | Show the close button. |
+| `banner` | boolean | `false` | A strip across the top of its positioning context. |
+
+| Slot | What it holds |
+| --- | --- |
+| Default | The text, when it needs more than words. |
+| `heading` | The title. |
+| `icon` | An icon of the page's own inside the mark. |
+| `actions` | Buttons or links, on the row under the words. |
+
+## Measures
+
+The mark is one control high (16px) in a one-square cell, so the words start one square in; the close button takes a one-square cell at the end of the first line. Each line of the title and the text is one square, and the actions share one row with half a square between them. The notice fills the width it is given. Tones set `--ds-message-mark`, `--ds-message-mark-ink` and `--ds-message-ink`.
+
+## React
+
+```tsx
+import { Message } from "@0001-labs/design-system-1/DS1/react/message";
+
+<Message tone="warning" heading="Edited somewhere else" onDismiss={() => setShown(false)}
+  actions={<><Button secondary onClick={keepMine}>Keep mine</Button><Button secondary onClick={loadTheirs}>Load theirs</Button></>}>
+  Your changes are safe on this device.
+</Message>
+```
+
+`Message` renders `ds-message` with its words and actions in the light DOM and its role in the markup, so the server's HTML is already a live region. `onDismiss` shows the close button and leaves removing the notice to the product. Register `ds-message` in the browser before hydration.
+
+## Without JavaScript
+
+A page without Lit draws the same notice with the classes in `notice.css`, which `controls.css` imports. The page writes its own words, its icon and its role.
+
+```html
+<div class="ds-notice ds-notice--danger" role="alert">
+  <span class="ds-notice__mark" aria-hidden="true"><!-- the warning icon --></span>
+  <p class="ds-notice__title">Couldn't save</p>
+  <p class="ds-notice__text">Check your connection and try again.</p>
+  <div class="ds-notice__actions">
+    <button class="ds-button ds-button--secondary" type="button">Try again</button>
+  </div>
+  <button class="ds-button ds-button--icon ds-notice__dismiss" type="button" aria-label="Close"><!-- the close icon --></button>
+</div>
+```
+
+`ds-notice--success` and `ds-notice--warning` are the other tones; without one the notice is neutral. See [Native controls](/1-root/native-controls/).
+
+[Empty state](/2-core/empty/)
+
+## Assistant
+
+An assistant message stays in the page. Supply its identity through `heading` or the icon slot, its response as content, and its next steps through `actions`. The app owns conversation state and requests.
+
+<ComponentExample example="message-assistant" />
+
+## Toast
+
+The toast form uses the existing Sonner-based queue, timers, gestures and announcements. Put one host in the app; `message()` sends messages to it.
+
+```html
+<ds-message form="toast" position="bottom-right" close-button></ds-message>
+```
+
+```ts
+import { message } from "@0001-labs/design-system-1";
+message.success("Changes saved");
+message.error("Could not save");
+message.promise(save(), { loading: "Saving", success: "Saved", error: "Could not save" });
+message.dismiss();
+```
+
+<ComponentExample example="toast" />
+
+`message()` supports the existing `toast()` options, including descriptions, actions, IDs, duration and promise updates. In React, import `Message` and `message` from `DS1/react/message`; register `ds-message` in the browser before hydration.
+
+| Attribute | Default | What it does (as in Sonner) |
+| --- | --- | --- |
+| `position` | `bottom-right` | `top-left`, `top-center`, `top-right`, `bottom-left`, `bottom-center` or `bottom-right`. |
+| `expand` | Off | Keeps the toasts spread out instead of stacked. |
+| `visible-toasts` | `3` | How many toasts show at once. |
+| `duration` | `4000` | Milliseconds each toast stays. |
+| `close-button` | Off | Adds a close button to every toast. |
+| `rich-colors` | Off | Fills success, info, warning and error toasts with their colour. |
+| `contained` | Off | Not in Sonner: draws the toasts inside the nearest positioned parent, such as a panel's status area, instead of the window. |
+| `label` | `Messages` | The region's accessible name; pass the product's own words. |
+| `close-label` | `Close` | The close button's accessible name. |
+
+### A toast's options
+
+`id`, `description`, `duration` (`Infinity` keeps it), `icon` (a Design system 1
+icon name), `action` and `cancel` (`{ label, onClick }`; the toast closes after
+the click unless `onClick` calls `preventDefault()`; with `href`, not in Sonner,
+the button is a link and closes the toast as it is followed), `dismissible`,
+`closeButton`, `important` (announced assertively; an error is unless it says
+`false`), `onDismiss` and
+`onAutoClose`. `message.promise()` also takes `loading`, `success`, `error` (text,
+or a function of the result) and `finally`.
+
+### Behaviour
+
+As in Sonner: the newest toast is in front, the next two peek out behind it,
+and hovering or focusing the stack spreads them out and pauses their time, as
+does holding a toast or hiding the tab. A swipe towards the edge dismisses a
+toast; Alt+T moves focus to the toasts and Escape lets go. Loading toasts stay
+until they are updated or dismissed.
+
+### Where it departs from Sonner
+
+A toast is drawn as Design system 1's label, not as Sonner's card: an ink chip
+one control high for each line of words, in the tooltip's colours (black with
+white words, turning over in dark mode), padded 4px, with no line and no
+shadow. It is as wide as its words, up to sixteen squares. Actions and Cancel
+are words of the same size, underlined. The pile advances one square per
+toast, a control and the rest of the square, and stands one square clear of
+the edge and the phone's safe area. Only `transform` and `opacity` animate; a
+toast stacked behind takes the front one's height at once. Swiping works
+towards the vertical edge only. Moving the element to another parent keeps its
+toasts and the time each had left. An error is announced assertively unless it
+says `important: false`.
+
+Set `--ds-toast-width`, `--ds-toast-background` and `--ds-toast-color` on
+`ds-message` with shared tokens to fit a surface. Copy `message` through Sync 1.
+
+
+## Compatibility
+
+`ds-notice`, `Notice`, `ds-toast`, `Toaster` and `toast()` remain supported for existing apps. They are compatibility entry points for Message. The native CSS classes remain `ds-notice` and `ds-notice__*`.

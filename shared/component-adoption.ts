@@ -94,13 +94,13 @@ const directoryColumns: ComponentColumn[] = ALL_LAYERS.flatMap(layer => layer.en
 })));
 export const IMPLEMENTATION_COLUMNS: ComponentColumn[] = [
   ...directoryColumns,
-  ...["button", "split", "checkbox", "radio", "switch", "text", "badge", "token", "avatar", "icon", "input", "file-picker", "color", "swatch", "select", "textarea", "composer", "tooltip", "cycle", "date", "language", "gap", "banner", "empty", "notice", "kbd", "stat", "meter", "steps", "progress", "card", "pagedots", "chart", "toast", "toggle", "loading", "spacing-handle"].map(id => ({ id, name: id, group: "Core" })),
+  ...["button", "split", "checkbox", "radio", "switch", "text", "badge", "token", "avatar", "icon", "input", "file-picker", "color", "swatch", "select", "textarea", "composer", "tooltip", "cycle", "date", "language", "gap", "banner", "empty", "message", "notice", "kbd", "stat", "meter", "steps", "progress", "card", "pagedots", "chart", "toast", "toggle", "loading", "spacing-handle"].map(id => ({ id, name: id, group: "Core" })),
   ...["token-field", "avatar-group", "calendar", "calendar-large", "date-picker", "matrix", "carousel", "slide", "row", "list", "tabs", "menu", "accordion", "form", "table", "sidebar", "tree", "navigation", "unit-card"].map(id => ({ id, name: id, group: "Unit" })),
   ...["dialog", "panel", "container", "layout", "grid", "page", "header", "footer", "document"].map(id => ({ id, name: id, group: "Page" })),
 ].filter((column, index, columns) => columns.findIndex(other => other.id === column.id) === index);
 /** Retired names fold into the component that took them over, so a product's older copy still counts there. */
 const FAMILY: Record<string, string> = {
-  split: "button", toggle: "switch", textarea: "input", language: "cycle", banner: "notice",
+  split: "button", toggle: "switch", textarea: "input", language: "cycle", banner: "message", notice: "message", toast: "message",
   meter: "progress", steps: "progress", pagedots: "progress", slide: "carousel", tree: "sidebar", layout: "page",
 };
 /** Retired with nothing taking their place. */

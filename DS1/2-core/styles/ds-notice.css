@@ -13,13 +13,15 @@
 }
 
 /* The banner is placed by the host; its block then fills the host. */
-:host([banner]) {
+:host([banner]),
+:host([form="banner"]) {
   position: absolute;
   top: 0;
   inset-inline: 0;
   z-index: 9999;
 }
-:host([banner]) .ds-notice--banner {
+:host([banner]) .ds-notice--banner,
+:host([form="banner"]) .ds-notice--banner {
   position: static;
 }
 

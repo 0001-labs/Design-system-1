@@ -54,6 +54,7 @@ export * from "./2-core/ds-input";
 export * from "./2-core/ds-kbd";
 export * from "./2-core/ds-file-picker";
 export * from "./2-core/ds-composer";
+export * from "./2-core/ds-message";
 export * from "./2-core/ds-notice";
 export * from "./2-core/ds-stat";
 export * from "./2-core/ds-progress";

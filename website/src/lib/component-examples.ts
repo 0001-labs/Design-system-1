@@ -99,9 +99,9 @@ export const EXAMPLES: Record<string, ComponentExample> = {
   },
   toast: {
     title: 'Toasts, as in Sonner',
-    hint: 'Each button calls toast(). Hover the stack to spread it out and pause it; swipe one down to dismiss it.',
+    hint: 'Each button calls message(). Hover the stack to spread it out and pause it; swipe one down to dismiss it.',
     height: 260,
-    html: `<ds-toast position="bottom-right" close-button></ds-toast>
+    html: `<ds-message form="toast" position="bottom-right" close-button></ds-message>
 <ds-row>
   <ds-button secondary data-toast="default">Default</ds-button>
   <ds-button secondary data-toast="success">Success</ds-button>
@@ -109,13 +109,13 @@ export const EXAMPLES: Record<string, ComponentExample> = {
   <ds-button secondary data-toast="action">Action</ds-button>
   <ds-button secondary data-toast="promise">Promise</ds-button>
 </ds-row>`,
-    script: `import { toast } from "@0001-labs/design-system-1";
+    script: `import { message } from "@0001-labs/design-system-1";
 
-toast("Event created", { description: "Monday at 9:00" });
-toast.success("Changes saved");
-toast.error("Could not save");
-toast("Item archived", { action: { label: "Undo", onClick: () => restore() } });
-toast.promise(save(), { loading: "Saving", success: "Saved", error: "Could not save" });`,
+message("Event created", { description: "Monday at 9:00" });
+message.success("Changes saved");
+message.error("Could not save");
+message("Item archived", { action: { label: "Undo", onClick: () => restore() } });
+message.promise(save(), { loading: "Saving", success: "Saved", error: "Could not save" });`,
   },
   chart: {
     title: 'Chart types on the grid',
@@ -227,11 +227,11 @@ render();`,
   },
   'banner': {
     title: 'A notice across the top', hint: 'With banner, the notice is a strip at the top of this isolated preview, its action at the end of the line.',
-    html: '<ds-notice banner tone="success" text="Your changes are saved" literal><a slot="actions" class="ds-link" href="/icons/">Browse icons</a></ds-notice>',
+    html: '<ds-message form="banner" tone="success" text="Your changes are saved" literal><a slot="actions" class="ds-link" href="/icons/">Browse icons</a></ds-message>',
   },
   'banner-dismiss': {
-    title: 'An action and a dismiss', hint: 'The close button fires ds-notice-dismiss and hides the banner.',
-    html: '<ds-notice banner text="A new version is ready" literal dismissible><ds-button slot="actions" secondary>Reload</ds-button></ds-notice>',
+    title: 'An action and a dismiss', hint: 'The close button fires ds-message-dismiss and hides the banner.',
+    html: '<ds-message form="banner" text="A new version is ready" literal dismissible><ds-button slot="actions" secondary>Reload</ds-button></ds-message>',
   },
   'empty': {
     title: 'Nothing here yet', hint: 'Without a heading, the title is the shared words in the current language.',
@@ -283,17 +283,21 @@ render();`,
   <p>When these terms change, the new ones apply from the date at the top.</p>
 </ds-document>`,
   },
+  'message-assistant': {
+    title: 'An assistant message', hint: 'The same Message face, with an identity and actions supplied by the app.',
+    html: '<ds-message form="assistant" heading="Assistant" text="Your draft is ready to review." literal><ds-button slot="actions" secondary>Review draft</ds-button></ds-message>',
+  },
   'notice': {
-    title: 'Four tones', hint: 'Danger is an alert, the others a status. The close button fires ds-notice-dismiss and hides the notice.',
-    html: `<ds-notice text="Changes from an earlier session are stored on this device." literal></ds-notice>
-<ds-notice tone="success" text="Your changes are saved." literal></ds-notice>
-<ds-notice tone="warning" heading="This list was edited somewhere else" text="Your changes are safe on this device." literal>
+    title: 'Four tones', hint: 'Danger is an alert, the others a status. The close button fires ds-message-dismiss and hides the notice.',
+    html: `<ds-message text="Changes from an earlier session are stored on this device." literal></ds-message>
+<ds-message tone="success" text="Your changes are saved." literal></ds-message>
+<ds-message tone="warning" heading="This list was edited somewhere else" text="Your changes are safe on this device." literal>
   <ds-button slot="actions" secondary>Keep mine</ds-button>
   <ds-button slot="actions" secondary>Load theirs</ds-button>
-</ds-notice>
-<ds-notice tone="danger" heading="Couldn't save" text="Check your connection and try again." literal dismissible>
+</ds-message>
+<ds-message tone="danger" heading="Couldn't save" text="Check your connection and try again." literal dismissible>
   <ds-button slot="actions" secondary>Try again</ds-button>
-</ds-notice>`,
+</ds-message>`,
     height: 340,
   },
   'pagedots': {
@@ -617,7 +621,7 @@ document.querySelectorAll('[data-grid-option]').forEach(control => {
 
 export const PAGE_EXAMPLES: Record<string, string[]> = {
   '2-core/choice': ['toggle'],
-  '2-core/toast': ['toast'],
+  '2-core/message': ['notice', 'banner', 'toast', 'message-assistant'],
   '2-core/chart': ['chart'],
   '2-core/avatar': ['avatar-borderless', 'avatar'],
   '2-core/button': ['button', 'button-icon', 'split'],
@@ -626,7 +630,7 @@ export const PAGE_EXAMPLES: Record<string, string[]> = {
   '2-core/input': ['input', 'input-states'],
   '2-core/text': ['text'],
   '2-core/card': ['card', 'card-outlined'],
-  '2-core/empty': ['empty', 'empty-search'], '2-core/notice': ['notice', 'banner', 'banner-dismiss'], '2-core/kbd': ['kbd'],
+  '2-core/empty': ['empty', 'empty-search'], '2-core/kbd': ['kbd'],
   '2-core/stat': ['stat'], '2-core/progress': ['meter', 'steps', 'pagedots'],
   '2-core/cycle': ['cycle', 'language'],
   '2-core/gap': ['gap'],
