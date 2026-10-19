@@ -69,7 +69,7 @@ test("a field's list: one square a choice, words and marks on the sixteen, the c
 });
 
 for (const scheme of ["light", "dark"] as const) {
-  test(`Context's gap face in ${scheme}: rows a pixel apart and groups two, the page showing through, words on the sixteen, the fill turned over`, async () => {
+  test(`Context's gap face in ${scheme}: rows a pixel apart and groups two, the page showing through, words on the sixteen, black in both themes`, async () => {
     const tab = await page(scheme);
     await tab.evaluate(() => {
       document.getElementById("stage")!.innerHTML = '<div id="area" style="width:200px;height:200px">Area</div><ds-context for="area"><button role="menuitem">Rename</button><button role="menuitem">Duplicate</button><hr data-ds-menu-separator><button role="menuitem" data-danger>Delete</button></ds-context>';
@@ -85,7 +85,8 @@ for (const scheme of ["light", "dark"] as const) {
       });
       const probe = document.createElement("span"); document.body.append(probe);
       const rgb = (value: string) => { probe.style.color = value; return getComputedStyle(probe).color; };
-      const colours = { text: rgb("var(--ds-text-color)"), paper: rgb("var(--ds-paper)"), red: rgb(document.documentElement.matches("[data-theme=dark], .dark-theme") || matchMedia("(prefers-color-scheme: dark)").matches ? "var(--ds-red-for-blood)" : "var(--ds-tuned-red)") };
+      const dark = document.documentElement.matches("[data-theme=dark], .dark-theme") || matchMedia("(prefers-color-scheme: dark)").matches;
+      const colours = { fill: rgb(dark ? "var(--ds-slate)" : "var(--ds-black)"), white: rgb("var(--ds-white)"), red: rgb("var(--ds-tuned-red)") };
       probe.remove();
       const frame = menu.shadowRoot!.querySelector<HTMLElement>(".frame")!;
       return { open: (menu as HTMLElement & { open: boolean }).open, at: menu.getBoundingClientRect(), rows, colours, clip: getComputedStyle(frame).clipPath };
@@ -100,10 +101,10 @@ for (const scheme of ["light", "dark"] as const) {
       expect(row.display).toBe("flex");
       expect(row.align).toBe("flex-end");
     }
-    // The ink is the fill, the paper's colour the words; turned over in dark. (The first row is
+    // Black rows with white words in both themes, the slate in dark. (The first row is
     // under the pointer that opened the menu, so it shows the hover.)
-    expect(box.rows[1]!.background).toBe(box.colours.text);
-    expect(box.rows[1]!.color).not.toBe(box.colours.text);
+    expect(box.rows[1]!.background).toBe(box.colours.fill);
+    expect(box.rows[1]!.color).toBe(box.colours.white);
     expect(box.rows[0]!.background).not.toBe(box.rows[1]!.background);
     expect(box.rows[2]!.color).toBe(box.colours.red);
     expect(box.clip).toContain("inset");
@@ -167,7 +168,7 @@ for (const scheme of ["light", "dark"] as const) {
       const quiet = [...menu.querySelectorAll("hr")].map(hr => getComputedStyle(hr).display);
       const probe = document.createElement("span"); document.body.append(probe);
       const rgb = (value: string) => { probe.style.color = value; return getComputedStyle(probe).color; };
-      const colours = { text: rgb("var(--ds-text-color)"), red: rgb(matchMedia("(prefers-color-scheme: dark)").matches ? "var(--ds-red-for-blood)" : "var(--ds-tuned-red)") };
+      const colours = { fill: rgb(matchMedia("(prefers-color-scheme: dark)").matches ? "var(--ds-slate)" : "var(--ds-black)"), white: rgb("var(--ds-white)"), red: rgb("var(--ds-tuned-red)") };
       probe.remove();
       return { rows, quiet, colours, clip: getComputedStyle(menu).clipPath, width: menu.getBoundingClientRect().width };
     });
@@ -178,8 +179,8 @@ for (const scheme of ["light", "dark"] as const) {
     expect(box.rows[3]!.top - box.rows[2]!.bottom).toBe(2);
     expect(box.quiet).toEqual(["none", "block", "none", "none"]);
     for (const row of box.rows.slice(1)) { expect(row.line).toBe("16px"); expect(row.align).toBe("flex-end"); }
-    expect(box.rows[1]!.background).toBe(box.colours.text);
-    expect(box.rows[1]!.color).not.toBe(box.colours.text);
+    expect(box.rows[1]!.background).toBe(box.colours.fill);
+    expect(box.rows[1]!.color).toBe(box.colours.white);
     expect(box.rows[3]!.color).toBe(box.colours.red);
     expect(box.clip).toContain("inset");
     expect(box.width).toBeGreaterThanOrEqual(4 * UNIT);

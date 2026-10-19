@@ -15,10 +15,11 @@
  */
 :host {
   --ds-menu-row: calc(var(--ds-row-height) - 1px);
-  --ds-context-fill: light-dark(var(--ds-black, #1e1e1e), var(--ds-white, #ffffff));
-  --ds-context-ink: light-dark(var(--ds-white, #ffffff), var(--ds-black, #1e1e1e));
+  /* Black in both themes, as Ezo's menus always were: in dark the slate, darker than the page. */
+  --ds-context-fill: light-dark(var(--ds-black, #2a2a2a), var(--ds-slate, #1e1e1e));
+  --ds-context-ink: var(--ds-white, #ffffff);
   --ds-context-hover: color-mix(in srgb, var(--ds-context-fill) 78%, var(--ds-context-ink));
-  --ds-context-danger: light-dark(var(--ds-tuned-red), var(--ds-red-for-blood));
+  --ds-context-danger: var(--ds-tuned-red);
   --ds-context-refused: var(--ds-tuned-red);
   width: var(--ds-menu-width, max-content);
   min-width: calc(4 * var(--ds-unit));

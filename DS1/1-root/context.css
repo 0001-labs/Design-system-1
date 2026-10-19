@@ -4,9 +4,9 @@
  * `.ds-context` is the `ds-context` element's look on a native menu, for a page
  * without Lit or a menu a library draws: Ezo's gap face. The rows carry the
  * colour and the menu only cuts the outer silhouette, so the page shows
- * through a pixel between rows and two between groups. The ink is the rows'
- * fill and the paper their words, turned over with the theme as the tooltip
- * is. Every row is 19px with the pixel under it, a square's pitch, its words
+ * through a pixel between rows and two between groups. The rows are black
+ * with white words in both themes, as Ezo's menus always were (the slate in
+ * dark, darker than the page). Every row is 19px with the pixel under it, a square's pitch, its words
  * on the sixteen and an icon at its end. A Select's menu is the light face,
  * `.ds-menu`; a Context's is this dark one.
  *
@@ -28,10 +28,11 @@
 
 .ds-context {
   --ds-context-row: calc(var(--ds-row-height) - 1px);
-  --ds-context-fill: light-dark(var(--ds-black, #1e1e1e), var(--ds-white, #ffffff));
-  --ds-context-ink: light-dark(var(--ds-white, #ffffff), var(--ds-black, #1e1e1e));
+  /* Black in both themes, as Ezo's menus always were: in dark the slate, darker than the page. */
+  --ds-context-fill: light-dark(var(--ds-black, #2a2a2a), var(--ds-slate, #1e1e1e));
+  --ds-context-ink: var(--ds-white, #ffffff);
   --ds-context-hover: color-mix(in srgb, var(--ds-context-fill) 78%, var(--ds-context-ink));
-  --ds-context-danger: light-dark(var(--ds-tuned-red), var(--ds-red-for-blood));
+  --ds-context-danger: var(--ds-tuned-red);
   --ds-context-refused: var(--ds-tuned-red);
   box-sizing: border-box;
   display: flex;

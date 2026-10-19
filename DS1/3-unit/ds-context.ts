@@ -15,8 +15,8 @@ const REFUSED = 1400;
  * from the keyboard. `context-selector` delegates one menu to many rows of a
  * long list, and focus returns to the row that opened it.
  *
- * It wears Ezo's gap face: each row carries the ink as its fill with the
- * paper's colour for its words, rows a pixel apart and groups two (an
+ * It wears Ezo's gap face: each row is black with white words in both themes
+ * (the slate in dark, darker than the page), rows a pixel apart and groups two (an
  * `hr data-ds-menu-separator` between them, never a line), the page showing
  * through the gaps, the outer corners rounded as one silhouette, and an icon
  * at a row's end. A group left empty leaves no gap. A row hovered or focused
