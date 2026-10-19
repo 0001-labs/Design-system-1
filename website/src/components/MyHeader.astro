@@ -15,6 +15,8 @@ const { landing = false } = Astro.props;
 
 <script>
   import '../lib/public-preferences';
+  import { connectCodeCopy } from '../lib/code-copy';
+  connectCodeCopy();
   import '../../../DS1/0-face/device';
   const frame = document.querySelector<HTMLIFrameElement>('#navigation-auth');
   const requestStatus = () => frame?.contentWindow?.postMessage({ type: 'ds1:navigation-auth-request' }, location.origin);
