@@ -274,3 +274,20 @@ test("a slotted button keeps a one-square box with its face at the foot, an icon
     }
   }
 });
+
+
+test("tags hug their words even in a stretching flex column", async () => {
+  for (const scheme of SCHEMES) {
+    const page = pages[scheme];
+    await stage(page, '<div style="display:flex;flex-direction:column;width:300px"><ds-tag>App</ds-tag><ds-tag>Published</ds-tag></div>');
+    const sizes = await page.evaluate(() => [...document.querySelectorAll('ds-tag')].map(tag => {
+      const range = document.createRange(); range.selectNodeContents(tag);
+      return { width: tag.getBoundingClientRect().width, words: range.getBoundingClientRect().width, height: tag.getBoundingClientRect().height };
+    }));
+    for (const size of sizes) {
+      expect(size.width).toBeCloseTo(size.words + 8, 1);
+      expect(size.height).toBe(16);
+    }
+    expect(sizes[1]!.width).toBeGreaterThan(sizes[0]!.width);
+  }
+});
