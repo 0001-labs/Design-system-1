@@ -15,7 +15,7 @@ A family for money and everyday life: accounts (`bank`, `postal`, `card`, `walle
 
 ## Dot icons
 
-Everyday money drawn in the dot matrix of Olivetti Dot: `dot-coin`, `dot-coins`, `dot-banknote`, `dot-banknotes`, `dot-wallet`, `dot-card`, `dot-bank`, `dot-receipt`, `dot-safe` and `dot-transfer`. Each is a 7 × 7 grid of filled circles in `currentColor` on a two-unit pitch (centres at 2, 4 … 14), each dot's diameter 91% of the pitch as in the font. They are a family of their own beside the rounded icons, for places that are set in Olivetti Dot. `scripts/build-dot-icons.mjs` holds every drawing as a bitmap and writes the SVGs; change a drawing there, run it, then `vp run icons:build` and `vp run generate:icons`. `--sheet FILE.html` writes a proof sheet at three sizes.
+Everyday money drawn in the dot matrix of Olivetti Dot: `dot-coin`, `dot-coins`, `dot-banknote`, `dot-banknotes`, `dot-wallet`, `dot-card`, `dot-bank`, `dot-receipt`, `dot-safe` and `dot-transfer`, and three faces for how a budget is doing, `dot-happy`, `dot-neutral` and `dot-sad`. Each is a 7 × 7 grid of filled circles in `currentColor` on a two-unit pitch (centres at 2, 4 … 14), each dot's diameter 91% of the pitch as in the font. They are a family of their own beside the rounded icons, for places that are set in Olivetti Dot. `scripts/build-dot-icons.mjs` holds every drawing as a bitmap and writes the SVGs; change a drawing there, run it, then `vp run icons:build` and `vp run generate:icons`. `--sheet FILE.html` writes a proof sheet at three sizes.
 
 ## Drawn arrows
 
