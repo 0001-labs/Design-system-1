@@ -304,6 +304,14 @@
     "url": "https://designsystem1.com/4-page/header/"
   },
   {
+    "id": "component:/4-page/overlay/",
+    "code": "OVLY",
+    "label": "Overlay",
+    "kind": "component",
+    "summary": "Design system 1 4-page.",
+    "url": "https://designsystem1.com/4-page/overlay/"
+  },
+  {
     "id": "component:/4-page/page/",
     "code": "PAGE",
     "label": "Page",

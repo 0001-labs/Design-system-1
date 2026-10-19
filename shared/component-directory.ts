@@ -87,6 +87,7 @@ export const ALL_LAYERS: DirectoryLayer[] = [
       { name: 'Container', href: '/4-page/container/', tag: 'ds-container' },
       { name: 'Document', href: '/4-page/document/', tag: 'ds-document' },
       { name: 'Grid', href: '/4-page/grid/', tag: 'ds-grid' },
+      { name: 'Overlay', href: '/4-page/overlay/', tag: 'ds-overlay' },
       { name: 'Page', href: '/4-page/page/', tag: 'ds-page' },
       { name: 'Panel', href: '/4-page/panel/', tag: 'ds-panel' },
     ],

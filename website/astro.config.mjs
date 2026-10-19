@@ -139,6 +139,7 @@ export default defineConfig({
             { label: "Footer", slug: "4-page/footer" },
             { label: "Grid", slug: "4-page/grid" },
             { label: "Header", slug: "4-page/header" },
+            { label: "Overlay", slug: "4-page/overlay" },
             { label: "Page", slug: "4-page/page" },
             { label: "Panel", slug: "4-page/panel" },
           ],
