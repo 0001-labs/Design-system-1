@@ -35,6 +35,7 @@ const { sidebar } = Astro.locals.starlightRoute;
 <script>
   import '../../../DS1/3-unit/ds-sidebar';
   import '../../../DS1/2-core/ds-badge';
+  import { hideSignedInLibraryEntry } from '../lib/sidebar-visibility';
   import { connectAppNavigation } from '../lib/app-navigation';
   import '../../../DS1/1-root/row.css';
   import '../../../DS1/2-core/ds-avatar';
@@ -67,7 +68,7 @@ const { sidebar } = Astro.locals.starlightRoute;
   };
   function rows(entries: Entry[], depth = 0, parent = ''): SidebarItem[] {
     return entries.flatMap((entry, index) => {
-      if (signedIn && (entry.label === 'Start Here' || entry.label === 'My libraries')) return [];
+      if (signedIn && (entry.label === 'Start Here' || hideSignedInLibraryEntry(entry))) return [];
       if (entry.href === '/app/libraries' && !signedIn) return [];
       const href = (entry.href === "/app/libraries" ? "/classless/libraries/" : entry.href) ?? (entry.entries ? overviewPaths[entry.label] : undefined);
       const id = href ?? `${parent}/group-${index}`;
@@ -163,6 +164,8 @@ const { sidebar } = Astro.locals.starlightRoute;
   });
   window.addEventListener("translations-ready", () => { renderNavigation(); });
   window.addEventListener("language-changed", () => { renderNavigation(); });
+  // Replay the authenticated summary after all sidebar listeners are ready.
+  document.querySelector<HTMLIFrameElement>('#navigation-auth')?.contentWindow?.postMessage({ type: 'ds1:navigation-auth-request' }, location.origin);
   navigation.addEventListener('sidebar-toggle', event => {
     const { id, expanded } = (event as CustomEvent).detail;
     if (expanded) collapsed.delete(id); else collapsed.add(id);

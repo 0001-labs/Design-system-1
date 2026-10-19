@@ -158,14 +158,7 @@ export default defineConfig({
                 { label: "API and tools", slug: "libraries/api" },
               ],
             },
-            {
-              label: "Native",
-              items: [
-                { label: "Overview", slug: "advanced/native" },
-                { label: "iOS", slug: "advanced/ios" },
-                { label: "Android", slug: "advanced/android" },
-              ],
-            },
+            { label: "Native", slug: "advanced/native" },
             { label: "Email design", slug: "email" },
             { label: "Film kit", slug: "advanced/film-kit" },
           ],
