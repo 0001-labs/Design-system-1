@@ -253,14 +253,39 @@ body.sidebar-open {
 .main-pane footer .meta { margin-top: 0; gap: var(--grid); font-size: var(--docs-type); line-height: var(--grid); }
 .main-pane footer .pagination-links { gap: var(--grid); }
 .main-pane footer .pagination-links a {
-  padding: var(--grid);
+  align-items: flex-end;
+  gap: calc(4px * var(--ds-sf));
+  padding: 0 var(--ds-row-padding, calc(4px * var(--ds-sf)));
   border: 0;
-  border-radius: 4px;
-  box-shadow: inset 0 0 0 1px var(--ds1-docs-divider);
-  font-size: var(--docs-type);
-  line-height: var(--grid);
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--ds-text-color-muted);
+  font-family: var(--ds-typeface-regular);
+  font-size: var(--ds-type-size-default);
+  line-height: var(--ds-type-lineheight-default);
+  transition: none;
 }
-.main-pane footer .pagination-links .link-title { font-size: var(--docs-type-heading); line-height: var(--grid); }
+.main-pane footer .pagination-links a > span {
+  padding-top: calc(4px * var(--ds-sf));
+}
+.main-pane footer .pagination-links .link-title {
+  display: inline-block;
+  padding-top: calc(4px * var(--ds-sf));
+  color: var(--ds-text-color);
+  font-size: var(--ds-type-size-default);
+  line-height: var(--ds-type-lineheight-default);
+}
+.main-pane footer .pagination-links svg {
+  width: var(--ds-control-height);
+  height: var(--ds-control-height);
+  color: var(--ds-text-color);
+}
+.main-pane footer .pagination-links a:hover { background: var(--ds-row-fill-hover); }
+.main-pane footer .pagination-links a:active { background: var(--ds-row-fill-press); }
+.main-pane footer .pagination-links a:focus-visible {
+  outline: calc(2px * var(--ds-sf)) solid var(--ds-text-color);
+  outline-offset: calc(-2px * var(--ds-sf));
+}
 
 /* On this page: twelve squares, its writing starting level with the page's. */
 .right-sidebar-container { width: 240px; flex: none; }
