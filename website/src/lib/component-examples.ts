@@ -6,6 +6,8 @@ export interface ComponentExample {
   html: string;
   script?: string;
   height?: number;
+  /** `content`: the frame fits what is drawn and may be shorter than `height`, growing while something opens over it. */
+  fit?: "content";
 }
 
 export const TABLE_DATA = [
@@ -358,7 +360,8 @@ calendar.events = [
   <ds-calendar picker label="When" literal name="when"></ds-calendar>
   <ds-calendar picker label="Trip" literal name="trip" value="2026-10-21/2026-10-24"></ds-calendar>
 </div>`,
-    height: 460,
+    height: 100,
+    fit: 'content',
   },
   'matrix': {
     title: 'Products against their parts', hint: 'Hover or move with the arrow keys: the row and the column light up. Pressing a square fires cell-press.',

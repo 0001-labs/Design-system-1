@@ -197,6 +197,15 @@ test("a picker opens its month, takes a day and gives it to its form", async () 
   expect(new FormData(picker.closest("form")!).get("due") ?? picker.value).toBe("2026-10-21");
 });
 
+test("a picker's face is a field with one chevron, and a range is one value", async () => {
+  const picker = await mount<Calendar>(`<ds-calendar picker label="Arrival and departure" literal value="2026-11-04/2026-11-07"></ds-calendar>`);
+  const trigger = picker.shadowRoot!.querySelector<HTMLButtonElement>(".trigger")!;
+  expect(trigger.classList.contains("ds-input")).toBe(true);
+  expect(trigger.classList.contains("ds-select")).toBe(false);
+  expect([...trigger.querySelectorAll("ds-icon")].map(icon => icon.getAttribute("type"))).toEqual(["chevron-down"]);
+  expect(trigger.querySelector(".text")!.textContent).toMatch(/^Nov 4\s*–\s*7, 2026$/);
+});
+
 test("Escape closes the picker's month", async () => {
   const picker = await mount<Calendar>(`<ds-calendar picker value="2026-10-18"></ds-calendar>`);
   picker.open = true;

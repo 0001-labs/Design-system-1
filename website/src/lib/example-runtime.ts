@@ -77,6 +77,17 @@ sample.addEventListener('change', event => {
   const target = (event.target as HTMLElement).localName;
   if (target === 'ds-calendar' || target === 'ds-calendar-large') output.textContent = `change: ${(event as CustomEvent).detail.value || '(cleared)'}`;
 });
+// An open picker's month stands over the page: the page grows to hold it while it is open, so the frame shows it whole.
+sample.addEventListener('ds-calendar-toggle', event => {
+  const picker = event.target as HTMLElement;
+  const hold = () => {
+    const panel = picker.shadowRoot?.querySelector<HTMLElement>('.popover');
+    const bottom = panel?.matches(':popover-open') ? panel.getBoundingClientRect().bottom + scrollY : 0;
+    document.body.style.minHeight = bottom ? `${Math.ceil(bottom + 20)}px` : '';
+  };
+  if ((event as CustomEvent).detail.open) requestAnimationFrame(hold);
+  else document.body.style.minHeight = '';
+});
 sample.addEventListener('form-invalid', () => { output.textContent = 'form-invalid: fill in the required field.'; });
 for (const name of ['change', 'press']) sample.addEventListener(name, event => {
   if ((event.target as HTMLElement).matches('ds-button[split]'))

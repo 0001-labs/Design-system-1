@@ -13,7 +13,7 @@ if (!sample) throw new Error(`Unknown component example: ${example}`);
     <ExampleViewToggle />
   </div>
   <div data-example-preview>
-  <iframe src={`/examples/${example}/`} title={`${sample.title} — interactive preview`} loading="lazy" scrolling="no" style={`height: ${sample.height ?? 160}px;`} data-preview-frame></iframe>
+  <iframe src={`/examples/${example}/`} title={`${sample.title} — interactive preview`} loading="lazy" scrolling="no" style={`height: ${sample.height ?? 160}px;`} data-fit={sample.fit} data-preview-frame></iframe>
   <p class="example-hint">{sample.hint}</p>
   </div>
   <div data-example-source hidden><ExampleCode html={sample.html} script={sample.script} /></div>

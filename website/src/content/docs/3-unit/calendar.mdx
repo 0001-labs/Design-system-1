@@ -133,7 +133,7 @@ picker.addEventListener("change", event => {
 });
 ```
 
-With `picker`, the calendar is a field one control high with the calendar icon at its start and the down arrow at its end. Pressing it opens a panel half a square below, on the menu's frame: the first and last day written out where they can be typed, the compact month one square a day, an **Include time** switch and **Clear**.
+With `picker`, the calendar is a field one control high, its value written in it and a chevron (`chevron-down`) at its end. A range is one picker and one value (Oct 21 – 24, 2026), never two pickers side by side for its ends. Pressing it opens a panel half a square below, on the menu's frame: the first and last day written out where they can be typed, the compact month one square a day, an **Include time** switch and **Clear**.
 
 It chooses as a month does. Each opening starts a new choice: the first day pressed is the value; the second, before or after, ends a range and closes the panel. Pressing the same day twice, or leaving after the first press, keeps one day.
 
@@ -149,7 +149,7 @@ The face writes the value in the current language, a range as the language write
 
 | Measure | Size |
 | --- | --- |
-| The field | The select's face: one control high at the foot of its square, ten squares wide (`--ds-calendar-picker-width`). |
+| The field | A field's face: one control high at the foot of its square, ten squares wide (`--ds-calendar-picker-width`), the words 4px in, the `chevron-down` icon (16px) 2px from the end. |
 | The days to type | A field one control high on its own square for the first day and one for the last; with times on, each day's time on the square below it. One square spare after them. |
 | The month | One square a day, seven squares wide: the month with its chevrons, the weekdays in a letter, six weeks with the neighbouring months' days in the title grey. |
 | The marks | The chosen days are squares with 4px corners in Sharp blue, the days between on a band of it, today a red disc. |

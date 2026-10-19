@@ -44,7 +44,8 @@ export function fitFrame(frame: HTMLIFrameElement): void {
     const doc = frame.contentDocument;
     if (!doc?.documentElement) return;
     const unit = 20 * (parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--sf")) || 1);
-    const height = Math.max(doc.documentElement.scrollHeight, doc.body?.scrollHeight ?? 0);
+    // A frame fitting its content measures the body alone: the document is never shorter than the frame, so it could only grow.
+    const height = frame.dataset.fit === "content" ? (doc.body?.scrollHeight ?? 0) : Math.max(doc.documentElement.scrollHeight, doc.body?.scrollHeight ?? 0);
     if (height) frame.style.height = `${Math.ceil(height / unit) * unit}px`;
   };
   const watch = () => {

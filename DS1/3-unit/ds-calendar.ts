@@ -753,7 +753,7 @@ export class Calendar extends CalendarBase {
     const name = this.label ? this.pickerWords(this.label, this.label) : this.pickerWords(undefined, "Date");
     const days = start ? (end ? `${start.day}/${end.day}` : start.day) : "";
     return html`<button
-        class="ds-select trigger"
+        class="ds-input trigger"
         part="trigger"
         type="button"
         aria-haspopup="dialog"
@@ -764,9 +764,8 @@ export class Calendar extends CalendarBase {
         @click=${this.toggle}
         @keydown=${this.onTriggerKey}
       >
-        <ds-icon class="icon" type="calendar" aria-hidden="true"></ds-icon>
         <span class="text">${text}</span>
-        <ds-icon class="arrow" type="down" aria-hidden="true"></ds-icon>
+        <ds-icon class="arrow" type="chevron-down" size="large" aria-hidden="true"></ds-icon>
       </button>
       <div
         class="popover"

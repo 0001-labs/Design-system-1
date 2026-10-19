@@ -257,9 +257,10 @@ export const SHOWCASE_EXAMPLES: Record<string, ComponentExample> = {
   },
   "calendar-visit": {
     "title": "Arrival and departure",
-    "hint": "Two labelled choices on one line, wrapping when space is limited.",
-    "html": "<section class=\"specimen\">\n<div class=\"columns\"><ds-calendar picker label=\"Arrival\" literal value=\"2026-11-04\"></ds-calendar><ds-calendar picker label=\"Departure\" literal value=\"2026-11-07\"></ds-calendar></div>\n</section>\n<style>\n.specimen { width: 100%; min-width: 0; --cell: calc(20px * var(--sf, 1)); }\n.specimen .line { width: 100%; }\n.specimen .grow { flex: 1; min-width: 0; }\n.specimen .muted { color: var(--ds-text-color-muted); }\n.specimen .mono { --ds-typeface-regular: var(--ds-typeface-mono); font-variant-numeric: tabular-nums; }\n.specimen .value { width: calc(4 * var(--cell)); text-align: right; }\n.specimen .mark { display: inline-flex; align-items: flex-end; width: var(--cell); height: var(--ds-control-height); flex: 0 0 var(--cell); }\n.specimen .columns { display: flex; flex-wrap: wrap; gap: var(--cell); }\n.specimen .columns > * { min-width: 0; }\n.specimen fieldset { border: 0; padding: 0; margin: 0; }\n.specimen legend { padding: 0; }\n.specimen label { display: flex; align-items: flex-end; gap: calc(var(--cell) / 2); min-height: var(--cell); }\n.specimen ds-panel { height: calc(10 * var(--cell)); }\n</style>",
-    "height": 460
+    "hint": "One picker chooses the stay: arrival and departure in the same month, written as one value.",
+    "html": "<section class=\"specimen\">\n<ds-calendar picker label=\"Arrival and departure\" literal name=\"stay\" value=\"2026-11-04/2026-11-07\"></ds-calendar>\n</section>\n<style>\n.specimen { width: 100%; min-width: 0; --cell: calc(20px * var(--sf, 1)); }\n.specimen .line { width: 100%; }\n.specimen .grow { flex: 1; min-width: 0; }\n.specimen .muted { color: var(--ds-text-color-muted); }\n.specimen .mono { --ds-typeface-regular: var(--ds-typeface-mono); font-variant-numeric: tabular-nums; }\n.specimen .value { width: calc(4 * var(--cell)); text-align: right; }\n.specimen .mark { display: inline-flex; align-items: flex-end; width: var(--cell); height: var(--ds-control-height); flex: 0 0 var(--cell); }\n.specimen .columns { display: flex; flex-wrap: wrap; gap: var(--cell); }\n.specimen .columns > * { min-width: 0; }\n.specimen fieldset { border: 0; padding: 0; margin: 0; }\n.specimen legend { padding: 0; }\n.specimen label { display: flex; align-items: flex-end; gap: calc(var(--cell) / 2); min-height: var(--cell); }\n.specimen ds-panel { height: calc(10 * var(--cell)); }\n</style>",
+    "height": 100,
+    "fit": "content"
   },
   "carousel-quotes": {
     "title": "Three observations",

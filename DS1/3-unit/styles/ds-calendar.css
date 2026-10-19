@@ -5,9 +5,9 @@
  * stands on the lower sixteen of its square. The boxes are hairlines centred
  * on the grid lines; today is a red disc nine tenths of a square across.
  *
- * A picker is the select's face: one control high at the foot of its square,
- * ten squares wide by default, the calendar icon at its start and the down
- * arrow at its end. Its month opens on the menu's frame, half a square from
+ * A picker is a field's face: one control high at the foot of its square,
+ * ten squares wide by default, its words 4px in and the chevron-down icon
+ * (16px, 2px from the end) at its end; a range is one value. Its month opens on the menu's frame, half a square from
  * the field: a 1px line, half a square inside it, no shadow, so eight squares
  * wide. Inside, on whole squares: the first and last day to type (each with
  * its time below when times are on), one square spare, the compact month one
@@ -282,15 +282,14 @@
 
 .trigger {
   display: inline-flex;
-  align-items: flex-end;
+  align-items: center;
   gap: calc(4px * var(--ds-sf, 1));
   width: var(--ds-calendar-picker-width);
-  padding-inline: 0 calc(4px * var(--ds-sf, 1));
+  padding-inline: calc(4px * var(--ds-sf, 1)) calc(2px * var(--ds-sf, 1));
   text-align: start;
   cursor: pointer;
 }
 .trigger:disabled { cursor: default; }
-.trigger .icon,
 .trigger .arrow { flex: 0 0 auto; }
 .trigger .text {
   flex: 1 1 auto;
@@ -300,7 +299,6 @@
   white-space: nowrap;
 }
 .trigger[data-empty] .text { color: var(--ds-title-color); }
-.trigger[aria-expanded="true"] .arrow { transform: rotate(180deg); }
 
 /* The month's panel, on the menu's frame. */
 .popover {
@@ -373,7 +371,6 @@
   .popover:popover-open {
     animation: ds-calendar-picker-in 140ms cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .trigger .arrow { transition: transform 140ms ease; }
 }
 @keyframes ds-calendar-picker-in {
   from { opacity: 0; transform: translateY(calc(-4px * var(--ds-sf, 1))); }
