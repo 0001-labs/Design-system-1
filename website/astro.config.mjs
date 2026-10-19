@@ -112,6 +112,7 @@ export default defineConfig({
             { label: "Message", slug: "2-core/message" },
             { label: "Progress", slug: "2-core/progress" },
             { label: "Stat", slug: "2-core/stat" },
+            { label: "Tag", slug: "2-core/tag" },
             { label: "Text", slug: "2-core/text" },
             { label: "Tooltip", slug: "2-core/tooltip" },
           ],

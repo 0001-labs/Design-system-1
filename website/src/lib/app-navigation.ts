@@ -17,7 +17,7 @@ export function connectAppNavigation(root: HTMLElement) {
       if (typeof item.name !== 'string' || typeof item.href !== 'string' || !item.href.startsWith('https://dash.designsystem1.com/private-app/#')) continue;
       const link = document.createElement('a');
       link.className = 'ds-row'; link.href = item.href;
-      const badge = document.createElement('ds-badge'); badge.textContent = 'App'; badge.setAttribute('aria-hidden', 'true');
+      const badge = document.createElement('ds-tag'); badge.textContent = 'App'; badge.setAttribute('aria-hidden', 'true');
       const name = document.createElement('span'); name.textContent = item.name;
       link.append(badge, name); links.append(link);
     }

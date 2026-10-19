@@ -65,6 +65,10 @@ Ezo's rule, the one to apply before any other alignment, so text and icons never
 
 Items stack edge to edge with no gap, as an Ezo list does. Lists, table rows, cells and their headers use neutral or transparent backgrounds by default, never automatic accent fills. Colour is opt-in for a meaningful state, not decoration across an entire list or table. Positions snap to the grid: anything a person can move lands on whole squares. Before calling a design done, measure it in the browser (an element's width and height must be whole squares minus the 1px correction) instead of judging by eye.
 
+## Tags
+
+`ds-tag` is a noninteractive category or status label: one control high, 4px scaled padding on each side, and the shared small corner. Its width hugs its text without rounding to squares, an intentional exception for compact labels. Use `--ds-tag-accent` for a pale fill and coloured text. App navigation uses Tag; Badge retains its grid-sized geometry.
+
 ## Text and prose
 
 - **Interface copy** (labels, messages, titles in an app) is `ds-text`: `tone` (`muted`, `title`, `warning`, `danger`), `size` (`small`, `heading`, `display`), `strong` and `wrap` work for a translation key as for `literal` text (what a person wrote is always `literal`, never a key; `ds-accordion literal` does the same for its summary and details). A heading is `role="heading"` with `aria-level`. A page without scripts uses the classes in `DS1/1-root/text.css` on native text: `ds-text`, `ds-text--small`, `--heading`, `--display`, `--strong`, `--muted`, `--title`, `--warning`, `--danger`. `one.css` and `controls.css` both import it.

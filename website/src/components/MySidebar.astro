@@ -34,7 +34,7 @@ const { sidebar } = Astro.locals.starlightRoute;
 
 <script>
   import '../../../DS1/3-unit/ds-sidebar';
-  import '../../../DS1/2-core/ds-badge';
+  import '../../../DS1/2-core/ds-tag';
   import { hideSignedInLibraryEntry } from '../lib/sidebar-visibility';
   import { connectAppNavigation } from '../lib/app-navigation';
   import '../../../DS1/1-root/row.css';
@@ -192,8 +192,7 @@ const { sidebar } = Astro.locals.starlightRoute;
   #private-app-toggle { width: 100%; text-align: left; }
   #private-app-links { padding-inline-start: var(--site-unit); }
   #private-app-links :global(a) { width: 100%; text-decoration: none; }
-  #private-app-links :global(ds-badge) { --ds-badge-background: light-dark(color-mix(in srgb, var(--ds-pink) 28%, white), color-mix(in srgb, var(--ds-pink) 20%, var(--ds-black))); --ds-badge-color: light-dark(color-mix(in srgb, var(--ds-pink) 45%, black), var(--ds-pink)); }
-  #private-app-links :global(ds-badge::part(frame)) { height: var(--ds-control-height); border-radius: var(--ds-radius); }
+  #private-app-links :global(ds-tag) { --ds-tag-accent: var(--ds-pink); }
   .workspace-heading { display: flex; align-items: flex-end; }
   #workspace-toggle { flex: 1; width: auto; min-width: 0; }
   #workspace-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

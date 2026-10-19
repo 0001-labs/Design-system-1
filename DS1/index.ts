@@ -38,6 +38,7 @@ export * from "./0-face/sidebar";
 // ============================================================================
 
 export * from "./2-core/ds-badge";
+export * from "./2-core/ds-tag";
 export * from "./2-core/ds-button";
 export * from "./2-core/ds-checkbox";
 export * from "./2-core/ds-radio";

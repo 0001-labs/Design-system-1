@@ -1,0 +1,28 @@
+@import "../../1-root/component-metrics.css";
+
+:host {
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: max-content;
+  max-width: 100%;
+  min-width: 0;
+  vertical-align: bottom;
+}
+:host([hidden]) { display: none !important; }
+.frame {
+  display: block;
+  box-sizing: border-box;
+  max-width: 100%;
+  padding-inline: calc(4px * var(--ds-sf, 1));
+  border-radius: var(--ds-radius);
+  background: var(--ds-tag-background, light-dark(color-mix(in srgb, var(--ds-tag-accent, var(--ds-grey, #7a7a7a)) 28%, white), color-mix(in srgb, var(--ds-tag-accent, var(--ds-grey, #7a7a7a)) 20%, var(--ds-black, #2a2a2a))));
+  color: var(--ds-tag-color, light-dark(color-mix(in srgb, var(--ds-tag-accent, var(--ds-grey, #7a7a7a)) 45%, black), var(--ds-tag-accent, var(--ds-grey, #7a7a7a))));
+  font-family: var(--ds-typeface-regular);
+  font-feature-settings: var(--ds-font-features);
+  font-size: var(--ds-type-size-default);
+  line-height: var(--ds-control-height);
+  letter-spacing: var(--ds-type-letterspacing-default);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
