@@ -7,9 +7,9 @@ import {
   parseShortcut, setKeyWords, shortcutLabel,
 } from "../DS1/0-face/keys";
 import { SHARED_WORDS } from "../DS1/0-face/shared-words";
-import { Kbd } from "../DS1/react/kbd";
+import { Kbd } from "../packages/app/src/react/kbd";
 vi.stubGlobal("fetch", vi.fn(async () => new Response("{}")));
-await import("../DS1/2-core/ds-kbd");
+await import("../packages/app/src/2-core/ds-kbd");
 
 const TRANSLATOR = Symbol.for("design-system-1.translate");
 const apple = { platform: "apple" } as const;

@@ -1,5 +1,5 @@
 import { createElement, Fragment, type CSSProperties, type ReactNode } from "react";
-import { getText } from "../0-face/i18n";
+import { getText } from "../../../../DS1/0-face/i18n";
 import styles from "../2-core/styles/ds-loading.css?inline";
 export const loadingStyles = styles;
 /** SSR-safe automatic feedback. Decorative when a containing status owns the label.

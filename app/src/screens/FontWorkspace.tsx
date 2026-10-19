@@ -10,7 +10,7 @@ import '../../../DS1/4-page/ds-page';
 import type { Sidebar, SidebarItem } from '../../../DS1/3-unit/ds-sidebar';
 import { Button } from '../../../DS1/react/button';
 import { Empty } from '../../../DS1/react/empty';
-import { LoadingIndicator } from '../../../DS1/react/loading';
+import { LoadingIndicator } from '../../../packages/app/src/react/loading';
 import { Page } from '../../../DS1/react/page';
 import { confirm } from '../../../DS1/0-face/feedback';
 import '../../../DS1/1-root/controls.css';

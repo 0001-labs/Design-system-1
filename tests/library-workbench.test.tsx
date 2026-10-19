@@ -19,7 +19,11 @@ it('uses the public catalogue and examples, preserving saved CSS until an edit',
   expect(sidebar.items.filter(item => item.depth === 0)).toHaveLength(LAYERS.length);
   expect(container.querySelector('iframe')?.getAttribute('src')).toBe('/examples/button/');
   expect(dirty).not.toHaveBeenCalled();
-  expect(container.querySelector<HTMLTextAreaElement>('[data-testid="live-css-source"]')?.value).toContain('--brand: pink');
+  expect(container.querySelector('[data-testid="live-css-source"]')).toBeNull();
+  const toggle = [...container.querySelectorAll('button')].find(button => button.textContent === 'Show stylesheet')!;
+  await act(async () => toggle.click());
+  expect(container.querySelector('[data-testid="live-css-source"]')?.textContent).toContain('--brand: pink');
+  expect(sidebar.items.some(item => item.label === 'Keyboard shortcut')).toBe(false);
   const avatar = [...sidebar.shadowRoot!.querySelectorAll<HTMLButtonElement>('button[data-item]')].find(button => button.textContent?.trim() === 'Avatar')!;
   act(() => { avatar.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true })); });
   expect(container.querySelector('iframe')?.getAttribute('src')).toBe('/examples/avatar-borderless/');

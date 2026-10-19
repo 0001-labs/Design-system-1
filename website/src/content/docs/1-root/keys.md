@@ -8,7 +8,7 @@ platform's command key, a guard that leaves typing alone, the label a shortcut
 is written with, and one call that binds it. Plain TypeScript with no
 framework and no language runtime. A page without the components copies it
 with Sync 1's `root` export, `"modules": ["keys"]`; the components export
-brings it with [`ds-kbd`](/2-core/kbd/).
+can use it to label its own controls.
 
 ## A shortcut, written once
 

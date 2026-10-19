@@ -4,7 +4,7 @@
  * product's own, shown when there is no `shortcut`. */
 import { createElement as h, forwardRef, type HTMLAttributes, type ReactNode } from "react";
 import type { Kbd as KbdElement } from "../2-core/ds-kbd";
-import type { KeyPlatform } from "../0-face/keys";
+import type { KeyPlatform } from "../../../../DS1/0-face/keys";
 
 export type KbdProps = HTMLAttributes<KbdElement> & {
   /** The shortcut, written once for every platform: `mod+shift+d`, `escape`, `?`. */

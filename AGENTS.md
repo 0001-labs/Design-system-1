@@ -121,7 +121,11 @@ System node: `ds1` ([map](https://system.0001.dev/system?focus=ds1)). Selected p
 
 ## Internal component visibility
 
-Visibility is independent of the numbered layers. `DS1/0-face/component-visibility.ts` classifies `spacing-handle` and `loading` as internal Core components: built-in editor interactions and automatic pending-state feedback. Their API is documented in source. They remain importable and available through Sync 1, but must not appear in public docs/search/examples or the normal library/workbench picker. `shared/component-directory.ts` exports filtered `LAYERS` for public surfaces and `ALL_LAYERS` for implementation tooling. The docs loader excludes internal names. Do not classify ordinary content components or charts as internal. Visibility is discoverability, not a secrecy or authorization boundary.
+Visibility is independent of the numbered layers. The private workspace package **App** (`packages/app`, `@0001-labs/app`, `private: true`) owns Keyboard shortcut, Spacing handle and Loading indicator. Their source, React adapters and dedicated styles live in `packages/app/src`; never import them from public `DS1/` or add them to its npm files or bundle. App composes public DS1 foundations in this workspace and is not published. Public Keys and native prose `<kbd>` remain public.
+
+`DS1/0-face/component-visibility.ts` excludes these controls from public docs/search/examples and normal library pickers. Sync 1's component graph supports explicit internal selections from App while preserving the copied layout; ordinary public selections never include App controls. `scripts/clean-public-dist.mjs` clears old compiled modules before public builds. `vp run package:check` inspects the actual packed archive and bundles for App leakage; run it after `build:bundle` and before release.
+
+Owner-only documentation and all its assets live under `https://dash.designsystem1.com/private-app/`. The Worker revalidates the pinned owner ID and verified account through the existing report authority on every request. Other hosts deny the entire asset prefix. The dashboard links to App only after owner authorization. Anonymous requests go to sign-in; nonowners are denied. Keep App files out of public search and sitemaps. Selected System parts: `auth`, `sharing`, `design`, `documentation`, `platform-web`; this is an existing-owner-only surface with no new backend mutation or public rollout.
 
 ## Public font specimens
 

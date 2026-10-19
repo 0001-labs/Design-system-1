@@ -34,7 +34,7 @@ const showsHost = (body: string) => /(^|[;\s])display\s*:\s*(?!none)/.test(body)
 const hidesHost = (selectors: readonly string[], body: string) =>
   selectors.includes(':host([hidden])') && /display\s*:\s*none\s*!important/.test(body);
 
-const elements = ['2-core', '3-unit', '4-page'].flatMap(layer =>
+const elements = ['2-core', '3-unit', '4-page', '../packages/app/src/2-core'].flatMap(layer =>
   readdirSync(join(root, layer))
     .filter(file => /^ds-.*\.ts$/.test(file))
     .map(file => ({ tag: file.replace(/\.ts$/, ''), css: stylesOf(join(root, layer, file)) })),

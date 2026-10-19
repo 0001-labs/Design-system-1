@@ -1,6 +1,6 @@
 import { LitElement, html, unsafeCSS } from "lit";
-import { define } from "../0-face/define";
-import { getText } from "../0-face/i18n";
+import { define } from "../../../../DS1/0-face/define";
+import { getText } from "../../../../DS1/0-face/i18n";
 import styles from "./styles/ds-loading.css?inline";
 
 /** The shared word a busy indicator reads without a label of its own. */

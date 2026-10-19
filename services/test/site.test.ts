@@ -33,6 +33,15 @@ describe("combined website routes", () => {
     }
   });
 
+  it("never serves App docs or assets through a public-host bypass", async () => {
+    for (const path of ['/private-app/', '/private-app/app.js', '/private-app/app.css', '/private-app/index.html']) {
+      expect((await site.fetch(path, { redirect: 'manual' })).status).toBe(404);
+      expect((await site.fetch('https://dash.designsystem1.com' + path, { redirect: 'manual' })).status).toBe(302);
+    }
+    const old = await site.fetch('/2-core/kbd/', { redirect: 'manual' });
+    expect(old.headers.get('location')).toBe('https://dash.designsystem1.com/private-app/');
+  });
+
   it("preserves query parameters when normalizing the app URL", async () => {
     const response = await site.fetch("/app?code=example", { redirect: "manual" });
     expect(response.status).toBe(308);

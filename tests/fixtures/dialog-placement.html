@@ -6,6 +6,7 @@
     <title>Dialog placement measurements</title>
     <link rel="stylesheet" href="/DS1/1-root/one.css" />
     <link rel="stylesheet" href="/DS1/1-root/controls.css" />
+    <link rel="stylesheet" href="/packages/app/src/1-root/kbd.css" />
     <style>
       body { margin: 0; padding: 0; }
       .row { display: block; height: calc(20px * var(--ds-sf, 1)); margin: 0; }
@@ -13,7 +14,7 @@
     </style>
     <script type="module">
       import "/DS1/4-page/ds-dialog.ts";
-      import "/DS1/2-core/ds-kbd.ts";
+      import "/packages/app/src/2-core/ds-kbd.ts";
       import { bindDialogSwipe } from "/DS1/0-face/dialog-swipe.ts";
       window.bindDialogSwipe = bindDialogSwipe;
       await document.fonts.ready;

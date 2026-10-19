@@ -52,3 +52,29 @@ describe('private dashboard HTML and session bridge', () => {
     }
   });
 });
+
+describe('private App documentation and assets', () => {
+  for (const path of ['/private-app/', '/private-app/app.js', '/private-app/app.css']) {
+    it(`gates ${path} using the verified pinned owner`, async () => {
+      const { env, send, assets } = setup();
+      const url = origin + path;
+      const anonymous = await dashboard(new Request(url), env, send);
+      expect(anonymous.status).toBe(302);
+      expect(assets).not.toHaveBeenCalled();
+      for (const user of [
+        { _id: 'other', email: 'jaa90@icloud.com', emailVerified: true },
+        { _id: 'owner', email: 'someone@example.com', emailVerified: true },
+        { _id: 'owner', email: 'jaa90@icloud.com', emailVerified: false },
+      ]) {
+        send.mockResolvedValue(Response.json({ status: 'success', value: user }));
+        expect((await dashboard(new Request(url, { headers: { cookie: '__Host-ds1-dashboard=token' } }), env, send)).status).toBe(403);
+        expect(assets).not.toHaveBeenCalled();
+      }
+      send.mockResolvedValue(Response.json({ status: 'success', value: { _id: 'owner', email: 'jaa90@icloud.com', emailVerified: true } }));
+      const response = await dashboard(new Request(url, { headers: { cookie: '__Host-ds1-dashboard=token' } }), env, send);
+      expect(response.status).toBe(200);
+      expect(response.headers.get('cache-control')).toBe('private, no-store');
+      expect(new URL(assets.mock.calls[0]![0].url).pathname).toBe(path);
+    });
+  }
+});

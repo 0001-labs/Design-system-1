@@ -11,7 +11,7 @@ import "../../../DS1/3-unit/ds-row";
 import { formatDateTime } from "../../../DS1/0-face/format";
 import "../../../DS1/2-core/ds-input";
 import { Button } from "../../../DS1/react/button";
-import { LoadingIndicator } from "../../../DS1/react/loading";
+import { LoadingIndicator } from "../../../packages/app/src/react/loading";
 import { Empty } from "../../../DS1/react/empty";
 import { Notice } from "../../../DS1/react/notice";
 import { libraryTemplate, templateVersion } from "../lib/libraryTemplate";

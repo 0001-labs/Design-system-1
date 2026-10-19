@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>App · Keyboard shortcut</title><link rel="stylesheet" href="/private-app/app.css"><script type="module" src="/private-app/app.js"></script>
+<style>
+body{margin:0;background:var(--background);color:var(--text-color);font:14px/20px var(--typeface-regular)}main{max-width:800px;margin:auto;padding:40px 20px}nav{display:flex;justify-content:space-between;gap:20px}a{color:inherit}h1{font-size:40px;line-height:1.1;font-weight:400;margin:40px 0 20px}h2{font-size:20px;font-weight:400;margin-top:40px}section{padding:20px 0}pre{overflow:auto;padding:20px;background:var(--fill);font:13px/20px var(--typeface-mono)}.preview{display:flex;flex-wrap:wrap;gap:20px;padding:20px;background:var(--fill)}.preview p{display:flex;align-items:center;gap:10px;margin:0}dt{margin-top:20px}dd{margin:0}.muted{color:var(--title-color)}
+</style></head><body><main>
+<nav><a href="/">Design system 1</a><span>App · Private</span></nav>
+<h1>Keyboard shortcut</h1>
+<p>App contains internal app-building controls. It is separate from the public Design system 1 package.</p>
+<p>A shortcut hint displays a command using the reader’s platform conventions. The application owns the action and its keyboard listener.</p>
+<section aria-label="Keyboard shortcut examples"><div class="preview"><p>Search <ds-kbd shortcut="mod+k"></ds-kbd></p><p>Duplicate <ds-kbd shortcut="mod+shift+d"></ds-kbd></p><p>Close <ds-kbd shortcut="escape" plain></ds-kbd></p></div></section>
+<h2>Use it</h2><pre><code>import '@0001-labs/app/keyboard-shortcut';
+
+&lt;ds-kbd shortcut="mod+k"&gt;&lt;/ds-kbd&gt;
+&lt;ds-kbd shortcut="escape" plain&gt;&lt;/ds-kbd&gt;
+&lt;ds-kbd&gt;Fn&lt;/ds-kbd&gt;</code></pre>
+<h2>Platforms</h2><div class="preview"><p>Apple <ds-kbd shortcut="mod+shift+d" platform="apple"></ds-kbd></p><p>Other <ds-kbd shortcut="mod+shift+d" platform="other"></ds-kbd></p></div>
+<dl><dt><code>shortcut</code></dt><dd>The command, written once: <code>mod+k</code>, <code>mod+shift+d</code> or <code>escape</code>.</dd><dt><code>plain</code></dt><dd>Muted text without a fill, for use beside an action.</dd><dt><code>platform</code></dt><dd>Optional <code>apple</code> or <code>other</code> override. By default, follows the reader’s device.</dd></dl>
+<h2>React</h2><pre><code>import '@0001-labs/app/keyboard-shortcut';
+import { Kbd } from '@0001-labs/app/react/keyboard-shortcut';
+
+&lt;Kbd shortcut="mod+k" /&gt;</code></pre>
+<p class="muted">Also in App: Spacing handle and Loading indicator. These controls are available internally through the workspace package and explicit Sync 1 selection. App is not published to npm.</p>
+</main></body></html>

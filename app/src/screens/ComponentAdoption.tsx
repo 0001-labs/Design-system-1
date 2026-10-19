@@ -10,7 +10,7 @@ import "../../../DS1/3-unit/ds-list";
 import "../../../DS1/3-unit/ds-row";
 import { Accordion } from "../../../DS1/react/accordion";
 import { Button } from "../../../DS1/react/button";
-import { LoadingIndicator } from "../../../DS1/react/loading";
+import { LoadingIndicator } from "../../../packages/app/src/react/loading";
 import { Checkbox } from "../../../DS1/react/choice";
 import { Notice } from "../../../DS1/react/notice";
 import "../../../DS1/1-root/component-tokens.css";
@@ -52,7 +52,7 @@ export function ComponentAdoption({ onSignOut }: { onSignOut?: () => Promise<voi
   }, [token, retry]);
   return <main className="adoption" data-testid="component-adoption">
     <header className="adoption-heading">
-      <div><p className="adoption-eyebrow">Reports · Private · <a href="#glossary">Glossary</a></p><h1>Component adoption</h1></div>
+      <div><p className="adoption-eyebrow">Reports · Private · <a href="/private-app/">App</a> · <a href="#glossary">Glossary</a></p><h1>Component adoption</h1></div>
       <ds-button onClick={() => void (onSignOut ? onSignOut() : signOut())}>Sign out</ds-button>
     </header>
     {error ? <Notice tone="danger" actions={<Button secondary type="button" onClick={() => setRetry(value => value + 1)}>Try again</Button>}>{error}</Notice>

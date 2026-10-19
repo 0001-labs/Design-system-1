@@ -1,14 +1,14 @@
 // @vitest-environment happy-dom
 import { readFileSync } from 'node:fs';
 import { afterEach, expect, test, vi } from 'vite-plus/test';
-import { bindSpacingHandle, type SpacingOptions } from '../DS1/2-core/spacing-handle';
-import { LoadingIndicator } from '../DS1/2-core/ds-loading';
+import { bindSpacingHandle, type SpacingOptions } from '../packages/app/src/2-core/spacing-handle';
+import { LoadingIndicator } from '../packages/app/src/2-core/ds-loading';
 import { LAYERS, ALL_LAYERS } from '../shared/component-directory';
 import { componentGraph } from '../scripts/component-graph.mjs';
 import { isPublicComponent } from '../DS1/0-face/component-visibility';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { createElement } from 'react';
-import { LoadingIndicator as Loading } from '../DS1/react/loading';
+import { LoadingIndicator as Loading } from '../packages/app/src/react/loading';
 // The language runtime asks for a translations file as it loads.
 vi.hoisted(() => { globalThis.fetch = async () => new Response('{}'); });
 let dispose: (() => void) | undefined;
@@ -41,11 +41,11 @@ test('loading has an accessible automatic busy state and SSR markup before hydra
  const el = new LoadingIndicator(); el.label='Opening document'; document.body.append(el); await el.updateComplete;
  expect(el.shadowRoot!.querySelector('[role=status]')!.getAttribute('aria-label')).toBe('Opening document');
  const html=renderToStaticMarkup(createElement(Loading,{label:'Opening document'}));
- expect(html).toContain('aria-busy="true"'); expect(readFileSync('DS1/2-core/styles/ds-loading.css','utf8')).toContain('prefers-reduced-motion'); expect(html).not.toContain('progressbar');
+ expect(html).toContain('aria-busy="true"'); expect(readFileSync('packages/app/src/2-core/styles/ds-loading.css','utf8')).toContain('prefers-reduced-motion'); expect(html).not.toContain('progressbar');
 });
 test('internal components remain exportable but are absent from public choices; ordinary components and charts stay public',()=>{
  const tags=LAYERS.flatMap(l=>l.entries).map(e=>e.tag);
- expect(tags).not.toContain('ds-loading'); expect(tags).not.toContain('ds-spacing-handle'); expect(tags).toContain('ds-button');
+ expect(tags).not.toContain('ds-kbd'); expect(tags).not.toContain('ds-loading'); expect(tags).not.toContain('ds-spacing-handle'); expect(tags).toContain('ds-button');
  expect(ALL_LAYERS.flatMap(l=>l.entries).some(e=>e.tag==='ds-loading')).toBe(true);
  expect(isPublicComponent('chart')).toBe(true);
  const graph=componentGraph('DS1',['loading','spacing-handle']);

@@ -23,6 +23,12 @@ function reportPage(response: Response, path: string): Response {
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    // Private App HTML and every asset require the owner session on its own host.
+    if (url.pathname.startsWith('/private-app')) {
+      if (url.hostname !== DASHBOARD_HOST) return new Response('Not found', { status: 404, headers: { 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex' } });
+      return dashboard(request, env);
+    }
+    if (/^\/2-core\/kbd\/?$/.test(url.pathname)) return Response.redirect(`https://${DASHBOARD_HOST}/private-app/`, 302);
     if (url.pathname === "/api/flags") return featureFlags(request, env);
     if (["/flags", "/flags/", "/app/flags"].includes(url.pathname)) {
       if (!["GET", "HEAD"].includes(request.method)) return new Response(null, {status:405});

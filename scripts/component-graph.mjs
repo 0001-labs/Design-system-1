@@ -8,6 +8,10 @@ import { dirname, join, relative, resolve } from 'node:path';
  */
 export function componentGraph(ds1, names) {
   const source = resolve(ds1) + '/';
+  // Internal App controls are opt-in Sync 1 inputs, never public package files.
+  const appSource = resolve(ds1, '../packages/app/src');
+  const actualPath = file => existsSync(resolve(source, file)) ? resolve(source, file) : resolve(appSource, file);
+  const exists = path => existsSync(path) || (path.startsWith(source) && existsSync(resolve(appSource, relative(source, path))));
   const components = [...new Set(names)].sort();
   const files = new Map();
 
@@ -15,7 +19,18 @@ export function componentGraph(ds1, names) {
     const path = resolve(source, file);
     if (!path.startsWith(source)) throw new Error(`Dependency outside DS1: ${file}`);
     if (files.has(file)) return;
-    const content = readFileSync(path, 'utf8');
+    const actual = actualPath(file);
+    let content = readFileSync(actual, 'utf8');
+    if (actual.startsWith(appSource + '/')) {
+      content = content.replace(/((?:from\s*|import\s*\(\s*|import\s*|@import\s*)["'])(\.[^"']+)(["'])/g, (_match, before, specifier, after) => {
+        const [specifierPath, query] = specifier.split('?');
+        const target = resolve(dirname(actual), specifierPath);
+        const virtual = target.startsWith(appSource + '/') ? resolve(source, relative(appSource, target)) : target;
+        if (!virtual.startsWith(source)) throw new Error(`App dependency outside design source: ${specifier}`);
+        const local = relative(dirname(path), virtual);
+        return before + (local.startsWith('.') ? local : './' + local) + (query ? '?' + query : '') + after;
+      });
+    }
     files.set(file, content);
     if (!/\.(ts|css)$/.test(file)) return;
     const imports = /(?:\bfrom\s*|\bimport\s*\(\s*|^\s*import\s*|@import\s*)["'](\.[^"']+)["']/gm;
@@ -24,7 +39,7 @@ export function componentGraph(ds1, names) {
       // TypeScript's own spelling names a source by its output: `./ds-text.js`
       // is `./ds-text.ts` when no such script sits beside it.
       const compiled = base.endsWith('.js') ? [base.slice(0, -3) + '.ts'] : [];
-      const dependency = [base, ...compiled, `${base}.ts`, `${base}.json`, join(base, 'index.ts')].find(existsSync);
+      const dependency = [base, ...compiled, `${base}.ts`, `${base}.json`, join(base, 'index.ts')].find(exists);
       if (!dependency) throw new Error(`Unresolved ${match[1]} in ${file}`);
       visit(relative(source, dependency));
     }
@@ -32,7 +47,7 @@ export function componentGraph(ds1, names) {
 
   const entries = components.map(name => {
     if (!/^[a-z][a-z-]*$/.test(name)) throw new Error(`Invalid component: ${name}`);
-    const file = ['2-core', '3-unit', '4-page'].map(layer => `${layer}/ds-${name}.ts`).find(file => existsSync(join(source, file)));
+    const file = ['2-core', '3-unit', '4-page'].map(layer => `${layer}/ds-${name}.ts`).find(file => exists(join(source, file)));
     if (!file) throw new Error(`Unknown component: ${name}`);
     visit(file);
     return file;

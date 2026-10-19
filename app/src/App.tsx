@@ -18,7 +18,7 @@ const paletteSuggestions = palette()
   .flatMap((colour) => [colour.hex, colour.pastel]);
 import { readCustomProperty, replaceCustomProperty } from "./lib/cssText";
 import { ComponentTree, type TreeNode } from "./ComponentTree";
-import { SpacingHandle as DsSpacingHandle } from "../../DS1/react/spacing-handle";
+import { SpacingHandle as DsSpacingHandle } from "../../packages/app/src/react/spacing-handle";
 import "../../DS1/2-core/ds-button";
 import "../../DS1/2-core/ds-color";
 import "../../DS1/2-core/ds-composer";

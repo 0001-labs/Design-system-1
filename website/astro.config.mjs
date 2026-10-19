@@ -108,7 +108,6 @@ export default defineConfig({
             { label: "Gap", slug: "2-core/gap" },
             { label: "Icon", slug: "2-core/icon" },
             { label: "Input", slug: "2-core/input" },
-            { label: "Keyboard shortcut", slug: "2-core/kbd" },
             { label: "Link", slug: "2-core/link" },
             { label: "Message", slug: "2-core/message" },
             { label: "Progress", slug: "2-core/progress" },

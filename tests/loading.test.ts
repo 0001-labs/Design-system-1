@@ -3,8 +3,8 @@ import { readFileSync } from 'node:fs';
 import { afterEach, expect, test, vi } from 'vite-plus/test';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { LoadingIndicator, LOADING_CONTROLS, LOADING_LABEL } from '../DS1/2-core/ds-loading';
-import { LoadingIndicator as Loading } from '../DS1/react/loading';
+import { LoadingIndicator, LOADING_CONTROLS, LOADING_LABEL } from '../packages/app/src/2-core/ds-loading';
+import { LoadingIndicator as Loading } from '../packages/app/src/react/loading';
 import { configureI18n, loadSharedWords, setLanguage } from '../DS1/0-face/i18n';
 import { SHARED_WORDS } from '../DS1/0-face/shared-words';
 import { LANGUAGES } from '../DS1/0-face/languages';
@@ -61,7 +61,7 @@ test('a spinner in a button or field knows it, through shadow roots too; on its 
 });
 
 test('the stylesheet sizes a spinner one control high in the same controls, and one square alone', () => {
-  const css = readFileSync('DS1/2-core/styles/ds-loading.css', 'utf8');
+  const css = readFileSync('packages/app/src/2-core/styles/ds-loading.css', 'utf8');
   const listed = /:where\(([^)]*)\) \.ds-loading\[data-variant="spinner"\]/.exec(css)?.[1];
   const normalise = (list: string) => list.split(',').map(entry => entry.trim().replaceAll('"', "'")).sort();
   expect(listed).toBeTruthy();

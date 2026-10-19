@@ -135,12 +135,6 @@ export const SHOWCASE_EXAMPLES: Record<string, ComponentExample> = {
     "html": "<section class=\"specimen\">\n<ds-row class=\"line\" ><ds-tooltip text=\"Add to selected works\"><ds-button secondary label=\"Add to selected works\"><span class=\"mark\"><ds-icon type=\"star\" size=\"large\" aria-hidden=\"true\"></ds-icon></span></ds-button></ds-tooltip><ds-tooltip text=\"Download original\"><ds-button secondary label=\"Download original\"><span class=\"mark\"><ds-icon type=\"download\" size=\"large\" aria-hidden=\"true\"></ds-icon></span></ds-button></ds-tooltip><ds-tooltip text=\"Move to archive\"><ds-button secondary label=\"Move to archive\"><span class=\"mark\"><ds-icon type=\"archive\" size=\"large\" aria-hidden=\"true\"></ds-icon></span></ds-button></ds-tooltip></ds-row>\n</section>\n<style>\n.specimen { width: 100%; min-width: 0; --cell: calc(20px * var(--sf, 1)); }\n.specimen .line { width: 100%; }\n.specimen .grow { flex: 1; min-width: 0; }\n.specimen .muted { color: var(--ds-text-color-muted); }\n.specimen .mono { --ds-typeface-regular: var(--ds-typeface-mono); font-variant-numeric: tabular-nums; }\n.specimen .value { width: calc(4 * var(--cell)); text-align: right; }\n.specimen .mark { display: inline-flex; align-items: flex-end; width: var(--cell); height: var(--ds-control-height); flex: 0 0 var(--cell); }\n.specimen .columns { display: flex; flex-wrap: wrap; gap: var(--cell); }\n.specimen .columns > * { min-width: 0; }\n.specimen fieldset { border: 0; padding: 0; margin: 0; }\n.specimen legend { padding: 0; }\n.specimen label { display: flex; align-items: flex-end; gap: calc(var(--cell) / 2); min-height: var(--cell); }\n.specimen ds-panel { height: calc(10 * var(--cell)); }\n</style>",
     "height": 200
   },
-  "kbd-commands": {
-    "title": "Commands in a reading room",
-    "hint": "Shortcut keys align at the ends of their action rows.",
-    "html": "<section class=\"specimen\">\n<ds-row class=\"line\" ><span class=\"mark\"><ds-icon type=\"search\" size=\"large\" aria-hidden=\"true\"></ds-icon></span><ds-text literal class=\"grow\">Find a passage</ds-text><ds-kbd shortcut=\"Mod+F\"></ds-kbd></ds-row><ds-row class=\"line\" ><span class=\"mark\"><ds-icon type=\"page\" size=\"large\" aria-hidden=\"true\"></ds-icon></span><ds-text literal class=\"grow\">New annotation</ds-text><ds-kbd shortcut=\"Mod+N\"></ds-kbd></ds-row><ds-row class=\"line\" ><span class=\"mark\"><ds-icon type=\"close\" size=\"large\" aria-hidden=\"true\"></ds-icon></span><ds-text literal class=\"grow\">Close reader</ds-text><ds-kbd shortcut=\"Escape\"></ds-kbd></ds-row>\n</section>\n<style>\n.specimen { width: 100%; min-width: 0; --cell: calc(20px * var(--sf, 1)); }\n.specimen .line { width: 100%; }\n.specimen .grow { flex: 1; min-width: 0; }\n.specimen .muted { color: var(--ds-text-color-muted); }\n.specimen .mono { --ds-typeface-regular: var(--ds-typeface-mono); font-variant-numeric: tabular-nums; }\n.specimen .value { width: calc(4 * var(--cell)); text-align: right; }\n.specimen .mark { display: inline-flex; align-items: flex-end; width: var(--cell); height: var(--ds-control-height); flex: 0 0 var(--cell); }\n.specimen .columns { display: flex; flex-wrap: wrap; gap: var(--cell); }\n.specimen .columns > * { min-width: 0; }\n.specimen fieldset { border: 0; padding: 0; margin: 0; }\n.specimen legend { padding: 0; }\n.specimen label { display: flex; align-items: flex-end; gap: calc(var(--cell) / 2); min-height: var(--cell); }\n.specimen ds-panel { height: calc(10 * var(--cell)); }\n</style>",
-    "height": 200
-  },
   "cycle-format": {
     "title": "Cycle through print formats",
     "hint": "A small set of choices beside the label it changes.",
@@ -427,9 +421,6 @@ export const SHOWCASE_PAGES: Record<string, string[]> = {
   ],
   "2-core/tooltip": [
     "tooltip-tools"
-  ],
-  "2-core/kbd": [
-    "kbd-commands"
   ],
   "2-core/cycle": [
     "cycle-format",

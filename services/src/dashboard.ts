@@ -30,16 +30,17 @@ export async function dashboard(request: Request, env: ReportsEnv & { ASSETS: Fe
   }
   if (!['GET', 'HEAD'].includes(request.method)) return new Response(null, { status: 404, headers: security });
   if (url.pathname.startsWith('/app/assets/') || url.pathname === '/icons/design-system-1.svg') return env.ASSETS.fetch(request);
-  if (!['/', '/app/', '/app/signin', '/app/reports/components'].includes(url.pathname)) return new Response(null, { status: 404, headers: security });
+  const privateApp = url.pathname === '/private-app/' || /^\/private-app\/[a-zA-Z0-9._-]+$/.test(url.pathname);
+  if (!privateApp && !['/', '/app/', '/app/signin', '/app/reports/components'].includes(url.pathname)) return new Response(null, { status: 404, headers: security });
   if (url.pathname !== '/app/signin') {
     // Revalidate the token with Convex on every HTML request; cookies confer no authority alone.
     const denied = await authorizeReport(sessionRequest(request), env, send);
     if (denied) {
-      if (denied.status === 401) return new Response(null, { status: 302, headers: { ...security, Location: '/app/signin', 'Set-Cookie': expired } });
+      if (denied.status === 401) return new Response(null, { status: 302, headers: { ...security, Location: privateApp ? '/app/signin?next=%2Fprivate-app%2F' : '/app/signin', 'Set-Cookie': expired } });
       return denied;
     }
   }
-  url.pathname = '/app/';
+  if (!privateApp) url.pathname = '/app/';
   const original = await env.ASSETS.fetch(new Request(url, request));
   const response = new Response(original.body, original);
   for (const [name, value] of Object.entries(security)) response.headers.set(name, value);

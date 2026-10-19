@@ -12,7 +12,7 @@ import '../../../../DS1/2-core/ds-select';
 import '../../../../DS1/2-core/ds-swatch';
 import '../../../../DS1/3-unit/ds-tabs';
 import { Button } from '../../../../DS1/react/button';
-import { LoadingIndicator } from '../../../../DS1/react/loading';
+import { LoadingIndicator } from '../../../../packages/app/src/react/loading';
 import { Notice } from '../../../../DS1/react/notice';
 import { useOwnerSession } from '../AdoptionDashboard';
 import { SignIn } from '../SignIn';

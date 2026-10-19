@@ -8,7 +8,7 @@ import { Avatar } from '../../../DS1/react/avatar';
 import { Input } from '../../../DS1/react/input';
 import { Button } from '../../../DS1/react/button';
 import { Notice } from '../../../DS1/react/notice';
-import { LoadingIndicator } from '../../../DS1/react/loading';
+import { LoadingIndicator } from '../../../packages/app/src/react/loading';
 import { Link } from '../router';
 import './profile.css';
 

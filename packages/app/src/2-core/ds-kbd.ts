@@ -4,9 +4,9 @@
 // the same class a page without scripts puts on a native <kbd>.
 
 import { LitElement, html, unsafeCSS } from "lit";
-import { define } from "../0-face/define";
-import { shortcutLabel, type KeyPlatform } from "../0-face/keys";
-import metrics from "../1-root/component-metrics.css?inline";
+import { define } from "../../../../DS1/0-face/define";
+import { shortcutLabel, type KeyPlatform } from "../../../../DS1/0-face/keys";
+import metrics from "../../../../DS1/1-root/component-metrics.css?inline";
 import kbd from "../1-root/kbd.css?inline";
 import styles from "./styles/ds-kbd.css?inline";
 

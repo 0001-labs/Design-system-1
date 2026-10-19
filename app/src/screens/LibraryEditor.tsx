@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import "../../../DS1/2-core/ds-button";
 import { Button } from "../../../DS1/react/button";
-import { LoadingIndicator } from "../../../DS1/react/loading";
+import { LoadingIndicator } from "../../../packages/app/src/react/loading";
 import "../../../DS1/2-core/ds-input";
 import { Input } from "../../../DS1/react/input";
 import "../../../DS1/2-core/ds-notice";

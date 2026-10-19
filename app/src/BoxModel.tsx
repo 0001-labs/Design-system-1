@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef } from "react";
-import { bindSpacingHandle } from "../../DS1/2-core/spacing-handle";
+import { bindSpacingHandle } from "../../packages/app/src/2-core/spacing-handle";
 export type BoxRegion = "margin" | "border" | "padding" | "content" | "all";
 export type BoxModelConfig = {
   paddingX: number; paddingY: number; radius: number;

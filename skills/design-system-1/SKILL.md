@@ -124,7 +124,7 @@ Write a shortcut once, `"mod+shift+d"`, and let `DS1/0-face/keys.ts` do the rest
 
 - `onShortcut(shortcut, handler, { target, typing })` binds it, leaves it alone while typing (`isTyping(event)`: text fields, selects, contenteditables, textboxes and input-method composition), prevents the browser's action and returns the unbind. `matchesShortcut(event, shortcut)` reads one keydown; `isModKey(event)` is the command key alone, so Ctrl-click stays a Mac's right click.
 - `shortcutLabel(shortcut)` writes it as the platform does: `⇧⌘D` (⌃ ⌥ ⇧ ⌘, no space) or `Ctrl+Shift+D`; the word keys are the shared words `key.ctrl` … in the page's language (`Strg+Umschalt+D`). `modKey()` is ⌘ or Ctrl. Give the control `aria-keyshortcuts` from `ariaKeyShortcuts(shortcut)`.
-- A hint is `<ds-kbd shortcut="mod+k">` (React `react/kbd`), or `kbd.ds-kbd` filled with `shortcutLabel()`; `plain` in a menu entry. Arrows are written as arrows and set in Inter. https://designsystem1.com/1-root/keys/
+- Internal app-building hints belong to the private App workspace package (`packages/app`, `@0001-labs/app`), excluded from the public DS1 package. A hint is `<ds-kbd shortcut="mod+k">` (React `@0001-labs/app/react/keyboard-shortcut`), or `kbd.ds-kbd` filled with `shortcutLabel()`; `plain` in a menu entry. Arrows are written as arrows and set in Inter. https://designsystem1.com/1-root/keys/
 
 ## Empty states and messages
 

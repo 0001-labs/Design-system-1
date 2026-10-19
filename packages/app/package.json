@@ -1,0 +1,19 @@
+{
+  "name": "@0001-labs/app",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Internal app-building controls for Design system 1.",
+  "type": "module",
+  "exports": {
+    "./keyboard-shortcut": "./src/2-core/ds-kbd.ts",
+    "./spacing-handle": "./src/2-core/ds-spacing-handle.ts",
+    "./loading": "./src/2-core/ds-loading.ts",
+    "./react/keyboard-shortcut": "./src/react/kbd.ts",
+    "./react/spacing-handle": "./src/react/spacing-handle.ts",
+    "./react/loading": "./src/react/loading.ts"
+  },
+  "peerDependencies": {
+    "lit": "^3.0.0",
+    "react": "^19.0.0"
+  }
+}

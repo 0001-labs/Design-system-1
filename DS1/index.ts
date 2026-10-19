@@ -51,7 +51,6 @@ export * from "./2-core/ds-empty";
 export * from "./2-core/ds-gap";
 export * from "./2-core/ds-icon";
 export * from "./2-core/ds-input";
-export * from "./2-core/ds-kbd";
 export * from "./2-core/ds-file-picker";
 export * from "./2-core/ds-composer";
 export * from "./2-core/ds-message";
@@ -102,6 +101,4 @@ export * from "./3-unit/ds-sidebar";
 
 export * from "./2-core/ds-chart";
 
-export * from "./2-core/ds-spacing-handle";
-export * from "./2-core/ds-loading";
 export * from "./0-face/component-visibility";

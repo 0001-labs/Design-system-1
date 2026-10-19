@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import '../../../DS1/2-core/ds-button';
 import '../../../DS1/2-core/ds-notice';
 import { Button } from '../../../DS1/react/button';
-import { LoadingIndicator } from '../../../DS1/react/loading';
+import { LoadingIndicator } from '../../../packages/app/src/react/loading';
 import { Notice } from '../../../DS1/react/notice';
 import { SignIn } from './SignIn';
 import { ComponentAdoption } from './ComponentAdoption';
@@ -19,6 +19,7 @@ export function useOwnerSession(title: string) {
   const { isLoading, isAuthenticated } = useConvexAuth();
   const token = useAuthToken();
   const { signOut } = useAuthActions();
+  const [destination] = useState(() => new URLSearchParams(window.location.search).get('next') === '/private-app/' ? '/private-app/' : '/');
   const [ready, setReady] = useState(false);
   const [error, setError] = useState('');
   useEffect(() => {
@@ -34,11 +35,11 @@ export function useOwnerSession(title: string) {
         if (!controller.signal.aborted) {
           setReady(true);
           // Prove the protected HTML route before showing anything after sign-in.
-          if (window.location.pathname !== '/') window.location.replace('/');
+          if (window.location.pathname !== '/') window.location.replace(destination);
         }
       }).catch(caught => { if (!controller.signal.aborted) setError(caught instanceof Error ? caught.message : 'Could not check access.'); });
     return () => controller.abort();
-  }, [token]);
+  }, [token, destination]);
   async function leave() {
     await fetch('/api/dashboard/session', { method: 'DELETE' });
     await signOut();

@@ -1,5 +1,5 @@
 import { LitElement, html, unsafeCSS } from "lit";
-import { define } from "../0-face/define";
+import { define } from "../../../../DS1/0-face/define";
 import { bindSpacingHandle, type SpacingOptions } from "./spacing-handle";
 import styles from "./styles/ds-spacing-handle.css?inline";
 export { bindSpacingHandle, type SpacingOptions };

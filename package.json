@@ -60,7 +60,7 @@
     "native:test": "vp run native:tokens && cd native/apple && swift test",
     "native:test:android": "vp run native:tokens && sh scripts/gradle.sh :ds1:testReleaseUnitTest :ds1:lintRelease :ds1:assembleRelease",
     "native:fonts": "python3 scripts/fonts/build-android-fonts.py",
-    "build:bundle": "vp run generate:icons && vp run generate:toast-assets && vp exec tsc && vp run build:vite && vp run build:vite:min && vp run build:vite:feedback",
+    "build:bundle": "node scripts/clean-public-dist.mjs && vp run generate:icons && vp run generate:toast-assets && vp exec tsc && vp run build:vite && vp run build:vite:min && vp run build:vite:feedback && node scripts/check-public-package.mjs",
     "build:vite": "vp build --config vite.config.lib.ts",
     "build:vite:min": "MINIFY=true vp build --config vite.config.lib.ts",
     "build:vite:feedback": "FEEDBACK=true MINIFY=true vp build --config vite.config.lib.ts",
@@ -87,7 +87,7 @@
     "test:e2e": "cd e2e && vp exec playwright test",
     "typecheck:all": "cd packages/css-validate && vp exec tsc --noEmit && cd ../../app && vp exec tsc --noEmit && cd ../services && vp exec tsc --noEmit",
     "services:dryrun": "cd services && vp run dryrun",
-    "site:build": "vp run docs:build && vp run app:build",
+    "site:build": "vp run docs:build && vp run app:build && vp run app-controls:build",
     "site:deploy": "sync1 guard && vp run site:build && cd services && vp exec wrangler deploy --config ../wrangler.jsonc",
     "deploy": "vp run site:deploy",
     "check:versions": "node scripts/versions.mjs",
@@ -102,7 +102,9 @@
     "cli": "node packages/library-tools/cli.mjs",
     "mcp": "node packages/library-tools/mcp.mjs",
     "sync": "sync1",
-    "sync:check": "sync1 check"
+    "sync:check": "sync1 check",
+    "app-controls:build": "vp build --config packages/app/vite.config.ts && node scripts/copy-app-docs.mjs",
+    "package:check": "node scripts/check-public-package.mjs"
   },
   "dependencies": {
     "@auth/core": "0.41.3",

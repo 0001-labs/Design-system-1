@@ -16,7 +16,7 @@ import { formatDateTime } from "../../../DS1/0-face/format";
 import { Badge } from "../../../DS1/react/badge";
 import { Button } from "../../../DS1/react/button";
 import { Empty } from "../../../DS1/react/empty";
-import { LoadingIndicator } from "../../../DS1/react/loading";
+import { LoadingIndicator } from "../../../packages/app/src/react/loading";
 import { Notice } from "../../../DS1/react/notice";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { downloadCss } from "../lib/download";
