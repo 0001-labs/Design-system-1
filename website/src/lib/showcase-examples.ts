@@ -3,6 +3,18 @@ import type { ComponentExample } from "./component-examples";
 
 /** Original, local-only specimens composed from the public component APIs. */
 export const SHOWCASE_EXAMPLES: Record<string, ComponentExample> = {
+  "image-landscape": {
+    title: "A wide photograph",
+    hint: "A 16:9 frame crops the photograph while keeping its centre in view.",
+    html: '<ds-image src="/examples/images/forest.webp" alt="A path beneath tall trees in a sunlit forest" ratio="16 / 9" caption="A quiet path through the forest." style="max-width: 640px" loading="eager"></ds-image>',
+    height: 430,
+  },
+  "image-fit": {
+    title: "Crop or show the whole image",
+    hint: "Cover fills the square. Contain preserves the complete photograph.",
+    html: '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;max-width:640px"><ds-image src="/examples/images/lake.jpg" alt="A mountain reflected in a lake" ratio="1" fit="cover" caption="Cover" loading="eager"></ds-image><ds-image src="/examples/images/lake.jpg" alt="The full portrait photograph of a mountain and its reflection" ratio="1" fit="contain" caption="Contain" loading="eager"></ds-image></div>',
+    height: 410,
+  },
   "tag-labels": {
     title: "Labels that fit their words",
     hint: "Each tag hugs its text with 4px of padding on each side.",

@@ -1,0 +1,14 @@
+@import "../../1-root/component-metrics.css";
+:host { display: block; width: 100%; max-width: 100%; min-width: 0; }
+:host([hidden]) { display: none !important; }
+figure { margin: 0; }
+.media { overflow: hidden; border-radius: var(--ds-radius); background: var(--ds-image-background, var(--ds-fill)); }
+img { display: block; width: 100%; max-width: 100%; }
+figcaption {
+  margin-top: calc(var(--ds-unit) / 2);
+  color: var(--ds-text-color-muted);
+  font-family: var(--ds-typeface-regular);
+  font-feature-settings: var(--ds-font-features);
+  font-size: var(--ds-type-size-default);
+  line-height: var(--ds-row-height);
+}

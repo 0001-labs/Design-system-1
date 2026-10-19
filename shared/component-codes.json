@@ -384,5 +384,13 @@
     "code": "PRIC",
     "kind": "component",
     "url": "https://designsystem1.com/1-root/pricing/"
+  },
+  {
+    "id": "component:/2-core/image/",
+    "code": "IMG",
+    "label": "Image",
+    "kind": "component",
+    "summary": "Responsive images, crops and captions.",
+    "url": "https://designsystem1.com/2-core/image/"
   }
 ]

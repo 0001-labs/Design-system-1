@@ -107,6 +107,7 @@ export default defineConfig({
             { label: "Empty state", slug: "2-core/empty" },
             { label: "Gap", slug: "2-core/gap" },
             { label: "Icon", slug: "2-core/icon" },
+            { label: "Image", slug: "2-core/image" },
             { label: "Input", slug: "2-core/input" },
             { label: "Link", slug: "2-core/link" },
             { label: "Message", slug: "2-core/message" },

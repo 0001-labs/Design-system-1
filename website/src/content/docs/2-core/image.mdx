@@ -1,0 +1,38 @@
+---
+title: Image
+description: Responsive photographs with cropping and captions.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+Image displays a photograph at its natural proportions or inside a chosen frame. It follows the available width, with the system’s small rounded corners.
+
+<ComponentExample example="image-landscape" />
+<ComponentExample example="image-fit" />
+
+## Use
+
+```html
+<ds-image
+  src="/photos/forest.webp"
+  alt="A sunlit path through tall trees"
+  width="1200"
+  height="800"
+  ratio="16 / 9"
+  caption="Along the forest path."
+></ds-image>
+```
+
+- `src` and `alt` supply the image and its text alternative. Use `alt=""` only for decorative images.
+- `width` and `height` describe the source dimensions and reserve space before it loads.
+- Omit `ratio` to keep natural proportions. Set it to `1`, `4 / 3` or `16 / 9` for a frame.
+- `fit="cover"` fills that frame; `fit="contain"` shows the whole image. `position` chooses the focal point, such as `50% 25%`.
+- `srcset` and `sizes` let the browser select a responsive source.
+- Images load lazily by default. Use `loading="eager"` for a prominent image at the top of the page.
+- `caption` adds visible text underneath. It does not replace `alt`.
+
+Copy `image` through Sync 1. React consumers can import `Image` from `DS1/react/image` after registering `DS1/2-core/ds-image`.
+
+## Example photographs
+
+[Forest by Johannes Plenio on Unsplash](https://unsplash.com/photos/pathway-of-trees-during-daytime-P1Iz3unD6Po), used under the [Unsplash License](https://unsplash.com/license). [Mountain reflection by lil artsy on Pexels](https://www.pexels.com/photo/reflection-of-a-mountain-on-a-lake-4390125/), used under the [Pexels License](https://www.pexels.com/license/). Example photos are stored with the documentation, outside the npm package.

@@ -291,3 +291,16 @@ test("tags hug their words even in a stretching flex column", async () => {
     expect(sizes[1]!.width).toBeGreaterThan(sizes[0]!.width);
   }
 });
+
+
+test("image frames reserve their ratio and preserve natural proportions", async () => {
+  await stage(pages.light, '<div style="width:320px"><ds-image width="1200" height="800"></ds-image><ds-image ratio="1" fit="contain"></ds-image><ds-image ratio="16 / 9"></ds-image></div>');
+  const sizes = await pages.light.evaluate(() => [...document.querySelectorAll('ds-image')].map(element => {
+    const img = element.shadowRoot!.querySelector('img')!;
+    const media = element.shadowRoot!.querySelector('.media')!;
+    return { width: media.getBoundingClientRect().width, height: media.getBoundingClientRect().height, fit: getComputedStyle(img).objectFit };
+  }));
+  expect(sizes[0]!.height).toBeCloseTo(320 * 2 / 3, 1);
+  expect(sizes[1]).toEqual({ width: 320, height: 320, fit: 'contain' });
+  expect(sizes[2]).toEqual({ width: 320, height: 180, fit: 'cover' });
+});
