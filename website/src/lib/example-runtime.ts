@@ -75,7 +75,7 @@ for (const name of ['day-press', 'event-press', 'navigate']) sample.addEventList
 });
 sample.addEventListener('change', event => {
   const target = (event.target as HTMLElement).localName;
-  if (target === 'ds-calendar' || target === 'ds-calendar-large' || target === 'ds-date-picker') output.textContent = `change: ${(event as CustomEvent).detail.value || '(cleared)'}`;
+  if (target === 'ds-calendar' || target === 'ds-calendar-large') output.textContent = `change: ${(event as CustomEvent).detail.value || '(cleared)'}`;
 });
 sample.addEventListener('form-invalid', () => { output.textContent = 'form-invalid: fill in the required field.'; });
 for (const name of ['change', 'press']) sample.addEventListener(name, event => {

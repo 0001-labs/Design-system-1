@@ -8,10 +8,8 @@ const { setLanguage } = await import("../DS1/0-face/i18n");
 const days = await import("../DS1/0-face/calendar");
 await import("../DS1/3-unit/ds-calendar");
 await import("../DS1/3-unit/ds-calendar-large");
-await import("../DS1/3-unit/ds-date-picker");
 type Calendar = HTMLElementTagNameMap["ds-calendar"];
 type Large = HTMLElementTagNameMap["ds-calendar-large"];
-type Picker = HTMLElementTagNameMap["ds-date-picker"];
 
 afterEach(() => { document.body.replaceChildren(); setLanguage("en"); });
 
@@ -167,9 +165,9 @@ test("the large calendar runs weeks in columns and fills a day's colours in band
   expect(large.focusDay).toBe("2026-10-19");
 });
 
-test("a date picker opens its month, takes a day and gives it to its form", async () => {
-  document.body.innerHTML = `<form><ds-date-picker name="due" label="Due" literal today="2026-10-18"></ds-date-picker></form>`;
-  const picker = document.querySelector("ds-date-picker") as Picker;
+test("a picker opens its month, takes a day and gives it to its form", async () => {
+  document.body.innerHTML = `<form><ds-calendar picker name="due" label="Due" literal today="2026-10-18"></ds-calendar></form>`;
+  const picker = document.querySelector("ds-calendar") as Calendar;
   await picker.updateComplete;
   const trigger = picker.shadowRoot!.querySelector<HTMLButtonElement>(".trigger")!;
   expect(trigger.getAttribute("aria-label")).toBe("Due");
@@ -200,7 +198,7 @@ test("a date picker opens its month, takes a day and gives it to its form", asyn
 });
 
 test("Escape closes the picker's month", async () => {
-  const picker = await mount<Picker>(`<ds-date-picker value="2026-10-18"></ds-date-picker>`);
+  const picker = await mount<Calendar>(`<ds-calendar picker value="2026-10-18"></ds-calendar>`);
   picker.open = true;
   await picker.updateComplete;
   key(picker.shadowRoot!.querySelector(".popover")!, "Escape");
@@ -208,8 +206,8 @@ test("Escape closes the picker's month", async () => {
   expect(picker.open).toBe(false);
 });
 
-test("a range calendar takes a first and a last day, either way round, and draws the days between", async () => {
-  const calendar = await mount<Calendar>(`<ds-calendar month="2026-10" selectable range compact></ds-calendar>`);
+test("a selectable calendar takes a first and a last day, either way round, and draws the days between", async () => {
+  const calendar = await mount<Calendar>(`<ds-calendar month="2026-10" selectable compact></ds-calendar>`);
   const values: string[] = [];
   calendar.addEventListener("change", event => values.push((event as CustomEvent).detail.value));
   cell(calendar, "2026-10-20").click();
@@ -221,9 +219,25 @@ test("a range calendar takes a first and a last day, either way round, and draws
   expect(cell(calendar, "2026-10-17").hasAttribute("data-inside")).toBe(true);
   expect(cell(calendar, "2026-10-17").getAttribute("aria-selected")).toBe("true");
   expect(cell(calendar, "2026-10-20").hasAttribute("data-last")).toBe(true);
+  expect(calendar.shadowRoot!.querySelector(".grid")!.getAttribute("aria-multiselectable")).toBe("true");
   // A third press starts again.
   cell(calendar, "2026-10-25").click();
   expect(calendar.value).toBe("2026-10-25");
+});
+
+test("the same day pressed twice is one day, and a value set from outside starts a new pick", async () => {
+  const calendar = await mount<Calendar>(`<ds-calendar month="2026-10" selectable compact></ds-calendar>`);
+  const ends: string[] = [];
+  calendar.addEventListener("change", event => ends.push(`${(event as CustomEvent).detail.value}:${(event as CustomEvent).detail.end}`));
+  cell(calendar, "2026-10-14").click();
+  await calendar.updateComplete;
+  cell(calendar, "2026-10-14").click();
+  await calendar.updateComplete;
+  expect(ends).toEqual(["2026-10-14:", "2026-10-14:2026-10-14"]);
+  calendar.value = "2026-10-03";
+  await calendar.updateComplete;
+  cell(calendar, "2026-10-09").click();
+  expect(calendar.value).toBe("2026-10-09");
 });
 
 test("outside days are drawn in a compact month and take it to their month", async () => {
@@ -238,7 +252,7 @@ test("outside days are drawn in a compact month and take it to their month", asy
 });
 
 test("the picker's values read and write ISO 8601, and a typed date is understood", async () => {
-  const { readDateValue, writeDateValue, parseTypedDay } = await import("../DS1/3-unit/ds-date-picker");
+  const { readDateValue, writeDateValue, parseTypedDay } = await import("../DS1/3-unit/ds-calendar");
   expect(readDateValue("2026-10-24T10:00/2026-10-21T09:30")).toEqual({ start: { day: "2026-10-21", time: "09:30" }, end: { day: "2026-10-24", time: "10:00" } });
   expect(writeDateValue({ day: "2026-10-21", time: "09:30" }, { day: "2026-10-24", time: "" }, { time: false })).toBe("2026-10-21/2026-10-24");
   expect(writeDateValue({ day: "2026-10-21", time: "09:30" }, undefined, { time: true })).toBe("2026-10-21T09:30");
@@ -249,8 +263,8 @@ test("the picker's values read and write ISO 8601, and a typed date is understoo
 });
 
 test("the picker always collects a range: a first and a last day, written as one value", async () => {
-  document.body.innerHTML = `<form><ds-date-picker name="trip" label="Trip" literal value="2026-10-21/2026-10-24"></ds-date-picker></form>`;
-  const picker = document.querySelector("ds-date-picker") as Picker;
+  document.body.innerHTML = `<form><ds-calendar picker name="trip" label="Trip" literal value="2026-10-21/2026-10-24"></ds-calendar></form>`;
+  const picker = document.querySelector("ds-calendar") as Calendar;
   await picker.updateComplete;
   expect(picker.time).toBe(false);
   const trigger = picker.shadowRoot!.querySelector<HTMLButtonElement>(".trigger")!;
@@ -260,7 +274,7 @@ test("the picker always collects a range: a first and a last day, written as one
   expect(picker.shadowRoot!.querySelectorAll(".field")).toHaveLength(2);
   const calendar = picker.shadowRoot!.querySelector("ds-calendar") as Calendar;
   await calendar.updateComplete;
-  expect(calendar.range).toBe(true);
+  expect(calendar.selectable).toBe(true);
   // A whole range is there, so the first press starts a new one.
   cell(calendar, "2026-10-12").click();
   await picker.updateComplete;
@@ -274,7 +288,7 @@ test("the picker always collects a range: a first and a last day, written as one
 });
 
 test("turning on a time gives each end one, an hour apart, and Clear empties the value", async () => {
-  const picker = await mount<Picker>(`<ds-date-picker value="2026-10-21"></ds-date-picker>`);
+  const picker = await mount<Calendar>(`<ds-calendar picker value="2026-10-21"></ds-calendar>`);
   picker.open = true;
   await picker.updateComplete;
   const timeSwitch = picker.shadowRoot!.querySelector<HTMLButtonElement>(".ds-switch")!;
@@ -290,7 +304,7 @@ test("turning on a time gives each end one, an hour apart, and Clear empties the
 });
 
 test("no calendar names a product", () => {
-  for (const file of ["0-face/calendar.ts", "3-unit/calendar-base.ts", "3-unit/ds-calendar.ts", "3-unit/ds-calendar-large.ts", "3-unit/ds-date-picker.ts", "3-unit/styles/ds-calendar.css", "3-unit/styles/ds-calendar-large.css", "3-unit/styles/ds-date-picker.css"]) {
+  for (const file of ["0-face/calendar.ts", "3-unit/calendar-base.ts", "3-unit/ds-calendar.ts", "3-unit/ds-calendar-large.ts", "3-unit/styles/ds-calendar.css", "3-unit/styles/ds-calendar-large.css"]) {
     expect(readFileSync(join(import.meta.dirname, "../DS1", file), "utf8")).not.toMatch(/\b(Ezo|Link|Consistency|Peer|Ins|tau99)\b/);
   }
 });

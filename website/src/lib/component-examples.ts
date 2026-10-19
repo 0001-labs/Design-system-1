@@ -328,8 +328,8 @@ calendar.addEventListener('change', event => console.log(event.detail.value));`,
     height: 280,
   },
   'calendar-range': {
-    title: 'A range, two squares a day', hint: 'Press a first day and a last; the pointer previews the end. A third press starts again. Each press fires change.',
-    html: `<ds-calendar compact selectable range fixed outside-days day-width="2"></ds-calendar>`,
+    title: 'One day or a range, two squares a day', hint: 'Press a day to choose it; press another to end a range from it, and the pointer previews the end. The press after starts again. Each press fires change.',
+    html: `<ds-calendar compact selectable fixed outside-days day-width="2"></ds-calendar>`,
     height: 400,
   },
   'calendar-large': {
@@ -343,11 +343,11 @@ calendar.events = [
 ];`,
     height: 420,
   },
-  'date-picker': {
+  'calendar-picker': {
     title: 'Pick a day or a range', hint: 'Open it with a click, Enter or the down arrow. Press a first day and a last; press one day twice, or leave, for a single day. Escape closes it.',
     html: `<div style="display:flex;flex-wrap:wrap;gap:var(--ds-unit)">
-  <ds-date-picker label="When" literal name="when"></ds-date-picker>
-  <ds-date-picker label="Trip" literal name="trip" value="2026-10-21/2026-10-24"></ds-date-picker>
+  <ds-calendar picker label="When" literal name="when"></ds-calendar>
+  <ds-calendar picker label="Trip" literal name="trip" value="2026-10-21/2026-10-24"></ds-calendar>
 </div>`,
     height: 460,
   },
@@ -670,7 +670,7 @@ export const PAGE_EXAMPLES: Record<string, string[]> = {
   '2-core/gap': ['gap'],
   '3-unit/row': ['row', 'row-centered'], '3-unit/list': ["list", "list-reading", "list-files", "list-schedule", "list-people", "list-details"], '3-unit/sidebar': ['sidebar', 'tree'],
   '3-unit/accordion': ['accordion'], '3-unit/form': ['form'], '3-unit/carousel': ['carousel', 'carousel-full', 'slide', 'slide-loop'],
-  '3-unit/calendar': ['calendar', 'calendar-compact', 'calendar-range', 'calendar-large'], '3-unit/date-picker': ['date-picker'], '3-unit/matrix': ['matrix'],
+  '3-unit/calendar': ['calendar', 'calendar-compact', 'calendar-range', 'calendar-picker', 'calendar-large'], '3-unit/matrix': ['matrix'],
   '3-unit/table': ['table'],
   '4-page/container': ['container'], '4-page/grid': ['grid'],
   '4-page/page': ['page'],

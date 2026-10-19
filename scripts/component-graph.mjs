@@ -7,7 +7,7 @@ import { dirname, join, relative, resolve } from 'node:path';
  * path inside DS1, with a generated `components.ts` that exports them all.
  */
 /** Components folded into another, named so a product's sync.json says what to take instead (never resolved for it). */
-const RENAMED = { dialog: 'overlay' };
+const RENAMED = { dialog: 'overlay', 'date-picker': 'calendar' };
 
 export function componentGraph(ds1, names) {
   const source = resolve(ds1) + '/';

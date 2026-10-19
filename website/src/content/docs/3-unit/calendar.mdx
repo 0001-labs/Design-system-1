@@ -1,19 +1,21 @@
 ---
 title: Calendar
-description: Days on whole squares, two ways — a month four squares a day, or months side by side as squares — plus the small month a date picker opens.
+description: Days on whole squares, two ways — a month four squares a day, or months side by side as squares — and the picker, a field that opens the small month to choose one day or a range.
 ---
 
 import ComponentExample from "../../../components/ComponentExample.astro";
 
 There are two calendars, drawn from the same days and keys.
 
-- **`ds-calendar`** draws a month the way a list draws its items: seven days across, a week to a row, each day a hairline box four squares wide and four high. Its date stands on the first square, two lines of events below it and one square to spare. With `compact`, a day is one square and the month becomes the small one a [date picker](/3-unit/date-picker/) opens, or one of twelve in a year.
+- **`ds-calendar`** draws a month the way a list draws its items: seven days across, a week to a row, each day a hairline box four squares wide and four high. Its date stands on the first square, two lines of events below it and one square to spare. With `compact`, a day is one square and the month becomes the small one, one of twelve in a year. With `picker`, it is a field that opens that small month to choose a date: see [the picker](#picker).
 - **`ds-calendar-large`** draws months side by side as squares: a week to a column and the seven days down it, one and a half times the grid, in a rounded frame that scrolls sideways. A day on which something happens is filled with its colour, so a long piece of work reads as a band across the weeks.
 
 
 ## Design examples
 
 <ComponentExample example="calendar-journal" />
+
+<ComponentExample example="calendar-visit" />
 
 ## Try it
 
@@ -22,6 +24,8 @@ There are two calendars, drawn from the same days and keys.
 <ComponentExample example="calendar-compact" compact />
 
 <ComponentExample example="calendar-range" compact />
+
+<ComponentExample example="calendar-picker" />
 
 <ComponentExample example="calendar-large" />
 
@@ -79,13 +83,59 @@ A day outside the month is an empty box. `fixed` always draws six weeks, so movi
 
 The title names the month at the start of the view as it scrolls. The arrows move a month at a time and Today scrolls to today's month; past the months drawn, `start` moves with them and `navigate` says so.
 
-## Ranges
+## Choosing a day or a range
 
 ```html
-<ds-calendar compact selectable range day-width="2" value="2026-10-14/2026-10-20"></ds-calendar>
+<ds-calendar compact selectable day-width="2" value="2026-10-14/2026-10-20"></ds-calendar>
 ```
 
-With `range`, a selectable calendar chooses a first and a last day. The first press starts the range and `value` holds that day alone; the second ends it, before or after the first, and `value` becomes `start/end` (ISO 8601's interval); a third starts again. While the end is still to come, the day under the pointer previews it. `change` carries `start` and `end` beside `value`.
+There is one way to choose, in a month and in the picker: a person picks one day or a range in the same calendar, with nothing to switch. The first press chooses a day, and `value` is that day. The next press ends a range from it, before or after, and `value` becomes `start/end` (ISO 8601's interval); pressing the same day again keeps the one day. The press after that starts again. While the end is still to come, the day under the pointer previews it.
+
+`change` fires with each press that chooses: `{ value, previous, start, end }`, `end` empty while it is still to come and the last day once it is chosen. A `value` set by the page is whole, so the next press starts again.
+
+## Picker
+
+```html
+<form>
+  <ds-calendar picker name="when" label="When" literal min="2026-10-01"></ds-calendar>
+</form>
+```
+
+```js
+picker.addEventListener("change", event => {
+  console.log(event.detail.value); // "2026-10-21", "2026-10-21/2026-10-24", "2026-10-21T09:00/2026-10-21T10:00", or "" when cleared
+});
+```
+
+With `picker`, the calendar is a field one control high with the calendar icon at its start and the down arrow at its end. Pressing it opens a panel half a square below, on the menu's frame: the first and last day written out where they can be typed, the compact month one square a day, an **Include time** switch and **Clear**.
+
+It chooses as a month does. Each opening starts a new choice: the first day pressed is the value; the second, before or after, ends a range and closes the panel. Pressing the same day twice, or leaving after the first press, keeps one day.
+
+The value is ISO 8601: a day, a day with its time, or two of them joined by a slash, which is also what a form sends. A value with a time turns Include time on; `time` sets it from the page.
+
+| Value | Face |
+| --- | --- |
+| `2026-10-21` | Oct 21, 2026 |
+| `2026-10-21/2026-10-24` | Oct 21 – 24, 2026 |
+| `2026-10-21T09:00/2026-10-21T10:00` | Oct 21, 2026, 9:00 – 10:00 AM |
+
+The face writes the value in the current language, a range as the language writes one. `length` writes a day `short`, `medium` (the default) or `long`; before a day is chosen the face reads `placeholder`, the shared words "Choose a date" by default, in the title grey.
+
+| Measure | Size |
+| --- | --- |
+| The field | The select's face: one control high at the foot of its square, ten squares wide (`--ds-calendar-picker-width`). |
+| The days to type | A field one control high on its own square for the first day and one for the last; with times on, each day's time on the square below it. One square spare after them. |
+| The month | One square a day, seven squares wide: the month with its chevrons, the weekdays in a letter, six weeks with the neighbouring months' days in the title grey. |
+| The marks | The chosen days are squares with 4px corners in Sharp blue, the days between on a band of it, today a red disc. |
+| Include time, Clear | One square each, the switch at the end, set off by one-square separators with a line through them. |
+| The frame | A 1px line with half a square inside it, no shadow: eight squares wide. |
+| Its place | Half a square below the field, or above it when there is more room there, kept on screen. |
+
+Turning times on gives the first day 9:00 and the last 10:00, which the time fields change; with times on, the panel stays open after the second press so they can be set.
+
+A typed day is read when the person presses Enter or leaves the field: `2026-10-21`, or a date the browser can read such as "Oct 21, 2026". Anything else puts the field back as it was.
+
+`required` leaves Clear out and tells the form a value is missing. `min` and `max` limit the days. A form's reset puts back the value the field started with. `readDateValue`, `writeDateValue` and `parseTypedDay` are exported for a page that reads or writes the value itself.
 
 ## Events
 
@@ -112,10 +162,11 @@ The day arithmetic the calendars use is `DS1/0-face/calendar.ts`, plain TypeScri
 
 ## Accessibility
 
-- Each calendar is a grid named by its month (or `label`), with one Tab stop on a day: the one moved to, the selected day, today, or the first. A range calendar is `aria-multiselectable`, and every day of the range is `aria-selected`.
+- Each calendar is a grid named by its month (or `label`), with one Tab stop on a day: the one moved to, the selected day, today, or the first. A selectable calendar is `aria-multiselectable`, and every day of the range is `aria-selected`.
 - The arrow keys move a day, or a week across the weeks; Home and End go to the week's first and last day; Page Up and Page Down move a month, with Shift a year. A month moves on when the focus leaves it, and right to left the arrows turn round.
 - Enter or Space presses the day. Each day is labelled with its whole date and what happens on it, and today is `aria-current="date"`; a selectable calendar marks the selected day with `aria-selected`.
 - The arrows are named "Previous month" and "Next month", and the month's name is announced when it changes. All the words are the shared words, in every language.
+- A picker's field is a button with `aria-haspopup="dialog"` and `aria-expanded`, named by `label` and the value. Enter, Space or the down arrow opens the panel with the focus on the first chosen day (or today); a click opens it and leaves the focus on the field. The typed fields and times are named by the label and which end they are; the switch is `role="switch"`. Escape, a press outside, or the focus leaving closes the panel, and the focus goes back to the field.
 
 ## API
 
@@ -124,21 +175,28 @@ The day arithmetic the calendars use is `DS1/0-face/calendar.ts`, plain TypeScri
 | Attribute | Type | Default | What it does |
 | --- | --- | --- | --- |
 | `month` | string | The value's month, or today's | The month shown, `YYYY-MM`. |
-| `value` | string | `""` | The selected day. |
-| `selectable` | boolean | `false` | Pressing a day selects it. |
+| `value` | string | `""` | The selected day or range; in a picker, with or without times. |
+| `selectable` | boolean | `false` | Pressing a day selects it, or ends a range. |
+| `picker` | boolean | `false` | A field that opens the small month. |
 | `compact` | boolean | `false` | One square per day. |
 | `day-width` | number | `4` (`1` compact) | Squares per day. |
 | `lines` | number | `2` | Lines of events under a date. |
 | `week-numbers` | boolean | `false` | The week's number on its first day. |
 | `fixed` | boolean | `false` | Always six weeks. |
 | `outside-days` | boolean | `false` | The days of the months before and after, in the title grey. |
-| `range` | boolean | `false` | Choose a first and a last day: `value` is `start/end`. |
 | `no-header` | boolean | `false` | Leave out the title and arrows. |
 | `no-today` | boolean | `false` | Leave out the Today button. |
 | `min`, `max` | string | — | The days a person may choose. |
 | `week-start` | string | The language's | The week's first day. |
 | `today` | string | The reader's today | The day drawn as today. |
-| `label` | string | The month | The grid's name; `literal` shows it as written. |
+| `label` | string | The month (a picker: "Date") | The grid's or the picker's name; `literal` shows it as written. |
+| `name` | string | — | The form field's name. |
+| `placeholder` | string | "Choose a date" | A picker's words before a day is chosen. |
+| `length` | string | `medium` | How a picker writes a day. |
+| `time` | boolean | `false` | A picker chooses a time with each day (Include time). |
+| `required` | boolean | `false` | A form needs a value. |
+| `disabled` | boolean | `false` | A picker cannot be opened. |
+| `open` | boolean | `false` | A picker's panel is open. |
 
 ### `ds-calendar-large`
 
@@ -152,7 +210,9 @@ The day arithmetic the calendars use is `DS1/0-face/calendar.ts`, plain TypeScri
 | Event | Detail | What it means |
 | --- | --- | --- |
 | `day-press` | `{ day, events }` | A day was pressed, or chosen with Enter or Space. Cancel it to keep a selectable calendar's value. |
-| `change` | `{ value, previous, start, end }` | A person selected a day, or an end of a range. |
+| `change` | `{ value, previous, start, end }` | A person selected a day, or the end of a range. |
+| `input` | `{ value, previous, start, end }` | A picker's value changed, the same moment as `change`. |
+| `ds-calendar-toggle` | `{ open }` | A picker's panel opened or closed. |
 | `event-press` | `{ event, day }` | An event was pressed (in a month). |
 | `navigate` | `{ month }` | A person moved to another month. |
 
@@ -161,6 +221,7 @@ The day arithmetic the calendars use is `DS1/0-face/calendar.ts`, plain TypeScri
 | `previousMonth()`, `nextMonth()` | Moves a month, as the arrows do. |
 | `showToday()` | Brings today's month into view. |
 | `showMonth(month)` | Shows a month (`ds-calendar`). |
+| `show()`, `hide()` | Opens or closes a picker's panel. |
 
 | Part | What it is |
 | --- | --- |
@@ -168,6 +229,7 @@ The day arithmetic the calendars use is `DS1/0-face/calendar.ts`, plain TypeScri
 | `grid`, `weekdays` | The grid and its weekday names. |
 | `day`, `week`, `event`, `more` | A month's days, weeks, events and the `+2` line; a day also carries `today` and `selected`. |
 | `cell`, `frame`, `scroller` | The large calendar's days, frame and scroller. |
+| `trigger`, `popover`, `field`, `options`, `clear` | A picker's field, its panel, a row of a day or a time to type, and Include time and Clear. |
 
 | Custom property | Default | What it sets |
 | --- | --- | --- |
@@ -176,6 +238,7 @@ The day arithmetic the calendars use is `DS1/0-face/calendar.ts`, plain TypeScri
 | `--ds-calendar-event-fill` | The fill (Apple green in the large calendar) | An event without a colour. |
 | `--ds-calendar-line` | `1px solid var(--ds-border-color)` | A month's lines. |
 | `--ds-calendar-ink` | `var(--ds-text-color)` | The large calendar's lines and selected day. |
+| `--ds-calendar-picker-width` | Ten squares | A picker's field. |
 
 ### Activity squares
 

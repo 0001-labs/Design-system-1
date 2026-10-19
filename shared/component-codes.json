@@ -232,14 +232,6 @@
     "url": "https://designsystem1.com/3-unit/matrix/"
   },
   {
-    "id": "component:/3-unit/date-picker/",
-    "code": "DTPK",
-    "label": "Date picker",
-    "kind": "component",
-    "summary": "Design system 1 3-unit.",
-    "url": "https://designsystem1.com/3-unit/date-picker/"
-  },
-  {
     "id": "component:/3-unit/form/",
     "code": "FORM",
     "label": "Form",
