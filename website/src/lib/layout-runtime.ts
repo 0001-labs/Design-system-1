@@ -13,7 +13,10 @@ Object.defineProperty(window, 'localStorage', {
     clear: () => { preferences.clear(); },
   } satisfies Storage,
 });
+window.DS_ONE_I18N = { autoLoad: false, persist: false };
 await import('../../../DS1/index');
+const { startScaling } = await import('../../../DS1/0-face/scaling');
+document.documentElement.style.setProperty('--ds-sf', 'var(--sf)');
 const { configureI18n, setLanguage } = await import('../../../DS1/0-face/i18n');
 configureI18n({ languages: ['en', 'da', 'ja'], sharedWords: true });
 setLanguage('en');
@@ -30,6 +33,7 @@ if (example.script) new Function(example.script)();
 
 const page = sample.querySelector('ds-page');
 let showing = false;
+let stopScaling: (() => void) | undefined;
 
 /** The elements an author placed, not those a component draws inside itself. */
 const placed = () => [...sample.querySelectorAll<HTMLElement>('*')].filter(element => layers[element.localName]);
@@ -102,6 +106,8 @@ window.addEventListener('message', event => {
     document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
   }
   if (event.data?.type === 'ds1-layout-layers') {
+    stopScaling?.();
+    stopScaling = startScaling({ surface: sample, mode: event.data.phone ? 'fluid' : 'fixed' });
     showing = Boolean(event.data.on);
     page?.toggleAttribute('view', showing);
     redraw();

@@ -3,6 +3,7 @@ import { LAYOUT_EXAMPLES } from '../lib/layout-examples';
 import { layersIn } from '../lib/component-layers';
 import ExampleCode from './ExampleCode.astro';
 import ExampleViewToggle from './ExampleViewToggle.astro';
+import ExampleDevice from './ExampleDevice.astro';
 interface Props { layout: string; }
 const { layout } = Astro.props;
 const sample = LAYOUT_EXAMPLES[layout];
@@ -20,9 +21,7 @@ const inside = layersIn(sample.html);
   </div>
   <div data-example-preview>
   <div class="layout-stage">
-    <div class="layout-device">
-      <iframe src={`/examples/layouts/${layout}/`} title={`${sample.name} layout — interactive preview`} loading="lazy" style={`height: ${sample.height}px;`}></iframe>
-    </div>
+    <ExampleDevice src={`/examples/layouts/${layout}/`} title={sample.name} height={sample.height} />
   </div>
   <p class="layout-readout" aria-live="polite" data-readout>Point at any part of the page to see what it is made of.</p>
   <dl class="layout-inside">
@@ -37,16 +36,15 @@ const inside = layersIn(sample.html);
   <div data-example-source hidden><ExampleCode html={sample.html} script={sample.script} /></div>
 </section>
 <script>
-  import { fitFrame, onChoice, followPageTheme } from '../lib/example-controls';
+  import { onChoice, followPageTheme } from '../lib/example-controls';
   document.querySelectorAll<HTMLElement>('[data-layout-example]').forEach(example => {
     const frame = example.querySelector<HTMLIFrameElement>('iframe')!;
     const readout = example.querySelector<HTMLElement>('[data-readout]')!;
     const resting = readout.textContent;
     followPageTheme(frame);
-    fitFrame(frame);
     let layers = false;
     const send = () => {
-      frame.contentWindow?.postMessage({ type: 'ds1-layout-layers', on: layers }, location.origin);
+      frame.contentWindow?.postMessage({ type: 'ds1-layout-layers', on: layers, phone: example.hasAttribute('data-phone') }, location.origin);
     };
     frame.addEventListener('load', send);
     window.addEventListener('message', event => {
@@ -54,7 +52,7 @@ const inside = layersIn(sample.html);
       if (event.data?.type === 'ds1-example-ready') send();
       if (event.data?.type === 'ds1-layout-inspect') readout.textContent = event.data.text || resting;
     });
-    onChoice(example.querySelector('[data-preview-width]'), value => example.toggleAttribute('data-phone', value === 'phone'));
+    onChoice(example.querySelector('[data-preview-width]'), value => { example.toggleAttribute('data-phone', value === 'phone'); send(); });
     const layersButton = example.querySelector<HTMLButtonElement>('[data-preview-layers]')!;
     layersButton.addEventListener('click', () => {
       layers = !layers;
@@ -72,11 +70,6 @@ const inside = layersIn(sample.html);
   .layout-example .layout-toolbar-end { display: flex; align-items: center; gap: calc(4px * var(--sf, 1)); margin-inline-start: auto; }
   .layout-example .layout-toolbar a:focus-visible { outline: 1px solid currentColor; outline-offset: 2px; }
   .layout-example .layout-stage { padding: var(--layout-unit); background: var(--ds-fill); }
-  .layout-example .layout-device { box-sizing: border-box; width: 100%; margin-inline: auto; padding: calc(var(--layout-unit) / 2); border-radius: var(--layout-unit); background: var(--ds-slate); }
-  .layout-example .layout-device iframe { border-radius: calc(var(--layout-unit) / 2); }
-  .layout-example[data-phone] .layout-device { width: calc(375px * var(--sf, 1) + var(--layout-unit)); max-width: 100%; padding-block: var(--layout-unit); border-radius: calc(2 * var(--layout-unit)); }
-  .layout-example[data-phone] .layout-device iframe { border-radius: var(--layout-unit); }
-  .layout-example iframe { display: block; width: 100%; margin-inline: auto; border: 0; background: var(--background); }
   .layout-example .layout-readout { min-height: calc(2 * var(--layout-unit)); margin: calc(10px * var(--sf, 1)) 0 0; }
   .layout-example .layout-inside { display: grid; gap: 0; margin: 0 0 calc(10px * var(--sf, 1)); }
   .layout-example .layout-inside > div { display: grid; grid-template-columns: calc(4 * var(--layout-unit)) minmax(0, 1fr); }
