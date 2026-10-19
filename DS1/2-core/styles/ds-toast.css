@@ -21,6 +21,12 @@ ol {
   --lift: -1;
   position: fixed;
   z-index: 2147483000;
+  /* A popover in the top layer (above an open sheet or modal): none of the browser's own frame. */
+  inset: auto;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  color: inherit;
   box-sizing: border-box;
   width: min(var(--ds-toast-width), calc(100% - 2 * var(--ds-toast-offset)));
   height: calc(var(--height) + var(--gaps) * var(--ds-toast-gap));

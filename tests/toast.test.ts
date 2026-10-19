@@ -40,6 +40,25 @@ test("shows a toast as Sonner does and closes it after four seconds", async () =
   expect(onAutoClose).toHaveBeenCalledOnce();
 });
 
+test("in the window the stack is a manual popover, shown again for each new toast so it stands above an open sheet or modal", async () => {
+  const element = await toaster();
+  const list = element.shadowRoot!.querySelector("ol")!;
+  expect(list.getAttribute("popover")).toBe("manual");
+  const shown = vi.fn();
+  list.showPopover = shown;
+  list.hidePopover = vi.fn();
+  toast("Marked as business");
+  await settle(element, 20);
+  expect(shown).toHaveBeenCalledTimes(1);
+  toast("Marked as personal");
+  await settle(element, 20);
+  expect(shown).toHaveBeenCalledTimes(2);
+  document.body.innerHTML = "<div style=\"position:relative\"><ds-toast contained></ds-toast></div>";
+  const contained = document.querySelector("ds-toast")!;
+  await contained.updateComplete;
+  expect(contained.shadowRoot!.querySelector("ol")!.hasAttribute("popover")).toBe(false);
+});
+
 test("the same id updates a toast in place and a promise settles it", async () => {
   const element = await toaster();
   let resolve!: (value: string) => void;

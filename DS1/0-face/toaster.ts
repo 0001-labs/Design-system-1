@@ -98,7 +98,9 @@ function icon(name: string, className: string): HTMLSpanElement | undefined {
 class PageToaster {
   readonly host = element("div", { "data-ds-toaster": "" });
   private readonly section = element("section", { "aria-live": "polite", "aria-relevant": "additions text", "aria-atomic": "false" });
-  private readonly list = element("ol", { tabindex: "-1" });
+  private readonly list = element("ol", { tabindex: "-1", popover: "manual" });
+  /** The front toast the stack was last raised for. */
+  private raisedFor: ToastId | undefined;
   private items: Item[] = [];
   private heights = new Map<ToastId, number>();
   private timers = new Map<ToastId, Timer>();
@@ -300,7 +302,21 @@ class PageToaster {
   }
 
   /** Draw the stack: every toast's place, and each toast's words where they changed. */
+  /** In the top layer, above an open sheet or modal, as `<ds-toast>`: shown again for each new front toast. */
+  private raise() {
+    const front = this.live[0]?.data.id;
+    if (front === this.raisedFor || typeof this.list.showPopover !== "function" || !this.list.isConnected) return;
+    this.raisedFor = front;
+    try {
+      if (this.list.matches(":popover-open")) this.list.hidePopover();
+      if (front !== undefined) this.list.showPopover();
+    } catch {
+      // A browser without popovers: it stays as it is drawn.
+    }
+  }
+
   render() {
+    this.raise();
     if (!this.live.length) { this.hovered = false; this.focused = false; }
     this.section.setAttribute("aria-label", `${settings.label ?? feedbackWord("Notifications")} alt+T`);
     this.host.toggleAttribute("rich-colors", !!settings.richColors);
