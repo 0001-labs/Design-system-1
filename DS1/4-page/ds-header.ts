@@ -1,12 +1,12 @@
 // ds-header.ts
 // A site header: the brand, the navigation with the page you are on, and the
 // actions, folding into a drawer on a narrow screen. Drawn by 1-root/header.css,
-// the same classes a page without scripts writes, and opened by 0-face/drawer.ts.
+// the same classes a page without scripts writes, and opened by 0-face/attach-overlay.ts.
 
 import { LitElement, html, nothing, unsafeCSS, type PropertyValues } from "lit";
 import { getText } from "../0-face/i18n";
 import { define } from "../0-face/define";
-import { attachDrawer, type Drawer } from "../0-face/drawer";
+import { attachOverlay, type Drawer } from "../0-face/attach-overlay";
 import { markCurrentLink } from "../0-face/header";
 import "../2-core/ds-icon";
 import metrics from "../1-root/component-metrics.css?inline";
@@ -107,7 +107,7 @@ export class Header extends LitElement {
     const toggle = root.querySelector<HTMLElement>('[part="toggle"]');
     const panel = root.querySelector<HTMLDialogElement>('[part="drawer"]');
     if (!toggle || !panel) return;
-    this.drawer = attachDrawer({
+    this.drawer = attachOverlay({
       toggle,
       panel,
       content: () => [...root.querySelectorAll(':is([part="nav"], [part="actions"]):not([hidden])')],
@@ -153,8 +153,8 @@ export class Header extends LitElement {
       <button class="ds-button ds-button--icon ds-header__toggle" part="toggle" type="button" aria-label=${menu} aria-controls="drawer" ?hidden=${!hasNav && !hasActions}>
         <ds-icon type="menu" size="large" aria-hidden="true"></ds-icon><ds-icon type="close" size="large" aria-hidden="true"></ds-icon>
       </button>
-      <dialog class="ds-dialog ds-drawer" part="drawer" id="drawer" aria-label=${menu}>
-        <div class="ds-drawer__bar"><button class="ds-button ds-button--icon ds-drawer__close" part="close" type="button" aria-label=${close}>
+      <dialog class="ds-overlay ds-overlay--screen" part="drawer" id="drawer" aria-label=${menu}>
+        <div class="ds-overlay__bar"><button class="ds-button ds-button--icon ds-overlay__close" part="close" type="button" aria-label=${close}>
           <ds-icon type="close" size="large" aria-hidden="true"></ds-icon>
         </button></div>
       </dialog>

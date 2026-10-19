@@ -3,10 +3,10 @@
  * from a menu button. Plain TypeScript with no Lit and no framework, so a page
  * of native HTML uses it as the elements do.
  *
- * `attachDrawer()` ties a toggle button to the parts it folds away (a
+ * `attachOverlay()` ties a toggle button to the parts it folds away (a
  * header's navigation and actions, a page's navigation). Opening moves them
- * into a native `<dialog class="ds-dialog ds-drawer">` laid over the screen
- * (1-root/drawer.css draws it), shown modally so the rest of the page is
+ * into a native `<dialog class="ds-overlay ds-overlay--screen">` laid over the screen
+ * (1-root/overlay.css draws it), shown modally so the rest of the page is
  * inert, with a close button where the toggle stood. While it is open:
  *
  * - Tab and Shift+Tab go round the panel's controls and never leave it;
@@ -19,7 +19,7 @@
  * stays the same (Menu) open or closed.
  *
  * @example
- * const drawer = attachDrawer({ toggle, content: [nav, actions], closeLabel: "Close" });
+ * const drawer = attachOverlay({ toggle, content: [nav, actions], closeLabel: "Close" });
  * drawer.open();
  */
 
@@ -29,8 +29,8 @@ export interface DrawerOptions {
   /** What the drawer holds while it is open: moved into the panel in this order and back on closing. */
   content: readonly Element[] | (() => readonly Element[]);
   /**
-   * The panel to open, with its close button marked `.ds-drawer__close`. A
-   * `<dialog class="ds-dialog ds-drawer">` is made beside the toggle when none
+   * The panel to open, with its close button marked `.ds-overlay__close`. A
+   * `<dialog class="ds-overlay ds-overlay--screen">` is made beside the toggle when none
    * is given, its close button a copy of the toggle.
    */
   panel?: HTMLDialogElement;
@@ -116,20 +116,20 @@ export function tabbables(root: Element): HTMLElement[] {
   return found;
 }
 
-export function attachDrawer(options: DrawerOptions): Drawer {
+export function attachOverlay(options: DrawerOptions): Drawer {
   const { toggle } = options;
   const document = toggle.ownerDocument;
   const made = !options.panel;
   const panel = options.panel ?? document.createElement("dialog");
   let placeholders: [Element, Comment][] = [];
   let open = false;
-  /** The button in the panel that closes it: made here, or the panel's own `.ds-drawer__close`. */
-  let closeButton: HTMLElement | null = options.panel?.querySelector<HTMLElement>(".ds-drawer__close") ?? null;
+  /** The button in the panel that closes it: made here, or the panel's own `.ds-overlay__close`. */
+  let closeButton: HTMLElement | null = options.panel?.querySelector<HTMLElement>(".ds-overlay__close") ?? null;
 
   if (made) {
-    panel.className = "ds-dialog ds-drawer";
+    panel.className = "ds-overlay ds-overlay--screen";
     const bar = document.createElement("div");
-    bar.className = "ds-drawer__bar";
+    bar.className = "ds-overlay__bar";
     // The close button is a copy of the toggle, so it shows the same icons
     // (the second one, close) in the same place.
     closeButton = toggle.cloneNode(true) as HTMLElement;
@@ -137,8 +137,8 @@ export function attachDrawer(options: DrawerOptions): Drawer {
     closeButton.removeAttribute("aria-controls");
     closeButton.removeAttribute("aria-expanded");
     closeButton.removeAttribute("aria-haspopup");
-    closeButton.classList.remove("ds-drawer__toggle", "ds-header__toggle");
-    closeButton.classList.add("ds-drawer__close");
+    closeButton.classList.remove("ds-overlay__toggle", "ds-header__toggle");
+    closeButton.classList.add("ds-overlay__close");
     closeButton.setAttribute("aria-label", options.closeLabel || "Close");
     if (closeButton instanceof HTMLButtonElement) closeButton.type = "button";
     bar.append(closeButton);
@@ -146,14 +146,14 @@ export function attachDrawer(options: DrawerOptions): Drawer {
     if (options.container) options.container.append(panel);
     else toggle.after(panel);
   }
-  panel.classList.add("ds-drawer");
+  panel.classList.add("ds-overlay--screen");
   const label = () => options.label || toggle.getAttribute("aria-label") || toggle.textContent?.trim() || "";
   if (!panel.hasAttribute("aria-label") && !panel.hasAttribute("aria-labelledby") && label()) panel.setAttribute("aria-label", label());
-  if (!panel.id) panel.id = `ds-drawer-${Math.random().toString(36).slice(2, 10)}`;
+  if (!panel.id) panel.id = `ds-overlay-${Math.random().toString(36).slice(2, 10)}`;
   if (!toggle.hasAttribute("aria-controls")) toggle.setAttribute("aria-controls", panel.id);
   toggle.setAttribute("aria-expanded", "false");
   toggle.setAttribute("aria-haspopup", "dialog");
-  toggle.classList.add("ds-drawer__toggle");
+  toggle.classList.add("ds-overlay__toggle");
 
   const parts = () => (typeof options.content === "function" ? options.content() : options.content).filter(Boolean);
 
@@ -162,7 +162,7 @@ export function attachDrawer(options: DrawerOptions): Drawer {
     open = true;
     const content = parts();
     placeholders = content.map(element => {
-      const mark = document.createComment("ds-drawer");
+      const mark = document.createComment("ds-overlay");
       element.before(mark);
       return [element, mark];
     });

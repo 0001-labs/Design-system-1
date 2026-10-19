@@ -1,7 +1,7 @@
 import { LitElement, html, unsafeCSS, type PropertyValues } from "lit";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { define } from "../0-face/define";
-import { attachDrawer, type Drawer } from "../0-face/drawer";
+import { attachOverlay, type Drawer } from "../0-face/attach-overlay";
 import { getText } from "../0-face/i18n";
 import "../2-core/ds-icon";
 import controls from "../1-root/controls.css?inline";
@@ -29,7 +29,7 @@ export const PAGE_LAYOUTS: readonly PageLayout[] = ["sidebar", "split", "inspect
  *
  * With `drawer`, the navigation folds away below 30 squares instead of
  * standing above the work: a menu button one square wide stands before the
- * header and opens it in a drawer over the page (0-face/drawer.ts, the
+ * header and opens it in a drawer over the page (0-face/attach-overlay.ts, the
  * header's), with focus kept inside, closed by Escape, its close button, a
  * link or the page widening, and the page's scroll held behind it.
  *
@@ -121,7 +121,7 @@ export class Page extends LitElement {
     const panel = root.querySelector<HTMLDialogElement>('[part="drawer"]');
     const nav = root.querySelector('[part="nav"]');
     if (!toggle || !panel || !nav || this.navigationDrawer) return;
-    this.navigationDrawer = attachDrawer({
+    this.navigationDrawer = attachOverlay({
       toggle, panel, content: [nav],
       onToggle: open => this.dispatchEvent(new CustomEvent("ds-page-drawer", { bubbles: true, composed: true, detail: { open } })),
     });
@@ -137,8 +137,8 @@ export class Page extends LitElement {
             <ds-icon type="menu" size="large" aria-hidden="true"></ds-icon><ds-icon type="close" size="large" aria-hidden="true"></ds-icon>
           </button>
         </div>
-        <dialog class="ds-dialog ds-drawer" part="drawer" id="drawer" aria-label=${label}>
-          <div class="ds-drawer__bar"><button class="ds-button ds-button--icon ds-drawer__close" part="drawer-close" type="button" aria-label=${close}>
+        <dialog class="ds-overlay ds-overlay--screen" part="drawer" id="drawer" aria-label=${label}>
+          <div class="ds-overlay__bar"><button class="ds-button ds-button--icon ds-overlay__close" part="drawer-close" type="button" aria-label=${close}>
             <ds-icon type="close" size="large" aria-hidden="true"></ds-icon>
           </button></div>
         </dialog>

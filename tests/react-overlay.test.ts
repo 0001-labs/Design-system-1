@@ -3,9 +3,9 @@ import { expect, test, vi } from "vite-plus/test";
 import { act, createElement as h, useState } from "react";
 import { createRoot, hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from "../DS1/react/dialog";
+import { Overlay, OverlayContent, OverlayTitle, OverlayDescription } from "../DS1/react/overlay";
 vi.stubGlobal("fetch", vi.fn(async () => new Response("{}")));
-await import("../DS1/4-page/ds-dialog");
+await import("../DS1/4-page/ds-overlay");
 
 test("React keeps close decisions controlled, forwards events and links accessible text", async () => {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
@@ -13,9 +13,9 @@ test("React keeps close decisions controlled, forwards events and links accessib
   const root = createRoot(mount); const requested = vi.fn(); const submit = vi.fn();
   function Example({ allow = false }) {
     const [open, setOpen] = useState(true);
-    return h(Dialog, { open, onOpenChange: (value, reason) => { requested(value, reason); if (allow) setOpen(value); } },
-      h(DialogContent, { closeLabel: "Dismiss example" },
-        h(DialogTitle, null, "Example title"), h(DialogDescription, null, "Example description"),
+    return h(Overlay, { open, onOpenChange: (value, reason) => { requested(value, reason); if (allow) setOpen(value); } },
+      h(OverlayContent, { closeLabel: "Dismiss example" },
+        h(OverlayTitle, null, "Example title"), h(OverlayDescription, null, "Example description"),
         h("form", { onSubmit: event => { event.preventDefault(); submit(event.currentTarget); } }, h("button", { type: "submit" }, "Save"))));
   }
   try {
@@ -37,7 +37,7 @@ test("React keeps close decisions controlled, forwards events and links accessib
 
 test("an initially open modal hydrates without a mismatched portal or duplicate dialog", async () => {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
-  const view = h(Dialog, { open: true }, h(DialogContent, null, h(DialogTitle, null, "Hydrated dialog")));
+  const view = h(Overlay, { open: true }, h(OverlayContent, null, h(OverlayTitle, null, "Hydrated dialog")));
   const mount = document.createElement("div");
   mount.innerHTML = renderToString(view);
   document.body.append(mount);
@@ -48,7 +48,7 @@ test("an initially open modal hydrates without a mismatched portal or duplicate 
     expect(recover).not.toHaveBeenCalled();
     expect(document.querySelectorAll("dialog")).toHaveLength(1);
     expect(document.querySelector("dialog")!.open).toBe(true);
-    expect(document.querySelector('dialog [data-ds-dialog="title"]')!.textContent).toBe("Hydrated dialog");
+    expect(document.querySelector('dialog [data-ds-overlay="title"]')!.textContent).toBe("Hydrated dialog");
   } finally { await act(async () => root!.unmount()); mount.remove(); }
 });
 
@@ -59,8 +59,8 @@ test("React modeless panels retain their layout, native ref and controlled outsi
   const outside = document.createElement('button'); document.body.append(outside);
   function Example({ allow = false }) {
     const [open, setOpen] = useState(true);
-    return h(Dialog, { open, onOpenChange: (value, reason) => { requested(value, reason); if (allow) setOpen(value); } },
-      h(DialogContent, { nonModal: true, portal: false, closeOnOutside: true, showClose: false, ref: nativeRef, 'aria-label': 'Floating tools' },
+    return h(Overlay, { open, onOpenChange: (value, reason) => { requested(value, reason); if (allow) setOpen(value); } },
+      h(OverlayContent, { nonModal: true, portal: false, closeOnOutside: true, showClose: false, ref: nativeRef, 'aria-label': 'Floating tools' },
         h('button', null, 'Local action')));
   }
   try {
@@ -84,8 +84,8 @@ test('a modeless panel returns focus to a launcher remounted by React', async ()
     const [open, setOpen] = useState(false);
     return h('div', null,
       !open && h('button', { 'data-launcher': '', onClick: () => setOpen(true) }, 'Open tools'),
-      h(Dialog, { open, onOpenChange: setOpen },
-        h(DialogContent, { nonModal: true, portal: false, returnFocus: () => mount.querySelector<HTMLElement>('[data-launcher]'), 'aria-label': 'Tools' },
+      h(Overlay, { open, onOpenChange: setOpen },
+        h(OverlayContent, { nonModal: true, portal: false, returnFocus: () => mount.querySelector<HTMLElement>('[data-launcher]'), 'aria-label': 'Tools' },
           h('button', null, 'Tool action'))));
   }
   try {

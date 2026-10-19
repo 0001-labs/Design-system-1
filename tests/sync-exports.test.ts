@@ -65,7 +65,7 @@ test('the root export can leave the faces to the product and add controls and pa
 });
 
 test('every root page script travels with what it imports', () => {
-  const modules = ['carousel', 'grid', 'grid-fit', 'layout-inspector', 'scaling', 'theme', 'theme-bootstrap', 'tooltips', 'sidebar', 'header', 'keys', 'dialog-swipe'];
+  const modules = ['carousel', 'grid', 'grid-fit', 'layout-inspector', 'scaling', 'theme', 'theme-bootstrap', 'tooltips', 'sidebar', 'header', 'keys', 'overlay-swipe'];
   for (const name of modules) {
     const copy = files('root', { styles: [], fonts: false, modules: [name] });
     for (const [file, content] of Object.entries(copy)) {
@@ -77,10 +77,10 @@ test('every root page script travels with what it imports', () => {
   }
   expect(Object.keys(files('root', { styles: [], fonts: false, modules: ['theme'] }))).toEqual(['0-face/theme.ts', '0-face/theme-bootstrap.js', '0-face/preference-options.ts']);
   // The keyboard helpers and a native sheet's swipe are plain modules, with nothing to bring.
-  expect(Object.keys(files('root', { styles: [], fonts: false, modules: ['keys', 'dialog-swipe'] }))).toEqual(['0-face/keys.ts', '0-face/dialog-swipe.ts']);
+  expect(Object.keys(files('root', { styles: [], fonts: false, modules: ['keys', 'overlay-swipe'] }))).toEqual(['0-face/keys.ts', '0-face/overlay-swipe.ts']);
   // The header's script is plain TypeScript: the drawer it opens, and nothing of Lit's or Vite's.
   const header = files('root', { styles: [], fonts: false, modules: ['header'] });
-  expect(Object.keys(header)).toEqual(['0-face/header.ts', '0-face/drawer.ts']);
+  expect(Object.keys(header)).toEqual(['0-face/header.ts', '0-face/attach-overlay.ts']);
   for (const content of Object.values(header)) expect(String(content)).not.toMatch(/from ["']lit|\?(?:inline|raw)["']/);
   // The carousel script stands alone: no imports, so a page without Lit takes one file.
   expect(Object.keys(files('root', { styles: [], fonts: false, modules: ['carousel'] }))).toEqual(['0-face/carousel.ts']);
@@ -134,10 +134,10 @@ test('the classless sheet is copied when a product asks for it, and keeps its pa
 });
 
 test('controls.css always arrives with the table, text, empty-state, notice, dialog placement, site chrome, carousel, card, figure, progress and row classes it imports', () => {
-  const chrome = ['header.css', 'drawer.css', 'footer.css', 'document.css'];
-  expect(Object.keys(files('tokens', { nativeControls: true }))).toEqual(['component-tokens.css', 'component-metrics.css', 'component-appearance.css', 'palette.css', 'table.css', 'text.css', 'empty.css', 'notice.css', 'dialog-placement.css', ...chrome, 'carousel.css', 'card.css', 'figures.css', 'progress.css', 'row.css', 'controls.css']);
+  const chrome = ['header.css', 'footer.css', 'document.css'];
+  expect(Object.keys(files('tokens', { nativeControls: true }))).toEqual(['component-tokens.css', 'component-metrics.css', 'component-appearance.css', 'palette.css', 'table.css', 'text.css', 'empty.css', 'notice.css', 'overlay.css', ...chrome, 'carousel.css', 'card.css', 'figures.css', 'progress.css', 'row.css', 'controls.css']);
   expect(Object.keys(files('tokens'))).not.toContain('text.css');
-  expect(Object.keys(files('root', { styles: ['grid.css'], fonts: false, nativeControls: true }))).toEqual(['grid.css', 'table.css', 'empty.css', 'notice.css', 'dialog-placement.css', ...chrome, 'carousel.css', 'card.css', 'figures.css', 'progress.css', 'row.css', 'controls.css', 'text.css']);
+  expect(Object.keys(files('root', { styles: ['grid.css'], fonts: false, nativeControls: true }))).toEqual(['grid.css', 'table.css', 'empty.css', 'notice.css', 'overlay.css', ...chrome, 'carousel.css', 'card.css', 'figures.css', 'progress.css', 'row.css', 'controls.css', 'text.css']);
   // Every sheet controls.css imports, and every sheet those import, is copied beside it, by either export.
   for (const copy of [files('tokens', { nativeControls: true }), files('root', { fonts: false, nativeControls: true })]) {
     for (const sheet of Object.keys(copy).filter(name => name.endsWith('.css'))) {
@@ -170,7 +170,7 @@ test('the languages export carries formatting with every module the language run
 
 test('the feedback export carries the module with everything it imports, by its paths in DS1', () => {
   const copy = files('feedback');
-  expect(Object.keys(copy).sort()).toEqual(['0-face/copy-text.ts', '0-face/dialogs.ts', '0-face/feedback-words.ts', '0-face/feedback.ts', '0-face/generated/toast-assets.ts', '0-face/load-toaster.ts', '0-face/toast-queue.ts', '0-face/toaster.ts']);
+  expect(Object.keys(copy).sort()).toEqual(['0-face/copy-text.ts', '0-face/feedback-overlays.ts', '0-face/feedback-words.ts', '0-face/feedback.ts', '0-face/generated/toast-assets.ts', '0-face/load-toaster.ts', '0-face/toast-queue.ts', '0-face/toaster.ts']);
   // No Lit, no component, no stylesheet or icon to import with a query, and no language runtime.
   expect(Object.keys(copy).some((file) => /^2-core\/ds-|^3-unit|^4-page/.test(file))).toBe(false);
   expect(Object.values(copy).some((content) => /from\s+["']lit/.test(String(content)))).toBe(false);

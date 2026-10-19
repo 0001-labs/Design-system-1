@@ -73,7 +73,7 @@ export function componentGraph(ds1, names) {
   if (components.includes('avatar')) visit('react/avatar.ts');
   if (components.includes('avatar-group')) visit('react/avatar-group.ts');
   if (['checkbox', 'radio', 'switch', 'select', 'color'].some(name => components.includes(name))) visit('react/choice.ts');
-  if (components.includes('dialog')) visit('react/dialog.ts');
+  if (components.includes('dialog')) visit('react/overlay.ts');
   if (components.includes('page')) visit('react/page.ts');
   if (components.includes('header')) visit('react/header.ts');
   if (components.includes('footer')) visit('react/footer.ts');

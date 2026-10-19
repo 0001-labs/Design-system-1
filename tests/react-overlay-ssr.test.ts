@@ -2,11 +2,11 @@
 import { createElement as h } from "react";
 import { renderToString } from "react-dom/server";
 import { expect, test } from "vite-plus/test";
-import { Dialog, DialogContent, DialogTitle } from "../DS1/react/dialog";
+import { Overlay, OverlayContent, OverlayTitle } from "../DS1/react/overlay";
 
 test("server rendering needs no DOM and leaves modal portals for the client", () => {
   expect(typeof globalThis.HTMLElement).toBe("undefined");
-  const output = renderToString(h(Dialog, { open: true }, h(DialogContent, null, h(DialogTitle, null, "Example"))));
+  const output = renderToString(h(Overlay, { open: true }, h(OverlayContent, null, h(OverlayTitle, null, "Example"))));
   expect(output).toBe("");
-  expect(renderToString(h(Dialog, { open: false }, h(DialogContent, null, "Hidden")))).toBe("");
+  expect(renderToString(h(Overlay, { open: false }, h(OverlayContent, null, "Hidden")))).toBe("");
 });

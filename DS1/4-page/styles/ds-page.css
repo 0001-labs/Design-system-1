@@ -185,7 +185,7 @@
 }
 /* Important, as the layouts' own margins and hairlines for the navigation
  * reach it by more specific selectors. */
-.ds-drawer > .nav {
+.ds-overlay--screen > .nav {
   margin: 0 !important;
   padding: 0 !important;
   border: 0 !important;

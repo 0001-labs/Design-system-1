@@ -3,7 +3,7 @@
 @import "./text.css";
 @import "./empty.css";
 @import "./notice.css";
-@import "./dialog-placement.css";
+@import "./overlay.css";
 @import "./header.css";
 @import "./footer.css";
 @import "./document.css";
@@ -481,25 +481,27 @@ textarea.ds-input {
 }
 
 /*
- * `.ds-dialog` is the `ds-dialog` element's frame on a native `<dialog>`:
- * twenty squares wide, a square of padding, square corners, a hairline and the
- * paper. Its header, title, description, footer and close button are marked
- * with data-ds-dialog, as inside the element.
+ * `.ds-overlay` is the `ds-overlay` element's frame on a native `<dialog>`, a
+ * modal by default: twenty squares wide, a square of padding, square corners,
+ * a hairline and the paper. `ds-overlay--sheet`, `ds-overlay--drawer` (with
+ * `ds-overlay--start` for the start side) and `ds-overlay--screen` are its
+ * other types (overlay.css). Its header, title, description, footer and close button are marked
+ * with data-ds-overlay, as inside the element.
  */
 
-dialog.ds-dialog {
+dialog.ds-overlay {
   box-sizing: border-box;
   position: fixed;
   inset: 0;
-  width: var(--ds-dialog-width, calc(20 * var(--ds-unit)));
-  max-width: var(--ds-dialog-max-width, calc(100vw - 2 * var(--ds-unit)));
-  max-height: var(--ds-dialog-max-height, calc(100dvh - 2 * var(--ds-unit)));
-  height: var(--ds-dialog-height, fit-content);
+  width: var(--ds-overlay-width, calc(20 * var(--ds-unit)));
+  max-width: var(--ds-overlay-max-width, calc(100vw - 2 * var(--ds-unit)));
+  max-height: var(--ds-overlay-max-height, calc(100dvh - 2 * var(--ds-unit)));
+  height: var(--ds-overlay-height, fit-content);
   margin: auto;
-  padding: var(--ds-dialog-padding, var(--ds-unit));
-  border: var(--ds-dialog-border, 1px solid var(--ds-border-color));
+  padding: var(--ds-overlay-padding, var(--ds-unit));
+  border: var(--ds-overlay-border, 1px solid var(--ds-border-color));
   border-radius: 0;
-  background: var(--ds-dialog-paper, var(--ds-paper));
+  background: var(--ds-overlay-paper, var(--ds-paper));
   color: var(--ds-text-color);
   box-shadow: none;
   overflow: auto;
@@ -512,40 +514,45 @@ dialog.ds-dialog {
   letter-spacing: var(--ds-type-letterspacing-default);
 }
 
-dialog.ds-dialog[open] {
+dialog.ds-overlay[open] {
   display: flex;
   flex-direction: column;
   gap: var(--ds-unit);
 }
 
-dialog.ds-dialog::backdrop {
+dialog.ds-overlay::backdrop {
   background: color-mix(in srgb, var(--ds-black) 40%, transparent);
 }
 
-.ds-dialog [data-ds-dialog="header"] {
+.ds-overlay [data-ds-overlay="header"] {
   display: flex;
   flex-direction: column;
-  padding-right: var(--ds-unit);
 }
 
-.ds-dialog [data-ds-dialog="title"] {
+/* The header keeps the last square of its row for the close button, only when it has one. */
+dialog.ds-overlay:has(> [data-ds-overlay="close"]) [data-ds-overlay="header"] {
+  padding-inline-end: var(--ds-unit);
+}
+
+/* The title on its square's lower sixteen, as every row's words. */
+.ds-overlay [data-ds-overlay="title"] {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   min-height: var(--ds-row-height);
   margin: 0;
   color: var(--ds-text-color);
   font: inherit;
   font-weight: var(--ds-type-weight-bold);
-  line-height: var(--ds-row-height);
+  line-height: var(--ds-type-lineheight-default);
 }
 
-.ds-dialog [data-ds-dialog="description"] {
+.ds-overlay [data-ds-overlay="description"] {
   margin: 0;
   color: var(--ds-text-color-muted);
   font: inherit;
 }
 
-.ds-dialog [data-ds-dialog="footer"] {
+.ds-overlay [data-ds-overlay="footer"] {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -554,7 +561,7 @@ dialog.ds-dialog::backdrop {
   min-height: var(--ds-row-height);
 }
 
-.ds-dialog [data-ds-dialog="close"] {
+.ds-overlay [data-ds-overlay="close"] {
   position: absolute;
   top: var(--ds-unit);
   right: var(--ds-unit);
@@ -562,17 +569,17 @@ dialog.ds-dialog::backdrop {
 
 /* A field in the frame, as a prompt has: its label one row high, the field
  * one row high beneath it and as wide as the frame, two squares in all. */
-.ds-dialog [data-ds-dialog="field"] {
+.ds-overlay [data-ds-overlay="field"] {
   display: flex;
   flex-direction: column;
 }
 
-.ds-dialog [data-ds-dialog="label"] {
+.ds-overlay [data-ds-overlay="label"] {
   min-height: var(--ds-row-height);
   line-height: var(--ds-row-height);
 }
 
-.ds-dialog [data-ds-dialog="field"] > .ds-input {
+.ds-overlay [data-ds-overlay="field"] > .ds-input {
   --ds-input-height: var(--ds-row-height);
   width: 100%;
 }

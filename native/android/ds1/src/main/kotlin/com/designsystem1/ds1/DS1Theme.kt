@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
  * Design system 1 around an app: light or dark as the saved [DS1Preferences.theme] says (the
  * system's by default) unless [dark] says otherwise, and the device scale from the width it is
  * given. It also puts the toast stack ([toasts]) and the page's dialogs ([dialogs]) on screen,
- * so `DS1Toast.success(…)` and `DS1Dialogs.confirm(…)` work from anywhere. Wrap the app once:
+ * so `DS1Toast.success(…)` and `DS1Overlays.confirm(…)` work from anywhere. Wrap the app once:
  * `setContent { DS1Theme { App() } }`.
  */
 @Composable
@@ -26,7 +26,7 @@ fun DS1Theme(
             Box {
                 content()
                 if (toasts) DS1ToastHost()
-                if (dialogs) DS1DialogHost()
+                if (dialogs) DS1OverlayHost()
             }
         }
     }

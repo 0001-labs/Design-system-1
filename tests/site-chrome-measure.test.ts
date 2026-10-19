@@ -126,8 +126,8 @@ test("on a narrow page the navigation folds into a drawer whose close button sta
       const before = toggle.getBoundingClientRect();
       toggle.click();
       await new Promise(requestAnimationFrame);
-      const panel = root.querySelector<HTMLDialogElement>("dialog.ds-drawer")!;
-      const close = panel.querySelector<HTMLElement>(".ds-drawer__close")!;
+      const panel = root.querySelector<HTMLDialogElement>("dialog.ds-overlay--screen")!;
+      const close = panel.querySelector<HTMLElement>(".ds-overlay__close")!;
       // Its transition is still running: measure it where it settles.
       panel.style.transition = "none";
       panel.style.transform = "none";
@@ -167,7 +167,7 @@ test("on a narrow page the navigation folds into a drawer whose close button sta
       const root: ParentNode = host.shadowRoot ?? host.parentElement!;
       let active = document.activeElement;
       while (active?.shadowRoot?.activeElement) active = active.shadowRoot.activeElement;
-      return { open: root.querySelector<HTMLDialogElement>("dialog.ds-drawer")!.open, focused: active === root.querySelector(".ds-header__toggle"), nav: Boolean(root.querySelector(".ds-header > .ds-header__nav")) };
+      return { open: root.querySelector<HTMLDialogElement>("dialog.ds-overlay--screen")!.open, focused: active === root.querySelector(".ds-header__toggle"), nav: Boolean(root.querySelector(".ds-header > .ds-header__nav")) };
     });
     expect(closed, at).toEqual({ open: false, focused: true, nav: true });
     await page.setViewportSize({ width: 1200, height: 800 });

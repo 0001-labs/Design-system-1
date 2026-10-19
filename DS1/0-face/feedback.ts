@@ -16,7 +16,7 @@
  *   (`./toaster.ts`) on a page without Lit and by `<ds-toast>` where the page
  *   has one. `configureToaster()` takes Sonner's `<Toaster />` props.
  * - `alert()`, `confirm()` and `prompt()` are drawn on the native
- *   `dialog.ds-dialog` frame from `1-root/controls.css`, which the page loads.
+ *   `dialog.ds-overlay` frame from `1-root/controls.css`, which the page loads.
  * - Default words (`./feedback-words.ts`) are English, with no language
  *   runtime. Where the page loads the language module (`./i18n.ts`, Sync 1's
  *   `languages` export), they are the shared words in the page's language
@@ -32,8 +32,8 @@
 export { configureToaster, pageToaster, toast } from "./toaster";
 export type { ToasterOptions } from "./toaster";
 export type { ToastButton, ToastData, ToastId, ToastOptions, ToastPosition, ToastPromiseMessages, ToastType } from "./toast-queue";
-export { alert, confirm, prompt } from "./dialogs";
-export type { AlertOptions, ConfirmOptions, PromptOptions } from "./dialogs";
+export { alert, confirm, prompt } from "./feedback-overlays";
+export type { AlertOptions, ConfirmOptions, PromptOptions } from "./feedback-overlays";
 export { copyText } from "./copy-text";
 export type { CopyTextOptions } from "./copy-text";
 export { setFeedbackWords } from "./feedback-words";

@@ -5,17 +5,17 @@ description: A shared modal with native focus and form behavior.
 
 import ComponentExample from "../../../components/ComponentExample.astro";
 
-`ds-dialog` owns modal behavior and appearance around a light-DOM `<dialog>`.
+`ds-overlay` owns modal behavior and appearance around a light-DOM `<dialog>`.
 The native element keeps labels, descriptions and form controls in one tree.
 Opening it uses `showModal()`; the browser supplies the top layer and inert background.
 
 ```html
-<ds-dialog open>
+<ds-overlay open>
   <dialog aria-labelledby="example-title">
-    <h2 id="example-title" data-ds-dialog="title">Example dialog</h2>
-    <button type="button" data-ds-dialog-dismiss>Close</button>
+    <h2 id="example-title" data-ds-overlay="title">Example dialog</h2>
+    <button type="button" data-ds-overlay-dismiss>Close</button>
   </dialog>
-</ds-dialog>
+</ds-overlay>
 ```
 
 For a single question on a page without Lit, use `confirm()`, `prompt()` and
@@ -33,37 +33,37 @@ styles and scroll position, including when an underlying dialog closes first.
 Select `dialog` in the source snapshot to include the optional React adapter:
 
 ```tsx
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription }
-  from "./design/react/dialog";
+import { Dialog, OverlayContent, OverlayHeader, OverlayTitle, OverlayDescription }
+  from "./design/react/overlay";
 
 <Dialog open={open} onOpenChange={setOpen}>
-  <DialogContent closeLabel="Close">
-    <DialogHeader>
-      <DialogTitle>Example dialog</DialogTitle>
-      <DialogDescription>Content and actions belong to the app.</DialogDescription>
-    </DialogHeader>
-  </DialogContent>
+  <OverlayContent closeLabel="Close">
+    <OverlayHeader>
+      <OverlayTitle>Example dialog</OverlayTitle>
+      <OverlayDescription>Content and actions belong to the app.</OverlayDescription>
+    </OverlayHeader>
+  </OverlayContent>
 </Dialog>
 ```
 
 The adapter links the title and description, portals the content into the body,
 and provides the shared close button. It does not import Lit during server
 rendering; register the selected components in the browser before mounting it.
-Use `DialogFooter` for actions. `showClose={false}` is available when content
+Use `OverlayFooter` for actions. `showClose={false}` is available when content
 already includes an accessible close action. A controlled root stays open when
 its `onOpenChange` handler declines a request. The optional second argument is
 the close reason, so products can distinguish Escape cancellation from a close
 button while DS1 remains responsible for handling the keyboard.
 
 The default width is 20 squares, padding one square, with square corners and
-no shadow. Set `--ds-dialog-width` for a different whole-square width. Colours,
+no shadow. Set `--ds-overlay-width` for a different whole-square width. Colours,
 type and scale follow the shared `--ds-*` tokens. Portals used by menus or
 popovers inside a modal must stay inside the native dialog or use the browser's
 own top layer; body-level overlays are outside the modal's interactive area.
 
-`DialogContent fullScreen` fills the viewport for document viewers, without
+`OverlayContent fullScreen` fills the viewport for document viewers, without
 invoking the Fullscreen API. `flush` removes the default padding and gap when
-the content already provides its own spacing. Set `--ds-dialog-height` for a
+the content already provides its own spacing. Set `--ds-overlay-height` for a
 tall, bounded frame. Content layouts still belong to the application; the
 shared frame supplies its paper, type, border, backdrop and modal behavior.
 `rotated` turns a document frame 90 degrees and swaps its viewport bounds,
@@ -87,30 +87,30 @@ takes a drawer. The modal behaviour is the dialog's own in each: the focus
 trap, Escape, the backdrop and the scroll lock.
 
 ```html
-<ds-dialog placement="sheet">
+<ds-overlay placement="sheet">
   <dialog aria-labelledby="trade-title">
-    <h2 id="trade-title" data-ds-dialog="title">Buy</h2>
+    <h2 id="trade-title" data-ds-overlay="title">Buy</h2>
   </dialog>
-</ds-dialog>
+</ds-overlay>
 ```
 
-- **A sheet** is as wide as the screen up to 32 squares (`--ds-dialog-sheet-width`)
+- **A sheet** is as wide as the screen up to 32 squares (`--ds-overlay-sheet-width`)
   and centred beyond that, as high as its content up to two squares below the
-  top (`--ds-dialog-sheet-gap`), then it scrolls. It has no line at its foot;
-  its line at the top is drawn inside its first square (`--ds-dialog-line`),
+  top (`--ds-overlay-sheet-gap`), then it scrolls. It has no line at its foot;
+  its line at the top is drawn inside its first square (`--ds-overlay-line`),
   so its rows stay on whole squares. A handle two squares wide and 4px high
   stands in the middle of that square and stays there while the content
-  scrolls; `--ds-dialog-handle: none` hides it, `--ds-dialog-handle-color`
+  scrolls; `--ds-overlay-handle: none` hides it, `--ds-overlay-handle-color`
   colours it.
-- **A drawer** is the screen's height and 16 squares wide (`--ds-dialog-width`),
+- **A drawer** is the screen's height and 16 squares wide (`--ds-overlay-width`),
   leaving at least two squares of the page beside it, with one line on the side
   facing the page. It has no handle.
 - Each keeps its square of padding inside the safe area of a phone's notch and
   home indicator (`env(safe-area-inset-*)`); give the page
   `<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">`.
 - Each slides in from its edge and back out to it, in transform alone, while
-  the backdrop fades (`--ds-dialog-enter` 380ms, `--ds-dialog-exit` 260ms,
-  `--ds-dialog-easing`). With reduced motion it fades where it stands.
+  the backdrop fades (`--ds-overlay-enter` 380ms, `--ds-overlay-exit` 260ms,
+  `--ds-overlay-easing`). With reduced motion it fades where it stands.
 
 **Swiping it away.** On a touch screen a finger that drags a sheet down, or a
 drawer towards its edge, moves it one to one after ten pixels, and the backdrop
@@ -119,36 +119,36 @@ release DS1 projects where the throw would come to rest and dismisses when that
 is past half its size and the finger is not moving back; otherwise it settles
 home. Content scrolled down scrolls back up before the sheet moves, a strip
 that scrolls sideways keeps its touches, and so do a slider, a range input and
-anything marked `data-ds-dialog-no-swipe`. Dismissing sends `ds-close-request`
+anything marked `data-ds-overlay-no-swipe`. Dismissing sends `ds-close-request`
 with the reason `swipe`: prevent it (unsaved changes, say) and the sheet
 settles home. A mouse or trackpad closes it with Escape or the close button.
 
-In React, `DialogContent placement="sheet"` keeps the dialog on the page while
+In React, `OverlayContent placement="sheet"` keeps the dialog on the page while
 it slides out, then removes it. An anchored panel ignores `placement`.
 
 On a page without Lit, the native frame takes the same placements as classes,
-with the swipe from `0-face/dialog-swipe.ts` (Sync 1: `root` with
-`"modules": ["dialog-swipe"]`):
+with the swipe from `0-face/overlay-swipe.ts` (Sync 1: `root` with
+`"modules": ["overlay-swipe"]`):
 
 ```html
-<dialog class="ds-dialog ds-dialog--sheet" aria-labelledby="menu-title">…</dialog>
+<dialog class="ds-overlay ds-overlay--sheet" aria-labelledby="menu-title">…</dialog>
 <script type="module">
-  import { bindDialogSwipe } from "./ds1/0-face/dialog-swipe.js";
+  import { bindOverlaySwipe } from "./ds1/0-face/overlay-swipe.js";
   const sheet = document.querySelector("dialog");
-  bindDialogSwipe(sheet); // a swipe sends ds-close-request on the dialog, then closes it
+  bindOverlaySwipe(sheet); // a swipe sends ds-close-request on the dialog, then closes it
   sheet.showModal();
 </script>
 ```
 
-`.ds-dialog--end` and `.ds-dialog--start` are the drawers. The page behind a
+`.ds-overlay--end` and `.ds-overlay--start` are the drawers. The page behind a
 modal native sheet or drawer does not scroll while it is open. The feedback
 module's confirmations and prompts stay centred.
 
 ## Modeless panels
 
-Set `non-modal` on `ds-dialog` to use native `show()` without a top layer or
-inert background. Use `data-ds-dialog-inline` on its native dialog for a panel
-in the document flow. In React, use `DialogContent nonModal`; `portal={false}`
+Set `non-modal` on `ds-overlay` to use native `show()` without a top layer or
+inert background. Use `data-ds-overlay-inline` on its native dialog for a panel
+in the document flow. In React, use `OverlayContent nonModal`; `portal={false}`
 keeps the panel inside its product layout or containing modal. `closeOnOutside`,
 `blockOutside`, `holdScroll` and `anchor` configure the same Lit behavior. A
 native `ref` points to the light-DOM dialog. If the product removes its launcher
@@ -178,11 +178,11 @@ field before gesture-time focus. The usual `show()` waits for child controls bef
 Escape is handled after a nested editor can cancel it, and keyboard scrolling
 inside the panel remains available while the page behind is held.
 
-Configure floating placement with `--ds-dialog-inset`, `--ds-dialog-margin`,
-`--ds-dialog-width`, `--ds-dialog-max-width`, `--ds-dialog-max-height` and
-`--ds-dialog-layer`. Transparent media frames may set `--ds-dialog-paper` and
-`--ds-dialog-border`. `--ds-dialog-padding` also applies to full-screen panels.
-Use `--ds-dialog-overflow: hidden` when a bounded layout provides its own
+Configure floating placement with `--ds-overlay-inset`, `--ds-overlay-margin`,
+`--ds-overlay-width`, `--ds-overlay-max-width`, `--ds-overlay-max-height` and
+`--ds-overlay-layer`. Transparent media frames may set `--ds-overlay-paper` and
+`--ds-overlay-border`. `--ds-overlay-padding` also applies to full-screen panels.
+Use `--ds-overlay-overflow: hidden` when a bounded layout provides its own
 scrolling regions. Set the opening mode before opening a panel.
 
 For a menu opened at a pointer or control, set `element.anchor = { x, y }`

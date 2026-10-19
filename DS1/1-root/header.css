@@ -1,5 +1,5 @@
 @import "./component-metrics.css";
-@import "./drawer.css";
+@import "./overlay.css";
 
 /*
  * A site header, as plain classes on native elements.
@@ -18,7 +18,7 @@
  *   ds-header__brand       the mark or name, a link home; a picture in it is one square high
  *   ds-header__nav         the links, a <nav>
  *   ds-header__actions     buttons or links at the end
- *   ds-header__toggle      the menu button: `.ds-button.ds-button--icon.ds-drawer__toggle`
+ *   ds-header__toggle      the menu button: `.ds-button.ds-button--icon.ds-overlay__toggle`
  *                          with a menu icon and a close icon, shown only on a narrow screen
  *   ds-header--sticky      stays at the top of the page as it scrolls, on the paper
  *
@@ -149,7 +149,7 @@
 
 /* In the drawer the navigation is a column of one-square links, and the
    actions a row one square below it. */
-.ds-drawer :is(.ds-header__nav, .ds-header__actions) {
+.ds-overlay--screen :is(.ds-header__nav, .ds-header__actions) {
   flex: 0 0 auto;
   flex-direction: column;
   align-items: flex-start;
@@ -158,7 +158,7 @@
   margin: 0;
 }
 
-.ds-drawer .ds-header__actions {
+.ds-overlay--screen .ds-header__actions {
   flex-direction: row;
   flex-wrap: wrap;
   gap: calc(var(--ds-unit) / 2);

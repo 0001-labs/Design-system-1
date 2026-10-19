@@ -13,10 +13,10 @@
       .tall { display: block; height: 2000px; }
     </style>
     <script type="module">
-      import "/DS1/4-page/ds-dialog.ts";
+      import "/DS1/4-page/ds-overlay.ts";
       import "/packages/app/src/2-core/ds-kbd.ts";
-      import { bindDialogSwipe } from "/DS1/0-face/dialog-swipe.ts";
-      window.bindDialogSwipe = bindDialogSwipe;
+      import { bindOverlaySwipe } from "/DS1/0-face/overlay-swipe.ts";
+      window.bindOverlaySwipe = bindOverlaySwipe;
       await document.fonts.ready;
       document.documentElement.dataset.ready = "true";
     </script>

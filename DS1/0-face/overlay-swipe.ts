@@ -1,9 +1,10 @@
 /**
  * Swipe a sheet or a drawer away: a finger that drags a dialog towards the
  * edge it came from moves it, and letting go far or fast enough dismisses it.
- * `ds-dialog` binds it for `placement="sheet"`, `"end"` and `"start"`; a page
- * without Lit binds its own `dialog.ds-dialog--sheet` (or `--end`, `--start`)
- * with `bindDialogSwipe(dialog)`. Plain TypeScript with no framework.
+ * `ds-overlay` binds it for `type="sheet"` and `type="drawer"`; a page
+ * without Lit binds its own `dialog.ds-overlay--sheet` (or `--drawer`, with
+ * `--start` for the start side) with `bindOverlaySwipe(dialog)`. Plain
+ * TypeScript with no framework.
  *
  * It follows the finger as touch does on Apple's platforms:
  *
@@ -13,26 +14,27 @@
  *   from the dialog's place on screen, not from where it was going).
  * - A drag along the content's own scroll is the content's: a sheet scrolled
  *   down scrolls back up first, a horizontal strip in a drawer scrolls, and a
- *   slider, a range input or anything marked `data-ds-dialog-no-swipe` keeps
+ *   slider, a range input or anything marked `data-ds-overlay-no-swipe` keeps
  *   its touches.
  * - Dragged the other way, it gives a little and pulls back (rubber-banding).
  * - On release it projects where the throw would come to rest (the
  *   deceleration of a scroll, rate 0.998) and dismisses when that is past half
  *   its size and the finger is not moving back; otherwise it settles home.
- * - The backdrop fades as the dialog goes (`--ds-dialog-progress`).
+ * - The backdrop fades as the dialog goes (`--ds-overlay-progress`).
  *
  * Dismissing asks first, as a close button does: the element sends
  * `ds-close-request` with the reason `"swipe"`, the native frame a cancelable
  * `ds-close-request` on the dialog, and closes it when no listener prevents
  * that. Declined (a form with unsaved changes asking first), it settles home.
- * The motion itself is dialog-placement.css's, in transform alone.
+ * The motion itself is overlay.css's, in transform alone.
  */
 
-export type DialogPlacement = "center" | "sheet" | "end" | "start";
+/** The edge an overlay comes from and a finger swipes it back to: a sheet's foot, a drawer's side, or none. */
+export type OverlayEdge = "none" | "bottom" | "end" | "start";
 
-export interface DialogSwipeOptions {
-  /** Where the dialog stands, read at each touch; from its class or `data-ds-placement` by default. */
-  placement?: DialogPlacement | (() => DialogPlacement);
+export interface OverlaySwipeOptions {
+  /** Its edge, read at each touch; from `data-ds-edge` or its class by default. */
+  edge?: OverlayEdge | (() => OverlayEdge);
   /**
    * Called when a swipe would dismiss it. By default a cancelable
    * `ds-close-request` (`detail.reason` `"swipe"`) on the dialog, then
@@ -51,14 +53,15 @@ const project = (velocity: number) => ((velocity / 1000) * DECELERATION) / (1 - 
 const rubberband = (overshoot: number, dimension: number, constant = 0.55) =>
   (overshoot * dimension * constant) / (dimension + constant * Math.abs(overshoot));
 
-const PLACEMENTS = new Set<DialogPlacement>(["center", "sheet", "end", "start"]);
+const EDGES = new Set<OverlayEdge>(["none", "bottom", "end", "start"]);
 
-/** A dialog's placement, from `data-ds-placement` or its `ds-dialog--` class. */
-export function dialogPlacement(dialog: HTMLDialogElement): DialogPlacement {
-  const marked = dialog.getAttribute("data-ds-placement") as DialogPlacement | null;
-  if (marked && PLACEMENTS.has(marked)) return marked;
-  for (const placement of ["sheet", "end", "start"] as const) if (dialog.classList.contains(`ds-dialog--${placement}`)) return placement;
-  return "center";
+/** An overlay's edge, from `data-ds-edge` (the element marks it) or its native classes. */
+export function overlayEdge(dialog: HTMLDialogElement): OverlayEdge {
+  const marked = dialog.getAttribute("data-ds-edge") as OverlayEdge | null;
+  if (marked && EDGES.has(marked)) return marked;
+  if (dialog.classList.contains("ds-overlay--sheet")) return "bottom";
+  if (dialog.classList.contains("ds-overlay--drawer")) return dialog.classList.contains("ds-overlay--start") ? "start" : "end";
+  return "none";
 }
 
 type Gesture = {
@@ -77,10 +80,10 @@ type Gesture = {
 };
 
 /** The axis the dialog leaves along, and the sign of the way out on it. */
-function direction(dialog: HTMLDialogElement, placement: DialogPlacement): { axis: "x" | "y"; sign: 1 | -1 } {
-  if (placement === "sheet") return { axis: "y", sign: 1 };
+function direction(dialog: HTMLDialogElement, edge: OverlayEdge): { axis: "x" | "y"; sign: 1 | -1 } {
+  if (edge === "bottom" || edge === "none") return { axis: "y", sign: 1 };
   const rtl = dialog.ownerDocument.defaultView?.getComputedStyle(dialog).direction === "rtl";
-  const right = (placement === "end") !== rtl;
+  const right = (edge === "end") !== rtl;
   return { axis: "x", sign: right ? 1 : -1 };
 }
 
@@ -123,10 +126,10 @@ function presented(dialog: HTMLDialogElement, axis: "x" | "y", sign: 1 | -1): nu
  * Let a finger swipe a sheet or drawer away. Returns the function that
  * unbinds it and clears what it set on the dialog.
  */
-export function bindDialogSwipe(dialog: HTMLDialogElement, options: DialogSwipeOptions = {}): () => void {
-  const placementNow = (): DialogPlacement => {
-    const given = typeof options.placement === "function" ? options.placement() : options.placement;
-    return given ?? dialogPlacement(dialog);
+export function bindOverlaySwipe(dialog: HTMLDialogElement, options: OverlaySwipeOptions = {}): () => void {
+  const edgeNow = (): OverlayEdge => {
+    const given = typeof options.edge === "function" ? options.edge() : options.edge;
+    return given ?? overlayEdge(dialog);
   };
   let gesture: Gesture | null = null;
   let settleTimer = 0;
@@ -134,23 +137,23 @@ export function bindDialogSwipe(dialog: HTMLDialogElement, options: DialogSwipeO
   const frame = (callback: () => void) => (view?.requestAnimationFrame ? view.requestAnimationFrame(callback) : view?.setTimeout(callback, 16) ?? 0);
 
   const write = (offset: number, size: number, sign: 1 | -1) => {
-    dialog.style.setProperty("--ds-dialog-drag", `${sign * offset}px`);
-    dialog.style.setProperty("--ds-dialog-progress", String(size > 0 ? Math.min(1, Math.max(0, offset / size)) : 0));
+    dialog.style.setProperty("--ds-overlay-drag", `${sign * offset}px`);
+    dialog.style.setProperty("--ds-overlay-progress", String(size > 0 ? Math.min(1, Math.max(0, offset / size)) : 0));
   };
   const clear = () => {
-    dialog.style.removeProperty("--ds-dialog-drag");
-    dialog.style.removeProperty("--ds-dialog-progress");
-    dialog.removeAttribute("data-ds-dialog-dragging");
+    dialog.style.removeProperty("--ds-overlay-drag");
+    dialog.style.removeProperty("--ds-overlay-progress");
+    dialog.removeAttribute("data-ds-overlay-dragging");
   };
   /** Home: the stylesheet's transition takes it back from where it is. */
   const settle = () => {
-    dialog.removeAttribute("data-ds-dialog-dragging");
-    dialog.style.setProperty("--ds-dialog-drag", "0px");
-    dialog.style.setProperty("--ds-dialog-progress", "0");
+    dialog.removeAttribute("data-ds-overlay-dragging");
+    dialog.style.setProperty("--ds-overlay-drag", "0px");
+    dialog.style.setProperty("--ds-overlay-progress", "0");
   };
 
   const dismiss = () => {
-    dialog.removeAttribute("data-ds-dialog-dragging");
+    dialog.removeAttribute("data-ds-overlay-dragging");
     if (options.onDismiss) options.onDismiss(dialog);
     else {
       const request = new CustomEvent("ds-close-request", { detail: { reason: "swipe" }, bubbles: true, composed: true, cancelable: true });
@@ -162,17 +165,17 @@ export function bindDialogSwipe(dialog: HTMLDialogElement, options: DialogSwipeO
   };
 
   const onStart = (event: TouchEvent) => {
-    const placement = placementNow();
-    if (!dialog.open || placement === "center") return;
+    const edge = edgeNow();
+    if (!dialog.open || edge === "none") return;
     if (event.touches.length !== 1) {
       if (gesture?.mode === "drag") settle();
       gesture = null;
       return;
     }
     const path = event.composedPath();
-    if (path.some(node => node instanceof Element && node.matches('[data-ds-dialog-no-swipe], input[type="range"], [role="slider"]'))) return;
+    if (path.some(node => node instanceof Element && node.matches('[data-ds-overlay-no-swipe], input[type="range"], [role="slider"]'))) return;
     const touch = event.touches[0]!;
-    const { axis, sign } = direction(dialog, placement);
+    const { axis, sign } = direction(dialog, edge);
     gesture = { id: touch.identifier, x: touch.clientX, y: touch.clientY, base: Math.max(0, presented(dialog, axis, sign)), start: 0, mode: "pending", offset: 0, samples: [], target: event.target, path };
   };
 
@@ -180,9 +183,9 @@ export function bindDialogSwipe(dialog: HTMLDialogElement, options: DialogSwipeO
     if (!gesture || gesture.mode === "ignore") return;
     const touch = [...event.touches].find(each => each.identifier === gesture!.id);
     if (!touch) return;
-    const placement = placementNow();
-    if (placement === "center") { gesture = null; return; }
-    const { axis, sign } = direction(dialog, placement);
+    const edge = edgeNow();
+    if (edge === "none") { gesture = null; return; }
+    const { axis, sign } = direction(dialog, edge);
     const dx = touch.clientX - gesture.x, dy = touch.clientY - gesture.y;
     const along = axis === "y" ? dy * sign : dx * sign;
     const across = axis === "y" ? dx : dy;
@@ -195,7 +198,7 @@ export function bindDialogSwipe(dialog: HTMLDialogElement, options: DialogSwipeO
       gesture.mode = "drag";
       gesture.start = along;
       settleTimer++;
-      dialog.setAttribute("data-ds-dialog-dragging", "");
+      dialog.setAttribute("data-ds-overlay-dragging", "");
     }
     event.preventDefault();
     const rect = dialog.getBoundingClientRect();
@@ -214,8 +217,8 @@ export function bindDialogSwipe(dialog: HTMLDialogElement, options: DialogSwipeO
     const ended = gesture;
     gesture = null;
     if (ended.mode !== "drag") return;
-    const placement = placementNow();
-    const { axis } = direction(dialog, placement === "center" ? "sheet" : placement);
+    const edge = edgeNow();
+    const { axis } = direction(dialog, edge);
     const rect = dialog.getBoundingClientRect();
     const size = axis === "y" ? rect.height : rect.width;
     // The speed of the last tenth of a second: a finger held still before letting go throws nothing.
@@ -225,7 +228,7 @@ export function bindDialogSwipe(dialog: HTMLDialogElement, options: DialogSwipeO
     const elapsed = first && last ? last.time - first.time : 0;
     const velocity = first && last && elapsed > 0 ? ((last.offset - first.offset) / elapsed) * 1000 : 0;
     const resting = ended.offset + project(velocity);
-    if (event.type !== "touchcancel" && placement !== "center" && ended.offset > 0 && resting > size / 2 && velocity > -100) dismiss();
+    if (event.type !== "touchcancel" && edge !== "none" && ended.offset > 0 && resting > size / 2 && velocity > -100) dismiss();
     else settle();
   };
 

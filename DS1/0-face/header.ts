@@ -4,7 +4,7 @@
  * draws them); call `startHeaders()` again for one added later.
  *
  * Each header's menu button (`.ds-header__toggle`) opens its navigation and
- * actions in a drawer (`0-face/drawer.ts`): a panel over the screen with focus
+ * actions in a drawer (`0-face/attach-overlay.ts`): a panel over the screen with focus
  * kept inside, closed by Escape, its close button, a link or the screen
  * widening, the page's scroll held behind it. The close button is named by the
  * toggle's `data-close-label`, "Close" without one; the page writes both names
@@ -25,7 +25,7 @@
  * </header>
  * <script type="module">import "/ds1/0-face/header.ts";</script>
  */
-import { attachDrawer, type Drawer } from "./drawer";
+import { attachOverlay, type Drawer } from "./attach-overlay";
 
 const started = new WeakMap<Element, Drawer>();
 
@@ -61,7 +61,7 @@ export function startHeaders(root: ParentNode = document): Drawer[] {
     if (started.has(header)) continue;
     const toggle = header.querySelector<HTMLElement>(":scope > .ds-header__toggle");
     if (!toggle) continue;
-    const drawer = attachDrawer({
+    const drawer = attachOverlay({
       toggle,
       content: () => [...header.querySelectorAll(":scope > :is(.ds-header__nav, .ds-header__actions)")],
       closeLabel: toggle.dataset.closeLabel,

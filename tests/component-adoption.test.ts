@@ -125,8 +125,8 @@ describe("source adoption evidence", () => {
       '2-core/ds-color.ts': 'export class ColorInput {}',
       'react/choice.ts': 'export const Checkbox = () => null; export const Radio = () => null; export const Switch = () => null; export const Select = () => null; export const ColorInput = () => null;',
       '2-core/ds-input.ts': 'export class Input {}',
-      '4-page/ds-dialog.ts': 'export class Dialog {}',
-      'react/dialog.ts': 'import type { Dialog as DialogElement } from "../4-page/ds-dialog"; export const DialogContent = () => null;',
+      '4-page/ds-overlay.ts': 'export class Overlay {}',
+      'react/overlay.ts': 'import type { Overlay as OverlayElement } from "../4-page/ds-overlay"; export const OverlayContent = () => null;',
       '2-core/ds-textarea.ts': 'import { Input } from "./ds-input"; export class Textarea extends Input {}',
       'react/button.ts': 'import type { Button as ButtonElement } from "../2-core/ds-button"; export const Button = () => null; export const ButtonLink = () => null;',
       'react/input.ts': 'import type { Input as InputElement } from "../2-core/ds-input"; export const Input = () => null; export const Textarea = () => null;',
@@ -140,10 +140,10 @@ describe("source adoption evidence", () => {
     writeFileSync(manifestPath, JSON.stringify(manifest));
     write(app, 'src/field.ts', 'import "./register"; export { Input as Field, Textarea as Multiline } from "../design/react/input";');
     write(app, 'src/action.ts', 'export { Button as Action } from "../design/react/button";');
-    write(app, 'src/dialog.ts', 'export { DialogContent as Modal, DialogTitle } from "../design/react/dialog";');
+    write(app, 'src/dialog.ts', 'export { OverlayContent as Modal, OverlayTitle } from "../design/react/overlay";');
     write(app, 'src/local.tsx', 'export const Input = () => <input />;');
     write(app, 'src/split.ts', 'import "./register"; export { Split as Segments } from "../design/react/split";');
-    write(app, 'src/page.tsx', 'import { Avatar, Logo } from "../design/react/avatar"; import { AvatarGroup } from "../design/react/avatar-group"; import { Accordion } from "../design/react/accordion"; import { ButtonLink } from "../design/react/button"; import { Menu } from "../design/react/menu"; import { Composer } from "../design/react/composer"; import { Segments } from "./split"; import { Checkbox as Check, Radio as RadioChoice, Switch as Toggle, Select as Choice, ColorInput as Color } from "../design/react/choice"; import { Modal, DialogTitle } from "./dialog"; import { Action as SharedAction } from "./action"; import { Button as DirectAction } from "../design/react/button"; import { Field as SharedField, Multiline as Notes } from "@/field"; import { Input as Direct } from "../design/react/input"; import { Input as Local } from "./local"; export const Page = () => <><Avatar /><Logo /><AvatarGroup /><ds-avatar-group /><Accordion /><ButtonLink /><Menu /><ds-menu /><Composer /><ds-composer><textarea /></ds-composer><Segments /><ds-split /><ezo-split /><Check /><RadioChoice /><input type="radio" /><Toggle /><Choice /><Color /><input type="color" /><select /><input type="checkbox" /><button role="switch" /><SharedField /><Direct /><Local /><Notes /><textarea /><SharedAction /><DirectAction /><Modal><DialogTitle>Title</DialogTitle></Modal><dialog /><section role="dialog" /><div role="alertdialog" /></>;');
+    write(app, 'src/page.tsx', 'import { Avatar, Logo } from "../design/react/avatar"; import { AvatarGroup } from "../design/react/avatar-group"; import { Accordion } from "../design/react/accordion"; import { ButtonLink } from "../design/react/button"; import { Menu } from "../design/react/menu"; import { Composer } from "../design/react/composer"; import { Segments } from "./split"; import { Checkbox as Check, Radio as RadioChoice, Switch as Toggle, Select as Choice, ColorInput as Color } from "../design/react/choice"; import { Modal, OverlayTitle } from "./dialog"; import { Action as SharedAction } from "./action"; import { Button as DirectAction } from "../design/react/button"; import { Field as SharedField, Multiline as Notes } from "@/field"; import { Input as Direct } from "../design/react/input"; import { Input as Local } from "./local"; export const Page = () => <><Avatar /><Logo /><AvatarGroup /><ds-avatar-group /><Accordion /><ButtonLink /><Menu /><ds-menu /><Composer /><ds-composer><textarea /></ds-composer><Segments /><ds-split /><ezo-split /><Check /><RadioChoice /><input type="radio" /><Toggle /><Choice /><Color /><input type="color" /><select /><input type="checkbox" /><button role="switch" /><SharedField /><Direct /><Local /><Notes /><textarea /><SharedAction /><DirectAction /><Modal><OverlayTitle>Title</OverlayTitle></Modal><dialog /><section role="dialog" /><div role="alertdialog" /></>;');
     git(app, 'add', '.'); git(app, '-c', 'user.name=Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'Use shared input');
     const scan = () => scanApp({ id: 'example', name: 'Example', directory: 'Example', roots: ['src'], manifest: 'design/components-manifest.json' }, studio, ds);
     expect(scan().cells.avatar).toMatchObject({ shared: 2, local: 0, unverified: 0 });
@@ -179,7 +179,7 @@ describe("source adoption evidence", () => {
     expect(scan().cells.textarea).toMatchObject({ shared: 1, local: 1, unverified: 0 });
     expect(scan().cells.button).toMatchObject({ shared: 3, unverified: 0 });
     expect(scan().cells.dialog).toMatchObject({ shared: 1, local: 3, unverified: 0 });
-    write(app, 'design/react/dialog.ts', added['react/dialog.ts'] + '\n// Local changes');
+    write(app, 'design/react/overlay.ts', added['react/overlay.ts'] + '\n// Local changes');
     expect(scan().cells.dialog).toMatchObject({ shared: 0, local: 3, unverified: 1 });
     write(app, 'design/react/button.ts', added['react/button.ts'] + '\n// Local changes');
     expect(scan().cells.button).toMatchObject({ shared: 0, unverified: 3 });
@@ -197,12 +197,12 @@ describe("source adoption evidence", () => {
 });
 
 it("counts a shared dialog frame once across HTML, Lit, JSX and direct DOM composition", () => {
-  expect(sourceSites("view.html", '<ds-dialog><dialog><p>Text</p></dialog></ds-dialog><dialog />').map(s => s.tag)).toEqual(["ds-dialog", "p", "dialog"]);
-  expect(sourceSites("view.ts", 'html`<ds-dialog .open=${open}><dialog>${text}</dialog></ds-dialog><dialog></dialog>`').map(s => s.tag)).toEqual(["ds-dialog", "dialog"]);
-  expect(sourceSites("view.tsx", 'const x = <><ds-dialog><dialog /></ds-dialog><dialog /></>').map(s => s.tag)).toEqual(["ds-dialog", "dialog"]);
-  const dom = 'function show() { const host = document.createElement("ds-dialog"); const frame = document.createElement("dialog"); host.append(frame); } function separate() { const frame = document.createElement("dialog"); }';
-  expect(sourceSites("view.ts", dom).map(s => s.tag)).toEqual(["ds-dialog", "dialog"]);
-  expect(sourceSites("view.ts", 'let host = document.createElement("ds-dialog"); const frame = document.createElement("dialog"); host.append(frame);').map(s => s.tag)).toEqual(["ds-dialog", "dialog"]);
+  expect(sourceSites("view.html", '<ds-overlay><dialog><p>Text</p></dialog></ds-overlay><dialog />').map(s => s.tag)).toEqual(["ds-overlay", "p", "dialog"]);
+  expect(sourceSites("view.ts", 'html`<ds-overlay .open=${open}><dialog>${text}</dialog></ds-overlay><dialog></dialog>`').map(s => s.tag)).toEqual(["ds-overlay", "dialog"]);
+  expect(sourceSites("view.tsx", 'const x = <><ds-overlay><dialog /></ds-overlay><dialog /></>').map(s => s.tag)).toEqual(["ds-overlay", "dialog"]);
+  const dom = 'function show() { const host = document.createElement("ds-overlay"); const frame = document.createElement("dialog"); host.append(frame); } function separate() { const frame = document.createElement("dialog"); }';
+  expect(sourceSites("view.ts", dom).map(s => s.tag)).toEqual(["ds-overlay", "dialog"]);
+  expect(sourceSites("view.ts", 'let host = document.createElement("ds-overlay"); const frame = document.createElement("dialog"); host.append(frame);').map(s => s.tag)).toEqual(["ds-overlay", "dialog"]);
 });
 
 it("recognizes explicit DOM dialog roles while leaving dynamic role values unresolved", () => {
@@ -725,13 +725,13 @@ describe("specimens, native frames of DS1 sites and shared parts", () => {
         .toEqual(["ds-row", "ds-row", "ds-row", "ol", "ul", "ds-row"]);
     }
   });
-  it("counts a dialog's data-ds-dialog parts as its frame, including markup written into a ds-dialog's native dialog", () => {
+  it("counts a dialog's data-ds-overlay parts as its frame, including markup written into a ds-overlay's native dialog", () => {
     for (const file of ["page.html", "view.tsx"]) {
       const attribute = file.endsWith("x") ? "className" : "class";
-      expect(tags(file, `<dialog ${attribute}="ds-dialog"><h2 data-ds-dialog="title">Title</h2><p data-ds-dialog="description">Text</p><p>Other</p></dialog><div><h2 data-ds-dialog="title">Loose</h2></div>`), file).toEqual(["dialog", "p", "h2"]);
+      expect(tags(file, `<dialog ${attribute}="ds-overlay"><h2 data-ds-overlay="title">Title</h2><p data-ds-overlay="description">Text</p><p>Other</p></dialog><div><h2 data-ds-overlay="title">Loose</h2></div>`), file).toEqual(["dialog", "p", "h2"]);
     }
-    expect(tags("view.ts", 'function ask() { const frame = document.createElement("ds-dialog"); const dialog = document.createElement("dialog"); dialog.innerHTML = `<h2 data-ds-dialog="title">Sure?</h2><p data-ds-dialog="description">It goes.</p><p role="alert"></p>`; frame.append(dialog); }')).toEqual(["ds-dialog", "p"]);
-    expect(tags("view.ts", 'function ask() { const dialog = document.createElement("dialog"); dialog.innerHTML = `<h2 data-ds-dialog="title">Sure?</h2>`; }')).toEqual(["dialog", "h2"]);
+    expect(tags("view.ts", 'function ask() { const frame = document.createElement("ds-overlay"); const dialog = document.createElement("dialog"); dialog.innerHTML = `<h2 data-ds-overlay="title">Sure?</h2><p data-ds-overlay="description">It goes.</p><p role="alert"></p>`; frame.append(dialog); }')).toEqual(["ds-overlay", "p"]);
+    expect(tags("view.ts", 'function ask() { const dialog = document.createElement("dialog"); dialog.innerHTML = `<h2 data-ds-overlay="title">Sure?</h2>`; }')).toEqual(["dialog", "h2"]);
   });
   it("keeps a form around DS1 controls as a local Form lead", () => {
     expect(tags("page.html", '<form><ds-input></ds-input><ds-button></ds-button></form>')).toEqual(["form", "ds-input", "ds-button"]);
@@ -791,7 +791,7 @@ describe("tooltips, disclosures, browser dialogs, ranges and table roles", () =>
     const studio = mkdtempSync(join(tmpdir(), "component-adoption-")); temporary.push(studio);
     const ds = join(studio, "Design system 1"), app = join(studio, "Pages");
     for (const root of [ds, app]) { mkdirSync(root); git(root, "init", "-b", "main"); }
-    const scripts = { "0-face/tooltips.ts": "export function startTooltips() {}\n", "0-face/feedback.ts": 'export { alert, confirm, prompt } from "./dialogs";\n', "0-face/dialogs.ts": "export const confirm = async () => true; export const alert = async () => {}; export const prompt = async () => null;\n" };
+    const scripts = { "0-face/tooltips.ts": "export function startTooltips() {}\n", "0-face/feedback.ts": 'export { alert, confirm, prompt } from "./feedback-overlays";\n', "0-face/feedback-overlays.ts": "export const confirm = async () => true; export const alert = async () => {}; export const prompt = async () => null;\n" };
     for (const [file, body] of Object.entries(scripts)) { write(ds, `DS1/${file}`, body); write(app, `web/ds1/${file}`, body); }
     commit(ds, "Scripts");
     write(app, "sync.lock.json", JSON.stringify({ "Design system 1": { commit: git(ds, "rev-parse", "HEAD"), files: Object.fromEntries(Object.entries(scripts).map(([file, body]) => [`web/ds1/${file}`, sha(body)])) } }));
@@ -801,9 +801,9 @@ describe("tooltips, disclosures, browser dialogs, ranges and table roles", () =>
     const scan = () => scanApp({ id: "pages", name: "Pages", directory: "Pages", roots: ["web/src"] }, studio, ds);
     expect(scan().cells.tooltip).toMatchObject({ shared: 1, local: 0, unverified: 0 });
     expect(scan().cells.dialog).toMatchObject({ shared: 1, local: 1, unverified: 0 });
-    write(app, "web/ds1/0-face/dialogs.ts", scripts["0-face/dialogs.ts"] + "// Local change\n");
+    write(app, "web/ds1/0-face/feedback-overlays.ts", scripts["0-face/feedback-overlays.ts"] + "// Local change\n");
     expect(scan().cells.dialog).toMatchObject({ shared: 0, local: 1, unverified: 1 });
-    expect(scan().cells.dialog!.issues).toContain("Locally modified: web/ds1/0-face/dialogs.ts");
+    expect(scan().cells.dialog!.issues).toContain("Locally modified: web/ds1/0-face/feedback-overlays.ts");
     write(app, "sync.lock.json", JSON.stringify({ "Design system 1": { commit: git(ds, "rev-parse", "HEAD"), files: {} } }));
     expect(scan().cells.tooltip).toMatchObject({ shared: 0, unverified: 1 });
   });

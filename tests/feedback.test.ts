@@ -125,7 +125,7 @@ test("a toast taken out of the page brings the toaster back", async () => {
   expect(titles()).toEqual(["Back again"]);
 });
 
-const opened = () => document.querySelector<HTMLDialogElement>("dialog.ds-dialog")!;
+const opened = () => document.querySelector<HTMLDialogElement>("dialog.ds-overlay")!;
 const button = (value: string) => opened().querySelector<HTMLButtonElement>(`button[value="${value}"]`)!;
 
 test("confirm opens the native frame, moves focus in and back, and answers", async () => {

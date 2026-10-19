@@ -2,7 +2,7 @@
  * Dialogs that answer with a promise, in place of the browser's `alert()`,
  * `confirm()` and `prompt()`, for pages without Lit or any other framework.
  *
- * Each is drawn on the native `dialog.ds-dialog` frame from `1-root/controls.css`
+ * Each is drawn on the native `dialog.ds-overlay` frame from `1-root/controls.css`
  * (which the page loads) with its native buttons, `.ds-button--primary`,
  * `--secondary` and `--danger`, and opened with `showModal()`, so the browser
  * keeps the rest of the page inert behind it. Their words default to the
@@ -100,32 +100,32 @@ function show(spec: Spec): Promise<boolean | string | null> {
     const id = `ds-feedback-${++count}`;
     const opener = focused();
     const dialog = element("dialog", {
-      class: "ds-dialog",
+      class: "ds-overlay",
       role: spec.kind === "prompt" ? "dialog" : "alertdialog",
       "aria-labelledby": `${id}-title`,
       "data-ds-feedback": spec.kind,
     });
-    const header = element("div", { "data-ds-dialog": "header" });
-    header.appendChild(element("h2", { id: `${id}-title`, "data-ds-dialog": "title" }, spec.title));
+    const header = element("div", { "data-ds-overlay": "header" });
+    header.appendChild(element("h2", { id: `${id}-title`, "data-ds-overlay": "title" }, spec.title));
     if (spec.text) {
-      header.appendChild(element("p", { id: `${id}-text`, "data-ds-dialog": "description" }, spec.text));
+      header.appendChild(element("p", { id: `${id}-text`, "data-ds-overlay": "description" }, spec.text));
       dialog.setAttribute("aria-describedby", `${id}-text`);
     }
     dialog.appendChild(header);
 
     let input: HTMLInputElement | undefined;
     if (spec.field) {
-      const field = element("div", { "data-ds-dialog": "field" });
+      const field = element("div", { "data-ds-overlay": "field" });
       input = element("input", { id: `${id}-field`, class: "ds-input", type: "text", autocomplete: "off" });
       input.value = spec.field.value;
       if (spec.field.placeholder) input.placeholder = spec.field.placeholder;
-      if (spec.field.label) field.appendChild(element("label", { for: input.id, "data-ds-dialog": "label" }, spec.field.label));
+      if (spec.field.label) field.appendChild(element("label", { for: input.id, "data-ds-overlay": "label" }, spec.field.label));
       else input.setAttribute("aria-labelledby", `${id}-title`);
       field.appendChild(input);
       dialog.appendChild(field);
     }
 
-    const footer = element("div", { "data-ds-dialog": "footer" });
+    const footer = element("div", { "data-ds-overlay": "footer" });
     const cancel = spec.cancel === undefined ? undefined : element("button", { type: "button", class: "ds-button ds-button--secondary", value: "cancel" }, spec.cancel);
     const confirm = element("button", { type: "button", class: spec.danger ? "ds-button ds-button--secondary ds-button--danger" : "ds-button ds-button--primary", value: "confirm" }, spec.confirm);
     if (cancel) footer.appendChild(cancel);

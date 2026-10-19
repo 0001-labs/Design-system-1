@@ -38,7 +38,7 @@ test('empty states and notices carry their React adapters and the classes that d
 
 test('shortcut hints and dialogs carry their adapters, keys, the placement sheet and the swipe', () => {
   const { files } = componentGraph(ds1, ['kbd', 'dialog']);
-  for (const file of ['2-core/ds-kbd.ts', 'react/kbd.ts', '0-face/keys.ts', '1-root/kbd.css', '4-page/ds-dialog.ts', 'react/dialog.ts', '0-face/dialog-swipe.ts', '1-root/dialog-placement.css']) expect(files.has(file), file).toBe(true);
+  for (const file of ['2-core/ds-kbd.ts', 'react/kbd.ts', '0-face/keys.ts', '1-root/kbd.css', '4-page/ds-overlay.ts', 'react/overlay.ts', '0-face/overlay-swipe.ts', '1-root/overlay.css']) expect(files.has(file), file).toBe(true);
 });
 
 test('a carousel carries its page dots, its React adapter, the shared script and the sheet that draws them', () => {
@@ -83,9 +83,9 @@ test('a specifier written with .js reads its TypeScript source, and a real scrip
 
 test('the site chrome carries its React adapters, the drawer script and the sheets that draw it', () => {
   const { files } = componentGraph(ds1, ['header', 'footer', 'document', 'page']);
-  for (const file of ['4-page/ds-header.ts', '4-page/ds-footer.ts', '4-page/ds-document.ts', 'react/header.ts', 'react/footer.ts', 'react/document.ts', '0-face/drawer.ts', '0-face/header.ts', '1-root/header.css', '1-root/drawer.css', '1-root/footer.css', '1-root/document.css', '1-root/prose.css', '2-core/ds-cycle.ts', '0-face/translations/en.json']) expect(files.has(file), file).toBe(true);
+  for (const file of ['4-page/ds-header.ts', '4-page/ds-footer.ts', '4-page/ds-document.ts', 'react/header.ts', 'react/footer.ts', 'react/document.ts', '0-face/attach-overlay.ts', '0-face/header.ts', '1-root/header.css', '1-root/overlay.css', '1-root/footer.css', '1-root/document.css', '1-root/prose.css', '2-core/ds-cycle.ts', '0-face/translations/en.json']) expect(files.has(file), file).toBe(true);
   // The page's drawer is the header's: selecting the page alone brings the script.
-  expect(componentGraph(ds1, ['page']).files.has('0-face/drawer.ts')).toBe(true);
+  expect(componentGraph(ds1, ['page']).files.has('0-face/attach-overlay.ts')).toBe(true);
 });
 
 test('unknown and malformed names are refused', () => {

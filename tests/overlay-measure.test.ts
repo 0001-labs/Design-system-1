@@ -17,7 +17,7 @@ beforeAll(async () => {
   server = await createServer({ configFile: false, root: process.cwd(), logLevel: "error", server: { host: "127.0.0.1", port: 0 } });
   await server.listen();
   browser = await chromium.launch();
-  url = `http://127.0.0.1:${(server.httpServer!.address() as AddressInfo).port}/tests/fixtures/dialog-placement.html`;
+  url = `http://127.0.0.1:${(server.httpServer!.address() as AddressInfo).port}/tests/fixtures/overlay.html`;
 }, 60_000);
 
 afterAll(async () => {
@@ -42,7 +42,7 @@ async function page(options: { scheme?: "light" | "dark"; width?: number; height
 
 const rows = (count: number) => Array.from({ length: count }, (_, index) => `<p class="row">Row ${index + 1}</p>`).join("");
 
-/** Opens a ds-dialog (or a native frame) and waits for it to come to rest. */
+/** Opens a ds-overlay (or a native frame) and waits for it to come to rest. */
 async function open(tab: Page, markup: string, { scale = 1, native = false } = {}) {
   await tab.evaluate(async ({ markup, scale, native }) => {
     document.documentElement.style.setProperty("--ds-sf", String(scale));
@@ -51,9 +51,9 @@ async function open(tab: Page, markup: string, { scale = 1, native = false } = {
     for (const element of stage.querySelectorAll<HTMLElement & { updateComplete?: Promise<unknown> }>("*")) await element.updateComplete;
     if (native) {
       const dialog = stage.querySelector("dialog")!;
-      (window as unknown as { unbind?: () => void }).unbind = (window as unknown as { bindDialogSwipe: (dialog: HTMLDialogElement) => () => void }).bindDialogSwipe(dialog);
+      (window as unknown as { unbind?: () => void }).unbind = (window as unknown as { bindOverlaySwipe: (dialog: HTMLDialogElement) => () => void }).bindOverlaySwipe(dialog);
       dialog.showModal();
-    } else await (stage.querySelector("ds-dialog") as HTMLElement & { show(): Promise<void> }).show();
+    } else await (stage.querySelector("ds-overlay") as HTMLElement & { show(): Promise<void> }).show();
     // The slide in starts a frame after opening; wait until it has come to rest, however busy the machine.
     const dialog = stage.querySelector("dialog")!;
     const rest = (value: string) => value === "none" || new DOMMatrixReadOnly(value).isIdentity;
@@ -89,7 +89,7 @@ async function measure(tab: Page) {
 async function swipe(tab: Page, path: [number, number][], { gap = 16, hold = 0, prevent = false } = {}) {
   return tab.evaluate(async ({ path, gap, hold, prevent }) => {
     const dialog = document.querySelector("dialog")!;
-    const host = dialog.closest("ds-dialog") ?? dialog;
+    const host = dialog.closest("ds-overlay") ?? dialog;
     const reasons: string[] = [];
     const listen = (event: Event) => { reasons.push((event as CustomEvent<{ reason: string }>).detail.reason); if (prevent) event.preventDefault(); };
     host.addEventListener("ds-close-request", listen);
@@ -104,11 +104,11 @@ async function swipe(tab: Page, path: [number, number][], { gap = 16, hold = 0, 
     for (const [x, y] of path.slice(1)) {
       await new Promise(resolve => setTimeout(resolve, gap));
       fire("touchmove", x, y, true);
-      dragging ||= dialog.hasAttribute("data-ds-dialog-dragging");
+      dragging ||= dialog.hasAttribute("data-ds-overlay-dragging");
     }
     if (hold) await new Promise(resolve => setTimeout(resolve, hold));
     const [endX, endY] = path.at(-1)!;
-    const dragged = dialog.style.getPropertyValue("--ds-dialog-drag");
+    const dragged = dialog.style.getPropertyValue("--ds-overlay-drag");
     fire("touchend", endX, endY, false);
     for (let i = 0; i < 3; i++) await new Promise(requestAnimationFrame);
     await Promise.all(document.getAnimations().map(animation => animation.finished.catch(() => {})));
@@ -130,7 +130,7 @@ async function handleRows(tab: Page, box: { left: number; top: number; width: nu
     const scale = image.height / height;
     const probe = document.createElement("span");
     document.body.append(probe);
-    probe.style.color = getComputedStyle(document.querySelector("dialog")!).getPropertyValue("--ds-dialog-handle-color") || "var(--ds-border-color)";
+    probe.style.color = getComputedStyle(document.querySelector("dialog")!).getPropertyValue("--ds-overlay-handle-color") || "var(--ds-border-color)";
     const handle = getComputedStyle(probe).color.match(/\d+/g)!.slice(0, 3).map(Number);
     probe.remove();
     const rows: number[] = [];
@@ -143,8 +143,8 @@ async function handleRows(tab: Page, box: { left: number; top: number; width: nu
   }, { data: shot, height });
 }
 
-const sheet = (content = rows(3), attributes = "") => `<ds-dialog placement="sheet" ${attributes}><dialog aria-label="Sheet">${content}</dialog></ds-dialog>`;
-const nativeSheet = (content = rows(3), placement = "sheet") => `<dialog class="ds-dialog ds-dialog--${placement}" aria-label="Sheet">${content}</dialog>`;
+const sheet = (content = rows(3), attributes = "") => `<ds-overlay placement="sheet" ${attributes}><dialog aria-label="Sheet">${content}</dialog></ds-overlay>`;
+const nativeSheet = (content = rows(3), placement = "sheet") => `<dialog class="ds-overlay ds-overlay--${placement}" aria-label="Sheet">${content}</dialog>`;
 
 test("a sheet stands at the foot of a phone, as wide as it, on whole squares, with its handle in its first square", async () => {
   for (const scheme of ["light", "dark"] as const) {
@@ -214,7 +214,7 @@ test("drawers are the screen's height and 16 squares wide, at the end or the sta
   const tab = await page();
   for (const [placement, dir, side] of [["end", "ltr", "right"], ["start", "ltr", "left"], ["end", "rtl", "left"], ["start", "rtl", "right"]] as const) {
     for (const native of [false, true]) {
-      const markup = native ? `<div dir="${dir}">${nativeSheet(rows(3), placement)}</div>` : `<div dir="${dir}"><ds-dialog placement="${placement}"><dialog aria-label="Drawer">${rows(3)}</dialog></ds-dialog></div>`;
+      const markup = native ? `<div dir="${dir}">${nativeSheet(rows(3), placement)}</div>` : `<div dir="${dir}"><ds-overlay placement="${placement}"><dialog aria-label="Drawer">${rows(3)}</dialog></ds-overlay></div>`;
       await open(tab, markup, { native });
       const box = await measure(tab);
       const label = `${placement} ${dir} ${native ? "native" : "element"}`;
@@ -235,7 +235,7 @@ test("a sheet slides out to its edge when it closes, and with reduced motion fad
     const tab = await page({ reducedMotion });
     await open(tab, sheet());
     const leaving = await tab.evaluate(async () => {
-      const host = document.querySelector("ds-dialog") as HTMLElement & { close(): void };
+      const host = document.querySelector("ds-overlay") as HTMLElement & { close(): void };
       const dialog = host.querySelector("dialog")!;
       const height = dialog.getBoundingClientRect().height;
       host.close();
@@ -270,7 +270,7 @@ test("a quick swipe down dismisses a sheet through a close request; a short, slo
   const quick = await swipe(tab, [[180, 500], [180, 530], [180, 570], [180, 620], [180, 680]]);
   expect(quick.reasons).toEqual(["swipe"]);
   expect(quick.open).toBe(false);
-  expect(await tab.evaluate(() => (document.querySelector("ds-dialog") as HTMLElement & { open: boolean }).open)).toBe(false);
+  expect(await tab.evaluate(() => (document.querySelector("ds-overlay") as HTMLElement & { open: boolean }).open)).toBe(false);
 });
 
 test("a declined swipe keeps the sheet open and settles it home", async () => {
@@ -302,7 +302,7 @@ test("a native sheet and a drawer swipe away too, toward their own edge", async 
   expect(down.reasons).toEqual(["swipe"]);
   expect(down.open).toBe(false);
 
-  await open(tab, `<ds-dialog placement="end"><dialog aria-label="Drawer">${rows(3)}</dialog></ds-dialog>`);
+  await open(tab, `<ds-overlay placement="end"><dialog aria-label="Drawer">${rows(3)}</dialog></ds-overlay>`);
   const left = await swipe(tab, [[200, 300], [170, 300], [130, 300], [80, 300]]);
   expect(left.dragging, "towards the page: it gives a little").toBe(true);
   expect(left.open).toBe(true);

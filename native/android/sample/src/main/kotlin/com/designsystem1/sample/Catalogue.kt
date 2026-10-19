@@ -76,8 +76,8 @@ private fun CatalogueScreen() {
                 DS1Button("Secondary", { DS1Toast.message("A message", "With a line below it") }, kind = DS1ButtonKind.Secondary)
                 DS1Button("Plain", { DS1Toast.error("Something went wrong") })
                 DS1IconButton(DS1IconName.close, "Close", { })
-                DS1DangerButton("Delete") { scope.launch { if (DS1Dialogs.confirm("Delete the list?", "It cannot be undone.", danger = true)) DS1Toast.success("Deleted") } }
-                DS1Button("Prompt", { scope.launch { DS1Dialogs.prompt("Rename", label = "Name", value = "Plan")?.let { DS1Toast.info(it) } } }, kind = DS1ButtonKind.Secondary)
+                DS1DangerButton("Delete") { scope.launch { if (DS1Overlays.confirm("Delete the list?", "It cannot be undone.", danger = true)) DS1Toast.success("Deleted") } }
+                DS1Button("Prompt", { scope.launch { DS1Overlays.prompt("Rename", label = "Name", value = "Plan")?.let { DS1Toast.info(it) } } }, kind = DS1ButtonKind.Secondary)
                 DS1Button("Copy", { DS1Clipboard.copy(context, "Design system 1") }, kind = DS1ButtonKind.Secondary, icon = DS1IconName.duplicate)
             }
             DS1Gap(size = DS1GapSize.Half)

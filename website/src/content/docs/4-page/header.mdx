@@ -78,11 +78,11 @@ Sync 1 copies the script with the `root` export's `"modules": ["header"]` (it br
 
 ## The drawer
 
-`attachDrawer()` from `0-face/drawer.ts` is the mechanism the header and [`ds-page drawer`](/4-page/layout/#a-drawer-on-a-narrow-page) share. Give it the toggle and the parts it folds away; it opens them in a `dialog.ds-dialog.ds-drawer` (drawn by `drawer.css`) and puts them back on closing.
+`attachOverlay()` from `0-face/attach-overlay.ts` is the mechanism the header and [`ds-page drawer`](/4-page/layout/#a-drawer-on-a-narrow-page) share. Give it the toggle and the parts it folds away; it opens them in a `dialog.ds-overlay.ds-overlay--screen` (drawn by `drawer.css`) and puts them back on closing.
 
 ```js
-import { attachDrawer } from "/ds1/0-face/drawer.ts";
-const drawer = attachDrawer({ toggle, content: [nav], closeLabel: "Close" });
+import { attachOverlay } from "/ds1/0-face/attach-overlay.ts";
+const drawer = attachOverlay({ toggle, content: [nav], closeLabel: "Close" });
 ```
 
 ## In React

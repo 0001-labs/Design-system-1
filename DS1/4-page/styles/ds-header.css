@@ -1,6 +1,6 @@
 /* ds-header.css */
-/* The element places the row; 1-root/header.css draws it, drawer.css its
-   drawer and controls.css the buttons. The links are the page's own, slotted:
+/* The element places the row; 1-root/header.css draws it, overlay.css its
+   screen overlay and controls.css the buttons. The links are the page's own, slotted:
    they take the navigation's look here, and a page's own link styles win. */
 
 :host {

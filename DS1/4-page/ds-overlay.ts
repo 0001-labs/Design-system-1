@@ -2,26 +2,33 @@ import { LitElement, css, html, unsafeCSS } from "lit";
 import { define } from "../0-face/define";
 import "../2-core/ds-button";
 import "../2-core/ds-icon";
-import { bindDialogSwipe, type DialogPlacement } from "../0-face/dialog-swipe";
-import "./styles/ds-dialog.css";
-import "../1-root/dialog-placement.css";
-import frameStyles from "./styles/ds-dialog.css?inline";
-import placementStyles from "../1-root/dialog-placement.css?inline";
+import { bindOverlaySwipe, type OverlayEdge } from "../0-face/overlay-swipe";
+import "./styles/ds-overlay.css";
+import "../1-root/overlay.css";
+import frameStyles from "./styles/ds-overlay.css?inline";
+import placementStyles from "../1-root/overlay.css?inline";
 import metrics from "../1-root/component-metrics.css?inline";
 
-export type { DialogPlacement } from "../0-face/dialog-swipe";
-export type DialogCloseReason = "escape" | "backdrop" | "outside" | "button" | "native" | "swipe";
+export type { OverlayEdge } from "../0-face/overlay-swipe";
+/**
+ * What an overlay is: a `modal` in the centre (the default), a `sheet` from the
+ * foot of the screen, a `drawer` at the end or start of a line, a `popover`
+ * at a point (`anchor`), or the whole `screen`.
+ */
+export type OverlayType = "modal" | "sheet" | "drawer" | "popover" | "screen";
+export type OverlaySide = "end" | "start";
+export type OverlayCloseReason = "escape" | "backdrop" | "outside" | "button" | "native" | "swipe";
 const dialogStyles = `${frameStyles}\n${placementStyles}`;
-const PLACEMENTS = new Set<string>(["sheet", "end", "start"]);
-const openDialogs = new WeakMap<Document, Set<Dialog>>();
+const TYPES = new Set<string>(["modal", "sheet", "drawer", "popover", "screen"]);
+const openDialogs = new WeakMap<Document, Set<Overlay>>();
 type SavedStyle = { style: CSSStyleDeclaration; name: string; value: string; priority: string; locked: string };
 const scrollStyles = new WeakMap<Document, { declarations: SavedStyle[]; x: number; y: number }>();
 
 /** One owner per declaration, including mixed modal and stationary panels. */
 function syncScroll(document: Document) {
   const stack = [...(openDialogs.get(document) ?? [])];
-  const holding = stack.some(dialog => !dialog.nonModal || dialog.holdScroll);
-  const fixed = stack.some(dialog => !dialog.nonModal);
+  const holding = stack.some(dialog => !dialog.modeless || dialog.holdScroll);
+  const fixed = stack.some(dialog => !dialog.modeless);
   let saved = scrollStyles.get(document);
   if (!holding && !saved) return;
   if (!saved) {
@@ -63,14 +70,17 @@ function styleRoot(root: Node) {
   styledRoots.add(root);
 }
 
-/** A native light-DOM dialog keeps forms and accessible ID references together.
- * The browser owns the top layer, inert background and modal focus navigation.
+/** Everything that stands over the page is an overlay, on a native light-DOM
+ * `<dialog>` that keeps forms and accessible ID references together. The
+ * browser owns the top layer, inert background and modal focus navigation.
  * Listen to ds-close-request and preventDefault to control whether it closes.
- * `placement` stands it in the centre (the default), as a sheet from the
- * bottom (`"sheet"`) or as a drawer at the end or start (`"end"`, `"start"`),
- * which slide in and out and a finger swipes away (reason `"swipe"`).
+ * `type` says what it is: a `modal` in the centre (the default), a `sheet`
+ * from the foot of the screen, a `drawer` at the `side` `"end"` (the default)
+ * or `"start"`, a `popover` at the `anchor` point, or the whole `screen`. A
+ * sheet and a drawer slide in and out and a finger swipes them away (reason
+ * `"swipe"`); a popover is modeless.
  */
-export class Dialog extends LitElement {
+export class Overlay extends LitElement {
   static properties = {
     open: { type: Boolean, reflect: true },
     nonModal: { type: Boolean, attribute: "non-modal", reflect: true },
@@ -79,7 +89,8 @@ export class Dialog extends LitElement {
     holdScroll: { type: Boolean, attribute: "hold-scroll" },
     closeOnEscape: { type: Boolean, attribute: "close-on-escape" },
     closeOnBackdrop: { type: Boolean, attribute: "close-on-backdrop" },
-    placement: { type: String, reflect: true },
+    type: { type: String, reflect: true },
+    side: { type: String, reflect: true },
     anchor: { attribute: false },
     returnFocus: { attribute: false },
   };
@@ -91,9 +102,11 @@ export class Dialog extends LitElement {
   declare holdScroll: boolean;
   declare closeOnEscape: boolean;
   declare closeOnBackdrop: boolean;
-  /** Where it stands: `"center"`, a `"sheet"` from the bottom, or a drawer at the `"end"` or `"start"`. An anchored panel ignores it. */
-  declare placement: DialogPlacement;
-  /** A viewport point for a floating panel; null uses ordinary dialog layout. */
+  /** What it is: `"modal"`, `"sheet"`, `"drawer"`, `"popover"` or `"screen"`. */
+  declare type: OverlayType;
+  /** A drawer's side: `"end"` (the default) or `"start"`. */
+  declare side: OverlaySide;
+  /** A popover's viewport point. */
   declare anchor: { x: number; y: number } | null;
   /** Resolve a replacement opener after the product has rendered its closed state. */
   declare returnFocus: (() => HTMLElement | null) | null;
@@ -115,7 +128,8 @@ export class Dialog extends LitElement {
     this.holdScroll = false;
     this.closeOnEscape = true;
     this.closeOnBackdrop = true;
-    this.placement = "center";
+    this.type = "modal";
+    this.side = "end";
     this.anchor = null;
     this.returnFocus = null;
   }
@@ -133,41 +147,52 @@ export class Dialog extends LitElement {
     super.disconnectedCallback();
   }
 
-  protected updated() { this.syncPlacement(); this.syncOpen(); this.place(); }
+  protected updated() { this.syncType(); this.syncOpen(); this.place(); }
 
-  /** Mark the native frame with its placement before it opens, so it slides in from its edge, and let a finger swipe it away. */
-  private syncPlacement() {
+  /** Its type as it is drawn: an unknown one is a modal. */
+  get kind(): OverlayType { return TYPES.has(this.type) ? this.type : "modal"; }
+  /** A modeless overlay leaves the page live: a popover always, any other with `non-modal`. */
+  get modeless() { return this.nonModal || this.kind === "popover"; }
+  /** The edge it comes from and a finger swipes it back to. */
+  get edge(): OverlayEdge {
+    if (this.kind === "sheet") return "bottom";
+    if (this.kind === "drawer") return this.side === "start" ? "start" : "end";
+    return "none";
+  }
+
+  /** Mark the native frame with its type and edge before it opens, so it slides in from that edge, and let a finger swipe it away. */
+  private syncType() {
     const dialog = this.dialog;
     if (!dialog) return;
-    const placement = !this.anchor && PLACEMENTS.has(this.placement) ? this.placement : null;
-    if (placement) dialog.setAttribute("data-ds-placement", placement);
-    else dialog.removeAttribute("data-ds-placement");
-    if (placement && !this.unbindSwipe) {
-      this.unbindSwipe = bindDialogSwipe(dialog, {
-        placement: () => (!this.anchor && PLACEMENTS.has(this.placement) ? this.placement : "center"),
+    dialog.setAttribute("data-ds-type", this.kind);
+    const edge = this.edge;
+    if (edge !== "none") dialog.setAttribute("data-ds-edge", edge);
+    else dialog.removeAttribute("data-ds-edge");
+    if (edge !== "none" && !this.unbindSwipe) {
+      this.unbindSwipe = bindOverlaySwipe(dialog, {
+        edge: () => this.edge,
         onDismiss: () => this.requestClose("swipe"),
       });
-    } else if (!placement && this.unbindSwipe) {
+    } else if (edge === "none" && this.unbindSwipe) {
       this.unbindSwipe();
       this.unbindSwipe = null;
     }
   }
 
-  /** Keep an anchored panel inside the visible viewport as its content or keyboard changes. */
+  /** Keep a popover inside the visible viewport as its content or keyboard changes. */
   place = () => {
     const dialog = this.dialog, view = this.ownerDocument.defaultView;
     if (!dialog || !view) return;
-    dialog.toggleAttribute("data-ds-dialog-anchored", !!this.anchor);
-    if (!this.anchor || !dialog.open) return;
+    if (this.kind !== "popover" || !this.anchor || !dialog.open) return;
     const viewport = view.visualViewport;
     const left = viewport?.offsetLeft ?? 0, top = viewport?.offsetTop ?? 0;
     const width = viewport?.width ?? view.innerWidth, height = viewport?.height ?? view.innerHeight;
     const margin = parseFloat(view.getComputedStyle(dialog).marginLeft) || 0;
-    dialog.style.setProperty("--ds-dialog-available-width", `${Math.max(0, width - 2 * margin)}px`);
-    dialog.style.setProperty("--ds-dialog-available-height", `${Math.max(0, height - 2 * margin)}px`);
+    dialog.style.setProperty("--ds-overlay-available-width", `${Math.max(0, width - 2 * margin)}px`);
+    dialog.style.setProperty("--ds-overlay-available-height", `${Math.max(0, height - 2 * margin)}px`);
     const rect = dialog.getBoundingClientRect();
-    dialog.style.setProperty("--ds-dialog-anchor-left", `${Math.max(left, Math.min(this.anchor.x - margin, left + width - rect.width - 2 * margin))}px`);
-    dialog.style.setProperty("--ds-dialog-anchor-top", `${Math.max(top, Math.min(this.anchor.y - margin, top + height - rect.height - 2 * margin))}px`);
+    dialog.style.setProperty("--ds-overlay-anchor-left", `${Math.max(left, Math.min(this.anchor.x - margin, left + width - rect.width - 2 * margin))}px`);
+    dialog.style.setProperty("--ds-overlay-anchor-top", `${Math.max(top, Math.min(this.anchor.y - margin, top + height - rect.height - 2 * margin))}px`);
   };
 
   private bindDialog = () => {
@@ -179,7 +204,7 @@ export class Dialog extends LitElement {
     dialog?.addEventListener("close", this.onNativeClose);
     dialog?.addEventListener("pointerdown", this.onPointerDown);
     dialog?.addEventListener("click", this.onClick);
-    this.syncPlacement();
+    this.syncType();
     this.syncOpen();
   };
 
@@ -191,7 +216,8 @@ export class Dialog extends LitElement {
     dialog?.removeEventListener("click", this.onClick);
     this.unbindSwipe?.();
     this.unbindSwipe = null;
-    dialog?.removeAttribute("data-ds-placement");
+    dialog?.removeAttribute("data-ds-type");
+    dialog?.removeAttribute("data-ds-edge");
     if (dialog?.open) dialog.close();
     this.release();
     this.dialog = null;
@@ -247,7 +273,7 @@ export class Dialog extends LitElement {
     if (!stack) openDialogs.set(document, stack = new Set());
     stack.add(this);
     syncScroll(document);
-    try { if (this.nonModal) dialog.show(); else dialog.showModal(); }
+    try { if (this.modeless) dialog.show(); else dialog.showModal(); }
     catch (error) { stack.delete(this); syncScroll(document); throw error; }
     this.place();
     if (typeof ResizeObserver !== "undefined") {
@@ -289,7 +315,7 @@ export class Dialog extends LitElement {
       const root = within.getRootNode();
       within = root instanceof ShadowRoot ? root.host : null;
     }
-    if (wasTop && (!this.nonModal || active === document.body || active === this.dialog || within)) {
+    if (wasTop && (!this.modeless || active === document.body || active === this.dialog || within)) {
       const resolve = this.returnFocus;
       if (resolve) queueMicrotask(() => {
         const target = resolve();
@@ -300,7 +326,7 @@ export class Dialog extends LitElement {
     this.opener = null;
   }
 
-  requestClose(reason: DialogCloseReason = "button") {
+  requestClose(reason: OverlayCloseReason = "button") {
     if (!this.open) return;
     const event = new CustomEvent("ds-close-request", { detail: { reason }, bubbles: true, composed: true, cancelable: true });
     if (this.dispatchEvent(event)) this.close();
@@ -312,21 +338,21 @@ export class Dialog extends LitElement {
   }
 
   private onDocumentKey = (event: KeyboardEvent) => {
-    if (!this.nonModal || !this.isTop() || event.defaultPrevented) return;
+    if (!this.modeless || !this.isTop() || event.defaultPrevented) return;
     if (event.key === "Escape" && this.closeOnEscape) {
       event.preventDefault(); event.stopImmediatePropagation(); this.requestClose("escape");
     } else if (this.holdScroll && !event.composedPath().includes(this) && !event.composedPath().some(node => node instanceof HTMLElement && (node.isContentEditable || node.matches("input, textarea, select"))) && ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "PageUp", "PageDown", "Home", "End", " "].includes(event.key)) event.preventDefault();
   };
   private onScrollGesture = (event: Event) => {
-    if (this.nonModal && this.holdScroll && this.isTop() && !event.composedPath().includes(this)) event.preventDefault();
+    if (this.modeless && this.holdScroll && this.isTop() && !event.composedPath().includes(this)) event.preventDefault();
   };
   private onOutsidePress = (event: Event) => {
-    if (!this.nonModal || !this.isTop()) return;
+    if (!this.modeless || !this.isTop()) return;
     this.outsidePress = !event.composedPath().includes(this);
     if (this.outsidePress && this.blockOutside) { event.preventDefault(); event.stopImmediatePropagation(); }
   };
   private onOutsideClick = (event: Event) => {
-    if (!this.nonModal || !this.isTop() || event.composedPath().includes(this)) return;
+    if (!this.modeless || !this.isTop() || event.composedPath().includes(this)) return;
     if (this.blockOutside) { event.preventDefault(); event.stopImmediatePropagation(); }
     if (this.closeOnOutside && this.outsidePress !== false) this.requestClose("outside");
     this.outsidePress = null;
@@ -354,7 +380,7 @@ export class Dialog extends LitElement {
   };
   private onClick = (event: MouseEvent) => {
     if (event.defaultPrevented) { this.pointerStartedOutside = false; return; }
-    const dismiss = event.composedPath().find(node => node instanceof HTMLElement && node.hasAttribute("data-ds-dialog-dismiss")) as HTMLElement | undefined;
+    const dismiss = event.composedPath().find(node => node instanceof HTMLElement && node.hasAttribute("data-ds-overlay-dismiss")) as HTMLElement | undefined;
     if (dismiss?.closest("dialog") === this.dialog) this.requestClose("button");
     else if (this.closeOnBackdrop && this.pointerStartedOutside && this.outside(event)) this.requestClose("backdrop");
     this.pointerStartedOutside = false;
@@ -363,5 +389,5 @@ export class Dialog extends LitElement {
   render() { return html`<slot @slotchange=${this.bindDialog}></slot>`; }
 }
 
-define("ds-dialog", Dialog);
-declare global { interface HTMLElementTagNameMap { "ds-dialog": Dialog } }
+define("ds-overlay", Overlay);
+declare global { interface HTMLElementTagNameMap { "ds-overlay": Overlay } }

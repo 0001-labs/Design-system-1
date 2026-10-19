@@ -1,26 +1,26 @@
-/** Optional React composition; behavior and appearance belong to ds-dialog. */
+/** Optional React composition; behavior and appearance belong to ds-overlay. */
 import { createContext, createElement, useContext, useEffect, useId, useLayoutEffect, useRef, useState, type HTMLAttributes, type ReactNode, type Ref } from "react";
 import { createPortal } from "react-dom";
-import type { Dialog as DialogElement, DialogCloseReason, DialogPlacement } from "../4-page/ds-dialog";
+import type { Overlay as OverlayElement, OverlayCloseReason, OverlaySide, OverlayType } from "../4-page/ds-overlay";
 
-const DialogContext = createContext<{ open: boolean; change: (open: boolean, reason?: DialogCloseReason) => void; title: string; description: string } | null>(null);
-const useDialog = () => {
-  const context = useContext(DialogContext);
-  if (!context) throw new Error("Dialog content must be inside Dialog.");
+const OverlayContext = createContext<{ open: boolean; change: (open: boolean, reason?: OverlayCloseReason) => void; title: string; description: string } | null>(null);
+const useOverlay = () => {
+  const context = useContext(OverlayContext);
+  if (!context) throw new Error("Overlay content must be inside Overlay.");
   return context;
 };
 
-export interface DialogProps { open?: boolean; defaultOpen?: boolean; onOpenChange?: (open: boolean, reason?: DialogCloseReason) => void; children?: ReactNode }
-export function Dialog({ open, defaultOpen = false, onOpenChange, children }: DialogProps) {
+export interface OverlayProps { open?: boolean; defaultOpen?: boolean; onOpenChange?: (open: boolean, reason?: OverlayCloseReason) => void; children?: ReactNode }
+export function Overlay({ open, defaultOpen = false, onOpenChange, children }: OverlayProps) {
   const [internal, setInternal] = useState(defaultOpen);
   const id = useId();
-  return createElement(DialogContext.Provider, { value: {
+  return createElement(OverlayContext.Provider, { value: {
     open: open ?? internal, title: `${id}-title`, description: `${id}-description`,
     change: (next, reason) => { if (open === undefined) setInternal(next); onOpenChange?.(next, reason); },
   } }, children);
 }
 
-export interface DialogContentProps extends HTMLAttributes<HTMLDialogElement> {
+export interface OverlayContentProps extends HTMLAttributes<HTMLDialogElement> {
   ref?: Ref<HTMLDialogElement>;
   /** Keep floating panels within their product layout or containing modal. */
   portal?: boolean;
@@ -34,28 +34,30 @@ export interface DialogContentProps extends HTMLAttributes<HTMLDialogElement> {
   showClose?: boolean;
   closeOnEscape?: boolean;
   closeOnBackdrop?: boolean;
-  /** Fill the viewport for document viewers; this is not the Fullscreen API. */
-  fullScreen?: boolean;
   /** Content supplies its own internal spacing. The shared frame stays intact. */
   flush?: boolean;
   /** Rotate a document frame while keeping it within the viewport. */
   rotated?: boolean;
   /**
-   * Where it stands: `"center"` (the default), a `"sheet"` from the bottom, or
-   * a drawer at the `"end"` or `"start"`. These slide out before they leave
-   * the page, and a finger swipes them away (reason `"swipe"`).
+   * What it is: a `"modal"` in the centre (the default), a `"sheet"` from the
+   * foot of the screen, a `"drawer"` at its `side`, a `"popover"` at `anchor`,
+   * or the whole `"screen"` (a document viewer; not the Fullscreen API). A
+   * sheet and a drawer slide out before they leave the page, and a finger
+   * swipes them away (reason `"swipe"`).
    */
-  placement?: DialogPlacement;
+  type?: OverlayType;
+  /** A drawer's side: `"end"` (the default) or `"start"`. */
+  side?: OverlaySide;
 }
 
-/** The longest a sliding dialog stays on the page after closing, should its transition never end. */
+/** The longest a sliding overlay stays on the page after closing, should its transition never end. */
 const LEAVING = 600;
-export function DialogContent({ children, portal = true, nonModal = false, closeOnOutside = false, blockOutside = false, holdScroll = false, anchor = null, returnFocus = null, closeLabel = "Close", showClose = true, closeOnEscape = true, closeOnBackdrop = true, fullScreen = false, flush = false, rotated = false, placement = "center", ...props }: DialogContentProps) {
-  const context = useDialog();
-  const host = useRef<DialogElement>(null);
+export function OverlayContent({ children, portal = true, nonModal = false, closeOnOutside = false, blockOutside = false, holdScroll = false, anchor = null, returnFocus = null, closeLabel = "Close", showClose = true, closeOnEscape = true, closeOnBackdrop = true, flush = false, rotated = false, type = "modal", side = "end", ...props }: OverlayContentProps) {
+  const context = useOverlay();
+  const host = useRef<OverlayElement>(null);
   const [mounted, setMounted] = useState(false);
   // A sheet or drawer stays on the page while it slides out, then leaves.
-  const sliding = placement !== "center";
+  const sliding = type === "sheet" || type === "drawer";
   const [leaving, setLeaving] = useState(false);
   const [wasOpen, setWasOpen] = useState(context.open);
   if (wasOpen !== context.open) {
@@ -85,17 +87,17 @@ export function DialogContent({ children, portal = true, nonModal = false, close
     const close = (event: Event) => {
       if (event.target !== element) return;
       event.preventDefault();
-      context.change(false, (event as CustomEvent<{ reason: DialogCloseReason }>).detail.reason);
+      context.change(false, (event as CustomEvent<{ reason: OverlayCloseReason }>).detail.reason);
     };
     element.addEventListener("ds-close-request", close);
     const native = element.querySelector("dialog")!;
     if (!("aria-labelledby" in props) && !props["aria-label"]) {
-      const title = native.querySelector('[data-ds-dialog="title"]');
+      const title = native.querySelector('[data-ds-overlay="title"]');
       if (title) native.setAttribute("aria-labelledby", title.id);
       else native.removeAttribute("aria-labelledby");
     }
     if (!("aria-describedby" in props)) {
-      const description = native.querySelector('[data-ds-dialog="description"]');
+      const description = native.querySelector('[data-ds-overlay="description"]');
       if (description) native.setAttribute("aria-describedby", description.id);
       else native.removeAttribute("aria-describedby");
     }
@@ -107,27 +109,28 @@ export function DialogContent({ children, portal = true, nonModal = false, close
     element.holdScroll = holdScroll;
     element.anchor = anchor;
     element.returnFocus = returnFocus;
-    element.placement = placement;
+    element.type = type;
+    element.side = side;
     element.open = context.open;
     return () => element.removeEventListener("ds-close-request", close);
   });
   if (!mounted || (!context.open && !leaving)) return null;
-  const content = createElement("ds-dialog", { ref: host },
-    createElement("dialog", { ...props, "data-ds-dialog-fullscreen": fullScreen || undefined, "data-ds-dialog-flush": flush || undefined, "data-ds-dialog-rotated": rotated || undefined }, children,
-      showClose && createElement("ds-button", { control: "slotted", icon: true, "data-ds-dialog": "close" },
-        createElement("button", { type: "button", "aria-label": closeLabel, "data-ds-dialog-dismiss": "" },
+  const content = createElement("ds-overlay", { ref: host },
+    createElement("dialog", { ...props, "data-ds-overlay-flush": flush || undefined, "data-ds-overlay-rotated": rotated || undefined }, children,
+      showClose && createElement("ds-button", { control: "slotted", icon: true, "data-ds-overlay": "close" },
+        createElement("button", { type: "button", "aria-label": closeLabel, "data-ds-overlay-dismiss": "" },
           createElement("ds-icon", { type: "close", "aria-hidden": true }))),
     ));
   return portal ? createPortal(content, document.body) : content;
 }
 
-export function DialogHeader(props: HTMLAttributes<HTMLDivElement>) { return createElement("div", { ...props, "data-ds-dialog": "header" }); }
-export function DialogFooter(props: HTMLAttributes<HTMLDivElement>) { return createElement("div", { ...props, "data-ds-dialog": "footer" }); }
-export function DialogTitle(props: HTMLAttributes<HTMLHeadingElement>) {
-  const context = useDialog();
-  return createElement("h2", { id: context.title, ...props, "data-ds-dialog": "title" });
+export function OverlayHeader(props: HTMLAttributes<HTMLDivElement>) { return createElement("div", { ...props, "data-ds-overlay": "header" }); }
+export function OverlayFooter(props: HTMLAttributes<HTMLDivElement>) { return createElement("div", { ...props, "data-ds-overlay": "footer" }); }
+export function OverlayTitle(props: HTMLAttributes<HTMLHeadingElement>) {
+  const context = useOverlay();
+  return createElement("h2", { id: context.title, ...props, "data-ds-overlay": "title" });
 }
-export function DialogDescription(props: HTMLAttributes<HTMLParagraphElement>) {
-  const context = useDialog();
-  return createElement("p", { id: context.description, ...props, "data-ds-dialog": "description" });
+export function OverlayDescription(props: HTMLAttributes<HTMLParagraphElement>) {
+  const context = useOverlay();
+  return createElement("p", { id: context.description, ...props, "data-ds-overlay": "description" });
 }

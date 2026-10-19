@@ -2,10 +2,10 @@
 import { afterEach, expect, test, vi } from "vite-plus/test";
 import { act, createElement as h, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { bindDialogSwipe, dialogPlacement } from "../DS1/0-face/dialog-swipe";
-import { Dialog, DialogContent, DialogTitle } from "../DS1/react/dialog";
+import { bindOverlaySwipe, dialogPlacement } from "../DS1/0-face/overlay-swipe";
+import { Overlay, OverlayContent, OverlayTitle } from "../DS1/react/overlay";
 vi.stubGlobal("fetch", vi.fn(async () => new Response("{}")));
-await import("../DS1/4-page/ds-dialog");
+await import("../DS1/4-page/ds-overlay");
 
 afterEach(() => { document.body.replaceChildren(); document.documentElement.removeAttribute("style"); });
 
@@ -26,8 +26,8 @@ async function swipe(dialog: HTMLDialogElement, path: [number, number][], { hold
   const moves: Event[] = [];
   for (const [x, y] of path.slice(1)) { time += 16; moves.push(fire("touchmove", x, y, true, time)); }
   time += hold;
-  const dragging = dialog.hasAttribute("data-ds-dialog-dragging");
-  const dragged = dialog.style.getPropertyValue("--ds-dialog-drag");
+  const dragging = dialog.hasAttribute("data-ds-overlay-dragging");
+  const dragged = dialog.style.getPropertyValue("--ds-overlay-drag");
   fire("touchend", ...path.at(-1)!, false, time);
   return { dragging, dragged, prevented: moves.some(move => move.defaultPrevented) };
 }
@@ -37,7 +37,7 @@ const tall = (dialog: HTMLDialogElement, height = 400) =>
 const QUICK: [number, number][] = [[100, 400], [100, 430], [100, 470], [100, 520], [100, 580]];
 
 async function sheet(placement = "sheet") {
-  const host = document.createElement("ds-dialog");
+  const host = document.createElement("ds-overlay");
   host.setAttribute("placement", placement);
   host.innerHTML = '<dialog aria-label="Sheet"><p>Words</p></dialog>';
   document.body.append(host);
@@ -48,7 +48,7 @@ async function sheet(placement = "sheet") {
 }
 
 test("placement marks the native frame, defaults to the centre and leaves an anchored panel alone", async () => {
-  const host = document.createElement("ds-dialog");
+  const host = document.createElement("ds-overlay");
   host.innerHTML = '<dialog aria-label="Example"></dialog>';
   document.body.append(host);
   await host.updateComplete;
@@ -95,12 +95,12 @@ test("a declined swipe keeps it open and settles it home; a slow, short drag set
   expect(reasons).toEqual(["swipe"]);
   await frames();
   expect(host.open).toBe(true);
-  expect(dialog.style.getPropertyValue("--ds-dialog-drag")).toBe("0px");
-  expect(dialog.style.getPropertyValue("--ds-dialog-progress")).toBe("0");
-  expect(dialog.hasAttribute("data-ds-dialog-dragging")).toBe(false);
+  expect(dialog.style.getPropertyValue("--ds-overlay-drag")).toBe("0px");
+  expect(dialog.style.getPropertyValue("--ds-overlay-progress")).toBe("0");
+  expect(dialog.hasAttribute("data-ds-overlay-dragging")).toBe(false);
   await swipe(dialog, [[100, 400], [100, 420], [100, 440], [100, 460]], { hold: 200 });
   expect(reasons).toEqual(["swipe"]);
-  expect(dialog.style.getPropertyValue("--ds-dialog-drag")).toBe("0px");
+  expect(dialog.style.getPropertyValue("--ds-overlay-drag")).toBe("0px");
 });
 
 test("dragged towards the page it gives a little, and fades the backdrop as it goes", async () => {
@@ -118,9 +118,9 @@ test("dragged towards the page it gives a little, and fades the backdrop as it g
   };
   // Tracked from where the drag began, twenty pixels down: 200 of 400 is half way.
   touch("touchstart", 400); touch("touchmove", 420); touch("touchmove", 620);
-  expect(dialog.style.getPropertyValue("--ds-dialog-progress")).toBe("0.5");
+  expect(dialog.style.getPropertyValue("--ds-overlay-progress")).toBe("0.5");
   touch("touchcancel", 620, false);
-  expect(dialog.style.getPropertyValue("--ds-dialog-drag")).toBe("0px");
+  expect(dialog.style.getPropertyValue("--ds-overlay-drag")).toBe("0px");
 });
 
 test("a sideways move, a slider and content scrolled down keep their touches", async () => {
@@ -164,11 +164,11 @@ test("a centred dialog is never swiped", async () => {
 });
 
 test("a native sheet asks with a cancelable ds-close-request on the dialog, closes unless declined, and starts clean when opened again", async () => {
-  document.body.innerHTML = '<dialog class="ds-dialog ds-dialog--sheet" aria-label="Native"><p>Words</p></dialog>';
+  document.body.innerHTML = '<dialog class="ds-overlay ds-overlay--sheet" aria-label="Native"><p>Words</p></dialog>';
   const dialog = document.querySelector("dialog")!;
   tall(dialog);
   expect(dialogPlacement(dialog)).toBe("sheet");
-  const unbind = bindDialogSwipe(dialog);
+  const unbind = bindOverlaySwipe(dialog);
   dialog.showModal();
   let decline = true;
   const reasons: string[] = [];
@@ -179,26 +179,26 @@ test("a native sheet asks with a cancelable ds-close-request on the dialog, clos
   await swipe(dialog, QUICK);
   expect(reasons).toEqual(["swipe", "swipe"]);
   expect(dialog.open).toBe(false);
-  expect(dialog.style.getPropertyValue("--ds-dialog-drag")).not.toBe("");
+  expect(dialog.style.getPropertyValue("--ds-overlay-drag")).not.toBe("");
   dialog.showModal();
   await frames(1);
-  expect(dialog.style.getPropertyValue("--ds-dialog-drag")).toBe("");
+  expect(dialog.style.getPropertyValue("--ds-overlay-drag")).toBe("");
   unbind();
   expect((await swipe(dialog, QUICK)).dragging).toBe(false);
 });
 
 test("onDismiss replaces the close request; a product closing a moment later is not settled home", async () => {
-  document.body.innerHTML = '<dialog class="ds-dialog ds-dialog--start" aria-label="Native"><p>Words</p></dialog>';
+  document.body.innerHTML = '<dialog class="ds-overlay ds-overlay--start" aria-label="Native"><p>Words</p></dialog>';
   const dialog = document.querySelector("dialog")!;
   tall(dialog);
   const onDismiss = vi.fn(() => setTimeout(() => dialog.close(), 5));
-  bindDialogSwipe(dialog, { onDismiss });
+  bindOverlaySwipe(dialog, { onDismiss });
   dialog.showModal();
   await swipe(dialog, [[300, 300], [270, 300], [230, 300], [180, 300], [120, 300]]);
   expect(onDismiss).toHaveBeenCalledWith(dialog);
   await frames();
   expect(dialog.open).toBe(false);
-  expect(dialog.style.getPropertyValue("--ds-dialog-drag")).not.toBe("0px");
+  expect(dialog.style.getPropertyValue("--ds-overlay-drag")).not.toBe("0px");
 });
 
 test("React passes placement, keeps a sliding dialog on the page until it has slid out, and removes a centred one at once", async () => {
@@ -209,28 +209,28 @@ test("React passes placement, keeps a sliding dialog on the page until it has sl
   function Example({ placement }: { placement: "sheet" | "center" }) {
     const [open, setOpen] = useState(true);
     toggle = setOpen;
-    return h(Dialog, { open, onOpenChange: setOpen, children: h(DialogContent, { placement }, h(DialogTitle, null, "Trade")) });
+    return h(Overlay, { open, onOpenChange: setOpen, children: h(OverlayContent, { placement }, h(OverlayTitle, null, "Trade")) });
   }
   await act(async () => { root.render(h(Example, { placement: "sheet" })); });
   await act(async () => { await new Promise(resolve => setTimeout(resolve, 0)); });
-  const host = document.querySelector("ds-dialog")!;
+  const host = document.querySelector("ds-overlay")!;
   expect(host.placement).toBe("sheet");
   expect(host.querySelector("dialog")!.getAttribute("data-ds-placement")).toBe("sheet");
   await act(async () => { toggle(false); });
-  expect(document.querySelector("ds-dialog")).toBe(host);
+  expect(document.querySelector("ds-overlay")).toBe(host);
   expect(host.open).toBe(false);
   await act(async () => {
     const event = new Event("transitionend");
     Object.defineProperties(event, { propertyName: { value: "transform" }, pseudoElement: { value: "" } });
     host.querySelector("dialog")!.dispatchEvent(event);
   });
-  expect(document.querySelector("ds-dialog")).toBeNull();
+  expect(document.querySelector("ds-overlay")).toBeNull();
 
   await act(async () => { root.render(h(Example, { placement: "center" })); });
   await act(async () => { toggle(true); });
   await act(async () => { await new Promise(resolve => setTimeout(resolve, 0)); });
-  expect(document.querySelector("ds-dialog")).not.toBeNull();
+  expect(document.querySelector("ds-overlay")).not.toBeNull();
   await act(async () => { toggle(false); });
-  expect(document.querySelector("ds-dialog")).toBeNull();
+  expect(document.querySelector("ds-overlay")).toBeNull();
   act(() => root.unmount());
 });

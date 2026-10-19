@@ -3,7 +3,7 @@ import { afterEach, expect, test, vi } from "vite-plus/test";
 
 vi.stubGlobal("fetch", vi.fn(async () => new Response("{}")));
 const { loadTranslations, setLanguage } = await import("../DS1/0-face/i18n");
-const { attachDrawer, tabbables } = await import("../DS1/0-face/drawer");
+const { attachOverlay, tabbables } = await import("../DS1/0-face/attach-overlay");
 const { startHeaders, markCurrentLink } = await import("../DS1/0-face/header");
 const { footerPreferences } = await import("../DS1/4-page/ds-footer");
 const { headingId, documentLevels } = await import("../DS1/4-page/ds-document");
@@ -48,8 +48,8 @@ test("a native header's menu button opens its navigation and actions in a modal 
   const { header, drawer, toggle, nav, actions } = nativeHeader();
   const panel = drawer.panel;
   expect(panel.tagName).toBe("DIALOG");
-  expect(panel.classList.contains("ds-dialog")).toBe(true);
-  expect(panel.classList.contains("ds-drawer")).toBe(true);
+  expect(panel.classList.contains("ds-overlay")).toBe(true);
+  expect(panel.classList.contains("ds-overlay--screen")).toBe(true);
   expect(panel.getAttribute("aria-label")).toBe("Menu");
   expect(toggle.getAttribute("aria-expanded")).toBe("false");
   expect(toggle.getAttribute("aria-haspopup")).toBe("dialog");
@@ -64,7 +64,7 @@ test("a native header's menu button opens its navigation and actions in a modal 
   expect(nav.parentElement).toBe(panel);
   expect(actions.parentElement).toBe(panel);
   expect([...panel.children].indexOf(nav)).toBeLessThan([...panel.children].indexOf(actions));
-  const close = panel.querySelector<HTMLButtonElement>(".ds-drawer__close")!;
+  const close = panel.querySelector<HTMLButtonElement>(".ds-overlay__close")!;
   expect(close.getAttribute("aria-label")).toBe("Luk");
   expect(close.hasAttribute("aria-expanded")).toBe(false);
   expect(close.classList.contains("ds-header__toggle")).toBe(false);
@@ -106,7 +106,7 @@ test("the drawer holds the page's scroll while it is open, and closes on its clo
   toggle.click();
   expect(document.documentElement.style.overflow).toBe("hidden");
   expect(document.documentElement.style.overscrollBehavior).toBe("none");
-  drawer.panel.querySelector<HTMLElement>(".ds-drawer__close")!.click();
+  drawer.panel.querySelector<HTMLElement>(".ds-overlay__close")!.click();
   expect(drawer.isOpen).toBe(false);
   expect(document.documentElement.style.overflow).toBe("clip");
 
@@ -128,8 +128,8 @@ test("two drawers share the page's scroll, and destroy takes a made panel away",
   const a = document.createElement("button"), b = document.createElement("button");
   const partA = document.createElement("div"), partB = document.createElement("div");
   document.body.append(a, partA, b, partB);
-  const first = attachDrawer({ toggle: a, content: [partA], label: "First" });
-  const second = attachDrawer({ toggle: b, content: [partB], closeOnLink: false });
+  const first = attachOverlay({ toggle: a, content: [partA], label: "First" });
+  const second = attachOverlay({ toggle: b, content: [partB], closeOnLink: false });
   drawers.push(second);
   first.open(); second.open();
   first.close();

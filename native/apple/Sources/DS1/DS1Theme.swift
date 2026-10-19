@@ -59,7 +59,7 @@ private struct DS1Themed: ViewModifier {
     func body(content: Content) -> some View {
         content
             .overlay { if toasts { DS1ToastHost() } }
-            .overlay { if dialogs { DS1DialogHost() } }
+            .overlay { if dialogs { DS1OverlayHost() } }
             .ds1Scaled(corner: corner)
             .preferredColorScheme(preferences.theme.colorScheme)
             .environment(\.locale, Locale(identifier: words.language.code))
@@ -70,7 +70,7 @@ extension View {
     /// Design system 1 around an app: light or dark as the saved theme says (the system's by
     /// default), the device scale from the width it is given, the reader's language, and the
     /// toast stack and the page's dialogs on screen, so `DS1Toast.success(…)` and
-    /// `DS1Dialogs.confirm(…)` work from anywhere. Put it on the root view once.
+    /// `DS1Overlays.confirm(…)` work from anywhere. Put it on the root view once.
     public func ds1Theme(corner: CGFloat = DS1Metrics.radius, toasts: Bool = true, dialogs: Bool = true) -> some View {
         modifier(DS1Themed(corner: corner, toasts: toasts, dialogs: dialogs))
     }

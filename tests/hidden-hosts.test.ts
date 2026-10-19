@@ -42,7 +42,7 @@ const elements = ['2-core', '3-unit', '4-page', '../packages/app/src/2-core'].fl
 
 test('the element list covers the components reported hidden-but-visible', () => {
   expect(elements.map(element => element.tag)).toEqual(
-    expect.arrayContaining(['ds-text', 'ds-button', 'ds-empty', 'ds-notice', 'ds-loading', 'ds-dialog', 'ds-cycle', 'ds-list']),
+    expect.arrayContaining(['ds-text', 'ds-button', 'ds-empty', 'ds-notice', 'ds-loading', 'ds-overlay', 'ds-cycle', 'ds-list']),
   );
   expect(elements.find(element => element.tag === 'ds-text')!.css).toContain(':host {');
 });

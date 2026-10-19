@@ -42,7 +42,7 @@ import androidx.compose.ui.window.DialogWindowProvider
 import kotlinx.coroutines.CompletableDeferred
 
 /**
- * `ds-dialog`: a box 20 squares wide (the screen less a square at each side at most) on the
+ * `ds-overlay`: a box 20 squares wide (the screen less a square at each side at most) on the
  * paper, a 1 dp border, square corners and no shadow, a square of padding and a square
  * between its parts, over the page dimmed to 40% of the ink. Its [title] in the medium face,
  * its [description] muted, then [content], then [footer] at the end; [onDismissRequest]
@@ -50,7 +50,7 @@ import kotlinx.coroutines.CompletableDeferred
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun DS1Dialog(
+fun DS1Overlay(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     title: String? = null,
@@ -101,7 +101,7 @@ fun DS1Dialog(
  * `danger` it is secondary in the danger colour, Cancel takes the focus and a tap outside
  * does not cancel.
  */
-object DS1Dialogs {
+object DS1Overlays {
     internal sealed class Request {
         abstract val title: String
         abstract val text: String?
@@ -131,36 +131,36 @@ object DS1Dialogs {
     }
 }
 
-/** Shows [DS1Dialogs]' requests one at a time. [DS1Theme] places it. */
+/** Shows [DS1Overlays]' requests one at a time. [DS1Theme] places it. */
 @Composable
-fun DS1DialogHost() {
-    val request = DS1Dialogs.queue.firstOrNull() ?: return
-    val finish: () -> Unit = { DS1Dialogs.queue.remove(request) }
+fun DS1OverlayHost() {
+    val request = DS1Overlays.queue.firstOrNull() ?: return
+    val finish: () -> Unit = { DS1Overlays.queue.remove(request) }
     when (request) {
-        is DS1Dialogs.Request.Alert -> {
+        is DS1Overlays.Request.Alert -> {
             val ok = remember(request) { FocusRequester() }
-            DS1Dialog({ request.done.complete(Unit); finish() }, title = request.title, description = request.text, footer = {
+            DS1Overlay({ request.done.complete(Unit); finish() }, title = request.title, description = request.text, footer = {
                 DS1Button(request.confirm, { request.done.complete(Unit); finish() }, Modifier.focusRequester(ok), kind = DS1ButtonKind.Primary)
             })
             LaunchedEffect(request) { runCatching { ok.requestFocus() } }
         }
-        is DS1Dialogs.Request.Confirm -> {
+        is DS1Overlays.Request.Confirm -> {
             val focus = remember(request) { FocusRequester() }
             val no = { request.done.complete(false); finish() }
             val yes = { request.done.complete(true); finish() }
-            DS1Dialog({ no() }, title = request.title, description = request.text, closeOnOutside = !request.danger, footer = {
+            DS1Overlay({ no() }, title = request.title, description = request.text, closeOnOutside = !request.danger, footer = {
                 DS1Button(request.cancel, { no() }, if (request.danger) Modifier.focusRequester(focus) else Modifier, kind = DS1ButtonKind.Secondary)
                 if (request.danger) DS1DangerButton(request.confirm) { yes() }
                 else DS1Button(request.confirm, { yes() }, Modifier.focusRequester(focus), kind = DS1ButtonKind.Primary)
             })
             LaunchedEffect(request) { runCatching { focus.requestFocus() } }
         }
-        is DS1Dialogs.Request.Prompt -> {
+        is DS1Overlays.Request.Prompt -> {
             var value by remember(request) { mutableStateOf(request.value) }
             val field = remember(request) { FocusRequester() }
             val cancel = { request.done.complete(null); finish() }
             val ok = { request.done.complete(value); finish() }
-            DS1Dialog({ cancel() }, title = request.title, description = request.text, footer = {
+            DS1Overlay({ cancel() }, title = request.title, description = request.text, footer = {
                 DS1Button(request.cancel, { cancel() }, kind = DS1ButtonKind.Secondary)
                 DS1Button(request.confirm, { ok() }, kind = DS1ButtonKind.Primary)
             }) {

@@ -52,7 +52,7 @@ Every public piece of the web library has a native counterpart with the same nam
 | `ds-tooltip` | `.ds1Tooltip(_:)` | `DS1Tooltip` |
 | `ds-cycle`, its language picker | `DS1Cycle`, `DS1ThemeCycle`, `DS1LanguageCycle` | `DS1Cycle`, `DS1ThemeCycle`, `DS1LanguageCycle` |
 | `toast()` and its stack | `DS1Toast`, `DS1ToastHost` | `DS1Toast`, `DS1ToastHost` |
-| `ds-dialog`, `alert`, `confirm`, `prompt` | `DS1DialogBox`, `.ds1Dialog`, `DS1Dialogs` | `DS1Dialog`, `DS1Dialogs` |
+| `ds-overlay`, `alert`, `confirm`, `prompt` | `DS1OverlayBox`, `.ds1Overlay`, `DS1Overlays` | `DS1Overlay`, `DS1Overlays` |
 | `ds-menu` | `DS1Menu`, `DS1MenuItem` (floating menus are the system's) | `DS1Menu`, `DS1MenuItem` |
 | `ds-accordion`, `ds-list`, `ds-panel` | `DS1Accordion`, `DS1List`, `DS1Panel` | `DS1Accordion`, `DS1List`, `DS1Panel` |
 | `ds-sidebar`, `ds-table`, `ds-token-field` | `DS1Sidebar`, `DS1Table`, `DS1TokenField` | `DS1Sidebar`, `DS1Table`, `DS1TokenField` |

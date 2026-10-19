@@ -1,10 +1,10 @@
 import SwiftUI
 
-/// `ds-dialog`'s box: 20 squares wide (the screen less a square at each side at most) on the
+/// `ds-overlay`'s box: 20 squares wide (the screen less a square at each side at most) on the
 /// paper, a 1-point border, square corners and no shadow, a square of padding and a square
 /// between its parts. Its `title` in the medium face, its `description` muted, the content,
-/// then `footer` at the end. Show it with `.ds1Dialog(isPresented:)`.
-public struct DS1DialogBox<Content: View, Footer: View>: View {
+/// then `footer` at the end. Show it with `.ds1Overlay(isPresented:)`.
+public struct DS1OverlayBox<Content: View, Footer: View>: View {
     @Environment(\.ds1Paper) private var paper
     @Environment(\.ds1Scale) private var scale
     let title: String?
@@ -46,7 +46,7 @@ public struct DS1DialogBox<Content: View, Footer: View>: View {
     }
 }
 
-private struct DS1DialogPresenter<Box: View>: ViewModifier {
+private struct DS1OverlayPresenter<Box: View>: ViewModifier {
     @Binding var isPresented: Bool
     let closeOnOutside: Bool
     let box: () -> Box
@@ -68,8 +68,8 @@ private struct DS1DialogPresenter<Box: View>: ViewModifier {
 extension View {
     /// Shows a dialog over this view on the page dimmed to 40% of the ink; a tap outside closes
     /// it unless `closeOnOutside` is false. Put it on the root so it covers the whole screen.
-    public func ds1Dialog<Box: View>(isPresented: Binding<Bool>, closeOnOutside: Bool = true, @ViewBuilder _ box: @escaping () -> Box) -> some View {
-        modifier(DS1DialogPresenter(isPresented: isPresented, closeOnOutside: closeOnOutside, box: box))
+    public func ds1Overlay<Box: View>(isPresented: Binding<Bool>, closeOnOutside: Bool = true, @ViewBuilder _ box: @escaping () -> Box) -> some View {
+        modifier(DS1OverlayPresenter(isPresented: isPresented, closeOnOutside: closeOnOutside, box: box))
     }
 }
 
@@ -77,8 +77,8 @@ extension View {
 /// the later ones waiting. `.ds1Theme()` shows them. The confirm button is primary; with
 /// `danger` it is secondary in the danger colour and a tap outside does not cancel.
 @MainActor
-public final class DS1Dialogs: ObservableObject {
-    public static let shared = DS1Dialogs()
+public final class DS1Overlays: ObservableObject {
+    public static let shared = DS1Overlays()
 
     enum Kind { case alert, confirm(danger: Bool), prompt(label: String?, placeholder: String) }
     struct Request: Identifiable {
@@ -120,9 +120,9 @@ public final class DS1Dialogs: ObservableObject {
     }
 }
 
-/// Shows `DS1Dialogs`' requests one at a time. `.ds1Theme()` places it.
-public struct DS1DialogHost: View {
-    @ObservedObject private var dialogs = DS1Dialogs.shared
+/// Shows `DS1Overlays`' requests one at a time. `.ds1Theme()` places it.
+public struct DS1OverlayHost: View {
+    @ObservedObject private var dialogs = DS1Overlays.shared
     @State private var value = ""
     public init() {}
 
@@ -133,7 +133,7 @@ public struct DS1DialogHost: View {
                 Rectangle().fill(DS1Color.black.withOpacity(0.4)).ignoresSafeArea()
                     .onTapGesture { if !danger { dialogs.finish(request, nil) } }
                     .accessibilityHidden(true)
-                DS1DialogBox(title: request.title, description: request.text) {
+                DS1OverlayBox(title: request.title, description: request.text) {
                     if case .prompt(let label, let placeholder) = request.kind {
                         DS1Field(placeholder, text: $value, label: label).onSubmit { dialogs.finish(request, value) }
                     }

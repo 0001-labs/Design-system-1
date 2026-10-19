@@ -25,7 +25,7 @@ test('a native switch is two control heights wide and its thumb travels one', ()
 
 test('a native text area spans whole rows and a dialog is twenty squares wide', () => {
   expect(rule('textarea.ds-input')).toContain('calc(var(--ds-textarea-rows, 3) * var(--ds-row-height))');
-  expect(rule('dialog.ds-dialog')).toContain('calc(20 * var(--ds-unit))');
+  expect(rule('dialog.ds-overlay')).toContain('calc(20 * var(--ds-unit))');
 });
 
 test('a segmented group marks its chosen native button in the accent', () => {
