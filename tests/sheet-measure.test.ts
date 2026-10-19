@@ -101,3 +101,28 @@ test("a bento's tiles stand half a square apart, in columns or on squares", asyn
   expect(box.words.map(word => word.left)).toEqual([20, 340, 20]);
   await tab.close();
 });
+
+test("a squares bento fits a narrower measure with data-fit, and pads its tiles by its own unit and padding", async () => {
+  const tab = await browser.newPage({ viewport: { width: 1200, height: 800 } });
+  await tab.goto(url);
+  await tab.waitForFunction(() => document.documentElement.dataset.ready === "true");
+  const box = await tab.evaluate(async () => {
+    const stage = document.getElementById("stage")!;
+    stage.innerHTML = '<div style="width:480px"><div class="ds-bento" id="fit" data-squares data-fit style="--ds-bento-columns: 32"><div data-place="0 0 15 7">A</div><div data-place="16 0 16 7">B</div></div></div>'
+      + '<div class="ds-bento" id="unit" data-squares style="--ds-bento-columns: 10; --ds-bento-unit: 38px; --ds-bento-padding: 40px"><div data-place="0 0 4 3">C</div><div data-place="5 0 5 3">D</div></div>';
+    (window as unknown as { placeBentos: () => void }).placeBentos();
+    for (let i = 0; i < 3; i++) await new Promise(requestAnimationFrame);
+    const [a, b] = [...document.querySelectorAll("#fit > div")].map(tile => tile.getBoundingClientRect());
+    const unit = document.getElementById("unit")!.getBoundingClientRect();
+    const [c, d] = [...document.querySelectorAll<HTMLElement>("#unit > div")];
+    return { fit: { width: document.getElementById("fit")!.getBoundingClientRect().width, gap: b!.left - a!.right }, unit: { width: unit.width, gap: d!.getBoundingClientRect().left - c!.getBoundingClientRect().right, pad: getComputedStyle(c!).paddingInlineStart, padEnd: getComputedStyle(c!).paddingInlineEnd } };
+  });
+  expect(box.fit.width).toBe(480);
+  // A shared column of 15px less a quarter square of reach on each side: the gap follows the square, as Ezo's narrow windows did.
+  expect(box.fit.gap).toBeCloseTo(480 / 32 - 10, 3);
+  expect(box.unit.width).toBe(380);
+  expect(box.unit.gap).toBe(19);
+  expect(box.unit.pad).toBe("40px");
+  expect(box.unit.padEnd).toBe("49.5px");
+  await tab.close();
+});

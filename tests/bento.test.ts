@@ -42,3 +42,18 @@ test("the element reflects its columns and places its tiles on squares", async (
   expect(bento.style.getPropertyValue("--ds-bento-columns")).toBe("32");
   expect(document.querySelector<HTMLElement>("ds-card")!.style.getPropertyValue("--ds-bento-end")).toBe("1");
 });
+
+test("a bento's layout picks each tile's place for it, and the tile's own place elsewhere", async () => {
+  const { tilePlace } = await import("../DS1/0-face/bento");
+  document.body.innerHTML = '<div class="ds-bento" data-squares data-layout="phone"><a data-place="16 0 16 20" data-place-phone="0 8 12 10"></a><a data-place="0 0 15 7"></a></div>';
+  const bento = document.querySelector<HTMLElement>(".ds-bento")!;
+  const [both, one] = [...document.querySelectorAll<HTMLElement>("a")];
+  expect(tilePlace(both!, "phone")).toEqual([0, 8, 12, 10]);
+  expect(tilePlace(both!)).toEqual([16, 0, 16, 20]);
+  expect(tilePlace(one!, "phone")).toEqual([0, 0, 15, 7]);
+  placeBento(bento);
+  expect(both!.style.getPropertyValue("--ds-bento-w")).toBe("12");
+  bento.removeAttribute("data-layout");
+  placeBento(bento);
+  expect(both!.style.getPropertyValue("--ds-bento-w")).toBe("16");
+});
