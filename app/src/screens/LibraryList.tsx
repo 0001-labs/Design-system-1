@@ -1,4 +1,3 @@
-import { useAuthActions } from "@convex-dev/auth/react";
 import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 
@@ -10,7 +9,6 @@ import "../../../DS1/2-core/ds-notice";
 import "../../../DS1/3-unit/ds-list";
 import "../../../DS1/3-unit/ds-row";
 import { formatDateTime } from "../../../DS1/0-face/format";
-import { Input } from "../../../DS1/react/input";
 import "../../../DS1/2-core/ds-input";
 import { Button } from "../../../DS1/react/button";
 import { LoadingIndicator } from "../../../DS1/react/loading";
@@ -35,12 +33,7 @@ const STATE_LABEL: Record<string, string> = {
 
 export function LibraryList() {
   const libraries = useQuery(api.libraries.list);
-  const profile = useQuery(api.users.profile);
-  const setCompanyName = useMutation(api.users.setCompanyName);
-  const [company, setCompany] = useState<string | null>(null);
-  const [savingCompany, setSavingCompany] = useState(false);
   const create = useMutation(api.libraries.create);
-  const { signOut } = useAuthActions();
 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -91,24 +84,11 @@ export function LibraryList() {
           >
             {busy ? "Creating…" : "New library"}
           </Button>
-          <Button secondary onClick={() => void signOut()} type="button">
-            Sign out
-          </Button>
+
         </div>
       </header>
 
-      <form className="company-settings" onSubmit={async event => {
-        event.preventDefault();
-        if (savingCompany) return;
-        setSavingCompany(true); setError(null);
-        try { await setCompanyName({ companyName: company ?? profile?.companyName ?? "" }); setCompany(null); }
-        catch { setError("Could not save the company name. Try again."); }
-        finally { setSavingCompany(false); }
-      }}>
-        <label>Company name<Input aria-label="Company name" maxLength={80} required disabled={savingCompany || !profile}
-          value={company ?? profile?.companyName ?? ""} onChange={event => setCompany(event.target.value)} /></label>
-        <Button secondary type="submit" disabled={savingCompany || !(company ?? profile?.companyName ?? "").trim()}>{savingCompany ? "Saving…" : "Save company name"}</Button>
-      </form>
+
 
       {error ? <Notice tone="danger">{error}</Notice> : null}
 

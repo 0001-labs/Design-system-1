@@ -16,6 +16,7 @@ import { libraryWorkspaceRedirect } from "../../shared/library-navigation";
 import { convex } from "./lib/convex";
 import { navigate, RouterProvider, useLocation, useRoute } from "./router";
 import { LibraryEditor } from "./screens/LibraryEditor";
+import { Profile } from "./screens/Profile";
 import { LibraryList } from "./screens/LibraryList";
 import { SignIn } from "./screens/SignIn";
 
@@ -60,6 +61,7 @@ function Routes() {
   }
 
   if (path === "/libraries") return <LibraryList />;
+  if (path === "/profile") return <Profile />;
   if (path === "/reports/components") { window.location.replace("https://dash.designsystem1.com/"); return <Splash />; }
   if (editor) return <LibraryEditor libraryId={editor.id} />;
 

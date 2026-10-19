@@ -1,0 +1,12 @@
+.profile-page { box-sizing: border-box; display: flex; flex-direction: column; align-items: flex-start; gap: calc(2 * var(--ds-unit)); width: min(100%, calc(32 * var(--ds-unit))); padding: var(--ds-unit); margin-inline: auto; font-size: var(--ds-type-size-default); color: var(--ds-text-color); }
+.profile-page > a { color: var(--ds-text-color-muted); }
+.profile-heading { display: flex; gap: calc(var(--ds-unit) / 2); align-items: center; }
+.profile-heading h1 { margin: 0; font-size: calc(20px * var(--ds-sf)); line-height: calc(2 * var(--ds-unit)); font-weight: normal; }
+.profile-email, .profile-form { width: 100%; }
+.profile-label { display: block; color: var(--ds-text-color-muted); line-height: var(--ds-unit); }
+.profile-email p { margin: 0; line-height: var(--ds-unit); overflow-wrap: anywhere; }
+.profile-form { display: flex; flex-direction: column; align-items: flex-start; gap: var(--ds-unit); }
+.profile-form label { width: min(100%, calc(16 * var(--ds-unit))); }
+.profile-form label ds-input { width: 100%; }
+.profile-status { line-height: var(--ds-unit); }
+.profile-session { padding-block: var(--ds-unit); }

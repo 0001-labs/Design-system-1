@@ -51,7 +51,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <a key={item.href} href={item.href} target={embedded ? "_top" : undefined}>{item.label}</a>
           ))}
         </nav>
-        <Link className="site-account" to={isAuthenticated ? "/libraries" : signInPath} aria-current={path === "/signin" ? "page" : undefined}>
+        <Link className="site-account" to={isAuthenticated ? "/profile" : signInPath} aria-current={path === "/signin" ? "page" : undefined}>
           {isLoading ? "Account" : isAuthenticated ? "Account" : "Sign in"}
         </Link>
       </header>

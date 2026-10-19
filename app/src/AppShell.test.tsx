@@ -19,7 +19,7 @@ test('top navigation omits Docs while the account link follows authentication', 
       Object.assign(session, { isAuthenticated, isLoading });
       await act(async () => root.render(createElement(AppShell, null, 'Page')));
       expect(Array.from(host.querySelectorAll('nav a'), a => a.textContent)).toEqual([]);
-      expect(host.querySelector('.site-account')?.getAttribute('href')).toBe('/libraries');
+      expect(host.querySelector('.site-account')?.getAttribute('href')).toBe(isAuthenticated ? '/profile' : '/libraries');
       expect(host.querySelector('.site-account')?.textContent).toBe(isLoading || isAuthenticated ? 'Account' : 'Sign in');
       expect(host.querySelector('nav')?.textContent).not.toContain('Editor');
     }
