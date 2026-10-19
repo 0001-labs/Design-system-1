@@ -1,6 +1,6 @@
 {
   "name": "@ds-one/services",
-  "version": "0.3.0-alpha.24",
+  "version": "0.3.0-alpha.25",
   "description": "The Design system 1 Cloudflare Worker: website, app, public stylesheets, and authenticated publishing.",
   "private": true,
   "type": "module",
