@@ -6,8 +6,7 @@ const { html, script } = Astro.props;
 const blocks = [{ id: 'html', label: 'Copy HTML', text: html }, ...(script ? [{ id: 'script', label: 'Copy JavaScript', text: script }] : [])];
 ---
 <div class="example-code-source" data-example-code>
-  <ds-accordion summary="Code">
-    <div slot="details">
+    <div>
       {blocks.map(block => (
         <div class="example-code-block">
           <ds-button control="slotted"><button type="button" data-copy={block.id}>{block.label}</button></ds-button>
@@ -16,15 +15,11 @@ const blocks = [{ id: 'html', label: 'Copy HTML', text: html }, ...(script ? [{ 
         </div>
       ))}
     </div>
-  </ds-accordion>
 </div>
 <script>
-  import '../../../DS1/3-unit/ds-accordion';
-  import { mountCodeEditors } from '../lib/example-code-editor';
   import { wireCodeCopy } from '../lib/example-controls';
   document.querySelectorAll<HTMLElement>('[data-example-code]').forEach(source => {
     wireCodeCopy(source);
-    mountCodeEditors(source);
   });
 </script>
 <style is:global>

@@ -1,0 +1,14 @@
+<div class="example-view-toggle" role="group" aria-label="Example view">
+  <ds-button control="slotted" choice active><button type="button" data-example-view-choice="example" aria-pressed="true">Example</button></ds-button>
+  <ds-button control="slotted" choice><button type="button" data-example-view-choice="code" aria-pressed="false">Code</button></ds-button>
+</div>
+<script>
+  import '../../../DS1/2-core/ds-button';
+  import { wireExampleView } from '../lib/example-view';
+  import { mountCodeEditors } from '../lib/example-code-editor';
+  document.querySelectorAll<HTMLElement>('[data-example-view]').forEach(example => wireExampleView(example, mountCodeEditors));
+</script>
+<style is:global>
+  .example-view-toggle { display:flex; flex:none; gap:calc(4px * var(--sf,1)); margin-inline-start:auto; }
+  [data-example-view] [data-example-preview][hidden], [data-example-view] [data-example-source][hidden] { display:none; }
+</style>

@@ -2,20 +2,23 @@
 import { LAYOUT_EXAMPLES } from '../lib/layout-examples';
 import { layersIn } from '../lib/component-layers';
 import ExampleCode from './ExampleCode.astro';
+import ExampleViewToggle from './ExampleViewToggle.astro';
 interface Props { layout: string; }
 const { layout } = Astro.props;
 const sample = LAYOUT_EXAMPLES[layout];
 if (!sample) throw new Error(`Unknown layout example: ${layout}`);
 const inside = layersIn(sample.html);
 ---
-<section class="layout-example not-content" data-ds-not-prose data-layout-example={layout} aria-label={`${sample.name} layout`}>
+<section class="layout-example not-content" data-ds-not-prose data-example-view data-layout-example={layout} aria-label={`${sample.name} layout`}>
   <div class="layout-toolbar">
     <ds-button split literal aria-label="Preview width" options="computer:Computer,phone:Phone" value="computer" data-preview-width></ds-button>
     <div class="layout-toolbar-end">
       <ds-button control="slotted" choice><button type="button" data-preview-layers aria-pressed="false">Show layers</button></ds-button>
       <a href={`/examples/layouts/${layout}/`} target="_blank" rel="noopener">Open full size</a>
+      <ExampleViewToggle />
     </div>
   </div>
+  <div data-example-preview>
   <div class="layout-stage">
     <div class="layout-device">
       <iframe src={`/examples/layouts/${layout}/`} title={`${sample.name} layout — interactive preview`} loading="lazy" style={`height: ${sample.height}px;`}></iframe>
@@ -30,7 +33,8 @@ const inside = layersIn(sample.html);
       </div>
     ))}
   </dl>
-  <ExampleCode html={sample.html} script={sample.script} />
+  </div>
+  <div data-example-source hidden><ExampleCode html={sample.html} script={sample.script} /></div>
 </section>
 <script>
   import { onChoice, followPageTheme } from '../lib/example-controls';

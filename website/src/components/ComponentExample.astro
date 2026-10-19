@@ -1,18 +1,22 @@
 ---
 import { EXAMPLES } from '../lib/component-examples';
 import ExampleCode from './ExampleCode.astro';
+import ExampleViewToggle from './ExampleViewToggle.astro';
 interface Props { example: string; compact?: boolean; }
 const { example } = Astro.props;
 const sample = EXAMPLES[example];
 if (!sample) throw new Error(`Unknown component example: ${example}`);
 ---
-<section class="component-example not-content" data-ds-not-prose data-example={example} aria-label={sample.title}>
+<section class="component-example not-content" data-ds-not-prose data-example-view data-example={example} aria-label={sample.title}>
   <div class="example-toolbar">
     <span>{sample.title}</span>
+    <ExampleViewToggle />
   </div>
+  <div data-example-preview>
   <iframe src={`/examples/${example}/`} title={`${sample.title} — interactive preview`} loading="lazy" style={`height: ${sample.height ?? 160}px;`} data-preview-frame></iframe>
   <p class="example-hint">{sample.hint}</p>
-  <ExampleCode html={sample.html} script={sample.script} />
+  </div>
+  <div data-example-source hidden><ExampleCode html={sample.html} script={sample.script} /></div>
 </section>
 <script>
   import { followPageTheme } from '../lib/example-controls';
