@@ -104,14 +104,15 @@ ds-swatch.disabled { opacity: .5; }
  * The field's list, in place of the platform's picker (`data-listed`). The
  * select takes no pointer, so a press on the field opens the list and no
  * platform picker; the keyboard still reaches the select, and its opening keys
- * open the list. The list is the menu engine's, as wide as the field rounded
- * up to whole squares (`--ds-select-list-width` widens it), each choice one
+ * open the list. The list is the menu engine's, as wide as its choices in whole
+ * squares and at least the field (`--ds-select-list-width` sets one), each choice one
  * square on the sixteen: an icon on the first square, the name, muted details,
  * a shortcut at the end and the check on the last square for the chosen one.
  */
 :host([data-listed]) { cursor: pointer; }
 :host([data-listed]) ::slotted(select) { pointer-events: none !important; }
-.list { --ds-menu-width: var(--ds-select-list-width, var(--ds-menu-anchor-width)); }
+/* The list fits its choices on whole squares, at least as wide as the field. */
+.list { --ds-menu-width: var(--ds-select-list-width); }
 .choice,
 .group-label {
   box-sizing: border-box;

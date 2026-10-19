@@ -30,7 +30,7 @@ export class Menu extends LitElement {
     anchor: { attribute: false },
     placement: { type: String },
     trigger: { attribute: false },
-    for: { type: String, reflect: true },
+    for: { type: String },
     triggerMode: { type: String, attribute: "trigger-mode", reflect: true },
     contextSelector: { type: String, attribute: "context-selector" },
     hover: { type: Boolean, reflect: true },
@@ -64,7 +64,8 @@ export class Menu extends LitElement {
   private search = "";
   private searchAt = 0;
   private gridColumn = 0;
-  private focusOnOpen = true;
+  /** Move focus into the menu when it opens (a person's opening always does); off to show a menu open without taking the reader's focus, as an example beside the page does. */
+  focusOnOpen = true;
   private hoverTimer?: ReturnType<typeof setTimeout>;
   private shown = false;
   private observer?: ResizeObserver;
@@ -181,7 +182,7 @@ export class Menu extends LitElement {
     if (this.dispatchEvent(event)) this.open = open;
   }
   /** Open a context menu from an actual viewport point or the trigger's keyboard position. */
-  openAt(point: { x: number; y: number }, invokingControl = this.trigger) {
+  openAt(point: { x: number; y: number }, invokingControl = this.trigger, { focus = true }: { focus?: boolean } = {}) {
     if (this.disabled) return;
     if (this.trigger && !this.enabled(this.trigger)) return;
     if (invokingControl && (!invokingControl.isConnected || !this.enabled(invokingControl))) return;
@@ -191,7 +192,7 @@ export class Menu extends LitElement {
       : invokingControl?.contains(focused) && focused instanceof HTMLElement ? focused
       : invokingControl?.querySelector<HTMLElement>(FOCUSABLE) ?? invokingControl;
     if (this.shown) this.opener = this.invokingControl;
-    this.focusOnOpen = true; this.openingEdge = "first";
+    this.focusOnOpen = focus; this.openingEdge = "first";
     this.toggleFromTrigger(true, { trigger: invokingControl, point });
     if (this.open) this.place();
   }
@@ -401,7 +402,8 @@ export class Menu extends LitElement {
     if (this.hasAttribute("data-ds-hug") && !view.getComputedStyle(this).getPropertyValue("--ds-menu-width").trim()) {
       this.style.width = "max-content";
       const natural = this.getBoundingClientRect().width;
-      const least = this.triggerMode === "context" || this.triggerMode === "manual" ? 4 * unit : anchorWidth;
+      // Opened at a point it needs only four squares; by an element, at least that element's width.
+      const least = (this.triggerMode === "context" || this.triggerMode === "manual") && this.contextPoint ? 4 * unit : anchorWidth;
       this.style.width = `${Math.min(room, Math.max(least, squares(natural, Math.ceil)))}px`;
     }
     if (this.placement === "right" || this.placement === "left" || this.triggerMode === "submenu") {

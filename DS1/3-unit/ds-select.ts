@@ -204,7 +204,7 @@ export class Select extends Menu {
     const select = this.control();
     const label = this.fieldName(select);
     const disabled = this.fieldDisabled ? "disabled" : "";
-    return html`<slot @slotchange=${this.observeControl}></slot><span aria-hidden="true" ?hidden=${this.listbox || Boolean(this.swatch)} class="arrow ${disabled}"></span>${this.swatch && !this.listbox ? html`<ds-swatch aria-hidden="true" .value=${this.swatch} class=${disabled}></ds-swatch>` : null}${this.listed ? html`<ds-menu class="list" id=${this.listId} floating role="listbox" trigger-mode="manual" aria-label=${label || nothing} .anchor=${this} ?open=${this.listOpen} @ds-menu-close=${this.onListClose}>${this.listOpen ? this.renderChoices() : nothing}</ds-menu>` : nothing}`;
+    return html`<slot @slotchange=${this.observeControl}></slot><span aria-hidden="true" ?hidden=${this.listbox || Boolean(this.swatch)} class="arrow ${disabled}"></span>${this.swatch && !this.listbox ? html`<ds-swatch aria-hidden="true" .value=${this.swatch} class=${disabled}></ds-swatch>` : null}${this.listed ? html`<ds-menu class="list" id=${this.listId} floating data-ds-hug role="listbox" trigger-mode="manual" aria-label=${label || nothing} .anchor=${this} ?open=${this.listOpen} @ds-menu-close=${this.onListClose}>${this.listOpen ? this.renderChoices() : nothing}</ds-menu>` : nothing}`;
   }
 }
 
