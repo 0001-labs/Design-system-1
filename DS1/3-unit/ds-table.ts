@@ -4,7 +4,8 @@
 // `sheet` it is a spreadsheet: every cell four squares by one, lettered
 // columns and numbered rows held in place while it scrolls both ways, and with
 // `reorderable` its rows move by the grip on their number: dragged with a
-// mouse, after a long press on a touch screen, or with Alt+↑/↓.
+// mouse, after a long press on a touch screen, or with Alt+↑/↓. A sheet's
+// words that do not fit fade out over their last square, never an ellipsis.
 
 import { LitElement, html, nothing, unsafeCSS, type PropertyValues } from "lit";
 import { getText } from "../0-face/i18n";
@@ -102,6 +103,9 @@ export class DsTable extends LitElement {
   /** A move waiting for the page's data, and the time it settles back without it. */
   private settle: { from: number; to: number; timer: ReturnType<typeof setTimeout> } | undefined;
   private status = "";
+  /** Measures the cells again when the sheet's size changes, as its scale does. */
+  private resize: ResizeObserver | undefined;
+  private watched: Element | undefined;
 
   constructor() {
     super();
@@ -114,8 +118,16 @@ export class DsTable extends LitElement {
 
   static styles = [unsafeCSS(metrics), unsafeCSS(table), unsafeCSS(styles)];
 
+  connectedCallback() {
+    super.connectedCallback();
+    // The faces may arrive after the first measure and change every width.
+    void document.fonts?.ready.then(() => { if (this.isConnected && this.sheet) this.fit(); });
+  }
+
   disconnectedCallback() {
     super.disconnectedCallback();
+    this.resize?.disconnect();
+    this.watched = undefined;
     this.release();
     if (this.settle) clearTimeout(this.settle.timer);
     this.settle = undefined;
@@ -126,6 +138,42 @@ export class DsTable extends LitElement {
     // New data puts every row where it belongs: the steps aside end in the same frame.
     if (changed.has("data") && this.settle) this.place(false);
     if (this.grip >= this.data.length) this.grip = Math.max(0, this.data.length - 1);
+  }
+
+  protected updated(changed: PropertyValues<this>) {
+    super.updated(changed);
+    if (!this.sheet) return;
+    // Before the first paint, so words that fit never show a fade.
+    if (["data", "columns", "footer", "sheet"].some(name => changed.has(name as keyof DsTable))) this.fit();
+    const table = this.table;
+    if (!table || table === this.watched || typeof ResizeObserver === "undefined") return;
+    this.resize ??= new ResizeObserver(() => this.fit());
+    this.resize.disconnect();
+    this.resize.observe(table);
+    this.watched = table;
+  }
+
+  /**
+   * Marks the cells whose words are cut, so only they fade where they are
+   * cut; a label fades at its end. A number always shows its last digits and loses its first: in a
+   * left-to-right sheet it is scrolled to its end and fades at its start;
+   * in a right-to-left one its digits already overflow on the left, the
+   * cell's end. All the reads come before any write, so it lays out once.
+   */
+  private fit() {
+    const words = [...this.renderRoot.querySelectorAll<HTMLElement>(".ds-table__words")];
+    if (!words.length) return;
+    const rtl = getComputedStyle(words[0]!).direction === "rtl";
+    const over = words.map(element => element.scrollWidth - element.clientWidth);
+    const scrolled = words.map((element, index) => !rtl && over[index]! > 0 && Boolean(element.parentElement?.matches("td[data-numeric]")));
+    words.forEach((element, index) => {
+      const left = scrolled[index] ? over[index]! : 0;
+      if (element.scrollLeft !== left) element.scrollLeft = left;
+    });
+    words.forEach((element, index) => {
+      const cut = over[index]! <= 0 ? undefined : scrolled[index] ? "start" : "end";
+      if (element.dataset.cut !== cut) { if (cut) element.dataset.cut = cut; else delete element.dataset.cut; }
+    });
   }
 
   private resolvedColumns(): TableColumn[] {
@@ -156,7 +204,7 @@ export class DsTable extends LitElement {
   private sheetRow(row: TableRow, columns: TableColumn[], number: string, index?: number) {
     const grip = this.reorderable && index !== undefined;
     return html`<tr><th scope="row" class="ds-table__number">${grip ? this.gripCell(number, index) : number}</th>${columns.map((column, index) =>
-      html`<td ?data-numeric=${column.numeric}>${text(cell(row, column.key, index))}</td>`)}</tr>`;
+      html`<td ?data-numeric=${column.numeric}><span class="ds-table__words">${text(cell(row, column.key, index))}</span></td>`)}</tr>`;
   }
 
   private gripCell(number: string, index: number) {
@@ -398,10 +446,10 @@ export class DsTable extends LitElement {
   private renderSheet(columns: TableColumn[]) {
     return html`
       <div class="ds-table-scroll" part="scroll" @pointerdown=${this.press} @touchmove=${{ handleEvent: this.holdTouch, passive: false }} @contextmenu=${this.holdMenu}>
-        <table class="ds-table" part="table" data-sheet ?data-reorderable=${this.reorderable} style=${`--ds-table-columns: ${columns.length}`} aria-label=${this.label ?? nothing}>
+        <table class="ds-table" part="table" data-sheet data-fit ?data-reorderable=${this.reorderable} style=${`--ds-table-columns: ${columns.length}`} aria-label=${this.label ?? nothing}>
           <thead>
             <tr class="ds-table__letters" aria-hidden="true"><td class="ds-table__number"></td>${columns.map((_, index) => html`<td>${columnLetter(index)}</td>`)}</tr>
-            <tr><td class="ds-table__number"></td>${columns.map(column => html`<th scope="col" ?data-numeric=${column.numeric}>${column.label}</th>`)}</tr>
+            <tr><td class="ds-table__number"></td>${columns.map(column => html`<th scope="col" ?data-numeric=${column.numeric}><span class="ds-table__words">${column.label}</span></th>`)}</tr>
           </thead>
           <tbody>${this.data.map((row, index) => this.sheetRow(row, columns, String(index + 1), index))}</tbody>
           ${this.footer ? html`<tfoot>${this.sheetRow(this.footer, columns, "")}</tfoot>` : nothing}

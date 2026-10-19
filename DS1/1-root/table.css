@@ -19,7 +19,13 @@
  *
  * `data-sheet` makes it a spreadsheet: every cell four squares by one (80 by
  * 20), its 1px lines at its end and foot so the words have 79 by 19, set 4px
- * in on the sixteen, as an Ezo item's are. Column letters and the row numbers
+ * in on the sixteen. Words that do not fit fade out over the last square
+ * where they are cut, never an ellipsis: put them in `.ds-table__words`,
+ * which carries the fade (a mask, so it fades to whatever is behind: the
+ * paper, a selected or hovered cell's fill). A table marked `data-fit`
+ * (`<ds-table sheet>` is) measures its cells and marks the cut ones
+ * `data-cut="end"`, or `"start"` for a number it has scrolled to its end, so
+ * words that fit never fade; without it every cell's end fades. Column letters and the row numbers
  * (`.ds-table__letters`, `.ds-table__number`, two squares wide) stay in place
  * while the sheet scrolls both ways inside `.ds-table-scroll`; give the table
  * `--ds-table-columns` (the number of data columns) and the scroll a height
@@ -161,10 +167,28 @@
   border-bottom: 1px solid var(--ds-table-rule);
   border-inline-end: 1px solid var(--ds-table-rule);
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 .ds-table[data-sheet] :is(th, td):last-child {
   padding-inline-end: var(--ds-table-text);
+}
+.ds-table[data-sheet] .ds-table__words {
+  --ds-table-fade-to: right;
+  --ds-table-fade-from: left;
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.ds-table[data-sheet]:dir(rtl) .ds-table__words {
+  --ds-table-fade-to: left;
+  --ds-table-fade-from: right;
+}
+/* Cut words fade over their last square to nothing, at the edge where they are cut. */
+.ds-table[data-sheet]:not([data-fit]) .ds-table__words,
+.ds-table[data-sheet] .ds-table__words[data-cut="end"] {
+  mask-image: linear-gradient(to var(--ds-table-fade-to), #000 calc(100% - var(--ds-table-row)), transparent);
+}
+.ds-table[data-sheet] .ds-table__words[data-cut="start"] {
+  mask-image: linear-gradient(to var(--ds-table-fade-from), #000 calc(100% - var(--ds-table-row)), transparent);
 }
 .ds-table[data-sheet] .ds-table__number {
   width: var(--ds-table-index);

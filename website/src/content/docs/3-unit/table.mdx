@@ -64,7 +64,7 @@ Give a `<table>` the `ds-table` class from the native controls stylesheet (`cont
 
 ## Sheet
 
-For a lot of data, as in a spreadsheet, give the table `sheet`. Every cell is four squares wide and one high, 80 by 20, with its 1px lines at its end and its foot, so its words have 79 by 19 and stand 4px in on the sixteen, as an Ezo item's do. Numbers keep to the column's end. A cell's words never widen it: what does not fit ends in an ellipsis. Above the column labels a row of letters (A, B … Z, AA …) names the columns, and a column two squares wide numbers the rows; both stay in place while the sheet scrolls both ways. A selected cell (`aria-selected="true"`) is ringed rather than filled. With `reorderable` the rows move by a grip on their number; see [Moving rows](#moving-rows).
+For a lot of data, as in a spreadsheet, give the table `sheet`. Every cell is four squares wide and one high, 80 by 20, with its 1px lines at its end and its foot, so its words have 79 by 19 and stand 4px in on the sixteen, as an Ezo item's do. Numbers keep to the column's end. A cell's words never widen it: what does not fit fades out over the cell's last square, never an ellipsis. The fade is on the words alone, so it fades into whatever is behind them, the paper or a selected or hovered cell's fill, and only where they are cut: words that fit stay whole. Words fade at their end; a number keeps its last digits against the column's end and fades its first ones, in either direction of writing. Above the column labels a row of letters (A, B … Z, AA …) names the columns, and a column two squares wide numbers the rows; both stay in place while the sheet scrolls both ways. A selected cell (`aria-selected="true"`) is ringed rather than filled. With `reorderable` the rows move by a grip on their number; see [Moving rows](#moving-rows).
 
 <ComponentExample example="table-sheet" />
 
@@ -75,16 +75,16 @@ sheet.columns = ["Item", { key: "sold", label: "Sold", numeric: true }];
 sheet.data = rows;
 ```
 
-On a native table, put `data-sheet` and `--ds-table-columns` (its number of data columns) on the `<table>`, a `.ds-table__letters` row and a `.ds-table__number` cell at the start of every row, and give `.ds-table-scroll` its height with `--ds-table-height`.
+On a native table, put `data-sheet` and `--ds-table-columns` (its number of data columns) on the `<table>`, a `.ds-table__letters` row and a `.ds-table__number` cell at the start of every row, the words of each cell in a `.ds-table__words` span, and give `.ds-table-scroll` its height with `--ds-table-height`. Without measuring, every cell's end fades; add `data-fit` to the table and mark the cut words yourself with `data-cut="end"` (or `"start"` for a number scrolled to its end) to fade only those, as `<ds-table sheet>` does.
 
 ```html
 <div class="ds-table-scroll" style="--ds-table-height: 400px">
   <table class="ds-table" data-sheet style="--ds-table-columns: 2">
     <thead>
       <tr class="ds-table__letters" aria-hidden="true"><td class="ds-table__number"></td><td>A</td><td>B</td></tr>
-      <tr><td class="ds-table__number"></td><th scope="col">Item</th><th scope="col" data-numeric>Sold</th></tr>
+      <tr><td class="ds-table__number"></td><th scope="col"><span class="ds-table__words">Item</span></th><th scope="col" data-numeric><span class="ds-table__words">Sold</span></th></tr>
     </thead>
-    <tbody><tr><th scope="row" class="ds-table__number">1</th><td>Atlas</td><td data-numeric>1,200</td></tr></tbody>
+    <tbody><tr><th scope="row" class="ds-table__number">1</th><td><span class="ds-table__words">Atlas</span></td><td data-numeric><span class="ds-table__words">1,200</span></td></tr></tbody>
   </table>
 </div>
 ```

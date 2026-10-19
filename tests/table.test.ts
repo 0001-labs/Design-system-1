@@ -173,3 +173,23 @@ test("the grip and the moving rows are drawn in table.css, in transform alone", 
   expect(rule(".ds-table[data-sheet] tbody tr[data-lifted] > :is(th, td)")).toContain("background: var(--ds-table-paper)");
   expect(css).toMatch(/prefers-reduced-motion: reduce\) \{\n  \.ds-table\[data-moving\] tbody tr/);
 });
+
+test("a sheet's words that do not fit fade over their last square, never an ellipsis", async () => {
+  expect(css).not.toContain("text-overflow: ellipsis");
+  const words = rule(".ds-table[data-sheet] .ds-table__words");
+  for (const part of ["display: block", "overflow: hidden", "white-space: nowrap"]) expect(words).toContain(part);
+  expect(css).toContain('.ds-table[data-sheet] .ds-table__words[data-cut="end"] {\n  mask-image: linear-gradient(to var(--ds-table-fade-to), #000 calc(100% - var(--ds-table-row)), transparent);');
+  expect(css).toContain('.ds-table[data-sheet] .ds-table__words[data-cut="start"] {\n  mask-image: linear-gradient(to var(--ds-table-fade-from), #000 calc(100% - var(--ds-table-row)), transparent);');
+  expect(rule(".ds-table[data-sheet]:dir(rtl) .ds-table__words")).toContain("--ds-table-fade-to: left");
+  // The fade is on the words alone, so a cell's fill and lines never fade.
+  expect(css).not.toMatch(/:is\(th, td\)[^{]*\{[^}]*mask-image/);
+  const table = document.createElement("ds-table");
+  table.sheet = true;
+  table.columns = ["Paper", { key: "sold", label: "Sold", numeric: true }];
+  table.data = [{ paper: "Recycled 170g", sold: 12 }];
+  document.body.append(table);
+  await table.updateComplete;
+  const root = table.shadowRoot!;
+  expect(root.querySelector("table")!.hasAttribute("data-fit")).toBe(true);
+  expect([...root.querySelectorAll("tbody td > .ds-table__words, thead th > .ds-table__words")].map(words => words.textContent)).toEqual(["Paper", "Sold", "Recycled 170g", "12"]);
+});
