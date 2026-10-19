@@ -61,7 +61,7 @@ const { sidebar } = Astro.locals.starlightRoute;
   };
   function rows(entries: Entry[], depth = 0, parent = ''): SidebarItem[] {
     return entries.flatMap((entry, index) => {
-      if (signedIn && entry.label === 'Start Here') return [];
+      if (signedIn && (entry.label === 'Start Here' || entry.label === 'My libraries')) return [];
       if (entry.href === '/app/libraries' && !signedIn) return [];
       const href = (entry.href === "/app/libraries" ? "/classless/libraries/" : entry.href) ?? (entry.entries ? overviewPaths[entry.label] : undefined);
       const id = href ?? `${parent}/group-${index}`;
