@@ -3,6 +3,8 @@ title: Document
 description: A page of terms, privacy, a legal notice or help, with contents and a definition table.
 ---
 
+import "../../../../../DS1/1-root/controls.css";
+
 import ComponentExample from "../../../components/ComponentExample.astro";
 
 A document page holds writing people read through or look things up in: terms, a privacy policy, a legal notice such as 特定商取引法に基づく表記, a help article. The contents stand at the start, twelve squares wide, and stay in view as the writing scrolls past; the writing, two squares after them, is a reading column of at most thirty-two squares, drawn by the [prose sheet](/1-root/prose/). Where the two do not fit side by side the contents stand above the writing and scroll away with it.
@@ -88,4 +90,4 @@ import { DocumentPage } from "./design/react/document";
 
 The writing is the children, so it renders on the server. The adapter does not register the element: import `4-page/ds-document` once in the browser entry.
 
-[Header](/4-page/header/) · [Footer](/4-page/footer/) · [Prose](/1-root/prose/) · [Table](/3-unit/table/)
+<p class="not-content" data-ds-not-prose>Example uses <a class="ds-link ds-link--plain" href="/4-page/header/">Header</a> · <a class="ds-link ds-link--plain" href="/4-page/footer/">Footer</a> · <a class="ds-link ds-link--plain" href="/1-root/prose/">Prose</a> · <a class="ds-link ds-link--plain" href="/3-unit/table/">Table</a></p>

@@ -3,6 +3,8 @@ title: Links
 description: Text links and links drawn as buttons, always real links the browser navigates.
 ---
 
+import "../../../../../DS1/1-root/controls.css";
+
 import ComponentExample from "../../../components/ComponentExample.astro";
 
 A destination is a link and an action is a button. Every link here is a real `<a href>`: the browser navigates, so middle-click, ⌘- or Ctrl-click, a new tab, Copy link and Enter all work. Nothing navigates from a click handler.
@@ -30,6 +32,16 @@ A destination is a link and an action is a button. Every link here is a real `<a
 | `--ds-link-visited-color` | `--ds-text-color-muted` | The ink of a visited link. |
 | `--ds-link-line-color` | The ink at 40% | The underline at rest. |
 | `--ds-link-hover-line-color` | The ink | The underline under the pointer. |
+
+## A plain text link
+
+Add `ds-link--plain` for a text link without an underline, including on hover. Use it in clearly labelled navigation or related-component lists. It keeps the normal link behaviour, visited colour and visible keyboard focus.
+
+<p class="not-content" data-ds-not-prose>Example uses <a class="ds-link ds-link--plain" href="/4-page/footer/">Footer</a> · <a class="ds-link ds-link--plain" href="/1-root/prose/">Prose</a> · <a class="ds-link ds-link--plain" href="/3-unit/table/">Table</a></p>
+
+```html
+<a class="ds-link ds-link--plain" href="/4-page/footer/">Footer</a>
+```
 
 ## A link that looks like a button
 

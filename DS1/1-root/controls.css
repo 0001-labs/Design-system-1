@@ -140,6 +140,11 @@ a.ds-button[aria-disabled="true"] {
   text-decoration-color: var(--ds-link-hover-line-color, currentColor);
 }
 
+/* Quiet navigation and related-component lists: no underline in any state. */
+.ds-link.ds-link--plain {
+  text-decoration: none;
+}
+
 .ds-link:focus-visible {
   outline: 2px solid var(--ds-focus-ring);
   outline-offset: 1px;
