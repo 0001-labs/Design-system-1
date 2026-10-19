@@ -5,8 +5,8 @@ description: Native writing, removable values and suggestions on the shared row 
 
 import ComponentExample from "../../../components/ComponentExample.astro";
 
-`ds-token-field` holds a native input, `ds-token` values and an optional `ds-menu`.
-The native input and menu choices stay in light DOM, preserving labels, native
+`ds-token-field` holds a native input, `ds-token` values and an optional
+[Select](/3-unit/select/) of suggestions. The native input and the choices stay in light DOM, preserving labels, native
 forms, validation, refs and combobox ARIA references. DS1 owns layout, chip faces,
 field focus, editing gestures and suggestion navigation. Products own candidate
 matching, parsing, validation messages and accepted values.
@@ -16,16 +16,16 @@ matching, parsing, validation messages and accepted values.
 <ds-token-field choose-label="Choose people" separators=",;">
   <ds-token value="one" label="First person" remove-label="Remove first person"></ds-token>
   <input id="people" type="text" autocomplete="off" />
-  <ds-menu slot="suggestions" aria-label="Choose people">
+  <ds-select slot="suggestions" role="listbox" aria-label="Choose people">
     <ds-button control="slotted"><button type="button" role="option">Second person</button></ds-button>
-  </ds-menu>
+  </ds-select>
 </ds-token-field>
 ```
 
 The field assigns stable option IDs, one active descendant and selected state.
-Menu keeps focus on the input during pointer selection and handles arrows, Enter,
+The Select keeps focus on the input during pointer selection and handles arrows, Enter,
 Escape, scrolling and viewport placement. Escape closes suggestions before a
-containing dialog. Home, End and text selection remain native editing keys.
+containing overlay. Home, End and text selection remain native editing keys.
 Without suggestions, the field leaves the native input role unchanged.
 
 Listen for `ds-token-commit` with `{text, reason}` (`enter`, `separator`, `input`,

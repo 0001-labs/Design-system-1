@@ -65,3 +65,18 @@ test('reconnect restores semantics and disabling a native fieldset blocks edits'
   host.remove(); expect(input.getAttribute('role')).toBe('searchbox'); document.querySelector('fieldset')!.append(host); await settle(); expect(input.getAttribute('role')).toBe('combobox');
   document.querySelector('fieldset')!.disabled=true; host.formDisabledCallback(true); input.value='one'; key(input,'Enter'); expect(commit).not.toHaveBeenCalled();
 });
+
+test('a Select takes the suggestions as the engine did: the field steers it and it stays open on a choice', async () => {
+  await import('../DS1/3-unit/ds-select');
+  document.body.innerHTML = '<label for="who">People</label><ds-token-field choose-label="Choose people"><input id="who"><ds-select slot="suggestions" role="listbox" aria-label="Choose people"><button role="option">One</button><button role="option">Two</button></ds-select></ds-token-field>';
+  const host = document.querySelector('ds-token-field')!, input = host.querySelector('input')!, list = host.querySelector('ds-select')!;
+  const settled = async () => { await settle(); await list.updateComplete; await settle(); };
+  await settled(); input.focus(); await settled();
+  expect(list.controller).toBe(input);
+  expect(list.getAttribute('role')).toBe('listbox');
+  expect(input.getAttribute('aria-expanded')).toBe('true');
+  key(input, 'ArrowDown'); await settled();
+  expect(document.getElementById(input.getAttribute('aria-activedescendant')!)?.textContent).toBe('Two');
+  list.querySelector<HTMLButtonElement>('button')!.click(); await Promise.resolve(); await settled();
+  expect(list.open).toBe(true);
+});

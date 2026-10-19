@@ -44,7 +44,7 @@ Every public piece of the web library has a native counterpart with the same nam
 | `ds-input`, `multiline` | `DS1Field` (`rows:`), `DS1FieldStyle` | `DS1Field(rows)` |
 | `ds-checkbox`, `ds-radio`, choice tiles | `DS1CheckboxStyle`, `DS1Checkbox`, `DS1Radio`, `DS1Choice` | `DS1Checkbox`, `DS1Radio`, `DS1Choice` |
 | `ds-switch`, `rounded` | `DS1SwitchStyle` (`.ds1Switch`, `.ds1Switch(rounded:)`) | `DS1Switch(rounded)` |
-| `ds-select` | `DS1Select` (the system's menu) | `DS1Select` |
+| `ds-select`, a field | `DS1Select` (the system's menu) | `DS1Select` |
 | `ds-tabs` | `DS1Tabs` | `DS1Tabs` |
 | `ds-badge`, `ds-token`, `ds-swatch`, link, `ds-gap` | `DS1Badge`, `DS1Token`, `DS1Swatch`, `DS1Link`, `DS1Gap` | `DS1Badge`, `DS1Token`, `DS1Swatch`, `DS1Link`, `DS1Gap` |
 | `ds-avatar`, `ds-avatar-group` | `DS1Avatar`, `DS1AvatarGroup` | `DS1Avatar`, `DS1AvatarGroup` |
@@ -53,7 +53,8 @@ Every public piece of the web library has a native counterpart with the same nam
 | `ds-cycle`, its language picker | `DS1Cycle`, `DS1ThemeCycle`, `DS1LanguageCycle` | `DS1Cycle`, `DS1ThemeCycle`, `DS1LanguageCycle` |
 | `toast()` and its stack | `DS1Toast`, `DS1ToastHost` | `DS1Toast`, `DS1ToastHost` |
 | `ds-overlay`, `alert`, `confirm`, `prompt` | `DS1OverlayBox`, `.ds1Overlay`, `DS1Overlays` | `DS1Overlay`, `DS1Overlays` |
-| `ds-menu` | `DS1Menu`, `DS1MenuItem` (floating menus are the system's) | `DS1Menu`, `DS1MenuItem` |
+| `ds-select`, a menu from a button | `DS1Menu`, `DS1MenuItem` (floating menus are the system's) | `DS1Menu`, `DS1MenuItem` |
+| `ds-context` | the system's context menu (`.contextMenu`) | the system's long-press menu |
 | `ds-accordion`, `ds-list`, `ds-panel` | `DS1Accordion`, `DS1List`, `DS1Panel` | `DS1Accordion`, `DS1List`, `DS1Panel` |
 | `ds-sidebar`, `ds-table`, `ds-token-field` | `DS1Sidebar`, `DS1Table`, `DS1TokenField` | `DS1Sidebar`, `DS1Table`, `DS1TokenField` |
 | `ds-page` and its layouts, tiles | `DS1Page`, `DS1PageLayout`, `DS1Tiles` | `DS1Page`, `DS1PageLayout`, `DS1Tiles` |

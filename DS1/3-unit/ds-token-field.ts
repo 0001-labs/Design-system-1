@@ -7,7 +7,7 @@ import styles from "./styles/ds-token-field.css?inline";
 let nextId = 0;
 export type TokenCommit = { text: string; reason: "enter" | "separator" | "input" | "blur" };
 /** Native field and ARIA targets stay together in light DOM. This component
- * owns chip layout, editing gestures and suggestion navigation through Menu. */
+ * owns chip layout, editing gestures and suggestion navigation through its Select (`ds-select slot="suggestions"`). */
 export class TokenField extends LitElement {
   static formAssociated = true;
   static properties = {
@@ -70,7 +70,7 @@ export class TokenField extends LitElement {
       menu.floating = true; menu.anchor = this; menu.controller = input;
       menu.trigger = this.shadowRoot?.querySelector<HTMLButtonElement>("button") ?? null;
       menu.open = this.expanded;
-      const choices = Array.from(menu.querySelectorAll<HTMLElement>('[role="option"]')).filter(option => option.closest("ds-menu") === menu);
+      const choices = Array.from(menu.querySelectorAll<HTMLElement>('[role="option"]')).filter(option => option.closest("ds-menu, ds-select") === menu);
       const options = choices.filter(option => !option.matches(':disabled, [disabled], [aria-disabled="true"]') && !option.closest("[hidden], [inert]"));
       for (const option of options) { if (!option.id) option.id = `${this.idPrefix}-option-${++this.optionId}`; option.tabIndex = -1; }
       if (!options.some(option => option.id === this.activeId)) this.activeId = options[0]?.id ?? "";

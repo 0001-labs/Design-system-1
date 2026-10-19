@@ -68,7 +68,7 @@ Below 30 squares of width every layout becomes one column, navigation first. The
 
 ## A drawer on a narrow page
 
-With `drawer`, the navigation folds away below 30 squares instead of standing above the work. A menu button stands in a one-square column before the header and opens the navigation in a drawer over the page, the same drawer the [Header](/4-page/header/#the-drawer) opens: focus stays inside it, Escape, its close button, a link or the page widening close it, and the page holds its scroll meanwhile. `ds-page-drawer` reports it opening and closing (`detail.open`); `openDrawer()` and `closeDrawer()` work it from code.
+With `drawer`, the navigation folds away below 30 squares instead of standing above the work. A menu button stands in a one-square column before the header and opens the navigation over the whole screen, the same [screen overlay](/4-page/overlay/#the-screen) the [Header](/4-page/header/) opens: focus stays inside it, Escape, its close button, a link or the page widening close it, and the page holds its scroll meanwhile. `ds-page-drawer` reports it opening and closing (`detail.open`); `openDrawer()` and `closeDrawer()` work it from code.
 
 ```html
 <ds-page layout="sidebar" drawer>

@@ -83,9 +83,10 @@ export class Select extends Menu {
   protected willUpdate(changed: PropertyValues) {
     // An action menu with an opener floats; one without stays in place.
     if (!this.field && !this.hasAttribute("floating") && (this.trigger || this.for)) this.floating = true;
-    this.closesOnChoice = !this.field;
+    // A field's suggestions (a controller steering it) close when the field says so.
+    this.closesOnChoice = !this.field && !this.controller;
     // A menu from a button fits its words, on whole squares.
-    this.toggleAttribute("data-ds-hug", !this.field && this.triggerMode !== "submenu");
+    this.toggleAttribute("data-ds-hug", !this.field && this.triggerMode !== "submenu" && !this.controller);
     super.willUpdate(changed);
   }
   focus(options?: FocusOptions) {
