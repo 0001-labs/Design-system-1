@@ -12,3 +12,8 @@ test('the shared page adapter is typed and renders ds-page with its layout and m
   expect(output).toContain('measure="28"');
   expect(output).toContain('<p>Work</p>');
 });
+
+test('the page adapter types the drawer of a narrow page', () => {
+  const output = renderToString(createElement(Page, { layout: 'sidebar', drawer: true, drawerLabel: 'Pages' }, createElement('nav', { slot: 'nav' }, 'Places')));
+  expect(output).toContain('drawer=""');
+});
