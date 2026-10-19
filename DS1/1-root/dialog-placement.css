@@ -73,7 +73,9 @@
   display: var(--ds-dialog-handle, block);
   position: sticky;
   z-index: 1;
-  top: calc((var(--ds-unit) - var(--ds-dialog-handle-height)) / 2 - var(--ds-dialog-line, 1px));
+  /* A sticky offset counts from the content edge, under the sheet's top padding: take that
+     padding off, so the handle is held where it already stands, in the first square. */
+  top: calc((var(--ds-unit) - var(--ds-dialog-handle-height)) / 2 - var(--ds-dialog-line, 1px) - var(--ds-dialog-within));
   flex: 0 0 auto;
   align-self: center;
   width: calc(2 * var(--ds-unit));

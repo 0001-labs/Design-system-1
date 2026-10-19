@@ -118,6 +118,31 @@ async function swipe(tab: Page, path: [number, number][], { gap = 16, hold = 0, 
   }, { path, gap, hold, prevent });
 }
 
+/** The rows of pixels, from the sheet's top, where the handle is drawn down the sheet's middle in its first two squares. */
+async function handleRows(tab: Page, box: { left: number; top: number; width: number }, square: number) {
+  const height = Math.round(2 * square);
+  const shot = (await tab.screenshot({ clip: { x: Math.round(box.left + box.width / 2) - 1, y: Math.round(box.top), width: 2, height } })).toString("base64");
+  return tab.evaluate(async ({ data, height }) => {
+    const image = await createImageBitmap(await (await fetch(`data:image/png;base64,${data}`)).blob());
+    const canvas = new OffscreenCanvas(image.width, image.height);
+    const context = canvas.getContext("2d")!;
+    context.drawImage(image, 0, 0);
+    const scale = image.height / height;
+    const probe = document.createElement("span");
+    document.body.append(probe);
+    probe.style.color = getComputedStyle(document.querySelector("dialog")!).getPropertyValue("--ds-dialog-handle-color") || "var(--ds-border-color)";
+    const handle = getComputedStyle(probe).color.match(/\d+/g)!.slice(0, 3).map(Number);
+    probe.remove();
+    const rows: number[] = [];
+    // Below the sheet's line, every row whose pixel is the handle's colour.
+    for (let y = 2; y < height; y++) {
+      const [r, g, b] = context.getImageData(0, Math.floor((y + 0.5) * scale), 1, 1).data;
+      if (Math.abs(r! - handle[0]!) + Math.abs(g! - handle[1]!) + Math.abs(b! - handle[2]!) < 12) rows.push(y);
+    }
+    return rows;
+  }, { data: shot, height });
+}
+
 const sheet = (content = rows(3), attributes = "") => `<ds-dialog placement="sheet" ${attributes}><dialog aria-label="Sheet">${content}</dialog></ds-dialog>`;
 const nativeSheet = (content = rows(3), placement = "sheet") => `<dialog class="ds-dialog ds-dialog--${placement}" aria-label="Sheet">${content}</dialog>`;
 
@@ -140,8 +165,12 @@ test("a sheet stands at the foot of a phone, as wide as it, on whole squares, wi
         expect(box.handle.display, label).toBe("block");
         expect(box.handle.width, label).toBeCloseTo(2 * square, 5);
         expect(box.handle.height, label).toBeCloseTo(4 * scale, 5);
-        // Centred in the first square, which holds the sheet's line (sticky top is measured inside it).
-        expect(box.handle.top, label).toBeCloseTo((square - 4 * scale) / 2 - 1, 5);
+        // Drawn centred in the first square: read the pixels down the sheet's middle, since a
+        // sticky offset is measured from the content edge, under the sheet's padding.
+        const drawn = await handleRows(tab, box, square);
+        expect(drawn.length, `${label}: the handle is drawn`).toBeGreaterThan(0);
+        expect(drawn.at(-1)!, `${label}: the handle stays in the first square`).toBeLessThan(square);
+        expect(Math.abs((drawn[0]! + drawn.at(-1)! + 1) / 2 - square / 2), `${label}: centred in it`).toBeLessThanOrEqual(1);
         expect(box.transform, `${label} at rest`).toMatch(/^(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
         expect(box.transition, label).toContain("transform");
       }
@@ -171,10 +200,14 @@ test("a tall sheet stops two squares below the top and scrolls, its handle stayi
   const scrolled = await tab.evaluate(() => {
     const dialog = document.querySelector("dialog")!;
     dialog.scrollTop = 200;
-    return { scrollTop: dialog.scrollTop, handleTop: getComputedStyle(dialog, "::before").top };
+    return { scrollTop: dialog.scrollTop };
   });
   expect(scrolled.scrollTop).toBe(200);
-  expect(scrolled.handleTop).toBe("7px");
+  await tab.evaluate(() => new Promise(requestAnimationFrame));
+  // Scrolled, the handle is still drawn in the middle of the first square.
+  const drawn = await handleRows(tab, box, UNIT);
+  expect(drawn.length).toBeGreaterThan(0);
+  expect(Math.abs((drawn[0]! + drawn.at(-1)! + 1) / 2 - UNIT / 2)).toBeLessThanOrEqual(1);
 });
 
 test("drawers are the screen's height and 16 squares wide, at the end or the start, with one line facing the page", async () => {
