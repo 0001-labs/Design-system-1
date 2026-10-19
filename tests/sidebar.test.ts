@@ -123,3 +123,69 @@ test("configured chevrons follow disclosure state without rotating the artwork",
   expect(icon().hasAttribute("data-open")).toBe(false);
   expect(sidebar.shadowRoot!.querySelector('.disclosure button')!.getAttribute("aria-label")).toBe("Collapse Section");
 });
+
+test("plus actions stay independent and all disabled row controls stay disabled", async () => {
+  const sidebar = await setup([{id: "pages", label: "Pages", expanded: true, action: {id: "add", label: "Add page", icon: "plus"}}]);
+  const action = vi.fn(), toggle = vi.fn(), activate = vi.fn();
+  sidebar.addEventListener("sidebar-action", action);
+  sidebar.addEventListener("sidebar-toggle", toggle);
+  sidebar.addEventListener("sidebar-activate", activate);
+  const button = sidebar.shadowRoot!.querySelector<HTMLButtonElement>('.action button')!;
+  expect(button.getAttribute('aria-label')).toBe('Add page: Pages');
+  expect(button.querySelector('ds-icon')!.getAttribute('type')).toBe('plus');
+  button.click();
+  expect(action.mock.calls[0][0].detail).toEqual({id: "pages", action: "add"});
+  expect(toggle).not.toHaveBeenCalled(); expect(activate).not.toHaveBeenCalled();
+  sidebar.items = [{...sidebar.items[0], disabled: true}];
+  await sidebar.updateComplete;
+  await Promise.all([...sidebar.shadowRoot!.querySelectorAll('ds-button')].map(button => button.updateComplete));
+  expect(button.disabled).toBe(true);
+  const disclosure = sidebar.shadowRoot!.querySelector<HTMLButtonElement>('.disclosure button')!;
+  expect(disclosure.disabled).toBe(true);
+  button.click(); disclosure.click();
+  expect(action).toHaveBeenCalledOnce(); expect(toggle).not.toHaveBeenCalled();
+});
+
+test("reorder requests stay opt-in, among siblings, and leave application state unchanged", async () => {
+  const items: SidebarItem[] = [
+    {id: "parent", label: "Parent", expanded: true},
+    {id: "a", label: "A", depth: 1},
+    {id: "disabled", label: "Disabled", depth: 1, disabled: true},
+    {id: "b", label: "B", depth: 1},
+    {id: "other", label: "Other", expanded: true},
+    {id: "c", label: "C", depth: 1},
+  ];
+  const sidebar = await setup(items), move = vi.fn(event => event.preventDefault());
+  sidebar.addEventListener("sidebar-move", move);
+  const request = (id: string, direction: string) => control(sidebar, id).dispatchEvent(new KeyboardEvent('keydown', {key: direction, altKey: true, bubbles: true, cancelable: true}));
+  request("a", "ArrowDown"); expect(move).not.toHaveBeenCalled();
+  sidebar.reorderable = true; await sidebar.updateComplete;
+  request("a", "ArrowDown");
+  expect(move.mock.calls[0][0].detail).toEqual({id: "a", targetId: "b", position: "after"});
+  expect(sidebar.items).toBe(items);
+  request("b", "ArrowDown"); expect(move).toHaveBeenCalledOnce();
+  request("b", "ArrowUp"); expect(move.mock.calls[1][0].detail).toEqual({id: "b", targetId: "a", position: "before"});
+});
+
+test("desktop drops reject external and disabled moves and clear their indicator", async () => {
+  const sidebar = await setup([{id: 'a', label: 'A'}, {id: 'b', label: 'B'}]);
+  sidebar.reorderable = true; await sidebar.updateComplete;
+  const rows = sidebar.shadowRoot!.querySelectorAll<HTMLElement>('.row');
+  const move = vi.fn(); sidebar.addEventListener('sidebar-move', move);
+  const transfer = {setData: vi.fn(), effectAllowed: '', dropEffect: ''};
+  function drag(row: HTMLElement, type: string) {
+    const event = new Event(type, {bubbles: true, cancelable: true});
+    Object.defineProperties(event, {dataTransfer: {value: transfer}, clientY: {value: 10}});
+    row.dispatchEvent(event); return event;
+  }
+  expect(drag(rows[1], 'dragover').defaultPrevented).toBe(false);
+  drag(rows[0], 'dragstart');
+  expect(drag(rows[1], 'dragover').defaultPrevented).toBe(true);
+  drag(rows[1], 'drop');
+  expect(move.mock.calls[0][0].detail).toEqual({id:'a', targetId:'b', position:'after'});
+  expect(rows[1].hasAttribute('data-drop')).toBe(false);
+  drag(rows[0], 'dragstart');
+  sidebar.reorderable = false; await sidebar.updateComplete;
+  drag(rows[1], 'dragover'); drag(rows[1], 'drop');
+  expect(move).toHaveBeenCalledOnce();
+});

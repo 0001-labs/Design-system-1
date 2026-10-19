@@ -115,3 +115,14 @@ ds-icon[data-open] { transform: rotate(90deg); }
   .tree .item[aria-selected="true"] { outline: 1px solid Highlight; outline-offset: -1px; }
   .tree .item:focus-visible { outline-color: Highlight; }
 }
+
+/* Extend the native destination over the row without moving its words or chevron.
+   Independent disclosure and action controls stand above this hit area. */
+.row { position: relative; isolation: isolate; }
+.choice, .choice > :is(a, button) { position: static; }
+.choice > :is(a, button)::after { content: ""; position: absolute; inset: 0; cursor: pointer; }
+.row[data-disabled] .choice > button::after { cursor: default; }
+.row > .disclosure, .row > .action { position: relative; z-index: 1; }
+.row:has(.choice > :focus-visible) { outline: 2px solid var(--ds-focus-ring); outline-offset: -2px; }
+.row[data-drop="before"] { box-shadow: inset 0 1px var(--ds-text-color); }
+.row[data-drop="after"] { box-shadow: inset 0 -1px var(--ds-text-color); }

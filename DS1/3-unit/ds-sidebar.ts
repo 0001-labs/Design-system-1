@@ -28,8 +28,12 @@ export interface SidebarItem {
   disabled?: boolean;
   /** Small muted words at the row's end: a count, a size. */
   meta?: string;
-  action?: { id: string; label: string };
+  action?: { id: string; label: string; icon?: string; disabled?: boolean };
+  /** Opt this row out of an enabled navigation reorder surface. */
+  reorderable?: boolean;
 }
+
+export interface SidebarMoveDetail { id: string; targetId: string; position: "before" | "after"; }
 
 /**
  * Compact navigation composed from Row, Button and Icon: the application's
@@ -62,6 +66,7 @@ export class Sidebar extends LitElement {
     expandIcon: { type: String, attribute: "expand-icon" },
     collapseIcon: { type: String, attribute: "collapse-icon" },
     tree: { type: Boolean, reflect: true },
+    reorderable: { type: Boolean, reflect: true },
   };
   declare items: SidebarItem[];
   declare label: string;
@@ -70,6 +75,8 @@ export class Sidebar extends LitElement {
   declare expandIcon?: string;
   declare collapseIcon?: string;
   declare tree: boolean;
+  declare reorderable: boolean;
+  private dragId?: string;
   static styles = unsafeCSS(styles);
 
   /** In a tree, the row that holds the Tab stop. */
@@ -81,6 +88,7 @@ export class Sidebar extends LitElement {
     this.label = "Navigation";
     this.empty = "No items";
     this.tree = false;
+    this.reorderable = false;
   }
 
   private resizeObserver?: ResizeObserver;
@@ -98,12 +106,14 @@ export class Sidebar extends LitElement {
   }
 
   disconnectedCallback() {
+    this.clearDrag();
     this.resizeObserver?.disconnect();
     super.disconnectedCallback();
   }
 
   updated() {
     this.markCutLabels();
+    if (this.dragId && !this.canMove(this.items.find(item => item.id === this.dragId))) this.clearDrag();
   }
 
   /** Only a label that does not fit its row gets a tooltip, holding the whole label. */
@@ -122,6 +132,7 @@ export class Sidebar extends LitElement {
   }
 
   private toggle(item: SidebarItem) {
+    if (item.disabled) return;
     this.request("toggle", { id: item.id, expanded: !item.expanded });
   }
 
@@ -225,7 +236,63 @@ export class Sidebar extends LitElement {
     </div><slot name="footer"></slot>`;
   }
 
+  private canMove(item?: SidebarItem): item is SidebarItem {
+    return Boolean(this.reorderable && !this.tree && item && !item.disabled && item.reorderable !== false);
+  }
+
+  private parent(item: SidebarItem): string | undefined {
+    const depth = item.depth ?? 0;
+    return this.items.slice(0, this.items.indexOf(item)).reverse().find(row => (row.depth ?? 0) < depth)?.id;
+  }
+
+  private moveAllowed(source?: SidebarItem, target?: SidebarItem): boolean {
+    return this.canMove(source) && this.canMove(target) && source.id !== target.id &&
+      (source.depth ?? 0) === (target.depth ?? 0) && this.parent(source) === this.parent(target);
+  }
+
+  private clearDrag() {
+    this.dragId = undefined;
+    this.renderRoot.querySelectorAll("[data-drop]").forEach(row => row.removeAttribute("data-drop"));
+  }
+
+  private dragStart(event: DragEvent, item: SidebarItem) {
+    if (!this.canMove(item) || !event.dataTransfer || event.composedPath().some(node =>
+      node instanceof HTMLElement && (node.classList.contains("action") || node.classList.contains("disclosure")))) {
+      event.preventDefault(); return;
+    }
+    this.dragId = item.id;
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", item.id);
+  }
+
+  private dragOver(event: DragEvent, target: SidebarItem) {
+    this.renderRoot.querySelectorAll("[data-drop]").forEach(row => row.removeAttribute("data-drop"));
+    if (!this.moveAllowed(this.items.find(item => item.id === this.dragId), target)) return;
+    event.preventDefault();
+    if (event.dataTransfer) event.dataTransfer.dropEffect = "move";
+    const row = event.currentTarget as HTMLElement;
+    const bounds = row.getBoundingClientRect();
+    row.dataset.drop = event.clientY < bounds.top + bounds.height / 2 ? "before" : "after";
+  }
+
+  private drop(event: DragEvent, target: SidebarItem) {
+    const source = this.items.find(item => item.id === this.dragId);
+    const position = (event.currentTarget as HTMLElement).dataset.drop;
+    if (this.moveAllowed(source, target) && (position === "before" || position === "after")) {
+      event.preventDefault();
+      this.request("move", { id: source!.id, targetId: target.id, position } satisfies SidebarMoveDetail);
+    }
+    this.clearDrag();
+  }
+
   private navigate(event: KeyboardEvent, item: SidebarItem) {
+    if (event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey && this.canMove(item) && (event.key === "ArrowUp" || event.key === "ArrowDown")) {
+      event.preventDefault();
+      const siblings = this.items.filter(row => this.moveAllowed(item, row) || row.id === item.id);
+      const target = siblings[siblings.indexOf(item) + (event.key === "ArrowUp" ? -1 : 1)];
+      if (target) this.request("move", { id: item.id, targetId: target.id, position: event.key === "ArrowUp" ? "before" : "after" } satisfies SidebarMoveDetail);
+      return;
+    }
     if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
     const index = this.items.indexOf(item);
     let target: SidebarItem | undefined;
@@ -251,10 +318,16 @@ export class Sidebar extends LitElement {
     return html`<slot name="header"></slot><nav aria-label=${this.label}>
       ${repeat(this.items, item => item.id, item => html`
         <ds-row class="row" ?data-current=${item.current} ?data-disabled=${item.disabled}
-          style=${`--depth:${Math.max(0, item.depth ?? 0)}`}>
+          style=${`--depth:${Math.max(0, item.depth ?? 0)}`}
+          draggable=${this.canMove(item) ? "true" : "false"}
+          @dragstart=${(event: DragEvent) => this.dragStart(event, item)}
+          @dragover=${(event: DragEvent) => this.dragOver(event, item)}
+          @dragleave=${(event: DragEvent) => { if (!(event.currentTarget as HTMLElement).contains(event.relatedTarget as Node | null)) (event.currentTarget as HTMLElement).removeAttribute("data-drop"); }}
+          @drop=${(event: DragEvent) => this.drop(event, item)}
+          @dragend=${() => this.clearDrag()}>
           <ds-button control="slotted" class="choice" ?disabled=${item.disabled}>
             ${item.href && !item.disabled ? html`
-              <a href=${item.href} data-item=${item.id} aria-current=${ifDefined(item.current ? "page" : undefined)}
+              <a href=${item.href} draggable=${ifDefined(this.reorderable ? "false" : undefined)} data-item=${item.id} aria-current=${ifDefined(item.current ? "page" : undefined)}
                 @click=${(event: MouseEvent) => this.activate(event, item)}
                 @keydown=${(event: KeyboardEvent) => this.navigate(event, item)}><span class="name">${item.icon ? html`<ds-icon type=${item.icon} aria-hidden="true"></ds-icon>` : nothing}${item.label}</span></a>` : html`
               <button type="button" data-item=${item.id} ?disabled=${item.disabled}
@@ -264,7 +337,7 @@ export class Sidebar extends LitElement {
                 @keydown=${(event: KeyboardEvent) => this.navigate(event, item)}><span class="name">${item.icon ? html`<ds-icon type=${item.icon} aria-hidden="true"></ds-icon>` : nothing}${item.label}</span></button>`}
           </ds-button>
           ${item.expanded !== undefined ? html`
-            <ds-button control="slotted" icon class="disclosure">
+            <ds-button control="slotted" icon class="disclosure" ?disabled=${item.disabled}>
               <button type="button" aria-label=${`${item.expanded ? "Collapse" : "Expand"} ${item.label}`}
                 aria-expanded=${item.expanded} @click=${() => this.toggle(item)}>
                 <ds-icon type=${(item.expanded ? this.collapseIcon : this.expandIcon) || "right"} aria-hidden="true" ?data-open=${item.expanded && !this.collapseIcon}></ds-icon>
@@ -272,9 +345,9 @@ export class Sidebar extends LitElement {
             </ds-button>` : nothing}
           <span class="spacer" aria-hidden="true"></span>
           ${item.meta ? html`<span class="meta">${item.meta}</span>` : nothing}
-          ${item.action ? html`<ds-button control="slotted" fit class="action"><button type="button"
+          ${item.action ? html`<ds-button control="slotted" ?fit=${!item.action.icon} ?icon=${Boolean(item.action.icon)} class="action" ?disabled=${item.disabled || item.action.disabled}><button type="button"
             aria-label=${`${item.action.label}: ${item.label}`}
-            @click=${() => this.request("action", { id: item.id, action: item.action!.id })}>${item.action.label}</button></ds-button>` : nothing}
+            @click=${() => { if (!item.disabled && !item.action?.disabled) this.request("action", { id: item.id, action: item.action!.id }); }}>${item.action.icon ? html`<ds-icon type=${item.action.icon} aria-hidden="true"></ds-icon>` : item.action.label}</button></ds-button>` : nothing}
         </ds-row>`)}
       ${this.items.length ? nothing : html`<p class="empty" role="status">${this.empty}</p>`}
     </nav><slot name="footer"></slot>`;

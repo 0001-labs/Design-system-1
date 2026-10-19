@@ -83,3 +83,28 @@ A page without Lit draws the tree with the classes in `row.css`, which `controls
 [Row](/3-unit/row/) · [Button](/2-core/button/) · [Icon](/2-core/icon/)
 
 Use `expand-icon="chevron-down" collapse-icon="chevron-up"` for vertical navigation disclosures. These optional icon names change the navigation buttons only; tree disclosures keep their directional arrow.
+
+
+## Whole rows and independent actions
+
+The native link or button covers the whole navigation row, including its empty space. Its text, indentation and disclosure stay in the same place. A section with no `href` toggles when pressed anywhere; a linked section still navigates and has a separate disclosure button. Optional actions remain independent of both.
+
+An icon action uses the same action event and keeps its accessible label:
+
+```ts
+sidebar.items = [
+  { id: "pages", label: "Pages", expanded: true,
+    action: { id: "create", label: "Add page", icon: "plus" } },
+  { id: "intro", label: "Introduction", depth: 1, href: "/intro" },
+];
+```
+
+Set `action.disabled` to disable only that action; `item.disabled` disables all of the row's controls. No plus button appears unless the application supplies it.
+
+## Optional reordering
+
+Set `sidebar.reorderable = true` to enable desktop HTML drag-and-drop in navigation mode. Drop in the top or bottom half of a sibling row to request a move before or after it. Alt+Up and Alt+Down request the same moves from the keyboard. Set an item's `reorderable: false` to exclude it. Disabled rows, other parents, external drags and tree mode are excluded. Touch dragging and reparenting are not implemented.
+
+`sidebar-move` carries `{ id, targetId, position: "before" | "after" }`. The component never changes or saves `items`: validate permissions and the hierarchy in the application, move the whole subtree when moving a parent, then replace `items` if the move is accepted. Keep `reorderable` false while saving. A rejected request leaves the order intact. After accepting a keyboard move, call `focusItem(id)` after `updateComplete` to retain focus. Supply translated keyboard guidance alongside any reorderable surface.
+
+The React adapter exposes `reorderable`, `onMove`, `expandIcon` and `collapseIcon` as props. These options are off unless supplied; the documentation navigation does not enable editing or reordering.
