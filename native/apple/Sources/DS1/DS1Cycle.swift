@@ -33,33 +33,17 @@ public struct DS1ThemeCycle: View {
     }
 }
 
-/// the language cycle: the language picker. Eight squares by one less the 1-point correction (four
-/// with `compact`), on the fill, the current language named in itself; a press steps to the
-/// next of the product's languages and saves it. `chip` hugs the name.
+/// A normal button that fits the language name. Legacy compact and chip arguments remain compatible.
 public struct DS1LanguageCycle: View {
-    @Environment(\.ds1Scale) private var scale
     @ObservedObject private var words = DS1Words.shared
-    let compact: Bool
-    let chip: Bool
     let primary: Bool
-    public init(compact: Bool = false, chip: Bool = false, primary: Bool = false) { self.compact = compact; self.chip = chip; self.primary = primary }
+    public init(compact: Bool = false, chip: Bool = false, primary: Bool = false) { self.primary = primary }
 
     public var body: some View {
         let name = words.language.nativeLabel
-        Group {
-            if chip {
-                Button(name) { DS1Preferences.shared.saveLanguage(words.next()) }.buttonStyle(.ds1(primary ? .primary : .secondary))
-            } else {
-                Button { DS1Preferences.shared.saveLanguage(words.next()) } label: {
-                    DS1ControlText(name, colour: primary ? .onAccent : .text)
-                        .environment(\.locale, Locale(identifier: words.language.code))
-                        .padding(.horizontal, scale(4))
-                        .frame(width: scale.squares(compact ? 4 : 8) - DS1Metrics.line, height: scale.unit - DS1Metrics.line, alignment: .leading)
-                        .background(primary ? DS1Color.accent : DS1Color.fill)
-                }
-                .buttonStyle(.plain)
-            }
-        }
-        .accessibilityLabel("\(words.text("Language")): \(name)")
+        Button(name) { DS1Preferences.shared.saveLanguage(words.next()) }
+            .buttonStyle(.ds1(primary ? .primary : .secondary))
+            .environment(\.locale, Locale(identifier: words.language.code))
+            .accessibilityLabel("\(words.text("Language")): \(name)")
     }
 }
