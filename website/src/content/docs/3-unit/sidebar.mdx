@@ -81,3 +81,5 @@ A page without Lit draws the tree with the classes in `row.css`, which `controls
 `connectSidebar` sends the same three events, named by each row's `data-id` (or its `id`). Unless the page cancels one, it does what the event asks: it opens or closes the row and hides or shows the rows inside it, keeping a closed row's rows hidden, or moves `aria-selected` to the row. It returns a function that takes the keyboard away again. The arrow is the library's `right` icon, turned down on an open row; `--ds-sidebar-disclosure` names another drawing. Navigation rows without Lit are [`a.ds-row.ds-row--nav`](/3-unit/row/#navigation-rows).
 
 [Row](/3-unit/row/) · [Button](/2-core/button/) · [Icon](/2-core/icon/)
+
+Use `expand-icon="chevron-down" collapse-icon="chevron-up"` for vertical navigation disclosures. These optional icon names change the navigation buttons only; tree disclosures keep their directional arrow.

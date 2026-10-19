@@ -59,11 +59,16 @@ export class Sidebar extends LitElement {
     items: { attribute: false },
     label: { type: String },
     empty: { type: String },
+    expandIcon: { type: String, attribute: "expand-icon" },
+    collapseIcon: { type: String, attribute: "collapse-icon" },
     tree: { type: Boolean, reflect: true },
   };
   declare items: SidebarItem[];
   declare label: string;
   declare empty: string;
+  /** Optional navigation disclosure pair; tree navigation keeps its directional arrow. */
+  declare expandIcon?: string;
+  declare collapseIcon?: string;
   declare tree: boolean;
   static styles = unsafeCSS(styles);
 
@@ -262,7 +267,7 @@ export class Sidebar extends LitElement {
             <ds-button control="slotted" icon class="disclosure">
               <button type="button" aria-label=${`${item.expanded ? "Collapse" : "Expand"} ${item.label}`}
                 aria-expanded=${item.expanded} @click=${() => this.toggle(item)}>
-                <ds-icon type="right" aria-hidden="true" ?data-open=${item.expanded}></ds-icon>
+                <ds-icon type=${(item.expanded ? this.collapseIcon : this.expandIcon) || "right"} aria-hidden="true" ?data-open=${item.expanded && !this.collapseIcon}></ds-icon>
               </button>
             </ds-button>` : nothing}
           <span class="spacer" aria-hidden="true"></span>

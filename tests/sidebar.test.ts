@@ -105,3 +105,21 @@ test("rows carry no browser title; only a label cut short shows the whole label 
     expect(control(sidebar, "long").hasAttribute("data-tooltip")).toBe(false);
   } finally { vi.restoreAllMocks(); }
 });
+
+test("configured chevrons follow disclosure state without rotating the artwork", async () => {
+  const sidebar = await setup([{ id: "section", label: "Section", expanded: false }]);
+  sidebar.expandIcon = "chevron-down";
+  sidebar.collapseIcon = "chevron-up";
+  await sidebar.updateComplete;
+  const icon = () => sidebar.shadowRoot!.querySelector('.disclosure ds-icon')!;
+  expect(icon().getAttribute("type")).toBe("chevron-down");
+  const toggle = vi.fn();
+  sidebar.addEventListener("sidebar-toggle", toggle);
+  sidebar.shadowRoot!.querySelector<HTMLButtonElement>('.disclosure button')!.click();
+  expect(toggle.mock.calls[0][0].detail).toEqual({ id: "section", expanded: true });
+  sidebar.items = [{ id: "section", label: "Section", expanded: true }];
+  await sidebar.updateComplete;
+  expect(icon().getAttribute("type")).toBe("chevron-up");
+  expect(icon().hasAttribute("data-open")).toBe(false);
+  expect(sidebar.shadowRoot!.querySelector('.disclosure button')!.getAttribute("aria-label")).toBe("Collapse Section");
+});
