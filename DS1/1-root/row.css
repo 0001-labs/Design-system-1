@@ -345,6 +345,11 @@ button.ds-row[aria-disabled="true"]:hover::after {
   border-radius: var(--ds-row-radius, var(--ds-row-fill-radius, calc(4px * var(--ds-sf))));
   background: var(--ds-row-fill-current, var(--ds-fill-hover));
 }
+/* A plain row (no press target inside) has no padding of its own: its words stand on the row's
+   edges, so the layer reaches the overhang past them, as a flush row's does. */
+.ds-row[data-open]:not([data-open="false"]):not(a, button, .ds-row--stacked, .ds-row--auto, :has(.ds-row__target))::after {
+  inset: 0 calc(-1 * var(--ds-row-overhang));
+}
 .ds-row[data-open]:is(.ds-row--stacked, .ds-row--auto)::after { inset: 0; }
 @media (forced-colors: active) {
   .ds-row[data-open]:not([data-open="false"])::after { outline: 1px solid Highlight; outline-offset: -1px; }

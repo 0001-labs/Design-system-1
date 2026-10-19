@@ -311,6 +311,9 @@ for (const scheme of SCHEMES) for (const sf of SCALES) {
     for (const s of states) expect(s.height).toBeCloseTo(20 * sf, 1);
     const cells = await page.locator("tbody th, tbody td").evaluateAll(els => els.map(el => getComputedStyle(el).backgroundColor));
     expect(cells).toEqual([states[0]!.fill, states[0]!.fill]);
+    // A plain row's words stand on its edges: the open layer reaches four past them, on its square.
+    const plain = await page.locator("#swipe-detail").evaluate(el => { const s = getComputedStyle(el, "::after"); return [s.top, s.bottom, s.left, s.right].map(parseFloat); });
+    expect(plain).toEqual([0, 0, -4 * sf, -4 * sf]);
     await page.evaluate(async () => {
       const el = document.querySelector("ds-row")! as HTMLElement & { open: boolean; updateComplete: Promise<unknown> };
       el.open = false;
