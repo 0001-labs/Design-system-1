@@ -294,3 +294,20 @@ test("no calendar names a product", () => {
     expect(readFileSync(join(import.meta.dirname, "../DS1", file), "utf8")).not.toMatch(/\b(Ezo|Link|Consistency|Peer|Ins|tau99)\b/);
   }
 });
+
+
+test("activity squares retain date labels and update their event fills", async () => {
+  const calendar = await mount<Large>('<ds-calendar-large activity no-header start="2026-10" months="1"></ds-calendar-large>');
+  calendar.events = [{ title: "Purchase", start: "2026-10-08", color: "var(--ds-yellow)" }];
+  await calendar.updateComplete;
+  expect(calendar.style.getPropertyValue("--ds-calendar-scale")).toBe("1");
+  expect(cell(calendar, "2026-10-08")?.hasAttribute("data-filled")).toBe(true);
+  expect(cell(calendar, "2026-10-09")?.hasAttribute("data-filled")).toBe(false);
+  expect(cell(calendar, "2026-10-08")?.getAttribute("title")).toContain("Purchase");
+  calendar.events = [];
+  await calendar.updateComplete;
+  expect(cell(calendar, "2026-10-08")?.hasAttribute("data-filled")).toBe(false);
+  calendar.activity = false;
+  await calendar.updateComplete;
+  expect(calendar.style.getPropertyValue("--ds-calendar-scale")).toBe("1.5");
+});

@@ -176,3 +176,17 @@ The day arithmetic the calendars use is `DS1/0-face/calendar.ts`, plain TypeScri
 | `--ds-calendar-event-fill` | The fill (Apple green in the large calendar) | An event without a colour. |
 | `--ds-calendar-line` | `1px solid var(--ds-border-color)` | A month's lines. |
 | `--ds-calendar-ink` | `var(--ds-text-color)` | The large calendar's lines and selected day. |
+
+### Activity squares
+
+Use `activity` on `ds-calendar-large` for a compact contribution-style grid.
+It defaults to one grid square per day, separates the squares, and fills dates
+with their event colours. Dates and event descriptions remain available to
+assistive technology and in a tooltip. Use `no-header` for a fixed month.
+
+```html
+<ds-calendar-large activity no-header start="2026-10" months="1"></ds-calendar-large>
+```
+
+Set `events` as a property, as with the full calendar. Days without events stay
+quiet; repeated events on one day do not increase the colour intensity.
