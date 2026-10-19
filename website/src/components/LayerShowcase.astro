@@ -132,7 +132,8 @@ const cards = [
   .type-sample { font-size:calc(4 * var(--u)); line-height:calc(4 * var(--u)); }
   .type-sample span { display:block; font-size:var(--ds-type-size-default,14px); line-height:var(--u); margin-top:var(--u); }
   .theme-pair { display:flex; }
-  .theme-pair span { width:calc(4 * var(--u)); height:calc(4 * var(--u)); background:var(--ds-white,#fff); color:var(--ds-black); padding:var(--u); font-size:calc(2 * var(--u)); line-height:calc(2 * var(--u)); }
+  /* Aa on one line of two squares: half a square at the sides leaves three squares for its 40px type. */
+  .theme-pair span { width:calc(4 * var(--u)); height:calc(4 * var(--u)); background:var(--ds-white,#fff); color:var(--ds-black); padding:var(--u) calc(var(--u) / 2); font-size:calc(2 * var(--u)); line-height:calc(2 * var(--u)); white-space:nowrap; overflow:hidden; }
   .theme-pair span+span { background:var(--ds-black); color:var(--ds-white,#fff); }
   .words, .values { display:grid; font-size:var(--ds-type-size-display,20px); line-height:calc(2 * var(--u)); }
   .words span:nth-child(2) { color:var(--ds-text-color-muted); }
