@@ -1,5 +1,6 @@
 import { mountShowcase } from "./showcase-runtime";
 import { mountChartExample } from './chart-example';
+import { fillSheetExample } from './sheet-example';
 import { EXAMPLES, MATRIX_DATA, TABLE_DATA, TABLE_FOOTER, calendarEvents } from './component-examples';
 import type { DsTable } from '../../../DS1/3-unit/ds-table';
 import type { SidebarItem } from '../../../DS1/3-unit/ds-sidebar';
@@ -153,7 +154,8 @@ if (grid) sample.querySelectorAll<HTMLSelectElement>('[data-grid-option]').forEa
   });
 });
 const table = sample.querySelector<DsTable>('ds-table');
-if (table && !table.hasAttribute("data-showcase-props")) Object.assign(table, { data: TABLE_DATA, footer: TABLE_FOOTER });
+if (table?.hasAttribute('sheet')) fillSheetExample(table);
+else if (table && !table.hasAttribute("data-showcase-props")) Object.assign(table, { data: TABLE_DATA, footer: TABLE_FOOTER });
 // A tooltip example should show the label on first sight, before someone
 // knows that they need to hover. Use its real hover behaviour for the demo.
 sample.querySelectorAll('ds-tooltip').forEach(tooltip => {
