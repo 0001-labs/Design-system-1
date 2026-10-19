@@ -50,7 +50,7 @@ type FieldProps = SelectHTMLAttributes<HTMLSelectElement> & {
   /** Keep the platform's own picker. */
   native?: boolean;
 };
-type MenuOnly = Omit<MenuProps, "tag"> & { items?: SelectEntry[] };
+type MenuOnly = Omit<MenuProps, "tag" | "onChange"> & { items?: SelectEntry[] };
 export type SelectProps = (FieldProps & { trigger?: undefined; items?: undefined }) | (MenuOnly & { trigger?: HTMLElement | null; open?: boolean });
 
 const isMenu = (props: SelectProps): props is MenuOnly & { trigger?: HTMLElement | null } =>

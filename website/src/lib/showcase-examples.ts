@@ -347,8 +347,8 @@ export const SHOWCASE_EXAMPLES: Record<string, ComponentExample> = {
   },
   "menu-recording": {
     "title": "Actions for a recording",
-    "hint": "Menu actions pair real icons and short labels on one-square rows.",
-    "html": "<section class=\"specimen\">\n<ds-menu open aria-label=\"Recording actions\"><ds-button secondary><span class=\"mark\"><ds-icon type=\"download\" size=\"large\" aria-hidden=\"true\"></ds-icon></span>Download</ds-button><ds-button secondary><span class=\"mark\"><ds-icon type=\"duplicate\" size=\"large\" aria-hidden=\"true\"></ds-icon></span>Duplicate</ds-button><ds-button secondary><span class=\"mark\"><ds-icon type=\"archive\" size=\"large\" aria-hidden=\"true\"></ds-icon></span>Archive</ds-button></ds-menu>\n</section>\n<style>\n.specimen { width: 100%; min-width: 0; --cell: calc(20px * var(--sf, 1)); }\n.specimen .line { width: 100%; }\n.specimen .grow { flex: 1; min-width: 0; }\n.specimen .muted { color: var(--ds-text-color-muted); }\n.specimen .mono { --ds-typeface-regular: var(--ds-typeface-mono); font-variant-numeric: tabular-nums; }\n.specimen .value { width: calc(4 * var(--cell)); text-align: right; }\n.specimen .mark { display: inline-flex; align-items: flex-end; width: var(--cell); height: var(--ds-control-height); flex: 0 0 var(--cell); }\n.specimen .columns { display: flex; flex-wrap: wrap; gap: var(--cell); }\n.specimen .columns > * { min-width: 0; }\n.specimen fieldset { border: 0; padding: 0; margin: 0; }\n.specimen legend { padding: 0; }\n.specimen label { display: flex; align-items: flex-end; gap: calc(var(--cell) / 2); min-height: var(--cell); }\n.specimen ds-panel { height: calc(10 * var(--cell)); }\n</style>",
+    "hint": "A Select's actions pair real icons and short labels on one-square rows.",
+    "html": "<section class=\"specimen\">\n<ds-select role=\"menu\" aria-label=\"Recording actions\"><ds-button secondary><span class=\"mark\"><ds-icon type=\"download\" size=\"large\" aria-hidden=\"true\"></ds-icon></span>Download</ds-button><ds-button secondary><span class=\"mark\"><ds-icon type=\"duplicate\" size=\"large\" aria-hidden=\"true\"></ds-icon></span>Duplicate</ds-button><ds-button secondary><span class=\"mark\"><ds-icon type=\"archive\" size=\"large\" aria-hidden=\"true\"></ds-icon></span>Archive</ds-button></ds-select>\n</section>\n<style>\n.specimen { width: 100%; min-width: 0; --cell: calc(20px * var(--sf, 1)); }\n.specimen .line { width: 100%; }\n.specimen .grow { flex: 1; min-width: 0; }\n.specimen .muted { color: var(--ds-text-color-muted); }\n.specimen .mono { --ds-typeface-regular: var(--ds-typeface-mono); font-variant-numeric: tabular-nums; }\n.specimen .value { width: calc(4 * var(--cell)); text-align: right; }\n.specimen .mark { display: inline-flex; align-items: flex-end; width: var(--cell); height: var(--ds-control-height); flex: 0 0 var(--cell); }\n.specimen .columns { display: flex; flex-wrap: wrap; gap: var(--cell); }\n.specimen .columns > * { min-width: 0; }\n.specimen fieldset { border: 0; padding: 0; margin: 0; }\n.specimen legend { padding: 0; }\n.specimen label { display: flex; align-items: flex-end; gap: calc(var(--cell) / 2); min-height: var(--cell); }\n.specimen ds-panel { height: calc(10 * var(--cell)); }\n</style>",
     "height": 240
   },
   "dialog-proof": {
@@ -404,7 +404,8 @@ export const SHOWCASE_PAGES: Record<string, string[]> = {
   ],
   "3-unit/select": [
     "select-print",
-    "select-sort"
+    "select-sort",
+    "menu-recording"
   ],
   "2-core/color": [
     "color-palette"
@@ -507,9 +508,6 @@ export const SHOWCASE_PAGES: Record<string, string[]> = {
   ],
   "3-unit/token-field": [
     "tokens-tags"
-  ],
-  "3-unit/menu": [
-    "menu-recording"
   ],
   "4-page/overlay": [
     "dialog-proof"

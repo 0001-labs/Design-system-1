@@ -268,10 +268,10 @@ it("counts shared context menu frames and native action rows through re-exports,
   write(app, "src/example.tsx", 'import { Content, Sub, Item, Trigger, Radio } from "./menu"; export const view = <Content><Item /><Trigger /><Sub><Radio /></Sub></Content>;');
   git(app, "add", "."); git(app, "-c", "user.name=Test", "-c", "user.email=test@example.com", "commit", "-m", "Use shared menu");
   const scan = () => scanApp({ id: "example", name: "Example", directory: "Example", roots: ["src"], manifest: "design/components-manifest.json" }, studio, ds);
-  expect(scan().cells.menu).toMatchObject({ shared: 2, unverified: 0 });
+  expect(scan().cells.context).toMatchObject({ shared: 2, unverified: 0 });
   expect(scan().cells.button).toMatchObject({ shared: 3, unverified: 0 });
   write(app, "design/react/context-menu.ts", files["react/context-menu.ts"] + "\n// Changed composition");
-  expect(scan().cells.menu).toMatchObject({ shared: 0, unverified: 2 });
+  expect(scan().cells.context).toMatchObject({ shared: 0, unverified: 2 });
   expect(scan().cells.button).toMatchObject({ shared: 0, unverified: 3 });
 });
 

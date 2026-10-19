@@ -1,0 +1,87 @@
+---
+title: Context
+description: The menu that opens where the pointer is, in Ezo's gap face.
+---
+
+`ds-context` is the menu that opens where the pointer is: a right click, the
+Context Menu key or Shift+F10, or a touch held half a second on the element
+`for` names (or `trigger`). It opens at the pointer, or at the control's foot
+from the keyboard, and keeps the menu engine's keyboard, typeahead, nested menus
+and focus. A menu that opens from a button is a [Select](/3-unit/select/).
+
+```html
+<ul id="notes">…</ul>
+<ds-context for="notes" aria-label="Note actions">
+  <button role="menuitem">Rename<ds-icon type="pen"></ds-icon></button>
+  <button role="menuitem">Duplicate</button>
+  <hr data-ds-menu-separator>
+  <button role="menuitem" data-danger>Delete</button>
+</ds-context>
+```
+
+## The gap face
+
+Context wears the face Ezo drew for its notes and board items. Each row carries
+the ink as its fill, with the paper's colour for its words, turned over in dark
+mode as the tooltip is. Rows stand a pixel apart and groups two: an
+`hr data-ds-menu-separator` between groups is a gap, never a line, and the page
+shows through every gap, because the rows carry the colour and the frame only
+cuts the outer silhouette with rounded corners. A group left empty leaves no
+gap: a separator first, last or after another is quiet.
+
+Every row is 19px with the pixel under it, a square's pitch, its words on the
+sixteen and an icon at its end. A row the pointer rests on lightens, the
+keyboard's focus rings it in the focus colour, a disabled row is dimmed, and a
+danger row (`data-danger`, or `ds-button danger`) is red on either fill. Its
+width is its content's, from four squares to sixteen (`--ds-menu-width` sets
+one). Tokens: `--ds-context-fill`, `--ds-context-ink`, `--ds-context-hover`,
+`--ds-context-danger`, `--ds-context-refused` and `--ds-context-radius`.
+
+## Choosing, waiting and refusing
+
+Choosing a row closes the menu after the row's own handlers ran, unless the row
+says `data-keep-open` (a colour that cycles in place) or a handler prevented its
+click.
+
+While a chosen change is awaited, set `pending`: every free row is held
+(`aria-disabled`, the wait cursor), the menu says `aria-busy`, and neither a
+choice, Escape nor a press outside closes it. Clearing `pending` frees only the
+rows it held. A change that was refused is never silent: `refuse(row)` turns
+that row red for a moment (1.4 seconds), beside the product's own message.
+
+## Long lists
+
+For a long or changing list keep one menu: name the list with `for` and mark
+its rows with `context-selector`. DS1 delegates the gestures to the row under
+the pointer, including rows added later; `ds-menu-toggle` carries the actual
+row as `detail.trigger` and the point as `detail.point`, and focus returns to
+that row. Give each row its own accessible name. A plain left click stays the
+row's; the click that follows a completed long press is consumed.
+
+`openAt({ x, y }, control)` opens it from elsewhere (a title's own gesture, a
+shortcut); `trigger-mode` is always `context`. For a gesture on a surface that
+opens something else, `bindContextMenuTrigger` from `DS1/3-unit/context-trigger`
+owns the same right click, keys and 500ms touch hold (`LONG_PRESS`).
+
+## React
+
+`DS1/react/context` composes it: `Context`, `ContextTrigger` (`asChild` keeps
+your element), `ContextContent`, `ContextItem` (`variant="destructive"`,
+`onSelect` may prevent dismissal), `ContextCheckboxItem`, `ContextRadioGroup`
+and `ContextRadioItem`, `ContextSub`, `ContextSubTrigger` and
+`ContextSubContent` for a nested menu, `ContextLabel`, `ContextSeparator`,
+`ContextGroup`, `ContextShortcut` and `ContextFilePicker` (kept mounted
+through the platform's file choice). The adapter owns React composition and
+state; the element owns the face, gestures, focus and placement. Register
+`ds-context` and `ds-select` in the browser before mounting it.
+
+```tsx
+<Context>
+  <ContextTrigger asChild><li>{note.title}</li></ContextTrigger>
+  <ContextContent>
+    <ContextItem onSelect={rename}>Rename</ContextItem>
+    <ContextSeparator />
+    <ContextItem variant="destructive" onSelect={remove}>Delete</ContextItem>
+  </ContextContent>
+</Context>
+```

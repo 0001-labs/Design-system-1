@@ -1,58 +1,59 @@
 ---
 title: Select
-description: Native choices with the shared field face.
+description: Every menu that opens from a button: a field's choices, a button's actions, a list in place.
 ---
 
 import ComponentExample from "../../../components/ComponentExample.astro";
 
-`ds-select` draws a native select field on the grid. It is one square high and
-eight wide by default; layout can set the host width. Size and multiple-selection
-lists use one square per visible row, four rows by default for `multiple`.
+`ds-select` is every menu that opens from a button. Around a native `<select>`
+it is a field and its list of choices; with entries of its own it is an action
+menu opened from a button; with neither an opener nor a select it is a list in
+place. One menu engine draws all three: whole squares, the keyboard, typeahead,
+placement, nested menus and focus. A menu that opens where the pointer is, is a
+[Context](/3-unit/context/).
+
+## A field
 
 ```html
 <label>Project
   <ds-select><select name="project" required>
     <option value="">Choose a project</option>
     <option value="alpha">Alpha</option>
+    <option value="beta" data-details="Shared">Beta</option>
+    <optgroup label="Archived">
+      <option value="gamma" data-icon="archive">Gamma</option>
+    </optgroup>
   </select></ds-select>
 </label>
 ```
 
-The native select owns labels, options, option groups, selection, keyboard
-navigation, the platform picker, validation, FormData, disabled fieldsets and
-reset. DS1 owns the field face, arrow, scale, focus and disabled appearance.
-There is no second hidden input and no replacement popup or keyboard handler.
+The native select keeps the value, labels, option groups, validation, FormData,
+disabled fieldsets and reset. DS1 draws the field, one square high and eight
+wide by default (layout can set the host width), and in place of the platform's
+picker its own list: one square a choice, the chosen one checked and focused on
+opening, groups headed by their `<optgroup>` label, half a square below the
+field and as wide as it in whole squares (`--ds-select-list-width` widens it).
+A press anywhere on the field opens it; so do Arrow Down and Up, Enter, Space,
+F4 and Alt+Arrow on the focused select. Typing a name finds it; Escape or a
+press outside closes it, and focus returns to the select. Choosing sets the
+select's value and sends `input` and `change`, so forms and frameworks see an
+ordinary change.
 
-React products import `Select` from `DS1/react/choice`. Standard native select
-props, children and the native ref pass through. `className`, `style` and `hidden`
-also place the host in the product layout. The adapter can render on the server;
-register `ds-select` in the browser before hydrating.
+An option may carry more on its row, all on the sixteen:
 
-```tsx
-<Select name="project" value={project} onChange={e => setProject(e.currentTarget.value)}>
-  <option value="alpha">Alpha</option>
-  <option value="beta">Beta</option>
-</Select>
-```
+- `data-details`: muted words after the name, as Link's lists show a workspace's members;
+- `data-shortcut`: a shortcut written once, `mod+k`, shown as the platform writes it (⌘K, Ctrl+K);
+- `data-icon`: a library icon on the row's first square.
 
-Remove product select appearance CSS and duplicate arrows when migrating.
-Keep data and persistence callbacks in the product. Verify required validation,
-controlled changes, labels, reset, keyboard choices and disabled state on light
-and dark paper, with the product scale and at phone width.
+`native` keeps the platform's own picker. A `multiple` select, or one with
+`size` above 1, stays a native list, one square a visible row (four for
+`multiple`).
 
+### Compact and colour choices
 
-## Design examples
-
-<ComponentExample example="select-print" />
-
-<ComponentExample example="select-sort" />
-
-## Compact and colour choices
-
-Use `fit` to size a single picker to its native options. `chip` uses the shared
-16px control height and quiet button face; `primary` gives a chip the accent.
-Widths and type follow the containing surface scale. Lists with `multiple` or
-more than one visible row keep their normal field face.
+`fit` sizes a field to its options. `chip` uses the shared 16px control height
+and quiet button face; `primary` gives a chip the accent. For a colour category,
+pass `swatch` a CSS colour: DS1 draws its `ds-swatch` in a one-square control.
 
 ```html
 <ds-select fit chip primary><select aria-label="Sort direction">
@@ -60,20 +61,97 @@ more than one visible row keep their normal field face.
 </select></ds-select>
 ```
 
-For a colour category picker, pass `swatch` a CSS colour. DS1 composes its own
-`ds-swatch` inside a one-square control; the native select still receives
-keyboard focus and opens the platform picker. Supply an accessible name and
-keep the colour/category mapping and selected value in the product.
+## A menu from a button
+
+Without a select, `ds-select` is the menu a button opens. Name the button with
+`for`, as `<label for>` names its field (or set `trigger` to the element):
+
+```html
+<ds-button id="more" icon aria-label="More"><ds-icon type="more"></ds-icon></ds-button>
+<ds-select for="more" aria-label="Recording actions">
+  <ds-button menu-item role="menuitem"><ds-icon type="download"></ds-icon>Download</ds-button>
+  <ds-button menu-item role="menuitem">Duplicate</ds-button>
+  <hr data-ds-menu-separator>
+  <ds-text data-ds-menu-label tone="muted" literal>Danger</ds-text>
+  <ds-button menu-item role="menuitem" danger>Delete</ds-button>
+</ds-select>
+```
+
+It is a menu (`role="menu"`) unless told otherwise, floats in the browser's
+popover layer half a square from its button, flips above when there is more
+room, and stays inside the visible screen, all on whole squares. The button gets
+`aria-haspopup`, `aria-expanded` and `aria-controls`. A click opens and closes
+it; Arrow Down opens at the first entry (or the checked one) and Arrow Up at the
+last. Arrows move between entries and skip disabled and hidden ones, Home and
+End jump, typing finds an entry (repeated letters cycle), Escape closes only the
+top menu, Tab leaves it, and focus returns to the button.
+
+Choosing an entry closes the menu after the entry's own handlers ran, unless
+the entry says `data-keep-open` (a colour that cycles in place) or a handler
+prevented its click. The cancelable events are the engine's: `ds-menu-toggle`
+(`detail.open`), `ds-menu-close` (`detail.reason`: `escape`, `outside`,
+`select`, `back`, `parent`) and `ds-menu-close-focus`.
+
+The menu stands on whole squares: its line and the padding inside it make half
+a square on each side, so n entries are n + 1 squares high, and every entry is
+one square high whatever button styles surround it. A separator takes one
+square with its line. `compact` entries are filled rows on a square's pitch,
+19px with the 1px between them. `hover` opens it while the pointer rests on its
+button (a breadcrumb), with a grace across the half-square gap. `columns` makes
+a small grid of one-square cells with two-dimensional arrows (a palette;
+`data-ds-menu-row` for a full-width action, `data-ds-menu-start` to start a
+section).
+
+A nested menu is another `ds-select` inside it with `trigger-mode="submenu"`
+and its row as `trigger`: it opens beside the row, with hover, the forward and
+back arrows, and its own Escape.
+
+For suggestions under a field (a mention, a token), set `controller` to the
+field and `activeId` to the chosen option: arrows request the next option with
+`ds-menu-active` while focus stays in the field.
+
+## React
+
+`Select` from `DS1/react/select` is both. With `<option>` children it is a
+field, the native select's props, children and ref passing through:
 
 ```tsx
-<Select swatch={categoryColour} aria-label="Category" value={category}
-  onChange={event => setCategory(event.currentTarget.value)}>
-  <option value="work">Work</option>
-  <option value="personal">Personal</option>
+<Select name="project" value={project} onChange={event => setProject(event.currentTarget.value)}>
+  <option value="alpha">Alpha</option>
+  <option value="beta" data-details="Shared">Beta</option>
 </Select>
 ```
 
-The React adapter also accepts `fit`, `chip` and `primary`. These visual
-properties go on the shared host; all native select properties stay on the
-select. No product overlay, hidden select styles or duplicate swatch face is
-needed.
+With `trigger` (or `open`, or `items`) it is a menu. Its entries are children,
+or `items`, entries as data after Link's dropdowns:
+
+```tsx
+<Select trigger={button} open={open} onOpenChange={setOpen} items={[
+  { heading: "Workspace" },
+  { label: "Rename", icon: "pen", shortcut: "mod+r", onSelect: rename },
+  { label: "Pinned", checked: pinned, keepOpen: true, onSelect: togglePin },
+  { label: "Move to", items: lists.map(list => ({ label: list.name, onSelect: () => move(list) })) },
+  { separator: true },
+  { label: "Delete", danger: true, onSelect: remove },
+]} />
+```
+
+An entry has a `label`, and may have `details`, an `icon`, a `shortcut`, an
+`href`, `danger`, `disabled`, `checked` (a checkbox row), `keepOpen`,
+`onSelect(event)` (prevent the event to keep the menu open) and `items` (a
+nested menu beside it). `{ heading }` and `{ separator: true }` stand between
+entries. Register `ds-select` in the browser before hydrating.
+
+## Design examples
+
+<ComponentExample example="select-print" />
+
+<ComponentExample example="select-sort" />
+
+<ComponentExample example="menu-recording" />
+
+Remove product select styles, popup positioning, keyboard listeners and
+duplicate arrows when moving to Select. Keep data and callbacks in the product,
+and check required validation, controlled changes, labels, reset, keyboard
+choices and disabled state on light and dark paper, at the product's scale and
+at phone width.
