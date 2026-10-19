@@ -1,16 +1,22 @@
 import SwiftUI
 
-/// `ds-button` for SwiftUI's `Button`: one control high, hugging its label, with the 4-point
-/// corner; `plain` on the paper, `secondary` on the fill, `primary` on the accent. Pressed
-/// and disabled states change only opacity.
+/// `ds-button` for SwiftUI's `Button`: a face one control high, hugging its label, with the
+/// 4-point corner, standing at the foot of a one-square box, as a slotted `ds-button` keeps its
+/// face on the square's lower sixteen with the spare four above (an icon's face on the first
+/// sixteen), so a button beside words or under a row stays on the grid. `plain` on the paper,
+/// `secondary` on the fill, `primary` on the accent. Pressed and disabled states change only
+/// opacity; the whole square is the press target.
 public struct DS1ButtonStyle: ButtonStyle {
     public enum Kind: Sendable { case plain, secondary, primary }
 
     let kind: Kind
-    public init(_ kind: Kind = .plain) { self.kind = kind }
+    /// An icon alone stands on the square's first sixteen, as the web's.
+    let icon: Bool
+    public init(_ kind: Kind = .plain) { self.kind = kind; self.icon = false }
+    init(_ kind: Kind, icon: Bool) { self.kind = kind; self.icon = icon }
 
     public func makeBody(configuration: Configuration) -> some View {
-        Face(configuration: configuration, kind: kind)
+        Face(configuration: configuration, kind: kind, icon: icon)
     }
 
     struct Face: View {
@@ -18,6 +24,7 @@ public struct DS1ButtonStyle: ButtonStyle {
         @Environment(\.isEnabled) private var enabled
         let configuration: Configuration
         let kind: Kind
+        let icon: Bool
 
         var body: some View {
             configuration.label
@@ -28,6 +35,7 @@ public struct DS1ButtonStyle: ButtonStyle {
                 .padding(.horizontal, kind == .plain ? 0 : scale(4))
                 .frame(height: scale.control)
                 .background(background, in: RoundedRectangle(cornerRadius: scale.radius, style: .continuous))
+                .frame(height: scale.unit, alignment: icon ? .top : .bottom)
                 .contentShape(Rectangle())
                 .opacity(!enabled ? 0.5 : configuration.isPressed ? 0.7 : 1)
         }
@@ -63,7 +71,7 @@ public struct DS1IconButton: View {
                 .foregroundStyle(kind == .plain ? DS1Color.textMuted : kind == .primary ? DS1Color.onAccent : DS1Color.text)
                 .frame(width: DS1Metrics.control)
         }
-        .buttonStyle(.ds1(kind))
+        .buttonStyle(DS1ButtonStyle(kind, icon: true))
         .accessibilityLabel(label)
     }
 }
