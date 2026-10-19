@@ -61,3 +61,7 @@ Give a `<table>` the `ds-table` class from the native controls stylesheet (`cont
 ```
 
 [Row](/3-unit/row/) · [Native controls](/1-root/native-controls/)
+
+## Open row details
+
+On a native `.ds-table`, mark the body row whose details are open with `data-open`. Its cells keep the shared current-row fill, including the sticky first cell, while selected cells keep their selection colour. Remove the attribute on close or move it when navigating between records. Keep `aria-expanded` on the row’s detail button in step. This is a controlled state; it does not add click or keyboard behavior to a table row.

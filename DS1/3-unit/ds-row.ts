@@ -25,6 +25,7 @@ const CURRENT = new Set(["page", "step", "location", "date", "time", "true"]);
  * @attr interactive - Make the row a button.
  * @attr disabled - Keep the row from being pressed.
  * @attr current - The destination being shown: `aria-current="page"`, or the value given (`step`, `location`, …).
+ * @attr open - Whether this row’s details are open; controlled by the caller, with aria-expanded on its target.
  * @attr nav - Draw a navigation row: corners of two pixels, as the sidebar's rows.
  * @attr label - The accessible name, when the row's words do not say it.
  * @attr target - Where a link opens (`_blank`, …).
@@ -45,6 +46,7 @@ export class Row extends LitElement {
     interactive: { type: Boolean, reflect: true },
     disabled: { type: Boolean, reflect: true },
     current: { type: String, reflect: true },
+    open: { type: Boolean, reflect: true },
     nav: { type: Boolean, reflect: true },
     label: { type: String },
     target: { type: String },
@@ -60,6 +62,7 @@ export class Row extends LitElement {
   declare interactive: boolean;
   declare disabled: boolean;
   declare current: string | null | undefined;
+  declare open: boolean | undefined;
   declare nav: boolean;
   declare label: string | undefined;
   declare target: string | undefined;
@@ -76,6 +79,7 @@ export class Row extends LitElement {
     this.interactive = false;
     this.disabled = false;
     this.current = undefined;
+    this.open = undefined;
     this.nav = false;
     this.label = undefined;
     this.target = undefined;
@@ -115,9 +119,9 @@ export class Row extends LitElement {
       ? this.disabled
         ? html`<a class="target" part="target" role="link" aria-disabled="true" aria-label=${ifDefined(label)}>${content}</a>`
         : html`<a class="target" part="target" href=${this.href} target=${ifDefined(this.target || undefined)} rel=${ifDefined(this.rel || undefined)}
-            aria-current=${ifDefined(current)} aria-label=${ifDefined(label)} @click=${this.press}>${content}</a>`
+            aria-expanded=${ifDefined(this.open === undefined ? undefined : String(this.open))} aria-current=${ifDefined(current)} aria-label=${ifDefined(label)} @click=${this.press}>${content}</a>`
       : html`<button class="target" part="target" type="button" ?disabled=${this.disabled}
-          aria-current=${ifDefined(current)} aria-label=${ifDefined(label)} @click=${this.press}>${content}</button>`;
+          aria-expanded=${ifDefined(this.open === undefined ? undefined : String(this.open))} aria-current=${ifDefined(current)} aria-label=${ifDefined(label)} @click=${this.press}>${content}</button>`;
     return html`${target}<slot name="end"></slot>`;
   }
 }

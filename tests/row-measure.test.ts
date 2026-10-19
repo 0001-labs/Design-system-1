@@ -173,7 +173,7 @@ test("the current destination and a selected tree row are drawn as the sidebar's
     const sidebar = await background(page, "#sidebar >>> .row[data-current]");
     expect(sidebar).not.toBe("rgba(0, 0, 0, 0)");
     expect(await background(page, "#current >>> .target", "::after")).toBe(sidebar);
-    expect(await background(page, "#native-current")).toBe(sidebar);
+    expect(await background(page, "#native-current", "::after")).toBe(sidebar);
     expect(await background(page, '#tree >>> [data-item="deep"]')).toBe(sidebar);
     expect(await background(page, '#native-tree [data-id="deep"]')).toBe(sidebar);
     const weight = await page.evaluate(() => [
@@ -190,6 +190,27 @@ test("the current destination and a selected tree row are drawn as the sidebar's
   expect(fills.light).not.toBe(fills.dark);
 });
 
+test("the pointer's layer is a square high two pixels around a one-square row's content, its corners hugging the icon tiles (Joachim, 19 October 2026)", async () => {
+  for (const sf of SCALES) {
+    const page = pages.light;
+    await stage(page, ROWS + '<a id="native-flush" class="ds-row" href="#flush" style="--ds-row-padding: 0px"><span>Flush</span></a>', sf);
+    const layer = (selector: string) => page.evaluate((selector) => {
+      const [host, inner] = selector.split(" >>> ");
+      let element: Element | null | undefined = document.querySelector(host!);
+      if (inner) element = element?.shadowRoot?.querySelector(inner);
+      const style = getComputedStyle(element!, "::after");
+      return [style.top, style.bottom, style.left, style.right, style.borderTopLeftRadius].map(parseFloat);
+    }, selector);
+    // From two above the sixteen to two below the foot: a square high; two past the 4px padding.
+    for (const id of ["#native-button", "#native-link", "#button >>> .target"])
+      expect(await layer(id), `${id} at ${sf}`).toEqual([2 * sf, -2 * sf, 2 * sf, 2 * sf, 6 * sf]);
+    // With no padding the layer reaches two past the row's edges.
+    expect((await layer("#native-flush")).slice(2, 4)).toEqual([-2 * sf, -2 * sf]);
+    // A tile is filled whole.
+    expect((await layer("#native-tile")).slice(0, 4)).toEqual([0, 0, 0, 0]);
+  }
+});
+
 test("the pointer and the press fill the row, and keyboard focus rings it inside its box", async () => {
   for (const scheme of SCHEMES) {
     const page = pages[scheme];
@@ -201,9 +222,9 @@ test("the pointer and the press fill the row, and keyboard focus rings it inside
     expect(hover).not.toBe(paper);
     const native = await box(page, "#native-link");
     await page.mouse.move(native.left + native.width / 2, native.top + native.height / 2);
-    expect(await background(page, "#native-link")).toBe(hover);
+    expect(await background(page, "#native-link", "::after")).toBe(hover);
     await page.mouse.down();
-    const press = await background(page, "#native-link");
+    const press = await background(page, "#native-link", "::after");
     expect(press).not.toBe(hover);
     await page.mouse.up();
     await page.mouse.move(799, 599);
@@ -217,7 +238,7 @@ test("the pointer and the press fill the row, and keyboard focus rings it inside
     await page.keyboard.press("Tab");
     await page.keyboard.press("Tab");
     expect(await page.evaluate(() => document.activeElement?.id)).toBe("native-link");
-    expect(await page.evaluate(() => { const s = getComputedStyle(document.activeElement!); return [s.outlineStyle, s.outlineOffset]; })).toEqual(["solid", "-2px"]);
+    expect(await page.evaluate(() => { const s = getComputedStyle(document.activeElement!, "::after"); return [s.outlineStyle, s.outlineOffset]; })).toEqual(["solid", "-2px"]);
   }
 });
 
@@ -272,3 +293,31 @@ test("a native tree takes the keyboard from connectSidebar", async () => {
   await page.keyboard.press("Space");
   expect(await page.evaluate(() => [...document.querySelectorAll<HTMLElement>("#native-tree li")].map((li) => [li.tabIndex, li.getAttribute("aria-selected")]))).toEqual([[-1, null], [-1, null], [0, "true"]]);
 });
+
+for (const scheme of SCHEMES) for (const sf of SCALES) {
+  test(`open detail rows retain their fill and geometry, then clear (${scheme}, ${sf})`, async () => {
+    const page = pages[scheme];
+    await stage(page, `<ds-row id="detail" interactive open><span>Record</span></ds-row>
+      <button id="native-detail" class="ds-row" data-open aria-expanded="true">Record</button>
+      <div id="swipe-detail" class="ds-row" data-open style="background: var(--ds-background)">Record</div>
+      <table class="ds-table" data-sticky><tbody><tr data-open><th scope="row">Record</th><td>12</td></tr></tbody></table>`, sf);
+    const states = await page.evaluate(() => {
+      const el = document.querySelector("ds-row")!;
+      const targets = [el.shadowRoot!.querySelector(".target")!, document.querySelector("#native-detail")!, document.querySelector("#swipe-detail")!];
+      return targets.map(t => ({ fill: getComputedStyle(t, "::after").backgroundColor, height: t.getBoundingClientRect().height }));
+    });
+    expect(states[0]!.fill).not.toBe("rgba(0, 0, 0, 0)");
+    expect(new Set(states.map(s => s.fill)).size).toBe(1);
+    for (const s of states) expect(s.height).toBeCloseTo(20 * sf, 1);
+    const cells = await page.locator("tbody th, tbody td").evaluateAll(els => els.map(el => getComputedStyle(el).backgroundColor));
+    expect(cells).toEqual([states[0]!.fill, states[0]!.fill]);
+    await page.evaluate(async () => {
+      const el = document.querySelector("ds-row")! as HTMLElement & { open: boolean; updateComplete: Promise<unknown> };
+      el.open = false;
+      document.querySelectorAll("[data-open]").forEach(e => e.removeAttribute("data-open"));
+      await el.updateComplete;
+    });
+    expect(await page.locator("#native-detail").evaluate(el => getComputedStyle(el, "::after").backgroundColor)).toBe("rgba(0, 0, 0, 0)");
+    expect(await page.locator("ds-row").evaluate(el => getComputedStyle(el.shadowRoot!.querySelector(".target")!, "::after").backgroundColor)).toBe("rgba(0, 0, 0, 0)");
+  });
+}

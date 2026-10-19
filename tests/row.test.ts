@@ -133,3 +133,19 @@ test("controls.css imports the row sheet, and the tree's arrow is the library's 
   expect(embedded.length).toBe(2);
   for (const svg of embedded) expect(svg).toContain(`d='${path}'`);
 });
+
+test("open details are controlled independently of navigation and reset on close", async () => {
+  const element = await row("interactive");
+  expect(target(element)!.hasAttribute("aria-expanded")).toBe(false);
+  element.open = true;
+  await element.updateComplete;
+  expect(element.hasAttribute("open")).toBe(true);
+  expect(target(element)!.getAttribute("aria-expanded")).toBe("true");
+  expect(target(element)!.hasAttribute("aria-current")).toBe(false);
+  target(element)!.click();
+  expect(element.open).toBe(true);
+  element.open = false;
+  await element.updateComplete;
+  expect(element.hasAttribute("open")).toBe(false);
+  expect(target(element)!.getAttribute("aria-expanded")).toBe("false");
+});
