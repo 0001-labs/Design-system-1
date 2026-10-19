@@ -320,7 +320,6 @@ public enum DS1IconName: String, CaseIterable, Sendable {
     case toggle
     case train
     case transfer
-    case triangle
     case tv
     case underline
     case undo

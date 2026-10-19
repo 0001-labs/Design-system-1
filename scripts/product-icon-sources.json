@@ -1450,13 +1450,6 @@
   },
   {
     "product": "Ezo",
-    "source": "client/design/2-core/generated/ds-icon-map.ts#triangle",
-    "name": "triangle",
-    "sourceHash": "d7a5304dbbc301832eff0ff26d86625d7d1f10388a2985e10dd1ac443c3f7557",
-    "iconHash": "5c69120c42d4459f063bb5e4d6578c8c75df0b34820ffd80621ad23a63e516b5"
-  },
-  {
-    "product": "Ezo",
     "source": "client/design/2-core/generated/ds-icon-map.ts#underline",
     "name": "underline",
     "sourceHash": "abaaac8faefc6eec5bceed6171c9c4717ad7713c7c934b0aabb5131418d4f791",
@@ -1545,13 +1538,6 @@
     "name": "views",
     "sourceHash": "5272e9aa664aad2c5c0d606f53bd75a2e1ef6057baf8f1f237bc5f6b97b62b03",
     "iconHash": "456c3f03cde2c7da3ac9583e0f70d17e73feaf403ddc6d73fa9db90cdc5545fb"
-  },
-  {
-    "product": "Ezo",
-    "source": "client/design/2-core/generated/ds-icon-map.ts#warning",
-    "name": "warning",
-    "sourceHash": "82fe6eebaca87b92333b97beb7ea3b522814b415a91e04a29dee16916b1d769d",
-    "iconHash": "c2c9b78dffdd8ea7826aed51c1d6fb294e1603957b13ac45ba3d984086380726"
   },
   {
     "product": "Ezo",

@@ -324,7 +324,6 @@ enum class DS1IconName(val fileName: String, @DrawableRes val drawable: Int) {
     toggle("toggle", R.drawable.ds1_icon_toggle),
     train("train", R.drawable.ds1_icon_train),
     transfer("transfer", R.drawable.ds1_icon_transfer),
-    triangle("triangle", R.drawable.ds1_icon_triangle),
     tv("tv", R.drawable.ds1_icon_tv),
     underline("underline", R.drawable.ds1_icon_underline),
     undo("undo", R.drawable.ds1_icon_undo),
