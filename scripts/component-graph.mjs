@@ -72,11 +72,13 @@ export function componentGraph(ds1, names) {
   if (components.includes('file-picker')) visit('react/file-picker.ts');
   if (components.includes('token-field') || components.includes('token')) visit('react/token-field.ts');
   if (components.includes('composer')) visit('react/composer.ts');
-  if (components.includes('menu')) { visit('react/menu.ts'); visit('react/context-menu.ts'); }
+  if (components.includes('menu')) visit('react/menu-engine.ts');
+  if (components.includes('select')) visit('react/select.ts');
+  if (components.includes('context')) visit('react/context.ts');
   if (components.includes('accordion')) visit('react/accordion.ts');
   if (components.includes('avatar')) visit('react/avatar.ts');
   if (components.includes('avatar-group')) visit('react/avatar-group.ts');
-  if (['checkbox', 'radio', 'switch', 'select', 'color'].some(name => components.includes(name))) visit('react/choice.ts');
+  if (['checkbox', 'radio', 'switch', 'color'].some(name => components.includes(name))) visit('react/choice.ts');
   if (components.includes('overlay')) visit('react/overlay.ts');
   if (components.includes('page')) visit('react/page.ts');
   if (components.includes('header')) visit('react/header.ts');

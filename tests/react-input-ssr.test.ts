@@ -3,7 +3,7 @@ import { createElement } from "react";
 import { renderToString } from "react-dom/server";
 import { expect, test } from "vite-plus/test";
 import { Input } from "../DS1/react/input";
-import { Menu } from "../DS1/react/menu";
+import { MenuHost as Menu } from "../DS1/react/menu-engine";
 test("a menu adapter renders without browser element globals", () => {
   expect(typeof globalThis.HTMLElement).toBe("undefined");
   const markup = renderToString(createElement(Menu, {open: false, role: "menu"}, createElement("button", {role: "menuitem"}, "Choice")));

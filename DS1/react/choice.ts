@@ -1,23 +1,11 @@
-/** Native controls retain labels, forms and events. Shared Lit elements own their faces. */
-import { createElement, forwardRef, useCallback, type ButtonHTMLAttributes, type InputHTMLAttributes, type SelectHTMLAttributes, type MouseEvent, type ReactNode } from "react";
+/** Native controls retain labels, forms and events. Shared Lit elements own their faces. Select is in `react/select`. */
+import { createElement, forwardRef, useCallback, type ButtonHTMLAttributes, type InputHTMLAttributes, type MouseEvent, type ReactNode } from "react";
 
 export type ColorInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "type">;
 export const ColorInput = forwardRef<HTMLInputElement, ColorInputProps>(function ColorInput(
   { className, style, hidden, ...props }, ref,
 ) {
   return createElement("ds-color", { className, style, hidden }, createElement("input", { ...props, type: "color", hidden, ref }));
-});
-
-export type SelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
-  fit?: boolean;
-  chip?: boolean;
-  primary?: boolean;
-  swatch?: string;
-};
-export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select(
-  { className, style, hidden, children, fit, chip, primary, swatch, ...props }, ref,
-) {
-  return createElement("ds-select", { className, style, hidden, fit: fit ? "" : undefined, chip: chip ? "" : undefined, primary: primary ? "" : undefined, swatch }, createElement("select", { ...props, hidden, ref }, children));
 });
 
 export type CheckboxProps = Omit<InputHTMLAttributes<HTMLInputElement>, "type"> & { indeterminate?: boolean };

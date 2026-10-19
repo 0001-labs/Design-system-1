@@ -2,7 +2,7 @@
 import { act, createElement as h, useState } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, expect, test, vi } from "vite-plus/test";
-import { Menu } from "../DS1/react/menu";
+import { MenuHost as Menu } from "../DS1/react/menu-engine";
 import { Button } from "../DS1/react/button";
 await import("../DS1/3-unit/ds-menu");
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });

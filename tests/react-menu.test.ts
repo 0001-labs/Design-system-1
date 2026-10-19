@@ -2,7 +2,7 @@
 import { act, createElement as h, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { expect, test, vi } from "vite-plus/test";
-import { Menu } from "../DS1/react/menu";
+import { MenuHost as Menu } from "../DS1/react/menu-engine";
 await import("../DS1/3-unit/ds-menu");
 
 test("controlled React menus can decline selection and close requests, then unmount with focus return", async () => {

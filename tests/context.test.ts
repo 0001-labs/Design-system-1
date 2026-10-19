@@ -96,3 +96,12 @@ test("a touch held half a second opens it, a shorter one does not", async () => 
   await host.updateComplete;
   expect(host.open).toBe(true);
 });
+
+test("its rows are its own: arrows move between them, skipping a disabled one", async () => {
+  const { host, open } = await context('<button role="menuitem">One</button><button role="menuitem" disabled>Two</button><button role="menuitem">Three</button>');
+  await open();
+  const [one, , three] = host.querySelectorAll("button");
+  one!.focus();
+  one!.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, composed: true, cancelable: true }));
+  expect(document.activeElement).toBe(three);
+});

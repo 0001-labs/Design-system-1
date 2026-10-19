@@ -120,3 +120,13 @@ test("without a select or an opener it is a list in place", async () => {
   expect(host.floating).toBe(false);
   expect(host.getAttribute("role")).toBe("listbox");
 });
+
+test("an action menu's rows are its own: arrows move between them", async () => {
+  document.body.innerHTML = '<ds-select><button role="menuitem">One</button><button role="menuitem">Two</button></ds-select>';
+  const host = document.querySelector("ds-select")!;
+  await settle(host);
+  const [one, two] = host.querySelectorAll("button");
+  one!.focus();
+  one!.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, composed: true, cancelable: true }));
+  expect(document.activeElement).toBe(two);
+});

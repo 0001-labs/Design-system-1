@@ -2,7 +2,8 @@
 import { createElement as h } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, test } from "vite-plus/test";
-import { Checkbox, Radio, Switch, Select, ColorInput } from "../DS1/react/choice";
+import { Checkbox, Radio, Switch, ColorInput } from "../DS1/react/choice";
+import { Select } from "../DS1/react/select";
 
 test("choice adapters render usable native controls without browser globals", () => {
   expect(typeof HTMLElement).toBe("undefined");

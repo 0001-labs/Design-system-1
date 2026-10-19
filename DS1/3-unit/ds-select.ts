@@ -83,6 +83,7 @@ export class Select extends Menu {
   protected willUpdate(changed: PropertyValues) {
     // An action menu with an opener floats; one without stays in place.
     if (!this.field && !this.hasAttribute("floating") && (this.trigger || this.for)) this.floating = true;
+    this.closesOnChoice = !this.field;
     super.willUpdate(changed);
   }
   focus(options?: FocusOptions) {

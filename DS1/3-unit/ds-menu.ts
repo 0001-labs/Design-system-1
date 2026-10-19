@@ -8,6 +8,8 @@ import { bindContextMenuTrigger } from "./context-trigger";
 
 const ITEM = '[role="option"], [role="menuitem"], [role="menuitemradio"], [role="menuitemcheckbox"]';
 const FOCUSABLE = 'button, a[href], input, select, textarea, [tabindex]';
+/** Every element the engine draws: the engine itself, Select and Context. */
+const MENUS = "ds-menu, ds-select, ds-context";
 export type MenuCloseReason = "escape" | "outside" | "select" | "back" | "parent";
 export type MenuTriggerMode = "click" | "context" | "submenu" | "manual";
 export type MenuToggleDetail = { open: boolean; trigger: HTMLElement | null; point?: { x: number; y: number } };
@@ -74,7 +76,9 @@ export class Menu extends LitElement {
   private focusVersion = 0;
   private contextPoint: MenuAnchor | null = null;
   private invokingControl: HTMLElement | null = null;
-  private get parentMenu(): Menu | null { return this.parentElement?.closest<Menu>("ds-menu") ?? null; }
+  /** Close the whole branch when a row is chosen (Select's and Context's menus); the engine alone leaves that to its product. */
+  protected closesOnChoice = false;
+  private get parentMenu(): Menu | null { return this.parentElement?.closest<Menu>(MENUS) ?? null; }
   private get rootMenu(): Menu { return this.parentMenu?.rootMenu ?? this; }
 
   constructor() {
@@ -83,6 +87,7 @@ export class Menu extends LitElement {
     this.placement = "bottom"; this.triggerMode = "click"; this.contextSelector = "";
     this.columns = 1; this.anchor = null; this.trigger = null; this.for = ""; this.hover = false; this.controller = null; this.activeId = "";
     this.addEventListener("keydown", this.onKeyDown);
+    this.addEventListener("click", this.onChoice);
     this.addEventListener("pointerdown", this.retainController);
     this.addEventListener("pointerover", this.onPointerChoice);
     this.addEventListener("pointerenter", this.onHoverEnter);
@@ -185,6 +190,18 @@ export class Menu extends LitElement {
     this.toggleFromTrigger(true, { trigger: invokingControl, point });
     if (this.open) this.place();
   }
+  /**
+   * A chosen row closes the branch after its own handlers ran, unless the row
+   * says `data-keep-open`, is disabled, or a handler prevented the click.
+   */
+  private onChoice = (event: MouseEvent) => {
+    if (!this.closesOnChoice) return;
+    const row = event.composedPath().find(node => node instanceof HTMLElement && node.matches(ITEM)) as HTMLElement | undefined;
+    if (!row || row.closest(MENUS) !== this || row.hasAttribute("data-keep-open") || !this.enabled(row)) return;
+    // A nested menu's row opens it; a file row waits for the platform's file choice.
+    if (row.getAttribute("aria-haspopup") || row.matches('ds-file-picker, input[type="file"]') || row.querySelector('input[type="file"]')) return;
+    queueMicrotask(() => { if (!event.defaultPrevented && this.open) this.select(); });
+  };
   /** A selected action dismisses its whole branch. Products can decline it. */
   select() { this.rootMenu.requestClose("select"); }
   private contextControl(event: Event): HTMLElement | null {
@@ -240,7 +257,7 @@ export class Menu extends LitElement {
   private items(includeDisabled = false): HTMLElement[] {
     return Array.from(this.querySelectorAll<HTMLElement>(ITEM)).filter(item =>
       (includeDisabled || this.enabled(item)) &&
-      !item.closest('[hidden], [inert]') && item.closest("ds-menu") === this,
+      !item.closest('[hidden], [inert]') && item.closest(MENUS) === this,
     );
   }
   private enabled(item: HTMLElement) {
@@ -307,7 +324,7 @@ export class Menu extends LitElement {
   private hide(restore: boolean) {
     if (!this.shown) return;
     this.shown = false;
-    for (const child of this.querySelectorAll<Menu>("ds-menu")) if (child.open) child.requestClose("parent");
+    for (const child of this.querySelectorAll<Menu>(MENUS)) if (child.open) child.requestClose("parent");
     clearTimeout(this.hoverTimer);
     this.focusVersion++;
     const active = this.ownerDocument.activeElement;
@@ -332,7 +349,7 @@ export class Menu extends LitElement {
   }
   requestClose(reason: MenuCloseReason) {
     this.restoreFocus = reason !== "outside" && reason !== "parent";
-    for (const child of this.querySelectorAll<Menu>("ds-menu")) child.restoreFocus = false;
+    for (const child of this.querySelectorAll<Menu>(MENUS)) child.restoreFocus = false;
     const event = new CustomEvent("ds-menu-close", {detail: {reason}, bubbles: true, composed: true, cancelable: true});
     if (this.dispatchEvent(event)) this.open = false;
   }
@@ -351,7 +368,7 @@ export class Menu extends LitElement {
   private onPointerChoice = (event: PointerEvent) => {
     if (this.controller || this.getAttribute("role") !== "menu" || event.pointerType === "touch") return;
     const item = event.composedPath().find(node => node instanceof HTMLElement && node.matches(ITEM)) as HTMLElement | undefined;
-    if (item && item.closest("ds-menu") === this && this.enabled(item)) item.focus({ preventScroll: true });
+    if (item && item.closest(MENUS) === this && this.enabled(item)) item.focus({ preventScroll: true });
   };
   private retainController = (event: PointerEvent) => {
     if (this.controller && event.button === 0 && event.composedPath().some(node => node instanceof HTMLElement && node.matches(ITEM))) event.preventDefault();

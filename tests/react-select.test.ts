@@ -2,7 +2,7 @@
 import { afterEach, expect, test } from "vite-plus/test";
 import { act, createElement as h, createRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Select } from "../DS1/react/choice";
+import { Select } from "../DS1/react/select";
 import "../DS1/3-unit/ds-select";
 
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });

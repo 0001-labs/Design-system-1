@@ -41,7 +41,7 @@ export class Context extends Menu {
     this.pending = false;
     this.triggerMode = "context";
     this.floating = true;
-    this.addEventListener("click", this.onRowClick);
+    this.closesOnChoice = true;
   }
   connectedCallback() {
     if (!this.hasAttribute("role")) this.setAttribute("role", "menu");
@@ -74,20 +74,14 @@ export class Context extends Menu {
     if (this.pending && reason !== "parent") return;
     super.requestClose(reason);
   }
+  /** While pending, a chosen row does not close it either. */
+  select() { if (!this.pending) super.select(); }
 
   /** Show that a chosen change was refused: its row turns red a moment. */
   refuse(row: HTMLElement) {
     row.setAttribute("data-ds-refused", "");
     setTimeout(() => row.removeAttribute("data-ds-refused"), REFUSED);
   }
-
-  /** A chosen row closes the menu after its own handlers ran, unless it keeps it open or they prevented that. */
-  private onRowClick = (event: MouseEvent) => {
-    const row = event.composedPath().find(node => node instanceof HTMLElement && node.matches(ROW)) as HTMLElement | undefined;
-    if (!row || row.closest("ds-context") !== this || this.pending) return;
-    if (row.hasAttribute("data-keep-open") || row.matches(':disabled, [aria-disabled="true"]')) return;
-    queueMicrotask(() => { if (!event.defaultPrevented && this.open) this.select(); });
-  };
 
   /** Groups without rows leave no gap: a separator first, last or after another is quiet. */
   private quietSeparators() {

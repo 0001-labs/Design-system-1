@@ -3,11 +3,13 @@ import { act, createElement as h, useState } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, expect, test, vi } from "vite-plus/test";
 import {
-  ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem,
-  ContextMenuSub, ContextMenuSubTrigger, ContextMenuSubContent,
-  ContextMenuCheckboxItem, ContextMenuRadioGroup, ContextMenuRadioItem, ContextMenuFilePicker,
-} from "../DS1/react/context-menu";
+  Context, ContextTrigger, ContextContent, ContextItem,
+  ContextSub, ContextSubTrigger, ContextSubContent,
+  ContextCheckboxItem, ContextRadioGroup, ContextRadioItem, ContextFilePicker,
+} from "../DS1/react/context";
 await import("../DS1/3-unit/ds-menu");
+await import("../DS1/3-unit/ds-select");
+await import("../DS1/3-unit/ds-context");
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
 let root: Root, host: HTMLDivElement;
 beforeEach(() => { host = document.createElement("div"); document.body.append(host); root = createRoot(host); });
@@ -16,18 +18,18 @@ async function fire(element: HTMLElement, event: Event) { await act(async () => 
 async function key(element: HTMLElement, key: string, options: KeyboardEventInit = {}) {
   await fire(element, new KeyboardEvent("keydown", { key, ...options, bubbles: true, composed: true, cancelable: true }));
 }
-function trigger() { return host.querySelector<HTMLButtonElement>("[data-slot=context-menu-trigger]")!; }
+function trigger() { return host.querySelector<HTMLButtonElement>("[data-slot=context-trigger]")!; }
 function item(label: string) { return [...host.querySelectorAll<HTMLButtonElement>("button")].find(node => node.textContent === label)!; }
-function menu() { return host.querySelector("ds-menu")!; }
+function menu() { return host.querySelector("ds-context")!; }
 function Example({ choose = () => {}, closeFocus = undefined as ((e: Event) => void) | undefined, disabled = false }) {
-  return h(ContextMenu, null,
-    h(ContextMenuTrigger, { asChild: true, disabled }, h("button", { type: "button" }, "Open")),
-    h(ContextMenuContent, { onCloseAutoFocus: closeFocus },
-      h(ContextMenuItem, { disabled: true }, "Unavailable"),
-      h(ContextMenuItem, { onClick: choose }, "First"),
-      h(ContextMenuSub, null, h(ContextMenuSubTrigger, null, "More"), h(ContextMenuSubContent, null,
-        h(ContextMenuItem, { onClick: choose }, "Nested"))),
-      h(ContextMenuItem, null, "Last")));
+  return h(Context, null,
+    h(ContextTrigger, { asChild: true, disabled }, h("button", { type: "button" }, "Open")),
+    h(ContextContent, { onCloseAutoFocus: closeFocus },
+      h(ContextItem, { disabled: true }, "Unavailable"),
+      h(ContextItem, { onClick: choose }, "First"),
+      h(ContextSub, null, h(ContextSubTrigger, null, "More"), h(ContextSubContent, null,
+        h(ContextItem, { onClick: choose }, "Nested"))),
+      h(ContextItem, null, "Last")));
 }
 test("context triggers retain left-click behavior and support keyboard opening, nested back and branch selection", async () => {
   const choose = vi.fn(); await act(async () => root.render(h(Example, { choose })));
@@ -53,8 +55,8 @@ test("Escape closes only the nested branch and an outside pointer closes the who
 });
 test("controlled state can decline opening; disabled and previously canceled triggers do not request it", async () => {
   const change = vi.fn();
-  await act(async () => root.render(h(ContextMenu, { open: false, onOpenChange: change },
-    h(ContextMenuTrigger, { asChild: true }, h("button", null, "Open")), h(ContextMenuContent, null, h(ContextMenuItem, null, "Choice")))));
+  await act(async () => root.render(h(Context, { open: false, onOpenChange: change },
+    h(ContextTrigger, { asChild: true }, h("button", null, "Open")), h(ContextContent, null, h(ContextItem, null, "Choice")))));
   await key(trigger(), "ContextMenu"); expect(change).toHaveBeenCalledWith(true); expect(menu().open).toBe(false);
   await act(async () => root.render(h(Example, { disabled: true })));
   await key(trigger(), "ContextMenu"); expect(menu().open).toBe(false);
@@ -63,12 +65,12 @@ test("checkbox and radio entries report real values; a canceled selection remain
   const changed = vi.fn();
   function Choices() {
     const [checked, setChecked] = useState(false), [value, setValue] = useState("a");
-    return h(ContextMenu, null, h(ContextMenuTrigger, { asChild: true }, h("button", null, "Open")),
-      h(ContextMenuContent, null,
-        h(ContextMenuCheckboxItem, { checked, onCheckedChange: next => { setChecked(next); changed(next); } }, "Show"),
-        h(ContextMenuRadioGroup, { value, onValueChange: next => { setValue(next); changed(next); } },
-          h(ContextMenuRadioItem, { value: "a" }, "Alpha"), h(ContextMenuRadioItem, { value: "b" }, "Beta")),
-        h(ContextMenuItem, { onSelect: event => event.preventDefault() }, "Keep")));
+    return h(Context, null, h(ContextTrigger, { asChild: true }, h("button", null, "Open")),
+      h(ContextContent, null,
+        h(ContextCheckboxItem, { checked, onCheckedChange: next => { setChecked(next); changed(next); } }, "Show"),
+        h(ContextRadioGroup, { value, onValueChange: next => { setValue(next); changed(next); } },
+          h(ContextRadioItem, { value: "a" }, "Alpha"), h(ContextRadioItem, { value: "b" }, "Beta")),
+        h(ContextItem, { onSelect: event => event.preventDefault() }, "Keep")));
   }
   await act(async () => root.render(h(Choices)));
   await key(trigger(), "ContextMenu"); await fire(item("Show"), new MouseEvent("click", { bubbles: true }));
@@ -87,9 +89,9 @@ test("an action that focuses a new field retains that focus through dismissal", 
 });
 test("native file choices stay mounted through selection and cancellation and clear the value before notifying", async () => {
   const selected = vi.fn(), cancel = vi.fn();
-  await act(async () => root.render(h(ContextMenu, null,
-    h(ContextMenuTrigger, { asChild: true }, h("button", null, "Open")),
-    h(ContextMenuContent, null, h(ContextMenuFilePicker, { label: "Choose", onFiles: selected, onCancel: cancel })))));
+  await act(async () => root.render(h(Context, null,
+    h(ContextTrigger, { asChild: true }, h("button", null, "Open")),
+    h(ContextContent, null, h(ContextFilePicker, { label: "Choose", onFiles: selected, onCancel: cancel })))));
   await key(trigger(), "ContextMenu"); const input = host.querySelector<HTMLInputElement>('input[type=file]')!;
   await fire(input, new MouseEvent("click", { bubbles: true })); expect(input.isConnected).toBe(true);
   const file = new File(["example"], "example.txt"); Object.defineProperty(input, "files", { value: [file], configurable: true });
@@ -98,8 +100,8 @@ test("native file choices stay mounted through selection and cancellation and cl
 });
 test("long press opens once and consumes its synthetic click while movement cancels the gesture", async () => {
   vi.useFakeTimers(); const click = vi.fn();
-  await act(async () => root.render(h(ContextMenu, null,
-    h(ContextMenuTrigger, { asChild: true }, h("button", { onClick: click }, "Open")), h(ContextMenuContent, null, h(ContextMenuItem, null, "Choice")))));
+  await act(async () => root.render(h(Context, null,
+    h(ContextTrigger, { asChild: true }, h("button", { onClick: click }, "Open")), h(ContextContent, null, h(ContextItem, null, "Choice")))));
   await fire(trigger(), new PointerEvent("pointerdown", { pointerType: "touch", button: 0, clientX: 20, clientY: 20, bubbles: true }));
   await fire(trigger(), new PointerEvent("pointermove", { pointerType: "touch", clientX: 40, clientY: 20, bubbles: true }));
   await act(async () => { vi.advanceTimersByTime(700); }); expect(menu().open).toBe(false);
