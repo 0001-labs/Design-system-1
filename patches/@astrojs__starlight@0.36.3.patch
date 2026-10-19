@@ -1,0 +1,36 @@
+diff --git a/components/TableOfContents/starlight-toc.ts b/components/TableOfContents/starlight-toc.ts
+index cd31980aa0e74bb38080e076745899795a3e3591..4951fd0679c0fe49a7fff2d46bed810204c3e3b0 100644
+--- a/components/TableOfContents/starlight-toc.ts
++++ b/components/TableOfContents/starlight-toc.ts	
+@@ -40,22 +40,18 @@ export class StarlightTOC extends HTMLElement {
+ 		};
+ 
+ 		/** Walk up the DOM to find the nearest heading. */
++		// The nearest heading at or before the element in document order, found in one walk back
++		// (the recursive search revisited the same subtrees and froze long pages without headings).
+ 		const getElementHeading = (el: Element | null): HTMLHeadingElement | null => {
+ 			if (!el) return null;
+-			const origin = el;
+-			while (el) {
+-				if (isHeading(el)) return el;
+-				// Assign the previous sibling’s last, most deeply nested child to el.
+-				el = el.previousElementSibling;
+-				while (el?.lastElementChild) {
+-					el = el.lastElementChild;
+-				}
+-				// Look for headings amongst siblings.
+-				const h = getElementHeading(el);
+-				if (h) return h;
++			const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
++			walker.currentNode = el;
++			let node: Node | null = el;
++			while (node) {
++				if (node instanceof Element && isHeading(node)) return node as HTMLHeadingElement;
++				node = walker.previousNode();
+ 			}
+-			// Walk back up the parent.
+-			return getElementHeading(origin.parentElement);
++			return null;
+ 		};
+ 
+ 		/** Handle intersections and set the current link to the heading for the current intersection. */

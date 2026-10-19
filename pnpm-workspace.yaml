@@ -24,3 +24,5 @@ peerDependencyRules:
   allowedVersions:
     vite: "*"
     vitest: "*"
+patchedDependencies:
+  '@astrojs/starlight@0.36.3': patches/@astrojs__starlight@0.36.3.patch

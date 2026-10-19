@@ -214,6 +214,9 @@ overrides:
   vite: npm:@voidzero-dev/vite-plus-core@0.2.8
   vitest: 4.1.10
 
+patchedDependencies:
+  '@astrojs/starlight@0.36.3': 8661974d99474b18c5a1ea7c81e54d68b8c61695d7da9ff4a30317c0440fed9a
+
 importers:
 
   .:
@@ -350,7 +353,6 @@ importers:
         specifier: ^19.0.0
         version: 19.2.8
 
-
   packages/css-validate:
     dependencies:
       css-tree:
@@ -416,7 +418,7 @@ importers:
     dependencies:
       '@astrojs/starlight':
         specifier: ^0.36.0
-        version: 0.36.3(astro@5.18.2(@types/node@24.13.3)(lightningcss@1.33.0)(rollup@4.63.1)(supports-color@10.2.2)(tsx@4.23.11)(typescript@5.9.3))
+        version: 0.36.3(patch_hash=8661974d99474b18c5a1ea7c81e54d68b8c61695d7da9ff4a30317c0440fed9a)(astro@5.18.2(@types/node@24.13.3)(lightningcss@1.33.0)(rollup@4.63.1)(supports-color@10.2.2)(tsx@4.23.11)(typescript@5.9.3))
       astro:
         specifier: ^5.6.1
         version: 5.18.2(@types/node@24.13.3)(lightningcss@1.33.0)(rollup@4.63.1)(supports-color@10.2.2)(tsx@4.23.11)(typescript@5.9.3)
@@ -4770,7 +4772,7 @@ snapshots:
       stream-replace-string: 2.0.0
       zod: 4.4.3
 
-  '@astrojs/starlight@0.36.3(astro@5.18.2(@types/node@24.13.3)(lightningcss@1.33.0)(rollup@4.63.1)(supports-color@10.2.2)(tsx@4.23.11)(typescript@5.9.3))':
+  '@astrojs/starlight@0.36.3(patch_hash=8661974d99474b18c5a1ea7c81e54d68b8c61695d7da9ff4a30317c0440fed9a)(astro@5.18.2(@types/node@24.13.3)(lightningcss@1.33.0)(rollup@4.63.1)(supports-color@10.2.2)(tsx@4.23.11)(typescript@5.9.3))':
     dependencies:
       '@astrojs/markdown-remark': 6.3.11
       '@astrojs/mdx': 4.3.14(astro@5.18.2(@types/node@24.13.3)(lightningcss@1.33.0)(rollup@4.63.1)(supports-color@10.2.2)(tsx@4.23.11)(typescript@5.9.3))
