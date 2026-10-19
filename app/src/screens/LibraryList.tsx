@@ -10,7 +10,6 @@ import "../../../DS1/2-core/ds-notice";
 import "../../../DS1/3-unit/ds-list";
 import "../../../DS1/3-unit/ds-row";
 import { formatDateTime } from "../../../DS1/0-face/format";
-import { Badge } from "../../../DS1/react/badge";
 import { Input } from "../../../DS1/react/input";
 import "../../../DS1/2-core/ds-input";
 import { Button } from "../../../DS1/react/button";
@@ -19,6 +18,9 @@ import { Empty } from "../../../DS1/react/empty";
 import { Notice } from "../../../DS1/react/notice";
 import { libraryTemplate, templateVersion } from "../lib/libraryTemplate";
 import { failureCode } from "../lib/convex";
+import { LibraryPreview } from "./LibraryPreview";
+import "../../../DS1/1-root/card.css";
+import "./library-cards.css";
 import { Link, navigate } from "../router";
 
 /** Human labels for the states convex/lib/libraryState.ts derives. */
@@ -106,41 +108,35 @@ export function LibraryList() {
         <label>Company name<Input aria-label="Company name" maxLength={80} required disabled={savingCompany || !profile}
           value={company ?? profile?.companyName ?? ""} onChange={event => setCompany(event.target.value)} /></label>
         <Button secondary type="submit" disabled={savingCompany || !(company ?? profile?.companyName ?? "").trim()}>{savingCompany ? "Saving…" : "Save company name"}</Button>
-        <a href="/start-here/overview/" target={document.documentElement.hasAttribute("data-docs-embed") ? "_top" : undefined}>Design system 1 / Base documentation</a>
       </form>
 
       {error ? <Notice tone="danger">{error}</Notice> : null}
 
-      {libraries.length === 0 ? (
-        <Empty data-testid="library-list-empty" icon="templates" level={2}>
-          A library is a copy of the DS1 semantic stylesheet that you customize and publish. Your
-          site then loads it from one link.
-        </Empty>
-      ) : (
-        <ds-list role="list" className="library-grid">
-          {libraries.map((library) => (
-            <ds-row auto role="listitem" key={library._id}>
-              <article className="library-card" data-ds-area="Library" data-testid="library-card">
-                <h2>
-                  <Link to={`/l/${library._id}`}>{library.name}</Link>
-                </h2>
+      <div role="list" className="library-grid library-preview-grid">
+        <div role="listitem">
+          <a className="ds-card library-preview-card" href="/start-here/overview/"
+            target={document.documentElement.hasAttribute("data-docs-embed") ? "_top" : undefined}>
+            <span className="ds-card__label">Built-in</span>
+            <h2 className="ds-card__title">Design system 1</h2>
+            <LibraryPreview />
+            <span className="library-preview-card__foot">The foundation · Components, colours and type</span>
+          </a>
+        </div>
+        {libraries.map(library => <div role="listitem" key={library._id}>
+          <Link to={`/l/${library._id}`} className="ds-card library-preview-card" data-testid="library-card">
+            <span className="ds-card__label" data-testid="state-pill" data-state={library.state}>
+              {STATE_LABEL[library.state] ?? library.state}{library.publishedVersion === null ? null : ` · v${library.publishedVersion}`}
+            </span>
+            <h2 className="ds-card__title">{library.name}</h2>
+            <LibraryPreview id={library._id} />
+            <span className="library-preview-card__foot">Edited {formatDateTime(library.draftUpdatedAt)} · {(library.draftBytes / 1024).toFixed(1)} KB</span>
+          </Link>
+        </div>)}
+      </div>
+      {libraries.length === 0 ? <Empty data-testid="library-list-empty" icon="templates" level={2}>
+        Start with Design system 1, or create a library with your own colours and components.
+      </Empty> : null}
 
-                <Badge className="library-card__state" data-testid="state-pill" data-state={library.state}>
-                  {STATE_LABEL[library.state] ?? library.state}
-                  {library.publishedVersion === null ? null : ` · v${library.publishedVersion}`}
-                </Badge>
-
-                <dl>
-                  <dt>Edited</dt>
-                  <dd>{formatDateTime(library.draftUpdatedAt)}</dd>
-                  <dt>Size</dt>
-                  <dd>{(library.draftBytes / 1024).toFixed(1)} KB</dd>
-                </dl>
-              </article>
-            </ds-row>
-          ))}
-        </ds-list>
-      )}
     </main>
   );
 }

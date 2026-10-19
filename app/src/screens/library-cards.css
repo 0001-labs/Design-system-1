@@ -1,0 +1,57 @@
+.app-shell .dashboard > .library-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(16 * var(--app-cell))), calc(16 * var(--app-cell))));
+  gap: var(--app-cell);
+  margin: var(--app-cell);
+}
+.library-preview-grid > [role="listitem"] { min-width: 0; }
+.app-shell .library-preview-card {
+  height: 100%;
+  padding: var(--app-cell);
+  gap: 0;
+  border: 0;
+  box-shadow: none;
+  --ds-card-fill: var(--ds-paper);
+}
+.app-shell .library-preview-card h2 {
+  margin: 0;
+  font-size: calc(20px * var(--ds-sf));
+  line-height: calc(2 * var(--app-cell));
+  font-weight: normal;
+}
+.library-preview-card__foot {
+  margin-top: var(--app-cell);
+  color: var(--ds-text-color-muted);
+  font-size: var(--ds-type-size-small);
+  line-height: var(--app-cell);
+}
+.library-specimen {
+  --preview-accent: var(--ds-accent-color);
+  --preview-paper: var(--ds-paper);
+  --preview-ink: var(--ds-text-color);
+  --preview-surface: var(--ds-fill);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--app-cell);
+  gap: var(--app-cell);
+  padding: var(--app-cell);
+  margin-top: var(--app-cell);
+  background: color-mix(in srgb, var(--preview-accent) 35%, var(--preview-paper));
+  border-radius: var(--ds-radius-card);
+  color: var(--preview-ink);
+}
+.library-specimen__page {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--app-cell) / 2);
+  padding: var(--app-cell);
+  background: var(--preview-paper);
+  border-radius: var(--ds-radius);
+}
+.library-specimen__heading { display: flex; justify-content: space-between; align-items: center; font-size: calc(2 * var(--app-cell)); line-height: calc(3 * var(--app-cell)); }
+.library-specimen__mark { width: var(--app-cell); height: var(--app-cell); border-radius: 50%; background: var(--preview-accent); }
+.library-specimen__line { height: calc(var(--app-cell) / 2); background: var(--preview-surface); }
+.library-specimen__line--short { width: 60%; }
+.library-specimen__button { display: flex; justify-content: space-between; padding-inline: calc(4px * var(--ds-sf)); margin-top: calc(var(--app-cell) / 2); background: var(--preview-accent); color: var(--preview-ink); font-size: var(--ds-type-size-default); line-height: var(--app-cell); border-radius: var(--ds-radius); }
+.library-specimen__palette { display: flex; flex-direction: column; gap: calc(var(--app-cell) / 2); justify-content: flex-end; }
+.library-specimen__palette > span { width: var(--app-cell); height: var(--app-cell); border-radius: var(--ds-radius); }
+.library-specimen[data-loading] { opacity: .4; }
