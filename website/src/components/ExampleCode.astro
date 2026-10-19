@@ -1,11 +1,11 @@
 ---
 /** An example's source, with a copy button per block. Shared by component and layout examples. */
-interface Props { html: string; script?: string; open?: boolean; }
-const { html, script, open = false } = Astro.props;
+interface Props { html: string; script?: string; }
+const { html, script } = Astro.props;
 const blocks = [{ id: 'html', label: 'Copy HTML', text: html }, ...(script ? [{ id: 'script', label: 'Copy JavaScript', text: script }] : [])];
 ---
 <div class="example-code-source" data-example-code>
-  <ds-accordion summary="Code" open={open}>
+  <ds-accordion summary="Code">
     <div slot="details">
       {blocks.map(block => (
         <div class="example-code-block">

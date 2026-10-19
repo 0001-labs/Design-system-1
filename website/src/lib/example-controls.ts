@@ -15,3 +15,21 @@ export function wireCodeCopy(source: HTMLElement): void {
     void copyText(code.textContent ?? '');
   }));
 }
+
+/** Embedded examples follow the document appearance, including changes after loading. */
+export function followPageTheme(frame: HTMLIFrameElement): void {
+  const root = document.documentElement;
+  const system = matchMedia('(prefers-color-scheme: dark)');
+  const send = () => {
+    const selected = root.getAttribute('data-theme');
+    const dark = selected === 'dark' || (selected !== 'light' && (root.classList.contains('dark-theme') || (!root.classList.contains('light-theme') && system.matches)));
+    frame.contentWindow?.postMessage({ type: 'ds1-example-theme', theme: dark ? 'dark' : 'light' }, location.origin);
+  };
+  frame.addEventListener('load', send);
+  window.addEventListener('message', event => {
+    if (event.origin === location.origin && event.source === frame.contentWindow && event.data?.type === 'ds1-example-ready') send();
+  });
+  new MutationObserver(send).observe(root, { attributes: true, attributeFilter: ['class', 'data-theme'] });
+  system.addEventListener('change', send);
+  send();
+}

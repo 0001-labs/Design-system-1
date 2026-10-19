@@ -11,7 +11,6 @@ const inside = layersIn(sample.html);
 <section class="layout-example not-content" data-ds-not-prose data-layout-example={layout} aria-label={`${sample.name} layout`}>
   <div class="layout-toolbar">
     <ds-button split literal aria-label="Preview width" options="computer:Computer,phone:Phone" value="computer" data-preview-width></ds-button>
-    <ds-button split literal aria-label="Preview appearance" options="light:Light,dark:Dark" value="light" data-preview-theme></ds-button>
     <div class="layout-toolbar-end">
       <ds-button control="slotted" choice><button type="button" data-preview-layers aria-pressed="false">Show layers</button></ds-button>
       <a href={`/examples/layouts/${layout}/`} target="_blank" rel="noopener">Open full size</a>
@@ -32,15 +31,14 @@ const inside = layersIn(sample.html);
   <ExampleCode html={sample.html} script={sample.script} />
 </section>
 <script>
-  import { onChoice } from '../lib/example-controls';
+  import { onChoice, followPageTheme } from '../lib/example-controls';
   document.querySelectorAll<HTMLElement>('[data-layout-example]').forEach(example => {
     const frame = example.querySelector<HTMLIFrameElement>('iframe')!;
     const readout = example.querySelector<HTMLElement>('[data-readout]')!;
     const resting = readout.textContent;
-    let theme = 'light';
+    followPageTheme(frame);
     let layers = false;
     const send = () => {
-      frame.contentWindow?.postMessage({ type: 'ds1-example-theme', theme }, location.origin);
       frame.contentWindow?.postMessage({ type: 'ds1-layout-layers', on: layers }, location.origin);
     };
     frame.addEventListener('load', send);
@@ -49,7 +47,6 @@ const inside = layersIn(sample.html);
       if (event.data?.type === 'ds1-example-ready') send();
       if (event.data?.type === 'ds1-layout-inspect') readout.textContent = event.data.text || resting;
     });
-    onChoice(example.querySelector('[data-preview-theme]'), value => { theme = value; send(); });
     onChoice(example.querySelector('[data-preview-width]'), value => example.toggleAttribute('data-phone', value === 'phone'));
     const layersButton = example.querySelector<HTMLButtonElement>('[data-preview-layers]')!;
     layersButton.addEventListener('click', () => {

@@ -2,7 +2,7 @@
 import { EXAMPLES } from '../lib/component-examples';
 import ExampleCode from './ExampleCode.astro';
 interface Props { example: string; compact?: boolean; }
-const { example, compact = false } = Astro.props;
+const { example } = Astro.props;
 const sample = EXAMPLES[example];
 if (!sample) throw new Error(`Unknown component example: ${example}`);
 ---
@@ -10,25 +10,18 @@ if (!sample) throw new Error(`Unknown component example: ${example}`);
   <div class="example-toolbar">
     <span>{sample.title}</span>
     <div class="example-toolbar-actions">
-      <ds-button split literal aria-label="Preview appearance" options="light:Light,dark:Dark" value="light" data-preview-theme></ds-button>
       <ds-button control="slotted"><button type="button" data-preview-reset>Reset</button></ds-button>
     </div>
   </div>
   <iframe src={`/examples/${example}/`} title={`${sample.title} — interactive preview`} loading="lazy" style={`height: ${sample.height ?? 160}px;`} data-preview-frame></iframe>
   <p class="example-hint">{sample.hint}</p>
-  <ExampleCode html={sample.html} script={sample.script} open={!compact} />
+  <ExampleCode html={sample.html} script={sample.script} />
 </section>
 <script>
-  import { onChoice } from '../lib/example-controls';
+  import { followPageTheme } from '../lib/example-controls';
   document.querySelectorAll<HTMLElement>('section[data-example]').forEach(example => {
     const frame = example.querySelector<HTMLIFrameElement>('iframe')!;
-    let theme = 'light';
-    const sendTheme = () => frame.contentWindow?.postMessage({ type: 'ds1-example-theme', theme }, location.origin);
-    frame.addEventListener('load', sendTheme);
-    window.addEventListener('message', event => {
-      if (event.origin === location.origin && event.source === frame.contentWindow && event.data?.type === 'ds1-example-ready') sendTheme();
-    });
-    onChoice(example.querySelector('[data-preview-theme]'), value => { theme = value; sendTheme(); });
+    followPageTheme(frame);
     example.querySelector('[data-preview-reset]')?.addEventListener('click', () => { frame.src = frame.src; });
   });
 </script>
