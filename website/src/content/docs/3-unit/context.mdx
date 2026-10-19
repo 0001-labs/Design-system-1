@@ -1,6 +1,6 @@
 ---
 title: Context
-description: "The menu that opens where the pointer is, in Ezo's gap face."
+description: "The menu that opens where the pointer is, and the bar over what is selected, in the gap face."
 ---
 
 import ComponentExample from "../../../components/ComponentExample.astro";
@@ -43,6 +43,47 @@ width is its content's, from four squares to sixteen (`--ds-menu-width` sets
 one). Tokens: `--ds-context-fill`, `--ds-context-ink`, `--ds-context-hover`,
 `--ds-context-danger`, `--ds-context-refused` and `--ds-context-radius`.
 
+## The bar
+
+`bar` lays the same rows side by side: the context bar that stands over what
+is selected, words in a text or a thing on a board. It is one row high, its
+cells a pixel apart and groups two, the page showing through, the outer corners
+rounded as one silhouette. A cell holding only an icon is one square (19px with
+the pixel beside it), the icon in its middle; give it an `aria-label`. A cell
+with words is 4px in on the sixteen. The bar is as long as its cells.
+
+`openOver(rect)` stands it half a square above the rectangle (the selection's
+`getBoundingClientRect()`, or an element), its start at the rectangle's start,
+below it when there is no room above, and kept inside the window. It opens
+without taking the focus, so the writing keeps its caret; a press outside it or
+Escape closes it, and the page opens it again over the next selection. Its
+rows are a menu laid out across (`aria-orientation="horizontal"`): ← and →
+move between them, in the reading direction. Give its rows `data-keep-open`
+when choosing one should leave it standing.
+
+```html
+<ds-context bar aria-label="Format">
+  <button role="menuitem" aria-label="Bold" data-keep-open><ds-icon type="bold"></ds-icon></button>
+  <button role="menuitem" aria-label="Italic" data-keep-open><ds-icon type="italic"></ds-icon></button>
+  <hr data-ds-menu-separator>
+  <button role="menuitem">Text<ds-icon type="chevron-down"></ds-icon></button>
+</ds-context>
+<script type="module">
+  const bar = document.querySelector("ds-context[bar]");
+  document.addEventListener("selectionchange", () => {
+    const selection = getSelection();
+    if (selection.isCollapsed) bar.open = false;
+    else bar.openOver(selection.getRangeAt(0).getBoundingClientRect());
+  });
+</script>
+```
+
+<ComponentExample example="context-bar" />
+
+Without Lit, `.ds-context.ds-context--bar` draws the same bar on a native menu,
+with `ds-context__item--icon` on a cell holding only an icon; the page places
+it.
+
 ## Choosing, waiting and refusing
 
 Choosing a row closes the menu after the row's own handlers ran, unless the row
@@ -79,7 +120,8 @@ and `ContextRadioItem`, `ContextSub`, `ContextSubTrigger` and
 `ContextGroup`, `ContextShortcut` and `ContextFilePicker` (kept mounted
 through the platform's file choice). The adapter owns React composition and
 state; the element owns the face, gestures, focus and placement. Register
-`ds-context` and `ds-select` in the browser before mounting it.
+`ds-context` and `ds-select` in the browser before mounting it. A bar is
+`ContextContent bar anchor={rect}` inside a controlled `Context open`.
 
 ```tsx
 <Context>

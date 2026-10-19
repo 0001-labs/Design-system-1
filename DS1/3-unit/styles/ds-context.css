@@ -113,3 +113,41 @@
   color: color-mix(in srgb, var(--ds-context-ink) 60%, var(--ds-context-fill));
   line-height: var(--ds-type-lineheight-default);
 }
+
+/* The bar: the same rows side by side, the context bar over what is selected.
+   One row high, the cells a pixel apart and groups two, the page showing
+   through; a cell with words is 4px in on the sixteen, a cell holding only an
+   icon one square (19px with the pixel beside it), the icon in its middle.
+   As long as its cells, never rounded up, so the silhouette ends with them. */
+:host([bar]) {
+  width: var(--ds-menu-width, max-content);
+  min-width: 0;
+}
+:host([bar]) .frame {
+  flex-direction: row;
+  align-items: stretch;
+  height: var(--ds-menu-row);
+  max-height: none;
+  overflow: auto hidden;
+  scrollbar-width: none;
+}
+:host([bar]) ::slotted(:is(button, a, ds-button, ds-file-picker)) {
+  flex: 0 0 auto !important;
+  width: auto;
+  min-width: var(--ds-menu-row);
+}
+:host([bar]) ::slotted(ds-button) {
+  --ds-button-min-width: var(--ds-menu-row) !important;
+}
+:host([bar]) ::slotted([data-ds-context-icon]) {
+  --ds-button-padding: 0 !important;
+  --ds-button-align: center !important;
+  justify-content: center !important;
+  width: var(--ds-menu-row);
+  padding: 0 !important;
+}
+:host([bar]) ::slotted(:is(hr, [data-ds-menu-separator])) {
+  width: 0 !important;
+  height: auto !important;
+}
+:host([bar]) ::slotted([data-ds-menu-label]) { flex: 0 0 auto; white-space: nowrap; }

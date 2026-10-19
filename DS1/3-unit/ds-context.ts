@@ -2,7 +2,7 @@ import { unsafeCSS, type PropertyValues } from "lit";
 import { define } from "../0-face/define";
 import menuStyles from "./styles/ds-menu.css?inline";
 import styles from "./styles/ds-context.css?inline";
-import { Menu, type MenuCloseReason } from "./ds-menu";
+import { Menu, type MenuAnchor, type MenuCloseReason } from "./ds-menu";
 
 const ROW = '[role="menuitem"], [role="menuitemradio"], [role="menuitemcheckbox"]';
 /** A refused change shows on its row this long, as Ezo shows it. */
@@ -25,20 +25,31 @@ const REFUSED = 1400;
  * says `data-keep-open` or its click was prevented. `pending` holds every row
  * and the menu open while an answer is awaited; `refuse(row)` shows a refused
  * change on its row.
+ *
+ * `bar` lays the same rows side by side, the context bar over what is
+ * selected: one row high, the cells a pixel apart and groups two, a cell
+ * holding only an icon one square, a cell with words 4px in. It stands half a
+ * square above its anchor (below when there is no room), its start at the
+ * anchor's, and opens without taking the focus, so the writing keeps the
+ * caret: `openOver(rect)`. ← and → move along it.
  */
 export class Context extends Menu {
   static properties = {
     ...Menu.properties,
     pending: { type: Boolean, reflect: true },
+    bar: { type: Boolean, reflect: true },
   };
   static styles = [unsafeCSS(menuStyles), unsafeCSS(styles)];
   /** Hold every row and keep the menu open while a chosen change is awaited. */
   declare pending: boolean;
+  /** The context bar: the rows side by side, over what is selected. */
+  declare bar: boolean;
   private quietObserver = new MutationObserver(() => this.quietSeparators());
 
   constructor() {
     super();
     this.pending = false;
+    this.bar = false;
     this.triggerMode = "context";
     this.floating = true;
     this.closesOnChoice = true;
@@ -57,11 +68,23 @@ export class Context extends Menu {
     // Always a context menu, always floating.
     this.triggerMode = "context";
     this.floating = true;
-    this.toggleAttribute("data-ds-hug", true);
+    // A menu hugs its words in whole squares; a bar is as long as its cells.
+    this.toggleAttribute("data-ds-hug", !this.bar);
+    if (this.bar) {
+      this.setAttribute("aria-orientation", "horizontal");
+      this.placement = "top";
+      // The writing under a bar keeps the caret; the page moves the focus in with a key of its own.
+      this.focusOnOpen = false;
+    } else if (changed.has("bar")) {
+      this.removeAttribute("aria-orientation");
+      this.placement = "bottom";
+      this.focusOnOpen = true;
+    }
     super.willUpdate(changed);
   }
   updated() {
     super.updated();
+    this.markIcons();
     // Pending holds the rows that were free, and frees only those again.
     for (const row of this.querySelectorAll<HTMLElement>(ROW)) {
       if (this.pending && row.getAttribute("aria-disabled") !== "true") { row.setAttribute("aria-disabled", "true"); row.dataset.dsContextHeld = ""; }
@@ -84,8 +107,23 @@ export class Context extends Menu {
     setTimeout(() => row.removeAttribute("data-ds-refused"), REFUSED);
   }
 
+  /** Open the bar over what is selected (a rectangle, or an element), keeping the focus where it is. */
+  openOver(anchor: MenuAnchor) {
+    this.anchor = anchor;
+    this.open = true;
+  }
+
+  /** In a bar, a cell holding only an icon is one square. */
+  private markIcons() {
+    for (const row of this.querySelectorAll<HTMLElement>(ROW)) {
+      if (row.closest("ds-context") !== this) continue;
+      row.toggleAttribute("data-ds-context-icon", this.bar && !(row.textContent ?? "").trim() && !!row.querySelector("ds-icon, svg, img"));
+    }
+  }
+
   /** Groups without rows leave no gap: a separator first, last or after another is quiet. */
   private quietSeparators() {
+    this.markIcons();
     let previousWasGap = true;
     const children = [...this.children] as HTMLElement[];
     const visible = children.filter(child => !child.hidden);

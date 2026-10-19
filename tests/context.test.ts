@@ -105,3 +105,29 @@ test("its rows are its own: arrows move between them, skipping a disabled one", 
   one!.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, composed: true, cancelable: true }));
   expect(document.activeElement).toBe(three);
 });
+
+test("a bar lays its rows side by side over its anchor, leaves the focus where it is, and steps with ← and →", async () => {
+  const { host } = await context('<button role="menuitem" aria-label="Bold"><ds-icon type="bold"></ds-icon></button><button role="menuitem" aria-label="Italic"><ds-icon type="italic"></ds-icon></button><hr data-ds-menu-separator><button role="menuitem">Turn into</button>', "bar");
+  expect(host.getAttribute("aria-orientation")).toBe("horizontal");
+  expect(host.hasAttribute("data-ds-hug")).toBe(false);
+  const [bold, italic, turn] = host.querySelectorAll("button");
+  expect([bold, italic, turn].map(row => row!.hasAttribute("data-ds-context-icon"))).toEqual([true, true, false]);
+  const writing = document.querySelector<HTMLElement>("li")!;
+  writing.focus();
+  host.openOver({ left: 40, top: 100, right: 120, bottom: 120, width: 80, height: 20 });
+  await settle(host);
+  expect(host.open).toBe(true);
+  expect(document.activeElement).toBe(writing);
+  const press = (row: Element, key: string) => row.dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true, composed: true, cancelable: true }));
+  bold!.focus();
+  press(bold!, "ArrowRight");
+  expect(document.activeElement).toBe(italic);
+  press(italic!, "ArrowDown");
+  expect(document.activeElement).toBe(italic);
+  press(italic!, "ArrowLeft");
+  expect(document.activeElement).toBe(bold);
+  host.bar = false; await settle(host);
+  expect(host.hasAttribute("aria-orientation")).toBe(false);
+  expect(host.hasAttribute("data-ds-hug")).toBe(true);
+  expect(bold!.hasAttribute("data-ds-context-icon")).toBe(false);
+});

@@ -120,3 +120,17 @@ test("Tab exits a menu even when the browser's next focus is outside the documen
   await key(trigger(), "ContextMenu"); await key(item("First"), "Tab", { shiftKey: true });
   expect(menu().open).toBe(false);
 });
+
+test("a bar stands over the anchor it is given, its rows side by side, and leaves the focus where it was", async () => {
+  const anchor = { left: 40, top: 100, right: 120, bottom: 120, width: 80, height: 20 };
+  const field = document.createElement("textarea"); document.body.append(field); field.focus();
+  await act(async () => root.render(h(Context, { open: true },
+    h(ContextContent, { bar: true, anchor, "aria-label": "Format" },
+      h(ContextItem, { "aria-label": "Bold" }, h("ds-icon", { type: "bold" })),
+      h(ContextItem, null, "Turn into")))));
+  await act(async () => { await menu().updateComplete; });
+  expect(menu().bar).toBe(true);
+  expect(menu().anchor).toEqual(anchor);
+  expect(menu().getAttribute("aria-orientation")).toBe("horizontal");
+  expect(document.activeElement).toBe(field);
+});

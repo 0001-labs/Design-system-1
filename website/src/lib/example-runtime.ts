@@ -289,10 +289,23 @@ if (document.body.dataset.exampleId === 'chart') {
       menu.openAt({ x: box.left + 7 * 20, y: box.top + 10 }, row, { focus: false });
     }
   }
+  if (exampleId === 'context-bar') {
+    // The bar stands over the words chosen, and over any the reader selects instead.
+    const bar = sample.querySelector<Shown & { openOver(anchor: DOMRect): void }>('ds-context[bar]');
+    const passage = sample.querySelector<HTMLElement>('.passage'), chosen = sample.querySelector<HTMLElement>('.chosen');
+    if (bar && passage && chosen) {
+      await bar.updateComplete;
+      bar.openOver(chosen.getBoundingClientRect());
+      passage.addEventListener('pointerup', () => {
+        const selection = getSelection();
+        if (selection && !selection.isCollapsed && passage.contains(selection.anchorNode)) bar.openOver(selection.getRangeAt(0).getBoundingClientRect());
+      });
+    }
+  }
   if (exampleId?.startsWith('select-') || exampleId?.startsWith('context-')) {
     sample.addEventListener('click', event => {
       const row = (event.target as Element).closest('[role^="menuitem"]');
-      if (row) output.textContent = `Chose: ${row.textContent?.trim()}`;
+      if (row) output.textContent = `Chose: ${row.getAttribute('aria-label') ?? row.textContent?.trim()}`;
     });
     sample.addEventListener('change', event => {
       const field = event.target as HTMLSelectElement;

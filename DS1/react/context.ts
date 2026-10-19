@@ -7,7 +7,7 @@ import {
 import { MenuHost, type MenuProps } from "./menu-engine";
 import { Button, type ButtonProps } from "./button";
 import { FilePicker, type FilePickerProps } from "./file-picker";
-import type { Menu as MenuElement, MenuCloseReason } from "../3-unit/ds-menu";
+import type { Menu as MenuElement, MenuAnchor, MenuCloseReason } from "../3-unit/ds-menu";
 
 const useCommitEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 type State = {
@@ -73,18 +73,23 @@ export const ContextTrigger = forwardRef<HTMLElement, ContextTriggerProps>(funct
   return h("span", { ...attributes, tabIndex: disabled ? -1 : 0 }, children);
 });
 
-export type ContextContentProps = Omit<MenuProps, "open" | "trigger" | "anchor" | "triggerMode" | "onOpenChange">;
+export type ContextContentProps = Omit<MenuProps, "open" | "trigger" | "anchor" | "triggerMode" | "onOpenChange"> & {
+  /** The context bar over what is selected: the rows side by side, standing over `anchor`, the focus left where it is. */
+  bar?: boolean;
+  /** Where a bar stands: the selection's rectangle, or an element. */
+  anchor?: MenuAnchor | null;
+};
 export const ContextContent = forwardRef<MenuElement, ContextContentProps>(function ContextContent(
-  { children, placement, ...props }, ref,
+  { children, placement, bar, anchor, ...props }, ref,
 ) {
   const state = useMenu();
   useCommitEffect(() => { state.menu.current?.renderNow(); });
   // Render the closed host so the source can continue listening to its trigger.
   // Open descendants unmount together, including nested menu state.
-  return h(MenuHost, { ...props, tag: state.nested ? "ds-select" : "ds-context", id: props.id ?? state.id, role: "menu", hidden: !state.open,
+  return h(MenuHost, { ...props, bar, tag: state.nested ? "ds-select" : "ds-context", id: props.id ?? state.id, role: "menu", hidden: !state.open,
     "data-slot": state.nested ? "context-sub-content" : "context-content",
-    open: state.open, trigger: state.trigger, anchor: state.trigger,
-    triggerMode: state.nested ? "submenu" : "context", placement: placement ?? (state.nested ? "right" : "bottom"),
+    open: state.open, trigger: state.trigger, anchor: bar ? anchor ?? null : state.trigger,
+    triggerMode: state.nested ? "submenu" : "context", placement: placement ?? (bar ? "top" : state.nested ? "right" : "bottom"),
     ref: (element: MenuElement | null) => { state.menu.current = element; setRef(ref, element); },
     onOpenChange: state.change,
   } as MenuProps, state.open ? children : null);

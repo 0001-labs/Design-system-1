@@ -449,12 +449,15 @@ export class Menu extends LitElement {
     const items = this.items(true); if (!items.some(item => this.enabled(item))) return;
     const current = external ? items.findIndex(item => item.id === this.activeId) : items.findIndex(item => event.composedPath().includes(item));
     const columns = Math.max(1, Math.floor(this.columns || 1));
+    // A menu laid out in one line (Context's bar) steps sideways, in the reading direction.
+    const across = this.getAttribute("aria-orientation") === "horizontal";
+    const forward = this.ownerDocument.defaultView?.getComputedStyle(this).direction === "rtl" ? -1 : 1;
     let next: number;
     switch (event.key) {
-      case "ArrowDown": next = columns > 1 ? this.gridStep(items, current, columns, 1) : this.step(items, current, 1, 1); break;
-      case "ArrowUp": next = columns > 1 ? this.gridStep(items, current, columns, -1) : this.step(items, current, 1, -1); break;
-      case "ArrowRight": if (columns === 1 || external) return; next = this.step(items, current, 1, 1); break;
-      case "ArrowLeft": if (columns === 1 || external) return; next = this.step(items, current, 1, -1); break;
+      case "ArrowDown": if (across) return; next = columns > 1 ? this.gridStep(items, current, columns, 1) : this.step(items, current, 1, 1); break;
+      case "ArrowUp": if (across) return; next = columns > 1 ? this.gridStep(items, current, columns, -1) : this.step(items, current, 1, -1); break;
+      case "ArrowRight": if (across) { next = this.step(items, current, 1, forward); break; } if (columns === 1 || external) return; next = this.step(items, current, 1, 1); break;
+      case "ArrowLeft": if (across) { next = this.step(items, current, 1, -forward); break; } if (columns === 1 || external) return; next = this.step(items, current, 1, -1); break;
       case "Home": if (external) return; next = items.findIndex(item => this.enabled(item)); break;
       case "End": if (external) return; next = this.lastEnabled(items); break;
       case "Enter":

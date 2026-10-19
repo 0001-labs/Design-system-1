@@ -409,6 +409,12 @@ export const SHOWCASE_EXAMPLES: Record<string, ComponentExample> = {
     "html": "<section class=\"specimen\">\n<div id=\"notes\" class=\"notes\"><ds-row class=\"line note\" tabindex=\"0\" aria-haspopup=\"menu\"><span class=\"mark\"><ds-icon type=\"page\" size=\"large\" aria-hidden=\"true\"></ds-icon></span><ds-text literal>Opening night plan</ds-text></ds-row><ds-row class=\"line note\" tabindex=\"0\" aria-haspopup=\"menu\"><span class=\"mark\"><ds-icon type=\"page\" size=\"large\" aria-hidden=\"true\"></ds-icon></span><ds-text literal>Lighting cues</ds-text></ds-row><ds-row class=\"line note\" tabindex=\"0\" aria-haspopup=\"menu\"><span class=\"mark\"><ds-icon type=\"page\" size=\"large\" aria-hidden=\"true\"></ds-icon></span><ds-text literal>Guest list</ds-text></ds-row></div>\n<ds-context for=\"notes\" context-selector=\".note\" aria-label=\"Note actions\"><button role=\"menuitem\">Rename<ds-icon type=\"pen\" aria-hidden=\"true\"></ds-icon></button><button role=\"menuitem\">Duplicate<ds-icon type=\"duplicate\" aria-hidden=\"true\"></ds-icon></button><button role=\"menuitem\">Star<ds-icon type=\"star\" aria-hidden=\"true\"></ds-icon></button><hr data-ds-menu-separator><button role=\"menuitem\">Archive<ds-icon type=\"archive\" aria-hidden=\"true\"></ds-icon></button><button role=\"menuitem\" data-danger>Delete<ds-icon type=\"delete\" aria-hidden=\"true\"></ds-icon></button></ds-context>\n</section>\n<style>\\n.specimen { width: 100%; min-width: 0; --cell: calc(20px * var(--sf, 1)); }\n.specimen .line { width: 100%; }\n.specimen .grow { flex: 1; min-width: 0; }\n.specimen .mark { display: inline-flex; align-items: flex-end; width: var(--cell); height: var(--ds-control-height); flex: 0 0 var(--cell); }\n.specimen label { display: flex; align-items: flex-end; gap: calc(var(--cell) / 2); min-height: var(--cell); }\n.specimen .notes { width: calc(16 * var(--cell)); }\n</style>",
     "height": 220
   },
+  "context-bar": {
+    "title": "A bar over the words chosen",
+    "hint": "Select words in the sentence: the bar stands half a square above them, a cell a square for each icon, and the caret stays in the writing.",
+    "html": "<section class=\"specimen\">\n<p class=\"passage\">The rehearsal starts at seven. <span class=\"chosen\">Bring the lighting cues</span> and the guest list, and leave the coats by the door.</p>\n<ds-context bar aria-label=\"Format\"><button role=\"menuitem\" aria-label=\"Bold\" data-keep-open><ds-icon type=\"bold\" aria-hidden=\"true\"></ds-icon></button><button role=\"menuitem\" aria-label=\"Italic\" data-keep-open><ds-icon type=\"italic\" aria-hidden=\"true\"></ds-icon></button><button role=\"menuitem\" aria-label=\"Strikethrough\" data-keep-open><ds-icon type=\"strike\" aria-hidden=\"true\"></ds-icon></button><button role=\"menuitem\" aria-label=\"Code\" data-keep-open><ds-icon type=\"code\" aria-hidden=\"true\"></ds-icon></button><button role=\"menuitem\" aria-label=\"Link\" data-keep-open><ds-icon type=\"link\" aria-hidden=\"true\"></ds-icon></button><hr data-ds-menu-separator><button role=\"menuitem\" data-keep-open>Text<ds-icon type=\"chevron-down\" aria-hidden=\"true\"></ds-icon></button></ds-context>\n</section>\n<style>\n.specimen { width: 100%; min-width: 0; --cell: calc(20px * var(--sf, 1)); }\n.specimen .passage { width: calc(16 * var(--cell)); margin: calc(3 * var(--cell)) 0 0; line-height: var(--cell); }\n.specimen .chosen { background: color-mix(in srgb, currentColor 15%, transparent); border-radius: 2px; }\n</style>",
+    "height": 200
+  },
   "menu-recording": {
     "title": "Actions for a recording",
     "hint": "A Select's actions pair real icons and short labels on one-square rows.",
@@ -476,7 +482,8 @@ export const SHOWCASE_PAGES: Record<string, string[]> = {
     "menu-recording"
   ],
   "3-unit/context": [
-    "context-notes"
+    "context-notes",
+    "context-bar"
   ],
   "2-core/color": [
     "color-palette"
