@@ -163,6 +163,7 @@ export default defineConfig({
             { label: "Native packages", slug: "advanced/native" },
             { label: "iOS", slug: "advanced/ios" },
             { label: "Android", slug: "advanced/android" },
+            { label: "Film kit", slug: "advanced/film-kit" },
           ],
         },
       ],
