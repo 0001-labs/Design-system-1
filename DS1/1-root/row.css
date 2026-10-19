@@ -133,13 +133,14 @@ button.ds-row {
 }
 
 /*
- * The pointer, the press, the current destination, an open row and the focus ring are one layer
- * under the row's content. It stands on the grid: exactly the row's square high, never into the
- * next row, and four pixels past the content at each side, so an icon tile and the words keep
- * room inside it, its corners a control's 4px. A row padded 4px is filled to its own edges; a row
- * whose words stand on the column's edge (padding 0) is filled four pixels beyond it. A taller row
- * (a stacked tile, `auto`) is filled whole.
- * Tokens: `--ds-row-fill-radius` (4px), `--ds-row-fill-overhang` (4px, at the sides).
+ * The pointer, the press, the current destination and the focus ring are one layer under the
+ * row's content (Joachim, 19 October 2026). On a one-square row it is a square high and sits two
+ * pixels around what the row holds: from two above the lower sixteen to two below the row's foot,
+ * and two past the content at each side, its corners the icon tiles' 4px and those two more, so a
+ * 16px icon stands in it with two all round. It is drawn over the row, never moving its words or
+ * icons off the grid. An open row (`data-open`) wears the same layer. A taller row (a stacked
+ * tile, `auto`) is filled whole.
+ * Tokens: `--ds-row-fill-radius` (6px), `--ds-row-fill-overhang` (2px).
  */
 a.ds-row,
 button.ds-row {
@@ -155,9 +156,12 @@ button.ds-row::after {
 a.ds-row::after,
 button.ds-row::after,
 .ds-row__target::after {
-  --ds-row-overhang: var(--ds-row-fill-overhang, calc(4px * var(--ds-sf)));
-  inset: 0 calc(var(--ds-row-padding, calc(4px * var(--ds-sf))) - var(--ds-row-overhang));
-  border-radius: var(--ds-row-radius, var(--ds-row-fill-radius, calc(4px * var(--ds-sf))));
+  --ds-row-overhang: var(--ds-row-fill-overhang, calc(2px * var(--ds-sf)));
+  inset:
+    calc(var(--ds-row-height) - var(--ds-control-height) - var(--ds-row-overhang))
+    calc(var(--ds-row-padding, calc(4px * var(--ds-sf))) - var(--ds-row-overhang))
+    calc(0px - var(--ds-row-overhang));
+  border-radius: var(--ds-row-radius, var(--ds-row-fill-radius, calc(6px * var(--ds-sf))));
 }
 :is(a, button).ds-row:is(.ds-row--stacked, .ds-row--auto)::after,
 :is(.ds-row--stacked, .ds-row--auto) .ds-row__target::after {
@@ -340,15 +344,19 @@ button.ds-row[aria-disabled="true"]:hover::after {
   position: absolute;
   z-index: -1;
   pointer-events: none;
-  --ds-row-overhang: var(--ds-row-fill-overhang, calc(4px * var(--ds-sf)));
-  inset: 0 calc(var(--ds-row-padding, calc(4px * var(--ds-sf))) - var(--ds-row-overhang));
-  border-radius: var(--ds-row-radius, var(--ds-row-fill-radius, calc(4px * var(--ds-sf))));
+  --ds-row-overhang: var(--ds-row-fill-overhang, calc(2px * var(--ds-sf)));
+  inset: calc(var(--ds-row-height) - var(--ds-control-height) - var(--ds-row-overhang))
+    calc(var(--ds-row-padding, calc(4px * var(--ds-sf))) - var(--ds-row-overhang))
+    calc(0px - var(--ds-row-overhang));
+  border-radius: var(--ds-row-radius, var(--ds-row-fill-radius, calc(6px * var(--ds-sf))));
   background: var(--ds-row-fill-current, var(--ds-fill-hover));
 }
-/* A plain row (no press target inside) has no padding of its own: its words stand on the row's
-   edges, so the layer reaches the overhang past them, as a flush row's does. */
+/* A plain row (no press target inside) has no padding of its own: its words and icons stand on
+   the row's edges, so the layer reaches two past them, as a flush row's does. */
 .ds-row[data-open]:not([data-open="false"]):not(a, button, .ds-row--stacked, .ds-row--auto, :has(.ds-row__target))::after {
-  inset: 0 calc(-1 * var(--ds-row-overhang));
+  inset: calc(var(--ds-row-height) - var(--ds-control-height) - var(--ds-row-overhang))
+    calc(0px - var(--ds-row-overhang))
+    calc(0px - var(--ds-row-overhang));
 }
 .ds-row[data-open]:is(.ds-row--stacked, .ds-row--auto)::after { inset: 0; }
 @media (forced-colors: active) {
