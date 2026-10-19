@@ -26,6 +26,7 @@ Everything is counted in **squares**: one square is 20px (`--unit`, `--1`), mult
 | An Ezo item | 4 squares wide (80px pitch, 79px drawn) | Ezo `--item-width` |
 | A wider item ("double the length") | 8 squares: 160px pitch, 159px drawn | twice the item width |
 | A list column | 4 squares (`--quad`) | Ezo `--column-width` |
+| Tabs | **4px between adjacent tabs**, multiplied by the device scale, in web and native tab bars | `ds-tabs`, `.ds-tabs`, `DS1Tabs` |
 | Gaps and margins | whole squares, or half a square (`--half`) at most | `grid.css` |
 | Text | 14px (`--type-size-default`), one square a line, standing on the lower sixteen of its square with the spare four above (see *the sixteen* below); 10px small, 13px heading, a 20px display title on two squares; padded 4px from a pressed item's edge | `one.css`, `text.css`, Ezo `--type-lineheight-default`, `--item-text-padding` |
 | Lines | 1px, centred on the grid line | Ezo `--outline-stroke` |

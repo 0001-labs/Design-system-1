@@ -454,7 +454,7 @@ textarea.ds-input {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: var(--ds-tabs-gap, calc(10px * var(--ds-sf)));
+  gap: calc(4px * var(--ds-sf));
   min-width: 0;
   height: var(--ds-row-height);
 }
