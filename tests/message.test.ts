@@ -40,8 +40,6 @@ test("the toast form receives the shared queue and preserves its configuration",
   const element = document.createElement("ds-message");
   element.form = "toast";
   element.position = "top-center";
-  element.duration = Infinity;
-  element.closeButton = true;
   document.body.append(element);
   await element.updateComplete;
   const stack = element.shadowRoot!.querySelector("ds-toast")!;

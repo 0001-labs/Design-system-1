@@ -61,8 +61,8 @@ configureToaster({ position: "top-center", closeButton: true });
 | `position` | `bottom-right` | `top-left`, `top-center`, `top-right`, `bottom-left`, `bottom-center` or `bottom-right`. |
 | `expand` | Off | Keeps the toasts spread out instead of stacked. |
 | `visibleToasts` | `3` | How many toasts show at once. |
-| `duration` | `4000` | Milliseconds each toast stays. |
-| `closeButton` | Off | Adds a close button to every toast. |
+| `duration` | `Infinity` | Stays until dismissed. Set a finite duration only for an explicitly timed message. |
+| `closeButton` | On | Adds a close button to every toast. |
 | `richColors` | Off | Fills success, info, warning and error toasts with their colour. |
 | `label` | Notifications | The region's accessible name. |
 | `closeLabel` | Close | The close button's accessible name. |

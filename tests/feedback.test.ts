@@ -7,7 +7,7 @@ const { configureI18n, loadSharedWords, setLanguage } = await import("../DS1/0-f
 afterEach(async () => {
   toast.dismiss();
   await vi.advanceTimersByTimeAsync?.(500).catch(() => undefined);
-  configureToaster({ position: "bottom-right", closeButton: false, richColors: false, expand: false });
+  configureToaster({ position: "bottom-right", duration: Infinity, closeButton: true, richColors: false, expand: false });
   for (const dialog of document.querySelectorAll("dialog")) dialog.dispatchEvent(new Event("cancel", { cancelable: true }));
   document.body.replaceChildren();
   vi.useRealTimers();
@@ -33,7 +33,7 @@ test("the page toaster is a polite live region in the page before the first toas
 test("draws a toast with no framework, as Sonner does, and closes it after four seconds", async () => {
   vi.useFakeTimers();
   const onAutoClose = vi.fn();
-  toast("Event created", { description: "Monday at 9:00", onAutoClose });
+  toast("Event created", { description: "Monday at 9:00", duration: 4000, onAutoClose });
   await settle(20);
   const [item] = toasts();
   expect(item!.querySelector(".title")?.textContent).toBe("Event created");
@@ -66,7 +66,7 @@ test("an error is announced assertively unless it says otherwise", async () => {
 
 test("queues the newest in front, shows three, and pauses while hovered", async () => {
   vi.useFakeTimers();
-  for (const title of ["One", "Two", "Three", "Four"]) toast(title);
+  for (const title of ["One", "Two", "Three", "Four"]) toast(title, { duration: 4000 });
   await settle(20);
   expect(titles()).toEqual(["Four", "Three", "Two", "One"]);
   expect(toasts().map(item => item.dataset.front)).toEqual(["true", "false", "false", "false"]);
@@ -259,4 +259,16 @@ test("copyText falls back to a hidden field where the Clipboard API is missing o
   await settle(20);
   expect(titles()[0]).toBe("Could not copy");
   expect(toasts()[0]!.dataset.type).toBe("error");
+});
+
+test("a page toast persists by default and has a close button", async () => {
+  vi.useFakeTimers();
+  const onAutoClose = vi.fn();
+  toast("Stay here", { onAutoClose });
+  await settle(60000);
+  expect(toasts()).toHaveLength(1);
+  expect(onAutoClose).not.toHaveBeenCalled();
+  toasts()[0]!.querySelector<HTMLButtonElement>("button.close")!.click();
+  await settle(300);
+  expect(toasts()).toHaveLength(0);
 });

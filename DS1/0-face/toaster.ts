@@ -47,7 +47,7 @@ export interface ToasterOptions {
   expand?: boolean;
   /** How many show at once; three by default. */
   visibleToasts?: number;
-  /** Milliseconds each toast stays; 4000 by default. */
+  /** Milliseconds each toast stays; Infinity by default, until dismissed. */
   duration?: number;
   /** A close button on every toast. */
   closeButton?: boolean;
@@ -234,7 +234,7 @@ class PageToaster {
   private draw(item: Item) {
     const { data } = item;
     const dismissible = data.dismissible !== false;
-    const closeButton = (data.closeButton ?? settings.closeButton ?? false) && dismissible;
+    const closeButton = (data.closeButton ?? settings.closeButton ?? true) && dismissible;
     const closeLabel = settings.closeLabel ?? feedbackWord("Close");
     const key = JSON.stringify([data.title, data.description, data.type, data.icon, data.action?.label, data.action?.href, data.cancel?.label, data.cancel?.href, closeButton, closeLabel]);
     const previous = item.element?.querySelector<HTMLElement>(".body");

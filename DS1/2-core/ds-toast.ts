@@ -13,7 +13,7 @@
  * - `<ds-toast>` is Sonner's `<Toaster />`, with its `position`, `expand`,
  *   `visible-toasts`, `duration`, `close-button` and `rich-colors`;
  *   `contained` draws it inside its positioned parent instead of the window.
- * - A toast stays 4 seconds; its timer pauses while the stack is hovered,
+ * - A toast stays until dismissed; an explicitly timed toast pauses while the stack is hovered,
  *   focused, held or the tab is hidden. Three show at once, stacked behind
  *   one another and spread out on hover. A swipe towards the edge dismisses one,
  *   Alt+T reaches them from the keyboard, and they come and go with Sonner's
@@ -101,7 +101,7 @@ export class Toaster extends LitElement {
     this.expand = false;
     this.visibleToasts = VISIBLE_TOASTS;
     this.duration = DURATION;
-    this.closeButton = false;
+    this.closeButton = true;
     this.richColors = false;
     this.contained = false;
     this.label = "Notifications";

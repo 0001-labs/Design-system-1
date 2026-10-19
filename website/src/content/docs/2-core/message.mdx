@@ -123,7 +123,7 @@ An assistant message stays in the page. Supply its identity through `heading` or
 
 ## Toast
 
-The toast form uses the existing Sonner-based queue, timers, gestures and announcements. Put one host in the app; `message()` sends messages to it.
+Toast messages stay on screen until dismissed, with a close button by default. This includes success and error messages after a promise finishes. The toast form uses the existing Sonner-based queue, gestures and announcements. Put one host in the app; `message()` sends messages to it.
 
 ```html
 <ds-message form="toast" position="bottom-right" close-button></ds-message>
@@ -146,8 +146,8 @@ message.dismiss();
 | `position` | `bottom-right` | `top-left`, `top-center`, `top-right`, `bottom-left`, `bottom-center` or `bottom-right`. |
 | `expand` | Off | Keeps the toasts spread out instead of stacked. |
 | `visible-toasts` | `3` | How many toasts show at once. |
-| `duration` | `4000` | Milliseconds each toast stays. |
-| `close-button` | Off | Adds a close button to every toast. |
+| `duration` | `Infinity` | Stays until dismissed. Set a finite duration only for an explicitly timed message. |
+| `close-button` | On | Adds a close button to every toast. |
 | `rich-colors` | Off | Fills success, info, warning and error toasts with their colour. |
 | `contained` | Off | Not in Sonner: draws the toasts inside the nearest positioned parent, such as a panel's status area, instead of the window. |
 | `label` | `Messages` | The region's accessible name; pass the product's own words. |

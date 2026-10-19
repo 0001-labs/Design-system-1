@@ -117,8 +117,8 @@ export class Message extends LitElement {
     this.closeLabel = "Close";
     this.form = "inline";
     this.position = "bottom-right";
-    this.duration = 4000;
-    this.closeButton = false;
+    this.duration = Infinity;
+    this.closeButton = true;
     this.tone = "neutral";
     this.literal = false;
     this.dismissible = false;

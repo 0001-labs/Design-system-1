@@ -24,7 +24,7 @@ const settle = async (element: HTMLElement & { updateComplete: Promise<boolean> 
 };
 
 test("shows a toast as Sonner does and closes it after four seconds", async () => {
-  const element = await toaster();
+  const element = await toaster('duration="4000"');
   const onAutoClose = vi.fn();
   toast("Event created", { description: "Monday at 9:00", onAutoClose });
   await settle(element, 20);
@@ -69,7 +69,7 @@ test("stacks the newest in front and shows three at once", async () => {
 });
 
 test("hovering spreads the stack and pauses its time", async () => {
-  const element = await toaster();
+  const element = await toaster('duration="4000"');
   toast("Paused");
   await settle(element, 20);
   const list = element.shadowRoot!.querySelector("ol")!;
@@ -115,7 +115,7 @@ test("toast() adds a toaster when the page has none", async () => {
 });
 
 test("moving the toaster keeps its toasts and the time they had left", async () => {
-  const element = await toaster("contained");
+  const element = await toaster('contained duration="4000"');
   toast("Moved");
   await settle(element, 3000);
   const parent = document.createElement("div");
@@ -136,4 +136,20 @@ test("an action can be a link, and following it closes the toast", async () => {
   link.click();
   await settle(element);
   expect(toasts(element)).toHaveLength(0);
+});
+
+ test("default toasts and resolved promises remain until explicitly dismissed", async () => {
+  const element = await toaster();
+  const onAutoClose = vi.fn();
+  toast("Keep this", { onAutoClose });
+  await settle(element, 60000);
+  expect(toasts(element)).toHaveLength(1);
+  expect(onAutoClose).not.toHaveBeenCalled();
+  toasts(element)[0]!.querySelector<HTMLButtonElement>("button.close")!.click();
+  await settle(element, 300);
+  expect(toasts(element)).toHaveLength(0);
+  toast.promise(Promise.resolve(), { loading: "Saving", success: "Saved", error: "Failed" });
+  await settle(element, 60000);
+  expect(toasts(element)).toHaveLength(1);
+  expect(toasts(element)[0]!.querySelector(".title")?.textContent).toBe("Saved");
 });

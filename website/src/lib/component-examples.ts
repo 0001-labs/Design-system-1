@@ -98,8 +98,8 @@ export const EXAMPLES: Record<string, ComponentExample> = {
 });`,
   },
   toast: {
-    title: 'Toasts, as in Sonner',
-    hint: 'Each button calls message(). Hover the stack to spread it out and pause it; swipe one down to dismiss it.',
+    title: 'Persistent toast messages',
+    hint: 'Each message stays until you dismiss it. Close it, swipe it away, or choose its action. Hover the stack to spread it out.',
     height: 260,
     html: `<ds-message form="toast" position="bottom-right" close-button></ds-message>
 <ds-row>

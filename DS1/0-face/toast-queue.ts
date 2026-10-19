@@ -62,7 +62,7 @@ export type ToastSignal = { toast: ToastData } | { dismiss: ToastId | undefined 
 type Listener = (signal: ToastSignal) => void;
 
 /** Sonner's constants, shared by both toasters; its gap and offset are rounded to squares in the stylesheet. */
-export const TOAST_DURATION = 4000;
+export const TOAST_DURATION = Infinity;
 export const VISIBLE_TOASTS = 3;
 export const TIME_BEFORE_UNMOUNT = 200;
 export const SWIPE_THRESHOLD = 45;
