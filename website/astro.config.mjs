@@ -159,7 +159,7 @@ export default defineConfig({
               ],
             },
             { label: "Native", slug: "advanced/native" },
-            { label: "Email design", slug: "email" },
+            { label: "Email kit", slug: "email" },
             { label: "Film kit", slug: "advanced/film-kit" },
           ],
         },
