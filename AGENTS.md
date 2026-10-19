@@ -127,6 +127,10 @@ Visibility is independent of the numbered layers. `DS1/0-face/component-visibili
 
 The public Fonts catalogue uses Aa's `createPlainEditor` for plain specimen text, copied through Sync 1 to `website/src/vendor/aa`. It inherits the specimen font and size, has no focus border or formatting controls, and uses Aa's rounded native-selection painter. This single-block specimen is an intentional exception to Markdown document storage/history in the `editing` guide; no specimen text is persisted. The selected parts for this interaction are `editing`, `design`, and `sharing`.
 
+## Read-only example source
+
+Component and layout example code uses the existing Sync 1 Aa snapshot in `website/src/vendor/aa`, through `createEditor` with `readOnly: true` and menus and toolbar disabled. Selected parts: `editing`, `documentation`, `design`, and `themes`. Code is wrapped in a safe Markdown fence for display; copying retains the exact original source. This is a public source viewer, not a replacement for a writable document editor: persistence, undo, attachments, collaboration and an editor migration flag do not apply. The shared example wrapper uses the theme-aware grey fill and remains collapsed initially.
+
 ## Product code
 
 Canonical short code: `DS1`. Use this three-character code for product-owned libraries and other compact ownership labels. Use this code followed by a colon for commit subjects; keep the full product name in prose.
