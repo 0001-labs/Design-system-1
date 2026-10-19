@@ -160,9 +160,14 @@ export default defineConfig({
                 { label: "API and tools", slug: "libraries/api" },
               ],
             },
-            { label: "Native packages", slug: "advanced/native" },
-            { label: "iOS", slug: "advanced/ios" },
-            { label: "Android", slug: "advanced/android" },
+            {
+              label: "Native packages",
+              items: [
+                { label: "About native packages", slug: "advanced/native" },
+                { label: "iOS", slug: "advanced/ios" },
+                { label: "Android", slug: "advanced/android" },
+              ],
+            },
             { label: "Film kit", slug: "advanced/film-kit" },
           ],
         },
