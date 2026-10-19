@@ -128,7 +128,7 @@ An assistant message stays in the page. Supply its identity through `heading` or
 
 ## Toast
 
-Toast messages stay on screen until dismissed, with a close button by default. This includes success and error messages after a promise finishes. The toast form uses the existing Sonner-based queue, gestures and announcements. Put one host in the app; `message()` sends messages to it.
+Toast messages can be persistent or timed. Persistent messages stay until dismissed (`duration: Infinity`, the default); timed messages close automatically after their duration in milliseconds, such as `duration: 4000`. Both have a close button by default. The same choice applies to success and error messages after a promise finishes. The toast form uses the existing Sonner-based queue, gestures and announcements. Put one host in the app; `message()` sends messages to it.
 
 ```html
 <ds-message form="toast" position="bottom-right" close-button></ds-message>
@@ -136,7 +136,8 @@ Toast messages stay on screen until dismissed, with a close button by default. T
 
 ```ts
 import { message } from "@0001-labs/design-system-1";
-message.success("Changes saved");
+message("Review required", { duration: Infinity });
+message.success("Changes saved", { duration: 4000 });
 message.error("Could not save");
 message.promise(save(), { loading: "Saving", success: "Saved", error: "Could not save" });
 message.dismiss();
@@ -151,7 +152,7 @@ message.dismiss();
 | `position` | `bottom-right` | `top-left`, `top-center`, `top-right`, `bottom-left`, `bottom-center` or `bottom-right`. |
 | `expand` | Off | Keeps the toasts spread out instead of stacked. |
 | `visible-toasts` | `3` | How many toasts show at once. |
-| `duration` | `Infinity` | Stays until dismissed. Set a finite duration only for an explicitly timed message. |
+| `duration` | `Infinity` | Use `Infinity` to stay until dismissed, or milliseconds (for example `4000`) to close automatically. |
 | `close-button` | On | Adds a close button to every toast. |
 | `rich-colors` | Off | Fills success, info, warning and error toasts with their colour. |
 | `contained` | Off | Not in Sonner: draws the toasts inside the nearest positioned parent, such as a panel's status area, instead of the window. |

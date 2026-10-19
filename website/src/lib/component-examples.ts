@@ -100,12 +100,13 @@ export const EXAMPLES: Record<string, ComponentExample> = {
 });`,
   },
   toast: {
-    title: 'Persistent toast messages',
-    hint: 'Each message stays until you dismiss it. Close it, swipe it away, or choose its action. Hover the stack to spread it out.',
+    title: 'Persistent and timed toast messages',
+    hint: 'Persistent stays until dismissed. Timed closes after four seconds; hover to pause its timer. Close either with its close button or a swipe.',
     height: 260,
     html: `<ds-message form="toast" position="bottom-right" close-button></ds-message>
 <ds-row>
-  <ds-button secondary data-toast="default">Default</ds-button>
+  <ds-button secondary data-toast="persistent">Persistent</ds-button>
+  <ds-button secondary data-toast="timed">Timed</ds-button>
   <ds-button secondary data-toast="success">Success</ds-button>
   <ds-button secondary data-toast="error">Error</ds-button>
   <ds-button secondary data-toast="action">Action</ds-button>
@@ -113,7 +114,8 @@ export const EXAMPLES: Record<string, ComponentExample> = {
 </ds-row>`,
     script: `import { message } from "@0001-labs/design-system-1";
 
-message("Event created", { description: "Monday at 9:00" });
+message("Review required", { duration: Infinity });
+message.success("Changes saved", { duration: 4000 });
 message.success("Changes saved");
 message.error("Could not save");
 message("Item archived", { action: { label: "Undo", onClick: () => restore() } });
