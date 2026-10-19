@@ -1,4 +1,5 @@
 ---
+import LargeDirectoryList from './LargeDirectoryList.astro';
 import { LAYERS } from '../../../shared/component-directory';
 const { number } = Astro.props as { number: number };
 const layer = LAYERS.find(layer => layer.number === number)!;
@@ -80,7 +81,7 @@ const cards = [
       </a>
     ))}
   </div>
-  <nav class="directory" aria-label={`Explore ${layer.name}`}><h2>Explore {layer.name}</h2><div>{layer.entries.map(entry => <a href={entry.href}>{entry.name}</a>)}</div></nav>
+  <nav class="directory" aria-label={`Explore ${layer.name}`}><h2>Explore {layer.name}</h2><LargeDirectoryList entries={layer.entries} /></nav>
 </section>
 
 <style>
@@ -110,10 +111,10 @@ const cards = [
   .caption h3 { font-size:var(--ds-type-size-default,14px); line-height:var(--u); margin:0; padding-right:var(--u); }
   .caption p { font-size:var(--ds-type-size-default,14px); line-height:var(--u); margin:calc(var(--u) / 2) 0 0; max-width:36ch; color:var(--ds-text-color-muted); }
   .open { position:absolute; top:var(--u);right:var(--u); }
-  .directory { margin-block:calc(2 * var(--u)); }
+  .directory { --directory-type:calc(6 * var(--u)); --layer-color:var(--layer-accent); margin-block:calc(2 * var(--u)); font-family:var(--typeface-regular); container-type:inline-size; }
   .directory h2 { font-size:var(--ds-type-size-default,14px); margin:0 0 var(--u); border:0; }
-  .directory>div { display:flex; flex-wrap:wrap; gap:calc(var(--u) / 2) var(--u); }
-  .directory a { color:inherit; text-decoration:underline; text-underline-offset:4px; }
+  @media(max-width:1100px) { .directory { --directory-type:calc(4 * var(--u)); } }
+  @media(max-width:680px) { .directory { --directory-type:calc(3 * var(--u)); } }
   .swatches { display:flex; width:100%; justify-content:center; }
   .swatches i { width:calc(3 * var(--u)); height:calc(5 * var(--u)); }
   .swatches i:nth-child(even) { margin-top:var(--u); }

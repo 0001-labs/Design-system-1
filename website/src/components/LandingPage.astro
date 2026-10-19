@@ -1,5 +1,6 @@
 ---
 import LandingHero from './LandingHero.astro';
+import LargeDirectoryList from './LargeDirectoryList.astro';
 import LayerDiagram from './LayerDiagram.astro';
 import { LAYERS } from '../lib/component-directory';
 ---
@@ -16,11 +17,7 @@ import { LAYERS } from '../lib/component-directory';
           <h2 id={`layer-${layer.number}`}><span class="directory-swatch" aria-hidden="true"></span>{layer.number} {layer.name}</h2>
           <p>{layer.summary}</p>
         </div>
-        <ul>
-          {layer.entries.map((entry) => (
-            <li><a href={entry.href}>{entry.name}</a></li>
-          ))}
-        </ul>
+        <LargeDirectoryList entries={layer.entries} />
       </section>
     ))}
   </div>
@@ -102,24 +99,6 @@ import { LAYERS } from '../lib/component-directory';
     line-height: var(--landing-unit);
   }
 
-  .directory-layer ul { margin: 0; padding: 0; list-style: none; }
-  .directory-layer li { margin: 0; }
-  .directory-layer li a {
-    display: block;
-    width: fit-content;
-    max-width: 100%;
-    padding: 0 0.08em;
-    margin-inline-start: -0.08em;
-    color: inherit;
-    font-size: var(--directory-type);
-    letter-spacing: -0.035em;
-    line-height: var(--directory-type);
-    text-decoration: none;
-    overflow-wrap: anywhere;
-    transition: background-color 120ms ease-out;
-  }
-  .directory-layer li a:hover { background: var(--layer-color); color: #1e1e1e; }
-  .directory-layer li a:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 
   @media (max-width: 1100px) {
     .landing { --landing-unit: min(calc(var(--unit, 20px) * var(--sf, 1)), calc(100vw / 39)); }

@@ -1,0 +1,29 @@
+---
+import type { DirectoryEntry } from '../../../shared/component-directory';
+const { entries } = Astro.props as { entries: DirectoryEntry[] };
+---
+<ul class="large-directory not-content" data-ds-not-prose>
+  {entries.map(entry => <li><a href={entry.href}>{entry.name}</a></li>)}
+</ul>
+<style>
+  .large-directory { margin: 0; padding: 0; list-style: none; }
+  .large-directory li { margin: 0; }
+  .large-directory li a {
+    display: block;
+    width: fit-content;
+    max-width: 100%;
+    padding: 0 0.08em;
+    margin-inline-start: -0.08em;
+    color: inherit;
+    font-size: var(--directory-type);
+    letter-spacing: -0.035em;
+    line-height: var(--directory-type);
+    text-decoration: none;
+    overflow-wrap: anywhere;
+    transition: background-color 120ms ease-out;
+  }
+  .large-directory li a:hover { background: var(--layer-color); color: var(--ds-black, #1e1e1e); }
+  .large-directory li a:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+
+  @media (prefers-reduced-motion: reduce) { .large-directory li a { transition: none; } }
+</style>
