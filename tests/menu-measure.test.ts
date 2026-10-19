@@ -129,3 +129,24 @@ test("a Context row hovered lightens, and the keyboard's focus rings it", async 
   expect(states.active).not.toBe(states.resting);
   await tab.close();
 });
+
+test("a menu from a button fits its words on whole squares, at least as wide as its button", async () => {
+  const tab = await page();
+  await tab.evaluate(() => {
+    document.getElementById("stage")!.innerHTML = '<button id="filter" type="button" style="width:20px;height:20px">F</button><ds-select for="filter" aria-label="Filter"><ds-button menu-item role="menuitemradio" aria-checked="true">All accounts and their cash</ds-button><ds-button menu-item role="menuitemradio">Wise</ds-button></ds-select>';
+  });
+  await frames(tab);
+  await tab.click("#filter");
+  await frames(tab);
+  const box = await tab.evaluate(() => {
+    const menu = document.querySelector("ds-select")!;
+    const row = menu.querySelector("ds-button")!;
+    const words = row.shadowRoot?.querySelector("button")?.scrollWidth ?? 0;
+    return { open: (menu as HTMLElement & { open: boolean }).open, width: menu.getBoundingClientRect().width, words, clipped: (row.shadowRoot?.querySelector("button")?.scrollWidth ?? 0) > (row.shadowRoot?.querySelector("button")?.clientWidth ?? 0) };
+  });
+  expect(box.open).toBe(true);
+  expect(box.width % UNIT).toBe(0);
+  expect(box.width).toBeGreaterThan(4 * UNIT);
+  expect(box.clipped).toBe(false);
+  await tab.close();
+});

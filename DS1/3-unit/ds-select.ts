@@ -84,6 +84,8 @@ export class Select extends Menu {
     // An action menu with an opener floats; one without stays in place.
     if (!this.field && !this.hasAttribute("floating") && (this.trigger || this.for)) this.floating = true;
     this.closesOnChoice = !this.field;
+    // A menu from a button fits its words, on whole squares.
+    this.toggleAttribute("data-ds-hug", !this.field && this.triggerMode !== "submenu");
     super.willUpdate(changed);
   }
   focus(options?: FocusOptions) {

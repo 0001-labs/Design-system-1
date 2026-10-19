@@ -22,7 +22,6 @@
   --ds-context-refused: var(--ds-tuned-red);
   width: var(--ds-menu-width, max-content);
   min-width: calc(4 * var(--ds-unit));
-  max-width: calc(16 * var(--ds-unit));
 }
 
 .frame {

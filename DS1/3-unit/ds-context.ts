@@ -57,6 +57,7 @@ export class Context extends Menu {
     // Always a context menu, always floating.
     this.triggerMode = "context";
     this.floating = true;
+    this.toggleAttribute("data-ds-hug", true);
     super.willUpdate(changed);
   }
   updated() {

@@ -110,6 +110,11 @@ export class Menu extends LitElement {
     this.hide(true);
     super.disconnectedCallback();
   }
+  /** The element it stands by: its anchor, or for a menu from a button, the button. */
+  private get anchorElement(): HTMLElement | null {
+    if (this.anchor instanceof HTMLElement) return this.anchor;
+    return !this.anchor && this.triggerMode !== "context" && this.triggerMode !== "manual" ? this.trigger : null;
+  }
   /** The opening button: `trigger`, else the element `for` names. */
   protected get forTarget(): HTMLElement | null {
     if (this.trigger) return this.trigger;
@@ -135,7 +140,7 @@ export class Menu extends LitElement {
     }
     if (this.floating && this.open) this.show(); else this.hide(true);
     this.syncTabStops();
-    const element = this.anchor instanceof HTMLElement ? this.anchor : null;
+    const element = this.anchorElement;
     if (this.observer && this.observedAnchor !== element) {
       if (this.observedAnchor) this.observer.unobserve(this.observedAnchor);
       if (element) this.observer.observe(element);
@@ -306,7 +311,7 @@ export class Menu extends LitElement {
     if (typeof ResizeObserver !== "undefined") {
       this.observer = new ResizeObserver(this.place);
       this.observer.observe(this);
-      this.observedAnchor = this.anchor instanceof HTMLElement ? this.anchor : null;
+      this.observedAnchor = this.anchorElement;
       if (this.observedAnchor) this.observer.observe(this.observedAnchor);
     }
     this.ownerDocument.addEventListener("pointerdown", this.onOutside, true);
@@ -374,7 +379,8 @@ export class Menu extends LitElement {
     if (this.controller && event.button === 0 && event.composedPath().some(node => node instanceof HTMLElement && node.matches(ITEM))) event.preventDefault();
   };
   place = () => {
-    const anchor = this.triggerMode === "context" || this.triggerMode === "manual" ? this.contextPoint ?? this.anchor : this.anchor;
+    // A menu from a button stands by its button unless given another anchor.
+    const anchor = this.triggerMode === "context" || this.triggerMode === "manual" ? this.contextPoint ?? this.anchor : this.anchor ?? this.trigger;
     if (!this.shown || !anchor) return;
     const rect = anchor instanceof HTMLElement ? anchor.getBoundingClientRect() : anchor, view = this.ownerDocument.defaultView!;
     const viewport = view.visualViewport;
@@ -387,7 +393,17 @@ export class Menu extends LitElement {
       round(Math.max(0, length) / unit + (round === Math.floor ? 0.001 : -0.001)) * unit;
     const room = squares(width - 2 * gap, Math.floor);
     this.style.maxWidth = `${room}px`;
-    this.style.setProperty("--ds-menu-anchor-width", `${Math.min(room, Math.max(4 * unit, squares(rect.width, Math.ceil)))}px`);
+    const anchorWidth = Math.min(room, Math.max(4 * unit, squares(rect.width, Math.ceil)));
+    this.style.setProperty("--ds-menu-anchor-width", `${anchorWidth}px`);
+    // A menu that hugs its words (Select's from a button, Context's) is as wide as they are,
+    // rounded up to whole squares, at least its anchor's width and at most the room there is;
+    // a product's --ds-menu-width still wins.
+    if (this.hasAttribute("data-ds-hug") && !view.getComputedStyle(this).getPropertyValue("--ds-menu-width").trim()) {
+      this.style.width = "max-content";
+      const natural = this.getBoundingClientRect().width;
+      const least = this.triggerMode === "context" || this.triggerMode === "manual" ? 4 * unit : anchorWidth;
+      this.style.width = `${Math.min(room, Math.max(least, squares(natural, Math.ceil)))}px`;
+    }
     if (this.placement === "right" || this.placement === "left" || this.triggerMode === "submenu") {
       this.style.setProperty("--ds-menu-available-height", `${squares(height - 2 * gap, Math.floor)}px`);
       const box = this.getBoundingClientRect();
