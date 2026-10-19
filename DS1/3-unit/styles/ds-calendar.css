@@ -93,9 +93,9 @@
 .nav:hover:not(:disabled) { background: var(--ds-fill); color: var(--ds-text-color); }
 :host(:dir(rtl)) .nav > ds-icon { transform: scaleX(-1); }
 
-/* The title as a button: pressing it travels up to the months of the year, then to twelve years.
- * One control high at the square's foot, the words on the sixteen where the title stands, the
- * pointer filling it 4px past them. */
+/* The title as a plain button, its words alone: pressing it travels up to the months of the year,
+ * then to twelve years. One control high at the square's foot, the words on the sixteen where the
+ * title stands, the pointer filling it 4px past them at each side. */
 .title-button {
   display: inline-flex;
   flex: 0 1 auto;
@@ -104,7 +104,7 @@
   max-width: 100%;
   height: var(--ds-control-height);
   margin: 0 0 0 calc(-4px * var(--ds-sf, 1));
-  padding: 0 0 0 calc(4px * var(--ds-sf, 1));
+  padding: 0 calc(4px * var(--ds-sf, 1));
   border: 0;
   border-radius: var(--ds-radius);
   background: transparent;
@@ -115,11 +115,10 @@
   letter-spacing: inherit;
   cursor: pointer;
 }
-:host(:dir(rtl)) .title-button { margin: 0 calc(-4px * var(--ds-sf, 1)) 0 0; padding: 0 calc(4px * var(--ds-sf, 1)) 0 0; }
+:host(:dir(rtl)) .title-button { margin: 0 calc(-4px * var(--ds-sf, 1)) 0 0; }
 .title-button:hover { background: var(--ds-fill); }
 .title-button:focus-visible { outline: 2px solid var(--ds-focus-ring); outline-offset: -2px; }
 .title-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.title-button > ds-icon { flex: 0 0 auto; color: var(--ds-title-color); }
 
 /* The months of a year, or twelve years: cells whole squares wide, three across a narrow month
  * and four across a wider one, each row one square, one square apart. The area keeps the days'

@@ -409,6 +409,8 @@ test("the title travels up to the months and to twelve years, and a choice comes
   const months: string[] = [];
   calendar.addEventListener("navigate", event => months.push((event as CustomEvent).detail.month));
   expect(title().textContent!.trim()).toBe("Sep 2027");
+  // The title is its words alone.
+  expect(title().querySelector("ds-icon")).toBeNull();
   title().click();
   await calendar.updateComplete;
   // The months of 2027, three across, the chosen month marked; the arrows step a year.

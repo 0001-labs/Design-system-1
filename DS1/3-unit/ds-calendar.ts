@@ -609,7 +609,7 @@ export class Calendar extends CalendarBase {
             type="button"
             aria-label=${`${title}, ${this.words("Choose a month and year")}`}
             @click=${this.levelUp}
-          ><span class="title-text" id="title" aria-live="polite">${title}</span><ds-icon type="chevron-down" size="large" aria-hidden="true"></ds-icon></button>`}
+          ><span class="title-text" id="title" aria-live="polite">${title}</span></button>`}
       <span class="controls">
         ${this.noToday || this.squaresPerDay < 2 ? nothing : html`<button class="ds-button today-button" part="today" type="button" @click=${() => this.showToday()}>${this.words("Today")}</button>`}
         ${arrow("previous")}
