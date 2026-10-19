@@ -66,6 +66,7 @@ export class CalendarLarge extends CalendarBase {
     start: { type: String, reflect: true },
     months: { type: Number },
     scale: { type: Number },
+    activity: { type: Boolean, reflect: true },
     noHeader: { type: Boolean, attribute: "no-header", reflect: true },
     visible: { state: true },
   };
@@ -75,6 +76,7 @@ export class CalendarLarge extends CalendarBase {
   declare start: string | undefined;
   declare months: number | undefined;
   declare scale: number | undefined;
+  declare activity: boolean;
   declare noHeader: boolean;
   /** The month at the start of the view, named in the title. */
   declare visible: Day | undefined;
@@ -88,6 +90,7 @@ export class CalendarLarge extends CalendarBase {
   constructor() {
     super();
     this.noHeader = false;
+    this.activity = false;
   }
 
   /** The first of the first month drawn. */
@@ -120,7 +123,7 @@ export class CalendarLarge extends CalendarBase {
 
   protected willUpdate(changed: PropertyValues<this>) {
     super.willUpdate(changed);
-    const scale = typeof this.scale === "number" && Number.isFinite(this.scale) && this.scale > 0 ? this.scale : 1.5;
+    const scale = typeof this.scale === "number" && Number.isFinite(this.scale) && this.scale > 0 ? this.scale : this.activity ? 1 : 1.5;
     this.style.setProperty("--ds-calendar-scale", String(scale));
   }
 
@@ -314,6 +317,7 @@ export class CalendarLarge extends CalendarBase {
                     data-day=${day}
                     tabindex=${day === tab ? 0 : -1}
                     aria-label=${this.cellLabel(day, events)}
+                    title=${this.activity ? this.cellLabel(day, events) : nothing}
                     aria-selected=${this.selectable ? String(selected || inside) : nothing}
                     aria-current=${isToday ? "date" : nothing}
                     aria-disabled=${this.allowed(day) ? nothing : "true"}

@@ -163,3 +163,16 @@
   .rail .weekday:not(:empty) { font-size: 0; }
   .rail .weekday:not(:empty)::after { content: attr(data-narrow); font-size: var(--ds-type-size-default); }
 }
+
+/* Activity keeps the day grid, with quiet separated squares and event colours. */
+:host([activity]) .frame { border: 0; border-radius: 0; }
+:host([activity]) .cell { position: relative; border: 0; background: none; }
+:host([activity]) .cell::before {
+  content: "";
+  position: absolute;
+  inset: calc(2px * var(--ds-sf, 1));
+  border-radius: calc(2px * var(--ds-sf, 1));
+  background: var(--ds-calendar-cell-fill, var(--ds-fill));
+}
+:host([activity]) .date { display: none; }
+:host([activity]) .cell[data-selected]::before { outline: 1px solid var(--ds-calendar-ink); }
