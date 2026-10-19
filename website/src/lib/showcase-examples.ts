@@ -315,6 +315,18 @@ export const SHOWCASE_EXAMPLES: Record<string, ComponentExample> = {
     "html": "<section class=\"specimen\">\n<div style=\"position:relative;isolation:isolate;padding:var(--ds-unit)\"><ds-grid contained></ds-grid><div style=\"position:relative\"><ds-row class=\"line\" ><span class=\"mark\"><ds-icon type=\"page\" size=\"large\" aria-hidden=\"true\"></ds-icon></span><ds-text literal >North window</ds-text></ds-row><ds-row class=\"line\" ><span class=\"mark\"><ds-icon type=\"page\" size=\"large\" aria-hidden=\"true\"></ds-icon></span><ds-text literal >East courtyard</ds-text></ds-row><ds-row class=\"line\" ><span class=\"mark\"><ds-icon type=\"page\" size=\"large\" aria-hidden=\"true\"></ds-icon></span><ds-text literal >Reading room</ds-text></ds-row><ds-row class=\"line\" ><span class=\"mark\"><ds-icon type=\"page\" size=\"large\" aria-hidden=\"true\"></ds-icon></span><ds-text literal >West staircase</ds-text></ds-row></div></div>\n</section>\n<style>\n.specimen { width: 100%; min-width: 0; --cell: calc(20px * var(--sf, 1)); }\n.specimen .line { width: 100%; }\n.specimen .grow { flex: 1; min-width: 0; }\n.specimen .muted { color: var(--ds-text-color-muted); }\n.specimen .mono { --ds-typeface-regular: var(--ds-typeface-mono); font-variant-numeric: tabular-nums; }\n.specimen .value { width: calc(4 * var(--cell)); text-align: right; }\n.specimen .mark { display: inline-flex; align-items: flex-end; width: var(--cell); height: var(--ds-control-height); flex: 0 0 var(--cell); }\n.specimen .columns { display: flex; flex-wrap: wrap; gap: var(--cell); }\n.specimen .columns > * { min-width: 0; }\n.specimen fieldset { border: 0; padding: 0; margin: 0; }\n.specimen legend { padding: 0; }\n.specimen label { display: flex; align-items: flex-end; gap: calc(var(--cell) / 2); min-height: var(--cell); }\n.specimen ds-panel { height: calc(10 * var(--cell)); }\n</style>",
     "height": 240
   },
+  "bento-layers": {
+    "title": "Four layers",
+    "hint": "A flow bento: three columns sharing the width, tiles one or two columns wide, half a square apart.",
+    "html": "<ds-bento>\n  <ds-card data-span=\"2\" tone=\"yellow\"><span slot=\"label\">Root</span><span slot=\"title\">One foundation</span>Colour, type and scale for everything after.</ds-card>\n  <ds-card tone=\"apple-green\"><span slot=\"label\">Core</span><span slot=\"title\">Small pieces</span>A control, a value, a state.</ds-card>\n  <ds-card tone=\"zenith-blue\"><span slot=\"label\">Unit</span><span slot=\"title\">Together</span>Rows, lists and forms.</ds-card>\n  <ds-card data-span=\"2\" tone=\"pink\"><span slot=\"label\">Page</span><span slot=\"title\">Everything in its place</span>Navigation, work and context on one grid.</ds-card>\n</ds-bento>",
+    "height": 460
+  },
+  "bento-squares": {
+    "title": "Tiles on squares",
+    "hint": "A squares bento: each tile placed on whole squares a square apart, its surface reaching a quarter square towards its neighbours, so the tiles stand half a square apart.",
+    "html": "<ds-bento squares columns=\"32\">\n  <ds-card data-place=\"0 0 15 7\"><span slot=\"label\">Archive</span><span slot=\"title\">Everything kept</span></ds-card>\n  <ds-card data-place=\"16 0 16 15\" tone=\"yellow\"><span slot=\"label\">Lists</span><span slot=\"title\">Every list in one place</span>Placed on whole squares, half a square from the tiles beside it.</ds-card>\n  <ds-card data-place=\"0 8 15 7\" tone=\"zenith-blue\"><span slot=\"label\">Home</span><span slot=\"title\">Today first</span></ds-card>\n</ds-bento>",
+    "height": 380
+  },
   "table-stock": {
     "title": "Print stock",
     "hint": "Text columns and numeric columns share rows; figures align at the end of their columns.",
@@ -544,6 +556,10 @@ export const SHOWCASE_PAGES: Record<string, string[]> = {
     "table-stock",
     "table-loans",
     "table-sheet"
+  ],
+  "3-unit/bento": [
+    "bento-layers",
+    "bento-squares"
   ],
   "3-unit/sidebar": [
     "sidebar-gallery"

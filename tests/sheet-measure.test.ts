@@ -66,3 +66,36 @@ test("a sheet: cells 80 by 20, words on the sixteen 4px in, headers held while i
   expect(box.after.label - box.after.letter).toBe(20);
   await tab.close();
 });
+
+test("a bento's tiles stand half a square apart, in columns or on squares", async () => {
+  const tab = await browser.newPage({ viewport: { width: 1200, height: 800 } });
+  await tab.goto(url);
+  await tab.waitForFunction(() => document.documentElement.dataset.ready === "true");
+  const box = await tab.evaluate(async () => {
+    const stage = document.getElementById("stage")!;
+    stage.style.width = "650px";
+    stage.innerHTML = '<ds-bento id="flow"><ds-card data-span="2">A</ds-card><ds-card>B</ds-card><ds-card>C</ds-card></ds-bento>'
+      + '<div style="width:640px"><ds-bento id="squares" squares columns="32"><ds-card data-place="0 0 15 7">D</ds-card><ds-card data-place="16 0 16 15">E</ds-card><ds-card data-place="0 8 15 7">F</ds-card></ds-bento></div>';
+    await Promise.all([...stage.querySelectorAll<HTMLElement & { updateComplete: Promise<unknown> }>("ds-bento, ds-card")].map(element => element.updateComplete));
+    for (let i = 0; i < 3; i++) await new Promise(requestAnimationFrame);
+    // The surface is the card's own box inside the element; what it holds is its label's.
+    const rects = (id: string) => [...document.querySelectorAll(`#${id} > ds-card`)].map(card => card.shadowRoot!.querySelector(".ds-card")!.getBoundingClientRect());
+    const words = [...document.querySelectorAll("#squares > ds-card")].map(card => { const range = document.createRange(); range.selectNodeContents(card); return range.getBoundingClientRect(); });
+    const [a, b, c] = rects("flow"), [d, e, f] = rects("squares");
+    const bento = document.getElementById("squares")!.getBoundingClientRect();
+    return { flow: { across: b!.left - a!.right, wide: a!.width, narrow: b!.width, down: c!.top - a!.bottom }, squares: { across: e!.left - d!.right, down: f!.top - d!.bottom, d: { left: d!.left - bento.left, top: d!.top - bento.top, width: d!.width, height: d!.height }, e: { right: bento.right - e!.right, width: e!.width } }, words: words.map(word => ({ left: word.left - bento.left, top: Math.round(word.top - bento.top) })) };
+  });
+  expect(box.flow.across).toBe(10);
+  expect(box.flow.down).toBe(10);
+  // 650 = three columns of 210 and two gaps of 10: a wide tile is two columns and the gap.
+  expect(box.flow.narrow).toBe(210);
+  expect(box.flow.wide).toBe(430);
+  expect(box.squares.across).toBe(10);
+  expect(box.squares.down).toBe(10);
+  // The bento's own edges stay on the squares: a tile at the edge reaches only inwards.
+  expect(box.squares.d).toEqual({ left: 0, top: 0, width: 305, height: 145 });
+  expect(box.squares.e).toEqual({ right: 0, width: 325 });
+  // What a tile holds stays a square inside its place, whatever its surface reaches.
+  expect(box.words.map(word => word.left)).toEqual([20, 340, 20]);
+  await tab.close();
+});

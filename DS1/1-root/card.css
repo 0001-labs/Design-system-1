@@ -45,7 +45,12 @@
   height: var(--ds-card-height, auto);
   min-width: 0;
   margin: 0;
-  padding: var(--ds-card-padding) var(--ds-card-padding) 0;
+  /* In a squares bento the surface reaches a quarter square towards its neighbours (`--ds-bento-inset-*`, 0 elsewhere), and the padding grows by as much so what it holds stays on the squares. */
+  padding:
+    calc(var(--ds-card-padding) + var(--ds-bento-inset-top, 0px))
+    calc(var(--ds-card-padding) + var(--ds-bento-inset-end, 0px))
+    var(--ds-bento-inset-bottom, 0px)
+    calc(var(--ds-card-padding) + var(--ds-bento-inset-start, 0px));
   overflow: hidden;
   border-radius: var(--ds-radius-card);
   background: var(--ds-card-fill);

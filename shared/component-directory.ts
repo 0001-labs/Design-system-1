@@ -68,6 +68,7 @@ export const ALL_LAYERS: DirectoryLayer[] = [
     entries: [
       { name: 'Accordion', href: '/3-unit/accordion/', tag: 'ds-accordion' },
       { name: 'Calendar', href: '/3-unit/calendar/', tag: 'ds-calendar' },
+      { name: 'Bento', href: '/3-unit/bento/', tag: 'ds-bento' },
       { name: 'Carousel', href: '/3-unit/carousel/', tag: 'ds-carousel' },
       { name: 'Context', href: '/3-unit/context/', tag: 'ds-context' },
       { name: 'Date picker', href: '/3-unit/date-picker/', tag: 'ds-date-picker' },

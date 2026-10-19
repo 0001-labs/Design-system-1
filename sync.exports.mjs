@@ -16,7 +16,7 @@ const importsText = ['one.css', 'controls.css'];
 /** one.css also imports the faces with their typeface tokens, and the palette. */
 const oneImports = ['fonts.css', 'palette.css'];
 /** The sheets controls.css imports besides the text classes: tables, empty states, notices, shortcut hints, the dialog's placements, the site chrome (header with its drawer, footer, document), carousels, cards, stats, progress, and rows. */
-const controlSheets = ['table.css', 'empty.css', 'notice.css', 'overlay.css', 'header.css', 'footer.css', 'document.css', 'carousel.css', 'card.css', 'figures.css', 'progress.css', 'row.css', 'context.css'];
+const controlSheets = ['table.css', 'empty.css', 'notice.css', 'overlay.css', 'header.css', 'footer.css', 'document.css', 'bento.css', 'carousel.css', 'card.css', 'figures.css', 'progress.css', 'row.css', 'context.css'];
 /** Sheets for writing that a product asks for by name, as a flag or in `styles`. */
 const writingSheets = { prose: 'prose.css', classless: 'one.semantic.css', cjk: 'cjk.css' };
 const askedSheets = options => Object.entries(writingSheets).filter(([flag]) => options[flag]).map(([, file]) => file);
@@ -41,6 +41,8 @@ const rootModules = {
   header: ['header.ts', 'attach-overlay.ts'],
   /** The banner leading to a site's iPhone app on native markup (.ds-notice--app): where it shows, Apple's meta tag, Open and the remembered close. */
   'app-banner': ['app-banner.ts', 'scaling.ts'],
+  /** Bentos on whole squares on native markup (.ds-bento[data-squares], placeBentos). */
+  bento: ['bento.ts'],
   /** Carousels and their dots on native markup (.ds-carousel, .ds-progress--dots). */
   carousel: ['carousel.ts'],
   /** The keyboard and pointer of a native sidebar tree (`connectSidebar`, for `.ds-sidebar` in row.css). */

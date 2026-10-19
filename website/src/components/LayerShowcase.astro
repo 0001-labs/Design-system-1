@@ -53,12 +53,12 @@ const cards = [
 ---
 <section class="showcase not-content" data-ds-not-prose data-layer={number} style={`--layer-accent: var(--ds-${accents[layer.color] ?? 'yellow'});`} aria-label={`${layer.name} showcase`}>
   <div class="intro">
-    <div><p class="layer-label">{number} {layer.name}</p><h2>{introductions[number - 1]}</h2><p>{descriptions[number - 1]}</p></div>
+    <div><h2>{introductions[number - 1]}</h2><p>{descriptions[number - 1]}</p></div>
     <div class="layer-art" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
   </div>
-  <div class="bento">
+  <ds-bento class="bento">
     {cards.map(([title, description, href, kind], index) => (
-      <a class:list={['tile', { wide: index === 0 || (number !== 4 && (index === 3 || index === 5 || index === 7)) }]} href={href}>
+      <a class="tile" data-span={index === 0 || (number !== 4 && (index === 3 || index === 5 || index === 7)) ? '2' : undefined} href={href}>
         <div class={`preview preview-${kind}`} aria-hidden="true">
           {kind === 'palette' && <div class="swatches">{['yellow','orange','apple-green','sharp-blue','pink','black'].map(color => <i style={`background:var(--ds-${color})`}></i>)}</div>}
           {kind === 'type' && <div class="type-sample">Aa<span>abcdefg 012345</span></div>}
@@ -85,23 +85,22 @@ const cards = [
         <div class="caption"><h3>{title}</h3><p>{description}</p><span class="open" aria-hidden="true"><ds-icon type="right"></ds-icon></span></div>
       </a>
     ))}
-  </div>
+  </ds-bento>
   <nav class="directory" aria-label={`Explore ${layer.name}`}><h2>Explore {layer.name}</h2><LargeDirectoryList entries={layer.entries} /></nav>
 </section>
 
 <style>
   /*
    * Everything on whole squares (--u): the showcase is as wide as the squares that fit, its
-   * columns whole squares one square apart, the illustrations measured in squares from a
+   * columns whole squares half a square (10px) apart, the illustrations measured in squares from a
    * two-square inset, and every line of words one square.
    */
-  .showcase { --u: var(--site-unit, 20px); --ink: var(--ds-text-color); width: calc(round(down, calc(100% - 2 * var(--u)), calc(3 * var(--u))) + 2 * var(--u)); color: var(--ink); margin-block: var(--u) calc(3 * var(--u)); }
+  .showcase { --u: var(--site-unit, 20px); --ink: var(--ds-text-color); width: calc(round(down, calc(100% - var(--u)), calc(3 * var(--u))) + var(--u)); color: var(--ink); margin-block: var(--u) calc(3 * var(--u)); }
   .showcase ds-icon { display:inline-flex; width:var(--ds-control-height,16px); height:var(--ds-control-height,16px); vertical-align:bottom; }
   .showcase * { box-sizing: border-box; }
   .intro { display:grid; grid-template-columns:minmax(0,1fr) calc(9 * var(--u)); align-items:start; gap:calc(2 * var(--u)); padding:calc(2 * var(--u)); min-height:calc(12 * var(--u)); background:var(--layer-accent); color:var(--ds-black); border-radius:var(--ds-corner-size,4px); overflow:hidden; }
-  .intro h2 { font-size:var(--ds-type-size-display,20px); line-height:calc(2 * var(--u)); margin:0 0 var(--u); border:0; }
-  .intro p { margin:0; max-width:44ch; line-height:var(--u); font-size:var(--ds-type-size-default,14px); }
-  .intro .layer-label { margin-bottom:var(--u); }
+  .intro h2 { color:inherit; font-size:var(--ds-type-size-display,20px); line-height:calc(2 * var(--u)); margin:0 0 var(--u); border:0; }
+  .intro p { color:inherit; margin:0; max-width:44ch; line-height:var(--u); font-size:var(--ds-type-size-default,14px); }
   .layer-art { position:relative; height:calc(8 * var(--u)); }
   .layer-art i { position:absolute; left:0; top:0; width:calc(5 * var(--u)); height:calc(5 * var(--u)); background:currentColor; opacity:.15; }
   .layer-art i:nth-child(2) { left:var(--u); top:var(--u); opacity:.25; }
@@ -110,9 +109,9 @@ const cards = [
   [data-layer="2"] .layer-art i { border-radius:50%; }
   [data-layer="3"] .layer-art i { width:calc(2 * var(--u)); }
   [data-layer="4"] .layer-art i { height:var(--u); }
-  .bento { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:var(--u); margin-top:var(--u); }
+  /* Design system 1's Bento places the tiles, half a square apart. */
+  .bento { margin-top:calc(var(--u) / 2); --ds-bento-row:auto; }
   .tile { display:flex; flex-direction:column; min-width:0; text-decoration:none; color:inherit; border-radius:var(--ds-corner-size,4px); background:var(--ds-fill); overflow:hidden; }
-  .tile.wide { grid-column:span 2; }
   .tile:hover { background:var(--ds-fill-hover); }
   .tile:focus-visible, .directory a:focus-visible { outline:2px solid var(--ds-focus-ring); outline-offset:2px; }
   .preview { height:calc(10 * var(--u)); display:flex; align-items:flex-start; justify-content:flex-start; padding:var(--u); overflow:hidden; background:color-mix(in srgb,var(--layer-accent) 18%,var(--ds-paper)); pointer-events:none; font-size:var(--ds-type-size-default,14px); line-height:var(--u); }

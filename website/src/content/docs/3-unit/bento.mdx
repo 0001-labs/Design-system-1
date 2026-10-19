@@ -1,0 +1,66 @@
+---
+title: Bento
+description: "Tiles of different sizes, half a square apart: in columns that share the width, or each on whole squares."
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+A bento shows several things at once as tiles of different sizes, standing half a square (10px) apart. Each tile is a [card](/2-core/card/) or any box that holds one thing; the bento only places them. Words in a tile follow the card: its name on one square, its title in the display size, every line on the squares.
+
+## Design examples
+
+<ComponentExample example="bento-layers" />
+
+<ComponentExample example="bento-squares" />
+
+## Flow
+
+By default the tiles flow into columns that share the bento's width, three unless `columns` says otherwise. A tile is one column wide and one row high; `data-span` widens it to more columns and `data-rows` makes it taller. A row is as high as its tallest tile, at least ten squares (`--ds-bento-row`), and a gap left by a wide tile is filled by the next one that fits. Below thirty squares of width the bento is one column.
+
+```html
+<ds-bento>
+  <ds-card data-span="2" tone="yellow"><span slot="title">One foundation</span></ds-card>
+  <ds-card><span slot="title">Small pieces</span></ds-card>
+</ds-bento>
+```
+
+To keep the columns on whole squares, make the bento as wide as whole squares plus its two gaps: three columns of `k` squares are `3k` squares and one more square wide.
+
+## Squares
+
+With `squares`, the bento is `columns` squares wide (48 unless set) and every tile stands on whole squares, given as `data-place="x y w h"`: the square across and down it starts on, counted from 0, and its width and height in squares. Place tiles a square apart. Each tile's surface then reaches a quarter square towards every tile beside it, so the tiles stand half a square apart while what they hold stays on the squares, and the bento's own edges stay on the page's.
+
+```html
+<ds-bento squares columns="32">
+  <ds-card data-place="0 0 15 7"><span slot="title">Everything kept</span></ds-card>
+  <ds-card data-place="16 0 16 15"><span slot="title">Every list in one place</span></ds-card>
+  <ds-card data-place="0 8 15 7"><span slot="title">Today first</span></ds-card>
+</ds-bento>
+```
+
+| Attribute | On | What it does |
+| --- | --- | --- |
+| `columns` | the bento | Columns that share the width (flow, three), or squares across (`squares`, 48). |
+| `squares` | the bento | Places every tile on whole squares by its `data-place`. |
+| `data-span` | a tile | Two to six columns wide (flow). |
+| `data-rows` | a tile | Two to six rows high (flow). |
+| `data-place` | a tile | `x y w h` in squares (`squares`). |
+
+Tokens: `--ds-bento-gap` (half a square), `--ds-bento-columns`, `--ds-bento-row`; on a tile `--ds-bento-span` and `--ds-bento-rows`.
+
+## On native markup
+
+A page without Lit writes `.ds-bento` from the native controls stylesheet (`controls.css`, which imports `bento.css`), with `data-squares` in place of `squares` and `--ds-bento-columns` for `columns`. A squares bento needs `placeBentos()` from `0-face/bento.ts` (Sync 1's root `"modules": ["bento"]`), which reads each tile's `data-place` and sets its reach; a flow bento needs no script.
+
+```html
+<div class="ds-bento" data-squares style="--ds-bento-columns: 32">
+  <a class="ds-card" href="/archive/" data-place="0 0 15 7">…</a>
+  <a class="ds-card" href="/lists/" data-place="16 0 16 15">…</a>
+</div>
+<script type="module">
+  import { placeBentos } from "/ds1/0-face/bento.js";
+  placeBentos();
+</script>
+```
+
+[Card](/2-core/card/) · [Carousel](/3-unit/carousel/) · [Grid](/4-page/grid/)
