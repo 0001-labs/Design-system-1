@@ -498,8 +498,8 @@ matrix.marks = [
     html: '<ds-cycle type="theme"></ds-cycle>',
   },
   'language': {
-    title: 'Choose a language', hint: 'Click to cycle through the configured languages in this preview.',
-    html: '<ds-cycle type="language"></ds-cycle>\n<ds-cycle type="language" chip primary></ds-cycle>\n<ds-text>Save</ds-text>',
+    title: 'Choose a language', hint: 'Click to cycle through the configured languages. Each choice is saved automatically.',
+    html: '<ds-cycle type="language"></ds-cycle>\n<ds-cycle type="language" primary></ds-cycle>',
   },
   'gap': {
     title: 'One square of space', hint: 'The gap separates two lines by one 20px square.',
