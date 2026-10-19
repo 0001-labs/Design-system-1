@@ -217,6 +217,13 @@
     "shapes": 1
   },
   {
+    "key": "chevron-down",
+    "name": "Chevron",
+    "source": "Library",
+    "url": "/icons/library/chevron-down.svg",
+    "shapes": 1
+  },
+  {
     "key": "chevron-left",
     "name": "Chevron",
     "source": "Library",
@@ -228,6 +235,13 @@
     "name": "Chevron",
     "source": "Library",
     "url": "/icons/library/chevron-right.svg",
+    "shapes": 1
+  },
+  {
+    "key": "chevron-up",
+    "name": "Chevron",
+    "source": "Library",
+    "url": "/icons/library/chevron-up.svg",
     "shapes": 1
   },
   {

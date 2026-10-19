@@ -2,7 +2,7 @@
 const { sidebar } = Astro.locals.starlightRoute;
 ---
 <div class="docs-sidebar-shell">
-  <ds-sidebar id="docs-navigation" label="Documentation" data-groups={JSON.stringify(sidebar)}>
+  <ds-sidebar id="docs-navigation" label="Documentation" expand-icon="chevron-down" collapse-icon="chevron-up" data-groups={JSON.stringify(sidebar)}>
     <div slot="header" class="docs-sidebar-header">
       <ds-button control="slotted" icon class="docs-sidebar-close">
         <button id="sidebar-close-btn" type="button" aria-label="Close navigation menu"><ds-icon type="close"></ds-icon></button>

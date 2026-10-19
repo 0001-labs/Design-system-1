@@ -247,6 +247,14 @@
     "shapes": 1
   },
   {
+    "key": "chevron-down",
+    "name": "Chevron",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M4.25 6.25L8 10L11.75 6.25\" stroke=\"currentColor\"/>\n</svg>",
+    "url": "/icons/library/chevron-down.svg",
+    "shapes": 1
+  },
+  {
     "key": "chevron-left",
     "name": "Chevron",
     "source": "Library",
@@ -260,6 +268,14 @@
     "source": "Library",
     "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M6.25 4.25L10 8L6.25 11.75\" stroke=\"currentColor\"/>\n</svg>",
     "url": "/icons/library/chevron-right.svg",
+    "shapes": 1
+  },
+  {
+    "key": "chevron-up",
+    "name": "Chevron",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M4.25 9.75L8 6L11.75 9.75\" stroke=\"currentColor\"/>\n</svg>",
+    "url": "/icons/library/chevron-up.svg",
     "shapes": 1
   },
   {
