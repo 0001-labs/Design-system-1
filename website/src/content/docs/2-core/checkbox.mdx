@@ -1,0 +1,39 @@
+---
+title: Checkbox
+description: A box that is ticked or not, around a native input, standing on the grid as an icon does.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+`ds-checkbox` draws a checkbox around a native input: a box one control (16px)
+square, on the lower sixteen at the start of its square, as an icon stands, so
+it takes one square and its words begin on the next. Its corners are a
+picture's 4px; ticked or mixed, it fills with the accent and the check stands in
+the ink on it. It follows the shared scale and palette and keeps its focus ring
+visible.
+
+```html
+<label><ds-checkbox><input type="checkbox" name="updates" /></ds-checkbox>Updates</label>
+```
+
+The native input keeps the label, ref, disabled fieldset behavior, events and
+form owner, required validation, FormData and native reset; its `indeterminate`
+property draws the mixed state. A page without Lit writes `ds-checkbox` on the
+native input itself (`<input class="ds-checkbox" type="checkbox">`).
+
+React products import `Checkbox` from `DS1/react/choice`. Register the Lit
+element in the browser before hydration; the adapter is safe to render on the
+server. Pass standard input props, and put an accessible label on the native
+input.
+
+```tsx
+<Checkbox name="updates" checked={updates} onChange={e => setUpdates(e.currentTarget.checked)} />
+```
+
+Product wrapper classes arrange the checkbox in a row; the shared component owns
+the box, the mark, colors, focus and the disabled face. Do not retain product CSS
+for those parts.
+
+## Design examples
+
+<ComponentExample example="choice-checklist" />

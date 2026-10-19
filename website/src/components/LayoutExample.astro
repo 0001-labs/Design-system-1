@@ -37,12 +37,13 @@ const inside = layersIn(sample.html);
   <div data-example-source hidden><ExampleCode html={sample.html} script={sample.script} /></div>
 </section>
 <script>
-  import { onChoice, followPageTheme } from '../lib/example-controls';
+  import { fitFrame, onChoice, followPageTheme } from '../lib/example-controls';
   document.querySelectorAll<HTMLElement>('[data-layout-example]').forEach(example => {
     const frame = example.querySelector<HTMLIFrameElement>('iframe')!;
     const readout = example.querySelector<HTMLElement>('[data-readout]')!;
     const resting = readout.textContent;
     followPageTheme(frame);
+    fitFrame(frame);
     let layers = false;
     const send = () => {
       frame.contentWindow?.postMessage({ type: 'ds1-layout-layers', on: layers }, location.origin);

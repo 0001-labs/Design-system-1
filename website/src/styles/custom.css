@@ -242,7 +242,7 @@ body.sidebar-open {
   min-height: var(--grid);
   padding-block: 0;
   border: 0;
-  box-shadow: inset 0 -1px var(--ds1-docs-divider);
+  box-shadow: none;
   font-size: var(--docs-type-small);
   line-height: var(--grid);
 }
@@ -308,3 +308,18 @@ body.sidebar-open {
 }
 .right-sidebar-panel starlight-toc ul ul a { padding-inline-start: var(--grid); }
 .right-sidebar-panel starlight-toc ul ul ul a { padding-inline-start: calc(2 * var(--grid)); }
+
+/* No horizontal lines and nothing that scrolls inside itself in the docs (Joachim, 19 October 2026):
+   tables keep their rows on the squares without rules, and wrap rather than scroll; code wraps. */
+.sl-markdown-content table {
+  display: table;
+  width: 100%;
+  overflow: visible;
+}
+.sl-markdown-content :is(th, td) {
+  border: 0;
+  overflow-wrap: anywhere;
+}
+.expressive-code pre {
+  overflow: visible;
+}

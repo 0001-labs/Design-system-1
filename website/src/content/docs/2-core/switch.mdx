@@ -1,0 +1,40 @@
+---
+title: Switch
+description: A setting that is on or off, around a native button, the one pill with a white round thumb.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+`ds-switch` draws a switch around a native button: a pill two control heights
+wide (32 × 16px), with a white round thumb 12px across, 2px in, travelling one
+control height. Off it is grey; on it is a darker green whatever the page's
+accent, so the white thumb stays clear in light and dark. There is one switch;
+there is no square one. Its measures follow the shared scale and it keeps its
+focus ring visible.
+
+```html
+<ds-switch><button type="button" role="switch" aria-checked="false" aria-label="Sharing"></button></ds-switch>
+```
+
+The native button keeps activation for both Space and Enter, its label, ref and
+disabled state, and never submits a form. Product state sets its `aria-checked`
+value after a change is accepted. A page without Lit writes `ds-switch` on the
+native button itself.
+
+React products import `Switch` from `DS1/react/choice`. It takes `checked` and
+`onCheckedChange`; canceling its `onClick` prevents the change request. Disabled
+and busy state are distinct: `aria-busy` announces work, while `disabled` blocks
+activation when the product requires it. Use `aria-label` when the switch has no
+visible text.
+
+```tsx
+<Switch aria-label="Sharing" checked={sharing} onCheckedChange={setSharing} disabled={saving} />
+```
+
+On Apple it is `.toggleStyle(.ds1Switch)`, on Android `DS1Switch`, the same pill.
+
+## Design examples
+
+<ComponentExample example="choice-switches" />
+
+<ComponentExample example="toggle" />

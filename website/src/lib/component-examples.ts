@@ -654,7 +654,7 @@ document.querySelectorAll('[data-grid-option]').forEach(control => {
 };
 
 export const PAGE_EXAMPLES: Record<string, string[]> = {
-  '2-core/choice': ['toggle'],
+  '2-core/switch': ['toggle'],
   '2-core/message': ['notice', 'banner', 'message-app', 'toast', 'message-assistant'],
   '2-core/chart': ['chart'],
   '2-core/avatar': ['avatar-borderless', 'avatar'],

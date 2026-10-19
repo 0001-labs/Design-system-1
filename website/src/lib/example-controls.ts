@@ -33,3 +33,24 @@ export function followPageTheme(frame: HTMLIFrameElement): void {
   system.addEventListener('change', send);
   send();
 }
+
+/**
+ * Nothing in the docs scrolls inside itself (Joachim, 19 October 2026): a preview frame is as tall
+ * as what it shows, rounded up to whole squares, and follows it as it changes.
+ */
+export function fitFrame(frame: HTMLIFrameElement): void {
+  frame.setAttribute("scrolling", "no");
+  const fit = () => {
+    const doc = frame.contentDocument;
+    if (!doc?.documentElement) return;
+    const unit = 20 * (parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--sf")) || 1);
+    const height = Math.max(doc.documentElement.scrollHeight, doc.body?.scrollHeight ?? 0);
+    if (height) frame.style.height = `${Math.ceil(height / unit) * unit}px`;
+  };
+  const watch = () => {
+    fit();
+    if (frame.contentDocument?.body) new ResizeObserver(fit).observe(frame.contentDocument.body);
+  };
+  frame.addEventListener("load", watch);
+  if (frame.contentDocument?.readyState === "complete" && frame.contentDocument.URL !== "about:blank") watch();
+}

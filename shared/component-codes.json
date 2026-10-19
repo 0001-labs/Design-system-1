@@ -64,12 +64,20 @@
     "url": "https://designsystem1.com/2-core/card/"
   },
   {
-    "id": "component:/2-core/choice/",
-    "code": "CHOI",
-    "label": "Checkbox and switch",
+    "id": "component:/2-core/checkbox/",
+    "code": "CHK",
+    "label": "Checkbox",
     "kind": "component",
     "summary": "Design system 1 2-core.",
-    "url": "https://designsystem1.com/2-core/choice/"
+    "url": "https://designsystem1.com/2-core/checkbox/"
+  },
+  {
+    "id": "component:/2-core/switch/",
+    "code": "SWCH",
+    "label": "Switch",
+    "kind": "component",
+    "summary": "Design system 1 2-core.",
+    "url": "https://designsystem1.com/2-core/switch/"
   },
   {
     "id": "component:/2-core/chart/",

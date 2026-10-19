@@ -90,7 +90,7 @@ export const SHOWCASE_EXAMPLES: Record<string, ComponentExample> = {
   "choice-checklist": {
     "title": "Preparing a small exhibition",
     "hint": "Checkboxes and labels occupy the same line; completed and unavailable states stay aligned.",
-    "html": "<section class=\"specimen\">\n<label><ds-checkbox><input type=\"checkbox\" checked></ds-checkbox>Print wall labels</label><label><ds-checkbox><input type=\"checkbox\" ></ds-checkbox>Pack the frames</label><label><ds-checkbox><input type=\"checkbox\" disabled></ds-checkbox>Reserve transport</label>\n</section>\n<style>\n.specimen { width: 100%; min-width: 0; --cell: calc(20px * var(--sf, 1)); }\n.specimen .line { width: 100%; }\n.specimen .grow { flex: 1; min-width: 0; }\n.specimen .muted { color: var(--ds-text-color-muted); }\n.specimen .mono { --ds-typeface-regular: var(--ds-typeface-mono); font-variant-numeric: tabular-nums; }\n.specimen .value { width: calc(4 * var(--cell)); text-align: right; }\n.specimen .mark { display: inline-flex; align-items: flex-end; width: var(--cell); height: var(--ds-control-height); flex: 0 0 var(--cell); }\n.specimen .columns { display: flex; flex-wrap: wrap; gap: var(--cell); }\n.specimen .columns > * { min-width: 0; }\n.specimen fieldset { border: 0; padding: 0; margin: 0; }\n.specimen legend { padding: 0; }\n.specimen label { display: flex; align-items: flex-end; gap: calc(var(--cell) / 2); min-height: var(--cell); }\n.specimen ds-panel { height: calc(10 * var(--cell)); }\n</style>",
+    "html": "<section class=\"specimen\">\n<label><ds-checkbox><input type=\"checkbox\" checked></ds-checkbox>Print wall labels</label><label><ds-checkbox><input type=\"checkbox\" ></ds-checkbox>Pack the frames</label><label><ds-checkbox><input type=\"checkbox\" disabled></ds-checkbox>Reserve transport</label>\n</section>\n<style>\n.specimen { width: 100%; min-width: 0; --cell: calc(20px * var(--sf, 1)); }\n.specimen .line { width: 100%; }\n.specimen .grow { flex: 1; min-width: 0; }\n.specimen .muted { color: var(--ds-text-color-muted); }\n.specimen .mono { --ds-typeface-regular: var(--ds-typeface-mono); font-variant-numeric: tabular-nums; }\n.specimen .value { width: calc(4 * var(--cell)); text-align: right; }\n.specimen .mark { display: inline-flex; align-items: flex-end; width: var(--cell); height: var(--ds-control-height); flex: 0 0 var(--cell); }\n.specimen .columns { display: flex; flex-wrap: wrap; gap: var(--cell); }\n.specimen .columns > * { min-width: 0; }\n.specimen fieldset { border: 0; padding: 0; margin: 0; }\n.specimen legend { padding: 0; }\n.specimen label { display: flex; align-items: flex-end; gap: 0; min-height: var(--cell); }\n.specimen ds-panel { height: calc(10 * var(--cell)); }\n</style>",
     "height": 200
   },
   "choice-switches": {
@@ -102,7 +102,7 @@ export const SHOWCASE_EXAMPLES: Record<string, ComponentExample> = {
   "radio-editions": {
     "title": "Choose an edition",
     "hint": "A single selection, arranged on one-square rows.",
-    "html": "<section class=\"specimen\">\n<fieldset><legend>Edition</legend><label><ds-radio><input type=\"radio\" name=\"edition\" value=\"0\" checked></ds-radio>Softcover</label><label><ds-radio><input type=\"radio\" name=\"edition\" value=\"1\" ></ds-radio>Clothbound</label><label><ds-radio><input type=\"radio\" name=\"edition\" value=\"2\" ></ds-radio>Signed copy</label></fieldset>\n</section>\n<style>\n.specimen { width: 100%; min-width: 0; --cell: calc(20px * var(--sf, 1)); }\n.specimen .line { width: 100%; }\n.specimen .grow { flex: 1; min-width: 0; }\n.specimen .muted { color: var(--ds-text-color-muted); }\n.specimen .mono { --ds-typeface-regular: var(--ds-typeface-mono); font-variant-numeric: tabular-nums; }\n.specimen .value { width: calc(4 * var(--cell)); text-align: right; }\n.specimen .mark { display: inline-flex; align-items: flex-end; width: var(--cell); height: var(--ds-control-height); flex: 0 0 var(--cell); }\n.specimen .columns { display: flex; flex-wrap: wrap; gap: var(--cell); }\n.specimen .columns > * { min-width: 0; }\n.specimen fieldset { border: 0; padding: 0; margin: 0; }\n.specimen legend { padding: 0; }\n.specimen label { display: flex; align-items: flex-end; gap: calc(var(--cell) / 2); min-height: var(--cell); }\n.specimen ds-panel { height: calc(10 * var(--cell)); }\n</style>",
+    "html": "<section class=\"specimen\">\n<fieldset><legend>Edition</legend><label><ds-radio><input type=\"radio\" name=\"edition\" value=\"0\" checked></ds-radio>Softcover</label><label><ds-radio><input type=\"radio\" name=\"edition\" value=\"1\" ></ds-radio>Clothbound</label><label><ds-radio><input type=\"radio\" name=\"edition\" value=\"2\" ></ds-radio>Signed copy</label></fieldset>\n</section>\n<style>\n.specimen { width: 100%; min-width: 0; --cell: calc(20px * var(--sf, 1)); }\n.specimen .line { width: 100%; }\n.specimen .grow { flex: 1; min-width: 0; }\n.specimen .muted { color: var(--ds-text-color-muted); }\n.specimen .mono { --ds-typeface-regular: var(--ds-typeface-mono); font-variant-numeric: tabular-nums; }\n.specimen .value { width: calc(4 * var(--cell)); text-align: right; }\n.specimen .mark { display: inline-flex; align-items: flex-end; width: var(--cell); height: var(--ds-control-height); flex: 0 0 var(--cell); }\n.specimen .columns { display: flex; flex-wrap: wrap; gap: var(--cell); }\n.specimen .columns > * { min-width: 0; }\n.specimen fieldset { border: 0; padding: 0; margin: 0; }\n.specimen legend { padding: 0; }\n.specimen label { display: flex; align-items: flex-end; gap: 0; min-height: var(--cell); }\n.specimen ds-panel { height: calc(10 * var(--cell)); }\n</style>",
     "height": 200
   },
   "select-print": {
@@ -450,8 +450,10 @@ export const SHOWCASE_PAGES: Record<string, string[]> = {
     "input-address",
     "input-validation"
   ],
-  "2-core/choice": [
-    "choice-checklist",
+  "2-core/checkbox": [
+    "choice-checklist"
+  ],
+  "2-core/switch": [
     "choice-switches"
   ],
   "2-core/radio": [

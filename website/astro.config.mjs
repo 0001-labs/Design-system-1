@@ -5,6 +5,8 @@ import starlight from "@astrojs/starlight";
 // https://astro.build/config
 export default defineConfig({
   site: "https://designsystem1.com",
+  // Checkbox and Switch were one page; the old address goes to the checkbox (19 October 2026).
+  redirects: { "/2-core/choice/": "/2-core/checkbox/" },
   devToolbar: { enabled: false },
   vite: {
     // Preview frames load components dynamically. Prebundle their shared
@@ -28,6 +30,8 @@ export default defineConfig({
     starlight({
       title: "Design system 1",
       expressiveCode: {
+        // Long lines wrap: nothing in the docs scrolls inside itself.
+        defaultProps: { wrap: true },
         // Code frames draw themselves: keep Design system 1's prose sheet out of them.
         plugins: [
           {
@@ -101,8 +105,8 @@ export default defineConfig({
             { label: "Avatar", slug: "2-core/avatar" },
             { label: "Button", slug: "2-core/button" },
             { label: "Card", slug: "2-core/card" },
-            { label: "Checkbox and switch", slug: "2-core/choice" },
             { label: "Chart", slug: "2-core/chart" },
+            { label: "Checkbox", slug: "2-core/checkbox" },
             { label: "Cycle", slug: "2-core/cycle" },
             { label: "Empty state", slug: "2-core/empty" },
             { label: "Gap", slug: "2-core/gap" },
@@ -113,6 +117,7 @@ export default defineConfig({
             { label: "Message", slug: "2-core/message" },
             { label: "Progress", slug: "2-core/progress" },
             { label: "Stat", slug: "2-core/stat" },
+            { label: "Switch", slug: "2-core/switch" },
             { label: "Tag", slug: "2-core/tag" },
             { label: "Text", slug: "2-core/text" },
             { label: "Tooltip", slug: "2-core/tooltip" },
