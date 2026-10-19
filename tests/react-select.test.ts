@@ -3,7 +3,7 @@ import { afterEach, expect, test } from "vite-plus/test";
 import { act, createElement as h, createRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Select } from "../DS1/react/choice";
-import "../DS1/2-core/ds-select";
+import "../DS1/3-unit/ds-select";
 
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
 afterEach(() => document.body.replaceChildren());
@@ -54,16 +54,16 @@ test("listbox rows and the arrow follow native attributes when they change", asy
   const option = document.createElement("option"); option.textContent = "Alpha"; option.value = "a";
   select.append(option); host.append(select); document.body.append(host);
   await host.updateComplete;
-  expect(host.shadowRoot!.querySelector("span")!.hidden).toBe(false);
+  expect(host.shadowRoot!.querySelector(".arrow")!.hidden).toBe(false);
   select.multiple = true; select.size = 3;
   await Promise.resolve(); await host.updateComplete;
   expect(host.style.getPropertyValue("--ds-select-rows")).toBe("3");
-  expect(host.shadowRoot!.querySelector("span")!.hidden).toBe(true);
+  expect(host.shadowRoot!.querySelector(".arrow")!.hidden).toBe(true);
   select.multiple = false; select.size = 0; select.disabled = true;
   await Promise.resolve(); await host.updateComplete;
   expect(host.style.getPropertyValue("--ds-select-rows")).toBe("1");
-  expect(host.shadowRoot!.querySelector("span")!.hidden).toBe(false);
-  expect(host.shadowRoot!.querySelector("span")!.className).toBe("disabled");
+  expect(host.shadowRoot!.querySelector(".arrow")!.hidden).toBe(false);
+  expect(host.shadowRoot!.querySelector(".arrow")!.classList.contains("disabled")).toBe(true);
 });
 
 test("chip and swatch treatments stay on the shared host while native forms and refs remain usable", async () => {

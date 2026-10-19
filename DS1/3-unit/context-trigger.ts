@@ -1,5 +1,8 @@
 import "./styles/context-trigger.css";
 
+/** A touch held this long opens a context menu: half a second, as tooltips, Ezo's board and iOS wait. */
+export const LONG_PRESS = 500;
+
 export type ContextGesture = MouseEvent | PointerEvent | KeyboardEvent;
 export type ContextPoint = { x: number; y: number };
 type Options = {
@@ -83,7 +86,7 @@ export function bindContextMenuTrigger(
       timer = undefined; point = undefined;
       if (disposed || !enabled(control) || !trigger.contains(control)) { cancel(); return; }
       if (open(at, control, event) !== false) arm(control);
-    }, 600);
+    }, LONG_PRESS);
   };
   trigger.addEventListener("contextmenu", context);
   trigger.addEventListener("keydown", key);

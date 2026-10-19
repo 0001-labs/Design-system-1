@@ -8,7 +8,7 @@ import '../../../../DS1/2-core/ds-file-picker';
 import '../../../../DS1/2-core/ds-icon';
 import '../../../../DS1/2-core/ds-input';
 import '../../../../DS1/2-core/ds-notice';
-import '../../../../DS1/2-core/ds-select';
+import '../../../../DS1/3-unit/ds-select';
 import '../../../../DS1/2-core/ds-swatch';
 import '../../../../DS1/3-unit/ds-tabs';
 import { Button } from '../../../../DS1/react/button';

@@ -402,7 +402,7 @@ export const SHOWCASE_PAGES: Record<string, string[]> = {
   "2-core/radio": [
     "radio-editions"
   ],
-  "2-core/select": [
+  "3-unit/select": [
     "select-print",
     "select-sort"
   ],

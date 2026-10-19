@@ -42,7 +42,7 @@ export * from "./2-core/ds-button";
 export * from "./2-core/ds-checkbox";
 export * from "./2-core/ds-radio";
 export * from "./2-core/ds-switch";
-export * from "./2-core/ds-select";
+export * from "./3-unit/ds-select";
 export * from "./2-core/ds-color";
 export * from "./2-core/ds-swatch";
 export * from "./2-core/ds-card";
@@ -90,6 +90,7 @@ export * from "./4-page/ds-footer";
 export * from "./4-page/ds-document";
 
 export * from "./3-unit/ds-menu";
+export * from "./3-unit/ds-context";
 export * from "./3-unit/ds-tabs";
 export * from "./4-page/ds-panel";
 export * from "./4-page/ds-overlay";

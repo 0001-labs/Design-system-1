@@ -5,7 +5,7 @@ import '../../../../DS1/2-core/ds-checkbox';
 import '../../../../DS1/2-core/ds-color';
 import '../../../../DS1/2-core/ds-file-picker';
 import '../../../../DS1/2-core/ds-input';
-import '../../../../DS1/2-core/ds-select';
+import '../../../../DS1/3-unit/ds-select';
 import '../../../../DS1/2-core/ds-swatch';
 import '../../../../DS1/3-unit/ds-tabs';
 import type { Button } from '../../../../DS1/2-core/ds-button';

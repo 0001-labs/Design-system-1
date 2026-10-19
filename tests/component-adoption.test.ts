@@ -121,7 +121,7 @@ describe("source adoption evidence", () => {
       '2-core/ds-checkbox.ts': 'export class Checkbox {}',
       '2-core/ds-radio.ts': 'export class Radio {}',
       '2-core/ds-switch.ts': 'export class Switch {}',
-      '2-core/ds-select.ts': 'export class Select {}',
+      '3-unit/ds-select.ts': 'export class Select {}',
       '2-core/ds-color.ts': 'export class ColorInput {}',
       'react/choice.ts': 'export const Checkbox = () => null; export const Radio = () => null; export const Switch = () => null; export const Select = () => null; export const ColorInput = () => null;',
       '2-core/ds-input.ts': 'export class Input {}',

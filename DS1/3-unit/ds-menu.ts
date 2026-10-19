@@ -1,4 +1,4 @@
-import { LitElement, html, unsafeCSS } from "lit";
+import { LitElement, html, unsafeCSS, type CSSResultGroup } from "lit";
 import { define } from "../0-face/define";
 import "../2-core/ds-button";
 import "../2-core/ds-file-picker";
@@ -18,7 +18,7 @@ const openMenus = new WeakMap<Document, Set<Menu>>();
 /** Shared option/action face and navigation. Floating menus use the native
  * popover layer; suggestions can keep focus on a light-DOM writing field. */
 export class Menu extends LitElement {
-  static styles = unsafeCSS(styles);
+  static styles: CSSResultGroup = unsafeCSS(styles);
   static properties = {
     compact: { type: Boolean, reflect: true },
     floating: { type: Boolean, reflect: true },
@@ -28,6 +28,7 @@ export class Menu extends LitElement {
     anchor: { attribute: false },
     placement: { type: String },
     trigger: { attribute: false },
+    for: { type: String, reflect: true },
     triggerMode: { type: String, attribute: "trigger-mode", reflect: true },
     contextSelector: { type: String, attribute: "context-selector" },
     hover: { type: Boolean, reflect: true },
@@ -46,6 +47,8 @@ export class Menu extends LitElement {
   /** Delegate context gestures from trigger to matching descendants. */
   declare contextSelector: string;
   declare trigger: HTMLElement | null;
+  /** The id of the button that opens it, in the same document or shadow root, as `<label for>` names its field; `trigger` wins when both are set. */
+  declare for: string;
   declare hover: boolean;
   declare controller: HTMLElement | null;
   declare activeId: string;
@@ -78,7 +81,7 @@ export class Menu extends LitElement {
     super();
     this.compact = false; this.floating = false; this.open = false; this.disabled = false;
     this.placement = "bottom"; this.triggerMode = "click"; this.contextSelector = "";
-    this.columns = 1; this.anchor = null; this.trigger = null; this.hover = false; this.controller = null; this.activeId = "";
+    this.columns = 1; this.anchor = null; this.trigger = null; this.for = ""; this.hover = false; this.controller = null; this.activeId = "";
     this.addEventListener("keydown", this.onKeyDown);
     this.addEventListener("pointerdown", this.retainController);
     this.addEventListener("pointerover", this.onPointerChoice);
@@ -102,8 +105,16 @@ export class Menu extends LitElement {
     this.hide(true);
     super.disconnectedCallback();
   }
+  /** The opening button: `trigger`, else the element `for` names. */
+  protected get forTarget(): HTMLElement | null {
+    if (this.trigger) return this.trigger;
+    if (!this.for) return null;
+    const root = this.getRootNode() as Document | ShadowRoot;
+    return root.getElementById?.(this.for) ?? null;
+  }
   updated() {
     if (this.disabled) this.contextBinding?.cancel();
+    if (!this.trigger && this.for) this.trigger = this.forTarget;
     this.bindTrigger(this.trigger);
     if (this.trigger && !this.contextSelector) {
       this.trigger.setAttribute("aria-haspopup", this.getAttribute("role") === "menu" ? "menu" : "listbox");
