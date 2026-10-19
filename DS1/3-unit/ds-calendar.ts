@@ -24,6 +24,7 @@ import {
   heatLevels,
   isDay,
   isoWeek,
+  monthName,
   monthTitle,
   monthWeeks,
   sameMonth,
@@ -114,6 +115,8 @@ const openPickers = new Set<Calendar>();
  *   for a scale that stays put from month to month; the busiest day shown
  *   by default.
  * @prop {boolean} noHeader - Leave out the title and arrows (`no-header`).
+ *   With a header, pressing the title travels by months and years: the
+ *   twelve months of the year, then twelve years, and back down.
  * @prop {boolean} noToday - Leave out the Today button (`no-today`).
  * @prop {string} min - The first day a person may choose.
  * @prop {string} max - The last day a person may choose.
@@ -128,7 +131,7 @@ const openPickers = new Set<Calendar>();
  * @prop {string} length - How a picker writes a day: `short`, `medium` (the
  *   default) or `long`.
  * @prop {boolean} time - A picker chooses a time with each day (Include time).
- * @prop {boolean} required - A form needs a value; a picker leaves Clear out.
+ * @prop {boolean} required - A form needs a value; Clear is left out.
  * @prop {boolean} disabled - A picker cannot be opened.
  * @prop {boolean} open - A picker's month is open.
  * @prop {CalendarEvent[]} events - What happens on the days (property only).
@@ -141,6 +144,9 @@ const openPickers = new Set<Calendar>();
  * @fires event-press - An event was pressed; `{ event, day }`.
  * @fires navigate - A person moved to another month; `{ month }`.
  * @fires ds-calendar-toggle - A picker's month opened or closed; `{ open }`.
+ *
+ * A selectable calendar has Clear one square below its month, and `clear()`
+ * empties the value from code; both fire `change` with an empty value.
  *
  * @example
  * <ds-calendar month="2026-10" week-numbers></ds-calendar>
@@ -172,6 +178,10 @@ export class Calendar extends CalendarBase {
     disabled: { type: Boolean, reflect: true },
     open: { type: Boolean, reflect: true },
     unfolded: { state: true },
+    embedded: { attribute: false },
+    level: { state: true },
+    browseYear: { state: true },
+    pickFocus: { state: true },
   };
 
   static styles = [unsafeCSS(metrics), unsafeCSS(controls), unsafeCSS(styles)];
@@ -197,6 +207,14 @@ export class Calendar extends CalendarBase {
   declare open: boolean;
   /** The day whose hidden events are unfolded. */
   declare unfolded: Day | undefined;
+  /** The small month inside a picker, whose Clear is the picker's own. */
+  declare embedded: boolean;
+  /** What the grid shows: the month's days, the twelve months of a year, or twelve years. */
+  declare level: "days" | "months" | "years";
+  /** The year the months and years are drawn around. */
+  declare browseYear: number;
+  /** The month (0–11) or year holding the Tab stop among the months or years. */
+  declare pickFocus: number | undefined;
 
   protected readonly weeksRun = "rows" as const;
 
@@ -223,6 +241,9 @@ export class Calendar extends CalendarBase {
     this.required = false;
     this.disabled = false;
     this.open = false;
+    this.embedded = false;
+    this.level = "days";
+    this.browseYear = 0;
   }
 
   disconnectedCallback() {
@@ -310,8 +331,182 @@ export class Calendar extends CalendarBase {
 
   /** Today's month, as the Today button does. */
   showToday() {
+    this.level = "days";
     this.showMonth(this.todayDay, true);
     this.focusDay = this.todayDay;
+  }
+
+  /** Empties the value, as Clear does, and says so with `change`. */
+  clear() {
+    if (this.picker) {
+      this.commit("");
+      this.open = false;
+      return;
+    }
+    const previous = this.value || "";
+    this.endPending = false;
+    this.hoverDay = undefined;
+    if (!previous) return;
+    this.value = "";
+    this.dispatchEvent(new CustomEvent<CalendarChangeDetail>("change", { bubbles: true, composed: true, detail: { value: "", previous, start: "", end: "" } }));
+  }
+
+  // Travelling by months and years: the title goes up a level, a choice comes back down.
+
+  /** A person has moved between levels, so a level's grid fades in when it comes. */
+  private travelled = false;
+
+  /** The twelve years drawn around `browseYear`, as their first and last. */
+  private get yearSpan(): [number, number] {
+    const first = Math.floor(this.browseYear / 12) * 12;
+    return [first, first + 11];
+  }
+
+  private yearName(year: number) {
+    return dateFormatter({ year: "numeric", timeZone: "UTC" }).format(Date.UTC(year, 6, 1));
+  }
+
+  /** The title: the days go up to the months of their year, the months to twelve years. */
+  private levelUp = () => {
+    this.travelled = true;
+    if (this.level === "days") {
+      this.browseYear = Number(this.shownMonth.slice(0, 4));
+      this.pickFocus = Number(this.shownMonth.slice(5, 7)) - 1;
+      this.level = "months";
+    } else if (this.level === "months") {
+      this.pickFocus = this.browseYear;
+      this.level = "years";
+    }
+  };
+
+  /** Back down a level: from twelve years to the months, from the months to the days. */
+  private levelDown(focus = false) {
+    this.travelled = true;
+    if (this.level === "years") {
+      this.pickFocus = Number(this.shownMonth.slice(5, 7)) - 1;
+      this.level = "months";
+      if (focus) void this.focusPick();
+    } else if (this.level === "months") {
+      this.level = "days";
+      if (focus) void this.focusCell(this.tabDay);
+    }
+  }
+
+  /** The arrows: a month among the days, a year among the months, twelve years among the years. */
+  private step(direction: -1 | 1) {
+    if (this.level === "days") return direction < 0 ? this.previousMonth() : this.nextMonth();
+    this.browseYear += direction * (this.level === "months" ? 1 : 12);
+    if (this.level === "years") this.pickFocus = (this.pickFocus ?? this.browseYear) + direction * 12;
+  }
+
+  /** A month or a year chosen: a year shows its months, a month its days. */
+  private choose(value: number) {
+    this.travelled = true;
+    if (this.level === "years") {
+      this.browseYear = value;
+      this.pickFocus = Number(this.shownMonth.slice(5, 7)) - 1;
+      this.level = "months";
+      void this.focusPick();
+      return;
+    }
+    const month = `${String(this.browseYear).padStart(4, "0")}-${String(value + 1).padStart(2, "0")}-01`;
+    this.level = "days";
+    this.showMonth(month, true);
+    const day = [this.focusDay, this.chosen.start, this.todayDay].find(day => day && sameMonth(day, month)) ?? month;
+    void this.focusCell(day);
+  }
+
+  private async focusPick() {
+    await this.updateComplete;
+    this.renderRoot.querySelector<HTMLElement>('.pick[tabindex="0"]')?.focus({ preventScroll: true });
+  }
+
+  private onPickKey = (event: KeyboardEvent) => {
+    const cell = (event.target as HTMLElement).closest<HTMLElement>("[data-pick]");
+    if (!cell) return;
+    const value = Number(cell.dataset.pick);
+    const columns = this.pickColumns;
+    const rtl = getComputedStyle(this).direction === "rtl";
+    const moves: Record<string, number> = { ArrowRight: rtl ? -1 : 1, ArrowLeft: rtl ? 1 : -1, ArrowDown: columns, ArrowUp: -columns };
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      this.choose(value);
+    } else if (event.key === "Escape") {
+      event.preventDefault();
+      event.stopPropagation();
+      this.levelDown(true);
+    } else if (event.key in moves) {
+      event.preventDefault();
+      let next = value + moves[event.key];
+      if (this.level === "months") {
+        // Past December is the next year's January.
+        if (next < 0 || next > 11) { this.browseYear += next < 0 ? -1 : 1; next = (next + 12) % 12; }
+      } else {
+        const [first, last] = this.yearSpan;
+        if (next < first || next > last) this.browseYear = next;
+      }
+      this.pickFocus = next;
+      void this.focusPick();
+    }
+  };
+
+  /** Months and years stand in rows of one square, one square apart: three across a narrow month, four across a wider one. */
+  private get pickColumns() {
+    return 7 * this.squaresPerDay >= 12 ? 4 : 3;
+  }
+
+  private renderPicks(weeks: number) {
+    const level = this.level;
+    const year = this.browseYear;
+    const today = this.todayDay;
+    const chosen = this.chosen.start;
+    const columns = this.pickColumns;
+    const cell = Math.floor((7 * this.squaresPerDay) / columns);
+    const values = level === "months" ? Array.from({ length: 12 }, (_, month) => month) : Array.from({ length: 12 }, (_, index) => this.yearSpan[0] + index);
+    const focus = this.pickFocus !== undefined && values.includes(this.pickFocus)
+      ? this.pickFocus
+      : level === "months" ? (chosen && Number(chosen.slice(0, 4)) === year ? Number(chosen.slice(5, 7)) - 1 : 0) : year;
+    const rows = Array.from({ length: Math.ceil(values.length / columns) }, (_, row) => values.slice(row * columns, row * columns + columns));
+    const long = cell >= 4;
+    const name = (value: number) => level === "months" ? monthName(`${String(year).padStart(4, "0")}-${String(value + 1).padStart(2, "0")}-01`, long ? "long" : "short") : this.yearName(value);
+    const isToday = (value: number) => level === "months" ? today.slice(0, 7) === `${String(year).padStart(4, "0")}-${String(value + 1).padStart(2, "0")}` : Number(today.slice(0, 4)) === value;
+    const isChosen = (value: number) => Boolean(chosen) && (level === "months" ? chosen.slice(0, 7) === `${String(year).padStart(4, "0")}-${String(value + 1).padStart(2, "0")}` : Number(chosen.slice(0, 4)) === value);
+    const allowed = (value: number) => {
+      const min = this.minDay, max = this.maxDay;
+      if (level === "years") return !(min && value < Number(min.slice(0, 4))) && !(max && value > Number(max.slice(0, 4)));
+      const month = `${String(year).padStart(4, "0")}-${String(value + 1).padStart(2, "0")}`;
+      return !(min && month < min.slice(0, 7)) && !(max && month > max.slice(0, 7));
+    };
+    return html`<div
+      class="picks"
+      part="picks"
+      role="grid"
+      data-level=${level}
+      ?data-travel=${this.travelled}
+      aria-label=${level === "months" ? this.yearName(year) : `${this.yearName(this.yearSpan[0])} – ${this.yearName(this.yearSpan[1])}`}
+      style=${`--ds-calendar-pick-columns: ${columns}; --ds-calendar-pick-cell: ${cell}; --ds-calendar-weeks: ${weeks}`}
+      @keydown=${this.onPickKey}
+    >${rows.map(row => html`<div role="row" class="pick-row">${row.map(value => html`<button
+        type="button"
+        role="gridcell"
+        class="pick"
+        part=${["pick", isChosen(value) ? "selected" : "", isToday(value) ? "today" : ""].filter(Boolean).join(" ")}
+        data-pick=${value}
+        tabindex=${value === focus ? 0 : -1}
+        aria-selected=${String(isChosen(value))}
+        aria-current=${isToday(value) ? "date" : nothing}
+        ?disabled=${!allowed(value)}
+        ?data-selected=${isChosen(value)}
+        ?data-today=${isToday(value)}
+        @click=${() => this.choose(value)}
+      ><span class="pick-mark">${name(value)}</span></button>`)}</div>`)}</div>`;
+  }
+
+  private renderClear() {
+    if (!this.selectable || this.embedded || this.required) return nothing;
+    return html`<div class="foot" part="foot">
+      <button class="ds-button ds-button--secondary clear-value" part="clear" type="button" ?disabled=${!this.value} @click=${() => this.clear()}>${this.words("Clear")}</button>
+    </div>`;
   }
 
   /** The day holding the Tab stop: the one moved to, the selected day, today, or the first. */
@@ -383,17 +578,38 @@ export class Calendar extends CalendarBase {
     const min = this.minDay, max = this.maxDay;
     const before = Boolean(min && addMonths(month, -1).slice(0, 7) < min.slice(0, 7));
     const after = Boolean(max && addMonths(month, 1).slice(0, 7) > max.slice(0, 7));
+    const level = this.level;
+    const year = this.browseYear;
+    const span = this.yearSpan;
+    const labels = { days: ["Previous month", "Next month"], months: ["Previous year", "Next year"], years: ["Earlier years", "Later years"] }[level];
+    const blocked = level === "days"
+      ? [before, after]
+      : level === "months"
+        ? [Boolean(min && year - 1 < Number(min.slice(0, 4))), Boolean(max && year + 1 > Number(max.slice(0, 4)))]
+        : [Boolean(min && span[0] - 1 < Number(min.slice(0, 4))), Boolean(max && span[0] + 12 > Number(max.slice(0, 4)))];
     const arrow = (which: "previous" | "next") => html`<button
       class="ds-button ds-button--icon nav"
       part=${which}
       type="button"
-      aria-label=${this.words(which === "previous" ? "Previous month" : "Next month")}
-      ?disabled=${which === "previous" ? before : after}
-      @click=${() => (which === "previous" ? this.previousMonth() : this.nextMonth())}
+      aria-label=${this.words(labels[which === "previous" ? 0 : 1])}
+      ?disabled=${blocked[which === "previous" ? 0 : 1]}
+      @click=${() => this.step(which === "previous" ? -1 : 1)}
     ><ds-icon type=${which === "previous" ? "chevron-left" : "chevron-right"} size="large" aria-hidden="true"></ds-icon></button>`;
-    const title = monthTitle(month, this.compact ? "short" : "long");
+    const title = level === "days"
+      ? monthTitle(month, this.compact ? "short" : "long")
+      : level === "months"
+        ? this.yearName(year)
+        : `${this.yearName(span[0])} – ${this.yearName(span[0] + 11)}`;
     return html`<div class="header" part="header">
-      <span class="title" id="title" aria-live="polite">${title}</span>
+      ${level === "years"
+        ? html`<span class="title" id="title" aria-live="polite">${title}</span>`
+        : html`<button
+            class="title title-button"
+            part="title"
+            type="button"
+            aria-label=${`${title}, ${this.words("Choose a month and year")}`}
+            @click=${this.levelUp}
+          ><span class="title-text" id="title" aria-live="polite">${title}</span><ds-icon type="chevron-down" size="large" aria-hidden="true"></ds-icon></button>`}
       <span class="controls">
         ${this.noToday || this.squaresPerDay < 2 ? nothing : html`<button class="ds-button today-button" part="today" type="button" @click=${() => this.showToday()}>${this.words("Today")}</button>`}
         ${arrow("previous")}
@@ -471,10 +687,11 @@ export class Calendar extends CalendarBase {
     const long = weekdayNames(first, "long");
     return html`<div class="calendar" part="calendar" @focusout=${this.onFocusOut} @pointerover=${this.onPointerOver} @pointerleave=${() => (this.hoverDay = undefined)}>
       ${this.renderHeader()}
-      <div
+      ${this.level !== "days" && !this.noHeader ? this.renderPicks(weeks.length) : html`<div
         class="grid"
         part="grid"
         role="grid"
+        ?data-travel=${this.travelled}
         aria-label=${this.nameOr(monthTitle(month))}
         aria-multiselectable=${this.selectable ? "true" : nothing}
         @keydown=${this.onKeyDown}
@@ -484,7 +701,8 @@ export class Calendar extends CalendarBase {
           ${short.map((name, index) => html`<span role="columnheader" class="weekday" aria-label=${long[index]}>${name}</span>`)}
         </div>
         ${weeks.map(week => html`<div role="row" class="week" part="week">${week.map((day, column) => this.renderDay(day, column))}</div>`)}
-      </div>
+      </div>`}
+      ${this.renderClear()}
     </div>`;
   }
 
@@ -524,8 +742,9 @@ export class Calendar extends CalendarBase {
     const month = this.smallMonth;
     if (month) {
       month.month = (this.ends.start?.day || this.today || this.todayDay).slice(0, 7);
-      // Each opening starts a new pick: the first press is a first day.
+      // Each opening starts a new pick on the month's days: the first press is a first day.
       month.endPending = false;
+      month.level = "days";
     }
     panel.showPopover?.();
     this.place();
@@ -689,10 +908,6 @@ export class Calendar extends CalendarBase {
     if (control && !event.composedPath().includes(control)) control.click();
   };
 
-  private clear = () => {
-    this.commit("");
-    this.open = false;
-  };
 
   private moment(side: CalendarEnd) {
     const [year, month, date] = side.day.split("-").map(Number);
@@ -785,6 +1000,7 @@ export class Calendar extends CalendarBase {
           selectable
           fixed
           outside-days
+          .embedded=${true}
           .value=${days}
           .min=${this.min}
           .max=${this.max}
@@ -801,7 +1017,7 @@ export class Calendar extends CalendarBase {
           ${this.required
             ? nothing
             : html`<div class="separator" aria-hidden="true"></div>
-                <button class="option clear" part="clear" type="button" ?disabled=${!start} @click=${this.clear}>${this.pickerWords(undefined, "Clear")}</button>`}
+                <button class="option clear" part="clear" type="button" ?disabled=${!start} @click=${() => this.clear()}>${this.pickerWords(undefined, "Clear")}</button>`}
         </div>
       </div>`;
   }

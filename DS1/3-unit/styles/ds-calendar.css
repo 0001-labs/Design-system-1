@@ -77,6 +77,7 @@
 .controls {
   display: flex;
   flex: 0 0 auto;
+  margin-inline-start: auto;
   align-items: flex-end;
   gap: 0;
 }
@@ -91,6 +92,99 @@
 }
 .nav:hover:not(:disabled) { background: var(--ds-fill); color: var(--ds-text-color); }
 :host(:dir(rtl)) .nav > ds-icon { transform: scaleX(-1); }
+
+/* The title as a button: pressing it travels up to the months of the year, then to twelve years.
+ * One control high at the square's foot, the words on the sixteen where the title stands, the
+ * pointer filling it 4px past them. */
+.title-button {
+  display: inline-flex;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: 0;
+  max-width: 100%;
+  height: var(--ds-control-height);
+  margin: 0 0 0 calc(-4px * var(--ds-sf, 1));
+  padding: 0 0 0 calc(4px * var(--ds-sf, 1));
+  border: 0;
+  border-radius: var(--ds-radius);
+  background: transparent;
+  color: var(--ds-text-color);
+  font: inherit;
+  font-family: var(--ds-typeface-medium, var(--ds-typeface-regular));
+  line-height: var(--ds-control-height);
+  letter-spacing: inherit;
+  cursor: pointer;
+}
+:host(:dir(rtl)) .title-button { margin: 0 calc(-4px * var(--ds-sf, 1)) 0 0; padding: 0 calc(4px * var(--ds-sf, 1)) 0 0; }
+.title-button:hover { background: var(--ds-fill); }
+.title-button:focus-visible { outline: 2px solid var(--ds-focus-ring); outline-offset: -2px; }
+.title-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.title-button > ds-icon { flex: 0 0 auto; color: var(--ds-title-color); }
+
+/* The months of a year, or twelve years: cells whole squares wide, three across a narrow month
+ * and four across a wider one, each row one square, one square apart. The area keeps the days'
+ * height, so nothing below moves between levels. */
+.picks {
+  box-sizing: border-box;
+  height: calc(var(--ds-unit) + var(--ds-calendar-weeks, 6) * var(--ds-calendar-day-height));
+  outline: none;
+}
+.pick-row {
+  display: grid;
+  grid-template-columns: repeat(var(--ds-calendar-pick-columns, 3), calc(var(--ds-calendar-pick-cell, 2) * var(--ds-unit)));
+  height: var(--ds-unit);
+  margin-block-end: var(--ds-unit);
+}
+.pick {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  height: var(--ds-unit);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ds-text-color);
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+  outline: none;
+}
+.pick-mark {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(100% - var(--ds-unit) * 0.1);
+  height: calc(var(--ds-unit) * 0.9);
+  overflow: hidden;
+  border-radius: var(--ds-radius);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.pick:hover:not(:disabled) .pick-mark { background: var(--ds-fill); }
+.pick:focus-visible .pick-mark { outline: 2px solid var(--ds-focus-ring); outline-offset: -1px; }
+.pick[data-today] .pick-mark { background: var(--ds-calendar-today); color: var(--ds-calendar-today-ink); }
+.pick[data-selected] .pick-mark { background: var(--ds-calendar-selected); color: var(--ds-calendar-selected-ink); }
+.pick:disabled { color: var(--ds-title-color); cursor: default; opacity: 0.5; }
+
+/* Clear: a button one control high at the foot of the square below the month's, one square apart. */
+.foot {
+  display: flex;
+  align-items: flex-end;
+  height: var(--ds-unit);
+  margin-block-start: var(--ds-unit);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :is(.grid, .picks)[data-travel] { animation: ds-calendar-level 160ms cubic-bezier(0.22, 1, 0.36, 1); }
+}
+@keyframes ds-calendar-level {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
 
 .grid { outline: none; }
 .weekdays,
@@ -249,12 +343,23 @@
 :host([compact]) .day[data-outside] .date { color: var(--ds-title-color); }
 
 /* A range: the days between its ends on a band of the selection's blue; the band runs into each end's square. */
-.day[data-inside] { background: var(--ds-calendar-band); }
-:host(:not([compact])) .day:is([data-first], [data-last]) { background: var(--ds-calendar-band); }
-:host([compact]) .day[data-first] { background: linear-gradient(to right, transparent 50%, var(--ds-calendar-band) 50%); }
-:host([compact]) .day[data-last] { background: linear-gradient(to left, transparent 50%, var(--ds-calendar-band) 50%); }
-:host([compact]:dir(rtl)) .day[data-first] { background: linear-gradient(to left, transparent 50%, var(--ds-calendar-band) 50%); }
-:host([compact]:dir(rtl)) .day[data-last] { background: linear-gradient(to right, transparent 50%, var(--ds-calendar-band) 50%); }
+/* In a month of boxes the band fills them; in a compact month it is the marks' height on their
+ * line, from the middle of the first day to the middle of the last, so the ends and the band read
+ * as one bar, the ends' squares drawn over it flush. */
+:host(:not([compact])) .day:is([data-inside], [data-first], [data-last]) { background: var(--ds-calendar-band); }
+:host([compact]) .day { isolation: isolate; }
+:host([compact]) .day:is([data-inside], [data-first], [data-last])::before {
+  position: absolute;
+  z-index: -1;
+  inset-inline: 0;
+  top: calc((var(--ds-calendar-day-height) - var(--ds-calendar-mark)) / 2);
+  height: var(--ds-calendar-mark);
+  background: var(--ds-calendar-band);
+  content: "";
+}
+:host([compact]) .day[data-first]::before { inset-inline-start: 50%; }
+:host([compact]) .day[data-last]::before { inset-inline-end: 50%; }
+:host([compact]) .day[data-inside] .date-line { align-items: center; padding: 0; }
 :host([compact][selectable]) .day[data-inside]:hover .date { background: transparent; }
 
 /* Today, as words in the title grey beside the arrows. */
