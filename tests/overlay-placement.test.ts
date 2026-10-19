@@ -2,7 +2,7 @@
 import { afterEach, expect, test, vi } from "vite-plus/test";
 import { act, createElement as h, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { bindOverlaySwipe, dialogPlacement } from "../DS1/0-face/overlay-swipe";
+import { bindOverlaySwipe, overlayEdge } from "../DS1/0-face/overlay-swipe";
 import { Overlay, OverlayContent, OverlayTitle } from "../DS1/react/overlay";
 vi.stubGlobal("fetch", vi.fn(async () => new Response("{}")));
 await import("../DS1/4-page/ds-overlay");
@@ -36,9 +36,11 @@ const tall = (dialog: HTMLDialogElement, height = 400) =>
   vi.spyOn(dialog, "getBoundingClientRect").mockReturnValue({ width: 375, height, top: 412, left: 0, right: 375, bottom: 812, x: 0, y: 412 } as DOMRect);
 const QUICK: [number, number][] = [[100, 400], [100, 430], [100, 470], [100, 520], [100, 580]];
 
-async function sheet(placement = "sheet") {
+/** An overlay of a type (a drawer at its side), opened. */
+async function sheet(type = "sheet", side = "end") {
   const host = document.createElement("ds-overlay");
-  host.setAttribute("placement", placement);
+  host.setAttribute("type", type);
+  host.setAttribute("side", side);
   host.innerHTML = '<dialog aria-label="Sheet"><p>Words</p></dialog>';
   document.body.append(host);
   await host.show();
@@ -47,28 +49,40 @@ async function sheet(placement = "sheet") {
   return { host, dialog };
 }
 
-test("placement marks the native frame, defaults to the centre and leaves an anchored panel alone", async () => {
+test("type marks the native frame and its edge, a modal by default; only a sheet and a drawer have an edge", async () => {
   const host = document.createElement("ds-overlay");
   host.innerHTML = '<dialog aria-label="Example"></dialog>';
   document.body.append(host);
   await host.updateComplete;
   const dialog = host.querySelector("dialog")!;
-  expect(host.placement).toBe("center");
-  expect(dialog.hasAttribute("data-ds-placement")).toBe(false);
-  for (const placement of ["sheet", "end", "start"] as const) {
-    host.placement = placement;
+  expect(host.type).toBe("modal");
+  expect(dialog.getAttribute("data-ds-type")).toBe("modal");
+  expect(dialog.hasAttribute("data-ds-edge")).toBe(false);
+  for (const [type, side, edge] of [["sheet", "end", "bottom"], ["drawer", "end", "end"], ["drawer", "start", "start"]] as const) {
+    host.type = type;
+    host.side = side;
     await host.updateComplete;
-    expect(dialog.getAttribute("data-ds-placement")).toBe(placement);
-    expect(host.getAttribute("placement")).toBe(placement);
-    expect(dialogPlacement(dialog)).toBe(placement);
+    expect(dialog.getAttribute("data-ds-type")).toBe(type);
+    expect(dialog.getAttribute("data-ds-edge")).toBe(edge);
+    expect(host.getAttribute("type")).toBe(type);
+    expect(overlayEdge(dialog)).toBe(edge);
   }
-  host.anchor = { x: 10, y: 10 };
+  for (const type of ["popover", "screen", "modal"] as const) {
+    host.type = type;
+    await host.updateComplete;
+    expect(dialog.getAttribute("data-ds-type")).toBe(type);
+    expect(dialog.hasAttribute("data-ds-edge")).toBe(false);
+  }
+  // An unknown type is drawn as a modal.
+  host.setAttribute("type", "center");
   await host.updateComplete;
-  expect(dialog.hasAttribute("data-ds-placement")).toBe(false);
-  host.anchor = null;
-  host.placement = "center";
-  await host.updateComplete;
-  expect(dialog.hasAttribute("data-ds-placement")).toBe(false);
+  expect(dialog.getAttribute("data-ds-type")).toBe("modal");
+  // A native frame tells its edge by its classes.
+  const native = document.createElement("dialog");
+  native.className = "ds-overlay ds-overlay--drawer ds-overlay--start";
+  expect(overlayEdge(native)).toBe("start");
+  native.className = "ds-overlay ds-overlay--sheet";
+  expect(overlayEdge(native)).toBe("bottom");
 });
 
 test("a quick swipe asks to close with the reason swipe, and closes; keyboard and focus stay the dialog's", async () => {
@@ -141,14 +155,14 @@ test("a sideways move, a slider and content scrolled down keep their touches", a
 });
 
 test("a drawer at the end swipes away to the right, and in a right-to-left page to the left", async () => {
-  const { host, dialog } = await sheet("end");
+  const { host, dialog } = await sheet("drawer", "end");
   const reasons: string[] = [];
   host.addEventListener("ds-close-request", event => reasons.push((event as CustomEvent<{ reason: string }>).detail.reason));
   expect((await swipe(dialog, [[200, 300], [230, 300], [270, 300], [320, 300], [370, 300]])).dragged).toMatch(/^\d/);
   expect(reasons).toEqual(["swipe"]);
   expect(host.open).toBe(false);
 
-  const rtl = await sheet("end");
+  const rtl = await sheet("drawer", "end");
   rtl.host.setAttribute("dir", "rtl");
   rtl.dialog.style.direction = "rtl";
   expect((await swipe(rtl.dialog, [[200, 300], [230, 300], [270, 300], [320, 300]])).dragged, "towards the page: it gives").toMatch(/^\d/);
@@ -158,7 +172,7 @@ test("a drawer at the end swipes away to the right, and in a right-to-left page 
 });
 
 test("a centred dialog is never swiped", async () => {
-  const { host, dialog } = await sheet("center");
+  const { host, dialog } = await sheet("modal");
   expect((await swipe(dialog, QUICK)).dragging).toBe(false);
   expect(host.open).toBe(true);
 });
@@ -167,7 +181,7 @@ test("a native sheet asks with a cancelable ds-close-request on the dialog, clos
   document.body.innerHTML = '<dialog class="ds-overlay ds-overlay--sheet" aria-label="Native"><p>Words</p></dialog>';
   const dialog = document.querySelector("dialog")!;
   tall(dialog);
-  expect(dialogPlacement(dialog)).toBe("sheet");
+  expect(overlayEdge(dialog)).toBe("bottom");
   const unbind = bindOverlaySwipe(dialog);
   dialog.showModal();
   let decline = true;
@@ -188,7 +202,7 @@ test("a native sheet asks with a cancelable ds-close-request on the dialog, clos
 });
 
 test("onDismiss replaces the close request; a product closing a moment later is not settled home", async () => {
-  document.body.innerHTML = '<dialog class="ds-overlay ds-overlay--start" aria-label="Native"><p>Words</p></dialog>';
+  document.body.innerHTML = '<dialog class="ds-overlay ds-overlay--drawer ds-overlay--start" aria-label="Native"><p>Words</p></dialog>';
   const dialog = document.querySelector("dialog")!;
   tall(dialog);
   const onDismiss = vi.fn(() => setTimeout(() => dialog.close(), 5));
@@ -201,21 +215,21 @@ test("onDismiss replaces the close request; a product closing a moment later is 
   expect(dialog.style.getPropertyValue("--ds-overlay-drag")).not.toBe("0px");
 });
 
-test("React passes placement, keeps a sliding dialog on the page until it has slid out, and removes a centred one at once", async () => {
+test("React passes the type, keeps a sliding sheet on the page until it has slid out, and removes a modal at once", async () => {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
   const mount = document.createElement("div"); document.body.append(mount);
   const root = createRoot(mount);
   let toggle: (open: boolean) => void = () => {};
-  function Example({ placement }: { placement: "sheet" | "center" }) {
+  function Example({ type }: { type: "sheet" | "modal" }) {
     const [open, setOpen] = useState(true);
     toggle = setOpen;
-    return h(Overlay, { open, onOpenChange: setOpen, children: h(OverlayContent, { placement }, h(OverlayTitle, null, "Trade")) });
+    return h(Overlay, { open, onOpenChange: setOpen, children: h(OverlayContent, { type }, h(OverlayTitle, null, "Trade")) });
   }
-  await act(async () => { root.render(h(Example, { placement: "sheet" })); });
+  await act(async () => { root.render(h(Example, { type: "sheet" })); });
   await act(async () => { await new Promise(resolve => setTimeout(resolve, 0)); });
   const host = document.querySelector("ds-overlay")!;
-  expect(host.placement).toBe("sheet");
-  expect(host.querySelector("dialog")!.getAttribute("data-ds-placement")).toBe("sheet");
+  expect(host.type).toBe("sheet");
+  expect(host.querySelector("dialog")!.getAttribute("data-ds-edge")).toBe("bottom");
   await act(async () => { toggle(false); });
   expect(document.querySelector("ds-overlay")).toBe(host);
   expect(host.open).toBe(false);
@@ -226,7 +240,7 @@ test("React passes placement, keeps a sliding dialog on the page until it has sl
   });
   expect(document.querySelector("ds-overlay")).toBeNull();
 
-  await act(async () => { root.render(h(Example, { placement: "center" })); });
+  await act(async () => { root.render(h(Example, { type: "modal" })); });
   await act(async () => { toggle(true); });
   await act(async () => { await new Promise(resolve => setTimeout(resolve, 0)); });
   expect(document.querySelector("ds-overlay")).not.toBeNull();

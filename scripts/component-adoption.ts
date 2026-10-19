@@ -44,7 +44,7 @@ const rowPart = /^ds-(?:row|sidebar)__/;
  * scripts that draw DS1 without a component: the tooltip script and the feedback dialogs.
  */
 const entryFiles = ["1-root/empty.css", "1-root/notice.css", "1-root/table.css", "1-root/kbd.css", "1-root/carousel.css", "1-root/card.css", "1-root/figures.css", "1-root/progress.css", "1-root/row.css", "react/empty.ts", "react/notice.ts", "react/kbd.ts", "react/carousel.ts", "react/stat.ts", "react/progress.ts", "0-face/tooltips.ts", "0-face/feedback.ts", "0-face/feedback-overlays.ts", ...siteChromeFiles];
-const native: Record<string, string> = { a: "link", button: "button", input: "input", select: "select", textarea: "textarea", p: "text", h1: "text", h2: "text", h3: "text", h4: "text", h5: "text", h6: "text", ul: "list", ol: "list", table: "table", form: "form", dialog: "dialog", details: "accordion", meter: "progress", progress: "progress", kbd: "kbd" };
+const native: Record<string, string> = { a: "link", button: "button", input: "input", select: "select", textarea: "textarea", p: "text", h1: "text", h2: "text", h3: "text", h4: "text", h5: "text", h6: "text", ul: "list", ol: "list", table: "table", form: "form", dialog: "overlay", details: "accordion", meter: "progress", progress: "progress", kbd: "kbd" };
 /**
  * `prose` marks native text, a list or a table inside an element marked data-ds-prose, which DS1's prose sheet draws.
  * `column` places a site that is not an element of its own kind: a title or data-tooltip attribute (Tooltip), a
@@ -593,9 +593,9 @@ export function readSource(file: string, source: string, exported?: ReadonlySet<
     if (ts.isCallExpression(node)) {
       const callee = node.expression;
       const at = line(node.getStart(ast));
-      if (ts.isIdentifier(callee) && imported.has(callee.text) && browserDialogs.has(imported.get(callee.text)!)) found.push({ tag: `${imported.get(callee.text)}()`, line: at, column: "dialog", imported: callee.text });
-      else if (ts.isIdentifier(callee) && browserDialogs.has(callee.text) && !declared.has(callee.text) && !imported.has(callee.text)) found.push({ tag: `${callee.text}()`, line: at, column: "dialog" });
-      else if (ts.isPropertyAccessExpression(callee) && ts.isIdentifier(callee.expression) && ["window", "globalThis"].includes(callee.expression.text) && !declared.has(callee.expression.text) && browserDialogs.has(callee.name.text)) found.push({ tag: `${callee.name.text}()`, line: at, column: "dialog" });
+      if (ts.isIdentifier(callee) && imported.has(callee.text) && browserDialogs.has(imported.get(callee.text)!)) found.push({ tag: `${imported.get(callee.text)}()`, line: at, column: "overlay", imported: callee.text });
+      else if (ts.isIdentifier(callee) && browserDialogs.has(callee.text) && !declared.has(callee.text) && !imported.has(callee.text)) found.push({ tag: `${callee.text}()`, line: at, column: "overlay" });
+      else if (ts.isPropertyAccessExpression(callee) && ts.isIdentifier(callee.expression) && ["window", "globalThis"].includes(callee.expression.text) && !declared.has(callee.expression.text) && browserDialogs.has(callee.name.text)) found.push({ tag: `${callee.name.text}()`, line: at, column: "overlay" });
     }
     if (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node) || ts.isTemplateHead(node) || ts.isTemplateMiddle(node) || ts.isTemplateTail(node)) {
       // Only markup contexts: a plain string or a code sample is not a site.
@@ -616,7 +616,7 @@ export function readSource(file: string, source: string, exported?: ReadonlySet<
 function emptyCell(): ComponentCell { return { shared: 0, styled: 0, local: 0, unverified: 0, sites: [], snapshot: "none", current: null, issues: [] }; }
 interface Manifest { commit: string; components: string[]; files: Record<string, string> }
 
-export function checkSnapshots(root: string, manifestPath: string | undefined, dsRoot: string): { commit: string | null; cells: Record<string, ComponentCell>; controls: ComponentCell; text: ComponentCell; prose: ComponentCell; reactInput: ComponentCell; reactButton: ComponentCell; reactDialog: ComponentCell; reactChoice: ComponentCell; reactSplit: ComponentCell; reactComposer: ComponentCell; reactMenu: ComponentCell; reactAccordion: ComponentCell; reactAvatar: ComponentCell; reactAvatarGroup: ComponentCell; reactToken: ComponentCell; reactFilePicker: ComponentCell; reactContextMenu: ComponentCell; reactBadge: ComponentCell; entries: Record<string, ComponentCell> } {
+export function checkSnapshots(root: string, manifestPath: string | undefined, dsRoot: string): { commit: string | null; cells: Record<string, ComponentCell>; controls: ComponentCell; text: ComponentCell; prose: ComponentCell; reactInput: ComponentCell; reactButton: ComponentCell; reactOverlay: ComponentCell; reactChoice: ComponentCell; reactSplit: ComponentCell; reactComposer: ComponentCell; reactMenu: ComponentCell; reactAccordion: ComponentCell; reactAvatar: ComponentCell; reactAvatarGroup: ComponentCell; reactToken: ComponentCell; reactFilePicker: ComponentCell; reactContextMenu: ComponentCell; reactBadge: ComponentCell; entries: Record<string, ComponentCell> } {
   const cells = Object.fromEntries(IMPLEMENTATION_COLUMNS.map(c => [c.id, emptyCell()]));
   const entries: Record<string, ComponentCell> = {};
   const controls = emptyCell();
@@ -624,7 +624,7 @@ export function checkSnapshots(root: string, manifestPath: string | undefined, d
   const prose = emptyCell();
   const reactInput = emptyCell();
   const reactButton = emptyCell();
-  const reactDialog = emptyCell();
+  const reactOverlay = emptyCell();
   const reactChoice = emptyCell();
   const reactSplit = emptyCell();
   const reactComposer = emptyCell();
@@ -636,7 +636,7 @@ export function checkSnapshots(root: string, manifestPath: string | undefined, d
   const reactBadge = emptyCell();
   const reactFilePicker = emptyCell();
   const reactContextMenu = emptyCell();
-  if (!manifestPath || !existsSync(join(root, manifestPath))) return { commit: null, cells, controls, text, prose, reactInput, reactButton, reactDialog, reactChoice, reactSplit, reactComposer, reactMenu, reactAccordion, reactAvatar, reactAvatarGroup, reactToken, reactFilePicker, reactContextMenu, reactBadge, entries };
+  if (!manifestPath || !existsSync(join(root, manifestPath))) return { commit: null, cells, controls, text, prose, reactInput, reactButton, reactOverlay, reactChoice, reactSplit, reactComposer, reactMenu, reactAccordion, reactAvatar, reactAvatarGroup, reactToken, reactFilePicker, reactContextMenu, reactBadge, entries };
   const manifest = JSON.parse(readFileSync(join(root, manifestPath), "utf8")) as Manifest;
   if (!/^[a-f0-9]{40}$/.test(manifest.commit) || !Array.isArray(manifest.components) || !manifest.files) throw new Error("Invalid component manifest");
   const snapshot = dirname(join(root, manifestPath));
@@ -648,11 +648,11 @@ export function checkSnapshots(root: string, manifestPath: string | undefined, d
     }
     return historical.get(file)!;
   };
-  for (const component of [...manifest.components, ...entryFiles.filter(file => manifest.files[file]).map(file => `@file:${file}`), "@controls", ...(manifest.files["1-root/text.css"] ? ["@text"] : []), ...(manifest.files["1-root/prose.css"] ? ["@prose"] : []), ...(manifest.files["react/badge.ts"] ? ["@react-badge"] : []), ...(manifest.files["react/context-menu.ts"] ? ["@react-context-menu"] : []), ...(manifest.files["react/file-picker.ts"] ? ["@react-file-picker"] : []), ...(manifest.files["react/token-field.ts"] ? ["@react-token-field"] : []), ...(manifest.files["react/avatar-group.ts"] ? ["@react-avatar-group"] : []), ...(manifest.files["react/avatar.ts"] ? ["@react-avatar"] : []), ...(manifest.files["react/accordion.ts"] ? ["@react-accordion"] : []), ...(manifest.files["react/menu.ts"] ? ["@react-menu"] : []), ...(manifest.files['react/composer.ts'] ? ['@react-composer'] : []), ...(manifest.files['react/split.ts'] ? ['@react-split'] : []), ...(manifest.files['react/input.ts'] ? ['@react-input'] : []), ...(manifest.files['react/button.ts'] ? ['@react-button'] : []), ...(manifest.files['react/overlay.ts'] ? ['@react-dialog'] : []), ...(manifest.files['react/choice.ts'] ? ['@react-choice'] : [])]) {
+  for (const component of [...manifest.components, ...entryFiles.filter(file => manifest.files[file]).map(file => `@file:${file}`), "@controls", ...(manifest.files["1-root/text.css"] ? ["@text"] : []), ...(manifest.files["1-root/prose.css"] ? ["@prose"] : []), ...(manifest.files["react/badge.ts"] ? ["@react-badge"] : []), ...(manifest.files["react/context-menu.ts"] ? ["@react-context-menu"] : []), ...(manifest.files["react/file-picker.ts"] ? ["@react-file-picker"] : []), ...(manifest.files["react/token-field.ts"] ? ["@react-token-field"] : []), ...(manifest.files["react/avatar-group.ts"] ? ["@react-avatar-group"] : []), ...(manifest.files["react/avatar.ts"] ? ["@react-avatar"] : []), ...(manifest.files["react/accordion.ts"] ? ["@react-accordion"] : []), ...(manifest.files["react/menu.ts"] ? ["@react-menu"] : []), ...(manifest.files['react/composer.ts'] ? ['@react-composer'] : []), ...(manifest.files['react/split.ts'] ? ['@react-split'] : []), ...(manifest.files['react/input.ts'] ? ['@react-input'] : []), ...(manifest.files['react/button.ts'] ? ['@react-button'] : []), ...(manifest.files['react/overlay.ts'] || manifest.files['react/dialog.ts'] ? ['@react-overlay'] : []), ...(manifest.files['react/choice.ts'] ? ['@react-choice'] : [])]) {
     const file = component.startsWith("@file:") ? component.slice("@file:".length) : undefined;
-    const cell = file ? (entries[file] = emptyCell()) : component === "@text" ? text : component === "@prose" ? prose : component === "@react-badge" ? reactBadge : component === "@react-context-menu" ? reactContextMenu : component === "@react-file-picker" ? reactFilePicker : component === "@react-token-field" ? reactToken : component === "@react-avatar-group" ? reactAvatarGroup : component === "@react-avatar" ? reactAvatar : component === "@react-accordion" ? reactAccordion : component === "@controls" ? controls : component === "@react-menu" ? reactMenu : component === "@react-composer" ? reactComposer : component === '@react-input' ? reactInput : component === '@react-button' ? reactButton : component === '@react-dialog' ? reactDialog : component === '@react-choice' ? reactChoice : component === '@react-split' ? reactSplit : cells[component];
+    const cell = file ? (entries[file] = emptyCell()) : component === "@text" ? text : component === "@prose" ? prose : component === "@react-badge" ? reactBadge : component === "@react-context-menu" ? reactContextMenu : component === "@react-file-picker" ? reactFilePicker : component === "@react-token-field" ? reactToken : component === "@react-avatar-group" ? reactAvatarGroup : component === "@react-avatar" ? reactAvatar : component === "@react-accordion" ? reactAccordion : component === "@controls" ? controls : component === "@react-menu" ? reactMenu : component === "@react-composer" ? reactComposer : component === '@react-input' ? reactInput : component === '@react-button' ? reactButton : component === '@react-overlay' ? reactOverlay : component === '@react-choice' ? reactChoice : component === '@react-split' ? reactSplit : cells[component];
     if (!cell) continue;
-    const entry = file ?? (component === "@text" ? "1-root/text.css" : component === "@prose" ? "1-root/prose.css" : component === "@react-badge" ? "react/badge.ts" : component === "@react-context-menu" ? "react/context-menu.ts" : component === "@react-file-picker" ? "react/file-picker.ts" : component === "@react-token-field" ? "react/token-field.ts" : component === "@react-avatar-group" ? "react/avatar-group.ts" : component === "@react-avatar" ? "react/avatar.ts" : component === "@react-accordion" ? "react/accordion.ts" : component === "@controls" ? "1-root/controls.css" : component === "@react-menu" ? "react/menu.ts" : component === "@react-composer" ? "react/composer.ts" : component === '@react-input' ? 'react/input.ts' : component === '@react-button' ? 'react/button.ts' : component === '@react-dialog' ? 'react/overlay.ts' : component === '@react-choice' ? 'react/choice.ts' : component === '@react-split' ? 'react/split.ts' : Object.keys(manifest.files).find(f => f.endsWith(`/ds-${component}.ts`)));
+    const entry = file ?? (component === "@text" ? "1-root/text.css" : component === "@prose" ? "1-root/prose.css" : component === "@react-badge" ? "react/badge.ts" : component === "@react-context-menu" ? "react/context-menu.ts" : component === "@react-file-picker" ? "react/file-picker.ts" : component === "@react-token-field" ? "react/token-field.ts" : component === "@react-avatar-group" ? "react/avatar-group.ts" : component === "@react-avatar" ? "react/avatar.ts" : component === "@react-accordion" ? "react/accordion.ts" : component === "@controls" ? "1-root/controls.css" : component === "@react-menu" ? "react/menu.ts" : component === "@react-composer" ? "react/composer.ts" : component === '@react-input' ? 'react/input.ts' : component === '@react-button' ? 'react/button.ts' : component === '@react-overlay' ? (manifest.files['react/overlay.ts'] ? 'react/overlay.ts' : 'react/dialog.ts') : component === '@react-choice' ? 'react/choice.ts' : component === '@react-split' ? 'react/split.ts' : Object.keys(manifest.files).find(f => f.endsWith(`/ds-${component}.ts`)));
     const visited = new Set<string>();
     let modified = false, unverifiable = false, current = true;
     const visit = (file: string) => {
@@ -678,7 +678,7 @@ export function checkSnapshots(root: string, manifestPath: string | undefined, d
     cell.snapshot = modified ? "modified" : unverifiable ? "unverified" : "verified";
     cell.current = current && !unverifiable;
   }
-  return { commit: manifest.commit, cells, controls, text, prose, reactInput, reactButton, reactDialog, reactChoice, reactSplit, reactComposer, reactMenu, reactAccordion, reactAvatar, reactAvatarGroup, reactToken, reactFilePicker, reactContextMenu, reactBadge, entries };
+  return { commit: manifest.commit, cells, controls, text, prose, reactInput, reactButton, reactOverlay, reactChoice, reactSplit, reactComposer, reactMenu, reactAccordion, reactAvatar, reactAvatarGroup, reactToken, reactFilePicker, reactContextMenu, reactBadge, entries };
 }
 
 /**
@@ -843,7 +843,7 @@ function directSnapshots(dsRoot: string): ReturnType<typeof checkSnapshots> {
     : { ...emptyCell(), snapshot: "verified", current: true };
   const files = git(dsRoot, "ls-files", "--", "DS1").split("\n");
   const cells = Object.fromEntries(IMPLEMENTATION_COLUMNS.map(c => [c.id, files.some(f => f.endsWith(`/ds-${c.id}.ts`)) ? source() : emptyCell()]));
-  return { commit: git(dsRoot, "rev-parse", "HEAD"), cells, controls: source(), text: source(), prose: source(), reactInput: source(), reactButton: source(), reactDialog: source(), reactChoice: source(), reactSplit: source(), reactComposer: source(), reactMenu: source(), reactAccordion: source(), reactAvatar: source(), reactAvatarGroup: source(), reactToken: source(), reactFilePicker: source(), reactContextMenu: source(), reactBadge: source(), entries: Object.fromEntries(entryFiles.map(file => [file, source()])) };
+  return { commit: git(dsRoot, "rev-parse", "HEAD"), cells, controls: source(), text: source(), prose: source(), reactInput: source(), reactButton: source(), reactOverlay: source(), reactChoice: source(), reactSplit: source(), reactComposer: source(), reactMenu: source(), reactAccordion: source(), reactAvatar: source(), reactAvatarGroup: source(), reactToken: source(), reactFilePicker: source(), reactContextMenu: source(), reactBadge: source(), entries: Object.fromEntries(entryFiles.map(file => [file, source()])) };
 }
 /** Where a direct-source app's shared adapters live, as if DS1/ were its snapshot. */
 const directManifest = "DS1/components-manifest.json";
@@ -886,7 +886,9 @@ function importedSharedAdapters(root: string, file: string, source: string, mani
     [resolve(root, dirname(manifestPath), 'react/split.ts')]: { Split: 'split' },
     [resolve(root, dirname(manifestPath), 'react/input.ts')]: { Input: 'input', Textarea: 'textarea' },
     [resolve(root, dirname(manifestPath), 'react/button.ts')]: { Button: 'button', ButtonLink: 'button' },
-    [resolve(root, dirname(manifestPath), 'react/overlay.ts')]: { OverlayContent: 'dialog' },
+    [resolve(root, dirname(manifestPath), 'react/overlay.ts')]: { OverlayContent: 'overlay' },
+    // A copy from before Overlay keeps the dialog's adapter, counted as Overlay.
+    [resolve(root, dirname(manifestPath), 'react/dialog.ts')]: { DialogContent: 'overlay' },
     [resolve(root, dirname(manifestPath), 'react/choice.ts')]: { Checkbox: 'checkbox', Radio: 'radio', Switch: 'switch', Select: 'select', ColorInput: 'color' },
   };
   const resolveModule = (from: string, name: string) => resolveImport(root, from, name);
@@ -1062,7 +1064,7 @@ export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): Ado
         const block = site.nativeStyle ? blockClasses[site.nativeStyle] : undefined;
         const custom = /^(ds|ezo|c9y)-(.+)$/.exec(site.tag);
         const chartPart = custom?.[1] === "ds" && ["bars", "range", "ratio", "spark"].includes(custom[2] ?? "") ? "chart" : undefined;
-        const component = (site.tag === "a" && site.nativeStyle === "ds-button" ? "button" : undefined) ?? chartPart ?? block?.component ?? (sharedAdapters.has(site.tag) ? sharedAdapters.get(site.tag)!.component : aliases[site.tag] ?? (custom && known.has(custom[2]!) ? custom[2]! : site.dialogRole ? "dialog" : (site.nativeStyle && nativeColumns[site.nativeStyle]) || (site.controlKind ?? native[site.tag])));
+        const component = (site.tag === "a" && site.nativeStyle === "ds-button" ? "button" : undefined) ?? chartPart ?? block?.component ?? (sharedAdapters.has(site.tag) ? sharedAdapters.get(site.tag)!.component : aliases[site.tag] ?? (custom && known.has(custom[2]!) ? custom[2]! : site.dialogRole ? "overlay" : (site.nativeStyle && nativeColumns[site.nativeStyle]) || (site.controlKind ?? native[site.tag])));
         if (!component) {
           if (site.tag.includes("-")) app.otherCustomElements[site.tag] = (app.otherCustomElements[site.tag] ?? 0) + 1;
           continue;
@@ -1071,7 +1073,7 @@ export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): Ado
         const ds = sharedAdapters.has(site.tag) || Boolean(aliases[site.tag]) || custom?.[1] === "ds";
         const adapterFile = sharedAdapters.get(site.tag)?.file;
         const entryEvidence = adapterFile && entryFiles.includes(adapterFile) ? snapshots.entries[adapterFile] ?? { ...emptyCell(), snapshot: "unverified" as const, current: false, issues: [`Not in the component manifest: ${adapterFile}`] } : undefined;
-        const evidence = entryEvidence ?? (sharedAdapters.get(site.tag)?.contextMenu ? snapshots.reactContextMenu : sharedAdapters.has(site.tag) ? (component === "badge" ? snapshots.reactBadge : component === "file-picker" ? snapshots.reactFilePicker : ["token", "token-field"].includes(component) ? snapshots.reactToken : component === "avatar-group" ? snapshots.reactAvatarGroup : component === "avatar" ? snapshots.reactAvatar : component === "accordion" ? snapshots.reactAccordion : component === "menu" ? snapshots.reactMenu : component === "composer" ? snapshots.reactComposer : component === "split" ? snapshots.reactSplit : component === "button" ? snapshots.reactButton : component === "dialog" ? snapshots.reactDialog : ["checkbox", "radio", "switch", "select", "color"].includes(component) ? snapshots.reactChoice : snapshots.reactInput) : cell);
+        const evidence = entryEvidence ?? (sharedAdapters.get(site.tag)?.contextMenu ? snapshots.reactContextMenu : sharedAdapters.has(site.tag) ? (component === "badge" ? snapshots.reactBadge : component === "file-picker" ? snapshots.reactFilePicker : ["token", "token-field"].includes(component) ? snapshots.reactToken : component === "avatar-group" ? snapshots.reactAvatarGroup : component === "avatar" ? snapshots.reactAvatar : component === "accordion" ? snapshots.reactAccordion : component === "menu" ? snapshots.reactMenu : component === "composer" ? snapshots.reactComposer : component === "split" ? snapshots.reactSplit : component === "button" ? snapshots.reactButton : component === "overlay" ? snapshots.reactOverlay : ["checkbox", "radio", "switch", "select", "color"].includes(component) ? snapshots.reactChoice : snapshots.reactInput) : cell);
         if (sharedAdapters.has(site.tag)) {
           cell.issues = [...new Set([...cell.issues, ...evidence.issues])];
           cell.current = cell.current === true && evidence.current === true;

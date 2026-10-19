@@ -6,6 +6,9 @@ import { dirname, join, relative, resolve } from 'node:path';
  * Collects the files under DS1/ that the named components need, keyed by their
  * path inside DS1, with a generated `components.ts` that exports them all.
  */
+/** Components folded into another, named so a product's sync.json says what to take instead (never resolved for it). */
+const RENAMED = { dialog: 'overlay' };
+
 export function componentGraph(ds1, names) {
   const source = resolve(ds1) + '/';
   // Internal App controls are opt-in Sync 1 inputs, never public package files.
@@ -48,6 +51,7 @@ export function componentGraph(ds1, names) {
   const entries = components.map(name => {
     if (!/^[a-z][a-z-]*$/.test(name)) throw new Error(`Invalid component: ${name}`);
     const file = ['2-core', '3-unit', '4-page'].map(layer => `${layer}/ds-${name}.ts`).find(file => exists(join(source, file)));
+    if (!file && RENAMED[name]) throw new Error(`Component ${name} is now ${RENAMED[name]}: rename it in sync.json`);
     if (!file) throw new Error(`Unknown component: ${name}`);
     visit(file);
     return file;
@@ -73,7 +77,7 @@ export function componentGraph(ds1, names) {
   if (components.includes('avatar')) visit('react/avatar.ts');
   if (components.includes('avatar-group')) visit('react/avatar-group.ts');
   if (['checkbox', 'radio', 'switch', 'select', 'color'].some(name => components.includes(name))) visit('react/choice.ts');
-  if (components.includes('dialog')) visit('react/overlay.ts');
+  if (components.includes('overlay')) visit('react/overlay.ts');
   if (components.includes('page')) visit('react/page.ts');
   if (components.includes('header')) visit('react/header.ts');
   if (components.includes('footer')) visit('react/footer.ts');

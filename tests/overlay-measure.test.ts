@@ -143,8 +143,9 @@ async function handleRows(tab: Page, box: { left: number; top: number; width: nu
   }, { data: shot, height });
 }
 
-const sheet = (content = rows(3), attributes = "") => `<ds-overlay placement="sheet" ${attributes}><dialog aria-label="Sheet">${content}</dialog></ds-overlay>`;
-const nativeSheet = (content = rows(3), placement = "sheet") => `<dialog class="ds-overlay ds-overlay--${placement}" aria-label="Sheet">${content}</dialog>`;
+const sheet = (content = rows(3), attributes = "") => `<ds-overlay type="sheet" ${attributes}><dialog aria-label="Sheet">${content}</dialog></ds-overlay>`;
+/** A native frame: a sheet, or a drawer at its end (`"end"`) or start (`"start"`). */
+const nativeSheet = (content = rows(3), edge: "sheet" | "end" | "start" = "sheet") => `<dialog class="ds-overlay ${edge === "sheet" ? "ds-overlay--sheet" : `ds-overlay--drawer${edge === "start" ? " ds-overlay--start" : ""}`}" aria-label="Sheet">${content}</dialog>`;
 
 test("a sheet stands at the foot of a phone, as wide as it, on whole squares, with its handle in its first square", async () => {
   for (const scheme of ["light", "dark"] as const) {
@@ -214,7 +215,7 @@ test("drawers are the screen's height and 16 squares wide, at the end or the sta
   const tab = await page();
   for (const [placement, dir, side] of [["end", "ltr", "right"], ["start", "ltr", "left"], ["end", "rtl", "left"], ["start", "rtl", "right"]] as const) {
     for (const native of [false, true]) {
-      const markup = native ? `<div dir="${dir}">${nativeSheet(rows(3), placement)}</div>` : `<div dir="${dir}"><ds-overlay placement="${placement}"><dialog aria-label="Drawer">${rows(3)}</dialog></ds-overlay></div>`;
+      const markup = native ? `<div dir="${dir}">${nativeSheet(rows(3), placement)}</div>` : `<div dir="${dir}"><ds-overlay type="drawer" side="${placement}"><dialog aria-label="Drawer">${rows(3)}</dialog></ds-overlay></div>`;
       await open(tab, markup, { native });
       const box = await measure(tab);
       const label = `${placement} ${dir} ${native ? "native" : "element"}`;
@@ -302,7 +303,7 @@ test("a native sheet and a drawer swipe away too, toward their own edge", async 
   expect(down.reasons).toEqual(["swipe"]);
   expect(down.open).toBe(false);
 
-  await open(tab, `<ds-overlay placement="end"><dialog aria-label="Drawer">${rows(3)}</dialog></ds-overlay>`);
+  await open(tab, `<ds-overlay type="drawer"><dialog aria-label="Drawer">${rows(3)}</dialog></ds-overlay>`);
   const left = await swipe(tab, [[200, 300], [170, 300], [130, 300], [80, 300]]);
   expect(left.dragging, "towards the page: it gives a little").toBe(true);
   expect(left.open).toBe(true);

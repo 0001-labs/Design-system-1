@@ -5,7 +5,7 @@ description: Toasts, dialogs that answer with a promise, and copying text, for p
 
 import FeedbackDemo from "../../../components/FeedbackDemo.astro";
 
-A page without Lit cannot use [`<ds-toast>`](/2-core/toast/) or [`<ds-overlay>`](/4-page/dialog/),
+A page without Lit cannot use [`<ds-toast>`](/2-core/toast/) or [`<ds-overlay>`](/4-page/overlay/),
 and falls back on the browser's `alert()`, `confirm()` and `prompt()`, or builds a toast and a
 copy button of its own. The feedback module gives such a page the system's own, from one import and with no framework:
 
@@ -34,7 +34,7 @@ Lit gets the same stack from the page toaster.
 
 | The page | Toasts | Dialogs |
 | --- | --- | --- |
-| Uses Lit components, or React through the adapters | [`<ds-toast>`](/2-core/toast/) and `toast()`; the module's `toast()` reaches the same stack | [`<ds-overlay>`](/4-page/dialog/) for anything with a form or content of its own; `confirm()`, `prompt()` and `alert()` from this module for a single question |
+| Uses Lit components, or React through the adapters | [`<ds-toast>`](/2-core/toast/) and `toast()`; the module's `toast()` reaches the same stack | [`<ds-overlay>`](/4-page/overlay/) for anything with a form or content of its own; `confirm()`, `prompt()` and `alert()` from this module for a single question |
 | Has no framework | This module's `toast()` | This module's `confirm()`, `prompt()` and `alert()`; a native `dialog.ds-overlay` of its own for more |
 
 ## Toasts
@@ -188,6 +188,6 @@ backend project that checks shared code, with no special types.
 
 ## Related
 
-[Toast](/2-core/toast/) is the Lit element. [Dialog](/4-page/dialog/) is the Lit element for
+[Toast](/2-core/toast/) is the Lit element. [Overlay](/4-page/overlay/) is the Lit element for
 dialogs with content of their own. [Native controls](/1-root/native-controls/) draws the dialog
 frame and its buttons.

@@ -511,7 +511,7 @@ export const SHOWCASE_PAGES: Record<string, string[]> = {
   "3-unit/menu": [
     "menu-recording"
   ],
-  "4-page/dialog": [
+  "4-page/overlay": [
     "dialog-proof"
   ]
 };

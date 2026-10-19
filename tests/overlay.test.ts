@@ -6,8 +6,8 @@ await import("../DS1/3-unit/ds-menu");
 await import("../DS1/2-core/ds-input");
 afterEach(() => { document.body.replaceChildren(); document.documentElement.removeAttribute("style"); });
 
-test("anchored panels follow content and the visible viewport, and stop after close", async () => {
-  const host = document.createElement('ds-overlay'); host.nonModal = true;
+test("a popover follows its content and the visible viewport, and stops after close", async () => {
+  const host = document.createElement('ds-overlay'); host.type = "popover";
   host.anchor = { x: 980, y: 700 };
   host.innerHTML = '<dialog style="margin:10px" aria-label="Actions"><button>Action</button></dialog>';
   document.body.append(host);

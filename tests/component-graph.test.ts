@@ -36,8 +36,8 @@ test('empty states and notices carry their React adapters and the classes that d
   expect(componentGraph(ds1, ['text']).files.has('react/notice.ts')).toBe(false);
 });
 
-test('shortcut hints and dialogs carry their adapters, keys, the placement sheet and the swipe', () => {
-  const { files } = componentGraph(ds1, ['kbd', 'dialog']);
+test('shortcut hints and overlays carry their adapters, keys, the overlay sheet and the swipe', () => {
+  const { files } = componentGraph(ds1, ['kbd', 'overlay']);
   for (const file of ['2-core/ds-kbd.ts', 'react/kbd.ts', '0-face/keys.ts', '1-root/kbd.css', '4-page/ds-overlay.ts', 'react/overlay.ts', '0-face/overlay-swipe.ts', '1-root/overlay.css']) expect(files.has(file), file).toBe(true);
 });
 
@@ -90,6 +90,8 @@ test('the site chrome carries its React adapters, the drawer script and the shee
 
 test('unknown and malformed names are refused', () => {
   expect(() => componentGraph(ds1, ['nothing'])).toThrow(/Unknown component/);
+  // A folded component's old name says what it became.
+  expect(() => componentGraph(ds1, ['dialog'])).toThrow(/dialog is now overlay/);
   expect(() => componentGraph(ds1, ['../x'])).toThrow(/Invalid component/);
 });
 

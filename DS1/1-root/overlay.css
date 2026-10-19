@@ -237,6 +237,12 @@
   gap: var(--ds-unit);
 }
 
+/* Content that supplies its own room, as the documentation's navigation does. */
+:is(ds-overlay > dialog[data-ds-type="screen"], dialog.ds-overlay.ds-overlay--screen)[data-ds-overlay-flush] {
+  padding: 0;
+  gap: 0;
+}
+
 :is(ds-overlay > dialog[data-ds-type="screen"], dialog.ds-overlay.ds-overlay--screen)::backdrop {
   background: transparent;
 }

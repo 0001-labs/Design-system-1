@@ -135,7 +135,7 @@ describe("source adoption evidence", () => {
     git(ds, 'add', '.'); git(ds, '-c', 'user.name=Test', '-c', 'user.email=test@example.com', 'commit', '-m', 'Add shared input');
     const manifestPath = join(app, 'design/components-manifest.json');
     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
-    manifest.commit = git(ds, 'rev-parse', 'HEAD'); manifest.components.push('avatar-group', 'avatar', 'accordion', 'menu', 'composer', 'split', 'input', 'textarea', 'dialog', 'checkbox', 'radio', 'switch', 'select', 'color');
+    manifest.commit = git(ds, 'rev-parse', 'HEAD'); manifest.components.push('avatar-group', 'avatar', 'accordion', 'menu', 'composer', 'split', 'input', 'textarea', 'overlay', 'checkbox', 'radio', 'switch', 'select', 'color');
     Object.assign(manifest.files, Object.fromEntries(Object.entries(added).map(([file, body]) => [file, createHash('sha256').update(body).digest('hex')])));
     writeFileSync(manifestPath, JSON.stringify(manifest));
     write(app, 'src/field.ts', 'import "./register"; export { Input as Field, Textarea as Multiline } from "../design/react/input";');
@@ -178,9 +178,9 @@ describe("source adoption evidence", () => {
     expect(scan().cells.input).toMatchObject({ shared: 2, local: 1, unverified: 0 });
     expect(scan().cells.textarea).toMatchObject({ shared: 1, local: 1, unverified: 0 });
     expect(scan().cells.button).toMatchObject({ shared: 3, unverified: 0 });
-    expect(scan().cells.dialog).toMatchObject({ shared: 1, local: 3, unverified: 0 });
+    expect(scan().cells.overlay).toMatchObject({ shared: 1, local: 3, unverified: 0 });
     write(app, 'design/react/overlay.ts', added['react/overlay.ts'] + '\n// Local changes');
-    expect(scan().cells.dialog).toMatchObject({ shared: 0, local: 3, unverified: 1 });
+    expect(scan().cells.overlay).toMatchObject({ shared: 0, local: 3, unverified: 1 });
     write(app, 'design/react/button.ts', added['react/button.ts'] + '\n// Local changes');
     expect(scan().cells.button).toMatchObject({ shared: 0, unverified: 3 });
     expect(scan().cells.input).toMatchObject({ shared: 2, unverified: 0 });
@@ -770,9 +770,9 @@ describe("tooltips, disclosures, browser dialogs, ranges and table roles", () =>
     expect(sourceSites("view.ts", 'const more = document.createElement("details"); const summary = document.createElement("summary");').map(site => site.tag).filter(counted)).toEqual(["details"]);
   });
   it("counts the browser's alert, confirm and prompt, and not a local or imported function of the same name", () => {
-    expect(marks("view.ts", 'alert("Saved"); if (window.confirm("Delete?")) remove(); const name = globalThis.prompt("Name"); dialog.confirm(); state.alert = true;')).toEqual([["alert()", "dialog"], ["confirm()", "dialog"], ["prompt()", "dialog"]]);
+    expect(marks("view.ts", 'alert("Saved"); if (window.confirm("Delete?")) remove(); const name = globalThis.prompt("Name"); dialog.confirm(); state.alert = true;')).toEqual([["alert()", "overlay"], ["confirm()", "overlay"], ["prompt()", "overlay"]]);
     expect(marks("view.ts", 'function confirm(text) { return true; } confirm("Sure?"); const prompt = ask; prompt();')).toEqual([]);
-    expect(sourceSites("view.ts", 'import { confirm as ask } from "./feedback"; ask({ title: "Sure?" });')).toMatchObject([{ tag: "confirm()", column: "dialog", imported: "ask" }]);
+    expect(sourceSites("view.ts", 'import { confirm as ask } from "./feedback"; ask({ title: "Sure?" });')).toMatchObject([{ tag: "confirm()", column: "overlay", imported: "ask" }]);
   });
   it("keeps range inputs and slider roles out of Input as a known gap", () => {
     for (const file of ["page.html", "view.tsx"]) expect(marks(file, '<input type="range" /><div role="slider"></div><input type="text" />'), file).toEqual([["input[type=range]", "range"], ["div[role=slider]", "range"]]);
@@ -800,10 +800,10 @@ describe("tooltips, disclosures, browser dialogs, ranges and table roles", () =>
     commit(app, "Page");
     const scan = () => scanApp({ id: "pages", name: "Pages", directory: "Pages", roots: ["web/src"] }, studio, ds);
     expect(scan().cells.tooltip).toMatchObject({ shared: 1, local: 0, unverified: 0 });
-    expect(scan().cells.dialog).toMatchObject({ shared: 1, local: 1, unverified: 0 });
+    expect(scan().cells.overlay).toMatchObject({ shared: 1, local: 1, unverified: 0 });
     write(app, "web/ds1/0-face/feedback-overlays.ts", scripts["0-face/feedback-overlays.ts"] + "// Local change\n");
-    expect(scan().cells.dialog).toMatchObject({ shared: 0, local: 1, unverified: 1 });
-    expect(scan().cells.dialog!.issues).toContain("Locally modified: web/ds1/0-face/feedback-overlays.ts");
+    expect(scan().cells.overlay).toMatchObject({ shared: 0, local: 1, unverified: 1 });
+    expect(scan().cells.overlay!.issues).toContain("Locally modified: web/ds1/0-face/feedback-overlays.ts");
     write(app, "sync.lock.json", JSON.stringify({ "Design system 1": { commit: git(ds, "rev-parse", "HEAD"), files: {} } }));
     expect(scan().cells.tooltip).toMatchObject({ shared: 0, unverified: 1 });
   });

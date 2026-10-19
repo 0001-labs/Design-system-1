@@ -38,7 +38,7 @@ const classlessMode = pathname === '/classless/editor' ? 'editor'
       </aside>}
 
       <!-- On a phone the same navigation opens in Design system 1's dialog, filling the screen. -->
-      {!isHome && <ds-overlay id="mobile-navigation"><dialog id="mobile-navigation-panel" aria-label="Documentation" data-ds-overlay-fullscreen data-ds-overlay-flush></dialog></ds-overlay>}
+      {!isHome && <ds-overlay id="mobile-navigation" type="screen"><dialog id="mobile-navigation-panel" aria-label="Documentation" data-ds-overlay-flush></dialog></ds-overlay>}
 
       <!-- Sidebar gap (desktop only) -->
       {!isHome && <div class="sidebar-gap"></div>}
@@ -166,7 +166,7 @@ const classlessMode = pathname === '/classless/editor' ? 'editor'
 
     <script>
       import '../../../DS1/4-page/ds-overlay';
-      import type { Dialog } from '../../../DS1/4-page/ds-overlay';
+      import type { Overlay } from '../../../DS1/4-page/ds-overlay';
       const scrollTimers = new WeakMap<Element, ReturnType<typeof setTimeout>>();
       document.addEventListener('scroll', event => {
         const panel = event.target;
@@ -180,7 +180,7 @@ const classlessMode = pathname === '/classless/editor' ? 'editor'
       // opens it in Design system 1's dialog, which owns the modal, its focus,
       // Escape and the close button. Closing puts it back in the sidebar.
       const sidebar = document.getElementById('sidebar');
-      const navigation = document.querySelector<Dialog>('ds-overlay#mobile-navigation');
+      const navigation = document.querySelector<Overlay>('ds-overlay#mobile-navigation');
       const panel = navigation?.querySelector('dialog');
       const shell = sidebar?.querySelector<HTMLElement>('.docs-sidebar-shell');
       const menuButton = document.getElementById('mobile-menu-btn');
