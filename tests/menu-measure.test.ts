@@ -150,3 +150,39 @@ test("a menu from a button fits its words on whole squares, at least as wide as 
   expect(box.clipped).toBe(false);
   await tab.close();
 });
+
+for (const scheme of ["light", "dark"] as const) {
+  test(`the native .ds-context in ${scheme}: the element's gap face on native buttons, groups as gaps, empty groups quiet`, async () => {
+    const tab = await page(scheme);
+    await tab.evaluate(() => {
+      document.getElementById("stage")!.innerHTML = '<div class="ds-context" role="menu" aria-label="Track"><hr><span class="ds-context__label">Track</span><button role="menuitem">Rename<span class="ds-context__shortcut">⌘R</span></button><button role="menuitem">Duplicate</button><hr><hr><button role="menuitem" class="ds-context__item--danger">Delete</button><hr></div>';
+    });
+    await frames(tab);
+    const box = await tab.evaluate(() => {
+      const menu = document.querySelector<HTMLElement>(".ds-context")!;
+      const rows = [...menu.querySelectorAll<HTMLElement>(".ds-context__label, button")].map(row => {
+        const r = row.getBoundingClientRect(), style = getComputedStyle(row);
+        return { top: r.top, bottom: r.bottom, height: r.height, background: style.backgroundColor, color: style.color, line: style.lineHeight, align: style.alignItems };
+      });
+      const quiet = [...menu.querySelectorAll("hr")].map(hr => getComputedStyle(hr).display);
+      const probe = document.createElement("span"); document.body.append(probe);
+      const rgb = (value: string) => { probe.style.color = value; return getComputedStyle(probe).color; };
+      const colours = { text: rgb("var(--ds-text-color)"), red: rgb(matchMedia("(prefers-color-scheme: dark)").matches ? "var(--ds-red-for-blood)" : "var(--ds-tuned-red)") };
+      probe.remove();
+      return { rows, quiet, colours, clip: getComputedStyle(menu).clipPath, width: menu.getBoundingClientRect().width };
+    });
+    expect(box.rows.map(row => row.height)).toEqual([19, 19, 19, 19]);
+    expect(box.rows[1]!.top - box.rows[0]!.bottom).toBe(1);
+    expect(box.rows[2]!.top - box.rows[1]!.bottom).toBe(1);
+    // One group gap where two separators stood, none first or last.
+    expect(box.rows[3]!.top - box.rows[2]!.bottom).toBe(2);
+    expect(box.quiet).toEqual(["none", "block", "none", "none"]);
+    for (const row of box.rows.slice(1)) { expect(row.line).toBe("16px"); expect(row.align).toBe("flex-end"); }
+    expect(box.rows[1]!.background).toBe(box.colours.text);
+    expect(box.rows[1]!.color).not.toBe(box.colours.text);
+    expect(box.rows[3]!.color).toBe(box.colours.red);
+    expect(box.clip).toContain("inset");
+    expect(box.width).toBeGreaterThanOrEqual(4 * UNIT);
+    await tab.close();
+  });
+}
