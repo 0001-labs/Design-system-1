@@ -92,6 +92,8 @@
     "{index} of {count}": "{count} 枚中 {index} 枚目",
     "Previous slide": "前のスライド",
     "Next slide": "次のスライド",
+    "Move row {index}": "{index} 行目を移動",
+    "Row {from} moved to {to}": "{from} 行目を {to} 行目に移動しました",
     "Pause": "一時停止",
     "Play": "再生",
     "Menu": "メニュー",

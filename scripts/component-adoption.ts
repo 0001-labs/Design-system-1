@@ -875,6 +875,7 @@ function importedSharedAdapters(root: string, file: string, source: string, mani
     [resolve(root, dirname(manifestPath), "react/steps.ts")]: { Steps: "steps" },
     [resolve(root, dirname(manifestPath), "react/progress.ts")]: { Progress: "progress" },
     [resolve(root, dirname(manifestPath), "react/sidebar.ts")]: { Sidebar: "sidebar" },
+    [resolve(root, dirname(manifestPath), "react/table.ts")]: { Table: "table" },
     [resolve(root, dirname(manifestPath), "react/avatar.ts")]: { Avatar: "avatar", Logo: "avatar" },
     [resolve(root, dirname(manifestPath), "react/accordion.ts")]: { Accordion: "accordion" },
     // Select and Context, and the copies from before them (a menu, a context menu).

@@ -215,7 +215,7 @@ export default {
      * The Lit components named in `components`, with everything they import and
      * their React adapters (`empty` brings react/empty.ts, `notice`
      * react/notice.ts, `carousel` react/carousel.ts, `stat` and `progress`
-     * theirs, `sidebar` react/sidebar.ts). controls.css always travels with them, and
+     * theirs, `sidebar` react/sidebar.ts, `table` react/table.ts). controls.css always travels with them, and
      * with it the native classes it imports, `.ds-empty`, `.ds-notice`,
      * `.ds-carousel`, `.ds-stat`, `.ds-progress` and `.ds-row` among them.
      * components-manifest.json records them for the component adoption report,

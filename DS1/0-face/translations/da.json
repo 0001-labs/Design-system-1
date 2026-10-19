@@ -92,6 +92,8 @@
     "{index} of {count}": "{index} af {count}",
     "Previous slide": "Forrige dias",
     "Next slide": "Næste dias",
+    "Move row {index}": "Flyt række {index}",
+    "Row {from} moved to {to}": "Række {from} flyttet til {to}",
     "Pause": "Pause",
     "Play": "Afspil",
     "Menu": "Menu",

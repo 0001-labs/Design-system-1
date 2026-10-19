@@ -85,6 +85,8 @@
     "{index} of {count}": "{index} af {count}",
     "Previous slide": "Fyrri glæra",
     "Next slide": "Næsta glæra",
+    "Move row {index}": "Færa röð {index}",
+    "Row {from} moved to {to}": "Röð {from} færð í {to}",
     "Pause": "Gera hlé",
     "Play": "Spila",
     "Menu": "Valmynd",

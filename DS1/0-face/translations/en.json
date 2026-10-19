@@ -92,6 +92,8 @@
     "{index} of {count}": "{index} of {count}",
     "Previous slide": "Previous slide",
     "Next slide": "Next slide",
+    "Move row {index}": "Move row {index}",
+    "Row {from} moved to {to}": "Row {from} moved to {to}",
     "Pause": "Pause",
     "Play": "Play",
     "Menu": "Menu",

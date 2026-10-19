@@ -29,6 +29,7 @@ Set the properties after the component has been registered. In Lit, bind them: `
 | `footer` | Object or Array | none | A totals row under the body. |
 | `sticky` | boolean | false | Keeps the first column in place while the table scrolls sideways. |
 | `sheet` | boolean | false | A spreadsheet: every cell four squares by one, columns lettered and rows numbered. See [Sheet](#sheet). |
+| `reorderable` | boolean | false | A sheet's rows move by the grip on their number. See [Moving rows](#moving-rows). |
 | `label` | string | none | The table's accessible name. |
 
 A column whose values are all numbers is numeric unless its `numeric` says otherwise. A table wider than its place scrolls sideways.
@@ -63,7 +64,7 @@ Give a `<table>` the `ds-table` class from the native controls stylesheet (`cont
 
 ## Sheet
 
-For a lot of data, as in a spreadsheet, give the table `sheet`. Every cell is four squares wide and one high, 80 by 20, with its 1px lines at its end and its foot, so its words have 79 by 19 and stand 4px in on the sixteen, as an Ezo item's do. Numbers keep to the column's end. A cell's words never widen it: what does not fit ends in an ellipsis. Above the column labels a row of letters (A, B … Z, AA …) names the columns, and a column two squares wide numbers the rows; both stay in place while the sheet scrolls both ways. A selected cell (`aria-selected="true"`) is ringed rather than filled.
+For a lot of data, as in a spreadsheet, give the table `sheet`. Every cell is four squares wide and one high, 80 by 20, with its 1px lines at its end and its foot, so its words have 79 by 19 and stand 4px in on the sixteen, as an Ezo item's do. Numbers keep to the column's end. A cell's words never widen it: what does not fit ends in an ellipsis. Above the column labels a row of letters (A, B … Z, AA …) names the columns, and a column two squares wide numbers the rows; both stay in place while the sheet scrolls both ways. A selected cell (`aria-selected="true"`) is ringed rather than filled. With `reorderable` the rows move by a grip on their number; see [Moving rows](#moving-rows).
 
 <ComponentExample example="table-sheet" />
 
@@ -87,6 +88,38 @@ On a native table, put `data-sheet` and `--ds-table-columns` (its number of data
   </table>
 </div>
 ```
+
+## Moving rows
+
+Give a sheet `reorderable` and its rows move, as items in a sortable list do. Hover a row and its number gives way to a grip, the `handle` icon. Press the grip and move 5px with a mouse, or hold it for 250ms with a finger (a finger that moves first scrolls the sheet), and the row lifts: it stays on the paper with a hairline above it and follows the pointer, while the rows it passes step aside by one row each, in transform alone, in 200ms on `cubic-bezier(0.2, 0, 0, 1)`. Near the sheet's top or foot it scrolls, faster the closer the pointer. Let go and the row lands on a whole row, in 330 to 550ms by its distance on `cubic-bezier(.2, 1, .1, 1)`, and the numbers follow it. Escape puts it back. Under reduced motion the rows move at once.
+
+The grips take the keyboard as one stop: ↑ and ↓, Home and End move between them, and Alt+↑ or Alt+↓ (or ⌘⇧↑ and ⌘⇧↓, Ctrl+Shift elsewhere, as a writing surface moves a block) moves the row one place, the focus going with it. Each grip is named "Move row 3", and each move is announced, "Row 3 moved to 5", in the page's language with the shared words.
+
+Every move asks first with a cancelable `table-move` whose `detail` is `{ from, to }`, both counted from 0. Left alone, the table moves the row in its own `data` (a new array; read it back from `table.data`). When the rows are the page's, prevent it, move them in your own state and set `data` again; the row waits where it was dropped until they arrive, and glides back if they do not. `moveRow(rows, from, to)` from `ds-table.ts` gives the new order.
+
+```js
+import { moveRow } from "@0001-labs/design-system-1/DS1/3-unit/ds-table";
+
+sheet.reorderable = true;
+sheet.addEventListener("table-move", event => {
+  event.preventDefault();
+  store.rows = moveRow(store.rows, event.detail.from, event.detail.to);
+  sheet.data = store.rows;
+});
+```
+
+In React, `Table` takes `onMove`, and with it the rows are the page's:
+
+```tsx
+import { Table } from "@0001-labs/design-system-1/DS1/react/table";
+import { moveRow } from "@0001-labs/design-system-1/DS1/3-unit/ds-table";
+
+const [rows, setRows] = useState(sales);
+<Table sheet reorderable label="A year of print sales" columns={columns} data={rows}
+  onMove={({ from, to }) => setRows(current => moveRow(current, from, to))} />
+```
+
+The totals row stays where it is. Moving rows belongs to the element; a native `.ds-table[data-sheet]` has no grips.
 
 [Row](/3-unit/row/) · [Native controls](/1-root/native-controls/)
 

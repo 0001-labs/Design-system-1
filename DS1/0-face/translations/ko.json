@@ -92,6 +92,8 @@
     "{index} of {count}": "{count}개 중 {index}번째",
     "Previous slide": "이전 슬라이드",
     "Next slide": "다음 슬라이드",
+    "Move row {index}": "{index}행 이동",
+    "Row {from} moved to {to}": "{from}행을 {to}행으로 이동함",
     "Pause": "일시정지",
     "Play": "재생",
     "Menu": "메뉴",

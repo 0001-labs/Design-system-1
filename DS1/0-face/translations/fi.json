@@ -92,6 +92,8 @@
     "{index} of {count}": "{index}/{count}",
     "Previous slide": "Edellinen dia",
     "Next slide": "Seuraava dia",
+    "Move row {index}": "Siirrä riviä {index}",
+    "Row {from} moved to {to}": "Rivi {from} siirretty kohtaan {to}",
     "Pause": "Tauko",
     "Play": "Toista",
     "Menu": "Valikko",

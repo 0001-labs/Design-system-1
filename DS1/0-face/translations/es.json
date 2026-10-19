@@ -92,6 +92,8 @@
     "{index} of {count}": "{index} de {count}",
     "Previous slide": "Diapositiva anterior",
     "Next slide": "Diapositiva siguiente",
+    "Move row {index}": "Mover fila {index}",
+    "Row {from} moved to {to}": "Fila {from} movida a {to}",
     "Pause": "Pausar",
     "Play": "Reproducir",
     "Menu": "Menú",

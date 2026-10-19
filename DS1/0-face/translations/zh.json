@@ -92,6 +92,8 @@
     "{index} of {count}": "第 {index} 张，共 {count} 张",
     "Previous slide": "上一张",
     "Next slide": "下一张",
+    "Move row {index}": "移动第 {index} 行",
+    "Row {from} moved to {to}": "第 {from} 行已移到第 {to} 行",
     "Pause": "暂停",
     "Play": "播放",
     "Menu": "菜单",

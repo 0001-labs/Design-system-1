@@ -24,6 +24,14 @@
  * while the sheet scrolls both ways inside `.ds-table-scroll`; give the table
  * `--ds-table-columns` (the number of data columns) and the scroll a height
  * with `--ds-table-height`.
+ *
+ * `data-reorderable` (set by `<ds-table sheet reorderable>`) gives each row
+ * number a grip, `.ds-table__handle` with the `handle` icon, in place of the
+ * number while the row is hovered or the grip focused. A lifted row
+ * (`tr[data-lifted]`) keeps the paper behind it and follows the pointer; while
+ * `data-moving` is on the table the other rows step aside in transform alone,
+ * a sortable list's 200ms on cubic-bezier(0.2, 0, 0, 1), and never under
+ * reduced motion.
  */
 
 .ds-table {
@@ -172,14 +180,14 @@
 .ds-table[data-sheet] thead :is(th, td) {
   position: sticky;
   top: 0;
-  z-index: 2;
+  z-index: 3;
   background: var(--ds-table-paper);
 }
 .ds-table[data-sheet] thead tr + tr :is(th, td) {
   top: var(--ds-table-row);
 }
 .ds-table[data-sheet] thead .ds-table__number {
-  z-index: 3;
+  z-index: 4;
 }
 .ds-table[data-sheet] .ds-table__letters td {
   color: var(--ds-title-color, light-dark(#797979, #9a9a9a));
@@ -197,4 +205,69 @@
   max-height: var(--ds-table-height, none);
   overflow: auto;
   overscroll-behavior: contain;
+}
+
+/* Rows that move: a grip on the number, the lifted row on paper, the others stepping aside. */
+.ds-table[data-sheet][data-reorderable] tbody .ds-table__number {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+.ds-table__index {
+  transition: opacity 100ms ease;
+}
+.ds-table__handle {
+  all: unset;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  color: var(--ds-reorder-color, light-dark(#777777, #cccccc));
+  cursor: grab;
+  opacity: 0;
+  transition: opacity 100ms ease;
+}
+.ds-table__handle:hover {
+  color: var(--ds-reorder-active-color, light-dark(#333333, #ffffff));
+}
+.ds-table__handle:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--ds-focus-ring, Highlight);
+}
+@media (hover: hover) {
+  .ds-table[data-reorderable]:not([data-moving]) tbody tr:hover .ds-table__handle { opacity: 1; }
+  .ds-table[data-reorderable]:not([data-moving]) tbody tr:hover .ds-table__index { opacity: 0; }
+}
+.ds-table[data-reorderable] tbody tr:is([data-lifted], :has(.ds-table__handle:focus-visible)) .ds-table__handle { opacity: 1; }
+.ds-table[data-reorderable] tbody tr:is([data-lifted], :has(.ds-table__handle:focus-visible)) .ds-table__index { opacity: 0; }
+.ds-table[data-moving] tbody tr {
+  transition: transform 200ms cubic-bezier(0.2, 0, 0, 1);
+}
+.ds-table[data-moving],
+.ds-table[data-moving] * {
+  cursor: grabbing;
+}
+.ds-table[data-sheet] tbody tr[data-lifted] {
+  position: relative;
+  z-index: 2;
+  transition: none;
+}
+.ds-table[data-sheet] tbody tr[data-lifted] > :is(th, td) {
+  background: var(--ds-table-paper);
+  box-shadow: inset 0 1px var(--ds-table-rule);
+}
+.ds-table__status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-table[data-moving] tbody tr,
+  .ds-table__index,
+  .ds-table__handle {
+    transition: none;
+  }
 }

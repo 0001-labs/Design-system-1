@@ -92,6 +92,8 @@
     "{index} of {count}": "{index} av {count}",
     "Previous slide": "Föregående bild",
     "Next slide": "Nästa bild",
+    "Move row {index}": "Flytta rad {index}",
+    "Row {from} moved to {to}": "Rad {from} flyttad till {to}",
     "Pause": "Pausa",
     "Play": "Spela upp",
     "Menu": "Meny",

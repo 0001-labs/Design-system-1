@@ -92,6 +92,8 @@
     "{index} of {count}": "{index} av {count}",
     "Previous slide": "Forrige lysbilde",
     "Next slide": "Neste lysbilde",
+    "Move row {index}": "Flytt rad {index}",
+    "Row {from} moved to {to}": "Rad {from} flyttet til {to}",
     "Pause": "Pause",
     "Play": "Spill av",
     "Menu": "Meny",
