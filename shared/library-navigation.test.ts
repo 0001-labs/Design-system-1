@@ -28,3 +28,10 @@ test('direct links retain library/component selection without redirecting embedd
   expect(libraryWorkspaceRedirect('/libraries', new URLSearchParams(), false, true)).toBeNull();
   expect(libraryWorkspaceRedirect('/signin', query, false, false)).toBeNull();
 });
+
+ test('overview survives deep links while component selection can leave it', () => {
+   const library = readLibraryNavigation({ id: 'one', name: 'Studio', publishedVersion: 2, view: 'overview' })!;
+   expect(new URL(libraryHref(library), 'https://example.com').searchParams.get('view')).toBe('overview');
+   expect(libraryWorkspaceRedirect('/l/one', new URLSearchParams('view=overview'), false, false)).toContain('view=overview');
+   expect(libraryHref({ ...library, view: undefined }, '/2-core/input/')).not.toContain('view=');
+ });

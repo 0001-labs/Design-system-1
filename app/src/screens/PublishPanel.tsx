@@ -117,12 +117,14 @@ export function PublishPanel(props: Props) {
   return (
     <ds-panel className="publish-panel" data-testid="publish-panel">
       <ds-row slot="header" fill>
-        <h2 className="ds-text ds-text--heading">Publish</h2>
+        <h2 className="ds-text ds-text--heading">System overview</h2>
         <Button secondary onClick={props.onClose} type="button">
           Close
         </Button>
       </ds-row>
 
+      <p className="ds-text">{history ? `${history.versions.filter(version => version.status === "published").length} published versions` : "Loading publications…"}</p>
+      <p className="ds-text ds-text--muted">Installation locations are not tracked yet.</p>
       <Badge className="library-card__state" data-state={props.state} data-testid="state-pill">
         {STATE_LABEL[props.state] ?? props.state}
         {props.publishedVersion !== null ? ` · v${props.publishedVersion}` : ""}

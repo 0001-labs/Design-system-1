@@ -36,6 +36,7 @@ const appPath = mode === 'editor' ? '/app/playground' : '/app/libraries';
     const libraryId = query.get('library');
     if (libraryId) {
       const appQuery = new URLSearchParams({ embed: 'docs' });
+      if (query.get('view') === 'overview') appQuery.set('view', 'overview');
       if (query.has('component')) appQuery.set('component', query.get('component')!);
       frame.src = `/app/l/${encodeURIComponent(libraryId)}?${appQuery}`;
     }
@@ -159,6 +160,6 @@ const appPath = mode === 'editor' ? '/app/playground' : '/app/libraries';
 </style>
 
 <style is:global>
-  html[data-library-workspace] .classless-workspace { grid-template-rows: minmax(0, 1fr); }
-  html[data-library-workspace] :is(.classless-heading, .classless-tabs, .right-sidebar-container) { display: none; }
+  html[data-signed-in] .classless-workspace { grid-template-rows: minmax(0, 1fr); }
+  html[data-signed-in] :is(.classless-heading, .classless-tabs, .right-sidebar-container) { display: none; }
 </style>

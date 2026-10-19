@@ -13,6 +13,11 @@ export default defineSchema({
   ...authTables,
   ...signInTables,
 
+  accountProfiles: defineTable({
+    userId: v.id("users"),
+    companyName: v.string(),
+  }).index("by_user", ["userId"]),
+
   libraries: defineTable({
     /** 20-char Crockford base32, the `/ds1/{publicId}/` segment. */
     publicId: v.string(),

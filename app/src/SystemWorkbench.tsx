@@ -61,6 +61,7 @@ export function SystemWorkbench({ initialCss, initialConfig, onDirty, headerSlot
   const setSelected = (component: string) => {
     const query = new URLSearchParams(routeSearch);
     query.set('component', component);
+    query.delete("view");
     navigate(`${path}?${query}`);
   };
   const embeddedLibrary = document.documentElement.hasAttribute('data-docs-embed') && path.startsWith('/l/');
@@ -91,7 +92,7 @@ export function SystemWorkbench({ initialCss, initialConfig, onDirty, headerSlot
   const shownBox = { ...buttonMetrics.box, ...boxPreview };
   const previewCss = boxPreview ? writeButtonBox(css, shownBox, buttonMode) : css;
   const commitBox = (patch: Partial<BoxModelConfig> & { gap?: number }) => update(writeButtonBox(css, { ...shownBox, ...patch }, buttonMode));
-  return <div className="workbench system-workbench" data-testid="workbench">
+  return <div className={`workbench system-workbench${routeSearch.get("view") === "overview" ? " system-workbench--overview" : ""}`} data-testid="workbench">
     {headerSlot}
     <div className={`system-workbench-panes${embeddedLibrary ? " system-workbench-panes--external-navigation" : ""}`}>
       {!embeddedLibrary && <aside className="library-panel system-library-panel">

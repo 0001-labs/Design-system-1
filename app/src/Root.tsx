@@ -1,9 +1,10 @@
+import { api } from "../../convex/_generated/api";
 import { FeatureFlags } from "./screens/FeatureFlags";
 import { AdoptionDashboard } from "./screens/AdoptionDashboard";
 import { FontWorkspace } from "./screens/FontWorkspace";
 import { IconBuilder } from "./screens/iconBuilder/IconBuilder";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
-import { useConvexAuth } from "convex/react";
+import { useConvexAuth, useQuery } from "convex/react";
 import { useEffect, type ReactNode } from "react";
 
 import "../../DS1/2-core/ds-button";
@@ -84,18 +85,19 @@ function NotFound() {
   );
 }
 
-// Same-origin public navigation receives only a verified session boolean.
+// Same-origin navigation receives only session status and the company display name.
 function NavigationAuth() {
   const { isAuthenticated, isLoading } = useConvexAuth();
+  const profile = useQuery(api.users.profile, !isLoading && isAuthenticated ? {} : "skip");
   useEffect(() => {
-    const report = () => window.parent.postMessage({ type: "ds1:navigation-auth", authenticated: !isLoading && isAuthenticated }, window.location.origin);
+    const report = () => window.parent.postMessage({ type: "ds1:navigation-auth", authenticated: !isLoading && isAuthenticated, companyName: !isLoading && isAuthenticated ? profile?.companyName ?? "" : "" }, window.location.origin);
     const request = (event: MessageEvent) => {
       if (event.origin === window.location.origin && event.source === window.parent && event.data?.type === "ds1:navigation-auth-request") report();
     };
     window.addEventListener("message", request);
     report();
     return () => window.removeEventListener("message", request);
-  }, [isAuthenticated, isLoading]);
+  }, [isAuthenticated, isLoading, profile?.companyName]);
   return null;
 }
 

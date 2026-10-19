@@ -22,7 +22,7 @@ import {
 } from "../lib/autosave";
 import { asFailure } from "../lib/convex";
 import { PublishPanel } from "./PublishPanel";
-import { Link, navigate } from "../router";
+import { Link, navigate, useLocation } from "../router";
 
 const SAVE_LABEL: Record<SaveState, string> = {
   saved: "Saved",
@@ -34,6 +34,8 @@ const SAVE_LABEL: Record<SaveState, string> = {
 };
 
 export function LibraryEditor({ libraryId }: { libraryId: string }) {
+  const { search, path } = useLocation();
+  const overview = search.get("view") === "overview";
   const id = libraryId as Id<"libraries">;
   const library = useQuery(api.libraries.get, { id });
   const saveDraft = useMutation(api.libraries.saveDraft);
@@ -45,7 +47,13 @@ export function LibraryEditor({ libraryId }: { libraryId: string }) {
 
   const [saveState, setSaveState] = useState<SaveState>("saved");
   const [serverRev, setServerRev] = useState<number | null>(null);
-  const [publishOpen, setPublishOpen] = useState(false);
+  const publishOpen = overview;
+  const setPublishOpen = (open: boolean | ((previous: boolean) => boolean)) => {
+    const query = new URLSearchParams(search);
+    if (typeof open === "function" ? open(overview) : open) query.set("view", "overview");
+    else query.delete("view");
+    navigate(`${path}?${query}`);
+  };
 
   // The CSS currently in the editor, which may be newer than what the server
   // has returned. The publish panel validates against this so its issue list
@@ -252,7 +260,7 @@ export function LibraryEditor({ libraryId }: { libraryId: string }) {
               onClick={() => setPublishOpen((open) => !open)}
               type="button"
             >
-              {publishOpen ? "Hide publish" : "Publish"}
+              {publishOpen ? "Back to components" : "System overview"}
             </Button>
           </div>
 

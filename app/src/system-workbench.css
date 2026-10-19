@@ -22,3 +22,13 @@
 
 .system-workbench-panes--external-navigation { grid-template-columns: minmax(0, 1fr) calc(20 * var(--site-unit)); }
 @media (max-width: 1100px) { .system-workbench-panes--external-navigation { grid-template-columns: minmax(0, 1fr); } }
+
+.app-shell .system-workbench--overview .system-workbench-panes,
+.app-shell .system-workbench--overview .css-file-panel { display: none; }
+.app-shell .system-workbench--overview { display: block; overflow: auto; }
+.company-settings { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--site-unit); padding: var(--site-unit); }
+.company-settings label { display: grid; gap: calc(var(--site-unit) / 2); }
+.company-settings a { color: inherit; }
+[data-docs-embed] .app-shell > .site-navigation { display: none; }
+
+[data-docs-embed] .app-shell .workbench { height: 100dvh; }

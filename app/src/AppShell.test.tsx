@@ -39,11 +39,11 @@ test('only the authenticated route library supplies its name and real published 
     Object.assign(session, { isAuthenticated: true, isLoading: false });
     libraryQuery.mockReturnValue({ name: 'Example library', publishedVersion: 7 });
     await act(async () => root.render(createElement(AppShell, null, 'Editor')));
-    expect(host.querySelector('.site-brand')?.textContent).toBe('Example library · v7');
+    expect(host.querySelector('.site-brand')?.textContent).toBe('Example library');
     expect(report).toHaveBeenLastCalledWith({ type: 'ds1:library-navigation', libraryId: 'library-one', library: { id: 'library-one', name: 'Example library', publishedVersion: 7, component: '/2-core/input/' } }, window.location.origin);
     libraryQuery.mockReturnValue({ name: 'Renamed library', publishedVersion: null });
     await act(async () => root.render(createElement(AppShell, null, 'Editor')));
-    expect(host.querySelector('.site-brand')?.textContent).toBe('Renamed library · Draft');
+    expect(host.querySelector('.site-brand')?.textContent).toBe('Renamed library');
     for (const state of [{ path: '/libraries', authenticated: true, loading: false }, { path: '/l/library-one', authenticated: false, loading: false }, { path: '/l/library-one', authenticated: true, loading: true }]) {
       location.path = state.path;
       Object.assign(session, { isAuthenticated: state.authenticated, isLoading: state.loading });

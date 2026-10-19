@@ -56,6 +56,7 @@ const { sidebar } = Astro.locals.starlightRoute;
       const id = href ?? `${parent}/group-${index}`;
       const item: SidebarItem = { id, label: label(entry.label), depth, href, current: href ? location.pathname.replace(/\/$/, "") === href.replace(/\/$/, "") : entry.isCurrent };
       if (!entry.entries) return [item];
+      item.href = undefined;
       item.expanded = !collapsed.has(id);
       return [item, ...(item.expanded ? rows(entry.entries, depth + 1, id) : [])];
     });
@@ -72,13 +73,14 @@ const { sidebar } = Astro.locals.starlightRoute;
   function renderNavigation() {
     navigation.label = library ? `${library.name} navigation` : 'Documentation';
     navigation.items = library ? [
+      { id: 'base-system', label: 'Design system 1', href: '/start-here/overview/' },
       { id: '/app/libraries', label: 'My libraries', href: '/classless/libraries/' },
-      { id: 'library-editor', label: 'Editor', href: libraryWorkspaceHref(library), depth: 1 },
+      { id: 'library-overview', label: library.name, href: libraryWorkspaceHref({ ...library, view: 'overview' }), current: library.view === 'overview' },
       ...LAYERS.flatMap(layer => {
         const id = `library-layer-${layer.number}`;
         const expanded = !collapsed.has(id);
         return [{ id, label: `${layer.number} ${layer.name}`, expanded }, ...(expanded ? layer.entries.map(entry => ({
-          id: entry.href, label: entry.name, depth: 1, href: libraryWorkspaceHref(library!, entry.href), current: library!.component === entry.href,
+          id: entry.href, label: entry.name, depth: 1, href: libraryWorkspaceHref({ ...library!, view: undefined }, entry.href), current: !library!.view && library!.component === entry.href,
         })) : [])];
       }),
     ] : rows(groups);
@@ -91,11 +93,11 @@ const { sidebar } = Astro.locals.starlightRoute;
   });
   navigation.addEventListener('sidebar-activate', event => {
     const id = (event as CustomEvent).detail.id;
-    if (!library || (id !== 'library-editor' && !LAYERS.some(layer => layer.entries.some(entry => entry.href === id)))) return;
+    if (!library || (id !== 'library-overview' && !LAYERS.some(layer => layer.entries.some(entry => entry.href === id)))) return;
     const frame = document.querySelector<HTMLIFrameElement>('#classless-app');
     if (!frame?.contentWindow) return;
     event.preventDefault();
-    frame.contentWindow.postMessage({ type: 'ds1:library-component', component: id === 'library-editor' ? library.component : id }, location.origin);
+    frame.contentWindow.postMessage(id === 'library-overview' ? { type: 'ds1:library-overview' } : { type: 'ds1:library-component', component: id }, location.origin);
   });
   window.addEventListener("hashchange", () => { renderNavigation(); });
   window.addEventListener("ds1-navigation-auth", event => { signedIn = (event as CustomEvent).detail.authenticated; if (!signedIn) library = null; renderNavigation(); renderAccount(); });

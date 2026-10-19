@@ -8,22 +8,31 @@ const { landing = false } = Astro.props;
 
 <PublicPreferences />
 <header class:list={['site-navigation', 'docs-header', { 'docs-header--with-sidebar': !landing }]}>
-  <a class="site-brand" href="/">Design system 1</a>
-  {!landing && <button id="mobile-menu-btn" class="site-brand docs-brand-menu" type="button" aria-label="Open documentation navigation" aria-controls="mobile-navigation-panel" aria-haspopup="dialog" aria-expanded="false">Design system 1</button>}
+  <nav class="system-breadcrumb" aria-label="System breadcrumb"><a data-company href="/classless/libraries/" hidden>My company</a><span data-company-slash hidden aria-hidden="true">/</span><a class="site-brand" href="/start-here/overview/">Design system 1</a></nav>
+  {!landing && <button id="mobile-menu-btn" class="site-brand docs-brand-menu" type="button" aria-label="Open documentation navigation" aria-controls="mobile-navigation-panel" aria-haspopup="dialog" aria-expanded="false"><ds-icon type="menu" aria-hidden="true"></ds-icon></button>}
 </header>
 <iframe id="navigation-auth" src="/app/navigation-auth" title="Account status" hidden aria-hidden="true" tabindex="-1"></iframe>
 
 <script>
   import '../lib/public-preferences';
-  import { libraryHeading, libraryWorkspaceHref, type LibraryNavigation } from '../../../shared/library-navigation';
+  import { libraryWorkspaceHref, type LibraryNavigation } from '../../../shared/library-navigation';
   import '../../../DS1/0-face/device';
+  let selectedLibrary: LibraryNavigation | null = null;
   function renderLibrary(library: LibraryNavigation | null) {
+    selectedLibrary = library;
     document.querySelectorAll<HTMLElement>('.docs-header .site-brand').forEach(brand => {
-      brand.textContent = library ? libraryHeading(library) : 'Design system 1';
-      if (brand instanceof HTMLAnchorElement) brand.href = library ? libraryWorkspaceHref(library) : '/';
+      if (brand instanceof HTMLAnchorElement) brand.textContent = library ? library.name : 'Design system 1';
+      if (brand instanceof HTMLAnchorElement) brand.href = library ? libraryWorkspaceHref({ ...library, view: 'overview' }) : '/start-here/overview/';
     });
   }
   window.addEventListener('ds1-library-navigation', event => renderLibrary((event as CustomEvent).detail.library));
+  document.querySelector('.docs-header a.site-brand')?.addEventListener('click', event => {
+    if (event instanceof MouseEvent && (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0)) return;
+    const workspace = document.querySelector<HTMLIFrameElement>('#classless-app');
+    if (!selectedLibrary || !workspace?.contentWindow) return;
+    event.preventDefault();
+    workspace.contentWindow.postMessage({ type: 'ds1:library-overview' }, location.origin);
+  });
   const frame = document.querySelector<HTMLIFrameElement>('#navigation-auth');
   const requestStatus = () => frame?.contentWindow?.postMessage({ type: 'ds1:navigation-auth-request' }, location.origin);
   frame?.addEventListener('load', requestStatus);
@@ -34,6 +43,10 @@ const { landing = false } = Astro.props;
     if (event.origin !== location.origin || event.source !== frame?.contentWindow || event.data?.type !== 'ds1:navigation-auth') return;
     const authenticated = event.data.authenticated === true;
     document.documentElement.toggleAttribute('data-signed-in', authenticated);
+    const company = document.querySelector<HTMLAnchorElement>('[data-company]')!;
+    company.hidden = !authenticated;
+    company.textContent = typeof event.data.companyName === 'string' && event.data.companyName.trim() ? event.data.companyName : 'My company';
+    document.querySelector<HTMLElement>('[data-company-slash]')!.hidden = !authenticated;
     if (!authenticated) renderLibrary(null);
     window.dispatchEvent(new CustomEvent('ds1-navigation-auth', { detail: { authenticated } }));
   });
@@ -43,7 +56,8 @@ const { landing = false } = Astro.props;
   .docs-header { display: flex; align-items: center; }
   .docs-header .docs-brand-menu { display: none; padding: 0; justify-content: flex-start; }
   @media (max-width: 768px) {
-    .docs-header--with-sidebar > a.site-brand { display: none; }
-    .docs-header .docs-brand-menu { display: inline-flex; }
+    .docs-header--with-sidebar .system-breadcrumb { flex: 1; min-width: 0; }
+    .docs-header .docs-brand-menu { display: inline-flex; width: var(--site-unit); overflow: hidden; font-size: 0; }
+
   }
 </style>
