@@ -1,3 +1,4 @@
+import { PRODUCT_EXAMPLES } from './product-examples';
 // The standard page layouts, each filled with the core and unit components a
 // real page would hold. The preview and the copyable code share one source;
 // every sample is local and sends nothing.
@@ -48,6 +49,7 @@ document.querySelector('ds-table').data = [
 ];`;
 
 export const LAYOUT_EXAMPLES: Record<string, LayoutExample> = {
+  ...PRODUCT_EXAMPLES,
   sidebar: {
     name: 'Sidebar',
     use: 'An app with places to go: navigation stays on the left while the work changes on the right.',

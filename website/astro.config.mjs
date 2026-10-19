@@ -150,7 +150,13 @@ export default defineConfig({
         },
         {
           label: "Examples",
-          slug: "start-here/examples",
+          items: [
+            { label: "Overview", slug: "start-here/examples" },
+            { label: "Shop", slug: "examples/shop" },
+            { label: "Planning app", slug: "examples/planner" },
+            { label: "Finance app", slug: "examples/finance" },
+            { label: "Product showcase", slug: "examples/product" },
+          ],
         },
         {
           label: "Advanced",
