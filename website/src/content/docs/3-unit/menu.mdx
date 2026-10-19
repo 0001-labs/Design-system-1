@@ -4,6 +4,8 @@ title: Menu
 description: Shared action menus, suggestion lists and small choice grids.
 ---
 
+import ComponentExample from "../../../components/ComponentExample.astro";
+
 `ds-menu` owns the face, keyboard navigation and placement of a list of choices.
 Give each choice a native `option` or `menuitem` role. DS1 React `Button` keeps
 the native button in light DOM, so its label, selected state and focus remain
@@ -72,6 +74,11 @@ Enter and Space still open the native chooser. Keep the picker mounted until
 its native change or cancel event, and copy its files before clearing its value.
 Remove product popup positioning, keyboard listeners and appearance styles.
 
+
+
+## Design examples
+
+<ComponentExample example="menu-recording" />
 
 ## Context and nested menus
 

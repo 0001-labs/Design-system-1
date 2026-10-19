@@ -3,6 +3,8 @@ title: Token field
 description: Native writing, removable values and suggestions on the shared row grid.
 ---
 
+import ComponentExample from "../../../components/ComponentExample.astro";
+
 `ds-token-field` holds a native input, `ds-token` values and an optional `ds-menu`.
 The native input and menu choices stay in light DOM, preserving labels, native
 forms, validation, refs and combobox ARIA references. DS1 owns layout, chip faces,
@@ -45,3 +47,8 @@ registration. TokenField takes native input props and a native input ref, plus
 `value`, `label`, `detail`, `removeLabel`, `disabled` and `onRemove`. Keep product
 rules in those callbacks. Classes and styles place the host; do not rebuild its
 face. Outside React, call `refresh()` after programmatic changes to children.
+
+
+## Design examples
+
+<ComponentExample example="tokens-tags" />

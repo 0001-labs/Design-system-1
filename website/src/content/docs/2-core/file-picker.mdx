@@ -3,6 +3,8 @@ title: File picker
 description: Native file selection with a shared button or preview face.
 ---
 
+import ComponentExample from "../../../components/ComponentExample.astro";
+
 `ds-file-picker` keeps a native `input type="file"` in light DOM. It is the
 focusable hit target: the browser owns the file chooser, labels, keyboard
 activation, file drops, required validation, form values, reset and disabled
@@ -52,6 +54,11 @@ In React, `onCancel` receives the native chooser cancellation event. Keep a menu
 that contains the picker mounted until `onChange` or `onCancel`, so returning
 from the system chooser cannot lose the selected files. Use `role="menuitem"`
 inside Menu to share its row and arrow navigation while Enter and Space stay native.
+
+
+## Design examples
+
+<ComponentExample example="file-picker-artwork" />
 
 ## Without Lit
 

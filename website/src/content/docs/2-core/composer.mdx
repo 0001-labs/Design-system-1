@@ -3,6 +3,8 @@ title: Composer
 description: A native multiline writing field with aligned inline highlights.
 ---
 
+import ComponentExample from "../../../components/ComponentExample.astro";
+
 `ds-composer` supplies the shared face, row-grid sizing and highlight layer for
 an editable message. Its direct child is a native `textarea`, so labels, forms,
 validation, selection and ARIA references to a mention list stay native.
@@ -50,3 +52,8 @@ programmatically. User input and form reset refresh automatically. The mirror
 is hidden from assistive technology, and contains no interactive elements.
 Use `ds-input multiline` for ordinary multiline fields that do not need highlights or
 a light-DOM connection to external options.
+
+
+## Design examples
+
+<ComponentExample example="composer-caption" />

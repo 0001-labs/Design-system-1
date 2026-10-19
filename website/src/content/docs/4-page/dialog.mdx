@@ -3,6 +3,8 @@ title: Dialog
 description: A shared modal with native focus and form behavior.
 ---
 
+import ComponentExample from "../../../components/ComponentExample.astro";
+
 `ds-dialog` owns modal behavior and appearance around a light-DOM `<dialog>`.
 The native element keeps labels, descriptions and form controls in one tree.
 Opening it uses `showModal()`; the browser supplies the top layer and inert background.
@@ -69,6 +71,11 @@ keeping its normal margins. Applications decide when to offer rotation.
 
 Aa mounts its floating toolbar, menus, find controls and link field inside the
 closest native dialog. Sync Aa before placing an older editor copy in a modal.
+
+
+## Design examples
+
+<ComponentExample example="dialog-proof" />
 
 ## Placement: sheets and drawers
 

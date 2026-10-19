@@ -1,3 +1,4 @@
+import { SHOWCASE_EXAMPLES, SHOWCASE_PAGES } from "./showcase-examples";
 import { mountChartExample } from './chart-example';
 export interface ComponentExample {
   title: string;
@@ -85,6 +86,7 @@ export function calendarEvents(kind: 'month' | 'large') {
 // The preview and the copyable code use the same source. These are local
 // examples only; no sample sends a request to a product's backend.
 export const EXAMPLES: Record<string, ComponentExample> = {
+  ...SHOWCASE_EXAMPLES,
   toggle: {
     title: 'Turn a setting on or off',
     hint: 'Click or press Space to change the local setting. No settings are saved.',
@@ -673,3 +675,7 @@ export const PAGE_EXAMPLES: Record<string, string[]> = {
   '4-page/page': ['page'],
   '4-page/header': ['header'], '4-page/footer': ['footer'], '4-page/document': ['document'],
 };
+
+for (const [page, examples] of Object.entries(SHOWCASE_PAGES)) {
+  PAGE_EXAMPLES[page] = [...(PAGE_EXAMPLES[page] ?? []), ...examples];
+}

@@ -1,3 +1,4 @@
+import { mountShowcase } from "./showcase-runtime";
 import { mountChartExample } from './chart-example';
 import { EXAMPLES, MATRIX_DATA, TABLE_DATA, TABLE_FOOTER, calendarEvents } from './component-examples';
 import type { DsTable } from '../../../DS1/3-unit/ds-table';
@@ -64,7 +65,7 @@ sample.addEventListener('change', event => {
 // The calendars hold the events their published scripts show, in the month being read.
 sample.querySelectorAll('ds-calendar:not([compact])').forEach(calendar => { (calendar as HTMLElement & { events: unknown }).events = calendarEvents('month'); });
 sample.querySelectorAll('ds-calendar-large').forEach(calendar => { (calendar as HTMLElement & { events: unknown }).events = calendarEvents('large'); });
-sample.querySelectorAll('ds-matrix').forEach(matrix => { Object.assign(matrix, MATRIX_DATA); });
+sample.querySelectorAll('ds-matrix:not([data-showcase-props])').forEach(matrix => { Object.assign(matrix, MATRIX_DATA); });
 sample.addEventListener('cell-press', event => { const { row, column, cell } = (event as CustomEvent).detail; output.textContent = `cell-press: ${row.label}, ${column.label}${cell ? ` (${cell.mark})` : ''}`; });
 for (const name of ['row-press', 'column-press']) sample.addEventListener(name, event => { const detail = (event as CustomEvent).detail; output.textContent = `${name}: ${(detail.row ?? detail.column).label}`; });
 for (const name of ['day-press', 'event-press', 'navigate']) sample.addEventListener(name, event => {
@@ -92,7 +93,7 @@ sample.querySelectorAll<HTMLElement>('[data-toast]').forEach(button => button.ad
 }));
 
 const sidebar = sample.querySelector('ds-sidebar');
-if (sidebar) {
+if (sidebar && !sidebar.hasAttribute("data-showcase-props")) {
   let expanded = true;
   let selected = 'overview';
   const render = () => {
@@ -150,7 +151,7 @@ if (grid) sample.querySelectorAll<HTMLSelectElement>('[data-grid-option]').forEa
   });
 });
 const table = sample.querySelector<DsTable>('ds-table');
-if (table) Object.assign(table, { data: TABLE_DATA, footer: TABLE_FOOTER });
+if (table && !table.hasAttribute("data-showcase-props")) Object.assign(table, { data: TABLE_DATA, footer: TABLE_FOOTER });
 // A tooltip example should show the label on first sight, before someone
 // knows that they need to hover. Use its real hover behaviour for the demo.
 sample.querySelectorAll('ds-tooltip').forEach(tooltip => {
@@ -247,3 +248,5 @@ if (document.body.dataset.exampleId === 'chart') {
 // Announce readiness after the library listeners exist, including in browsers
 // whose iframe load event precedes completion of awaited module imports.
 parent.postMessage({ type: 'ds1-example-library-ready' }, location.origin);
+
+mountShowcase(sample);

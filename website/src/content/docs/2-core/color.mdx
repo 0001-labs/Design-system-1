@@ -3,6 +3,8 @@ title: Color
 description: Native colour fields and shared colour samples.
 ---
 
+import ComponentExample from "../../../components/ComponentExample.astro";
+
 `ds-color` draws a native colour field two squares wide and one square high.
 The native input owns its platform picker, accessible label, form value,
 disabled fieldsets and reset. DS1 owns its border, focus, padding and scale.
@@ -34,3 +36,8 @@ state, or supply adjacent text. Colour data and saving belong to the product.
 For an exact hex text entry, compose with `ds-input`. The product validates
 its stored colour format and any contrast or permission requirements. Keep
 those requirements separate from the native picker and shared visual controls.
+
+
+## Design examples
+
+<ComponentExample example="color-palette" />

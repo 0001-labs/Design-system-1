@@ -3,6 +3,8 @@ title: Badge
 description: A shared, noninteractive status label with an optional icon.
 ---
 
+import ComponentExample from "../../../components/ComponentExample.astro";
+
 `ds-badge` shows a status in one shared row. Products supply the words, icon
 and status meaning; DS1 owns the face, type, truncation and independent scale.
 It is not a button and adds no tab stop.
@@ -32,3 +34,10 @@ see [Native controls](/1-root/native-controls/#badge).
 React products can import `Badge` from `DS1/react/badge`, registering the Lit
 element in the browser before hydration. `iconOnly` is a boolean property;
 native attributes, children and the forwarded ref belong to the shared host.
+
+
+## Design examples
+
+<ComponentExample example="badge-records" />
+
+<ComponentExample example="badge-actions" />
