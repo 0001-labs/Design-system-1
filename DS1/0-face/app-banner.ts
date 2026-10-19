@@ -101,7 +101,7 @@ export function ensureSmartAppBanner(options: AppBannerOptions): void {
   const meta = document.createElement("meta");
   meta.name = "apple-itunes-app";
   meta.content = [`app-id=${options.appId}`, options.open ? `app-argument=${options.open}` : ""].filter(Boolean).join(", ");
-  document.head.append(meta);
+  document.head.appendChild(meta);
 }
 
 /**
