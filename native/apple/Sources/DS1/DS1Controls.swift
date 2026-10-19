@@ -243,7 +243,7 @@ public struct DS1Tabs<Value: Hashable>: View {
     }
 
     public var body: some View {
-        HStack(spacing: scale.half) {
+        HStack(spacing: scale(4)) {
             ForEach(tabs) { tab in
                 let chosen = tab.value == selection
                 Button { selection = tab.value } label: {
