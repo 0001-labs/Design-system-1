@@ -12,6 +12,18 @@ place. One menu engine draws all three: whole squares, the keyboard, typeahead,
 placement, nested menus and focus. A menu that opens where the pointer is, is a
 [Context](/3-unit/context/).
 
+## Design examples
+
+<ComponentExample example="select-actions" />
+
+<ComponentExample example="select-field-list" />
+
+<ComponentExample example="select-print" />
+
+<ComponentExample example="select-sort" />
+
+<ComponentExample example="menu-recording" />
+
 ## A field
 
 ```html
@@ -141,14 +153,6 @@ An entry has a `label`, and may have `details`, an `icon`, a `shortcut`, an
 `onSelect(event)` (prevent the event to keep the menu open) and `items` (a
 nested menu beside it). `{ heading }` and `{ separator: true }` stand between
 entries. Register `ds-select` in the browser before hydrating.
-
-## Design examples
-
-<ComponentExample example="select-print" />
-
-<ComponentExample example="select-sort" />
-
-<ComponentExample example="menu-recording" />
 
 Remove product select styles, popup positioning, keyboard listeners and
 duplicate arrows when moving to Select. Keep data and callbacks in the product,

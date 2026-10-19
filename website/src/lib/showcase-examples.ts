@@ -351,6 +351,24 @@ export const SHOWCASE_EXAMPLES: Record<string, ComponentExample> = {
     "html": "<section class=\"specimen\">\n<label for=\"recording-tags\">Keywords</label><ds-token-field separators=\",;\"><ds-token value=\"rain\" label=\"Rain\" remove-label=\"Remove Rain\"></ds-token><ds-token value=\"courtyard\" label=\"Courtyard\" remove-label=\"Remove Courtyard\"></ds-token><input id=\"recording-tags\" placeholder=\"Add a keyword\"></ds-token-field>\n</section>\n<style>\n.specimen { width: 100%; min-width: 0; --cell: calc(20px * var(--sf, 1)); }\n.specimen .line { width: 100%; }\n.specimen .grow { flex: 1; min-width: 0; }\n.specimen .muted { color: var(--ds-text-color-muted); }\n.specimen .mono { --ds-typeface-regular: var(--ds-typeface-mono); font-variant-numeric: tabular-nums; }\n.specimen .value { width: calc(4 * var(--cell)); text-align: right; }\n.specimen .mark { display: inline-flex; align-items: flex-end; width: var(--cell); height: var(--ds-control-height); flex: 0 0 var(--cell); }\n.specimen .columns { display: flex; flex-wrap: wrap; gap: var(--cell); }\n.specimen .columns > * { min-width: 0; }\n.specimen fieldset { border: 0; padding: 0; margin: 0; }\n.specimen legend { padding: 0; }\n.specimen label { display: flex; align-items: flex-end; gap: calc(var(--cell) / 2); min-height: var(--cell); }\n.specimen ds-panel { height: calc(10 * var(--cell)); }\n</style>",
     "height": 180
   },
+  "select-actions": {
+    "title": "Actions from a button",
+    "hint": "Press More: the menu stands half a square below its button, fits its words on whole squares, and closes when an action is chosen.",
+    "html": "<section class=\"specimen\">\n<ds-row class=\"line\"><ds-text literal class=\"grow\">Rain over the courtyard</ds-text><ds-button id=\"recording-more\" secondary icon label=\"More actions\"><ds-icon type=\"more\" aria-hidden=\"true\"></ds-icon></ds-button></ds-row>\n<ds-select for=\"recording-more\" aria-label=\"Recording actions\"><ds-text data-ds-menu-label tone=\"muted\" literal>Recording</ds-text><ds-button menu-item role=\"menuitem\"><span class=\"mark\"><ds-icon type=\"download\" size=\"large\" aria-hidden=\"true\"></ds-icon></span>Download</ds-button><ds-button menu-item role=\"menuitem\"><span class=\"mark\"><ds-icon type=\"duplicate\" size=\"large\" aria-hidden=\"true\"></ds-icon></span>Duplicate</ds-button><ds-button menu-item role=\"menuitem\"><span class=\"mark\"><ds-icon type=\"archive\" size=\"large\" aria-hidden=\"true\"></ds-icon></span>Archive</ds-button><hr data-ds-menu-separator><ds-button menu-item role=\"menuitem\" danger><span class=\"mark\"><ds-icon type=\"delete\" size=\"large\" aria-hidden=\"true\"></ds-icon></span>Delete</ds-button></ds-select>\n</section>\n<style>\\n.specimen { width: 100%; min-width: 0; --cell: calc(20px * var(--sf, 1)); }\n.specimen .line { width: 100%; }\n.specimen .grow { flex: 1; min-width: 0; }\n.specimen .mark { display: inline-flex; align-items: flex-end; width: var(--cell); height: var(--ds-control-height); flex: 0 0 var(--cell); }\n.specimen label { display: flex; align-items: flex-end; gap: calc(var(--cell) / 2); min-height: var(--cell); }\n.specimen .notes { width: calc(16 * var(--cell)); }\n</style>",
+    "height": 260
+  },
+  "select-field-list": {
+    "title": "A field's choices, in place of the picker",
+    "hint": "Press the field: one square a choice, the chosen one checked, groups headed by their label, details and shortcuts on the row.",
+    "html": "<section class=\"specimen\">\n<label>Paper <ds-select><select aria-label=\"Paper\"><option data-details=\"Uncoated\" data-shortcut=\"mod+1\">Natural</option><option selected data-details=\"Smooth\" data-shortcut=\"mod+2\">Bright white</option><optgroup label=\"Recycled\"><option data-icon=\"page\" data-details=\"Grey fleck\">Newsprint</option><option data-icon=\"page\" disabled>Kraft</option></optgroup></select></ds-select></label>\n</section>\n<style>\\n.specimen { width: 100%; min-width: 0; --cell: calc(20px * var(--sf, 1)); }\n.specimen .line { width: 100%; }\n.specimen .grow { flex: 1; min-width: 0; }\n.specimen .mark { display: inline-flex; align-items: flex-end; width: var(--cell); height: var(--ds-control-height); flex: 0 0 var(--cell); }\n.specimen label { display: flex; align-items: flex-end; gap: calc(var(--cell) / 2); min-height: var(--cell); }\n.specimen .notes { width: calc(16 * var(--cell)); }\n</style>",
+    "height": 260
+  },
+  "context-notes": {
+    "title": "A note's actions where the pointer is",
+    "hint": "Right-click a note, press and hold one, or press Shift+F10: Ezo's gap face, a pixel between rows and two between groups, the page showing through.",
+    "html": "<section class=\"specimen\">\n<div id=\"notes\" class=\"notes\"><ds-row class=\"line note\" tabindex=\"0\" aria-haspopup=\"menu\"><span class=\"mark\"><ds-icon type=\"page\" size=\"large\" aria-hidden=\"true\"></ds-icon></span><ds-text literal>Opening night plan</ds-text></ds-row><ds-row class=\"line note\" tabindex=\"0\" aria-haspopup=\"menu\"><span class=\"mark\"><ds-icon type=\"page\" size=\"large\" aria-hidden=\"true\"></ds-icon></span><ds-text literal>Lighting cues</ds-text></ds-row><ds-row class=\"line note\" tabindex=\"0\" aria-haspopup=\"menu\"><span class=\"mark\"><ds-icon type=\"page\" size=\"large\" aria-hidden=\"true\"></ds-icon></span><ds-text literal>Guest list</ds-text></ds-row></div>\n<ds-context for=\"notes\" context-selector=\".note\" aria-label=\"Note actions\"><button role=\"menuitem\">Rename<ds-icon type=\"pen\" aria-hidden=\"true\"></ds-icon></button><button role=\"menuitem\">Duplicate<ds-icon type=\"duplicate\" aria-hidden=\"true\"></ds-icon></button><button role=\"menuitem\">Star<ds-icon type=\"star\" aria-hidden=\"true\"></ds-icon></button><hr data-ds-menu-separator><button role=\"menuitem\">Archive<ds-icon type=\"archive\" aria-hidden=\"true\"></ds-icon></button><button role=\"menuitem\" data-danger>Delete<ds-icon type=\"delete\" aria-hidden=\"true\"></ds-icon></button></ds-context>\n</section>\n<style>\\n.specimen { width: 100%; min-width: 0; --cell: calc(20px * var(--sf, 1)); }\n.specimen .line { width: 100%; }\n.specimen .grow { flex: 1; min-width: 0; }\n.specimen .mark { display: inline-flex; align-items: flex-end; width: var(--cell); height: var(--ds-control-height); flex: 0 0 var(--cell); }\n.specimen label { display: flex; align-items: flex-end; gap: calc(var(--cell) / 2); min-height: var(--cell); }\n.specimen .notes { width: calc(16 * var(--cell)); }\n</style>",
+    "height": 220
+  },
   "menu-recording": {
     "title": "Actions for a recording",
     "hint": "A Select's actions pair real icons and short labels on one-square rows.",
@@ -409,9 +427,14 @@ export const SHOWCASE_PAGES: Record<string, string[]> = {
     "radio-editions"
   ],
   "3-unit/select": [
+    "select-actions",
+    "select-field-list",
     "select-print",
     "select-sort",
     "menu-recording"
+  ],
+  "3-unit/context": [
+    "context-notes"
   ],
   "2-core/color": [
     "color-palette"

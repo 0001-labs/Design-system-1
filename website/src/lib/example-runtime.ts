@@ -247,6 +247,35 @@ if (document.body.dataset.exampleId === 'chart') {
   });
 }
 
+// Select's and Context's menus are shown open, as they look in use, without taking the
+// reader's focus; whatever is chosen is said below the example.
+{
+  const exampleId = document.body.dataset.exampleId;
+  type Shown = HTMLElement & { open: boolean; focusOnOpen: boolean; updateComplete: Promise<unknown>; openAt(point: { x: number; y: number }, control: HTMLElement, options: { focus: boolean }): void };
+  if (exampleId === 'select-actions') {
+    const menu = sample.querySelector<Shown>('ds-select[for]');
+    if (menu) { await menu.updateComplete; menu.focusOnOpen = false; menu.open = true; }
+  }
+  if (exampleId === 'context-notes') {
+    const menu = sample.querySelector<Shown>('ds-context'), row = sample.querySelector<HTMLElement>('.note');
+    if (menu && row) {
+      await menu.updateComplete;
+      const box = row.getBoundingClientRect();
+      menu.openAt({ x: box.left + 7 * 20, y: box.top + 10 }, row, { focus: false });
+    }
+  }
+  if (exampleId?.startsWith('select-') || exampleId?.startsWith('context-')) {
+    sample.addEventListener('click', event => {
+      const row = (event.target as Element).closest('[role^="menuitem"]');
+      if (row) output.textContent = `Chose: ${row.textContent?.trim()}`;
+    });
+    sample.addEventListener('change', event => {
+      const field = event.target as HTMLSelectElement;
+      if (field.localName === 'select') output.textContent = `Chose: ${field.selectedOptions[0]?.textContent?.trim()}`;
+    });
+  }
+}
+
 // Announce readiness after the library listeners exist, including in browsers
 // whose iframe load event precedes completion of awaited module imports.
 parent.postMessage({ type: 'ds1-example-library-ready' }, location.origin);
