@@ -107,8 +107,12 @@ For local Worker data, run `vp run reports:scan` and `vp run reports:upload:loca
 
 
 Shared context-menu adapters are verified as a complete dependency graph through
-`react/context-menu.ts`, including pure product re-exports and imported aliases.
-`ContextMenuContent` and `ContextMenuSubContent` count in Menu; their Item,
+`react/context.ts` (`react/context-menu.ts` in copies from before Context),
+including pure product re-exports and imported aliases. `ContextContent` and
+`ContextSubContent` (`ContextMenuContent` and `ContextMenuSubContent` before)
+count in Context; a copy whose manifest names the engine as `menu` takes its
+snapshot for Context. Menu folds into Select, and Dialog and Drawer into
+Overlay. Their Item,
 SubTrigger, CheckboxItem and RadioItem count in Button, Label in Text, and
 FilePicker in File picker. Root/state providers, groups and the composed
 indicators are not additional sites. Earlier scans did not infer Radix React
