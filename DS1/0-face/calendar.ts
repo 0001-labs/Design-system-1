@@ -173,7 +173,30 @@ export type CalendarEvent = {
   time?: string;
   /** A colour token or value for the event's fill (`var(--ds-zenith-blue)`). */
   color?: string;
+  /** How much it counts for in a calendar's heat (commits, purchases, hours); 1 when left out. */
+  count?: number;
 };
+
+/** A day's heat: 1 (a little) to 4 (the most). */
+export type HeatLevel = 1 | 2 | 3 | 4;
+
+/**
+ * How strongly each day is lit, as a contribution graph lights it: the
+ * amounts of its events added up, in four steps of the busiest day (or of
+ * `max`, for a scale that stays put from month to month). A day with nothing
+ * has no level.
+ */
+export function heatLevels(byDay: ReadonlyMap<Day, readonly CalendarEvent[]>, max?: number): Map<Day, HeatLevel> {
+  const amounts = new Map<Day, number>();
+  for (const [day, events] of byDay) {
+    const amount = events.reduce((sum, event) => sum + (typeof event.count === "number" && Number.isFinite(event.count) ? Math.max(0, event.count) : 1), 0);
+    if (amount > 0) amounts.set(day, amount);
+  }
+  const top = typeof max === "number" && Number.isFinite(max) && max > 0 ? max : Math.max(0, ...amounts.values());
+  const levels = new Map<Day, HeatLevel>();
+  for (const [day, amount] of amounts) levels.set(day, Math.min(4, Math.max(1, Math.ceil((amount / top) * 4))) as HeatLevel);
+  return levels;
+}
 
 /** The events that touch each day between `from` and `to`, in order: longest first, then by time. */
 export function eventsByDay(events: readonly CalendarEvent[], from: Day, to: Day): Map<Day, CalendarEvent[]> {

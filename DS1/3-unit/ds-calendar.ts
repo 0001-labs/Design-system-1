@@ -21,6 +21,7 @@ import {
   dateNumber,
   dayOf,
   eventsByDay,
+  heatLevels,
   isDay,
   isoWeek,
   monthTitle,
@@ -30,6 +31,7 @@ import {
   weekdayNames,
   type CalendarEvent,
   type Day,
+  type HeatLevel,
 } from "../0-face/calendar";
 import { CalendarBase, readMonth, readRange, type CalendarChangeDetail } from "./calendar-base";
 import "../2-core/ds-icon";
@@ -105,6 +107,12 @@ const openPickers = new Set<Calendar>();
  * @prop {boolean} fixed - Always draw six weeks, so the month keeps its height.
  * @prop {boolean} outsideDays - Draw the days of the months before and after
  *   in the title grey (`outside-days`); pressing one moves there.
+ * @prop {boolean} heat - Light each day by how much happens on it, as a
+ *   contribution graph does: the events' `count`s added up (one each by
+ *   default), in four steps of the busiest day shown.
+ * @prop {number} heatMax - The amount that lights a day fully (`heat-max`),
+ *   for a scale that stays put from month to month; the busiest day shown
+ *   by default.
  * @prop {boolean} noHeader - Leave out the title and arrows (`no-header`).
  * @prop {boolean} noToday - Leave out the Today button (`no-today`).
  * @prop {string} min - The first day a person may choose.
@@ -153,6 +161,8 @@ export class Calendar extends CalendarBase {
     outsideDays: { type: Boolean, attribute: "outside-days", reflect: true },
     noHeader: { type: Boolean, attribute: "no-header", reflect: true },
     noToday: { type: Boolean, attribute: "no-today", reflect: true },
+    heat: { type: Boolean, reflect: true },
+    heatMax: { type: Number, attribute: "heat-max" },
     picker: { type: Boolean, reflect: true },
     name: { type: String, reflect: true },
     placeholder: { type: String },
@@ -175,6 +185,8 @@ export class Calendar extends CalendarBase {
   declare outsideDays: boolean;
   declare noHeader: boolean;
   declare noToday: boolean;
+  declare heat: boolean;
+  declare heatMax: number | undefined;
   declare picker: boolean;
   declare name: string | undefined;
   declare placeholder: string | undefined;
@@ -189,6 +201,7 @@ export class Calendar extends CalendarBase {
   protected readonly weeksRun = "rows" as const;
 
   private byDay = new Map<Day, CalendarEvent[]>();
+  private heatByDay = new Map<Day, HeatLevel>();
   private readonly internals = typeof this.attachInternals === "function" ? this.attachInternals() : null;
   /** The value the field started with, for a form's reset. */
   private initial = "";
@@ -204,6 +217,7 @@ export class Calendar extends CalendarBase {
     this.outsideDays = false;
     this.noHeader = false;
     this.noToday = false;
+    this.heat = false;
     this.picker = false;
     this.time = false;
     this.required = false;
@@ -400,7 +414,8 @@ export class Calendar extends CalendarBase {
     const unfolded = this.unfolded === day;
     const shown = unfolded || events.length <= lines ? events : events.slice(0, Math.max(0, lines - 1));
     const hidden = events.length - shown.length;
-    const parts = ["day", isToday ? "today" : "", selected ? "selected" : ""].filter(Boolean).join(" ");
+    const heat = this.heatByDay.get(day);
+    const parts = ["day", isToday ? "today" : "", selected ? "selected" : "", heat ? "heat" : ""].filter(Boolean).join(" ");
     return html`<div
       role="gridcell"
       class="day"
@@ -418,6 +433,7 @@ export class Calendar extends CalendarBase {
       ?data-last=${last}
       ?data-outside=${outside}
       ?data-busy=${events.length > 0}
+      data-heat=${heat ?? nothing}
       ?data-open=${unfolded}
     >
       <span class="date-line" aria-hidden="true">
@@ -444,6 +460,8 @@ export class Calendar extends CalendarBase {
     const first = this.firstDay;
     const weeks = monthWeeks(month, first, this.fixed);
     this.byDay = eventsByDay(this.events ?? [], weeks[0][0], weeks.at(-1)![6]);
+    // Heat is measured over the days of the month shown, so the neighbours' days never set its scale.
+    this.heatByDay = this.heat ? heatLevels(new Map([...this.byDay].filter(([day]) => sameMonth(day, month))), this.heatMax) : new Map();
     // A compact month names its days in a letter (one square) or two (wider); a full month in short.
     const short = this.compact
       ? this.squaresPerDay < 2

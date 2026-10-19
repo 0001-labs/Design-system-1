@@ -327,6 +327,15 @@ calendar.addEventListener('change', event => console.log(event.detail.value));`,
     html: `<ds-calendar compact selectable fixed></ds-calendar>`,
     height: 280,
   },
+  'calendar-heat': {
+    title: 'Heat, as a contribution graph', hint: 'heat lights each day by how much happens on it: the events’ counts added up, in four steps of the busiest day. Quiet days stay plain.',
+    html: `<ds-calendar compact heat fixed outside-days day-width="2"></ds-calendar>`,
+    script: `const calendar = document.querySelector('ds-calendar');
+const month = calendar.shownMonth.slice(0, 7);
+const counts = [0, 2, 5, 1, 0, 0, 3, 8, 4, 0, 1, 6, 12, 2, 0, 0, 7, 3, 9, 1, 0, 0, 2, 10, 5, 4, 0, 0, 1, 3, 6];
+calendar.events = counts.flatMap((count, index) => count ? [{ title: count + ' changes', start: month + '-' + String(index + 1).padStart(2, '0'), count }] : []);`,
+    height: 400,
+  },
   'calendar-range': {
     title: 'One day or a range, two squares a day', hint: 'Press a day to choose it; press another to end a range from it, and the pointer previews the end. The press after starts again. Each press fires change.',
     html: `<ds-calendar compact selectable fixed outside-days day-width="2"></ds-calendar>`,
@@ -670,7 +679,7 @@ export const PAGE_EXAMPLES: Record<string, string[]> = {
   '2-core/gap': ['gap'],
   '3-unit/row': ['row', 'row-centered'], '3-unit/list': ["list", "list-reading", "list-files", "list-schedule", "list-people", "list-details"], '3-unit/sidebar': ['sidebar', 'tree'],
   '3-unit/accordion': ['accordion'], '3-unit/form': ['form'], '3-unit/carousel': ['carousel', 'carousel-full', 'slide', 'slide-loop'],
-  '3-unit/calendar': ['calendar', 'calendar-compact', 'calendar-range', 'calendar-picker', 'calendar-large'], '3-unit/matrix': ['matrix'],
+  '3-unit/calendar': ['calendar', 'calendar-compact', 'calendar-heat', 'calendar-range', 'calendar-picker', 'calendar-large'], '3-unit/matrix': ['matrix'],
   '3-unit/table': ['table'],
   '4-page/container': ['container'], '4-page/grid': ['grid'],
   '4-page/page': ['page'],

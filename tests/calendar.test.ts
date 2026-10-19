@@ -303,6 +303,61 @@ test("turning on a time gives each end one, an hour apart, and Clear empties the
   expect(picker.open).toBe(false);
 });
 
+test("heat lights a day by its amount, in four steps of the busiest day", () => {
+  const byDay = new Map([
+    ["2026-10-01", [{ title: "a", start: "2026-10-01" }]],
+    ["2026-10-02", [{ title: "b", start: "2026-10-02", count: 4 }]],
+    ["2026-10-03", [{ title: "c", start: "2026-10-03", count: 6 }, { title: "d", start: "2026-10-03", count: 2 }]],
+    ["2026-10-04", [{ title: "e", start: "2026-10-04", count: 0 }]],
+  ]);
+  const levels = days.heatLevels(byDay);
+  expect(levels.get("2026-10-01")).toBe(1);
+  expect(levels.get("2026-10-02")).toBe(2);
+  expect(levels.get("2026-10-03")).toBe(4);
+  expect(levels.has("2026-10-04")).toBe(false);
+  // A fixed scale keeps a quiet month quiet.
+  expect(days.heatLevels(byDay, 32).get("2026-10-03")).toBe(1);
+  expect(days.heatLevels(byDay, 4).get("2026-10-03")).toBe(4);
+});
+
+test("a heat calendar marks each busy day with its step and leaves quiet days plain", async () => {
+  const calendar = await mount<Calendar>(`<ds-calendar compact heat fixed outside-days month="2026-07" today="2026-07-20"></ds-calendar>`);
+  calendar.events = [
+    { title: "Commit", start: "2026-07-02" },
+    { title: "Commits", start: "2026-07-03", count: 2 },
+    { title: "Commits", start: "2026-07-08", count: 3 },
+    { title: "Commits", start: "2026-07-09", count: 4 },
+    // The month after is drawn in the title grey, unlit, and never sets the scale.
+    { title: "Commits", start: "2026-08-01", count: 40 },
+  ];
+  await calendar.updateComplete;
+  expect(["02", "03", "08", "09"].map(date => cell(calendar, `2026-07-${date}`).dataset.heat)).toEqual(["1", "2", "3", "4"]);
+  expect(cell(calendar, "2026-07-04").hasAttribute("data-heat")).toBe(false);
+  expect(cell(calendar, "2026-08-01").hasAttribute("data-heat")).toBe(false);
+  expect(cell(calendar, "2026-07-09").getAttribute("part")).toContain("heat");
+  calendar.heat = false;
+  await calendar.updateComplete;
+  expect(cell(calendar, "2026-07-09").hasAttribute("data-heat")).toBe(false);
+});
+
+test("heat's colours come from the palette, follow light and dark, and keep the date readable", () => {
+  const css = readFileSync(join(import.meta.dirname, "../DS1/3-unit/styles/ds-calendar.css"), "utf8");
+  expect(css).toMatch(/--ds-calendar-heat-1: var\(--one-apple-green-pastel/);
+  expect(css).toMatch(/--ds-calendar-heat-3: var\(--one-apple-green,/);
+  expect(css).toMatch(/--ds-calendar-heat-4: light-dark\(/);
+  // Each step's fill against its ink, as the palette resolves them, light then dark.
+  const luminance = (hex: string) => {
+    const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255).map(c => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const contrast = (a: string, b: string) => { const [x, y] = [luminance(a), luminance(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05); };
+  const mix = (a: string, b: string, share = 0.5) => "#" + [1, 3, 5].map(i => Math.round(parseInt(a.slice(i, i + 2), 16) * share + parseInt(b.slice(i, i + 2), 16) * (1 - share)).toString(16).padStart(2, "0")).join("");
+  const slate = "#1e1e1e", white = "#ffffff";
+  const light = [["#daffcc", slate], [mix("#daffcc", "#99ff73"), slate], ["#99ff73", slate], [mix("#99ff73", slate, 0.6), slate]];
+  const dark = [["#284c1a", white], [mix("#284c1a", "#529d36"), white], ["#529d36", slate], ["#99ff73", slate]];
+  for (const [fill, ink] of [...light, ...dark]) expect(contrast(fill, ink)).toBeGreaterThanOrEqual(4.5);
+});
+
 test("no calendar names a product", () => {
   for (const file of ["0-face/calendar.ts", "3-unit/calendar-base.ts", "3-unit/ds-calendar.ts", "3-unit/ds-calendar-large.ts", "3-unit/styles/ds-calendar.css", "3-unit/styles/ds-calendar-large.css"]) {
     expect(readFileSync(join(import.meta.dirname, "../DS1", file), "utf8")).not.toMatch(/\b(Ezo|Link|Consistency|Peer|Ins|tau99)\b/);
