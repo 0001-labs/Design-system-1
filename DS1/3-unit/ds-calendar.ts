@@ -145,7 +145,7 @@ const openPickers = new Set<Calendar>();
  * @fires navigate - A person moved to another month; `{ month }`.
  * @fires ds-calendar-toggle - A picker's month opened or closed; `{ open }`.
  *
- * A selectable calendar has Clear one square below its month, and `clear()`
+ * A selectable calendar shows Clear right under its dates while something is chosen, and `clear()`
  * empties the value from code; both fire `change` with an empty value.
  *
  * @example
@@ -503,9 +503,9 @@ export class Calendar extends CalendarBase {
   }
 
   private renderClear() {
-    if (!this.selectable || this.embedded || this.required) return nothing;
+    if (!this.selectable || this.embedded || this.required || !this.value) return nothing;
     return html`<div class="foot" part="foot">
-      <button class="ds-button ds-button--secondary clear-value" part="clear" type="button" ?disabled=${!this.value} @click=${() => this.clear()}>${this.words("Clear")}</button>
+      <button class="ds-button ds-button--secondary clear-value" part="clear" type="button" @click=${() => this.clear()}>${this.words("Clear")}</button>
     </div>`;
   }
 

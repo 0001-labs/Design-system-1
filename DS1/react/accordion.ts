@@ -27,7 +27,7 @@ export const Accordion = forwardRef<AccordionElement, AccordionProps>(function A
     ref: (element: AccordionElement | null) => {host.current = element; if (typeof ref === "function") ref(element); else if (ref) ref.current = element;},
   }, h("ds-button", {slot: "trigger", control: "slotted", choice: true, disabled},
     h("button", {type: "button", role: triggerRole, disabled, "aria-expanded": expanded, "aria-controls": id}, summary,
-      h("ds-icon", {type: expanded ? "up" : "down", "aria-hidden": "true", style: {marginInlineStart: "auto", flex: "0 0 auto"}}))),
+      h("ds-icon", {type: "chevron-down", size: "large", "aria-hidden": "true", style: {marginInlineStart: "auto", flex: "0 0 auto", color: "var(--ds-title-color)", transform: expanded ? "rotate(180deg)" : undefined}}))),
     actions == null ? null : h("div", {slot: "actions"}, actions),
     h("div", {slot: "details", id, hidden: !expanded}, children));
 });

@@ -3,11 +3,12 @@ import "../2-core/ds-text";
 import "../2-core/ds-icon";
 import "../2-core/ds-button";
 import { define } from "../0-face/define";
-import "./ds-row";
 import styles from "./styles/ds-accordion.css?inline";
 
 /**
- * Native accordion using <details>/<summary> (no JS toggle logic).
+ * Native accordion using <details>/<summary> (no JS toggle logic): the
+ * summary one square high at the start, the library's chevron-down at its
+ * end (turned over when open), the details from the square below.
  *
  * Usage (with translation text):
  * <ds-accordion summary="How it began" details="Designed in Hokkaido"></ds-accordion>
@@ -86,22 +87,10 @@ export class Accordion extends LitElement {
     return html`
       <details ?open=${this.open}>
         <summary>
-          <ds-row class="summaryRow" centered>
-            <ds-text .text=${this.summary} ?literal=${this.literal}></ds-text>
-            <ds-icon class="chevron" aria-hidden="true">
-              <svg
-                viewBox="0 0 10.157 8.219"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-                focusable="false"
-              >
-                <path
-                  d="M5.078 8.219L0 3.141L1.414 1.727L5.078 5.391L8.743 1.727L10.157 3.141L5.078 8.219Z"
-                  fill="currentColor"
-                />
-              </svg>
-            </ds-icon>
-          </ds-row>
+          <span class="summaryRow">
+            <ds-text class="summaryText" .text=${this.summary} ?literal=${this.literal}></ds-text>
+            <ds-icon class="chevron" type="chevron-down" size="large" aria-hidden="true"></ds-icon>
+          </span>
         </summary>
 
         <div class="detailsBody">

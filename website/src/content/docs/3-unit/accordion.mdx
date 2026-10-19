@@ -1,11 +1,20 @@
 ---
 title: Accordion
-description: A native details and summary disclosure composed from a row, text and an icon.
+description: A native details and summary disclosure, its summary one square at the start with the library's chevron at its end.
 ---
 
 import ComponentExample from "../../../components/ComponentExample.astro";
 
-A native details and summary disclosure composed from a row, text and an icon.
+A native details and summary disclosure. The summary is a row one square high: its words at the start on the sixteen, the library's `chevron-down` (16px, in the title grey) at its end, turned over while open. The pointer fills the row 4px past its words and chevron, keyboard focus rings it, and the details start on the square below, a line to a square.
+
+| Measure | Size |
+| --- | --- |
+| The summary | One square high, the words 4px from the fill's edge, standing where the details' words start. |
+| The chevron | `chevron-down`, 16px, on the sixteen at the end; it turns over in transform alone (none with reduced motion). |
+| The details | From the square below the summary, every line one square; wrapping text is a paragraph, never a row one square high. |
+| The width | Twelve squares (`--ds-accordion-width`). |
+
+The React `Accordion` draws the same chevron on its trigger.
 
 
 ## Design examples

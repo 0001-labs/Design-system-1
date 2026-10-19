@@ -47,3 +47,18 @@ test('without literal the summary and details stay translation keys', async () =
   expect(summary!.shadowRoot!.textContent).toContain('Hjem');
   expect(details!.shadowRoot!.textContent).toContain('Noter');
 });
+
+test('the summary carries the library chevron at its end, never a drawn one', async () => {
+  const accordion = document.createElement('ds-accordion');
+  accordion.summary = 'Notes';
+  document.body.append(accordion);
+  await texts(accordion);
+  const root = accordion.shadowRoot!;
+  const chevron = root.querySelector('summary .chevron')!;
+  expect(chevron.getAttribute('type')).toBe('chevron-down');
+  expect(chevron.getAttribute('size')).toBe('large');
+  expect(root.querySelector('svg')).toBeNull();
+  expect(root.querySelector('[centered]')).toBeNull();
+  // The words first, the chevron last.
+  expect([...root.querySelector('.summaryRow')!.children].map(child => child.className)).toEqual(['summaryText', 'chevron']);
+});

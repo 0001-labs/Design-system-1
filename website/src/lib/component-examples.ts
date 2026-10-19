@@ -62,13 +62,20 @@ export const MATRIX_DATA = {
 };
 
 /** The examples' events, in the month being read so a calendar always has some. */
-export function calendarEvents(kind: 'month' | 'large') {
+/** How much happened on each day of the month, as the heat example's script writes it. */
+export const HEAT_COUNTS = [0, 2, 5, 1, 0, 0, 3, 8, 4, 0, 1, 6, 12, 2, 0, 0, 7, 3, 9, 1, 0, 0, 2, 10, 5, 4, 0, 0, 1, 3, 6];
+
+export function calendarEvents(kind: 'month' | 'large' | 'heat') {
   const now = new Date();
   const month = (offset: number) => {
     const at = new Date(now.getFullYear(), now.getMonth() + offset, 1);
     return `${at.getFullYear()}-${String(at.getMonth() + 1).padStart(2, '0')}`;
   };
   const m = month(0);
+  if (kind === 'heat') {
+    const last = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    return HEAT_COUNTS.slice(0, last).flatMap((count, index) => count ? [{ title: `${count} changes`, start: `${m}-${String(index + 1).padStart(2, '0')}`, count }] : []);
+  }
   if (kind === 'large') return [
     { title: 'Identity', start: `${month(-1)}-08`, end: `${m}-06`, color: 'var(--ds-zenith-blue)' },
     { title: 'Website', start: `${m}-02`, end: `${month(1)}-13`, color: 'var(--ds-apple-green)' },
@@ -617,7 +624,8 @@ render();`,
   'accordion': {
     title: 'Open the details', hint: 'Click the summary or focus it and press Enter.',
     html: '<ds-accordion summary="How does this work?">\n  <div slot="details">The summary opens and closes this content.</div>\n</ds-accordion>',
-    height: 200,
+    height: 100,
+    fit: 'content',
   },
   'form': {
     title: 'A local form', hint: 'Type a name and submit. The result stays in this preview.',

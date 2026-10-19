@@ -64,6 +64,7 @@ sample.addEventListener('change', event => {
   if ((event.target as HTMLElement).localName === 'ds-carousel') output.textContent = `change: ${(event as CustomEvent).detail.index}`;
 });
 // The calendars hold the events their published scripts show, in the month being read.
+sample.querySelectorAll('ds-calendar[heat]:not([data-showcase-props])').forEach(calendar => { (calendar as HTMLElement & { events: unknown }).events = calendarEvents('heat'); });
 sample.querySelectorAll('ds-calendar:not([compact])').forEach(calendar => { (calendar as HTMLElement & { events: unknown }).events = calendarEvents('month'); });
 sample.querySelectorAll('ds-calendar-large').forEach(calendar => { (calendar as HTMLElement & { events: unknown }).events = calendarEvents('large'); });
 sample.querySelectorAll('ds-matrix:not([data-showcase-props])').forEach(matrix => { Object.assign(matrix, MATRIX_DATA); });

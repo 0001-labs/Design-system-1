@@ -367,18 +367,18 @@ test("heat's colours come from the palette, follow light and dark, and keep the 
   for (const [fill, ink] of [...light, ...dark]) expect(contrast(fill, ink)).toBeGreaterThanOrEqual(4.5);
 });
 
-test("a selectable calendar has Clear below its month, which empties the value and says so", async () => {
+test("a selectable calendar shows Clear under its dates while something is chosen, which empties the value and says so", async () => {
   const calendar = await mount<Calendar>(`<ds-calendar month="2026-10" selectable compact value="2026-10-10/2026-10-17"></ds-calendar>`);
   const clear = calendar.shadowRoot!.querySelector<HTMLButtonElement>(".clear-value")!;
   expect(clear.textContent).toBe("Clear");
-  expect(clear.disabled).toBe(false);
   const changes: { value: string; previous: string }[] = [];
   calendar.addEventListener("change", event => changes.push((event as CustomEvent).detail));
   clear.click();
   await calendar.updateComplete;
   expect(calendar.value).toBe("");
   expect(changes).toEqual([{ value: "", previous: "2026-10-10/2026-10-17", start: "", end: "" }]);
-  expect(clear.disabled).toBe(true);
+  // Nothing chosen, nothing to clear: Clear goes.
+  expect(calendar.shadowRoot!.querySelector(".clear-value")).toBeNull();
   // From code, the same; nothing to clear says nothing.
   calendar.value = "2026-10-05";
   await calendar.updateComplete;

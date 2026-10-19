@@ -1,5 +1,8 @@
-/* ds-accordion.css */
-/* Accordion component styles using native <details>/<summary> */
+/* ds-accordion.css
+ * The summary is a row one square high: its words at the start on the sixteen, the library's
+ * chevron-down (16px, in the title grey) at its end, turned over when open. The pointer fills the
+ * row 4px past its words and chevron, keeping them where they stand; keyboard focus rings it.
+ * The details start on the square below, their lines one square each. */
 @import "../../1-root/component-metrics.css";
 
 :host {
@@ -15,37 +18,47 @@ details {
 }
 
 summary {
+  display: block;
+  margin-inline: calc(-4px * var(--ds-sf, 1));
+  padding-inline: calc(4px * var(--ds-sf, 1));
+  border-radius: var(--ds-radius);
   cursor: pointer;
   user-select: none;
   list-style: none;
   outline: none;
 }
-
 summary::-webkit-details-marker {
   display: none;
 }
+summary:hover { background: var(--ds-row-fill-hover, var(--ds-fill)); }
+summary:focus-visible { outline: 2px solid var(--ds-focus-ring); outline-offset: -2px; }
 
 .summaryRow {
-  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  gap: calc(4px * var(--ds-sf, 1));
+  min-height: var(--ds-unit);
+  line-height: var(--ds-type-lineheight-default);
 }
+.summaryText { flex: 1 1 auto; min-width: 0; }
 
-ds-icon.chevron {
-  transform: rotate(0deg);
-  transition: transform 140ms ease;
+.chevron {
+  flex: 0 0 auto;
+  color: var(--ds-title-color);
 }
-
-details[open] ds-icon.chevron {
-  transform: rotate(180deg);
+details[open] .chevron { transform: rotate(180deg); }
+@media (prefers-reduced-motion: no-preference) {
+  .chevron { transition: transform 140ms ease; }
 }
 
 .detailsBody {
-  padding-top: calc(var(--half) * var(--sf));
+  padding: 0;
 }
 
 .detailsText {
   display: block;
   white-space: normal;
-  text-align: left;
+  text-align: start;
 }
 
 :host([control="slotted"]) { width: 100%; }

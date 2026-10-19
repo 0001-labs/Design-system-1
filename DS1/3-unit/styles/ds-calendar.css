@@ -6,7 +6,7 @@
  * on the grid lines; today is a red disc nine tenths of a square across.
  *
  * A picker is a field's face: one control high at the foot of its square,
- * ten squares wide by default, its words 4px in and the chevron-down icon
+ * as wide as its words (it hugs them, as a button does), its words 4px in and the chevron-down icon
  * (16px, 2px from the end) at its end; a range is one value. Its month opens on the menu's frame, half a square from
  * the field: a 1px line, half a square inside it, no shadow, so eight squares
  * wide. Inside, on whole squares: the first and last day to type (each with
@@ -169,12 +169,12 @@
 .pick[data-selected] .pick-mark { background: var(--ds-calendar-selected); color: var(--ds-calendar-selected-ink); }
 .pick:disabled { color: var(--ds-title-color); cursor: default; opacity: 0.5; }
 
-/* Clear: a button one control high at the foot of the square below the month's, one square apart. */
+/* Clear, only while something is chosen: a button one control high, centred on the square right under the dates. */
 .foot {
   display: flex;
   align-items: flex-end;
+  justify-content: center;
   height: var(--ds-unit);
-  margin-block-start: var(--ds-unit);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -377,8 +377,8 @@
 
 /* The picker: a field that opens the small month. */
 :host([picker]) {
-  --ds-calendar-picker-width: calc(10 * var(--ds-unit));
   display: inline-flex;
+  max-width: 100%;
   align-items: flex-end;
   vertical-align: bottom;
   height: var(--ds-unit);
@@ -388,7 +388,8 @@
   display: inline-flex;
   align-items: center;
   gap: calc(4px * var(--ds-sf, 1));
-  width: var(--ds-calendar-picker-width);
+  width: var(--ds-calendar-picker-width, max-content);
+  max-width: 100%;
   padding-inline: calc(4px * var(--ds-sf, 1)) calc(2px * var(--ds-sf, 1));
   text-align: start;
   cursor: pointer;

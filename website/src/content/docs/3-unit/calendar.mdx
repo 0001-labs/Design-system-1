@@ -15,6 +15,8 @@ There are two calendars, drawn from the same days and keys.
 
 <ComponentExample example="calendar-journal" />
 
+<ComponentExample example="calendar-streak" />
+
 <ComponentExample example="calendar-visit" />
 
 ## Try it
@@ -121,7 +123,7 @@ There is one way to choose, in a month and in the picker: a person picks one day
 
 ### Clear
 
-A selectable calendar has **Clear** one square below its month, at the start: a secondary button one control high, in the shared word, disabled while nothing is chosen. It empties the value and fires `change` with `value` empty (`start` and `end` too). `clear()` does the same from code, in a month and in a picker (where it also closes the panel). `required` leaves Clear out; the picker's month uses the picker's own Clear.
+A selectable calendar shows **Clear** while something is chosen: a secondary button one control high, in the shared word, centred on the square right under the dates. With nothing chosen it is not there. It empties the value and fires `change` with `value` empty (`start` and `end` too). `clear()` does the same from code, in a month and in a picker (where it also closes the panel). `required` leaves Clear out; the picker's month uses the picker's own Clear.
 
 ## Months and years
 
@@ -165,7 +167,7 @@ The face writes the value in the current language, a range as the language write
 
 | Measure | Size |
 | --- | --- |
-| The field | A field's face: one control high at the foot of its square, ten squares wide (`--ds-calendar-picker-width`), the words 4px in, the `chevron-down` icon (16px) 2px from the end. |
+| The field | A field's face: one control high at the foot of its square, as wide as its words (it hugs them, as a button does; `--ds-calendar-picker-width` sets a width), the words 4px in, the `chevron-down` icon (16px) 2px from the end. |
 | The days to type | A field one control high on its own square for the first day and one for the last; with times on, each day's time on the square below it. One square spare after them. |
 | The month | One square a day, seven squares wide: the month with its chevrons, the weekdays in a letter, six weeks with the neighbouring months' days in the title grey. |
 | The marks | The chosen days are squares with 4px corners in Sharp blue, the days between on a band of it, today a red disc. |
@@ -285,7 +287,7 @@ The day arithmetic the calendars use is `DS1/0-face/calendar.ts`, plain TypeScri
 | `--ds-calendar-event-fill` | The fill (Apple green in the large calendar) | An event without a colour. |
 | `--ds-calendar-line` | `1px solid var(--ds-border-color)` | A month's lines. |
 | `--ds-calendar-ink` | `var(--ds-text-color)` | The large calendar's lines and selected day. |
-| `--ds-calendar-picker-width` | Ten squares | A picker's field. |
+| `--ds-calendar-picker-width` | Its words' width | A picker's field. |
 | `--ds-calendar-heat-1` … `-4` | The accent's four steps | Heat's fills. |
 | `--ds-calendar-heat-ink-1` … `-4` | The ink, or white on the dark steps | The date on each step. |
 
