@@ -13,7 +13,6 @@ export function AppShell({ children }: { children: ReactNode }) {
   const signInPath = path === "/reports/components" || path === "/libraries" || path.startsWith("/l/") ? path : "/signin";
   const embedded = document.documentElement.hasAttribute("data-docs-embed");
 
-  const profile = useQuery(api.users.profile, !isLoading && isAuthenticated ? {} : "skip");
   const editor = matchRoute("/l/:id", path);
   const library = useQuery(api.libraries.get, !isLoading && isAuthenticated && editor ? { id: editor.id as Id<"libraries"> } : "skip");
   const current: LibraryNavigation | null = !isLoading && isAuthenticated && editor && library
@@ -39,10 +38,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="app-shell">
       <header className="site-navigation" data-ds-area="Navigation">
         <div className="system-breadcrumb" aria-label="System breadcrumb">
-          {isAuthenticated && !isLoading && <><Link to="/libraries">{profile?.companyName || "My company"}</Link><span aria-hidden="true">/</span></>}
-          <a className="site-brand" href={current ? libraryHref({ ...current, view: "overview" }) : "/start-here/overview/"}
-            onClick={current ? event => { if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return; event.preventDefault(); navigate(`${libraryHref({ ...current, view: "overview" }).slice(4)}${embedded ? "&embed=docs" : ""}`); } : undefined}
-            target={!current && embedded ? "_top" : undefined}>{current ? current.name : "Design system 1"}</a>
+          <a className="site-brand" href="/start-here/overview/" target={embedded ? "_top" : undefined}>Design system 1</a>
         </div>
         <nav aria-label="Main navigation" className="site-links">
           {siteNavigation.filter((item) => item.href !== "/app/libraries" || (!isLoading && isAuthenticated)).map((item) => item.href.startsWith("/app/") ? (

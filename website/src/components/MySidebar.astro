@@ -4,6 +4,16 @@ const { sidebar } = Astro.locals.starlightRoute;
 <div class="docs-sidebar-shell">
   <ds-sidebar id="docs-navigation" label="Documentation" expand-icon="chevron-down" collapse-icon="chevron-up" data-groups={JSON.stringify(sidebar)}>
     <div slot="header" class="docs-sidebar-header">
+      <section id="workspace" hidden aria-label="Company workspace">
+        <div class="workspace-heading"><button id="workspace-toggle" class="ds-row" type="button" aria-label="Expand workspace" aria-expanded="false" aria-controls="workspace-libraries">
+          <ds-avatar id="workspace-avatar" initial="?" aria-hidden="true"></ds-avatar>
+          <span id="workspace-name">My company</span>
+          <ds-icon id="workspace-chevron" type="chevron-down" aria-hidden="true"></ds-icon>
+          </button><ds-button control="slotted" icon id="workspace-add"><button type="button" aria-label="New library"><ds-icon type="plus" aria-hidden="true"></ds-icon></button></ds-button>
+        </div>
+        <ds-sidebar id="workspace-libraries" label="Your design systems" hidden></ds-sidebar>
+        <p id="workspace-error" role="alert" hidden></p>
+      </section>
       <ds-button control="slotted" icon class="docs-sidebar-close">
         <button id="sidebar-close-btn" type="button" aria-label="Close navigation menu"><ds-icon type="close"></ds-icon></button>
       </ds-button>
@@ -20,6 +30,7 @@ const { sidebar } = Astro.locals.starlightRoute;
 
 <script>
   import '../../../DS1/3-unit/ds-sidebar';
+  import '../../../DS1/1-root/row.css';
   import '../../../DS1/2-core/ds-avatar';
   import { translate } from '../../../DS1/0-face/i18n';
   import { LAYERS } from '../../../shared/component-directory';
@@ -61,6 +72,36 @@ const { sidebar } = Astro.locals.starlightRoute;
       return [item, ...(item.expanded ? rows(entry.entries, depth + 1, id) : [])];
     });
   }
+  const workspace = document.querySelector<HTMLElement>('#workspace')!;
+  const workspaceToggle = document.querySelector('#workspace-toggle')!;
+  const workspaceAvatar = document.querySelector('#workspace-avatar')!;
+  const workspaceLibraries = document.querySelector('ds-sidebar#workspace-libraries')!;
+  const workspaceAdd = document.querySelector('#workspace-add')!;
+  let workspaceOpen = false;
+  let workspaceName = 'My company';
+  let workspaceItems: { id: string; name: string; publishedVersion: number | null }[] = [];
+  let librariesLoaded = false;
+  function renderWorkspace() {
+    workspace.hidden = !signedIn;
+    document.querySelector('#workspace-name')!.textContent = workspaceName;
+    workspaceAvatar.setAttribute('initial', workspaceName.slice(0, 1).toUpperCase());
+    workspaceAvatar.setAttribute('label', workspaceName);
+    workspaceToggle.setAttribute('aria-expanded', String(workspaceOpen));
+    workspaceToggle.setAttribute('aria-label', `${workspaceOpen ? 'Collapse' : 'Expand'} ${workspaceName}`);
+    document.querySelector('#workspace-chevron')!.setAttribute('type', workspaceOpen ? 'chevron-up' : 'chevron-down');
+    workspaceLibraries.hidden = !workspaceOpen;
+    workspaceLibraries.items = [
+      { id: 'workspace-all', label: 'My libraries', href: '/classless/libraries/' },
+      { id: 'workspace-base', label: 'Design system 1', meta: 'Built-in', href: '/start-here/overview/' },
+      ...workspaceItems.map(item => ({ id: `workspace-${item.id}`, label: item.name, href: libraryWorkspaceHref({ ...item, component: '/2-core/button/', view: 'overview' }), current: item.id === library?.id })),
+      ...(!librariesLoaded ? [{ id: 'workspace-loading', label: 'Loading libraries…', disabled: true }] : []),
+    ];
+  }
+  workspaceToggle.addEventListener('click', () => { workspaceOpen = !workspaceOpen; renderWorkspace(); });
+  workspaceAdd.addEventListener('click', () => {
+    if (!signedIn || workspaceAdd.hasAttribute('disabled')) return;
+    document.querySelector<HTMLIFrameElement>('#navigation-auth')?.contentWindow?.postMessage({ type: 'ds1:create-library' }, location.origin);
+  });
   const account = document.querySelector<HTMLAnchorElement>('#docs-account')!;
   const signInLabel = account.querySelector<HTMLElement>('[data-account-signin]')!;
   const avatar = account.querySelector<HTMLElement>('[data-account-avatar]')!;
@@ -74,7 +115,6 @@ const { sidebar } = Astro.locals.starlightRoute;
     navigation.label = library ? `${library.name} navigation` : 'Documentation';
     navigation.items = library ? [
       { id: 'base-system', label: 'Design system 1', href: '/start-here/overview/' },
-      { id: '/app/libraries', label: 'My libraries', href: '/classless/libraries/' },
       { id: 'library-overview', label: library.name, href: libraryWorkspaceHref({ ...library, view: 'overview' }), current: library.view === 'overview' },
       ...LAYERS.flatMap(layer => {
         const id = `library-layer-${layer.number}`;
@@ -86,9 +126,11 @@ const { sidebar } = Astro.locals.starlightRoute;
     ] : rows(groups);
   }
   renderAccount();
+  renderWorkspace();
   renderNavigation();
   window.addEventListener('ds1-library-navigation', event => {
     library = (event as CustomEvent).detail.library;
+    renderWorkspace();
     renderNavigation();
   });
   navigation.addEventListener('sidebar-activate', event => {
@@ -100,7 +142,19 @@ const { sidebar } = Astro.locals.starlightRoute;
     frame.contentWindow.postMessage(id === 'library-overview' ? { type: 'ds1:library-overview' } : { type: 'ds1:library-component', component: id }, location.origin);
   });
   window.addEventListener("hashchange", () => { renderNavigation(); });
-  window.addEventListener("ds1-navigation-auth", event => { signedIn = (event as CustomEvent).detail.authenticated; if (!signedIn) library = null; renderNavigation(); renderAccount(); });
+  window.addEventListener("ds1-navigation-auth", event => {
+    const detail = (event as CustomEvent).detail;
+    signedIn = detail.authenticated;
+    if (!signedIn) { library = null; workspaceOpen = false; }
+    workspaceName = typeof detail.companyName === 'string' && detail.companyName.trim() ? detail.companyName : 'My company';
+    workspaceItems = signedIn && Array.isArray(detail.libraries) ? detail.libraries.filter((item: any) => typeof item.id === 'string' && typeof item.name === 'string') : [];
+    librariesLoaded = detail.librariesLoaded === true;
+    workspaceAdd.toggleAttribute('disabled', detail.creating === true);
+    const error = document.querySelector<HTMLElement>('#workspace-error')!;
+    error.hidden = !signedIn || !detail.creationError;
+    error.textContent = detail.creationError ?? '';
+    renderWorkspace(); renderNavigation(); renderAccount();
+  });
   window.addEventListener("translations-ready", () => { renderNavigation(); });
   window.addEventListener("language-changed", () => { renderNavigation(); });
   navigation.addEventListener('sidebar-toggle', event => {
@@ -117,6 +171,13 @@ const { sidebar } = Astro.locals.starlightRoute;
   .docs-sidebar-header { display: flex; flex-direction: column; gap: 20px; }
   .docs-sidebar-close { display: none; align-self: flex-end; }
   .docs-sidebar-footer { display: flex; align-items: center; gap: calc(var(--site-unit) / 2); height: calc(2 * var(--site-unit)); border-top: 1px solid var(--ds1-docs-header-border); font-size: calc(10px * var(--sf, 1)); }
+  #workspace[hidden], #workspace-libraries[hidden] { display: none; }
+  #workspace { flex: none; }
+  .workspace-heading { display: flex; align-items: flex-end; }
+  #workspace-toggle { flex: 1; width: auto; min-width: 0; }
+  #workspace-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #workspace-libraries { height: auto; max-height: calc(12 * var(--site-unit)); padding-inline-start: calc(var(--site-unit) / 2); box-sizing: border-box; }
+  #workspace-error { color: var(--ds-danger-color); font-size: var(--ds-type-size-small); margin: 0; }
   #docs-account { display: inline-flex; align-items: center; justify-content: center; margin-left: auto; min-width: var(--site-unit); height: var(--site-unit); color: inherit; text-decoration: none; }
   #docs-account:hover { text-decoration: underline; }
   #docs-account:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
