@@ -1,0 +1,153 @@
+---
+import { LAYERS } from '../../../shared/component-directory';
+const { number } = Astro.props as { number: number };
+const layer = LAYERS.find(layer => layer.number === number)!;
+const themes = ['yellow', 'apple-green', 'sharp-blue', 'orange'];
+const introductions = [
+  'One foundation. Every detail.', 'Small pieces. Real possibilities.',
+  'Pieces that work together.', 'Give everything its place.',
+];
+const descriptions = [
+  'Colour, type, language and scale give every interface a common starting point.',
+  'Choose a control, show a value, communicate a state. Build with pieces that already belong together.',
+  'Turn individual controls into navigation, collections and forms with a shared rhythm.',
+  'Arrange navigation, content and tools into a complete screen, on the same twenty-pixel grid.',
+];
+const cards = [
+  [
+    ['Colours', 'A palette for paper, ink and everything between.', '/colours/', 'palette'],
+    ['Fonts', 'Type with a voice, on a shared baseline.', '/1-root/fonts/', 'type'],
+    ['Theming', 'The same system, in light and dark.', '/1-root/theming/', 'theme'],
+    ['Languages', 'Words that feel at home.', '/1-root/languages/', 'language'],
+    ['Formatting', 'Dates, numbers and money, written clearly.', '/1-root/formatting/', 'format'],
+    ['Scaling', 'One square. Every screen.', '/1-root/scaling/', 'grid'],
+  ],
+  [
+    ['Button', 'Every action starts somewhere.', '/2-core/button/', 'buttons'],
+    ['Chart', 'Give your numbers a shape.', '/2-core/chart/', 'chart'],
+    ['Input', 'A clear place for the next thought.', '/2-core/input/', 'input'],
+    ['Avatar', 'A little space for identity.', '/2-core/avatar/', 'avatar'],
+    ['Message', 'Feedback, right when it matters.', '/2-core/message/', 'message'],
+    ['Checkbox and switch', 'A choice you can see.', '/2-core/choice/', 'choice'],
+  ],
+  [
+    ['Sidebar', 'Places to go, with room to grow.', '/3-unit/sidebar/', 'sidebar'],
+    ['Calendar', 'Make room for what comes next.', '/3-unit/calendar/', 'calendar'],
+    ['Form', 'Related choices, brought together.', '/3-unit/form/', 'form'],
+    ['Table', 'Information that lines up.', '/3-unit/table/', 'table'],
+    ['Accordion', 'More detail, when you need it.', '/3-unit/accordion/', 'accordion'],
+    ['List', 'A rhythm for your collection.', '/3-unit/list/', 'list'],
+  ],
+  [
+    ['Page', 'Navigation, work and context in one place.', '/4-page/page/', 'page'],
+    ['Grid', 'A structure that everything shares.', '/4-page/grid/', 'grid'],
+    ['Document', 'A quiet place for the words.', '/4-page/document/', 'document'],
+    ['Panel', 'A home for supporting details.', '/4-page/panel/', 'panel'],
+    ['Container', 'Keep content comfortably in view.', '/4-page/container/', 'container'],
+  ],
+][number - 1];
+---
+<section class="showcase" data-layer={number} style={`--layer-accent: var(--ds-${themes[number - 1]});`} aria-label={`${layer.name} showcase`}>
+  <div class="intro">
+    <div><p class="layer-label">{number} {layer.name}</p><h2>{introductions[number - 1]}</h2><p>{descriptions[number - 1]}</p></div>
+    <div class="layer-art" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+  </div>
+  <div class="bento">
+    {cards.map(([title, description, href, kind], index) => (
+      <a class:list={['tile', { wide: index === 0 || (number !== 4 && (index === 3 || index === 5)) }]} href={href}>
+        <div class={`preview ${kind}`} aria-hidden="true">
+          {kind === 'palette' && <div class="swatches">{['yellow','orange','apple-green','sharp-blue','pink','black'].map(color => <i style={`background:var(--ds-${color})`}></i>)}</div>}
+          {kind === 'type' && <div class="type-sample">Aa<span>abcdefg 012345</span></div>}
+          {kind === 'theme' && <div class="theme-pair"><span>Aa</span><span>Aa</span></div>}
+          {kind === 'language' && <div class="words"><span>Hello</span><span>こんにちは</span><span>Hej</span></div>}
+          {kind === 'format' && <div class="values"><span>12,345.67</span><span>19 October</span><span>¥2,400</span></div>}
+          {kind === 'grid' && <div class="square-grid"><i></i><i></i><i></i></div>}
+          {kind === 'buttons' && <div class="button-samples"><span class="primary">Save changes</span><span>Cancel</span><span class="icon-button"><ds-icon type="plus"></ds-icon></span></div>}
+          {kind === 'chart' && <div class="bars">{[3,5,4,7,6,8,10].map(height => <i style={`--bar:${height}`}></i>)}</div>}
+          {kind === 'input' && <div class="mini-field"><span>Your name</span><b>Alex Morgan<i></i></b></div>}
+          {kind === 'avatar' && <div class="avatars"><span>A</span><span>B</span><span>C</span></div>}
+          {kind === 'message' && <div class="toast-sample"><ds-icon type="check"></ds-icon> Changes saved <span><ds-icon type="close"></ds-icon></span></div>}
+          {kind === 'choice' && <div class="choices"><span><ds-icon type="check"></ds-icon></span><i></i><b></b></div>}
+          {kind === 'sidebar' && <div class="mini-sidebar"><b><ds-icon type="chevron-down"></ds-icon> Workspace <span><ds-icon type="plus"></ds-icon></span></b><span>Overview</span><span class="selected">Projects</span><span>Archive</span></div>}
+          {kind === 'calendar' && <div class="mini-calendar"><b>October</b><div>{Array.from({ length: 28 }, (_, i) => <span class:list={{ selected: i === 18 }}>{i + 1}</span>)}</div></div>}
+          {kind === 'form' && <div class="mini-form"><span>Name</span><i></i><span>Email</span><i></i><b>Continue</b></div>}
+          {kind === 'table' && <div class="mini-table">{['Name|Status','Draft|In progress','Review|Ready','Release|Complete'].map(row => <div>{row.split('|').map(word => <span>{word}</span>)}</div>)}</div>}
+          {kind === 'accordion' && <div class="mini-accordion"><b>Details <span><ds-icon type="chevron-down"></ds-icon></span></b><i></i><i></i><b>More information <span><ds-icon type="chevron-right"></ds-icon></span></b></div>}
+          {kind === 'list' && <div class="mini-list">{['Research','Design','Build'].map((name,i) => <div><i>{i+1}</i><span>{name}</span><b><ds-icon type="chevron-right"></ds-icon></b></div>)}</div>}
+          {['page','document','panel','container'].includes(kind) && <div class={`screen screen-${kind}`}><div class="screen-top"><i></i><i></i><i></i></div><div class="screen-body"><aside><i></i><i></i><i></i></aside><div class="screen-main"><b></b><i></i><i></i><div class="screen-cards"><span></span><span></span><span></span></div></div><div class="screen-detail"><i></i><i></i></div></div></div>}
+        </div>
+        <div class="caption"><h3>{title}</h3><p>{description}</p><span class="open" aria-hidden="true"><ds-icon type="right"></ds-icon></span></div>
+      </a>
+    ))}
+  </div>
+  <nav class="directory" aria-label={`Explore ${layer.name}`}><h2>Explore {layer.name}</h2><div>{layer.entries.map(entry => <a href={entry.href}>{entry.name}</a>)}</div></nav>
+</section>
+
+<style>
+  .showcase { --u: var(--site-unit, 20px); --ink: var(--ds-text-color); color: var(--ink); margin-block: var(--u) calc(3 * var(--u)); }
+  .showcase ds-icon { display:inline-flex; width:var(--ds-control-height,16px); height:var(--ds-control-height,16px); vertical-align:bottom; }
+  .showcase * { box-sizing: border-box; }
+  .intro { display:grid; grid-template-columns: 2fr 1fr; align-items:center; gap:var(--u); padding:calc(2 * var(--u)); background:var(--layer-accent); color:var(--ds-black); min-height:calc(12 * var(--u)); border-radius:var(--ds-corner-size,4px); overflow:hidden; }
+  [data-layer="3"] .intro { color:white; }
+  .intro h2 { font-size:var(--ds-type-size-display,20px); line-height:calc(2 * var(--u)); margin:0 0 var(--u); border:0; }
+  .intro p { margin:0; max-width:44ch; line-height:var(--u); font-size:var(--ds-type-size-default,14px); }
+  .intro .layer-label { margin-bottom:var(--u); }
+  .layer-art { position:relative; height:calc(8 * var(--u)); }
+  .layer-art i { position:absolute; width:calc(5 * var(--u)); height:calc(5 * var(--u)); background:currentColor; opacity:.15; left:calc(var(--u) * 1); top:0; }
+  .layer-art i:nth-child(2) { left:calc(2 * var(--u));top:var(--u);opacity:.25; }
+  .layer-art i:nth-child(3) { left:calc(3 * var(--u));top:calc(2 * var(--u));opacity:.5; }
+  .layer-art i:nth-child(4) { left:calc(4 * var(--u));top:calc(3 * var(--u));opacity:1; }
+  [data-layer="2"] .layer-art i { border-radius:50%; }
+  [data-layer="3"] .layer-art i { width:calc(2 * var(--u)); }
+  [data-layer="4"] .layer-art i { height:var(--u); }
+  .bento { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:var(--u); margin-top:var(--u); }
+  .tile { display:flex; flex-direction:column; min-width:0; text-decoration:none; color:inherit; border-radius:var(--ds-corner-size,4px); background:var(--ds-fill); overflow:hidden; }
+  .tile.wide { grid-column:span 2; }
+  .tile:hover { background:var(--ds-fill-hover); }
+  .tile:focus-visible, .directory a:focus-visible { outline:2px solid var(--ds-focus-ring); outline-offset:2px; }
+  .preview { height:calc(10 * var(--u)); display:flex; align-items:center; justify-content:center; padding:var(--u); overflow:hidden; background:color-mix(in srgb,var(--layer-accent) 14%,var(--ds-paper)); pointer-events:none; }
+  .caption { position:relative; padding:var(--u); flex:1; }
+  .caption h3 { font-size:var(--ds-type-size-default,14px); line-height:var(--u); margin:0; padding-right:var(--u); }
+  .caption p { font-size:var(--ds-type-size-default,14px); line-height:var(--u); margin:calc(var(--u) / 2) 0 0; max-width:36ch; color:var(--ds-text-color-muted); }
+  .open { position:absolute; top:var(--u);right:var(--u); }
+  .directory { margin-block:calc(2 * var(--u)); }
+  .directory h2 { font-size:var(--ds-type-size-default,14px); margin:0 0 var(--u); border:0; }
+  .directory>div { display:flex; flex-wrap:wrap; gap:calc(var(--u) / 2) var(--u); }
+  .directory a { color:inherit; text-decoration:underline; text-underline-offset:4px; }
+  .swatches { display:flex; width:100%; justify-content:center; }
+  .swatches i { width:calc(3 * var(--u)); height:calc(5 * var(--u)); }
+  .swatches i:nth-child(even) { margin-top:var(--u); }
+  .type-sample { font-size:calc(4 * var(--u));line-height:calc(5 * var(--u)); }
+  .type-sample span { display:block; font-size:var(--ds-type-size-default,14px);line-height:var(--u); }
+  .theme-pair { display:flex; }
+  .theme-pair span { background:var(--ds-white,#fff);color:var(--ds-black);padding:var(--u);font-size:calc(2 * var(--u));line-height:calc(3 * var(--u)); }
+  .theme-pair span+span { background:var(--ds-black);color:var(--ds-white,#fff); }
+  .words,.values { display:grid;gap:calc(var(--u) / 2);font-size:var(--ds-type-size-display,20px);line-height:calc(2 * var(--u)); }
+  .words span:nth-child(2) { color:var(--ds-text-color-muted); }
+  .square-grid { position:relative;width:100%;max-width:calc(16 * var(--u));height:calc(7 * var(--u));background-image:linear-gradient(to right,color-mix(in srgb,var(--ink) 16%,transparent) 1px,transparent 1px),linear-gradient(to bottom,color-mix(in srgb,var(--ink) 16%,transparent) 1px,transparent 1px);background-size:var(--u) var(--u); }
+  .square-grid i { position:absolute;left:var(--u);top:var(--u);width:calc(3 * var(--u));height:calc(2 * var(--u));background:var(--layer-accent); }
+  .square-grid i:nth-child(2) { left:calc(5 * var(--u));width:calc(5 * var(--u)); }
+  .square-grid i:nth-child(3) { top:calc(4 * var(--u));width:calc(9 * var(--u)); }
+  .button-samples { display:flex;gap:calc(var(--u) / 2);align-items:center;flex-wrap:wrap;justify-content:center; }
+  .button-samples span { background:var(--ds-fill);border-radius:4px;padding-inline:4px;line-height:var(--ds-control-height,16px);font-size:var(--ds-type-size-default,14px); }
+  .button-samples .primary { background:var(--layer-accent);color:var(--ds-black); }
+  .button-samples .icon-button { width:var(--u);text-align:center; }
+  .bars { display:flex;gap:calc(var(--u) / 2);height:calc(6 * var(--u));align-items:end; }
+  .bars i { width:var(--u);height:calc(var(--bar) * var(--u) / 2);background:var(--layer-accent); }
+  .mini-field { width:100%;max-width:calc(10 * var(--u));font-size:var(--ds-type-size-default,14px);line-height:var(--u); }
+  .mini-field>b { display:block;font-weight:400;margin-top:calc(var(--u) / 2);background:var(--ds-paper);padding-inline:4px;border-radius:4px; }
+  .mini-field i { border-left:1px solid currentColor;margin-left:2px; }
+  .avatars { display:flex; }.avatars span { width:calc(2 * var(--u));height:calc(2 * var(--u));display:grid;place-items:center;border-radius:50%;background:var(--layer-accent);color:var(--ds-black);margin-left:calc(var(--u) / -2);border:2px solid var(--ds-paper); }.avatars span:nth-child(2){background:var(--ds-yellow)}.avatars span:nth-child(3){background:var(--ds-pink)}
+  .toast-sample { background:var(--ds-black);color:white;border-radius:4px;padding-inline:4px;font-size:var(--ds-type-size-default,14px);line-height:var(--u); }.toast-sample span { margin-left:var(--u); }
+  .choices { display:flex;align-items:center;gap:var(--u); }.choices span,.choices i { width:16px;height:16px;background:var(--layer-accent);border-radius:4px;line-height:16px;text-align:center;color:var(--ds-black); }.choices i { background:var(--ds-paper);border:1px solid var(--ds-text-color-muted); }.choices b { width:32px;height:16px;border-radius:16px;background:var(--layer-accent);padding:2px; }.choices b:after { content:'';display:block;background:var(--ds-black);width:12px;height:12px;border-radius:50%;margin-left:auto; }
+  .mini-sidebar,.mini-calendar,.mini-form,.mini-table,.mini-accordion,.mini-list { background:var(--ds-paper);padding:var(--u);width:100%;max-width:calc(12 * var(--u));font-size:var(--ds-type-size-default,14px);line-height:var(--u); }
+  .mini-sidebar>b { display:block;font-weight:500; }.mini-sidebar b>span { float:right; }.mini-sidebar>span { display:block;padding-left:var(--u); }.selected { background:var(--ds-fill-hover); }
+  .mini-calendar { max-width:calc(9 * var(--u)); }.mini-calendar>div { display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:var(--ds-type-size-small,10px); }.mini-calendar b { display:block;margin-bottom:calc(var(--u) / 2); }
+  .mini-form { max-width:calc(10 * var(--u)); }.mini-form span,.mini-form i { display:block; }.mini-form i { height:var(--u);background:var(--ds-fill);margin-bottom:calc(var(--u) / 2); }.mini-form b { background:var(--layer-accent);color:white;padding-inline:4px;font-weight:400;border-radius:4px; }
+  .mini-table>div { display:flex;justify-content:space-between;border-bottom:1px solid var(--ds-border-color); }.mini-table>div:first-child { color:var(--ds-text-color-muted); }
+  .mini-accordion b { display:block;font-weight:400; }.mini-accordion b>span { float:right; }.mini-accordion i { display:block;background:var(--ds-fill);height:calc(var(--u) / 2);margin-block:calc(var(--u) / 2); }.mini-accordion i:nth-child(3){width:60%;margin-bottom:var(--u)}
+  .mini-list>div { display:flex;align-items:center;gap:calc(var(--u) / 2);margin-block:calc(var(--u) / 2); }.mini-list i { font-style:normal;width:var(--u);background:var(--ds-fill);text-align:center; }.mini-list b { margin-left:auto; }
+  .screen { width:100%;max-width:calc(20 * var(--u));height:calc(8 * var(--u));background:var(--ds-paper);overflow:hidden;border-radius:4px; }.screen-top { height:var(--u);display:flex;gap:4px;align-items:center;padding-inline:calc(var(--u) / 2);background:var(--ds-fill); }.screen-top i { width:4px;height:4px;border-radius:50%;background:var(--ds-text-color-muted); }.screen-body { display:flex;height:calc(100% - var(--u)); }.screen aside { width:25%;padding:calc(var(--u) / 2);background:color-mix(in srgb,var(--layer-accent) 30%,var(--ds-paper)); }.screen .screen-main { flex:1;padding:var(--u); }.screen i:not(.screen-top i),.screen b { display:block;height:calc(var(--u) / 2);background:var(--ds-fill-hover);margin-bottom:calc(var(--u) / 2); }.screen .screen-main>b { background:var(--layer-accent);width:50%; }.screen-cards { display:flex;gap:calc(var(--u) / 2);margin-top:var(--u); }.screen-cards span { flex:1;height:calc(2 * var(--u));background:var(--ds-fill); }.screen .screen-detail { display:none;width:25%;padding:calc(var(--u) / 2);background:var(--ds-fill); }.screen-panel .screen-detail { display:block; }.screen-document aside,.screen-container aside { display:none; }.screen-document .screen-cards { display:none; }.screen-document .screen-main>i { margin-top:var(--u); }.screen-container .screen-main { max-width:70%;margin:auto;background:color-mix(in srgb,var(--layer-accent) 20%,var(--ds-paper));height:80%; }
+  @media(max-width:900px) { .bento { grid-template-columns:repeat(2,minmax(0,1fr)); }.tile.wide { grid-column:span 2; }.layer-art { transform:scale(.75);transform-origin:left center; } }
+  @media(max-width:540px) { .intro { grid-template-columns:1fr;padding:var(--u); }.layer-art { display:none; }.bento { grid-template-columns:1fr; }.tile.wide { grid-column:auto; }.preview { height:calc(9 * var(--u)); } }
+</style>

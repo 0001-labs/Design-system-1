@@ -2,7 +2,7 @@
 const { sidebar } = Astro.locals.starlightRoute;
 ---
 <div class="docs-sidebar-shell">
-  <ds-sidebar id="docs-navigation" label="Documentation" expand-icon="chevron-down" collapse-icon="chevron-up" data-groups={JSON.stringify(sidebar)}>
+  <ds-sidebar id="docs-navigation" label="Documentation" disclosure-position="start" expand-icon="chevron-down" collapse-icon="chevron-up" data-groups={JSON.stringify(sidebar)}>
     <div slot="header" class="docs-sidebar-header">
       <section id="workspace" hidden aria-label="Company workspace">
         <div class="workspace-heading"><button id="workspace-toggle" class="ds-row" type="button" aria-label="Expand workspace" aria-expanded="false" aria-controls="workspace-libraries">
@@ -67,7 +67,6 @@ const { sidebar } = Astro.locals.starlightRoute;
       const id = href ?? `${parent}/group-${index}`;
       const item: SidebarItem = { id, label: label(entry.label), depth, href, current: href ? location.pathname.replace(/\/$/, "") === href.replace(/\/$/, "") : entry.isCurrent };
       if (!entry.entries) return [item];
-      item.href = undefined;
       item.expanded = !collapsed.has(id);
       return [item, ...(item.expanded ? rows(entry.entries, depth + 1, id) : [])];
     });

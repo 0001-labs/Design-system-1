@@ -189,3 +189,21 @@ test("desktop drops reject external and disabled moves and clear their indicator
   drag(rows[1], 'dragover'); drag(rows[1], 'drop');
   expect(move).toHaveBeenCalledOnce();
 });
+
+test("leading disclosure and group destination remain independent", async () => {
+  const sidebar = await setup([{ id: "root", label: "Root", href: "#root", expanded: true }]);
+  sidebar.disclosurePosition = "start";
+  await sidebar.updateComplete;
+  const toggle = vi.fn(), activate = vi.fn(event => event.preventDefault());
+  sidebar.addEventListener("sidebar-toggle", toggle);
+  sidebar.addEventListener("sidebar-activate", activate);
+  const row = sidebar.shadowRoot!.querySelector('.row')!;
+  expect(row.firstElementChild?.classList.contains('disclosure')).toBe(true);
+  row.querySelector<HTMLButtonElement>('.disclosure button')!.click();
+  expect(toggle).toHaveBeenCalledOnce();
+  expect(activate).not.toHaveBeenCalled();
+  control(sidebar, 'root').click();
+  expect(activate).toHaveBeenCalledOnce();
+  expect(toggle).toHaveBeenCalledOnce();
+  expect(control(sidebar, 'root').getAttribute('href')).toBe('#root');
+});

@@ -16,7 +16,7 @@ export type SidebarProps = Omit<HTMLAttributes<SidebarElement>, "onSelect" | "on
   empty?: string;
   /** A tree of nested things instead of navigation. */
   tree?: boolean;
-  expandIcon?: string;
+  disclosurePosition?: "start" | "end"; expandIcon?: string;
   collapseIcon?: string;
   reorderable?: boolean;
   onMove?: (move: SidebarMoveDetail) => void;
@@ -33,16 +33,17 @@ export type SidebarProps = Omit<HTMLAttributes<SidebarElement>, "onSelect" | "on
 const useCommitEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 export const Sidebar = forwardRef<SidebarElement, SidebarProps>(function Sidebar(
-  { items, label, empty, tree, expandIcon, collapseIcon, reorderable, onMove, onToggle, onSelect, onActivate, onAction, ...props }, ref,
+  { items, label, empty, tree, expandIcon, collapseIcon, disclosurePosition, reorderable, onMove, onToggle, onSelect, onActivate, onAction, ...props }, ref,
 ) {
   const host = useRef<SidebarElement>(null);
   useCommitEffect(() => {
     const element = host.current; if (!element) return;
     element.items = items;
+    element.disclosurePosition = disclosurePosition;
     element.expandIcon = expandIcon;
     element.collapseIcon = collapseIcon;
     element.reorderable = Boolean(reorderable);
-  }, [items, expandIcon, collapseIcon, reorderable]);
+  }, [items, expandIcon, collapseIcon, disclosurePosition, reorderable]);
   useCommitEffect(() => {
     const element = host.current; if (!element) return;
     const detail = (event: Event) => (event as CustomEvent<{ id: string; expanded?: boolean; action?: string }>).detail;

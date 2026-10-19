@@ -65,6 +65,7 @@ export class Sidebar extends LitElement {
     empty: { type: String },
     expandIcon: { type: String, attribute: "expand-icon" },
     collapseIcon: { type: String, attribute: "collapse-icon" },
+    disclosurePosition: { type: String, attribute: "disclosure-position", reflect: true },
     tree: { type: Boolean, reflect: true },
     reorderable: { type: Boolean, reflect: true },
   };
@@ -74,6 +75,8 @@ export class Sidebar extends LitElement {
   /** Optional navigation disclosure pair; tree navigation keeps its directional arrow. */
   declare expandIcon?: string;
   declare collapseIcon?: string;
+  /** Place navigation disclosures before the label; default preserves trailing disclosures. */
+  declare disclosurePosition?: "start" | "end";
   declare tree: boolean;
   declare reorderable: boolean;
   private dragId?: string;
@@ -313,6 +316,16 @@ export class Sidebar extends LitElement {
     if (target && !target.disabled) this.focusItem(target.id);
   }
 
+  private renderDisclosure(item: SidebarItem) {
+    return item.expanded !== undefined ? html`
+            <ds-button control="slotted" icon class="disclosure" ?disabled=${item.disabled}>
+              <button type="button" aria-label=${`${item.expanded ? "Collapse" : "Expand"} ${item.label}`}
+                aria-expanded=${item.expanded} @click=${() => this.toggle(item)}>
+                <ds-icon type=${(item.expanded ? this.collapseIcon : this.expandIcon) || "right"} aria-hidden="true" ?data-open=${item.expanded && !this.collapseIcon}></ds-icon>
+              </button>
+            </ds-button>` : nothing;
+  }
+
   render() {
     if (this.tree) return this.renderTree();
     return html`<slot name="header"></slot><nav aria-label=${this.label}>
@@ -325,6 +338,7 @@ export class Sidebar extends LitElement {
           @dragleave=${(event: DragEvent) => { if (!(event.currentTarget as HTMLElement).contains(event.relatedTarget as Node | null)) (event.currentTarget as HTMLElement).removeAttribute("data-drop"); }}
           @drop=${(event: DragEvent) => this.drop(event, item)}
           @dragend=${() => this.clearDrag()}>
+          ${this.disclosurePosition === "start" ? this.renderDisclosure(item) : nothing}
           <ds-button control="slotted" class="choice" ?disabled=${item.disabled}>
             ${item.href && !item.disabled ? html`
               <a href=${item.href} draggable=${ifDefined(this.reorderable ? "false" : undefined)} data-item=${item.id} aria-current=${ifDefined(item.current ? "page" : undefined)}
@@ -336,13 +350,7 @@ export class Sidebar extends LitElement {
                 @click=${(event: MouseEvent) => this.activate(event, item)}
                 @keydown=${(event: KeyboardEvent) => this.navigate(event, item)}><span class="name">${item.icon ? html`<ds-icon type=${item.icon} aria-hidden="true"></ds-icon>` : nothing}${item.label}</span></button>`}
           </ds-button>
-          ${item.expanded !== undefined ? html`
-            <ds-button control="slotted" icon class="disclosure" ?disabled=${item.disabled}>
-              <button type="button" aria-label=${`${item.expanded ? "Collapse" : "Expand"} ${item.label}`}
-                aria-expanded=${item.expanded} @click=${() => this.toggle(item)}>
-                <ds-icon type=${(item.expanded ? this.collapseIcon : this.expandIcon) || "right"} aria-hidden="true" ?data-open=${item.expanded && !this.collapseIcon}></ds-icon>
-              </button>
-            </ds-button>` : nothing}
+          ${this.disclosurePosition !== "start" ? this.renderDisclosure(item) : nothing}
           <span class="spacer" aria-hidden="true"></span>
           ${item.meta ? html`<span class="meta">${item.meta}</span>` : nothing}
           ${item.action ? html`<ds-button control="slotted" ?fit=${!item.action.icon} ?icon=${Boolean(item.action.icon)} class="action" ?disabled=${item.disabled || item.action.disabled}><button type="button"

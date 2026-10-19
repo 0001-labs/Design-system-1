@@ -129,3 +129,6 @@ ds-icon[data-open] { transform: rotate(90deg); }
 
 /* Keep the disclosure press target one square while its icon sits on the sixteen. */
 .row > .disclosure > button::after { content: ""; position: absolute; inset: 0; }
+
+:host([disclosure-position="start"]) .row { padding-inline-start: calc(4px * var(--ds-sf) + var(--depth) * var(--ds-unit)); }
+:host([disclosure-position="start"]) .row:not(:has(.disclosure)) .choice { margin-inline-start: var(--ds-unit); }
