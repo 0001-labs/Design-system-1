@@ -11,7 +11,7 @@ afterEach(() => {
   delete window.DS_ONE_PREFERENCES;
   configureI18n({ languages: ["en", "ja"], storageKey: "language" });
 });
-async function picker(chip = true) {
+async function picker(chip = false) {
   const element = new Cycle(); element.type = "language"; element.chip = chip;
   document.body.append(element); await element.updateComplete;
   await element.shadowRoot!.querySelector("ds-button")?.updateComplete;
@@ -151,4 +151,16 @@ test("a labelled theme cycle reads the translated value after its name", async (
   const face = cycle.shadowRoot!.querySelector("ds-button")!;
   await face.updateComplete;
   expect(face.shadowRoot!.querySelector("button")!.getAttribute("aria-label")).toMatch(/^Theme: (Light|Dark|System)$/);
+});
+
+ test("default and legacy language pickers all use a label-sized normal button", async () => {
+  for (const attributes of [[], ["compact"], ["chip"]]) {
+    const element = new Cycle(); element.type = "language";
+    attributes.forEach(name => element.setAttribute(name, ""));
+    document.body.append(element); await element.updateComplete;
+    const face = element.shadowRoot!.querySelector("ds-button");
+    expect(face).not.toBeNull();
+    expect(face!.hasAttribute("fit")).toBe(true);
+    expect(face!.querySelector("button")?.getAttribute("type")).toBe("button");
+  }
 });

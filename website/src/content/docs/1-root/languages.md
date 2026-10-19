@@ -227,7 +227,7 @@ export const setLanguage = mutation({
 <ds-cycle type="language"></ds-cycle>
 ```
 
-The language cycle goes through the product's languages, each shown by its own name, sets the language on a press and follows it when something else changes it. One square high and eight wide; `compact` makes it four, `chip` a chip. See [Cycle](/2-core/cycle/#the-language-picker).
+The language cycle goes through the product's languages, each shown by its own name, sets the language on a press and follows it when something else changes it. It uses a normal button that fits its language name; there is no fixed-width item variant. See [Cycle](/2-core/cycle/#the-language-picker).
 
 ## Dates, numbers and money
 

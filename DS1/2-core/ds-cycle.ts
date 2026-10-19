@@ -74,7 +74,7 @@ export class Cycle extends LitElement {
   static get properties() {
     return {
       type: { type: String, reflect: true },
-      // The language picker as a chip, the cycle's button, instead of an item.
+      // Compatibility attribute; every language picker now uses the normal button.
       chip: { type: Boolean, reflect: true },
       values: { type: Array },
       value: { type: String },
@@ -607,8 +607,8 @@ export class Cycle extends LitElement {
 
   /**
    * The language picker: a native button carrying the language's code as
-   * `lang`, so each name is set in its own typeface. An item on its own, eight
-   * squares wide (four with `compact`); with `chip`, the cycle's button around it.
+   * `lang`, so each name is set in its own typeface. Always uses the normal
+   * label-sized button; legacy `chip` and `compact` attributes do not change its width.
    */
   private renderLanguagePicker() {
     const code = this.currentValue || currentLanguage.value;
@@ -621,9 +621,9 @@ export class Cycle extends LitElement {
     >
       ${nativeLanguageName(code)}
     </button>`;
-    return this.chip ? html`<ds-button fit control="slotted"
+    return html`<ds-button fit control="slotted"
       ?primary=${this.primary && !this.secondary} ?secondary=${this.secondary}
-      ?disabled=${this.disabled || this._fieldsetDisabled}>${button}</ds-button>` : button;
+      ?disabled=${this.disabled || this._fieldsetDisabled}>${button}</ds-button>`;
   }
 
   render() {

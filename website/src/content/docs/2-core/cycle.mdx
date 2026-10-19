@@ -40,15 +40,15 @@ import { configureI18n } from './DS1/0-face/i18n';
 configureI18n({ languages: ['en', 'da', 'ja'], sharedWords: true });
 ```
 
-Drawn as an item: one square high and eight wide, `compact` four. `chip` draws it as the cycle's button instead, a chip that fits its language's name, `primary` or `secondary`:
+The language picker is a normal button that fits its language’s name, with the same height, padding and corners as Button. Use `primary` or `secondary` for its appearance. The legacy `compact` and `chip` attributes remain accepted but no longer change its width:
 
 ```html
 <ds-cycle type="language"></ds-cycle>
-<ds-cycle type="language" compact></ds-cycle>
-<ds-cycle type="language" chip primary></ds-cycle>
+<ds-cycle type="language" secondary></ds-cycle>
+<ds-cycle type="language" primary></ds-cycle>
 ```
 
-Both forms use a native button, follow a disabled fieldset, and announce one language change per activation. `disabled` prevents changes.
+All variants use a native button, follow a disabled fieldset, and announce one language change per activation. `disabled` prevents changes.
 
 ## Your own values
 
