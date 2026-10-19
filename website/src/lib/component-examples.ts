@@ -233,6 +233,10 @@ render();`,
     title: 'A notice across the top', hint: 'With banner, the notice is a strip at the top of this isolated preview, its action at the end of the line.',
     html: '<ds-message form="banner" tone="success" text="Your changes are saved" literal><a slot="actions" class="ds-link" href="/icons/">Browse icons</a></ds-message>',
   },
+  'message-app': {
+    title: 'Leading to the app', hint: 'form="app" at the top of the page: drawn in iOS browsers other than Safari, which shows Apple\'s own banner. preview draws it here on any device.',
+    html: '<ds-message form="app" heading="Field notes" text="Notes for the day, kept on your phone" literal src="/favicon.svg" app-id="1234567890" open="https://example.com/notes" preview></ds-message>',
+  },
   'banner-dismiss': {
     title: 'An action and a dismiss', hint: 'The close button fires ds-message-dismiss and hides the banner.',
     html: '<ds-message form="banner" text="A new version is ready" literal dismissible><ds-button slot="actions" secondary>Reload</ds-button></ds-message>',
@@ -651,7 +655,7 @@ document.querySelectorAll('[data-grid-option]').forEach(control => {
 
 export const PAGE_EXAMPLES: Record<string, string[]> = {
   '2-core/choice': ['toggle'],
-  '2-core/message': ['notice', 'banner', 'toast', 'message-assistant'],
+  '2-core/message': ['notice', 'banner', 'message-app', 'toast', 'message-assistant'],
   '2-core/chart': ['chart'],
   '2-core/avatar': ['avatar-borderless', 'avatar'],
   '2-core/button': ['button', 'button-icon', 'split'],

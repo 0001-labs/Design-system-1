@@ -25,8 +25,21 @@
   position: static;
 }
 
+/* The app banner stands in the flow, at the top of the page. */
+:host([form="app"]) {
+  display: block;
+}
+
 /* Slotted words take the notice's lines rather than their own margins. */
 ::slotted([slot="heading"]),
 ::slotted(:not([slot])) {
   margin: 0;
+}
+
+/* The app's own picture in the icon slot fills its two squares. */
+::slotted(img[slot="icon"]) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }

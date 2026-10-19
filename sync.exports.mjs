@@ -39,6 +39,8 @@ const rootModules = {
   'overlay-swipe': ['overlay-swipe.ts'],
   /** The site header's menu for pages without Lit, and the drawer it opens. */
   header: ['header.ts', 'attach-overlay.ts'],
+  /** The banner leading to a site's iPhone app on native markup (.ds-notice--app): where it shows, Apple's meta tag, Open and the remembered close. */
+  'app-banner': ['app-banner.ts', 'scaling.ts'],
   /** Carousels and their dots on native markup (.ds-carousel, .ds-progress--dots). */
   carousel: ['carousel.ts'],
   /** The keyboard and pointer of a native sidebar tree (`connectSidebar`, for `.ds-sidebar` in row.css). */
@@ -169,7 +171,7 @@ export default {
      * adds the prose sheet (prose.css) and `classless` the classless sheet
      * (one.semantic.css) and `cjk` Noto Sans for Japanese and Chinese (cjk.css,
      * from Google Fonts), which `styles` may also name; `modules` names page scripts
-     * from 0-face/ (carousel, grid, grid-fit, layout-inspector, scaling, theme,
+     * from 0-face/ (app-banner, carousel, grid, grid-fit, layout-inspector, scaling, theme,
      * theme-bootstrap, tooltips, tree, header, keys, overlay-swipe), copied with what they import, into 0-face/;
      * `scriptsTo` puts that 0-face/ folder elsewhere, a path from `to`
      * (`"../../src/ds1"` puts the stylesheets in `public/ds1` and the scripts

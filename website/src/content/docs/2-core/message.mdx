@@ -7,7 +7,7 @@ import ComponentExample from "../../../components/ComponentExample.astro";
 
 A notice stands where its words apply: the failure beside the form that failed, the warning above the list it is about. It is not positioned and takes no box or shadow. A square mark, one control high and filled in the tone's colour, carries the tone; the words sit on the paper beside it, each line one square, with the actions on the row below.
 
-Message shows information on an app or page. Set `form="inline"`, `form="banner"`, `form="toast"` or `form="assistant"`. The form describes where the message appears; tone describes what it means.
+Message shows information on an app or page. Set `form="inline"`, `form="banner"`, `form="toast"`, `form="assistant"` or `form="app"`. The form describes where the message appears; tone describes what it means.
 
 
 ## Design examples
@@ -64,6 +64,53 @@ notice.addEventListener("ds-message-dismiss", event => {
 
 An action is a real link or button in the `actions` slot; a page without Lit writes `ds-notice--banner` beside the tone.
 
+## Leading to the app
+
+`form="app"` is the row at the top of a site that leads to its iPhone app: the app's picture, its name (`heading`) with one line about it (`text`) in the muted ink under it, Open and the close. It stands in the flow above the site's own header, on the paper, with a hairline at its foot.
+
+<ComponentExample example="message-app" />
+
+```html
+<ds-message form="app" heading="Field notes" text="Notes for the day, kept on your phone" literal
+  src="/app-icon.png" app-id="1234567890" open="https://example.com/notes"></ds-message>
+```
+
+It decides for itself where it shows, before it draws, so it never pops in after the page:
+
+| Where | What shows |
+| --- | --- |
+| Safari on an iPhone or iPad, with `app-id` | Nothing of its own: it writes Apple's `<meta name="apple-itunes-app" content="app-id=…, app-argument=…">` and Safari draws its Smart App Banner. |
+| Chrome, Firefox, Edge and iOS's other browsers | The row. |
+| A computer, Android, a page opened from the home screen, an app's own web view | Nothing. |
+| Anywhere, once closed | Nothing again in this browser (remembered under `remember`, one name per app by default). |
+
+Safari reads the meta tag as the page loads, so a page that knows its app writes the tag in its own head; the element writes one only where the page did not. Without `app-id` (an app not yet in the App Store, with only `app-url`), Safari draws the row as the other browsers do.
+
+Open is a link to the app's store address (`app-url`, or the App Store's own from `app-id`), which offers Open when the app is installed. With `open`, the link first tries that address (a universal link or the app's own scheme, the page the person is on) and goes to the store when the page is still in view a moment later. `preview` draws the row on any device, for documentation.
+
+| Attribute | What it does |
+| --- | --- |
+| `heading` | The app's name. |
+| `text` | One line about it. |
+| `src` | The app's picture; the `icon` slot takes an element instead. |
+| `app-id` | The App Store id: Apple's banner and the store address. |
+| `app-url` | The store address, when it is not the App Store's own. |
+| `open` | The address that opens the app at this page. |
+| `remember` | The name the close is remembered by. |
+| `preview` | Draw it on any device. |
+
+It is three squares high: half a square above and below two squares of content. The picture fills two squares with a picture's corners and a hairline; the name and the line take a square each on the sixteen, cut with an ellipsis; Open (the primary button, one control high) and the close each stand on the sixteen of the square in the middle of the two, the close in a one-square cell at the end; one square at each side. Every measure follows the scale. It is a region named by the app's name. A page without Lit writes the same row as `ds-notice--app` and calls `startAppBanners()` (Sync 1's root `"modules": ["app-banner"]`):
+
+```html
+<div class="ds-notice ds-notice--app" data-app-id="1234567890" data-open="https://example.com/notes" role="region" aria-label="Field notes" hidden>
+  <span class="ds-notice__picture" aria-hidden="true"><img src="/app-icon.png" alt=""></span>
+  <p class="ds-notice__title">Field notes</p>
+  <p class="ds-notice__text">Notes for the day, kept on your phone</p>
+  <a class="ds-button ds-button--primary ds-notice__open">Open</a>
+  <button class="ds-button ds-button--icon ds-notice__dismiss" type="button" aria-label="Close"><!-- the close icon --></button>
+</div>
+```
+
 ## API
 
 | Attribute | Type | Default | What it does |
@@ -75,6 +122,7 @@ An action is a real link or button in the `actions` slot; a page without Lit wri
 | `icon` | string | The tone's | Another icon for the mark. |
 | `dismissible` | boolean | `false` | Show the close button. |
 | `banner` | boolean | `false` | A strip across the top of its positioning context. |
+| `form` | `inline`, `banner`, `toast`, `assistant`, `app` | `inline` | Where the message appears; `app` is the row leading to the site's app (see above). |
 
 | Slot | What it holds |
 | --- | --- |
@@ -99,6 +147,8 @@ import { Message } from "@0001-labs/design-system-1/DS1/react/message";
 ```
 
 `Message` renders `ds-message` with its words and actions in the light DOM and its role in the markup, so the server's HTML is already a live region. `onDismiss` shows the close button and leaves removing the notice to the product. Register `ds-message` in the browser before hydration.
+
+The app banner takes the same props: `<Message form="app" heading="Field notes" text="Notes for the day, kept on your phone" src="/app-icon.png" appId="1234567890" open={deepLink} />`.
 
 ## Without JavaScript
 

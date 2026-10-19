@@ -13,7 +13,19 @@ export type MessageProps = Omit<HTMLAttributes<MessageElement>, "title"> & {
   contained?: boolean;
   label?: string;
   closeLabel?: string;
-  form?: "inline" | "banner" | "toast" | "assistant";
+  form?: "inline" | "banner" | "toast" | "assistant" | "app";
+  /** (app) The app's icon. */
+  src?: string;
+  /** (app) The App Store id, for Apple's banner and the store address. */
+  appId?: string;
+  /** (app) The store address, when it is not the App Store's own. */
+  appUrl?: string;
+  /** (app) The address that opens the app at this page. */
+  open?: string;
+  /** (app) The name the close is remembered by; one per app by default. */
+  remember?: string;
+  /** (app) Draw it on any device, for documentation. */
+  preview?: boolean;
   position?: import("../0-face/toast-queue").ToastPosition;
   duration?: number;
   closeButton?: boolean;
@@ -40,7 +52,7 @@ const title = (content: ReactNode) =>
   content == null || content === false || content === "" ? null : h("span", { slot: "heading" }, content);
 
 export const Message = forwardRef<MessageElement, MessageProps>(function Message(
-  { expand, visibleToasts, richColors, contained, label, closeLabel, form, position, duration, closeButton, tone, heading, text, icon, actions, dismissible, banner, onDismiss, children, ...props }, ref,
+  { expand, visibleToasts, richColors, contained, label, closeLabel, form, position, duration, closeButton, tone, heading, text, icon, actions, dismissible, banner, onDismiss, src, appId, appUrl, open, remember, preview, children, ...props }, ref,
 ) {
   const host = useRef<MessageElement | null>(null);
   useCommitEffect(() => {
@@ -58,7 +70,8 @@ export const Message = forwardRef<MessageElement, MessageProps>(function Message
   return h("ds-message", {
     expand: expand || undefined, "visible-toasts": visibleToasts, "rich-colors": richColors || undefined, contained: contained || undefined, label, "close-label": closeLabel,
     form, position, duration, "close-button": closeButton || undefined,
-    role: form === "toast" ? "presentation" : tone === "danger" ? "alert" : "status",
+    src, "app-id": appId, "app-url": appUrl, open, remember, preview: preview || undefined,
+    role: form === "toast" ? "presentation" : form === "app" ? "region" : tone === "danger" ? "alert" : "status",
     ...props, tone, icon, banner: banner || undefined, dismissible: (dismissible ?? Boolean(onDismiss)) || undefined,
     ref: (element: MessageElement | null) => {
       host.current = element;

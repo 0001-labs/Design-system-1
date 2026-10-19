@@ -21,6 +21,14 @@
  *   ds-notice--banner               a strip across the top of its positioning
  *                                   context instead: one square high, filled in
  *                                   the tone's colour, everything on one line
+ *   ds-notice--app                  a row at the top of the page leading to the
+ *                                   site's iPhone app: its picture
+ *                                   (ds-notice__picture, two squares), its name
+ *                                   and one line about it, Open
+ *                                   (a.ds-notice__open) and the close; three
+ *                                   squares high with a hairline at its foot.
+ *                                   startAppBanners() from 0-face/app-banner.ts
+ *                                   shows it only where it belongs
  *
  * Give the block role="status", or role="alert" for danger, so assistive
  * technology reads it when it appears.
@@ -162,4 +170,77 @@
 .ds-notice--banner .ds-notice__dismiss {
   margin-block: 0;
   margin-inline-start: 0;
+}
+
+/* The app banner: a row at the top of the page, in the flow, three squares
+   high: half a square above and below two squares of content, a hairline at
+   its foot. The app's picture fills two squares with a picture's corners; the
+   name and the line about it take a square each, on the sixteen; Open and the
+   close stand on the sixteen of the square in the middle of the two. */
+.ds-notice--app {
+  grid-template-columns: calc(2 * var(--ds-unit)) minmax(0, 1fr) auto var(--ds-unit);
+  grid-template-rows: var(--ds-unit) var(--ds-unit);
+  column-gap: calc(var(--ds-unit) / 2);
+  align-items: end;
+  padding: calc(var(--ds-unit) / 2) var(--ds-unit);
+  background: var(--ds-paper);
+  box-shadow: inset 0 -1px 0 var(--ds-border-color);
+  line-height: var(--ds-type-lineheight-default);
+}
+
+.ds-notice--app[hidden] {
+  display: none;
+}
+
+.ds-notice__picture {
+  box-sizing: border-box;
+  grid-column: 1;
+  grid-row: 1 / 3;
+  align-self: stretch;
+  overflow: hidden;
+  border-radius: var(--ds-radius);
+  background: var(--ds-fill);
+  outline: 1px solid var(--ds-border-color);
+  outline-offset: -1px;
+}
+
+.ds-notice__picture img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ds-notice--app .ds-notice__title,
+.ds-notice--app .ds-notice__text {
+  grid-column: 2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-notice--app .ds-notice__title { grid-row: 1; }
+
+.ds-notice--app .ds-notice__text {
+  grid-row: 2;
+  color: var(--ds-text-color-muted);
+}
+
+/* Open and the close: their square starts half a square into the two, its
+   control on the lower sixteen of it. */
+.ds-notice--app .ds-notice__open,
+.ds-notice--app .ds-notice__dismiss {
+  grid-row: 1 / 3;
+  align-self: start;
+  margin: calc(1.5 * var(--ds-unit) - var(--ds-control-height)) 0 0;
+}
+
+.ds-notice--app .ds-notice__open {
+  grid-column: 3;
+  text-decoration: none;
+}
+
+.ds-notice--app .ds-notice__dismiss {
+  grid-column: 4;
+  justify-self: end;
 }

@@ -1,8 +1,9 @@
 // ds-message.ts
 // An inline notice in the flow of the page: a tone, a title and/or text,
 // actions and an optional dismiss; with `banner`, a strip across the top of
-// its positioning context instead. Drawn by 1-root/notice.css, the same
-// classes a page without scripts writes.
+// its positioning context instead; with `form="app"`, a row at the top of the
+// page leading to the site's iPhone app (0-face/app-banner.ts decides where).
+// Drawn by 1-root/notice.css, the same classes a page without scripts writes.
 
 import { LitElement, html, nothing, unsafeCSS, type PropertyValues } from "lit";
 import { getText } from "../0-face/i18n";
@@ -10,9 +11,10 @@ import { define } from "../0-face/define";
 import "./ds-icon";
 import "./ds-toast";
 import type { ToastPosition } from "../0-face/toast-queue";
+import { appBannerPlacement, appStoreUrl, closeAppBanner, ensureSmartAppBanner, openApp, type AppBannerOptions, type AppBannerPlacement } from "../0-face/app-banner";
 export { toast as message } from "../0-face/toast-queue";
 export type { ToastOptions as MessageOptions, ToastId as MessageId } from "../0-face/toast-queue";
-export type MessageForm = "inline" | "banner" | "toast" | "assistant";
+export type MessageForm = "inline" | "banner" | "toast" | "assistant" | "app";
 import metrics from "../1-root/component-metrics.css?inline";
 import controls from "../1-root/controls.css?inline";
 import styles from "./styles/ds-notice.css?inline";
@@ -42,6 +44,19 @@ export interface MessageDismissDetail { tone: MessageTone }
  * @prop {boolean} banner - A strip one square high across the top of its
  *   positioning context, filled in the tone's colour, its words, actions and
  *   close button on one line; it reserves no room in the flow.
+ * @prop {string} form - `inline` (the default), `banner`, `toast`,
+ *   `assistant`, or `app`: a row at the top of the page leading to the site's
+ *   iPhone app, with its picture, `heading` (the app's name), `text` (one
+ *   line about it), Open and a close. On iOS Safari it draws nothing and puts
+ *   Apple's Smart App Banner on instead; in iOS's other browsers it draws
+ *   itself; never on a computer, Android, from the home screen or in a web
+ *   view; once closed, never again in this browser.
+ * @prop {string} src - (app) The app's icon.
+ * @prop {string} app-id - (app) The App Store id, for Apple's banner and the store address.
+ * @prop {string} app-url - (app) The store address, when it is not the App Store's own.
+ * @prop {string} open - (app) The address that opens the app at this page.
+ * @prop {string} remember - (app) The name the close is remembered by; one per app by default.
+ * @prop {boolean} preview - (app) Draw it on any device, for documentation.
  *
  * @slot - The text, when it needs more than words: a link, a strong word.
  * @slot heading - The title, as inline content.
@@ -79,6 +94,12 @@ export class Message extends LitElement {
     icon: { type: String },
     dismissible: { type: Boolean, reflect: true },
     banner: { type: Boolean, reflect: true },
+    src: { type: String },
+    appId: { type: String, attribute: "app-id" },
+    appUrl: { type: String, attribute: "app-url" },
+    open: { type: String },
+    remember: { type: String },
+    preview: { type: Boolean },
   };
 
   static styles = [unsafeCSS(metrics), unsafeCSS(controls), unsafeCSS(styles)];
@@ -102,6 +123,14 @@ export class Message extends LitElement {
   declare icon: string | undefined;
   declare dismissible: boolean;
   declare banner: boolean;
+  declare src: string | undefined;
+  declare appId: string | undefined;
+  declare appUrl: string | undefined;
+  declare open: string | undefined;
+  declare remember: string | undefined;
+  declare preview: boolean;
+  /** (app) Where this device shows it, decided before each render. */
+  private placement: AppBannerPlacement = "none";
 
   /** The role this element last set, so a role the page wrote is left alone. */
   private ownRole: string | null = null;
@@ -123,6 +152,7 @@ export class Message extends LitElement {
     this.literal = false;
     this.dismissible = false;
     this.banner = false;
+    this.preview = false;
   }
 
   /** The tone in effect: an unknown value reads as neutral. */
@@ -146,13 +176,28 @@ export class Message extends LitElement {
   protected willUpdate(changed: PropertyValues<this>) {
     super.willUpdate(changed);
     if (changed.has("tone") || changed.has("form")) this.syncRole();
+    if (this.form === "app") this.place();
+    else if (changed.get("form") === "app") this.hidden = false;
+  }
+
+  private get app(): AppBannerOptions {
+    return { appId: this.appId, appUrl: this.appUrl, open: this.open, key: this.remember };
+  }
+
+  /** Decides where the app banner shows, before it draws, so it never pops in after the page. */
+  private place() {
+    this.placement = this.preview ? "drawn" : appBannerPlacement(this.app);
+    if (this.placement === "safari") ensureSmartAppBanner(this.app);
+    this.hidden = this.placement !== "drawn";
+    const name = this.words(this.heading) || this.querySelector('[slot="heading"]')?.textContent?.trim();
+    if (name && this.getAttribute("aria-label") !== name) this.setAttribute("aria-label", name);
   }
 
   private syncRole() {
     if (!this.isConnected) return;
     const current = this.getAttribute("role");
     if (current !== null && current !== this.ownRole) return;
-    this.ownRole = this.form === "toast" ? "presentation" : this.resolvedTone === "danger" ? "alert" : "status";
+    this.ownRole = this.form === "toast" ? "presentation" : this.form === "app" ? "region" : this.resolvedTone === "danger" ? "alert" : "status";
     if (current !== this.ownRole) this.setAttribute("role", this.ownRole);
   }
 
@@ -178,13 +223,39 @@ export class Message extends LitElement {
     const event = new CustomEvent<MessageDismissDetail>(this.dismissEvent, {
       bubbles: true, composed: true, cancelable: true, detail: { tone: this.resolvedTone },
     });
+    // An app banner closed stays closed in this browser, whoever removes it.
+    if (this.form === "app" && !this.preview) closeAppBanner(this.app);
     if (!this.dispatchEvent(event)) return false;
     this.hidden = true;
     return true;
   }
 
+  private openApp(event: MouseEvent) {
+    if (!this.open || this.preview) return;
+    event.preventDefault();
+    openApp(this.app);
+  }
+
+  private renderApp() {
+    const heading = this.words(this.heading);
+    const text = this.words(this.text);
+    const changed = () => this.requestUpdate();
+    return html`<div class="ds-notice ds-notice--app" part="message notice">
+      <span class="ds-notice__picture" part="picture" aria-hidden="true">
+        <slot name="icon" @slotchange=${changed}>${this.src ? html`<img src=${this.src} alt="">` : nothing}</slot>
+      </span>
+      <div class="ds-notice__title" part="title"><slot name="heading" @slotchange=${changed}>${heading}</slot></div>
+      <div class="ds-notice__text" part="text"><slot @slotchange=${changed}></slot>${this.slotted("") ? nothing : text}</div>
+      <a class="ds-button ds-button--primary ds-notice__open" part="open" href=${appStoreUrl(this.app) || this.open || nothing} @click=${(event: MouseEvent) => this.openApp(event)}>${getText("Open") || "Open"}</a>
+      <button class="ds-button ds-button--icon ds-notice__dismiss" part="dismiss" type="button" aria-label=${getText("Close") || "Close"} @click=${() => this.dismiss()}>
+        <ds-icon type="close" aria-hidden="true"></ds-icon>
+      </button>
+    </div>`;
+  }
+
   render() {
     if (this.form === "toast") return html`<ds-toast .expand=${this.expand} .visibleToasts=${this.visibleToasts} .richColors=${this.richColors} .contained=${this.contained} .label=${this.label} .closeLabel=${this.closeLabel} .position=${this.position} .duration=${this.duration} .closeButton=${this.closeButton}></ds-toast>`;
+    if (this.form === "app") return this.placement === "drawn" ? this.renderApp() : nothing;
     const tone = this.resolvedTone;
     const heading = this.words(this.heading);
     const text = this.words(this.text);
