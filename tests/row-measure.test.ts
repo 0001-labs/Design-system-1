@@ -93,6 +93,21 @@ test("a pressable row is one square high and a tile whole squares, the element a
   }
 });
 
+test("a native row's words stand on the sixteen even in a page set on 20px lines, a link or button row too", async () => {
+  for (const sf of SCALES) {
+    const page = pages.light;
+    // A product's page often sets its text on whole-square lines; a native link or button
+    // inherits its font, which must not carry that line into the row.
+    await stage(page, `<div style="line-height:calc(20px * ${sf})">${ROWS}<div id="native-div" class="ds-row"><span>Plain</span></div></div>`, sf);
+    for (const id of ["native-div", "native-link", "native-button"]) {
+      const row = await box(page, `#${id}`);
+      const words = await box(page, `#${id} > span`);
+      expect(words.height, `${id} line at ${sf}`).toBeCloseTo(16 * sf, 3);
+      expect(words.top + words.height, `${id} words on the row's foot at ${sf}`).toBeCloseTo(row.top + row.height, 3);
+    }
+  }
+});
+
 test("a press anywhere on the row is the row's, and a control inside presses only itself", async () => {
   for (const sf of SCALES) {
     const page = pages.light;

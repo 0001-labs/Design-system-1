@@ -89,10 +89,13 @@ button.ds-row,
   -webkit-tap-highlight-color: transparent;
 }
 
+/* The font inherited above would bring the page's line into the row: the words go back on the
+   sixteen, as every row's (a stacked tile keeps its square lines below). */
 a.ds-row,
 button.ds-row {
   position: relative;
   width: 100%;
+  line-height: var(--ds-type-lineheight-default);
   padding: 0 var(--ds-row-padding, calc(4px * var(--ds-sf)));
   border-radius: var(--ds-row-radius, 0);
 }
