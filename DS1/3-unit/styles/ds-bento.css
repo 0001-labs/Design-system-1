@@ -39,7 +39,10 @@
 
 :host([squares]) {
   --ds-bento-reach: calc(var(--ds-unit) / 4);
-  grid-template-columns: repeat(var(--ds-bento-columns, 48), minmax(0, 1fr));
+  /* Exactly its squares wide: each column one square. */
+  width: calc(var(--ds-bento-columns, 48) * var(--ds-unit));
+  max-width: none;
+  grid-template-columns: repeat(var(--ds-bento-columns, 48), var(--ds-unit));
   grid-auto-rows: var(--ds-unit);
   grid-auto-flow: row;
   gap: 0;

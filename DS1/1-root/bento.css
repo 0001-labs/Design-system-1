@@ -12,7 +12,7 @@
  * `--ds-bento-row` (ten squares by default). Below thirty squares of width
  * the bento is one column.
  *
- * Squares (`data-squares`): the bento is `--ds-bento-columns` squares wide
+ * Squares (`data-squares`): the bento is exactly `--ds-bento-columns` squares wide
  * and every tile is placed on whole squares (`data-place="x y w h"`,
  * counted from 0). Tiles are placed a square apart, and a tile's surface
  * reaches a quarter square towards each tile beside it, so they stand half a
@@ -70,7 +70,10 @@
 /* Squares: every tile on whole squares, a square apart, its surface a quarter square nearer each neighbour. */
 .ds-bento[data-squares] {
   --ds-bento-reach: calc(var(--ds-unit) / 4);
-  grid-template-columns: repeat(var(--ds-bento-columns, 48), minmax(0, 1fr));
+  /* Exactly its squares wide: each column one square. */
+  width: calc(var(--ds-bento-columns, 48) * var(--ds-unit));
+  max-width: none;
+  grid-template-columns: repeat(var(--ds-bento-columns, 48), var(--ds-unit));
   grid-auto-rows: var(--ds-unit);
   grid-auto-flow: row;
   gap: 0;

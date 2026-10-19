@@ -318,13 +318,13 @@ export const SHOWCASE_EXAMPLES: Record<string, ComponentExample> = {
   "bento-layers": {
     "title": "Four layers",
     "hint": "A flow bento: three columns sharing the width, tiles one or two columns wide, half a square apart.",
-    "html": "<ds-bento>\n  <ds-card data-span=\"2\" tone=\"yellow\"><span slot=\"label\">Root</span><span slot=\"title\">One foundation</span>Colour, type and scale for everything after.</ds-card>\n  <ds-card tone=\"apple-green\"><span slot=\"label\">Core</span><span slot=\"title\">Small pieces</span>A control, a value, a state.</ds-card>\n  <ds-card tone=\"zenith-blue\"><span slot=\"label\">Unit</span><span slot=\"title\">Together</span>Rows, lists and forms.</ds-card>\n  <ds-card data-span=\"2\" tone=\"pink\"><span slot=\"label\">Page</span><span slot=\"title\">Everything in its place</span>Navigation, work and context on one grid.</ds-card>\n</ds-bento>",
+    "html": "<ds-bento>\n  <ds-card data-span=\"2\" tone=\"yellow\"><span slot=\"label\">Root</span><span slot=\"title\">One foundation</span>Colour, type and scale for everything after.</ds-card>\n  <ds-card tone=\"apple-green\"><span slot=\"label\">Core</span><span slot=\"title\">Small pieces</span>A control, a value, a state.</ds-card>\n  <ds-card tone=\"sharp-blue\"><span slot=\"label\">Unit</span><span slot=\"title\">Together</span>Rows, lists and forms.</ds-card>\n  <ds-card data-span=\"2\" tone=\"pink\"><span slot=\"label\">Page</span><span slot=\"title\">Everything in its place</span>Navigation, work and context on one grid.</ds-card>\n</ds-bento>",
     "height": 460
   },
   "bento-squares": {
     "title": "Tiles on squares",
     "hint": "A squares bento: each tile placed on whole squares a square apart, its surface reaching a quarter square towards its neighbours, so the tiles stand half a square apart.",
-    "html": "<ds-bento squares columns=\"32\">\n  <ds-card data-place=\"0 0 15 7\"><span slot=\"label\">Archive</span><span slot=\"title\">Everything kept</span></ds-card>\n  <ds-card data-place=\"16 0 16 15\" tone=\"yellow\"><span slot=\"label\">Lists</span><span slot=\"title\">Every list in one place</span>Placed on whole squares, half a square from the tiles beside it.</ds-card>\n  <ds-card data-place=\"0 8 15 7\" tone=\"zenith-blue\"><span slot=\"label\">Home</span><span slot=\"title\">Today first</span></ds-card>\n</ds-bento>",
+    "html": "<ds-bento squares columns=\"32\">\n  <ds-card data-place=\"0 0 15 7\"><span slot=\"label\">Archive</span><span slot=\"title\">Everything kept</span></ds-card>\n  <ds-card data-place=\"16 0 16 15\" tone=\"yellow\"><span slot=\"label\">Lists</span><span slot=\"title\">Every list in one place</span>Placed on whole squares, half a square from the tiles beside it.</ds-card>\n  <ds-card data-place=\"0 8 15 7\" tone=\"sharp-blue\"><span slot=\"label\">Home</span><span slot=\"title\">Today first</span></ds-card>\n</ds-bento>",
     "height": 380
   },
   "table-stock": {
