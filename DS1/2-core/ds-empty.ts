@@ -22,6 +22,8 @@ export const EMPTY_HEADING = "Nothing here yet";
  * @prop {string} icon - An icon from the library on the square above the title.
  * @prop {boolean} centered - Centre the words in the space the element stands in.
  * @prop {number} level - Make the title a heading of this level (1–6).
+ * @prop {string} tone - `done`: empty because everything is finished; the
+ *   check (or `icon`) on a mark in the success green, the title in that green.
  *
  * @slot - The text, when it needs more than words: a link, a strong word.
  * @slot heading - The title, as inline content.
@@ -41,6 +43,7 @@ export class Empty extends LitElement {
     icon: { type: String },
     centered: { type: Boolean, reflect: true },
     level: { type: Number },
+    tone: { type: String, reflect: true },
   };
 
   static styles = [unsafeCSS(metrics), unsafeCSS(empty), unsafeCSS(styles)];
@@ -51,6 +54,7 @@ export class Empty extends LitElement {
   declare icon: string | undefined;
   declare centered: boolean;
   declare level: number | undefined;
+  declare tone: "done" | undefined;
 
   private readonly relabel = () => this.requestUpdate();
 
@@ -92,15 +96,17 @@ export class Empty extends LitElement {
   render() {
     const heading = this.heading ? this.words(this.heading) : getText(EMPTY_HEADING) || EMPTY_HEADING;
     const text = this.words(this.text);
-    const hasIcon = Boolean(this.icon) || this.slotted("icon");
+    const done = this.tone === "done";
+    const icon = this.icon || (done ? "check" : "");
+    const hasIcon = Boolean(icon) || this.slotted("icon");
     const slottedText = this.slotted("");
     const hasText = Boolean(text) || slottedText;
     const hasActions = this.slotted("actions");
     const level = this.level && this.level >= 1 && this.level <= 6 ? Math.round(this.level) : undefined;
     const changed = () => this.requestUpdate();
-    return html`<div class="ds-empty${this.centered ? " ds-empty--centered" : ""}" part="empty">
+    return html`<div class="ds-empty${this.centered ? " ds-empty--centered" : ""}${done ? " ds-empty--done" : ""}" part="empty">
       <div class="ds-empty__icon" part="icon" aria-hidden="true" ?hidden=${!hasIcon}>
-        <slot name="icon" @slotchange=${changed}>${this.icon ? html`<ds-icon size="large" .type=${this.icon}></ds-icon>` : nothing}</slot>
+        <slot name="icon" @slotchange=${changed}>${icon ? html`<ds-icon size=${done ? "small" : "large"} .type=${icon}></ds-icon>` : nothing}</slot>
       </div>
       <div class="ds-empty__title" part="title" role=${level ? "heading" : nothing} aria-level=${level ?? nothing}>
         <slot name="heading" @slotchange=${changed}>${heading}</slot>

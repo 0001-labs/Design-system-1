@@ -17,15 +17,17 @@ export type EmptyProps = Omit<HTMLAttributes<EmptyElement>, "title"> & {
   centered?: boolean;
   /** Make the title a heading of this level (1–6). */
   level?: number;
+  /** `done`: empty because everything is finished, the check on the success green. */
+  tone?: "done";
 };
 
 const title = (content: ReactNode) =>
   content == null || content === false || content === "" ? null : h("span", { slot: "heading" }, content);
 
 export const Empty = forwardRef<EmptyElement, EmptyProps>(function Empty(
-  { heading, text, icon, actions, centered, level, children, ...props }, ref,
+  { heading, text, icon, actions, centered, level, tone, children, ...props }, ref,
 ) {
-  return h("ds-empty", { ...props, icon, centered: centered || undefined, level, ref },
+  return h("ds-empty", { ...props, icon, centered: centered || undefined, level, tone, ref },
     title(heading),
     children ?? text,
     actions == null || actions === false ? null : h("div", { slot: "actions", style: { display: "contents" } }, actions));

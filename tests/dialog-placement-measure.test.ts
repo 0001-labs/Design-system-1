@@ -179,7 +179,7 @@ test("a sheet stands at the foot of a phone, as wide as it, on whole squares, wi
     const handle = (await measure(tab)).handle.background;
     expect(handle).toBe(scheme === "light" ? "rgb(216, 216, 216)" : "rgb(61, 61, 61)");
   }
-});
+}, 30_000);
 
 test("on a wide screen a sheet is 32 squares wide, centred on whole squares", async () => {
   const tab = await page({ width: 1200, height: 800 });

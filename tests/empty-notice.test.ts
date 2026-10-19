@@ -61,6 +61,27 @@ test("an empty state shows its icon, slotted words, actions and heading level on
   expect(shown(empty, "actions")).toBe(false);
 });
 
+test("a done empty state says everything is found: the check on the success green's mark, the title in that green", async () => {
+  const empty = document.createElement("ds-empty");
+  empty.setAttribute("tone", "done");
+  empty.heading = "Every receipt is found";
+  document.body.append(empty);
+  await empty.updateComplete;
+  const block = empty.shadowRoot!.querySelector('[part="empty"]')!;
+  expect(block.classList.contains("ds-empty--done")).toBe(true);
+  // The check is its icon unless the page gives another.
+  expect(shown(empty, "icon")).toBe(true);
+  expect(empty.shadowRoot!.querySelector('[part="icon"] ds-icon')!.getAttribute("type") ?? (empty.shadowRoot!.querySelector('[part="icon"] ds-icon') as HTMLElement & { type: string }).type).toBe("check");
+  empty.icon = "receipt"; await empty.updateComplete;
+  expect((empty.shadowRoot!.querySelector('[part="icon"] ds-icon') as HTMLElement & { type: string }).type).toBe("receipt");
+  // One green, shared: deep on light paper, Apple green on dark, a mark one control high on the sixteen.
+  const tokens = readFileSync(join(import.meta.dirname, "../DS1/1-root/component-tokens.css"), "utf8");
+  expect(tokens).toContain("--ds-success-color: light-dark(");
+  const css = sheet("empty.css");
+  expect(rule(css, ".ds-empty--done .ds-empty__icon")).toContain("var(--ds-success-color)");
+  expect(rule(css, ".ds-empty--done .ds-empty__title")).toContain("var(--ds-success-color)");
+});
+
 test("a notice is a status, an alert when it reports danger, and keeps a role the page gives it", async () => {
   const notice = document.createElement("ds-notice");
   notice.text = "Saved";
