@@ -1,7 +1,7 @@
 {
   "name": "ds-one-app",
   "private": true,
-  "version": "0.3.0-alpha.14",
+  "version": "0.3.0-alpha.15",
   "type": "module",
   "scripts": {
     "dev": "vp dev --host 127.0.0.1",
