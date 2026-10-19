@@ -18,6 +18,10 @@ const { sidebar } = Astro.locals.starlightRoute;
         <button id="sidebar-close-btn" type="button" aria-label="Close navigation menu"><ds-icon type="close"></ds-icon></button>
       </ds-button>
     </div>
+      <section id="private-app-navigation" slot="private-app" hidden aria-label="Internal App components">
+        <button id="private-app-toggle" class="ds-row" type="button" aria-expanded="false" aria-controls="private-app-links"><ds-icon type="chevron-down" aria-hidden="true"></ds-icon><span>App</span></button>
+        <div id="private-app-links" hidden></div>
+      </section>
     <div slot="footer" class="docs-sidebar-footer">
       <ds-button href="https://github.com/0001-labs/Design-system-1">GitHub</ds-button>
       <a id="docs-account" href="/app/signin" aria-label="Sign in">
@@ -30,6 +34,9 @@ const { sidebar } = Astro.locals.starlightRoute;
 
 <script>
   import '../../../DS1/3-unit/ds-sidebar';
+  import '../../../DS1/2-core/ds-tag';
+  import { hideSignedInLibraryEntry } from '../lib/sidebar-visibility';
+  import { connectAppNavigation } from '../lib/app-navigation';
   import '../../../DS1/1-root/row.css';
   import '../../../DS1/2-core/ds-avatar';
   import { translate } from '../../../DS1/0-face/i18n';
@@ -61,7 +68,7 @@ const { sidebar } = Astro.locals.starlightRoute;
   };
   function rows(entries: Entry[], depth = 0, parent = ''): SidebarItem[] {
     return entries.flatMap((entry, index) => {
-      if (signedIn && (entry.label === 'Start Here' || entry.label === 'My libraries')) return [];
+      if (signedIn && (entry.label === 'Start Here' || hideSignedInLibraryEntry(entry))) return [];
       if (entry.href === '/app/libraries' && !signedIn) return [];
       const href = (entry.href === "/app/libraries" ? "/classless/libraries/" : entry.href) ?? (entry.entries ? overviewPaths[entry.label] : undefined);
       const id = href ?? `${parent}/group-${index}`;
@@ -112,7 +119,7 @@ const { sidebar } = Astro.locals.starlightRoute;
   }
   function renderNavigation() {
     navigation.label = library ? `${library.name} navigation` : 'Documentation';
-    navigation.items = library ? [
+    const items: SidebarItem[] = library ? [
       { id: 'base-system', label: 'Design system 1', href: '/start-here/overview/' },
       { id: 'library-overview', label: library.name, href: libraryWorkspaceHref({ ...library, view: 'overview' }), current: library.view === 'overview' },
       ...LAYERS.flatMap(layer => {
@@ -123,7 +130,15 @@ const { sidebar } = Astro.locals.starlightRoute;
         })) : [])];
       }),
     ] : rows(groups);
+    const pageIndex = items.findIndex(item => item.id === '/4-page/overview/' || item.id === 'library-layer-4');
+    if (pageIndex >= 0) {
+      let last = pageIndex;
+      while (last + 1 < items.length && (items[last + 1].depth ?? 0) > 0) last++;
+      items[last].afterSlot = 'private-app';
+    }
+    navigation.items = items;
   }
+  connectAppNavigation(document.querySelector<HTMLElement>('#private-app-navigation')!);
   renderAccount();
   renderWorkspace();
   renderNavigation();
@@ -156,6 +171,8 @@ const { sidebar } = Astro.locals.starlightRoute;
   });
   window.addEventListener("translations-ready", () => { renderNavigation(); });
   window.addEventListener("language-changed", () => { renderNavigation(); });
+  // Replay the authenticated summary after all sidebar listeners are ready.
+  document.querySelector<HTMLIFrameElement>('#navigation-auth')?.contentWindow?.postMessage({ type: 'ds1:navigation-auth-request' }, location.origin);
   navigation.addEventListener('sidebar-toggle', event => {
     const { id, expanded } = (event as CustomEvent).detail;
     if (expanded) collapsed.delete(id); else collapsed.add(id);
@@ -170,8 +187,12 @@ const { sidebar } = Astro.locals.starlightRoute;
   .docs-sidebar-header { display: flex; flex-direction: column; gap: 20px; }
   .docs-sidebar-close { display: none; align-self: flex-end; }
   .docs-sidebar-footer { display: flex; align-items: center; gap: calc(var(--site-unit) / 2); height: calc(2 * var(--site-unit)); border-top: 1px solid var(--ds1-docs-header-border); font-size: calc(10px * var(--sf, 1)); }
-  #workspace[hidden], #workspace-libraries[hidden] { display: none; }
+  #private-app-navigation[hidden], #private-app-links[hidden], #workspace[hidden], #workspace-libraries[hidden] { display: none; }
   #workspace { flex: none; }
+  #private-app-toggle { width: 100%; text-align: left; }
+  #private-app-links { padding-inline-start: var(--site-unit); }
+  #private-app-links :global(a) { width: 100%; text-decoration: none; }
+  #private-app-links :global(ds-tag) { --ds-tag-accent: var(--ds-pink); }
   .workspace-heading { display: flex; align-items: flex-end; }
   #workspace-toggle { flex: 1; width: auto; min-width: 0; }
   #workspace-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

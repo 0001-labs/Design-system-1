@@ -4,7 +4,7 @@
 body{margin:0;background:var(--background);color:var(--text-color);font:14px/20px var(--typeface-regular)}main{max-width:800px;margin:auto;padding:40px 20px}nav{display:flex;justify-content:space-between;gap:20px}a{color:inherit}h1{font-size:40px;line-height:1.1;font-weight:400;margin:40px 0 20px}h2{font-size:20px;font-weight:400;margin-top:40px}section{padding:20px 0}pre{overflow:auto;padding:20px;background:var(--fill);font:13px/20px var(--typeface-mono)}.preview{display:flex;flex-wrap:wrap;gap:20px;padding:20px;background:var(--fill)}.preview p{display:flex;align-items:center;gap:10px;margin:0}dt{margin-top:20px}dd{margin:0}.muted{color:var(--title-color)}
 </style></head><body><main>
 <nav><a href="/">Design system 1</a><span>App · Private</span></nav>
-<h1>Keyboard shortcut</h1>
+<h1 id="keyboard-shortcut">Keyboard shortcut</h1>
 <p>App contains internal app-building controls. It is separate from the public Design system 1 package.</p>
 <p>A shortcut hint displays a command using the reader’s platform conventions. The application owns the action and its keyboard listener.</p>
 <section aria-label="Keyboard shortcut examples"><div class="preview"><p>Search <ds-kbd shortcut="mod+k"></ds-kbd></p><p>Duplicate <ds-kbd shortcut="mod+shift+d"></ds-kbd></p><p>Close <ds-kbd shortcut="escape" plain></ds-kbd></p></div></section>
@@ -19,5 +19,16 @@ body{margin:0;background:var(--background);color:var(--text-color);font:14px/20p
 import { Kbd } from '@0001-labs/app/react/keyboard-shortcut';
 
 &lt;Kbd shortcut="mod+k" /&gt;</code></pre>
+<section id="spacing-handle"><h2>Spacing handle</h2><p>Adjust a spacing value by dragging or using the arrow keys. The application owns preview, commit and undo.</p><div class="preview"><ds-spacing-handle label="Spacing"></ds-spacing-handle></div><pre><code>import '@0001-labs/app/spacing-handle';
+
+handle.options = {
+  value: 20, min: 0, max: 100, step: 10,
+  onPreview: value =&gt; preview(value),
+  onCommit: value =&gt; save(value)
+};</code></pre></section>
+<section id="loading-indicator"><h2>Loading indicator</h2><p>Automatic pending-state feedback, with an accessible status label. Use a bar for a page or a spinner beside a control.</p><div class="preview"><ds-loading label="Loading preview"></ds-loading><ds-loading label="Loading preview" variant="spinner"></ds-loading></div><pre><code>import '@0001-labs/app/loading';
+
+&lt;ds-loading label="Loading document"&gt;&lt;/ds-loading&gt;
+&lt;ds-loading variant="spinner"&gt;&lt;/ds-loading&gt;</code></pre></section>
 <p class="muted">Also in App: Spacing handle and Loading indicator. These controls are available internally through the workspace package and explicit Sync 1 selection. App is not published to npm.</p>
 </main></body></html>

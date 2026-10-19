@@ -54,6 +54,7 @@ export const ALL_LAYERS: DirectoryLayer[] = [
       { name: 'Message', href: '/2-core/message/', tag: 'ds-message' },
       { name: 'Progress', href: '/2-core/progress/', tag: 'ds-progress' },
       { name: 'Stat', href: '/2-core/stat/', tag: 'ds-stat' },
+      { name: 'Tag', href: '/2-core/tag/', tag: 'ds-tag' },
       { name: 'Text', href: '/2-core/text/', tag: 'ds-text' },
       { name: 'Tooltip', href: '/2-core/tooltip/', tag: 'ds-tooltip' },
     ],

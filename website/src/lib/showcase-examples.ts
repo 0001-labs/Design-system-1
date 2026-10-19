@@ -3,6 +3,12 @@ import type { ComponentExample } from "./component-examples";
 
 /** Original, local-only specimens composed from the public component APIs. */
 export const SHOWCASE_EXAMPLES: Record<string, ComponentExample> = {
+  "tag-labels": {
+    title: "Labels that fit their words",
+    hint: "Each tag hugs its text with 4px of padding on each side.",
+    html: '<ds-row><ds-tag style="--ds-tag-accent: var(--ds-pink)">App</ds-tag><ds-tag style="--ds-tag-accent: var(--ds-apple-green)">Published</ds-tag><ds-tag style="--ds-tag-accent: var(--ds-orange)">Draft</ds-tag></ds-row>',
+    height: 120,
+  },
   "button-publishing": {
     "title": "A publication toolbar",
     "hint": "Primary, secondary and quiet actions share one baseline.",

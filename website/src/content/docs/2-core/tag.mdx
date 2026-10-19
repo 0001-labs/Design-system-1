@@ -1,0 +1,20 @@
+---
+title: Tag
+description: A compact label that hugs its words.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+Tag labels a category or status. Its rounded face hugs the text, with 4px of padding on each side and one control of height. Width follows the words without rounding to grid squares.
+
+<ComponentExample example="tag-labels" />
+
+```html
+<ds-tag style="--ds-tag-accent: var(--ds-pink)">App</ds-tag>
+```
+
+Set `--ds-tag-accent` to a system colour for a pale fill and coloured text in both themes. Use `--ds-tag-background` and `--ds-tag-color` for explicit colours. Long labels truncate within the available space.
+
+A tag is a label, with no click action or tab stop. Put it inside a link or button when the containing item is interactive. Use [Badge](/2-core/badge/) when you need a grid-sized status marker or an icon.
+
+Copy `tag` through Sync 1. React consumers can use `Tag` from `DS1/react/tag` after registering `DS1/2-core/ds-tag`.

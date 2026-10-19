@@ -34,6 +34,17 @@ Without a `heading`, the title is the shared words' "Nothing here yet" in the cu
 
 `heading` and `text` are translation keys, like [Text](/2-core/text/); `literal` shows them as written. Words that need a link or a strong word go in the default slot, and a title that needs markup in the `heading` slot, as inline content.
 
+### Done
+
+A place can be empty because everything in it is finished: every receipt found, nothing left to review. `tone="done"` says so. Its icon is the check unless you give another, standing on a round mark one control high in the success green (`--ds-success-color`: Apple green deepened with the ink on light paper, Apple green itself on dark), and the title takes the same green.
+
+```html
+<ds-empty tone="done" heading="Every receipt is found" text="New payments without one appear here.">
+</ds-empty>
+```
+
+Without JavaScript, add `ds-empty--done` to the block and put the check in `ds-empty__icon`.
+
 ## API
 
 | Attribute | Type | Default | What it does |
@@ -44,6 +55,7 @@ Without a `heading`, the title is the shared words' "Nothing here yet" in the cu
 | `icon` | string | Empty | An [icon](/2-core/icon/) on its own square above the title, in the muted ink. |
 | `centered` | boolean | `false` | Centre the words in the space the element stands in. |
 | `level` | number | None | Make the title a heading of this level, 1 to 6. |
+| `tone` | `done` | None | Empty because everything is finished: the check (or `icon`) on the success green's mark, the title in that green. |
 
 | Slot | What it holds |
 | --- | --- |

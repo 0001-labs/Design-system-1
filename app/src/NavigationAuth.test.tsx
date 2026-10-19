@@ -3,6 +3,7 @@ import { expect, test, vi } from 'vite-plus/test';
 import { act, createElement } from 'react';
 import { createRoot } from 'react-dom/client';
 import { getFunctionName } from 'convex/server';
+vi.mock('@convex-dev/auth/react', () => ({ useAuthToken: () => 'test-session' }));
 const mocks = vi.hoisted(() => ({ session: {isAuthenticated:true,isLoading:false}, create:vi.fn() }));
 vi.mock('convex/react', () => ({
   useConvexAuth: () => mocks.session,
@@ -12,6 +13,7 @@ vi.mock('convex/react', () => ({
 import { NavigationAuth } from './NavigationAuth';
 test('workspace creation accepts only the parent and ignores duplicate or signed-out requests', async () => {
   vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null, {status:403})));
   const root = createRoot(document.createElement('div'));
   const sent = vi.spyOn(window.parent,'postMessage').mockImplementation(() => {});
   let finish!: (result: any) => void;
@@ -32,4 +34,20 @@ test('workspace creation accepts only the parent and ignores duplicate or signed
     await act(async () => request());
     expect(mocks.create).toHaveBeenCalledOnce();
   } finally { await act(async () => root.unmount()); sent.mockRestore(); mocks.session.isAuthenticated=true; vi.unstubAllGlobals(); }
+});
+
+test('the bridge exposes App only after server authorization and clears it on sign-out', async () => {
+  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
+  const components = [{name:'Keyboard shortcut',href:'https://dash.designsystem1.com/private-app/#keyboard-shortcut'}];
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({components})));
+  const root = createRoot(document.createElement('div'));
+  const sent = vi.spyOn(window.parent, 'postMessage').mockImplementation(() => {});
+  try {
+    await act(async () => root.render(createElement(NavigationAuth)));
+    expect(sent.mock.calls.at(-1)?.[0]).toMatchObject({authenticated:true,appComponents:components});
+    expect(fetch).toHaveBeenCalledWith('/api/app-navigation', expect.objectContaining({headers:{Authorization:'Bearer test-session'},cache:'no-store'}));
+    mocks.session.isAuthenticated = false;
+    await act(async () => root.render(createElement(NavigationAuth)));
+    expect(sent.mock.calls.at(-1)?.[0]).toMatchObject({authenticated:false,appComponents:[]});
+  } finally { await act(async () => root.unmount()); sent.mockRestore(); mocks.session.isAuthenticated = true; vi.unstubAllGlobals(); }
 });

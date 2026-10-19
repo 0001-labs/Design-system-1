@@ -28,6 +28,8 @@ export interface SidebarItem {
   disabled?: boolean;
   /** Small muted words at the row's end: a count, a size. */
   meta?: string;
+  /** Optional application content following this navigation row. */
+  afterSlot?: string;
   action?: { id: string; label: string; icon?: string; disabled?: boolean };
   /** Opt this row out of an enabled navigation reorder surface. */
   reorderable?: boolean;
@@ -356,7 +358,7 @@ export class Sidebar extends LitElement {
           ${item.action ? html`<ds-button control="slotted" ?fit=${!item.action.icon} ?icon=${Boolean(item.action.icon)} class="action" ?disabled=${item.disabled || item.action.disabled}><button type="button"
             aria-label=${`${item.action.label}: ${item.label}`}
             @click=${() => { if (!item.disabled && !item.action?.disabled) this.request("action", { id: item.id, action: item.action!.id }); }}>${item.action.icon ? html`<ds-icon type=${item.action.icon} aria-hidden="true"></ds-icon>` : item.action.label}</button></ds-button>` : nothing}
-        </ds-row>`)}
+        </ds-row>${item.afterSlot ? html`<slot name=${item.afterSlot}></slot>` : nothing}`)}
       ${this.items.length ? nothing : html`<p class="empty" role="status">${this.empty}</p>`}
     </nav><slot name="footer"></slot>`;
   }

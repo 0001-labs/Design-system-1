@@ -16,6 +16,8 @@
  *   ds-empty__text           lines of one square, muted
  *   ds-empty__actions        buttons or links on one row, one square below
  *   ds-empty--centered       centred in the space it stands in
+ *   ds-empty--done           all done: the check on a mark in the success
+ *                            green, the title in that green
  *
  * Tokens: `--ds-empty-measure` (the widest it grows, sixteen squares) and
  * `--ds-empty-padding` (the room above and below, none by default).
@@ -80,4 +82,24 @@
 
 .ds-empty--centered .ds-empty__actions {
   justify-content: center;
+}
+
+/* Done: a place empty because everything in it is finished (every receipt
+   found, nothing left to review). The icon, the check by default, stands on a
+   round mark one control high in the success green, on the sixteen, and the
+   title takes the same green; the line under it stays muted. */
+.ds-empty--done .ds-empty__icon {
+  box-sizing: border-box;
+  justify-content: center;
+  width: var(--ds-control-height);
+  height: var(--ds-control-height);
+  margin-top: calc(var(--ds-unit) - var(--ds-control-height));
+  border-radius: 50%;
+  background: var(--ds-success-color);
+  color: light-dark(var(--ds-white), var(--ds-black));
+  --ds-icon-color: currentColor;
+}
+
+.ds-empty--done .ds-empty__title {
+  color: var(--ds-success-color);
 }

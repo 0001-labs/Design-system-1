@@ -496,12 +496,36 @@
     "shapes": 26
   },
   {
+    "key": "dot-happy",
+    "name": "Dot",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<g fill=\"currentColor\"><circle cx=\"6\" cy=\"2\" r=\"0.91\"/><circle cx=\"8\" cy=\"2\" r=\"0.91\"/><circle cx=\"10\" cy=\"2\" r=\"0.91\"/><circle cx=\"4\" cy=\"4\" r=\"0.91\"/><circle cx=\"12\" cy=\"4\" r=\"0.91\"/><circle cx=\"2\" cy=\"6\" r=\"0.91\"/><circle cx=\"6\" cy=\"6\" r=\"0.91\"/><circle cx=\"10\" cy=\"6\" r=\"0.91\"/><circle cx=\"14\" cy=\"6\" r=\"0.91\"/><circle cx=\"2\" cy=\"8\" r=\"0.91\"/><circle cx=\"14\" cy=\"8\" r=\"0.91\"/><circle cx=\"2\" cy=\"10\" r=\"0.91\"/><circle cx=\"6\" cy=\"10\" r=\"0.91\"/><circle cx=\"10\" cy=\"10\" r=\"0.91\"/><circle cx=\"14\" cy=\"10\" r=\"0.91\"/><circle cx=\"4\" cy=\"12\" r=\"0.91\"/><circle cx=\"8\" cy=\"12\" r=\"0.91\"/><circle cx=\"12\" cy=\"12\" r=\"0.91\"/><circle cx=\"6\" cy=\"14\" r=\"0.91\"/><circle cx=\"8\" cy=\"14\" r=\"0.91\"/><circle cx=\"10\" cy=\"14\" r=\"0.91\"/></g>\n</svg>",
+    "url": "/icons/library/dot-happy.svg",
+    "shapes": 21
+  },
+  {
+    "key": "dot-neutral",
+    "name": "Dot",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<g fill=\"currentColor\"><circle cx=\"6\" cy=\"2\" r=\"0.91\"/><circle cx=\"8\" cy=\"2\" r=\"0.91\"/><circle cx=\"10\" cy=\"2\" r=\"0.91\"/><circle cx=\"4\" cy=\"4\" r=\"0.91\"/><circle cx=\"12\" cy=\"4\" r=\"0.91\"/><circle cx=\"2\" cy=\"6\" r=\"0.91\"/><circle cx=\"6\" cy=\"6\" r=\"0.91\"/><circle cx=\"10\" cy=\"6\" r=\"0.91\"/><circle cx=\"14\" cy=\"6\" r=\"0.91\"/><circle cx=\"2\" cy=\"8\" r=\"0.91\"/><circle cx=\"14\" cy=\"8\" r=\"0.91\"/><circle cx=\"2\" cy=\"10\" r=\"0.91\"/><circle cx=\"6\" cy=\"10\" r=\"0.91\"/><circle cx=\"8\" cy=\"10\" r=\"0.91\"/><circle cx=\"10\" cy=\"10\" r=\"0.91\"/><circle cx=\"14\" cy=\"10\" r=\"0.91\"/><circle cx=\"4\" cy=\"12\" r=\"0.91\"/><circle cx=\"12\" cy=\"12\" r=\"0.91\"/><circle cx=\"6\" cy=\"14\" r=\"0.91\"/><circle cx=\"8\" cy=\"14\" r=\"0.91\"/><circle cx=\"10\" cy=\"14\" r=\"0.91\"/></g>\n</svg>",
+    "url": "/icons/library/dot-neutral.svg",
+    "shapes": 21
+  },
+  {
     "key": "dot-receipt",
     "name": "Dot",
     "source": "Library",
     "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<g fill=\"currentColor\"><circle cx=\"4\" cy=\"2\" r=\"0.91\"/><circle cx=\"6\" cy=\"2\" r=\"0.91\"/><circle cx=\"8\" cy=\"2\" r=\"0.91\"/><circle cx=\"10\" cy=\"2\" r=\"0.91\"/><circle cx=\"12\" cy=\"2\" r=\"0.91\"/><circle cx=\"4\" cy=\"4\" r=\"0.91\"/><circle cx=\"12\" cy=\"4\" r=\"0.91\"/><circle cx=\"4\" cy=\"6\" r=\"0.91\"/><circle cx=\"8\" cy=\"6\" r=\"0.91\"/><circle cx=\"12\" cy=\"6\" r=\"0.91\"/><circle cx=\"4\" cy=\"8\" r=\"0.91\"/><circle cx=\"12\" cy=\"8\" r=\"0.91\"/><circle cx=\"4\" cy=\"10\" r=\"0.91\"/><circle cx=\"8\" cy=\"10\" r=\"0.91\"/><circle cx=\"12\" cy=\"10\" r=\"0.91\"/><circle cx=\"4\" cy=\"12\" r=\"0.91\"/><circle cx=\"12\" cy=\"12\" r=\"0.91\"/><circle cx=\"4\" cy=\"14\" r=\"0.91\"/><circle cx=\"8\" cy=\"14\" r=\"0.91\"/><circle cx=\"12\" cy=\"14\" r=\"0.91\"/></g>\n</svg>",
     "url": "/icons/library/dot-receipt.svg",
     "shapes": 20
+  },
+  {
+    "key": "dot-sad",
+    "name": "Dot",
+    "source": "Library",
+    "svg": "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<g fill=\"currentColor\"><circle cx=\"6\" cy=\"2\" r=\"0.91\"/><circle cx=\"8\" cy=\"2\" r=\"0.91\"/><circle cx=\"10\" cy=\"2\" r=\"0.91\"/><circle cx=\"4\" cy=\"4\" r=\"0.91\"/><circle cx=\"12\" cy=\"4\" r=\"0.91\"/><circle cx=\"2\" cy=\"6\" r=\"0.91\"/><circle cx=\"6\" cy=\"6\" r=\"0.91\"/><circle cx=\"10\" cy=\"6\" r=\"0.91\"/><circle cx=\"14\" cy=\"6\" r=\"0.91\"/><circle cx=\"2\" cy=\"8\" r=\"0.91\"/><circle cx=\"14\" cy=\"8\" r=\"0.91\"/><circle cx=\"2\" cy=\"10\" r=\"0.91\"/><circle cx=\"8\" cy=\"10\" r=\"0.91\"/><circle cx=\"14\" cy=\"10\" r=\"0.91\"/><circle cx=\"4\" cy=\"12\" r=\"0.91\"/><circle cx=\"6\" cy=\"12\" r=\"0.91\"/><circle cx=\"10\" cy=\"12\" r=\"0.91\"/><circle cx=\"12\" cy=\"12\" r=\"0.91\"/><circle cx=\"6\" cy=\"14\" r=\"0.91\"/><circle cx=\"8\" cy=\"14\" r=\"0.91\"/><circle cx=\"10\" cy=\"14\" r=\"0.91\"/></g>\n</svg>",
+    "url": "/icons/library/dot-sad.svg",
+    "shapes": 21
   },
   {
     "key": "dot-safe",

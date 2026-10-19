@@ -160,6 +160,14 @@
     "url": "https://designsystem1.com/2-core/stat/"
   },
   {
+    "id": "component:/2-core/tag/",
+    "code": "TAG",
+    "label": "Tag",
+    "kind": "component",
+    "summary": "A compact label that hugs its words.",
+    "url": "https://designsystem1.com/2-core/tag/"
+  },
+  {
     "id": "component:/2-core/text/",
     "code": "TEXT",
     "label": "Text",

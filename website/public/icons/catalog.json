@@ -436,11 +436,32 @@
     "shapes": 26
   },
   {
+    "key": "dot-happy",
+    "name": "Dot",
+    "source": "Library",
+    "url": "/icons/library/dot-happy.svg",
+    "shapes": 21
+  },
+  {
+    "key": "dot-neutral",
+    "name": "Dot",
+    "source": "Library",
+    "url": "/icons/library/dot-neutral.svg",
+    "shapes": 21
+  },
+  {
     "key": "dot-receipt",
     "name": "Dot",
     "source": "Library",
     "url": "/icons/library/dot-receipt.svg",
     "shapes": 20
+  },
+  {
+    "key": "dot-sad",
+    "name": "Dot",
+    "source": "Library",
+    "url": "/icons/library/dot-sad.svg",
+    "shapes": 21
   },
   {
     "key": "dot-safe",

@@ -40,6 +40,25 @@ test("shows a toast as Sonner does and closes it after four seconds", async () =
   expect(onAutoClose).toHaveBeenCalledOnce();
 });
 
+test("in the window the stack is a manual popover, shown again for each new toast so it stands above an open sheet or modal", async () => {
+  const element = await toaster();
+  const list = element.shadowRoot!.querySelector("ol")!;
+  expect(list.getAttribute("popover")).toBe("manual");
+  const shown = vi.fn();
+  list.showPopover = shown;
+  list.hidePopover = vi.fn();
+  toast("Marked as business");
+  await settle(element, 20);
+  expect(shown).toHaveBeenCalledTimes(1);
+  toast("Marked as personal");
+  await settle(element, 20);
+  expect(shown).toHaveBeenCalledTimes(2);
+  document.body.innerHTML = "<div style=\"position:relative\"><ds-toast contained></ds-toast></div>";
+  const contained = document.querySelector("ds-toast")!;
+  await contained.updateComplete;
+  expect(contained.shadowRoot!.querySelector("ol")!.hasAttribute("popover")).toBe(false);
+});
+
 test("the same id updates a toast in place and a promise settles it", async () => {
   const element = await toaster();
   let resolve!: (value: string) => void;
@@ -152,4 +171,26 @@ test("an action can be a link, and following it closes the toast", async () => {
   await settle(element, 60000);
   expect(toasts(element)).toHaveLength(1);
   expect(toasts(element)[0]!.querySelector(".title")?.textContent).toBe("Saved");
+});
+
+
+test("pressing a close icon inside shadow DOM does not capture the pointer", async () => {
+  const element = await toaster();
+  const onDismiss = vi.fn();
+  toast.success("Copied", { duration: Infinity, onDismiss });
+  await settle(element, 10000);
+  const item = toasts(element)[0]!;
+  const capture = vi.fn();
+  item.setPointerCapture = capture;
+  const close = item.querySelector<HTMLButtonElement>("button.close")!;
+  const icon = close.querySelector("ds-icon")!;
+  await icon.updateComplete;
+  const glyph = icon.shadowRoot!.querySelector("svg")!;
+  expect(glyph).not.toBeNull();
+  glyph.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, composed: true, pointerId: 1 }));
+  expect(capture).not.toHaveBeenCalled();
+  glyph.dispatchEvent(new MouseEvent("click", { bubbles: true, composed: true }));
+  await settle(element, 500);
+  expect(onDismiss).toHaveBeenCalledOnce();
+  expect(toasts(element)).toHaveLength(0);
 });

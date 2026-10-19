@@ -94,6 +94,8 @@ export class Toaster extends LitElement {
   private swipe?: { id: ToastId; start: number; time: number; amount: number };
   private resizes = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(() => this.measure());
   private stopListening?: () => void;
+  /** The front toast the stack was last raised for. */
+  private raisedFor: ToastId | undefined;
 
   constructor() {
     super();
@@ -220,6 +222,7 @@ export class Toaster extends LitElement {
   }
 
   protected updated(): void {
+    this.raise();
     for (const body of this.renderRoot.querySelectorAll<HTMLElement>(".body")) this.resizes?.observe(body);
     this.measure();
     if (!this.live.length) { this._hovered = false; this._focused = false; }
@@ -231,9 +234,31 @@ export class Toaster extends LitElement {
     }
   }
 
+  /**
+   * In the window the stack stands in the browser's top layer, so a sheet, a drawer or a modal
+   * open on the page never covers it: a manual popover, shown again (to the top of the layer)
+   * whenever a new toast comes to the front, and hidden when none is left. Contained, it stays
+   * in its box.
+   */
+  private raise() {
+    const list = this.renderRoot.querySelector<HTMLElement>("ol");
+    if (!list || this.contained || typeof list.showPopover !== "function") return;
+    const front = this.live[0]?.data.id;
+    if (front === this.raisedFor) return;
+    this.raisedFor = front;
+    try {
+      if (list.matches(":popover-open")) list.hidePopover();
+      if (front !== undefined) list.showPopover();
+    } catch {
+      // Out of the document, or a browser without popovers: it stays as it is drawn.
+    }
+  }
+
   private onPointerDown(event: PointerEvent, item: Item) {
     if (item.data.dismissible === false || item.data.type === "loading") return;
-    if ((event.composedPath()[0] as Element | undefined)?.closest?.("button, a")) return;
+    // Controls can contain icons with their own shadow root. Inspect the whole
+    // event path so swipe capture never steals their click.
+    if (event.composedPath().some(node => node instanceof Element && node.matches("button, a"))) return;
     (event.currentTarget as HTMLElement).setPointerCapture?.(event.pointerId);
     this.swipe = { id: item.data.id, start: event.clientY, time: Date.now(), amount: 0 };
     this.interacting = true;
@@ -331,6 +356,7 @@ export class Toaster extends LitElement {
     const [y, x] = this.position.split("-") as ["top" | "bottom", "left" | "center" | "right"];
     return html`<section aria-label=${`${this.label} alt+T`} aria-live="polite" aria-relevant="additions text" aria-atomic="false">
       <ol
+        popover=${this.contained ? nothing : "manual"}
         tabindex="-1"
         data-y=${y}
         data-x=${x}
