@@ -190,7 +190,7 @@ test("the current destination and a selected tree row are drawn as the sidebar's
   expect(fills.light).not.toBe(fills.dark);
 });
 
-test("the pointer's layer is a square high two pixels around a one-square row's content, its corners hugging the icon tiles (Joachim, 19 October 2026)", async () => {
+test("the pointer's layer is exactly the row's square, four pixels past its content at each side, on the grid (Joachim, 19 October 2026)", async () => {
   for (const sf of SCALES) {
     const page = pages.light;
     await stage(page, ROWS + '<a id="native-flush" class="ds-row" href="#flush" style="--ds-row-padding: 0px"><span>Flush</span></a>', sf);
@@ -201,11 +201,11 @@ test("the pointer's layer is a square high two pixels around a one-square row's 
       const style = getComputedStyle(element!, "::after");
       return [style.top, style.bottom, style.left, style.right, style.borderTopLeftRadius].map(parseFloat);
     }, selector);
-    // From two above the sixteen to two below the foot: a square high; two past the 4px padding.
+    // The row's own square, top to foot: never into the next row; padded 4px, it fills the row's edges.
     for (const id of ["#native-button", "#native-link", "#button >>> .target"])
-      expect(await layer(id), `${id} at ${sf}`).toEqual([2 * sf, -2 * sf, 2 * sf, 2 * sf, 6 * sf]);
-    // With no padding the layer reaches two past the row's edges.
-    expect((await layer("#native-flush")).slice(2, 4)).toEqual([-2 * sf, -2 * sf]);
+      expect(await layer(id), `${id} at ${sf}`).toEqual([0, 0, 0, 0, 4 * sf]);
+    // Words on the column's edge (no padding): the layer reaches four past the row's edges.
+    expect((await layer("#native-flush")).slice(0, 4)).toEqual([0, 0, -4 * sf, -4 * sf]);
     // A tile is filled whole.
     expect((await layer("#native-tile")).slice(0, 4)).toEqual([0, 0, 0, 0]);
   }

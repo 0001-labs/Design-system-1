@@ -115,6 +115,15 @@
 .ds-table tbody > tr[data-open]:not([data-open="false"]) > :is(th, td):not([aria-selected="true"]) {
   background: var(--ds-row-fill-current, var(--ds-fill-hover));
 }
+/* Its ends rounded as a row's layer is, so an open row reads the same in a table and a list. */
+.ds-table tbody > tr[data-open]:not([data-open="false"]) > :is(th, td):first-child {
+  border-start-start-radius: var(--ds-row-fill-radius, calc(4px * var(--ds-sf)));
+  border-end-start-radius: var(--ds-row-fill-radius, calc(4px * var(--ds-sf)));
+}
+.ds-table tbody > tr[data-open]:not([data-open="false"]) > :is(th, td):last-child {
+  border-start-end-radius: var(--ds-row-fill-radius, calc(4px * var(--ds-sf)));
+  border-end-end-radius: var(--ds-row-fill-radius, calc(4px * var(--ds-sf)));
+}
 @media (forced-colors: active) {
   .ds-table tbody > tr[data-open]:not([data-open="false"]) > :is(th, td):not([aria-selected="true"]) {
     background: Highlight;
