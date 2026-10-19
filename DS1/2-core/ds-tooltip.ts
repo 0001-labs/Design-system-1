@@ -100,7 +100,29 @@ export class Tooltip extends LitElement {
     trigger.setAttribute("aria-describedby", [...ids, this.description.id].join(" "));
   };
 
-  updated(): void { this.describe(); }
+  updated(): void {
+    this.describe();
+    if (this._visible) this.place();
+  }
+
+  /**
+   * Keeps the bubble inside the window, as the page's tooltips do (0-face/tooltips.ts): four
+   * pixels from its edges, and below the control when there is no room above (or above when
+   * `placement="bottom"` has no room below). A tooltip at a frame's edge is never cut short.
+   */
+  private place(): void {
+    const bubble = this.shadowRoot?.querySelector<HTMLElement>(".bubble");
+    if (!bubble || bubble.hidden) return;
+    const edge = 4 * (parseFloat(getComputedStyle(this).getPropertyValue("--ds-sf")) || 1);
+    bubble.style.removeProperty("--ds-tooltip-shift");
+    bubble.dataset.side = this.placement === "bottom" ? "bottom" : "top";
+    let box = bubble.getBoundingClientRect();
+    if (bubble.dataset.side === "top" && box.top < edge) bubble.dataset.side = "bottom";
+    else if (bubble.dataset.side === "bottom" && box.bottom > innerHeight - edge) bubble.dataset.side = "top";
+    box = bubble.getBoundingClientRect();
+    const shift = box.left < edge ? edge - box.left : box.right > innerWidth - edge ? innerWidth - edge - box.right : 0;
+    if (shift) bubble.style.setProperty("--ds-tooltip-shift", `${shift}px`);
+  }
 
   render() {
     return html`<slot @slotchange=${this.describe}></slot>

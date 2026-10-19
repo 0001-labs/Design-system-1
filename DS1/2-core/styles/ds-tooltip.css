@@ -10,7 +10,8 @@
   position: absolute;
   left: 50%;
   bottom: calc(100% + 2px * var(--ds-sf, var(--sf, 1)));
-  transform: translateX(-50%);
+  /* Centred over its control, shifted to stay four pixels inside the window (ds-tooltip.ts). */
+  transform: translateX(calc(-50% + var(--ds-tooltip-shift, 0px)));
   z-index: var(--ds-tooltip-z-index, 1000);
   width: max-content;
   max-width: min(calc(320px * var(--ds-sf, var(--sf, 1))), calc(100vw - 20px));
@@ -32,7 +33,7 @@
 
 .bubble[hidden] { display: none; }
 
-:host([placement="bottom"]) .bubble {
+.bubble[data-side="bottom"] {
   bottom: auto;
   top: calc(100% + 2px * var(--ds-sf, var(--sf, 1)));
 }
