@@ -233,7 +233,9 @@ export class Toaster extends LitElement {
 
   private onPointerDown(event: PointerEvent, item: Item) {
     if (item.data.dismissible === false || item.data.type === "loading") return;
-    if ((event.composedPath()[0] as Element | undefined)?.closest?.("button, a")) return;
+    // Controls can contain icons with their own shadow root. Inspect the whole
+    // event path so swipe capture never steals their click.
+    if (event.composedPath().some(node => node instanceof Element && node.matches("button, a"))) return;
     (event.currentTarget as HTMLElement).setPointerCapture?.(event.pointerId);
     this.swipe = { id: item.data.id, start: event.clientY, time: Date.now(), amount: 0 };
     this.interacting = true;

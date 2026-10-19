@@ -153,3 +153,25 @@ test("an action can be a link, and following it closes the toast", async () => {
   expect(toasts(element)).toHaveLength(1);
   expect(toasts(element)[0]!.querySelector(".title")?.textContent).toBe("Saved");
 });
+
+
+test("pressing a close icon inside shadow DOM does not capture the pointer", async () => {
+  const element = await toaster();
+  const onDismiss = vi.fn();
+  toast.success("Copied", { duration: Infinity, onDismiss });
+  await settle(element, 10000);
+  const item = toasts(element)[0]!;
+  const capture = vi.fn();
+  item.setPointerCapture = capture;
+  const close = item.querySelector<HTMLButtonElement>("button.close")!;
+  const icon = close.querySelector("ds-icon")!;
+  await icon.updateComplete;
+  const glyph = icon.shadowRoot!.querySelector("svg")!;
+  expect(glyph).not.toBeNull();
+  glyph.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, composed: true, pointerId: 1 }));
+  expect(capture).not.toHaveBeenCalled();
+  glyph.dispatchEvent(new MouseEvent("click", { bubbles: true, composed: true }));
+  await settle(element, 500);
+  expect(onDismiss).toHaveBeenCalledOnce();
+  expect(toasts(element)).toHaveLength(0);
+});

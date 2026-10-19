@@ -267,7 +267,9 @@ class PageToaster {
     toast.addEventListener("pointerdown", event => {
       const now = this.live.find(entry => entry.data.id === id);
       if (!now || now.data.dismissible === false || now.data.type === "loading") return;
-      if ((event.composedPath()[0] as Element | undefined)?.closest?.("button, a")) return;
+      // Controls can contain icons with their own shadow root. Inspect the whole
+      // event path so swipe capture never steals their click.
+      if (event.composedPath().some(node => node instanceof Element && node.matches("button, a"))) return;
       toast.setPointerCapture?.(event.pointerId);
       this.swipe = { id, start: event.clientY, time: Date.now(), amount: 0 };
       this.interacting = true;
