@@ -113,6 +113,6 @@ export const Select = forwardRef<HTMLSelectElement | MenuElement, SelectProps>(f
     }, items ? items.map((entry, index) => h(Entry, { key: index, entry, menu: host })) : children);
   }
   const { className, style, hidden, children, fit, chip, primary, swatch, native, ...field } = props as FieldProps;
-  return h("ds-select", { className, style, hidden, fit: fit ? "" : undefined, chip: chip ? "" : undefined, primary: primary ? "" : undefined, native: native ? "" : undefined, swatch },
+  return h("ds-select", { className, style, hidden, fit: fit ? "" : undefined, chip: chip ? "" : undefined, primary: primary ? "" : undefined, native: native || undefined, swatch },
     h("select", { ...field, hidden, ref }, children));
 });
