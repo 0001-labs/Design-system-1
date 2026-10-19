@@ -367,6 +367,123 @@ test("heat's colours come from the palette, follow light and dark, and keep the 
   for (const [fill, ink] of [...light, ...dark]) expect(contrast(fill, ink)).toBeGreaterThanOrEqual(4.5);
 });
 
+test("a selectable calendar has Clear below its month, which empties the value and says so", async () => {
+  const calendar = await mount<Calendar>(`<ds-calendar month="2026-10" selectable compact value="2026-10-10/2026-10-17"></ds-calendar>`);
+  const clear = calendar.shadowRoot!.querySelector<HTMLButtonElement>(".clear-value")!;
+  expect(clear.textContent).toBe("Clear");
+  expect(clear.disabled).toBe(false);
+  const changes: { value: string; previous: string }[] = [];
+  calendar.addEventListener("change", event => changes.push((event as CustomEvent).detail));
+  clear.click();
+  await calendar.updateComplete;
+  expect(calendar.value).toBe("");
+  expect(changes).toEqual([{ value: "", previous: "2026-10-10/2026-10-17", start: "", end: "" }]);
+  expect(clear.disabled).toBe(true);
+  // From code, the same; nothing to clear says nothing.
+  calendar.value = "2026-10-05";
+  await calendar.updateComplete;
+  calendar.clear();
+  calendar.clear();
+  expect(changes.map(change => change.value)).toEqual(["", ""]);
+  // A required calendar, a plain month and the month inside a picker have none.
+  for (const markup of [`<ds-calendar selectable required></ds-calendar>`, `<ds-calendar></ds-calendar>`]) {
+    const other = await mount<Calendar>(markup);
+    expect(other.shadowRoot!.querySelector(".clear-value")).toBeNull();
+  }
+  const picker = await mount<Calendar>(`<ds-calendar picker value="2026-10-05"></ds-calendar>`);
+  picker.open = true;
+  await picker.updateComplete;
+  const inner = picker.shadowRoot!.querySelector("ds-calendar") as Calendar;
+  await inner.updateComplete;
+  expect(inner.shadowRoot!.querySelector(".clear-value")).toBeNull();
+  picker.clear();
+  await picker.updateComplete;
+  expect(picker.value).toBe("");
+  expect(picker.open).toBe(false);
+});
+
+test("the title travels up to the months and to twelve years, and a choice comes back down", async () => {
+  const calendar = await mount<Calendar>(`<ds-calendar compact selectable month="2027-09" today="2026-10-19" value="2027-09-16"></ds-calendar>`);
+  const root = calendar.shadowRoot!;
+  const title = () => root.querySelector<HTMLElement>(".title-button, .title")!;
+  const months: string[] = [];
+  calendar.addEventListener("navigate", event => months.push((event as CustomEvent).detail.month));
+  expect(title().textContent!.trim()).toBe("Sep 2027");
+  title().click();
+  await calendar.updateComplete;
+  // The months of 2027, three across, the chosen month marked; the arrows step a year.
+  expect(title().textContent!.trim()).toBe("2027");
+  const picks = () => [...root.querySelectorAll<HTMLButtonElement>(".pick")];
+  expect(picks().map(pick => pick.textContent)).toEqual(["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]);
+  expect(root.querySelectorAll(".pick-row")).toHaveLength(4);
+  expect(picks().filter(pick => pick.hasAttribute("data-selected")).map(pick => pick.textContent)).toEqual(["Sep"]);
+  expect(root.querySelector('[part="previous"]')!.getAttribute("aria-label")).toBe("Previous year");
+  (root.querySelector('[part="previous"]') as HTMLButtonElement).click();
+  await calendar.updateComplete;
+  expect(title().textContent!.trim()).toBe("2026");
+  expect(picks().filter(pick => pick.hasAttribute("data-today")).map(pick => pick.textContent)).toEqual(["Oct"]);
+  // Up again: twelve years, the title not a button; arrows step twelve.
+  title().click();
+  await calendar.updateComplete;
+  expect(title().textContent!.trim()).toBe("2016 – 2027");
+  expect(root.querySelector(".title-button")).toBeNull();
+  expect(picks().map(pick => pick.textContent)[0]).toBe("2016");
+  expect(root.querySelector('[part="next"]')!.getAttribute("aria-label")).toBe("Later years");
+  // A year goes down to its months, a month to its days.
+  picks().find(pick => pick.textContent === "2025")!.click();
+  await calendar.updateComplete;
+  expect(title().textContent!.trim()).toBe("2025");
+  picks().find(pick => pick.textContent === "Mar")!.click();
+  await calendar.updateComplete;
+  expect(calendar.month).toBe("2025-03");
+  expect(title().textContent!.trim()).toBe("Mar 2025");
+  expect(cells(calendar).length).toBeGreaterThan(0);
+  expect(months).toEqual(["2025-03"]);
+  // Nothing was chosen on the way.
+  expect(calendar.value).toBe("2027-09-16");
+});
+
+test("among the months the arrow keys move, Enter chooses and Escape goes back down", async () => {
+  const calendar = await mount<Calendar>(`<ds-calendar compact month="2026-05"></ds-calendar>`);
+  const root = calendar.shadowRoot!;
+  root.querySelector<HTMLElement>(".title-button")!.click();
+  await calendar.updateComplete;
+  const focused = () => root.querySelector<HTMLElement>('.pick[tabindex="0"]')!;
+  // The Tab stop starts on the month shown.
+  expect(focused().textContent).toBe("May");
+  key(focused(), "ArrowDown");
+  await calendar.updateComplete;
+  expect(focused().textContent).toBe("Aug");
+  key(focused(), "ArrowLeft");
+  await calendar.updateComplete;
+  expect(focused().textContent).toBe("Jul");
+  const escape = new KeyboardEvent("keydown", { key: "Escape", bubbles: true, composed: true, cancelable: true });
+  focused().dispatchEvent(escape);
+  await calendar.updateComplete;
+  expect(escape.defaultPrevented).toBe(true);
+  expect(root.querySelector(".picks")).toBeNull();
+  expect(calendar.month).toBe("2026-05");
+  root.querySelector<HTMLElement>(".title-button")!.click();
+  await calendar.updateComplete;
+  key(root.querySelector<HTMLElement>('.pick[data-pick="0"]')!, "ArrowLeft");
+  await calendar.updateComplete;
+  // Before January is the year before's December.
+  expect(root.querySelector(".title-button")!.textContent!.trim()).toBe("2025");
+  expect(focused().textContent).toBe("Dec");
+  key(focused(), "Enter");
+  await calendar.updateComplete;
+  expect(calendar.month).toBe("2025-12");
+});
+
+test("a compact range's band is the marks' height on their line, from the middle of each end", () => {
+  const css = readFileSync(join(import.meta.dirname, "../DS1/3-unit/styles/ds-calendar.css"), "utf8");
+  const band = css.slice(css.indexOf(":host([compact]) .day:is([data-inside], [data-first], [data-last])::before"));
+  expect(band).toMatch(/height: var\(--ds-calendar-mark\)/);
+  expect(band).toMatch(/top: calc\(\(var\(--ds-calendar-day-height\) - var\(--ds-calendar-mark\)\) \/ 2\)/);
+  expect(css).toMatch(/:host\(\[compact\]\) \.day\[data-first\]::before \{ inset-inline-start: 50%; \}/);
+  expect(css).not.toMatch(/linear-gradient\(to (right|left), transparent 50%, var\(--ds-calendar-band\)/);
+});
+
 test("no calendar names a product", () => {
   for (const file of ["0-face/calendar.ts", "3-unit/calendar-base.ts", "3-unit/ds-calendar.ts", "3-unit/ds-calendar-large.ts", "3-unit/styles/ds-calendar.css", "3-unit/styles/ds-calendar-large.css"]) {
     expect(readFileSync(join(import.meta.dirname, "../DS1", file), "utf8")).not.toMatch(/\b(Ezo|Link|Consistency|Peer|Ins|tau99)\b/);

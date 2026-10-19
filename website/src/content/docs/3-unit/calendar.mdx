@@ -49,12 +49,12 @@ calendar.addEventListener("change", event => console.log(event.detail.value));
 | Measure | Size |
 | --- | --- |
 | A day | Four squares wide (`day-width`), its date's square, `lines` squares of events (two), and one square to spare. |
-| The title and arrows | One square, one square above the days. Today and the arrows stand at the end: each arrow a chevron on a square of its own, one control high, in the title grey until the pointer fills it. |
+| The title and arrows | One square, one square above the days. The title is a button one control high with a chevron after it, filled by the pointer 4px past its words (see [months and years](#months-and-years)). Today and the arrows stand at the end: each arrow a chevron on a square of its own, one control high, in the title grey until the pointer fills it. |
 | The weekday names | One square, in the title grey, at the start of each day. |
 | A date | At the end of its first square, in the title grey, tabular figures. |
 | Today | A disc nine tenths of a square across, in red for blood, the date in white. |
 | The selected day | A square of the same size with the system's 4px corners, in Sharp blue, the date in white. |
-| A range | Each end drawn as the selected day, the days between on a band of the blue at 16%. |
+| A range | Each end drawn as the selected day, the days between on a band of the blue at 16%. In a compact month the band is the marks' height on their line, from the middle of the first day to the middle of the last, so the ends and the band read as one bar. |
 | An event | One square, drawn one pixel short, its words 4px from its edges; the time first, fainter. Filled with its `color` or the fill. |
 | More events than lines | The last line says `+2`; pressing it lays the day's events over the days below. |
 | A week number | `W42` in the compressed face, at the start of the week's first day, with `week-numbers`. |
@@ -118,6 +118,22 @@ The title names the month at the start of the view as it scrolls. The arrows mov
 There is one way to choose, in a month and in the picker: a person picks one day or a range in the same calendar, with nothing to switch. The first press chooses a day, and `value` is that day. The next press ends a range from it, before or after, and `value` becomes `start/end` (ISO 8601's interval); pressing the same day again keeps the one day. The press after that starts again. While the end is still to come, the day under the pointer previews it.
 
 `change` fires with each press that chooses: `{ value, previous, start, end }`, `end` empty while it is still to come and the last day once it is chosen. A `value` set by the page is whole, so the next press starts again.
+
+### Clear
+
+A selectable calendar has **Clear** one square below its month, at the start: a secondary button one control high, in the shared word, disabled while nothing is chosen. It empties the value and fires `change` with `value` empty (`start` and `end` too). `clear()` does the same from code, in a month and in a picker (where it also closes the panel). `required` leaves Clear out; the picker's month uses the picker's own Clear.
+
+## Months and years
+
+Pressing the title travels by months and years, as a date picker's title does. The days go up to the twelve months of their year (the title reads the year and the arrows step a year), the year goes up to twelve years (the title reads them, `2016 – 2027`, and the arrows step twelve). Choosing a year shows its months; choosing a month shows its days and fires `navigate`. Nothing is chosen on the way.
+
+| Measure | Size |
+| --- | --- |
+| A month or a year | One square high and whole squares wide, three across a narrow month (two squares each) and four across a wider one, rows one square apart. |
+| Its mark | Nine tenths of a square high with a picture's corners: the chosen month or year in Sharp blue, today's in the today red, the pointer's in the fill. |
+| The area | The days' height, so nothing below moves between levels; the level a person moves to fades in (opacity and scale, none with reduced motion). |
+
+The months and years are a grid with one Tab stop: the arrow keys move (past December is the next year's January), Enter or Space chooses, and Escape goes back down a level without closing a picker. Month names and years come from the current language through `format.ts`. `no-header` leaves the travel out with the title.
 
 ## Picker
 
@@ -192,7 +208,7 @@ The day arithmetic the calendars use is `DS1/0-face/calendar.ts`, plain TypeScri
 - Each calendar is a grid named by its month (or `label`), with one Tab stop on a day: the one moved to, the selected day, today, or the first. A selectable calendar is `aria-multiselectable`, and every day of the range is `aria-selected`.
 - The arrow keys move a day, or a week across the weeks; Home and End go to the week's first and last day; Page Up and Page Down move a month, with Shift a year. A month moves on when the focus leaves it, and right to left the arrows turn round.
 - Enter or Space presses the day. Each day is labelled with its whole date and what happens on it, and today is `aria-current="date"`; a selectable calendar marks the selected day with `aria-selected`.
-- The arrows are named "Previous month" and "Next month", and the month's name is announced when it changes. All the words are the shared words, in every language.
+- The arrows are named "Previous month" and "Next month" ("Previous year", "Next year", "Earlier years" and "Later years" among the months and years), and the month's name is announced when it changes. The title button is named by the title and "Choose a month and year". All the words are the shared words, in every language.
 - A picker's field is a button with `aria-haspopup="dialog"` and `aria-expanded`, named by `label` and the value. Enter, Space or the down arrow opens the panel with the focus on the first chosen day (or today); a click opens it and leaves the focus on the field. The typed fields and times are named by the label and which end they are; the switch is `role="switch"`. Escape, a press outside, or the focus leaving closes the panel, and the focus goes back to the field.
 
 ## API
@@ -223,7 +239,7 @@ The day arithmetic the calendars use is `DS1/0-face/calendar.ts`, plain TypeScri
 | `placeholder` | string | "Choose a date" | A picker's words before a day is chosen. |
 | `length` | string | `medium` | How a picker writes a day. |
 | `time` | boolean | `false` | A picker chooses a time with each day (Include time). |
-| `required` | boolean | `false` | A form needs a value. |
+| `required` | boolean | `false` | A form needs a value; Clear is left out. |
 | `disabled` | boolean | `false` | A picker cannot be opened. |
 | `open` | boolean | `false` | A picker's panel is open. |
 
@@ -250,11 +266,13 @@ The day arithmetic the calendars use is `DS1/0-face/calendar.ts`, plain TypeScri
 | `previousMonth()`, `nextMonth()` | Moves a month, as the arrows do. |
 | `showToday()` | Brings today's month into view. |
 | `showMonth(month)` | Shows a month (`ds-calendar`). |
+| `clear()` | Empties the value, as Clear does, and fires `change`. |
 | `show()`, `hide()` | Opens or closes a picker's panel. |
 
 | Part | What it is |
 | --- | --- |
-| `header`, `previous`, `next`, `today` | The title row and its buttons. |
+| `header`, `title`, `previous`, `next`, `today` | The title row and its buttons. |
+| `picks`, `pick`, `foot`, `clear` | The months or years, one of them (with `selected` and `today`), and Clear's row and button. |
 | `grid`, `weekdays` | The grid and its weekday names. |
 | `day`, `week`, `event`, `more` | A month's days, weeks, events and the `+2` line; a day also carries `today`, `selected` and `heat`. |
 | `cell`, `frame`, `scroller` | The large calendar's days, frame and scroller. |
