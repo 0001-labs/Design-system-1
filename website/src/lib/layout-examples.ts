@@ -127,7 +127,7 @@ export const LAYOUT_EXAMPLES: Record<string, LayoutExample> = {
     <ds-text literal strong>Page</ds-text>
     <ds-input label="Address" name="slug" value="/reading-room"></ds-input>
     <ds-row fill><ds-text literal>Status</ds-text><ds-select><select aria-label="Status"><option>Draft</option><option>Published</option></select></ds-select></ds-row>
-    <ds-row fill><ds-text literal>Show in menu</ds-text><ds-switch rounded><button type="button" role="switch" aria-label="Show in menu" aria-checked="true"></button></ds-switch></ds-row>
+    <ds-row fill><ds-text literal>Show in menu</ds-text><ds-switch><button type="button" role="switch" aria-label="Show in menu" aria-checked="true"></button></ds-switch></ds-row>
     <ds-row fill><ds-text literal>Language</ds-text><ds-cycle type="language" compact></ds-cycle></ds-row>
   </ds-form>
 </ds-page>`,
@@ -152,8 +152,8 @@ document.querySelectorAll('ds-switch button').forEach(button => button.addEventL
     <ds-row><ds-text literal tone="muted">Changes apply to this device until you save them.</ds-text></ds-row>
   </div>
   <ds-list>
-    <ds-row fill><ds-text literal>Notifications</ds-text><ds-switch rounded><button type="button" role="switch" aria-label="Notifications" aria-checked="true"></button></ds-switch></ds-row>
-    <ds-row fill><ds-text literal>Weekly summary</ds-text><ds-switch rounded><button type="button" role="switch" aria-label="Weekly summary" aria-checked="false"></button></ds-switch></ds-row>
+    <ds-row fill><ds-text literal>Notifications</ds-text><ds-switch><button type="button" role="switch" aria-label="Notifications" aria-checked="true"></button></ds-switch></ds-row>
+    <ds-row fill><ds-text literal>Weekly summary</ds-text><ds-switch><button type="button" role="switch" aria-label="Weekly summary" aria-checked="false"></button></ds-switch></ds-row>
     <ds-row fill><ds-text literal>Theme</ds-text><ds-cycle type="theme"></ds-cycle></ds-row>
     <ds-row fill><ds-text literal>Language</ds-text><ds-cycle type="language" compact></ds-cycle></ds-row>
     <ds-row fill><ds-text literal>Week starts on</ds-text><ds-select><select aria-label="Week starts on"><option>Monday</option><option>Sunday</option></select></ds-select></ds-row>

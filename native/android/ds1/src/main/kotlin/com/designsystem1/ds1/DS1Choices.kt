@@ -118,9 +118,8 @@ fun DS1Choice(
 }
 
 /**
- * `ds-switch`: a 32 by 16 track with a 12 dp thumb two dp in, both with the corner; on, the
- * track takes the accent and the thumb the ink on it, sliding one control height in 140 ms.
- * [rounded] is the rounded switch: a pill with a white round thumb on dark Apple green.
+ * `ds-switch`: a 32 by 16 pill with a 12 dp white round thumb two dp in; grey when off and
+ * dark Apple green when on, sliding one control height in 140 ms.
  */
 @Composable
 fun DS1Switch(
@@ -128,21 +127,12 @@ fun DS1Switch(
     onCheckedChange: ((Boolean) -> Unit)?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    rounded: Boolean = false,
 ) {
     val scale = LocalDS1Scale.current
     val interaction = remember { MutableInteractionSource() }
-    val corner = if (rounded) scale.control else scale.radius
-    val track = when {
-        !checked -> DS1Colors.fill
-        rounded -> SWITCH_TRACK_ON
-        else -> DS1Colors.accent
-    }
-    val thumb = when {
-        rounded -> DS1Colors.white
-        checked -> DS1Colors.onAccent
-        else -> DS1Colors.textMuted
-    }
+    val corner = scale.control
+    val track = if (checked) SWITCH_TRACK_ON else DS1Colors.fill
+    val thumb = DS1Colors.white
     val travel by animateDpAsState(if (checked) scale.control else 0.dp, tween(140), label = "switch")
     Box(
         modifier
@@ -154,7 +144,7 @@ fun DS1Switch(
             .padding(scale(2f)),
         contentAlignment = Alignment.CenterStart,
     ) {
-        Box(Modifier.offset { androidx.compose.ui.unit.IntOffset(travel.roundToPx(), 0) }.size(scale(12f)).background(thumb.current, if (rounded) CircleShape else RoundedCornerShape(scale.radius)))
+        Box(Modifier.offset { androidx.compose.ui.unit.IntOffset(travel.roundToPx(), 0) }.size(scale(12f)).background(thumb.current, CircleShape))
     }
 }
 

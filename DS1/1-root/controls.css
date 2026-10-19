@@ -297,8 +297,9 @@ textarea.ds-input {
 /*
  * `.ds-switch` is the `ds-switch` element's look on a native
  * `<button role="switch" aria-checked>`: two control heights wide, its thumb
- * one control high less a 2px inset, travelling one control height.
- * `.ds-switch--rounded` is the round variant with a white thumb.
+ * one control high less a 2px inset, travelling one control height. A pill with a white
+ * round thumb, grey when off and the darker green when on, whatever the page's accent: the
+ * one switch (Joachim, 19 October 2026).
  */
 
 .ds-switch {
@@ -314,9 +315,9 @@ textarea.ds-input {
   margin: 0;
   padding: calc(2px * var(--ds-sf));
   border: 0;
-  border-radius: var(--ds-radius);
+  border-radius: var(--ds-choice-unit);
   background: var(--ds-fill);
-  color: var(--ds-text-color-muted);
+  color: var(--ds-white);
   cursor: pointer;
   touch-action: manipulation;
 }
@@ -326,33 +327,18 @@ textarea.ds-input {
   display: block;
   width: calc(var(--ds-choice-unit) - 4px * var(--ds-sf));
   height: 100%;
-  border-radius: var(--ds-radius);
-  background: currentColor;
+  border-radius: 50%;
+  background: var(--ds-white);
   transform: translateX(0);
   transition: transform 140ms ease;
 }
 
 .ds-switch[aria-checked="true"] {
-  background: var(--ds-accent-color);
-  color: var(--ds-button-text-color-on-accent);
+  background: var(--ds-switch-track-on);
 }
 
 .ds-switch[aria-checked="true"]::after {
   transform: translateX(var(--ds-choice-unit));
-}
-
-.ds-switch--rounded {
-  border-radius: var(--ds-choice-unit);
-  color: var(--ds-white);
-}
-
-.ds-switch--rounded::after {
-  border-radius: 50%;
-  background: var(--ds-white);
-}
-
-.ds-switch--rounded[aria-checked="true"] {
-  background: var(--ds-switch-track-on);
 }
 
 @media (prefers-reduced-motion: reduce) {

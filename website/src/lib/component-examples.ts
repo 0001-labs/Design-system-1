@@ -91,8 +91,8 @@ export const EXAMPLES: Record<string, ComponentExample> = {
     title: 'Turn a setting on or off',
     hint: 'Click or press Space to change the local setting. No settings are saved.',
     height: 180,
-    html: `<label style="display:flex;align-items:center;gap:20px">Notifications <ds-switch rounded><button type="button" role="switch" aria-label="Notifications" aria-checked="true"></button></ds-switch></label>
-<label style="display:flex;align-items:center;gap:20px">Unavailable <ds-switch rounded><button type="button" role="switch" aria-label="Unavailable" aria-checked="false" disabled></button></ds-switch></label>`,
+    html: `<label style="display:flex;align-items:center;gap:20px">Notifications <ds-switch><button type="button" role="switch" aria-label="Notifications" aria-checked="true"></button></ds-switch></label>
+<label style="display:flex;align-items:center;gap:20px">Unavailable <ds-switch><button type="button" role="switch" aria-label="Unavailable" aria-checked="false" disabled></button></ds-switch></label>`,
     script: `document.querySelectorAll('ds-toggle button').forEach(button => {
   button.addEventListener('click', () => {
     button.setAttribute('aria-checked', String(button.getAttribute('aria-checked') !== 'true'));

@@ -95,7 +95,7 @@ private fun CatalogueScreen() {
             }
             DS1Gap(size = DS1GapSize.Half)
             Row(horizontalArrangement = Arrangement.spacedBy(scale(4f)), verticalAlignment = Alignment.CenterVertically) {
-                DS1Switch(on, { on = it }); DS1Switch(on, { on = it }, rounded = true); DS1LineText(if (on) "On" else "Off")
+                DS1Switch(on, { on = it }); DS1LineText(if (on) "On" else "Off")
             }
             DS1Gap(size = DS1GapSize.Half)
             Row(horizontalArrangement = Arrangement.spacedBy(scale(4f))) {

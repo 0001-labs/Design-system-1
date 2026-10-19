@@ -43,7 +43,7 @@ Every public piece of the web library has a native counterpart with the same nam
 | `ds-button split` | `DS1SplitButton` | `DS1SplitButton` |
 | `ds-input`, `multiline` | `DS1Field` (`rows:`), `DS1FieldStyle` | `DS1Field(rows)` |
 | `ds-checkbox`, `ds-radio`, choice tiles | `DS1CheckboxStyle`, `DS1Checkbox`, `DS1Radio`, `DS1Choice` | `DS1Checkbox`, `DS1Radio`, `DS1Choice` |
-| `ds-switch`, `rounded` | `DS1SwitchStyle` (`.ds1Switch`, `.ds1Switch(rounded:)`) | `DS1Switch(rounded)` |
+| `ds-switch` | `DS1SwitchStyle` (`.ds1Switch`) | `DS1Switch` |
 | `ds-select`, a field | `DS1Select` (the system's menu) | `DS1Select` |
 | `ds-tabs` | `DS1Tabs` | `DS1Tabs` |
 | `ds-badge`, `ds-token`, `ds-swatch`, link, `ds-gap` | `DS1Badge`, `DS1Token`, `DS1Swatch`, `DS1Link`, `DS1Gap` | `DS1Badge`, `DS1Token`, `DS1Swatch`, `DS1Link`, `DS1Gap` |

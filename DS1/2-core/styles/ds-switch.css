@@ -21,10 +21,10 @@
   padding: calc(2px * var(--ds-sf)) !important;
   margin: 0 !important;
   border: 0 !important;
-  border-radius: var(--ds-radius) !important;
-  corner-shape: var(--ds-corner-shape, round) !important;
+  border-radius: var(--ds-choice-unit) !important;
+  corner-shape: round !important;
   background: var(--ds-fill) !important;
-  color: var(--ds-text-color-muted) !important;
+  color: var(--ds-white) !important;
   box-shadow: none !important;
   cursor: pointer !important;
   touch-action: manipulation;
@@ -34,32 +34,16 @@
   display: block;
   width: calc(var(--ds-choice-unit) - 4px * var(--ds-sf));
   height: 100%;
-  border-radius: var(--ds-radius);
-  corner-shape: var(--ds-corner-shape, round);
-  background: currentColor;
+  border-radius: 50%;
+  corner-shape: round;
+  background: var(--ds-white);
   transform: translateX(0);
   transition: transform 140ms ease;
 }
 ::slotted(button[aria-checked="true"]) {
-  background: var(--ds-accent-color) !important;
-  color: var(--ds-button-text-color-on-accent) !important;
+  background: var(--ds-switch-track-on) !important;
 }
 ::slotted(button[aria-checked="true"])::after { transform: translateX(var(--ds-choice-unit)); }
 ::slotted(button:focus-visible) { outline: 2px solid var(--ds-focus-ring) !important; outline-offset: 1px !important; }
 ::slotted(button:disabled) { cursor: default !important; opacity: .5 !important; }
 @media (prefers-reduced-motion: reduce) { ::slotted(button)::after { transition: none; } }
-
-/* Rounded switches keep their shape and white thumb independently of page accents. */
-:host([rounded]) ::slotted(button) {
-  border-radius: var(--ds-choice-unit) !important;
-  corner-shape: round !important;
-  color: var(--ds-white) !important;
-}
-:host([rounded]) ::slotted(button)::after {
-  border-radius: 50%;
-  corner-shape: round;
-  background: var(--ds-white);
-}
-:host([rounded]) ::slotted(button[aria-checked="true"]) {
-  background: var(--ds-switch-track-on) !important;
-}

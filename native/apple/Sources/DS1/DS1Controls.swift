@@ -124,33 +124,27 @@ extension DS1Choice where Preview == EmptyView {
     }
 }
 
-/// `ds-switch` for SwiftUI's `Toggle`: a 32 by 16 track and a 12-point thumb 2 in, with the
-/// corner; on, the accent and the ink on it, sliding one control height in 140 ms. `rounded`
-/// is the rounded switch: a pill with a white round thumb on dark Apple green.
+/// `ds-switch` for SwiftUI's `Toggle`: a 32 by 16 pill and a 12-point white round thumb 2 in;
+/// grey when off and dark Apple green when on, sliding one control height in 140 ms.
 public struct DS1SwitchStyle: ToggleStyle {
-    let rounded: Bool
-    public init(rounded: Bool = false) { self.rounded = rounded }
-    public func makeBody(configuration: Configuration) -> some View { Face(configuration: configuration, rounded: rounded) }
+    public init() {}
+    public func makeBody(configuration: Configuration) -> some View { Face(configuration: configuration) }
 
     struct Face: View {
         @Environment(\.ds1Scale) private var scale
         @Environment(\.isEnabled) private var enabled
         @Environment(\.accessibilityReduceMotion) private var reduceMotion
         let configuration: Configuration
-        let rounded: Bool
         var body: some View {
             let on = configuration.isOn
-            let corner = rounded ? scale.control : scale.radius
+            let corner = scale.control
             Button { configuration.isOn.toggle() } label: {
                 HStack(spacing: scale(4)) {
                     configuration.label
                     ZStack(alignment: .leading) {
                         RoundedRectangle(cornerRadius: corner, style: .continuous)
-                            .fill(!on ? DS1Color.fill : rounded ? DS1Color(0x529d36) : DS1Color.accent)
-                        Group {
-                            if rounded { Circle().fill(DS1Color.white) }
-                            else { RoundedRectangle(cornerRadius: scale.radius, style: .continuous).fill(on ? DS1Color.onAccent : DS1Color.textMuted) }
-                        }
+                            .fill(on ? DS1Color(0x529d36) : DS1Color.fill)
+                        Circle().fill(DS1Color.white)
                         .frame(width: scale(12), height: scale(12))
                         .padding(scale(2))
                         .offset(x: on ? scale.control : 0)
@@ -169,8 +163,6 @@ public struct DS1SwitchStyle: ToggleStyle {
 
 extension ToggleStyle where Self == DS1SwitchStyle {
     public static var ds1Switch: DS1SwitchStyle { DS1SwitchStyle() }
-    /// `rounded`: the rounded switch, a pill with a white round thumb.
-    public static func ds1Switch(rounded: Bool) -> DS1SwitchStyle { DS1SwitchStyle(rounded: rounded) }
 }
 
 /// One segment of a split button or one tab: its value, its words, an icon, and whether it can be chosen.

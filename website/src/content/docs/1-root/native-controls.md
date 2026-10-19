@@ -13,7 +13,7 @@ description: The components' look as plain classes on native elements, and the s
 | `ds-input` on a `<textarea>` | `<textarea>` | A multiline field of whole rows; `--ds-textarea-rows` sets how many, three by default. |
 | `ds-select` | `<select>` | A field with the chevron drawn in its text colour. Without scripts the platform's picker opens; the [Select](/3-unit/select/) element draws its own list. |
 | `ds-checkbox`, `ds-radio` | `<input type="checkbox">`, `<input type="radio">` | The `ds-checkbox` and `ds-radio` faces: one square on the field's ground with a 1px line; the checkbox fills with the accent and shows the check, the radio a dot half a square across. |
-| `ds-switch`, with `ds-switch--rounded` | `<button role="switch" aria-checked>` | The Switch: two control heights wide, its thumb travelling one. The page toggles `aria-checked`. |
+| `ds-switch` | `<button role="switch" aria-checked>` | The Switch: a pill two control heights wide, its white round thumb travelling one, grey off and the darker green on. The page toggles `aria-checked`. |
 | `ds-range` | `<input type="range">` | A slider one control high on the lower sixteen of its square, eight squares wide: a 1px line across its middle and a thumb one control high and half a control wide in the ink. See [Range](#range). |
 | `ds-tabs`, with `ds-tabs--fill` | a row of `.ds-button` | The Tabs row. With `role="group"` it is a segmented control: the choices grey, the chosen one (`aria-pressed`, `aria-selected` or `aria-current`) in the accent. |
 | `ds-overlay` | `<dialog>` | The Overlay's frame, a modal: twenty squares wide, a square of padding, a hairline, the paper and a dimmed backdrop. Mark its parts with `data-ds-overlay="header"`, `title`, `description`, `footer` and `close`, as inside the element, and a field with `field`, its label with `label`. The [feedback module](/1-root/feedback/) draws `confirm()`, `prompt()` and `alert()` on it. `ds-overlay--sheet` stands it at the foot of the screen with a handle, `--drawer` (with `--start` for the start side) as a drawer, `--screen` over the whole screen; `bindOverlaySwipe()` from `0-face/overlay-swipe.ts` lets a finger swipe a sheet or drawer away ([Sheets and drawers](/4-page/overlay/#sheets-and-drawers)). From `overlay.css`, which controls.css imports. |
@@ -133,7 +133,7 @@ The page flips `aria-pressed` when it is clicked. The words stay the same in bot
 | `ds-toggle` | `<button class="ds-button" aria-pressed>` | An action that stays on: show the timeline, mute a track, bold. |
 | `ds-tabs` with `role="group"` | a row of `.ds-button` with `aria-pressed` | One of two or more choices: list or board; day, week or month. |
 
-The rounded switch is [`<ds-switch rounded>`](/2-core/choice/#rounded): on a page without Lit it is `ds-switch ds-switch--rounded`. The `ds-toggle` class is the toggle button.
+The switch is [`<ds-switch>`](/2-core/choice/#the-switch): on a page without Lit it is `ds-switch`, the same pill. The `ds-toggle` class is the toggle button.
 
 ## Range
 

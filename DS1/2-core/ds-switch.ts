@@ -2,8 +2,8 @@ import { LitElement, html, unsafeCSS } from "lit";
 import { define } from "../0-face/define";
 import styles from "./styles/ds-switch.css?inline";
 
-/** The shared switch face. The slotted button retains native activation and refs. */
-/** rounded selects a pill track, white circular thumb and darker-green on state. */
+/** The switch: a pill with a white round thumb, grey when off and the darker green when on,
+    whatever the page's accent. The slotted button retains native activation and refs. */
 export class Switch extends LitElement {
   static styles = unsafeCSS(styles);
   focus(options?: FocusOptions) { this.querySelector<HTMLButtonElement>(":scope > button")?.focus(options); }
