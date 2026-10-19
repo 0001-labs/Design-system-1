@@ -102,7 +102,7 @@ export const IMPLEMENTATION_COLUMNS: ComponentColumn[] = [
 const FAMILY: Record<string, string> = {
   split: "button", toggle: "switch", textarea: "input", language: "cycle", banner: "message", notice: "message", toast: "message",
   meter: "progress", steps: "progress", pagedots: "progress", slide: "carousel", tree: "sidebar", layout: "page",
-  dialog: "overlay", drawer: "overlay", menu: "select",
+  dialog: "overlay", drawer: "overlay", menu: "select", "date-picker": "calendar",
 };
 /** Retired with nothing taking their place. */
 const RETIRED = new Set(["date"]);

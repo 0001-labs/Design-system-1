@@ -3,7 +3,16 @@
  * one when compact) and, beside its date's square, holds --ds-calendar-lines
  * one-square lines of events and one square to spare. Every line of words
  * stands on the lower sixteen of its square. The boxes are hairlines centred
- * on the grid lines; today is a red disc nine tenths of a square across. */
+ * on the grid lines; today is a red disc nine tenths of a square across.
+ *
+ * A picker is the select's face: one control high at the foot of its square,
+ * ten squares wide by default, the calendar icon at its start and the down
+ * arrow at its end. Its month opens on the menu's frame, half a square from
+ * the field: a 1px line, half a square inside it, no shadow, so eight squares
+ * wide. Inside, on whole squares: the first and last day to type (each with
+ * its time below when times are on), one square spare, the compact month one
+ * square a day, then Include time and Clear, each one square, set off by
+ * one-square separators with a line through them. */
 
 :host {
   --ds-calendar-day: calc(var(--ds-unit) * var(--ds-calendar-day-squares, 4));
@@ -236,3 +245,112 @@
 /* In a compact month the pointer's day and the chosen day take squares with the system's corners; today keeps its disc. */
 :host([compact]) .date { border-radius: var(--ds-radius); }
 :host([compact]) .day[data-today]:not([data-selected]) .date { border-radius: 999px; }
+
+/* The picker: a field that opens the small month. */
+:host([picker]) {
+  --ds-calendar-picker-width: calc(10 * var(--ds-unit));
+  display: inline-flex;
+  align-items: flex-end;
+  vertical-align: bottom;
+  height: var(--ds-unit);
+}
+
+.trigger {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: calc(4px * var(--ds-sf, 1));
+  width: var(--ds-calendar-picker-width);
+  padding-inline: 0 calc(4px * var(--ds-sf, 1));
+  text-align: start;
+  cursor: pointer;
+}
+.trigger:disabled { cursor: default; }
+.trigger .icon,
+.trigger .arrow { flex: 0 0 auto; }
+.trigger .text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.trigger[data-empty] .text { color: var(--ds-title-color); }
+.trigger[aria-expanded="true"] .arrow { transform: rotate(180deg); }
+
+/* The month's panel, on the menu's frame. */
+.popover {
+  position: fixed;
+  inset: auto;
+  box-sizing: border-box;
+  margin: 0;
+  padding: calc(var(--ds-unit) / 2 - 1px);
+  border: 1px solid var(--ds-border-color);
+  border-radius: var(--ds-radius-card);
+  background: var(--ds-paper);
+  color: var(--ds-text-color);
+  box-shadow: none;
+  overflow: visible;
+}
+.popover:not(:popover-open) { display: none; }
+
+/* The days to type: a row of one square for each end, its time on the row below; one square spare after. */
+.fields { margin-block-end: var(--ds-unit); }
+.field-row {
+  display: flex;
+  align-items: flex-end;
+  gap: calc(var(--ds-unit) / 2);
+  height: var(--ds-unit);
+}
+.field { flex: 1 1 auto; min-width: 0; }
+.clock { flex: 1 1 auto; min-width: 0; }
+.fields, .options { width: calc(7 * var(--ds-unit)); }
+
+/* Include time and Clear, each one square, the words on the sixteen. */
+.option {
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--ds-unit);
+  width: 100%;
+  height: var(--ds-unit);
+  margin: 0;
+  padding: 0 calc(4px * var(--ds-sf, 1));
+  border: 0;
+  border-radius: var(--ds-radius);
+  background: transparent;
+  color: var(--ds-text-color);
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.option:hover:not(:disabled) { background: var(--ds-row-fill-hover, var(--ds-fill)); }
+.option:focus-visible { outline: 2px solid var(--ds-focus-ring); outline-offset: -2px; }
+.option:disabled { color: var(--ds-title-color); cursor: default; }
+.option .ds-switch { flex: 0 0 auto; }
+
+/* A separator: one square with a 1px line through its middle. */
+.separator {
+  position: relative;
+  height: var(--ds-unit);
+}
+.separator::after {
+  position: absolute;
+  inset-inline: 0;
+  top: calc(50% - 0.5px);
+  height: 1px;
+  background: var(--ds-border-color);
+  content: "";
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .popover:popover-open {
+    animation: ds-calendar-picker-in 140ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .trigger .arrow { transition: transform 140ms ease; }
+}
+@keyframes ds-calendar-picker-in {
+  from { opacity: 0; transform: translateY(calc(-4px * var(--ds-sf, 1))); }
+  to { opacity: 1; transform: none; }
+}

@@ -71,7 +71,6 @@ export const ALL_LAYERS: DirectoryLayer[] = [
       { name: 'Bento', href: '/3-unit/bento/', tag: 'ds-bento' },
       { name: 'Carousel', href: '/3-unit/carousel/', tag: 'ds-carousel' },
       { name: 'Context', href: '/3-unit/context/', tag: 'ds-context' },
-      { name: 'Date picker', href: '/3-unit/date-picker/', tag: 'ds-date-picker' },
       { name: 'Form', href: '/3-unit/form/', tag: 'ds-form' },
       { name: 'Footer', href: '/4-page/footer/', tag: 'ds-footer' },
       { name: 'Header', href: '/4-page/header/', tag: 'ds-header' },
