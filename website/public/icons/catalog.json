@@ -1797,13 +1797,6 @@
     "shapes": 2
   },
   {
-    "key": "triangle",
-    "name": "Triangle",
-    "source": "Library",
-    "url": "/icons/library/triangle.svg",
-    "shapes": 1
-  },
-  {
     "key": "tv",
     "name": "Tv",
     "source": "Library",

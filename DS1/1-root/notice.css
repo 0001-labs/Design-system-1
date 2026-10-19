@@ -12,7 +12,7 @@
  * the danger colour. The `ds-notice` element draws the same parts.
  *
  *   ds-notice                       the block: mark, words, dismiss
- *   ds-notice__mark                 the square mark; holds an icon in its ink
+ *   ds-notice__mark                 the mark, a picture's 4px corners; holds an icon in its ink
  *   ds-notice__title                one line in the medium face
  *   ds-notice__text                 lines of one square
  *   ds-notice__actions              buttons or links on one row
@@ -84,6 +84,9 @@
   height: var(--ds-control-height);
   margin-block: calc((var(--ds-unit) - var(--ds-control-height)) / 2);
   overflow: hidden;
+  /* Rounded as every icon tile is (Joachim, 19 October 2026). */
+  border-radius: var(--ds-radius);
+  corner-shape: var(--ds-corner-shape, round);
   background: var(--ds-notice-mark);
   color: var(--ds-notice-mark-ink);
   --ds-icon-color: var(--ds-notice-mark-ink);
