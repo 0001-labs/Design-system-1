@@ -9,6 +9,9 @@
   height: var(--ds-unit);
 }
 :host([hidden]) { display: none !important; }
+/* A plain radio as the checkbox: a 16px circle on its square's lower sixteen, at its start. */
+:host(:not([choice])) { display: inline-grid; align-items: end; justify-items: start; vertical-align: top; }
+:host(:not([choice])) ::slotted(input[type="radio"]) { width: var(--ds-control-height) !important; height: var(--ds-control-height) !important; }
 ::slotted(input[type="radio"]) {
   appearance: none !important;
   box-sizing: border-box !important;
@@ -30,8 +33,8 @@
 ::slotted(input[hidden]) { display: none !important; }
 ::slotted(input)::before {
   content: "";
-  width: calc(var(--ds-unit) / 2);
-  height: calc(var(--ds-unit) / 2);
+  width: calc(var(--ds-control-height) / 2);
+  height: calc(var(--ds-control-height) / 2);
   border-radius: 50%;
   background: currentColor;
   opacity: 0;

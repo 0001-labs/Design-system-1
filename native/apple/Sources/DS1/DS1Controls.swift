@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// `ds-checkbox` for SwiftUI's `Toggle`: one square, a 1-point border, the corner; on, the
+/// `ds-checkbox` for SwiftUI's `Toggle`: a 16-point box on its square's lower sixteen at its
+/// start, as an icon stands, a 1-point border, the corner; on, the
 /// accent with the check in the ink on it. Use `Toggle(…).toggleStyle(.ds1Checkbox)`, or
 /// `DS1Checkbox` for a mixed state.
 public struct DS1CheckboxStyle: ToggleStyle {
@@ -49,15 +50,17 @@ struct DS1CheckboxBox: View {
         ZStack {
             shape.fill(on || mixed ? DS1Color.accent : DS1Color.inputBackground)
             shape.strokeBorder(DS1Color.border, lineWidth: DS1Metrics.line)
-            if mixed { Rectangle().fill(DS1Color.onAccent).frame(width: scale(10), height: scale(2)) }
+            if mixed { Rectangle().fill(DS1Color.onAccent).frame(width: scale(8), height: scale(2)) }
             else if on { DS1Icon(.check, size: .large).foregroundStyle(DS1Color.onAccent) }
         }
-        .frame(width: scale.unit, height: scale.unit)
+        .frame(width: scale.control, height: scale.control)
+        .frame(width: scale.unit, height: scale.unit, alignment: .bottomLeading)
         .opacity(enabled ? 1 : 0.5)
     }
 }
 
-/// `ds-radio`: a one-square circle with a 10-point dot in the text colour when chosen.
+/// `ds-radio`: a 16-point circle on its square's lower sixteen at its start, with an 8-point
+/// dot in the text colour when chosen.
 public struct DS1Radio: View {
     @Environment(\.ds1Scale) private var scale
     @Environment(\.isEnabled) private var enabled
@@ -72,9 +75,10 @@ public struct DS1Radio: View {
             ZStack {
                 Circle().fill(DS1Color.inputBackground)
                 Circle().strokeBorder(DS1Color.border, lineWidth: DS1Metrics.line)
-                if selected { Circle().fill(DS1Color.text).frame(width: scale(10), height: scale(10)) }
+                if selected { Circle().fill(DS1Color.text).frame(width: scale(8), height: scale(8)) }
             }
-            .frame(width: scale.unit, height: scale.unit)
+            .frame(width: scale.control, height: scale.control)
+            .frame(width: scale.unit, height: scale.unit, alignment: .bottomLeading)
             .opacity(enabled ? 1 : 0.5)
         }
         .buttonStyle(.plain)

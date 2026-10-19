@@ -1,10 +1,14 @@
 @import "../../1-root/component-metrics.css";
 
+/* One square, the box one control (16px) square on its lower sixteen at its start, as an icon
+   stands, so the words begin on the next square (Joachim, 19 October 2026). */
 :host {
   --ds-choice-unit: calc(var(--ds-1) * var(--ds-sf));
-  display: inline-flex;
+  display: inline-grid;
+  align-items: end;
+  justify-items: start;
   flex: 0 0 auto;
-  vertical-align: middle;
+  vertical-align: top;
   width: var(--ds-choice-unit);
   height: var(--ds-choice-unit);
 }
@@ -14,9 +18,9 @@
   box-sizing: border-box !important;
   display: grid !important;
   place-items: center !important;
-  width: 100% !important;
+  width: var(--ds-control-height) !important;
   min-width: 0 !important;
-  height: 100% !important;
+  height: var(--ds-control-height) !important;
   min-height: 0 !important;
   margin: 0 !important;
   padding: 0 !important;
@@ -31,15 +35,15 @@
 ::slotted(input:checked), ::slotted(input:indeterminate) { background: var(--ds-accent-color) !important; }
 ::slotted(input)::before {
   content: "";
-  width: calc(.8 * var(--ds-choice-unit));
-  height: calc(.8 * var(--ds-choice-unit));
+  width: var(--ds-control-height);
+  height: var(--ds-control-height);
   background: currentColor;
   mask: var(--ds-checkbox-mark) center / contain no-repeat;
   opacity: 0;
 }
 ::slotted(input:checked)::before { opacity: 1; }
 ::slotted(input:indeterminate)::before {
-  width: calc(var(--ds-choice-unit) / 2);
+  width: calc(var(--ds-control-height) / 2);
   height: calc(2px * var(--ds-sf));
   mask: none;
   opacity: 1;

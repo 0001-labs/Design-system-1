@@ -226,8 +226,10 @@ textarea.ds-input {
 
 /*
  * `.ds-checkbox` and `.ds-radio` are the `ds-checkbox` and `ds-radio` elements'
- * faces on a native `<input>`: one square on the field's ground with a 1px
- * line. The checkbox has the corners of a control and fills with the accent,
+ * faces on a native `<input>`: a box one control (16px) square on the field's
+ * ground with a 1px line, standing as an icon does, on the lower sixteen at the
+ * start of its square, so it takes one square and the words begin on the next
+ * (Joachim, 19 October 2026). The checkbox has the corners of a control and fills with the accent,
  * the check (`x-icon/check.svg`) in its ink; the radio is a circle with a dot
  * half a square across in the text colour.
  */
@@ -238,10 +240,12 @@ textarea.ds-input {
   display: inline-grid;
   flex: 0 0 auto;
   place-items: center;
-  vertical-align: middle;
-  width: var(--ds-row-height);
-  height: var(--ds-row-height);
+  vertical-align: top;
+  width: var(--ds-control-height);
+  height: var(--ds-control-height);
   margin: 0;
+  margin-block-start: calc(var(--ds-row-height) - var(--ds-control-height));
+  margin-inline-end: calc(var(--ds-row-height) - var(--ds-control-height));
   padding: 0;
   border: 1px solid var(--ds-border-color);
   background: var(--ds-input-background);
@@ -267,13 +271,13 @@ textarea.ds-input {
 }
 
 .ds-checkbox::before {
-  width: calc(0.8 * var(--ds-row-height));
-  height: calc(0.8 * var(--ds-row-height));
+  width: var(--ds-control-height);
+  height: var(--ds-control-height);
   mask: var(--ds-checkbox-mark) center / contain no-repeat;
 }
 
 .ds-checkbox:indeterminate::before {
-  width: calc(var(--ds-row-height) / 2);
+  width: calc(var(--ds-control-height) / 2);
   height: calc(2px * var(--ds-sf));
   mask: none;
 }
@@ -284,8 +288,8 @@ textarea.ds-input {
 }
 
 .ds-radio::before {
-  width: calc(var(--ds-row-height) / 2);
-  height: calc(var(--ds-row-height) / 2);
+  width: calc(var(--ds-control-height) / 2);
+  height: calc(var(--ds-control-height) / 2);
   border-radius: 50%;
 }
 

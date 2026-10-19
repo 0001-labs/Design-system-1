@@ -304,3 +304,44 @@ test("image frames reserve their ratio and preserve natural proportions", async 
   expect(sizes[1]).toEqual({ width: 320, height: 320, fit: 'contain' });
   expect(sizes[2]).toEqual({ width: 320, height: 180, fit: 'cover' });
 });
+
+test("a checkbox and a radio are a 16px box on the lower sixteen at the start of their square, as an icon stands; the switch is the one pill (Joachim, 19 October 2026)", async () => {
+  for (const scheme of SCHEMES) {
+    const page = pages[scheme];
+    await stage(page, `<div id="row" style="display:flex;align-items:flex-start">
+      <ds-checkbox id="box"><input type="checkbox" checked /></ds-checkbox>
+      <ds-radio id="dot"><input type="radio" /></ds-radio>
+      <input id="native-box" class="ds-checkbox" type="checkbox" />
+      <input id="native-dot" class="ds-radio" type="radio" />
+      <ds-switch id="switch"><button type="button" role="switch" aria-checked="true" aria-label="On"></button></ds-switch>
+      <button id="native-switch" class="ds-switch" type="button" role="switch" aria-checked="false" aria-label="Off"></button></div>`);
+    const boxes = await page.evaluate(() => {
+      const top = document.getElementById("row")!.getBoundingClientRect();
+      return Object.fromEntries(["box", "dot", "native-box", "native-dot"].map((id) => {
+        const host = document.getElementById(id)!;
+        const input = host instanceof HTMLInputElement ? host : host.querySelector("input")!;
+        const outer = host.getBoundingClientRect(), r = input.getBoundingClientRect(), s = getComputedStyle(input);
+        const footprint = host instanceof HTMLInputElement ? [r.width + parseFloat(s.marginInlineEnd), r.height + parseFloat(s.marginBlockStart)] : [outer.width, outer.height];
+        return [id, { size: [r.width, r.height], fromTop: r.top - top.top, fromStart: r.left - (host instanceof HTMLInputElement ? r.left : outer.left), footprint }];
+      }));
+    });
+    for (const [id, box] of Object.entries(boxes)) {
+      expect(box.size, `${id} ${scheme}`).toEqual([16, 16]);
+      expect(box.fromTop, `${id} on the lower sixteen`).toBe(4);
+      expect(box.fromStart, `${id} at its square's start`).toBe(0);
+      expect(box.footprint, `${id} takes one square`).toEqual([UNIT, UNIT]);
+    }
+    const switches = await page.evaluate(() => ["switch", "native-switch"].map((id) => {
+      const host = document.getElementById(id)!;
+      const button = host instanceof HTMLButtonElement ? host : host.querySelector("button")!;
+      const s = getComputedStyle(button), thumb = getComputedStyle(button, "::after");
+      return { radius: parseFloat(s.borderTopLeftRadius), thumbRadius: thumb.borderTopLeftRadius, thumb: thumb.backgroundColor, track: s.backgroundColor };
+    }));
+    for (const s of switches) {
+      expect(s.radius).toBe(16);
+      expect(s.thumbRadius).toBe("50%");
+      expect(s.thumb).toBe("rgb(255, 255, 255)");
+    }
+    expect(switches[0]!.track).toBe("rgb(82, 157, 54)");
+  }
+});

@@ -30,8 +30,9 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
 
 /**
- * `ds-checkbox`: one square, a 1 dp border, the corner; checked or mixed on the accent with
- * the check (or a 10 by 2 bar) in the ink on the accent.
+ * `ds-checkbox`: a 16 dp box on its square's lower sixteen at its start, as an icon stands, a
+ * 1 dp border, the corner; checked or mixed on the accent with the check (or an 8 by 2 bar) in
+ * the ink on the accent.
  */
 @Composable
 fun DS1Checkbox(
@@ -49,19 +50,25 @@ fun DS1Checkbox(
     Box(
         modifier
             .size(scale.unit)
-            .ds1FocusRing(interaction)
-            .alpha(if (enabled) 1f else 0.5f)
-            .background((if (on) DS1Colors.accent else DS1Colors.inputBackground).current, shape)
-            .border(DS1Metrics.line.dp, DS1Colors.border.current, shape)
             .then(if (onCheckedChange != null) Modifier.triStateToggleable(state, interaction, null, enabled, Role.Checkbox) { onCheckedChange(!checked) } else Modifier),
-        contentAlignment = Alignment.Center,
+        contentAlignment = Alignment.BottomStart,
     ) {
-        if (indeterminate) Box(Modifier.size(scale(10f), scale(2f)).background(DS1Colors.onAccent.current))
-        else if (checked) DS1Icon(DS1IconName.check, size = DS1IconSize.Large, tint = DS1Colors.onAccent.current)
+        Box(
+            Modifier
+                .size(scale.control)
+                .ds1FocusRing(interaction)
+                .alpha(if (enabled) 1f else 0.5f)
+                .background((if (on) DS1Colors.accent else DS1Colors.inputBackground).current, shape)
+                .border(DS1Metrics.line.dp, DS1Colors.border.current, shape),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (indeterminate) Box(Modifier.size(scale(8f), scale(2f)).background(DS1Colors.onAccent.current))
+            else if (checked) DS1Icon(DS1IconName.check, size = DS1IconSize.Large, tint = DS1Colors.onAccent.current)
+        }
     }
 }
 
-/** `ds-radio`: a one-square circle with a 10 dp dot in the text colour when chosen. */
+/** `ds-radio`: a 16 dp circle on its square's lower sixteen at its start, with an 8 dp dot in the text colour when chosen. */
 @Composable
 fun DS1Radio(selected: Boolean, onClick: (() -> Unit)?, modifier: Modifier = Modifier, enabled: Boolean = true) {
     val scale = LocalDS1Scale.current
@@ -69,14 +76,20 @@ fun DS1Radio(selected: Boolean, onClick: (() -> Unit)?, modifier: Modifier = Mod
     Box(
         modifier
             .size(scale.unit)
-            .ds1FocusRing(interaction, corner = scale.unit)
-            .alpha(if (enabled) 1f else 0.5f)
-            .background(DS1Colors.inputBackground.current, CircleShape)
-            .border(DS1Metrics.line.dp, DS1Colors.border.current, CircleShape)
             .then(if (onClick != null) Modifier.selectable(selected, interaction, null, enabled, Role.RadioButton, onClick) else Modifier),
-        contentAlignment = Alignment.Center,
+        contentAlignment = Alignment.BottomStart,
     ) {
-        if (selected) Box(Modifier.size(scale(10f)).background(DS1Colors.text.current, CircleShape))
+        Box(
+            Modifier
+                .size(scale.control)
+                .ds1FocusRing(interaction, corner = scale.control)
+                .alpha(if (enabled) 1f else 0.5f)
+                .background(DS1Colors.inputBackground.current, CircleShape)
+                .border(DS1Metrics.line.dp, DS1Colors.border.current, CircleShape),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (selected) Box(Modifier.size(scale(8f)).background(DS1Colors.text.current, CircleShape))
+        }
     }
 }
 
