@@ -1,3 +1,4 @@
+import { useAuthToken } from '@convex-dev/auth/react';
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { useEffect, useRef, useState } from "react";
 import { api } from "../../convex/_generated/api";
@@ -6,7 +7,21 @@ import { libraryTemplate, templateVersion } from "./lib/libraryTemplate";
 // Only the same-origin parent receives the signed-in workspace summary.
 export function NavigationAuth() {
   const { isAuthenticated, isLoading } = useConvexAuth();
+  const token = useAuthToken();
+  const [appNavigation, setAppNavigation] = useState<{ token: string; components: { name: string; href: string }[] } | null>(null);
   const ready = !isLoading && isAuthenticated;
+  useEffect(() => {
+    setAppNavigation(null);
+    if (!ready || !token) return;
+    const controller = new AbortController();
+    void fetch('/api/app-navigation', { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: controller.signal })
+      .then(async response => {
+        if (!response.ok) return;
+        const data = await response.json();
+        if (!controller.signal.aborted && Array.isArray(data.components)) setAppNavigation({ token, components: data.components });
+      }).catch(() => { /* Access unavailable: keep internal navigation hidden. */ });
+    return () => controller.abort();
+  }, [ready, token]);
   const profile = useQuery(api.users.profile, ready ? {} : "skip");
   const libraries = useQuery(api.libraries.list, ready ? {} : "skip");
   const create = useMutation(api.libraries.create);
@@ -16,6 +31,7 @@ export function NavigationAuth() {
   useEffect(() => {
     const report = () => window.parent.postMessage({
       type: "ds1:navigation-auth", authenticated: ready,
+      appComponents: ready && token === appNavigation?.token ? appNavigation.components : [],
       companyName: ready ? profile?.companyName ?? "" : "",
       libraries: ready ? libraries?.map(({ _id, name, publishedVersion }) => ({ id: _id, name, publishedVersion })) ?? [] : [],
       librariesLoaded: ready && libraries !== undefined, creating, creationError,
@@ -33,6 +49,6 @@ export function NavigationAuth() {
     };
     window.addEventListener("message", request); report();
     return () => window.removeEventListener("message", request);
-  }, [ready, profile?.companyName, libraries, creating, creationError, create]);
+  }, [ready, token, appNavigation, profile?.companyName, libraries, creating, creationError, create]);
   return null;
 }

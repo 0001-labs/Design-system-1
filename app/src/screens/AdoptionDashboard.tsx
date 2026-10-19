@@ -19,7 +19,7 @@ export function useOwnerSession(title: string) {
   const { isLoading, isAuthenticated } = useConvexAuth();
   const token = useAuthToken();
   const { signOut } = useAuthActions();
-  const [destination] = useState(() => new URLSearchParams(window.location.search).get('next') === '/private-app/' ? '/private-app/' : '/');
+  const [destination] = useState(() => new URLSearchParams(window.location.search).get('next') === '/private-app/' ? '/private-app/' + (['#keyboard-shortcut', '#spacing-handle', '#loading-indicator'].includes(window.location.hash) ? window.location.hash : '') : '/');
   const [ready, setReady] = useState(false);
   const [error, setError] = useState('');
   useEffect(() => {
