@@ -101,7 +101,7 @@ const cards = [
   [data-layer="2"] .layer-art i { border-radius:50%; }
   [data-layer="3"] .layer-art i { width:calc(2 * var(--u)); }
   [data-layer="4"] .layer-art i { height:var(--u); }
-  .bento { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:var(--u); margin-top:var(--u); }
+  .bento { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:calc(var(--u) / 2); margin-top:var(--u); }
   .tile { display:flex; flex-direction:column; min-width:0; text-decoration:none; color:inherit; border-radius:var(--ds-corner-size,4px); background:var(--ds-fill); overflow:hidden; }
   .tile.wide { grid-column:span 2; }
   .tile:hover { background:var(--ds-fill-hover); }
