@@ -94,6 +94,19 @@
   inset: 0;
   border-radius: var(--ds-row-radius, 0);
 }
+/* The state layer two pixels around what a one-square row holds (1-root/row.css says why). */
+.target::after {
+  --ds-row-overhang: var(--ds-row-fill-overhang, calc(2px * var(--ds-sf)));
+  inset:
+    calc(var(--ds-row-height) - var(--ds-control-height) - var(--ds-row-overhang))
+    calc(var(--ds-row-padding, calc(4px * var(--ds-sf))) - var(--ds-row-overhang))
+    calc(0px - var(--ds-row-overhang));
+  border-radius: var(--ds-row-radius, var(--ds-row-fill-radius, calc(6px * var(--ds-sf))));
+}
+:host([stacked]) .target::after,
+:host([auto]) .target::after {
+  inset: 0;
+}
 .target::before { z-index: 1; }
 .target::after { z-index: -1; }
 ::slotted([slot="end"]) { position: relative; z-index: 2; }

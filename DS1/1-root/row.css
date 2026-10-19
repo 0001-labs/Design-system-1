@@ -132,18 +132,50 @@ button.ds-row {
   z-index: 2;
 }
 
-/* The pointer, the press, the current destination and the focus ring. */
-a.ds-row[href]:hover,
-button.ds-row:hover:not(:disabled),
+/*
+ * The pointer, the press, the current destination and the focus ring are one layer under the
+ * row's content (Joachim, 19 October 2026). On a one-square row it is a square high and sits two
+ * pixels around what the row holds: from two above the lower sixteen to two below the row's foot,
+ * and two past the content at each side, its corners the icon tiles' 4px and those two more, so a
+ * 16px icon stands in it with two all round. A taller row (a stacked tile, `auto`) is filled whole.
+ * Tokens: `--ds-row-fill-radius` (6px), `--ds-row-fill-overhang` (2px).
+ */
+a.ds-row,
+button.ds-row {
+  isolation: isolate;
+}
+a.ds-row::after,
+button.ds-row::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+}
+a.ds-row::after,
+button.ds-row::after,
+.ds-row__target::after {
+  --ds-row-overhang: var(--ds-row-fill-overhang, calc(2px * var(--ds-sf)));
+  inset:
+    calc(var(--ds-row-height) - var(--ds-control-height) - var(--ds-row-overhang))
+    calc(var(--ds-row-padding, calc(4px * var(--ds-sf))) - var(--ds-row-overhang))
+    calc(0px - var(--ds-row-overhang));
+  border-radius: var(--ds-row-radius, var(--ds-row-fill-radius, calc(6px * var(--ds-sf))));
+}
+:is(a, button).ds-row:is(.ds-row--stacked, .ds-row--auto)::after,
+:is(.ds-row--stacked, .ds-row--auto) .ds-row__target::after {
+  inset: 0;
+}
+a.ds-row[href]:hover::after,
+button.ds-row:hover:not(:disabled)::after,
 .ds-row__target:is(a[href], button:not(:disabled)):hover::after {
   background: var(--ds-row-fill-hover, var(--ds-fill));
 }
-a.ds-row[href]:active,
-button.ds-row:active:not(:disabled),
+a.ds-row[href]:active::after,
+button.ds-row:active:not(:disabled)::after,
 .ds-row__target:is(a[href], button:not(:disabled)):active::after {
   background: var(--ds-row-fill-press, var(--ds-fill-hover));
 }
-.ds-row:is(a, button)[aria-current]:not([aria-current="false"]),
+.ds-row:is(a, button)[aria-current]:not([aria-current="false"])::after,
 .ds-row__target[aria-current]:not([aria-current="false"])::after {
   background: var(--ds-row-fill-current, var(--ds-fill-hover));
 }
@@ -152,8 +184,8 @@ button.ds-row:active:not(:disabled),
   --ds-type-weight-default: var(--ds-row-current-weight, 500);
   font-weight: var(--ds-row-current-weight, 500);
 }
-a.ds-row:focus-visible,
-button.ds-row:focus-visible,
+a.ds-row:focus-visible::after,
+button.ds-row:focus-visible::after,
 .ds-row__target:focus-visible::after {
   outline: 2px solid var(--ds-focus-ring);
   outline-offset: -2px;
@@ -169,8 +201,8 @@ button.ds-row[aria-disabled="true"],
 .ds-row__target:is(:disabled, [aria-disabled="true"], a:not([href])) {
   cursor: default;
 }
-a.ds-row[aria-disabled="true"]:hover,
-button.ds-row[aria-disabled="true"]:hover {
+a.ds-row[aria-disabled="true"]:hover::after,
+button.ds-row[aria-disabled="true"]:hover::after {
   background: none;
 }
 
