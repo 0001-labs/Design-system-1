@@ -109,3 +109,15 @@
 .ds-table[data-sticky] [aria-selected="true"]:first-child {
   background: var(--ds-accent-color, Highlight);
 }
+
+/* Keep the row whose details are open visible, including its sticky first cell.
+   Cell selection remains independent and keeps its accent. */
+.ds-table tbody > tr[data-open]:not([data-open="false"]) > :is(th, td):not([aria-selected="true"]) {
+  background: var(--ds-row-fill-current, var(--ds-fill-hover));
+}
+@media (forced-colors: active) {
+  .ds-table tbody > tr[data-open]:not([data-open="false"]) > :is(th, td):not([aria-selected="true"]) {
+    background: Highlight;
+    color: HighlightText;
+  }
+}

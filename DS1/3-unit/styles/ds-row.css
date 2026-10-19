@@ -118,6 +118,7 @@
   font-weight: var(--ds-row-current-weight, 500);
 }
 .target[aria-current]::after { background: var(--ds-row-fill-current, var(--ds-fill-hover)); }
+:host([open]) .target::after { background: var(--ds-row-fill-current, var(--ds-fill-hover)); }
 .target:focus-visible::after { outline: 2px solid var(--ds-focus-ring); outline-offset: -2px; }
 
 :host([disabled]) .target { cursor: default; opacity: 0.5; }
@@ -127,6 +128,7 @@
 :host([nav]) { --ds-row-radius: calc(2px * var(--ds-sf)); }
 
 @media (forced-colors: active) {
+  :host([open]) .target::after,
   .target[aria-current]::after { outline: 1px solid Highlight; outline-offset: -1px; }
   .target:focus-visible::after { outline-color: Highlight; }
 }

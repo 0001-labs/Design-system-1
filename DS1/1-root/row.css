@@ -330,3 +330,26 @@ button.ds-row[aria-disabled="true"]:hover::after {
     background-color: CanvasText;
   }
 }
+
+/* A controlled detail view: the caller marks its open row, and clears it on close.
+   Navigation's current state and the text weight remain independent. */
+.ds-row[data-open]:not([data-open="false"]) {
+  position: relative;
+  isolation: isolate;
+}
+.ds-row[data-open]:not([data-open="false"])::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  --ds-row-overhang: var(--ds-row-fill-overhang, calc(2px * var(--ds-sf)));
+  inset: calc(var(--ds-row-height) - var(--ds-control-height) - var(--ds-row-overhang))
+    calc(var(--ds-row-padding, calc(4px * var(--ds-sf))) - var(--ds-row-overhang))
+    calc(0px - var(--ds-row-overhang));
+  border-radius: var(--ds-row-radius, var(--ds-row-fill-radius, calc(6px * var(--ds-sf))));
+  background: var(--ds-row-fill-current, var(--ds-fill-hover));
+}
+.ds-row[data-open]:is(.ds-row--stacked, .ds-row--auto)::after { inset: 0; }
+@media (forced-colors: active) {
+  .ds-row[data-open]:not([data-open="false"])::after { outline: 1px solid Highlight; outline-offset: -1px; }
+}

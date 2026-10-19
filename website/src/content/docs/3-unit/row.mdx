@@ -93,3 +93,14 @@ A page without Lit draws the same rows with the classes in `row.css`, which `con
 The cells of a row with a target must not be positioned themselves, or the target's press stops at its own cell. A disabled native row is a `<button disabled>`, or a link without `href` with `aria-disabled="true"`. In React, put the classes on the `<a>` or `<button>` directly.
 
 [List](/3-unit/list/) · [Sidebar](/3-unit/sidebar/) · [Text](/2-core/text/) · [Icon](/2-core/icon/)
+
+## Rows with open details
+
+Set `open` on the row whose details are showing. This fills it with the current-row colour without changing its text weight. The component exposes `aria-expanded` on its press target; it does not toggle itself. Keep the property tied to the displayed record, update it when stepping between records, and set it to `false` when the details close. Leave it unset on rows that do not open details.
+
+```html
+<ds-row interactive open><span>Selected record</span></ds-row>
+<button class="ds-row" data-open aria-expanded="true">Selected record</button>
+```
+
+Native rows use `data-open` on `.ds-row`, including a row with a separate `.ds-row__target`. Remove it (or set it to `false`) when closed, and update `aria-expanded` on the button that opens the details. The application owns record identity and opening/closing; hover never clears the open state. A native table uses `data-open` on its body `<tr>` instead.

@@ -293,3 +293,31 @@ test("a native tree takes the keyboard from connectSidebar", async () => {
   await page.keyboard.press("Space");
   expect(await page.evaluate(() => [...document.querySelectorAll<HTMLElement>("#native-tree li")].map((li) => [li.tabIndex, li.getAttribute("aria-selected")]))).toEqual([[-1, null], [-1, null], [0, "true"]]);
 });
+
+for (const scheme of SCHEMES) for (const sf of SCALES) {
+  test(`open detail rows retain their fill and geometry, then clear (${scheme}, ${sf})`, async () => {
+    const page = pages[scheme];
+    await stage(page, `<ds-row id="detail" interactive open><span>Record</span></ds-row>
+      <button id="native-detail" class="ds-row" data-open aria-expanded="true">Record</button>
+      <div id="swipe-detail" class="ds-row" data-open style="background: var(--ds-background)">Record</div>
+      <table class="ds-table" data-sticky><tbody><tr data-open><th scope="row">Record</th><td>12</td></tr></tbody></table>`, sf);
+    const states = await page.evaluate(() => {
+      const el = document.querySelector("ds-row")!;
+      const targets = [el.shadowRoot!.querySelector(".target")!, document.querySelector("#native-detail")!, document.querySelector("#swipe-detail")!];
+      return targets.map(t => ({ fill: getComputedStyle(t, "::after").backgroundColor, height: t.getBoundingClientRect().height }));
+    });
+    expect(states[0]!.fill).not.toBe("rgba(0, 0, 0, 0)");
+    expect(new Set(states.map(s => s.fill)).size).toBe(1);
+    for (const s of states) expect(s.height).toBeCloseTo(20 * sf, 1);
+    const cells = await page.locator("tbody th, tbody td").evaluateAll(els => els.map(el => getComputedStyle(el).backgroundColor));
+    expect(cells).toEqual([states[0]!.fill, states[0]!.fill]);
+    await page.evaluate(async () => {
+      const el = document.querySelector("ds-row")! as HTMLElement & { open: boolean; updateComplete: Promise<unknown> };
+      el.open = false;
+      document.querySelectorAll("[data-open]").forEach(e => e.removeAttribute("data-open"));
+      await el.updateComplete;
+    });
+    expect(await page.locator("#native-detail").evaluate(el => getComputedStyle(el, "::after").backgroundColor)).toBe("rgba(0, 0, 0, 0)");
+    expect(await page.locator("ds-row").evaluate(el => getComputedStyle(el.shadowRoot!.querySelector(".target")!, "::after").backgroundColor)).toBe("rgba(0, 0, 0, 0)");
+  });
+}
