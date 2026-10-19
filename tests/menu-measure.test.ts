@@ -112,6 +112,36 @@ for (const scheme of ["light", "dark"] as const) {
   });
 }
 
+test("a Context's shared-button rows are Ezo's items: 19px on a square's pitch, words 4px in, an icon at the end", async () => {
+  const tab = await page();
+  await tab.evaluate(() => {
+    const row = (name: string, icon = "") => `<ds-button control="slotted" menu-item><button role="menuitem"><ds-text literal>${name}</ds-text>${icon ? `<ds-icon type="${icon}" size="large"></ds-icon>` : ""}</button></ds-button>`;
+    document.getElementById("stage")!.innerHTML = `<div id="area" style="width:200px;height:200px">Area</div><ds-context for="area">${row("Star", "star")}${row("Undo")}<hr data-ds-menu-separator>${row("Rename")}</ds-context>`;
+  });
+  await frames(tab);
+  const area = (await tab.locator("#area").boundingBox())!;
+  await tab.mouse.click(area.x + 10, area.y + 10, { button: "right" });
+  await frames(tab);
+  const box = await tab.evaluate(() => {
+    const menu = document.querySelector("ds-context")!;
+    const rows = [...menu.querySelectorAll<HTMLElement>(":scope > ds-button")].map(row => {
+      const r = row.getBoundingClientRect();
+      const words = document.createRange(); words.selectNodeContents(row.querySelector("ds-text")!);
+      const icon = row.querySelector("ds-icon")?.getBoundingClientRect();
+      return { top: r.top, bottom: r.bottom, height: r.height, start: words.getBoundingClientRect().left - r.left, icon: icon ? { end: r.right - icon.right, foot: icon.bottom - r.top } : null };
+    });
+    return { rows, width: menu.getBoundingClientRect().width };
+  });
+  expect(box.rows.map(row => row.height)).toEqual([19, 19, 19]);
+  expect(box.rows[1]!.top - box.rows[0]!.bottom).toBe(1);
+  expect(box.rows[2]!.top - box.rows[1]!.bottom).toBe(2);
+  for (const row of box.rows) expect(row.start).toBeCloseTo(4, 3);
+  expect(box.rows[0]!.icon).toEqual({ end: 4, foot: 19 });
+  expect(box.width % UNIT).toBe(0);
+  expect(box.width).toBe(4 * UNIT);
+  await tab.close();
+});
+
 test("a Context row hovered lightens, and the keyboard's focus rings it", async () => {
   const tab = await page();
   await tab.evaluate(() => {

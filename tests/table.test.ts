@@ -55,3 +55,33 @@ test("named columns read by key or position, and the first column can stay put",
   expect(table.shadowRoot!.querySelector("table")!.hasAttribute("data-sticky")).toBe(true);
   expect(table.shadowRoot!.querySelector("thead th:nth-child(2)")!.hasAttribute("data-numeric")).toBe(true);
 });
+
+test("a sheet letters its columns, numbers its rows and tells its stylesheet how many columns it has", async () => {
+  const { columnLetter } = await import("../DS1/3-unit/ds-table");
+  expect([0, 1, 25, 26, 27, 51, 52, 701, 702].map(columnLetter)).toEqual(["A", "B", "Z", "AA", "AB", "AZ", "BA", "ZZ", "AAA"]);
+  const table = document.createElement("ds-table");
+  table.sheet = true;
+  table.columns = ["Item", { key: "sold", label: "Sold", numeric: true }];
+  table.data = [{ item: "Atlas", sold: 1200 }, { item: "Comet", sold: 80 }];
+  table.footer = { item: "Total", sold: 1280 };
+  document.body.append(table);
+  await table.updateComplete;
+  const root = table.shadowRoot!;
+  const sheet = root.querySelector<HTMLTableElement>("table[data-sheet]")!;
+  expect(sheet.style.getPropertyValue("--ds-table-columns")).toBe("2");
+  expect([...root.querySelectorAll(".ds-table__letters td")].map(cell => cell.textContent)).toEqual(["", "A", "B"]);
+  expect(root.querySelector(".ds-table__letters")!.getAttribute("aria-hidden")).toBe("true");
+  expect([...root.querySelectorAll("thead tr + tr th")].map(cell => cell.textContent)).toEqual(["Item", "Sold"]);
+  expect([...root.querySelectorAll("tbody th[scope=row]")].map(cell => cell.textContent)).toEqual(["1", "2"]);
+  expect(root.querySelector("tbody tr td[data-numeric]")!.textContent).toBe((1200).toLocaleString());
+  expect(root.querySelector("tfoot th")!.textContent).toBe("");
+});
+
+test("a sheet's cells are four squares by one, on lines at their end and foot", () => {
+  expect(rule(".ds-table[data-sheet]")).toContain("--ds-table-cell: calc(4 * var(--ds-table-row))");
+  expect(rule(".ds-table[data-sheet]")).toContain("table-layout: fixed");
+  const cell = rule(".ds-table[data-sheet] :is(th, td)");
+  expect(cell).toContain("width: var(--ds-table-cell)");
+  expect(cell).toContain("border-inline-end: 1px solid var(--ds-table-rule)");
+  expect(cell).toContain("padding: 0 var(--ds-table-text)");
+});

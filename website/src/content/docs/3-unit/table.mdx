@@ -28,6 +28,7 @@ Set the properties after the component has been registered. In Lit, bind them: `
 | `columns` | Array | `[]` | Headers. A string is a label read from its lowercase key (`"Users"` reads `users`); an object is `{ key, label, numeric? }`. Empty, the first row's keys are the headers. |
 | `footer` | Object or Array | none | A totals row under the body. |
 | `sticky` | boolean | false | Keeps the first column in place while the table scrolls sideways. |
+| `sheet` | boolean | false | A spreadsheet: every cell four squares by one, columns lettered and rows numbered. See [Sheet](#sheet). |
 | `label` | string | none | The table's accessible name. |
 
 A column whose values are all numbers is numeric unless its `numeric` says otherwise. A table wider than its place scrolls sideways.
@@ -56,6 +57,33 @@ Give a `<table>` the `ds-table` class from the native controls stylesheet (`cont
     <thead><tr><th scope="col">Product</th><th scope="col" data-numeric>Users</th></tr></thead>
     <tbody><tr><th scope="row">Atlas</th><td data-numeric>120</td></tr></tbody>
     <tfoot><tr><th scope="row">Total</th><td data-numeric>120</td></tr></tfoot>
+  </table>
+</div>
+```
+
+## Sheet
+
+For a lot of data, as in a spreadsheet, give the table `sheet`. Every cell is four squares wide and one high, 80 by 20, with its 1px lines at its end and its foot, so its words have 79 by 19 and stand 4px in on the sixteen, as an Ezo item's do. Numbers keep to the column's end. A cell's words never widen it: what does not fit ends in an ellipsis. Above the column labels a row of letters (A, B … Z, AA …) names the columns, and a column two squares wide numbers the rows; both stay in place while the sheet scrolls both ways. A selected cell (`aria-selected="true"`) is ringed rather than filled.
+
+<ComponentExample example="table-sheet" />
+
+```js
+const sheet = document.querySelector("ds-table[sheet]");
+sheet.style.setProperty("--ds-table-height", "400px");
+sheet.columns = ["Item", { key: "sold", label: "Sold", numeric: true }];
+sheet.data = rows;
+```
+
+On a native table, put `data-sheet` and `--ds-table-columns` (its number of data columns) on the `<table>`, a `.ds-table__letters` row and a `.ds-table__number` cell at the start of every row, and give `.ds-table-scroll` its height with `--ds-table-height`.
+
+```html
+<div class="ds-table-scroll" style="--ds-table-height: 400px">
+  <table class="ds-table" data-sheet style="--ds-table-columns: 2">
+    <thead>
+      <tr class="ds-table__letters" aria-hidden="true"><td class="ds-table__number"></td><td>A</td><td>B</td></tr>
+      <tr><td class="ds-table__number"></td><th scope="col">Item</th><th scope="col" data-numeric>Sold</th></tr>
+    </thead>
+    <tbody><tr><th scope="row" class="ds-table__number">1</th><td>Atlas</td><td data-numeric>1,200</td></tr></tbody>
   </table>
 </div>
 ```

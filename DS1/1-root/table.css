@@ -16,6 +16,14 @@
  *   <th colspan="2">                       a column group, in a header row
  *   <th scope="rowgroup">                  a row group, a heading row in grey
  *   <td aria-selected="true">              a selected cell
+ *
+ * `data-sheet` makes it a spreadsheet: every cell four squares by one (80 by
+ * 20), its 1px lines at its end and foot so the words have 79 by 19, set 4px
+ * in on the sixteen, as an Ezo item's are. Column letters and the row numbers
+ * (`.ds-table__letters`, `.ds-table__number`, two squares wide) stay in place
+ * while the sheet scrolls both ways inside `.ds-table-scroll`; give the table
+ * `--ds-table-columns` (the number of data columns) and the scroll a height
+ * with `--ds-table-height`.
  */
 
 .ds-table {
@@ -120,4 +128,73 @@
     background: Highlight;
     color: HighlightText;
   }
+}
+
+/* A spreadsheet: cells four squares by one, on lines, lettered and numbered. */
+.ds-table[data-sheet] {
+  --ds-table-cell: calc(4 * var(--ds-table-row));
+  --ds-table-index: calc(2 * var(--ds-table-row));
+  --ds-table-text: calc(4px * var(--ds-sf, 1));
+  table-layout: fixed;
+  width: calc(var(--ds-table-index) + var(--ds-table-columns, 8) * var(--ds-table-cell));
+  min-width: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.ds-table-scroll > .ds-table[data-sheet] {
+  width: calc(var(--ds-table-index) + var(--ds-table-columns, 8) * var(--ds-table-cell));
+  min-width: 0;
+}
+.ds-table[data-sheet] :is(th, td) {
+  width: var(--ds-table-cell);
+  max-width: var(--ds-table-cell);
+  height: var(--ds-table-row);
+  padding: 0 var(--ds-table-text);
+  border-bottom: 1px solid var(--ds-table-rule);
+  border-inline-end: 1px solid var(--ds-table-rule);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ds-table[data-sheet] :is(th, td):last-child {
+  padding-inline-end: var(--ds-table-text);
+}
+.ds-table[data-sheet] .ds-table__number {
+  width: var(--ds-table-index);
+  max-width: var(--ds-table-index);
+  position: sticky;
+  inset-inline-start: 0;
+  z-index: 1;
+  background: var(--ds-table-paper);
+  color: var(--ds-title-color, light-dark(#797979, #9a9a9a));
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.ds-table[data-sheet] thead :is(th, td) {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--ds-table-paper);
+}
+.ds-table[data-sheet] thead tr + tr :is(th, td) {
+  top: var(--ds-table-row);
+}
+.ds-table[data-sheet] thead .ds-table__number {
+  z-index: 3;
+}
+.ds-table[data-sheet] .ds-table__letters td {
+  color: var(--ds-title-color, light-dark(#797979, #9a9a9a));
+  text-align: center;
+}
+.ds-table[data-sheet] tbody td:not([data-numeric]) {
+  color: inherit;
+}
+.ds-table[data-sheet] [aria-selected="true"] {
+  background: transparent;
+  color: inherit;
+  box-shadow: inset 0 0 0 2px var(--ds-focus-ring, Highlight);
+}
+.ds-table-scroll:has(> .ds-table[data-sheet]) {
+  max-height: var(--ds-table-height, none);
+  overflow: auto;
+  overscroll-behavior: contain;
 }

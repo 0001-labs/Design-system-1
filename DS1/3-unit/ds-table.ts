@@ -1,6 +1,8 @@
 // ds-table.ts
 // A data table: rows one square high on hairlines, drawn from data with the
-// same rules as a native `<table class="ds-table">` (1-root/table.css).
+// same rules as a native `<table class="ds-table">` (1-root/table.css). With
+// `sheet` it is a spreadsheet: every cell four squares by one, lettered
+// columns and numbered rows held in place while it scrolls both ways.
 
 import { LitElement, html, nothing, unsafeCSS } from "lit";
 import metrics from "../1-root/component-metrics.css?inline";
@@ -27,6 +29,7 @@ export class DsTable extends LitElement {
     columns: { type: Array },
     footer: { type: Object },
     sticky: { type: Boolean, reflect: true },
+    sheet: { type: Boolean, reflect: true },
     label: { type: String },
   };
 
@@ -38,6 +41,8 @@ export class DsTable extends LitElement {
   declare footer: TableRow | undefined;
   /** Keeps the first column in place while the table scrolls sideways. */
   declare sticky: boolean;
+  /** A spreadsheet: cells 80 by 20, columns lettered A, B, C…, rows numbered, both held in place. */
+  declare sheet: boolean;
   /** The table's accessible name. */
   declare label: string | undefined;
 
@@ -46,6 +51,7 @@ export class DsTable extends LitElement {
     this.data = [];
     this.columns = [];
     this.sticky = false;
+    this.sheet = false;
   }
 
   static styles = [unsafeCSS(metrics), unsafeCSS(table), unsafeCSS(styles)];
@@ -75,8 +81,29 @@ export class DsTable extends LitElement {
     })}</tr>`;
   }
 
+  private sheetRow(row: TableRow, columns: TableColumn[], number: string) {
+    return html`<tr><th scope="row" class="ds-table__number">${number}</th>${columns.map((column, index) =>
+      html`<td ?data-numeric=${column.numeric}>${text(cell(row, column.key, index))}</td>`)}</tr>`;
+  }
+
+  private renderSheet(columns: TableColumn[]) {
+    return html`
+      <div class="ds-table-scroll" part="scroll">
+        <table class="ds-table" part="table" data-sheet style=${`--ds-table-columns: ${columns.length}`} aria-label=${this.label ?? nothing}>
+          <thead>
+            <tr class="ds-table__letters" aria-hidden="true"><td class="ds-table__number"></td>${columns.map((_, index) => html`<td>${columnLetter(index)}</td>`)}</tr>
+            <tr><td class="ds-table__number"></td>${columns.map(column => html`<th scope="col" ?data-numeric=${column.numeric}>${column.label}</th>`)}</tr>
+          </thead>
+          <tbody>${this.data.map((row, index) => this.sheetRow(row, columns, String(index + 1)))}</tbody>
+          ${this.footer ? html`<tfoot>${this.sheetRow(this.footer, columns, "")}</tfoot>` : nothing}
+        </table>
+      </div>
+    `;
+  }
+
   render() {
     const columns = this.resolvedColumns();
+    if (this.sheet) return this.renderSheet(columns);
     return html`
       <div class="ds-table-scroll" part="scroll">
         <table class="ds-table" part="table" ?data-sticky=${this.sticky} aria-label=${this.label ?? nothing}>
@@ -93,6 +120,13 @@ export class DsTable extends LitElement {
 
 function cell(row: TableRow, key: string, index: number): unknown {
   return Array.isArray(row) ? row[index] : (row as Record<string, unknown>)[key];
+}
+
+/** A spreadsheet's column name: A … Z, then AA, AB … */
+export function columnLetter(index: number): string {
+  let name = "";
+  for (let n = index + 1; n > 0; n = Math.floor((n - 1) / 26)) name = String.fromCharCode(65 + ((n - 1) % 26)) + name;
+  return name;
 }
 
 function text(value: unknown): string {

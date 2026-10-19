@@ -34,16 +34,21 @@
   clip-path: inset(0 round var(--ds-context-radius, var(--ds-radius, 4px)));
 }
 
-/* Rows: shared buttons through their tokens, native buttons and links through their box. */
+/* Rows: shared buttons through their tokens, native buttons and links through their box.
+   A row is an Ezo item, not a button: 19px drawn on a square's pitch, the words
+   4px in on the sixteen, an icon at its end. The button's own menu-entry and
+   floating-menu tokens (a square high, words at the start) would otherwise win,
+   so these are important. */
 ::slotted(ds-button) {
-  --ds-button-height: var(--ds-menu-row);
-  --ds-button-padding: 0 calc(4px * var(--ds-sf));
-  /* The words at the row's start, an icon at its end. */
-  --ds-button-align: space-between;
+  --ds-button-height: var(--ds-menu-row) !important;
+  --ds-button-padding: 0 calc(4px * var(--ds-sf)) !important;
+  --ds-button-align: space-between !important;
   --ds-button-background: var(--ds-context-fill);
   --ds-button-color: var(--ds-context-ink);
   --ds-radius: 0px;
   width: 100%;
+  min-height: var(--ds-menu-row) !important;
+  height: var(--ds-menu-row) !important;
 }
 ::slotted(ds-button:is(:hover, :focus-within):not([disabled], [aria-disabled="true"])) {
   --ds-button-background: var(--ds-context-hover);
