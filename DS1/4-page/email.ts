@@ -116,6 +116,8 @@ export interface EmailFrameOptions {
   language?: string
   fontUrl?: string
   wideLabel?: boolean
+  /** Plain paper with a wider reading column, without visible grid ruling. */
+  plain?: boolean
   /** Trusted HTML from a template renderer, never raw user input. */
   headerHtml?: string
   beforeHeaderHtml?: string
@@ -126,11 +128,12 @@ export interface EmailFrameOptions {
 /** Rows are trusted template HTML. Escape every interpolated user value. */
 export function emailFrame(options: EmailFrameOptions, body: string): string {
   const { product, homeUrl, title, preheader = '', language = 'en', fontUrl, wideLabel = false, headerHtml, beforeHeaderHtml = '', brandStyles = '' } = options
+  const plain = options.plain === true
   return `<!doctype html>
 <html lang="${escapeHtml(language)}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="supported-color-schemes" content="light dark"><title>${escapeHtml(title)}</title>
 <style>
-${responsiveStyles}
-${darkStyles}
+${plain ? `@media screen and (max-width:700px) {.ds-email-page {width:100% !important;max-width:480px !important;}.ds-email-outer {padding:40px 20px !important;}}` : responsiveStyles}
+${plain ? `@media (prefers-color-scheme:dark) {.ds-email-paper {background-color:#171717 !important;}.ds-email-type {color:#eeeeee !important;}}` : darkStyles}
 ${fontUrl ? `@font-face { font-family:'GT-America-Standard-Regular'; src:url('${escapeHtml(fontUrl)}') format('woff2'); font-weight:400; font-style:normal; mso-font-alt:Arial; }` : ''}
 ${brandStyles}
 </style>
@@ -138,8 +141,8 @@ ${brandStyles}
 </head>
 <body class="ds-email-type" style="margin:0;padding:0;background-color:#ffffff;${emailType};-webkit-text-size-adjust:100%">
 ${preheader ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all">${escapeHtml(preheader)}</div>` : ''}
-<table class="ds-email-paper ds-email-type" role="presentation" width="100%" cellpadding="0" cellspacing="0" style="min-height:640px;background-color:#ffffff;background-image:${grid};background-size:20px 100%,100% calc(100% - 28px);background-position:${gridPosition};background-repeat:repeat-x,no-repeat;${emailType}"><tr><td class="ds-email-outer" align="center" valign="top" style="padding:28px 20px 20px">
-<table class="ds-email-page ds-email-type" role="presentation" width="240" cellpadding="0" cellspacing="0" style="width:240px;table-layout:fixed;border-collapse:collapse;${emailType}">
+<table class="ds-email-paper ds-email-type" role="presentation" width="100%" cellpadding="0" cellspacing="0" style="${plain ? 'background-color:#ffffff;' : `min-height:640px;background-color:#ffffff;background-image:${grid};background-size:20px 100%,100% calc(100% - 28px);background-position:${gridPosition};background-repeat:repeat-x,no-repeat;`}${emailType}"><tr><td class="ds-email-outer" align="center" valign="top" style="padding:${plain ? '40px 20px' : '28px 20px 20px'}">
+<table class="ds-email-page ds-email-type" role="presentation" width="${plain ? 480 : 240}" cellpadding="0" cellspacing="0" style="width:${plain ? 480 : 240}px;max-width:100%;table-layout:fixed;border-collapse:collapse;${emailType}">
 ${beforeHeaderHtml}
 ${headerHtml ?? `<tr><td class="ds-email-cell-row" align="right" height="20" style="height:20px;padding:0;font-size:0;line-height:0"><a href="${escapeHtml(homeUrl)}" class="ds-email-cell ds-email-cell-label${wideLabel ? ' ds-email-cell-wide' : ''}" style="text-decoration:none;position:relative;display:block;margin-left:auto;box-sizing:border-box;width:${wideLabel ? 160 : 80}px;height:20px;border:0;background:#e6e6e6;font-family:${font};font-size:14px;line-height:20px;mso-line-height-rule:exactly;font-weight:400;letter-spacing:normal;color:#797979;text-align:left"><span class="ds-email-cell-ink" style="display:block;box-sizing:border-box;padding:0 4px;white-space:nowrap;overflow:hidden">${escapeHtml(product)}</span></a></td></tr>`}
 ${body}
