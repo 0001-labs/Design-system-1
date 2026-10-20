@@ -60,8 +60,9 @@ Every public piece of the web library has a native counterpart with the same nam
 | `ds-page` and its layouts, tiles | `DS1Page`, `DS1PageLayout`, `DS1Tiles` | `DS1Page`, `DS1PageLayout`, `DS1Tiles` |
 | `ds-row`, `ds-grid` | `DS1Row`, `DS1Rule`, `DS1PaperGrid` | `DS1Row`, `DS1Rule`, `DS1PaperGrid` |
 | `format.ts`, `pricing.ts`, `copyText` | `DS1Format`, `DS1Pricing`, `DS1Clipboard` | `DS1Format`, `DS1Pricing`, `DS1Clipboard` |
+| `ds-bars` | `DS1Bars`, `DS1BarItem` | `DS1Bars`, `DS1BarItem` |
 
-Left out on purpose: the 2-core card (off the system: no boxes around content), `ds-form` (the platform's own forms), and page dots. Charts, the composer, and `ds-stat`, `ds-meter` and `ds-steps` follow later; until then a native figure is `DS1Figures` on its lines.
+Left out on purpose: the 2-core card (off the system: no boxes around content), `ds-form` (the platform's own forms), and page dots. The other charts (`ds-chart`, `ds-spark`, `ds-ratio`, `ds-range`), the composer, and `ds-stat`, `ds-meter` and `ds-steps` follow later; until then a native figure is `DS1Figures` on its lines.
 
 ## What stays native
 
