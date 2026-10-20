@@ -14,7 +14,12 @@
 <style is:global>
   .sl-markdown-content:has([data-examples-device]) { container-type: inline-size; }
   .examples-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--grid); }
-  .examples-card { min-width: 0; }
+  .examples-grid > .examples-card { min-width: 0; margin: 0; }
+  [data-global-example-device="mobile"] .examples-card > .sl-heading-wrapper { margin: 0; min-height: calc(2 * var(--grid)); }
+  [data-global-example-device="mobile"] .examples-card .layout-toolbar { min-height: calc(2 * var(--grid)); box-sizing: border-box; }
+  [data-global-example-device="mobile"] .examples-card [data-phone] .example-device,
+  [data-global-example-device="mobile"] .examples-card [data-phone].not-content .example-device { width: calc(14 * 20px * var(--sf, 1)); max-width: 100%; }
+
   @container (min-width: 600px) {
     [data-global-example-device="mobile"] .examples-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: calc(2 * var(--grid)); }
   }
