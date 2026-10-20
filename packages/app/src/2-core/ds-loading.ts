@@ -39,17 +39,20 @@ export class LoadingIndicator extends LitElement {
   static properties = {
     label: { type: String },
     variant: { type: String },
+    gradient: { type: Boolean, reflect: true },
     inControl: { state: true },
   };
   static styles = unsafeCSS(styles);
   // Declared, not class fields, so Lit's reactive accessors are not shadowed.
   declare label: string;
   declare variant: string;
+  declare gradient: boolean;
   declare inControl: boolean;
   constructor() {
     super();
     this.label = "";
     this.variant = "bar";
+    this.gradient = false;
     this.inControl = false;
   }
   private readonly relabel = () => this.requestUpdate();
@@ -66,7 +69,7 @@ export class LoadingIndicator extends LitElement {
   }
   render() {
     const label = this.label || getText(LOADING_LABEL) || LOADING_LABEL;
-    return html`<span class="ds-loading" data-variant=${this.variant} data-context=${this.inControl ? "control" : "page"} role="status" aria-label=${label} aria-busy="true"><span class="ds-loading__fill" aria-hidden="true"></span></span>`;
+    return html`<span class="ds-loading" data-variant=${this.variant} ?data-gradient=${this.gradient} data-context=${this.inControl ? "control" : "page"} role="status" aria-label=${label} aria-busy="true"><span class="ds-loading__fill" aria-hidden="true"></span></span>`;
   }
 }
 define("ds-loading", LoadingIndicator);

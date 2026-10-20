@@ -11,3 +11,18 @@
 @keyframes ds-loading-slide { to { transform: translateX(100%); } }
 @keyframes ds-loading-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .ds-loading, .ds-loading__fill { animation: none !important; } .ds-loading__fill { transform: none; opacity: .65; } }
+
+/* Palette gradients are an opt-in face; the neutral busy feedback stays the default. */
+.ds-loading[data-gradient] {
+  --ds-loading-spectrum: var(--ds-apple-green), var(--ds-yellow), var(--ds-pink), var(--ds-zenith-blue), var(--ds-apple-green);
+  background: linear-gradient(90deg, var(--ds-loading-spectrum));
+}
+.ds-loading[data-gradient] > .ds-loading__fill {
+  background: linear-gradient(90deg, transparent, var(--ds-text-color), transparent);
+  opacity: .45;
+}
+.ds-loading[data-gradient][data-variant="spinner"] {
+  border: 0;
+  background: conic-gradient(from 0deg, var(--ds-loading-spectrum));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
+}
