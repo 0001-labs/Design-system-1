@@ -4,6 +4,7 @@ import MySidebar from '../components/MySidebar.astro';
 import MyHead from '../components/MyHead.astro';
 import LibraryWorkspace from '../components/LibraryWorkspace.astro';
 import LandingPage from '../components/LandingPage.astro';
+import ExamplesNavigationRail from '../components/ExamplesNavigationRail.astro';
 
 interface Props {
   title?: string;
@@ -32,10 +33,11 @@ const libraryMode = pathname === '/libraries/playground' ? 'editor'
     <MyHeader landing={isHome} />
 
     <!-- Main Container with Sidebar and Content -->
-    <div class:list={['main-container', { 'main-container--home': isHome }]}>
+    <div class:list={['main-container', { 'main-container--home': isHome, 'main-container--examples': isExamples }]}>
       <!-- Sidebar -->
       {!isHome && <aside id="sidebar" class="sidebar" aria-label="Documentation navigation">
         <MySidebar />
+        {isExamples && <ExamplesNavigationRail />}
       </aside>}
 
       <!-- On a phone the same navigation opens in Design system 1's dialog, filling the screen. -->
@@ -162,6 +164,12 @@ const libraryMode = pathname === '/libraries/playground' ? 'editor'
           width: calc(240px * var(--sf, 1));
           min-width: calc(240px * var(--sf, 1));
         }
+      }
+      @media (min-width: 769px) {
+        .main-container--examples .sidebar { width: var(--site-unit); min-width: var(--site-unit); scrollbar-width: none; }
+        .main-container--examples .sidebar::-webkit-scrollbar { display: none; }
+        .main-container--examples .sidebar > .docs-sidebar-shell { display: none; }
+        .main-container--examples .sidebar-gap { display: none; }
       }
       html[data-docs-compact] :is(.sidebar, .sidebar-gap, .right-sidebar-container) { display: none; }
       html[data-docs-compact] .main-content { width: 100%; }
