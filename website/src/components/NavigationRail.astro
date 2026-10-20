@@ -16,9 +16,15 @@ const entries = flatten(sidebar);
   <ds-button control="slotted" icon class="rail-open">
     <button id="sidebar-rail-open" type="button" aria-label="Expand sidebar"><ds-icon type="right" aria-hidden="true" /></button>
   </ds-button>
+  <div class="rail-links">
   {entries.map(entry => <ds-button control="slotted" primary={entry.marker ? '' : undefined} fit class="rail-entry" data-section={entry.section} data-rail-layer={entry.marker} aria-label={entry.name}>
     <a href={entry.href} aria-label={entry.name} aria-current={entry.href.replace(/\/$/, '') === Astro.url.pathname.replace(/\/$/, '') ? 'page' : undefined}>{entry.name}</a>
   </ds-button>)}
+  </div>
+  <footer class="rail-footer">
+    <ds-button control="slotted" fit><a href="https://github.com/0001-labs/Design-system-1">GitHub</a></ds-button>
+    <ds-button control="slotted" fit><a id="rail-account" href="/app/signin">Sign in</a></ds-button>
+  </footer>
 </nav>
 <script>
   import '../../../DS1/2-core/ds-icon';
@@ -28,10 +34,18 @@ const entries = flatten(sidebar);
     setSidebarCollapsed(false);
     document.querySelector<HTMLButtonElement>(document.documentElement.hasAttribute('data-signed-in') ? '#workspace-hide button' : '#public-sidebar-hide button')?.focus();
   });
-  const rail = document.querySelector<HTMLElement>('.docs-navigation-rail');
+  const rail = document.querySelector<HTMLElement>('.rail-links');
+  const account = document.querySelector<HTMLAnchorElement>('#rail-account');
+  function renderAccount(signedIn: boolean) {
+    if (!account) return;
+    account.href = signedIn ? '/app/profile' : '/app/signin';
+    account.textContent = signedIn ? 'Profile' : 'Sign in';
+  }
+  renderAccount(document.documentElement.hasAttribute('data-signed-in'));
   window.addEventListener('ds1-navigation-auth', event => {
     const detail = (event as CustomEvent).detail;
     if (detail.loading) return;
+    renderAccount(detail.authenticated === true);
     rail?.querySelectorAll('[data-private-rail]').forEach(button => button.remove());
     for (const component of readAppComponents(detail)) {
       const heading = rail?.querySelector(`[data-rail-layer="${component.layer}"]`);
@@ -57,7 +71,10 @@ const entries = flatten(sidebar);
 <style>
   .docs-navigation-rail { display: none; }
   @media (min-width: 769px) {
-    :global(html[data-sidebar-collapsed]) .docs-navigation-rail { display: flex; flex-direction: column; width: calc(8 * var(--site-unit)); padding: var(--site-unit) calc(var(--site-unit) / 2) var(--site-unit) var(--site-unit); }
+    :global(html[data-sidebar-collapsed]) .docs-navigation-rail { display: flex; flex-direction: column; width: calc(8 * var(--site-unit)); height: 100%; padding: var(--site-unit) calc(var(--site-unit) / 2) var(--site-unit) var(--site-unit); }
+    .rail-links { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; }
+    .rail-links::-webkit-scrollbar { display: none; }
+    .rail-footer { display: flex; align-items: flex-end; justify-content: space-between; flex: none; height: calc(2 * var(--site-unit)); border-top: 1px solid var(--ds1-docs-header-border); }
     .rail-open { align-self: flex-start; flex: none; margin-bottom: var(--site-unit); }
     .docs-navigation-rail :global(.rail-entry) { --section-color: var(--light-grey); --ds-button-text-color: var(--text-color); height: var(--site-unit); align-items: flex-end; align-self: flex-start; }
     .docs-navigation-rail :global([data-section='1']) { --section-color: var(--yellow); }
