@@ -28,10 +28,10 @@ export const SETTINGS_EXAMPLE: LayoutExample = {
         <div class="settings-stack">
           <div class="settings-actions"><ds-avatar id="settings-avatar" initial="A" size="large" color="var(--one-zenith-blue)"></ds-avatar><ds-text literal id="settings-profile-name">Alex Morgan</ds-text></div>
           <div class="settings-fields">
-            <ds-input id="settings-name" label="Full name" name="name" value="Alex Morgan" required></ds-input>
+            <ds-input id="settings-name" label="Name" name="name" value="Alex Morgan" required></ds-input>
             <ds-input label="Email" name="email" type="email" value="alex@example.com" required></ds-input>
+            <ds-input label="Workspace name" name="workspace" value="Studio" required></ds-input>
           </div>
-          <ds-input label="Workspace name" name="workspace" value="Studio" required></ds-input>
         </div>
       </section>
       <section class="settings-section" aria-labelledby="preferences-heading">
