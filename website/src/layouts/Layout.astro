@@ -13,6 +13,7 @@ const { title } = Astro.props;
 const pathname = Astro.url.pathname.replace(/\/$/, '');
 const isHome = pathname === '';
 const isTool = ['/2-core/icon/collection', '/colours', '/components'].includes(pathname);
+const isExamples = pathname === '/start-here/examples';
 const libraryMode = pathname === '/libraries/playground' ? 'editor'
   : pathname === '/libraries/workspace' ? 'libraries' : null;
 ---
@@ -44,7 +45,7 @@ const libraryMode = pathname === '/libraries/playground' ? 'editor'
       {!isHome && <div class="sidebar-gap"></div>}
 
       <!-- Main Content -->
-      <main aria-label="Documentation content" class:list={['main-content', { 'main-content--app': libraryMode, 'main-content--home': isHome, 'main-content--tools': isTool }]}>
+      <main aria-label="Documentation content" class:list={['main-content', { 'main-content--app': libraryMode, 'main-content--home': isHome, 'main-content--tools': isTool || isExamples }]}>
         {isHome ? <LandingPage /> : libraryMode ? <LibraryWorkspace mode={libraryMode} /> : <slot />}
       </main>
     </div>

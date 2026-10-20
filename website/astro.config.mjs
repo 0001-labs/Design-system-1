@@ -6,7 +6,15 @@ import starlight from "@astrojs/starlight";
 export default defineConfig({
   site: "https://designsystem1.com",
   // Checkbox and Switch were one page; the old address goes to the checkbox (19 October 2026).
-  redirects: { "/2-core/choice/": "/2-core/checkbox/" },
+  redirects: {
+    "/2-core/choice/": "/2-core/checkbox/",
+    "/examples/": "/start-here/examples/",
+    "/examples/settings/": "/start-here/examples/#general-settings",
+    "/examples/shop/": "/start-here/examples/#shop",
+    "/examples/planner/": "/start-here/examples/#planning-app",
+    "/examples/finance/": "/start-here/examples/#finance-app",
+    "/examples/product/": "/start-here/examples/#product-showcase",
+  },
   devToolbar: { enabled: false },
   vite: {
     // Preview frames load components dynamically. Prebundle their shared
@@ -153,16 +161,7 @@ export default defineConfig({
             { label: "Panel", slug: "4-page/panel" },
           ],
         },
-        {
-          label: "Examples",
-          items: [
-            { label: "Overview", slug: "start-here/examples" },
-            { label: "Shop", slug: "examples/shop" },
-            { label: "Planning app", slug: "examples/planner" },
-            { label: "Finance app", slug: "examples/finance" },
-            { label: "Product showcase", slug: "examples/product" },
-          ],
-        },
+        { label: "Examples", slug: "start-here/examples" },
         {
           label: "Advanced",
           items: [

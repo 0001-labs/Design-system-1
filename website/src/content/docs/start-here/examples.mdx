@@ -1,54 +1,85 @@
 ---
 title: Examples
 description: Full pages built from the system’s components, plus downloadable HTML examples.
+tableOfContents: false
+prev: false
+next: false
 ---
 
 import LayoutExample from "../../../components/LayoutExample.astro";
+import ExampleDevice from "../../../components/ExampleDevice.astro";
 
 import { HTML_EXAMPLES } from '../../../lib/html-examples';
 
-These full-page examples compose Core and Unit components using [Layout](/4-page/page/). Open one full size or use **Show layers** to inspect its composition.
+Full pages built with Design system 1. Try each example here, switch between Computer and Phone, or open it full size. Changes stay in the preview.
 
-## Shops and apps
+[General settings](#general-settings) · [Shop](#shop) · [Planning app](#planning-app) · [Finance app](#finance-app) · [Product showcase](#product-showcase) · [Page layouts](#page-layouts) · [HTML examples](#html-examples)
 
-- [Shop](/examples/shop/) — a photo-led collection with filters and a shopping bag.
-- [Planning app](/examples/planner/) — project navigation, searchable items and a visual brief.
-- [Finance app](/examples/finance/) — account balances, cash flow and transactions.
-- [Product showcase](/examples/product/) — a product story, large photographs and a package choice.
+## General settings
 
-These are working local examples with fictional content. Their components, colours, type and spacing come from the current DS1 source; example CSS only arranges the pieces.
+Profile details, regional preferences and notification choices. Save a change, then edit again and reset to your last save.
 
-## Sidebar
+<LayoutExample layout="settings" />
+
+## Shop
+
+A collection of everyday objects, with category filters and a shopping bag.
+
+<LayoutExample layout="shop" />
+
+## Planning app
+
+A studio launch week. Complete an item, search the list, add work or open the photography brief.
+
+<LayoutExample layout="planner" />
+
+## Finance app
+
+Account balances, cash flow and transactions. Switch accounts, change the month or find a payment.
+
+<LayoutExample layout="finance" />
+
+## Product showcase
+
+A headphone launch with a product story, photographs and a working package choice.
+
+<LayoutExample layout="product" />
+
+## Page layouts
+
+The six page compositions, filled with working controls. Use **Show layers** to see how the pieces fit, or **Code** to copy their source.
+
+### Sidebar
 
 An app with places to go: navigation stays on the left while the work changes on the right.
 
 <LayoutExample layout="sidebar" />
 
-## List and detail
+### List and detail
 
 Many things of one kind: pick one from the list and read it in full beside it. The list column is 16 squares, wide enough for a name and a date.
 
 <LayoutExample layout="split" />
 
-## Inspector
+### Inspector
 
 Making something: pages on the left, the work in the middle, its settings on the right. Below 48 squares of width the settings move under the work.
 
 <LayoutExample layout="inspector" />
 
-## Column
+### Column
 
 Something read or filled in from top to bottom: settings, an article, a long form. The column is 32 squares wide and sits in the middle, on a whole square.
 
 <LayoutExample layout="column" />
 
-## Centred
+### Centred
 
 One task and nothing else on the screen: signing in, confirming, a single question. The column is 16 squares and sits in the middle of the height too, on a whole square.
 
 <LayoutExample layout="centered" />
 
-## Tiles
+### Tiles
 
 An overview of many numbers at once. Each tile is 12 squares wide and the row fills with as many as fit; `data-tile="wide"` takes two, `data-tile="full"` the whole row.
 
@@ -64,6 +95,7 @@ The files load the Design system 1 stylesheet and bundled Lit module from this s
   <h2>{example.title}</h2>
   <p>{example.description}</p>
   <p><a href={`/examples/files/${example.id}.html`} target="_blank" rel="noopener">View example</a> · <a href={`/examples/files/${example.id}.html`} download={`${example.id}.html`}>Download HTML</a></p>
+  <div class="not-content" data-ds-not-prose><ExampleDevice src={`/examples/files/${example.id}.html`} title={example.title} height={480} /></div>
 </section>)}
 
 ## What you download
