@@ -11,6 +11,13 @@
     setExamplesDevice(gallery, 'computer');
   });
 </script>
-<style>
+<style is:global>
+  .sl-markdown-content:has([data-examples-device]) { container-type: inline-size; }
+  .examples-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--grid); }
+  .examples-card { min-width: 0; }
+  @container (min-width: 600px) {
+    [data-global-example-device="mobile"] .examples-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: calc(2 * var(--grid)); }
+  }
+
   .examples-device-switch { margin-block: calc(20px * var(--sf, 1)); }
 </style>
