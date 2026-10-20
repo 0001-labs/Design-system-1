@@ -20,6 +20,8 @@ export type OverlaySide = "end" | "start";
 export type OverlayCloseReason = "escape" | "backdrop" | "outside" | "button" | "native" | "swipe";
 const dialogStyles = `${frameStyles}\n${placementStyles}`;
 const TYPES = new Set<string>(["modal", "sheet", "drawer", "popover", "screen"]);
+/** A phone's width, as `0-face/grid.ts` reads it. */
+const onPhone = () => typeof matchMedia === "function" && matchMedia("(max-width: 768px)").matches;
 const openDialogs = new WeakMap<Document, Set<Overlay>>();
 type SavedStyle = { style: CSSStyleDeclaration; name: string; value: string; priority: string; locked: string };
 const scrollStyles = new WeakMap<Document, { declarations: SavedStyle[]; x: number; y: number }>();
@@ -74,7 +76,7 @@ function styleRoot(root: Node) {
  * `<dialog>` that keeps forms and accessible ID references together. The
  * browser owns the top layer, inert background and modal focus navigation.
  * Listen to ds-close-request and preventDefault to control whether it closes.
- * `type` says what it is: a `modal` in the centre (the default), a `sheet`
+ * `type` says what it is: a `modal` in the centre (the default; a sheet on a phone), a `sheet`
  * from the foot of the screen, a `drawer` at the `side` `"end"` (the default)
  * or `"start"`, a `popover` at the `anchor` point, or the whole `screen`. A
  * sheet and a drawer slide in and out and a finger swipes them away (reason
@@ -149,8 +151,11 @@ export class Overlay extends LitElement {
 
   protected updated() { this.syncType(); this.syncOpen(); this.place(); }
 
-  /** Its type as it is drawn: an unknown one is a modal. */
-  get kind(): OverlayType { return TYPES.has(this.type) ? this.type : "modal"; }
+  /** Its type as it is drawn: an unknown one is a modal, and a modal on a phone is a sheet (Joachim, 20 October 2026: no modals on a phone at all). */
+  get kind(): OverlayType {
+    const type = TYPES.has(this.type) ? this.type : "modal";
+    return type === "modal" && onPhone() ? "sheet" : type;
+  }
   /** A modeless overlay leaves the page live: a popover always, any other with `non-modal`. */
   get modeless() { return this.nonModal || this.kind === "popover"; }
   /** The edge it comes from and a finger swipes it back to. */

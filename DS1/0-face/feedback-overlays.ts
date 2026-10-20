@@ -3,7 +3,7 @@
  * `confirm()` and `prompt()`, for pages without Lit or any other framework.
  *
  * Each is drawn on the native `dialog.ds-overlay` frame from `1-root/controls.css`
- * (which the page loads) with its native buttons, `.ds-button--primary`,
+ * (which the page loads), as a sheet from the screen's foot on a phone, with its native buttons, `.ds-button--primary`,
  * `--secondary` and `--danger`, and opened with `showModal()`, so the browser
  * keeps the rest of the page inert behind it. Their words default to the
  * shared words (OK, Cancel) in the page's language where the page loads the
@@ -99,8 +99,10 @@ function show(spec: Spec): Promise<boolean | string | null> {
   return new Promise(resolve => {
     const id = `ds-feedback-${++count}`;
     const opener = focused();
+    // A sheet from the foot of a phone's screen, never a modal there (Joachim, 20 October 2026).
+    const phone = typeof matchMedia === "function" && matchMedia("(max-width: 768px)").matches;
     const dialog = element("dialog", {
-      class: "ds-overlay",
+      class: phone ? "ds-overlay ds-overlay--sheet" : "ds-overlay",
       role: spec.kind === "prompt" ? "dialog" : "alertdialog",
       "aria-labelledby": `${id}-title`,
       "data-ds-feedback": spec.kind,
