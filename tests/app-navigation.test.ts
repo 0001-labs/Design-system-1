@@ -23,9 +23,9 @@ test('private names require owner metadata and a local workspace destination', (
 test('owner-only links sit alphabetically in Core and disappear when collapsed or signed out', () => {
   const root = document.createElement('div');
   const items = placeAppNavigation(root, rows, components);
-  const expanded = items.flatMap(item => [item.label, ...[...root.querySelectorAll(`[slot="${item.afterSlot}"] a`)].map(link=>link.textContent)]);
+  const expanded = items.flatMap(item => [item.label, ...[...root.querySelectorAll(`[slot="${item.afterSlot}"] a`)].map(link=>link.querySelector('span')?.textContent)]);
   expect(expanded).toEqual(['1 Root','2 Core','Input','Keyboard shortcut','Link','Loading indicator','Spacing handle','Stat','Switch','3 Unit']);
-  expect(root.querySelector('ds-tag')).toBeNull();
+  expect([...root.querySelectorAll('ds-tag')].map(tag => tag.textContent)).toEqual(['App', 'App', 'App']);
   expect([...root.querySelectorAll('a')].every(link=>link.classList.contains('private-component-link'))).toBe(true);
   placeAppNavigation(root, rows.map(row=>({...row,expanded:row.label==='2 Core'?false:row.expanded})), components);
   expect(root.querySelectorAll('a')).toHaveLength(0);

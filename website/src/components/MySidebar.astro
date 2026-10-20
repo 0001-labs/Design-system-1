@@ -180,7 +180,7 @@ const { sidebar } = Astro.locals.starlightRoute;
   .docs-sidebar-footer { display: flex; align-items: center; gap: calc(var(--site-unit) / 2); height: calc(2 * var(--site-unit)); border-top: 1px solid var(--ds1-docs-header-border); font-size: calc(10px * var(--sf, 1)); }
   #workspace[hidden], #workspace-libraries[hidden] { display: none; }
   #workspace { flex: none; }
-  #docs-navigation :global(.private-component-link) { width: 100%; color: var(--ds-text-color-muted); text-decoration: none; padding-inline-start: calc(4px * var(--sf, 1) + var(--site-unit) / 2); }
+  #docs-navigation :global(.private-component-link) { width: 100%; color: var(--ds-text-color-muted); text-decoration: none; padding-inline-start: calc(4px * var(--sf, 1) + 2 * var(--site-unit)); gap: calc(4px * var(--sf, 1)); }
   .workspace-heading { display: flex; align-items: flex-end; }
   #workspace-toggle { flex: 1; width: auto; min-width: 0; }
   #workspace-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
