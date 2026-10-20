@@ -53,6 +53,7 @@ const inside = layersIn(sample.html);
       if (event.data?.type === 'ds1-layout-inspect') readout.textContent = event.data.text || resting;
     });
     onChoice(example.querySelector('[data-preview-width]'), value => { example.toggleAttribute('data-phone', value === 'phone'); send(); });
+    example.addEventListener('example-device-change', send);
     const layersButton = example.querySelector<HTMLButtonElement>('[data-preview-layers]')!;
     layersButton.addEventListener('click', () => {
       layers = !layers;

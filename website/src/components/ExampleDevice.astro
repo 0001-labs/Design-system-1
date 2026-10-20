@@ -14,6 +14,11 @@ const { title, src, height } = Astro.props;
   <img class="example-phone-frame" src="/examples/device/iphone-frame.webp" width="910" height="1855" alt="" loading="lazy" />
 </div>
 <style is:global>
+  [data-global-example-device] [data-preview-width] { display: none; }
+  [data-tablet] .example-device { width: calc(40 * 20px * var(--sf, 1)); max-width: 100%; }
+  [data-tablet] .example-device-glass { border-radius: calc(20px * var(--sf, 1)); padding: calc(20px * var(--sf, 1)); background: var(--ds-fill); }
+  [data-tablet] .example-window-chrome { display: none; }
+  [data-tablet] .example-device iframe { height: calc(50 * 20px * var(--sf, 1)); }
   .example-device {
     position: relative;
     width: 100%;
@@ -34,7 +39,7 @@ const { title, src, height } = Astro.props;
   .example-window-chrome span { position: absolute; inset: calc(8px * var(--device-scale)) calc(70px * var(--device-scale)) auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; font-size: calc(10px * var(--device-scale)); line-height: calc(20px * var(--device-scale)); }
   .example-device iframe { display: block; width: 100%; height: var(--example-height); margin: 0; border: 0; background: var(--device-paper); }
   .example-phone-status, .example-phone-frame, .example-phone-home { display: none; }
-  [data-phone] .example-device { width: calc(21 * var(--layout-unit)); max-width: 100%; aspect-ratio: 910 / 1855; }
+  [data-phone] .example-device { width: calc(21 * 20px * var(--sf, 1)); max-width: 100%; aspect-ratio: 910 / 1855; }
   /* The supplied artwork's screen is 1622/1819 wide, inset 98/1819 and 60/3710 down. */
   [data-phone] .example-device-glass { position: absolute; top: calc(100% * 60 / 3710); left: calc(100% * 98 / 1819); width: calc(100% * 1622 / 1819); height: calc(100% * 1622 / 1819 * 2.212 * 910 / 1855); border-radius: 14.2857% / 6.4583%; box-shadow: none; display: flex; flex-direction: column; }
   [data-phone] .example-window-chrome { display: none; }

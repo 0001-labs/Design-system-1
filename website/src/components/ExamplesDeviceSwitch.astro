@@ -1,0 +1,16 @@
+<div class="examples-device-switch not-content" data-ds-not-prose>
+  <ds-button split literal aria-label="Example device" options="computer:Computer,mobile:Mobile,tablet:Tablet" value="computer" data-examples-device></ds-button>
+</div>
+<script>
+  import { onChoice } from '../lib/example-controls';
+  import { setExamplesDevice } from '../lib/examples-device';
+  document.querySelectorAll<HTMLElement>('[data-examples-device]').forEach(control => {
+    const gallery = control.closest<HTMLElement>('.sl-markdown-content');
+    if (!gallery) return;
+    onChoice(control, device => setExamplesDevice(gallery, device));
+    setExamplesDevice(gallery, 'computer');
+  });
+</script>
+<style>
+  .examples-device-switch { margin-block: calc(20px * var(--sf, 1)); }
+</style>
