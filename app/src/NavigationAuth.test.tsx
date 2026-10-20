@@ -38,16 +38,30 @@ test('workspace creation accepts only the parent and ignores duplicate or signed
 
 test('the bridge exposes App only after server authorization and clears it on sign-out', async () => {
   vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
-  const components = [{name:'Keyboard shortcut',href:'https://dash.designsystem1.com/private-app/#keyboard-shortcut'}];
-  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({components})));
+  const components = [{name:'Keyboard shortcut',href:'/libraries/workspace/?internal=keyboard-shortcut',layer:2}];
+  vi.stubGlobal('fetch', vi.fn().mockImplementation(async (_url, options) => options?.method ? new Response(null, {status:204}) : Response.json({components})));
   const root = createRoot(document.createElement('div'));
   const sent = vi.spyOn(window.parent, 'postMessage').mockImplementation(() => {});
   try {
     await act(async () => root.render(createElement(NavigationAuth)));
     expect(sent.mock.calls.at(-1)?.[0]).toMatchObject({authenticated:true,appComponents:components});
     expect(fetch).toHaveBeenCalledWith('/api/app-navigation', expect.objectContaining({headers:{Authorization:'Bearer test-session'},cache:'no-store'}));
+    expect(fetch).toHaveBeenCalledWith('/api/dashboard/session', expect.objectContaining({method:'POST',headers:{Authorization:'Bearer test-session'}}));
     mocks.session.isAuthenticated = false;
     await act(async () => root.render(createElement(NavigationAuth)));
     expect(sent.mock.calls.at(-1)?.[0]).toMatchObject({authenticated:false,appComponents:[]});
+    expect(fetch).toHaveBeenCalledWith('/api/dashboard/session', expect.objectContaining({method:'DELETE'}));
   } finally { await act(async () => root.unmount()); sent.mockRestore(); mocks.session.isAuthenticated = true; vi.unstubAllGlobals(); }
+});
+
+test('private links stay hidden when the owner document session cannot be established', async () => {
+  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
+  const components = [{name:'Keyboard shortcut',href:'/libraries/workspace/?internal=keyboard-shortcut',layer:2}];
+  vi.stubGlobal('fetch', vi.fn().mockImplementation(async (_url, options) => options?.method ? new Response(null, {status:403}) : Response.json({components})));
+  const root = createRoot(document.createElement('div'));
+  const sent = vi.spyOn(window.parent, 'postMessage').mockImplementation(() => {});
+  try {
+    await act(async () => root.render(createElement(NavigationAuth)));
+    expect(sent.mock.calls.at(-1)?.[0]).toMatchObject({authenticated:true,appComponents:[]});
+  } finally { await act(async () => root.unmount()); sent.mockRestore(); vi.unstubAllGlobals(); }
 });

@@ -7,8 +7,8 @@ export async function appNavigation(request: Request, env: ReportsEnv, send: typ
   const denied = await authorizeReport(request, env, send);
   if (denied) return denied;
   return Response.json({ components: [
-    { name: 'Keyboard shortcut', href: 'https://dash.designsystem1.com/private-app/#keyboard-shortcut' },
-    { name: 'Spacing handle', href: 'https://dash.designsystem1.com/private-app/#spacing-handle' },
-    { name: 'Loading indicator', href: 'https://dash.designsystem1.com/private-app/#loading-indicator' },
+    { name: 'Keyboard shortcut', layer: 2, href: '/libraries/workspace/?internal=keyboard-shortcut' },
+    { name: 'Spacing handle', layer: 2, href: '/libraries/workspace/?internal=spacing-handle' },
+    { name: 'Loading indicator', layer: 2, href: '/libraries/workspace/?internal=loading-indicator' },
   ] }, { headers });
 }

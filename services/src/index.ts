@@ -24,12 +24,13 @@ function reportPage(response: Response, path: string): Response {
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
-    // Private App HTML and every asset require the owner session on its own host.
+    // Private App HTML and assets revalidate the owner on the two configured hosts.
     if (url.pathname.startsWith('/private-app')) {
-      if (url.hostname !== DASHBOARD_HOST) return new Response('Not found', { status: 404, headers: { 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex' } });
+      if (![DASHBOARD_HOST, 'designsystem1.com'].includes(url.hostname)) return new Response('Not found', { status: 404, headers: { 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex' } });
       return dashboard(request, env);
     }
-    if (/^\/2-core\/kbd\/?$/.test(url.pathname)) return Response.redirect(`https://${DASHBOARD_HOST}/private-app/`, 302);
+    if (url.hostname === 'designsystem1.com' && url.pathname === '/api/dashboard/session') return dashboard(request, env);
+    if (/^\/2-core\/kbd\/?$/.test(url.pathname)) return Response.redirect('https://designsystem1.com/libraries/workspace/?internal=keyboard-shortcut', 302);
     if (url.pathname === "/api/app-navigation") return appNavigation(request, env);
     if (url.pathname === "/api/flags") return featureFlags(request, env);
     if (["/flags", "/flags/", "/app/flags"].includes(url.pathname)) {
@@ -126,6 +127,12 @@ export default {
       return reportPage(await env.ASSETS.fetch(new Request(url, request)), requestedPath);
     }
 
+    if (url.pathname.replace(/\/$/, '') === '/libraries/workspace' && url.searchParams.has('internal')) {
+      const shell = new Response(response.body, response);
+      shell.headers.set('Cache-Control', 'private, no-store');
+      shell.headers.set('X-Robots-Tag', 'noindex, nofollow');
+      return shell;
+    }
     return reportPage(response, url.pathname);
   },
 } satisfies ExportedHandler<Env>;

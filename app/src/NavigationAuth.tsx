@@ -8,16 +8,24 @@ import { libraryTemplate, templateVersion } from "./lib/libraryTemplate";
 export function NavigationAuth() {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const token = useAuthToken();
-  const [appNavigation, setAppNavigation] = useState<{ token: string; components: { name: string; href: string }[] } | null>(null);
+  const [appNavigation, setAppNavigation] = useState<{ token: string; components: { name: string; href: string; layer: number }[] } | null>(null);
   const ready = !isLoading && isAuthenticated;
   useEffect(() => {
     setAppNavigation(null);
-    if (!ready || !token) return;
+    if (!ready || !token) {
+      void fetch('/api/dashboard/session', { method: 'DELETE', cache: 'no-store' }).catch(() => {});
+      return;
+    }
     const controller = new AbortController();
     void fetch('/api/app-navigation', { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: controller.signal })
       .then(async response => {
-        if (!response.ok) return;
+        if (!response.ok) {
+          await fetch('/api/dashboard/session', { method: 'DELETE', cache: 'no-store', signal: controller.signal });
+          return;
+        }
         const data = await response.json();
+        const session = await fetch('/api/dashboard/session', { method: 'POST', headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: controller.signal });
+        if (!session.ok) return;
         if (!controller.signal.aborted && Array.isArray(data.components)) setAppNavigation({ token, components: data.components });
       }).catch(() => { /* Access unavailable: keep internal navigation hidden. */ });
     return () => controller.abort();

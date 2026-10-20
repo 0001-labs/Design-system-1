@@ -33,13 +33,14 @@ describe("combined website routes", () => {
     }
   });
 
-  it("never serves App docs or assets through a public-host bypass", async () => {
+  it("gates App docs and every asset on the docs and dashboard hosts", async () => {
     for (const path of ['/private-app/', '/private-app/app.js', '/private-app/app.css', '/private-app/index.html']) {
-      expect((await site.fetch(path, { redirect: 'manual' })).status).toBe(404);
+      expect((await site.fetch(path, { redirect: 'manual' })).status).toBe(302);
+      expect((await site.fetch('https://www.designsystem1.com' + path, { redirect: 'manual' })).status).toBe(404);
       expect((await site.fetch('https://dash.designsystem1.com' + path, { redirect: 'manual' })).status).toBe(302);
     }
     const old = await site.fetch('/2-core/kbd/', { redirect: 'manual' });
-    expect(old.headers.get('location')).toBe('https://dash.designsystem1.com/private-app/');
+    expect(old.headers.get('location')).toBe('https://designsystem1.com/libraries/workspace/?internal=keyboard-shortcut');
   });
 
   it("preserves query parameters when normalizing the app URL", async () => {

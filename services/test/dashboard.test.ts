@@ -54,10 +54,10 @@ describe('private dashboard HTML and session bridge', () => {
 });
 
 describe('private App documentation and assets', () => {
-  for (const path of ['/private-app/', '/private-app/app.js', '/private-app/app.css']) {
-    it(`gates ${path} using the verified pinned owner`, async () => {
+  for (const path of ['/private-app/', '/private-app/app.js', '/private-app/app.css']) for (const host of [origin, 'https://designsystem1.com']) {
+    it(`gates ${host}${path} using the verified pinned owner`, async () => {
       const { env, send, assets } = setup();
-      const url = origin + path;
+      const url = host + path;
       const anonymous = await dashboard(new Request(url), env, send);
       expect(anonymous.status).toBe(302);
       expect(assets).not.toHaveBeenCalled();

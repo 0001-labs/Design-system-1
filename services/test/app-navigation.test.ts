@@ -19,5 +19,7 @@ test('internal navigation is returned only for the pinned, verified owner', asyn
   const response = await appNavigation(request('valid'), env, send);
   expect(response.status).toBe(200);
   expect(response.headers.get('cache-control')).toBe('private, no-store');
-  expect((await response.json() as {components: {name:string}[]}).components.map(item => item.name)).toEqual(['Keyboard shortcut', 'Spacing handle', 'Loading indicator']);
+  const { components } = await response.json() as {components: {name:string; layer:number; href:string}[]};
+  expect(components.map(item => item.name)).toEqual(['Keyboard shortcut', 'Spacing handle', 'Loading indicator']);
+  expect(components.every(item => item.layer === 2 && item.href.startsWith('/libraries/workspace/?internal='))).toBe(true);
 });

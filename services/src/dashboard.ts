@@ -36,7 +36,7 @@ export async function dashboard(request: Request, env: ReportsEnv & { ASSETS: Fe
     // Revalidate the token with Convex on every HTML request; cookies confer no authority alone.
     const denied = await authorizeReport(sessionRequest(request), env, send);
     if (denied) {
-      if (denied.status === 401) return new Response(null, { status: 302, headers: { ...security, Location: privateApp ? '/app/signin?next=%2Fprivate-app%2F' : '/app/signin', 'Set-Cookie': expired } });
+      if (denied.status === 401) return new Response(null, { status: 302, headers: { ...security, Location: privateApp ? `/app/signin?next=${encodeURIComponent(url.hostname === 'designsystem1.com' ? '/libraries/workspace/' : '/private-app/')}` : '/app/signin', 'Set-Cookie': expired } });
       return denied;
     }
   }
