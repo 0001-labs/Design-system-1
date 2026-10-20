@@ -1,5 +1,5 @@
 import { html, LitElement, nothing, unsafeCSS, type PropertyDeclarations, type PropertyValues } from "lit";
-import { type DataPoint, drawSparkline, GridChart, type Marker, type Series, type SeriesKind } from "./chart/grid-chart";
+import { type DataPoint, drawSparkline, GridChart, type Marker, type Series, type SeriesKind, STEPS } from "./chart/grid-chart";
 
 import { define } from "../0-face/define";
 import styles from "./chart/chart.css?inline";
@@ -273,43 +273,87 @@ export interface BarItem {
   caption?: string;
 }
 
+/**
+ * The round size each square of a bar chart stands for (the line chart's steps: 1, 2, 2.5 and 5 times
+ * a power of ten), the smallest with which `max` fits in `squares`.
+ */
+export function barStep(max: number, squares: number): number {
+  return STEPS.find((step) => Math.ceil(max / step) <= Math.max(1, squares)) ?? STEPS[STEPS.length - 1]!;
+}
+
+const compact = new Intl.NumberFormat(undefined, { notation: "compact", maximumFractionDigits: 1 });
+
 export class GridBars extends ChartElement {
   static properties: PropertyDeclarations = {
     items: { attribute: false },
     rows: { type: Number },
     span: { type: Number },
+    axis: { type: Boolean, reflect: true },
+    values: { type: Boolean, reflect: true },
+    fill: { type: Boolean, reflect: true },
+    format: { attribute: false },
   };
   connectedCallback(): void { this.dataset.chartKind = "bars"; super.connectedCallback(); }
   declare items: BarItem[];
   declare rows: number;
   declare span: number;
+  /** A scale at the end, two squares wide: each square of the area one round step, labelled just above its line, the lines across the bars. */
+  declare axis: boolean;
+  /** Each bar's value written over it, by `format`. */
+  declare values: boolean;
+  /** The bars share the width left beside the scale, in whole pixels, instead of `span` squares each. */
+  declare fill: boolean;
+  /** Writes the scale's labels and the values over the bars. */
+  declare format: (value: number) => string;
 
   constructor() {
     super();
     this.items = [];
     this.rows = 4;
     this.span = 2;
+    this.axis = false;
+    this.values = false;
+    this.fill = false;
+    this.format = (value) => compact.format(value);
   }
 
   render() {
-    const height = (this.rows - 1) * this.unit;
+    const squares = Math.max(1, this.rows - 1);
+    const height = squares * this.unit;
     const max = Math.max(...this.items.flatMap((item) => [item.value, item.compare ?? 0]), 1e-9);
-    const px = (v: number) => Math.max(1, Math.round((v / max) * (height - 4)));
+    // With a scale, a square is a step, so the bars stand on its lines; a value over the tallest
+    // keeps its square above it.
+    const step = this.axis ? barStep(max, squares - (this.values ? 1 : 0)) : 0;
+    const room = height - 4 - (this.values ? this.unit : 0);
+    const px = (v: number) => Math.max(1, Math.round(this.axis ? (v / step) * this.unit : (v / max) * room));
+    const captions = this.items.some((item) => item.caption);
+    const lines = this.axis ? Array.from({ length: squares }, (_, i) => i + 1).filter((row) => row * step <= max + step) : [];
     return html`<div class="bars" style="--span: ${this.span}">
-      ${this.items.map(
-        (item) => html`<div class="bar-cell">
-          <div class="bar-area" style="height: ${height}px">
-            ${item.compare !== undefined
-              ? html`<span class="bar-compare" style="height: ${px(item.compare)}px"></span>`
-              : nothing}
-            ${item.value > 0
-              ? html`<span class="bar-fill ${item.tone ?? "ink"}" style="height: ${px(item.value)}px"></span>`
-              : nothing}
-          </div>
-          <span class="bar-caption">${item.caption ?? ""}</span>
-          <span class="bar-label">${item.label}</span>
-        </div>`,
-      )}
+      <div class="bar-columns">
+        ${this.axis ? html`<span class="bar-guides" style="height: ${height}px" aria-hidden="true"></span>` : nothing}
+        ${this.items.map(
+          (item) => html`<div class="bar-cell">
+            <div class="bar-area" style="height: ${height}px">
+              ${item.compare !== undefined
+                ? html`<span class="bar-compare" style="height: ${px(item.compare)}px"></span>`
+                : nothing}
+              ${item.value > 0
+                ? html`<span class="bar-fill ${item.tone ?? "ink"}" style="height: ${px(item.value)}px"></span>`
+                : nothing}
+              ${this.values && item.value > 0
+                ? html`<span class="bar-value" style="bottom: ${px(item.value) + 2}px">${this.format(item.value)}</span>`
+                : nothing}
+            </div>
+            ${captions ? html`<span class="bar-caption">${item.caption ?? ""}</span>` : nothing}
+            <span class="bar-label">${item.label}</span>
+          </div>`,
+        )}
+      </div>
+      ${this.axis
+        ? html`<div class="bar-axis" style="height: ${height}px" aria-hidden="true">
+            ${lines.map((row) => html`<span class="bar-tick" style="bottom: ${row * this.unit}px">${this.format(row * step)}</span>`)}
+          </div>`
+        : nothing}
     </div>`;
   }
 }

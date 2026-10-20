@@ -69,7 +69,8 @@ interface Palette {
   gridMajor: string;
 }
 
-const STEPS: number[] = [];
+/** The round sizes a square of a chart stands for: 1, 2, 2.5 and 5 times a power of ten. */
+export const STEPS: number[] = [];
 for (let exp = -4; exp <= 9; exp++) {
   for (const base of [1, 2, 2.5, 5]) STEPS.push(base * 10 ** exp);
 }

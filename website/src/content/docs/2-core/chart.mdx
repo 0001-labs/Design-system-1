@@ -48,7 +48,7 @@ For multiple series, use `createChart(canvas, options)`, `addSeries`, `setData`,
 ## Compact charts
 
 - `ds-spark`: `values`, optional `base`, and `cols` (default four). One square high.
-- `ds-bars`: `items` with `label`, `value`, optional `compare`, `tone` (`up`, `down`, `ink`) and `caption`; `rows` and `span` in squares. Intended for nonnegative values.
+- `ds-bars`: `items` with `label`, `value`, optional `compare`, `tone` (`up`, `down`, `ink`) and `caption`; `rows` and `span` in squares. Intended for nonnegative values. `axis` adds the scale at the end, two squares wide, as the line chart's: each square of the area one round step (1, 2, 2.5 or 5 times a power of ten, `barStep`), its label in the muted ink just above its line, and the lines run across the bars. `values` writes each bar's value just over it, centred. `format` writes both (compact numbers by default). `fill` lets the bars share the width beside the scale instead of `span` squares each, where twelve bars and a scale must fit a phone. The Swift and Kotlin packages draw the same as `DS1Bars` with `DS1BarItem`.
 - `ds-ratio`: `value` between zero and one; out-of-range values clamp.
 - `ds-range`: `min`, `max`, `from`, `to` and `marks` (`value`, optional `label`, `kind` of `dot` or `tick`). This is a display, not a range input.
 

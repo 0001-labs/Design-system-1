@@ -112,13 +112,31 @@
 
 .bars {
   display: flex;
+  align-items: flex-start;
+}
+
+.bar-columns {
+  position: relative;
+  display: flex;
+}
+
+:host([fill]) .bar-columns {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .bar-cell {
   display: grid;
-  grid-template-rows: auto var(--ds-chart-unit) var(--ds-chart-unit);
+  grid-template-rows: auto;
+  grid-auto-rows: var(--ds-chart-unit);
   align-items: center;
   width: calc(var(--span) * var(--ds-chart-unit));
+}
+
+:host([fill]) .bar-cell {
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
 }
 
 .bar-area {
@@ -128,8 +146,23 @@
   box-shadow: inset 0 -1px 0 var(--ds-chart-line);
 }
 
+/* A scale's lines across the bars, one a square, under them. */
+.bar-guides {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(to top, transparent 0 calc(var(--ds-chart-unit) - 1px), var(--ds-chart-line) calc(var(--ds-chart-unit) - 1px) var(--ds-chart-unit));
+}
+
 .bar-fill {
+  position: relative;
   width: calc(var(--span) * var(--ds-chart-unit) - 1px);
+}
+
+:host([fill]) .bar-fill,
+:host([fill]) .bar-compare {
+  width: calc(100% - 1px);
 }
 
 .bar-fill.up {
@@ -153,11 +186,47 @@
   box-shadow: inset 0 0 0 1px var(--ds-chart-ink);
 }
 
+/* A bar's value just over it, in the small type, centred on the bar and free to run past it. */
+.bar-value {
+  position: absolute;
+  left: 0;
+  width: calc(100% - 1px);
+  display: flex;
+  justify-content: center;
+  font-size: var(--ds-chart-small);
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--ds-chart-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The scale at the end: two squares, each label just above its line, as the line chart's. */
+.bar-axis {
+  position: relative;
+  flex: none;
+  width: calc(2 * var(--ds-chart-unit));
+}
+
+.bar-tick {
+  position: absolute;
+  right: 0;
+  margin-bottom: 2px;
+  font-size: var(--ds-chart-small);
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--ds-chart-muted);
+  font-variant-numeric: tabular-nums;
+}
+
 .bar-caption,
 .bar-label {
   font-size: var(--ds-chart-small);
   white-space: nowrap;
   overflow: hidden;
+}
+
+.bar-label {
+  color: var(--ds-chart-muted);
 }
 
 .bar-label {
