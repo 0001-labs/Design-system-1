@@ -515,6 +515,17 @@
 }
 .header[data-views] .controls { justify-self: end; }
 .views { justify-self: center; }
+/* On a phone the title and the arrows keep the first row, and Day, Week and
+ * Month stand on a row of their own a square under them. */
+@media (max-width: 639px) {
+  .header[data-views] {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: var(--ds-unit) var(--ds-unit);
+    row-gap: var(--ds-unit);
+    height: auto;
+  }
+  .header[data-views] .views { grid-column: 1 / -1; grid-row: 2; justify-self: start; }
+}
 
 /* One day: its events without a time on lines a day wide across the top, then
  * its hours, one square each with a hairline at the foot, in an area twelve
