@@ -28,6 +28,7 @@ public struct DS1ButtonStyle: ButtonStyle {
 
         var body: some View {
             configuration.label
+                .environment(\.ds1ButtonFilled, kind != .plain)
                 .font(DS1Font.font(.regular, size: scale.type))
                 .tracking(scale.tracking)
                 .lineLimit(1)
@@ -47,6 +48,50 @@ public struct DS1ButtonStyle: ButtonStyle {
             case .primary: .accent
             }
         }
+    }
+}
+
+/// Words and an icon on one button face, hugging them as the web's: a 16-point icon carries
+/// about 4 points of its own room around its glyph, so it takes no gap from the words and, on a
+/// filled face, none of the padding on its side. The glyph then stands 4 points from the words
+/// and from the face's edge, as the words stand from the other edge.
+public struct DS1ButtonLabel: View {
+    public enum Side: Sendable { case leading, trailing }
+
+    @Environment(\.ds1Scale) private var scale
+    @Environment(\.ds1ButtonFilled) private var filled
+    let text: String
+    let icon: DS1IconName
+    let side: Side
+
+    public init(_ text: String, icon: DS1IconName, side: Side = .trailing) {
+        self.text = text; self.icon = icon; self.side = side
+    }
+
+    public var body: some View {
+        HStack(spacing: 0) {
+            if side == .leading { glyph }
+            Text(text)
+            if side == .trailing { glyph }
+        }
+    }
+
+    private var glyph: some View {
+        DS1Icon(icon, size: .large)
+            .padding(side == .trailing ? .trailing : .leading, filled ? -scale(4) : 0)
+    }
+}
+
+private struct DS1ButtonFilledKey: EnvironmentKey {
+    static let defaultValue = false
+}
+
+extension EnvironmentValues {
+    /// Whether the button face around a label is filled (secondary or primary), so its padding
+    /// can give way to an icon's own room.
+    var ds1ButtonFilled: Bool {
+        get { self[DS1ButtonFilledKey.self] }
+        set { self[DS1ButtonFilledKey.self] = newValue }
     }
 }
 

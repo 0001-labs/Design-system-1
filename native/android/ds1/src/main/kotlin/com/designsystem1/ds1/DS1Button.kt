@@ -45,6 +45,20 @@ fun DS1Button(
     width: DS1ButtonWidth = DS1ButtonWidth.Hug,
     enabled: Boolean = true,
     content: @Composable RowScope.() -> Unit,
+) = DS1ButtonFace(onClick, modifier, kind, width, enabled, hug = null, content = content)
+
+/** Which side of the words an icon hugs, or none: see the labelled [DS1Button]. */
+private enum class DS1ButtonHug { Start, End }
+
+@Composable
+private fun DS1ButtonFace(
+    onClick: () -> Unit,
+    modifier: Modifier,
+    kind: DS1ButtonKind,
+    width: DS1ButtonWidth,
+    enabled: Boolean,
+    hug: DS1ButtonHug?,
+    content: @Composable RowScope.() -> Unit,
 ) {
     val scale = LocalDS1Scale.current
     val interaction = remember { MutableInteractionSource() }
@@ -69,15 +83,22 @@ fun DS1Button(
                 .background(ground, shape)
                 .clickable(interactionSource = interaction, indication = null, enabled = enabled, role = Role.Button, onClick = onClick)
                 .alpha(if (!enabled) 0.5f else if (pressed) 0.7f else 1f)
-                .padding(horizontal = if (kind == DS1ButtonKind.Plain) scale(0f) else scale(4f)),
-            horizontalArrangement = Arrangement.spacedBy(scale(4f), Alignment.CenterHorizontally),
+                .padding(
+                    start = if (kind == DS1ButtonKind.Plain || hug == DS1ButtonHug.Start) scale(0f) else scale(4f),
+                    end = if (kind == DS1ButtonKind.Plain || hug == DS1ButtonHug.End) scale(0f) else scale(4f),
+                ),
+            horizontalArrangement = Arrangement.spacedBy(if (hug != null) scale(0f) else scale(4f), Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically,
             content = content,
         )
     }
 }
 
-/** A button with a label, and an icon before it if given. */
+/**
+ * A button with a label, and an icon before it (`icon`) or after it (`trailingIcon`) if given.
+ * Words and an icon hug, as the web's: a 16 dp icon carries about 4 dp of its own room around its
+ * glyph, so it takes no gap from the words and, on a filled face, none of the padding on its side.
+ */
 @Composable
 fun DS1Button(
     label: String,
@@ -86,12 +107,19 @@ fun DS1Button(
     kind: DS1ButtonKind = DS1ButtonKind.Plain,
     width: DS1ButtonWidth = DS1ButtonWidth.Hug,
     icon: DS1IconName? = null,
+    trailingIcon: DS1IconName? = null,
     enabled: Boolean = true,
 ) {
-    DS1Button(onClick, modifier, kind, width, enabled) {
+    val hug = when {
+        icon != null -> DS1ButtonHug.Start
+        trailingIcon != null -> DS1ButtonHug.End
+        else -> null
+    }
+    DS1ButtonFace(onClick, modifier, kind, width, enabled, hug) {
         val colour = (LocalDS1ContentColour.current ?: DS1Colors.text)
-        if (icon != null) DS1Icon(icon, tint = colour.current)
+        if (icon != null) DS1Icon(icon, size = DS1IconSize.Large, tint = colour.current)
         DS1ControlText(label, colour)
+        if (trailingIcon != null && icon == null) DS1Icon(trailingIcon, size = DS1IconSize.Large, tint = colour.current)
     }
 }
 

@@ -606,6 +606,35 @@ dialog.ds-overlay:has(> [data-ds-overlay="close"]) [data-ds-overlay="header"] {
   --ds-button-color: var(--ds-danger-color, var(--ds-tuned-red));
 }
 
+/*
+ * Words and an icon on one face hug them. A 16 × 16 icon carries about 4px
+ * of its own room around its glyph, so beside words it takes no gap and, on a
+ * filled face, none of the padding on its side: the glyph stands 4px from the
+ * words and 4px from the face's edge, as the words stand from the other edge.
+ * The same on every face: `.ds-button`, a slotted `ds-button`, the host face
+ * (and the shadow face in ds-button.css). The words are an element beside the
+ * icon (`ds-text`, a span); an icon of a product's own is an inline `svg` or
+ * marked `data-ds-icon`, and is drawn sixteen square here. A menu's entries
+ * keep their gap, so their words line up down the menu.
+ */
+:is(.ds-button, ds-button[control="slotted"]:not([menu-item]) > :is(button, a), ds-button[control="host"]:not([menu-item])):not([role="option"], [role^="menuitem"]):has(> :is(ds-icon, .ds-icon, svg, [data-ds-icon]):not(:only-child)) {
+  --ds-button-gap: 0px;
+}
+
+:is(.ds-button, ds-button[control="slotted"] > :is(button, a), ds-button[control="host"]) > :is(svg, [data-ds-icon]):not(:only-child) {
+  flex: 0 0 auto;
+  width: var(--ds-control-height);
+  height: var(--ds-control-height);
+}
+
+:is(.ds-button--primary, .ds-button--secondary, ds-button:is([primary], [secondary])[control="slotted"] > :is(button, a), ds-button:is([primary], [secondary])[control="host"]) > :is(ds-icon, .ds-icon, svg, [data-ds-icon]):last-child:not(:first-child) {
+  margin-inline-end: calc(-4px * var(--ds-sf));
+}
+
+:is(.ds-button--primary, .ds-button--secondary, ds-button:is([primary], [secondary])[control="slotted"] > :is(button, a), ds-button:is([primary], [secondary])[control="host"]) > :is(ds-icon, .ds-icon, svg, [data-ds-icon]):first-child:not(:last-child) {
+  margin-inline-start: calc(-4px * var(--ds-sf));
+}
+
 .ds-button--fixed {
   width: var(--ds-button-width, calc(4 * var(--ds-unit)));
 }

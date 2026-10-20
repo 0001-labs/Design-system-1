@@ -85,6 +85,16 @@ import { Button } from './design/react/button';
 
 Every face, including React and native slotted controls, is one control high and stands at the foot of its line, so its words take the lower sixteen of the square; a menu entry is a row high with its words on the same sixteen. Buttons hug their label by default, including React and native slotted controls. `fit` remains an explicit alias. Optional `--ds-button-min-width` and `--ds-button-align` tokens control a minimum width and label alignment without reaching into the shadow root.
 
+## Words and an icon
+
+Words and an icon on one face hug them. A 16 × 16 icon carries about 4px of its own room around its glyph, so beside words it takes no gap and, on a primary or secondary face, none of the padding on its side: the glyph stands 4px from the words and 4px from the face's edge, as the words stand from the other edge. Put the words in an element (`ds-text`, a span) beside the icon. A product's own icon is an inline `svg` or an element marked `data-ds-icon`, drawn sixteen square. Use `chevron-down` for a button that reveals more below it.
+
+```html
+<ds-button secondary><ds-text text="Show more"></ds-text><ds-icon name="chevron-down"></ds-icon></ds-button>
+```
+
+Menu entries keep their gap, so their words line up down the menu. Swift's `DS1ButtonLabel("Show more", icon: .chevronDown)` and Kotlin's `DS1Button("Show more", onClick, trailingIcon = DS1IconName.chevronDown)` hug the same way.
+
 Slotted buttons are one row high. Use `fixed` for four squares, `wide` for eight squares, `icon` for one square, or `--ds-button-width` for a layout-sized control. Menu items retain their full-row width.
 
 The adapter's default type is `button`; set `submit` or `reset` deliberately.
