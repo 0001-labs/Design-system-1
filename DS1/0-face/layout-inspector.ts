@@ -51,16 +51,18 @@ export function createLayoutInspector() {
   </style><div class="boxes"></div>`;
   document.body.appendChild(overlay);
   const layer = shadow.querySelector<HTMLDivElement>('.boxes')!;
+  type Kind = 'area' | 'text' | 'field' | 'component';
   // A page of thousands of words draws its first boxes and stops.
   const limit = 2000;
   const fields = new Set(['input', 'textarea', 'select', 'img', 'picture', 'svg', 'video', 'canvas', 'iframe']);
   const skipped = new Set(['script', 'style', 'template', 'noscript', 'link', 'meta', 'slot']);
+  // Primitives drawn as what they show rather than named: words, an icon,
+  // and a gap with nothing to see.
+  const primitives: Record<string, Kind | 'none'> = { 'ds-text': 'text', 'ds-icon': 'field', 'ds-gap': 'none' };
   let frame = 0;
   let visible = false;
   const observed = new Set<HTMLElement>();
   const observedRoots = new Set<ShadowRoot>();
-
-  type Kind = 'area' | 'text' | 'field' | 'component';
   const collect = () => {
     const areas: HTMLElement[] = [];
     const words: [HTMLElement, Kind][] = [];
@@ -70,19 +72,21 @@ export function createLayoutInspector() {
         const name = element.localName;
         if (skipped.has(name) || element.hasAttribute('data-ds-layout-overlay') || element.hasAttribute('data-ds-grid-overlay')) continue;
         if (element.hasAttribute('data-ds-area')) areas.push(element);
-        const component = name.includes('-');
+        const primitive = primitives[name];
+        if (primitive === 'none') continue;
+        const component = !primitive && name.includes('-');
         if (component) components.push(element);
-        if (fields.has(name)) {
+        if (fields.has(name) || primitive === 'field') {
           if (!inText) words.push([element, 'field']);
           continue;
         }
-        const text = !inText && !component && Array.from(element.childNodes).some((node) =>
-          node.nodeType === Node.TEXT_NODE && node.textContent!.trim() !== '');
+        const text = !inText && !component && (primitive === 'text' || Array.from(element.childNodes).some((node) =>
+          node.nodeType === Node.TEXT_NODE && node.textContent!.trim() !== ''));
         if (text) words.push([element, 'text']);
         // A design system component is drawn whole; an app's own component is
         // opened, so what it holds is drawn too.
         const content = element.shadowRoot;
-        if (content && (!name.startsWith('ds-') || element.hasAttribute('data-ds-layout-root'))) {
+        if (content && !primitive && (!name.startsWith('ds-') || element.hasAttribute('data-ds-layout-root'))) {
           if (!observedRoots.has(content)) {
             mutations.observe(content, { subtree: true, childList: true, characterData: true });
             observedRoots.add(content);
