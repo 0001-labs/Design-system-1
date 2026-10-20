@@ -1,23 +1,13 @@
 ---
 const { sidebar } = Astro.locals.starlightRoute;
 type Entry = { label: string; href?: string; entries?: Entry[] };
-// App navigation only: reuse existing drawings without adding component icons to DS1.
-const icons: Record<string, string> = {
-  Colours: 'sun', Fonts: 'text', Languages: 'globe', Formatting: 'text', Theming: 'sun',
-  Prose: 'page-note', Feedback: 'info', Keys: 'keyboard', Device: 'phone', Scaling: '1xgrid', Preferences: 'settings', Pricing: 'money',
-  Avatar: 'avatar', Button: 'block-button', Card: 'page', Chart: 'block-page-progress', Checkbox: 'check', Cycle: 'refresh',
-  'Empty state': 'page', Gap: 'block-divider', Icon: 'app', Image: 'image', Input: 'block-forms', Link: 'link', Message: 'block-banner',
-  Progress: 'block-page-progress', Stat: 'money', Switch: 'toggle', Tag: 'tag', Text: 'text', Tooltip: 'info',
-  Accordion: 'block-accordion', Calendar: 'calendar', Bento: '4x4', Carousel: 'block-logo-marquee', Context: 'menu', Form: 'block-forms',
-  List: 'lists', Matrix: '4x4', Row: 'list-line', Select: 'chevron-down', Sidebar: 'window', Table: 'table', 'Table of contents': 'lists', Tabs: 'block-tabs',
-  Container: 'block-group', Document: 'page-note', Footer: 'block-section', Grid: '1xgrid', Header: 'block-heading', Overlay: 'duplicate', Page: 'page', Panel: 'window',
-  Examples: 'app', Native: 'phone', 'Email kit': 'page', 'Film kit': 'image',
-};
-function flatten(entries: Entry[]): { name: string; href: string; marker?: string; icon: string }[] {
+// This compact navigation is app-owned; it adds no public component icons.
+function flatten(entries: Entry[], section = ''): { name: string; href: string; marker?: string; section: string }[] {
   return entries.flatMap(entry => {
     const layer = entry.label.match(/^([1-4]) (Root|Core|Unit|Page)$/);
+    const currentSection = layer?.[1] ?? section;
     const href = entry.href ?? (layer ? `/${layer[1]}-${layer[2].toLowerCase()}/overview/` : undefined);
-    return [...(href ? [{ name: entry.label, href, marker: layer?.[1], icon: icons[entry.label] ?? 'book' }] : []), ...flatten(entry.entries ?? [])];
+    return [...(href ? [{ name: entry.label, href, marker: layer?.[1], section: currentSection }] : []), ...flatten(entry.entries ?? [], currentSection)];
   });
 }
 const entries = flatten(sidebar);
@@ -26,9 +16,9 @@ const entries = flatten(sidebar);
   <ds-button control="slotted" icon class="rail-open">
     <button id="sidebar-rail-open" type="button" aria-label="Expand sidebar" data-tooltip="Expand sidebar"><ds-icon type="right" aria-hidden="true" /></button>
   </ds-button>
-  {entries.map(entry => <a href={entry.href} aria-label={entry.name} data-tooltip={entry.name} data-rail-layer={entry.marker} aria-current={entry.href.replace(/\/$/, '') === Astro.url.pathname.replace(/\/$/, '') ? 'page' : undefined}>
-    {entry.marker ? <span aria-hidden="true">{entry.marker}</span> : <ds-icon type={entry.icon} aria-hidden="true" />}
-  </a>)}
+  {entries.map(entry => <ds-button control="slotted" primary class="rail-entry" data-section={entry.section} data-rail-layer={entry.marker} aria-label={entry.name}>
+    <a href={entry.href} aria-label={entry.name} data-tooltip={entry.name} aria-current={entry.href.replace(/\/$/, '') === Astro.url.pathname.replace(/\/$/, '') ? 'page' : undefined}>{entry.name}</a>
+  </ds-button>)}
 </nav>
 <script>
   import '../../../DS1/2-core/ds-icon';
@@ -43,35 +33,40 @@ const entries = flatten(sidebar);
   window.addEventListener('ds1-navigation-auth', event => {
     const detail = (event as CustomEvent).detail;
     if (detail.loading) return;
-    rail?.querySelectorAll('[data-private-rail]').forEach(link => link.remove());
+    rail?.querySelectorAll('[data-private-rail]').forEach(button => button.remove());
     for (const component of readAppComponents(detail)) {
       const heading = rail?.querySelector(`[data-rail-layer="${component.layer}"]`);
       if (!heading) continue;
+      const button = document.createElement('ds-button');
+      button.className = 'rail-entry';
+      button.setAttribute('control', 'slotted');
+      button.setAttribute('primary', '');
+      button.dataset.section = String(component.layer);
+      button.dataset.privateRail = '';
+      button.setAttribute('aria-label', component.name);
       const link = document.createElement('a');
       link.href = component.href;
-      link.dataset.privateRail = '';
       link.dataset.tooltip = component.name;
       link.setAttribute('aria-label', component.name);
-      const icon = document.createElement('ds-icon');
-      icon.setAttribute('type', 'app');
-      icon.setAttribute('aria-hidden', 'true');
-      link.append(icon);
+      link.textContent = component.name;
+      button.append(link);
       let next = heading.nextElementSibling;
       while (next && !next.hasAttribute('data-rail-layer') && (next.getAttribute('aria-label') ?? '').localeCompare(component.name, 'en') < 0) next = next.nextElementSibling;
-      rail!.insertBefore(link, next);
+      rail!.insertBefore(button, next);
     }
   });
 </script>
 <style>
   .docs-navigation-rail { display: none; }
   @media (min-width: 769px) {
-    :global(html[data-sidebar-collapsed]) .docs-navigation-rail { display: flex; flex-direction: column; width: calc(2 * var(--site-unit)); padding-top: var(--site-unit); }
-    .rail-open { align-self: center; flex: none; margin-bottom: var(--site-unit); }
-    .docs-navigation-rail :global(a) { display: flex; flex: none; align-items: flex-end; justify-content: center; width: calc(2 * var(--site-unit)); height: var(--site-unit); color: inherit; text-decoration: none; font-size: calc(14px * var(--sf, 1)); line-height: calc(16px * var(--sf, 1)); }
-    .docs-navigation-rail :global(a:hover) { background: var(--ds-fill); }
-    .docs-navigation-rail :global(a[aria-current]) { color: var(--sharp-blue); background: var(--ds-fill); }
-    .docs-navigation-rail :global(a[data-private-rail]) { color: var(--ds-text-color-muted); }
-    .docs-navigation-rail :global(a:focus-visible) { outline: 1px solid currentColor; outline-offset: -1px; }
-    .docs-navigation-rail :global(ds-icon) { width: calc(16px * var(--sf, 1)); height: calc(16px * var(--sf, 1)); }
+    :global(html[data-sidebar-collapsed]) .docs-navigation-rail { display: flex; flex-direction: column; width: calc(9 * var(--site-unit)); padding: var(--site-unit); }
+    .rail-open { align-self: flex-start; flex: none; margin-bottom: var(--site-unit); }
+    .docs-navigation-rail :global(.rail-entry) { --section-color: var(--light-grey); --ds-button-background-color-primary: var(--black); --ds-button-text-color-on-accent: var(--section-color); --ds-button-width: 100%; height: var(--site-unit); align-items: flex-end; }
+    .docs-navigation-rail :global([data-section='1']) { --section-color: var(--yellow); }
+    .docs-navigation-rail :global([data-section='2']) { --section-color: var(--apple-green); }
+    .docs-navigation-rail :global([data-section='3']) { --section-color: var(--zenith-blue); }
+    .docs-navigation-rail :global([data-section='4']) { --section-color: var(--pink); }
+    .docs-navigation-rail :global([data-rail-layer]) { --ds-button-background-color-primary: var(--section-color); --ds-button-text-color-on-accent: var(--black); }
+    .docs-navigation-rail :global(.rail-entry:has(a[aria-current])) { outline: 1px solid var(--sharp-blue); outline-offset: 1px; }
   }
 </style>
