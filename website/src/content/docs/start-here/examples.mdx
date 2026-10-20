@@ -120,11 +120,15 @@ Each HTML example is a complete HTML document. Open it to try the page, or downl
 
 The files load the Design system 1 stylesheet and bundled Lit module from this site, then use `ds-*` elements alongside semantic HTML. Fonts load with the stylesheet. These are online dependencies.
 
-{HTML_EXAMPLES.map(example => <section>
+<div className="examples-grid">
+
+{HTML_EXAMPLES.map(example => <section className="examples-card">
   <h2>{example.title}</h2>
   <p><a href={`/examples/files/${example.id}.html`} target="_blank" rel="noopener">View example</a> · <a href={`/examples/files/${example.id}.html`} download={`${example.id}.html`}>Download HTML</a></p>
   <div class="not-content" data-ds-not-prose><ExampleDevice src={`/examples/files/${example.id}.html`} title={example.title} height={480} /></div>
 </section>)}
+
+</div>
 
 ## What you download
 
