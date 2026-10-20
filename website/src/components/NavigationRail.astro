@@ -16,7 +16,7 @@ const entries = flatten(sidebar);
   <ds-button control="slotted" icon class="rail-open">
     <button id="sidebar-rail-open" type="button" aria-label="Expand sidebar" data-tooltip="Expand sidebar"><ds-icon type="right" aria-hidden="true" /></button>
   </ds-button>
-  {entries.map(entry => <ds-button control="slotted" primary class="rail-entry" data-section={entry.section} data-rail-layer={entry.marker} aria-label={entry.name}>
+  {entries.map(entry => <ds-button control="slotted" primary={entry.marker ? '' : undefined} fit class="rail-entry" data-section={entry.section} data-rail-layer={entry.marker} aria-label={entry.name}>
     <a href={entry.href} aria-label={entry.name} data-tooltip={entry.name} aria-current={entry.href.replace(/\/$/, '') === Astro.url.pathname.replace(/\/$/, '') ? 'page' : undefined}>{entry.name}</a>
   </ds-button>)}
 </nav>
@@ -40,7 +40,7 @@ const entries = flatten(sidebar);
       const button = document.createElement('ds-button');
       button.className = 'rail-entry';
       button.setAttribute('control', 'slotted');
-      button.setAttribute('primary', '');
+      button.setAttribute('fit', '');
       button.dataset.section = String(component.layer);
       button.dataset.privateRail = '';
       button.setAttribute('aria-label', component.name);
@@ -61,7 +61,7 @@ const entries = flatten(sidebar);
   @media (min-width: 769px) {
     :global(html[data-sidebar-collapsed]) .docs-navigation-rail { display: flex; flex-direction: column; width: calc(9 * var(--site-unit)); padding: var(--site-unit); }
     .rail-open { align-self: flex-start; flex: none; margin-bottom: var(--site-unit); }
-    .docs-navigation-rail :global(.rail-entry) { --section-color: var(--light-grey); --ds-button-background-color-primary: var(--black); --ds-button-text-color-on-accent: var(--section-color); --ds-button-width: 100%; height: var(--site-unit); align-items: flex-end; }
+    .docs-navigation-rail :global(.rail-entry) { --section-color: var(--light-grey); --ds-button-text-color: var(--text-color); height: var(--site-unit); align-items: flex-end; align-self: flex-start; }
     .docs-navigation-rail :global([data-section='1']) { --section-color: var(--yellow); }
     .docs-navigation-rail :global([data-section='2']) { --section-color: var(--apple-green); }
     .docs-navigation-rail :global([data-section='3']) { --section-color: var(--zenith-blue); }
