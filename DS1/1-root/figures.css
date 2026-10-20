@@ -24,7 +24,9 @@
  *                            squares wide, one square between them and between rows
  *   ds-stats[data-frame]     the group in a rounded 1px frame with a 1px line
  *                            between stats, as a framed table: the columns share
- *                            the width, each stat half a square in from its lines
+ *                            the width, each stat's words 4px in from its lines
+ *                            as a framed table's, and a square at its foot, so
+ *                            the frame stays whole squares high
  *
  * Tokens: `--ds-stat-size` (the figure's type size before the scale, 20px)
  * and `--ds-stat-lines` (the squares its line takes, 2), `--ds-stat-typeface`
@@ -148,7 +150,7 @@
 }
 .ds-stats[data-frame] > * {
   min-width: 0;
-  padding: 0 calc(var(--ds-unit) / 2) calc(var(--ds-unit) / 2);
+  padding: 0 calc(4px * var(--ds-sf, 1)) var(--ds-unit);
 }
 .ds-stats[data-frame] > * + * {
   box-shadow: inset 1px 0 0 var(--ds-border-color, light-dark(#d8d8d8, #3d3d3d));
