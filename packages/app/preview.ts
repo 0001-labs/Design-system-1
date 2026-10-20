@@ -1,14 +1,17 @@
 import './src/index';
 import '../../DS1/1-root/prose.css';
-import { startScaling } from '../../DS1/0-face/scaling';
 
 // The private guide's controlled example; applications supply their own state.
 if (typeof document !== 'undefined') {
-  startScaling({ surface: true });
   const component = document.documentElement.dataset.component ?? 'keyboard-shortcut';
   if (window.parent === window) location.replace(`https://designsystem1.com/libraries/workspace/?internal=${encodeURIComponent(component)}`);
   window.addEventListener('message', event => {
     if (event.origin !== location.origin || event.source !== window.parent || event.data?.type !== 'ds1:docs-theme') return;
+    const scale = Number(event.data.scale);
+    if (Number.isFinite(scale) && scale > 0 && scale <= 4) {
+      document.documentElement.style.setProperty('--sf', String(scale));
+      document.documentElement.style.setProperty('--ds-sf', String(scale));
+    }
     const dark = event.data.theme === 'dark';
     document.documentElement.classList.toggle('dark-theme', dark);
     document.documentElement.classList.toggle('light-theme', !dark);

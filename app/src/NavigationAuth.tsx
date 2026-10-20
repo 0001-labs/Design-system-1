@@ -9,27 +9,28 @@ export function NavigationAuth() {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const token = useAuthToken();
   const [appNavigation, setAppNavigation] = useState<{ token: string; components: { name: string; href: string; layer: number }[] } | null>(null);
+  const [navigationLoading, setNavigationLoading] = useState(true);
   const ready = !isLoading && isAuthenticated;
   useEffect(() => {
     setAppNavigation(null);
+    if (isLoading) return;
     if (!ready || !token) {
       void fetch('/api/dashboard/session', { method: 'DELETE', cache: 'no-store' }).catch(() => {});
       return;
     }
     const controller = new AbortController();
-    void fetch('/api/app-navigation', { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: controller.signal })
+    setNavigationLoading(true);
+    void fetch('/api/app-navigation', { method: 'POST', headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: controller.signal })
       .then(async response => {
         if (!response.ok) {
           await fetch('/api/dashboard/session', { method: 'DELETE', cache: 'no-store', signal: controller.signal });
           return;
         }
         const data = await response.json();
-        const session = await fetch('/api/dashboard/session', { method: 'POST', headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: controller.signal });
-        if (!session.ok) return;
         if (!controller.signal.aborted && Array.isArray(data.components)) setAppNavigation({ token, components: data.components });
-      }).catch(() => { /* Access unavailable: keep internal navigation hidden. */ });
+      }).catch(() => { /* Access unavailable: keep internal navigation hidden. */ }).finally(() => { if (!controller.signal.aborted) setNavigationLoading(false); });
     return () => controller.abort();
-  }, [ready, token]);
+  }, [ready, token, isLoading]);
   const profile = useQuery(api.users.profile, ready ? {} : "skip");
   const libraries = useQuery(api.libraries.list, ready ? {} : "skip");
   const create = useMutation(api.libraries.create);
@@ -38,7 +39,7 @@ export function NavigationAuth() {
   const [creationError, setCreationError] = useState<string | null>(null);
   useEffect(() => {
     const report = () => window.parent.postMessage({
-      type: "ds1:navigation-auth", authenticated: ready,
+      type: "ds1:navigation-auth", authenticated: ready, loading: isLoading || (ready && navigationLoading),
       appComponents: ready && token === appNavigation?.token ? appNavigation.components : [],
       companyName: ready ? profile?.companyName ?? "" : "",
       libraries: ready ? libraries?.map(({ _id, name, publishedVersion }) => ({ id: _id, name, publishedVersion })) ?? [] : [],
@@ -57,6 +58,6 @@ export function NavigationAuth() {
     };
     window.addEventListener("message", request); report();
     return () => window.removeEventListener("message", request);
-  }, [ready, token, appNavigation, profile?.companyName, libraries, creating, creationError, create]);
+  }, [ready, token, isLoading, navigationLoading, appNavigation, profile?.companyName, libraries, creating, creationError, create]);
   return null;
 }

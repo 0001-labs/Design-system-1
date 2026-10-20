@@ -149,7 +149,7 @@ const { sidebar } = Astro.locals.starlightRoute;
   window.addEventListener("ds1-navigation-auth", event => {
     const detail = (event as CustomEvent).detail;
     signedIn = detail.authenticated;
-    appComponents = readAppComponents(detail);
+    if (!detail.loading) appComponents = readAppComponents(detail);
     if (!signedIn) { library = null; workspaceOpen = false; }
     workspaceName = typeof detail.companyName === 'string' && detail.companyName.trim() ? detail.companyName : 'My company';
     workspaceItems = signedIn && Array.isArray(detail.libraries) ? detail.libraries.filter((item: any) => typeof item.id === 'string' && typeof item.name === 'string') : [];

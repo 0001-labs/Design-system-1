@@ -39,14 +39,14 @@ test('workspace creation accepts only the parent and ignores duplicate or signed
 test('the bridge exposes App only after server authorization and clears it on sign-out', async () => {
   vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   const components = [{name:'Keyboard shortcut',href:'/libraries/workspace/?internal=keyboard-shortcut',layer:2}];
-  vi.stubGlobal('fetch', vi.fn().mockImplementation(async (_url, options) => options?.method ? new Response(null, {status:204}) : Response.json({components})));
+  vi.stubGlobal('fetch', vi.fn().mockImplementation(async (url) => url === '/api/app-navigation' ? Response.json({components}) : new Response(null, {status:204})));
   const root = createRoot(document.createElement('div'));
   const sent = vi.spyOn(window.parent, 'postMessage').mockImplementation(() => {});
   try {
     await act(async () => root.render(createElement(NavigationAuth)));
     expect(sent.mock.calls.at(-1)?.[0]).toMatchObject({authenticated:true,appComponents:components});
     expect(fetch).toHaveBeenCalledWith('/api/app-navigation', expect.objectContaining({headers:{Authorization:'Bearer test-session'},cache:'no-store'}));
-    expect(fetch).toHaveBeenCalledWith('/api/dashboard/session', expect.objectContaining({method:'POST',headers:{Authorization:'Bearer test-session'}}));
+    expect(fetch).toHaveBeenCalledTimes(1);
     mocks.session.isAuthenticated = false;
     await act(async () => root.render(createElement(NavigationAuth)));
     expect(sent.mock.calls.at(-1)?.[0]).toMatchObject({authenticated:false,appComponents:[]});
@@ -57,11 +57,25 @@ test('the bridge exposes App only after server authorization and clears it on si
 test('private links stay hidden when the owner document session cannot be established', async () => {
   vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
   const components = [{name:'Keyboard shortcut',href:'/libraries/workspace/?internal=keyboard-shortcut',layer:2}];
-  vi.stubGlobal('fetch', vi.fn().mockImplementation(async (_url, options) => options?.method ? new Response(null, {status:403}) : Response.json({components})));
+  vi.stubGlobal('fetch', vi.fn().mockImplementation(async () => new Response(null, {status:403})));
   const root = createRoot(document.createElement('div'));
   const sent = vi.spyOn(window.parent, 'postMessage').mockImplementation(() => {});
   try {
     await act(async () => root.render(createElement(NavigationAuth)));
     expect(sent.mock.calls.at(-1)?.[0]).toMatchObject({authenticated:true,appComponents:[]});
   } finally { await act(async () => root.unmount()); sent.mockRestore(); vi.unstubAllGlobals(); }
+});
+
+test('restoring authentication does not delete an existing document session', async () => {
+  vi.stubGlobal('IS_REACT_ACT_ENVIRONMENT', true);
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null, {status:403})));
+  mocks.session.isLoading = true;
+  mocks.session.isAuthenticated = false;
+  const root = createRoot(document.createElement('div'));
+  const sent = vi.spyOn(window.parent, 'postMessage').mockImplementation(() => {});
+  try {
+    await act(async () => root.render(createElement(NavigationAuth)));
+    expect(fetch).not.toHaveBeenCalled();
+    expect(sent.mock.calls.at(-1)?.[0]).toMatchObject({loading:true});
+  } finally { await act(async () => root.unmount()); sent.mockRestore(); mocks.session.isLoading=false; mocks.session.isAuthenticated=true; vi.unstubAllGlobals(); }
 });

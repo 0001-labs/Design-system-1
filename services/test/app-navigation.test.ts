@@ -23,3 +23,14 @@ test('internal navigation is returned only for the pinned, verified owner', asyn
   expect(components.map(item => item.name)).toEqual(['Keyboard shortcut', 'Spacing handle', 'Loading indicator']);
   expect(components.every(item => item.layer === 2 && item.href.startsWith('/libraries/workspace/?internal='))).toBe(true);
 });
+
+test('one same-origin owner request also establishes the private document session', async () => {
+  const send = vi.fn().mockResolvedValue(Response.json({status:'success',value:{_id:'owner',email:'jaa90@icloud.com',emailVerified:true}}));
+  const req = new Request('https://designsystem1.com/api/app-navigation',{method:'POST',headers:{Origin:'https://designsystem1.com',Authorization:'Bearer valid'}});
+  const response = await appNavigation(req,env,send);
+  expect(response.status).toBe(200);
+  expect(response.headers.get('set-cookie')).toContain('HttpOnly; Secure; SameSite=Strict');
+  expect(send).toHaveBeenCalledTimes(1);
+  const foreign = new Request(req,{headers:{Origin:'https://elsewhere.example',Authorization:'Bearer valid'}});
+  expect((await appNavigation(foreign,env,send)).status).toBe(403);
+});

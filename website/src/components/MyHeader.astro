@@ -40,6 +40,7 @@ const { landing = false } = Astro.props;
       return;
     }
     if (event.data?.type !== 'ds1:navigation-auth') return;
+    if (event.data.loading && event.data.authenticated !== true) return;
     const authenticated = event.data.authenticated === true;
     document.documentElement.toggleAttribute('data-signed-in', authenticated);
     window.dispatchEvent(new CustomEvent('ds1-navigation-auth', { detail: { ...event.data, authenticated } }));

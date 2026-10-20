@@ -8,6 +8,11 @@ const COOKIE = '__Host-ds1-dashboard';
 const security = { 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow', 'Referrer-Policy': 'same-origin', Vary: 'Cookie, Authorization' };
 const expired = `${COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0`;
 
+export function ownerSessionCookie(request: Request): string | null {
+  const token = request.headers.get('authorization')?.slice(7) ?? '';
+  return /^[A-Za-z0-9._~-]{1,8192}$/.test(token) ? `${COOKIE}=${token}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=3600` : null;
+}
+
 function sessionRequest(request: Request): Request {
   if (request.headers.has('authorization')) return request;
   const token = request.headers.get('cookie')?.split(';').map(value => value.trim()).find(value => value.startsWith(`${COOKIE}=`))?.slice(COOKIE.length + 1);

@@ -13,13 +13,14 @@
   if (requested !== null) {
     workspace.hidden = false;
     const sendTheme = () => frame.contentWindow?.postMessage({
-      type: 'ds1:docs-theme', theme: document.documentElement.classList.contains('dark-theme') ? 'dark' : 'light',
+      type: 'ds1:docs-theme', scale: getComputedStyle(document.documentElement).getPropertyValue('--sf').trim() || '1', theme: document.documentElement.classList.contains('dark-theme') ? 'dark' : 'light',
     }, location.origin);
     frame.addEventListener('load', sendTheme);
     window.addEventListener('theme-changed', sendTheme);
     new MutationObserver(sendTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'data-theme'] });
     window.addEventListener('ds1-navigation-auth', event => {
       const detail = (event as CustomEvent).detail;
+      if (detail.loading) { status.hidden = false; status.textContent = 'Checking access…'; return; }
       const component = readAppComponents(detail).find(item => new URL(item.href, location.origin).searchParams.get('internal') === requested);
       if (context) context.hidden = !component;
       if (!component) {
