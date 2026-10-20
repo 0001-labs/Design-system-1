@@ -1,5 +1,4 @@
-import { html, LitElement, nothing, unsafeCSS, type PropertyValues } from "lit";
-import { property, state } from "lit/decorators.js";
+import { html, LitElement, nothing, unsafeCSS, type PropertyDeclarations, type PropertyValues } from "lit";
 import { type DataPoint, drawSparkline, GridChart, type Marker, type Series, type SeriesKind } from "./chart/grid-chart";
 
 import { define } from "../0-face/define";
@@ -8,9 +7,19 @@ export * from "./chart/grid-chart";
 
 /** Independent chart configuration; no module-wide size or theme state. */
 export class ChartElement extends LitElement {
+  static properties: PropertyDeclarations = {
+    unit: { type: Number },
+    grid: {},
+  };
   static styles = unsafeCSS(styles);
-  @property({ type: Number }) unit = 20;
-  @property() grid: "full" | "rows" | "none" = "rows";
+  declare unit: number;
+  declare grid: "full" | "rows" | "none";
+
+  constructor() {
+    super();
+    this.unit = 20;
+    this.grid = "rows";
+  }
   private media?: MediaQueryList;
   private themeChanged = () => this.refreshTheme();
   connectedCallback(): void {
@@ -43,22 +52,53 @@ function observeWidth(element: HTMLElement, callback: (width: number) => void): 
 }
 
 export class GridLineChart extends ChartElement {
+  static properties: PropertyDeclarations = {
+    data: { attribute: false },
+    kind: {},
+    base: { type: Number },
+    color: {},
+    rows: { type: Number },
+    markers: { attribute: false },
+    timeRange: { attribute: false },
+    extremes: { type: Boolean },
+    labels: { type: Boolean },
+    live: { type: Boolean },
+    format: { attribute: false },
+    drawKey: {},
+    dot: { state: true },
+  };
   connectedCallback(): void { this.dataset.chartKind = "line"; super.connectedCallback(); }
-  @property({ attribute: false }) data: DataPoint[] = [];
-  @property() kind: SeriesKind = "area";
-  @property({ type: Number }) base?: number;
-  @property() color = "--ds-chart-ink";
-  @property({ type: Number }) rows = 8;
-  @property({ attribute: false }) markers: Marker[] = [];
-  @property({ attribute: false }) timeRange: [number, number] | null = null;
-  @property({ type: Boolean }) extremes = false;
-  @property({ type: Boolean }) labels = false;
-  @property({ type: Boolean }) live = false;
-  @property({ attribute: false }) format: (value: number) => string = (v) => v.toFixed(2);
+  declare data: DataPoint[];
+  declare kind: SeriesKind;
+  declare base: number | undefined;
+  declare color: string;
+  declare rows: number;
+  declare markers: Marker[];
+  declare timeRange: [number, number] | null;
+  declare extremes: boolean;
+  declare labels: boolean;
+  declare live: boolean;
+  declare format: (value: number) => string;
   /** Changing this replays the draw-in. */
-  @property() drawKey = "";
+  declare drawKey: string;
 
-  @state() private dot: { x: number; y: number } | null = null;
+  private declare dot: { x: number; y: number } | null;
+
+  constructor() {
+    super();
+    this.data = [];
+    this.kind = "area";
+    this.color = "--ds-chart-ink";
+    this.rows = 8;
+    this.markers = [];
+    this.timeRange = null;
+    this.extremes = false;
+    this.labels = false;
+    this.live = false;
+    this.format = (v) => v.toFixed(2);
+    this.drawKey = "";
+    this.dot = null;
+  }
 
   private chart?: GridChart;
   private series?: Series;
@@ -182,10 +222,21 @@ export class GridLineChart extends ChartElement {
 }
 
 export class GridSpark extends ChartElement {
+  static properties: PropertyDeclarations = {
+    values: { attribute: false },
+    base: { type: Number },
+    cols: { type: Number },
+  };
   connectedCallback(): void { this.dataset.chartKind = "spark"; super.connectedCallback(); }
-  @property({ attribute: false }) values: number[] = [];
-  @property({ type: Number }) base?: number;
-  @property({ type: Number }) cols = 4;
+  declare values: number[];
+  declare base: number | undefined;
+  declare cols: number;
+
+  constructor() {
+    super();
+    this.values = [];
+    this.cols = 4;
+  }
   refreshTheme(): void { this.draw(); }
 
   render() {
@@ -223,10 +274,22 @@ export interface BarItem {
 }
 
 export class GridBars extends ChartElement {
+  static properties: PropertyDeclarations = {
+    items: { attribute: false },
+    rows: { type: Number },
+    span: { type: Number },
+  };
   connectedCallback(): void { this.dataset.chartKind = "bars"; super.connectedCallback(); }
-  @property({ attribute: false }) items: BarItem[] = [];
-  @property({ type: Number }) rows = 4;
-  @property({ type: Number }) span = 2;
+  declare items: BarItem[];
+  declare rows: number;
+  declare span: number;
+
+  constructor() {
+    super();
+    this.items = [];
+    this.rows = 4;
+    this.span = 2;
+  }
 
   render() {
     const height = (this.rows - 1) * this.unit;
@@ -252,9 +315,19 @@ export class GridBars extends ChartElement {
 }
 
 export class GridRatio extends ChartElement {
+  static properties: PropertyDeclarations = {
+    value: { type: Number },
+    width: { state: true },
+  };
   connectedCallback(): void { this.dataset.chartKind = "ratio"; super.connectedCallback(); }
-  @property({ type: Number }) value = 0.5;
-  @state() private width = 0;
+  declare value: number;
+  private declare width: number;
+
+  constructor() {
+    super();
+    this.value = 0.5;
+    this.width = 0;
+  }
   private observer?: ResizeObserver;
 
   protected initialize(): void {
@@ -283,13 +356,31 @@ export interface RangeMark {
 }
 
 export class GridRange extends ChartElement {
+  static properties: PropertyDeclarations = {
+    min: { type: Number },
+    max: { type: Number },
+    from: { type: Number },
+    to: { type: Number },
+    marks: { attribute: false },
+    width: { state: true },
+  };
   connectedCallback(): void { this.dataset.chartKind = "range"; super.connectedCallback(); }
-  @property({ type: Number }) min = 0;
-  @property({ type: Number }) max = 1;
-  @property({ type: Number }) from = 0;
-  @property({ type: Number }) to = 1;
-  @property({ attribute: false }) marks: RangeMark[] = [];
-  @state() private width = 0;
+  declare min: number;
+  declare max: number;
+  declare from: number;
+  declare to: number;
+  declare marks: RangeMark[];
+  private declare width: number;
+
+  constructor() {
+    super();
+    this.min = 0;
+    this.max = 1;
+    this.from = 0;
+    this.to = 1;
+    this.marks = [];
+    this.width = 0;
+  }
   private observer?: ResizeObserver;
 
   protected initialize(): void {
