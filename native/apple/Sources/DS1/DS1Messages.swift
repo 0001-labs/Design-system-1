@@ -112,7 +112,7 @@ public struct DS1Empty<Actions: View>: View {
                         .frame(width: scale.control, height: scale.control)
                         .padding(.top, scale.unit - scale.control).accessibilityHidden(true)
                 }
-                DS1LineText(heading ?? DS1Words.shared.text("Nothing here yet"), strong: true, wrap: true).accessibilityAddTraits(.isHeader)
+                DS1LineText(heading ?? DS1Words.shared.text("Nothing here yet"), strong: true, wrap: true, fillWidth: false).accessibilityAddTraits(.isHeader)
             }
             if let text { DS1LineText(text, tone: .muted, wrap: true) }
             if Actions.self != EmptyView.self { HStack(spacing: scale.half) { actions }.frame(minHeight: scale.unit).padding(.top, scale.unit) }

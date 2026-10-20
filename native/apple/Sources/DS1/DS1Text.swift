@@ -135,8 +135,9 @@ public struct DS1LineText: View {
     let figures: Bool
     let cells: Bool
     let wrap: Bool
+    let fillWidth: Bool
 
-    public init(_ string: String, style: DS1TextStyle = .text, tone: DS1Tone = .text, strong: Bool = false, figures: Bool = false, cells: Bool = true, wrap: Bool = false) {
+    public init(_ string: String, style: DS1TextStyle = .text, tone: DS1Tone = .text, strong: Bool = false, figures: Bool = false, cells: Bool = true, wrap: Bool = false, fillWidth: Bool = true) {
         self.string = string
         self.style = style
         self.tone = tone
@@ -144,6 +145,7 @@ public struct DS1LineText: View {
         self.figures = figures
         self.cells = cells
         self.wrap = wrap
+        self.fillWidth = fillWidth
     }
 
     private var alignment: HorizontalAlignment {
@@ -172,7 +174,7 @@ public struct DS1LineText: View {
                 .padding(.top, above)
                 .padding(.bottom, max(0, line - laid - above))
                 .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: .infinity, minHeight: line, alignment: Alignment(horizontal: alignment, vertical: .center))
+                .frame(maxWidth: fillWidth ? .infinity : nil, minHeight: line, alignment: Alignment(horizontal: alignment, vertical: .center))
         } else {
             text
                 .lineLimit(1)
