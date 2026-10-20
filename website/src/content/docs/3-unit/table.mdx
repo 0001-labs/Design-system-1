@@ -41,6 +41,14 @@ table.data = [{ product: "Atlas", users: 120, status: "Active" }];
 table.footer = { product: "Total", users: 120 };
 ```
 
+## Frame
+
+`data-frame` on a native `.ds-table` draws the same rows in a rounded 1px frame with a 1px line between columns, for a list of things a person opens. Every line is drawn inside the cells' squares, so each row keeps its 20px pitch and the last row's rule is the frame's foot; words stand 4px in from the lines, and fills in the cells stay inside the corners (`--ds-table-radius`, the card's corner by default).
+
+```html
+<table class="ds-table" data-frame>…</table>
+```
+
 ## Sheet
 
 For a lot of data, as in a spreadsheet, give the table `sheet`. Every cell is four squares wide and one high, 80 by 20, with its 1px lines at its end and its foot, so its words have 79 by 19 and stand 4px in on the sixteen, as an Ezo item's do. Numbers keep to the column's end. A cell's words never widen it: what does not fit fades out over the cell's last square, never an ellipsis. The fade is on the words alone, so it fades into whatever is behind them, the paper or a selected or hovered cell's fill, and only where they are cut: words that fit stay whole. Words fade at their end; a number keeps its last digits against the column's end and fades its first ones, in either direction of writing. Above the column labels a row of letters (A, B … Z, AA …) names the columns, and a column two squares wide numbers the rows; both stay in place while the sheet scrolls both ways. A selected cell (`aria-selected="true"`) is ringed rather than filled. With `reorderable` the rows move by a grip on their number; see [Moving rows](#moving-rows).

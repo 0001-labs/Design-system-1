@@ -22,7 +22,9 @@ test("a row is one square on a hairline, with no box and no column lines", () =>
   expect(cell).toContain("line-height: var(--ds-type-lineheight-default)");
   expect(cell).toContain("vertical-align: bottom");
   expect(cell).toContain("font-weight: inherit");
-  expect(css).not.toMatch(/border-(left|right|top)|outline:/);
+  // Only a table that asks for its frame (`data-frame`) has one.
+  const plain = css.replace(/\.ds-table\[data-frame\][^{]*\{[^}]*\}/g, "");
+  expect(plain).not.toMatch(/border-(left|right|top)|outline:/);
 });
 
 test("the native controls carry the table", () => {
@@ -192,4 +194,14 @@ test("a sheet's words that do not fit fade over their last square, never an elli
   const root = table.shadowRoot!;
   expect(root.querySelector("table")!.hasAttribute("data-fit")).toBe(true);
   expect([...root.querySelectorAll("tbody td > .ds-table__words, thead th > .ds-table__words")].map(words => words.textContent)).toEqual(["Paper", "Sold", "Recycled 170g", "12"]);
+});
+
+test("a framed table draws its rounded frame and column lines inside the cells, so rows keep their pitch", () => {
+  const css = readFileSync(join(import.meta.dirname, "../DS1/1-root/table.css"), "utf8");
+  const frame = css.slice(css.indexOf(".ds-table[data-frame] {"), css.indexOf(".ds-table[data-frame] :is(th, td) {"));
+  expect(frame).toMatch(/outline: 1px solid var\(--ds-table-rule\);/);
+  expect(frame).toMatch(/outline-offset: -1px;/);
+  expect(frame).toMatch(/border-radius: var\(--ds-table-radius\);/);
+  expect(frame).not.toMatch(/\bborder:/);
+  expect(css).toMatch(/\.ds-table\[data-frame\] :is\(th, td\) \+ :is\(th, td\) \{\s*box-shadow: inset 1px 0 0 var\(--ds-table-rule\);/);
 });
