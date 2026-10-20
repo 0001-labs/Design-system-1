@@ -14,6 +14,7 @@ import { define } from "../0-face/define";
  *
  * @element ds-tabs
  * @attr fill - Share the width equally between the choices.
+ * @attr text - Text tabs: the words alone, no fill, the current one in the ink.
  *
  * @example
  * <ds-tabs role="group" fill>
@@ -30,15 +31,18 @@ export class Tabs extends LitElement {
   static properties = {
     fill: { type: Boolean, reflect: true },
     wrap: { type: Boolean, reflect: true },
+    text: { type: Boolean, reflect: true },
   };
 
   declare fill: boolean;
   declare wrap: boolean;
+  declare text: boolean;
 
   constructor() {
     super();
     this.fill = false;
     this.wrap = false;
+    this.text = false;
     this.addEventListener("keydown", this.navigate);
   }
 

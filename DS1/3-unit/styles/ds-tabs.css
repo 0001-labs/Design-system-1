@@ -42,3 +42,29 @@
   --ds-button-background: var(--ds-button-background-color-primary);
   --ds-button-color: var(--ds-button-text-color-on-accent);
 }
+
+/*
+ * Text tabs (`text`): the words alone, no fill in any state, the current one
+ * in the ink and the others muted until the pointer is over them. The tabs
+ * stay 4px apart, as every tab run, each with its 4px of padding, so the words
+ * stand twelve apart; the run is drawn 4px back so the first word starts on
+ * the column's edge, as a heading would.
+ */
+:host([text]) {
+  margin-inline-start: calc(-4px * var(--ds-sf));
+}
+
+:host([text]) ::slotted(ds-button),
+:host([text]) ::slotted(ds-button:hover),
+:host([text]) ::slotted(ds-button[active]) {
+  --ds-button-background: transparent;
+}
+
+:host([text]) ::slotted(ds-button) {
+  --ds-button-color: var(--ds-text-color-muted);
+}
+
+:host([text]) ::slotted(ds-button:hover),
+:host([text]) ::slotted(ds-button[active]) {
+  --ds-button-color: var(--ds-text-color);
+}
