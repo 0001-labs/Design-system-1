@@ -173,7 +173,7 @@ const libraryMode = pathname === '/libraries/playground' ? 'editor'
         }
       }
       @media (min-width: 769px) {
-        html[data-sidebar-collapsed] .sidebar { width: var(--site-unit); min-width: var(--site-unit); scrollbar-width: none; }
+        html[data-sidebar-collapsed] .sidebar { width: calc(2 * var(--site-unit)); min-width: calc(2 * var(--site-unit)); scrollbar-width: none; }
         html[data-sidebar-collapsed] .sidebar::-webkit-scrollbar { display: none; }
         html[data-sidebar-collapsed] .sidebar > .docs-sidebar-shell { display: none; }
         html[data-sidebar-collapsed] .sidebar-gap { display: none; }
@@ -208,7 +208,7 @@ const libraryMode = pathname === '/libraries/playground' ? 'editor'
       document.getElementById('workspace-hide')?.addEventListener('click', () => {
         if (navigation?.open) { navigation.requestClose('button'); return; }
         setSidebarCollapsed(true);
-        menuButton?.focus();
+        document.getElementById('sidebar-rail-open')?.focus();
       });
       document.getElementById('sidebar-close-btn')?.setAttribute('data-ds-overlay-dismiss', '');
 

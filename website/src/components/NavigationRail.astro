@@ -23,6 +23,9 @@ function flatten(entries: Entry[]): { name: string; href: string; marker?: strin
 const entries = flatten(sidebar);
 ---
 <nav class="docs-navigation-rail" aria-label="Documentation shortcuts">
+  <ds-button control="slotted" icon class="rail-open">
+    <button id="sidebar-rail-open" type="button" aria-label="Expand sidebar" data-tooltip="Expand sidebar"><ds-icon type="right" aria-hidden="true" /></button>
+  </ds-button>
   {entries.map(entry => <a href={entry.href} aria-label={entry.name} data-tooltip={entry.name} data-rail-layer={entry.marker} aria-current={entry.href.replace(/\/$/, '') === Astro.url.pathname.replace(/\/$/, '') ? 'page' : undefined}>
     {entry.marker ? <span aria-hidden="true">{entry.marker}</span> : <ds-icon type={entry.icon} aria-hidden="true" />}
   </a>)}
@@ -31,6 +34,11 @@ const entries = flatten(sidebar);
   import '../../../DS1/2-core/ds-icon';
   import '../../../DS1/0-face/tooltips';
   import { readAppComponents } from '../lib/app-navigation';
+  import { setSidebarCollapsed } from '../lib/sidebar-state';
+  document.getElementById('sidebar-rail-open')?.addEventListener('click', () => {
+    setSidebarCollapsed(false);
+    document.querySelector<HTMLButtonElement>('#workspace-hide button')?.focus();
+  });
   const rail = document.querySelector<HTMLElement>('.docs-navigation-rail');
   window.addEventListener('ds1-navigation-auth', event => {
     const detail = (event as CustomEvent).detail;
@@ -57,8 +65,9 @@ const entries = flatten(sidebar);
 <style>
   .docs-navigation-rail { display: none; }
   @media (min-width: 769px) {
-    :global(html[data-sidebar-collapsed]) .docs-navigation-rail { display: flex; flex-direction: column; width: var(--site-unit); }
-    .docs-navigation-rail :global(a) { display: flex; flex: none; align-items: flex-end; justify-content: center; width: var(--site-unit); height: var(--site-unit); color: inherit; text-decoration: none; font-size: calc(14px * var(--sf, 1)); line-height: calc(16px * var(--sf, 1)); }
+    :global(html[data-sidebar-collapsed]) .docs-navigation-rail { display: flex; flex-direction: column; width: calc(2 * var(--site-unit)); padding-top: var(--site-unit); }
+    .rail-open { align-self: center; flex: none; margin-bottom: var(--site-unit); }
+    .docs-navigation-rail :global(a) { display: flex; flex: none; align-items: flex-end; justify-content: center; width: calc(2 * var(--site-unit)); height: var(--site-unit); color: inherit; text-decoration: none; font-size: calc(14px * var(--sf, 1)); line-height: calc(16px * var(--sf, 1)); }
     .docs-navigation-rail :global(a:hover) { background: var(--ds-fill); }
     .docs-navigation-rail :global(a[aria-current]) { color: var(--sharp-blue); background: var(--ds-fill); }
     .docs-navigation-rail :global(a[data-private-rail]) { color: var(--ds-text-color-muted); }
