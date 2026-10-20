@@ -576,3 +576,9 @@ test("the week view shows one week with every event, and the day view its hours"
   await calendar.updateComplete;
   expect(calendar.date).toBe("2026-10-27");
 });
+
+test("a month's frame has a card's rounded corners on its four corner days", () => {
+  const css = readFileSync(join(import.meta.dirname, "../DS1/3-unit/styles/ds-calendar.css"), "utf8");
+  expect(css).toMatch(/--ds-calendar-radius: var\(--ds-radius-card/);
+  for (const corner of ["start-start", "start-end", "end-start", "end-end"]) expect(css).toContain(`border-${corner}-radius: var(--ds-calendar-radius)`);
+});
