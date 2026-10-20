@@ -95,7 +95,6 @@ const { sidebar } = Astro.locals.starlightRoute;
     document.querySelector('#workspace-chevron')!.setAttribute('type', workspaceOpen ? 'chevron-up' : 'chevron-down');
     workspaceLibraries.hidden = !workspaceOpen;
     workspaceLibraries.items = [
-      { id: 'workspace-all', label: 'My libraries', href: '/libraries/workspace/' },
       { id: 'workspace-base', label: 'Design system 1', meta: 'Built-in', href: '/start-here/overview/' },
       ...workspaceItems.map(item => ({ id: `workspace-${item.id}`, label: item.name, href: libraryWorkspaceHref({ ...item, component: '/2-core/button/', view: 'overview' }), current: item.id === library?.id })),
       ...(!librariesLoaded ? [{ id: 'workspace-loading', label: 'Loading libraries…', disabled: true }] : []),

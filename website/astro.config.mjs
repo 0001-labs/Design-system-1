@@ -167,14 +167,6 @@ export default defineConfig({
         {
           label: "Advanced",
           items: [
-            {
-              label: "My libraries",
-              items: [
-                { label: "About My libraries", slug: "libraries" },
-                { label: "Open My libraries", link: "/app/libraries" },
-                { label: "API and tools", slug: "libraries/api" },
-              ],
-            },
             { label: "Native", slug: "advanced/native" },
             { label: "Email kit", slug: "email" },
             { label: "Film kit", slug: "advanced/film-kit" },
