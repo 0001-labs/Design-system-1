@@ -51,8 +51,8 @@ A place can be empty because everything in it is finished: every receipt found, 
 | `heading` | string | "Nothing here yet" | The title: a translation key, or the words with `literal`. |
 | `text` | string | Empty | The line under the title. The default slot takes its place. |
 | `literal` | boolean | `false` | Show `heading` and `text` as written, never looked up. |
-| `icon` | string | Empty | An [icon](/2-core/icon/) on its own square above the title, in the muted ink. |
-| `centered` | boolean | `false` | Centre the words in the space the element stands in. |
+| `icon` | string | Empty | An [icon](/2-core/icon/) inline before the title, in the muted ink. |
+| `centered` | boolean | `true` | Centre the words in the space the element stands in. |
 | `level` | number | None | Make the title a heading of this level, 1 to 6. |
 | `tone` | `done` | None | Empty because everything is finished: the check (or `icon`) on the success green's mark, the title in that green. |
 
@@ -65,7 +65,7 @@ A place can be empty because everything in it is finished: every receipt found, 
 
 ## Measures
 
-The block is at most sixteen squares wide (`--ds-empty-measure`), with no room above or below unless the page gives it some (`--ds-empty-padding`). The icon, the title and each line of text take one square; one square stands between the text and the actions, which share a row with half a square between them. The title is in the medium face and the text in the muted ink. Nothing is illustrated and nothing is in capitals.
+The block is at most sixteen squares wide (`--ds-empty-measure`), with no room above or below unless the page gives it some (`--ds-empty-padding`). The block, text and actions are centred. The icon and title share the first square: a 16px icon with 4px before the title, both on the lower sixteen (scaled). Each line of text takes one square; one square stands between the text and the actions, which share a row with half a square between them. The title is in the medium face and the text in the muted ink. Nothing is illustrated and nothing is in capitals.
 
 ## React
 

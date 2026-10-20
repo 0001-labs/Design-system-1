@@ -89,7 +89,7 @@ extension DS1Notice where Actions == EmptyView {
     }
 }
 
-/// `ds-empty`: an empty place saying what fills it. An optional `icon` on its own square, the
+/// `ds-empty`: an empty place saying what fills it. An optional `icon` inline before the title, the
 /// `heading` in the medium face, the `text` muted, every line one square, at most 16 squares
 /// wide; `actions` a square below.
 public struct DS1Empty<Actions: View>: View {
@@ -100,24 +100,31 @@ public struct DS1Empty<Actions: View>: View {
     let centered: Bool
     let actions: Actions
 
-    public init(heading: String? = nil, text: String? = nil, icon: DS1IconName? = nil, centered: Bool = false, @ViewBuilder actions: () -> Actions) {
+    public init(heading: String? = nil, text: String? = nil, icon: DS1IconName? = nil, centered: Bool = true, @ViewBuilder actions: () -> Actions) {
         self.heading = heading; self.text = text; self.icon = icon; self.centered = centered; self.actions = actions()
     }
 
     public var body: some View {
         VStack(alignment: centered ? .center : .leading, spacing: 0) {
-            if let icon { DS1Icon(icon, size: .large).foregroundStyle(DS1Color.textMuted).frame(height: scale.unit) }
-            DS1LineText(heading ?? DS1Words.shared.text("Nothing here yet"), strong: true, wrap: true).accessibilityAddTraits(.isHeader)
+            HStack(alignment: .top, spacing: scale.unit - scale.control) {
+                if let icon {
+                    DS1Icon(icon, size: .large).foregroundStyle(DS1Color.textMuted)
+                        .frame(width: scale.control, height: scale.control)
+                        .padding(.top, scale.unit - scale.control).accessibilityHidden(true)
+                }
+                DS1LineText(heading ?? DS1Words.shared.text("Nothing here yet"), strong: true, wrap: true).accessibilityAddTraits(.isHeader)
+            }
             if let text { DS1LineText(text, tone: .muted, wrap: true) }
             if Actions.self != EmptyView.self { HStack(spacing: scale.half) { actions }.frame(minHeight: scale.unit).padding(.top, scale.unit) }
         }
         .multilineTextAlignment(centered ? .center : .leading)
         .frame(maxWidth: scale.squares(16), alignment: centered ? .center : .leading)
+        .frame(maxWidth: .infinity, alignment: centered ? .center : .leading)
     }
 }
 
 extension DS1Empty where Actions == EmptyView {
-    public init(heading: String? = nil, text: String? = nil, icon: DS1IconName? = nil, centered: Bool = false) {
+    public init(heading: String? = nil, text: String? = nil, icon: DS1IconName? = nil, centered: Bool = true) {
         self.init(heading: heading, text: text, icon: icon, centered: centered) { EmptyView() }
     }
 }

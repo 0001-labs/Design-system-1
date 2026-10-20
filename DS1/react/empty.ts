@@ -9,7 +9,7 @@ export type EmptyProps = Omit<HTMLAttributes<EmptyElement>, "title"> & {
   heading?: ReactNode;
   /** The line under the title; `children` take its place when given. */
   text?: ReactNode;
-  /** An icon from the library on the square above the title. */
+  /** An icon from the library inline before the title. */
   icon?: string;
   /** The buttons or links that fill the place, on one row. */
   actions?: ReactNode;
@@ -27,7 +27,7 @@ const title = (content: ReactNode) =>
 export const Empty = forwardRef<EmptyElement, EmptyProps>(function Empty(
   { heading, text, icon, actions, centered, level, tone, children, ...props }, ref,
 ) {
-  return h("ds-empty", { ...props, icon, centered: centered || undefined, level, tone, ref },
+  return h("ds-empty", { ...props, icon, centered: centered ?? true, level, tone, ref },
     title(heading),
     children ?? text,
     actions == null || actions === false ? null : h("div", { slot: "actions", style: { display: "contents" } }, actions));

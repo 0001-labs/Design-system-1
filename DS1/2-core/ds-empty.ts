@@ -19,8 +19,8 @@ export const EMPTY_HEADING = "Nothing here yet";
  *   stand with `literal`. Unset, the shared words' "Nothing here yet".
  * @prop {string} text - The line under it: a translation key, or literal words.
  * @prop {boolean} literal - Show `heading` and `text` as written, never looked up.
- * @prop {string} icon - An icon from the library on the square above the title.
- * @prop {boolean} centered - Centre the words in the space the element stands in.
+ * @prop {string} icon - An icon from the library inline before the title.
+ * @prop {boolean} centered - Centre the words in the space the element stands in (the default).
  * @prop {number} level - Make the title a heading of this level (1–6).
  * @prop {string} tone - `done`: empty because everything is finished; the
  *   check (or `icon`) on a mark in the success green, the title in that green.
@@ -61,7 +61,7 @@ export class Empty extends LitElement {
   constructor() {
     super();
     this.literal = false;
-    this.centered = false;
+    this.centered = true;
   }
 
   connectedCallback() {
@@ -104,12 +104,14 @@ export class Empty extends LitElement {
     const hasActions = this.slotted("actions");
     const level = this.level && this.level >= 1 && this.level <= 6 ? Math.round(this.level) : undefined;
     const changed = () => this.requestUpdate();
-    return html`<div class="ds-empty${this.centered ? " ds-empty--centered" : ""}${done ? " ds-empty--done" : ""}" part="empty">
+    return html`<div class="ds-empty${this.centered ? " ds-empty--centered" : " ds-empty--start"}${done ? " ds-empty--done" : ""}" part="empty">
+      <div class="ds-empty__heading" part="heading">
       <div class="ds-empty__icon" part="icon" aria-hidden="true" ?hidden=${!hasIcon}>
         <slot name="icon" @slotchange=${changed}>${icon ? html`<ds-icon size=${done ? "small" : "large"} .type=${icon}></ds-icon>` : nothing}</slot>
       </div>
       <div class="ds-empty__title" part="title" role=${level ? "heading" : nothing} aria-level=${level ?? nothing}>
         <slot name="heading" @slotchange=${changed}>${heading}</slot>
+      </div>
       </div>
       <div class="ds-empty__text" part="text" ?hidden=${!hasText}><slot @slotchange=${changed}></slot>${slottedText ? nothing : text}</div>
       <div class="ds-empty__actions" part="actions" ?hidden=${!hasActions}><slot name="actions" @slotchange=${changed}></slot></div>

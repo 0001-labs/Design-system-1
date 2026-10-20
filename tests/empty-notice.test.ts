@@ -53,9 +53,9 @@ test("an empty state shows its icon, slotted words, actions and heading level on
   expect(title.getAttribute("role")).toBe("heading");
   expect(title.getAttribute("aria-level")).toBe("2");
   expect(empty.shadowRoot!.querySelector("ds-icon")!.getAttribute("size")).toBe("large");
-  expect(empty.shadowRoot!.querySelector(".ds-empty--centered")).toBeNull();
-  empty.centered = true; await empty.updateComplete;
   expect(empty.shadowRoot!.querySelector(".ds-empty--centered")).not.toBeNull();
+  empty.centered = false; await empty.updateComplete;
+  expect(empty.shadowRoot!.querySelector(".ds-empty--start")).not.toBeNull();
   empty.querySelector('[slot="actions"]')!.remove();
   await new Promise(resolve => setTimeout(resolve)); await empty.updateComplete;
   expect(shown(empty, "actions")).toBe(false);

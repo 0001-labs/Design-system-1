@@ -113,7 +113,7 @@ fun DS1Notice(
 }
 
 /**
- * `ds-empty`: an empty place saying what fills it. An optional [icon] on its own square, the
+ * `ds-empty`: an empty place saying what fills it. An optional [icon] inline before the title, the
  * [heading] in the medium face, the [text] in the muted colour, every line one square, at
  * most 16 squares wide; [actions] a square below. [centered] centres it.
  */
@@ -123,20 +123,25 @@ fun DS1Empty(
     heading: String = DS1Words.text("Nothing here yet"),
     text: String? = null,
     icon: DS1IconName? = null,
-    centered: Boolean = false,
+    centered: Boolean = true,
     actions: (@Composable RowScope.() -> Unit)? = null,
 ) {
     val scale = LocalDS1Scale.current
     Column(
-        modifier.widthIn(max = scale.squares(16f)),
+        modifier.fillMaxWidth(),
         horizontalAlignment = if (centered) Alignment.CenterHorizontally else Alignment.Start,
     ) {
-        if (icon != null) Box(Modifier.height(scale.unit), contentAlignment = Alignment.Center) { DS1Icon(icon, size = DS1IconSize.Large, tint = DS1Colors.textMuted.current) }
-        DS1LineText(heading, Modifier.semantics { heading() }, strong = true, wrap = true)
-        if (text != null) DS1LineText(text, tone = DS1Tone.Muted, wrap = true)
-        if (actions != null) {
-            Spacer(Modifier.height(scale.unit))
-            Row(Modifier.heightIn(min = scale.unit), horizontalArrangement = Arrangement.spacedBy(scale.half), verticalAlignment = Alignment.CenterVertically, content = actions)
+        Column(Modifier.widthIn(max = scale.squares(16f)).fillMaxWidth(), horizontalAlignment = if (centered) Alignment.CenterHorizontally else Alignment.Start) {
+            val alignment = if (centered) androidx.compose.ui.text.style.TextAlign.Center else androidx.compose.ui.text.style.TextAlign.Start
+            Row(horizontalArrangement = Arrangement.spacedBy(scale.unit - scale.control), verticalAlignment = Alignment.Top) {
+                if (icon != null) Box(Modifier.padding(top = scale.unit - scale.control).size(scale.control)) { DS1Icon(icon, size = DS1IconSize.Large, tint = DS1Colors.textMuted.current) }
+                androidx.compose.foundation.text.BasicText(heading, Modifier.weight(1f, fill = false).semantics { heading() }, style = ds1TextStyle(face = DS1Font.Face.Medium).copy(textAlign = alignment))
+            }
+            if (text != null) androidx.compose.foundation.text.BasicText(text, style = ds1TextStyle(tone = DS1Tone.Muted).copy(textAlign = alignment))
+            if (actions != null) {
+                Spacer(Modifier.height(scale.unit))
+                Row(Modifier.heightIn(min = scale.unit), horizontalArrangement = Arrangement.spacedBy(scale.half), verticalAlignment = Alignment.CenterVertically, content = actions)
+            }
         }
     }
 }
