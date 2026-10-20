@@ -4,7 +4,7 @@ import MySidebar from '../components/MySidebar.astro';
 import MyHead from '../components/MyHead.astro';
 import LibraryWorkspace from '../components/LibraryWorkspace.astro';
 import LandingPage from '../components/LandingPage.astro';
-import ExamplesNavigationRail from '../components/ExamplesNavigationRail.astro';
+import NavigationRail from '../components/NavigationRail.astro';
 
 interface Props {
   title?: string;
@@ -26,6 +26,13 @@ const libraryMode = pathname === '/libraries/playground' ? 'editor'
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title || 'Design system 1'}</title>
     <MyHead />
+    <script is:inline>
+      try {
+        const collapsed = location.pathname.replace(/\/$/, '') === '/start-here/examples' || localStorage.getItem('ds1-docs-sidebar-collapsed') === 'true';
+        document.documentElement.toggleAttribute('data-sidebar-collapsed', collapsed);
+        if (collapsed) localStorage.setItem('ds1-docs-sidebar-collapsed', 'true');
+      } catch {}
+    </script>
     <link rel="icon" type="image/svg+xml" href="/icons/design-system-1.svg" />
   </head>
   <body>
@@ -33,11 +40,11 @@ const libraryMode = pathname === '/libraries/playground' ? 'editor'
     <MyHeader landing={isHome} />
 
     <!-- Main Container with Sidebar and Content -->
-    <div class:list={['main-container', { 'main-container--home': isHome, 'main-container--examples': isExamples }]}>
+    <div class:list={['main-container', { 'main-container--home': isHome }]}>
       <!-- Sidebar -->
       {!isHome && <aside id="sidebar" class="sidebar" aria-label="Documentation navigation">
         <MySidebar />
-        {isExamples && <ExamplesNavigationRail />}
+        <NavigationRail />
       </aside>}
 
       <!-- On a phone the same navigation opens in Design system 1's dialog, filling the screen. -->
@@ -166,12 +173,11 @@ const libraryMode = pathname === '/libraries/playground' ? 'editor'
         }
       }
       @media (min-width: 769px) {
-        .main-container--examples .sidebar { width: var(--site-unit); min-width: var(--site-unit); scrollbar-width: none; }
-        .main-container--examples .sidebar::-webkit-scrollbar { display: none; }
-        .main-container--examples .sidebar > .docs-sidebar-shell { display: none; }
-        .main-container--examples .sidebar-gap { display: none; }
+        html[data-sidebar-collapsed] .sidebar { width: var(--site-unit); min-width: var(--site-unit); scrollbar-width: none; }
+        html[data-sidebar-collapsed] .sidebar::-webkit-scrollbar { display: none; }
+        html[data-sidebar-collapsed] .sidebar > .docs-sidebar-shell { display: none; }
+        html[data-sidebar-collapsed] .sidebar-gap { display: none; }
       }
-      html[data-sidebar-collapsed] :is(.sidebar, .sidebar-gap) { display: none; }
       html[data-docs-compact] :is(.sidebar, .sidebar-gap, .right-sidebar-container) { display: none; }
       html[data-docs-compact] .main-content { width: 100%; }
       html[data-docs-compact] .main-pane { padding: var(--site-unit); }
@@ -179,6 +185,7 @@ const libraryMode = pathname === '/libraries/playground' ? 'editor'
 
     <script>
       import '../../../DS1/4-page/ds-overlay';
+      import { setSidebarCollapsed } from '../lib/sidebar-state';
       import type { Overlay } from '../../../DS1/4-page/ds-overlay';
       const scrollTimers = new WeakMap<Element, ReturnType<typeof setTimeout>>();
       document.addEventListener('scroll', event => {
@@ -200,7 +207,7 @@ const libraryMode = pathname === '/libraries/playground' ? 'editor'
 
       document.getElementById('workspace-hide')?.addEventListener('click', () => {
         if (navigation?.open) { navigation.requestClose('button'); return; }
-        document.documentElement.setAttribute('data-sidebar-collapsed', '');
+        setSidebarCollapsed(true);
         menuButton?.focus();
       });
       document.getElementById('sidebar-close-btn')?.setAttribute('data-ds-overlay-dismiss', '');
@@ -211,7 +218,7 @@ const libraryMode = pathname === '/libraries/playground' ? 'editor'
       }
       menuButton?.addEventListener('click', () => {
         if (document.documentElement.hasAttribute('data-sidebar-collapsed') && !document.documentElement.hasAttribute('data-docs-compact')) {
-          document.documentElement.removeAttribute('data-sidebar-collapsed');
+          setSidebarCollapsed(false);
           document.querySelector<HTMLButtonElement>('#workspace-hide button')?.focus();
           return;
         }

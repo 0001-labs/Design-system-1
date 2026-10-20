@@ -22,8 +22,8 @@ function flatten(entries: Entry[]): { name: string; href: string; marker?: strin
 }
 const entries = flatten(sidebar);
 ---
-<nav class="examples-navigation-rail" aria-label="Documentation shortcuts">
-  {entries.map(entry => <a href={entry.href} aria-label={entry.name} data-tooltip={entry.name} data-rail-layer={entry.marker} aria-current={entry.name === 'Examples' ? 'page' : undefined}>
+<nav class="docs-navigation-rail" aria-label="Documentation shortcuts">
+  {entries.map(entry => <a href={entry.href} aria-label={entry.name} data-tooltip={entry.name} data-rail-layer={entry.marker} aria-current={entry.href.replace(/\/$/, '') === Astro.url.pathname.replace(/\/$/, '') ? 'page' : undefined}>
     {entry.marker ? <span aria-hidden="true">{entry.marker}</span> : <ds-icon type={entry.icon} aria-hidden="true" />}
   </a>)}
 </nav>
@@ -31,7 +31,7 @@ const entries = flatten(sidebar);
   import '../../../DS1/2-core/ds-icon';
   import '../../../DS1/0-face/tooltips';
   import { readAppComponents } from '../lib/app-navigation';
-  const rail = document.querySelector<HTMLElement>('.examples-navigation-rail');
+  const rail = document.querySelector<HTMLElement>('.docs-navigation-rail');
   window.addEventListener('ds1-navigation-auth', event => {
     const detail = (event as CustomEvent).detail;
     if (detail.loading) return;
@@ -55,14 +55,14 @@ const entries = flatten(sidebar);
   });
 </script>
 <style>
-  .examples-navigation-rail { display: none; }
+  .docs-navigation-rail { display: none; }
   @media (min-width: 769px) {
-    .examples-navigation-rail { display: flex; flex-direction: column; width: var(--site-unit); }
-    .examples-navigation-rail :global(a) { display: flex; flex: none; align-items: flex-end; justify-content: center; width: var(--site-unit); height: var(--site-unit); color: inherit; text-decoration: none; font-size: calc(14px * var(--sf, 1)); line-height: calc(16px * var(--sf, 1)); }
-    .examples-navigation-rail :global(a:hover) { background: var(--ds-fill); }
-    .examples-navigation-rail :global(a[aria-current]) { color: var(--sharp-blue); background: var(--ds-fill); }
-    .examples-navigation-rail :global(a[data-private-rail]) { color: var(--ds-text-color-muted); }
-    .examples-navigation-rail :global(a:focus-visible) { outline: 1px solid currentColor; outline-offset: -1px; }
-    .examples-navigation-rail :global(ds-icon) { width: calc(16px * var(--sf, 1)); height: calc(16px * var(--sf, 1)); }
+    :global(html[data-sidebar-collapsed]) .docs-navigation-rail { display: flex; flex-direction: column; width: var(--site-unit); }
+    .docs-navigation-rail :global(a) { display: flex; flex: none; align-items: flex-end; justify-content: center; width: var(--site-unit); height: var(--site-unit); color: inherit; text-decoration: none; font-size: calc(14px * var(--sf, 1)); line-height: calc(16px * var(--sf, 1)); }
+    .docs-navigation-rail :global(a:hover) { background: var(--ds-fill); }
+    .docs-navigation-rail :global(a[aria-current]) { color: var(--sharp-blue); background: var(--ds-fill); }
+    .docs-navigation-rail :global(a[data-private-rail]) { color: var(--ds-text-color-muted); }
+    .docs-navigation-rail :global(a:focus-visible) { outline: 1px solid currentColor; outline-offset: -1px; }
+    .docs-navigation-rail :global(ds-icon) { width: calc(16px * var(--sf, 1)); height: calc(16px * var(--sf, 1)); }
   }
 </style>
