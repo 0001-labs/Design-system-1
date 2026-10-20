@@ -553,12 +553,17 @@ test("the week view shows one week with every event, and the day view its hours"
   expect(calendar.date).toBe("2026-10-28");
   expect(navigate).toHaveBeenCalledOnce();
 
-  const views = [...calendar.shadowRoot!.querySelectorAll<HTMLElement>(".views ds-button")];
-  expect(views.map(button => button.textContent!.trim())).toEqual(["Day", "Week", "Month"]);
+  const views = calendar.shadowRoot!.querySelector<HTMLElement & { options: string; value: string }>("ds-button.views")!;
+  expect(views.hasAttribute("split")).toBe(true);
+  expect(views.options).toBe("day:Day,week:Week,month:Month");
+  expect(views.value).toBe("week");
   const changed = vi.fn();
+  const chosenDay = vi.fn();
   calendar.addEventListener("view-change", changed);
-  views[0].click();
+  calendar.addEventListener("change", chosenDay);
+  views.dispatchEvent(new CustomEvent("change", { detail: { value: "day" }, bubbles: true, composed: true, cancelable: true }));
   await calendar.updateComplete;
+  expect(chosenDay).not.toHaveBeenCalled();
   expect(calendar.view).toBe("day");
   expect(changed.mock.calls[0][0].detail).toEqual({ view: "day" });
   calendar.events = [{ title: "All day", start: "2026-10-28" }, { title: "Standup", start: "2026-10-28", time: "09:30" }];

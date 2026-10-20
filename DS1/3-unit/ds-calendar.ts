@@ -46,7 +46,6 @@ import {
 import { CalendarBase, readMonth, readRange, type CalendarChangeDetail } from "./calendar-base";
 import "../2-core/ds-icon";
 import "../2-core/ds-button";
-import "./ds-tabs";
 import metrics from "../1-root/component-metrics.css?inline";
 import controls from "../1-root/controls.css?inline";
 import styles from "./styles/ds-calendar.css?inline";
@@ -411,6 +410,13 @@ export class Calendar extends CalendarBase {
     this.dispatchEvent(new CustomEvent<CalendarViewDetail>("view-change", { bubbles: true, composed: true, detail: { view } }));
   }
 
+  /** The split button's choice; its own change event stays inside, since a calendar's change is a chosen day. */
+  private onViewChange = (event: Event) => {
+    event.stopPropagation();
+    const view = (event as CustomEvent<{ value: string }>).detail?.value;
+    if (view === "month" || view === "week" || view === "day") this.showView(view);
+  };
+
   /** Brings a day into view: its month, its week or the day itself. */
   private bringIntoView(day: Day) {
     const view = this.shownView;
@@ -768,7 +774,7 @@ export class Calendar extends CalendarBase {
       : level === "months"
         ? this.yearName(year)
         : `${this.yearName(span[0])} – ${this.yearName(span[0] + 11)}`;
-    return html`<div class="header" part="header">
+    return html`<div class="header" part="header" ?data-views=${this.views && !this.compact && !this.picker}>
       ${level === "years"
         ? html`<span class="title" id="title" aria-live="polite">${title}</span>`
         : html`<button
@@ -778,14 +784,17 @@ export class Calendar extends CalendarBase {
             aria-label=${`${title}, ${this.words("Choose a month and year")}`}
             @click=${this.levelUp}
           ><span class="title-text" id="title" aria-live="polite">${title}</span></button>`}
+      ${this.views && !this.compact && !this.picker ? html`<ds-button
+        class="views"
+        part="views"
+        split
+        literal
+        aria-label=${this.words("View")}
+        .options=${VIEWS.map(([choice, word]) => `${choice}:${this.words(word)}`).join(",")}
+        .value=${view}
+        @change=${this.onViewChange}
+      ></ds-button>` : nothing}
       <span class="controls">
-        ${this.views && !this.compact && !this.picker ? html`<ds-tabs class="views" part="views" role="group" split aria-label=${this.words("View")}>
-          ${VIEWS.map(([choice, word]) => html`<ds-button
-            aria-pressed=${String(choice === view)}
-            ?active=${choice === view}
-            @click=${() => this.showView(choice)}
-          >${this.words(word)}</ds-button>`)}
-        </ds-tabs>` : nothing}
         ${this.noToday || this.squaresPerDay < 2 ? nothing : html`<button class="ds-button today-button" part="today" type="button" @click=${() => this.showToday()}>${this.words("Today")}</button>`}
         ${arrow("previous")}
         ${arrow("next")}

@@ -494,8 +494,14 @@
   to { opacity: 1; transform: none; }
 }
 
-/* Day, Week and Month in the header, before Today and the arrows. */
-.views { flex: 0 0 auto; }
+/* Day, Week and Month on a split button in the middle of the header, the
+ * title at its start and Today and the arrows at its end. */
+.header[data-views] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+}
+.header[data-views] .controls { justify-self: end; }
+.views { justify-self: center; }
 
 /* One day: its events without a time on lines a day wide across the top, then
  * its hours, one square each with a hairline at the foot, in an area twelve
