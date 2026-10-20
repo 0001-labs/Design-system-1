@@ -44,7 +44,7 @@ export function placeAppNavigation(root: HTMLElement, rows: SidebarItem[], compo
       name.textContent = component.name;
       const tag = document.createElement('ds-tag');
       tag.textContent = 'App';
-      link.append(name, tag);
+      link.append(tag, name);
       if (location.pathname + location.search === component.href) link.setAttribute('aria-current', 'page');
       slot.append(link);
     }
