@@ -1,4 +1,5 @@
 ---
+import "../styles/example-code.css";
 import '../vendor/aa/aa.css';
 /** An example's source, with a copy button per block. Shared by component and layout examples. */
 interface Props { html: string; script?: string; }
@@ -22,12 +23,4 @@ const blocks = [{ id: 'html', label: 'Copy HTML', text: html }, ...(script ? [{ 
     wireCodeCopy(source);
   });
 </script>
-<style is:global>
-  .example-code-source { --example-code-unit: calc(20px * var(--sf, 1)); }
-  .example-code-block { display: flex; flex-direction: column; align-items: flex-end; gap: calc(var(--example-code-unit) / 2); margin-block: calc(var(--example-code-unit) / 2); }
-  .example-code-editor { align-self: stretch; min-width: 0; padding: var(--example-code-unit); background: var(--ds-fill); border-radius: calc(4px * var(--sf, 1)); --aa-code-paper: transparent; --aa-line: var(--example-code-unit); }
-  .example-code-editor:empty { display: none; }
-  .example-code-editor .aa-block[data-kind="code"] { padding: 0; white-space: pre-wrap; overflow-wrap: anywhere; overflow: visible; -webkit-user-modify: read-only; }
-  .example-code-block pre[hidden] { display: none; }
-  .example-code-block pre { background: var(--ds-fill); align-self: stretch; margin: 0; padding: var(--example-code-unit); white-space: pre-wrap; overflow-wrap: anywhere; overflow: visible; border-radius: 4px; font-size: 13px; line-height: var(--example-code-unit); }
-</style>
+

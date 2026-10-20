@@ -1,8 +1,28 @@
+import '../../website/src/styles/custom.css';
+import '../../website/src/styles/component-example.css';
+import '../../website/src/styles/example-code.css';
+import '../../DS1/2-core/ds-button';
+import { wireExampleView } from '../../website/src/lib/example-view';
+import { mountCodeEditors } from '../../website/src/lib/example-code-editor';
+import { wireCodeCopy } from '../../website/src/lib/example-controls';
 import './src/index';
 import '../../DS1/1-root/prose.css';
 
 // The private guide's controlled example; applications supply their own state.
 if (typeof document !== 'undefined') {
+  document.querySelectorAll<HTMLElement>('.preview').forEach((preview, index) => {
+    const section = document.createElement('section');
+    section.className = 'component-example';
+    section.setAttribute('data-ds-not-prose', '');
+    section.setAttribute('data-example-view', '');
+    const sample = [...preview.children].map(child => child.outerHTML).join('\n');
+    section.innerHTML = `<div class="example-toolbar"><span>Example</span><div class="example-view-toggle" role="group" aria-label="Example view"><ds-button control="slotted" choice active><button type="button" data-example-view-choice="example" aria-pressed="true">Example</button></ds-button><ds-button control="slotted" choice><button type="button" data-example-view-choice="code" aria-pressed="false">Code</button></ds-button></div></div><div data-example-preview></div><div data-example-source hidden><div class="example-code-source" data-example-code><div class="example-code-block"><ds-button control="slotted"><button type="button" data-copy="html">Copy HTML</button></ds-button><div class="example-code-editor" data-code-editor aria-label="HTML source"></div><pre><code data-source="html"></code></pre></div></div></div>`;
+    section.querySelector('code')!.textContent = sample;
+    preview.replaceWith(section);
+    section.querySelector('[data-example-preview]')!.append(preview);
+    wireExampleView(section, mountCodeEditors);
+    wireCodeCopy(section.querySelector('[data-example-code]')!);
+  });
   const component = document.documentElement.dataset.component ?? 'keyboard-shortcut';
   if (window.parent === window) location.replace(`https://designsystem1.com/libraries/workspace/?internal=${encodeURIComponent(component)}`);
   window.addEventListener('message', event => {

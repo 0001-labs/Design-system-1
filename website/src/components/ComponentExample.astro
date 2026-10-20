@@ -1,4 +1,5 @@
 ---
+import "../styles/component-example.css";
 import { EXAMPLES } from '../lib/examples';
 import ExampleCode from './ExampleCode.astro';
 import ExampleViewToggle from './ExampleViewToggle.astro';
@@ -26,8 +27,4 @@ if (!sample) throw new Error(`Unknown component example: ${example}`);
     fitFrame(frame);
   });
 </script>
-<style is:global>
-  .component-example { --example-unit: calc(20px * var(--sf, 1)); margin-block: var(--example-unit); color: var(--text-color); font-size: calc(14px * var(--sf, 1)); line-height: var(--example-unit); }
-  .component-example .example-toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: calc(var(--example-unit) / 2); padding-block: calc(var(--example-unit) / 2); }
-  .component-example iframe { display: block; width: 100%; border: 0; background: var(--background); }
-  .component-example .example-hint { margin: calc(var(--example-unit) / 2) 0; font-size: calc(14px * var(--sf, 1)); color: var(--text-color); }</style>
+
