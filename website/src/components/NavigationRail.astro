@@ -14,15 +14,14 @@ const entries = flatten(sidebar);
 ---
 <nav class="docs-navigation-rail" aria-label="Documentation shortcuts">
   <ds-button control="slotted" icon class="rail-open">
-    <button id="sidebar-rail-open" type="button" aria-label="Expand sidebar" data-tooltip="Expand sidebar"><ds-icon type="right" aria-hidden="true" /></button>
+    <button id="sidebar-rail-open" type="button" aria-label="Expand sidebar"><ds-icon type="right" aria-hidden="true" /></button>
   </ds-button>
   {entries.map(entry => <ds-button control="slotted" primary={entry.marker ? '' : undefined} fit class="rail-entry" data-section={entry.section} data-rail-layer={entry.marker} aria-label={entry.name}>
-    <a href={entry.href} aria-label={entry.name} data-tooltip={entry.name} aria-current={entry.href.replace(/\/$/, '') === Astro.url.pathname.replace(/\/$/, '') ? 'page' : undefined}>{entry.name}</a>
+    <a href={entry.href} aria-label={entry.name} aria-current={entry.href.replace(/\/$/, '') === Astro.url.pathname.replace(/\/$/, '') ? 'page' : undefined}>{entry.name}</a>
   </ds-button>)}
 </nav>
 <script>
   import '../../../DS1/2-core/ds-icon';
-  import '../../../DS1/0-face/tooltips';
   import { readAppComponents } from '../lib/app-navigation';
   import { setSidebarCollapsed } from '../lib/sidebar-state';
   document.getElementById('sidebar-rail-open')?.addEventListener('click', () => {
@@ -46,7 +45,6 @@ const entries = flatten(sidebar);
       button.setAttribute('aria-label', component.name);
       const link = document.createElement('a');
       link.href = component.href;
-      link.dataset.tooltip = component.name;
       link.setAttribute('aria-label', component.name);
       link.textContent = component.name;
       button.append(link);
