@@ -167,4 +167,4 @@ const appPath = mode === 'editor' ? '/app/playground' : '/app/libraries';
 
 <style is:global>
   html[data-signed-in] .library-workspace { grid-template-rows: minmax(0, 1fr); }
-  html[data-signed-in] :is(.library-heading, .library-tabs, .right-sidebar-container) { display: none; }</style>
+  html[data-signed-in] .library-workspace :is(.library-heading, .library-tabs) { display: none; }</style>
