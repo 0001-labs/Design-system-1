@@ -34,6 +34,12 @@ test('following a section focuses it and retains query state; modified links sta
  expect(click.defaultPrevented).toBe(true);expect(headings[1].scrollIntoView).toHaveBeenCalled();expect(document.activeElement).toBe(headings[1]);
  expect(location.search).toBe('?view=reference');expect(location.hash).toBe('#second');expect(toc.current).toBe('#second');
 });
+test('the current-section threshold follows the rendered row at a changed surface scale',async()=>{
+ const {toc,article,positions}=await setup();
+ toc.shadowRoot!.querySelector<HTMLElement>('.title')!.getBoundingClientRect=()=>new DOMRect(0,0,400,40);
+ positions.splice(0,3,80,130,500);article.dispatchEvent(new Event('scroll'));await frame();
+ expect(toc.current).toBe('#second');
+});
 test('slotted links retain their text and external destinations; reconnect restores tracking',async()=>{
  const {toc,article,positions}=await setup();toc.items=[];toc.innerHTML='<a href="#first">Authored first</a><a href="/another-page/#section">Another page</a>';
  await toc.updateComplete;toc.refresh();await frame();expect(toc.querySelector('a')?.getAttribute('aria-current')).toBe('location');

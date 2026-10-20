@@ -117,7 +117,8 @@ export class TableOfContents extends LitElement {
     const scrollTop = this.scroller?.scrollTop ?? window.scrollY;
     const scrollHeight = this.scroller?.scrollHeight ?? this.ownerDocument.documentElement.scrollHeight;
     const end = scrollTop > 0 && scrollTop + height >= scrollHeight - 1;
-    const unit = parseFloat(getComputedStyle(this).getPropertyValue('--ds-unit')) || 20;
+    // The rendered row resolves nested scale and calc() tokens to actual pixels.
+    const unit = this.renderRoot.querySelector<HTMLElement>('.title')?.getBoundingClientRect().height || 20;
     const line = top + (end ? height : unit);
     let current = this.sections[0].link.getAttribute('href')!;
     for (const { link, heading } of this.sections) {
