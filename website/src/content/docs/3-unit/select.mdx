@@ -40,8 +40,8 @@ placement, nested menus and focus. A menu that opens where the pointer is, is a
 ```
 
 The native select keeps the value, labels, option groups, validation, FormData,
-disabled fieldsets and reset. DS1 draws the field, one square high and eight
-wide by default (layout can set the host width), and in place of the platform's
+disabled fieldsets and reset. DS1 draws the field, one square high, hugging its options with a chevron at the end
+by default (layout can set the host width), and in place of the platform's
 picker its own list: one square a choice, the chosen one checked and focused on
 opening, groups headed by their `<optgroup>` label, half a square below the
 field and as wide as it in whole squares (`--ds-select-list-width` widens it).
@@ -63,7 +63,7 @@ An option may carry more on its row, all on the sixteen:
 
 ### Compact and colour choices
 
-`fit` sizes a field to its options. `chip` uses the shared 16px control height
+Fields hug their options by default; `fit` remains an explicit alias. `chip` uses the shared 16px control height
 and quiet button face; `primary` gives a chip the accent. For a colour category,
 pass `swatch` a CSS colour: DS1 draws its `ds-swatch` in a one-square control.
 

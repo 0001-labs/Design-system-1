@@ -3,14 +3,15 @@
 /*
  * Select as a field, around a native <select> (`data-field`): the menu
  * engine's own rules (an action menu's) do not reach it. One square high and
- * eight wide by default; a list one square a visible row.
+ * hugging its options by default; a list one square a visible row.
  */
 :host([data-field]) {
   --ds-select-unit: calc(var(--ds-1) * var(--ds-sf));
   display: inline-flex;
   position: relative;
   vertical-align: middle;
-  width: calc(8 * var(--ds-select-unit));
+  width: max-content;
+  align-self: flex-start;
   max-width: 100%;
   min-width: 0;
   max-height: none;
@@ -21,9 +22,10 @@
   appearance: none !important;
   box-sizing: border-box !important;
   display: block !important;
-  width: 100% !important;
+  field-sizing: content;
+  width: auto !important;
   min-width: 0 !important;
-  max-width: none !important;
+  max-width: 100% !important;
   height: 100% !important;
   min-height: 0 !important;
   margin: 0 !important;
@@ -60,6 +62,9 @@
 ::slotted(select[size]:not([size="0"]):not([size="1"])) {
   padding: 0 calc(4px * var(--ds-sf)) !important;
 }
+
+:host([data-listbox]) { width: calc(8 * var(--ds-select-unit)); }
+:host([data-listbox]) ::slotted(select) { width: 100% !important; }
 
 /* Intrinsic width uses the native option sizing, including translated labels. */
 :host([fit]:not([data-listbox])) { width: max-content; }

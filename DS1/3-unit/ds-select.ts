@@ -1,7 +1,7 @@
 import { html, nothing, unsafeCSS, type PropertyValues, type TemplateResult } from "lit";
 import { define } from "../0-face/define";
 import { shortcutLabel } from "../0-face/keys";
-import down from "../x-icon/down.svg?raw";
+import down from "../x-icon/chevron-down.svg?raw";
 import check from "../x-icon/check.svg?raw";
 import menuStyles from "./styles/ds-menu.css?inline";
 import styles from "./styles/ds-select.css?inline";
