@@ -12,6 +12,8 @@
   height: var(--ds-row-height);
 }
 
+:host([hidden]) { display: none !important; }
+
 :host([wrap]) {
   flex-wrap: wrap;
   height: auto;
@@ -67,4 +69,35 @@
 :host([text]) ::slotted(ds-button:hover),
 :host([text]) ::slotted(ds-button[active]) {
   --ds-button-color: var(--ds-text-color);
+}
+
+/*
+ * Split tabs (`split`): joined into one face a control high, as the split
+ * button draws it: a pixel of the paper between them, the run's outer corners
+ * rounded (each tab's `segment` place), the tabs muted on the secondary
+ * ground, the current one on the accent.
+ */
+:host([split]) {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 1px;
+  height: var(--ds-control-height);
+  vertical-align: bottom;
+}
+
+:host([split]) ::slotted(ds-button) {
+  --ds-button-height: var(--ds-control-height);
+  --ds-button-padding: 0 calc(5px * var(--ds-sf));
+  --ds-button-background: var(--ds-button-background-color-secondary);
+  --ds-button-color: var(--ds-text-color-muted);
+}
+
+:host([split]) ::slotted(ds-button:hover) {
+  --ds-button-background: var(--ds-button-background-color-secondary);
+  --ds-button-color: var(--ds-text-color);
+}
+
+:host([split]) ::slotted(ds-button[active]) {
+  --ds-button-background: var(--ds-accent-color);
+  --ds-button-color: var(--ds-button-text-color-on-accent);
 }

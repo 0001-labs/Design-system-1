@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -81,11 +82,17 @@ fun <T> DS1SplitButton(
     }
 }
 
+/** `ds-tabs`' faces: buttons (the default), the words alone (`text`), or joined as a split button (`split`). */
+enum class DS1TabsFace { Button, Text, Split }
+
 /**
- * `ds-tabs`: tabs one square apart in a row one square high; each tab one control high on
- * no ground, muted, and the chosen one on the fill in the text colour. [fill] gives every tab
- * the same width. With [segmented], tabs are one square high on the fill and the chosen one
- * on the accent (`role="group"` with `aria-pressed`).
+ * `ds-tabs`: tabs 4 dp apart in a row one square high, in one of three [face]s. [DS1TabsFace.Button]:
+ * each tab one control high on no ground, muted, the chosen one on the fill in the text colour.
+ * [DS1TabsFace.Text]: the words alone, no fill, the chosen one in the ink, the run drawn 4 dp back so
+ * the first word starts on the edge. [DS1TabsFace.Split]: joined into one face a control high as the
+ * split button, a dp between them, the chosen one on the accent. [fill] gives every tab the same
+ * width. With [segmented] (an option group, `role="group"` with `aria-pressed`), button tabs are one
+ * square high on the fill and the chosen one on the accent.
  */
 @Composable
 fun <T> DS1Tabs(
@@ -93,37 +100,51 @@ fun <T> DS1Tabs(
     selected: T,
     onSelect: (T) -> Unit,
     modifier: Modifier = Modifier,
+    face: DS1TabsFace = DS1TabsFace.Button,
     segmented: Boolean = false,
     fill: Boolean = false,
 ) {
     val scale = LocalDS1Scale.current
+    val split = face == DS1TabsFace.Split
+    val text = face == DS1TabsFace.Text
     Row(
-        modifier.height(scale.unit).selectableGroup(),
-        horizontalArrangement = Arrangement.spacedBy(scale(4f)),
+        modifier
+            .height(scale.unit)
+            .then(if (text) Modifier.offset(x = -scale(4f)) else Modifier)
+            .selectableGroup(),
+        horizontalArrangement = Arrangement.spacedBy(if (split) 1.dp else scale(4f)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        for (tab in tabs) {
+        tabs.forEachIndexed { i, tab ->
             val chosen = tab.value == selected
             val interaction = remember { MutableInteractionSource() }
             val ground = when {
-                segmented && chosen -> DS1Colors.accent.current
-                segmented -> DS1Colors.fill.current
+                text -> Color.Transparent
+                (split || segmented) && chosen -> DS1Colors.accent.current
+                split || segmented -> DS1Colors.fill.current
                 chosen -> DS1Colors.fill.current
                 else -> Color.Transparent
             }
             val ink = when {
-                segmented && chosen -> DS1Colors.onAccent
+                text -> if (chosen) DS1Colors.text else DS1Colors.textMuted
+                (split || segmented) && chosen -> DS1Colors.onAccent
+                split -> DS1Colors.textMuted
                 segmented || chosen -> DS1Colors.text
                 else -> DS1Colors.textMuted
             }
+            val r = scale.radius
+            val shape = if (split) RoundedCornerShape(
+                topStart = if (i == 0) r else 0.dp, bottomStart = if (i == 0) r else 0.dp,
+                topEnd = if (i == tabs.lastIndex) r else 0.dp, bottomEnd = if (i == tabs.lastIndex) r else 0.dp,
+            ) else RoundedCornerShape(r)
             Row(
                 Modifier
                     .then(if (fill) Modifier.weight(1f) else Modifier)
-                    .height(if (segmented) scale.unit else scale.control)
-                    .background(ground, RoundedCornerShape(scale.radius))
+                    .height(if (segmented && !split && !text) scale.unit else scale.control)
+                    .background(ground, shape)
                     .ds1FocusRing(interaction)
                     .selectable(chosen, interaction, null, tab.enabled, Role.Tab) { onSelect(tab.value) }
-                    .padding(horizontal = scale(4f)),
+                    .padding(horizontal = scale(if (split) 5f else 4f)),
                 horizontalArrangement = Arrangement.spacedBy(scale(4f), Alignment.CenterHorizontally),
                 verticalAlignment = Alignment.CenterVertically,
             ) {

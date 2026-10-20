@@ -224,21 +224,86 @@ public struct DS1SplitButton<Value: Hashable>: View {
     }
 }
 
-/// `ds-tabs`: tabs half a square apart on a row one square high, each one control high on no
-/// ground and muted, the chosen one on the fill in the text colour. `segmented` puts them on
-/// the fill one square high, the chosen one on the accent. `fill` gives each the same width.
+/// `ds-tabs`: tabs 4 apart on a row one square high, in one of three faces. `.button` (the
+/// default): each one control high on no ground and muted, the chosen one on the fill in the text
+/// colour. `.text` (`ds-tabs text`): the words alone, no fill, the chosen one in the ink, the run
+/// drawn 4 back so the first word starts on the edge. `.split` (`ds-tabs split`): joined into one
+/// face a control high as the split button, a point between them, the chosen one on the accent.
+/// `segmented` (an option group) puts button tabs on the fill one square high, the chosen one on
+/// the accent. `fill` gives each the same width.
 public struct DS1Tabs<Value: Hashable>: View {
+    public enum Face: Sendable { case button, text, split }
+
     @Environment(\.ds1Scale) private var scale
     let tabs: [DS1Segment<Value>]
     @Binding var selection: Value
+    let face: Face
     let segmented: Bool
     let fill: Bool
 
-    public init(_ tabs: [DS1Segment<Value>], selection: Binding<Value>, segmented: Bool = false, fill: Bool = false) {
-        self.tabs = tabs; _selection = selection; self.segmented = segmented; self.fill = fill
+    public init(_ tabs: [DS1Segment<Value>], selection: Binding<Value>, face: Face = .button, segmented: Bool = false, fill: Bool = false) {
+        self.tabs = tabs; _selection = selection; self.face = face; self.segmented = segmented; self.fill = fill
     }
 
     public var body: some View {
+        switch face {
+        case .button: buttons
+        case .text: words
+        case .split: joined
+        }
+    }
+
+    private var words: some View {
+        HStack(alignment: .bottom, spacing: scale(4)) {
+            ForEach(tabs) { tab in
+                let chosen = tab.value == selection
+                Button { selection = tab.value } label: {
+                    HStack(spacing: scale(4)) {
+                        if let icon = tab.icon { DS1Icon(icon) }
+                        if !tab.label.isEmpty { DS1ControlText(tab.label, colour: chosen ? .text : .textMuted) }
+                    }
+                    .foregroundStyle(chosen ? DS1Color.text : DS1Color.textMuted)
+                    .padding(.horizontal, scale(4))
+                    .frame(maxWidth: fill ? .infinity : nil)
+                    .frame(height: scale.control)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .disabled(!tab.enabled)
+                .accessibilityAddTraits(chosen ? [.isButton, .isSelected] : .isButton)
+            }
+        }
+        .padding(.leading, -scale(4))
+        .frame(height: scale.unit, alignment: .bottom)
+    }
+
+    private var joined: some View {
+        HStack(spacing: 1) {
+            ForEach(Array(tabs.enumerated()), id: \.element.id) { i, tab in
+                let chosen = tab.value == selection
+                Button { selection = tab.value } label: {
+                    HStack(spacing: scale(4)) {
+                        if let icon = tab.icon { DS1Icon(icon) }
+                        if !tab.label.isEmpty { DS1ControlText(tab.label, colour: chosen ? .onAccent : .textMuted) }
+                    }
+                    .foregroundStyle(chosen ? DS1Color.onAccent : DS1Color.textMuted)
+                    .padding(.horizontal, scale(5))
+                    .frame(maxWidth: fill ? .infinity : nil)
+                    .frame(height: scale.control)
+                    .background(chosen ? DS1Color.accent : DS1Color.fill, in: UnevenRoundedRectangle(
+                        topLeadingRadius: i == 0 ? scale.radius : 0, bottomLeadingRadius: i == 0 ? scale.radius : 0,
+                        bottomTrailingRadius: i == tabs.count - 1 ? scale.radius : 0, topTrailingRadius: i == tabs.count - 1 ? scale.radius : 0,
+                        style: .continuous))
+                }
+                .buttonStyle(.plain)
+                .disabled(!tab.enabled)
+                .accessibilityAddTraits(chosen ? [.isButton, .isSelected] : .isButton)
+            }
+        }
+        .frame(height: scale.unit, alignment: .bottom)
+    }
+
+    private var buttons: some View {
         HStack(spacing: scale(4)) {
             ForEach(tabs) { tab in
                 let chosen = tab.value == selection

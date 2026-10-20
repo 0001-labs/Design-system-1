@@ -336,6 +336,14 @@
     "url": "https://designsystem1.com/3-unit/select/"
   },
   {
+    "id": "component:/3-unit/tabs/",
+    "code": "TABS",
+    "label": "Tabs",
+    "kind": "component",
+    "summary": "Design system 1 3-unit.",
+    "url": "https://designsystem1.com/3-unit/tabs/"
+  },
+  {
     "id": "component:/3-unit/context/",
     "code": "CTX",
     "label": "Context",

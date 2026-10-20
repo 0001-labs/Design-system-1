@@ -137,6 +137,7 @@ export default defineConfig({
             { label: "Select", slug: "3-unit/select" },
             { label: "Sidebar", slug: "3-unit/sidebar" },
             { label: "Table", slug: "3-unit/table" },
+            { label: "Tabs", slug: "3-unit/tabs" },
           ],
         },
         {

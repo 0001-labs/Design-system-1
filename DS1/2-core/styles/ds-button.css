@@ -169,7 +169,16 @@
   margin-inline-start: calc(-4px * var(--ds-sf));
 }
 
-/* A segment gets its outside corners from the enclosing split control. */
+/* A segment gets its outside corners from the enclosing split control, or
+   from its place in a joined run of tabs (`ds-tabs split`). */
 :host([segment]) :is(button, a) {
   border-radius: 0 !important;
+}
+:host(:is([segment="first"], [segment="only"])) :is(button, a) {
+  border-start-start-radius: var(--ds-radius) !important;
+  border-end-start-radius: var(--ds-radius) !important;
+}
+:host(:is([segment="last"], [segment="only"])) :is(button, a) {
+  border-start-end-radius: var(--ds-radius) !important;
+  border-end-end-radius: var(--ds-radius) !important;
 }

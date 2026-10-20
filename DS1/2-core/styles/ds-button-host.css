@@ -235,3 +235,16 @@
 :host([menu-item][control="slotted"]) ::slotted([aria-checked="true"]) {
   box-shadow: inset 0 0 0 1px var(--ds-focus-ring) !important;
 }
+
+/* A tab in a joined run (`ds-tabs split`): square inside, rounded at the run's ends. */
+:host([control="host"][segment]) {
+  border-radius: 0 !important;
+}
+:host([control="host"]:is([segment="first"], [segment="only"])) {
+  border-start-start-radius: var(--ds-radius) !important;
+  border-end-start-radius: var(--ds-radius) !important;
+}
+:host([control="host"]:is([segment="last"], [segment="only"])) {
+  border-start-end-radius: var(--ds-radius) !important;
+  border-end-end-radius: var(--ds-radius) !important;
+}

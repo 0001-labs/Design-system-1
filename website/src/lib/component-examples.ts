@@ -208,6 +208,18 @@ render();`,
     title: 'An icon and an action', hint: 'Icons follow the button’s text colour.',
     html: '<ds-button primary>\n  <ds-icon type="check"></ds-icon> Save\n</ds-button>',
   },
+  'tabs': {
+    title: 'Buttons', hint: 'The default face: each tab muted on no ground, the current one on the fill. Arrow keys move between them.',
+    html: '<ds-tabs aria-label="Views">\n  <ds-button control="host" role="tab" active aria-selected="true">Overview</ds-button>\n  <ds-button control="host" role="tab" aria-selected="false">Activity</ds-button>\n  <ds-button control="host" role="tab" aria-selected="false">Settings</ds-button>\n</ds-tabs>',
+  },
+  'tabs-text': {
+    title: 'Text', hint: 'The words alone, 4px apart, the current one in the ink. For tabs that stand where a heading would.',
+    html: '<ds-tabs text aria-label="Payment">\n  <ds-button control="host" role="tab" active aria-selected="true">Details</ds-button>\n  <ds-button control="host" role="tab" aria-selected="false">Items</ds-button>\n  <ds-button control="host" role="tab" aria-selected="false">Receipt</ds-button>\n</ds-tabs>',
+  },
+  'tabs-split': {
+    title: 'Split', hint: 'Joined into one face as the split button, the current one on the accent.',
+    html: '<ds-tabs split aria-label="Show">\n  <ds-button control="host" role="tab" active aria-selected="true">List</ds-button>\n  <ds-button control="host" role="tab" aria-selected="false">Calendar</ds-button>\n  <ds-button control="host" role="tab" aria-selected="false">Chart</ds-button>\n</ds-tabs>',
+  },
   'tooltip': {
     title: 'Hover or focus', hint: 'The label starts visible. Hover over the button, or focus it with Tab to try it.',
     html: '<ds-tooltip text="Save your changes">\n  <ds-button secondary>Hover or focus me</ds-button>\n</ds-tooltip>',
@@ -680,6 +692,7 @@ export const PAGE_EXAMPLES: Record<string, string[]> = {
   '2-core/avatar': ['avatar-borderless', 'avatar'],
   '2-core/button': ['button', 'button-icon', 'split'],
   '2-core/tooltip': ['tooltip', 'tooltip-fallback'],
+  '3-unit/tabs': ['tabs', 'tabs-text', 'tabs-split'],
   '2-core/icon': ['icon', 'icon-variants'],
   '2-core/input': ['input', 'input-states'],
   '2-core/text': ['text'],
