@@ -22,7 +22,7 @@ describe("single Worker deployment", () => {
   });
   it("attaches the product hostnames and legacy domain", () => {
     expect(config.routes).toEqual([
-      { pattern: "dash.designsystem1.com", custom_domain: true },
+      { pattern: "adoption.designsystem1.com", custom_domain: true },
       { pattern: "fonts.designsystem1.com", custom_domain: true },
       { pattern: "icon.designsystem1.com", custom_domain: true },
       { pattern: "designsystem1.com", custom_domain: true },

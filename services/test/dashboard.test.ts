@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vite-plus/test';
 import { dashboard } from '../src/dashboard';
 import type { ReportsEnv } from '../src/reports';
-const origin = 'https://dash.designsystem1.com';
+const origin = 'https://adoption.designsystem1.com';
 function setup() {
   const assets = vi.fn().mockResolvedValue(new Response('Application'));
   const get = vi.fn();

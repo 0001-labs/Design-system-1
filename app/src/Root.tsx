@@ -62,7 +62,7 @@ function Routes() {
 
   if (path === "/libraries") return <LibraryList />;
   if (path === "/profile") return <Profile />;
-  if (path === "/reports/components") { window.location.replace("https://dash.designsystem1.com/"); return <Splash />; }
+  if (path === "/reports/components") { window.location.replace("https://adoption.designsystem1.com/"); return <Splash />; }
   if (editor) return <LibraryEditor libraryId={editor.id} />;
 
   return <NotFound />;
@@ -91,7 +91,7 @@ function NotFound() {
 export function Root({ children }: { children?: ReactNode }) {
   return (
     <ConvexAuthProvider client={convex}>
-      <RouterProvider>{["/flags", "/flags/", "/app/flags"].includes(window.location.pathname) ? <FeatureFlags /> : window.location.pathname === "/app/navigation-auth" ? <NavigationAuth /> : window.location.hostname === "dash.designsystem1.com" ? <AdoptionDashboard /> : window.location.hostname === "fonts.designsystem1.com" ? <FontWorkspace /> : window.location.hostname === "icon.designsystem1.com" ? <IconBuilder /> : <AppShell>{children ?? <Routes />}</AppShell>}</RouterProvider>
+      <RouterProvider>{["/flags", "/flags/", "/app/flags"].includes(window.location.pathname) ? <FeatureFlags /> : window.location.pathname === "/app/navigation-auth" ? <NavigationAuth /> : window.location.hostname === "adoption.designsystem1.com" ? <AdoptionDashboard /> : window.location.hostname === "fonts.designsystem1.com" ? <FontWorkspace /> : window.location.hostname === "icon.designsystem1.com" ? <IconBuilder /> : <AppShell>{children ?? <Routes />}</AppShell>}</RouterProvider>
     </ConvexAuthProvider>
   );
 }

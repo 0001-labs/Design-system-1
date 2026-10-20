@@ -1,7 +1,7 @@
-/** Owner dashboard: the public sign-in shell contains no report data. */
+/** Owner dashboard (component adoption and the glossary) at adoption.designsystem1.com: the public sign-in shell contains no report data. dash.designsystem1.com is now Design system 1's dash portal on 0001's System Worker. */
 import { authorizeReport, type ReportsEnv } from './reports';
 
-export const DASHBOARD_HOST = 'dash.designsystem1.com';
+export const DASHBOARD_HOST = 'adoption.designsystem1.com';
 /** The owner's icon builder: the same gate and session as the dashboard, on its own host. */
 export const ICON_HOST = 'icon.designsystem1.com';
 const COOKIE = '__Host-ds1-dashboard';

@@ -12,7 +12,7 @@ describe("combined website routes", () => {
   });
 
   it("isolates the dashboard host from the public app and library endpoints", async () => {
-    const origin = "https://dash.designsystem1.com";
+    const origin = "https://adoption.designsystem1.com";
     expect((await site.fetch(origin + "/", { redirect: "manual" })).status).toBe(302);
     expect(await (await site.fetch(origin + "/app/signin")).text()).toBe("Application");
     expect((await site.fetch(origin + "/api/reports/components")).status).toBe(401);
@@ -37,7 +37,7 @@ describe("combined website routes", () => {
     for (const path of ['/private-app/', '/private-app/app.js', '/private-app/app.css', '/private-app/index.html']) {
       expect((await site.fetch(path, { redirect: 'manual' })).status).toBe(302);
       expect((await site.fetch('https://www.designsystem1.com' + path, { redirect: 'manual' })).status).toBe(404);
-      expect((await site.fetch('https://dash.designsystem1.com' + path, { redirect: 'manual' })).status).toBe(302);
+      expect((await site.fetch('https://adoption.designsystem1.com' + path, { redirect: 'manual' })).status).toBe(302);
     }
     const old = await site.fetch('/2-core/kbd/', { redirect: 'manual' });
     expect(old.headers.get('location')).toBe('https://designsystem1.com/libraries/workspace/?internal=keyboard-shortcut');
@@ -101,11 +101,11 @@ describe("combined website routes", () => {
       expect(await response.text()).not.toContain('"private":true');
     }
     const shortcut = await site.fetch("/reports/components", { redirect: "manual" });
-    expect(shortcut.headers.get("location")).toBe("https://dash.designsystem1.com/");
+    expect(shortcut.headers.get("location")).toBe("https://adoption.designsystem1.com/");
     const shell = await site.fetch("/app/reports/components", { redirect: "manual" });
     expect(shell.headers.get("x-robots-tag")).toBe("noindex, nofollow");
     expect(shell.headers.get("cache-control")).toBe("private, no-store");
     expect(shell.status).toBe(302);
-    expect(shell.headers.get("location")).toBe("https://dash.designsystem1.com/");
+    expect(shell.headers.get("location")).toBe("https://adoption.designsystem1.com/");
   });
 });

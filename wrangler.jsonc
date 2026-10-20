@@ -24,7 +24,8 @@
     "MAX_CSS_BYTES": "524288"
   },
   "routes": [
-    { "pattern": "dash.designsystem1.com", "custom_domain": true },
+    // The owner's adoption dashboard; dash.designsystem1.com is the dash portal on 0001's System Worker.
+    { "pattern": "adoption.designsystem1.com", "custom_domain": true },
     { "pattern": "fonts.designsystem1.com", "custom_domain": true },
     { "pattern": "icon.designsystem1.com", "custom_domain": true },
     {
