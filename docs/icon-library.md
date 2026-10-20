@@ -19,7 +19,7 @@ Everyday money drawn in the dot matrix of Olivetti Dot: `dot-coin`, `dot-coins`,
 
 ## Drawn arrows
 
-An arrow drawn inside an icon keeps the form of the Inter arrows the type uses: a 90° head whose arms are cut square, as in `right`, `in`, `download` and `upload`. `move` puts four of these heads on a cross. The circular arrows follow `rewind`: an open ring that runs a short way along its tangent into an L-shaped head with one vertical and one horizontal arm. `refresh` turns clockwise with its head at the upper right, so it reads apart from `loop` (two square arrows) and `repeat` (the rounded media pair); `history` is the counter-clockwise ring with clock hands, and `rotate` is a quarter turn over an image frame.
+An arrow drawn inside an icon keeps the form of the Inter arrows the type uses: a 90° head whose arms are cut square, as in `right`, `in`, `download` and `upload`. `move` puts four of these heads on a cross. The circular arrows follow `rewind`: an open ring that runs a short way along its tangent into an L-shaped head with one vertical and one horizontal arm. `refresh` turns clockwise with its head at the upper right, so it reads apart from `loop` (two square arrows) and `repeat` (the rounded media pair); `history` is the counter-clockwise ring with clock hands, and `rotate` is a quarter turn over an image frame. `repeat-small` is `repeat` drawn for 6 to 10 pixels, as a badge on a picture's corner: the same rounded pair, simplified, at a 2.4 weight so each line stays more than a pixel wide; never use it at 16.
 
 ## Interface additions
 

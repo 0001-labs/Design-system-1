@@ -1437,6 +1437,13 @@
     "shapes": 1
   },
   {
+    "key": "repeat-small",
+    "name": "Repeat",
+    "source": "Library",
+    "url": "/icons/library/repeat-small.svg",
+    "shapes": 4
+  },
+  {
     "key": "repeat",
     "name": "Repeat",
     "source": "Library",

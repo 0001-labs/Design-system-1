@@ -268,6 +268,7 @@ public enum DS1IconName: String, CaseIterable, Sendable {
     case refund
     case relationships
     case `repeat`
+    case repeatSmall = "repeat-small"
     case rewind
     case rewind30 = "rewind-30"
     case rewind30Alt = "rewind-30-alt"

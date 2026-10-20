@@ -272,6 +272,7 @@ enum class DS1IconName(val fileName: String, @DrawableRes val drawable: Int) {
     refund("refund", R.drawable.ds1_icon_refund),
     relationships("relationships", R.drawable.ds1_icon_relationships),
     repeat("repeat", R.drawable.ds1_icon_repeat),
+    repeatSmall("repeat-small", R.drawable.ds1_icon_repeat_small),
     rewind("rewind", R.drawable.ds1_icon_rewind),
     rewind30("rewind-30", R.drawable.ds1_icon_rewind_30),
     rewind30Alt("rewind-30-alt", R.drawable.ds1_icon_rewind_30_alt),
