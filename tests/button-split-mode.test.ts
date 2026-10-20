@@ -23,3 +23,17 @@ test('a split is a group as soon as it is connected, before its first render', (
   document.body.append(button);
   expect(button.getAttribute('role')).toBe('group');
 });
+
+test('a labelled split writes each segment\'s words after its icon, and an unlabelled one names it by them', async () => {
+  const button = new Button(); button.split = true; button.literal = true;
+  button.options = 'private:@eye-off:Private,public:@globe:Public'; button.value = 'private';
+  document.body.append(button); await button.updateComplete;
+  const first = () => button.shadowRoot!.querySelector('button')!;
+  expect(first().getAttribute('aria-label')).toBe('Private');
+  expect(first().querySelector('ds-text')).toBeNull();
+  button.labelled = true; await button.updateComplete;
+  expect(first().hasAttribute('aria-label')).toBe(false);
+  expect(first().hasAttribute('data-icon-words')).toBe(true);
+  expect(first().querySelector('ds-icon')!.getAttribute('type')).toBe('eye-off');
+  expect((first().querySelector('ds-text') as HTMLElement & { text: string }).text).toBe('Private');
+});

@@ -48,6 +48,9 @@
   border-end-end-radius: var(--ds-radius);
 }
 :host([split]) button[data-icon] { width: var(--ds-control-height); padding: 0; }
+/* An icon with its words hugs them: the icon's own 4px room around its glyph
+   replaces the padding on its side and the gap before the words. */
+:host([split]) button[data-icon-words] { gap: 0; padding-inline-start: 0; }
 :host([split]) ds-icon { --ds-icon-size: 16px; color: inherit; }
 :host([split]) ds-text { color: inherit; }
 /* Compact numeric views: a single digit is a square; longer values use the

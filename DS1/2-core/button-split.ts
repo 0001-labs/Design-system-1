@@ -12,7 +12,7 @@ export interface SplitSegment<T extends string = string> {
 export interface SplitButtonState extends HTMLElement {
   options: string; segments: ReadonlyArray<SplitSegment> | undefined;
   value: string; disabled: boolean; splitDisabled: boolean;
-  actions: boolean; literal: boolean; renderRoot: HTMLElement | DocumentFragment;
+  actions: boolean; literal: boolean; labelled?: boolean; renderRoot: HTMLElement | DocumentFragment;
 }
 function choices(host: SplitButtonState): ReadonlyArray<SplitSegment> {
     return host.segments ?? host.options.split(",").map(part => part.trim()).filter(Boolean).map(part => {
@@ -41,15 +41,20 @@ export function focusSplit(host: SplitButtonState, options?: FocusOptions) {
   (buttons.find(button => button.getAttribute("aria-pressed") === "true") ?? buttons[0])?.focus(options);
 }
 export function renderSplit(host: SplitButtonState) {
+    // `labelled` writes a segment's words after its icon; otherwise an icon stands alone and names it.
+    const words = (segment: SplitSegment) => html`<ds-text .text=${segment.label} .literal=${host.literal}></ds-text>`;
     return html`${choices(host).map(segment => html`<button
       type="button" part="segment" value=${segment.value}
       aria-pressed=${host.actions ? nothing : String(segment.value === host.value)}
-      aria-label=${segment.icon ? (host.literal ? segment.label : getText(segment.label)) : nothing}
-      ?data-icon=${!!segment.icon}
+      aria-label=${segment.icon && !host.labelled ? (host.literal ? segment.label : getText(segment.label)) : nothing}
+      ?data-icon=${!!segment.icon && !host.labelled}
+      ?data-icon-words=${!!segment.icon && !!host.labelled}
       ?data-short=${segment.label.length === 1}
       ?disabled=${host.splitDisabled || segment.disabled}
       @click=${() => press(host, segment)}
     >${segment.icon
-      ? html`<ds-icon type=${segment.icon} aria-hidden="true"></ds-icon>`
-      : html`<ds-text .text=${segment.label} .literal=${host.literal}></ds-text>`}</button>`)}`;
+      ? host.labelled
+        ? html`<ds-icon type=${segment.icon} aria-hidden="true"></ds-icon>${words(segment)}`
+        : html`<ds-icon type=${segment.icon} aria-hidden="true"></ds-icon>`
+      : words(segment)}</button>`)}`;
 }

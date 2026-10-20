@@ -102,7 +102,9 @@ export class Tooltip extends LitElement {
 
   updated(): void {
     this.describe();
+    const bubble = this.shadowRoot?.querySelector<HTMLElement>(".bubble");
     if (this._visible) this.place();
+    else if (bubble && open(bubble)) bubble.hidePopover();
   }
 
   /**
@@ -113,7 +115,15 @@ export class Tooltip extends LitElement {
   private place(): void {
     const bubble = this.shadowRoot?.querySelector<HTMLElement>(".bubble");
     if (!bubble || bubble.hidden) return;
-    const edge = 4 * (parseFloat(getComputedStyle(this).getPropertyValue("--ds-sf")) || 1);
+    // The bubble stands in the browser's top layer, where no scrolling frame,
+    // dialog or sheet can cut it short, placed by the control's own box.
+    if (typeof bubble.showPopover === "function" && !open(bubble)) bubble.showPopover();
+    const scale = parseFloat(getComputedStyle(this).getPropertyValue("--ds-sf")) || 1;
+    const edge = 4 * scale;
+    const anchor = this.getBoundingClientRect();
+    bubble.style.setProperty("--ds-tooltip-x", `${anchor.left + anchor.width / 2}px`);
+    bubble.style.setProperty("--ds-tooltip-above", `${anchor.top - 2 * scale}px`);
+    bubble.style.setProperty("--ds-tooltip-below", `${anchor.bottom + 2 * scale}px`);
     bubble.style.removeProperty("--ds-tooltip-shift");
     bubble.dataset.side = this.placement === "bottom" ? "bottom" : "top";
     let box = bubble.getBoundingClientRect();
@@ -126,8 +136,13 @@ export class Tooltip extends LitElement {
 
   render() {
     return html`<slot @slotchange=${this.describe}></slot>
-      <span class="bubble" role="tooltip" aria-hidden="true" ?hidden=${!this._visible || !this.label}>${this.label}</span>`;
+      <span class="bubble" role="tooltip" aria-hidden="true" popover="manual" ?hidden=${!this._visible || !this.label}>${this.label}</span>`;
   }
+}
+
+/** Whether a bubble is open in the top layer; false where the browser has no popovers. */
+function open(bubble: HTMLElement): boolean {
+  try { return bubble.matches(":popover-open"); } catch { return false; }
 }
 
 define("ds-tooltip", Tooltip);
