@@ -1,0 +1,10 @@
+---
+const { toc } = Astro.locals.starlightRoute;
+type Entry = { text: string; slug: string; children: Entry[] };
+const flatten = (entries: Entry[], depth = 0): { label: string; href: string; depth: number }[] =>
+  entries.flatMap(entry => [{ label: entry.text, href: `#${encodeURIComponent(entry.slug)}`, depth }, ...flatten(entry.children, depth + 1)]);
+---
+{toc && <ds-table-of-contents label={Astro.locals.t('tableOfContents.onThisPage')} literal>
+  {flatten(toc.items).map(item => <a href={item.href} data-depth={item.depth}>{item.label}</a>)}
+</ds-table-of-contents>}
+<script>import '../../../DS1/3-unit/ds-table-of-contents';</script>

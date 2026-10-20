@@ -280,6 +280,14 @@
     "url": "https://designsystem1.com/3-unit/table/"
   },
   {
+    "id": "component:/3-unit/table-of-contents/",
+    "code": "TOC",
+    "label": "Table of contents",
+    "kind": "component",
+    "summary": "Design system 1 3-unit.",
+    "url": "https://designsystem1.com/3-unit/table-of-contents/"
+  },
+  {
     "id": "component:/4-page/container/",
     "code": "CONT",
     "label": "Container",

@@ -143,6 +143,10 @@ The public Fonts catalogue uses Aa's `createPlainEditor` for plain specimen text
 
 Component and layout example code uses the existing Sync 1 Aa snapshot in `website/src/vendor/aa`, through `createEditor` with `readOnly: true` and menus and toolbar disabled. Selected parts: `editing`, `documentation`, `design`, and `themes`. Code is wrapped in a safe Markdown fence for display; copying retains the exact original source. This is a public source viewer, not a replacement for a writable document editor: persistence, undo, attachments, collaboration and an editor migration flag do not apply. The shared example wrapper uses the theme-aware grey fill and remains collapsed initially.
 
+## System parts for Table of contents
+
+Table of contents is the public Unit `ds-table-of-contents` (`DS1/3-unit/`), used by the documentation's right sidebar through `website/src/components/TableOfContents.astro`. Page layout owns its placement and visibility; the full-width Examples page omits it. Selected System parts: `design`, `documentation`, `sharing`, `themes`, `platform-web`. It is a new opt-in Sync 1 component; existing document-layout contents and Starlight's compact mobile contents retain their existing behavior.
+
 ## Product code
 
 Canonical short code: `DS1`. Use this three-character code for product-owned libraries and other compact ownership labels. Use this code followed by a colon for commit subjects; keep the full product name in prose.

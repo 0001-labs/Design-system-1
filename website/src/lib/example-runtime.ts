@@ -1,7 +1,7 @@
 import { mountShowcase } from "./showcase-runtime";
 import { mountChartExample } from './chart-example';
 import { fillSheetExample } from './sheet-example';
-import { EXAMPLES, MATRIX_DATA, TABLE_DATA, TABLE_FOOTER, calendarEvents } from './component-examples';
+import { EXAMPLES, MATRIX_DATA, TABLE_DATA, TABLE_FOOTER, calendarEvents } from './examples';
 import type { DsTable } from '../../../DS1/3-unit/ds-table';
 import type { SidebarItem } from '../../../DS1/3-unit/ds-sidebar';
 

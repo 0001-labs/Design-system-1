@@ -76,6 +76,7 @@ export default defineConfig({
         MarkdownContent: "./src/components/MarkdownContent.astro",
         // The page's title, drawn as Design system 1's display text
         PageTitle: "./src/components/Heading.astro",
+        TableOfContents: "./src/components/TableOfContents.astro",
       },
       customCss: [
         // Custom CSS file
@@ -145,6 +146,7 @@ export default defineConfig({
             { label: "Select", slug: "3-unit/select" },
             { label: "Sidebar", slug: "3-unit/sidebar" },
             { label: "Table", slug: "3-unit/table" },
+            { label: "Table of contents", slug: "3-unit/table-of-contents" },
             { label: "Tabs", slug: "3-unit/tabs" },
           ],
         },

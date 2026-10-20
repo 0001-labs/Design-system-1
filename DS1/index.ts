@@ -78,6 +78,7 @@ export * from "./3-unit/ds-list";
 export * from "./3-unit/ds-matrix";
 export * from "./3-unit/ds-row";
 export * from "./3-unit/ds-table";
+export * from "./3-unit/ds-table-of-contents";
 
 // ============================================================================
 // 4-page: Layout Components

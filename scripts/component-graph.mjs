@@ -69,6 +69,7 @@ export function componentGraph(ds1, names) {
   for (const name of ['stat', 'progress']) if (components.includes(name)) visit(`react/${name}.ts`);
   if (components.includes('sidebar')) visit('react/sidebar.ts');
   if (components.includes('table')) visit('react/table.ts');
+  if (components.includes('table-of-contents')) visit('react/table-of-contents.ts');
   if (components.includes('toast')) visit('react/toast.ts');
   if (components.includes('file-picker')) visit('react/file-picker.ts');
   if (components.includes('token-field') || components.includes('token')) visit('react/token-field.ts');

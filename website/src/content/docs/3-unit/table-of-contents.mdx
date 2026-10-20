@@ -1,0 +1,43 @@
+---
+title: Table of contents
+description: Section links for a longer page, with nested headings and the current section marked as you scroll.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+A Table of contents lists the sections of a page. Its title stands above the links, each link on a one-square row. Nested sections stand one square further in. The section in view is marked in blue; the other links use the muted ink. Its width is twelve squares by default and stays within its container.
+
+A long label ends in an ellipsis and shows its full words in the shared tooltip on hover or keyboard focus.
+
+## Try it
+
+<ComponentExample example="table-of-contents" />
+
+## Use it
+
+Slot native links into `<ds-table-of-contents>`. Give a nested link `data-depth="1"` (or another nonnegative depth). Each same-page fragment names an element with that `id`. Keep the element and its targets in the same document or shadow root.
+
+```html
+<ds-table-of-contents label="On this page" literal>
+  <a href="#overview">Overview</a>
+  <a href="#examples">Design examples</a>
+  <a href="#try-it">Try it</a>
+  <a href="#size" data-depth="1">Choose a size</a>
+</ds-table-of-contents>
+```
+
+You can instead set `items` to `{ href, label, depth? }[]`. The `label` is a translation key by default (`Contents`); use `literal` for words that should appear as written. `target` can point to a content element when a composing component puts the contents in a separate shadow root. Call `refresh()` after replacing target elements without changing the links.
+
+## Navigation and current section
+
+Every entry is a real link and a Tab stop. Enter follows it and moves focus to the section. Modified clicks, links to other pages and downloads retain native browser behavior. Fragment navigation preserves the page query and creates a normal history entry.
+
+The Unit tracks the nearest scrolling ancestor of its targets, including an independently scrolling article. It updates after scrolling or resizing, and marks the last visible section at the bottom. It reads geometry only when needed and removes listeners and observers when disconnected. `toc-change` reports `{ href }` when the current section changes.
+
+The Unit owns the links and current state. The page owns placement, sticky positioning and responsive visibility. The documentation uses it in the right sidebar; a full-width example page can leave it out.
+
+## React and customization
+
+`TableOfContents` from `react/table-of-contents.ts` accepts `items`, `label`, `literal`, `target` and `onSectionChange`. Register the Lit element in the browser before hydration.
+
+Use `--ds-toc-width`, `--ds-toc-color` and `--ds-toc-current-color` for a library-specific width or ink. Type, links, indentation and gaps follow the local `--ds-sf` scale. Light and dark colours come from the shared tokens.
