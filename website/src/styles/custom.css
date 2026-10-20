@@ -226,6 +226,8 @@ body.sidebar-open {
 
 /* Code frames: thirteen on the same rows, a square of room around it, its frame a shadow. */
 .expressive-code {
+  --ec-codeFontFml: var(--typeface-mono);
+  --ec-codePadInl: var(--grid);
   --ec-brdRad: calc(4px * var(--sf, 1));
   margin: var(--grid) 0;
   font-size: calc(13px * var(--sf, 1));
@@ -235,7 +237,14 @@ body.sidebar-open {
 .expressive-code .frame pre { border: 0; background: transparent; }
 .expressive-code .frame pre > code { padding: var(--grid) 0; font-size: calc(13px * var(--sf, 1)); line-height: var(--grid); }
 .expressive-code .frame .ec-line { font-size: calc(13px * var(--sf, 1)); line-height: var(--grid); }
-.expressive-code .frame .ec-line .code { padding-inline: var(--grid); }
+.expressive-code .frame pre > code,
+.expressive-code .frame .ec-line,
+.expressive-code .frame .ec-line .code,
+.expressive-code .frame .ec-line .code span { font-family: var(--typeface-mono); }
+.expressive-code .frame .ec-line .code {
+  padding-inline-start: calc(var(--ecIndent, 0ch) + var(--grid) - var(--ecGtrBrdWd));
+  padding-inline-end: var(--grid);
+}
 .expressive-code .frame.is-terminal .header,
 .expressive-code .frame.has-title .header {
   height: var(--grid);
