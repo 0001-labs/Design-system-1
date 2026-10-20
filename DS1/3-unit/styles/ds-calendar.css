@@ -317,7 +317,8 @@
   align-items: flex-end;
   gap: var(--ds-calendar-pad);
   height: calc(var(--ds-unit) - 1px);
-  margin: 0.5px;
+  /* A pixel at the start, so the day's line (and the month's frame) shows beside a bar. */
+  margin: 0.5px 0.5px 0.5px 1px;
   padding-inline: var(--ds-calendar-pad);
   overflow: hidden;
   white-space: nowrap;
@@ -336,7 +337,7 @@
 .event[data-span] {
   position: relative;
   z-index: 1;
-  width: calc(var(--ds-calendar-event-span) * var(--ds-calendar-day) - 1px);
+  width: calc(var(--ds-calendar-event-span) * var(--ds-calendar-day) - 1.5px);
 }
 /* A line a bar passes over, or an empty line above another event. */
 .line { flex: 0 0 auto; height: var(--ds-unit); }
@@ -559,5 +560,5 @@
   min-width: 0;
 }
 .hour-events .event,
-.all-day .event { width: calc(var(--ds-calendar-day) - 1px); }
+.all-day .event { width: calc(var(--ds-calendar-day) - 1.5px); }
 

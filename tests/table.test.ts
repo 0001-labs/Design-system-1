@@ -199,9 +199,11 @@ test("a sheet's words that do not fit fade over their last square, never an elli
 test("a framed table draws its rounded frame and column lines inside the cells, so rows keep their pitch", () => {
   const css = readFileSync(join(import.meta.dirname, "../DS1/1-root/table.css"), "utf8");
   const frame = css.slice(css.indexOf(".ds-table[data-frame] {"), css.indexOf(".ds-table[data-frame] :is(th, td) {"));
-  expect(frame).toMatch(/outline: 1px solid var\(--ds-table-rule\);/);
-  expect(frame).toMatch(/outline-offset: -1px;/);
   expect(frame).toMatch(/border-radius: var\(--ds-table-radius\);/);
-  expect(frame).not.toMatch(/\bborder:/);
+  // Drawn over the cells by a pseudo-element, so a filled cell never covers it.
+  const over = css.slice(css.indexOf(".ds-table[data-frame]::after {"));
+  expect(over).toMatch(/z-index: 1;/);
+  expect(over).toMatch(/border: 1px solid var\(--ds-table-rule\);/);
+  expect(over).toMatch(/pointer-events: none;/);
   expect(css).toMatch(/\.ds-table\[data-frame\] :is\(th, td\) \+ :is\(th, td\) \{\s*box-shadow: inset 1px 0 0 var\(--ds-table-rule\);/);
 });

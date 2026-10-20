@@ -82,11 +82,21 @@
 
 .ds-table[data-frame] {
   --ds-table-radius: var(--ds-radius-card, calc(8px * var(--ds-sf, 1)));
+  position: relative;
   border-collapse: separate;
   border-radius: var(--ds-table-radius);
-  outline: 1px solid var(--ds-table-rule);
-  outline-offset: -1px;
   clip-path: inset(0 round var(--ds-table-radius));
+}
+/* The frame is drawn over the cells, so a filled cell never covers it. */
+.ds-table[data-frame]::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  box-sizing: border-box;
+  border: 1px solid var(--ds-table-rule);
+  border-radius: var(--ds-table-radius);
+  content: "";
+  pointer-events: none;
 }
 .ds-table[data-frame] :is(th, td) {
   padding-inline: calc(4px * var(--ds-sf, 1));

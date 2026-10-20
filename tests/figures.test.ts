@@ -256,7 +256,7 @@ test("the native classes are imported by controls.css and draw every part the el
 test("a framed group of stats draws its rounded frame and the lines between them inside its stats", () => {
   const sheet = readFileSync(join(import.meta.dirname, "../DS1/1-root/figures.css"), "utf8");
   const frame = sheet.slice(sheet.indexOf(".ds-stats[data-frame] {"), sheet.indexOf(".ds-stats[data-frame] > * {"));
-  expect(frame).toContain("outline-offset: -1px");
+  expect(sheet).toMatch(/\.ds-stats\[data-frame\]::after \{[^}]*border: 1px solid/);
   expect(frame).toContain("border-radius: var(--ds-stats-radius)");
   expect(frame).toContain("gap: 0");
   expect(sheet).toMatch(/\.ds-stats\[data-frame\] > \* \+ \* \{\s*box-shadow: inset 1px 0 0/);
