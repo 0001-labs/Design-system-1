@@ -330,7 +330,7 @@ export class GridBars extends ChartElement {
     const lines = this.axis ? Array.from({ length: squares }, (_, i) => i + 1).filter((row) => row * step <= max + step) : [];
     return html`<div class="bars" style="--span: ${this.span}">
       <div class="bar-columns">
-        ${this.axis ? html`<span class="bar-guides" style="height: ${height}px" aria-hidden="true"></span>` : nothing}
+        ${this.axis ? html`<span class="bar-guides" style="top: ${height - lines.length * this.unit}px; height: ${lines.length * this.unit}px" aria-hidden="true"></span>` : nothing}
         ${this.items.map(
           (item) => html`<div class="bar-cell">
             <div class="bar-area" style="height: ${height}px">

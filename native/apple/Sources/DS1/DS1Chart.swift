@@ -71,7 +71,7 @@ public struct DS1Bars: View {
                 }
             }
             .background(alignment: .top) {
-                if axis { guides(height: height) }
+                if axis { guides(height: height, lines: ticks.count) }
             }
             if axis {
                 ZStack(alignment: .bottomTrailing) {
@@ -119,14 +119,13 @@ public struct DS1Bars: View {
         .frame(maxWidth: fill ? .infinity : nil)
     }
 
-    /// The scale's lines across the bars, one a square from the foot, under them.
-    private func guides(height: CGFloat) -> some View {
+    /// The scale's lines across the bars, one a square from the foot up to its highest label, under them.
+    private func guides(height: CGFloat, lines: Int) -> some View {
         Canvas { context, size in
             var path = Path()
-            var y = size.height - scale.unit
-            while y > 0 {
+            for row in 0 ..< lines {
+                let y = size.height - CGFloat(row + 1) * scale.unit
                 path.addRect(CGRect(x: 0, y: y - DS1Metrics.line / 2, width: size.width, height: DS1Metrics.line))
-                y -= scale.unit
             }
             context.fill(path, with: .style(DS1Color.slateLight))
         }

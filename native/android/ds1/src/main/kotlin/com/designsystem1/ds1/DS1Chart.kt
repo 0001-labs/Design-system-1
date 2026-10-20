@@ -101,10 +101,9 @@ fun DS1Bars(
             (if (fill) Modifier.weight(1f) else Modifier).drawBehind {
                 if (!axis) return@drawBehind
                 val unit = scale.unit.toPx()
-                var y = height.toPx() - unit
-                while (y > 0f) {
+                for (row in 1..ticks.size) {
+                    val y = height.toPx() - row * unit
                     drawRect(faint, Offset(0f, y - 0.5f), Size(size.width, 1f))
-                    y -= unit
                 }
             },
         ) {
