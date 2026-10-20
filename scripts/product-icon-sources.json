@@ -1016,13 +1016,6 @@
   },
   {
     "product": "Ezo",
-    "source": "client/design/2-core/generated/ds-icon-map.ts#more",
-    "name": "more",
-    "sourceHash": "7ac288babb1493ed49ba1c224e77381fdc062a8c9f99c68b4560aff4a5594aea",
-    "iconHash": "d46c50a3c5837e10c04fdac86dba40166c43abb5ca78d9effe19772bfafe5e3b"
-  },
-  {
-    "product": "Ezo",
     "source": "client/design/2-core/generated/ds-icon-map.ts#navigation-check",
     "name": "navigation-check",
     "sourceHash": "d0fc4c03f6d7b6e93eeed94c3faef82698bbdc54b1ff7295356727feb86fa709",
