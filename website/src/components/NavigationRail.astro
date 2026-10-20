@@ -27,7 +27,7 @@ const entries = flatten(sidebar);
   import { setSidebarCollapsed } from '../lib/sidebar-state';
   document.getElementById('sidebar-rail-open')?.addEventListener('click', () => {
     setSidebarCollapsed(false);
-    document.querySelector<HTMLButtonElement>('#workspace-hide button')?.focus();
+    document.querySelector<HTMLButtonElement>(document.documentElement.hasAttribute('data-signed-in') ? '#workspace-hide button' : '#public-sidebar-hide button')?.focus();
   });
   const rail = document.querySelector<HTMLElement>('.docs-navigation-rail');
   window.addEventListener('ds1-navigation-auth', event => {

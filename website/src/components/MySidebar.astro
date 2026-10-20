@@ -4,6 +4,7 @@ const { sidebar } = Astro.locals.starlightRoute;
 <div class="docs-sidebar-shell">
   <ds-sidebar id="docs-navigation" label="Documentation" disclosure-position="start" expand-icon="chevron-down" collapse-icon="chevron-up" data-groups={JSON.stringify(sidebar)}>
     <div slot="header" class="docs-sidebar-header">
+      <ds-button control="slotted" icon id="public-sidebar-hide"><button type="button" aria-label="Hide sidebar" data-tooltip="Hide sidebar"><ds-icon type="left" aria-hidden="true"></ds-icon></button></ds-button>
       <section id="workspace" hidden aria-label="Company workspace">
         <div class="workspace-heading"><button id="workspace-toggle" class="ds-row" type="button" aria-label="Expand workspace" aria-expanded="false" aria-controls="workspace-libraries">
           <ds-avatar id="workspace-avatar" initial="?" aria-hidden="true"></ds-avatar>
@@ -176,6 +177,10 @@ const { sidebar } = Astro.locals.starlightRoute;
   .docs-sidebar-shell { display: flex; flex: 1; min-height: 0; height: 100%; padding: var(--site-unit); overflow: hidden; }
   ds-sidebar { width: 100%; height: 100%; }
   .docs-sidebar-header { display: flex; flex-direction: column; gap: 20px; }
+  #public-sidebar-hide { align-self: flex-end; }
+  :global(html[data-signed-in]) #public-sidebar-hide { display: none; }
+  :global(html[data-docs-compact]) #public-sidebar-hide { display: none; }
+  @media (max-width: 768px) { #public-sidebar-hide { display: none; } }
   .docs-sidebar-close { display: none; align-self: flex-end; }
   .docs-sidebar-footer { display: flex; align-items: center; gap: calc(var(--site-unit) / 2); height: calc(2 * var(--site-unit)); border-top: 1px solid var(--ds1-docs-header-border); font-size: calc(10px * var(--sf, 1)); }
   #workspace[hidden], #workspace-libraries[hidden] { display: none; }
