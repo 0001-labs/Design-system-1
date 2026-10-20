@@ -315,7 +315,19 @@
   color: var(--ds-calendar-event-ink, var(--ds-text-color));
   cursor: pointer;
 }
-.event .name { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.event .name { min-width: 0; overflow: hidden; }
+/* A name its bar cuts fades out over the bar's last square, at the end where it is cut. */
+.event .name[data-cut] { mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-unit)), transparent); }
+:host(:dir(rtl)) .event .name[data-cut] { mask-image: linear-gradient(to left, #000 calc(100% - var(--ds-unit)), transparent); }
+/* An event over several days is one bar from its first day in the week,
+ * drawn over the days after it (and their lines) with its name written once. */
+.event[data-span] {
+  position: relative;
+  z-index: 1;
+  width: calc(var(--ds-calendar-event-span) * var(--ds-calendar-day) - 1px);
+}
+/* A line a bar passes over, or an empty line above another event. */
+.line { flex: 0 0 auto; height: var(--ds-unit); }
 .event .time { flex: 0 0 auto; opacity: 0.6; font-variant-numeric: tabular-nums; }
 .more { color: var(--ds-title-color); cursor: pointer; }
 .more:hover { color: var(--ds-text-color); }
@@ -481,3 +493,50 @@
   from { opacity: 0; transform: translateY(calc(-4px * var(--ds-sf, 1))); }
   to { opacity: 1; transform: none; }
 }
+
+/* Day, Week and Month in the header, before Today and the arrows. */
+.views { flex: 0 0 auto; }
+
+/* One day: its events without a time on lines a day wide across the top, then
+ * its hours, one square each with a hairline at the foot, in an area twelve
+ * squares high that scrolls; an hour's events stand a day wide beside each
+ * other after its name and wrap onto more squares when they need them. */
+.day-view { width: calc(7 * var(--ds-calendar-day)); }
+.all-day {
+  display: grid;
+  grid-template-columns: repeat(7, var(--ds-calendar-day));
+  padding-block-end: var(--ds-unit);
+}
+.hours {
+  position: relative;
+  height: calc(12 * var(--ds-unit));
+  overflow-y: auto;
+  border-block-start: var(--ds-calendar-line);
+}
+.hour {
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-start;
+  min-height: var(--ds-unit);
+  border-block-end: var(--ds-calendar-line);
+}
+.hour-name {
+  box-sizing: border-box;
+  flex: 0 0 calc(2 * var(--ds-unit));
+  height: calc(var(--ds-unit) - 1px);
+  padding-block-start: calc(3px * var(--ds-sf, 1));
+  padding-inline-start: var(--ds-calendar-pad);
+  color: var(--ds-title-color);
+  font-variant-numeric: tabular-nums;
+  line-height: calc(16px * var(--ds-sf, 1));
+  white-space: nowrap;
+}
+.hour-events {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.hour-events .event,
+.all-day .event { width: calc(var(--ds-calendar-day) - 1px); }
+
