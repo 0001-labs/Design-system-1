@@ -15,14 +15,19 @@
 /* Palette gradients are an opt-in face; the neutral busy feedback stays the default. */
 .ds-loading[data-gradient] {
   --ds-loading-spectrum: var(--ds-apple-green), var(--ds-yellow), var(--ds-pink), var(--ds-zenith-blue), var(--ds-apple-green);
-  background: linear-gradient(90deg, var(--ds-loading-spectrum));
 }
 .ds-loading[data-gradient] > .ds-loading__fill {
-  background: linear-gradient(90deg, transparent, var(--ds-text-color), transparent);
-  opacity: .45;
+  background: linear-gradient(90deg, var(--ds-loading-spectrum));
 }
 .ds-loading[data-gradient][data-variant="spinner"] {
   border: 0;
-  background: conic-gradient(from 0deg, var(--ds-loading-spectrum));
+  background: color-mix(in srgb, currentColor 18%, transparent);
   mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
+}
+
+.ds-loading[data-gradient][data-variant="spinner"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(var(--ds-apple-green) 0deg, var(--ds-yellow) 45deg, var(--ds-pink) 90deg, var(--ds-zenith-blue) 135deg, transparent 180deg 360deg);
 }
