@@ -57,7 +57,7 @@ const entries = flatten(sidebar);
 <style>
   .docs-navigation-rail { display: none; }
   @media (min-width: 769px) {
-    :global(html[data-sidebar-collapsed]) .docs-navigation-rail { display: flex; flex-direction: column; width: calc(8 * var(--site-unit)); padding: var(--site-unit) calc(var(--site-unit) / 2); }
+    :global(html[data-sidebar-collapsed]) .docs-navigation-rail { display: flex; flex-direction: column; width: calc(8 * var(--site-unit)); padding: var(--site-unit) calc(var(--site-unit) / 2) var(--site-unit) var(--site-unit); }
     .rail-open { align-self: flex-start; flex: none; margin-bottom: var(--site-unit); }
     .docs-navigation-rail :global(.rail-entry) { --section-color: var(--light-grey); --ds-button-text-color: var(--text-color); height: var(--site-unit); align-items: flex-end; align-self: flex-start; }
     .docs-navigation-rail :global([data-section='1']) { --section-color: var(--yellow); }
