@@ -57,6 +57,8 @@ const { landing = false } = Astro.props;
     .docs-header .docs-brand-menu { display: inline-flex; width: var(--site-unit); overflow: hidden; font-size: 0; }
 
   }
+  :global(html[data-sidebar-collapsed]) .docs-header--with-sidebar .system-breadcrumb { flex: 1; min-width: 0; }
+  :global(html[data-sidebar-collapsed]) .docs-header .docs-brand-menu { display: inline-flex; width: var(--site-unit); overflow: hidden; font-size: 0; }
   :global(html[data-docs-compact]) .docs-header--with-sidebar .system-breadcrumb { flex: 1; min-width: 0; }
   :global(html[data-docs-compact]) .docs-header .docs-brand-menu { display: inline-flex; width: var(--site-unit); overflow: hidden; font-size: 0; }
 </style>

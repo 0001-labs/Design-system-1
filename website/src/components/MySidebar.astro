@@ -9,7 +9,7 @@ const { sidebar } = Astro.locals.starlightRoute;
           <ds-avatar id="workspace-avatar" initial="?" aria-hidden="true"></ds-avatar>
           <span id="workspace-name">My company</span>
           <ds-icon id="workspace-chevron" type="chevron-down" aria-hidden="true"></ds-icon>
-          </button><ds-button control="slotted" icon id="workspace-add"><button type="button" aria-label="New library"><ds-icon type="plus" aria-hidden="true"></ds-icon></button></ds-button>
+          </button><div class="workspace-header-action"><ds-button control="slotted" icon id="workspace-hide"><button type="button" aria-label="Hide sidebar"><ds-icon type="left" aria-hidden="true"></ds-icon></button></ds-button><ds-button control="slotted" icon id="workspace-add"><button type="button" aria-label="New library"><ds-icon type="plus" aria-hidden="true"></ds-icon></button></ds-button></div>
         </div>
         <ds-sidebar id="workspace-libraries" label="Your design systems" hidden></ds-sidebar>
         <p id="workspace-error" role="alert" hidden></p>
@@ -181,6 +181,10 @@ const { sidebar } = Astro.locals.starlightRoute;
   #workspace[hidden], #workspace-libraries[hidden] { display: none; }
   #workspace { flex: none; }
   #docs-navigation :global(.private-component-link) { width: 100%; color: var(--ds-text-color-muted); text-decoration: none; padding-inline-start: calc(4px * var(--sf, 1) + 2 * var(--site-unit)); gap: calc(4px * var(--sf, 1)); }
+  .workspace-header-action { position: relative; width: var(--site-unit); flex: none; }
+  #workspace-hide { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+  .workspace-heading:hover #workspace-hide, #workspace-hide:focus-within { opacity: 1; pointer-events: auto; }
+  .workspace-heading:hover #workspace-add, .workspace-header-action:has(#workspace-hide:focus-within) #workspace-add { opacity: 0; pointer-events: none; }
   .workspace-heading { display: flex; align-items: flex-end; }
   #workspace-toggle { flex: 1; width: auto; min-width: 0; }
   #workspace-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

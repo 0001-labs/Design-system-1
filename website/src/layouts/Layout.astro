@@ -171,6 +171,7 @@ const libraryMode = pathname === '/libraries/playground' ? 'editor'
         .main-container--examples .sidebar > .docs-sidebar-shell { display: none; }
         .main-container--examples .sidebar-gap { display: none; }
       }
+      html[data-sidebar-collapsed] :is(.sidebar, .sidebar-gap) { display: none; }
       html[data-docs-compact] :is(.sidebar, .sidebar-gap, .right-sidebar-container) { display: none; }
       html[data-docs-compact] .main-content { width: 100%; }
       html[data-docs-compact] .main-pane { padding: var(--site-unit); }
@@ -197,6 +198,11 @@ const libraryMode = pathname === '/libraries/playground' ? 'editor'
       const shell = sidebar?.querySelector<HTMLElement>('.docs-sidebar-shell');
       const menuButton = document.getElementById('mobile-menu-btn');
 
+      document.getElementById('workspace-hide')?.addEventListener('click', () => {
+        if (navigation?.open) { navigation.requestClose('button'); return; }
+        document.documentElement.setAttribute('data-sidebar-collapsed', '');
+        menuButton?.focus();
+      });
       document.getElementById('sidebar-close-btn')?.setAttribute('data-ds-overlay-dismiss', '');
 
       function restore() {
@@ -204,6 +210,11 @@ const libraryMode = pathname === '/libraries/playground' ? 'editor'
         menuButton?.setAttribute('aria-expanded', 'false');
       }
       menuButton?.addEventListener('click', () => {
+        if (document.documentElement.hasAttribute('data-sidebar-collapsed') && !document.documentElement.hasAttribute('data-docs-compact')) {
+          document.documentElement.removeAttribute('data-sidebar-collapsed');
+          document.querySelector<HTMLButtonElement>('#workspace-hide button')?.focus();
+          return;
+        }
         if (!navigation || !panel || !shell) return;
         if (navigation.open) { navigation.requestClose('button'); return; }
         panel.append(shell);
