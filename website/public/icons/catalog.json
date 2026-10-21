@@ -1718,6 +1718,13 @@
     "shapes": 2
   },
   {
+    "key": "tabs",
+    "name": "Tabs",
+    "source": "Library",
+    "url": "/icons/library/tabs.svg",
+    "shapes": 2
+  },
+  {
     "key": "tag",
     "name": "Tag",
     "source": "Library",
