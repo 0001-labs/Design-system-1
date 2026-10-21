@@ -401,6 +401,9 @@ importers:
 
   website:
     dependencies:
+      '@astrojs/sitemap':
+        specifier: ^3.7.3
+        version: 3.7.3
       '@astrojs/starlight':
         specifier: ^0.36.0
         version: 0.36.3(patch_hash=8661974d99474b18c5a1ea7c81e54d68b8c61695d7da9ff4a30317c0440fed9a)(astro@5.18.2(@types/node@24.13.3)(lightningcss@1.33.0)(rollup@4.63.1)(supports-color@10.2.2)(tsx@4.23.11)(typescript@5.9.3))
@@ -6016,18 +6019,6 @@ snapshots:
       - utf-8-validate
       - vite
 
-  '@vitest/browser-preview@4.1.10(@voidzero-dev/vite-plus-core@0.2.8(@types/node@24.13.3)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3))(vitest@4.1.10(@edge-runtime/vm@5.0.0)(@types/node@20.19.43)(@vitest/browser-preview@4.1.10)(@voidzero-dev/vite-plus-core@0.2.8(@types/node@20.19.43)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3))(happy-dom@21.0.1))':
-    dependencies:
-      '@testing-library/dom': 10.4.1
-      '@testing-library/user-event': 14.6.3(@testing-library/dom@10.4.1)
-      '@vitest/browser': 4.1.10(@voidzero-dev/vite-plus-core@0.2.8(@types/node@24.13.3)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3))(vitest@4.1.10(@edge-runtime/vm@5.0.0)(@types/node@20.19.43)(@vitest/browser-preview@4.1.10)(@voidzero-dev/vite-plus-core@0.2.8(@types/node@20.19.43)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3))(happy-dom@21.0.1))
-      vitest: 4.1.10(@edge-runtime/vm@5.0.0)(@types/node@20.19.43)(@vitest/browser-preview@4.1.10)(@voidzero-dev/vite-plus-core@0.2.8(@types/node@20.19.43)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3))(happy-dom@21.0.1)
-    transitivePeerDependencies:
-      - bufferutil
-      - msw
-      - utf-8-validate
-      - vite
-
   '@vitest/browser-preview@4.1.10(@voidzero-dev/vite-plus-core@0.2.8(@types/node@24.13.3)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3))(vitest@4.1.10)':
     dependencies:
       '@testing-library/dom': 10.4.1
@@ -6056,23 +6047,6 @@ snapshots:
     dependencies:
       '@blazediff/core': 1.9.1
       '@vitest/mocker': 4.1.10(@voidzero-dev/vite-plus-core@0.2.8(@types/node@20.19.43)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3))
-      '@vitest/utils': 4.1.10
-      magic-string: 0.30.21
-      pngjs: 7.0.0
-      sirv: 3.0.2
-      tinyrainbow: 3.1.1
-      vitest: 4.1.10(@edge-runtime/vm@5.0.0)(@types/node@20.19.43)(@vitest/browser-preview@4.1.10)(@voidzero-dev/vite-plus-core@0.2.8(@types/node@20.19.43)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3))(happy-dom@21.0.1)
-      ws: 8.21.3
-    transitivePeerDependencies:
-      - bufferutil
-      - msw
-      - utf-8-validate
-      - vite
-
-  '@vitest/browser@4.1.10(@voidzero-dev/vite-plus-core@0.2.8(@types/node@24.13.3)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3))(vitest@4.1.10(@edge-runtime/vm@5.0.0)(@types/node@20.19.43)(@vitest/browser-preview@4.1.10)(@voidzero-dev/vite-plus-core@0.2.8(@types/node@20.19.43)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3))(happy-dom@21.0.1))':
-    dependencies:
-      '@blazediff/core': 1.9.1
-      '@vitest/mocker': 4.1.10(@voidzero-dev/vite-plus-core@0.2.8(@types/node@24.13.3)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3))
       '@vitest/utils': 4.1.10
       magic-string: 0.30.21
       pngjs: 7.0.0
@@ -9106,8 +9080,8 @@ snapshots:
     dependencies:
       '@oxc-project/types': 0.142.0
       '@oxlint/plugins': 1.73.0
-      '@vitest/browser': 4.1.10(@voidzero-dev/vite-plus-core@0.2.8(@types/node@24.13.3)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3))(vitest@4.1.10(@edge-runtime/vm@5.0.0)(@types/node@20.19.43)(@vitest/browser-preview@4.1.10)(@voidzero-dev/vite-plus-core@0.2.8(@types/node@20.19.43)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3))(happy-dom@21.0.1))
-      '@vitest/browser-preview': 4.1.10(@voidzero-dev/vite-plus-core@0.2.8(@types/node@24.13.3)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3))(vitest@4.1.10(@edge-runtime/vm@5.0.0)(@types/node@20.19.43)(@vitest/browser-preview@4.1.10)(@voidzero-dev/vite-plus-core@0.2.8(@types/node@20.19.43)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3))(happy-dom@21.0.1))
+      '@vitest/browser': 4.1.10(@voidzero-dev/vite-plus-core@0.2.8(@types/node@24.13.3)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3))(vitest@4.1.10)
+      '@vitest/browser-preview': 4.1.10(@voidzero-dev/vite-plus-core@0.2.8(@types/node@24.13.3)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3))(vitest@4.1.10)
       '@vitest/expect': 4.1.10
       '@vitest/mocker': 4.1.10(@voidzero-dev/vite-plus-core@0.2.8(@types/node@24.13.3)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3))
       '@vitest/pretty-format': 4.1.10
@@ -9119,7 +9093,7 @@ snapshots:
       oxfmt: 0.61.0(vite-plus@0.2.8(@edge-runtime/vm@5.0.0)(@types/node@24.13.3)(@voidzero-dev/vite-plus-core@0.2.8(@types/node@24.13.3)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3))(esbuild@0.28.2)(happy-dom@21.0.1)(tsx@4.23.11)(typescript@5.9.3))
       oxlint: 1.76.0(oxlint-tsgolint@7.0.2001)(vite-plus@0.2.8(@edge-runtime/vm@5.0.0)(@types/node@24.13.3)(@voidzero-dev/vite-plus-core@0.2.8(@types/node@24.13.3)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3))(esbuild@0.28.2)(happy-dom@21.0.1)(tsx@4.23.11)(typescript@5.9.3))
       oxlint-tsgolint: 7.0.2001
-      vitest: 4.1.10(@edge-runtime/vm@5.0.0)(@types/node@24.13.3)(@vitest/browser-preview@4.1.10(@voidzero-dev/vite-plus-core@0.2.8(@types/node@20.19.43)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3))(vitest@4.1.10))(@voidzero-dev/vite-plus-core@0.2.8(@types/node@24.13.3)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3))(happy-dom@21.0.1)
+      vitest: 4.1.10(@edge-runtime/vm@5.0.0)(@types/node@24.13.3)(@vitest/browser-preview@4.1.10)(@voidzero-dev/vite-plus-core@0.2.8(@types/node@24.13.3)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3))(happy-dom@21.0.1)
     optionalDependencies:
       '@voidzero-dev/vite-plus-darwin-arm64': 0.2.8
       '@voidzero-dev/vite-plus-darwin-x64': 0.2.8
@@ -9261,36 +9235,6 @@ snapshots:
     optionalDependencies:
       '@edge-runtime/vm': 5.0.0
       '@types/node': 20.19.43
-      '@vitest/browser-preview': 4.1.10(@voidzero-dev/vite-plus-core@0.2.8(@types/node@20.19.43)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3))(vitest@4.1.10)
-      happy-dom: 21.0.1
-    transitivePeerDependencies:
-      - msw
-
-  vitest@4.1.10(@edge-runtime/vm@5.0.0)(@types/node@24.13.3)(@vitest/browser-preview@4.1.10(@voidzero-dev/vite-plus-core@0.2.8(@types/node@20.19.43)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3))(vitest@4.1.10))(@voidzero-dev/vite-plus-core@0.2.8(@types/node@24.13.3)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3))(happy-dom@21.0.1):
-    dependencies:
-      '@vitest/expect': 4.1.10
-      '@vitest/mocker': 4.1.10(@voidzero-dev/vite-plus-core@0.2.8(@types/node@24.13.3)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3))
-      '@vitest/pretty-format': 4.1.10
-      '@vitest/runner': 4.1.10
-      '@vitest/snapshot': 4.1.10
-      '@vitest/spy': 4.1.10
-      '@vitest/utils': 4.1.10
-      es-module-lexer: 2.3.1
-      expect-type: 1.4.0
-      magic-string: 0.30.21
-      obug: 2.1.4
-      pathe: 2.0.3
-      picomatch: 4.0.5
-      std-env: 4.2.0
-      tinybench: 2.9.0
-      tinyexec: 1.3.0
-      tinyglobby: 0.2.17
-      tinyrainbow: 3.1.1
-      vite: '@voidzero-dev/vite-plus-core@0.2.8(@types/node@24.13.3)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3)'
-      why-is-node-running: 2.3.0
-    optionalDependencies:
-      '@edge-runtime/vm': 5.0.0
-      '@types/node': 24.13.3
       '@vitest/browser-preview': 4.1.10(@voidzero-dev/vite-plus-core@0.2.8(@types/node@20.19.43)(esbuild@0.27.7)(tsx@4.23.11)(typescript@5.9.3))(vitest@4.1.10)
       happy-dom: 21.0.1
     transitivePeerDependencies:
