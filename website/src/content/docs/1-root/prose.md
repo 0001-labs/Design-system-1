@@ -58,6 +58,10 @@ An example, a widget or a code frame inside the writing that draws itself carrie
 
 Each rule is as strong as one attribute, so one class in the page's own stylesheet overrides it. The heading sizes have base tokens: `--ds-display-text-size` (20px) for `h1`, `--ds-prose-h2-size` (17px) and `--ds-prose-h3-size` (15px), and `--ds-code-text-size` (13px) for code.
 
+## Writing it
+
+[Aa](https://aa.0001.dev) is the text editor that goes with Design system 1. It draws what a person writes with these same measures and stores it as Markdown, so writing in an app and reading it on a page look the same.
+
 ## Prose or text
 
 Long-form and marketing content, such as an article, a help page or a landing page's story, stays in native headings, paragraphs and lists under `data-ds-prose`. Copy in an application's interface uses [`ds-text`](/2-core/text/), or the `.ds-text` classes where a page has no scripts. Both are Design system 1's styles.
