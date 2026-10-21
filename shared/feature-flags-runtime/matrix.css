@@ -1,0 +1,74 @@
+/*
+ * The flags matrix (matrix.ts) on Design system 1's 20px square: one square per flag and audience, 14px text, 1px
+ * lines, flag names slanted at 45° above their columns, audience names right-aligned beside the grid. Many flags are two
+ * tables, one under the other, so nothing scrolls sideways. A product's own
+ * colours apply through --stack-line, --stack-muted and --text-color, else Design system 1's.
+ */
+.flags-matrix {
+  --flag-square: calc(20px * var(--sf, 1));
+  --flag-line: var(--stack-line, var(--ds-color-line, #d9d9d9));
+  --flag-muted: var(--stack-muted, var(--ds-color-muted, #8a8a8a));
+  --flag-ink: var(--text-color, var(--ds-color-text, #1e1e1e));
+  overflow-x: auto;
+  padding-right: calc(6 * var(--flag-square));
+  padding-bottom: var(--flag-square);
+  color: var(--flag-ink);
+}
+.flags-matrix .matrix-table { border-collapse: separate; border-spacing: 0; table-layout: fixed; font-size: calc(14px * var(--sf, 1)); line-height: var(--flag-square); }
+.flags-matrix .matrix-table th,
+.flags-matrix .matrix-table td { padding: 0; height: var(--flag-square); font-weight: 400; text-align: left; }
+/* Separate borders on the square's pitch: each cell is a square less 1px inside, and a 1px line. */
+.flags-matrix .matrix-table td {
+  width: calc(var(--flag-square) - 1px); min-width: calc(var(--flag-square) - 1px); max-width: calc(var(--flag-square) - 1px);
+  height: calc(var(--flag-square) - 1px); line-height: calc(var(--flag-square) - 1px);
+  box-sizing: content-box; border-right: 1px solid var(--flag-line); border-bottom: 1px solid var(--flag-line);
+  text-align: center; vertical-align: top;
+}
+.flags-matrix .matrix-corner,
+.flags-matrix .matrix-row {
+  width: calc(8 * var(--flag-square)); min-width: calc(8 * var(--flag-square)); max-width: calc(8 * var(--flag-square));
+  padding-right: 4px; white-space: nowrap; overflow: hidden; text-overflow: clip; box-sizing: border-box;
+}
+/* An audience's name is in .matrix-words, which fades over its last square when it is cut, never an ellipsis: matrix.ts
+   marks it data-cut="end" while it does not fit. The mask is on the words, so the line beside the grid stays whole. */
+.flags-matrix .matrix-words { display: block; overflow: hidden; text-overflow: clip; white-space: nowrap; }
+.flags-matrix .matrix-words[data-cut="end"] { mask-image: linear-gradient(to right, #000 calc(100% - var(--flag-square)), transparent); }
+.flags-matrix .matrix-words[data-cut="end"]:dir(rtl) { mask-image: linear-gradient(to left, #000 calc(100% - var(--flag-square)), transparent); }
+.flags-matrix .matrix-corner { color: transparent; }
+/* Names end where the grid starts, 4px clear of it. */
+.flags-matrix .matrix-table th.matrix-row { text-align: right; padding-right: 4px; border-right: 1px solid var(--flag-line); }
+/* Column names slanted at 45°, read left to right, rising from the middle of their column. */
+.flags-matrix .matrix-table .matrix-column { position: relative; height: calc(8 * var(--flag-square)); width: var(--flag-square); vertical-align: bottom; }
+.flags-matrix .matrix-column span {
+  position: absolute; left: calc(var(--flag-square) / 2); bottom: 0; z-index: 2; display: block;
+  white-space: nowrap; line-height: var(--flag-square); transform: rotate(-45deg); transform-origin: 0 100%;
+}
+/* A second table stands a square below the first. */
+.flags-matrix .matrix-table + .matrix-table { margin-top: var(--flag-square); }
+/* A darker line closes the grid. */
+.flags-matrix .matrix-table tbody tr:last-child > td,
+.flags-matrix .matrix-table tbody tr:last-child > th { border-bottom-color: var(--flag-ink); }
+.flags-matrix-caption {
+  caption-side: bottom; text-align: left; white-space: normal; padding-top: var(--flag-square);
+  color: var(--flag-muted); font-size: calc(10px * var(--sf, 1)); line-height: var(--flag-square);
+}
+/* Each square holds Design system 1's check (on) or close (off) icon, centred. */
+.flags-matrix .flags-matrix-toggle {
+  display: flex; align-items: center; justify-content: center;
+  width: calc(var(--flag-square) - 1px); height: calc(var(--flag-square) - 1px); min-height: 0;
+  padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--flag-muted); cursor: pointer;
+}
+.flags-matrix .flags-matrix-toggle[aria-checked="true"] { color: var(--flag-ink); }
+/* A flag released to everyone shows its check in green, so the released column reads at a glance. */
+.flags-matrix .flags-matrix-toggle[data-audience="everyone"][aria-checked="true"] { color: var(--flag-released, color-mix(in srgb, var(--ds-apple-green, #99ff73) 55%, var(--flag-ink))); }
+.flags-matrix .flags-matrix-toggle:hover { box-shadow: inset 0 0 0 1px var(--flag-muted); }
+.flags-matrix .flags-matrix-toggle:focus-visible { position: relative; z-index: 1; outline: 2px solid var(--flag-ink); outline-offset: 2px; }
+.flags-matrix .flags-matrix-toggle:disabled { opacity: .45; cursor: wait; }
+.flags-matrix .flags-matrix-toggle > .ds-icon {
+  display: block; width: calc(12px * var(--sf, 1)); height: calc(12px * var(--sf, 1)); background-color: currentColor;
+  -webkit-mask: var(--ds-icon) center / contain no-repeat; mask: var(--ds-icon) center / contain no-repeat;
+}
+.flags-matrix .ds-icon-check { --ds-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M6.68649 11.884L12.443 6.13601L11.736 5.42715L6.68835 10.4827L4.26399 8.0501L3.55696 8.74525L6.68649 11.884Z'/%3E%3C/svg%3E"); }
+.flags-matrix .ds-icon-close { --ds-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M12.1215 4.58087L8.70453 7.99397L12.1176 11.4169L11.4106 12.112L7.99847 8.69108L4.58636 12.112L3.87836 11.4031L7.29535 7.99005L3.88226 4.56716L4.58929 3.87201L8.0014 7.29294L11.4145 3.87201L12.1215 4.58087Z'/%3E%3C/svg%3E"); }
+.flags-matrix-add { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--flag-square, 20px); margin-top: calc(20px * var(--sf, 1)); }
+.flags-matrix-status { min-height: calc(20px * var(--sf, 1)); font-size: calc(10px * var(--sf, 1)); line-height: calc(20px * var(--sf, 1)); }
