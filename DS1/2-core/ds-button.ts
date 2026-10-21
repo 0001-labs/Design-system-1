@@ -108,7 +108,7 @@ export class Button extends Control {
    * Words a face cuts fade over their last square, never an ellipsis: marks
    * them `data-cut="end"` while they do not fit, on each face mode.
    */
-  private cuts = new CutFades(this, { targets: () => this.cutWords(), text: true });
+  protected readonly cuts = new CutFades(this, { targets: () => this.cutWords(), text: true });
 
   /**
    * What holds a face's words: the `ds-text` it draws for `text`, the elements

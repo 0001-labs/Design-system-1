@@ -15,7 +15,7 @@ export class Token extends LitElement {
   };
   static styles = unsafeCSS(styles);
   /** Words cut short fade over their last square, never an ellipsis: marks them `data-cut="end"` while they do not fit. */
-  private cuts = new CutFades(this, { selector: ".copy > span, small" });
+  protected readonly cuts = new CutFades(this, { selector: ".copy > span, small" });
   declare value: string; declare label: string; declare detail: string;
   declare removeLabel: string; declare disabled: boolean; declare fieldDisabled: boolean;
   private fieldsetDisabled = false;

@@ -109,7 +109,7 @@ export class Matrix extends LitElement {
 
   static styles = [unsafeCSS(metrics), unsafeCSS(styles)];
   /** Words cut short fade over their last square, never an ellipsis: marks them `data-cut="end"` while they do not fit. */
-  private cuts = new CutFades(this, { selector: ".name" });
+  protected readonly cuts = new CutFades(this, { selector: ".name" });
 
   declare rows: MatrixAxis[];
   declare columns: MatrixAxis[];

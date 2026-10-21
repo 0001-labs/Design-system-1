@@ -20,7 +20,7 @@ export class Badge extends LitElement {
   private contentObserver?: MutationObserver;
   private measureFrame = 0;
   /** Marks the words `data-cut="end"` while they are wider than the badge. */
-  private cuts = new CutFades(this, { selector: ".frame:not(.icon-only) .label" });
+  protected readonly cuts = new CutFades(this, { selector: ".frame:not(.icon-only) .label" });
 
   constructor() { super(); this.icon = ""; this.iconOnly = false; }
 

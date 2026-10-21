@@ -155,7 +155,7 @@ export type CutFadeOptions = {
 
 /**
  * The cut-words watcher as a Lit reactive controller:
- * `private cuts = new CutFades(this, { selector: ".label" })`. It watches from
+ * `protected readonly cuts = new CutFades(this, { selector: ".label" })`. It watches from
  * when the element connects to when it disconnects, and measures after every
  * update; call `measure()` when words change outside an update.
  */

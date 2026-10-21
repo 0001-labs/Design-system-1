@@ -13,7 +13,7 @@ export class Radio extends LitElement {
   };
   static styles = unsafeCSS(styles);
   /** Words cut short fade over their last square, never an ellipsis: marks them `data-cut="end"` while they do not fit. */
-  private cuts = new CutFades(this, { selector: ".label" });
+  protected readonly cuts = new CutFades(this, { selector: ".label" });
   declare choice: boolean;
   declare compact: boolean;
   declare preview: boolean;

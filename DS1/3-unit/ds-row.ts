@@ -98,7 +98,7 @@ export class Row extends LitElement {
   static styles = unsafeCSS(styles);
 
   /** Marks each `.ds-row__name` `data-cut="end"` while its words are wider than its box, measured again as they resize or change. */
-  private cuts = new CutFades(this, { targets: () => this.querySelectorAll(":scope > .ds-row__name"), text: true });
+  protected readonly cuts = new CutFades(this, { targets: () => this.querySelectorAll(":scope > .ds-row__name"), text: true });
 
   /** Measures the names again, as when the slotted content changes. */
   private measureNames = () => this.cuts.measure();

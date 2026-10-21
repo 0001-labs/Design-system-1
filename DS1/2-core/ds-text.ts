@@ -62,7 +62,7 @@ export class Text extends LitElement {
   declare _currentLanguage: string;
   private _slotKey: string = "";
   /** Marks the element cut while its literal words are wider than its box. */
-  private cuts = new CutFades(this, { targets: () => (this.literal && !this.wrap ? [this] : []), text: true });
+  protected readonly cuts = new CutFades(this, { targets: () => (this.literal && !this.wrap ? [this] : []), text: true });
   private boundHandlers: { languageChanged: EventListener };
 
   constructor() {

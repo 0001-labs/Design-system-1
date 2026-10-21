@@ -99,7 +99,7 @@ export class DocumentPage extends LitElement {
 
   static styles = [unsafeCSS(metrics), unsafeCSS(documentSheet), unsafeCSS(styles)];
   /** Words cut short fade over their last square, never an ellipsis: marks them `data-cut="end"` while they do not fit. */
-  private cuts = new CutFades(this, { selector: ".ds-document__toc-list a" });
+  protected readonly cuts = new CutFades(this, { selector: ".ds-document__toc-list a" });
 
   declare levels: string;
   declare label: string | undefined;

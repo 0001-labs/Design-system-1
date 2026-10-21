@@ -21,7 +21,7 @@ export class TableOfContents extends LitElement {
   };
   static styles = unsafeCSS(styles);
   /** A cut label fades over its last square, never an ellipsis: marks it `data-cut="end"` while it does not fit. */
-  private cuts = new CutFades(this, { selector: 'a', targets: () => this.querySelectorAll(':scope > a'), text: true });
+  protected readonly cuts = new CutFades(this, { selector: 'a', targets: () => this.querySelectorAll(':scope > a'), text: true });
   declare items: TableOfContentsItem[];
   declare label: string;
   declare literal: boolean;

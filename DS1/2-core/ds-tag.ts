@@ -11,7 +11,7 @@ import styles from "./styles/ds-tag.css?inline";
 export class Tag extends LitElement {
   static styles = unsafeCSS(styles);
   /** Marks the words `data-cut="end"` while they are wider than the tag. */
-  private cuts = new CutFades(this, { selector: ".words", text: true });
+  protected readonly cuts = new CutFades(this, { selector: ".words", text: true });
   render() { return html`<span class="frame" part="frame"><span class="words"><slot @slotchange=${() => this.cuts.measure()}></slot></span></span>`; }
 }
 define("ds-tag", Tag);
