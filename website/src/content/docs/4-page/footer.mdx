@@ -1,11 +1,13 @@
 ---
 title: Footer
-description: A site footer with the brand, columns of links, the language and theme, and the copyright.
+description: A site footer with the brand, columns of links or contact lines, round marks, the language and theme, the copyright and the policies.
 ---
 
 import ComponentExample from "../../../components/ComponentExample.astro";
 
 A site footer stands its brand and a line about the site at the start, in twelve squares; columns of links beside it, eight squares each, two squares apart; and two squares below, the legal line at the start and the preferences, language and theme, at the end. Every line is one square. Column headings are in the title grey, links in the text's ink with a faint hairline under the pointer, and a hairline runs along the top. Columns that do not fit beside the brand go below it; on a narrow screen the brand stands above the columns and the preferences come before the legal line.
+
+A column can also hold contact lines: words alone, such as an address or a registration number, beside links. Among words alone the links are underlined in the text's ink, as a [link](/2-core/link/) in running text is, and so is a heading that is a link. A column is eight squares wide unless it names its own width in whole squares. A column of icon links can stand as a stack of round marks at the end of the row, one control high, one a line, each on the lower sixteen of its square. Links to a privacy policy or terms stand on the square under the copyright, drawn as secondary [buttons](/2-core/button/).
 
 
 ## Design examples
@@ -16,6 +18,10 @@ A site footer stands its brand and a line about the site at the start, in twelve
 
 <ComponentExample example="footer" />
 
+### Contact lines and marks
+
+<ComponentExample example="footer-contact" />
+
 ## Use it
 
 ```html
@@ -25,7 +31,15 @@ A site footer stands its brand and a line about the site at the start, in twelve
 </ds-footer>
 ```
 
-`columns` is a list of `{ heading, links }`, each link `{ label, href, external, current }`: `external` opens in a new tab with no referrer, `current` marks the page being read. Words are translation keys unless `literal`. The copyright reads `© <year> <owner>`, this year and the brand by default. `preferences` puts a [`ds-cycle`](/2-core/cycle/) for each setting it names at the end of the last row: `language`, `theme`, or both when it is present and empty.
+`columns` is a list of `{ heading, href, links, width, icons }`, each link `{ label, href, external, current, icon }`:
+
+- A link without `href` is a line of words alone. A column with words alone underlines its links.
+- `href` on a column makes its heading a link.
+- `width` is the column's width in whole squares, eight by default.
+- `icon` draws the link as a mark, its label its accessible name. A column's marks stand first in a row of their own, or, with `icons: "stack"`, as round marks one a line at the end of the row, one square wide; the column's heading then names the marks for assistive technology instead of standing above them.
+- `external` opens in a new tab with no referrer, `current` marks the page being read.
+
+`policies` is a list of links, `{ label, href }`, drawn as secondary buttons on the square under the copyright. Words are translation keys unless `literal`. The copyright reads `© <year> <owner>`, this year and the brand by default. `preferences` puts a [`ds-cycle`](/2-core/cycle/) for each setting it names at the end of the last row: `language`, `theme`, or both when it is present and empty.
 
 | Attribute | Type | Default | What it does |
 | --- | --- | --- | --- |
@@ -36,6 +50,7 @@ A site footer stands its brand and a line about the site at the start, in twelve
 | `label` | string | Empty | Names the columns as a navigation; without it they are plain lists. |
 | `owner` | string | The brand | Who holds the copyright. |
 | `year` | number | This year | The copyright's year. |
+| `policies` | `FooterLink[]` | `[]` | Links under the copyright, as secondary buttons. |
 | `preferences` | string | None | `language`, `theme`, or both. |
 | `literal` | boolean | `false` | Show the words as written. |
 
@@ -45,6 +60,34 @@ A site footer stands its brand and a line about the site at the start, in twelve
 | `preferences` | Controls of the page's own beside the cycles, such as a currency. |
 | `legal` | The last line, in place of the copyright. |
 
+## Without the element
+
+A page that writes its own markup uses the same classes. A line of words alone is a `<span>` in its `<li>`; a column's width is `--ds-footer-column-width`; a stack of marks is `ds-footer__column--stack`.
+
+```html
+<footer class="ds-footer">
+  <div class="ds-footer__columns">
+    <div class="ds-footer__column">
+      <h2 class="ds-footer__heading"><a href="/about">Studio Ltd</a></h2>
+      <ul class="ds-footer__links">
+        <li><span>Reg. 12345678</span></li>
+        <li><a href="mailto:hello@example.com">hello@example.com</a></li>
+      </ul>
+    </div>
+    <div class="ds-footer__column" style="--ds-footer-column-width: 12">…</div>
+    <div class="ds-footer__column ds-footer__column--stack">
+      <ul class="ds-footer__icons" aria-label="Follow">
+        <li><a href="https://instagram.com/name" aria-label="Instagram"><span class="ds-icon" aria-hidden="true" style="--ds-icon: url(icons/instagram.svg)"></span></a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="ds-footer__base">
+    <p class="ds-footer__legal">© 2026 Studio</p>
+    <ul class="ds-footer__policies"><li><a class="ds-button ds-button--secondary" href="/privacy">Privacy policy</a></li></ul>
+  </div>
+</footer>
+```
+
 ## In React
 
 ```tsx
@@ -53,6 +96,6 @@ import { Footer } from "./design/react/footer";
 <Footer brand="Name" literal preferences="" columns={[{ heading: "Product", links: [{ label: "Help", href: "/help" }] }]} />
 ```
 
-`columns` is set as a property. The adapter does not register the element: import `4-page/ds-footer` once in the browser entry.
+`columns` and `policies` are set as properties. The adapter does not register the element: import `4-page/ds-footer` once in the browser entry.
 
 [Header](/4-page/header/) · [Document](/4-page/document/) · [Cycle](/2-core/cycle/)

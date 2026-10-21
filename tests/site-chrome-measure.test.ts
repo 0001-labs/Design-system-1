@@ -283,6 +283,98 @@ test("a narrow footer stands its brand above the columns, two to a row, and its 
   }
 });
 
+const CONTACT_COLUMNS = JSON.stringify([
+  { heading: "Name Ltd", href: "/about", links: [{ label: "Reg. 12345678" }, { label: "hello@example.com", href: "mailto:hello@example.com" }, { label: "+00 00 00 00 00", href: "tel:+0000000000" }] },
+  { heading: "Office", href: "/office", links: [{ label: "1 Street" }, { label: "1000 City" }, { label: "Country" }] },
+  { heading: "A boat with a long name for a column", width: 12, links: [{ label: "The harbour" }, { label: "2 Quay" }] },
+  { heading: "Follow", icons: "stack", links: [
+    { label: "Instagram", href: "https://instagram.com/name", icon: "/DS1/x-icon/instagram.svg" },
+    { label: "Facebook", href: "https://facebook.com/name", icon: "/DS1/x-icon/facebook.svg" },
+    { label: "LinkedIn", href: "https://linkedin.com/company/name", icon: "/DS1/x-icon/linkedin.svg" },
+  ] },
+]);
+const mark = (name: string) => `<li><a href="https://${name}.com/name" aria-label="${name}"><span class="ds-icon" aria-hidden="true" style="--ds-icon: url(/DS1/x-icon/${name}.svg)"></span></a></li>`;
+const NATIVE_CONTACT_FOOTER = `<footer class="ds-footer">
+  <div class="ds-footer__columns">
+    <div class="ds-footer__column"><h2 class="ds-footer__heading"><a href="/about">Name Ltd</a></h2><ul class="ds-footer__links"><li><span>Reg. 12345678</span></li><li><a href="mailto:hello@example.com">hello@example.com</a></li><li><a href="tel:+0000000000">+00 00 00 00 00</a></li></ul></div>
+    <div class="ds-footer__column"><h2 class="ds-footer__heading"><a href="/office">Office</a></h2><ul class="ds-footer__links"><li><span>1 Street</span></li><li><span>1000 City</span></li><li><span>Country</span></li></ul></div>
+    <div class="ds-footer__column" style="--ds-footer-column-width: 12"><h2 class="ds-footer__heading">A boat with a long name for a column</h2><ul class="ds-footer__links"><li><span>The harbour</span></li><li><span>2 Quay</span></li></ul></div>
+    <div class="ds-footer__column ds-footer__column--stack"><ul class="ds-footer__icons" aria-label="Follow">${["instagram", "facebook", "linkedin"].map(mark).join("")}</ul></div>
+  </div>
+  <div class="ds-footer__base"><p class="ds-footer__legal">© 2023 Name</p><ul class="ds-footer__policies"><li><a class="ds-button ds-button--secondary" href="/privacy">Privacy policy</a></li></ul></div>
+</footer>`;
+const LIT_CONTACT_FOOTER = `<ds-footer literal year="2023" owner="Name" columns='${CONTACT_COLUMNS}' policies='[{"label":"Privacy policy","href":"/privacy"}]'></ds-footer>`;
+
+test("a contact footer stands its lines on whole squares, its marks round on the sixteen at the row's end and its policies on the square under the copyright", async () => {
+  for (const scheme of SCHEMES) for (const scale of SCALES) for (const markup of [NATIVE_CONTACT_FOOTER, LIT_CONTACT_FOOTER]) {
+    await stage(pages[scheme], markup, { scale, width: 1200 });
+    const box = await pages[scheme].evaluate(() => {
+      const host = document.querySelector<HTMLElement>("#stage > *")!;
+      const root: ParentNode = host.shadowRoot ?? host.parentElement!;
+      const footer = root.querySelector<HTMLElement>(".ds-footer")!;
+      const frame = footer.getBoundingClientRect();
+      const rect = (element: Element) => { const r = element.getBoundingClientRect(); return { left: r.left - frame.left, top: r.top - frame.top, right: r.right - frame.left, bottom: r.bottom - frame.top, width: r.width, height: r.height }; };
+      const style = (element: Element) => getComputedStyle(element);
+      const linkLines = [...footer.querySelectorAll(".ds-footer__links a, .ds-footer__heading > a")];
+      return {
+        width: frame.width,
+        columns: [...footer.querySelectorAll(".ds-footer__column")].map(rect),
+        lines: [...footer.querySelectorAll(".ds-footer__heading, .ds-footer__links > li > *, .ds-footer__legal")].map(rect),
+        underlines: linkLines.map(a => [style(a).textDecorationLine, style(a).textDecorationColor !== "rgba(0, 0, 0, 0)", style(a).color === style(footer).color]),
+        marks: [...footer.querySelectorAll(".ds-footer__column--stack .ds-footer__icons a")].map(a => ({ ...rect(a), radius: style(a).borderRadius, fill: style(a).backgroundColor, ink: style(footer).color })),
+        legal: rect(footer.querySelector(".ds-footer__legal")!),
+        policies: [...footer.querySelectorAll(".ds-footer__policies li")].map(rect),
+        buttons: [...footer.querySelectorAll(".ds-footer__policies a")].map(rect),
+      };
+    });
+    const unit = 20 * scale, control = 16 * scale, at = `${scheme} at ${scale}: ${markup.slice(1, 10)}`;
+    const squares = (n: number) => Math.round((n / unit) * 1000) / 1000;
+    expect(box.columns.map(column => [squares(column.left), squares(column.width)]), at).toEqual([[1, 8], [11, 8], [21, 12], [squares(box.width) - 2, 1]]);
+    // The marks' column ends a square from the footer's end.
+    expect(box.columns.at(-1)!.right, at).toBeCloseTo(box.width - unit, 3);
+    for (const line of box.lines) expect(line.height, at).toBeCloseTo(unit, 3);
+    for (const line of box.lines) expect(squares(line.top) % 1, at).toBeCloseTo(0, 3);
+    // Links among words alone, and linked headings, are underlined in the text's ink.
+    expect(box.underlines.length, at).toBe(4);
+    for (const underline of box.underlines) expect(underline, at).toEqual(["underline", true, true]);
+    // Three round marks one control high, one a square, each on the sixteen of its square, in the ink.
+    expect(box.marks.length, at).toBe(3);
+    box.marks.forEach((m, i) => {
+      expect([m.width, m.height], at).toEqual([control, control]);
+      expect(m.left - box.columns.at(-1)!.left, at).toBeCloseTo(0, 3);
+      expect(m.bottom - box.marks[0]!.bottom, at).toBeCloseTo(i * unit, 3);
+      expect(squares(m.bottom) % 1, at).toBeCloseTo(0, 3);
+      expect(m.radius, at).toBe("50%");
+      expect(m.fill, at).toBe(m.ink);
+    });
+    expect(box.marks[0]!.top, at).toBeCloseTo(box.columns[0]!.top + unit - control, 3);
+    // The policy stands on the square right under the copyright, a control-high button on its sixteen.
+    expect(box.policies.length, at).toBe(1);
+    expect(box.policies[0]!.top, at).toBeCloseTo(box.legal.bottom, 3);
+    expect(box.policies[0]!.height, at).toBeCloseTo(unit, 3);
+    expect(box.buttons[0]!.height, at).toBeCloseTo(control, 3);
+    expect(box.buttons[0]!.bottom, at).toBeCloseTo(box.policies[0]!.bottom, 3);
+    expect(box.buttons[0]!.left, at).toBeCloseTo(unit, 3);
+  }
+});
+
+test("a narrow contact footer folds its columns and keeps its marks stacked at the end", async () => {
+  for (const markup of [NATIVE_CONTACT_FOOTER, LIT_CONTACT_FOOTER]) {
+    await stage(pages.light, markup, { width: 400 });
+    const box = await pages.light.evaluate(() => {
+      const host = document.querySelector<HTMLElement>("#stage > *")!;
+      const root: ParentNode = host.shadowRoot ?? host.parentElement!;
+      const footer = root.querySelector<HTMLElement>(".ds-footer")!;
+      const frame = footer.getBoundingClientRect();
+      return [...footer.querySelectorAll(".ds-footer__column")].map(column => { const r = column.getBoundingClientRect(); return [r.left - frame.left, r.right - frame.left, r.top - frame.top]; });
+    });
+    expect(box.map(([left]) => left)).toEqual([20, 200 + 20, 20, 360]);
+    expect(box[1]![2]).toBe(box[0]![2]);
+    expect(box[2]![2]).toBeGreaterThan(box[0]![2]!);
+    expect(box[3]![1]).toBe(380);
+  }
+});
+
 const WRITING = `<h1>Terms</h1><p>These terms apply to the service.</p>
   <h2 id="using">Using the service</h2><p>${"Words in a long paragraph. ".repeat(30)}</p>
   <h2 id="notice">特定商取引法に基づく表記</h2>

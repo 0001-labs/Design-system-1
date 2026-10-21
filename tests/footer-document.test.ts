@@ -3,7 +3,7 @@ import { afterEach, expect, test, vi } from "vite-plus/test";
 
 vi.stubGlobal("fetch", vi.fn(async () => new Response("{}")));
 const { loadTranslations, setLanguage } = await import("../DS1/0-face/i18n");
-await import("../DS1/4-page/ds-footer");
+const { footerColumnWidth } = await import("../DS1/4-page/ds-footer");
 await import("../DS1/4-page/ds-document");
 
 afterEach(() => { document.body.replaceChildren(); setLanguage("en"); });
@@ -182,4 +182,45 @@ test("ds-footer draws a column's icon links first, in a row of marks named by th
   expect(marks.map(a => [a.getAttribute("aria-label"), a.getAttribute("target")])).toEqual([["Instagram", "_blank"], ["LinkedIn", "_blank"]]);
   expect(marks[0]!.querySelector<HTMLElement>(".ds-icon")!.getAttribute("style")).toContain('icons/instagram.svg');
   expect([...column.querySelectorAll(".ds-footer__links a")].map(a => a.textContent)).toEqual(["hello@example.com"]);
+});
+
+test("ds-footer draws contact lines: words alone beside links, a heading that is a link, a column's own width and round marks stacked at the end", async () => {
+  const footer = document.createElement("ds-footer");
+  Object.assign(footer, { literal: true, year: 2023, owner: "Name", columns: [
+    { heading: "Name Ltd", href: "/about", links: [
+      { label: "Reg. 12345678" },
+      { label: "hello@example.com", href: "mailto:hello@example.com" },
+    ] },
+    { heading: "Office", width: 10, links: [{ label: "1 Street" }, { label: "1000 City" }] },
+    { heading: "Follow", icons: "stack", links: [
+      { label: "Instagram", href: "https://instagram.com/name", external: true, icon: "icons/instagram.svg" },
+      { label: "LinkedIn", href: "https://linkedin.com/company/name", external: true, icon: "icons/linkedin.svg" },
+    ] },
+  ], policies: [{ label: "Privacy policy", href: "/privacy" }, { label: "No address" }] });
+  document.body.append(footer);
+  await footer.updateComplete;
+  const root = footer.shadowRoot!;
+  const [contact, office, follow] = [...root.querySelectorAll<HTMLElement>(".ds-footer__column")];
+  const heading = contact!.querySelector<HTMLAnchorElement>(".ds-footer__heading > a")!;
+  expect([heading.textContent, heading.getAttribute("href")]).toEqual(["Name Ltd", "/about"]);
+  expect([...contact!.querySelectorAll(".ds-footer__links > li > *")].map(line => [line.tagName, line.textContent])).toEqual([["SPAN", "Reg. 12345678"], ["A", "hello@example.com"]]);
+  expect(contact!.getAttribute("style")).toBeNull();
+  expect(office!.querySelector(".ds-footer__heading")!.children).toHaveLength(0);
+  expect(office!.getAttribute("style")).toContain("--ds-footer-column-width: 10");
+  expect(follow!.classList.contains("ds-footer__column--stack")).toBe(true);
+  // The stacked column's heading names its marks; it draws no heading line.
+  expect(follow!.querySelector(".ds-footer__heading")).toBeNull();
+  expect(follow!.querySelector(".ds-footer__icons")!.getAttribute("aria-label")).toBe("Follow");
+  expect([...follow!.querySelectorAll<HTMLAnchorElement>(".ds-footer__icons a")].map(a => a.getAttribute("aria-label"))).toEqual(["Instagram", "LinkedIn"]);
+  expect(follow!.querySelector(".ds-footer__links")).toBeNull();
+  // Policies stand under the copyright as secondary buttons; one without an address is left out.
+  expect(root.querySelector(".ds-footer__legal")!.textContent!.trim()).toBe("© 2023 Name");
+  const policies = [...root.querySelectorAll<HTMLAnchorElement>(".ds-footer__policies a")];
+  expect(policies.map(a => [a.className, a.textContent, a.getAttribute("href")])).toEqual([["ds-button ds-button--secondary", "Privacy policy", "/privacy"]]);
+  footer.policies = []; await footer.updateComplete;
+  expect(root.querySelector(".ds-footer__policies")).toBeNull();
+});
+
+test("a footer column's width is whole squares, eight unless it names a positive number", () => {
+  expect([undefined, 0, -2, "x", 10, 9.6, "12"].map(footerColumnWidth)).toEqual([8, 8, 8, 8, 10, 10, 12]);
 });

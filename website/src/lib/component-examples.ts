@@ -293,6 +293,14 @@ render();`,
   columns='[{"heading":"Product","links":[{"label":"Download","href":"#download"},{"label":"Help","href":"#help"}]},{"heading":"Company","links":[{"label":"About","href":"#about"},{"label":"Terms","href":"#terms"}]}]'>
 </ds-footer>`,
   },
+  'footer-contact': {
+    title: 'Contact lines and marks', hint: 'Words alone beside links, which are underlined among them; a heading that is a link; a column twelve squares wide; round marks stacked at the end; the policy under the copyright.',
+    height: 260,
+    html: `<ds-footer literal year="2026" owner="Studio" style="flex-basis:100%"
+  columns='[{"heading":"Studio Ltd","href":"#about","links":[{"label":"Reg. 12345678"},{"label":"hello@example.com","href":"mailto:hello@example.com"}]},{"heading":"Office","href":"#map","links":[{"label":"1 Harbour Street"},{"label":"1000 City"}]},{"heading":"The boat - trips on the water","width":12,"links":[{"label":"North quay"},{"label":"1000 City"}]},{"heading":"Follow","icons":"stack","links":[{"label":"Instagram","href":"https://instagram.com","icon":"/icons/library/instagram.svg"},{"label":"Facebook","href":"https://facebook.com","icon":"/icons/library/facebook.svg"},{"label":"LinkedIn","href":"https://linkedin.com","icon":"/icons/library/linkedin.svg"}]}]'
+  policies='[{"label":"Privacy policy","href":"#privacy"}]'>
+</ds-footer>`,
+  },
   'document': {
     title: 'A legal notice', hint: 'The contents are built from the headings; the section in view is marked as you scroll.',
     height: 420,
@@ -711,7 +719,7 @@ export const PAGE_EXAMPLES: Record<string, string[]> = {
   '3-unit/table': ['table'],
   '4-page/container': ['container'], '4-page/grid': ['grid'],
   '4-page/page': ['page'],
-  '4-page/header': ['header'], '4-page/footer': ['footer'], '4-page/document': ['document'],
+  '4-page/header': ['header'], '4-page/footer': ['footer', 'footer-contact'], '4-page/document': ['document'],
 };
 
 for (const [page, examples] of Object.entries(SHOWCASE_PAGES)) {
