@@ -1,6 +1,6 @@
 import { authorizeReport, type ReportsEnv } from './reports';
 import { FEATURE_FLAGS } from '../../shared/feature-flags';
-import { isReleaseRule } from '../../shared/feature-flags-runtime/index';
+import { isReleaseRule, type ReleaseRule } from '../../shared/feature-flags-runtime/index';
 
 const headers = { 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow', Vary: 'Authorization' };
 export async function featureFlags(request: Request, env: ReportsEnv, send: typeof fetch = fetch): Promise<Response> {
@@ -24,16 +24,19 @@ export class InvalidFeatureFlag extends Error {}
 export async function setFeatureFlag(env: Pick<ReportsEnv, 'LIBRARIES'>, input: unknown): Promise<{saved:true}> {
   const value = input as {key?: unknown};
   if (!value || typeof value.key !== 'string' || !Object.hasOwn(FEATURE_FLAGS, value.key) || !isReleaseRule(input) || (input.accountIds?.length ?? 0) > 100) throw new InvalidFeatureFlag('Invalid feature flag');
-  await env.LIBRARIES.put(`feature-flags/${value.key}.json`, JSON.stringify({enabled:input.enabled,audience:input.audience,accountIds:input.accountIds ?? []}));
+  await env.LIBRARIES.put(`feature-flags/${value.key}.json`, JSON.stringify({enabled:input.enabled,audience:input.audience,accountIds:input.accountIds ?? [],...shareOf(input)}));
   return {saved:true};
 }
+
+/** A share of the accounts keeps its percent, so it reads back, and resolves, as the share it was saved as. */
+const shareOf = (rule: ReleaseRule | null) => rule?.audience === 'percentage' ? {percentage:rule.percentage} : {};
 
 export async function manageFeatureFlags(env: Pick<ReportsEnv, 'LIBRARIES'>) {
   const flags = await Promise.all(Object.entries(FEATURE_FLAGS).map(async ([key, definition]) => {
     const object = await env.LIBRARIES.get(`feature-flags/${key}.json`);
     const stored: unknown = object ? await object.json() : undefined;
     const rule = isReleaseRule(stored) ? stored : null;
-    return { key, label: definition.label, description: definition.description, enabled: rule?.enabled ?? (object ? false : definition.defaultEnabled === true), audience:rule?.audience ?? 'owner', accountIds:rule?.accountIds ?? [], inherited:!object };
+    return { key, label: definition.label, description: definition.description, enabled: rule?.enabled ?? (object ? false : definition.defaultEnabled === true), audience:rule?.audience ?? 'owner', accountIds:rule?.accountIds ?? [], ...shareOf(rule), inherited:!object };
   }));
   return flags;
 }

@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vite-plus/test';
 import { FEATURE_FLAGS } from '../../shared/feature-flags';
+import { resolveFlag, rolloutBucket } from '../../shared/feature-flags-runtime/index';
 import { featureFlags, manageFeatureFlags, setFeatureFlag } from '../src/flags';
 import type { ReportsEnv } from '../src/reports';
 const setup = () => ({
@@ -49,6 +50,38 @@ describe('shared HTTP and service-binding flag store', () => {
       await expect(setFeatureFlag(env,{...rule,audience:'invalid'})).rejects.toThrow('Invalid feature flag');
       await expect(setFeatureFlag(env,{...rule,accountIds:Array(101).fill('account')})).rejects.toThrow('Invalid feature flag');
       expect((await manageFeatureFlags(env))[0]?.enabled).toBe(false);
+    } finally { Reflect.deleteProperty(FEATURE_FLAGS,'test-release'); }
+  });
+
+  it('stores a share of the accounts with its percent, reads it back and resolves it by bucket', async () => {
+    const {env,send}=setup();
+    Object.defineProperty(FEATURE_FLAGS,'test-release',{value:{label:'Test release'},enumerable:true,configurable:true});
+    try {
+      const stored=new Map<string,string>();
+      vi.mocked(env.LIBRARIES.put).mockImplementation(async (key,body) => { stored.set(key,body as string); return {} as R2Object; });
+      vi.mocked(env.LIBRARIES.get).mockImplementation(async (key) => {
+        const body=stored.get(key);
+        return body ? {json:async()=>JSON.parse(body)} as R2ObjectBody : null;
+      });
+      const rule={key:'test-release',enabled:true,audience:'percentage',accountIds:[],percentage:25};
+      expect((await featureFlags(request('PUT',rule),env,send)).status).toBe(200);
+      expect(JSON.parse(stored.get('feature-flags/test-release.json')!)).toEqual({enabled:true,audience:'percentage',accountIds:[],percentage:25});
+      const [flag]=await manageFeatureFlags(env);
+      expect(flag).toMatchObject({key:'test-release',enabled:true,audience:'percentage',percentage:25,inherited:false});
+      const rules={'test-release':JSON.parse(stored.get('feature-flags/test-release.json')!)};
+      const accounts=Array.from({length:400},(_,index)=>`account-${index}`);
+      const inShare=accounts.filter(accountId=>resolveFlag(FEATURE_FLAGS,'test-release',rules,{accountId}));
+      expect(inShare).toEqual(accounts.filter(accountId=>rolloutBucket('test-release',accountId)<25));
+      expect(inShare.length).toBeGreaterThan(0);
+      expect(resolveFlag(FEATURE_FLAGS,'test-release',rules,{isOwner:true})).toBe(false);
+      // A share without a whole percent from 1 to 99 is refused and the stored rule stays.
+      await expect(setFeatureFlag(env,{...rule,percentage:undefined})).rejects.toThrow('Invalid feature flag');
+      await expect(setFeatureFlag(env,{...rule,percentage:100})).rejects.toThrow('Invalid feature flag');
+      expect((await manageFeatureFlags(env))[0]?.percentage).toBe(25);
+      // Another audience drops the percent.
+      await setFeatureFlag(env,{...rule,audience:'owner'});
+      expect(JSON.parse(stored.get('feature-flags/test-release.json')!)).toEqual({enabled:true,audience:'owner',accountIds:[]});
+      expect((await manageFeatureFlags(env))[0]).not.toHaveProperty('percentage');
     } finally { Reflect.deleteProperty(FEATURE_FLAGS,'test-release'); }
   });
 });
