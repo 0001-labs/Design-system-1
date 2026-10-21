@@ -26,7 +26,14 @@ a, ::slotted(a) {
   text-decoration: none;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: clip;
+}
+/* A cut label fades over its last square, never an ellipsis (0-face/cut-fade.ts marks it). */
+a[data-cut="end"], ::slotted(a[data-cut="end"]) {
+  mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-unit)), transparent);
+}
+:host(:dir(rtl)) a[data-cut="end"], :host(:dir(rtl)) ::slotted(a[data-cut="end"]) {
+  mask-image: linear-gradient(to left, #000 calc(100% - var(--ds-unit)), transparent);
 }
 a:hover, ::slotted(a:hover) { color: var(--ds-text-color); text-decoration: underline; }
 a[aria-current], ::slotted(a[aria-current]) { color: var(--ds-toc-current-color, var(--ds-sharp-blue)); }

@@ -7,6 +7,7 @@
 import { LitElement, html, nothing, unsafeCSS } from "lit";
 import { getText } from "../0-face/i18n";
 import { define } from "../0-face/define";
+import { CutFades } from "../0-face/cut-fade";
 import metrics from "../1-root/component-metrics.css?inline";
 import documentSheet from "../1-root/document.css?inline";
 import documentRules from "../1-root/document.css?raw";
@@ -97,6 +98,8 @@ export class DocumentPage extends LitElement {
   };
 
   static styles = [unsafeCSS(metrics), unsafeCSS(documentSheet), unsafeCSS(styles)];
+  /** Words cut short fade over their last square, never an ellipsis: marks them `data-cut="end"` while they do not fit. */
+  private cuts = new CutFades(this, { selector: ".ds-document__toc-list a" });
 
   declare levels: string;
   declare label: string | undefined;

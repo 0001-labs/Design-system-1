@@ -2,6 +2,7 @@ import { LitElement, html, nothing, unsafeCSS } from "lit";
 import { repeat } from "lit/directives/repeat.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { define } from "../0-face/define";
+import { CutFades } from "../0-face/cut-fade";
 import { treeStep } from "../0-face/sidebar";
 import "../0-face/tooltips";
 import "../2-core/ds-button";
@@ -92,6 +93,8 @@ export class Sidebar extends LitElement {
   declare reorderable: boolean;
   private dragId?: string;
   static styles = unsafeCSS(styles);
+  /** Words cut short fade over their last square, never an ellipsis: marks them `data-cut="end"` while they do not fit. */
+  private cuts = new CutFades(this, { selector: ".name, .tree .label" });
 
   /** In a tree, the row that holds the Tab stop. */
   private focusId?: string;

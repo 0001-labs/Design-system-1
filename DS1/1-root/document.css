@@ -93,9 +93,17 @@
   text-decoration-line: underline;
   text-decoration-thickness: 1px;
   text-decoration-color: transparent;
-  text-overflow: ellipsis;
+  text-overflow: clip;
   text-underline-offset: calc(2px * var(--ds-sf));
   white-space: nowrap;
+}
+
+/* A cut link fades over its last square, never an ellipsis (0-face/cut-fade.ts marks it). */
+.ds-document__toc-list a[data-cut="end"] {
+  mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-unit)), transparent);
+}
+.ds-document__toc-list a[data-cut="end"]:dir(rtl) {
+  mask-image: linear-gradient(to left, #000 calc(100% - var(--ds-unit)), transparent);
 }
 
 .ds-document__toc-list a:hover {

@@ -2,6 +2,7 @@ import { LitElement, html, unsafeCSS } from "lit";
 import { ifDefined } from "lit/directives/if-defined.js";
 import styles from "./styles/ds-row.css?inline";
 import { define } from "../0-face/define";
+import { CutFades } from "../0-face/cut-fade";
 
 /** The values `aria-current` takes besides `page`. */
 const CURRENT = new Set(["page", "step", "location", "date", "time", "true"]);
@@ -35,8 +36,8 @@ const CURRENT = new Set(["page", "step", "location", "date", "time", "true"]);
  * the row's end; a 16px picture (an avatar tile, a large icon) before the
  * name stands on its square with the row's gap putting the words on the next.
  * The element measures each name and marks it `data-cut="end"` while its
- * words do not fit, so the stylesheet fades them over the last square
- * instead of ending them with an ellipsis.
+ * words do not fit, so the stylesheet fades them over the last square, never
+ * an ellipsis; a `ds-text literal` name fades the same way.
  *
  * @slot - The row's content, inside its press target.
  * @slot end - Controls of their own after the content, outside the press target.
@@ -96,36 +97,11 @@ export class Row extends LitElement {
 
   static styles = unsafeCSS(styles);
 
-  /** Watches the row and its names, so a name is marked cut as soon as it no longer fits. */
-  private sizes: ResizeObserver | undefined;
+  /** Marks each `.ds-row__name` `data-cut="end"` while its words are wider than its box, measured again as they resize or change. */
+  private cuts = new CutFades(this, { targets: () => this.querySelectorAll(":scope > .ds-row__name"), text: true });
 
-  connectedCallback(): void {
-    super.connectedCallback();
-    if (typeof ResizeObserver !== "undefined") {
-      this.sizes = new ResizeObserver(() => this.measureNames());
-      this.sizes.observe(this);
-    }
-  }
-
-  disconnectedCallback(): void {
-    super.disconnectedCallback();
-    this.sizes?.disconnect();
-    this.sizes = undefined;
-  }
-
-  firstUpdated(): void {
-    this.measureNames();
-  }
-
-  /** Marks each `.ds-row__name` `data-cut="end"` while its words are wider than its box. */
-  private measureNames = () => {
-    for (const name of this.querySelectorAll<HTMLElement>(":scope > .ds-row__name")) {
-      this.sizes?.observe(name);
-      const cut = name.scrollWidth > name.clientWidth + 1;
-      if (cut) name.setAttribute("data-cut", "end");
-      else if (name.getAttribute("data-cut") === "end") name.removeAttribute("data-cut");
-    }
-  };
+  /** Measures the names again, as when the slotted content changes. */
+  private measureNames = () => this.cuts.measure();
 
   /** The `aria-current` value, or none. */
   private get currentValue(): string | undefined {

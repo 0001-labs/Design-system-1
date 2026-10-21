@@ -238,7 +238,15 @@
   padding-inline-end: calc(4px * var(--ds-sf, 1));
   overflow: hidden;
   white-space: nowrap;
-  text-overflow: ellipsis;
+  text-overflow: clip;
+}
+
+/* A cut step name fades over its last square, never an ellipsis (0-face/cut-fade.ts marks it). */
+.ds-progress__label[data-cut="end"] {
+  mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-unit)), transparent);
+}
+.ds-progress__label[data-cut="end"]:dir(rtl) {
+  mask-image: linear-gradient(to left, #000 calc(100% - var(--ds-unit)), transparent);
 }
 
 .ds-progress__step--current .ds-progress__label {

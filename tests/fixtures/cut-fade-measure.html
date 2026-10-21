@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cut words fade</title>
+    <link rel="stylesheet" href="/DS1/1-root/one.css" />
+    <link rel="stylesheet" href="/DS1/1-root/controls.css" />
+    <style>
+      body { margin: 0; padding: 0; }
+      #stage { position: absolute; top: 0; left: 0; width: 480px; }
+    </style>
+    <script type="module">
+      import "/DS1/2-core/ds-text.ts";
+      import "/DS1/2-core/ds-button.ts";
+      import "/DS1/2-core/ds-tag.ts";
+      import "/DS1/3-unit/ds-row.ts";
+      import { startCutFades } from "/DS1/0-face/cut-fade.ts";
+      window.startCutFades = startCutFades;
+      await customElements.whenDefined("ds-row");
+      await document.fonts.ready;
+      document.documentElement.dataset.ready = "true";
+    </script>
+  </head>
+  <body>
+    <div id="stage" data-ds-surface></div>
+  </body>
+</html>

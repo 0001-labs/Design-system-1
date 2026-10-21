@@ -147,6 +147,6 @@ test("the native classes are on the grid and take their colours from tokens", ()
   expect(mark).toContain("width: var(--ds-control-height)");
   expect(mark).toContain("height: var(--ds-control-height)");
   expect(rule(notice, ".ds-notice--danger")).toContain("--ds-notice-ink: var(--ds-danger-color)");
-  // Colours are tokens: no raw hex, rgb or named reds.
-  for (const css of [empty, notice]) expect(css.replace(/\/\*[\s\S]*?\*\//g, "")).not.toMatch(/#[0-9a-f]{3,8}\b|rgba?\(|\bred\b/i);
+  // Colours are tokens: no raw hex, rgb or named reds. A cut word's mask is an alpha, not a colour.
+  for (const css of [empty, notice]) expect(css.replace(/\/\*[\s\S]*?\*\//g, "").replace(/mask-image:[^;]*;/g, "")).not.toMatch(/#[0-9a-f]{3,8}\b|rgba?\(|\bred\b/i);
 });

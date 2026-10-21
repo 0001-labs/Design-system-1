@@ -3,7 +3,10 @@
 :host([hidden]) { display: none !important; }
 .frame { display: flex; align-items: center; box-sizing: border-box; max-width: 100%; min-width: 0; height: var(--ds-row-height); padding-inline-start: calc(4px * var(--ds-sf)); background: var(--ds-fill); color: var(--ds-text-color); border-radius: var(--ds-radius); font-family: var(--ds-typeface-regular); font-size: var(--ds-type-size-default); line-height: var(--ds-type-lineheight-default); letter-spacing: var(--ds-type-letterspacing-default); }
 .copy { display: flex; align-items: baseline; gap: calc(4px * var(--ds-sf)); min-width: 0; padding-inline: calc(4px * var(--ds-sf)); }
-.copy > span, small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.copy > span, small { overflow: hidden; text-overflow: clip; white-space: nowrap; min-width: 0; }
+/* Cut words fade over their last square, never an ellipsis (0-face/cut-fade.ts marks them). */
+:is(.copy > span, small)[data-cut="end"] { mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-unit)), transparent); }
+:host(:dir(rtl)) :is(.copy > span, small)[data-cut="end"] { mask-image: linear-gradient(to left, #000 calc(100% - var(--ds-unit)), transparent); }
 small { font-size: var(--ds-type-size-small); color: var(--ds-text-color-muted); }
 ds-button { flex: 0 0 auto; --ds-button-height: var(--ds-row-height); --ds-button-width: var(--ds-row-height); }
 ::slotted([slot="leading"]) { flex: 0 0 auto; }

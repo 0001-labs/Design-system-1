@@ -1,6 +1,7 @@
 import { LitElement, html, unsafeCSS } from "lit";
 import { getText, currentLanguage } from "../0-face/i18n";
 import { define } from "../0-face/define";
+import { CutFades } from "../0-face/cut-fade";
 import styles from "./styles/ds-text.css?inline";
 
 /**
@@ -17,6 +18,10 @@ import styles from "./styles/ds-text.css?inline";
  *   square, or a 20px title on two squares
  * @prop {boolean} strong - The medium weight
  * @prop {boolean} wrap - Let the text run over several lines, each one square
+ *
+ * Literal text that does not fit its width is cut and fades out over its last
+ * square, never an ellipsis: the element marks itself `data-cut="end"` while
+ * its words are wider than its box, and takes the mark off when they fit.
  *
  * The four work alike for a translation key and for literal text. For a
  * heading, give the element `role="heading"` and `aria-level`.
@@ -56,6 +61,8 @@ export class Text extends LitElement {
   declare _text: string;
   declare _currentLanguage: string;
   private _slotKey: string = "";
+  /** Marks the element cut while its literal words are wider than its box. */
+  private cuts = new CutFades(this, { targets: () => (this.literal && !this.wrap ? [this] : []), text: true });
   private boundHandlers: { languageChanged: EventListener };
 
   constructor() {

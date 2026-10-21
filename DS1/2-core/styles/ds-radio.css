@@ -81,6 +81,9 @@
   letter-spacing: var(--ds-type-letterspacing-default);
   white-space: nowrap;
   text-align: center;
-  text-overflow: ellipsis;
+  text-overflow: clip;
 }
+/* A cut label fades over its last square, never an ellipsis (0-face/cut-fade.ts marks it). */
+.label[data-cut="end"] { mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-unit)), transparent); }
+:host(:dir(rtl)) .label[data-cut="end"] { mask-image: linear-gradient(to left, #000 calc(100% - var(--ds-unit)), transparent); }
 :host([compact]) .label { padding-inline: 0; }

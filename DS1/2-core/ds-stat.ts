@@ -6,6 +6,7 @@
 import { LitElement, html, nothing, unsafeCSS } from "lit";
 import { getText } from "../0-face/i18n";
 import { define } from "../0-face/define";
+import { CutFades } from "../0-face/cut-fade";
 import { figureCells, figureFormat, formatFigure, type FigureFormat, type FigureOptions } from "./figures";
 import "./ds-icon";
 import metrics from "../1-root/component-metrics.css?inline";
@@ -63,6 +64,8 @@ export class Stat extends LitElement {
   };
 
   static styles = [unsafeCSS(metrics), unsafeCSS(figures), unsafeCSS(styles)];
+  /** Words cut short fade over their last square, never an ellipsis: marks them `data-cut="end"` while they do not fit. */
+  private cuts = new CutFades(this, { selector: ".ds-stat__figure" });
 
   declare label: string | undefined;
   declare value: number | undefined;

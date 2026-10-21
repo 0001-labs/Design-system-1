@@ -9,6 +9,7 @@ import { reportFailure, type Failure } from "../0-face/failures";
 import { LitElement, html, nothing, unsafeCSS, type PropertyValues } from "lit";
 import { getText } from "../0-face/i18n";
 import { define } from "../0-face/define";
+import { CutFades } from "../0-face/cut-fade";
 import "./ds-icon";
 import "./ds-toast";
 import type { ToastPosition } from "../0-face/toast-queue";
@@ -105,6 +106,8 @@ export class Message extends LitElement {
   };
 
   static styles = [unsafeCSS(metrics), unsafeCSS(controls), unsafeCSS(styles)];
+  /** Words cut short fade over their last square, never an ellipsis: marks them `data-cut="end"` while they do not fit. */
+  private cuts = new CutFades(this, { selector: ".ds-notice__title, .ds-notice__text" });
 
   /** Authored diagnostic for a real failure; never derived from slotted user content. */
   declare failure: Failure | undefined;

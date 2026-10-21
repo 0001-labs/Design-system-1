@@ -42,7 +42,10 @@ ds-icon { transform: rotate(0deg); }
 ds-icon[data-open] { transform: rotate(90deg); }
 .choice { flex: 0 1 auto; min-width: 0; }
 .name:has(ds-icon) { display: flex; align-items: center; gap: calc(4px * var(--ds-sf)); }
-.name { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.name { overflow: hidden; white-space: nowrap; text-overflow: clip; }
+/* Cut words fade over their last square, never an ellipsis (0-face/cut-fade.ts marks them). */
+:is(.name, .tree .label)[data-cut="end"] { mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-unit)), transparent); }
+:host(:dir(rtl)) :is(.name, .tree .label)[data-cut="end"] { mask-image: linear-gradient(to left, #000 calc(100% - var(--ds-unit)), transparent); }
 .meta { flex: none; padding-inline-start: calc(4px * var(--ds-sf)); font-size: var(--ds-type-size-small); color: var(--ds-text-color-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .action { margin-inline-start: calc(4px * var(--ds-sf)); --ds-text-size: 10px; --ds-button-color: var(--ds-text-color-muted); }
 .empty { margin: 0; padding: calc(var(--ds-unit) / 2); color: var(--ds-text-color-muted); }
@@ -105,7 +108,7 @@ ds-icon[data-open] { transform: rotate(90deg); }
   min-width: 0;
   padding-inline-start: calc(4px * var(--ds-sf));
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: clip;
 }
 
 @media (prefers-reduced-motion: reduce) {

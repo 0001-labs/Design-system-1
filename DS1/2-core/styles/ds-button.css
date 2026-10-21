@@ -10,9 +10,10 @@
   flex: 0 0 auto;
   width: var(--ds-button-width, max-content);
   max-width: 100%;
-  /* Clipped along the line only: a word that runs long ends in an ellipsis,
-     but the descenders of g, y, p and j hang below the 16-unit box as they
-     would anywhere else, instead of being cut off at its edge. */
+  /* Clipped along the line only: a word that runs long is cut and fades over
+     its last square (never an ellipsis), but the descenders of g, y, p and j
+     hang below the 16-unit box as they would anywhere else, instead of being
+     cut off at its edge. */
   overflow-x: clip;
   overflow-y: visible;
 }
@@ -62,7 +63,7 @@
   white-space: nowrap;
   overflow-x: clip;
   overflow-y: visible;
-  text-overflow: ellipsis;
+  text-overflow: clip;
   /* Default to no-background when no variant is specified */
   background-color: transparent;
   text-decoration: none;
@@ -72,12 +73,27 @@
 :is(button, a) ::slotted(*) {
   overflow-x: clip;
   overflow-y: visible;
-  text-overflow: ellipsis;
+  text-overflow: clip;
   white-space: nowrap;
   max-width: 100%;
   text-align: left;
   justify-content: flex-start;
   color: inherit;
+}
+
+/* Cut words fade over their last square, never an ellipsis: the element marks
+   them `data-cut="end"` while they do not fit (0-face/cut-fade.ts). Words in an
+   element of their own fade on any face; words written straight into the
+   button fade with the face itself, so only on a face without a fill. */
+:is(button, a) ds-text[data-cut="end"],
+:is(button, a) ::slotted([data-cut="end"]),
+:host(:not([primary]):not([secondary])) :is(button, a)[data-cut="end"] {
+  mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-unit)), transparent);
+}
+:host(:dir(rtl)) :is(button, a) ds-text[data-cut="end"],
+:host(:dir(rtl)) :is(button, a) ::slotted([data-cut="end"]),
+:host(:not([primary]):not([secondary]):dir(rtl)) :is(button, a)[data-cut="end"] {
+  mask-image: linear-gradient(to left, #000 calc(100% - var(--ds-unit)), transparent);
 }
 
 :is(button, a)[primary] {

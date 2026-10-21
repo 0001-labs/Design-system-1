@@ -172,7 +172,15 @@
   text-transform: none !important;
   text-decoration: none !important;
   overflow: hidden !important;
-  text-overflow: ellipsis !important;
+  text-overflow: clip !important;
+}
+/* Cut words fade over the face's last square, never an ellipsis; a filled
+   face keeps its fill whole and is cut plainly (0-face/cut-fade.ts marks it). */
+:host([control="slotted"]:not([primary]):not([secondary])) ::slotted(:is(button, a)[data-cut="end"]) {
+  mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-unit)), transparent);
+}
+:host([control="slotted"]:not([primary]):not([secondary]):dir(rtl)) ::slotted(:is(button, a)[data-cut="end"]) {
+  mask-image: linear-gradient(to left, #000 calc(100% - var(--ds-unit)), transparent);
 }
 :host([control="slotted"][icon]) ::slotted(:is(button, a)) {
   justify-content: center !important;

@@ -1,5 +1,6 @@
 import { LitElement, html, nothing, unsafeCSS } from 'lit';
 import { define } from '../0-face/define';
+import { CutFades } from '../0-face/cut-fade';
 import { getText } from '../0-face/i18n';
 import '../0-face/tooltips';
 import '../2-core/ds-text';
@@ -19,6 +20,8 @@ export class TableOfContents extends LitElement {
     target: { attribute: false }, current: { state: true },
   };
   static styles = unsafeCSS(styles);
+  /** A cut label fades over its last square, never an ellipsis: marks it `data-cut="end"` while it does not fit. */
+  private cuts = new CutFades(this, { selector: 'a', targets: () => this.querySelectorAll(':scope > a'), text: true });
   declare items: TableOfContentsItem[];
   declare label: string;
   declare literal: boolean;

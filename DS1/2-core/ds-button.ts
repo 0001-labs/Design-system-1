@@ -6,6 +6,7 @@ import { ifDefined } from "lit/directives/if-defined.js";
 import "./ds-text";
 import { Control } from "../0-face/control";
 import { define } from "../0-face/define";
+import { CutFades } from "../0-face/cut-fade";
 import hostStyles from "./styles/ds-button-host.css?inline";
 import styles from "./styles/ds-button.css?inline";
 
@@ -102,6 +103,30 @@ export class Button extends Control {
 
   // Private state
   declare _loading: boolean;
+
+  /**
+   * Words a face cuts fade over their last square, never an ellipsis: marks
+   * them `data-cut="end"` while they do not fit, on each face mode.
+   */
+  private cuts = new CutFades(this, { targets: () => this.cutWords(), text: true });
+
+  /**
+   * What holds a face's words: the `ds-text` it draws for `text`, the elements
+   * slotted into it, and the face itself where words are written straight into
+   * the button; the light-DOM button of a slotted control. A split's segments,
+   * an icon and the host face (whose words never cut) hold none.
+   */
+  private *cutWords(): Iterable<Element> {
+    if (this.split || this.hostControl || this.icon) return;
+    if (this.control === "slotted") { yield* this.querySelectorAll(":scope > :is(button, a)"); return; }
+    const face = this.shadowRoot?.querySelector('[part="control"]');
+    if (!face) return;
+    const words = face.querySelector(":scope > ds-text");
+    if (words) { yield words; return; }
+    yield* this.querySelectorAll(":scope > :not(ds-icon):not([slot])");
+    const written = [...this.childNodes].some(node => node.nodeType === Node.TEXT_NODE && !!node.textContent?.trim());
+    if (written) yield face;
+  }
 
   constructor() {
     super();

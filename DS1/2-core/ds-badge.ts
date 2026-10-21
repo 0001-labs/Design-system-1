@@ -1,9 +1,13 @@
 import { LitElement, html, unsafeCSS } from "lit";
 import { define } from "../0-face/define";
+import { CutFades } from "../0-face/cut-fade";
 import "./ds-icon";
 import styles from "./styles/ds-badge.css?inline";
 
-/** A noninteractive status label. Products own its words and status meaning. */
+/**
+ * A noninteractive status label. Products own its words and status meaning.
+ * Words that do not fit fade out over their last square, never an ellipsis.
+ */
 export class Badge extends LitElement {
   static properties = {
     icon: { type: String },
@@ -15,6 +19,8 @@ export class Badge extends LitElement {
   private observer?: ResizeObserver;
   private contentObserver?: MutationObserver;
   private measureFrame = 0;
+  /** Marks the words `data-cut="end"` while they are wider than the badge. */
+  private cuts = new CutFades(this, { selector: ".frame:not(.icon-only) .label" });
 
   constructor() { super(); this.icon = ""; this.iconOnly = false; }
 
@@ -62,6 +68,7 @@ export class Badge extends LitElement {
       // "Done" at 32.3px read as 32 and was cut short in a 40px badge.)
       const natural = frame.getBoundingClientRect().width;
       frame.style.width = `${Math.max(1, Math.ceil(natural / unit)) * unit}px`;
+      this.cuts.measure();
     });
   };
 

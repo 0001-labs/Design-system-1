@@ -29,7 +29,7 @@ Text a person wrote, such as a list's name or an item, is `literal`: it is shown
 | Attribute | Type | Default | What it does |
 | --- | --- | --- | --- |
 | `text` | string | Empty | Translation key. Without it, slot text supplies the key. |
-| `literal` | boolean | `false` | Show the text as written, cut with an ellipsis at its width. |
+| `literal` | boolean | `false` | Show the text as written. Cut at its width, it fades over its last square, never an ellipsis; text that fits stays crisp. |
 | `tone` | `muted`, `title`, `warning`, `danger` | None | A quieter grey, the title grey, the warning colour (`--ds-warning-color`) for something that needs care, or the danger colour (`--ds-danger-color`) for a failure or a loss. |
 | `size` | `small`, `heading`, `display` | None | 10px; a 13px heading on one square; a 20px title on two squares. |
 | `strong` | boolean | `false` | The medium weight. |
@@ -58,6 +58,26 @@ A warning that asks for care before something goes wrong takes the warning tone:
 ```
 
 Like any element, a hidden one stays out of the page: `<ds-text hidden>` is not drawn.
+
+## Cut words fade
+
+Wherever Design system 1 cuts words that do not fit (a literal text, a row's name, a tag, a menu entry, a calendar's title), they fade out over their last square, never ending in an ellipsis. Words that fit stay crisp. The fade is a mask on the words, so it fades into whatever is behind them, and it runs to the left in a right-to-left page. It is drawn only while the words are marked `data-cut="end"`; the components measure and mark their own words as they resize, render or change.
+
+A page without Lit marks the native classes (`.ds-row__name`, `.ds-sidebar__label`, `.ds-menu__item`, `.ds-badge__label`, `.ds-notice__title`, `.ds-progress__label` …) with one call from `0-face/cut-fade.ts` (Sync 1 `root` `"modules": ["cut-fade"]`):
+
+```js
+import { startCutFades } from "./0-face/cut-fade.ts";
+const stop = startCutFades(); // marks them in the page, and keeps marking them as it changes
+```
+
+A component of your own owns a watcher: `watchCuts()` with `select(root, selector)`, `measure()` after each render and `disconnect()`, or, in Lit, `new CutFades(this, { selector: ".label" })`, which measures after every update. Its stylesheet clips the words (`text-overflow: clip`) and fades them under the mark:
+
+```css
+.label[data-cut="end"] { mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-unit)), transparent); }
+.label[data-cut="end"]:dir(rtl) { mask-image: linear-gradient(to left, #000 calc(100% - var(--ds-unit)), transparent); }
+```
+
+Put the words in an element of their own when their box has a fill, so the fill stays whole.
 
 ## Interface copy and writing
 

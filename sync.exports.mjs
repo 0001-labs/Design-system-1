@@ -49,6 +49,8 @@ const rootModules = {
   carousel: ['carousel.ts'],
   /** The keyboard and pointer of a native sidebar tree (`connectSidebar`, for `.ds-sidebar` in row.css). */
   sidebar: ['sidebar.ts'],
+  /** Cut words fading over their last square on native markup (`startCutFades`, marking `.ds-row__name`, `.ds-menu__item` … `data-cut="end"`). */
+  'cut-fade': ['cut-fade.ts'],
   /** The theme module (light, dark, system in signals) with the head script it runs and its options' type; needs @lit-labs/signals. */
   theme: ['theme.ts', 'theme-bootstrap.js', 'preference-options.ts'],
 };
@@ -174,7 +176,7 @@ export default {
      * adds the prose sheet (prose.css) and `cjk` Noto Sans for Japanese and Chinese (cjk.css,
      * from Google Fonts), which `styles` may also name; `modules` names page scripts
      * from 0-face/ (app-banner, carousel, grid, grid-fit, layout-inspector, scaling, theme,
-     * theme-bootstrap, tooltips, tree, header, keys, overlay-swipe), copied with what they import, into 0-face/;
+     * theme-bootstrap, tooltips, tree, header, keys, overlay-swipe, cut-fade), copied with what they import, into 0-face/;
      * `scriptsTo` puts that 0-face/ folder elsewhere, a path from `to`
      * (`"../../src/ds1"` puts the stylesheets in `public/ds1` and the scripts
      * in `src/ds1/0-face`). one.css and controls.css bring text.css, and

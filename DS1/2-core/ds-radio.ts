@@ -1,5 +1,6 @@
 import { LitElement, html, unsafeCSS } from "lit";
 import { define } from "../0-face/define";
+import { CutFades } from "../0-face/cut-fade";
 import styles from "./styles/ds-radio.css?inline";
 
 /** Native radios keep their group, keyboard, labels and form. DS1 owns the face. */
@@ -11,6 +12,8 @@ export class Radio extends LitElement {
     label: { type: String },
   };
   static styles = unsafeCSS(styles);
+  /** Words cut short fade over their last square, never an ellipsis: marks them `data-cut="end"` while they do not fit. */
+  private cuts = new CutFades(this, { selector: ".label" });
   declare choice: boolean;
   declare compact: boolean;
   declare preview: boolean;

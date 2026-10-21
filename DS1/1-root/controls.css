@@ -690,10 +690,19 @@ dialog.ds-overlay:has(> [data-ds-overlay="close"]) [data-ds-overlay="header"] {
   color: var(--ds-text-color);
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: clip;
   cursor: default;
   user-select: none;
   outline: none;
+}
+
+/* Words cut short fade over the entry's last square, never an ellipsis:
+ * 0-face/cut-fade.ts marks the entry `data-cut="end"` while they do not fit. */
+.ds-menu__item[data-cut="end"] {
+  mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-unit)), transparent);
+}
+.ds-menu__item[data-cut="end"]:dir(rtl) {
+  mask-image: linear-gradient(to left, #000 calc(100% - var(--ds-unit)), transparent);
 }
 
 /* An entry a library draws as its own button or link is one square high too,
@@ -952,8 +961,10 @@ dialog.ds-overlay:has(> [data-ds-overlay="close"]) [data-ds-overlay="header"] {
 
 /*
  * `.ds-badge` is the `ds-badge` element's status label: one square high on the
- * neutral fill, its words padded 4px and cut short with an ellipsis, never a
- * button. Where the browser can size to content in calc (calc-size), its width
+ * neutral fill, its words padded 4px, never a button. Words that do not fit
+ * are cut, never with an ellipsis: in a `.ds-badge__label` of their own they
+ * fade over its last square while marked `data-cut="end"`, the fill staying
+ * whole. Where the browser can size to content in calc (calc-size), its width
  * rounds up to whole squares as the element's does; elsewhere it hugs the
  * words. An icon inside is a `.ds-icon` before the words. `--icon` shows the
  * icon alone, one square wide, and keeps the words for assistive technology:
@@ -981,8 +992,23 @@ dialog.ds-overlay:has(> [data-ds-overlay="close"]) [data-ds-overlay="header"] {
   font-weight: var(--ds-type-weight-default);
   line-height: var(--ds-row-height);
   letter-spacing: var(--ds-type-letterspacing-default);
-  text-overflow: ellipsis;
+  text-overflow: clip;
   white-space: nowrap;
+}
+
+.ds-badge__label {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  vertical-align: top;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+.ds-badge__label[data-cut="end"] {
+  mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-unit)), transparent);
+}
+.ds-badge__label[data-cut="end"]:dir(rtl) {
+  mask-image: linear-gradient(to left, #000 calc(100% - var(--ds-unit)), transparent);
 }
 
 .ds-badge > .ds-icon {

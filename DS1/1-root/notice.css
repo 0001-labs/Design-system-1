@@ -158,7 +158,15 @@
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: clip;
+}
+
+/* Cut words fade over their last square, never an ellipsis (0-face/cut-fade.ts marks them). */
+:is(.ds-notice--banner, .ds-notice--app) :is(.ds-notice__title, .ds-notice__text)[data-cut="end"] {
+  mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-unit)), transparent);
+}
+:is(.ds-notice--banner, .ds-notice--app) :is(.ds-notice__title, .ds-notice__text)[data-cut="end"]:dir(rtl) {
+  mask-image: linear-gradient(to left, #000 calc(100% - var(--ds-unit)), transparent);
 }
 
 .ds-notice--banner .ds-notice__text {
@@ -219,7 +227,7 @@
   grid-column: 2;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: clip;
 }
 
 .ds-notice--app .ds-notice__title { grid-row: 1; }

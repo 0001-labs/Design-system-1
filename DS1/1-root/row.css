@@ -21,9 +21,9 @@
  *   ds-row--auto           as high as its content, at least one square
  *   ds-row--stacked        the content stacked, each line one square (a tile, a card)
  *   ds-row--nav            a navigation row: the sidebar's two-pixel corners
- *   ds-row__name           a record's words: they hug and give way first, cut with an ellipsis
- *                          (`data-cut="end"`, set by the element where it measures them cut,
- *                          fades them over the last square instead)
+ *   ds-row__name           a record's words: they hug and give way first; cut, they fade over
+ *                          the last square, never an ellipsis (`data-cut="end"`, set by the
+ *                          element, or 0-face/cut-fade.ts on a page without Lit)
  *   ds-row__value          the figure or date at the row's end, in tabular figures
  *   aria-current="page"    the destination being shown, filled and in the medium weight
  *   aria-disabled="true"   or `disabled` on a button: dimmed, not pressable
@@ -36,7 +36,7 @@
  *   ds-sidebar             the tree (`role="tree"`)
  *   ds-sidebar__item       a row (`role="treeitem"`, `aria-level`, `aria-expanded` on a parent, `aria-selected`)
  *   ds-sidebar__disclosure the arrow on its own square, turned down when the row is open; empty on a leaf
- *   ds-sidebar__label      the words, cut short with an ellipsis
+ *   ds-sidebar__label      the words; cut, they fade over the last square (`data-cut="end"`)
  *   ds-sidebar__meta       small muted words at the row's end
  *
  * An icon (`.ds-icon`) in a tree row takes a square of its own. Tokens:
@@ -224,10 +224,9 @@ button.ds-row[aria-disabled="true"]:hover::after {
   min-width: 0;
   overflow: hidden;
   white-space: nowrap;
-  text-overflow: ellipsis;
+  text-overflow: clip;
 }
 .ds-row .ds-row__name[data-cut="end"] {
-  text-overflow: clip;
   mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-unit)), transparent);
 }
 .ds-row:dir(rtl) .ds-row__name[data-cut="end"] {
@@ -336,7 +335,13 @@ button.ds-row[aria-disabled="true"]:hover::after {
   min-width: 0;
   padding-inline-start: calc(4px * var(--ds-sf));
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: clip;
+}
+.ds-sidebar__label[data-cut="end"] {
+  mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-unit)), transparent);
+}
+.ds-sidebar__label[data-cut="end"]:dir(rtl) {
+  mask-image: linear-gradient(to left, #000 calc(100% - var(--ds-unit)), transparent);
 }
 .ds-sidebar__meta {
   flex: none;

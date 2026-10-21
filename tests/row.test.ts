@@ -153,12 +153,14 @@ test("open details are controlled independently of navigation and reset on close
 test("a record's name and value are drawn alike by the element and the native class", () => {
   const element = css("DS1/3-unit/styles/ds-row.css");
   const native = css("DS1/1-root/row.css");
-  const rule = (css: string, selector: string) => css.match(new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\s*\\{([^}]*)\\}"))?.[1];
+  // Comments can hold braces (a page's `* { margin: 0 }` reset): read the rules without them.
+  const rule = (css: string, selector: string) => css.replace(/\/\*[\s\S]*?\*\//g, "").match(new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\s*\\{([^}]*)\\}"))?.[1];
   const name = [rule(element, "::slotted(.ds-row__name)"), rule(native, ".ds-row .ds-row__name")];
   for (const css of name) {
     expect(css).toContain("flex: 0 1 auto");
     expect(css).toContain("min-width: 0");
-    expect(css).toContain("text-overflow: ellipsis");
+    expect(css).toContain("text-overflow: clip");
+    expect(css).not.toContain("ellipsis");
   }
   const cut = [rule(element, '::slotted(.ds-row__name[data-cut="end"])'), rule(native, '.ds-row .ds-row__name[data-cut="end"]')];
   for (const css of cut) expect(css).toContain("calc(100% - var(--ds-unit))");

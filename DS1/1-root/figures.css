@@ -94,7 +94,15 @@
   min-height: calc(var(--ds-stat-lines, 2) * var(--ds-unit));
   letter-spacing: calc(var(--ds-display-text-tracking, -0.4px) * var(--ds-sf, 1));
   white-space: nowrap;
-  text-overflow: ellipsis;
+  text-overflow: clip;
+}
+
+/* A figure too wide for its column fades over its last square, never an ellipsis (0-face/cut-fade.ts marks it). */
+.ds-stat__figure[data-cut="end"] {
+  mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-unit)), transparent);
+}
+.ds-stat__figure[data-cut="end"]:dir(rtl) {
+  mask-image: linear-gradient(to left, #000 calc(100% - var(--ds-unit)), transparent);
 }
 
 .ds-stat__digit {

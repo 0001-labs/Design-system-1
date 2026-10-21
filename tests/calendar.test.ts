@@ -535,7 +535,7 @@ test("an event over several days is one bar on one line, its name written once, 
 
 test("a cut name fades over its bar's last square rather than ending in an ellipsis", () => {
   const css = readFileSync(join(import.meta.dirname, "../DS1/3-unit/styles/ds-calendar.css"), "utf8");
-  expect(css).toMatch(/\.event \.name\[data-cut\] \{ mask-image: linear-gradient\(to right, #000 calc\(100% - var\(--ds-unit\)\), transparent\); \}/);
+  expect(css).toMatch(/\.event \.name\[data-cut="end"\] \{ mask-image: linear-gradient\(to right, #000 calc\(100% - var\(--ds-unit\)\), transparent\); \}/);
   expect(css).not.toMatch(/\.event \.name \{[^}]*ellipsis/);
 });
 

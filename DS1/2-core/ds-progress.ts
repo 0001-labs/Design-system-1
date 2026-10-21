@@ -10,6 +10,7 @@
 import { LitElement, html, nothing, unsafeCSS, type PropertyValues } from "lit";
 import { getText } from "../0-face/i18n";
 import { define } from "../0-face/define";
+import { CutFades } from "../0-face/cut-fade";
 import { formatNumber } from "../0-face/format";
 import { dotForKey, dotState } from "../0-face/carousel";
 import { figureFormat, meterAria, type FigureFormat, type MeterAria } from "./figures";
@@ -124,6 +125,8 @@ export class Progress extends LitElement {
   };
 
   static styles = [unsafeCSS(metrics), unsafeCSS(progress), unsafeCSS(styles)];
+  /** Words cut short fade over their last square, never an ellipsis: marks them `data-cut="end"` while they do not fit. */
+  private cuts = new CutFades(this, { selector: ".ds-progress__label" });
 
   declare value: number;
   declare min: number;

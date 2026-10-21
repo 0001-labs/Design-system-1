@@ -41,7 +41,9 @@
   color: inherit;
 }
 
-/* Text someone wrote: shown as it stands, cut with an ellipsis at its width. */
+/* Text someone wrote: shown as it stands. Cut at its width, it fades over its
+   last square, never an ellipsis: the element marks itself `data-cut="end"`
+   while its words do not fit (0-face/cut-fade.ts). */
 :host([literal]) {
   height: auto;
   min-height: var(--ds-control-height);
@@ -55,8 +57,14 @@
   font-weight: var(--ds-type-weight-default);
   line-height: var(--ds-type-lineheight-default);
   letter-spacing: var(--ds-type-letterspacing-default);
-  text-overflow: ellipsis;
+  text-overflow: clip;
   white-space: nowrap;
+}
+:host([literal]:not([wrap])[data-cut="end"]) {
+  mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-unit)), transparent);
+}
+:host([literal]:not([wrap])[data-cut="end"]:dir(rtl)) {
+  mask-image: linear-gradient(to left, #000 calc(100% - var(--ds-unit)), transparent);
 }
 
 /*

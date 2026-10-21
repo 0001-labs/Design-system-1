@@ -7,6 +7,7 @@
 
 import { LitElement, html, nothing, unsafeCSS, type PropertyValues } from "lit";
 import { define } from "../0-face/define";
+import { CutFades } from "../0-face/cut-fade";
 import { getText } from "../0-face/i18n";
 import metrics from "../1-root/component-metrics.css?inline";
 import styles from "./styles/ds-matrix.css?inline";
@@ -107,6 +108,8 @@ export class Matrix extends LitElement {
   };
 
   static styles = [unsafeCSS(metrics), unsafeCSS(styles)];
+  /** Words cut short fade over their last square, never an ellipsis: marks them `data-cut="end"` while they do not fit. */
+  private cuts = new CutFades(this, { selector: ".name" });
 
   declare rows: MatrixAxis[];
   declare columns: MatrixAxis[];

@@ -20,6 +20,7 @@
 
 import { html, nothing, unsafeCSS, type PropertyValues } from "lit";
 import { define } from "../0-face/define";
+import { CutFades } from "../0-face/cut-fade";
 import { getText } from "../0-face/i18n";
 import { dateFormatter, type DateLength } from "../0-face/format";
 import {
@@ -273,6 +274,8 @@ export class Calendar extends CalendarBase {
   };
 
   static styles = [unsafeCSS(metrics), unsafeCSS(controls), unsafeCSS(styles)];
+  /** Words cut short (the title, a weekday, the picker's value, an event's name on its bar) fade over their last square, never "…": marks them `data-cut="end"` while they do not fit. */
+  private cuts = new CutFades(this, { selector: ".title:not(.title-button), .title-text, .weekday, .trigger .text, .event .name" });
 
   declare month: string | undefined;
   declare compact: boolean;
@@ -446,10 +449,6 @@ export class Calendar extends CalendarBase {
 
   protected updated(changed: PropertyValues<this>) {
     super.updated(changed);
-    // Names cut by their bar fade out over its last square, never "…"; one that fits stays whole.
-    for (const name of this.renderRoot.querySelectorAll<HTMLElement>(".event .name")) {
-      name.toggleAttribute("data-cut", name.scrollWidth > name.clientWidth + 0.5);
-    }
     // A day opens its hours an hour before its first timed event, or at seven.
     if (this.shownView === "day" && (changed.has("view") || changed.has("date") || changed.has("events"))) {
       const hours = this.renderRoot.querySelector<HTMLElement>(".hours");

@@ -1,6 +1,7 @@
 import { LitElement, html, nothing, unsafeCSS } from "lit";
 import styles from "./styles/ds-list.css?inline";
 import { define } from "../0-face/define";
+import { CutFades } from "../0-face/cut-fade";
 
 /** Children that are never items of the list. */
 const NOT_ITEMS = new Set(["template", "script", "style", "slot"]);
@@ -35,6 +36,8 @@ export class List extends LitElement {
   declare heading: string | undefined;
 
   static styles = unsafeCSS(styles);
+  /** Words cut short fade over their last square, never an ellipsis: marks them `data-cut="end"` while they do not fit. */
+  private cuts = new CutFades(this, { selector: ".heading" });
 
   /** The items this element gave a role, so roles the page wrote are left alone. */
   private ownItems = new Set<Element>();
