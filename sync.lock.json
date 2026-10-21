@@ -27,7 +27,7 @@
     }
   },
   "Feature flags": {
-    "commit": "5e23daad387bb9d4ec9349a0390aa4b391a5af36",
+    "commit": "21720d8c8372cf1066c7716a8cd5c922241b1494",
     "version": null,
     "owned": ["shared/feature-flags-runtime"],
     "files": {
@@ -35,7 +35,7 @@
       "shared/feature-flags-runtime/index.ts": "1c28daa43f44ad88d5214ef14d295546cc9eccb8385a45a1fa5dd3c94cec0290",
       "shared/feature-flags-runtime/manage.ts": "baaeb0a8aa9beb12432fa92558e7f529efc6fef19be56177ee72bfbedff629bd",
       "shared/feature-flags-runtime/matrix.css": "c1045245cf56264ce70cb31c14e72225dbee9f0a67ee0055b9de83e542ee3def",
-      "shared/feature-flags-runtime/matrix.ts": "c669b37756452e0394c9d028a0f9fa7cc7cd418714ad242f13a9c551824fe529"
+      "shared/feature-flags-runtime/matrix.ts": "172c7e9f8368ad7ce85b9a936179e54fc3570a275063c55f066195ae897f82ff"
     }
   }
 }

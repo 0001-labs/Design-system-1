@@ -6,6 +6,9 @@ import type { ManagedFlag } from './manage';
 // The rows read as a release: Off, Owner, the named accounts, a growing share
 // of the accounts, then Everyone last.
 
+// Nodes are added with appendChild, which every product's DOM types agree on: Cloudflare's Worker types
+// redeclare Element.append for HTMLRewriter, so append(node) fails to type-check where both are loaded.
+
 export type AudienceRow = { kind: 'off' | 'owner' | 'everyone' } | { kind: 'account'; id: string } | { kind: 'percentage'; value: number };
 
 /** The shares of the accounts a flag can be released to, in the order they are offered; index.ts accepts any whole percent. */
@@ -83,9 +86,9 @@ export function mountAudienceMatrix(host: HTMLElement, initial: ManagedFlag[], c
   const chart = document.createElement('div'); chart.className = 'flags-matrix matrix-chart';
   const form = document.createElement('form'); form.className = 'flags-matrix-add';
   const label = document.createElement('label'); label.textContent = 'Account identity ';
-  const input = document.createElement('input'); input.className = 'ds-input'; input.required = true; input.setAttribute('aria-label', 'Account identity'); label.append(input);
+  const input = document.createElement('input'); input.className = 'ds-input'; input.required = true; input.setAttribute('aria-label', 'Account identity'); label.appendChild(input);
   const add = document.createElement('button'); add.className = 'ds-button'; add.textContent = 'Add row'; add.type = 'submit';
-  form.append(label, add);
+  form.appendChild(label); form.appendChild(add);
   // The names are measured when they are drawn and whenever their box changes (a hidden matrix shown, the page's fonts arriving).
   const cuts = typeof ResizeObserver === 'undefined' ? undefined : new ResizeObserver(entries => { for (const entry of entries) markCut(entry.target); });
   const measure = () => { for (const words of chart.querySelectorAll('.matrix-words')) markCut(words); };
@@ -99,11 +102,11 @@ export function mountAudienceMatrix(host: HTMLElement, initial: ManagedFlag[], c
         const caption = table.createCaption(); caption.className = 'flags-matrix-caption';
         caption.textContent = 'Flags across, audiences and accounts down. A check shows who the release rule includes, a cross who it leaves out. Changes save automatically. Choosing an account replaces Owner, a share or Everyone; multiple accounts can be selected. A share releases to that part of the accounts, the same accounts each time, and a larger share keeps them.';
       }
-      const head = table.createTHead().insertRow(); const corner = document.createElement('th'); corner.scope = 'col'; corner.className = 'matrix-corner'; corner.textContent = 'Audience'; head.append(corner);
-      for (const flag of group) { const th = document.createElement('th'); th.scope = 'col'; th.className = 'matrix-column'; const span = document.createElement('span'); span.textContent = flag.label; th.title = flag.description || flag.label; th.append(span); head.append(th); }
+      const head = table.createTHead().insertRow(); const corner = document.createElement('th'); corner.scope = 'col'; corner.className = 'matrix-corner'; corner.textContent = 'Audience'; head.appendChild(corner);
+      for (const flag of group) { const th = document.createElement('th'); th.scope = 'col'; th.className = 'matrix-column'; const span = document.createElement('span'); span.textContent = flag.label; th.title = flag.description || flag.label; th.appendChild(span); head.appendChild(th); }
       const body = table.createTBody();
       for (const [row, name] of audienceRows(accounts)) {
-        const tr = body.insertRow(); const th = document.createElement('th'); th.scope = 'row'; th.className = 'matrix-row'; th.title = name; const words = document.createElement('span'); words.className = 'matrix-words'; words.textContent = name; th.append(words); tr.append(th);
+        const tr = body.insertRow(); const th = document.createElement('th'); th.scope = 'row'; th.className = 'matrix-row'; th.title = name; const words = document.createElement('span'); words.className = 'matrix-words'; words.textContent = name; th.appendChild(words); tr.appendChild(th);
         for (const flag of group) {
           const cell = tr.insertCell(); const button = document.createElement('button'); button.type = 'button'; button.className = 'flags-matrix-toggle'; button.setAttribute('role','switch'); button.setAttribute('aria-label',`${name}: ${flag.label}`); button.dataset.audience = row.kind; setToggle(button, selected(flag,row)); button.disabled = busy;
           button.addEventListener('click', async () => {
@@ -119,7 +122,7 @@ export function mountAudienceMatrix(host: HTMLElement, initial: ManagedFlag[], c
             busy = false; render();
             const same = [...chart.querySelectorAll<HTMLButtonElement>('button')].find(item => item.getAttribute('aria-label') === `${name}: ${flag.label}`); same?.focus();
           });
-          cell.append(button);
+          cell.appendChild(button);
         }
       }
       return table;
