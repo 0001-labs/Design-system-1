@@ -94,7 +94,7 @@ export function LibraryList() {
 
       <div role="list" className="library-grid library-preview-grid">
         <div role="listitem">
-          <a className="ds-card library-preview-card" href="/start-here/overview/"
+          <a className="ds-card library-preview-card" href="/"
             target={document.documentElement.hasAttribute("data-docs-embed") ? "_top" : undefined}>
             <span className="ds-card__label">Built-in</span>
             <h2 className="ds-card__title">Design system 1</h2>

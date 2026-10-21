@@ -1,7 +1,13 @@
 ---
 title: Overview
-description: A Lit Web Component library for interfaces on the 20px grid.
+description: A Lit Web Component library for interfaces on the 20px grid. Everything fits in a grid.
 ---
+
+import LandingHero from "../../components/LandingHero.astro";
+import LayerDiagram from "../../components/LayerDiagram.astro";
+import ComponentDirectory from "../../components/ComponentDirectory.astro";
+
+<LandingHero embedded />
 
 Design system 1 is a Lit Web Component library. Load its stylesheet and module, then write `ds-button`, `ds-input`, `ds-table` and the other elements directly in HTML. React adapters use the same components.
 
@@ -11,7 +17,13 @@ Design system 1 is a Lit Web Component library. Load its stylesheet and module, 
 
 **1 Root** supplies the shared colours, type, scale, theme and language. **2 Core** contains individual components. **3 Unit** composes them into calendars, tables, navigation and forms. **4 Page** arranges them into layouts.
 
+<LayerDiagram />
+
 [Browse the components](/2-core/overview/). Each page shows the component's properties, slots, events and examples. Components own their appearance and interaction; your application supplies data and actions.
+
+## Every component
+
+<ComponentDirectory />
 
 ## One library, your design
 

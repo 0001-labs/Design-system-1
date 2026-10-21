@@ -2,14 +2,12 @@
 import '../../../DS1/1-root/one.css';
 import PublicPreferences from './PublicPreferences.astro';
 import '../../../shared/site-navigation.css';
-interface Props { landing?: boolean; }
-const { landing = false } = Astro.props;
 ---
 
 <PublicPreferences />
-<header class:list={['site-navigation', 'docs-header', { 'docs-header--with-sidebar': !landing }]}>
-  <nav class="system-breadcrumb" aria-label="System breadcrumb"><a class="site-brand" href="/start-here/overview/">Design system 1</a><span id="private-component-context" hidden>App</span></nav>
-  {!landing && <button id="mobile-menu-btn" class="site-brand docs-brand-menu" type="button" aria-label="Open documentation navigation" aria-controls="mobile-navigation-panel" aria-haspopup="dialog" aria-expanded="false"><ds-icon type="menu" aria-hidden="true"></ds-icon></button>}
+<header class="site-navigation docs-header docs-header--with-sidebar">
+  <nav class="system-breadcrumb" aria-label="System breadcrumb"><a class="site-brand" href="/">Design system 1</a><span id="private-component-context" hidden>App</span></nav>
+  <button id="mobile-menu-btn" class="site-brand docs-brand-menu" type="button" aria-label="Open documentation navigation" aria-controls="mobile-navigation-panel" aria-haspopup="dialog" aria-expanded="false"><ds-icon type="menu" aria-hidden="true"></ds-icon></button>
 </header>
 <iframe id="navigation-auth" src="/app/navigation-auth" title="Account status" hidden aria-hidden="true" tabindex="-1"></iframe>
 

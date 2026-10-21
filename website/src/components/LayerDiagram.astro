@@ -9,6 +9,7 @@ import { LAYERS } from '../lib/component-directory';
 const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
 ---
 
+<div class="layer-diagram-frame not-content" data-ds-not-prose>
 <div class="layer-diagram" role="group" aria-label="The four layers of Design system 1, each built from the one before">
   {LAYERS.map((layer, index) => (
     <div class="layer-group" data-color={layer.color}>
@@ -37,19 +38,24 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
   ))}
 
 </div>
+</div>
 
 <style>
+  /* The diagram fills the column it stands in: each box as many whole squares wide as four fit with
+     two squares between them, four at the least. */
+  .layer-diagram-frame { container-type: inline-size; }
   .layer-diagram {
-    --diagram-unit: var(--landing-unit);
+    --diagram-unit: var(--landing-unit, var(--site-unit, 20px));
+    --diagram-box: max(calc(4 * var(--diagram-unit)), round(down, calc((100cqw - 6 * var(--diagram-unit)) / 4), var(--diagram-unit)));
     --diagram-ink: var(--ds1-docs-header-text);
     display: grid;
-    grid-template-columns: repeat(4, calc(4 * var(--diagram-unit)));
+    grid-template-columns: repeat(4, var(--diagram-box));
     column-gap: calc(2 * var(--diagram-unit));
     row-gap: calc(2 * var(--diagram-unit));
     align-items: start;
     color: var(--diagram-ink);
     font-family: var(--typeface-regular);
-    font-size: var(--landing-type);
+    font-size: var(--landing-type, var(--ds-type-size-default, 14px));
     line-height: var(--diagram-unit);
   }
   .layer-group { position: relative; --summary-rows: 3; --box-radius: calc(0.2 * var(--diagram-unit)); --box-fill: light-dark(#e6e6e6, #fff); }
@@ -126,7 +132,7 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
   /* A layer leads to the next along the names' row: a line from a quarter
      square after its name to a fifth of a square before the next, ending in
      an arrowhead of two strokes a fifth of a square long at 35 degrees. */
-  .layer-name { display: flex; align-items: center; width: calc(6 * var(--diagram-unit)); }
+  .layer-name { display: flex; align-items: center; width: calc(var(--diagram-box) + 2 * var(--diagram-unit)); }
   .layer-arrow {
     position: relative;
     flex: 1;
@@ -151,16 +157,16 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
   /* Every explanation is written to fit three rows and keeps all three, so the boxes start on one line. */
   .layer-summary {
     /* Wider than a box: it runs on into the two squares before the next group. */
-    width: calc(5.5 * var(--diagram-unit));
+    width: calc(var(--diagram-box) + 1.5 * var(--diagram-unit));
     min-height: calc(var(--summary-rows) * var(--diagram-unit));
     margin: 0 0 var(--diagram-unit);
     color: var(--ds1-docs-header-text-secondary);
   }
 
   @media (max-width: 680px) {
-    .layer-diagram { grid-template-columns: repeat(2, calc(4 * var(--diagram-unit))); row-gap: calc(2 * var(--diagram-unit)); }
+    .layer-diagram { --diagram-box: max(calc(4 * var(--diagram-unit)), round(down, calc((100cqw - 2 * var(--diagram-unit)) / 2), var(--diagram-unit))); grid-template-columns: repeat(2, var(--diagram-box)); row-gap: calc(2 * var(--diagram-unit)); }
     .layer-group:nth-child(2n) .layer-arrow { display: none; }
   }
-  :global(html.mobile) .layer-diagram { grid-template-columns: repeat(2, calc(4 * var(--diagram-unit))); row-gap: calc(2 * var(--diagram-unit)); }
+  :global(html.mobile) .layer-diagram { --diagram-box: max(calc(4 * var(--diagram-unit)), round(down, calc((100cqw - 2 * var(--diagram-unit)) / 2), var(--diagram-unit))); grid-template-columns: repeat(2, var(--diagram-box)); row-gap: calc(2 * var(--diagram-unit)); }
   :global(html.mobile) .layer-group:nth-child(2n) .layer-arrow { display: none; }
 </style>

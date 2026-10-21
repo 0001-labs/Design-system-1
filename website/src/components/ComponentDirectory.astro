@@ -1,0 +1,79 @@
+---
+import LargeDirectoryList from './LargeDirectoryList.astro';
+import { LAYERS } from '../lib/component-directory';
+// Every component by layer, in the Overview's column: the layer's name and what it is beside its
+// list, staying in view while the names go by. The names are the links, one a line, two squares
+// high, so the longest still fits the column.
+---
+
+<div class="component-directory not-content" data-ds-not-prose role="group" aria-label="Every component, by layer">
+  {LAYERS.map((layer) => (
+    <section class="directory-layer" data-color={layer.color} aria-labelledby={`layer-${layer.number}`}>
+      <div class="directory-layer-head">
+        <h3 id={`layer-${layer.number}`}><span class="directory-swatch" aria-hidden="true"></span>{layer.number} {layer.name}</h3>
+        <p>{layer.summary}</p>
+      </div>
+      <LargeDirectoryList entries={layer.entries} />
+    </section>
+  ))}
+</div>
+
+<style>
+  .component-directory {
+    --directory-unit: var(--site-unit, 20px);
+    --directory-type: calc(2 * var(--directory-unit));
+    margin-block: var(--directory-unit) calc(2 * var(--directory-unit));
+    color: var(--ds1-docs-header-text);
+    font-family: var(--typeface-regular);
+  }
+  .component-directory :is(h3, p) { margin: 0; }
+  .directory-layer {
+    --layer-color: light-dark(#e6e6e6, #ffffff);
+    display: grid;
+    grid-template-columns: calc(8 * var(--directory-unit)) minmax(0, 1fr);
+    column-gap: calc(2 * var(--directory-unit));
+    row-gap: var(--directory-unit);
+    padding-block: var(--directory-unit) calc(2 * var(--directory-unit));
+    border-top: 1px solid var(--ds1-docs-divider, var(--ds1-docs-header-border));
+  }
+  .directory-layer[data-color='light-green'] { --layer-color: #99ff73; }
+  .directory-layer[data-color='light-blue'] { --layer-color: #ccccff; }
+  .directory-layer[data-color='pink'] { --layer-color: #f5aad1; }
+  .directory-layer[data-color='yellow'] { --layer-color: #eaff00; }
+
+  .directory-layer-head {
+    position: sticky;
+    top: calc(var(--site-header-height, 0px) + var(--directory-unit));
+    align-self: start;
+  }
+  /* One square a line, the swatch and words on its lower sixteen. */
+  .directory-layer-head h3 {
+    display: flex;
+    align-items: flex-end;
+    gap: calc(4px * var(--sf, 1));
+    height: var(--directory-unit);
+    color: inherit;
+    font-family: var(--typeface-medium);
+    font-size: var(--ds-type-size-default, 14px);
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: calc(16px * var(--sf, 1));
+  }
+  .directory-swatch {
+    flex: none;
+    width: calc(16px * var(--sf, 1));
+    height: calc(16px * var(--sf, 1));
+    background: var(--layer-color);
+  }
+  .directory-layer-head p {
+    color: var(--ds1-docs-header-text-secondary);
+    line-height: var(--directory-unit);
+  }
+
+  @media (max-width: 680px) {
+    .directory-layer { grid-template-columns: minmax(0, 1fr); }
+    .directory-layer-head { position: static; }
+  }
+  :global(html.mobile) .directory-layer { grid-template-columns: minmax(0, 1fr); }
+  :global(html.mobile) .directory-layer-head { position: static; }
+</style>

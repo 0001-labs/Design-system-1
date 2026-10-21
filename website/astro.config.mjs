@@ -8,6 +8,8 @@ export default defineConfig({
   // Checkbox and Switch were one page; the old address goes to the checkbox (19 October 2026).
   redirects: {
     "/2-core/choice/": "/2-core/checkbox/",
+    // The front page became the Overview, in the docs (21 October 2026).
+    "/start-here/overview/": "/",
     "/examples/": "/start-here/examples/",
     "/examples/settings/": "/start-here/examples/#general-settings",
     "/examples/shop/": "/start-here/examples/#shop",
@@ -86,7 +88,7 @@ export default defineConfig({
         {
           label: "Start Here",
           items: [
-            { label: "Overview", slug: "start-here/overview" },
+            { label: "Overview", link: "/" },
             { label: "Use with HTML", slug: "start-here/quick-start" },
           ],
         },

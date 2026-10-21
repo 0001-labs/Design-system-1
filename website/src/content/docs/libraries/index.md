@@ -15,7 +15,7 @@ The editor and the API operate on the same libraries. Revision checks protect a 
 
 ## Start without an account
 
-The [documentation](/start-here/overview/) and [downloadable HTML examples](/start-here/examples/) are public. You do not need an account, a build step to use the components directly in HTML.
+The [documentation](/) and [downloadable HTML examples](/start-here/examples/) are public. You do not need an account, a build step to use the components directly in HTML.
 
 The [playground](/app/playground) is for temporary experiments. Copy your work to keep it, or sign in to save a library.
 

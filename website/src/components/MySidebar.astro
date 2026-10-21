@@ -94,7 +94,7 @@ const { sidebar } = Astro.locals.starlightRoute;
   function renderNavigation() {
     navigation.label = library ? `${library.name} navigation` : 'Documentation';
     const items: SidebarItem[] = library ? [
-      { id: 'base-system', label: 'Design system 1', href: '/start-here/overview/' },
+      { id: 'base-system', label: 'Design system 1', href: '/' },
       { id: 'library-overview', label: library.name, href: libraryWorkspaceHref({ ...library, view: 'overview' }), current: library.view === 'overview' },
       ...LAYERS.flatMap(layer => {
         const id = `library-layer-${layer.number}`;

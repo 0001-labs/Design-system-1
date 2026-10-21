@@ -11,6 +11,12 @@ const C = {
 } as const;
 type Color = keyof typeof C;
 
+interface Props {
+  /** Drawn inside the Overview's column, as wide as it, with no buttons: the reader is already in the docs. */
+  embedded?: boolean;
+}
+const { embedded = false } = Astro.props;
+
 // Each row is five big squares wide; a row of smaller squares fits more.
 const rows: { size: number; colors: Color[] }[] = [
   { size: 80, colors: ['blue', 'red', 'green', 'red', 'green'] },
@@ -31,19 +37,23 @@ const tiles = rows.flatMap((row) => {
 });
 ---
 
-<section class="landing-hero" aria-labelledby="landing-title">
+<div class:list={{ 'landing-hero-frame': embedded }}>
+<section class:list={['landing-hero', { 'landing-hero--embedded': embedded }]} aria-label={embedded ? 'Design system 1' : undefined} aria-labelledby={embedded ? undefined : 'landing-title'}>
   <svg class="landing-hero-blocks" viewBox="0 0 400 320" preserveAspectRatio="xMinYMin slice" shape-rendering="crispEdges" aria-hidden="true">
     {tiles.map((tile) => <rect x={tile.x} y={tile.y} width={tile.size + 0.5} height={tile.size + 0.5} fill={tile.fill} />)}
   </svg>
   <PaperMaterial />
-  <h1 id="landing-title" class="landing-hero-title">Design system 1</h1>
-  <div class="landing-hero-panel">
+  {embedded
+    ? <p class="landing-hero-title" aria-hidden="true">Design system 1</p>
+    : <h1 id="landing-title" class="landing-hero-title">Design system 1</h1>}
+  {!embedded && <div class="landing-hero-panel">
     <nav class="landing-hero-actions" aria-label="Get started">
       <a class="landing-hero-button landing-hero-button--primary" href="#learn-more">Learn more</a>
-      <a class="landing-hero-button" href="/start-here/overview/">Go to docs</a>
+      <a class="landing-hero-button" href="/">Go to docs</a>
     </nav>
-  </div>
+  </div>}
 </section>
+</div>
 
 <style>
   .landing-hero {
@@ -123,14 +133,32 @@ const tiles = rows.flatMap((row) => {
   .landing-hero-button:hover { background: rgb(255 255 255 / 0.9); color: #1e1e1e; text-decoration: none; }
   .landing-hero-button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 
+  /* In the Overview the whole cover stands in the column, five units across to four down, the name
+     down its fourth column and short enough to fit; a picture's corners. */
+  .landing-hero-frame {
+    container-type: inline-size;
+    margin-block: 0 calc(2 * var(--site-unit, 20px));
+  }
+  .landing-hero--embedded {
+    --hero-scale: calc(100cqw / 400);
+    --hero-title-column: 280;
+    --hero-title-size: calc(40 * var(--hero-scale));
+    --hero-edge: calc(10 * var(--hero-scale));
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 400 / 320;
+    border-radius: var(--ds-radius, 4px);
+  }
+  .landing-hero--embedded .landing-hero-title { top: var(--hero-edge); }
+
   /* Upright, the screen shows the first two columns: the name moves to the red one there. */
   @media (max-aspect-ratio: 1/1) {
     /* The name stops above the words and buttons, which stack there. */
-    .landing-hero {
+    .landing-hero:not(.landing-hero--embedded) {
       --hero-title-column: 120;
       --hero-title-size: min(12.5dvh, 56 * var(--hero-scale), (100dvh - 310px) / 7.2);
     }
-    .landing-hero-title { left: min(calc(var(--hero-title-column) * var(--hero-scale)), calc(100vw - var(--hero-title-size) * 0.5 - var(--hero-edge))); }
+    .landing-hero:not(.landing-hero--embedded) .landing-hero-title { left: min(calc(var(--hero-title-column) * var(--hero-scale)), calc(100vw - var(--hero-title-size) * 0.5 - var(--hero-edge))); }
     .landing-hero-actions { display: grid; justify-items: center; }
   }
   @media (prefers-reduced-motion: reduce) {

@@ -38,7 +38,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="app-shell">
       <header className="site-navigation" data-ds-area="Navigation">
         <div className="system-breadcrumb" aria-label="System breadcrumb">
-          <a className="site-brand" href="/start-here/overview/" target={embedded ? "_top" : undefined}>Design system 1</a>
+          <a className="site-brand" href="/" target={embedded ? "_top" : undefined}>Design system 1</a>
         </div>
         <nav aria-label="Main navigation" className="site-links">
           {siteNavigation.filter((item) => item.href !== "/app/libraries" || (!isLoading && isAuthenticated)).map((item) => item.href.startsWith("/app/") ? (
