@@ -2,6 +2,8 @@ import { appNavigation } from './app-navigation';
 import { WorkerEntrypoint } from "cloudflare:workers";
 import { featureFlags, manageFeatureFlags, setFeatureFlag } from "./flags";
 import { dashboard, DASHBOARD_HOST, ICON_HOST } from "./dashboard";
+
+const PLAY_HOST = "play.designsystem1.com";
 import { libraryApi } from "./libraries";
 import { fontWorkspace } from "./fonts";
 import assets from "./assets/index.ts";
@@ -55,6 +57,22 @@ export default {
       response.headers.set("X-Robots-Tag", "noindex, nofollow");
       response.headers.set("Referrer-Policy", "same-origin");
       return response;
+    }
+
+    // The playground lives on its own host: its page at the root, the site's assets beside it.
+    if (url.hostname === PLAY_HOST) {
+      if (!["GET", "HEAD"].includes(request.method)) return new Response("Not found", { status: 404 });
+      if (url.pathname === "/" || url.pathname === "/play" || url.pathname === "/play/") {
+        const page = new URL(request.url);
+        page.pathname = "/play/";
+        return env.ASSETS.fetch(new Request(page, request));
+      }
+      if (/^\/(_astro|examples|icons|fonts|resources)\//.test(url.pathname) || /^\/(translations\.json|favicon\.(ico|svg))$/.test(url.pathname)) return env.ASSETS.fetch(request);
+      url.hostname = "designsystem1.com";
+      return Response.redirect(url.toString(), 308);
+    }
+    if (url.hostname === "designsystem1.com" && url.pathname.replace(/\/$/, "") === "/play") {
+      return Response.redirect(`https://${PLAY_HOST}/`, 308);
     }
 
     if (url.hostname === "www.designsystem1.com" ||

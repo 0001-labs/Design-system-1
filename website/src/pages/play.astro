@@ -1,0 +1,169 @@
+---
+// The playground, served at play.designsystem1.com: one HTML file to edit on the left, the page it
+// makes on the right in a computer's window or on a phone. Nothing is sent anywhere; the reader's
+// file is kept in this browser until they start again.
+import '../../../DS1/1-root/one.css';
+import PublicPreferences from '../components/PublicPreferences.astro';
+import ExampleDevice from '../components/ExampleDevice.astro';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Playground — Design system 1</title>
+    <meta name="description" content="Edit one HTML file built with Design system 1 and see the page as you write, on a computer or a phone." />
+    <link rel="icon" type="image/svg+xml" href="/icons/design-system-1.svg" />
+    <PublicPreferences />
+  </head>
+  <body>
+    <header class="play-bar">
+      <a class="play-brand" href="https://designsystem1.com/">Design system 1</a>
+      <ds-text literal tone="muted">Playground</ds-text>
+      <span class="play-grow"></span>
+      <ds-button split literal class="play-panes" aria-label="Show" options="code:Code,preview:Preview" value="code" data-pane-choice></ds-button>
+      <ds-button split literal aria-label="Preview width" options="computer:Computer,phone:Phone" value="computer" data-preview-width></ds-button>
+      <ds-button id="play-reset">Start again</ds-button>
+      <ds-button id="play-copy">Copy</ds-button>
+      <ds-button id="play-download" primary>Download</ds-button>
+    </header>
+    <main class="play" data-pane="code">
+      <section class="play-code" aria-label="Your HTML file">
+        <textarea id="play-source" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="HTML of the page"></textarea>
+      </section>
+      <section class="play-preview" aria-label="The page">
+        <div class="play-stage"><ExampleDevice src="about:blank" title="Your page" height={600} /></div>
+      </section>
+    </main>
+    <script>
+      import '../../../DS1/index';
+      import { confirm } from '../../../DS1/0-face/feedback';
+      import { copyText } from '../../../DS1/0-face/copy-text';
+      import { onChoice } from '../lib/example-controls';
+      import { PLAYGROUND_HTML } from '../lib/playground-example';
+
+      const KEY = 'ds1-playground:html';
+      const play = document.querySelector<HTMLElement>('.play')!;
+      const source = document.querySelector<HTMLTextAreaElement>('#play-source')!;
+      const frame = document.querySelector<HTMLIFrameElement>('.play-preview iframe')!;
+      frame.removeAttribute('loading');
+
+      const stored = () => { try { return localStorage.getItem(KEY); } catch { return null; } };
+      const keep = (html: string) => { try { if (html === PLAYGROUND_HTML) localStorage.removeItem(KEY); else localStorage.setItem(KEY, html); } catch {} };
+
+      // HTML is not a language that fails: a half-written tag is only unfinished. The page waits
+      // until the writing pauses with no tag open where the caret is (a "<" with no ">" yet) and no
+      // comment left open, and shows the last finished version until then; nothing is marked as an
+      // error.
+      function finished(html: string, caret: number): boolean {
+        const before = html.slice(0, caret);
+        if (before.lastIndexOf('<') > before.lastIndexOf('>')) return false;
+        return html.lastIndexOf('<!--') <= html.lastIndexOf('-->');
+      }
+      let shown = '';
+      function show(html: string) {
+        if (html === shown) return;
+        shown = html;
+        frame.srcdoc = html;
+      }
+      let pause: ReturnType<typeof setTimeout> | undefined;
+      source.addEventListener('input', () => {
+        clearTimeout(pause);
+        pause = setTimeout(() => {
+          keep(source.value);
+          if (finished(source.value, source.selectionStart)) show(source.value);
+        }, 500);
+      });
+      // Tab writes two spaces; Shift+Tab and Escape leave the editor as usual.
+      source.addEventListener('keydown', event => {
+        if (event.key !== 'Tab' || event.shiftKey || event.altKey || event.metaKey || event.ctrlKey) return;
+        event.preventDefault();
+        source.setRangeText('  ', source.selectionStart, source.selectionEnd, 'end');
+        source.dispatchEvent(new Event('input'));
+      });
+
+      source.value = stored() ?? PLAYGROUND_HTML;
+      show(source.value);
+
+      onChoice(document.querySelector('[data-preview-width]'), value => { play.toggleAttribute('data-phone', value === 'phone'); });
+      onChoice(document.querySelector('[data-pane-choice]'), value => { play.dataset.pane = value; });
+
+      document.querySelector('#play-reset')!.addEventListener('click', async () => {
+        if (source.value === PLAYGROUND_HTML) return;
+        if (!(await confirm({ title: 'Start again?', text: 'Your changes are replaced by the example.', confirm: 'Start again', danger: true }))) return;
+        source.value = PLAYGROUND_HTML;
+        keep(source.value);
+        show(source.value);
+      });
+      document.querySelector('#play-copy')!.addEventListener('click', () => { void copyText(source.value); });
+      document.querySelector('#play-download')!.addEventListener('click', () => {
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(new Blob([source.value], { type: 'text/html' }));
+        link.download = 'page.html';
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+      });
+    </script>
+  </body>
+</html>
+<style is:global>
+  html, body { height: 100%; margin: 0; }
+  body {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    background: var(--background);
+    color: var(--text-color);
+    font-family: var(--typeface-regular);
+    font-size: var(--ds-type-size-default, 14px);
+    line-height: var(--ds-unit, 20px);
+  }
+  /* One row of one square with a square around it, as a header is. */
+  .play-bar { display: flex; align-items: flex-end; gap: var(--ds-unit); padding: var(--ds-unit); border-bottom: 1px solid var(--ds-border-color); line-height: calc(16px * var(--sf, 1)); }
+  .play-brand { color: inherit; font-family: var(--typeface-medium); text-decoration: none; }
+  .play-grow { flex: 1; }
+  .play-panes { display: none; }
+  .play { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 0; }
+  .play-code { display: flex; min-height: 0; border-right: 1px solid var(--ds-border-color); }
+  /* Plain text in the code face, one square a line: nothing is highlighted, nothing marked wrong. */
+  #play-source {
+    flex: 1;
+    box-sizing: border-box;
+    margin: 0;
+    padding: var(--ds-unit);
+    border: 0;
+    outline: none;
+    resize: none;
+    background: var(--background);
+    color: var(--text-color);
+    font-family: var(--typeface-mono);
+    font-size: calc(13px * var(--sf, 1));
+    line-height: var(--ds-unit);
+    tab-size: 2;
+    white-space: pre;
+    overflow: auto;
+  }
+  #play-source:focus-visible { box-shadow: inset 0 0 0 2px var(--ds-focus-ring); }
+  .play-preview { container-type: size; min-height: 0; overflow: auto; background: var(--ds-fill); }
+  .play-stage { box-sizing: border-box; padding: var(--ds-unit); }
+  /* The computer's window fills the pane; the phone stands whole in it. */
+  .play .example-device iframe { height: calc(100cqh - 2 * var(--ds-unit) - 34px * var(--sf, 1)); }
+  .play[data-phone] .example-device { width: min(calc(21 * var(--ds-unit)), calc((100cqh - 2 * var(--ds-unit)) * 910 / 1855)); }
+  .play[data-phone] .example-device iframe { height: 0; }
+
+  @media (max-width: 900px) {
+    .play-bar { flex-wrap: wrap; }
+    .play-bar > ds-text, .play-grow { display: none; }
+    .play-panes { display: inline-flex; }
+    .play { grid-template-columns: minmax(0, 1fr); }
+    .play-code { border-right: 0; }
+    .play[data-pane='code'] .play-preview, .play[data-pane='preview'] .play-code { display: none; }
+  }
+  /* On a phone the page is already a phone's: the preview is the page itself, without a frame. */
+  @media (max-width: 600px) {
+    .play-bar [data-preview-width], #play-copy { display: none; }
+    .play-stage { padding: 0; }
+    .play .example-device-glass { border-radius: 0; box-shadow: none; }
+    .play .example-window-chrome { display: none; }
+    .play .example-device iframe { height: 100cqh; }
+  }
+</style>

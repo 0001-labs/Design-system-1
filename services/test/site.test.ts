@@ -21,6 +21,19 @@ describe("combined website routes", () => {
     }
   });
 
+  it("serves the playground at the root of its own host, with the site's assets beside it", async () => {
+    const origin = "https://play.designsystem1.com";
+    expect(await (await site.fetch(origin + "/")).text()).toBe("Playground");
+    expect(await (await site.fetch(origin + "/resources/design-system-1.js")).text()).toBe("Components");
+    const docs = await site.fetch(origin + "/2-core/button/", { redirect: "manual" });
+    expect(docs.status).toBe(308);
+    expect(docs.headers.get("location")).toBe("https://designsystem1.com/2-core/button/");
+    expect((await site.fetch(origin + "/api/libraries", { method: "POST" })).status).toBe(404);
+    const old = await site.fetch("/play/", { redirect: "manual" });
+    expect(old.status).toBe(308);
+    expect(old.headers.get("location")).toBe("https://play.designsystem1.com/");
+  });
+
   it("gates the icon builder host like the dashboard and serves it nothing else", async () => {
     const origin = "https://icon.designsystem1.com";
     const page = await site.fetch(origin + "/", { redirect: "manual" });

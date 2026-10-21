@@ -25,6 +25,7 @@ describe("single Worker deployment", () => {
       { pattern: "adoption.designsystem1.com", custom_domain: true },
       { pattern: "fonts.designsystem1.com", custom_domain: true },
       { pattern: "icon.designsystem1.com", custom_domain: true },
+      { pattern: "play.designsystem1.com", custom_domain: true },
       { pattern: "designsystem1.com", custom_domain: true },
       { pattern: "www.designsystem1.com", custom_domain: true },
       { pattern: "dsone.dev/*", zone_name: "dsone.dev" },

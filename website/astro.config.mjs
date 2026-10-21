@@ -92,6 +92,7 @@ export default defineConfig({
           items: [
             { label: "Overview", link: "/" },
             { label: "Use with HTML", slug: "start-here/quick-start" },
+            { label: "Playground", link: "https://play.designsystem1.com/" },
           ],
         },
         {
