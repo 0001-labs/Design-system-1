@@ -21,14 +21,13 @@ Root establishes the common ground for the system: the square, colours, type, sc
 | [Fonts](/1-root/fonts/) | Typefaces, font loading and specimens. |
 | [Prose](/1-root/prose/) | Long-form writing in native HTML, drawn on the grid inside `data-ds-prose`. |
 | [Languages](/1-root/languages/) | Supported languages, shared words and translation lookup. |
-| [Formatting](/1-root/formatting/) | Dates, times, relative time, numbers, money and lists in the current language. |
+| [Formatting](/1-root/formatting/) | Dates, times, relative time, numbers, money, prices and lists in the current language. |
 | [Theming](/1-root/theming/) | Appearance tokens and light/dark behavior. |
 | [Device](/1-root/device/) | Device detection and responsive scale. |
 | [Scaling](/1-root/scaling/) | The phone and tablet scale, `--sf`, put on the page. |
 | [Preferences](/1-root/preferences/) | Remembering supported user choices. |
-| [Pricing](/1-root/pricing/) | The reader's likely currency, and prices written in it. |
 
-All built-ins are grouped here alongside the visual foundations: Languages, Formatting, Theming, Device, Preferences and Pricing. Formatting and Pricing write values; they do not implement billing or payments. These topics support interface controls rather than being controls themselves. The language module belongs here; the visible language choice, a [Cycle](/2-core/cycle/), belongs in Core. The docs group runtime foundations here even when their implementation lives in `DS1/0-face/`; this does not move their source or change import paths.
+All built-ins are grouped here alongside the visual foundations: Languages, Formatting, Theming, Device and Preferences. Formatting writes values, prices too; they do not implement billing or payments. These topics support interface controls rather than being controls themselves. The language module belongs here; the visible language choice, a [Cycle](/2-core/cycle/), belongs in Core. The docs group runtime foundations here even when their implementation lives in `DS1/0-face/`; this does not move their source or change import paths.
 
 ## How the layers fit
 

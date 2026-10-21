@@ -8,6 +8,8 @@ export default defineConfig({
   // Checkbox and Switch were one page; the old address goes to the checkbox (19 October 2026).
   redirects: {
     "/2-core/choice/": "/2-core/checkbox/",
+    // Pricing became part of Formatting (21 October 2026).
+    "/1-root/pricing/": "/1-root/formatting/#prices",
     // The front page became the Overview, in the docs (21 October 2026).
     "/start-here/overview/": "/",
     "/examples/": "/start-here/examples/",
@@ -106,7 +108,6 @@ export default defineConfig({
             { label: "Device", slug: "1-root/device" },
             { label: "Scaling", slug: "1-root/scaling" },
             { label: "Preferences", slug: "1-root/preferences" },
-            { label: "Pricing", slug: "1-root/pricing" },
           ],
         },
         {
