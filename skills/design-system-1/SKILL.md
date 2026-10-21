@@ -272,6 +272,7 @@ Only three of these are Design system 1 colours (#99ff73, #ccff4d, #ccccff); the
 - The editing ones, for Aa's toolbar and menus: `bold`, `italic`, `underline`, `strike`, `code`, `link`, `equation`, `mention`, `comment`; the block kinds `text`, `h1`, `h2`, `h3`, `bullet`, `numbered`, `todo`, `toggle`, `quote`, `divider`, `code-block`, `callout`, `table`, `image`; and `handle` (the block's grip), `slash` (the `/` menu), `indent`, `outdent`, `undo`, `redo`, `duplicate`, `delete`, `change` (turn into).
 - A product carries the icons it uses as files (Sync 1's `icons` export) and, without Lit, draws one with the `.ds-icon` class from `controls.css`: the file named in `--ds-icon` as a mask in `currentColor`, 14px, 12px (`--small`) or 16px (`--large`), so it follows the text. Never write a product's own icon-mask rule.
 - An icon that does not exist yet is added to the library first, by `docs/icon-library.md`: derived from its neighbours, 16 × 16, then `vp run icons:build` and the icon tests. Never draw a one-off icon inside a product.
+- A country is shown by its flag from `DS1/x-flag/` (every country, by its two-letter code in lower case, `ie.svg`), never by an emoji flag: an `<img class="ds-flag">`, 3:2, one control high (12px with `--small`), square corners and the fill's grey hairline centred on its edge, on the sixteen with the words 4px after it. Sync 1's `flags` export copies them (`true` for every one). They are not listed on the Icon page.
 
 ## Native apps (Swift and Kotlin)
 

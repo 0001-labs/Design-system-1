@@ -186,3 +186,14 @@ test('the feedback export brings the language runtime it used to when asked', ()
   const copy = files('feedback', { languages: true });
   for (const file of ['0-face/feedback.ts', '0-face/i18n.ts', '0-face/shared-words.ts', '0-face/languages.ts', '0-face/translations/da.json']) expect(copy).toHaveProperty([file]);
 });
+
+test('the flags export copies the flags named, or every one, always with their licence', () => {
+  const tree = (dir: string, { only }: { only?: RegExp } = {}) => new Map(readdirSync(join(root, dir)).filter((file) => !only || only.test(file)).map((file) => [file, read(`${dir}/${file}`)]));
+  const flags = (options: Record<string, unknown>) => (exports.flags as unknown as { files(context: unknown): Record<string, unknown> }).files({ read, tree, options });
+  expect(Object.keys(flags({ flags: ['jp', 'ie'] }))).toEqual(['LICENSE.md', 'jp.svg', 'ie.svg']);
+  const all = flags({ flags: true });
+  expect(Object.keys(all).length).toBeGreaterThan(240);
+  for (const [file, svg] of Object.entries(all)) if (file.endsWith('.svg')) expect(String(svg)).toMatch(/^<svg [^>]*width="30" height="20"/);
+  expect(() => flags({ flags: ['zz'] })).toThrow('Unknown flag: zz');
+  expect(() => flags({})).toThrow('Name the flags');
+});

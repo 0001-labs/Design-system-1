@@ -29,6 +29,10 @@ An arrow drawn inside an icon keeps the form of the Inter arrows the type uses: 
 - `flip` mirrors a shape across a dashed axis. `title-struck` is the title T crossed by a level line, where `untitle` is crossed diagonally.
 - The theme picker uses `sun`, `moon` and `system`, a circle filled on its left half, in the rounded family's weight. `offline` is `wifi` with its arcs cut around a slash. `sparkle` is filled like `star`; `keyboard` and `cursor`, the pointer, are rounded.
 
+## Flags
+
+Country flags are their own folder, `DS1/x-flag/`, outside the icon collection and its catalogue: in colour, 3:2 rather than 16 square, and one for every country and territory (plus the UK's nations, `gb-eng`, `gb-sct`, `gb-wls`, `gb-nir`, and a few regions such as `es-ct` and `eu`). The Icon page says they exist and how to draw them without listing them. `scripts/import-flags.mjs` writes the folder from country-flag-icons' 3:2 drawings (MIT, `x-flag/LICENSE.md`), each framed 30 × 20 and otherwise untouched; Japan's is Ezo's, the disc three-fifths of the height. Leave the drawings to the import: to change one, change the script and run it again. `.ds-flag` in `controls.css` draws one, and Sync 1's `flags` export copies them.
+
 ## Brand marks
 
 Third-party brand marks are monochrome outlines in `currentColor`, named after the brand in one word (`figma`, `drive`, `github`). Fourteen of them (airtable, drive, dropbox, facebook, figma, github, instagram, linkedin, loom, notion, slack, vimeo, x-brand, youtube) are adapted from Tabler Icons' MIT outlines, drawn in a 24-unit inner frame at a 1.5 stroke so they render at the library's one-unit weight; the licence is in `DS1/x-icon/Tabler-LICENSE.md`. The X mark's key is `x-brand`, because `close` is the cross and a bare `x` would read as one. `google` and `apple` keep their own drawings. `jpbank` is Japan Post Bank's own JP BANK mark, its outlines taken unchanged from the official logo on Wikimedia Commons (File:Japan_Post_Bank_Logo.svg, public domain as a text logo, a trademark of Japan Post Bank), framed on the 16-unit grid; its colour is #009042 on white.

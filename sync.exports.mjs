@@ -311,5 +311,19 @@ export default {
         return Object.fromEntries(Object.entries(icons).map(([name, file]) => [file, read(`DS1/x-icon/${name}.svg`)]));
       },
     },
+    /**
+     * Country flags from DS1/x-flag, drawn with `.ds-flag`: `flags` lists their codes in lower
+     * case (`["jp", "dk"]`), or is `true` for every one, for a page that shows where people are
+     * from and cannot know which. Their licence comes with them.
+     */
+    flags: {
+      files({ read, tree, options }) {
+        const all = [...tree('DS1/x-flag', { only: /^[^/]+\.svg$/ }).keys()];
+        const files = options.flags === true ? all : Array.isArray(options.flags) ? options.flags.map(code => `${code}.svg`) : [];
+        if (!files.length) throw new Error('Name the flags to copy: "flags": ["jp", …], or true for every one');
+        for (const file of files) if (!all.includes(file)) throw new Error(`Unknown flag: ${file.slice(0, -4)}`);
+        return { 'LICENSE.md': read('DS1/x-flag/LICENSE.md'), ...Object.fromEntries(files.map(file => [file, read(`DS1/x-flag/${file}`)])) };
+      },
+    },
   },
 };

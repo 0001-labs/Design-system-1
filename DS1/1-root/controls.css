@@ -1068,6 +1068,37 @@ dialog.ds-overlay:has(> [data-ds-overlay="close"]) [data-ds-overlay="header"] {
 }
 
 /*
+ * `.ds-flag` is a country's flag from `DS1/x-flag/`, an `<img>` of the file
+ * named by its two-letter code in lower case (`x-flag/ie.svg`), drawn as Ezo
+ * draws Japan's: 3:2 with square corners and a hairline in the fill's grey
+ * centred on its edge, so a white field keeps its edge on the paper. One
+ * control high (16px) and half as wide again, 12px high with `--small`, times
+ * the scale; on a line it stands on the sixteen, and words after it start 4px
+ * on. Its `alt` is the country's name, or empty beside the name written out.
+ */
+
+:where(.ds-flag) {
+  --ds-flag-box: calc(var(--ds-flag-size, 16px) * var(--ds-sf));
+  display: inline-block;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  width: calc(var(--ds-flag-box) * 1.5);
+  height: var(--ds-flag-box);
+  vertical-align: bottom;
+  object-fit: cover;
+  outline: 1px solid var(--ds-fill);
+  outline-offset: -0.5px;
+}
+
+:where(.ds-flag:not(:last-child)) {
+  margin-inline-end: calc(4px * var(--ds-sf));
+}
+
+:where(.ds-flag--small) {
+  --ds-flag-size: 12px;
+}
+
+/*
  * `.ds-drop` is `ds-file-picker`'s area on a `<label>` around a native
  * `<input type="file">`: the secondary button's face, as wide as its row and
  * eight squares high (`--compact`: four), its words centred in a square of

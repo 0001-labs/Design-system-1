@@ -40,4 +40,14 @@ The source files live in `DS1/x-icon/`. Add missing drawings to that library fir
 
 `ds-icon` draws the most common icons at once and loads the rest in one deferred chunk the first time one is asked for. A component that always draws one icon ships that drawing with itself through `provideIcons({ name: svg })`, as `ds-avatar` does with its person, so it never waits for the chunk.
 
+## Flags
+
+Every country has its flag, in `DS1/x-flag/` by its two-letter code in lower case (`ie.svg`, `jp.svg`, `gb-sct.svg` for a nation of the UK), so a page can show where people are from. They are not listed here. Each is 3:2 with square corners, drawn as an `<img>` with `.ds-flag` from `controls.css`: one control high, 12px with `.ds-flag--small`, a hairline in the fill's grey on its edge, standing on the line's sixteen with the words 4px after it.
+
+```html
+<img class="ds-flag" src="flags/ie.svg" alt=""> Dublin, Ireland
+```
+
+A product copies them with Sync 1's `flags` export: `"flags": ["jp", "dk"]`, or `true` for every one when the country is not known in advance. The drawings are country-flag-icons' (MIT, licence beside them); Japan's is Ezo's.
+
 [Button](/2-core/button/) · [Tooltip](/2-core/tooltip/) · [All components](/2-core/overview/#component-overview)
