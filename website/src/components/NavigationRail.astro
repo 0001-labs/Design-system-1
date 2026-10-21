@@ -80,7 +80,8 @@ const here = Astro.url.pathname.replace(/\/$/, '');
     :global(html[data-sidebar-collapsed]) .docs-navigation-rail { display: flex; flex-direction: column; width: calc(8 * var(--site-unit)); height: 100%; padding: var(--site-unit) calc(var(--site-unit) / 2) var(--site-unit) var(--site-unit); }
     .rail-links { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; }
     .rail-links::-webkit-scrollbar { display: none; }
-    .rail-footer { display: flex; align-items: flex-end; justify-content: space-between; flex: none; height: calc(2 * var(--site-unit)); border-top: 1px solid var(--ds1-docs-header-border); }
+    /* Half a square between the last link and the line over the footer. */
+    .rail-footer { display: flex; align-items: flex-end; justify-content: space-between; flex: none; height: calc(2 * var(--site-unit)); margin-top: calc(var(--site-unit) / 2); border-top: 1px solid var(--ds1-docs-header-border); }
     .rail-links > :global(.rail-gap) { margin-top: var(--site-unit); }
     .rail-group { flex: none; height: var(--site-unit); margin: 0; padding: 0; color: var(--ds-text-color-muted, var(--text-color)); line-height: var(--site-unit); }
     .docs-navigation-rail :global(.rail-heading a) { display: inline-flex; align-items: flex-end; gap: calc(4px * var(--sf, 1)); }
