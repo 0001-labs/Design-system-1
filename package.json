@@ -74,6 +74,7 @@
     "lint:fix": "vp lint --fix",
     "format": "vp fmt",
     "test": "vp test --passWithNoTests",
+    "e2e:blackbox": "test-run ds1 'Design system 1 black box' 'node scripts/e2e-blackbox.mjs'",
     "clean": "rm -rf node_modules web/node_modules dist",
     "docs:dev": "cd website && vp run dev",
     "icons:build": "vp exec tsx scripts/build-icon-assets.ts",
