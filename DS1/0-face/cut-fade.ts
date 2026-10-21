@@ -138,10 +138,14 @@ export function watchCuts(options: CutWatchOptions = {}): CutWatcher {
   };
 }
 
-/** The part of a Lit element `CutFades` uses, so this module needs nothing from Lit. */
+/**
+ * The part of a Lit element `CutFades` uses, so this module needs nothing from
+ * Lit. The render root is read as a node to search; it is typed loosely so an
+ * element type-checks in every product, whichever DOM library it compiles with.
+ */
 type ControllerHost = Element & {
   addController(controller: { hostConnected?(): void; hostUpdated?(): void; hostDisconnected?(): void }): void;
-  readonly renderRoot?: ParentNode;
+  readonly renderRoot?: unknown;
 };
 
 export type CutFadeOptions = {
@@ -175,7 +179,7 @@ export class CutFades {
     this.hostDisconnected();
     const watcher = watchCuts();
     const { selector, targets, text } = this.options;
-    if (selector) watcher.watch(() => (this.host.renderRoot ?? this.host).querySelectorAll(selector));
+    if (selector) watcher.watch(() => ((this.host.renderRoot as ParentNode | undefined) ?? this.host).querySelectorAll(selector));
     if (targets) watcher.watch(targets);
     this.watcher = watcher;
     // Words slotted into the element can change without an update or a resize.
