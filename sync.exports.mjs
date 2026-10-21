@@ -43,6 +43,8 @@ const rootModules = {
   'app-banner': ['app-banner.ts', 'scaling.ts'],
   /** Bentos on whole squares on native markup (.ds-bento[data-squares], placeBentos). */
   bento: ['bento.ts'],
+  /** Image focus: where a photo's subject is, for a cover crop that keeps it (focusOf, objectPosition, startFocus for data-ds-focus). */
+  focus: ['focus.ts', 'focus-vision.swift'],
   /** Carousels and their dots on native markup (.ds-carousel, .ds-progress--dots). */
   carousel: ['carousel.ts'],
   /** The keyboard and pointer of a native sidebar tree (`connectSidebar`, for `.ds-sidebar` in row.css). */

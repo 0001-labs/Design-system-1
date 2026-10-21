@@ -337,9 +337,6 @@ importers:
       lit:
         specifier: ^3.0.0
         version: 3.3.3
-      react:
-        specifier: ^19.0.0
-        version: 19.2.8
 
   packages/css-validate:
     dependencies:

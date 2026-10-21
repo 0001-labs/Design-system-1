@@ -110,6 +110,7 @@ export default defineConfig({
             { label: "Keys", slug: "1-root/keys" },
             { label: "Device", slug: "1-root/device" },
             { label: "Scaling", slug: "1-root/scaling" },
+            { label: "Image focus", slug: "1-root/focus" },
             { label: "Preferences", slug: "1-root/preferences" },
           ],
         },
