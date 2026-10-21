@@ -2,7 +2,7 @@
    characters in a column eight squares wide, the drawing beside them, and the
    drawing tried as text below. Every measure is in squares (--font-unit,
    scaled with the surface). */
-.font-stage:has(> .workbench:not([hidden])) { overflow: hidden; }
+.font-stage:has(.workbench:not([hidden])) { overflow: hidden; }
 .workbench {
   --wb-unit: var(--font-unit, calc(20px * var(--sf, 1)));
   display: grid;

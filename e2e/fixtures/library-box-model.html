@@ -1,11 +1,13 @@
 <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><div id="root"></div><script type="module">
-import React from 'react'; import {createRoot} from 'react-dom/client';
 import '/DS1/1-root/one.css'; import '/shared/site-navigation.css';
 import '/app/src/app.css'; import '/app/src/shell.css';
-import {SystemWorkbench} from '/app/src/SystemWorkbench.tsx';
+import '/app/src/SystemWorkbench.ts';
 const initialCss=new URLSearchParams(location.search).has('legacy') ? ':root { --one-button-padding-inline: 48px; --one-button-padding-block: 4px; --one-radius: 8px; --one-accent-color: #d357fe; } body > main { width: calc(100% - 2rem); margin-inline: auto; } :where(button) { padding: var(--one-button-padding-block) var(--one-button-padding-inline); border: 2px solid var(--one-accent-color); border-radius: var(--one-radius); background: var(--one-accent-color); font: 14px/16px sans-serif; } :where(button[variant=neutral]) { background: #e3e3e3; } :where(button:disabled) { background: #d9d9d9; }' : ':root { --brand: pink; }\n.brand { color: var(--brand); }';
-function App() {const [saved,setSaved]=React.useState(null); return React.createElement('div',{className:'app-shell'},
-React.createElement(SystemWorkbench,{initialCss,initialConfig:{schema:1,brand:'preserved'},onDirty:setSaved}),
-React.createElement('output',{id:'saved-draft',style:{display:'none'}},JSON.stringify(saved)));}
-createRoot(document.getElementById('root')).render(React.createElement(App));
+const shell=document.createElement('div'); shell.className='app-shell';
+const workbench=document.createElement('ds1-system-workbench');
+workbench.initialCss=initialCss; workbench.initialConfig={schema:1,brand:'preserved'};
+const saved=document.createElement('output'); saved.id='saved-draft'; saved.style.display='none'; saved.textContent='null';
+workbench.addEventListener('workbench-dirty',event=>{saved.textContent=JSON.stringify(event.detail);});
+shell.append(workbench,saved);
+document.getElementById('root').replaceChildren(shell);
 </script></body></html>

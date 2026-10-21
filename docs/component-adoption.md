@@ -84,7 +84,7 @@ Run `vp run reports:scan` from this repository. `ADOPTION_STUDIO_ROOT` names the
 Checks:
 
 ```sh
-vp test tests/component-adoption.test.ts tests/library-markdown-adoption.test.ts tests/library-pin-adoption.test.ts tests/icon-adoption.test.ts app/src/screens/IconMatrix.test.tsx services/test/reports.test.ts services/test/dashboard.test.ts services/test/site.test.ts services/test/config.test.ts
+vp test tests/component-adoption.test.ts tests/library-markdown-adoption.test.ts tests/library-pin-adoption.test.ts tests/icon-adoption.test.ts app/src/screens/IconMatrix.test.ts services/test/reports.test.ts services/test/dashboard.test.ts services/test/site.test.ts services/test/config.test.ts
 vp run app:build
 cd services
 vp exec tsc --noEmit
