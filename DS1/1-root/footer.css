@@ -134,6 +134,37 @@
   text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
 }
 
+/* A column's icon links (a brand's marks: Instagram, Facebook, LinkedIn) stand first, in a row of
+   their own one square high, each mark a whole square, half a square apart, named by its label. */
+.ds-footer .ds-footer__icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 calc(var(--ds-unit) / 2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-footer__icons li {
+  margin: 0;
+  padding: 0;
+}
+
+.ds-footer__icons a {
+  display: flex;
+  align-items: flex-end;
+  height: var(--ds-unit);
+  color: inherit;
+}
+
+.ds-footer__icons .ds-icon {
+  --ds-icon-size: 20px;
+}
+
+.ds-footer__icons a:hover {
+  color: var(--ds-text-color-muted);
+}
+
 .ds-footer__links a[aria-current]:not([aria-current="false"]) {
   text-decoration-color: currentColor;
 }

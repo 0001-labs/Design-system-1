@@ -166,3 +166,20 @@ test("contents of the page's own take the built list's place", async () => {
   expect(root.querySelector("nav")!.hasAttribute("hidden")).toBe(false);
   expect(root.querySelector('slot[name="contents"]')).not.toBeNull();
 });
+
+test("ds-footer draws a column's icon links first, in a row of marks named by their labels", async () => {
+  const footer = document.createElement("ds-footer");
+  Object.assign(footer, { literal: true, columns: [{ heading: "Contact", links: [
+    { label: "hello@example.com", href: "mailto:hello@example.com" },
+    { label: "Instagram", href: "https://instagram.com/name", external: true, icon: "icons/instagram.svg" },
+    { label: "LinkedIn", href: "https://linkedin.com/company/name", external: true, icon: "icons/linkedin.svg" },
+  ] }] });
+  document.body.append(footer);
+  await footer.updateComplete;
+  const column = footer.shadowRoot!.querySelector(".ds-footer__column")!;
+  expect([...column.children].map(child => child.className)).toEqual(["ds-footer__heading", "ds-footer__icons", "ds-footer__links"]);
+  const marks = [...column.querySelectorAll<HTMLAnchorElement>(".ds-footer__icons a")];
+  expect(marks.map(a => [a.getAttribute("aria-label"), a.getAttribute("target")])).toEqual([["Instagram", "_blank"], ["LinkedIn", "_blank"]]);
+  expect(marks[0]!.querySelector<HTMLElement>(".ds-icon")!.getAttribute("style")).toContain('icons/instagram.svg');
+  expect([...column.querySelectorAll(".ds-footer__links a")].map(a => a.textContent)).toEqual(["hello@example.com"]);
+});

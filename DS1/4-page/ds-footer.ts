@@ -6,6 +6,7 @@
 import { LitElement, html, nothing, unsafeCSS } from "lit";
 import { getText } from "../0-face/i18n";
 import { define } from "../0-face/define";
+import { CutFades } from "../0-face/cut-fade";
 import "../2-core/ds-cycle";
 import metrics from "../1-root/component-metrics.css?inline";
 import controls from "../1-root/controls.css?inline";
@@ -20,6 +21,12 @@ export interface FooterLink {
   external?: boolean;
   /** The page being read: `aria-current="page"`. */
   current?: boolean;
+  /**
+   * The link drawn as a mark, its label its accessible name: the icon file's
+   * address (`icons/instagram.svg`, as Sync 1's `icons` export copies it). A
+   * column's icon links stand first, in a row of their own.
+   */
+  icon?: string;
 }
 
 /** A footer column: a heading and its links. */
@@ -79,6 +86,8 @@ export class Footer extends LitElement {
   };
 
   static styles = [unsafeCSS(metrics), unsafeCSS(controls), unsafeCSS(styles)];
+  /** Words cut short fade over their last square, never an ellipsis: marks them `data-cut="end"` while they do not fit. */
+  private cuts = new CutFades(this, { selector: ".ds-footer__links a" });
 
   declare brand: string | undefined;
   declare href: string;
@@ -120,6 +129,11 @@ export class Footer extends LitElement {
     return [...this.children].some(node => node.getAttribute("slot") === name);
   }
 
+  private iconLink(link: FooterLink) {
+    return html`<li><a href=${link.href} aria-label=${this.words(link.label)} aria-current=${link.current ? "page" : nothing}
+      target=${link.external ? "_blank" : nothing} rel=${link.external ? "noopener noreferrer" : nothing}><span class="ds-icon" aria-hidden="true" style=${`--ds-icon: url("${link.icon}")`}></span></a></li>`;
+  }
+
   private link(link: FooterLink) {
     return html`<li><a href=${link.href} aria-current=${link.current ? "page" : nothing}
       target=${link.external ? "_blank" : nothing} rel=${link.external ? "noopener noreferrer" : nothing}>${this.words(link.label)}</a></li>`;
@@ -135,7 +149,8 @@ export class Footer extends LitElement {
     const hasBrand = brandSlotted || Boolean(this.brand) || Boolean(this.tagline);
     const list = columns.map(column => html`<div class="ds-footer__column" part="column">
       ${column.heading ? html`<h2 class="ds-footer__heading" part="heading">${this.words(column.heading)}</h2>` : nothing}
-      <ul class="ds-footer__links">${column.links.map(link => this.link(link))}</ul>
+      ${column.links.some(link => link.icon) ? html`<ul class="ds-footer__icons" part="icons">${column.links.filter(link => link.icon).map(link => this.iconLink(link))}</ul>` : nothing}
+      <ul class="ds-footer__links">${column.links.filter(link => !link.icon).map(link => this.link(link))}</ul>
     </div>`);
     return html`<footer class="ds-footer" part="footer">
       <div class="ds-footer__brand" part="brand" ?hidden=${!hasBrand}>
