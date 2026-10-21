@@ -29,6 +29,8 @@ export interface SidebarItem {
   disabled?: boolean;
   /** Small muted words at the row's end: a count, a size. */
   meta?: string;
+  /** Small muted words just after the label, read with it: a version. */
+  detail?: string;
   /** Optional application content following this navigation row. */
   afterSlot?: string;
   action?: { id: string; label: string; icon?: string; disabled?: boolean };
@@ -246,7 +248,7 @@ export class Sidebar extends LitElement {
           @focus=${() => { this.focusId = item.id; }}>
           <span class="disclosure" aria-hidden="true">${item.expanded === undefined ? nothing : html`<ds-icon type="right" ?data-open=${item.expanded}></ds-icon>`}</span>
           ${item.icon ? html`<span class="icon" aria-hidden="true"><ds-icon type=${item.icon}></ds-icon></span>` : nothing}
-          <span class="label">${item.label}</span>
+          <span class="label">${item.label}${item.detail ? html`<span class="detail">${item.detail}</span>` : nothing}</span>
           ${item.meta ? html`<span class="meta">${item.meta}</span>` : nothing}
         </div>`;
       })}
@@ -358,12 +360,12 @@ export class Sidebar extends LitElement {
             ${item.href && !item.disabled ? html`
               <a href=${item.href} draggable=${ifDefined(this.reorderable ? "false" : undefined)} data-item=${item.id} aria-current=${ifDefined(item.current ? "page" : undefined)}
                 @click=${(event: MouseEvent) => this.activate(event, item)}
-                @keydown=${(event: KeyboardEvent) => this.navigate(event, item)}><span class="name">${item.icon ? html`<ds-icon type=${item.icon} aria-hidden="true"></ds-icon>` : nothing}${item.label}</span></a>` : html`
+                @keydown=${(event: KeyboardEvent) => this.navigate(event, item)}><span class="name">${item.icon ? html`<ds-icon type=${item.icon} aria-hidden="true"></ds-icon>` : nothing}${item.label}${item.detail ? html`<span class="detail">${item.detail}</span>` : nothing}</span></a>` : html`
               <button type="button" data-item=${item.id} ?disabled=${item.disabled}
                 aria-expanded=${ifDefined(item.expanded === undefined ? undefined : String(item.expanded))}
                 aria-current=${ifDefined(item.current ? "page" : undefined)}
                 @click=${(event: MouseEvent) => this.activate(event, item)}
-                @keydown=${(event: KeyboardEvent) => this.navigate(event, item)}><span class="name">${item.icon ? html`<ds-icon type=${item.icon} aria-hidden="true"></ds-icon>` : nothing}${item.label}</span></button>`}
+                @keydown=${(event: KeyboardEvent) => this.navigate(event, item)}><span class="name">${item.icon ? html`<ds-icon type=${item.icon} aria-hidden="true"></ds-icon>` : nothing}${item.label}${item.detail ? html`<span class="detail">${item.detail}</span>` : nothing}</span></button>`}
           </ds-button>
           ${this.disclosurePosition !== "start" ? this.renderDisclosure(item) : nothing}
           <span class="spacer" aria-hidden="true"></span>

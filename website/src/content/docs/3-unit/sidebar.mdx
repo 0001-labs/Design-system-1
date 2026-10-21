@@ -20,7 +20,7 @@ A sidebar is navigation: the places of an application, every row a link or a but
 
 ## Data and behaviour
 
-Set the `items` property to an array of visible rows. Each row has a unique `id` and a `label`; optional fields are `depth`, `href`, `expanded`, `current`, `disabled`, `icon` (a name from the [icon library](/icons/)), `meta`, and `action: { id, label }`. Omit `expanded` for a leaf. Collapsed children must be omitted from the array.
+Set the `items` property to an array of visible rows. Each row has a unique `id` and a `label`; optional fields are `depth`, `href`, `expanded`, `current`, `disabled`, `icon` (a name from the [icon library](/icons/)), `detail` (small muted words just after the label, such as a version), `meta` (small muted words at the row's end, such as a count), and `action: { id, label }`. Omit `expanded` for a leaf. Collapsed children must be omitted from the array.
 
 The application owns the hierarchy, filtering, selected destination and saved expansion state. The Unit owns the row layout, disclosure controls, focus and keyboard navigation. Supply a `label` for the navigation landmark and `empty` for its empty state. The `header` and `footer` slots hold optional search and supporting controls. When the host has a constrained height, only the navigation rows scroll; header and footer controls stay visible.
 

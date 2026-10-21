@@ -218,3 +218,12 @@ test("narrow navigation reflects its mode and hugs each row to its words", async
   expect(css).toContain(":host([narrow]) .row { width: fit-content;");
   expect(control(sidebar, "map").getAttribute("aria-current")).toBe("page");
 });
+
+test("a detail follows the label in its name, before the meta at the row's end", async () => {
+  const sidebar = await setup([{id: "ezo", label: "Ezo", detail: "0.2.12", meta: "3 flags", href: "#ezo"}, {id: "link", label: "Link"}]);
+  const name = control(sidebar, "ezo").querySelector(".name")!;
+  expect(name.querySelector(".detail")?.textContent).toBe("0.2.12");
+  expect(name.textContent).toBe("Ezo0.2.12");
+  expect(sidebar.shadowRoot!.querySelector(".meta")?.textContent).toBe("3 flags");
+  expect(control(sidebar, "link").querySelector(".detail")).toBeNull();
+});

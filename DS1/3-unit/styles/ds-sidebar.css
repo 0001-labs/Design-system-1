@@ -46,6 +46,9 @@ ds-icon[data-open] { transform: rotate(90deg); }
 /* Cut words fade over their last square, never an ellipsis (0-face/cut-fade.ts marks them). */
 :is(.name, .tree .label)[data-cut="end"] { mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-unit)), transparent); }
 :host(:dir(rtl)) :is(.name, .tree .label)[data-cut="end"] { mask-image: linear-gradient(to left, #000 calc(100% - var(--ds-unit)), transparent); }
+/* A detail (a version) follows the label in the small muted type, 4px after its words and on their line, cut with them. */
+.detail { margin-inline-start: calc(4px * var(--ds-sf)); font-size: var(--ds-type-size-small); line-height: 1; color: var(--ds-text-color-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.name:has(ds-icon) .detail { margin-inline-start: 0; }
 .meta { flex: none; padding-inline-start: calc(4px * var(--ds-sf)); font-size: var(--ds-type-size-small); color: var(--ds-text-color-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .action { margin-inline-start: calc(4px * var(--ds-sf)); --ds-text-size: 10px; --ds-button-color: var(--ds-text-color-muted); }
 .empty { margin: 0; padding: calc(var(--ds-unit) / 2); color: var(--ds-text-color-muted); }
