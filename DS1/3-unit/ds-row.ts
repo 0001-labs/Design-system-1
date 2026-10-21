@@ -30,6 +30,14 @@ const CURRENT = new Set(["page", "step", "location", "date", "time", "true"]);
  * @attr label - The accessible name, when the row's words do not say it.
  * @attr target - Where a link opens (`_blank`, …).
  * @attr rel - The link's relationship (`noopener`, …).
+ * A record's row puts its parts in classes: `ds-row__name` for the words,
+ * which hug and give way first, and `ds-row__value` for the figure or date at
+ * the row's end; a 16px picture (an avatar tile, a large icon) before the
+ * name stands on its square with the row's gap putting the words on the next.
+ * The element measures each name and marks it `data-cut="end"` while its
+ * words do not fit, so the stylesheet fades them over the last square
+ * instead of ending them with an ellipsis.
+ *
  * @slot - The row's content, inside its press target.
  * @slot end - Controls of their own after the content, outside the press target.
  * @fires ds-row-press - `{ href }`: the row was pressed. Cancel it to route a link yourself; a modified click on a link is left to the browser.
@@ -88,6 +96,37 @@ export class Row extends LitElement {
 
   static styles = unsafeCSS(styles);
 
+  /** Watches the row and its names, so a name is marked cut as soon as it no longer fits. */
+  private sizes: ResizeObserver | undefined;
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    if (typeof ResizeObserver !== "undefined") {
+      this.sizes = new ResizeObserver(() => this.measureNames());
+      this.sizes.observe(this);
+    }
+  }
+
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.sizes?.disconnect();
+    this.sizes = undefined;
+  }
+
+  firstUpdated(): void {
+    this.measureNames();
+  }
+
+  /** Marks each `.ds-row__name` `data-cut="end"` while its words are wider than its box. */
+  private measureNames = () => {
+    for (const name of this.querySelectorAll<HTMLElement>(":scope > .ds-row__name")) {
+      this.sizes?.observe(name);
+      const cut = name.scrollWidth > name.clientWidth + 1;
+      if (cut) name.setAttribute("data-cut", "end");
+      else if (name.getAttribute("data-cut") === "end") name.removeAttribute("data-cut");
+    }
+  };
+
   /** The `aria-current` value, or none. */
   private get currentValue(): string | undefined {
     const value = this.current;
@@ -111,10 +150,10 @@ export class Row extends LitElement {
   }
 
   render() {
-    if (!this.href && !this.interactive) return html`<slot></slot>`;
+    if (!this.href && !this.interactive) return html`<slot @slotchange=${this.measureNames}></slot>`;
     const current = this.currentValue;
     const label = this.label || undefined;
-    const content = html`<slot></slot>`;
+    const content = html`<slot @slotchange=${this.measureNames}></slot>`;
     const target = this.href
       ? this.disabled
         ? html`<a class="target" part="target" role="link" aria-disabled="true" aria-label=${ifDefined(label)}>${content}</a>`

@@ -17,6 +17,10 @@
  *   <th scope="rowgroup">                  a row group, a heading row in grey
  *   <td aria-selected="true">              a selected cell
  *
+ * `data-plain` takes every line away: the same rows with no rule at their
+ * foot, standing on the paper as a list's rows do (Money's tables), the
+ * words still on the lower sixteen of each square.
+ *
  * `data-frame` draws the same rows in a rounded 1px frame with a 1px line
  * between columns. Every line is drawn inside the cells' squares, the frame
  * over the first and last pixels as the sheet's lines are at a cell's end and
@@ -80,6 +84,10 @@
   padding-inline-end: 0;
 }
 
+/* A plain table: no lines at all, each row one square with its words on the lower sixteen. */
+.ds-table[data-plain] :is(th, td) {
+  border-bottom: 0;
+}
 .ds-table[data-frame] {
   --ds-table-radius: var(--ds-radius-card, calc(8px * var(--ds-sf, 1)));
   position: relative;

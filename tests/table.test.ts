@@ -207,3 +207,9 @@ test("a framed table draws its rounded frame and column lines inside the cells, 
   expect(over).toMatch(/pointer-events: none;/);
   expect(css).toMatch(/\.ds-table\[data-frame\] :is\(th, td\) \+ :is\(th, td\) \{\s*box-shadow: inset 1px 0 0 var\(--ds-table-rule\);/);
 });
+
+test("a plain table takes every line away and keeps its rows one square", () => {
+  const plain = css.match(/\.ds-table\[data-plain\] :is\(th, td\) \{([^}]*)\}/)?.[1];
+  expect(plain).toContain("border-bottom: 0");
+  expect(plain).not.toContain("height");
+});

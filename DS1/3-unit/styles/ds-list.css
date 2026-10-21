@@ -25,3 +25,25 @@
 :host([columns="3"]) {
   --ds-list-columns: 3;
 }
+
+/* The group's name on the square above its rows: words on the lower sixteen of the square with
+   the spare four above, in the muted ink, as a day's heading stands over Money's payments. It
+   names the list (aria-label), so the drawn words are hidden from assistive technology. */
+.heading {
+  box-sizing: border-box;
+  flex: none;
+  grid-column: 1 / -1;
+  width: 100%;
+  height: var(--ds-unit);
+  padding-top: calc(4px * var(--ds-sf));
+  overflow: hidden;
+  color: var(--ds-list-heading-color, var(--ds-text-color-muted));
+  font-family: var(--ds-typeface-regular);
+  font-feature-settings: var(--ds-font-features);
+  font-size: var(--ds-type-size-default);
+  font-weight: var(--ds-type-weight-default);
+  line-height: var(--ds-type-lineheight-default);
+  letter-spacing: var(--ds-type-letterspacing-default);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

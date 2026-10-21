@@ -58,6 +58,19 @@ A tile or a card is a row with `stacked` and a width in whole squares: each chil
 </ds-row>
 ```
 
+## The parts of a record
+
+A row that stands for a record (a payment, an event) names its parts with classes, so the page writes no layout of its own: a 16px picture first (an [Avatar](/2-core/avatar/) tile or a large [Icon](/2-core/icon/)), which takes the first sixteen of its square while the row's 4px gap puts the words on the next; the words in `ds-row__name`, which hug and give way first; a [Tag](/2-core/tag/) after them where there is one; and the figure or date in `ds-row__value`, at the row's end in tabular figures. A name wider than its room ends with an ellipsis, or, where the element has measured it cut and marked it `data-cut="end"`, fades over its last square. The [List](/3-unit/list/#rows-of-records) shows the rows under their headings.
+
+```html
+<ds-row href="/coffee">
+  <ds-avatar shape="square" icon="coffee" color="var(--ds-yellow)"></ds-avatar>
+  <ds-text class="ds-row__name" literal>Coffee</ds-text>
+  <ds-tag>Cash</ds-tag>
+  <ds-text class="ds-row__value" literal>5.05 kr</ds-text>
+</ds-row>
+```
+
 ## Navigation rows
 
 <ComponentExample example="row-nav" />

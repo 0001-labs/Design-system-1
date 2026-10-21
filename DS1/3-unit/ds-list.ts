@@ -1,4 +1,4 @@
-import { LitElement, html, unsafeCSS } from "lit";
+import { LitElement, html, nothing, unsafeCSS } from "lit";
 import styles from "./styles/ds-list.css?inline";
 import { define } from "../0-face/define";
 
@@ -15,21 +15,32 @@ const CONTROLS = new Set(["a", "button", "input", "select", "textarea", "summary
  * A link, button or other control directly inside keeps its own role: wrap it
  * in a row (or another element) to make it an item.
  *
+ * `heading` names the group on the square above its rows (a day, a month),
+ * the words in the muted ink: the list takes it as its accessible name, so
+ * the drawn words are hidden from assistive technology and a page that
+ * writes its own `aria-label` keeps it.
+ *
  * @element ds-list
  * @attr columns - Lay the items out in this many equal columns.
+ * @attr heading - The group's name, drawn on the square above the rows and given to the list as its name.
+ * @csspart heading - The heading's line.
  */
 export class List extends LitElement {
   static properties = {
     columns: { type: Number, reflect: true },
+    heading: { type: String, reflect: true },
   };
 
   declare columns: number | undefined;
+  declare heading: string | undefined;
 
   static styles = unsafeCSS(styles);
 
   /** The items this element gave a role, so roles the page wrote are left alone. */
   private ownItems = new Set<Element>();
   private ownRole = false;
+  /** Whether the list's `aria-label` is its heading, so the page's own name is never replaced. */
+  private ownLabel = false;
 
   connectedCallback(): void {
     super.connectedCallback();
@@ -64,13 +75,27 @@ export class List extends LitElement {
     this.syncItems();
   }
 
-  updated(): void {
+  updated(changed: Map<string, unknown>): void {
     if (typeof this.columns === "number" && Number.isInteger(this.columns) && this.columns > 0) this.style.setProperty("--ds-list-columns", String(this.columns));
     else this.style.removeProperty("--ds-list-columns");
+    if (changed.has("heading")) this.nameByHeading();
+  }
+
+  /** The heading names the list, unless the page wrote a name of its own. */
+  private nameByHeading() {
+    const heading = this.heading?.trim();
+    if (heading && (this.ownLabel || !this.hasAttribute("aria-label"))) {
+      this.setAttribute("aria-label", heading);
+      this.ownLabel = true;
+    } else if (!heading && this.ownLabel) {
+      this.removeAttribute("aria-label");
+      this.ownLabel = false;
+    }
   }
 
   render() {
-    return html`<slot @slotchange=${this.syncItems}></slot>`;
+    const heading = this.heading?.trim();
+    return html`${heading ? html`<span class="heading" part="heading" aria-hidden="true">${heading}</span>` : nothing}<slot @slotchange=${this.syncItems}></slot>`;
   }
 }
 

@@ -41,6 +41,14 @@ table.data = [{ product: "Atlas", users: 120, status: "Active" }];
 table.footer = { product: "Total", users: 120 };
 ```
 
+## Plain
+
+`data-plain` on a native `.ds-table` takes every line away: the same rows with no rule at their foot, standing on the paper as a [List](/3-unit/list/)'s rows do, their words still on the lower sixteen of each square and the headers in the title grey. For a table whose rows are read as a list beside one (Money's tables, Link's clients).
+
+```html
+<table class="ds-table" data-plain>…</table>
+```
+
 ## Frame
 
 `data-frame` on a native `.ds-table` draws the same rows in a rounded 1px frame with a 1px line between columns, for a list of things a person opens. Every line is drawn inside the cells' squares, so each row keeps its 20px pitch and the last row's rule is the frame's foot; words stand 4px in from the lines, and fills in the cells stay inside the corners (`--ds-table-radius`, the card's corner by default).

@@ -124,6 +124,36 @@
 :host([disabled]) .target { cursor: default; opacity: 0.5; }
 :host([disabled]) .target::after { background: none; }
 
+/*
+ * The parts of a record's row (Money's payments, Link's events): a 16px picture before the
+ * name (an avatar tile, a large icon) takes the first sixteen of its square, and the row's 4px
+ * gap puts the words on the next square. The name hugs its words and gives way first, ended
+ * with an ellipsis, or, once the element has measured it cut (`data-cut="end"`), faded out
+ * over its last square. A tag stands after the name, and the value (a figure, a date) at the
+ * row's end in tabular figures.
+ */
+::slotted(.ds-row__name) {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+::slotted(.ds-row__name[data-cut="end"]) {
+  text-overflow: clip;
+  mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-unit)), transparent);
+}
+:host(:dir(rtl)) ::slotted(.ds-row__name[data-cut="end"]) {
+  mask-image: linear-gradient(to left, #000 calc(100% - var(--ds-unit)), transparent);
+}
+::slotted(.ds-row__value) {
+  flex: none;
+  margin-inline-start: auto;
+  white-space: nowrap;
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
 /* A navigation row: the sidebar's two-pixel corners. */
 :host([nav]) { --ds-row-radius: calc(2px * var(--ds-sf)); }
 

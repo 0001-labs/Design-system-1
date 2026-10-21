@@ -21,6 +21,10 @@
  *   ds-row--auto           as high as its content, at least one square
  *   ds-row--stacked        the content stacked, each line one square (a tile, a card)
  *   ds-row--nav            a navigation row: the sidebar's two-pixel corners
+ *   ds-row__name           a record's words: they hug and give way first, cut with an ellipsis
+ *                          (`data-cut="end"`, set by the element where it measures them cut,
+ *                          fades them over the last square instead)
+ *   ds-row__value          the figure or date at the row's end, in tabular figures
  *   aria-current="page"    the destination being shown, filled and in the medium weight
  *   aria-disabled="true"   or `disabled` on a button: dimmed, not pressable
  *
@@ -210,6 +214,31 @@ button.ds-row[aria-disabled="true"]:hover::after {
 
 .ds-row--nav {
   --ds-row-radius: calc(2px * var(--ds-sf));
+}
+
+/* The parts of a record's row, as the element draws them: a 16px picture before the name takes
+   the first sixteen of its square and the row's 4px gap puts the words on the next; the name
+   hugs and gives way first; the value stands at the row's end. */
+.ds-row .ds-row__name {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.ds-row .ds-row__name[data-cut="end"] {
+  text-overflow: clip;
+  mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-unit)), transparent);
+}
+.ds-row:dir(rtl) .ds-row__name[data-cut="end"] {
+  mask-image: linear-gradient(to left, #000 calc(100% - var(--ds-unit)), transparent);
+}
+.ds-row .ds-row__value {
+  flex: none;
+  margin-inline-start: auto;
+  white-space: nowrap;
+  text-align: end;
+  font-variant-numeric: tabular-nums;
 }
 
 /* A sidebar of nested things: the tree. */

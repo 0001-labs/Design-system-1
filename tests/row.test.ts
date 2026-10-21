@@ -149,3 +149,35 @@ test("open details are controlled independently of navigation and reset on close
   expect(element.hasAttribute("open")).toBe(false);
   expect(target(element)!.getAttribute("aria-expanded")).toBe("false");
 });
+
+test("a record's name and value are drawn alike by the element and the native class", () => {
+  const element = css("DS1/3-unit/styles/ds-row.css");
+  const native = css("DS1/1-root/row.css");
+  const rule = (css: string, selector: string) => css.match(new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\s*\\{([^}]*)\\}"))?.[1];
+  const name = [rule(element, "::slotted(.ds-row__name)"), rule(native, ".ds-row .ds-row__name")];
+  for (const css of name) {
+    expect(css).toContain("flex: 0 1 auto");
+    expect(css).toContain("min-width: 0");
+    expect(css).toContain("text-overflow: ellipsis");
+  }
+  const cut = [rule(element, '::slotted(.ds-row__name[data-cut="end"])'), rule(native, '.ds-row .ds-row__name[data-cut="end"]')];
+  for (const css of cut) expect(css).toContain("calc(100% - var(--ds-unit))");
+  const value = [rule(element, "::slotted(.ds-row__value)"), rule(native, ".ds-row .ds-row__value")];
+  for (const css of value) {
+    expect(css).toContain("margin-inline-start: auto");
+    expect(css).toContain("font-variant-numeric: tabular-nums");
+  }
+});
+
+test("the element marks a name cut while its words are wider than its box, and unmarks it when they fit", async () => {
+  const element = await row("", '<span class="ds-row__name">A long name</span><span class="ds-row__value">12</span>');
+  const name = element.querySelector<HTMLElement>(".ds-row__name")!;
+  // happy-dom has no layout: stand in for the measures a browser would give.
+  Object.defineProperty(name, "scrollWidth", { value: 120, configurable: true });
+  Object.defineProperty(name, "clientWidth", { value: 80, configurable: true });
+  (element as unknown as { measureNames: () => void }).measureNames();
+  expect(name.getAttribute("data-cut")).toBe("end");
+  Object.defineProperty(name, "clientWidth", { value: 120, configurable: true });
+  (element as unknown as { measureNames: () => void }).measureNames();
+  expect(name.hasAttribute("data-cut")).toBe(false);
+});

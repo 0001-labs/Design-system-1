@@ -25,12 +25,31 @@ A list brings names, icons, figures and actions onto the same grid. These exampl
 
 Put `ds-row` elements directly in the list. `ds-list` supplies the containing layout; each row supplies its alignment and content.
 
+## Rows of records
+
+<ComponentExample example="list-records" />
+
+A list of records (payments under their day, events under their month) is the same list with `heading`, the group's name drawn on the square above its rows in the muted ink, and rows with `href` whose parts are classes: a 16px picture before the name (an [Avatar](/2-core/avatar/) tile, `shape="square"` with `icon` and `color`, or a large [Icon](/2-core/icon/)) on the first sixteen of its square, the words in `ds-row__name` on the next square, a [Tag](/2-core/tag/) after them, and the figure or date in `ds-row__value` at the row's end. The name hugs its words and gives way first: cut, it fades over its last square (the row measures it and marks it `data-cut="end"`). The rows stack edge to edge with no lines between them; the pointer and a press fill the row's layer, two pixels around what it holds. Give the list `--ds-row-padding: 0px` where its pictures and values stand on the column's edges.
+
+The heading names the list (`aria-label`), so the drawn words are hidden from assistive technology; a page that writes its own `aria-label` keeps it. Each group is its own list, one square apart on a page.
+
+```html
+<ds-list heading="Monday" style="--ds-row-padding: 0px">
+  <ds-row href="/laundromat">
+    <ds-avatar shape="square" icon="plus" color="var(--ds-pink)"></ds-avatar>
+    <ds-text class="ds-row__name" literal>Laundromat, Hakodate</ds-text>
+    <ds-tag>JP Bank</ds-tag>
+    <ds-text class="ds-row__value" literal>46.29 kr</ds-text>
+  </ds-row>
+</ds-list>
+```
+
 ## Roles
 
 The element is a list: it takes `role="list"`, and every element directly inside it `role="listitem"`, including rows added later. A row taken out of the list loses the role the list gave it. Roles the page writes are left alone: a list with a role of its own (such as `listbox`, or `none` for a list used only for layout) gives its children no role, and a child with a role keeps it. Screen readers then announce the list and its number of items, as for `<ul>` and `<li>`.
 
 ## API
 
-The component has a default slot and the `columns` attribute, which lays the items out in that many equal columns. There is no `ds-list-item` custom element, sorting API or selection state built into it.
+The component has a default slot, the `columns` attribute, which lays the items out in that many equal columns, and `heading`, the group's name on the square above the rows (its part is `heading`; `--ds-list-heading-color` is its ink). There is no `ds-list-item` custom element, sorting API or selection state built into it.
 
 [Row](/3-unit/row/) · [Text](/2-core/text/)
