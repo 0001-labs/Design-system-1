@@ -141,7 +141,8 @@ Pressing the title travels by months and years, as a date picker's title does. T
 | Measure | Size |
 | --- | --- |
 | A month or a year | One square high and whole squares wide, three across a narrow month (two squares each) and four across a wider one, rows one square apart. |
-| Its mark | Nine tenths of a square high with a picture's corners: the chosen month or year in Sharp blue, today's in the today red, the pointer's in the fill. |
+| Its mark | Hugs its words, as a button does: one control high on the row's sixteen, padded 4px from the words, with a button's corners, in the middle of its cell and never stretched across it. The current month or year and the chosen one take the accent (`--ds-accent-color`, lettered in `--ds-button-text-color-on-accent`), as a chosen segment does; the pointer's takes the fill. |
+| The title | A plain button hugging its words on every level, the pointer filling it only 4px past them; never a bar across the header. |
 | The area | The days' height, so nothing below moves between levels; the level a person moves to fades in (opacity and scale, none with reduced motion). |
 
 The months and years are a grid with one Tab stop: the arrow keys move (past December is the next year's January), Enter or Space chooses, and Escape goes back down a level without closing a picker. Month names and years come from the current language through `format.ts`. `no-header` leaves the travel out with the title.

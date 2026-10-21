@@ -96,7 +96,8 @@
 
 /* The title as a plain button, its words alone: pressing it travels up to the months of the year,
  * then to twelve years. One control high at the square's foot, the words on the sixteen where the
- * title stands, the pointer filling it 4px past them at each side. */
+ * title stands, hugging them: never a bar across the header, the pointer filling it only 4px past
+ * the words at each side. */
 .title-button {
   display: inline-flex;
   flex: 0 1 auto;
@@ -139,10 +140,12 @@
   height: var(--ds-unit);
   margin-block-end: var(--ds-unit);
 }
+/* Each choice hugs its words, one control high on the row's sixteen and padded 4px from them, as
+ * a button is, in the middle of its cell; never stretched to fill the cell. */
 .pick {
   box-sizing: border-box;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
   min-width: 0;
   height: var(--ds-unit);
@@ -159,19 +162,22 @@
 .pick-mark {
   box-sizing: border-box;
   display: inline-flex;
+  flex: 0 1 auto;
   align-items: center;
   justify-content: center;
-  width: calc(100% - var(--ds-unit) * 0.1);
-  height: calc(var(--ds-unit) * 0.9);
+  max-width: 100%;
+  height: var(--ds-control-height);
+  padding: 0 calc(4px * var(--ds-sf, 1));
   overflow: hidden;
   border-radius: var(--ds-radius);
+  line-height: var(--ds-control-height);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-.pick:hover:not(:disabled) .pick-mark { background: var(--ds-fill); }
+.pick:hover:not(:disabled):not([data-today], [data-selected]) .pick-mark { background: var(--ds-fill); }
 .pick:focus-visible .pick-mark { outline: 2px solid var(--ds-focus-ring); outline-offset: -1px; }
-.pick[data-today] .pick-mark { background: var(--ds-calendar-today); color: var(--ds-calendar-today-ink); }
-.pick[data-selected] .pick-mark { background: var(--ds-calendar-selected); color: var(--ds-calendar-selected-ink); }
+/* The current month or year and the chosen one take the accent, as a chosen segment does. */
+.pick:is([data-today], [data-selected]) .pick-mark { background: var(--ds-accent-color); color: var(--ds-button-text-color-on-accent); }
 .pick:disabled { color: var(--ds-title-color); cursor: default; opacity: 0.5; }
 
 /* Clear, only while something is chosen: a button one control high, centred on the square right under the dates. */
@@ -518,6 +524,8 @@
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
 }
 .header[data-views] .controls { justify-self: end; }
+/* The title hugs its words in its column, never stretched across it. */
+.header[data-views] .title { justify-self: start; }
 .views { justify-self: center; }
 /* On a phone the title and the arrows keep the first row, and Day, Week and
  * Month stand on a row of their own a square under them. */
