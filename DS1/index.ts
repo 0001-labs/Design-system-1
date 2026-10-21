@@ -108,3 +108,6 @@ export * from "./2-core/ds-chart";
 export * from "./0-face/component-visibility";
 
 export * from "./2-core/ds-image";
+
+export { reportFailure, FAILURE_EVENT } from "./0-face/failures";
+export type { Failure } from "./0-face/failures";

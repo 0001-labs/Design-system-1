@@ -21,6 +21,8 @@
  * says `important: false`.
  */
 
+import { reportFailure, type Failure } from "./failures";
+
 export type ToastId = string | number;
 export type ToastType = "default" | "success" | "info" | "warning" | "error" | "loading";
 export type ToastPosition = "top-left" | "top-center" | "top-right" | "bottom-left" | "bottom-center" | "bottom-right";
@@ -31,6 +33,9 @@ export type ToastPosition = "top-left" | "top-center" | "top-right" | "bottom-le
  */
 export interface ToastButton { label: string; onClick?: (event: MouseEvent) => void; href?: string }
 export interface ToastOptions {
+  /** A real failed operation to report. Omit for validation and expected refusals.
+   * Authored code and summary only; the visible title/description are never reported. */
+  failure?: Failure;
   /** Reuse an id to update a toast in place, as Sonner does. */
   id?: ToastId;
   description?: string;
@@ -122,6 +127,7 @@ function show(title: string, type: ToastType, options: ToastOptions = {}): Toast
   const data: ToastData = { ...options, ...(important === undefined ? {} : { important }), id, title, type };
   // A copy: a listener may add or remove listeners while it hears the toast.
   for (const listener of Array.from(state.toasters.size ? state.toasters : state.fallbacks)) listener({ toast: data });
+  if (type === "error" && options.failure) reportFailure(options.failure);
   return id;
 }
 

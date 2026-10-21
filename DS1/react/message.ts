@@ -7,6 +7,8 @@ import type { Message as MessageElement, MessageTone } from "../2-core/ds-messag
 export type { MessageTone } from "../2-core/ds-message";
 export type MessageProps = Omit<HTMLAttributes<MessageElement>, "title"> & {
   /** The mark's colour and icon; danger also colours the words. Neutral by default. */
+  /** Stable diagnostic for a real operation failure, independent of colour. */
+  failure?: import("../0-face/failures").Failure;
   expand?: boolean;
   visibleToasts?: number;
   richColors?: boolean;
@@ -52,7 +54,7 @@ const title = (content: ReactNode) =>
   content == null || content === false || content === "" ? null : h("span", { slot: "heading" }, content);
 
 export const Message = forwardRef<MessageElement, MessageProps>(function Message(
-  { expand, visibleToasts, richColors, contained, label, closeLabel, form, position, duration, closeButton, tone, heading, text, icon, actions, dismissible, banner, onDismiss, src, appId, appUrl, open, remember, preview, children, ...props }, ref,
+  { failure, expand, visibleToasts, richColors, contained, label, closeLabel, form, position, duration, closeButton, tone, heading, text, icon, actions, dismissible, banner, onDismiss, src, appId, appUrl, open, remember, preview, children, ...props }, ref,
 ) {
   const host = useRef<MessageElement | null>(null);
   useCommitEffect(() => {
@@ -68,7 +70,7 @@ export const Message = forwardRef<MessageElement, MessageProps>(function Message
   });
   // The live region is in the markup from the first render, on the server too.
   return h("ds-message", {
-    expand: expand || undefined, "visible-toasts": visibleToasts, "rich-colors": richColors || undefined, contained: contained || undefined, label, "close-label": closeLabel,
+    failure, expand: expand || undefined, "visible-toasts": visibleToasts, "rich-colors": richColors || undefined, contained: contained || undefined, label, "close-label": closeLabel,
     form, position, duration, "close-button": closeButton || undefined,
     src, "app-id": appId, "app-url": appUrl, open, remember, preview: preview || undefined,
     role: form === "toast" ? "presentation" : form === "app" ? "region" : tone === "danger" ? "alert" : "status",

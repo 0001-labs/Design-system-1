@@ -218,3 +218,27 @@ Set `--ds-toast-width`, `--ds-toast-background` and `--ds-toast-color` on
 ## Compatibility
 
 `ds-notice`, `Notice`, `ds-toast`, `Toaster` and `toast()` remain supported for existing apps. They are compatibility entry points for Message. The native CSS classes remain `ds-notice` and `ds-notice__*`.
+
+
+## Reporting a failure
+
+A failed operation is different from a warning, invalid input or an expected refusal.
+Colour alone never reports a failure. Give an error toast an explicit diagnostic:
+
+```ts
+message.error("Could not save your changes", {
+  failure: { code: "document.save", message: "Document save failed" },
+});
+```
+
+Inline, banner and assistant messages take the same `failure` object as a property
+(`.failure` in Lit, `failure` in React). It reports once when the diagnostic changes;
+ordinary redraws do not report it again. For a custom error surface, call
+`reportFailure({ code: "document.load", message: "Document load failed" })`
+from `0-face/feedback`.
+
+The browser emits `ds-failure` with `{ code, message }` for the application's
+reporter to receive. No network destination is built into the component. Use stable,
+authored codes and summaries; never pass filenames, document titles, input values,
+emails or raw server responses. The visible message, description and slots are
+never copied into the diagnostic. Validation and warning messages omit `failure`.

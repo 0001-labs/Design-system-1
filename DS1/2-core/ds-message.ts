@@ -5,6 +5,7 @@
 // page leading to the site's iPhone app (0-face/app-banner.ts decides where).
 // Drawn by 1-root/notice.css, the same classes a page without scripts writes.
 
+import { reportFailure, type Failure } from "../0-face/failures";
 import { LitElement, html, nothing, unsafeCSS, type PropertyValues } from "lit";
 import { getText } from "../0-face/i18n";
 import { define } from "../0-face/define";
@@ -77,6 +78,7 @@ export interface MessageDismissDetail { tone: MessageTone }
  */
 export class Message extends LitElement {
   static properties = {
+    failure: { attribute: false },
     expand: { type: Boolean },
     visibleToasts: { type: Number, attribute: "visible-toasts" },
     richColors: { type: Boolean, attribute: "rich-colors" },
@@ -103,6 +105,10 @@ export class Message extends LitElement {
   };
 
   static styles = [unsafeCSS(metrics), unsafeCSS(controls), unsafeCSS(styles)];
+
+  /** Authored diagnostic for a real failure; never derived from slotted user content. */
+  declare failure: Failure | undefined;
+  private reportedFailure = "";
 
   declare expand: boolean;
   declare visibleToasts: number;
@@ -178,6 +184,19 @@ export class Message extends LitElement {
     if (changed.has("tone") || changed.has("form")) this.syncRole();
     if (this.form === "app") this.place();
     else if (changed.get("form") === "app") this.hidden = false;
+  }
+
+  protected updated(changed: PropertyValues<this>) {
+    super.updated(changed);
+    if (!this.failure || this.hidden || this.form === "toast" || this.form === "app") {
+      this.reportedFailure = "";
+      return;
+    }
+    const key = JSON.stringify(this.failure);
+    if (key !== this.reportedFailure) {
+      this.reportedFailure = key;
+      reportFailure(this.failure);
+    }
   }
 
   private get app(): AppBannerOptions {

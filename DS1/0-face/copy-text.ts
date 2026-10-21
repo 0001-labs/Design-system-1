@@ -92,5 +92,5 @@ async function say(copied: boolean, words: string): Promise<void> {
     }
   }
   if (copied) toast.success(words);
-  else toast.error(words);
+  else toast.error(words, { failure: { code: "clipboard.copy", message: "Clipboard copy failed" } });
 }

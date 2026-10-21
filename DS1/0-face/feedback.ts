@@ -38,3 +38,6 @@ export { copyText } from "./copy-text";
 export type { CopyTextOptions } from "./copy-text";
 export { setFeedbackWords } from "./feedback-words";
 export type { FeedbackWord, FeedbackWords } from "./feedback-words";
+
+export { reportFailure, FAILURE_EVENT } from "./failures";
+export type { Failure } from "./failures";
