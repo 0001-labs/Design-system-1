@@ -582,3 +582,28 @@ test("a month's frame has a card's rounded corners on its four corner days", () 
   expect(css).toMatch(/--ds-calendar-radius: var\(--ds-radius-card/);
   for (const corner of ["start-start", "start-end", "end-start", "end-end"]) expect(css).toContain(`border-${corner}-radius: var(--ds-calendar-radius)`);
 });
+
+test("monthHeading names the month view's title, and leaves the week view, the months and the button's name", async () => {
+  const calendar = await mount<Calendar>(`<ds-calendar month="2026-10" today="2026-10-18"></ds-calendar>`);
+  const root = calendar.shadowRoot!;
+  const seen: Date[] = [];
+  calendar.monthHeading = month => { seen.push(month); return `Events in ${month.toLocaleDateString("en", { month: "long" })}`; };
+  await calendar.updateComplete;
+  expect(root.querySelector(".title-text")!.textContent).toBe("Events in October");
+  expect(root.querySelector(".title-button")!.getAttribute("aria-label")).toBe("Events in October, Choose a month and year");
+  const first = seen.at(-1)!;
+  expect([first.getFullYear(), first.getMonth(), first.getDate()]).toEqual([2026, 9, 1]);
+  expect(calendar.hasAttribute("monthheading")).toBe(false);
+  root.querySelector<HTMLElement>(".title-button")!.click();
+  await calendar.updateComplete;
+  expect(root.querySelector(".title-button")!.textContent!.trim()).toBe("2026");
+  calendar.level = "days";
+  calendar.view = "week";
+  calendar.date = "2026-10-21";
+  await calendar.updateComplete;
+  expect(root.querySelector(".title-text")!.textContent).not.toContain("Events in");
+  calendar.view = "month";
+  calendar.monthHeading = undefined;
+  await calendar.updateComplete;
+  expect(root.querySelector(".title-text")!.textContent).toBe("October 2026");
+});

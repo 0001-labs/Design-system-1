@@ -64,6 +64,15 @@ calendar.addEventListener("change", event => console.log(event.detail.value));
 
 A day outside the month is an empty box. `fixed` always draws six weeks, so moving between months never changes the calendar's height.
 
+### The month's title
+
+The title names the month and year ("October 2026"). Give `monthHeading` a function to write it in your own words: it is a property, given the first of the month shown as a `Date`, and returns the title's text. The week and day views, the twelve months and the twelve years keep their own titles, and the title stays the button that opens the months, its name saying so.
+
+```js
+const calendar = document.querySelector("ds-calendar");
+calendar.monthHeading = month => `Events in ${month.toLocaleDateString("en", { month: "long" })}`;
+```
+
 ### Compact
 
 `compact` makes every day a square, one square across by default: the date centred in it, the weekday names a letter each, the month's name shortened, and no events written out. With `day-width="2"` each day is two squares each way, the weekday names take two letters, Today stands beside the arrows and the marks grow to a square and two thirds, for a month with more room. `outside-days` writes the days of the months before and after in the title grey; pressing one goes there. When the calendar has events, a day with one keeps the ink and a day without falls back to the title grey, so a year of small months shows where things happened.
@@ -257,6 +266,8 @@ The day arithmetic the calendars use is `DS1/0-face/calendar.ts`, plain TypeScri
 | `required` | boolean | `false` | A form needs a value; Clear is left out. |
 | `disabled` | boolean | `false` | A picker cannot be opened. |
 | `open` | boolean | `false` | A picker's panel is open. |
+
+Properties only: `events`, the days' events, and `monthHeading`, `(month: Date) => string`, the month view's title (see [the month's title](#the-months-title)).
 
 ### `ds-calendar-large`
 

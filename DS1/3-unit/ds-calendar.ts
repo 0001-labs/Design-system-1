@@ -220,6 +220,11 @@ const openPickers = new Set<Calendar>();
  * @prop {boolean} disabled - A picker cannot be opened.
  * @prop {boolean} open - A picker's month is open.
  * @prop {CalendarEvent[]} events - What happens on the days (property only).
+ * @prop {(month: Date) => string} monthHeading - Names the month view's title
+ *   (property only): given the first of the month shown, it returns the words,
+ *   so a product can write "Events in October" instead of "October 2026". The
+ *   week and day views, the twelve months and the twelve years keep their own
+ *   titles, and the title button's label still says what it opens.
  *
  * @fires day-press - A day was pressed or chosen with Enter or Space;
  *   `{ day, events }`. Cancelable: cancelled, a selectable calendar keeps its value.
@@ -268,6 +273,7 @@ export class Calendar extends CalendarBase {
     open: { type: Boolean, reflect: true },
     unfolded: { state: true },
     embedded: { attribute: false },
+    monthHeading: { attribute: false },
     level: { state: true },
     browseYear: { state: true },
     pickFocus: { state: true },
@@ -278,6 +284,8 @@ export class Calendar extends CalendarBase {
   private cuts = new CutFades(this, { selector: ".title:not(.title-button), .title-text, .weekday, .trigger .text, .event .name" });
 
   declare month: string | undefined;
+  /** Names the month view's title from the first of the month shown; the month and year when unset. */
+  declare monthHeading: ((month: Date) => string) | undefined;
   declare compact: boolean;
   declare dayWidth: number | undefined;
   declare lines: number | undefined;
@@ -769,7 +777,9 @@ export class Calendar extends CalendarBase {
         ? this.rangeTitle(shownDays[0], shownDays[6])
         : view === "day"
           ? dayLabel(this.shownDay)
-          : monthTitle(month, this.compact ? "short" : "long")
+          : this.monthHeading
+            ? this.monthHeading(new Date(Number(month.slice(0, 4)), Number(month.slice(5, 7)) - 1, 1))
+            : monthTitle(month, this.compact ? "short" : "long")
       : level === "months"
         ? this.yearName(year)
         : `${this.yearName(span[0])} – ${this.yearName(span[0] + 11)}`;
