@@ -6,7 +6,7 @@
 // the Languages page, the README and Use with HTML, and AGENTS.md's
 // Distribution: the documentation and every page its navigation, directory and
 // sitemap name, the redirects and hosts, every file those pages load, the
-// hosted stylesheet and module, Play, the dash portal, the owner-only hosts
+// hosted stylesheet and module, Play, System CI where /flags sends, the owner-only hosts
 // asking to sign in, and the published package on npm and jsDelivr.
 //
 //   node scripts/e2e-blackbox.mjs                              # against https://designsystem1.com
@@ -20,7 +20,7 @@ import process from "node:process";
 
 const PUBLIC = "https://designsystem1.com";
 const PLAY = "https://play.designsystem1.com";
-const DASH = "https://dash.designsystem1.com";
+const FLAGS_MATRIX = "https://system.0001.dev/system/ci";
 const ADOPTION = "https://adoption.designsystem1.com";
 const ICON = "https://icon.designsystem1.com";
 const FONTS = "https://fonts.designsystem1.com";
@@ -463,10 +463,10 @@ await step("Redirects", [
         ["/app goes to /app/", async () => expectRedirect(await request("/app"), 308, `${APEX}/app/`)],
         ...["/play", "/play/"].map((path) => [`${path} goes to Play`, async () => expectRedirect(await request(path), 308, `${PLAY}/`)]),
         ...["/flags", "/flags/", "/app/flags"].map((path) => [
-          `${path} goes to the dash portal's Flags`,
+          `${path} goes to System CI's Flags matrix`,
           async () => {
             const answer = await request(path);
-            expectRedirect(answer, 308, `${DASH}/flags`);
+            expectRedirect(answer, 308, FLAGS_MATRIX);
             expectPrivate(answer);
           },
         ]),
@@ -602,14 +602,8 @@ if (PRODUCTION) {
     ["/private-app/ is not on Play", async () => expectStatus(await request(`${PLAY}/private-app/`), 404)],
   ]);
 
-  await step("Dash", [
-    [
-      "dash.designsystem1.com, where /flags sends, answers",
-      async () => {
-        const dash = await request(`${DASH}/flags`);
-        expect(dash.status < 500, `${DASH}/flags answered ${dash.status}`);
-      },
-    ],
+  await step("Flags", [
+    ["System CI's Flags matrix, where /flags sends, asks to sign in", async () => expectRedirect(await request(FLAGS_MATRIX), 303, "https://system.0001.dev/login")],
   ]);
 
   await step("Private hosts", [

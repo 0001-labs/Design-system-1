@@ -35,10 +35,10 @@ export default {
     if (/^\/2-core\/kbd\/?$/.test(url.pathname)) return Response.redirect('https://designsystem1.com/libraries/workspace/?internal=keyboard-shortcut', 302);
     if (url.pathname === "/api/app-navigation") return appNavigation(request, env);
     if (url.pathname === "/api/flags") return featureFlags(request, env);
-    // The release controls are the Flags tab of Design system 1's dash portal, dash.designsystem1.com,
-    // served by 0001's System Worker behind the System login; the old page addresses send there.
+    // The release controls are in System CI's Flags matrix, behind the System login, which reads and
+    // saves them through FeatureFlagsService; the old page addresses send there.
     if (["/flags", "/flags/", "/app/flags"].includes(url.pathname)) {
-      return new Response(null, { status: 308, headers: { Location: "https://dash.designsystem1.com/flags", "Cache-Control": "private, no-store", "X-Robots-Tag": "noindex, nofollow" } });
+      return new Response(null, { status: 308, headers: { Location: "https://system.0001.dev/system/ci", "Cache-Control": "private, no-store", "X-Robots-Tag": "noindex, nofollow" } });
     }
     if (url.hostname === DASHBOARD_HOST && url.pathname !== "/api/reports/components") return dashboard(request, env);
     if (url.hostname === ICON_HOST) return dashboard(request, env);
