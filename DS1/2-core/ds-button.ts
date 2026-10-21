@@ -113,12 +113,21 @@ export class Button extends Control {
   /**
    * What holds a face's words: the `ds-text` it draws for `text`, the elements
    * slotted into it, and the face itself where words are written straight into
-   * the button; the light-DOM button of a slotted control. A split's segments,
-   * an icon and the host face (whose words never cut) hold none.
+   * the button; the light-DOM button of a slotted control; the element itself
+   * for the host face, whose slotted words never shrink and are cut by it. A
+   * face marked cut paints its words through the fade over its fill, which
+   * stays whole. A split's segments and an icon hold none.
    */
   private *cutWords(): Iterable<Element> {
-    if (this.split || this.hostControl || this.icon) return;
+    if (this.split || this.icon) return;
     if (this.control === "slotted") { yield* this.querySelectorAll(":scope > :is(button, a)"); return; }
+    if (this.hostControl) {
+      const words = [...this.childNodes].some(node =>
+        node.nodeType === Node.TEXT_NODE ? !!node.textContent?.trim()
+          : node instanceof Element && node.localName !== "ds-icon" && !node.hasAttribute("slot"));
+      if (words) yield this;
+      return;
+    }
     const face = this.shadowRoot?.querySelector('[part="control"]');
     if (!face) return;
     const words = face.querySelector(":scope > ds-text");

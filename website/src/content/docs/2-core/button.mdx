@@ -97,6 +97,8 @@ Menu entries keep their gap, so their words line up down the menu. Swift's `DS1B
 
 Slotted buttons are one row high. Use `fixed` for four squares, `wide` for eight squares, `icon` for one square, or `--ds-button-width` for a layout-sized control. Menu items retain their full-row width.
 
+Words wider than their face are cut and fade over its last square, never an ellipsis, on every face and in every `control` mode; words that fit are drawn plainly. A filled face keeps its fill whole to its edge: words in an element of their own (`ds-text`, a span) fade with a mask, and words written straight into the button are painted through the same fade over the fill, its end padding left clear and an icon beside them crisp. The element marks the cut face, or its words, `data-cut="end"` while they do not fit.
+
 The adapter's default type is `button`; set `submit` or `reset` deliberately.
 Refs and event targets are the real native button. `className` and `style` apply
 to the host for layout; ARIA, IDs, native attributes and handlers reach the
