@@ -16,8 +16,6 @@
   line-height: var(--ds-type-lineheight-default);
   letter-spacing: var(--ds-type-letterspacing-default);
   text-align: left;
-  text-transform: var(--text-transform-default);
-  text-decoration: var(--text-decoration-default);
   vertical-align: middle;
   white-space: nowrap;
   color: var(--ds-text-tone, inherit);
