@@ -96,6 +96,16 @@
 }
 :host(:is([layout="column"], [layout="centered"], [layout="tiles"])) .nav { margin-block-end: var(--ds-unit); }
 
+/* A column or centred page stands what it holds one square apart, as blocks of writing are,
+   so a page needs no spacing of its own; `--ds-page-flow` sets another distance. A button or a tag
+   keeps its own width. */
+:host(:is([layout="column"], [layout="centered"])) .main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: var(--ds-page-flow, var(--ds-unit));
+}
+:host(:is([layout="column"], [layout="centered"])) .main ::slotted(:is(ds-button, ds-tag, ds-badge, ds-avatar, ds-cycle, a, button)) { justify-self: start; }
 :host([layout="centered"]) { --ds-page-measure: calc(16 * var(--ds-unit)); }
 :host([layout="centered"]) .page { grid-template-rows: auto; align-content: center; }
 

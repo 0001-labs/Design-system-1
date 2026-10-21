@@ -52,6 +52,8 @@ Every column is a whole number of squares. Between columns there are two squares
 | `centered` | — | 16 squares, centred on the grid both ways | — |
 | `tiles` | — | 12-square tiles | — |
 
+In a `column` or `centered` page, what you put in it stands one square apart, top to bottom, so a page needs no layout CSS of its own: a title, a paragraph, a table and a row of buttons (`ds-row`) follow one another on the squares. A button, a tag or a link keeps its own width. `--ds-page-flow` sets another distance.
+
 Below 30 squares of width every layout becomes one column, navigation first. The layout follows the width of its own container, not the window, so a page inside a panel stacks when the panel is narrow.
 
 ## Attributes
