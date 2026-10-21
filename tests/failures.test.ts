@@ -59,3 +59,15 @@ test("promise failures report after rejection, success and malformed diagnostics
     expect((heard.mock.calls[0][0] as CustomEvent).detail).toEqual(failure);
   } finally { window.removeEventListener("ds-failure", heard); }
 });
+
+test("keeps a bounded startup handoff and stops queueing when a reporter acknowledges", () => {
+  const key = Symbol.for("design-system-1.pending-failures");
+  const scope = globalThis as unknown as Record<symbol, unknown[]>;
+  scope[key] = [];
+  for (let i = 0; i < 25; i++) reportFailure({ code: `save.${i}`, message: "Save failed" });
+  expect(scope[key]).toHaveLength(20);
+  const acknowledge = (event: Event) => event.preventDefault();
+  window.addEventListener("ds-failure", acknowledge);
+  try { reportFailure(failure); expect(scope[key]).toHaveLength(20); }
+  finally { window.removeEventListener("ds-failure", acknowledge); delete scope[key]; }
+});
