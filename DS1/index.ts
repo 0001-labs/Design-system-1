@@ -30,6 +30,7 @@ export * from "./0-face/format";
 export * from "./0-face/preferences";
 export * from "./0-face/pricing";
 export * from "./0-face/theme";
+export * from "./0-face/shape";
 export * from "./0-face/keys";
 export * from "./0-face/sidebar";
 

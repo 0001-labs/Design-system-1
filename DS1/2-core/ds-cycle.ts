@@ -11,6 +11,7 @@ import type { LanguageCode } from "../0-face/i18n";
 import { LANGUAGE_METADATA, isLanguage, normalizeLanguage } from "../0-face/languages";
 import { currentThemeMode, setThemeMode, THEME_MODES } from "../0-face/theme";
 import type { ThemeMode } from "../0-face/theme";
+import { getShape, setShape, SHAPES, type Shape } from "../0-face/shape";
 import { savePreferences } from "../0-face/preferences";
 import "./ds-button";
 import "./ds-icon";
@@ -65,7 +66,7 @@ export function nativeLanguageName(code: string): string {
   return getLanguageDisplayName(code, { locale: code });
 }
 
-const SETTINGS = new Set(["language", "theme", "accent-color", "notes-style-medium", "page-style", "icon-only"]);
+const SETTINGS = new Set(["language", "theme", "shape", "accent-color", "notes-style-medium", "page-style", "icon-only"]);
 
 // Use a regular class with proper TypeScript type declarations and JSDoc comments
 export class Cycle extends LitElement {
@@ -172,6 +173,7 @@ export class Cycle extends LitElement {
       "theme-changed",
       this.boundHandlers.handleThemeChanged
     );
+    window.addEventListener("shape-changed", this.onShapeChanged);
     window.addEventListener(
       "accent-color-changed",
       this.boundHandlers.handleAccentColorChanged
@@ -196,6 +198,10 @@ export class Cycle extends LitElement {
       // Light, dark and the system's, the stored choice
       this.values = [...THEME_MODES];
       this.currentValue = currentThemeMode.get();
+    } else if (this.type === "shape") {
+      // Square, rounded and circular, the stored choice
+      this.values = [...SHAPES];
+      this.currentValue = getShape();
     } else if (this.type === "accent-color") {
       // Set up accent color cycling
       this.values = [
@@ -262,6 +268,8 @@ export class Cycle extends LitElement {
     } else if (this.type === "theme") {
       // The stored choice, which may be the system's
       this.currentValue = currentThemeMode.get();
+    } else if (this.type === "shape") {
+      this.currentValue = getShape();
     } else if (this.type === "accent-color") {
       // Get current accent color
       const currentAccentColor = getAccentColor();
@@ -311,6 +319,7 @@ export class Cycle extends LitElement {
       "theme-changed",
       this.boundHandlers.handleThemeChanged
     );
+    window.removeEventListener("shape-changed", this.onShapeChanged);
     window.removeEventListener(
       "accent-color-changed",
       this.boundHandlers.handleAccentColorChanged
@@ -367,6 +376,11 @@ export class Cycle extends LitElement {
       savePreferences({ theme: newTheme as ThemeMode });
 
       // Theme helper already emits the change event, so no manual dispatch here
+    } else if (this.type === "shape") {
+      const next = this.values[(this.values.indexOf(this.currentValue) + 1) % this.values.length];
+      this.currentValue = next;
+      // The runtime stores it, marks the root and emits shape-changed
+      setShape(next as Shape);
     } else if (this.type === "accent-color") {
       // Cycle through accent colors
       const currentIndex = this.values.indexOf(this.currentValue);
@@ -464,9 +478,19 @@ export class Cycle extends LitElement {
     this.requestUpdate();
   }
 
+  /** Another control, or another tab, chose a shape. */
+  private onShapeChanged = (): void => {
+    if (this.type === "shape") this.setupInitialValue();
+  };
+
   getValueDisplay(value: string): string | any {
     if (this.type === "language") {
       return nativeLanguageName(value);
+    } else if (this.type === "shape") {
+      // Square, Rounded or Circular, in the shared words
+      const word = value.charAt(0).toUpperCase() + value.slice(1);
+      const translated = this.translationsReady ? translate(word) : "";
+      return translated && translated !== word ? translated : word;
     } else if (this.type === "theme") {
       // Try to get translated theme name
       if (this.translationsReady) {

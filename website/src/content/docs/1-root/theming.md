@@ -127,6 +127,16 @@ A page without the components copies the module with Sync 1's `root` export, `"m
 CSS-only documents can use `color-scheme: light dark` and the existing `light-dark()` tokens. A preview pinned to one scheme must set its own paper, ink and line tokens as well as its scheme: inherited token values may already have resolved at the root.
 
 <span id="component-theming"></span>
+## Shape
+
+A reader can choose the corners every component draws, as a theme: **Square**, **Rounded** or **Circular**. The choice is remembered and put on the page before its first paint, as `data-ds-shape` on the root, which the components read: square corners, rounded ones (drawn as squircles where the browser can) or pills. Until a reader chooses, the components keep their own corners, or the product's `shapeDefault`.
+
+```html
+<ds-cycle type="shape" label="Shape"></ds-cycle>
+```
+
+From code, `setShape("circular")` and `getShape()` from `0-face/shape.ts`; a change dispatches `shape-changed` on window. The head script that puts the theme on before the first paint (`0-face/theme-bootstrap.js`) puts the shape on too. Set `shapeDefault` and `shapeStorageKey` (`"ds-one:shape"`) on `window.DS_ONE_PREFERENCES` before it. A footer offers it with `<ds-footer preferences="theme shape">`.
+
 ## Component-specific theming
 
 ### Button variants

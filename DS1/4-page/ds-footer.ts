@@ -29,14 +29,16 @@ export interface FooterColumn {
 }
 
 /** The settings a footer offers, each a `ds-cycle` of that type. */
-export type FooterPreference = "language" | "theme";
-const PREFERENCES: readonly FooterPreference[] = ["language", "theme"];
+export type FooterPreference = "language" | "theme" | "shape";
+const PREFERENCES: readonly FooterPreference[] = ["language", "theme", "shape"];
+/** What an empty `preferences` offers: the shape only when it is named. */
+const DEFAULT_PREFERENCES: readonly FooterPreference[] = ["language", "theme"];
 
-/** The preferences named by an attribute: every one when it is present but empty. */
+/** The preferences named by an attribute: language and theme when it is present but empty. */
 export function footerPreferences(value: string | null | undefined): FooterPreference[] {
   if (value == null || value === "false") return [];
   const named = value.split(/[\s,]+/).filter(Boolean);
-  if (!named.length || named.includes("true")) return [...PREFERENCES];
+  if (!named.length || named.includes("true")) return [...DEFAULT_PREFERENCES];
   return PREFERENCES.filter(name => named.includes(name));
 }
 
@@ -50,7 +52,7 @@ export function footerPreferences(value: string | null | undefined): FooterPrefe
  * @prop {string} label - The columns' accessible name, as a navigation; without it they are plain lists.
  * @prop {string} owner - Who holds the copyright: the brand by default.
  * @prop {number} year - The copyright's year: this year by default.
- * @prop {string} preferences - `language`, `theme` or both, as `ds-cycle`
+ * @prop {string} preferences - `language`, `theme`, `shape` or several, as `ds-cycle`
  *   buttons at the end of the last row; present but empty, both.
  * @prop {boolean} literal - Show the words as written, never looked up.
  *
@@ -148,7 +150,7 @@ export class Footer extends LitElement {
       <div class="ds-footer__base" part="base">
         <p class="ds-footer__legal" part="legal"><slot name="legal" @slotchange=${this.relabel}>${owner ? `© ${year} ${owner}` : `© ${year}`}</slot></p>
         <div class="ds-footer__preferences" part="preferences" ?hidden=${!hasPreferences}>
-          ${preferences.map(type => html`<ds-cycle type=${type}></ds-cycle>`)}
+          ${preferences.map(type => html`<ds-cycle type=${type} label=${type === "shape" ? "Shape" : nothing}></ds-cycle>`)}
           <slot name="preferences" @slotchange=${this.relabel}></slot>
         </div>
       </div>

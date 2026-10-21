@@ -7,6 +7,7 @@ import '../../../shared/site-navigation.css';
 <PublicPreferences />
 <header class="site-navigation docs-header docs-header--with-sidebar">
   <nav class="system-breadcrumb" aria-label="System breadcrumb"><a class="site-brand" href="/">Design system 1</a><span id="private-component-context" hidden>App</span></nav>
+  <ds-cycle type="shape" label="Shape" class="docs-shape"></ds-cycle>
   <button id="mobile-menu-btn" class="site-brand docs-brand-menu" type="button" aria-label="Open documentation navigation" aria-controls="mobile-navigation-panel" aria-haspopup="dialog" aria-expanded="false"><ds-icon type="menu" aria-hidden="true"></ds-icon></button>
 </header>
 <iframe id="navigation-auth" src="/app/navigation-auth" title="Account status" hidden aria-hidden="true" tabindex="-1"></iframe>
@@ -47,6 +48,7 @@ import '../../../shared/site-navigation.css';
 
 <style>
   .docs-header { display: flex; align-items: center; }
+  .docs-header .docs-shape { margin-inline-start: auto; }
   .docs-header .system-breadcrumb .site-brand { text-decoration: none; }
   #private-component-context { color: var(--ds-text-color-muted); }
   #private-component-context[hidden] { display: none; }

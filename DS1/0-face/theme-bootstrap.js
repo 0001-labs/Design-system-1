@@ -182,3 +182,46 @@
   window.addEventListener("storage", function (event) { if (event.key === null || event.key === key()) apply(); });
   window.addEventListener("pageshow", function () { apply(); });
 })();
+
+/**
+ * The shape, on before the first paint as well: square, rounded or circular,
+ * the corners every component draws (component-appearance.css keys on
+ * `data-ds-shape` on the root). Rounded draws squircles where the browser
+ * can. With nothing stored it is `shapeDefault` from
+ * `window.DS_ONE_PREFERENCES`, and without that the root carries no shape and
+ * the components keep their own corners. It is stored under `shapeStorageKey`
+ * (`"ds-one:shape"`), applied again when another tab stores one, and changed
+ * with `window.DS_ONE_SHAPE.set(shape)`, which dispatches `shape-changed` on
+ * window with `{ shape }`.
+ */
+(function () {
+  if (typeof window === "undefined" || typeof document === "undefined" || window.DS_ONE_SHAPE) return;
+  var root = document.documentElement;
+  var SHAPES = ["square", "rounded", "circular"];
+  var session = null;
+  function options() { return window.DS_ONE_PREFERENCES || {}; }
+  function key() { return options().shapeStorageKey || "ds-one:shape"; }
+  function stored() {
+    if (session) return session;
+    try {
+      var saved = window.localStorage.getItem(key());
+      if (SHAPES.indexOf(saved) >= 0) return saved;
+    } catch { /* Storage can be blocked. */ }
+    return SHAPES.indexOf(options().shapeDefault) >= 0 ? options().shapeDefault : null;
+  }
+  function apply() {
+    var shape = stored();
+    if (shape) root.setAttribute("data-ds-shape", shape);
+    else root.removeAttribute("data-ds-shape");
+    return shape;
+  }
+  function set(shape) {
+    if (SHAPES.indexOf(shape) < 0) return;
+    try { window.localStorage.setItem(key(), shape); session = null; } catch { session = shape; }
+    apply();
+    window.dispatchEvent(new CustomEvent("shape-changed", { detail: { shape: shape } }));
+  }
+  window.DS_ONE_SHAPE = { shape: stored, set: set, apply: apply };
+  apply();
+  window.addEventListener("storage", function (event) { if (event.key === null || event.key === key()) apply(); });
+})();

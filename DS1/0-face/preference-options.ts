@@ -22,6 +22,10 @@ export interface PreferenceOptions {
    * (`--background`) by default. `false` leaves both to the page.
    */
   themePaper?: { light: string; dark: string } | false;
+  /** Where the shape is stored: `"ds-one:shape"` by default. */
+  shapeStorageKey?: string;
+  /** The shape for a visitor who has chosen none; without it the components keep their own corners. */
+  shapeDefault?: "square" | "rounded" | "circular";
 }
 
 declare global {
