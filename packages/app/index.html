@@ -23,8 +23,7 @@ html[data-component="keyboard-shortcut"] [data-component="keyboard-shortcut"],ht
 &lt;ds-kbd&gt;Fn&lt;/ds-kbd&gt;</code></pre>
 <h2>Platforms</h2><div class="preview" data-ds-not-prose><p>Apple <ds-kbd shortcut="mod+shift+d" platform="apple"></ds-kbd></p><p>Other <ds-kbd shortcut="mod+shift+d" platform="other"></ds-kbd></p></div>
 <dl><dt><code>shortcut</code></dt><dd>The command, written once: <code>mod+k</code>, <code>mod+shift+d</code> or <code>escape</code>.</dd><dt><code>plain</code></dt><dd>Muted text without a fill, for use beside an action.</dd><dt><code>platform</code></dt><dd>Optional <code>apple</code> or <code>other</code> override. By default, follows the reader’s device.</dd></dl>
-<h2>React</h2><pre><code>import '@0001-labs/app/keyboard-shortcut';
-import { Kbd } from '@0001-labs/app/react/keyboard-shortcut';
+<h2>React</h2><p>Sync 1's components export copies the React adapter with <code>kbd</code> (<code>react/kbd.ts</code>), unless the product asks for <code>"react": false</code>.</p><pre><code>import { Kbd } from './design/react/kbd';
 
 &lt;Kbd shortcut="mod+k" /&gt;</code></pre>
 </article>
