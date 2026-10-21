@@ -22,6 +22,14 @@ describe('library API', () => {
     const init = (send.mock.calls as unknown as [string, RequestInit][])[0]![1];
     expect(init.headers).toMatchObject({ authorization: 'Bearer session' });
     expect(JSON.parse(init.body as string)).toMatchObject({ path: 'libraries:list', args: [{}] });
+    // Cloudflare Workers throw on any redirect mode but "follow" and "manual".
+    expect(['follow', 'manual']).toContain(init.redirect);
+  });
+  it('refuses a redirect from the backend', async () => {
+    const send = vi.fn(async () => new Response(null, { status: 302, headers: { Location: 'https://example.com/' } }));
+    const result = await libraryApi(request('list'), env, send);
+    expect(result.status).toBe(502);
+    expect(await result.json()).toMatchObject({ error: { code: 'upstream_error' } });
   });
   it('preserves conflicts and their revision without retrying writes', async () => {
     const send = vi.fn(async () => Response.json({ status: 'error', errorData: { code: 'draft_conflict', message: 'Edited elsewhere.', details: { serverRev: 3 } } }));

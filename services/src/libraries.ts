@@ -63,8 +63,10 @@ export async function libraryApi(request: Request, env: LibraryApiEnv, send: typ
   try {
     const response = await send(`${env.REPORTS_AUTH_URL}/api/${kind}`, {
       method: "POST", headers: { "Content-Type": "application/json", ...(authorization ? { authorization } : {}) },
-      body: JSON.stringify({ path: backendPath, args: [args], format: "convex_encoded_json" }), redirect: "error", signal: AbortSignal.timeout(60_000),
+      body: JSON.stringify({ path: backendPath, args: [args], format: "convex_encoded_json" }), redirect: "manual", signal: AbortSignal.timeout(60_000),
     });
+    // Workers accept only "follow" or "manual" (a "error" redirect throws before the request is sent), so a redirect is refused here.
+    if (response.status >= 300 && response.status < 400) return fail("upstream_error", "Library service could not complete the request.", 502);
     if (response.status === 401 || response.status === 403) return fail("unauthenticated", "Sign in again.", 401);
     if (!response.ok) return fail("upstream_error", "Library service could not complete the request.", 502);
     const result = await response.json() as { status: string; value?: unknown; errorData?: unknown };
