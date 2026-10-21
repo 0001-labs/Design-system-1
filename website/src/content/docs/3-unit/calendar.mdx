@@ -195,7 +195,17 @@ Both calendars take the same events, as a property:
 | `count` | How much it counts for in `heat`; one when left out. |
 | `id` | Anything the page needs back; the calendar leaves it alone. |
 
-A day lists its events longest first, then by time.
+A day lists its events longest first, then by time. An event over several days keeps one line through its week and is one bar, its name written once across the days; it breaks at the week's end and where a day's last line is given to "+N". A name its bar cuts fades out over the bar's last square, never with an ellipsis.
+
+## Week and day
+
+`view="week"` shows the week `date` falls in (today's by default), with every event of each day: the week is as many lines deep as its fullest day, and nothing folds behind "+N". `view="day"` shows one day: its events without a `time` across the top, a day wide each, then its hours, one square each in an area twelve squares high that scrolls, each timed event at its hour beside the others of that hour; it opens an hour before the first one, or at seven. The arrows move a week or a day, Today goes to today's, and the title still travels up to the months and years.
+
+`views` puts Day, Week and Month on a split button in the middle of the header, which sets `view` and fires `view-change` with `{ view }`. A compact calendar and a picker are always a month.
+
+```html
+<ds-calendar views view="week"></ds-calendar>
+```
 
 ## Days and weeks
 
@@ -225,6 +235,9 @@ The day arithmetic the calendars use is `DS1/0-face/calendar.ts`, plain TypeScri
 | `picker` | boolean | `false` | A field that opens the small month. |
 | `compact` | boolean | `false` | One square per day. |
 | `day-width` | number | `4` (`1` compact) | Squares per day. |
+| `view` | string | `month` | `month`, `week` or `day`. |
+| `views` | boolean | `false` | Day, Week and Month in the header. |
+| `date` | string | Today, or the month's first | The day the week or day view shows. |
 | `lines` | number | `2` | Lines of events under a date. |
 | `week-numbers` | boolean | `false` | The week's number on its first day. |
 | `fixed` | boolean | `false` | Always six weeks. |

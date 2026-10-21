@@ -22,6 +22,11 @@
  *   ds-stat--danger, --warning    the figure in that colour
  *   ds-stats                 a group of stats on whole squares: columns eight
  *                            squares wide, one square between them and between rows
+ *   ds-stats[data-frame]     the group in a rounded 1px frame with a 1px line
+ *                            between stats, as a framed table: the columns share
+ *                            the width, each stat's words 4px in from its lines
+ *                            as a framed table's, and a square at its foot, so
+ *                            the frame stays whole squares high
  *
  * Tokens: `--ds-stat-size` (the figure's type size before the scale, 20px)
  * and `--ds-stat-lines` (the squares its line takes, 2), `--ds-stat-typeface`
@@ -133,6 +138,35 @@
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.ds-stats[data-frame] {
+  --ds-stats-radius: var(--ds-radius-card, calc(4px * var(--ds-sf, 1)));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--ds-stats-width, 8) * var(--ds-unit))), 1fr));
+  position: relative;
+  gap: 0;
+  border-radius: var(--ds-stats-radius);
+}
+/* The frame is drawn over the stats, as a framed table's is over its cells. */
+.ds-stats[data-frame]::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  box-sizing: border-box;
+  border: 1px solid var(--ds-border-color, light-dark(#d8d8d8, #3d3d3d));
+  border-radius: var(--ds-stats-radius);
+  content: "";
+  pointer-events: none;
+}
+.ds-stats[data-frame] > * {
+  min-width: 0;
+  padding: 0 calc(4px * var(--ds-sf, 1)) var(--ds-unit);
+}
+.ds-stats[data-frame] > * + * {
+  box-shadow: inset 1px 0 0 var(--ds-border-color, light-dark(#d8d8d8, #3d3d3d));
+}
+.ds-stats[data-frame]:dir(rtl) > * + * {
+  box-shadow: inset -1px 0 0 var(--ds-border-color, light-dark(#d8d8d8, #3d3d3d));
 }
 
 .ds-stats > li {

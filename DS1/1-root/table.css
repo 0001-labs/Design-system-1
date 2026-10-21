@@ -17,6 +17,13 @@
  *   <th scope="rowgroup">                  a row group, a heading row in grey
  *   <td aria-selected="true">              a selected cell
  *
+ * `data-frame` draws the same rows in a rounded 1px frame with a 1px line
+ * between columns. Every line is drawn inside the cells' squares, the frame
+ * over the first and last pixels as the sheet's lines are at a cell's end and
+ * foot, so each row keeps its 20px pitch and the last row's rule is the
+ * frame's foot; words stand 4px in from the lines. Fills in the cells keep
+ * inside the rounded corners.
+ *
  * `data-sheet` makes it a spreadsheet: every cell four squares by one (80 by
  * 20), its 1px lines at its end and foot so the words have 79 by 19, set 4px
  * in on the sixteen. Words that do not fit fade out over the last square
@@ -71,6 +78,34 @@
 
 .ds-table :is(th, td):last-child {
   padding-inline-end: 0;
+}
+
+.ds-table[data-frame] {
+  --ds-table-radius: var(--ds-radius-card, calc(8px * var(--ds-sf, 1)));
+  position: relative;
+  border-collapse: separate;
+  border-radius: var(--ds-table-radius);
+  clip-path: inset(0 round var(--ds-table-radius));
+}
+/* The frame is drawn over the cells, so a filled cell never covers it. */
+.ds-table[data-frame]::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  box-sizing: border-box;
+  border: 1px solid var(--ds-table-rule);
+  border-radius: var(--ds-table-radius);
+  content: "";
+  pointer-events: none;
+}
+.ds-table[data-frame] :is(th, td) {
+  padding-inline: calc(4px * var(--ds-sf, 1));
+}
+.ds-table[data-frame] :is(th, td) + :is(th, td) {
+  box-shadow: inset 1px 0 0 var(--ds-table-rule);
+}
+.ds-table[data-frame]:dir(rtl) :is(th, td) + :is(th, td) {
+  box-shadow: inset -1px 0 0 var(--ds-table-rule);
 }
 
 .ds-table thead th,

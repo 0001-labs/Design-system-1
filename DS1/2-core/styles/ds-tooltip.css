@@ -5,13 +5,19 @@
 }
 :host([hidden]) { display: none !important; }
 
+/* In the top layer (a manual popover), fixed over its control by the box
+ * ds-tooltip.ts measures: centred, two pixels above, shifted to stay four
+ * pixels inside the window; nothing the control stands in can cut it short. */
 .bubble {
   box-sizing: border-box;
-  position: absolute;
-  left: 50%;
-  bottom: calc(100% + 2px * var(--ds-sf, var(--sf, 1)));
-  /* Centred over its control, shifted to stay four pixels inside the window (ds-tooltip.ts). */
-  transform: translateX(calc(-50% + var(--ds-tooltip-shift, 0px)));
+  position: fixed;
+  inset: auto;
+  left: var(--ds-tooltip-x, 50%);
+  top: var(--ds-tooltip-above, auto);
+  margin: 0;
+  border: 0;
+  overflow: visible;
+  transform: translate(calc(-50% + var(--ds-tooltip-shift, 0px)), -100%);
   z-index: var(--ds-tooltip-z-index, 1000);
   width: max-content;
   max-width: min(calc(320px * var(--ds-sf, var(--sf, 1))), calc(100vw - 20px));
@@ -34,6 +40,6 @@
 .bubble[hidden] { display: none; }
 
 .bubble[data-side="bottom"] {
-  bottom: auto;
-  top: calc(100% + 2px * var(--ds-sf, var(--sf, 1)));
+  top: var(--ds-tooltip-below, auto);
+  transform: translateX(calc(-50% + var(--ds-tooltip-shift, 0px)));
 }

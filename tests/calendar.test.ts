@@ -508,3 +508,77 @@ test("activity squares retain date labels and update their event fills", async (
   await calendar.updateComplete;
   expect(calendar.style.getPropertyValue("--ds-calendar-scale")).toBe("1.5");
 });
+
+test("an event over several days is one bar on one line, its name written once, broken only at the week's end", async () => {
+  const { weekLines } = await import("../DS1/3-unit/ds-calendar");
+  const week = ["2026-10-18", "2026-10-19", "2026-10-20", "2026-10-21", "2026-10-22", "2026-10-23", "2026-10-24"];
+  const long = { title: "Press days", start: "2026-10-18", end: "2026-10-22" };
+  const short = { title: "Flowers", start: "2026-10-19" };
+  const byDay = days.eventsByDay([short, long], week[0], week[6]);
+  const laid = weekLines(week, byDay, 2);
+  expect(laid[0].lines).toEqual([{ event: long, span: 5 }]);
+  expect(laid[1].lines).toEqual(["on", { event: short, span: 1 }]);
+  expect(laid[4].lines).toEqual(["on"]);
+  expect(laid[5].lines).toEqual([]);
+
+  const calendar = await mount<Calendar>(`<ds-calendar month="2026-10" week-start="0"></ds-calendar>`);
+  calendar.events = [long, short, { title: "Over the weekend", start: "2026-10-24", end: "2026-10-26" }];
+  await calendar.updateComplete;
+  const bar = cell(calendar, "2026-10-18").querySelector<HTMLElement>(".event")!;
+  expect(bar.dataset.span).toBe("5");
+  expect(bar.style.getPropertyValue("--ds-calendar-event-span").trim()).toBe("5");
+  expect(cell(calendar, "2026-10-19").querySelectorAll(".event")).toHaveLength(1);
+  // Across a week's end the bar starts again on the next week's first day.
+  expect(cell(calendar, "2026-10-24").querySelector<HTMLElement>(".event")!.dataset.span).toBeUndefined();
+  expect(cell(calendar, "2026-10-25").querySelector<HTMLElement>(".event")!.dataset.span).toBe("2");
+});
+
+test("a cut name fades over its bar's last square rather than ending in an ellipsis", () => {
+  const css = readFileSync(join(import.meta.dirname, "../DS1/3-unit/styles/ds-calendar.css"), "utf8");
+  expect(css).toMatch(/\.event \.name\[data-cut\] \{ mask-image: linear-gradient\(to right, #000 calc\(100% - var\(--ds-unit\)\), transparent\); \}/);
+  expect(css).not.toMatch(/\.event \.name \{[^}]*ellipsis/);
+});
+
+test("the week view shows one week with every event, and the day view its hours", async () => {
+  const calendar = await mount<Calendar>(`<ds-calendar view="week" date="2026-10-21" week-start="0" views></ds-calendar>`);
+  calendar.events = ["A", "B", "C", "D"].map(title => ({ title, start: "2026-10-21" }));
+  await calendar.updateComplete;
+  expect(cells(calendar).map(day => day.dataset.day)).toEqual(["2026-10-18", "2026-10-19", "2026-10-20", "2026-10-21", "2026-10-22", "2026-10-23", "2026-10-24"]);
+  expect(cell(calendar, "2026-10-21").querySelectorAll(".event")).toHaveLength(4);
+  expect(cell(calendar, "2026-10-21").querySelector("[data-more]")).toBeNull();
+  const navigate = vi.fn();
+  calendar.addEventListener("navigate", navigate);
+  calendar.shadowRoot!.querySelector<HTMLButtonElement>('[part="next"]')!.click();
+  await calendar.updateComplete;
+  expect(calendar.date).toBe("2026-10-28");
+  expect(navigate).toHaveBeenCalledOnce();
+
+  const views = calendar.shadowRoot!.querySelector<HTMLElement & { options: string; value: string }>("ds-button.views")!;
+  expect(views.hasAttribute("split")).toBe(true);
+  expect(views.options).toBe("day:Day,week:Week,month:Month");
+  expect(views.value).toBe("week");
+  const changed = vi.fn();
+  const chosenDay = vi.fn();
+  calendar.addEventListener("view-change", changed);
+  calendar.addEventListener("change", chosenDay);
+  views.dispatchEvent(new CustomEvent("change", { detail: { value: "day" }, bubbles: true, composed: true, cancelable: true }));
+  await calendar.updateComplete;
+  expect(chosenDay).not.toHaveBeenCalled();
+  expect(calendar.view).toBe("day");
+  expect(changed.mock.calls[0][0].detail).toEqual({ view: "day" });
+  calendar.events = [{ title: "All day", start: "2026-10-28" }, { title: "Standup", start: "2026-10-28", time: "09:30" }];
+  await calendar.updateComplete;
+  const root = calendar.shadowRoot!;
+  expect(root.querySelectorAll(".hour")).toHaveLength(24);
+  expect(root.querySelector(".all-day")!.textContent).toContain("All day");
+  expect(root.querySelector('.hour[data-hour="9"]')!.textContent).toContain("Standup");
+  root.querySelector<HTMLButtonElement>('[part="previous"]')!.click();
+  await calendar.updateComplete;
+  expect(calendar.date).toBe("2026-10-27");
+});
+
+test("a month's frame has a card's rounded corners on its four corner days", () => {
+  const css = readFileSync(join(import.meta.dirname, "../DS1/3-unit/styles/ds-calendar.css"), "utf8");
+  expect(css).toMatch(/--ds-calendar-radius: var\(--ds-radius-card/);
+  for (const corner of ["start-start", "start-end", "end-start", "end-end"]) expect(css).toContain(`border-${corner}-radius: var(--ds-calendar-radius)`);
+});

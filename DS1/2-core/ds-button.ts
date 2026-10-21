@@ -21,6 +21,7 @@ export class Button extends Control {
     segments: { attribute: false },
     value: { type: String, reflect: true },
     actions: { type: Boolean, reflect: true },
+    labelled: { type: Boolean, reflect: true },
     literal: { type: Boolean, reflect: true },
     compact: { type: Boolean, reflect: true },
     _fieldsetDisabled: { state: true },
@@ -50,6 +51,8 @@ export class Button extends Control {
   declare segments: ReadonlyArray<SplitSegment> | undefined;
   declare value: string;
   declare actions: boolean;
+  /** A split's segments with an icon show their words after it too. */
+  declare labelled: boolean;
   declare literal: boolean;
   declare compact: boolean;
   declare private _fieldsetDisabled: boolean;
@@ -104,7 +107,7 @@ export class Button extends Control {
     super();
     if (typeof this.attachInternals === "function") this.attachInternals();
     this.split = false; this.options = ""; this.value = "";
-    this.actions = false; this.literal = false; this.compact = false; this._fieldsetDisabled = false;
+    this.actions = false; this.labelled = false; this.literal = false; this.compact = false; this._fieldsetDisabled = false;
     this.addEventListener("click", event => {
       if (this._fieldsetDisabled) { event.preventDefault(); event.stopImmediatePropagation(); }
     }, { capture: true });
