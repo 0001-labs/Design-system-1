@@ -17,7 +17,18 @@
  *   ds-text--display                       20 on two squares, medium
  *   ds-text--strong                        medium
  *   ds-text--muted, --title, --danger      tones
+ *
+ * The page's own text reads as ds-text does: what stands in the body outside
+ * a component is 14 on a one-square line in the text colour, scaled with the
+ * device, so a product never sets its own body size, leading or ink.
  */
+
+body {
+  color: var(--ds-text-color);
+  font-family: var(--ds-typeface-regular);
+  font-size: var(--ds-type-size-default);
+  line-height: var(--ds-unit);
+}
 
 .ds-text {
   margin: 0;
