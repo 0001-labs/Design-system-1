@@ -176,6 +176,11 @@
   --brand-highlight: light-dark(#fde70c, #fde70c);
 }
 
+/* The canvas behind the page is the library's paper too, over the paper the theme's head script paints. */
+html {
+  background-color: var(--background) !important;
+}
+
 /* Charts and the heat of a month take the library's colour; they set these on themselves, so the library names them. */
 ds-chart, ds-bars, ds-spark, ds-ratio {
   --ds-chart-up: light-dark(#594dff, #ccccff);

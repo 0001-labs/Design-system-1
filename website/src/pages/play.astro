@@ -1,10 +1,16 @@
 ---
-// The playground, served at play.designsystem1.com: one HTML file to edit on the left, the page it
-// makes on the right in a computer's window or on a phone. Nothing is sent anywhere; the reader's
-// file is kept in this browser until they start again.
+// The playground, served at play.designsystem1.com: a small website to edit, its files in a
+// sidebar, the selected one in Aa on the left, and the page on the right in a computer's window or
+// on a phone, its links between pages working. Nothing is sent anywhere; the reader's site is kept
+// in this browser until they start again.
 import '../../../DS1/1-root/one.css';
+import '../vendor/aa/aa.css';
+import '../../../DS1/1-root/row.css';
 import PublicPreferences from '../components/PublicPreferences.astro';
 import ExampleDevice from '../components/ExampleDevice.astro';
+import { LIBRARIES } from '../lib/library-example-parts';
+// The libraries a reader can try the site in, after Design system 1 itself.
+const libraries = (['graphite', 'studio', 'voyage', 'lagoon', 'bloom', 'grove', 'signal'] as const).map(id => ({ id, name: LIBRARIES[id].name }));
 ---
 <!doctype html>
 <html lang="en">
@@ -12,15 +18,18 @@ import ExampleDevice from '../components/ExampleDevice.astro';
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Playground — Design system 1</title>
-    <meta name="description" content="Edit one HTML file built with Design system 1 and see the page as you write, on a computer or a phone." />
+    <meta name="description" content="Edit a small website built with Design system 1 and see its pages as you write, on a computer or a phone." />
     <link rel="icon" type="image/svg+xml" href="/icons/design-system-1.svg" />
     <PublicPreferences />
   </head>
   <body>
     <header class="play-bar">
       <a class="play-brand" href="https://designsystem1.com/">Design system 1</a>
-      <ds-text literal tone="muted">Playground</ds-text>
       <span class="play-grow"></span>
+      <ds-select class="play-library"><select id="play-library" aria-label="Library">
+        <option value="">Design system 1</option>
+        {libraries.map(library => <option value={library.id}>{library.name}</option>)}
+      </select></ds-select>
       <ds-button split literal class="play-panes" aria-label="Show" options="code:Code,preview:Preview" value="code" data-pane-choice></ds-button>
       <ds-button split literal aria-label="Preview width" options="computer:Computer,phone:Phone" value="computer" data-preview-width></ds-button>
       <ds-button id="play-reset">Start again</ds-button>
@@ -28,8 +37,13 @@ import ExampleDevice from '../components/ExampleDevice.astro';
       <ds-button id="play-download" primary>Download</ds-button>
     </header>
     <main class="play" data-pane="code">
-      <section class="play-code" aria-label="Your HTML file">
-        <textarea id="play-source" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="HTML of the page"></textarea>
+      <nav class="play-files" aria-label="Files">
+        <ds-text literal tone="muted" class="play-files-title">Files</ds-text>
+        <div id="play-file-list"></div>
+        <ds-button id="play-new-page"><ds-icon type="plus" aria-hidden="true"></ds-icon><span>New page</span></ds-button>
+      </nav>
+      <section class="play-code" aria-label="The selected file">
+        <div id="play-editor"></div>
       </section>
       <section class="play-preview" aria-label="The page">
         <div class="play-stage"><ExampleDevice src="about:blank" title="Your page" height={600} /></div>
@@ -37,72 +51,216 @@ import ExampleDevice from '../components/ExampleDevice.astro';
     </main>
     <script>
       import '../../../DS1/index';
-      import { confirm } from '../../../DS1/0-face/feedback';
+      import { confirm, prompt } from '../../../DS1/0-face/feedback';
       import { copyText } from '../../../DS1/0-face/copy-text';
       import { onChoice } from '../lib/example-controls';
-      import { PLAYGROUND_HTML } from '../lib/playground-example';
+      import { PLAYGROUND_FILES, type PlaygroundFile } from '../lib/playground-example';
+      import { createPlaygroundEditor } from '../lib/playground-editor';
+      import { zip } from '../lib/zip';
 
-      const KEY = 'ds1-playground:html';
+      const KEY = 'ds1-playground:site';
       const play = document.querySelector<HTMLElement>('.play')!;
-      const source = document.querySelector<HTMLTextAreaElement>('#play-source')!;
-      const frame = document.querySelector<HTMLIFrameElement>('.play-preview iframe')!;
-      frame.removeAttribute('loading');
+      const library = document.querySelector<HTMLSelectElement>('#play-library')!;
+      const list = document.querySelector<HTMLElement>('#play-file-list')!;
 
-      const stored = () => { try { return localStorage.getItem(KEY); } catch { return null; } };
-      const keep = (html: string) => { try { if (html === PLAYGROUND_HTML) localStorage.removeItem(KEY); else localStorage.setItem(KEY, html); } catch {} };
+      // The site: its files, the one open in the editor and the page shown beside it.
+      type Site = { files: PlaygroundFile[]; open: string; page: string };
+      const fresh = (): Site => ({ files: PLAYGROUND_FILES.map(file => ({ ...file })), open: 'index.html', page: 'index.html' });
+      function stored(): Site | null {
+        try {
+          const site = JSON.parse(localStorage.getItem(KEY) ?? 'null') as Site | null;
+          return site && Array.isArray(site.files) && site.files.length ? site : null;
+        } catch { return null; }
+      }
+      let site = stored() ?? fresh();
+      const keep = () => { try { localStorage.setItem(KEY, JSON.stringify(site)); } catch {} };
+      const file = (name: string) => site.files.find(entry => entry.name === name);
+      const isPage = (name: string) => name.endsWith('.html');
+      const languageOf = (name: string) => (name.endsWith('.css') ? 'css' : 'html') as 'html' | 'css';
+
+      // The preview is named for assistive technology rather than titled, so no browser tooltip
+      // stands over the page.
+      const prepare = (preview: HTMLIFrameElement) => {
+        preview.removeAttribute('loading');
+        preview.removeAttribute('title');
+        preview.setAttribute('aria-label', 'Your page');
+      };
+      let current = document.querySelector<HTMLIFrameElement>('.play-preview iframe')!;
+      prepare(current);
+
+      // A page as the preview loads it: the site's own stylesheets written into it, since a page
+      // shown from memory has no folder to find them in.
+      function compose(name: string): string {
+        const page = file(name)?.content ?? '';
+        return page.replace(/<link\b[^>]*\brel=["']stylesheet["'][^>]*>/gi, link => {
+          const href = /\bhref=["']([^"']+)["']/i.exec(link)?.[1]?.replace(/^\.\//, '');
+          const sheet = href ? file(href) : undefined;
+          return sheet ? `<style data-file="${sheet.name}">\n${sheet.content}\n</style>` : link;
+        });
+      }
+
+      // A link to another page of the site opens that page, in the preview and the editor; a link
+      // within the page or elsewhere behaves as it would.
+      function wire(preview: HTMLIFrameElement) {
+        preview.contentDocument?.addEventListener('click', event => {
+          const anchor = event.composedPath().find((node): node is HTMLAnchorElement => node instanceof (preview.contentWindow as typeof window).HTMLAnchorElement);
+          const href = anchor?.getAttribute('href')?.replace(/^\.\//, '').split('#')[0];
+          if (!href || !file(href) || !isPage(href)) return;
+          event.preventDefault();
+          open(href);
+        }, true);
+      }
 
       // HTML is not a language that fails: a half-written tag is only unfinished. The page waits
       // until the writing pauses with no tag open where the caret is (a "<" with no ">" yet) and no
       // comment left open, and shows the last finished version until then; nothing is marked as an
       // error.
-      function finished(html: string, caret: number): boolean {
-        const before = html.slice(0, caret);
+      function finished(text: string, caret: number): boolean {
+        const before = text.slice(0, caret);
         if (before.lastIndexOf('<') > before.lastIndexOf('>')) return false;
-        return html.lastIndexOf('<!--') <= html.lastIndexOf('-->');
+        return text.lastIndexOf('<!--') <= text.lastIndexOf('-->');
       }
+
+      // A new version loads out of sight over the one shown, and takes its place, at the same
+      // scroll, once its components are drawn: the page changes in place, never blank between.
       let shown = '';
-      function show(html: string) {
+      let pending: HTMLIFrameElement | null = null;
+      async function drawn(preview: HTMLIFrameElement) {
+        const page = preview.contentWindow;
+        const tags = [...new Set([...(preview.contentDocument?.querySelectorAll('*') ?? [])].map(element => element.localName).filter(name => name.includes('-')))];
+        if (!page) return;
+        await Promise.race([Promise.all(tags.map(tag => page.customElements.whenDefined(tag))), new Promise(done => setTimeout(done, 2000))]);
+        // A frame out of sight gets no animation frames: a moment for the components to draw.
+        await new Promise(done => setTimeout(done, 60));
+      }
+      function show({ keepScroll = true } = {}) {
+        const html = compose(site.page);
         if (html === shown) return;
         shown = html;
-        frame.srcdoc = html;
+        pending?.remove();
+        const next = current.cloneNode(false) as HTMLIFrameElement;
+        prepare(next);
+        const scroll = keepScroll ? current.contentWindow?.scrollY ?? 0 : 0;
+        Object.assign(next.style, { position: 'absolute', left: `${current.offsetLeft}px`, top: `${current.offsetTop}px`, width: `${current.offsetWidth}px`, height: `${current.offsetHeight}px`, visibility: 'hidden' });
+        pending = next;
+        // Its own document's load, not the empty page a new frame starts as.
+        next.addEventListener('load', async function settle() {
+          if (next.contentWindow?.location.href !== 'about:srcdoc') return;
+          next.removeEventListener('load', settle);
+          wire(next);
+          await drawn(next);
+          if (pending !== next) return;
+          next.contentWindow?.scrollTo(0, scroll);
+          next.removeAttribute('style');
+          current.remove();
+          current = next;
+          pending = null;
+        });
+        next.srcdoc = html;
+        current.after(next);
       }
+
+      // The library is a line in each page's head, after Design system 1's stylesheet: choosing one
+      // writes it into every page, choosing Design system 1 takes it out.
+      const LIBRARY_LINK = /\n[ \t]*<link rel="stylesheet" href="https:\/\/designsystem1\.com\/examples\/libraries\/([a-z]+)\.css">/;
+      const BASE_LINK = /(<link rel="stylesheet" href="https:\/\/designsystem1\.com\/resources\/design-system-1\.css">)/;
+      const libraryIn = (html: string) => LIBRARY_LINK.exec(html)?.[1] ?? '';
+      function withLibrary(html: string, id: string): string {
+        const without = html.replace(LIBRARY_LINK, '');
+        if (!id) return without;
+        const line = `<link rel="stylesheet" href="https://designsystem1.com/examples/libraries/${id}.css">`;
+        return BASE_LINK.test(without) ? without.replace(BASE_LINK, `$1\n  ${line}`) : without.replace(/<\/head>/i, `  ${line}\n</head>`);
+      }
+
       let pause: ReturnType<typeof setTimeout> | undefined;
-      source.addEventListener('input', () => {
+      const editor = createPlaygroundEditor(document.querySelector<HTMLElement>('#play-editor')!, file(site.open)?.content ?? '', () => {
         clearTimeout(pause);
         pause = setTimeout(() => {
-          keep(source.value);
-          if (finished(source.value, source.selectionStart)) show(source.value);
+          const open = file(site.open);
+          if (!open) return;
+          open.content = editor.value;
+          keep();
+          if (isPage(open.name)) library.value = libraryIn(open.content);
+          if (!isPage(open.name) || finished(open.content, editor.caret)) show();
         }, 500);
       });
-      // Tab writes two spaces; Shift+Tab and Escape leave the editor as usual.
-      source.addEventListener('keydown', event => {
-        if (event.key !== 'Tab' || event.shiftKey || event.altKey || event.metaKey || event.ctrlKey) return;
-        event.preventDefault();
-        source.setRangeText('  ', source.selectionStart, source.selectionEnd, 'end');
-        source.dispatchEvent(new Event('input'));
+      editor.set(file(site.open)?.content ?? '', languageOf(site.open));
+
+      // The files, one row each, the open one current, as a sidebar's rows are.
+      function renderFiles() {
+        list.replaceChildren(...site.files.map(entry => {
+          const row = document.createElement('button');
+          row.type = 'button';
+          row.className = 'ds-row ds-row--nav play-file';
+          row.textContent = entry.name;
+          if (entry.name === site.open) row.setAttribute('aria-current', 'page');
+          row.addEventListener('click', () => open(entry.name));
+          return row;
+        }));
+      }
+      function open(name: string) {
+        const entry = file(name);
+        if (!entry) return;
+        const before = site.page;
+        site.open = name;
+        if (isPage(name)) site.page = name;
+        keep();
+        editor.set(entry.content, languageOf(name));
+        renderFiles();
+        if (isPage(name)) library.value = libraryIn(entry.content);
+        show({ keepScroll: site.page === before });
+      }
+
+      library.addEventListener('change', () => {
+        for (const entry of site.files) if (isPage(entry.name)) entry.content = withLibrary(entry.content, library.value);
+        keep();
+        editor.set(file(site.open)!.content, languageOf(site.open));
+        show();
       });
 
-      source.value = stored() ?? PLAYGROUND_HTML;
-      show(source.value);
+      document.querySelector('#play-new-page')!.addEventListener('click', async () => {
+        const answer = await prompt({ title: 'New page', label: 'File name', value: 'about.html', confirm: 'Add page' });
+        if (!answer) return;
+        const name = answer.trim().toLowerCase().replace(/[^a-z0-9.-]+/g, '-').replace(/(\.html)?$/, '.html');
+        if (!file(name)) {
+          const title = name.replace(/\.html$/, '').replace(/-/g, ' ').replace(/^./, letter => letter.toUpperCase());
+          const model = file('index.html')?.content ?? PLAYGROUND_FILES[0].content;
+          const headEnd = model.indexOf('</head>');
+          const head = headEnd < 0 ? '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n' : model.slice(0, headEnd).replace(/<title>[^<]*<\/title>/i, `<title>${title}</title>`);
+          // New pages stand after the other pages, before the stylesheets.
+          const firstSheet = site.files.findIndex(entry => !isPage(entry.name));
+          site.files.splice(firstSheet < 0 ? site.files.length : firstSheet, 0, {
+            name,
+            content: `${head}</head>\n<body>\n  <ds-page layout="column">\n    <ds-text literal size="display" strong wrap role="heading" aria-level="1">${title}</ds-text>\n    <ds-text literal wrap>A new page. Link to it from another with <a href="${name}">${name}</a>.</ds-text>\n    <ds-button href="index.html">Back home</ds-button>\n  </ds-page>\n</body>\n</html>\n`,
+          });
+        }
+        open(name);
+      });
 
       onChoice(document.querySelector('[data-preview-width]'), value => { play.toggleAttribute('data-phone', value === 'phone'); });
       onChoice(document.querySelector('[data-pane-choice]'), value => { play.dataset.pane = value; });
 
       document.querySelector('#play-reset')!.addEventListener('click', async () => {
-        if (source.value === PLAYGROUND_HTML) return;
-        if (!(await confirm({ title: 'Start again?', text: 'Your changes are replaced by the example.', confirm: 'Start again', danger: true }))) return;
-        source.value = PLAYGROUND_HTML;
-        keep(source.value);
-        show(source.value);
+        if (!(await confirm({ title: 'Start again?', text: 'Your site is replaced by the example.', confirm: 'Start again', danger: true }))) return;
+        site = fresh();
+        keep();
+        library.value = '';
+        open(site.open);
       });
-      document.querySelector('#play-copy')!.addEventListener('click', () => { void copyText(source.value); });
+      document.querySelector('#play-copy')!.addEventListener('click', () => { void copyText(editor.value); });
       document.querySelector('#play-download')!.addEventListener('click', () => {
         const link = document.createElement('a');
-        link.href = URL.createObjectURL(new Blob([source.value], { type: 'text/html' }));
-        link.download = 'page.html';
+        link.href = URL.createObjectURL(zip(site.files.map(entry => ({ name: `site/${entry.name}`, content: entry.content }))));
+        link.download = 'site.zip';
         link.click();
         setTimeout(() => URL.revokeObjectURL(link.href), 1000);
       });
+
+      renderFiles();
+      library.value = libraryIn(file(site.page)?.content ?? '');
+      current.addEventListener('load', () => { if (current.contentWindow?.location.href === 'about:srcdoc') wire(current); });
+      shown = compose(site.page);
+      current.srcdoc = shown;
     </script>
   </body>
 </html>
@@ -122,41 +280,70 @@ import ExampleDevice from '../components/ExampleDevice.astro';
   .play-brand { color: inherit; font-family: var(--typeface-medium); text-decoration: none; }
   .play-grow { flex: 1; }
   .play-panes { display: none; }
-  .play { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 0; }
+  .play { display: grid; grid-template-columns: calc(10 * var(--ds-unit)) minmax(0, 1fr) minmax(0, 1fr); min-height: 0; }
+
+  /* The files: a sidebar's rows, one square each, the open file current. */
+  .play-files { display: flex; flex-direction: column; gap: 0; min-height: 0; padding: var(--ds-unit) calc(var(--ds-unit) / 2) var(--ds-unit) var(--ds-unit); overflow-y: auto; border-right: 1px solid var(--ds-border-color); }
+  .play-files-title { padding-top: calc(4px * var(--sf, 1)); line-height: calc(16px * var(--sf, 1)); }
+  .play-files #play-file-list { display: grid; margin-block: calc(var(--ds-unit) / 2) var(--ds-unit); }
+  .play-file { width: 100%; border: 0; background: none; font: inherit; color: inherit; text-align: start; cursor: pointer; }
+  .play-files #play-new-page { align-self: flex-start; }
+
+  /* A dark editor whatever the page's theme, as code editors are: line numbers, then Aa's block in
+     the code face, one square a line, never wrapping. */
   .play-code { display: flex; min-height: 0; border-right: 1px solid var(--ds-border-color); }
-  /* Plain text in the code face, one square a line: nothing is highlighted, nothing marked wrong. */
-  #play-source {
+  #play-editor {
+    --play-ink: #f5f5f5;
+    display: flex;
     flex: 1;
-    box-sizing: border-box;
-    margin: 0;
-    padding: var(--ds-unit);
-    border: 0;
-    outline: none;
-    resize: none;
-    background: var(--background);
-    color: var(--text-color);
+    min-width: 0;
+    min-height: 0;
+    overflow: auto;
+    background: #1e1e1e;
+    color: var(--play-ink);
     font-family: var(--typeface-mono);
     font-size: calc(13px * var(--sf, 1));
     line-height: var(--ds-unit);
-    tab-size: 2;
-    white-space: pre;
-    overflow: auto;
+    color-scheme: dark;
   }
-  #play-source:focus-visible { box-shadow: inset 0 0 0 2px var(--ds-focus-ring); }
+  #play-editor:focus-within { box-shadow: inset 0 0 0 2px var(--ds-focus-ring); }
+  .play-lines { position: sticky; left: 0; z-index: 1; flex: none; display: flex; flex-direction: column; align-self: flex-start; min-width: calc(2 * var(--ds-unit)); min-height: 100%; padding: var(--ds-unit) calc(var(--ds-unit) / 2); background: #1e1e1e; color: #5f5f5f; text-align: end; user-select: none; }
+  .play-lines span { height: var(--ds-unit); }
+  .play-lines .play-line-current { color: #cacaca; }
+  .play-aa { flex: 1; min-width: max-content; padding: var(--ds-unit) var(--ds-unit) var(--ds-unit) calc(var(--ds-unit) / 2); }
+  .play-aa .aa-block { min-height: 100%; outline: none; white-space: pre; font: inherit; line-height: inherit; color: inherit; caret-color: var(--play-ink); tab-size: 2; }
+  ::highlight(play-tag) { color: #f5aad1; }
+  ::highlight(play-attribute) { color: #fec20d; }
+  ::highlight(play-string) { color: #99ff73; }
+  ::highlight(play-comment) { color: #8a8a8a; }
+  ::highlight(play-keyword) { color: #ccccff; }
+  ::highlight(play-property) { color: #69d8fb; }
+  ::highlight(play-number) { color: #fde70c; }
+  ::highlight(play-punctuation) { color: #b3b3b3; }
+
   .play-preview { container-type: size; min-height: 0; overflow: auto; background: var(--ds-fill); }
   .play-stage { box-sizing: border-box; padding: var(--ds-unit); }
+  .play:not([data-phone]) .example-device-glass { position: relative; }
   /* The computer's window fills the pane; the phone stands whole in it. */
   .play .example-device iframe { height: calc(100cqh - 2 * var(--ds-unit) - 34px * var(--sf, 1)); }
   .play[data-phone] .example-device { width: min(calc(21 * var(--ds-unit)), calc((100cqh - 2 * var(--ds-unit)) * 910 / 1855)); }
   .play[data-phone] .example-device iframe { height: 0; }
 
+  @media (max-width: 1100px) {
+    .play { grid-template-columns: calc(8 * var(--ds-unit)) minmax(0, 1fr) minmax(0, 1fr); }
+  }
   @media (max-width: 900px) {
     .play-bar { flex-wrap: wrap; }
-    .play-bar > ds-text, .play-grow { display: none; }
+    .play-grow { display: none; }
     .play-panes { display: inline-flex; }
-    .play { grid-template-columns: minmax(0, 1fr); }
+    .play { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+    /* The files stand in a row over the code. */
+    .play-files { flex-direction: row; align-items: flex-end; gap: calc(var(--ds-unit) / 2); padding: calc(var(--ds-unit) / 2) var(--ds-unit); overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--ds-border-color); }
+    .play-files-title { display: none; }
+    .play-files #play-file-list { display: flex; gap: calc(var(--ds-unit) / 2); margin: 0; }
+    .play-file { width: auto; white-space: nowrap; }
     .play-code { border-right: 0; }
-    .play[data-pane='code'] .play-preview, .play[data-pane='preview'] .play-code { display: none; }
+    .play[data-pane='code'] .play-preview, .play[data-pane='preview'] :is(.play-code, .play-files) { display: none; }
   }
   /* On a phone the page is already a phone's: the preview is the page itself, without a frame. */
   @media (max-width: 600px) {
