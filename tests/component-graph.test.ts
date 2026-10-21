@@ -104,3 +104,24 @@ test('the components export records its files for the adoption report', () => {
   expect(Object.keys(manifest.files)).toContain('2-core/ds-text.ts');
   expect(Object.keys(manifest.files)).not.toContain('components-manifest.json');
 });
+
+test('the React adapters travel by default, and "react": false leaves every one of them out', () => {
+  const names = ['button', 'empty', 'notice', 'select', 'menu', 'loading', 'spacing-handle', 'kbd', 'table', 'overlay', 'swatch'];
+  const withAdapters = componentGraph(ds1, names).files;
+  for (const file of ['react/button.ts', 'react/button-split.ts', 'react/empty.ts', 'react/notice.ts', 'react/select.ts', 'react/menu-engine.ts', 'react/loading.ts', 'react/spacing-handle.ts', 'react/kbd.ts']) expect(withAdapters.has(file), file).toBe(true);
+  const lit = componentGraph(ds1, names, { react: false }).files;
+  expect([...lit.keys()].filter(file => file.startsWith('react/'))).toEqual([]);
+  // The elements, their sheets and the scripts that are not adapters still travel.
+  for (const file of ['2-core/ds-button.ts', '2-core/button-split.ts', '2-core/ds-empty.ts', '2-core/ds-notice.ts', '3-unit/ds-select.ts', '2-core/ds-loading.ts', '0-face/tooltips.ts', '1-root/controls.css', 'components.ts']) expect(lit.has(file), file).toBe(true);
+});
+
+test('the components export takes "react": false from sync.json, and refuses anything but a boolean', () => {
+  const git = () => 'a'.repeat(40);
+  const run = (options: Record<string, unknown>) => exported.exports.components.files({ source: resolve('.'), options, git });
+  expect(run({ components: ['button'] }).has('react/button.ts')).toBe(true);
+  expect(run({ components: ['button'], react: true }).has('react/button.ts')).toBe(true);
+  const lit = run({ components: ['button'], react: false });
+  expect(lit.has('react/button.ts')).toBe(false);
+  expect(Object.keys(JSON.parse(lit.get('components-manifest.json')).files).some(file => file.startsWith('react/'))).toBe(false);
+  expect(() => run({ components: ['button'], react: 'no' })).toThrow(/"react" is true/);
+});

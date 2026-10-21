@@ -2,14 +2,16 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 
-/**
- * Collects the files under DS1/ that the named components need, keyed by their
- * path inside DS1, with a generated `components.ts` that exports them all.
- */
 /** Components folded into another, named so a product's sync.json says what to take instead (never resolved for it). */
 const RENAMED = { dialog: 'overlay', 'date-picker': 'calendar' };
 
-export function componentGraph(ds1, names) {
+/**
+ * Collects the files under DS1/ that the named components need, keyed by their
+ * path inside DS1, with a generated `components.ts` that exports them all.
+ * `react: false` leaves the React adapters (`react/*.ts`) out, for a product
+ * that uses the Lit elements alone; by default they travel with their components.
+ */
+export function componentGraph(ds1, names, { react = true } = {}) {
   const source = resolve(ds1) + '/';
   // Internal App controls are opt-in Sync 1 inputs, never public package files.
   const appSource = resolve(ds1, '../packages/app/src');
@@ -22,6 +24,7 @@ export function componentGraph(ds1, names) {
     const path = resolve(source, file);
     if (!path.startsWith(source)) throw new Error(`Dependency outside DS1: ${file}`);
     if (files.has(file)) return;
+    if (!react && file.startsWith('react/')) throw new Error(`${file} is a React adapter, left out by "react": false`);
     const actual = actualPath(file);
     let content = readFileSync(actual, 'utf8');
     if (actual.startsWith(appSource + '/')) {
@@ -57,37 +60,38 @@ export function componentGraph(ds1, names) {
     return file;
   });
   // React consumers may import the optional, source-owned state adapter.
-  if (components.includes('spacing-handle')) visit('react/spacing-handle.ts');
-  if (components.includes('loading')) visit('react/loading.ts');
-  if (components.includes('button')) visit('react/button.ts');
-  if (components.includes('badge')) visit('react/badge.ts');
-  if (components.includes('empty')) visit('react/empty.ts');
-  if (components.includes('message')) visit('react/message.ts');
-  if (components.includes('notice')) visit('react/notice.ts');
-  if (components.includes('kbd')) visit('react/kbd.ts');
-  if (components.includes('carousel')) visit('react/carousel.ts');
-  for (const name of ['stat', 'progress']) if (components.includes(name)) visit(`react/${name}.ts`);
-  if (components.includes('sidebar')) visit('react/sidebar.ts');
-  if (components.includes('table')) visit('react/table.ts');
-  if (components.includes('table-of-contents')) visit('react/table-of-contents.ts');
-  if (components.includes('toast')) visit('react/toast.ts');
-  if (components.includes('file-picker')) visit('react/file-picker.ts');
-  if (components.includes('token-field') || components.includes('token')) visit('react/token-field.ts');
-  if (components.includes('composer')) visit('react/composer.ts');
-  if (components.includes('menu')) visit('react/menu-engine.ts');
-  if (components.includes('select')) visit('react/select.ts');
-  if (components.includes('context')) visit('react/context.ts');
-  if (components.includes('accordion')) visit('react/accordion.ts');
-  if (components.includes('avatar')) visit('react/avatar.ts');
-  if (components.includes('avatar-group')) visit('react/avatar-group.ts');
-  if (['checkbox', 'radio', 'switch', 'color'].some(name => components.includes(name))) visit('react/choice.ts');
-  if (components.includes('overlay')) visit('react/overlay.ts');
-  if (components.includes('page')) visit('react/page.ts');
-  if (components.includes('header')) visit('react/header.ts');
-  if (components.includes('footer')) visit('react/footer.ts');
-  if (components.includes('document')) visit('react/document.ts');
+  const adapter = file => { if (react) visit(file); };
+  if (components.includes('spacing-handle')) adapter('react/spacing-handle.ts');
+  if (components.includes('loading')) adapter('react/loading.ts');
+  if (components.includes('button')) adapter('react/button.ts');
+  if (components.includes('badge')) adapter('react/badge.ts');
+  if (components.includes('empty')) adapter('react/empty.ts');
+  if (components.includes('message')) adapter('react/message.ts');
+  if (components.includes('notice')) adapter('react/notice.ts');
+  if (components.includes('kbd')) adapter('react/kbd.ts');
+  if (components.includes('carousel')) adapter('react/carousel.ts');
+  for (const name of ['stat', 'progress']) if (components.includes(name)) adapter(`react/${name}.ts`);
+  if (components.includes('sidebar')) adapter('react/sidebar.ts');
+  if (components.includes('table')) adapter('react/table.ts');
+  if (components.includes('table-of-contents')) adapter('react/table-of-contents.ts');
+  if (components.includes('toast')) adapter('react/toast.ts');
+  if (components.includes('file-picker')) adapter('react/file-picker.ts');
+  if (components.includes('token-field') || components.includes('token')) adapter('react/token-field.ts');
+  if (components.includes('composer')) adapter('react/composer.ts');
+  if (components.includes('menu')) adapter('react/menu-engine.ts');
+  if (components.includes('select')) adapter('react/select.ts');
+  if (components.includes('context')) adapter('react/context.ts');
+  if (components.includes('accordion')) adapter('react/accordion.ts');
+  if (components.includes('avatar')) adapter('react/avatar.ts');
+  if (components.includes('avatar-group')) adapter('react/avatar-group.ts');
+  if (['checkbox', 'radio', 'switch', 'color'].some(name => components.includes(name))) adapter('react/choice.ts');
+  if (components.includes('overlay')) adapter('react/overlay.ts');
+  if (components.includes('page')) adapter('react/page.ts');
+  if (components.includes('header')) adapter('react/header.ts');
+  if (components.includes('footer')) adapter('react/footer.ts');
+  if (components.includes('document')) adapter('react/document.ts');
   if (components.includes('swatch')) visit('0-face/tooltips.ts');
-  if (components.includes('input')) visit('react/input.ts');
+  if (components.includes('input')) adapter('react/input.ts');
   visit('1-root/component-tokens.css');
   visit('1-root/controls.css');
   files.set('components.ts', '/** Generated by Design system 1. Change the source and sync. */\n' + entries.map(file => `export * from './${file.slice(0, -3)}';\n`).join(''));

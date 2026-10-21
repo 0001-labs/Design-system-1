@@ -235,7 +235,9 @@ export default {
      * The Lit components named in `components`, with everything they import and
      * their React adapters (`empty` brings react/empty.ts, `notice`
      * react/notice.ts, `carousel` react/carousel.ts, `stat` and `progress`
-     * theirs, `sidebar` react/sidebar.ts, `table` react/table.ts). controls.css always travels with them, and
+     * theirs, `sidebar` react/sidebar.ts, `table` react/table.ts); `react:
+     * false` leaves every adapter out, for a product on the Lit elements alone
+     * (`{ "components": ["button", …], "react": false }`). controls.css always travels with them, and
      * with it the native classes it imports, `.ds-empty`, `.ds-notice`,
      * `.ds-carousel`, `.ds-stat`, `.ds-progress` and `.ds-row` among them.
      * components-manifest.json records them for the component adoption report,
@@ -244,7 +246,8 @@ export default {
     components: {
       files({ source, options, git }) {
         if (!Array.isArray(options.components) || !options.components.length) throw new Error('Name the components to copy: "components": ["button", …]');
-        const { components, files } = componentGraph(join(source, 'DS1'), options.components);
+        if (options.react !== undefined && typeof options.react !== 'boolean') throw new Error('"react" is true (the default, with the React adapters) or false (the Lit elements alone)');
+        const { components, files } = componentGraph(join(source, 'DS1'), options.components, { react: options.react !== false });
         const hashes = Object.fromEntries([...files].sort(([a], [b]) => a.localeCompare(b)).map(([file, content]) => [file, createHash('sha256').update(content).digest('hex')]));
         const tracked = [...files.keys()].filter(file => file !== 'components.ts').map(file => `DS1/${file}`);
         const commit = git(['log', '-1', '--format=%H', '--', ...tracked]) || git(['rev-parse', 'HEAD']);

@@ -9,7 +9,7 @@ Design system 1 (`/Users/joachim/0001/Design system 1`, source in `DS1/`) is the
 
 ## Web interface
 
-Use the Lit `ds-*` components for web controls, including plain HTML pages: a stylesheet link loads the foundations and a module script registers the elements. React uses the same components through adapters. Libraries customize their public tokens. CLASSless and the vanilla stylesheet are retired. Native classes and page helpers mentioned below describe existing implementation/consumer compatibility; select the Lit component for new work. Keep semantic HTML inside/slotted into controls and for prose. Swift, Kotlin and email keep their platform renderers.
+Use the Lit `ds-*` components for web controls, including plain HTML pages: a stylesheet link loads the foundations and a module script registers the elements. React uses the same components through adapters, which Sync 1's `components` export copies with them; a product without React leaves them out with `"react": false` beside its `"components"`. Libraries customize their public tokens. CLASSless and the vanilla stylesheet are retired. Native classes and page helpers mentioned below describe existing implementation/consumer compatibility; select the Lit component for new work. Keep semantic HTML inside/slotted into controls and for prose. Swift, Kotlin and email keep their platform renderers.
 
 ## Propagating shared design
 
