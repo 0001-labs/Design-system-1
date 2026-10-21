@@ -31,7 +31,7 @@ An arrow drawn inside an icon keeps the form of the Inter arrows the type uses: 
 
 ## Flags
 
-Country flags are their own folder, `DS1/x-flag/`, outside the icon collection and its catalogue: in colour, 3:2 rather than 16 square, and one for every country and territory (plus the UK's nations, `gb-eng`, `gb-sct`, `gb-wls`, `gb-nir`, and a few regions such as `es-ct` and `eu`). The Icon page says they exist and how to draw them without listing them. `scripts/import-flags.mjs` writes the folder from country-flag-icons' 3:2 drawings (MIT, `x-flag/LICENSE.md`), each framed 30 × 20 and otherwise untouched; Japan's is Ezo's, the disc three-fifths of the height. Leave the drawings to the import: to change one, change the script and run it again. `.ds-flag` in `controls.css` draws one, and Sync 1's `flags` export copies them.
+Country flags are their own folder, `DS1/x-flag/`, outside the icon collection and its catalogue: in colour, 3:2 rather than 16 square, and one for every country and territory (plus the UK's nations, `gb-eng`, `gb-sct`, `gb-wls`, `gb-nir`, and a few regions such as `es-ct` and `eu`). The Icon page says they exist and how to draw them without listing them. `scripts/import-flags.mjs` writes the folder from country-flag-icons' 3:2 drawings (MIT, `x-flag/LICENSE.md`), each framed 30 × 20 and otherwise untouched; Japan's is Ezo's, the disc three-fifths of the height. Leave the drawings to the import: to change one, change the script and run it again. `.ds-flag` in `controls.css` draws one, its corners a quarter of its height and centred in a table row, and Sync 1's `flags` export copies them.
 
 ## Brand marks
 
