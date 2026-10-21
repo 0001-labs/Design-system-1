@@ -167,3 +167,24 @@ test('tabs own arrow navigation, skip disabled tabs, and leave filter groups alo
   choices[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
   expect(document.activeElement).toBe(choices[0]);
 });
+
+test('paper tabs mark each tab with the notebook face and take the mark back', async () => {
+  const tabs = document.createElement('ds-tabs');
+  const choices = ['Description', 'Material'].map(label => {
+    const button = document.createElement('ds-button');
+    button.control = 'host';
+    button.setAttribute('role', 'tab');
+    button.textContent = label;
+    return button;
+  });
+  tabs.paper = true;
+  tabs.append(...choices);
+  document.body.append(tabs);
+  await Promise.all([tabs.updateComplete, ...choices.map(choice => choice.updateComplete)]);
+  expect(tabs.hasAttribute('paper')).toBe(true);
+  expect(choices.every(choice => choice.hasAttribute('paper'))).toBe(true);
+  expect(choices.some(choice => choice.hasAttribute('segment'))).toBe(false);
+  tabs.paper = false;
+  await tabs.updateComplete;
+  expect(choices.some(choice => choice.hasAttribute('paper'))).toBe(false);
+});

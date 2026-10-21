@@ -7,10 +7,12 @@ import { define } from "../0-face/define";
  * a segmented option group. The choices are `ds-button`s; the current one is
  * `active`.
  *
- * Three faces, always 4px apart where they stand apart: buttons (the
+ * Four faces, always 4px apart where they stand apart: buttons (the
  * default), each tab muted on no ground and the current one on the fill;
- * `text`, the words alone; and `split`, the tabs joined into one face as the
- * split button draws it, the current one on the accent.
+ * `text`, the words alone; `split`, the tabs joined into one face as the
+ * split button draws it, the current one on the accent; and `paper`, a
+ * notebook's tabs hanging from a page's top edge, a row high, the current one
+ * on the paper's colour and joined to the page.
  *
  * The element is a `tablist` unless it says otherwise, and its buttons take the
  * tab look. An option group that is not a set of tabs takes `role="group"`, its
@@ -21,6 +23,7 @@ import { define } from "../0-face/define";
  * @attr fill - Share the width equally between the choices.
  * @attr text - Text tabs: the words alone, no fill, the current one in the ink.
  * @attr split - Split tabs: joined into one face a control high, the current one on the accent.
+ * @attr paper - Paper tabs: a notebook's tabs a row high, rounded at the top, the current one on the paper and joined to the page.
  *
  * @example
  * <ds-tabs role="group" fill>
@@ -39,12 +42,14 @@ export class Tabs extends LitElement {
     wrap: { type: Boolean, reflect: true },
     text: { type: Boolean, reflect: true },
     split: { type: Boolean, reflect: true },
+    paper: { type: Boolean, reflect: true },
   };
 
   declare fill: boolean;
   declare wrap: boolean;
   declare text: boolean;
   declare split: boolean;
+  declare paper: boolean;
 
   constructor() {
     super();
@@ -52,6 +57,7 @@ export class Tabs extends LitElement {
     this.wrap = false;
     this.text = false;
     this.split = false;
+    this.paper = false;
     this.addEventListener("keydown", this.navigate);
   }
 
@@ -76,22 +82,27 @@ export class Tabs extends LitElement {
     tabs[next].click();
   };
 
-  /** Split, each tab knows its place in the run, so only the run's ends are rounded. */
-  private syncSegments = (): void => {
+  /**
+   * Split, each tab knows its place in the run, so only the run's ends are
+   * rounded; paper, each tab wears the mark that gives it a notebook tab's face.
+   */
+  private syncFaces = (): void => {
     const tabs = [...this.children].filter(child => child.localName === "ds-button");
     tabs.forEach((tab, index) => {
       const place = tabs.length === 1 ? "only" : index === 0 ? "first" : index === tabs.length - 1 ? "last" : "middle";
       if (this.split) tab.setAttribute("segment", place);
       else if (/^(first|middle|last|only)$/.test(tab.getAttribute("segment") ?? "")) tab.removeAttribute("segment");
+      if (this.paper) tab.setAttribute("paper", "");
+      else tab.removeAttribute("paper");
     });
   };
 
   protected updated(changed: PropertyValues): void {
-    if (changed.has("split")) this.syncSegments();
+    if (changed.has("split") || changed.has("paper")) this.syncFaces();
   }
 
   render() {
-    return html`<slot @slotchange=${this.syncSegments}></slot>`;
+    return html`<slot @slotchange=${this.syncFaces}></slot>`;
   }
 }
 

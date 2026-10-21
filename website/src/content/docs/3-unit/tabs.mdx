@@ -1,6 +1,6 @@
 ---
 title: Tabs
-description: "A run of choices of which one is current, in three faces: buttons, text, or joined as a split button."
+description: "A run of choices of which one is current, in four faces: buttons, text, joined as a split button, or a notebook's paper tabs."
 ---
 
 import ComponentExample from "../../../components/ComponentExample.astro";
@@ -15,13 +15,16 @@ A run of choices of which one is current: a panel's tabs, a subtab bar, a segmen
 
 <ComponentExample example="tabs-split" />
 
-## Three faces
+<ComponentExample example="tabs-paper" />
+
+## Four faces
 
 | Face | Attribute | How it looks | Use it for |
 | --- | --- | --- | --- |
 | Buttons | none (the default) | Each tab one control high, muted on no ground; the current one on the fill in the ink. | A panel's or a sheet's tabs. |
 | Text | `text` | The words alone, no fill in any state; the current one in the ink, the others muted. Each tab keeps its 4px of padding, so the words stand twelve apart, and the run is drawn 4px back so the first word starts on the column's edge. | Tabs that stand where a heading would, inside a page or a sheet. |
 | Split | `split` | Joined into one face a control high as the [split button](/2-core/button/) draws it: a pixel between the tabs, the run's outer corners rounded, the current one on the accent. | A compact switch between views of the same thing. |
+| Paper | `paper` | A notebook's tabs hanging from a page's top edge: each a row high with its words on the sixteen, half a square of room at its sides, rounded at the top and square where it joins the page; the current one on the paper's colour in the ink, so it reads as part of the page below, the others on the quiet fill in the muted ink. The run stands at the page's edge; the page places it over the band above. | A page's own tabs on a phone, where there is no room for a bar: a document's description and its material. |
 
 ## Attributes
 
@@ -29,11 +32,12 @@ A run of choices of which one is current: a panel's tabs, a subtab bar, a segmen
 | --- | --- | --- | --- |
 | `text` | boolean | false | Text tabs: the words alone, no fill. |
 | `split` | boolean | false | Split tabs: joined into one face, the current one on the accent. |
+| `paper` | boolean | false | Paper tabs: a notebook's tabs a row high, the current one on the paper and joined to the page. |
 | `fill` | boolean | false | Shares the width equally between the tabs. |
 | `wrap` | boolean | false | Lets a long run wrap onto more rows. |
 | `role` | string | `tablist` | `group` makes it an option group: its buttons take `aria-pressed`, grey with the chosen one on the accent. |
 
-Each tab is a `ds-button` with `control="host"`, `role="tab"`, `aria-selected` and `active` on the current one. In a split run each tab gets its place, `segment="first"`, `"middle"` or `"last"`, so only the run's ends are rounded.
+Each tab is a `ds-button` with `control="host"`, `role="tab"`, `aria-selected` and `active` on the current one. In a split run each tab gets its place, `segment="first"`, `"middle"` or `"last"`, so only the run's ends are rounded; in a paper run each tab is marked `paper`, which gives it the notebook tab's face.
 
 ```html
 <ds-tabs text aria-label="Payment">
@@ -43,6 +47,6 @@ Each tab is a `ds-button` with `control="host"`, `role="tab"`, `aria-selected` a
 </ds-tabs>
 ```
 
-On Apple platforms and Android it is `DS1Tabs` with `face: .button`, `.text` or `.split` (Kotlin `DS1TabsFace`).
+On Apple platforms and Android it is `DS1Tabs` with `face: .button`, `.text` or `.split` (Kotlin `DS1TabsFace`); the paper face is on the web only so far.
 
 [Button](/2-core/button/) · [Select](/3-unit/select/)

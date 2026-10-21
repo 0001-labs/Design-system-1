@@ -169,6 +169,20 @@
   margin-inline-start: calc(-4px * var(--ds-sf));
 }
 
+/* A paper tab (`ds-tabs paper`) on this face: a row high with its words on
+   the sixteen, half a square of room at its sides, in the run's colours,
+   rounded at the top only and square at the foot, where it joins the page. */
+:host([paper]) :is(button, a) {
+  height: var(--ds-row-height);
+  min-height: var(--ds-row-height);
+  max-height: var(--ds-row-height);
+  align-items: flex-end;
+  padding: 0 calc(10px * var(--ds-sf));
+  border-radius: var(--ds-radius) var(--ds-radius) 0 0;
+  background-color: var(--ds-button-background, transparent);
+  color: var(--ds-button-color, var(--button-text-color));
+}
+
 /* A segment gets its outside corners from the enclosing split control, or
    from its place in a joined run of tabs (`ds-tabs split`). */
 :host([segment]) :is(button, a) {

@@ -53,7 +53,9 @@
  * the column's edge, as a heading would.
  */
 :host([text]) {
-  margin-inline-start: calc(-4px * var(--ds-sf));
+  /* Important: a page's `* { margin: 0 }` reset (Tailwind's preflight, say)
+     reaches the host from outside and would set the first word 4px in. */
+  margin-inline-start: calc(-4px * var(--ds-sf)) !important;
 }
 
 :host([text]) ::slotted(ds-button),
@@ -100,4 +102,38 @@
 :host([split]) ::slotted(ds-button[active]) {
   --ds-button-background: var(--ds-accent-color);
   --ds-button-color: var(--ds-button-text-color-on-accent);
+}
+
+/*
+ * Paper tabs (`paper`): a notebook's tabs hanging from a page's top edge.
+ * Each tab is a row high with its words on the sixteen, half a square of room
+ * at its sides, the tabs 4px apart, rounded at the top and square at the foot
+ * where they join the page (each tab's `paper` mark, which the run sets):
+ * the current one on the paper's colour in the ink, so it reads as part of
+ * the page below; the others on the quiet fill in the muted ink, lit under
+ * the pointer. The run stands at the page's edge; the page places it, over a
+ * header's band, say, so the tabs hang into it.
+ */
+:host([paper]) {
+  align-items: flex-end;
+  height: var(--ds-row-height);
+}
+
+:host([paper]) ::slotted(ds-button) {
+  --ds-button-height: var(--ds-row-height);
+  --ds-button-padding: 0 calc(10px * var(--ds-sf));
+  --ds-button-background: var(--ds-button-background-color-secondary);
+  --ds-button-color: var(--ds-text-color-muted);
+}
+
+:host([paper]) ::slotted(ds-button:hover) {
+  --ds-button-background: var(--ds-fill-hover);
+  --ds-button-color: var(--ds-text-color);
+}
+
+:host([paper]) ::slotted(ds-button[active]),
+:host([paper]) ::slotted(ds-button[active]:hover) {
+  /* The page's own colour: a product's --ds-background, else the paper's. */
+  --ds-button-background: var(--ds-background, var(--background, Canvas));
+  --ds-button-color: var(--ds-text-color);
 }
