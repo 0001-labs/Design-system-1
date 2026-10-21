@@ -56,7 +56,7 @@ async function start(entry: string, bindings: Record<string, string> = {}): Prom
         const path = new URL(request.url).pathname;
         if (path === "/") return new Response("Documentation");
         if (path === "/app/") return new Response("Application");
-        if (path === "/play/") return new Response("Playground");
+        if (path === "/play/") return new Response("Play");
         if (path === "/resources/design-system-1.js") return new Response("Components");
         return new Response("Missing asset", { status: 404 });
       },

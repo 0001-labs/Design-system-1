@@ -59,7 +59,7 @@ export default {
       return response;
     }
 
-    // The playground lives on its own host: its page at the root, the site's assets beside it.
+    // Play lives on its own host: its page at the root, the site's assets beside it.
     if (url.hostname === PLAY_HOST) {
       if (!["GET", "HEAD"].includes(request.method)) return new Response("Not found", { status: 404 });
       if (url.pathname === "/" || url.pathname === "/play" || url.pathname === "/play/") {

@@ -1,4 +1,4 @@
-// The playground's code editor: Aa's plain editor (one plain-text block, Aa's editing and rounded
+// Play's code editor: Aa's plain editor (one plain-text block, Aa's editing and rounded
 // selection), with line numbers beside it and the code coloured by the browser's CSS highlights,
 // which paint ranges of the text without changing it. HTML is coloured as written, the CSS in a
 // <style> and a .css file, and the JavaScript in a <script>. Nothing reacts to unfinished code: a
@@ -80,7 +80,7 @@ export function highlight(code: string, language: 'html' | 'css' = 'html'): Toke
   return tokens;
 }
 
-export interface PlaygroundEditor {
+export interface PlayEditor {
   /** The file as written. */
   readonly value: string;
   /** Where the caret is, from the start of the file; the end when the editor is not focused. */
@@ -91,7 +91,7 @@ export interface PlaygroundEditor {
 
 const supported = typeof CSS !== 'undefined' && 'highlights' in CSS && typeof Highlight !== 'undefined';
 
-export function createPlaygroundEditor(parent: HTMLElement, value: string, onChange: () => void): PlaygroundEditor {
+export function createPlayEditor(parent: HTMLElement, value: string, onChange: () => void): PlayEditor {
   const lines = document.createElement('div');
   lines.className = 'play-lines';
   lines.setAttribute('aria-hidden', 'true');

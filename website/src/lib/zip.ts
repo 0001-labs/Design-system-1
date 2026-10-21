@@ -1,5 +1,5 @@
-// A zip of text files, stored as they are (no compression), which every system opens: what the
-// playground downloads, so the site leaves as a folder of its files.
+// A zip of text files, stored as they are (no compression), which every system opens: what Play
+// downloads, so the site leaves as a folder of its files.
 
 const table = Array.from({ length: 256 }, (_, n) => {
   let c = n;

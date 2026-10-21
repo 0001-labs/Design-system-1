@@ -3,22 +3,22 @@ import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { expect, it } from 'vite-plus/test';
-import { highlight } from '../website/src/lib/playground-editor';
-import { PLAYGROUND_FILES } from '../website/src/lib/playground-example';
+import { highlight } from '../website/src/lib/play-editor';
+import { PLAY_FILES } from '../website/src/lib/play-example';
 import { crc32, zip } from '../website/src/lib/zip';
 
 it('downloads the site as a zip every system opens', async () => {
   expect(crc32(new TextEncoder().encode('123456789'))).toBe(0xcbf43926);
   const folder = mkdtempSync(join(tmpdir(), 'play-zip-'));
   const archive = join(folder, 'site.zip');
-  writeFileSync(archive, new Uint8Array(await zip(PLAYGROUND_FILES.map(file => ({ name: `site/${file.name}`, content: file.content }))).arrayBuffer()));
+  writeFileSync(archive, new Uint8Array(await zip(PLAY_FILES.map(file => ({ name: `site/${file.name}`, content: file.content }))).arrayBuffer()));
   execFileSync('unzip', ['-q', archive, '-d', folder]);
-  for (const file of PLAYGROUND_FILES) expect(readFileSync(join(folder, 'site', file.name), 'utf8')).toBe(file.content);
+  for (const file of PLAY_FILES) expect(readFileSync(join(folder, 'site', file.name), 'utf8')).toBe(file.content);
 });
 
 it('links every page of the example to the others and to its stylesheet', () => {
-  const names = new Set(PLAYGROUND_FILES.map(file => file.name));
-  for (const page of PLAYGROUND_FILES.filter(file => file.name.endsWith('.html'))) {
+  const names = new Set(PLAY_FILES.map(file => file.name));
+  for (const page of PLAY_FILES.filter(file => file.name.endsWith('.html'))) {
     for (const [, href] of page.content.matchAll(/href=["']([^"'#:]+)["']/g)) expect(names.has(href), `${page.name} → ${href}`).toBe(true);
   }
 });

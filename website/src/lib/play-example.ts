@@ -1,7 +1,7 @@
-// The site the playground opens with: three pages and no CSS of their own, the components laying
+// The site Play opens with: three pages and no CSS of their own, the components laying
 // them out. Each page is a complete HTML document that loads Design system 1 from
 // designsystem1.com, links to the others by file name and works as it stands when downloaded.
-export interface PlaygroundFile { name: string; content: string }
+export interface PlayFile { name: string; content: string }
 
 const head = (title: string) => `<head>
   <meta charset="utf-8">
@@ -23,7 +23,7 @@ const header = (current: string) => `  <ds-header brand="Garden club" href="inde
 const footer = `    <ds-footer slot="footer" brand="Garden club" tagline="Growing things together since 2019" label="Footer" literal year="2026"
       columns='[{"heading":"Club","links":[{"label":"Home","href":"index.html"},{"label":"Plants","href":"plants.html"},{"label":"Join","href":"join.html"}]}]'></ds-footer>`;
 
-export const PLAYGROUND_FILES: PlaygroundFile[] = [
+export const PLAY_FILES: PlayFile[] = [
   {
     name: 'index.html',
     content: `<!doctype html>
@@ -112,7 +112,7 @@ ${footer}
     const form = document.querySelector('#join');
     const thanks = document.querySelector('#thanks');
     form.addEventListener('form-submit', event => {
-      thanks.text = 'Welcome to the club, ' + event.detail.data.name + '. Nothing was sent: this is a playground.';
+      thanks.text = 'Welcome to the club, ' + event.detail.data.name + '. Nothing was sent: this is Play.';
       thanks.hidden = false;
     });
     form.addEventListener('form-reset', () => { thanks.hidden = true; });

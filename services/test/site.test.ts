@@ -21,9 +21,9 @@ describe("combined website routes", () => {
     }
   });
 
-  it("serves the playground at the root of its own host, with the site's assets beside it", async () => {
+  it("serves Play at the root of its own host, with the site's assets beside it", async () => {
     const origin = "https://play.designsystem1.com";
-    expect(await (await site.fetch(origin + "/")).text()).toBe("Playground");
+    expect(await (await site.fetch(origin + "/")).text()).toBe("Play");
     expect(await (await site.fetch(origin + "/resources/design-system-1.js")).text()).toBe("Components");
     const docs = await site.fetch(origin + "/2-core/button/", { redirect: "manual" });
     expect(docs.status).toBe(308);

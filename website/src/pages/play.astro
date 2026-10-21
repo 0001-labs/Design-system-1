@@ -1,5 +1,5 @@
 ---
-// The playground, served at play.designsystem1.com: a small website to edit, its files in a
+// Play, served at play.designsystem1.com: a small website to edit, its files in a
 // sidebar, the selected one in Aa on the left, and the page on the right in a computer's window or
 // on a phone, its links between pages working. Nothing is sent anywhere; the reader's site is kept
 // in this browser until they start again.
@@ -17,7 +17,7 @@ const libraries = (['graphite', 'studio', 'voyage', 'lagoon', 'bloom', 'grove', 
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Playground — Design system 1</title>
+    <title>Play — Design system 1</title>
     <meta name="description" content="Edit a small website built with Design system 1 and see its pages as you write, on a computer or a phone." />
     <link rel="icon" type="image/svg+xml" href="/icons/design-system-1.svg" />
     <PublicPreferences />
@@ -56,12 +56,12 @@ const libraries = (['graphite', 'studio', 'voyage', 'lagoon', 'bloom', 'grove', 
       import { confirm } from '../../../DS1/0-face/feedback';
       import { copyText } from '../../../DS1/0-face/copy-text';
       import { onChoice } from '../lib/example-controls';
-      import { PLAYGROUND_FILES, type PlaygroundFile } from '../lib/playground-example';
-      import { createPlaygroundEditor } from '../lib/playground-editor';
+      import { PLAY_FILES, type PlayFile } from '../lib/play-example';
+      import { createPlayEditor } from '../lib/play-editor';
       import { zip } from '../lib/zip';
 
       // The Garden club as this browser keeps it (a new key since the Example menu went).
-      const KEY = 'ds1-playground:garden';
+      const KEY = 'ds1-play:garden';
       const play = document.querySelector<HTMLElement>('.play')!;
       // The design library, chosen from the title's text button: its name stands in the title and
       // its entry in the menu is checked.
@@ -80,9 +80,9 @@ const libraries = (['graphite', 'studio', 'voyage', 'lagoon', 'bloom', 'grove', 
       const list = document.querySelector<HTMLElement>('#play-file-list')!;
 
       // The site: its files, the one open in the editor and the page shown beside it.
-      type Site = { files: PlaygroundFile[]; open: string; page: string };
-      const fresh = (): Site => ({ files: PLAYGROUND_FILES.map(file => ({ ...file })), open: 'index.html', page: 'index.html' });
-      const untouched = () => JSON.stringify(site.files) === JSON.stringify(PLAYGROUND_FILES);
+      type Site = { files: PlayFile[]; open: string; page: string };
+      const fresh = (): Site => ({ files: PLAY_FILES.map(file => ({ ...file })), open: 'index.html', page: 'index.html' });
+      const untouched = () => JSON.stringify(site.files) === JSON.stringify(PLAY_FILES);
       function stored(): Site | null {
         try {
           const site = JSON.parse(localStorage.getItem(KEY) ?? 'null') as Site | null;
@@ -190,7 +190,7 @@ const libraries = (['graphite', 'studio', 'voyage', 'lagoon', 'bloom', 'grove', 
       }
 
       let pause: ReturnType<typeof setTimeout> | undefined;
-      const editor = createPlaygroundEditor(document.querySelector<HTMLElement>('#play-editor')!, file(site.open)?.content ?? '', () => {
+      const editor = createPlayEditor(document.querySelector<HTMLElement>('#play-editor')!, file(site.open)?.content ?? '', () => {
         clearTimeout(pause);
         pause = setTimeout(() => {
           const open = file(site.open);
