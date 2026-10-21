@@ -317,3 +317,6 @@ body.sidebar-open {
   overflow: visible;
 }
 html:root { --ds-sf: var(--sf, 1); }
+
+/* Root's topics: the names are the links, without an underline. */
+.sl-markdown-content .topic-table a { text-decoration: none; }
