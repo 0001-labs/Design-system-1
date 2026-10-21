@@ -207,3 +207,14 @@ test("leading disclosure and group destination remain independent", async () => 
   expect(toggle).toHaveBeenCalledOnce();
   expect(control(sidebar, 'root').getAttribute('href')).toBe('#root');
 });
+
+test("narrow navigation reflects its mode and hugs each row to its words", async () => {
+  const sidebar = await setup([{id: "map", label: "Map", href: "#map", current: true}, {id: "size", label: "Size", href: "#size"}]);
+  sidebar.narrow = true; await sidebar.updateComplete;
+  expect(sidebar.hasAttribute("narrow")).toBe(true);
+  const { readFileSync } = await import("node:fs");
+  const css = readFileSync("DS1/3-unit/styles/ds-sidebar.css", "utf8");
+  expect(css).toContain(":host([narrow]) { width: calc(8 * var(--ds-unit)); }");
+  expect(css).toContain(":host([narrow]) .row { width: fit-content;");
+  expect(control(sidebar, "map").getAttribute("aria-current")).toBe("page");
+});

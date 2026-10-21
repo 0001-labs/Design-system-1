@@ -16,6 +16,8 @@ export type SidebarProps = Omit<HTMLAttributes<SidebarElement>, "onSelect" | "on
   empty?: string;
   /** A tree of nested things instead of navigation. */
   tree?: boolean;
+  /** Navigation eight squares wide, each row hugging its words. */
+  narrow?: boolean;
   disclosurePosition?: "start" | "end"; expandIcon?: string;
   collapseIcon?: string;
   reorderable?: boolean;
@@ -33,7 +35,7 @@ export type SidebarProps = Omit<HTMLAttributes<SidebarElement>, "onSelect" | "on
 const useCommitEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 export const Sidebar = forwardRef<SidebarElement, SidebarProps>(function Sidebar(
-  { items, label, empty, tree, expandIcon, collapseIcon, disclosurePosition, reorderable, onMove, onToggle, onSelect, onActivate, onAction, ...props }, ref,
+  { items, label, empty, tree, narrow, expandIcon, collapseIcon, disclosurePosition, reorderable, onMove, onToggle, onSelect, onActivate, onAction, ...props }, ref,
 ) {
   const host = useRef<SidebarElement>(null);
   useCommitEffect(() => {
@@ -65,7 +67,7 @@ export const Sidebar = forwardRef<SidebarElement, SidebarProps>(function Sidebar
       element.removeEventListener("sidebar-action", action);
     };
   });
-  return h("ds-sidebar", { ...props, label, empty, tree: tree || undefined,
+  return h("ds-sidebar", { ...props, label, empty, tree: tree || undefined, narrow: narrow || undefined,
     ref: (element: SidebarElement | null) => { host.current = element; if (typeof ref === "function") ref(element); else if (ref) ref.current = element; },
   });
 });

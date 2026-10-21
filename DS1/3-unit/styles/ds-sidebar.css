@@ -132,3 +132,11 @@ ds-icon[data-open] { transform: rotate(90deg); }
 
 :host([disclosure-position="start"]) .row { padding-inline-start: calc(4px * var(--ds-sf) + var(--depth) * var(--ds-unit)); }
 :host([disclosure-position="start"]) .row:not(:has(.disclosure)) .choice { margin-inline-start: var(--ds-unit); }
+
+/* Narrow: eight squares wide, each row hugging its words, so the pointer's and the current
+   row's fill wrap the label (and its meta and disclosure) 4px either side instead of running
+   across the column. Rows still stand one square apart, half a square further in per level. */
+:host([narrow]) { width: calc(8 * var(--ds-unit)); }
+:host([narrow]) nav { display: flex; flex-direction: column; align-items: flex-start; }
+:host([narrow]) .row { width: fit-content; max-width: 100%; }
+:host([narrow]) .spacer { display: none; }

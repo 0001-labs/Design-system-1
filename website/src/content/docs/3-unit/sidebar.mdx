@@ -40,6 +40,19 @@ The rows' fills and the current row's weight are the shared row tokens (`--ds-ro
 
 In React, `Sidebar` from `react/sidebar.ts` takes `items`, `label`, `empty`, `tree`, `onToggle`, `onSelect`, `onActivate` and `onAction`.
 
+## Narrow
+
+`narrow` is the navigation for an application's few places beside its work: eight squares wide instead of twelve, every row hugging its words. The pointer's fill and the current row's fill wrap the label, its count and its disclosure, 4px either side, rather than running across the column, so a short list of places reads as words on the paper. Rows stay one square apart and half a square further in per level, with the same keyboard and events as the wider navigation. Use it in `ds-page`'s navigation area with `--ds-page-nav` set to eight squares, so the work starts two squares after it:
+
+```html
+<ds-page layout="sidebar" divided fill drawer style="--ds-page-nav: calc(8 * var(--ds-unit))">
+  <ds-sidebar slot="nav" narrow label="Application"></ds-sidebar>
+  <main>…</main>
+</ds-page>
+```
+
+React: `<Sidebar narrow items={…} />`. A place that has things of its own (documents, apps) can list them as deeper rows under its own row; a long tree of things belongs in [`tree`](#tree) instead.
+
 ## Tree
 
 <ComponentExample example="tree" />

@@ -52,9 +52,15 @@ export interface SidebarMoveDetail { id: string; targetId: string; position: "be
  * `0-face/sidebar.ts`). The application keeps the rows: it passes the
  * visible ones in `items`, in order, and answers the events.
  *
+ * With `narrow`, the navigation is eight squares wide and each row hugs its
+ * words: the pointer's and the current row's fill wraps the label, its meta
+ * and its disclosure, 4px either side, instead of running across the column.
+ * For an application's few places beside its work.
+ *
  * @element ds-sidebar
  * @attr label - The navigation's or the tree's accessible name.
  * @attr tree - A tree of nested things instead of navigation.
+ * @attr narrow - Navigation eight squares wide, each row hugging its words.
  * @fires sidebar-toggle - `{ id, expanded }`: a row asks to open or close.
  * @fires sidebar-activate - `{ id }`: a row was pressed (navigation), or Enter or a double click opened one (a tree).
  * @fires sidebar-select - `{ id }`: a click, Space or Enter chose a tree row.
@@ -69,6 +75,7 @@ export class Sidebar extends LitElement {
     collapseIcon: { type: String, attribute: "collapse-icon" },
     disclosurePosition: { type: String, attribute: "disclosure-position", reflect: true },
     tree: { type: Boolean, reflect: true },
+    narrow: { type: Boolean, reflect: true },
     reorderable: { type: Boolean, reflect: true },
   };
   declare items: SidebarItem[];
@@ -80,6 +87,8 @@ export class Sidebar extends LitElement {
   /** Place navigation disclosures before the label; default preserves trailing disclosures. */
   declare disclosurePosition?: "start" | "end";
   declare tree: boolean;
+  /** Eight squares wide, each row hugging its words (navigation only). */
+  declare narrow: boolean;
   declare reorderable: boolean;
   private dragId?: string;
   static styles = unsafeCSS(styles);
@@ -93,6 +102,7 @@ export class Sidebar extends LitElement {
     this.label = "Navigation";
     this.empty = "No items";
     this.tree = false;
+    this.narrow = false;
     this.reorderable = false;
   }
 
