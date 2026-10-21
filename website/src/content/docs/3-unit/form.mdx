@@ -22,7 +22,7 @@ Collect fields, validate them, and emit a submission event.
 
 The example has no `action` endpoint. Submit an empty field to see validation, then enter a name to see the form data. It sends no server request.
 
-Use a native `<button type="submit">` in the form slot. `ds-button` does not forward a submit type.
+A submit or reset button works as it does in a native `<form>`: a `<button type="submit">` or `<button type="reset">`, the same inside `<ds-button control="slotted">`, or `<ds-button type="submit">`. A `<button>` without a `type` submits, as in HTML, so give every other button `type="button"`. Enter submits from a one-line field. On a button it presses that button, and in a multiline field it starts a new line.
 
 ## Attributes
 

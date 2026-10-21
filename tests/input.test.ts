@@ -202,3 +202,12 @@ test.each([false, true])('the field marks its rows while an error shows, and a t
   expect(wrapper().classList.contains('has-error')).toBe(false);
   expect(control.shadowRoot!.querySelector('.error-message')).toBeNull();
 });
+
+test('autofill follows the field type unless the page names it or turns it off', async () => {
+  expect((await field('type="email"')).input.getAttribute('autocomplete')).toBe('email');
+  expect((await field('type="password"')).input.getAttribute('autocomplete')).toBe('current-password');
+  expect((await field('type="password" autocomplete="new-password"')).input.getAttribute('autocomplete')).toBe('new-password');
+  expect((await field('name="name" autocomplete="name"')).input.getAttribute('autocomplete')).toBe('name');
+  expect((await field('type="email" autocomplete="off"')).input.getAttribute('autocomplete')).toBe('off');
+  expect((await field('type="search"')).input.hasAttribute('autocomplete')).toBe(false);
+});

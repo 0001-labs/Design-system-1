@@ -7,6 +7,8 @@ import "../2-core/ds-icon";
 import controls from "../1-root/controls.css?inline";
 import styles from "./styles/ds-page.css?inline";
 
+const MAIN = "main, [role='main']";
+
 export type PageLayout = "sidebar" | "split" | "inspector" | "column" | "centered" | "tiles";
 export const PAGE_LAYOUTS: readonly PageLayout[] = ["sidebar", "split", "inspector", "column", "centered", "tiles"];
 
@@ -19,6 +21,9 @@ export const PAGE_LAYOUTS: readonly PageLayout[] = ["sidebar", "split", "inspect
  * - the default slot is the main area
  * - `slot="aside"` is the trailing column, shown by `inspector`
  * - `slot="footer"` runs along the bottom of the main area
+ *
+ * The main area is the document's main landmark (`role="main"`), unless the
+ * page stands inside a `<main>` or another page, or is given a `<main>` itself.
  *
  * Columns are whole squares: `sidebar` and `inspector` lead with 12, `split`
  * with 16; `column` is 32 wide and `centered` 16, and `measure` sets either in
@@ -59,6 +64,7 @@ export class Page extends LitElement {
     view: { type: Boolean, reflect: true },
     drawer: { type: Boolean, reflect: true },
     drawerLabel: { type: String, attribute: "drawer-label" },
+    landmark: { state: true },
   };
 
   declare layout: PageLayout;
@@ -68,6 +74,7 @@ export class Page extends LitElement {
   declare view: boolean;
   declare drawer: boolean;
   declare drawerLabel: string | undefined;
+  private declare landmark: boolean;
 
   static styles = [unsafeCSS(controls), unsafeCSS(styles)];
 
@@ -81,10 +88,23 @@ export class Page extends LitElement {
     this.fill = false;
     this.view = false;
     this.drawer = false;
+    this.landmark = true;
   }
+
+  /**
+   * The main area is the page's main landmark, unless the page stands inside
+   * one (or inside another page) or is given its own `<main>`.
+   */
+  private readonly syncLandmark = () => {
+    const slot = this.renderRoot?.querySelector?.<HTMLSlotElement>("slot:not([name])");
+    const given = slot?.assignedElements({ flatten: true }).some(element => element.matches(MAIN) || !!element.querySelector(MAIN));
+    const inside = !!this.parentElement?.closest(`${MAIN}, ds-page`);
+    this.landmark = !given && !inside;
+  };
 
   connectedCallback() {
     super.connectedCallback();
+    this.syncLandmark();
     window.addEventListener("language-changed", this.relabel);
     window.addEventListener("translations-loaded", this.relabel);
   }
@@ -144,7 +164,7 @@ export class Page extends LitElement {
         </dialog>
         <div class="area nav" part="nav" data-area="nav"><slot name="nav"></slot></div>
         <div class="area header" part="header" data-area="header"><slot name="header"></slot></div>
-        <div class="area main" part="main" data-area="main"><slot></slot></div>
+        <div class="area main" part="main" data-area="main" role=${ifDefined(this.landmark ? "main" : undefined)}><slot @slotchange=${this.syncLandmark}></slot></div>
         <div class="area aside" part="aside" data-area="aside"><slot name="aside"></slot></div>
         <div class="area footer" part="footer" data-area="footer"><slot name="footer"></slot></div>
       </div>
@@ -158,6 +178,7 @@ export class Page extends LitElement {
       slot.addEventListener("slotchange", sync);
       sync();
     });
+    this.syncLandmark();
   }
 }
 

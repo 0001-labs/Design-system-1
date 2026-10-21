@@ -48,6 +48,7 @@ Give a field a visible label. A placeholder is a hint, not a label. Put the reas
 | `aria-invalid` | string | Empty | Forward an application validation state to the native field. |
 | `aria-describedby` | string | Empty | Copy the referenced description into the field's shadow root. |
 | `spellcheck` | string | Empty | Native spelling hint, `true` or `false`. |
+| `autocomplete` | string | From `type` | What the browser may fill in, such as `name`, `email` or `new-password`. Without it, `email`, `tel` and `url` fields say so, `password` is `current-password`, and any other field is left to the browser as a native input is. `off` turns autofill off. |
 
 Native constraints include `min`, `max`, `step`, `pattern`, `minlength` and `maxlength`.
 

@@ -12,6 +12,9 @@ export interface FormValidationResult {
   errors: { [key: string]: string };
 }
 
+/** Inputs Enter does not submit from: it presses or toggles them instead. */
+const IMPLICIT_SUBMIT_SKIPS = new Set(["button", "submit", "reset", "image", "checkbox", "radio", "file", "color", "range"]);
+
 export class Form extends LitElement {
   static properties = {
     action: { type: String },
@@ -275,16 +278,49 @@ export class Form extends LitElement {
     void this.submit();
   }
 
-  private _handleKeydown(e: KeyboardEvent): void {
-    if (e.key === "Enter" && !e.shiftKey) {
-      const target = e.target as HTMLElement;
-      // Don't submit if in a textarea
-      if (target.tagName.toLowerCase() !== "textarea") {
-        e.preventDefault();
-        void this.submit();
-      }
-    }
+  connectedCallback(): void {
+    super.connectedCallback();
+    this.addEventListener("click", this._handleButtonClick);
+    this.addEventListener("keydown", this._handleKeydown);
   }
+
+  disconnectedCallback(): void {
+    this.removeEventListener("click", this._handleButtonClick);
+    this.removeEventListener("keydown", this._handleKeydown);
+    super.disconnectedCallback();
+  }
+
+  /**
+   * The form is drawn in this element's shadow, so a submit or reset button
+   * put inside it belongs to no form of its own. Its click does what it would
+   * in a form: a native button (bare or in `ds-button control="slotted"`), or
+   * `<ds-button type="submit">`. A button in a real <form> is left to that form.
+   */
+  private _handleButtonClick = (e: Event): void => {
+    if (e.defaultPrevented) return;
+    const control = (e.target as Element | null)?.closest?.("button, input, ds-button[type]");
+    if (!control || !this.contains(control)) return;
+    let type: string | null;
+    if (control instanceof HTMLButtonElement || control instanceof HTMLInputElement) {
+      if (control.form || control.disabled) return;
+      type = control.type;
+    } else {
+      if (control.hasAttribute("disabled") || control.hasAttribute("href")) return;
+      type = control.getAttribute("type");
+    }
+    if (type === "submit") void this.submit();
+    else if (type === "reset") this.reset();
+  };
+
+  private _handleKeydown = (e: KeyboardEvent): void => {
+    if (e.key !== "Enter" || e.shiftKey || e.defaultPrevented) return;
+    // Enter submits from a field, as in a form: on a button it presses that
+    // button, and in a textarea (a multiline ds-input's too) it starts a line.
+    const origin = e.composedPath()[0];
+    if (!(origin instanceof HTMLInputElement) || origin.form || IMPLICIT_SUBMIT_SKIPS.has(origin.type)) return;
+    e.preventDefault();
+    void this.submit();
+  };
 
   render() {
     return html`
@@ -295,7 +331,6 @@ export class Form extends LitElement {
         ?novalidate=${this.novalidate}
         autocomplete=${this.autocomplete}
         @submit=${this._handleSubmit}
-        @keydown=${this._handleKeydown}
       >
         <slot></slot>
       </form>

@@ -13,14 +13,14 @@ const head = (title: string) => `<head>
   <script type="module" src="https://designsystem1.com/resources/design-system-1.js"></script>
 </head>`;
 
-const header = (current: string) => `  <ds-header brand="Garden club" href="index.html" literal>
+const header = (current: string) => `  <ds-header brand="Garden club" href="index.html" label="Main" literal>
     <a href="index.html"${current === 'index.html' ? ' aria-current="page"' : ''}>Home</a>
     <a href="plants.html"${current === 'plants.html' ? ' aria-current="page"' : ''}>Plants</a>
     <a href="join.html"${current === 'join.html' ? ' aria-current="page"' : ''}>Join</a>
     <ds-button slot="actions" primary href="join.html">Join the club</ds-button>
   </ds-header>`;
 
-const footer = `    <ds-footer slot="footer" brand="Garden club" tagline="Growing things together since 2019" literal year="2026"
+const footer = `    <ds-footer slot="footer" brand="Garden club" tagline="Growing things together since 2019" label="Footer" literal year="2026"
       columns='[{"heading":"Club","links":[{"label":"Home","href":"index.html"},{"label":"Plants","href":"plants.html"},{"label":"Join","href":"join.html"}]}]'></ds-footer>`;
 
 export const PLAYGROUND_FILES: PlaygroundFile[] = [
@@ -96,7 +96,7 @@ ${header('join.html')}
     <ds-text literal size="display" strong wrap role="heading" aria-level="1">Join the club.</ds-text>
     <ds-text literal wrap tone="muted">We meet on Saturday mornings at the allotments. Bring gloves; we have the rest.</ds-text>
     <ds-form id="join">
-      <ds-input label="Name" name="name" required></ds-input>
+      <ds-input label="Name" name="name" autocomplete="name" required></ds-input>
       <ds-input label="Email" name="email" type="email" required></ds-input>
       <ds-row>
         <ds-button control="slotted" primary><button type="submit">Join</button></ds-button>

@@ -12,6 +12,14 @@ import { getText, currentLanguage } from "../0-face/i18n";
 import "./ds-text";
 import styles from "./styles/ds-input.css?inline";
 
+/** The autofill a field's type implies when it names none of its own. */
+const TYPE_AUTOCOMPLETE: Partial<Record<string, string>> = {
+  email: "email",
+  tel: "tel",
+  url: "url",
+  password: "current-password",
+};
+
 export class Input extends LitElement {
   static formAssociated = true;
   private readonly focusFromLabel = (event: MouseEvent) => {
@@ -163,7 +171,7 @@ export class Input extends LitElement {
     this.readonly = false;
     this.required = false;
     this.autofocus = false;
-    this.autocomplete = "off";
+    this.autocomplete = "";
     this.pattern = "";
     this.minlength = 0;
     this.maxlength = -1;
@@ -351,6 +359,18 @@ export class Input extends LitElement {
       this.value = state;
       this.internals?.setFormValue(state);
     }
+  }
+
+  /**
+   * What the browser may fill in. Without `autocomplete` an email, phone,
+   * web address or password field says what it holds (a sign-up's password
+   * sets "new-password"), and any other field is left to the browser, as a
+   * native input is; "off" still turns it off.
+   */
+  protected resolvedAutocomplete(): string | undefined {
+    if (this.autocomplete) return this.autocomplete;
+    if (this.multiline) return undefined;
+    return TYPE_AUTOCOMPLETE[this.type];
   }
 
   protected accessibleLabel(): string | undefined {
@@ -552,7 +572,7 @@ export class Input extends LitElement {
       ?readonly=${this.readonly}
       ?required=${this.required}
       ?autofocus=${this.autofocus}
-      autocomplete=${this.autocomplete}
+      autocomplete=${ifDefined(this.resolvedAutocomplete())}
       minlength=${ifDefined(this.minlength || undefined)}
       maxlength=${ifDefined(this.maxlength >= 0 ? this.maxlength : undefined)}
       rows=${rows}
@@ -587,7 +607,7 @@ export class Input extends LitElement {
       ?readonly=${this.readonly}
       ?required=${this.required}
       ?autofocus=${this.autofocus}
-      autocomplete=${this.autocomplete}
+      autocomplete=${ifDefined(this.resolvedAutocomplete())}
       pattern=${ifDefined(this.pattern || undefined)}
       minlength=${ifDefined(this.minlength || undefined)}
       maxlength=${ifDefined(this.maxlength >= 0 ? this.maxlength : undefined)}

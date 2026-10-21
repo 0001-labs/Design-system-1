@@ -69,3 +69,14 @@ test("a measure is rounded to a whole square and anything else is ignored", () =
   expect(measureStyle(0.4)).toBeUndefined();
   for (const value of [0, -4, Number.NaN, Infinity, null, undefined]) expect(measureStyle(value)).toBeUndefined();
 });
+
+test("the main area is the main landmark unless the page has one already", async () => {
+  expect(area(await setup(`<ds-page layout="column"><p>Work</p></ds-page>`), "main").getAttribute("role")).toBe("main");
+  expect(area(await setup(`<main><ds-page layout="column"><p>Work</p></ds-page></main>`), "main").hasAttribute("role")).toBe(false);
+  expect(area(await setup(`<ds-page layout="column"><main>Work</main></ds-page>`), "main").hasAttribute("role")).toBe(false);
+  const nested = await setup(`<ds-page layout="column"><ds-page layout="column"><p>Work</p></ds-page></ds-page>`);
+  const inner = nested.querySelector("ds-page") as Page;
+  await inner.updateComplete;
+  expect(area(nested, "main").getAttribute("role")).toBe("main");
+  expect(area(inner, "main").hasAttribute("role")).toBe(false);
+});
