@@ -123,7 +123,7 @@ The fixed specimen viewport scrolls internally, keeping size changes from moving
 
 ## System parts for charts
 
-System node: `ds1` ([map](https://system.0001.dev/system?focus=ds1)). Selected parts: `design`, `sharing`, `themes`; applicable dependencies: `stack-lit` and `stack-cloudflare`. Chart drawing and standalone components live in `DS1/2-core/ds-chart.ts` and `DS1/2-core/chart/`, selected through the existing Sync 1 components export as `chart`. Composed dashboards remain outside this core. Theme storage, data and accessible summaries belong to consumers; charts redraw on `refreshTheme()` and system scheme changes. See the Chart documentation for API and limitations. Acceptance and release evidence is in the work item; source relationships alone do not prove visual or live acceptance.
+System node: `ds1` ([map](https://system.0001.dev/system?focus=ds1)). It holds the design, component and language rules every product follows in its own implementation guide (the former Design & components and Languages parts). Selected parts: `sharing`, `themes`, `dashboard`; its email renderer (`DS1/4-page/email.ts`) is what the `stack-resend` guide sends with; applicable dependencies: `stack-lit` and `stack-cloudflare`. Chart drawing and standalone components live in `DS1/2-core/ds-chart.ts` and `DS1/2-core/chart/`, selected through the existing Sync 1 components export as `chart`. Composed dashboards remain outside this core. Theme storage, data and accessible summaries belong to consumers; charts redraw on `refreshTheme()` and system scheme changes. See the Chart documentation for API and limitations. Acceptance and release evidence is in the work item; source relationships alone do not prove visual or live acceptance.
 
 ## Internal component visibility
 
