@@ -2,20 +2,20 @@
 
 /*
  * Select as a field, around a native <select> (`data-field`): the menu
- * engine's own rules (an action menu's) do not reach it. One square high and
- * hugging its options by default; a list one square a visible row.
+ * engine's own rules (an action menu's) do not reach it. One control high
+ * (16px), standing at the foot of its line on the lower sixteen as a button
+ * does, and hugging its options by default; a list one square a visible row.
  */
 :host([data-field]) {
   --ds-select-unit: calc(var(--ds-1) * var(--ds-sf));
   display: inline-flex;
   position: relative;
-  vertical-align: middle;
+  vertical-align: bottom;
   width: max-content;
-  align-self: flex-start;
   max-width: 100%;
   min-width: 0;
   max-height: none;
-  height: calc(var(--ds-select-rows, 1) * var(--ds-select-unit));
+  height: var(--ds-control-height);
 }
 :host([hidden]) { display: none !important; }
 ::slotted(select) {
@@ -39,7 +39,7 @@
   font-size: var(--ds-type-size-default) !important;
   font-weight: var(--ds-type-weight-default) !important;
   letter-spacing: var(--ds-type-letterspacing-default) !important;
-  line-height: calc(var(--ds-select-unit) - 2px) !important;
+  line-height: calc(var(--ds-control-height) - 2px) !important;
   box-shadow: none !important;
   cursor: pointer !important;
 }
@@ -49,8 +49,8 @@
   inset-inline-end: calc(2px * var(--ds-sf));
   top: 50%;
   transform: translateY(-50%);
-  width: calc(.8 * var(--ds-select-unit));
-  height: calc(.8 * var(--ds-select-unit));
+  width: var(--ds-control-height);
+  height: var(--ds-control-height);
   background: var(--ds-input-color);
   mask: var(--ds-select-arrow) center / contain no-repeat;
 }
@@ -61,17 +61,17 @@
 ::slotted(select[multiple]),
 ::slotted(select[size]:not([size="0"]):not([size="1"])) {
   padding: 0 calc(4px * var(--ds-sf)) !important;
+  line-height: calc(var(--ds-select-unit) - 2px) !important;
 }
 
-:host([data-listbox]) { width: calc(8 * var(--ds-select-unit)); }
+:host([data-listbox]) { width: calc(8 * var(--ds-select-unit)); height: calc(var(--ds-select-rows, 1) * var(--ds-select-unit)); }
 :host([data-listbox]) ::slotted(select) { width: 100% !important; }
 
 /* Intrinsic width uses the native option sizing, including translated labels. */
 :host([fit]:not([data-listbox])) { width: max-content; }
 :host([fit]:not([data-listbox])) ::slotted(select) { width: auto !important; max-width: 100% !important; }
 
-/* A settings chip keeps the same native picker, on the shared control height. */
-:host([chip]:not([data-listbox])) { height: var(--ds-control-height); }
+/* A settings chip keeps the same native picker and height, filled as a button. */
 :host([chip]:not([data-listbox])) ::slotted(select) {
   border: 0 !important;
   background: var(--ds-button-background-color-secondary) !important;
