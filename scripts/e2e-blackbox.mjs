@@ -325,7 +325,9 @@ await step("Pages", [
       const nested = [];
       for (const link of internalLinks) {
         const answer = await page(link.href);
-        const count = (pattern) => (answer.text.match(pattern) ?? []).length;
+        // Tags in the markup only: a code sample's copy button carries its document in an attribute.
+        const markup = answer.text.replace(/<script\b[\s\S]*?<\/script>/gi, "").replace(/="[^"]*"/g, '=""');
+        const count = (pattern) => (markup.match(pattern) ?? []).length;
         if (count(/<html[\s>]/gi) !== 1 || count(/<head>/gi) !== 1 || count(/<title>/gi) !== 1) nested.push(link.href);
       }
       expect(nested.length === 0, `${nested.length} of ${internalLinks.length} pages draw a second document inside their body, e.g. ${nested.slice(0, 3).join(", ")}`);
