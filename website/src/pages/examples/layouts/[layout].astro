@@ -11,8 +11,13 @@ const layers = JSON.stringify(Object.fromEntries(Object.entries(TAG_LAYERS).map(
 ---
 <!doctype html>
 <html lang="en" class="light-theme">
-  <head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="robots" content="noindex" /><title>{sample.name} layout — example</title></head>
+  <head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="robots" content="noindex" /><title>{sample.name} layout — example</title>
+    {/* A library brings its own paper: the theme leaves the canvas to the stylesheet. */}
+    {sample.library && <script is:inline>window.DS_ONE_PREFERENCES = Object.assign({}, window.DS_ONE_PREFERENCES, { themePaper: false });</script>}
+  </head>
   <body data-layout={layout} data-layers={layers}>
+    {/* After Design system 1's stylesheets in the head, so the library's tokens win. */}
+    {sample.library && <link rel="stylesheet" href={sample.library.href} data-library={sample.library.name} />}
     <main id="sample" data-ds-surface></main>
     <div id="layers" aria-hidden="true"></div>
     <script>import '../../../lib/layout-runtime';</script>

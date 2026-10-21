@@ -9,6 +9,8 @@ const { layout } = Astro.props;
 const sample = LAYOUT_EXAMPLES[layout];
 if (!sample) throw new Error(`Unknown layout example: ${layout}`);
 const inside = layersIn(sample.html);
+// The code a reader copies loads the same library, after Design system 1's stylesheet.
+const code = sample.library ? `<link rel="stylesheet" href="${sample.library.href}">\n${sample.html}` : sample.html;
 ---
 <section class="layout-example not-content" data-ds-not-prose data-example-view data-layout-example={layout} aria-label={`${sample.name} layout`}>
   <div class="layout-toolbar">
@@ -33,7 +35,7 @@ const inside = layersIn(sample.html);
     ))}
   </dl>
   </div>
-  <div data-example-source hidden><ExampleCode html={sample.html} script={sample.script} /></div>
+  <div data-example-source hidden><ExampleCode html={code} script={sample.script} /></div>
 </section>
 <script>
   import { onChoice, followPageTheme } from '../lib/example-controls';

@@ -1,3 +1,6 @@
+import { LIBRARY_EXAMPLES } from './library-examples';
+import { LIBRARY_SITES } from './library-sites';
+import { LIBRARY_BRANDS } from './library-brands';
 import { PRODUCT_EXAMPLES } from './product-examples';
 import { SETTINGS_EXAMPLE } from './settings-example';
 // The standard page layouts, each filled with the core and unit components a
@@ -11,6 +14,8 @@ export interface LayoutExample {
   html: string;
   script?: string;
   height: number;
+  /** A published design library the example is drawn with, pinned to one version. */
+  library?: { name: string; id: string; version: number; href: string };
 }
 
 const sidebarScript = `const sidebar = document.querySelector('ds-sidebar');
@@ -52,6 +57,9 @@ document.querySelector('ds-table').data = [
 export const LAYOUT_EXAMPLES: Record<string, LayoutExample> = {
   settings: SETTINGS_EXAMPLE,
   ...PRODUCT_EXAMPLES,
+  ...LIBRARY_EXAMPLES,
+  ...LIBRARY_SITES,
+  ...LIBRARY_BRANDS,
   sidebar: {
     name: 'Sidebar',
     use: 'An app with places to go: navigation stays on the left while the work changes on the right.',
