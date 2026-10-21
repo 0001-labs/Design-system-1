@@ -66,21 +66,9 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
   .layer-group[data-color='grey'] { --box-fill: light-dark(#e6e6e6, #bdbdbd); }
 
   .layer-name { margin: 0; font-family: var(--typeface-medium); }
-  /* The name is a link in running text, as `.ds-link` in controls.css draws
-     it (the site does not load that sheet): the text's ink, a hairline
-     underline 2px below the letters that turns to the full ink under the
-     pointer, and the muted ink once visited. */
-  .layer-name .ds-link {
-    color: inherit;
-    text-decoration-line: underline;
-    text-decoration-thickness: 1px;
-    text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
-    text-underline-offset: calc(2px * var(--sf, 1));
-    transition: none;
-  }
+  /* The name is a link with no underline: the text's ink, the muted ink once visited. */
+  .layer-name .ds-link { color: inherit; text-decoration: none; }
   .layer-name .ds-link:visited { color: var(--ds1-docs-header-text-secondary); }
-  .layer-name .ds-link:hover { color: inherit; text-decoration-color: currentColor; }
-  .layer-name .ds-link:visited:hover { color: var(--ds1-docs-header-text-secondary); }
   .layer-name .ds-link:focus-visible { outline: 2px solid currentColor; outline-offset: 1px; }
   .layer-group ul { margin: 0; padding: 0; list-style: none; }
   .layer-group li { margin: 0; }

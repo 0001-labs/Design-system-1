@@ -11,7 +11,7 @@ interface Props {
 
 const { title } = Astro.props;
 const pathname = Astro.url.pathname.replace(/\/$/, '');
-const isTool = ['/2-core/icon/collection', '/colours', '/components'].includes(pathname);
+const isTool = ['/2-core/icon/collection', '/components'].includes(pathname);
 const isExamples = pathname === '/start-here/examples';
 const libraryMode = pathname === '/libraries/playground' ? 'editor'
   : pathname === '/libraries/workspace' ? 'libraries' : null;
@@ -25,11 +25,8 @@ const libraryMode = pathname === '/libraries/playground' ? 'editor'
     <title>{title || 'Design system 1'}</title>
     <MyHead />
     <script is:inline>
-      try {
-        const collapsed = location.pathname.replace(/\/$/, '') === '/start-here/examples' || localStorage.getItem('ds1-docs-sidebar-collapsed') === 'true';
-        document.documentElement.toggleAttribute('data-sidebar-collapsed', collapsed);
-        if (collapsed) localStorage.setItem('ds1-docs-sidebar-collapsed', 'true');
-      } catch {}
+      // On a wider screen the documentation's navigation is the rail, always: nothing collapses.
+      document.documentElement.setAttribute('data-sidebar-collapsed', '');
     </script>
     <link rel="icon" type="image/svg+xml" href="/icons/design-system-1.svg" />
   </head>
@@ -172,7 +169,6 @@ const libraryMode = pathname === '/libraries/playground' ? 'editor'
 
     <script>
       import '../../../DS1/4-page/ds-overlay';
-      import { setSidebarCollapsed } from '../lib/sidebar-state';
       import type { Overlay } from '../../../DS1/4-page/ds-overlay';
       const scrollTimers = new WeakMap<Element, ReturnType<typeof setTimeout>>();
       document.addEventListener('scroll', event => {
@@ -192,11 +188,6 @@ const libraryMode = pathname === '/libraries/playground' ? 'editor'
       const shell = sidebar?.querySelector<HTMLElement>('.docs-sidebar-shell');
       const menuButton = document.getElementById('mobile-menu-btn');
 
-      document.querySelectorAll('#workspace-hide, #public-sidebar-hide').forEach(button => button.addEventListener('click', () => {
-        if (navigation?.open) { navigation.requestClose('button'); return; }
-        setSidebarCollapsed(true);
-        document.getElementById('sidebar-rail-open')?.focus();
-      }));
       document.getElementById('sidebar-close-btn')?.setAttribute('data-ds-overlay-dismiss', '');
 
       function restore() {
@@ -204,11 +195,6 @@ const libraryMode = pathname === '/libraries/playground' ? 'editor'
         menuButton?.setAttribute('aria-expanded', 'false');
       }
       menuButton?.addEventListener('click', () => {
-        if (document.documentElement.hasAttribute('data-sidebar-collapsed') && !document.documentElement.hasAttribute('data-docs-compact')) {
-          setSidebarCollapsed(false);
-          document.querySelector<HTMLButtonElement>(document.documentElement.hasAttribute('data-signed-in') ? '#workspace-hide button' : '#public-sidebar-hide button')?.focus();
-          return;
-        }
         if (!navigation || !panel || !shell) return;
         if (navigation.open) { navigation.requestClose('button'); return; }
         panel.append(shell);
