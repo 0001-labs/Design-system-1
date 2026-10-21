@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { expect, it } from 'vitest';
+import { expect, it } from 'vite-plus/test';
 import { readFileSync } from 'node:fs';
 
 const layout = readFileSync('website/src/layouts/Layout.astro', 'utf8');

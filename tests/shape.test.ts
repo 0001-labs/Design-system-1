@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { beforeEach, expect, it } from 'vitest';
+import { beforeEach, expect, it } from 'vite-plus/test';
 import { readFileSync } from 'node:fs';
 import { footerPreferences } from '../DS1/4-page/ds-footer';
 
