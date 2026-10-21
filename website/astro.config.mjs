@@ -175,6 +175,7 @@ export default defineConfig({
             { label: "Native", slug: "advanced/native" },
             { label: "Email kit", slug: "email" },
             { label: "Film kit", slug: "advanced/film-kit" },
+            { label: "Text editor", link: "https://aa.0001.dev" },
           ],
         },
       ],
