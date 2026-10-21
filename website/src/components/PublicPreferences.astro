@@ -2,7 +2,9 @@
 import translations from '../../public/translations.json';
 import { readFileSync } from 'node:fs';
 import { transformSync } from 'esbuild';
-import themeBootstrap from '../../../DS1/0-face/theme-bootstrap.js?raw';
+import themeBootstrapSource from '../../../DS1/0-face/theme-bootstrap.js?raw';
+// Inlined without its comments, as the scaling bootstrap is: the page carries the script, not its notes.
+const themeBootstrap = transformSync(themeBootstrapSource, { minify: true }).code;
 const scalingBootstrap = transformSync(readFileSync(new URL('../../../DS1/0-face/scaling.ts', import.meta.url), 'utf8') + '\napplyScaling(); document.documentElement.style.setProperty("--ds-sf", "var(--sf)"); document.documentElement.toggleAttribute("data-docs-compact", document.documentElement.clientWidth / (parseFloat(document.documentElement.style.getPropertyValue("--sf")) || 1) <= 768);', { loader: 'ts', format: 'iife', minify: true }).code;
 const languages = [...new Set(['en', ...Object.keys(translations)])];
 ---

@@ -9,9 +9,9 @@ const isTool = ['/2-core/icon/collection', '/components'].includes(pathname);
 const isExamples = pathname === '/start-here/examples';
 const libraryMode = pathname === '/libraries/playground' ? 'editor'
   : pathname === '/libraries/workspace' ? 'libraries' : null;
+// Starlight's PageFrame: drawn inside Starlight's own body, whose head is MyHead.
 ---
 
-    <!-- Starlight's PageFrame: it is drawn inside Starlight's own <body>, whose <head> is MyHead. -->
     <script is:inline>
       // On a wider screen the documentation's navigation is the rail, always: nothing collapses.
       document.documentElement.setAttribute('data-sidebar-collapsed', '');
