@@ -5,14 +5,16 @@ type Entry = { label: string; href?: string; entries?: Entry[] };
 // last under its name, a layer's name after its colour's square and linked to its overview, and its
 // pages one a line. It is app-owned and adds no public component icons.
 type RailRow = { name: string; href?: string; layer?: string; heading?: boolean; gap?: boolean; section: string };
+// The layers' groups are named alone, Root to Page; their pages' addresses keep the number.
+const LAYER_NUMBERS: Record<string, string> = { Root: '1', Core: '2', Unit: '3', Page: '4' };
 const sentence = (label: string) => label.charAt(0) + label.slice(1).toLowerCase();
 function flatten(entries: Entry[], section = ''): RailRow[] {
   return entries.flatMap((entry, index) => {
-    const layer = entry.label.match(/^([1-4]) (Root|Core|Unit|Page)$/);
+    const layer = LAYER_NUMBERS[entry.label];
     if (entry.entries) {
-      const currentSection = layer?.[1] ?? entry.label;
+      const currentSection = layer ?? entry.label;
       const heading: RailRow = layer
-        ? { name: layer[2], href: `/${layer[1]}-${layer[2].toLowerCase()}/overview/`, layer: layer[1], heading: true, gap: index > 0, section: currentSection }
+        ? { name: entry.label, href: `/${layer}-${entry.label.toLowerCase()}/overview/`, layer, heading: true, gap: index > 0, section: currentSection }
         : { name: sentence(entry.label), heading: true, gap: index > 0, section: currentSection };
       return [heading, ...flatten(entry.entries, currentSection)];
     }

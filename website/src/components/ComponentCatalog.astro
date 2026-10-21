@@ -19,7 +19,7 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
       <div class="examples-gallery">
         {LAYERS.filter(layer => layer.number > 1).map(layer => (
           <section class="gallery-layer" aria-labelledby={`examples-layer-${layer.number}`}>
-            <h2 id={`examples-layer-${layer.number}`}>{layer.number} {layer.name}</h2>
+            <h2 id={`examples-layer-${layer.number}`}>{layer.name}</h2>
             <p>{layer.summary}</p>
             <div class="gallery-entries">
               {layer.entries.map(entry => {
@@ -38,7 +38,7 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
       {LAYERS.map((layer) => (
         <section class="directory-layer" data-color={layer.color} aria-labelledby={`layer-${layer.number}`}>
           <div class="directory-layer-head">
-            <h2 id={`layer-${layer.number}`}><span class="directory-swatch" aria-hidden="true"></span>{layer.number} {layer.name}</h2>
+            <h2 id={`layer-${layer.number}`}><span class="directory-swatch" aria-hidden="true"></span>{layer.name}</h2>
             <p>{layer.summary}</p>
           </div>
           <ul>

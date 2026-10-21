@@ -95,7 +95,7 @@ export default defineConfig({
           ],
         },
         {
-          label: "1 Root",
+          label: "Root",
           items: [
             { label: "Colours", link: "/colours/" },
             { label: "Fonts", slug: "1-root/fonts" },
@@ -112,7 +112,7 @@ export default defineConfig({
           ],
         },
         {
-          label: "2 Core",
+          label: "Core",
           items: [
             { label: "Avatar", slug: "2-core/avatar" },
             { label: "Button", slug: "2-core/button" },
@@ -136,7 +136,7 @@ export default defineConfig({
           ],
         },
         {
-          label: "3 Unit",
+          label: "Unit",
           items: [
             { label: "Accordion", slug: "3-unit/accordion" },
             { label: "Calendar", slug: "3-unit/calendar" },
@@ -155,7 +155,7 @@ export default defineConfig({
           ],
         },
         {
-          label: "4 Page",
+          label: "Page",
           items: [
             { label: "Container", slug: "4-page/container" },
             { label: "Document", slug: "4-page/document" },

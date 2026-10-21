@@ -44,7 +44,7 @@ const { sidebar } = Astro.locals.starlightRoute;
   const collapsed = new Set<string>();
   let signedIn = document.documentElement.hasAttribute("data-signed-in");
   const translationKeys: Record<string, string> = {
-    'Start Here': 'startHere', 'Built-ins': 'builtIns', '1 Root': 'root', '2 Core': 'core', '3 Unit': 'unit', '4 Page': 'page',
+    'Start Here': 'startHere', 'Built-ins': 'builtIns', Root: 'root', Core: 'core', Unit: 'unit', Page: 'page',
     Introduction: 'introduction', 'Manual Setup': 'manualSetup', Theming: 'theming', 'Mobile Detection': 'mobileDetection',
     Styling: 'styling', Fonts: 'fonts', Button: 'button', Text: 'text', Link: 'link', Icon: 'icon', Tooltip: 'tooltip',
     Navigation: 'navigation', List: 'list', Panel: 'panel', Card: 'card', Layout: 'layout', Grid: 'grid',
@@ -56,8 +56,8 @@ const { sidebar } = Astro.locals.starlightRoute;
   }
 
   const overviewPaths: Record<string, string> = {
-    '1 Root': '/1-root/overview/', '2 Core': '/2-core/overview/',
-    '3 Unit': '/3-unit/overview/', '4 Page': '/4-page/overview/',
+    Root: '/1-root/overview/', Core: '/2-core/overview/',
+    Unit: '/3-unit/overview/', Page: '/4-page/overview/',
     Icon: '/2-core/icon/',
   };
   function rows(entries: Entry[], depth = 0, parent = ''): SidebarItem[] {
