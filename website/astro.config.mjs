@@ -98,6 +98,7 @@ export default defineConfig({
         {
           label: "Root",
           items: [
+            { label: "Constraints", slug: "1-root/constraints" },
             { label: "Colours", link: "/colours/" },
             { label: "Fonts", slug: "1-root/fonts" },
             { label: "Languages", slug: "1-root/languages" },

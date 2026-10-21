@@ -1,0 +1,414 @@
+---
+// The Constraints page's pictures, each under the Loupe's glass. A picture is drawn with the
+// system's own pieces; its marks (`.mark`) are the rule, shown only under the glass, so what the
+// glass shows is where the pieces really stand against where the rule puts them.
+//   mark y / x      a rule across or down the picture at --y or --x
+//   mark span-y     a measure down the picture from --y to --y2 at --x, labelled data-label
+//   mark span-x     a measure across from --x to --x2 at --y
+// Every position is in the page's pixels from the picture's top left corner.
+import Loupe from './Loupe.astro';
+
+type Example = 'grid' | 'collisions' | 'snap' | 'sixteen' | 'list' | 'fonts';
+const { example } = Astro.props as { example: Example };
+---
+
+{example === 'grid' && (
+  <Loupe width={8} height={2} focus={[80, 20]} zoom={5} label="Four items on the squares, each four squares wide and one high, drawn a pixel short so a pixel of paper stands between them">
+    {['Brief', 'Sketch', 'Review', 'Print'].map((name, index) => (
+      <span class="item" style={`--x: ${(index % 2) * 4}; --y: ${Math.floor(index / 2)};`}>{name}</span>
+    ))}
+    <i class="mark x" style="--x: 80"></i>
+    <i class="mark y" style="--y: 20"></i>
+    <i class="mark span-x" style="--x: 79; --x2: 80; --y: 13" data-label="1"></i>
+    <i class="mark span-y" style="--x: 86; --y: 20; --y2: 39" data-label="19"></i>
+    <i class="mark span-x" style="--x: 80; --x2: 100; --y: 42" data-label="20"></i>
+    <Fragment slot="caption">An item is four squares wide and one high, 80 by 20 apart, drawn 79 by 19: the last pixel is paper, so two items meet without touching.</Fragment>
+  </Loupe>
+)}
+
+{example === 'collisions' && (
+  <Loupe width={10} height={3} focus={[36, 42]} zoom={8} label="Three rows stacked edge to edge; the open one's layer reaches two pixels into the next row's spare four and stops two pixels short of its words">
+    <div class="rows">
+      <ds-row href="#collisions"><ds-icon size="large" type="home"></ds-icon><span>Overview</span></ds-row>
+      <ds-row href="#collisions" open><ds-icon size="large" type="folder"></ds-icon><span>Projects</span></ds-row>
+      <ds-row href="#collisions"><ds-icon size="large" type="star"></ds-icon><span>Starred</span></ds-row>
+    </div>
+    <i class="mark y" style="--y: 40"></i>
+    <i class="mark y" style="--y: 44"></i>
+    <i class="mark span-y" style="--x: 30; --y: 40; --y2: 42" data-label="2" data-side="start"></i>
+    <i class="mark span-y" style="--x: 30; --y: 42; --y2: 44" data-label="2 clear" data-side="start"></i>
+    <Fragment slot="caption">Rows stand edge to edge with nothing between them. The open row's layer is drawn over it, two pixels past what it holds, and reaches only into the next row's spare four: it stops two pixels short of the next row's words.</Fragment>
+  </Loupe>
+)}
+
+{example === 'snap' && (
+  <Loupe width={10} height={4} focus={[80, 20]} zoom={6} label="Three blocks to drag; each lands on whole squares and never on another">
+    <div class="snap" data-snap>
+      <button type="button" class="block" data-block data-name="Notes" style="--x: 0; --y: 0; --bw: 4; --bh: 1; --tone: var(--ds-apple-green);">Notes</button>
+      <button type="button" class="block" data-block data-name="Calendar" style="--x: 5; --y: 1; --bw: 4; --bh: 2; --tone: var(--ds-zenith-blue);">Calendar</button>
+      <button type="button" class="block" data-block data-name="Tag" style="--x: 1; --y: 3; --bw: 2; --bh: 1; --tone: var(--ds-pink);">Tag</button>
+      <span class="overlap" data-overlap hidden></span>
+      <span class="visually-hidden" aria-live="polite" data-announce></span>
+    </div>
+    <Fragment slot="caption">Drag a block, or focus it and use the arrow keys. It follows the pointer, shows where it would collide in the danger colour, and lands on the nearest whole squares that are free.</Fragment>
+  </Loupe>
+)}
+
+{example === 'sixteen' && (
+  <Loupe width={10} height={3} focus={[25, 30]} zoom={7} label="A row with an icon, a day and a time: everything stands on the lower sixteen pixels of its square, the spare four above">
+    <ds-row class="one-row"><ds-icon size="large" type="calendar"></ds-icon><span>Monday</span><span class="end">12:30</span></ds-row>
+    <i class="mark y" style="--y: 24"></i>
+    <i class="mark y" style="--y: 27"></i>
+    <i class="mark y" style="--y: 37"></i>
+    <i class="mark span-y" style="--x: 18; --y: 20; --y2: 24" data-label="4" data-side="start"></i>
+    <i class="mark span-y" style="--x: 34; --y: 20; --y2: 27" data-label="7"></i>
+    <i class="mark span-y" style="--x: 34; --y: 37; --y2: 40" data-label="3"></i>
+    <Fragment slot="caption">Words, icons and controls take the lower sixteen pixels of their square, the spare four above. A 14px capital's top is then 7px below the square's top line and its baseline 3px above the next; the icon's foot is on that line.</Fragment>
+  </Loupe>
+)}
+
+{example === 'list' && (
+  <Loupe width={10} height={3} focus={[18, 30]} zoom={8} label="A list: each icon on the first sixteen pixels of its square, the words from the next square, numbers ending on the last square">
+    <div class="rows">
+      <ds-row><ds-icon size="large" type="note"></ds-icon><span>Notes</span><span class="end">12</span></ds-row>
+      <ds-row><ds-icon size="large" type="calendar"></ds-icon><span>Calendar</span><span class="end">3</span></ds-row>
+      <ds-row><ds-icon size="large" type="star"></ds-icon><span>Starred</span><span class="end">128</span></ds-row>
+    </div>
+    <i class="mark x" style="--x: 16"></i>
+    <i class="mark x" style="--x: 20"></i>
+    <i class="mark x" style="--x: 200"></i>
+    <i class="mark span-x" style="--x: 0; --x2: 16; --y: 21" data-label="16"></i>
+    <i class="mark span-x" style="--x: 16; --x2: 20; --y: 41" data-label="4"></i>
+    <Fragment slot="caption">The icon takes the first sixteen pixels of its square, flush with its edge; the words begin on the next square, so the spare four stand between them. Counts end on the row's last square in tabular figures, so their digits line up.</Fragment>
+  </Loupe>
+)}
+
+{example === 'fonts' && (
+  <Loupe width={9} height={3} focus={[66, 30]} zoom={8} label="The same letters in the system's face, in an added face as it is drawn, and in the added face adjusted onto the sixteen">
+    <div class="faces">
+      <span class="face" style="--x: 0">Hxg</span>
+      <span class="face face--drawn" style="--x: 3">Hxg</span>
+      <span class="face face--adjusted" style="--x: 6">Hxg</span>
+      <span class="face-name ds-text ds-text--small ds-text--muted" style="--x: 0">GT America</span>
+      <span class="face-name ds-text ds-text--small ds-text--muted" style="--x: 3">As drawn</span>
+      <span class="face-name ds-text ds-text--small ds-text--muted" style="--x: 6">Adjusted</span>
+    </div>
+    <i class="mark y" style="--y: 27"></i>
+    <i class="mark y" style="--y: 37"></i>
+    <i class="mark span-y" style="--x: 58; --y: 20; --y2: 27" data-label="7" data-side="start"></i>
+    <i class="mark span-y" style="--x: 58; --y: 37; --y2: 40" data-label="3" data-side="start"></i>
+    <Fragment slot="caption">GT Canon drawn as it comes stands half a pixel higher than the system's face. One descriptor in its <code>@font-face</code> puts it on the same baseline, so every component sets it right without a nudge of its own.</Fragment>
+  </Loupe>
+)}
+
+<script>
+  // Blocks that land on whole squares and never on one another. The glass's copy of the
+  // picture is moved with the picture, so it shows the same thing.
+  type Spot = { x: number; y: number; w: number; h: number };
+  const hits = (a: Spot, b: Spot) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
+
+  for (const snap of document.querySelectorAll<HTMLElement>('[data-loupe-scene] [data-snap]')) {
+    const figure = snap.closest<HTMLElement>('[data-loupe]');
+    const copy = figure?.querySelector<HTMLElement>('[data-loupe-zoomed] [data-snap]');
+    if (!figure || !copy) continue;
+    const columns = Number(getComputedStyle(figure).getPropertyValue('--w'));
+    const rows = Number(getComputedStyle(figure).getPropertyValue('--h'));
+    const blocks = [...snap.querySelectorAll<HTMLElement>('[data-block]')];
+    const copies = [...copy.querySelectorAll<HTMLElement>('[data-block]')];
+    const overlaps = [snap, copy].map((scene) => scene.querySelector<HTMLElement>('[data-overlap]'));
+    const announce = snap.querySelector<HTMLElement>('[data-announce]');
+    const spots: Spot[] = blocks.map((block) => {
+      const value = (name: string) => Number(block.style.getPropertyValue(name));
+      return { x: value('--x'), y: value('--y'), w: value('--bw'), h: value('--bh') };
+    });
+
+    const set = (index: number, name: string, value: string | null) => {
+      for (const block of [blocks[index], copies[index]]) {
+        if (!block) continue;
+        if (value === null) block.style.removeProperty(name);
+        else block.style.setProperty(name, value);
+      }
+    };
+    const free = (index: number, spot: Spot) =>
+      spot.x >= 0 && spot.y >= 0 && spot.x + spot.w <= columns && spot.y + spot.h <= rows &&
+      spots.every((other, j) => j === index || !hits(spot, other));
+    const nearest = (index: number, x: number, y: number): Spot => {
+      const { w, h } = spots[index];
+      let best = spots[index];
+      let distance = Infinity;
+      for (let row = 0; row + h <= rows; row++) for (let column = 0; column + w <= columns; column++) {
+        const spot = { x: column, y: row, w, h };
+        const d = (column - x) ** 2 + (row - y) ** 2;
+        if (d < distance && free(index, spot)) [best, distance] = [spot, d];
+      }
+      return best;
+    };
+    const describe = (index: number) => {
+      const { x, y } = spots[index];
+      const label = `${blocks[index].dataset.name}, column ${x + 1}, row ${y + 1}`;
+      blocks[index].setAttribute('aria-label', label);
+      return label;
+    };
+    const showOverlap = (spot: Spot | null) => {
+      for (const overlap of overlaps) {
+        if (!overlap) continue;
+        overlap.hidden = !spot;
+        if (!spot) continue;
+        overlap.style.setProperty('--ox', String(spot.x * 20));
+        overlap.style.setProperty('--oy', String(spot.y * 20));
+        overlap.style.setProperty('--ow', String(spot.w * 20));
+        overlap.style.setProperty('--oh', String(spot.h * 20));
+      }
+    };
+    const land = (index: number, spot: Spot) => {
+      spots[index] = spot;
+      set(index, '--x', String(spot.x));
+      set(index, '--y', String(spot.y));
+      set(index, '--dx', null);
+      set(index, '--dy', null);
+      set(index, 'z-index', null);
+      for (const block of [blocks[index], copies[index]]) {
+        delete block?.dataset.dragging;
+        delete block?.dataset.collides;
+      }
+      showOverlap(null);
+    };
+
+    blocks.forEach((block, index) => {
+      describe(index);
+      let start: { x: number; y: number; pixel: number } | null = null;
+      let moved = { x: spots[index].x, y: spots[index].y };
+
+      block.addEventListener('pointerdown', (event) => {
+        if (event.button !== 0) return;
+        block.setPointerCapture(event.pointerId);
+        start = { x: event.clientX, y: event.clientY, pixel: snap.getBoundingClientRect().width / (columns * 20) };
+        for (const each of [block, copies[index]]) if (each) each.dataset.dragging = '';
+        set(index, 'z-index', '2');
+      });
+      block.addEventListener('pointermove', (event) => {
+        if (!start) return;
+        const dx = (event.clientX - start.x) / start.pixel;
+        const dy = (event.clientY - start.y) / start.pixel;
+        set(index, '--dx', String(dx));
+        set(index, '--dy', String(dy));
+        moved = { x: spots[index].x + dx / 20, y: spots[index].y + dy / 20 };
+        const here = { ...spots[index], ...moved };
+        const other = spots.find((spot, j) => j !== index && hits(here, spot));
+        const overlap = other && {
+          x: Math.max(here.x, other.x),
+          y: Math.max(here.y, other.y),
+          w: Math.min(here.x + here.w, other.x + other.w) - Math.max(here.x, other.x),
+          h: Math.min(here.y + here.h, other.y + other.h) - Math.max(here.y, other.y),
+        };
+        for (const each of [block, copies[index]]) {
+          if (!each) continue;
+          if (overlap) each.dataset.collides = '';
+          else delete each.dataset.collides;
+        }
+        showOverlap(overlap || null);
+      });
+      const drop = () => {
+        if (!start) return;
+        start = null;
+        land(index, nearest(index, moved.x, moved.y));
+        if (announce) announce.textContent = describe(index);
+      };
+      block.addEventListener('pointerup', drop);
+      block.addEventListener('pointercancel', drop);
+
+      block.addEventListener('keydown', (event) => {
+        const step = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[event.key];
+        if (!step) return;
+        event.preventDefault();
+        const spot = { ...spots[index], x: spots[index].x + step[0], y: spots[index].y + step[1] };
+        const open = free(index, spot);
+        if (open) land(index, spot);
+        if (announce) announce.textContent = open ? describe(index) : `${describe(index)}, it cannot move there`;
+      });
+    });
+  }
+</script>
+
+<style>
+  /* The marks are the rule, drawn only under the glass in hairlines and labels a pixel thick and
+     ten pixels high once magnified. */
+  .mark {
+    --mark: var(--ds-sharp-blue);
+    --hair: calc(1px / var(--z));
+    position: absolute;
+    display: none;
+    font-style: normal;
+    pointer-events: none;
+    z-index: 4;
+  }
+  :global(.loupe-scene--zoomed) .mark { display: block; }
+  .mark.y {
+    left: calc(-2 * var(--u));
+    right: calc(-2 * var(--u));
+    top: calc(var(--y) * var(--p));
+    height: var(--hair);
+    background: color-mix(in srgb, var(--mark) 70%, transparent);
+  }
+  .mark.x {
+    top: calc(-2 * var(--u));
+    bottom: calc(-2 * var(--u));
+    left: calc(var(--x) * var(--p));
+    width: var(--hair);
+    background: color-mix(in srgb, var(--mark) 70%, transparent);
+  }
+  .mark.span-y {
+    left: calc(var(--x) * var(--p) - 3 * var(--hair));
+    top: calc(var(--y) * var(--p));
+    width: calc(6 * var(--hair));
+    height: calc((var(--y2) - var(--y)) * var(--p));
+    background:
+      linear-gradient(var(--mark), var(--mark)) center / var(--hair) 100% no-repeat,
+      linear-gradient(var(--mark), var(--mark)) top / 100% var(--hair) no-repeat,
+      linear-gradient(var(--mark), var(--mark)) bottom / 100% var(--hair) no-repeat;
+  }
+  .mark.span-x {
+    left: calc(var(--x) * var(--p));
+    top: calc(var(--y) * var(--p) - 3 * var(--hair));
+    width: calc((var(--x2) - var(--x)) * var(--p));
+    height: calc(6 * var(--hair));
+    background:
+      linear-gradient(var(--mark), var(--mark)) center / 100% var(--hair) no-repeat,
+      linear-gradient(var(--mark), var(--mark)) left / var(--hair) 100% no-repeat,
+      linear-gradient(var(--mark), var(--mark)) right / var(--hair) 100% no-repeat;
+  }
+  /* A label is set at its own size and drawn back down by the glass's magnification. */
+  .mark[data-label]::after {
+    content: attr(data-label);
+    position: absolute;
+    padding: 0 calc(3px * var(--sf, 1));
+    border-radius: calc(2px * var(--sf, 1));
+    background: var(--mark);
+    color: var(--ds-white);
+    font-size: var(--ds-type-size-small, 10px);
+    line-height: calc(14px * var(--sf, 1));
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .mark.span-y[data-label]::after {
+    top: 50%;
+    left: calc(100% + 2 * var(--hair));
+    transform-origin: 0 0;
+    transform: scale(calc(1 / var(--z))) translateY(-50%);
+  }
+  .mark.span-y[data-side='start']::after {
+    left: auto;
+    right: calc(100% + 2 * var(--hair));
+    transform-origin: 100% 0;
+  }
+  .mark.span-x[data-label]::after {
+    left: 50%;
+    bottom: calc(100% + 2 * var(--hair));
+    transform-origin: 0 100%;
+    transform: scale(calc(1 / var(--z))) translateX(-50%);
+  }
+
+  /* Items as an Ezo list draws them: a 80 by 20 pitch, 79 by 19 drawn, the words 4px in on the sixteen. */
+  .item {
+    position: absolute;
+    left: calc(var(--x) * var(--u));
+    top: calc(var(--y) * var(--u));
+    width: calc(4 * var(--u) - var(--p));
+    height: calc(var(--u) - var(--p));
+    padding: calc(3 * var(--p)) calc(4 * var(--p)) 0;
+    background: var(--ds-fill);
+    line-height: calc(16 * var(--p));
+    white-space: nowrap;
+  }
+
+  .rows { display: flex; flex-direction: column; width: 100%; }
+  .rows ds-row, .one-row { width: 100%; }
+  .one-row { position: absolute; left: 0; top: var(--u); }
+  .end { margin-inline-start: auto; font-variant-numeric: tabular-nums; }
+
+  /* The blocks: whole squares, drawn a pixel short, carried in transform alone. */
+  .snap { position: absolute; inset: 0; }
+  .block {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: calc(var(--bw) * var(--u) - var(--p));
+    height: calc(var(--bh) * var(--u) - var(--p));
+    margin: 0;
+    padding: calc(4 * var(--p)) calc(4 * var(--p)) 0;
+    border: 0;
+    border-radius: 0;
+    background: var(--tone);
+    color: var(--ds-black);
+    font: inherit;
+    line-height: calc(16 * var(--p));
+    text-align: start;
+    vertical-align: top;
+    cursor: grab;
+    touch-action: none;
+    transform: translate(
+      calc(var(--x) * var(--u) + var(--dx, 0) * var(--p)),
+      calc(var(--y) * var(--u) + var(--dy, 0) * var(--p))
+    );
+    transition: transform 330ms cubic-bezier(0.2, 1, 0.1, 1);
+  }
+  .block:focus-visible { outline: 2px solid var(--ds-focus-ring); outline-offset: -2px; }
+  .block[data-dragging] { cursor: grabbing; transition: none; }
+  .block[data-collides] { box-shadow: inset 0 0 0 1px var(--ds-danger-color); }
+  .overlap {
+    position: absolute;
+    left: calc(var(--ox) * var(--p));
+    top: calc(var(--oy) * var(--p));
+    width: calc(var(--ow) * var(--p));
+    height: calc(var(--oh) * var(--p));
+    background: repeating-linear-gradient(
+      45deg,
+      var(--ds-danger-color) 0 calc(1 * var(--p)),
+      transparent 0 calc(3 * var(--p))
+    );
+    outline: 1px solid var(--ds-danger-color);
+    pointer-events: none;
+    z-index: 3;
+  }
+  .overlap[hidden] { display: none; }
+
+  /* The same letters in three faces, each in a cell three squares wide on one row. */
+  .faces { position: absolute; inset: 0; }
+  .face, .face-name {
+    position: absolute;
+    left: calc(var(--x) * var(--u));
+    width: calc(3 * var(--u));
+    padding-top: calc(4 * var(--p));
+    line-height: calc(16 * var(--p));
+    white-space: nowrap;
+  }
+  .face { top: var(--u); font-size: var(--ds-type-size-default, 14px); }
+  .face-name { top: calc(2 * var(--u)); line-height: 1; padding-top: calc(7 * var(--p)); }
+  .face--drawn { font-family: GT-Canon-M-Standard-Medium, serif; }
+  .face--adjusted { font-family: 'GT Canon on the sixteen', serif; }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .block { transition: none; }
+  }
+</style>
+
+<style is:global>
+  /* GT Canon with its descent set to GT America's, so its baseline stands where the system's does:
+     8 + 7 × (ascent − descent) = 13.2px down a 16px line at 14px, 3px above the square's line. */
+  @font-face {
+    font-family: 'GT Canon on the sixteen';
+    src: url('../../../DS1/1-root/fonts/GT-Canon-M-Standard-Medium-Trial.woff2') format('woff2');
+    font-display: swap;
+    ascent-override: 100%;
+    descent-override: 25.8%;
+  }
+</style>

@@ -20,6 +20,7 @@ export const ALL_LAYERS: DirectoryLayer[] = [
     color: 'yellow',
     summary: 'Shared styling, language, formatting, appearance and preferences.',
     entries: [
+      { name: 'Constraints', href: '/1-root/constraints/' },
       { name: 'Styling', href: '/1-root/styling/', tag: 'one.css' },
       { name: 'Colours', href: '/colours/' },
       { name: 'Fonts', href: '/1-root/fonts/', tag: 'fonts' },

@@ -1,0 +1,224 @@
+---
+// A picture drawn at its size on a plate of Root's yellow, with the paper's grain, and a
+// magnifying glass beside it that shows the same picture many times larger, its pixels and
+// squares ruled in. The glass looks where the pointer is and goes back to its spot when the
+// pointer leaves. The picture is the default slot, drawn twice: once at its size and once
+// under the glass, where the marks inside it (`.mark`, see Constraints.astro) are shown.
+import PaperMaterial from './PaperMaterial.astro';
+
+interface Props {
+  /** The picture's width and height, in squares. */
+  width: number;
+  height: number;
+  /** Where the glass looks first, in the picture's pixels from its top left corner. */
+  focus: [number, number];
+  /** How many times larger the glass draws it. */
+  zoom?: number;
+  /** What the picture shows, for assistive technology. */
+  label: string;
+}
+
+const { width, height, focus, zoom = 8, label } = Astro.props;
+const picture = await Astro.slots.render('default');
+---
+
+<figure
+  class="loupe not-content"
+  data-ds-not-prose
+  data-loupe
+  data-focus={focus.join(' ')}
+  style={`--w: ${width}; --h: ${height}; --z: ${zoom}; --fx: ${focus[0]}; --fy: ${focus[1]};`}
+>
+  <div class="loupe-plate">
+    <div class="loupe-scene" data-loupe-scene role="group" aria-label={label}>
+      <Fragment set:html={picture} />
+      <span class="loupe-ring" aria-hidden="true"></span>
+    </div>
+    <PaperMaterial />
+    <div class="loupe-lens" aria-hidden="true">
+      <div class="loupe-scene loupe-scene--zoomed" data-loupe-zoomed inert set:html={picture} />
+      <span class="loupe-glass"></span>
+      <PaperMaterial />
+      <span class="loupe-reading">{zoom} ×</span>
+    </div>
+  </div>
+  {Astro.slots.has('caption') && <figcaption><slot name="caption" /></figcaption>}
+</figure>
+
+<script>
+  // The glass follows the pointer over the picture, in the picture's own pixels, and
+  // eases back to where it started when the pointer leaves.
+  for (const figure of document.querySelectorAll<HTMLElement>('[data-loupe]')) {
+    const scene = figure.querySelector<HTMLElement>('[data-loupe-scene]');
+    if (!scene) continue;
+    const [homeX, homeY] = (figure.dataset.focus ?? '0 0').split(' ').map(Number);
+    const columns = Number(getComputedStyle(figure).getPropertyValue('--w')) || 1;
+    const rows = Number(getComputedStyle(figure).getPropertyValue('--h')) || 1;
+    const look = (x: number, y: number) => {
+      figure.style.setProperty('--fx', String(x));
+      figure.style.setProperty('--fy', String(y));
+    };
+    scene.addEventListener('pointermove', (event) => {
+      const box = scene.getBoundingClientRect();
+      const pixel = box.width / (columns * 20);
+      const x = Math.min(columns * 20, Math.max(0, (event.clientX - box.left) / pixel));
+      const y = Math.min(rows * 20, Math.max(0, (event.clientY - box.top) / pixel));
+      figure.dataset.looking = '';
+      look(Math.round(x * 4) / 4, Math.round(y * 4) / 4);
+    });
+    scene.addEventListener('pointerleave', () => {
+      delete figure.dataset.looking;
+      look(homeX, homeY);
+    });
+  }
+</script>
+
+<style>
+  /*
+   * Everything in squares (--u) and the page's pixels (--p, a twentieth of a square): the plate is
+   * as wide as the whole squares that fit, padded two squares, and the glass is ten squares across.
+   */
+  .loupe {
+    --u: calc(20px * var(--sf, 1));
+    --p: calc(var(--u) / 20);
+    --lens: calc(10 * var(--u));
+    --plate: color-mix(in srgb, var(--ds-yellow) 24%, var(--ds-paper));
+    --rule: var(--ds-sharp-blue);
+    --pixel-line: color-mix(in srgb, var(--ds-text-color) 9%, transparent);
+    --square-line: color-mix(in srgb, var(--ds-text-color) 28%, transparent);
+    width: calc(round(down, 100%, var(--u)));
+    margin: var(--u) 0 calc(2 * var(--u));
+  }
+  .loupe * { box-sizing: border-box; }
+  .loupe-plate {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: calc(2 * var(--u));
+    padding: calc(2 * var(--u));
+    border-radius: var(--ds-corner-size, 4px);
+    background: var(--plate);
+    color: var(--ds-text-color);
+    overflow: hidden;
+  }
+  .loupe-plate > :global(.paper-material) { --material-unit: var(--u); }
+
+  /* The picture at its size, with its squares marked faintly at their corners. */
+  .loupe-scene {
+    position: relative;
+    flex: none;
+    width: calc(var(--w) * var(--u));
+    height: calc(var(--h) * var(--u));
+    font-size: var(--ds-type-size-default, 14px);
+    touch-action: pan-y;
+  }
+  .loupe-scene::before {
+    content: '';
+    position: absolute;
+    inset: 0 calc(-1 * var(--p)) calc(-1 * var(--p)) 0;
+    background:
+      linear-gradient(to right, var(--square-line) var(--p), transparent 0) 0 0 / var(--u) calc(3 * var(--p)),
+      linear-gradient(to bottom, var(--square-line) var(--p), transparent 0) 0 0 / calc(3 * var(--p)) var(--u);
+    opacity: 0.6;
+    pointer-events: none;
+  }
+  .loupe-scene--zoomed::before { content: none; }
+
+  /* What the glass sees, ringed on the picture. */
+  .loupe-ring {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: calc(var(--lens) / var(--z));
+    height: calc(var(--lens) / var(--z));
+    border: 1px solid var(--ds-text-color);
+    border-radius: 50%;
+    transform: translate(calc(var(--fx) * var(--p) - 50%), calc(var(--fy) * var(--p) - 50%));
+    transition: transform 300ms cubic-bezier(0.2, 0, 0, 1);
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  /* The glass: a circle of the plate, a line round it, and the picture under it. */
+  .loupe-lens {
+    position: relative;
+    flex: none;
+    width: var(--lens);
+    height: var(--lens);
+    margin-inline-start: auto;
+    border-radius: 50%;
+    background: var(--plate);
+    box-shadow: 0 0 0 1px var(--ds-text-color);
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .loupe-lens > :global(.paper-material) { --material-unit: calc(var(--u) * var(--z)); }
+  .loupe-scene--zoomed {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform-origin: 0 0;
+    transform:
+      translate(calc(var(--lens) / 2 - var(--fx) * var(--p) * var(--z)), calc(var(--lens) / 2 - var(--fy) * var(--p) * var(--z)))
+      scale(var(--z));
+    transition: transform 300ms cubic-bezier(0.2, 0, 0, 1);
+    pointer-events: none;
+  }
+  [data-looking] .loupe-ring,
+  [data-looking] .loupe-scene--zoomed { transition: none; }
+
+  /* Under the glass every pixel is ruled, and every square more firmly. */
+  .loupe-scene--zoomed::after {
+    content: '';
+    position: absolute;
+    inset: calc(-2 * var(--u));
+    background:
+      linear-gradient(to right, var(--square-line) calc(1px / var(--z)), transparent 0) 0 0 / var(--u) var(--u),
+      linear-gradient(to bottom, var(--square-line) calc(1px / var(--z)), transparent 0) 0 0 / var(--u) var(--u),
+      linear-gradient(to right, var(--pixel-line) calc(1px / var(--z)), transparent 0) 0 0 / var(--p) var(--p),
+      linear-gradient(to bottom, var(--pixel-line) calc(1px / var(--z)), transparent 0) 0 0 / var(--p) var(--p);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .loupe-glass {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(70% 55% at 30% 20%, rgb(255 255 255 / 0.35), rgb(255 255 255 / 0) 60%);
+    mix-blend-mode: soft-light;
+    pointer-events: none;
+  }
+  .loupe-reading {
+    position: absolute;
+    left: 50%;
+    bottom: var(--u);
+    transform: translateX(-50%);
+    padding: 0 calc(4px * var(--sf, 1));
+    border-radius: calc(4px * var(--sf, 1));
+    background: var(--ds-text-color);
+    color: var(--plate);
+    font-size: var(--ds-type-size-small, 10px);
+    line-height: calc(16px * var(--sf, 1));
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .loupe figcaption {
+    margin-top: calc(var(--u) / 2);
+    max-width: calc(32 * var(--u));
+    color: var(--ds-text-color-muted);
+    font-size: var(--ds-type-size-default, 14px);
+    line-height: var(--u);
+  }
+
+  /* A phone: one square around the picture, and the glass under it, in the middle. */
+  @media (max-width: 640px) {
+    .loupe-plate { justify-content: center; padding: var(--u); }
+    .loupe-lens { margin-inline: auto; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .loupe-ring, .loupe-scene--zoomed { transition: none; }
+  }
+</style>

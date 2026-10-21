@@ -1,5 +1,12 @@
 [
   {
+    "id": "component:/1-root/constraints/",
+    "label": "Constraints",
+    "code": "CNST",
+    "kind": "component",
+    "url": "https://designsystem1.com/1-root/constraints/"
+  },
+  {
     "id": "component:/1-root/styling/",
     "code": "STYL",
     "label": "Styling",

@@ -1,0 +1,86 @@
+---
+title: Constraints
+description: The rules every piece keeps, seen up close - everything on the squares, nothing on top of anything else, words on the lower sixteen, and a face you add adjusted onto the same line.
+---
+
+import Constraints from "../../../components/Constraints.astro";
+
+Constraints are the rules every piece of Design system 1 keeps, so a page never has to be corrected by eye. They are measured in pixels and squares, not judged. Each picture below is drawn with the system's own pieces and magnified under a glass, its pixels ruled in and the rule drawn in blue. Move the pointer over a picture and the glass follows it.
+
+## On the squares
+
+Everything is counted in squares of 20 pixels, multiplied by `--sf` on phones and tablets (see [Scaling](/1-root/scaling/)). Widths are whole squares, heights are whole squares, and gaps are whole squares or half a square at most. Nothing takes a size of its own.
+
+<Constraints example="grid" />
+
+A piece that fills its squares is drawn one pixel short at its end and foot (`--margin-correction`), so two pieces side by side or one above the other meet on the grid line with a pixel of paper between them. Lines are one pixel. To see the squares behind a page while you build it, lay a [Grid](/4-page/grid/) under it.
+
+## Nothing collides
+
+Two pieces never stand on the same pixels. Rows stack edge to edge with no gap and no overlap; columns stand whole squares apart; a menu stands half a square from the button that opens it. What a piece draws beyond itself goes only where nothing else is:
+
+- a pressed row's layer reaches two pixels past what the row holds, into the spare four above the next row's words, never onto them;
+- keyboard focus is ringed two pixels inside a row, so the rings of two rows stacked edge to edge never touch;
+- words that do not fit fade over their last square where they are cut; they never run under the next column.
+
+<Constraints example="collisions" />
+
+Anything a person can move lands on whole squares, and never on another piece. While it moves it follows the pointer freely; where it would collide is shown, and on release it lands on the nearest whole squares that are free.
+
+<Constraints example="snap" />
+
+## The sixteen
+
+In a square, words, pictures and controls take the **lower sixteen pixels**, with the spare four above them. A 14px line of text is set on a 16px line box standing against the foot of its square; a 16px icon and a 16px control stand on the same sixteen. Centring in the twenty is wrong: the words would sit two pixels higher than in every other row.
+
+<Constraints example="sixteen" />
+
+| Where | The rule |
+| --- | --- |
+| A row, one square high | `align-items: flex-end` and a 16px line, so everything ends on the row's bottom line |
+| A line on its own: a heading, a date, a label | 4px above it and a 16px line, still one square |
+| A square with a rule at its foot: a table cell, a tab bar | 3px above the sixteen, then the 1px rule; never a 19px line |
+| Prose that wraps | 20px lines, one square a line: the one exception |
+
+## A list on the grid
+
+A list is rows one square high, stacked edge to edge. Across a row, a picture takes the first sixteen of its square, flush with the square's edge; the words begin on the next square, so the square's spare four stand between them. Words without a picture begin on the square's edge. Numbers end on the row's last square in tabular figures, so a column of them lines up digit for digit.
+
+<Constraints example="list" />
+
+Lists, rows and their headers stand on the paper with no fill of their own. Colour is for a meaningful state, such as the open or current row, never decoration across a list.
+
+## A face you add
+
+The system's faces stand on the sixteen as they are drawn. A face you add, for a library or a product, has its own ascent and descent, so at 14px on a 16px line its capitals stand a little higher or lower: often less than a pixel, which is enough to make every row look wrong.
+
+<Constraints example="fonts" />
+
+Where a line box puts the baseline follows from the face's vertical metrics: in a 16px line at 14px it stands `8 + 7 × (ascent − descent)` pixels down, each as a fraction of the em. GT America's ascent is 1 and its descent 0.258, which puts the baseline 13.2px down the line, 3px above the square's foot; its capitals, 0.71 of the em, are 10px tall and stand 3px inside the sixteen at both ends.
+
+To put an added face on the same line, give its `@font-face` the same difference between ascent and descent, and, if its capitals are taller or shorter, the size that makes them 10px:
+
+```css
+@font-face {
+  font-family: "My face";
+  src: url("my-face.woff2") format("woff2");
+  /* GT Canon: ascent 1, descent 0.37, capitals 0.705 of the em. Its descent set to 0.258
+     gives GT America's 0.742; its capitals are within a percent, so no size-adjust. */
+  ascent-override: 100%;
+  descent-override: 25.8%;
+}
+```
+
+- **Read the face's metrics** from its file: the ascent and descent the browser uses (the `hhea` table, or `OS/2` typographic metrics when the face sets `USE_TYPO_METRICS`) and the cap height, each over the face's units per em.
+- **Match the baseline** with `ascent-override` and `descent-override` so that ascent minus descent is 0.742.
+- **Match the capitals** with `size-adjust`: 0.71 over the face's cap height. It scales the overrides too, so divide them by the same factor.
+- **Correct the face once**, in its `@font-face`. Never move its words with padding, `top` or a transform in each component: every component then sets the face right, and the system's own faces are left alone.
+
+## Checking it
+
+Measure in the browser rather than judging by eye:
+
+- an element's width and height are whole squares, less the one pixel of correction where it fills them;
+- a 14px capital's top is 7px below the row's top grid line and its baseline 3px above the next;
+- a 16px icon's foot is on the row's bottom line;
+- no two elements' boxes intersect, except a layer drawn over its own row.
