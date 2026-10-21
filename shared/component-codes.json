@@ -389,6 +389,13 @@
     "url": "https://designsystem1.com/1-root/theming/"
   },
   {
+    "id": "component:/1-root/shape/",
+    "label": "Shape",
+    "code": "SHAP",
+    "kind": "component",
+    "url": "https://designsystem1.com/1-root/shape/"
+  },
+  {
     "id": "component:/1-root/device/",
     "label": "Device",
     "code": "DVC",
