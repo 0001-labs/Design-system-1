@@ -1,15 +1,9 @@
 ---
 import MyHeader from '../components/MyHeader.astro';
 import MySidebar from '../components/MySidebar.astro';
-import MyHead from '../components/MyHead.astro';
 import LibraryWorkspace from '../components/LibraryWorkspace.astro';
 import NavigationRail from '../components/NavigationRail.astro';
 
-interface Props {
-  title?: string;
-}
-
-const { title } = Astro.props;
 const pathname = Astro.url.pathname.replace(/\/$/, '');
 const isTool = ['/2-core/icon/collection', '/components'].includes(pathname);
 const isExamples = pathname === '/start-here/examples';
@@ -17,20 +11,11 @@ const libraryMode = pathname === '/libraries/playground' ? 'editor'
   : pathname === '/libraries/workspace' ? 'libraries' : null;
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title || 'Design system 1'}</title>
-    <MyHead />
+    <!-- Starlight's PageFrame: it is drawn inside Starlight's own <body>, whose <head> is MyHead. -->
     <script is:inline>
       // On a wider screen the documentation's navigation is the rail, always: nothing collapses.
       document.documentElement.setAttribute('data-sidebar-collapsed', '');
     </script>
-    <link rel="icon" type="image/svg+xml" href="/icons/design-system-1.svg" />
-  </head>
-  <body>
     <!-- Header -->
     <MyHeader />
 
@@ -207,5 +192,3 @@ const libraryMode = pathname === '/libraries/playground' ? 'editor'
       window.addEventListener('resize', closeWideNavigation);
       window.addEventListener('scaling-changed', closeWideNavigation);
     </script>
-  </body>
-</html>
