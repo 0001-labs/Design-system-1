@@ -2,7 +2,7 @@
 
 A design system for building interfaces on a 20px grid. Typography, colour, spacing and components share the same rules.
 
-Use Lit Web Components directly in HTML, or through the React adapters. Change the design through CSS custom properties.
+Use the Lit web components directly in HTML, with any framework or none. Change the design through CSS custom properties.
 
 [Explore the system](https://designsystem1.com/) · [Try the workbench](https://designsystem1.com/app/) · [npm](https://www.npmjs.com/package/@0001-labs/design-system-1)
 
