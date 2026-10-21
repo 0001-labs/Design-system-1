@@ -16,6 +16,12 @@
  *   resize, when `measure()` is called (after a render, since words can change
  *   without the box resizing), once the page's fonts have loaded and, with
  *   `text: true`, when the words inside them change. `disconnect()` lets go.
+ * - Every watcher measures in the next frame, together with every other one:
+ *   all widths are read, then all marks written, so a page building a few
+ *   hundred words lays itself out once for them rather than once each. Read
+ *   one by one, after each element connected or updated, the words of Ezo's
+ *   landing page laid it out again two hundred times, over half a second.
+ *   Elements that resize are measured the same way, in one pass for all.
  * - `CutFades` is the same watcher as a Lit reactive controller: it starts when
  *   its element connects, measures after every update and stops when it
  *   disconnects.
@@ -80,16 +86,94 @@ export type CutWatcher = {
   disconnect(): void;
 };
 
+type Watched = {
+  /** Finds the elements again and observes the new ones; returns them. */
+  refresh(): Set<Element>;
+  stopped: boolean;
+};
+
+/** Reads every element's widths first, then writes every mark, so the page is laid out once for all of them. */
+function markAll(elements: Iterable<Element>) {
+  const cuts: [Element, boolean][] = [];
+  for (const element of elements) if (element.isConnected) cuts.push([element, isCut(element)]);
+  hookFonts();
+  for (const [element, cut] of cuts) {
+    const mark = element.getAttribute(CUT_ATTRIBUTE);
+    if (cut) {
+      if (mark !== "end") element.setAttribute(CUT_ATTRIBUTE, "end");
+    } else if (mark === "end") element.removeAttribute(CUT_ATTRIBUTE);
+  }
+}
+
+const live = new Set<Watched>();
+const queued = new Set<Watched>();
+let frame = false;
+
+const nextFrame = (run: () => void) => {
+  if (typeof requestAnimationFrame === "function") requestAnimationFrame(run);
+  else setTimeout(run, 0);
+};
+
+function flush() {
+  frame = false;
+  const watchers = [...queued];
+  queued.clear();
+  const elements = new Set<Element>();
+  for (const watcher of watchers) {
+    if (watcher.stopped) continue;
+    for (const element of watcher.refresh()) elements.add(element);
+  }
+  markAll(elements);
+}
+
+/** Measures this watcher in the next frame, with every other watcher waiting for it. */
+function schedule(watcher: Watched) {
+  if (watcher.stopped) return;
+  queued.add(watcher);
+  if (frame) return;
+  frame = true;
+  nextFrame(flush);
+}
+
+// One observer for every watched element: the sizes of a frame arrive in one
+// call, read in one pass. An element two watchers hold (a row's name, which the
+// row and its ds-text both watch) is let go when the last one does.
+let sizes: ResizeObserver | undefined;
+const holders = new Map<Element, number>();
+function observe(element: Element) {
+  if (typeof ResizeObserver === "undefined") return;
+  sizes ??= new ResizeObserver(entries => markAll(entries.map(entry => entry.target)));
+  const held = holders.get(element) ?? 0;
+  if (!held) sizes.observe(element);
+  holders.set(element, held + 1);
+}
+function unobserve(element: Element) {
+  const held = holders.get(element);
+  if (!held) return;
+  if (held > 1) { holders.set(element, held - 1); return; }
+  holders.delete(element);
+  sizes?.unobserve(element);
+}
+
+// Words drawn in a fallback face are narrower or wider once the page's fonts
+// arrive. Asking for `document.fonts.ready` lays out a page that has changed,
+// so it is asked once, while a measure has just laid the page out anyway.
+let fontsHooked = false;
+function hookFonts() {
+  if (fontsHooked || typeof document === "undefined") return;
+  fontsHooked = true;
+  const again = () => { for (const watcher of live) schedule(watcher); };
+  const fonts = document.fonts;
+  fonts?.ready?.then(again, () => {});
+  fonts?.addEventListener?.("loadingdone", again);
+}
+
 /** A watcher that marks the elements it watches `data-cut="end"` while their words do not fit. */
 export function watchCuts(options: CutWatchOptions = {}): CutWatcher {
   const sources: CutSource[] = [];
   let watched = new Set<Element>();
-  let stopped = false;
-  const sizes = typeof ResizeObserver === "undefined"
-    ? undefined
-    : new ResizeObserver(entries => { for (const entry of entries) markCut(entry.target); });
   const words = options.text && typeof MutationObserver !== "undefined"
-    ? new MutationObserver(() => { for (const element of watched) markCut(element); })
+    ? new MutationObserver(() => schedule(self))
     : undefined;
 
   const collect = () => {
@@ -101,42 +185,44 @@ export function watchCuts(options: CutWatchOptions = {}): CutWatcher {
     return found;
   };
 
-  const measure = () => {
-    if (stopped) return;
-    const next = collect();
-    let changed = next.size !== watched.size;
-    for (const element of watched) {
-      if (!next.has(element)) { sizes?.unobserve(element); changed = true; }
-    }
-    for (const element of next) {
-      if (!watched.has(element)) { sizes?.observe(element); changed = true; }
-    }
-    // A MutationObserver cannot let one element go, so it starts again when the set changes.
-    if (words && changed) {
-      words.disconnect();
-      for (const element of next) words.observe(element, { childList: true, characterData: true, subtree: true });
-    }
-    watched = next;
-    for (const element of watched) markCut(element);
+  const self: Watched = {
+    stopped: false,
+    refresh() {
+      const next = collect();
+      let changed = next.size !== watched.size;
+      for (const element of watched) {
+        if (!next.has(element)) { unobserve(element); changed = true; }
+      }
+      for (const element of next) {
+        if (!watched.has(element)) { observe(element); changed = true; }
+      }
+      // A MutationObserver cannot let one element go, so it starts again when the set changes.
+      if (words && changed) {
+        words.disconnect();
+        for (const element of next) words.observe(element, { childList: true, characterData: true, subtree: true });
+      }
+      watched = next;
+      return watched;
+    },
   };
-
-  // Words drawn in a fallback face are narrower or wider once the page's fonts arrive.
-  const fonts = typeof document === "undefined" ? undefined : document.fonts?.ready;
-  if (fonts && typeof fonts.then === "function") fonts.then(measure, () => {});
+  live.add(self);
 
   return {
-    watch(source) { sources.push(source); measure(); },
-    select(root, selector) { sources.push(() => root.querySelectorAll(selector)); measure(); },
-    measure,
+    watch(source) { sources.push(source); schedule(self); },
+    select(root, selector) { sources.push(() => root.querySelectorAll(selector)); schedule(self); },
+    measure() { schedule(self); },
     disconnect() {
-      stopped = true;
-      sizes?.disconnect();
+      self.stopped = true;
+      live.delete(self);
+      queued.delete(self);
+      for (const element of watched) unobserve(element);
       words?.disconnect();
       watched = new Set();
       sources.length = 0;
     },
   };
 }
+
 
 /**
  * The part of a Lit element `CutFades` uses, so this module needs nothing from
@@ -214,16 +300,12 @@ export class CutFades {
 export function startCutFades(root: ParentNode = document, selector: string = CUT_FADE_SELECTOR): () => void {
   const watcher = watchCuts();
   watcher.select(root, selector);
-  let frame = 0;
-  const later = () => {
-    if (frame) return;
-    frame = requestAnimationFrame(() => { frame = 0; watcher.measure(); });
-  };
-  const changes = typeof MutationObserver === "undefined" ? undefined : new MutationObserver(later);
+  // The page is marked as it starts, in one pass; its changes are measured in the frame after them.
+  markAll(root.querySelectorAll(selector));
+  const changes = typeof MutationObserver === "undefined" ? undefined : new MutationObserver(() => watcher.measure());
   const node = root instanceof Document ? root.documentElement : (root as Node);
   changes?.observe(node, { childList: true, characterData: true, subtree: true });
   return () => {
-    if (frame) cancelAnimationFrame(frame);
     changes?.disconnect();
     watcher.disconnect();
   };

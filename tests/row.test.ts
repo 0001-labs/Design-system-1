@@ -177,9 +177,12 @@ test("the element marks a name cut while its words are wider than its box, and u
   // happy-dom has no layout: stand in for the measures a browser would give.
   Object.defineProperty(name, "scrollWidth", { value: 120, configurable: true });
   Object.defineProperty(name, "clientWidth", { value: 80, configurable: true });
+  const frame = () => new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
   (element as unknown as { measureNames: () => void }).measureNames();
+  await frame();
   expect(name.getAttribute("data-cut")).toBe("end");
   Object.defineProperty(name, "clientWidth", { value: 120, configurable: true });
   (element as unknown as { measureNames: () => void }).measureNames();
+  await frame();
   expect(name.hasAttribute("data-cut")).toBe(false);
 });

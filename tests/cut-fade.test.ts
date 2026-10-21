@@ -13,6 +13,9 @@ await import("../DS1/2-core/ds-tag");
 
 afterEach(() => document.body.replaceChildren());
 
+/** Every watcher measures in the next frame, all together. */
+const frame = () => new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
+
 /** happy-dom has no layout: stand in for the measures a browser would give. */
 function measures(element: Element, scroll: number, client: number) {
   Object.defineProperty(element, "scrollWidth", { value: scroll, configurable: true });
@@ -59,10 +62,12 @@ test("a literal ds-text wider than its box is marked cut, and loses the mark whe
   measures(text, 240, 120);
   text.requestUpdate();
   await text.updateComplete;
+  await frame();
   expect(text.getAttribute("data-cut")).toBe("end");
   measures(text, 120, 120);
   text.text = "Short";
   await text.updateComplete;
+  await frame();
   expect(text.hasAttribute("data-cut")).toBe(false);
 });
 
@@ -73,6 +78,7 @@ test("a translated ds-text is never measured: only words someone wrote are cut",
   measures(text, 240, 120);
   text.requestUpdate();
   await text.updateComplete;
+  await frame();
   expect(text.hasAttribute("data-cut")).toBe(false);
 });
 
@@ -84,10 +90,12 @@ test("a row's slotted ds-text literal name is marked cut by the row and the text
   measures(name, 200, 80);
   row.requestUpdate();
   await row.updateComplete;
+  await frame();
   expect(name.getAttribute("data-cut")).toBe("end");
   measures(name, 80, 80);
   row.requestUpdate();
   await row.updateComplete;
+  await frame();
   expect(name.hasAttribute("data-cut")).toBe(false);
 });
 
@@ -105,13 +113,14 @@ test("a tag's and a button's words are marked, never the filled frame", async ()
   button.requestUpdate();
   await tag.updateComplete;
   await button.updateComplete;
+  await frame();
   expect(words.getAttribute("data-cut")).toBe("end");
   expect(tag.shadowRoot!.querySelector(".frame")!.hasAttribute("data-cut")).toBe(false);
   expect(label.getAttribute("data-cut")).toBe("end");
   expect(button.shadowRoot!.querySelector('[part="control"]')!.hasAttribute("data-cut")).toBe(false);
 });
 
-test("the watcher marks what a selector finds at each measure, and lets go when disconnected", () => {
+test("the watcher marks what a selector finds at each measure, and lets go when disconnected", async () => {
   document.body.innerHTML = `<p class="words">One</p>`;
   const watcher = watchCuts();
   watcher.select(document.body, ".words");
@@ -123,11 +132,15 @@ test("the watcher marks what a selector finds at each measure, and lets go when 
   measures(second, 100, 50);
   document.body.append(second);
   watcher.measure();
+  // Nothing is read until the frame, where every watcher measures together.
+  expect(first.hasAttribute("data-cut")).toBe(false);
+  await frame();
   expect(first.getAttribute("data-cut")).toBe("end");
   expect(second.getAttribute("data-cut")).toBe("end");
   watcher.disconnect();
   measures(first, 50, 50);
   watcher.measure();
+  await frame();
   expect(first.getAttribute("data-cut")).toBe("end");
 });
 
