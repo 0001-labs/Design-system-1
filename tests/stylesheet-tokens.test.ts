@@ -151,7 +151,6 @@ const offMeasures: Record<string, string> = {
   "2-core/styles/ds-toast.css width 14": "the page toaster's inline icons",
   "2-core/styles/ds-toast.css height 14": "the page toaster's inline icons",
   "2-core/styles/ds-toast.css corner 1": "a toast button's focus ring",
-  "3-unit/styles/ds-list.css gap 8": "columns of a list: off the grid, to be decided",
   "3-unit/styles/ds-matrix.css width 7": "a matrix's cell marks",
   "3-unit/styles/ds-matrix.css height 7": "a matrix's cell marks",
   "3-unit/styles/ds-matrix.css width 8": "a matrix's cell marks",
