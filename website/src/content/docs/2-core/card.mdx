@@ -36,7 +36,7 @@ A card shows one thing among others: its name, a title, a line of writing and a 
 | `variant` | `filled` (the default) or `outlined`, a 1px line and no fill. |
 | `width`, `height` | The size in whole squares. |
 | `padding` | `none`, `small` (half a square), `medium` (one, the default) or `large` (two). |
-| `media` | Where the picture stands: `start`, `center` or `bleed` (on past the padding to the end edge). |
+| `media` | Where the picture stands: `start`, `center` or `bleed` (on to the end edge and down to the foot, its corners there the card's). |
 | `disabled` | Neither pressed nor followed. |
 
 | Slot | Holds |
@@ -51,6 +51,6 @@ The corners are a card's (`--ds-radius-card`, 4px by default); a product sets `-
 ## Accessibility
 
 - A card with `href` is one link and a card with `interactive` one button: never put a second link or button inside either. Keyboard focus rings it 2px inside.
-- The pointer tints the card and its picture rises a little; with reduced motion the picture stays still.
+- The pointer tints the card; nothing in it moves.
 
 [Slide](/3-unit/slide/) · [Row](/3-unit/row/)

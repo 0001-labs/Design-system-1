@@ -5,8 +5,9 @@
  * A site header, as plain classes on native elements.
  *
  * One row of one square, a square of room around it: the brand at the start
- * in twelve squares (as a page's navigation column is, so the links stand
- * over the work), the navigation two squares after it, the actions at the end. Every link is
+ * (at least twelve squares), the navigation in the middle of the row, centred
+ * on the page whatever the brand and the actions hold, the actions at the end:
+ * three columns, the two outer ones sharing what the middle leaves. Every link is
  * one square high, a square apart, in the text's ink; the page you are on
  * (`aria-current="page"`) stands on a hairline of the full ink, the others
  * show a faint one under the pointer. Below thirty squares of width the
@@ -30,7 +31,8 @@
 .ds-header {
   box-sizing: border-box;
   container-type: inline-size;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(max-content, 1fr) auto minmax(max-content, 1fr);
   align-items: center;
   gap: calc(2 * var(--ds-unit));
   min-width: 0;
@@ -56,6 +58,8 @@
 
 .ds-header__brand {
   box-sizing: border-box;
+  grid-column: 1;
+  justify-self: start;
   display: inline-flex;
   flex: 0 0 auto;
   min-width: var(--ds-header-brand, calc(12 * var(--ds-unit)));
@@ -85,17 +89,18 @@
   padding: 0;
 }
 
-.ds-header__nav {
-  flex: 1 1 auto;
+.ds-header > .ds-header__nav {
+  grid-column: 2;
+  justify-content: center;
   flex-wrap: wrap;
   row-gap: 0;
 }
 
-.ds-header__actions {
-  flex: 0 0 auto;
+.ds-header > .ds-header__actions {
+  grid-column: 3;
+  justify-self: end;
   justify-content: flex-end;
   gap: calc(var(--ds-unit) / 2);
-  margin-inline-start: auto;
 }
 
 /* A link in the navigation: the text's ink on a one-square line. */
@@ -128,7 +133,8 @@
    Two classes, so the button's own display and margin do not undo it. */
 .ds-header > .ds-header__toggle {
   display: none;
-  margin-inline-start: auto;
+  grid-column: 3;
+  justify-self: end;
   /* Centred in the last square of the row, where the close button stands too. */
   margin-inline-end: calc((var(--ds-unit) - var(--ds-control-height)) / 2);
 }

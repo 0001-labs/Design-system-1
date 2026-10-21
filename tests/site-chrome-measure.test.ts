@@ -81,7 +81,7 @@ async function headerBox(page: Page) {
   });
 }
 
-test("a header is one row of one square with a square around it, its links over the work fifteen squares in", async () => {
+test("a header is one row of one square with a square around it, its links in the middle of the row where they fit", async () => {
   for (const scheme of SCHEMES) for (const scale of SCALES) {
     const boxes = [];
     for (const markup of [NATIVE_HEADER, LIT_HEADER]) {
@@ -94,7 +94,10 @@ test("a header is one row of one square with a square around it, its links over 
       expect(box.height, at).toBeCloseTo(3 * unit, 5);
       expect(box.brand!.left, at).toBeCloseTo(unit, 5);
       expect(box.brand!.width, at).toBeCloseTo(12 * unit, 5);
-      expect(box.nav!.left, at).toBeCloseTo(15 * unit, 5);
+      // Centred on the row where the brand's twelve squares leave room; else two squares after the brand.
+      const nav = box.nav!;
+      if ((nav.left + nav.width + nav.right - nav.width) / 2 >= 15 * unit) expect(nav.left, `${at}: the links centred`).toBeCloseTo(nav.right, 0);
+      else expect(nav.left, `${at}: the links after the brand`).toBeCloseTo(15 * unit, 5);
       for (const link of box.links) {
         expect(link!.height, at).toBeCloseTo(unit, 5);
         expect(link!.top, at).toBeCloseTo(unit, 5);

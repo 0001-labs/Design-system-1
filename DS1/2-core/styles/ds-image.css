@@ -2,7 +2,8 @@
 :host { display: block; width: 100%; max-width: 100%; min-width: 0; }
 :host([hidden]) { display: none !important; }
 figure { margin: 0; }
-.media { overflow: hidden; border-radius: var(--ds-radius); background: var(--ds-image-background, var(--ds-fill)); }
+/* A picture's corners; a container whose edges cut it (a card's bleed) squares the end and the foot. */
+.media { overflow: hidden; border-radius: var(--ds-radius); border-start-end-radius: var(--ds-image-end-radius, var(--ds-radius)); border-end-end-radius: var(--ds-image-end-radius, var(--ds-radius)); border-end-start-radius: var(--ds-image-foot-radius, var(--ds-radius)); background: var(--ds-image-background, var(--ds-fill)); }
 img { display: block; width: 100%; max-width: 100%; }
 figcaption {
   margin-top: calc(var(--ds-unit) / 2);

@@ -5,7 +5,7 @@ description: A site header with its navigation, the page you are on and its acti
 
 import ComponentExample from "../../../components/ComponentExample.astro";
 
-A site header is one row of one square with a square of room around it: the brand at the start, in twelve squares as a page's navigation column is, so the links stand over the work; the navigation two squares after it; the actions at the end. Every link is one square high, a square apart, in the text's ink. The page you are on (`aria-current="page"`) stands on a hairline of the full ink, the others show a faint one under the pointer.
+A site header is one row of one square with a square of room around it: the brand at the start, in at least twelve squares; the navigation in the middle, centred on the row whatever the brand and the actions hold; the actions at the end. Where the row is too narrow to centre the links clear of the brand, they stand two squares after it. Every link is one square high, a square apart, in the text's ink. The page you are on (`aria-current="page"`) stands on a hairline of the full ink, the others show a faint one under the pointer.
 
 Below thirty squares of width the navigation and actions fold away. A menu button, an icon button in the row's last square, opens them over the whole screen, [Overlay](/4-page/overlay/#the-screen)'s screen type on the page's paper, its close button where the menu button stood, the links one square each. While it is open, Tab and Shift+Tab go round its controls and never leave it, Escape, the close button, a link or the screen widening close it, and the page behind holds its scroll and gets it back as it was. Closing returns focus to the menu button.
 
