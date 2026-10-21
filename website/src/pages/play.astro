@@ -9,6 +9,7 @@ import '../../../DS1/1-root/row.css';
 import PublicPreferences from '../components/PublicPreferences.astro';
 import ExampleDevice from '../components/ExampleDevice.astro';
 import { LIBRARIES } from '../lib/library-example-parts';
+import { PLAYGROUND_SITES } from '../lib/playground-sites';
 // The libraries a reader can try the site in, after Design system 1 itself.
 const libraries = (['graphite', 'studio', 'voyage', 'lagoon', 'bloom', 'grove', 'signal'] as const).map(id => ({ id, name: LIBRARIES[id].name }));
 ---
@@ -26,6 +27,12 @@ const libraries = (['graphite', 'studio', 'voyage', 'lagoon', 'bloom', 'grove', 
     <header class="play-bar">
       <a class="play-brand" href="https://designsystem1.com/">Design system 1</a>
       <span class="play-grow"></span>
+      <ds-select class="play-example"><select id="play-example" aria-label="Example">
+        <option value={PLAYGROUND_SITES[0].id}>{PLAYGROUND_SITES[0].name}</option>
+        <optgroup label="Drawn with a library">
+          {PLAYGROUND_SITES.slice(1).map(example => <option value={example.id}>{example.name}</option>)}
+        </optgroup>
+      </select></ds-select>
       <ds-select class="play-library"><select id="play-library" aria-label="Library">
         <option value="">Design system 1</option>
         {libraries.map(library => <option value={library.id}>{library.name}</option>)}
@@ -40,7 +47,6 @@ const libraries = (['graphite', 'studio', 'voyage', 'lagoon', 'bloom', 'grove', 
       <nav class="play-files" aria-label="Files">
         <ds-text literal tone="muted" class="play-files-title">Files</ds-text>
         <div id="play-file-list"></div>
-        <ds-button id="play-new-page"><ds-icon type="plus" aria-hidden="true"></ds-icon><span>New page</span></ds-button>
       </nav>
       <section class="play-code" aria-label="The selected file">
         <div id="play-editor"></div>
@@ -51,10 +57,11 @@ const libraries = (['graphite', 'studio', 'voyage', 'lagoon', 'bloom', 'grove', 
     </main>
     <script>
       import '../../../DS1/index';
-      import { confirm, prompt } from '../../../DS1/0-face/feedback';
+      import { confirm } from '../../../DS1/0-face/feedback';
       import { copyText } from '../../../DS1/0-face/copy-text';
       import { onChoice } from '../lib/example-controls';
-      import { PLAYGROUND_FILES, type PlaygroundFile } from '../lib/playground-example';
+      import type { PlaygroundFile } from '../lib/playground-example';
+      import { PLAYGROUND_SITES } from '../lib/playground-sites';
       import { createPlaygroundEditor } from '../lib/playground-editor';
       import { zip } from '../lib/zip';
 
@@ -62,10 +69,14 @@ const libraries = (['graphite', 'studio', 'voyage', 'lagoon', 'bloom', 'grove', 
       const play = document.querySelector<HTMLElement>('.play')!;
       const library = document.querySelector<HTMLSelectElement>('#play-library')!;
       const list = document.querySelector<HTMLElement>('#play-file-list')!;
+      const exampleMenu = document.querySelector<HTMLSelectElement>('#play-example')!;
 
-      // The site: its files, the one open in the editor and the page shown beside it.
-      type Site = { files: PlaygroundFile[]; open: string; page: string };
-      const fresh = (): Site => ({ files: PLAYGROUND_FILES.map(file => ({ ...file })), open: 'index.html', page: 'index.html' });
+      // The site: the example it started from, its files, the one open in the editor and the page
+      // shown beside it.
+      type Site = { example: string; files: PlaygroundFile[]; open: string; page: string };
+      const exampleOf = (id: string) => PLAYGROUND_SITES.find(entry => entry.id === id) ?? PLAYGROUND_SITES[0];
+      const fresh = (id = PLAYGROUND_SITES[0].id): Site => ({ example: exampleOf(id).id, files: exampleOf(id).files.map(file => ({ ...file })), open: 'index.html', page: 'index.html' });
+      const untouched = () => JSON.stringify(site.files) === JSON.stringify(exampleOf(site.example).files);
       function stored(): Site | null {
         try {
           const site = JSON.parse(localStorage.getItem(KEY) ?? 'null') as Site | null;
@@ -218,34 +229,29 @@ const libraries = (['graphite', 'studio', 'voyage', 'lagoon', 'bloom', 'grove', 
         show();
       });
 
-      document.querySelector('#play-new-page')!.addEventListener('click', async () => {
-        const answer = await prompt({ title: 'New page', label: 'File name', value: 'about.html', confirm: 'Add page' });
-        if (!answer) return;
-        const name = answer.trim().toLowerCase().replace(/[^a-z0-9.-]+/g, '-').replace(/(\.html)?$/, '.html');
-        if (!file(name)) {
-          const title = name.replace(/\.html$/, '').replace(/-/g, ' ').replace(/^./, letter => letter.toUpperCase());
-          const model = file('index.html')?.content ?? PLAYGROUND_FILES[0].content;
-          const headEnd = model.indexOf('</head>');
-          const head = headEnd < 0 ? '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n' : model.slice(0, headEnd).replace(/<title>[^<]*<\/title>/i, `<title>${title}</title>`);
-          // New pages stand after the other pages, before the stylesheets.
-          const firstSheet = site.files.findIndex(entry => !isPage(entry.name));
-          site.files.splice(firstSheet < 0 ? site.files.length : firstSheet, 0, {
-            name,
-            content: `${head}</head>\n<body>\n  <ds-page layout="column">\n    <ds-text literal size="display" strong wrap role="heading" aria-level="1">${title}</ds-text>\n    <ds-text literal wrap>A new page. Link to it from another with <a href="${name}">${name}</a>.</ds-text>\n    <ds-button href="index.html">Back home</ds-button>\n  </ds-page>\n</body>\n</html>\n`,
-          });
-        }
-        open(name);
-      });
-
       onChoice(document.querySelector('[data-preview-width]'), value => { play.toggleAttribute('data-phone', value === 'phone'); });
       onChoice(document.querySelector('[data-pane-choice]'), value => { play.dataset.pane = value; });
 
-      document.querySelector('#play-reset')!.addEventListener('click', async () => {
-        if (!(await confirm({ title: 'Start again?', text: 'Your site is replaced by the example.', confirm: 'Start again', danger: true }))) return;
-        site = fresh();
+      // Another example replaces the site, asking first when the site has been changed.
+      function start(id: string) {
+        site = fresh(id);
         keep();
-        library.value = '';
+        exampleMenu.value = site.example;
+        library.value = libraryIn(file('index.html')!.content);
         open(site.open);
+      }
+      exampleMenu.addEventListener('change', async () => {
+        const id = exampleMenu.value;
+        if (!untouched() && !(await confirm({ title: `Open ${exampleOf(id).name}?`, text: 'Your changes to this site are replaced by the example.', confirm: 'Open example', danger: true }))) {
+          exampleMenu.value = site.example;
+          return;
+        }
+        start(id);
+      });
+      document.querySelector('#play-reset')!.addEventListener('click', async () => {
+        if (untouched()) return;
+        if (!(await confirm({ title: 'Start again?', text: 'Your site is replaced by the example.', confirm: 'Start again', danger: true }))) return;
+        start(site.example);
       });
       document.querySelector('#play-copy')!.addEventListener('click', () => { void copyText(editor.value); });
       document.querySelector('#play-download')!.addEventListener('click', () => {
@@ -257,6 +263,8 @@ const libraries = (['graphite', 'studio', 'voyage', 'lagoon', 'bloom', 'grove', 
       });
 
       renderFiles();
+      site.example = exampleOf(site.example).id;
+      exampleMenu.value = site.example;
       library.value = libraryIn(file(site.page)?.content ?? '');
       current.addEventListener('load', () => { if (current.contentWindow?.location.href === 'about:srcdoc') wire(current); });
       shown = compose(site.page);
@@ -285,9 +293,8 @@ const libraries = (['graphite', 'studio', 'voyage', 'lagoon', 'bloom', 'grove', 
   /* The files: a sidebar's rows, one square each, the open file current. */
   .play-files { display: flex; flex-direction: column; gap: 0; min-height: 0; padding: var(--ds-unit) calc(var(--ds-unit) / 2) var(--ds-unit) var(--ds-unit); overflow-y: auto; border-right: 1px solid var(--ds-border-color); }
   .play-files-title { padding-top: calc(4px * var(--sf, 1)); line-height: calc(16px * var(--sf, 1)); }
-  .play-files #play-file-list { display: grid; margin-block: calc(var(--ds-unit) / 2) var(--ds-unit); }
+  .play-files #play-file-list { display: grid; margin-top: calc(var(--ds-unit) / 2); }
   .play-file { width: 100%; border: 0; background: none; font: inherit; color: inherit; text-align: start; cursor: pointer; }
-  .play-files #play-new-page { align-self: flex-start; }
 
   /* A dark editor whatever the page's theme, as code editors are: line numbers, then Aa's block in
      the code face, one square a line, never wrapping. */

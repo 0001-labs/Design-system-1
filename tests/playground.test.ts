@@ -34,3 +34,16 @@ it('colours HTML and what a page holds, and takes a half-written tag as it comes
   expect(kinds('1')).toContain('number');
   expect(kinds('<ds-butt')).toContain('tag');
 });
+
+it('opens every library example as one page in its library, which the library picker can change', async () => {
+  const { PLAYGROUND_SITES } = await import('../website/src/lib/playground-sites');
+  const LIBRARY_LINK = /\n[ \t]*<link rel="stylesheet" href="https:\/\/designsystem1\.com\/examples\/libraries\/([a-z]+)\.css">/;
+  expect(PLAYGROUND_SITES[0].id).toBe('garden');
+  for (const site of PLAYGROUND_SITES.slice(1)) {
+    const page = site.files[0].content;
+    expect(site.files.map(file => file.name), site.id).toEqual(['index.html']);
+    expect(LIBRARY_LINK.exec(page)?.[1], site.id).toBe(site.library);
+    expect(page, site.id).toContain('https://designsystem1.com/resources/design-system-1.js');
+    expect(page, site.id).not.toMatch(/(?:src|href)="\/(?!\/)/);
+  }
+});
