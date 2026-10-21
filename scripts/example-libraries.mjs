@@ -15,7 +15,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const root = new URL('..', import.meta.url).pathname;
+const root = fileURLToPath(new URL('..', import.meta.url));
 
 const version = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).version;
 const revision = /LIBRARY_REVISION = "([^"]+)"/.exec(readFileSync(join(root, 'DS1/1-root/library-tokens.ts'), 'utf8'))[1];

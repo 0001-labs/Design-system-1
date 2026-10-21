@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { expect, it } from 'vitest';
+import { expect, it } from 'vite-plus/test';
 import { setExamplesDevice } from '../website/src/lib/examples-device';
 
 it('switches layout and HTML previews together and clears the previous device', () => {
