@@ -81,6 +81,7 @@ export abstract class CalendarBase extends LitElement {
     label: { type: String },
     literal: { type: Boolean, reflect: true },
     events: { attribute: false },
+    dayAllowed: { attribute: false },
     focusDay: { state: true },
     hoverDay: { state: true },
     endPending: { state: true },
@@ -92,6 +93,8 @@ export abstract class CalendarBase extends LitElement {
   declare min: string | undefined;
   /** The last day a person may choose. */
   declare max: string | undefined;
+  /** Which days between min and max a person may choose, such as the days with room left; every one when left out. Set a new function to draw the days again. */
+  declare dayAllowed: ((day: Day) => boolean) | undefined;
   /** The day drawn as today; the reader's own today when left out. */
   declare today: string | undefined;
   /** The first day of the week: `0`–`6` from Sunday, or a day's English name; the language's own when left out. */
@@ -177,7 +180,7 @@ export abstract class CalendarBase extends LitElement {
 
   /** Whether a person may choose the day. */
   protected allowed(day: Day): boolean {
-    return clampDay(day, this.minDay, this.maxDay) === day;
+    return clampDay(day, this.minDay, this.maxDay) === day && (this.dayAllowed?.(day) ?? true);
   }
 
   /** The chosen days: the first and the last of a range, or the one day twice. */

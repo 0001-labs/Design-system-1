@@ -94,6 +94,21 @@ test("days outside min and max cannot be chosen", async () => {
   expect(calendar.value).toBe("");
 });
 
+test("dayAllowed leaves out the days it says no to, between min and max", async () => {
+  const calendar = await mount<Calendar>(`<ds-calendar month="2026-10" selectable min="2026-10-10"></ds-calendar>`);
+  calendar.dayAllowed = day => day.endsWith("2") || day.endsWith("4");
+  await calendar.updateComplete;
+  expect(cell(calendar, "2026-10-13").getAttribute("aria-disabled")).toBe("true");
+  expect(cell(calendar, "2026-10-02").getAttribute("aria-disabled")).toBe("true");
+  expect(cell(calendar, "2026-10-12").hasAttribute("aria-disabled")).toBe(false);
+  cell(calendar, "2026-10-13").click();
+  expect(calendar.value).toBe("");
+  cell(calendar, "2026-10-12").click();
+  cell(calendar, "2026-10-14").click();
+  expect(calendar.value).toBe("2026-10-12/2026-10-14");
+  expect(calendar.hasAttribute("dayallowed")).toBe(false);
+});
+
 test("the keys move a day, a week and a month, and carry the month along", async () => {
   const calendar = await mount<Calendar>(`<ds-calendar month="2026-10" today="2026-10-31" week-start="1"></ds-calendar>`);
   const months: string[] = [];

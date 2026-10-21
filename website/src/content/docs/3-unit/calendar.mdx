@@ -221,7 +221,11 @@ A day lists its events longest first, then by time. An event over several days k
 
 A day is written `YYYY-MM-DD` and stays on its date in every time zone. The week starts where the language starts it (Monday in most of Europe, Sunday in the United States and Japan); `week-start` sets it, `0`–`6` from Sunday or a day's English name. Month and weekday names come from the current language.
 
-`min` and `max` limit the days a person may choose: the days outside them are drawn faint and cannot be selected. `today` draws another day as today, for a preview or a test.
+`min` and `max` limit the days a person may choose: the days outside them are drawn faint and cannot be selected. `dayAllowed`, a property taking a function from a day to true or false, leaves out more days between them, such as the days a booking has no room left. Set a new function when what it reads changes, and the days are drawn again. `today` draws another day as today, for a preview or a test.
+
+```js
+calendar.dayAllowed = day => room.has(day);
+```
 
 The day arithmetic the calendars use is `DS1/0-face/calendar.ts`, plain TypeScript without Lit: `monthWeeks`, `addDays`, `addMonths`, `firstWeekday`, `weekdayNames`, `isoWeek`, `eventsByDay` and the rest.
 
@@ -268,7 +272,7 @@ The day arithmetic the calendars use is `DS1/0-face/calendar.ts`, plain TypeScri
 | `disabled` | boolean | `false` | A picker cannot be opened. |
 | `open` | boolean | `false` | A picker's panel is open. |
 
-Properties only: `events`, the days' events, and `monthHeading`, `(month: Date) => string`, the month view's title (see [the month's title](#the-months-title)).
+Properties only: `events`, the days' events; `monthHeading`, `(month: Date) => string`, the month view's title (see [the month's title](#the-months-title)); and `dayAllowed`, `(day: string) => boolean`, the days that may be chosen between `min` and `max` (see [days and weeks](#days-and-weeks)).
 
 ### `ds-calendar-large`
 
