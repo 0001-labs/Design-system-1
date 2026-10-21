@@ -10,19 +10,15 @@ packages:
   - "services"
   - "website"
 catalog:
-  vite: npm:@voidzero-dev/vite-plus-core@0.2.8
-  vitest: 4.1.10
-  vite-plus: 0.2.8
+  vite: npm:@voidzero-dev/vite-plus-core@1.3.0
+  vite-plus: 1.3.0
 overrides:
   astro>vite: "^6.4.1"
-  vite: "catalog:"
-  vitest: "catalog:"
+  vite@*: "catalog:"
 peerDependencyRules:
   allowAny:
     - vite
-    - vitest
   allowedVersions:
     vite: "*"
-    vitest: "*"
 patchedDependencies:
-  '@astrojs/starlight@0.36.3': patches/@astrojs__starlight@0.36.3.patch
+  "@astrojs/starlight@0.36.3": patches/@astrojs__starlight@0.36.3.patch

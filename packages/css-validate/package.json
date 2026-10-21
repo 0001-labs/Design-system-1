@@ -1,30 +1,29 @@
 {
   "name": "@ds-one/css-validate",
   "version": "0.3.0-alpha.28",
-  "description": "Publish-time CSS validation for hosted DS1 libraries. Runs unchanged in the browser and in a Cloudflare Worker.",
   "private": true,
+  "description": "Publish-time CSS validation for hosted DS1 libraries. Runs unchanged in the browser and in a Cloudflare Worker.",
   "license": "MIT",
+  "files": [
+    "src"
+  ],
   "type": "module",
   "exports": {
     ".": "./src/index.ts"
   },
-  "files": [
-    "src"
-  ],
   "scripts": {
     "test": "vp test",
     "test:watch": "vp test --watch",
     "typecheck": "vp exec tsc --noEmit"
   },
-  "//": "Exactly one runtime dependency on purpose: this module is bundled into a Cloudflare Worker. Tests use the Vite+ runner.",
   "dependencies": {
     "css-tree": "^3.2.1"
   },
   "devDependencies": {
     "@types/css-tree": "^2.3.11",
     "typescript": "^5.0.0",
-    "vite-plus": "catalog:",
     "vite": "catalog:",
-    "vitest": "catalog:"
-  }
+    "vite-plus": "catalog:"
+  },
+  "//": "Exactly one runtime dependency on purpose: this module is bundled into a Cloudflare Worker. Tests use the Vite+ runner."
 }

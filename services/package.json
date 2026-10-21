@@ -1,8 +1,8 @@
 {
   "name": "@ds-one/services",
   "version": "0.3.0-alpha.28",
-  "description": "The Design system 1 Cloudflare Worker: website, app, public stylesheets, and authenticated publishing.",
   "private": true,
+  "description": "The Design system 1 Cloudflare Worker: website, app, public stylesheets, and authenticated publishing.",
   "type": "module",
   "scripts": {
     "test": "vp test",
@@ -15,17 +15,16 @@
     "smoke": "vp exec tsx scripts/smoke.ts",
     "dryrun": "vp exec wrangler deploy --config ../wrangler.jsonc --dry-run"
   },
-  "//": "Tests use the Vite+ runner with Miniflare and an esbuild-bundled Worker entry.",
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250109.0",
-    "miniflare": "^4.20250109.0",
-    "typescript": "^5.0.0",
-    "wrangler": "^4.26.1",
-    "vite-plus": "catalog:",
-    "vite": "catalog:",
-    "tsx": "^4.21.0",
     "@types/node": "^24.0.0",
-    "vitest": "catalog:",
-    "esbuild": "^0.27.0"
-  }
+    "esbuild": "^0.27.0",
+    "miniflare": "^4.20250109.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.0.0",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "wrangler": "^4.26.1"
+  },
+  "//": "Tests use the Vite+ runner with Miniflare and an esbuild-bundled Worker entry."
 }

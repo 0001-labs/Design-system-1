@@ -118,3 +118,4 @@ CLAUDE.md
 
 # Private codebase reports are uploaded to authenticated R2 storage, never site assets.
 .reports/
+.vitest/
