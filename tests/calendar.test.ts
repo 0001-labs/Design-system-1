@@ -94,6 +94,12 @@ test("days outside min and max cannot be chosen", async () => {
   expect(calendar.value).toBe("");
 });
 
+test("a date's number is the number alone in every language", () => {
+  expect(days.dateNumber("2026-10-01", "da")).toBe("1");
+  expect(days.dateNumber("2026-10-18", "ja")).toBe("18");
+  expect(days.dateNumber("2026-10-18", "en")).toBe("18");
+});
+
 test("dayAllowed leaves out the days it says no to, between min and max", async () => {
   const calendar = await mount<Calendar>(`<ds-calendar month="2026-10" selectable min="2026-10-10"></ds-calendar>`);
   calendar.dayAllowed = day => day.endsWith("2") || day.endsWith("4");

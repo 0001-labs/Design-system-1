@@ -144,9 +144,11 @@ export const monthTitle = (day: Day, width: "long" | "short" = "long", language?
 export const monthName = (day: Day, width: "long" | "short" = "long", language?: string) =>
   dateFormatter({ month: width, timeZone: "UTC", language }).format(noon(day));
 
-/** The date's number in the language's digits: "18". */
-export const dateNumber = (day: Day, language?: string) =>
-  dateFormatter({ day: "numeric", timeZone: "UTC", language }).format(noon(day));
+/** The date's number alone, in the language's digits: "18", never Danish's "18." or Japanese's "18日". */
+export const dateNumber = (day: Day, language?: string) => {
+  const parts = dateFormatter({ day: "numeric", timeZone: "UTC", language }).formatToParts(noon(day));
+  return parts.find(part => part.type === "day")?.value ?? parts.map(part => part.value).join("");
+};
 
 /** The whole day, for a day's accessible name: "Sunday, 18 October 2026". */
 export const dayLabel = (day: Day, language?: string) =>
