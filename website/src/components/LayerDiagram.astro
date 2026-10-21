@@ -14,7 +14,7 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
   {LAYERS.map((layer, index) => (
     <div class="layer-group" data-color={layer.color}>
       <p class="layer-name">
-        <a class="ds-link" href={`/${layer.number}-${layer.name.toLowerCase()}/overview/`}>{layer.number} {layer.name}</a>
+        <a class="ds-link" href={`/${layer.number}-${layer.name.toLowerCase()}/overview/`}>{layer.name}</a>
         {index < LAYERS.length - 1 && (
           <span class="layer-arrow" aria-hidden="true">
             <svg class="layer-arrow-head" viewBox="-0.17 -0.12 0.17 0.24"><polyline points="-0.164,-0.115 0,0 -0.164,0.115" /></svg>

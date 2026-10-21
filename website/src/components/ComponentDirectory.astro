@@ -10,7 +10,7 @@ import { LAYERS } from '../lib/component-directory';
   {LAYERS.map((layer) => (
     <section class="directory-layer" data-color={layer.color} aria-labelledby={`layer-${layer.number}`}>
       <div class="directory-layer-head">
-        <h3 id={`layer-${layer.number}`}><span class="directory-swatch" aria-hidden="true"></span>{layer.number} {layer.name}</h3>
+        <h3 id={`layer-${layer.number}`}><span class="directory-swatch" aria-hidden="true"></span>{layer.name}</h3>
         <p>{layer.summary}</p>
       </div>
       <LargeDirectoryList entries={layer.entries} />

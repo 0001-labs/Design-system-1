@@ -129,13 +129,7 @@ CSS-only documents can use `color-scheme: light dark` and the existing `light-da
 <span id="component-theming"></span>
 ## Shape
 
-A reader can choose the corners every component draws, as a theme: **Square**, **Rounded** or **Circular**. The choice is remembered and put on the page before its first paint, as `data-ds-shape` on the root, which the components read: square corners, rounded ones (drawn as squircles where the browser can) or pills. Until a reader chooses, the components keep their own corners, or the product's `shapeDefault`.
-
-```html
-<ds-cycle type="shape" label="Shape"></ds-cycle>
-```
-
-From code, `setShape("circular")` and `getShape()` from `0-face/shape.ts`; a change dispatches `shape-changed` on window. The head script that puts the theme on before the first paint (`0-face/theme-bootstrap.js`) puts the shape on too. Set `shapeDefault` and `shapeStorageKey` (`"ds-one:shape"`) on `window.DS_ONE_PREFERENCES` before it. A footer offers it with `<ds-footer preferences="theme shape">`.
+The corners every component draws, square, rounded or circular, are the reader's choice too, put on by the same head script: see [Shape](/1-root/shape/).
 
 ## Component-specific theming
 

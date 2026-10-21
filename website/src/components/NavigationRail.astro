@@ -5,14 +5,16 @@ type Entry = { label: string; href?: string; entries?: Entry[] };
 // last under its name, a layer's name after its colour's square and linked to its overview, and its
 // pages one a line. It is app-owned and adds no public component icons.
 type RailRow = { name: string; href?: string; layer?: string; heading?: boolean; gap?: boolean; section: string };
+// The layers' groups are named alone, Root to Page; their pages' addresses keep the number.
+const LAYER_NUMBERS: Record<string, string> = { Root: '1', Core: '2', Unit: '3', Page: '4' };
 const sentence = (label: string) => label.charAt(0) + label.slice(1).toLowerCase();
 function flatten(entries: Entry[], section = ''): RailRow[] {
   return entries.flatMap((entry, index) => {
-    const layer = entry.label.match(/^([1-4]) (Root|Core|Unit|Page)$/);
+    const layer = LAYER_NUMBERS[entry.label];
     if (entry.entries) {
-      const currentSection = layer?.[1] ?? entry.label;
+      const currentSection = layer ?? entry.label;
       const heading: RailRow = layer
-        ? { name: layer[2], href: `/${layer[1]}-${layer[2].toLowerCase()}/overview/`, layer: layer[1], heading: true, gap: index > 0, section: currentSection }
+        ? { name: entry.label, href: `/${layer}-${entry.label.toLowerCase()}/overview/`, layer, heading: true, gap: index > 0, section: currentSection }
         : { name: sentence(entry.label), heading: true, gap: index > 0, section: currentSection };
       return [heading, ...flatten(entry.entries, currentSection)];
     }
@@ -83,7 +85,7 @@ const here = Astro.url.pathname.replace(/\/$/, '');
     /* Half a square between the last link and the line over the footer. */
     .rail-footer { display: flex; align-items: flex-end; justify-content: space-between; flex: none; height: calc(2 * var(--site-unit)); margin-top: calc(var(--site-unit) / 2); border-top: 1px solid var(--ds1-docs-header-border); }
     .rail-links > :global(.rail-gap) { margin-top: var(--site-unit); }
-    .rail-group { flex: none; height: var(--site-unit); margin: 0; padding: 0; color: var(--ds-text-color-muted, var(--text-color)); line-height: var(--site-unit); }
+    .rail-group { flex: none; height: var(--site-unit); margin: 0; padding: 0; font-size: var(--ds-type-size-default, calc(14px * var(--sf, 1))); color: var(--ds-text-color-muted, var(--text-color)); line-height: var(--site-unit); }
     .docs-navigation-rail :global(.rail-heading a) { display: inline-flex; align-items: flex-end; gap: calc(4px * var(--sf, 1)); }
     .docs-navigation-rail :global(.rail-swatch) { flex: none; width: calc(10px * var(--sf, 1)); height: calc(10px * var(--sf, 1)); margin-bottom: calc(3px * var(--sf, 1)); border-radius: calc(2px * var(--sf, 1)); background: var(--section-color); }
     .docs-navigation-rail :global(.rail-entry) { --section-color: var(--light-grey); --ds-button-text-color: var(--text-color); height: var(--site-unit); align-items: flex-end; align-self: flex-start; }

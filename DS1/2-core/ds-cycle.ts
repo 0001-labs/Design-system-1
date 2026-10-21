@@ -32,24 +32,6 @@ const applyAccentColor = () => {
   document.documentElement.style.setProperty("--accent-color", `var(${color})`);
 };
 
-// Notes style medium utilities
-const saveNotesStyleMedium = (style: string) => {
-  localStorage.setItem("notesStyleMedium", style);
-};
-
-const getNotesStyleMedium = (): string => {
-  return localStorage.getItem("notesStyleMedium") || "note"; // Default to note
-};
-
-// Note behavior utilities
-const savePageStyle = (style: string) => {
-  localStorage.setItem("pageStyle", style);
-};
-
-const getPageStyle = (): string => {
-  return localStorage.getItem("pageStyle") || "note"; // Default to note
-};
-
 // App width utilities removed
 
 // The settings a cycle knows by name. Any other cycle steps through its own
@@ -66,7 +48,7 @@ export function nativeLanguageName(code: string): string {
   return getLanguageDisplayName(code, { locale: code });
 }
 
-const SETTINGS = new Set(["language", "theme", "shape", "accent-color", "notes-style-medium", "page-style", "icon-only"]);
+const SETTINGS = new Set(["language", "theme", "shape", "accent-color"]);
 
 // Use a regular class with proper TypeScript type declarations and JSDoc comments
 export class Cycle extends LitElement {
@@ -121,7 +103,6 @@ export class Cycle extends LitElement {
     handleLanguageChanged: EventListener;
     handleThemeChanged: EventListener;
     handleAccentColorChanged: EventListener;
-    handleNoteBehaviorChanged: EventListener;
   };
 
   constructor() {
@@ -149,7 +130,6 @@ export class Cycle extends LitElement {
       handleLanguageChanged: this.handleLanguageChanged.bind(this),
       handleThemeChanged: this.handleThemeChanged.bind(this),
       handleAccentColorChanged: this.handleAccentColorChanged.bind(this),
-      handleNoteBehaviorChanged: this.handleNoteBehaviorChanged.bind(this),
     };
   }
 
@@ -177,10 +157,6 @@ export class Cycle extends LitElement {
     window.addEventListener(
       "accent-color-changed",
       this.boundHandlers.handleAccentColorChanged
-    );
-    window.addEventListener(
-      "page-style-changed",
-      this.boundHandlers.handleNoteBehaviorChanged
     );
 
     // Initialize the component
@@ -221,30 +197,6 @@ export class Cycle extends LitElement {
 
       // Apply the accent color to ensure it's active
       applyAccentColor();
-    } else if (this.type === "notes-style-medium") {
-      // Set up notes style medium cycling
-      this.values = ["default", "big", "gallery"];
-
-      // Set initial value based on current notes style medium
-      const currentNotesStyle = getNotesStyleMedium();
-      this.currentValue = currentNotesStyle;
-
-      // Check if this should be disabled based on note behavior
-      const currentPageStyle = getPageStyle();
-      this.disabled = currentPageStyle === "note";
-    } else if (this.type === "page-style") {
-      // Set up page style cycling
-      this.values = ["note", "page"];
-
-      // Set initial value based on current page style
-      const currentPageStyle = getPageStyle();
-      this.currentValue = currentPageStyle;
-    } else if (this.type === "icon-only") {
-      // Set up icon-only cycling (no label)
-      this.values = ["note", "page"];
-
-      // Set initial value
-      this.currentValue = this.values[0];
     }
 
     // Request update to re-render with new values
@@ -277,22 +229,6 @@ export class Cycle extends LitElement {
 
       // Apply the accent color to ensure it's active
       applyAccentColor();
-    } else if (this.type === "notes-style-medium") {
-      // Get current notes style medium
-      const currentNotesStyle = getNotesStyleMedium();
-      this.currentValue = currentNotesStyle;
-
-      // Check if this should be disabled based on note behavior
-      const currentPageStyle = getPageStyle();
-      this.disabled = currentPageStyle === "note";
-    } else if (this.type === "page-style") {
-      // Get current page style
-      const currentPageStyle = getPageStyle();
-      this.currentValue = currentPageStyle;
-    } else if (this.type === "icon-only") {
-      // Get current page style for icon-only
-      const currentPageStyle = getPageStyle();
-      this.currentValue = currentPageStyle;
     }
 
     this.requestUpdate();
@@ -323,10 +259,6 @@ export class Cycle extends LitElement {
     window.removeEventListener(
       "accent-color-changed",
       this.boundHandlers.handleAccentColorChanged
-    );
-    window.removeEventListener(
-      "page-style-changed",
-      this.boundHandlers.handleNoteBehaviorChanged
     );
   }
 
@@ -405,69 +337,6 @@ export class Cycle extends LitElement {
           detail: { color: newColor },
         })
       );
-    } else if (this.type === "notes-style-medium") {
-      // Cycle through notes style medium options
-      const currentIndex = this.values.indexOf(this.currentValue);
-      const nextIndex = (currentIndex + 1) % this.values.length;
-      const newStyle = this.values[nextIndex];
-
-      // Update current value
-      this.currentValue = newStyle;
-
-      // Save the new notes style medium
-      saveNotesStyleMedium(newStyle);
-
-      // Save preferences
-      savePreferences({ notesStyleMedium: newStyle });
-
-      // Dispatch notes style medium change event
-      window.dispatchEvent(
-        new CustomEvent("notes-style-medium-changed", {
-          detail: { style: newStyle },
-        })
-      );
-    } else if (this.type === "page-style") {
-      // Cycle through note behavior options
-      const currentIndex = this.values.indexOf(this.currentValue);
-      const nextIndex = (currentIndex + 1) % this.values.length;
-      const newBehavior = this.values[nextIndex];
-
-      // Update current value
-      this.currentValue = newBehavior;
-
-      // Save the new note behavior
-      savePageStyle(newBehavior);
-
-      // Save preferences
-      savePreferences({ pageStyle: newBehavior });
-
-      // Dispatch note behavior change event
-      window.dispatchEvent(
-        new CustomEvent("page-style-changed", {
-          detail: { behavior: newBehavior },
-        })
-      );
-    } else if (this.type === "icon-only") {
-      // Cycle through icon-only options (note/page)
-      const currentIndex = this.values.indexOf(this.currentValue);
-      const nextIndex = (currentIndex + 1) % this.values.length;
-      const newIconOnlyValue = this.values[nextIndex];
-
-      // Update current value
-      this.currentValue = newIconOnlyValue;
-
-      // Save the new page style
-      savePageStyle(newIconOnlyValue);
-
-      // Save preferences
-      savePreferences({ pageStyle: newIconOnlyValue });
-
-      // Dispatch page style change event
-      window.dispatchEvent(
-        new CustomEvent("page-style-changed", {
-          detail: { behavior: newIconOnlyValue },
-        })
-      );
     } else if (!SETTINGS.has(this.type)) {
       const next = this.values[(this.values.indexOf(this.currentValue) + 1) % this.values.length];
       this.currentValue = this.value = next;
@@ -505,29 +374,6 @@ export class Cycle extends LitElement {
     } else if (this.type === "accent-color") {
       // Get color name from CSS variable
       return this.getColorName(value);
-    } else if (this.type === "notes-style-medium") {
-      // Return SVG icon for notes style medium
-      return this.getNotesStyleIcon(value);
-    } else if (this.type === "page-style") {
-      // Return translated text for note behavior
-      if (this.translationsReady) {
-        const translatedText = translate(value === "note" ? "Note" : "Page");
-        if (
-          translatedText &&
-          translatedText !== (value === "note" ? "Note" : "Page")
-        ) {
-          return translatedText;
-        }
-      }
-      return value;
-    } else if (this.type === "icon-only") {
-      // Return SVG icon for icon-only type (note/page icons)
-      if (value === "note") {
-        return html`<ds-icon type="note"></ds-icon>`;
-      } else if (value === "page") {
-        return html`<ds-icon type="page"></ds-icon>`;
-      }
-      return html`<span>${value}</span>`;
     }
 
     return value;
@@ -574,21 +420,6 @@ export class Cycle extends LitElement {
     return colorVar.replace("--", "").replace("-", " ");
   }
 
-  getNotesStyleIcon(style: string) {
-    if (style === "page") {
-      return html`<ds-icon type="page"></ds-icon>`;
-    } else if (style === "note") {
-      return html`<ds-icon type="note"></ds-icon>`;
-    } else if (style === "default") {
-      return html`<ds-icon type="default"></ds-icon>`;
-    } else if (style === "big") {
-      return html`<ds-icon type="big"></ds-icon>`;
-    } else if (style === "gallery") {
-      return html`<ds-icon type="gallery"></ds-icon>`;
-    }
-    return html`<span>${style}</span>`;
-  }
-
   /**
    * A cycle without a stated look takes the one its type has always had: the
    * language and theme cycles are grey chips, every other one, the accent
@@ -618,7 +449,6 @@ export class Cycle extends LitElement {
     if (this.type === "language") return nativeLanguageName(value);
     if (this.type === "theme") return translate(value === "light" ? "Light" : value === "dark" ? "Dark" : "System");
     if (this.type === "accent-color") return translate(this.getColorKey(value));
-    if (this.type === "page-style" || this.type === "icon-only") return translate(value === "note" ? "Note" : "Page");
     return value;
   }
 
@@ -661,12 +491,7 @@ export class Cycle extends LitElement {
           ?disabled=${this.disabled || this._fieldsetDisabled}
           @click=${this.handleButtonClick}
         >
-          ${this.type === "notes-style-medium" || this.type === "icon-only"
-            ? html`<span
-                style="display: inline-flex; align-items: center; gap: var(--025)"
-                >${this.getValueDisplay(this.currentValue)}</span
-              >`
-            : this.type === "language"
+          ${this.type === "language"
               ? html`<ds-text
                   literal text=${this.getValueDisplay(this.currentValue)}
                 ></ds-text>`
@@ -678,11 +503,7 @@ export class Cycle extends LitElement {
                   ? html`<ds-text
                       text=${this.getColorKey(this.currentValue)}
                     ></ds-text>`
-                  : this.type === "page-style"
-                    ? html`<ds-text
-                        text=${this.currentValue === "note" ? "Note" : "Page"}
-                      ></ds-text>`
-                    : html`<ds-text
+                  : html`<ds-text
                         literal text=${this.getValueDisplay(this.currentValue)}
                       ></ds-text>`}
         </ds-button>
@@ -711,10 +532,6 @@ export class Cycle extends LitElement {
   }
 
   private handleAccentColorChanged() {
-    this.setupInitialValue();
-  }
-
-  private handleNoteBehaviorChanged() {
     this.setupInitialValue();
   }
 }

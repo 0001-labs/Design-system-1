@@ -8,6 +8,8 @@ export default defineConfig({
   // Checkbox and Switch were one page; the old address goes to the checkbox (19 October 2026).
   redirects: {
     "/2-core/choice/": "/2-core/checkbox/",
+    // Pricing became part of Formatting (21 October 2026).
+    "/1-root/pricing/": "/1-root/formatting/#prices",
     // The front page became the Overview, in the docs (21 October 2026).
     "/start-here/overview/": "/",
     "/examples/": "/start-here/examples/",
@@ -93,24 +95,24 @@ export default defineConfig({
           ],
         },
         {
-          label: "1 Root",
+          label: "Root",
           items: [
             { label: "Colours", link: "/colours/" },
             { label: "Fonts", slug: "1-root/fonts" },
             { label: "Languages", slug: "1-root/languages" },
             { label: "Formatting", slug: "1-root/formatting" },
             { label: "Theming", slug: "1-root/theming" },
+            { label: "Shape", slug: "1-root/shape" },
             { label: "Prose", slug: "1-root/prose" },
             { label: "Feedback", slug: "1-root/feedback" },
             { label: "Keys", slug: "1-root/keys" },
             { label: "Device", slug: "1-root/device" },
             { label: "Scaling", slug: "1-root/scaling" },
             { label: "Preferences", slug: "1-root/preferences" },
-            { label: "Pricing", slug: "1-root/pricing" },
           ],
         },
         {
-          label: "2 Core",
+          label: "Core",
           items: [
             { label: "Avatar", slug: "2-core/avatar" },
             { label: "Button", slug: "2-core/button" },
@@ -134,7 +136,7 @@ export default defineConfig({
           ],
         },
         {
-          label: "3 Unit",
+          label: "Unit",
           items: [
             { label: "Accordion", slug: "3-unit/accordion" },
             { label: "Calendar", slug: "3-unit/calendar" },
@@ -153,7 +155,7 @@ export default defineConfig({
           ],
         },
         {
-          label: "4 Page",
+          label: "Page",
           items: [
             { label: "Container", slug: "4-page/container" },
             { label: "Document", slug: "4-page/document" },
