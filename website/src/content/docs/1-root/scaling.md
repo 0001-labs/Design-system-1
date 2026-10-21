@@ -9,7 +9,20 @@ Every measure in Design system 1 is a number of squares multiplied by `--sf`. Th
 
 - **A computer stays at 1**, however narrow its window. A narrow window rearranges the layout with media queries; it does not scale.
 - **A phone or a tablet** is drawn as if the screen were 280 units wide: the scale is the page's width (without its scroll bar) over 280, never under 0.75 or over 2. A 375px phone gets 1.339, so everything is a third larger.
-- A phone or tablet is a mobile browser, or a screen that takes touch and whose shorter side is at most 820px. The [Device](/1-root/device/) module uses the same rule.
+- A phone or tablet is a mobile browser, or a screen that takes touch and whose shorter side is at most 820px.
+
+## Which screens scale
+
+Before it works out a scale, the module decides whether the page is on a phone or a tablet. That decision is the only one it needs about the device, and it makes it itself, with nothing imported:
+
+1. **The browser says it is mobile.** The user agent names a phone or tablet: `Mobile`, `Android`, `iPhone`, `iPad`, `iPod`, `Windows Phone`, `Kindle`, `Silk`, `Opera Mini`, `Tablet` and the like.
+2. **Or the screen takes touch and is small enough.** It reports more than one touch point (`navigator.maxTouchPoints > 1`) and the shorter side of the window is at most 820px. An iPad that reports itself as a Mac is caught here when its shorter side is 820px or less, and so is a phone browser asking for the desktop site. A larger iPad in desktop mode, 1024px on its shorter side, counts as a computer.
+
+Either one makes it a phone or a tablet: the page scales, and the root gets `data-mobile`. Neither makes it a computer: `--sf` stays 1 and `data-mobile` is taken off. A touch-screen laptop whose window is wider and taller than 820px stays a computer, and so does a computer's window made as narrow as a phone's.
+
+The check runs again with every resize and turn, so a tablet's split-screen view is decided afresh. The scale itself never tells a phone from a tablet; both follow the same rule, and only the cap at 2 sets a tablet apart.
+
+The [Device](/1-root/device/) module makes the same check and also tells a tablet from a phone, marks the root `.mobile` or `.desktop`, and reports `scaling-changed`, for the pages that need more than the scale.
 
 ## On a phone or a tablet
 
