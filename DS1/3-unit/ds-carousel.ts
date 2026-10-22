@@ -9,7 +9,7 @@
 import { LitElement, html, nothing, unsafeCSS, type PropertyValues } from "lit";
 import { getText } from "../0-face/i18n";
 import { define } from "../0-face/define";
-import { COPY, autoplayInterval, bleedOf, driveCarousel, nearestSlide, prefersReducedMotion, scrollToSlide, type CarouselDrive } from "../0-face/carousel";
+import { COPY, autoplayInterval, bleedOf, dragTrack, driveCarousel, nearestSlide, prefersReducedMotion, scrollToSlide, type CarouselDrive } from "../0-face/carousel";
 import "../2-core/ds-icon";
 import "../2-core/ds-progress";
 import type { ProgressSelectDetail } from "../2-core/ds-progress";
@@ -113,6 +113,8 @@ export class Carousel extends LitElement {
   declare paused: boolean;
   /** The strip's drive: the bleed's measures, the loop's copies and autoplay. */
   private drive: CarouselDrive | null = null;
+  /** Stops the strip's drag (dragTrack); started with the track, again when the element comes back to a page. */
+  private undrag: (() => void) | undefined;
 
   /** Attributes this element wrote, so what the page wrote is left alone. */
   private readonly own = new Map<Element, Set<string>>();
@@ -165,8 +167,14 @@ export class Carousel extends LitElement {
     return Math.max(0, Math.min(this.count - 1, current));
   }
 
+  private startDrag() {
+    const track = this.track;
+    if (track && !this.undrag) this.undrag = dragTrack(track, () => { if (!this.loop) this.move(nearestSlide(track, this.slides, this.index)); });
+  }
+
   connectedCallback() {
     super.connectedCallback();
+    if (this.hasUpdated) this.startDrag();
     window.addEventListener("language-changed", this.relabel);
     window.addEventListener("translations-loaded", this.relabel);
   }
@@ -178,6 +186,8 @@ export class Carousel extends LitElement {
     clearTimeout(this.settle);
     this.drive?.stop();
     this.drive = null;
+    this.undrag?.();
+    this.undrag = undefined;
     super.disconnectedCallback();
   }
 
@@ -225,6 +235,8 @@ export class Carousel extends LitElement {
   protected firstUpdated() {
     // The strip's drive starts once, from the options the element was given.
     const track = this.track;
+    // A mouse drags the strip, and a press that ends a drag or a swipe chooses nothing (dragTrack).
+    this.startDrag();
     const bleed = bleedOf(this.bleed);
     if (track && (bleed !== "none" || this.loop || this.every > 0)) {
       this.drive = driveCarousel(this, track, this, { bleed, loop: this.loop, autoplay: this.every });

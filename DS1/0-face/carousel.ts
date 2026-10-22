@@ -192,6 +192,73 @@ export function nearestSlide(track: HTMLElement, slides: readonly HTMLElement[],
 }
 
 
+/**
+ * A strip under the pointer. A finger, a pen or a trackpad scrolls the track
+ * natively; a mouse drags it the same way (snapping held off while it drags),
+ * and on letting go `settle` puts it on a slide. A press that ends a drag or a
+ * scroll, by any pointer, never presses what it started on, so a person can
+ * swipe across cards that open something without choosing one. Returns the
+ * function that stops it.
+ */
+export function dragTrack(track: HTMLElement, settle: () => void): () => void {
+  let held: { id: number; x: number; left: number; mouse: boolean } | null = null;
+  let moved = false;
+  let quietUntil = 0;
+  const down = (event: PointerEvent) => {
+    if (!event.isPrimary || (event.pointerType === "mouse" && event.button !== 0)) return;
+    held = { id: event.pointerId, x: event.clientX, left: track.scrollLeft, mouse: event.pointerType === "mouse" };
+    moved = false;
+  };
+  const move = (event: PointerEvent) => {
+    if (!held || event.pointerId !== held.id) return;
+    const dx = event.clientX - held.x;
+    if (!moved && Math.abs(dx) < 6) return;
+    if (!moved && held.mouse) {
+      try { track.setPointerCapture(event.pointerId); } catch { /* a pointer already gone */ }
+      track.setAttribute("data-dragging", "");
+    }
+    moved = true;
+    if (held.mouse) track.scrollLeft = held.left - dx;
+  };
+  const up = (event: PointerEvent) => {
+    if (!held || event.pointerId !== held.id) return;
+    const mouse = held.mouse;
+    held = null;
+    if (!moved) return;
+    quietUntil = performance.now() + 400;
+    if (mouse) {
+      track.removeAttribute("data-dragging");
+      settle();
+    }
+  };
+  // A native scroll while a finger is down is a swipe: the press it ends is not a choice.
+  const scrolled = () => { if (held) moved = true; };
+  const click = (event: MouseEvent) => {
+    if (performance.now() > quietUntil) return;
+    event.preventDefault();
+    event.stopPropagation();
+  };
+  // A picture in a slide would be dragged out of the page instead of the strip.
+  const dragstart = (event: DragEvent) => event.preventDefault();
+  track.addEventListener("pointerdown", down);
+  track.addEventListener("pointermove", move);
+  track.addEventListener("pointerup", up);
+  track.addEventListener("pointercancel", up);
+  track.addEventListener("scroll", scrolled, { passive: true });
+  track.addEventListener("click", click, true);
+  track.addEventListener("dragstart", dragstart);
+  return () => {
+    track.removeEventListener("pointerdown", down);
+    track.removeEventListener("pointermove", move);
+    track.removeEventListener("pointerup", up);
+    track.removeEventListener("pointercancel", up);
+    track.removeEventListener("scroll", scrolled);
+    track.removeEventListener("click", click, true);
+    track.removeEventListener("dragstart", dragstart);
+    track.removeAttribute("data-dragging");
+  };
+}
+
 /** Where a slide starts along the track, from the track's own start, in its scroll's terms. */
 function startOf(track: HTMLElement, slide: HTMLElement): number {
   const box = track.getBoundingClientRect();
@@ -588,6 +655,8 @@ export function startCarousel(element: HTMLElement, options: StartCarouselOption
 
   track.addEventListener("scroll", scrolled, { passive: true });
   track.addEventListener("scrollend", ended);
+  // A loop's drive settles the strip itself; every other strip settles on the nearest slide.
+  const undrag = dragTrack(track, () => (loop ? undefined : go(nearestSlide(track, slides(), current), true)));
   previousButton?.addEventListener("click", previous);
   nextButton?.addEventListener("click", next);
   observer?.observe(track, { childList: true });
@@ -601,6 +670,7 @@ export function startCarousel(element: HTMLElement, options: StartCarouselOption
     stop() {
       track.removeEventListener("scroll", scrolled);
       track.removeEventListener("scrollend", ended);
+      undrag();
       previousButton?.removeEventListener("click", previous);
       nextButton?.removeEventListener("click", next);
       observer?.disconnect();

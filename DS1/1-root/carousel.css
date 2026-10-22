@@ -64,6 +64,13 @@
   display: none;
 }
 
+/* A mouse dragging the strip (0-face/carousel.ts dragTrack): no snapping until it lets go, and no words selected on the way. */
+.ds-carousel__track[data-dragging] {
+  scroll-snap-type: none;
+  cursor: grabbing;
+  user-select: none;
+}
+
 /* Slides of their own width, several in view. */
 .ds-carousel[data-slides="auto"] > .ds-carousel__track {
   grid-auto-columns: max-content;

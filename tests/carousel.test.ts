@@ -321,3 +321,39 @@ test("the dots and the carousel are drawn on the square, autoplay is opt-in, and
   expect(script.autoplayInterval(null)).toBe(0);
   expect(sheet("3-unit/ds-carousel.ts")).toContain("this.autoplay = null;");
 });
+
+test("a drag across the strip never presses the slide it ends on; a plain press still does", async () => {
+  document.body.innerHTML = `<div class="ds-carousel"><div class="ds-carousel__track"><button class="a">A</button><button class="b">B</button></div></div>`;
+  const element = document.querySelector<HTMLElement>(".ds-carousel")!;
+  const track = element.querySelector<HTMLElement>(".ds-carousel__track")!;
+  const handle = script.startCarousel(element);
+  const pressed: string[] = [];
+  element.querySelectorAll("button").forEach(button => button.addEventListener("click", () => pressed.push(button.className)));
+  const pointer = (type: string, x: number, pointerType = "mouse") => track.dispatchEvent(new PointerEvent(type, { pointerId: 3, pointerType, isPrimary: true, button: 0, clientX: x, bubbles: true }));
+  // A mouse drag: the strip follows it, and the press that ends it chooses nothing.
+  pointer("pointerdown", 200);
+  pointer("pointermove", 150);
+  expect(track.hasAttribute("data-dragging")).toBe(true);
+  pointer("pointerup", 100);
+  expect(track.hasAttribute("data-dragging")).toBe(false);
+  element.querySelector<HTMLButtonElement>(".a")!.click();
+  expect(pressed).toEqual([]);
+  // A finger's swipe scrolls the track natively; the press that ends it chooses nothing either.
+  await new Promise(resolve => setTimeout(resolve, 450));
+  pointer("pointerdown", 200, "touch");
+  track.dispatchEvent(new Event("scroll"));
+  pointer("pointerup", 120, "touch");
+  element.querySelector<HTMLButtonElement>(".b")!.click();
+  expect(pressed).toEqual([]);
+  // A press without a drag is a press.
+  await new Promise(resolve => setTimeout(resolve, 450));
+  pointer("pointerdown", 200);
+  pointer("pointerup", 201);
+  element.querySelector<HTMLButtonElement>(".b")!.click();
+  expect(pressed).toEqual(["b"]);
+  handle.stop();
+});
+
+test("the sheet holds off snapping while a mouse drags the strip", () => {
+  expect(sheet("1-root/carousel.css")).toMatch(/\.ds-carousel__track\[data-dragging\] \{\s*scroll-snap-type: none;/);
+});
