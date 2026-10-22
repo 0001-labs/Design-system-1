@@ -267,7 +267,7 @@ export class ConsistencyEditor extends LitElement {
         value: key === 'gap' ? (this.history.value.gaps[gap] ?? this.textSpacing?.defaultValue(gap) ?? 20) : this.history.value[key], disabled: !this.enabled(key), min: limits[key][0], max: limits[key][1], step: 20, shiftStep: 40,
         axis: key === 'gap' ? host.dataset.axis as 'horizontal' | 'vertical' : 'horizontal', snapPreview: false,
         gain: pointerGain(key, Number(getComputedStyle(this).getPropertyValue('--sf'))),
-        onPointerStart: event => { this.settle.cancel(); this.selected = key; if (gap) this.selectedGap = gap; host.focus({ preventScroll: true }); },
+        onPointerStart: event => { this.settle.cancel(); this.selected = key; if (gap) this.selectedGap = gap; (host.ownerDocument.activeElement as HTMLElement | null)?.blur?.(); },
         onStart: kind => { host.setAttribute('data-spacing-active', ''); this.interaction = kind; this.selected = key; if (gap) this.selectedGap = gap; },
         onPreview: value => { this.preview = { ...this.preview, [previewKey]: value }; },
         onCommit: value => {

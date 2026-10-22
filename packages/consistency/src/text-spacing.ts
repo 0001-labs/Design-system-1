@@ -48,7 +48,7 @@ export class TextSpacingLayer {
           const dispose = bindSpacingHandle(host, () => ({
             value: this.state.value(id, fallback), disabled: !this.state.enabled(), min: 0, max: 2000, step: 20, shiftStep: 40,
             axis: 'vertical', snapPreview: false, gain: pointerGain('gap', Number(getComputedStyle(this.root).getPropertyValue('--sf'))),
-            onPointerStart: () => { this.state.select(id); host.focus({ preventScroll: true }); },
+            onPointerStart: () => { this.state.select(id); (host.ownerDocument.activeElement as HTMLElement | null)?.blur?.(); },
             onStart: kind => { pointer = kind === 'pointer'; host.setAttribute('data-spacing-active', ''); this.state.select(id); },
             onPreview: next => this.state.preview(id, next), onCommit: next => this.state.commit(id, next, pointer),
             onEnd: cancelled => { host.removeAttribute('data-spacing-active'); if (cancelled) this.state.cancel(); },
