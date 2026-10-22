@@ -38,3 +38,12 @@ it('vertical and horizontal spacer centres follow one physical pointer unit with
   expect(pointerGain('width', scale) * scale).toBe(1);
  }
 });
+it('deletes disjoint selected blocks as one undoable edit and preserves untouched source', async () => {
+ const { removeSourceRanges } = await import('./model');
+ const source = '# Heading\n\nFirst\n\n```ts\nconst keep = true;\n```\n\nLast';
+ const first = source.indexOf('First'), code = source.indexOf('```ts'), last = source.indexOf('Last');
+ const text = removeSourceRanges(source, [{ start: first, end: code }, { start: last, end: source.length }]);
+ expect(text).toBe('# Heading\n\n```ts\nconst keep = true;\n```');
+ const history = new CompositionHistory(); history.commit({ text, hidden: ['bookshop'] }); history.undo();
+ expect(history.value.text).toBe(initialComposition.text); expect(history.value.hidden).toEqual([]);
+});

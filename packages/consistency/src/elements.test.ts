@@ -25,18 +25,28 @@ it('requests deletion through Aa atom-source for standard history', () => {
   expect(change.mock.calls[0][0].detail).toEqual({ source: '' }); cleanup?.();
 });
 
-it('saves settings as one source request and escapes unsafe text in the DS1 face', async () => {
+it('edits the rendered card fields directly and commits safely through Aa', () => {
   const atom = contentElementAtoms(() => true)[1], host = document.createElement('span'); document.body.append(host);
   const cleanup = atom.draw!(host, atom.insert!.source), change = vi.fn(); host.addEventListener('aa-atom-source', change);
-  host.click();
-  const panel = document.querySelector('ds-overlay')!;
-  const fields = panel.querySelectorAll('ds-input');
-  fields[0].value = 'New label'; fields[1].value = '<script>bad()</script>'; fields[2].value = 'New body';
-  const apply = Array.from(panel.querySelectorAll('ds-button')).find(button => button.textContent === 'Apply')!;
-  apply.click();
+  expect(host.querySelector('ds-input')).toBeNull();
+  const title = host.querySelector<HTMLElement>('[slot="title"] .aa-block')!;
+  title.textContent = '<script>bad()</script>';
+  title.dispatchEvent(new Event('input', { bubbles: true }));
+  title.dispatchEvent(new FocusEvent('focusout', { bubbles: true }));
   expect(change).toHaveBeenCalledTimes(1);
-  expect(readContentElement(change.mock.calls[0][0].detail.source)).toEqual({ kind: 'card', label: 'New label', title: '<script>bad()</script>', body: 'New body' });
+  expect(readContentElement(change.mock.calls[0][0].detail.source)).toMatchObject({ title: '<script>bad()</script>' });
   expect(host.querySelector('script')).toBeNull(); cleanup?.();
+});
+
+it('changes card appearance from its context menu without a second text editor', () => {
+  const atom = contentElementAtoms(() => true)[1], host = document.createElement('span'); document.body.append(host);
+  const cleanup = atom.draw!(host, atom.insert!.source), change = vi.fn(); host.addEventListener('aa-atom-source', change);
+  host.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true }));
+  const menu = document.querySelector('ds-context')!;
+  expect(menu.querySelector('ds-input, input, textarea, [contenteditable]')).toBeNull();
+  Array.from(menu.querySelectorAll('button')).find(button => button.textContent === 'Sharp blue')!.click();
+  expect(readContentElement(change.mock.calls.at(-1)![0].detail.source)).toMatchObject({ tone: 'sharp-blue', variant: 'filled' });
+  cleanup?.();
 });
 
 it.each(['button', 'card'])('inserts /%s through Aa slash menu and undoes through its standard history', async kind => {
@@ -64,4 +74,13 @@ it('previews the selected library with real components and follows library chang
   owner.dataset.consistencyLibrary = 'ink'; await new Promise(resolve => setTimeout(resolve, 0));
   expect(preview.dataset.consistencyLibrary).toBe('ink'); expect(preview.style.colorScheme).toBe('dark');
   cleanup?.(); expect(preview.children).toHaveLength(0);
+});
+
+it('keeps button destinations in source and rejects unsafe destinations', () => {
+  for (const action of [{ kind: 'link' as const, target: 'https://example.com' }, { kind: 'page' as const, target: '/about' }]) {
+    const value: ContentElement = { kind: 'button', label: 'Read more', secondary: false, action };
+    expect(readContentElement(writeContentElement(value))).toEqual(value);
+  }
+  const unsafe = readContentElement('```c9y-button\n{"label":"Go","secondary":false,"action":{"kind":"link","target":"javascript:alert(1)"}}\n```');
+  expect(unsafe).toEqual({ kind: 'button', label: 'Go', secondary: false });
 });

@@ -1,6 +1,7 @@
 export type Dimension = 'width' | 'padding' | 'gap';
-export interface Composition { width: number; padding: number; gap: number; wrap: boolean; text: string; sections: Record<string, string>; gaps: Record<string, number>; order: string[] }
+export interface Composition { width: number; padding: number; gap: number; wrap: boolean; text: string; sections: Record<string, string>; gaps: Record<string, number>; order: string[]; hidden: string[] }
 export const initialComposition: Composition = { width: 640, padding: 40, gap: 40, wrap: true,
+  hidden: [],
   order: ['intro', 'work', 'approach', 'contact'],
   gaps: { 'intro-actions': 40, 'intro-work': 40, 'work-cards': 40, 'work-approach': 40, 'approach-stats': 40, 'approach-contact': 40, 'contact-card': 40, 'contact-action': 40, 'projects-columns': 20, 'stats-columns': 40, 'actions-columns': 20 },
   sections: {
@@ -36,4 +37,11 @@ export class CompositionHistory {
  * centre under one physical pointer unit, on either axis and at every scale. */
 export function pointerGain(key: Dimension, scale: number): number {
   return (key === 'width' ? 1 : 2) / (Number.isFinite(scale) && scale > 0 ? scale : 1);
+}
+
+/** Remove selected block source ranges in one document edit. */
+export function removeSourceRanges(source: string, ranges: readonly { start: number; end: number }[]): string {
+  let result = source;
+  for (const range of [...ranges].sort((a, b) => b.start - a.start)) result = result.slice(0, range.start) + result.slice(range.end);
+  return result.replace(/^\n+|\n+$/g, '');
 }

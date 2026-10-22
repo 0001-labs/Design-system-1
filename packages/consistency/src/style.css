@@ -5,9 +5,9 @@ consistency-editor{display:block;--ds-sf:var(--sf);color:var(--ds-text-color);fo
 .consistency-padding{inset:0 auto 0 0;top:0;left:0;width:max(calc(20px * var(--sf)),var(--composition-padding));transform:none;pointer-events:none}
 .ghost-surface{position:absolute;inset:0;pointer-events:auto;touch-action:none;cursor:ew-resize;outline:none}
 .ghost-surface--width{transform:translateX(50%);border-left:1px solid var(--ds-yellow)}
-.ghost-surface--padding{background:color-mix(in srgb,var(--ds-yellow) 6%,transparent)}
+.ghost-surface--padding{background:color-mix(in srgb,var(--ds-pink) 6%,transparent)}
 .ghost-surface--gap{cursor:ns-resize;min-height:calc(20px * var(--sf));top:50%;transform:translateY(-50%)}
-.ghost-surface:hover,.ghost-surface:focus-visible{background:color-mix(in srgb,var(--ds-yellow) 24%,transparent)}
+.ghost-surface:hover,.ghost-surface:focus-visible{background:color-mix(in srgb,var(--ds-pink) 24%,transparent)}
 .ghost-surface:focus-visible{outline:1px solid var(--ds-text-color);outline-offset:1px}
 .ghost-measure{position:absolute;pointer-events:none;white-space:nowrap;background:var(--ds-yellow);color:var(--ds-black);font-size:calc(12px * var(--sf));line-height:calc(16px * var(--sf));padding:0 calc(4px * var(--sf));border-radius:calc(2px * var(--sf))}
 .ghost-surface--width .ghost-measure{right:calc(10px * var(--sf));top:calc(-20px * var(--sf))}
@@ -100,3 +100,36 @@ consistency-editor{display:block;--ds-sf:var(--sf);color:var(--ds-text-color);fo
 .production-on .ghost-surface--width:focus-visible{background-color:transparent}
 .production-on .ghost-surface--padding:is(:hover,:focus-visible,[data-spacing-active]){box-shadow:inset -1px 0 var(--ds-yellow)}
 .production-on .ghost-surface--width:is(:hover,:focus-visible,[data-spacing-active]){background-image:linear-gradient(to right,transparent calc(50% - .5px),var(--ds-yellow) calc(50% - .5px),var(--ds-yellow) calc(50% + .5px),transparent calc(50% + .5px))}
+/* Editing feedback is a soft blush surface rather than a framed box. */
+.ghost-measure{background:var(--ds-pink)}
+.ghost-surface{border-radius:var(--ds-radius)}
+.ghost-surface:focus-visible{outline:0;box-shadow:none;background:color-mix(in srgb,var(--ds-pink) 32%,transparent)}
+.consistency-gap{border-radius:var(--ds-radius)}
+.consistency-gap::before{display:none}
+.production-on .ghost-surface--padding:is(:hover,:focus-visible,[data-spacing-active]),
+.production-on .ghost-surface--width:is(:hover,:focus-visible,[data-spacing-active]){background:color-mix(in srgb,var(--ds-pink) 16%,transparent);box-shadow:none}
+.production-on .ghost-surface--padding:focus-visible,
+.production-on .ghost-surface--width:focus-visible{box-shadow:none;background:color-mix(in srgb,var(--ds-pink) 32%,transparent)}
+
+/* The neutral workspace makes the authored page boundary visible without a frame. */
+.consistency-stage{background-color:color-mix(in srgb,var(--ds-paper) 92%,var(--ds-text-color));border-radius:var(--ds-radius)}
+.consistency-sheet{border-radius:var(--ds-radius)}
+/* Zero padding has an edge, not a painted twenty-pixel hit area. */
+.consistency-shell .ghost-surface--padding[aria-valuenow="0"]{background:transparent;box-shadow:none;border-radius:0}
+.ghost-surface--padding[aria-valuenow="0"]::before{content:'';position:absolute;inset:0 auto 0 0;width:1px;background:var(--ds-pink);pointer-events:none}
+.production-on .ghost-surface--padding[aria-valuenow="0"]::before{opacity:0}
+.production-on .ghost-surface--padding[aria-valuenow="0"]:is(:hover,:focus-visible,[data-spacing-active])::before{opacity:1}
+/* A website viewport scrolls its content; it is not a sheet on a desk. */
+.consistency-stage{padding:0;background-color:color-mix(in srgb,var(--ds-paper) 92%,var(--ds-text-color));border-radius:var(--ds-radius)}
+.consistency-sheet{height:max(calc(400px * var(--sf)),round(down,calc(100dvh - 180px * var(--sf)),var(--u)));overflow:auto;overscroll-behavior:contain;scrollbar-width:thin}
+.consistency-hint{display:none}
+.consistency-stage{height:max(calc(400px * var(--sf)),round(down,calc(100dvh - 180px * var(--sf)),var(--u)));align-self:start}
+.ghost-surface--padding[aria-valuenow="0"] .ghost-measure{left:0;transform:none}
+.production-on .ghost-surface--width .ghost-measure{top:0}
+/* Removing an element also removes the gap that no longer has two neighbours. */
+.consistency-projects:has(>ds-card[hidden]){grid-template-columns:minmax(0,1fr)}
+.consistency-projects:has(>ds-card[hidden])>.consistency-gap,
+.consistency-statistics:has(>ds-stat[hidden])>.consistency-gap,
+.consistency-sample-actions:has(>ds-button[hidden])>.consistency-gap{display:none}
+.consistency-statistics:has(>ds-stat[hidden])>ds-stat:not([hidden]){flex:1;width:auto}
+.consistency-group.consistency-sheet{height:auto;overflow:visible;border-radius:0}

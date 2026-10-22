@@ -1,0 +1,10 @@
+.aa-command-preview.consistency-element-preview:has(.consistency-element-preview-inner){width:calc(7 * var(--ds-unit));padding:0}
+.consistency-element-preview-inner{width:calc(14 * var(--ds-unit));padding:var(--ds-unit);box-sizing:border-box;zoom:.5}
+.consistency-content-element [contenteditable]{outline:none;min-width:1ch;cursor:text;white-space:pre-wrap}
+.consistency-content-element ds-button{cursor:text}
+.consistency-content-element .aa-plain{display:inline-block;font:inherit;color:inherit;line-height:inherit}
+.consistency-content-element .aa-plain>.aa-block{margin:0;padding:0;font:inherit;color:inherit;line-height:inherit;background:none;min-height:0}
+.consistency-content-button{position:relative}
+.consistency-button-action{position:absolute;z-index:10;left:0;top:calc(100% + var(--ds-unit)/2);display:flex;align-items:center;gap:calc(var(--ds-unit)/2);padding:calc(var(--ds-unit)/2);background:var(--ds-paper);outline:1px solid var(--ds-border-color);border-radius:var(--ds-radius);white-space:nowrap}
+.consistency-button-action[hidden]{display:none}
+.consistency-button-action ds-input{--ds-input-width:calc(12 * var(--ds-unit))}

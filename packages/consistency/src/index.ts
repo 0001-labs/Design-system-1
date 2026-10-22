@@ -1,3 +1,5 @@
+import { TextSpacingLayer } from './text-spacing';
+import './text-spacing.css';
 import { LitElement, html } from 'lit';
 import { initGridFit } from '../../../DS1/0-face/grid-fit';
 import { LIBRARY_PRESETS, libraryTokens, type LibraryId } from './libraries';
@@ -12,13 +14,13 @@ import '../../../DS1/2-core/ds-tag';
 import '../../../DS1/2-core/ds-stat';
 import '../../../DS1/2-core/ds-switch';
 import '../../../DS1/3-unit/ds-select';
-import { defineAaEditor, type AaEditorElement } from '../../../website/src/vendor/aa/aa.js';
+import { defineAaEditor, parseBlocks, type AaEditorElement } from '../../../website/src/vendor/aa/aa.js';
 import { bindSpacingHandle } from '../../app/src/2-core/spacing-handle';
 import { canStartMarquee, selectionRect, intersects, type SelectionRect } from './marquee';
 import { CompositionSettle } from './settle';
 import { createPreviewEditorOptions } from './aa';
 import type { EditorOptions } from '../../../website/src/vendor/aa/aa';
-import { CompositionHistory, pointerGain, initialComposition, dimensionValue, limits, type Dimension } from './model';
+import { CompositionHistory, removeSourceRanges, pointerGain, initialComposition, dimensionValue, limits, type Dimension } from './model';
 defineAaEditor();
 
 /** A reusable, document-owned ghost layer. It never mutates arbitrary page CSS. */
@@ -47,20 +49,21 @@ export class ConsistencyEditor extends LitElement {
     return this.editorOptions.get(key)!;
   }
   private cancelMarquee?: () => void;
-  private onEscape = (event: KeyboardEvent) => { if (event.key === 'Escape') { this.cancelMarquee?.(); this.selection = new Set(); this.marquee = null; } };
+  private onEscape = (event: KeyboardEvent) => { this.deleteSelection(event); if (event.key === 'Escape') { this.cancelMarquee?.(); this.selection = new Set(); this.marquee = null; } };
   connectedCallback() { super.connectedCallback(); window.addEventListener('keydown', this.onEscape); }
   history = new CompositionHistory();
   private sort?: SortableController;
   private spacingDisposers: (() => void)[] = [];
   private spacingBound = false;
+  private textSpacing?: TextSpacingLayer;
   private linkedEditors = new WeakSet<AaEditorElement>();
   private settle = new CompositionSettle();
   private interaction: "pointer" | "keyboard" = "keyboard";
   private cleanups: (() => void)[] = [];
   constructor() { super(); this.revision = 0; this.preview = {}; this.selected = 'gap'; this.selectedGap = 'intro-actions'; this.layers = { marquee: true, spacing: true, boundaries: true, reorder: false, place: false, production: true }; this.selection = new Set(); this.marquee = null; this.editorError = ''; this.library = 'original'; }
   createRenderRoot() { return this; }
-  disconnectedCallback() { window.removeEventListener('keydown', this.onEscape); this.cancelMarquee?.(); this.sort?.destroy(); this.spacingDisposers.forEach(dispose => dispose()); this.settle.cancel(); this.cleanups.forEach(fn => fn()); this.cleanups = []; super.disconnectedCallback(); }
-  private value(key: Dimension, gap = this.selectedGap) { return this.preview[key === 'gap' ? gap : key] ?? (key === 'gap' ? this.history.value.gaps[gap] : this.history.value[key]); }
+  disconnectedCallback() { this.textSpacing?.destroy(); this.textSpacing = undefined; window.removeEventListener('keydown', this.onEscape); this.cancelMarquee?.(); this.sort?.destroy(); this.spacingDisposers.forEach(dispose => dispose()); this.settle.cancel(); this.cleanups.forEach(fn => fn()); this.cleanups = []; super.disconnectedCallback(); }
+  private value(key: Dimension, gap = this.selectedGap) { return this.preview[key === 'gap' ? gap : key] ?? (key === 'gap' ? (this.history.value.gaps[gap] ?? this.textSpacing?.defaultValue(gap) ?? 20) : this.history.value[key]); }
   private commit(key: Dimension, value: number, gap = this.selectedGap) {
     if (key === 'gap') this.history.commit({ gaps: { ...this.history.value.gaps, [gap]: dimensionValue(key, value) } });
     else this.history.commit({ [key]: dimensionValue(key, value) });
@@ -75,9 +78,29 @@ export class ConsistencyEditor extends LitElement {
   private layerToggle(layer: keyof typeof this.layers, label: string) {
     return html`<label class="consistency-layer-toggle"><span>${label}</span><ds-switch><button type="button" role="switch" aria-label=${label} aria-checked=${String(this.layers[layer])} @click=${() => this.toggle(layer)}></button></ds-switch></label>`;
   }
+  private deleteSelection(event: KeyboardEvent) {
+    if (!['Delete', 'Backspace'].includes(event.key) || !this.selection.size || event.altKey || event.metaKey || event.ctrlKey) return;
+    if ((event.target as Element)?.closest?.('aa-editor, input, textarea, select, button, [contenteditable]')) return;
+    event.preventDefault();
+    const doc = this.history.value, sections = { ...doc.sections };
+    let text = doc.text;
+    const hidden = new Set(doc.hidden);
+    const order = doc.order.filter(id => !this.selection.has('group-' + id));
+    for (const key of ['intro', ...Object.keys(sections)]) {
+      const source = key === 'intro' ? text : sections[key];
+      const blocks = parseBlocks(source);
+      const ranges = blocks.flatMap((block, index) => this.selection.has(`text:${key}:${index}`) ? [{ start: block.start, end: blocks[index + 1]?.start ?? source.length }] : []);
+      if (!ranges.length) continue;
+      const next = removeSourceRanges(source, ranges);
+      if (key === 'intro') text = next; else sections[key] = next;
+    }
+    for (const id of this.selection) if (!id.startsWith('text:') && !id.startsWith('group-') && !['intro', 'work', 'approach', 'contact'].includes(id)) hidden.add(id);
+    this.history.commit({ text, sections, order, hidden: [...hidden] });
+    this.selection = new Set(); this.revision++;
+  }
   private startMarquee(event: PointerEvent) {
     if ((this.layers.reorder && (event.target as Element).closest('[data-sort-group]')) || !this.layers.marquee || !event.isPrimary || event.button !== 0 || !canStartMarquee(event.target as Element)) return;
-    event.preventDefault(); this.cancelMarquee?.();
+    event.preventDefault(); (document.activeElement as HTMLElement | null)?.blur?.(); this.cancelMarquee?.();
     const base = event.shiftKey ? new Set(this.selection) : new Set<string>();
     const x = event.clientX, y = event.clientY;
     const move = (next: PointerEvent) => {
@@ -85,6 +108,7 @@ export class ConsistencyEditor extends LitElement {
       this.marquee = selectionRect(x, y, next.clientX, next.clientY);
       const chosen = new Set(base);
       this.querySelectorAll<HTMLElement>('[data-selectable]').forEach(element => {
+        if (element.hidden || element.querySelector('[data-selectable]') || !element.getClientRects().length) return;
         if (intersects(this.marquee!, element.getBoundingClientRect())) chosen.add(element.dataset.selectable!);
       });
       this.selection = chosen;
@@ -146,7 +170,7 @@ export class ConsistencyEditor extends LitElement {
       intro: html`<section class="consistency-story-section" id="studio-intro"><div class="consistency-text-bounds" data-ds-area data-selectable="intro"><aa-editor toolbar class=${doc.wrap ? '' : 'consistency-nowrap'} aria-label="Composition text" data-editor-key="intro" .options=${this.optionsFor('intro')} .value=${doc.text}
             @input=${(e: Event) => { this.history.commit({ text: (e.currentTarget as AaEditorElement).value }); this.revision++; }}></aa-editor></div>
           ${this.gap('intro-actions')}
-          <div class="consistency-sample-actions"><ds-button secondary @click=${() => this.goTo('studio-work')}>Explore the studio</ds-button>${this.gap('actions-columns', true)}<ds-button @click=${() => this.goTo('studio-contact')}>Get in touch</ds-button></div></section>
+          <div class="consistency-sample-actions"><ds-button data-selectable="explore-action" secondary @click=${() => this.goTo('studio-work')}>Explore the studio</ds-button>${this.gap('actions-columns', true)}<ds-button data-selectable="contact-action-button" @click=${() => this.goTo('studio-contact')}>Get in touch</ds-button></div></section>
           ${this.gap('intro-work')}`,
       work: html`<section class="consistency-story-section" id="studio-work">${this.sectionText('work', 'Selected work text')}
             ${this.gap('work-cards')}<div class="consistency-projects">
@@ -159,7 +183,7 @@ export class ConsistencyEditor extends LitElement {
           </section>${this.gap('approach-contact')}`,
       contact: html`<section class="consistency-story-section" id="studio-contact">${this.sectionText('contact', 'Contact section text')}
             ${this.gap('contact-card')}<ds-card data-ds-prose data-selectable="contact-note" variant="outlined" height="8"><span slot="label">A note for later</span><span slot="title">What would you like to make?</span><p>This is your page to shape. Edit the words above and leave the thought here.</p></ds-card>
-            ${this.gap('contact-action')}<div class="consistency-sample-actions"><ds-button secondary @click=${() => this.goTo('studio-intro')}>Back to the beginning</ds-button></div>
+            ${this.gap('contact-action')}<div class="consistency-sample-actions"><ds-button data-selectable="back-action" secondary @click=${() => this.goTo('studio-intro')}>Back to the beginning</ds-button></div>
           </section>`,
     };
     return html`<div data-sort-group=${id} data-selectable=${'group-' + id} class="consistency-group" @pointerdown=${(event: PointerEvent) => { if (this.layers.reorder && canStartMarquee(event.target as Element)) this.selection = new Set(['group-' + id]); }} aria-label=${id === 'intro' ? 'Introduction' : id === 'work' ? 'Selected work' : id === 'approach' ? 'How we work' : 'Contact'}>${contents[id]}</div>`;
@@ -169,6 +193,19 @@ export class ConsistencyEditor extends LitElement {
     if (document.fonts && typeof ResizeObserver !== 'undefined') initGridFit();
   }
   protected updated() {
+    this.querySelectorAll<HTMLElement>('aa-editor[data-editor-key]').forEach(editor => {
+      editor.querySelectorAll<HTMLElement>(':scope > .aa-block').forEach((block, index) => { block.dataset.selectable = `text:${editor.dataset.editorKey}:${index}`; });
+    });
+    this.querySelectorAll<HTMLElement>('[data-selectable]').forEach(element => { element.hidden = this.history.value.hidden.includes(element.dataset.selectable!); });
+    this.textSpacing ??= new TextSpacingLayer(this, {
+      value: (id, fallback) => this.preview[id] ?? this.history.value.gaps[id] ?? fallback,
+      enabled: () => this.layers.spacing,
+      select: id => { this.selected = 'gap'; this.selectedGap = id; },
+      preview: (id, value) => { this.preview = { ...this.preview, [id]: value }; },
+      commit: (id, value) => this.commit('gap', value, id),
+      cancel: () => { this.preview = {}; },
+    });
+    this.textSpacing.refresh();
     this.querySelectorAll<AaEditorElement>('aa-editor').forEach(element => {
       if (element.editor) {
         element.editor.reordering = this.layers.reorder;
@@ -215,7 +252,7 @@ export class ConsistencyEditor extends LitElement {
     }
 
     this.querySelectorAll<HTMLElement>('[data-sort-group]').forEach(element => element.tabIndex = this.layers.reorder ? 0 : -1);
-    this.querySelectorAll<HTMLElement>('[data-selectable]').forEach(element => element.toggleAttribute('data-selected', (this.layers.marquee || this.layers.reorder) && this.selection.has(element.dataset.selectable!)));
+    this.querySelectorAll<HTMLElement>('[data-selectable]').forEach(element => element.toggleAttribute(element.classList.contains('aa-block') ? 'data-composition-selected' : 'data-selected', (this.layers.marquee || this.layers.reorder) && this.selection.has(element.dataset.selectable!)));
     if (this.spacingBound) return;
     this.spacingBound = true;
     this.querySelectorAll<HTMLElement>('[data-handle]').forEach(host => {
@@ -223,7 +260,7 @@ export class ConsistencyEditor extends LitElement {
       const gap = host.dataset.gap || '';
       const previewKey = key === 'gap' ? gap : key;
       this.spacingDisposers.push(bindSpacingHandle(host, () => ({
-        value: key === 'gap' ? this.history.value.gaps[gap] : this.history.value[key], disabled: !this.enabled(key), min: limits[key][0], max: limits[key][1], step: 20, shiftStep: 40,
+        value: key === 'gap' ? (this.history.value.gaps[gap] ?? this.textSpacing?.defaultValue(gap) ?? 20) : this.history.value[key], disabled: !this.enabled(key), min: limits[key][0], max: limits[key][1], step: 20, shiftStep: 40,
         axis: key === 'gap' ? host.dataset.axis as 'horizontal' | 'vertical' : 'horizontal', snapPreview: false,
         gain: pointerGain(key, Number(getComputedStyle(this).getPropertyValue('--sf'))),
         onPointerStart: event => { this.settle.cancel(); this.selected = key; if (gap) this.selectedGap = gap; host.focus({ preventScroll: true }); },
