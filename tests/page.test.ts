@@ -80,3 +80,14 @@ test("the main area is the main landmark unless the page has one already", async
   expect(area(nested, "main").getAttribute("role")).toBe("main");
   expect(area(inner, "main").hasAttribute("role")).toBe(false);
 });
+
+// page.window-width in DS1/0-face/constraints.ts
+test("every column of a page can shrink to the window, and below thirty squares every layout stacks", async () => {
+  const { readFileSync } = await import("node:fs");
+  const css = readFileSync(`${import.meta.dirname}/../DS1/4-page/styles/ds-page.css`, "utf8");
+  // A share of the room is never wider than the room: every 1fr is minmax(0, 1fr).
+  expect(css.match(/1fr/g)!.length).toBe(css.match(/minmax\(0, 1fr\)/g)!.length);
+  expect(css).toMatch(/\.area \{[^}]*min-width: 0;/);
+  const narrow = /@container \(max-width: 599px\) \{([^]*?)\n\}/.exec(css)![1]!;
+  expect(narrow).toContain("grid-template-columns: minmax(0, 1fr);");
+});

@@ -46,6 +46,15 @@ function cards(root: ParentNode) {
   });
 }
 
+/** Whether something the element stands in cuts it off or scrolls it, so it cannot widen the page. */
+function contained(element: Element) {
+  for (let box = element.parentElement; box && box !== element.ownerDocument.documentElement; box = box.parentElement) {
+    const style = getComputedStyle(box);
+    if (/hidden|clip|auto|scroll/.test(style.overflowX) || style.position === 'fixed') return true;
+  }
+  return false;
+}
+
 /** Cards side by side: one parent, one top and one height. */
 function rows(found: ReturnType<typeof cards>) {
   const groups: (typeof found)[] = [];
@@ -99,6 +108,34 @@ export const constraints: Constraint[] = [
         const rounded = corners.filter(([, radius, meets]) => meets && parseFloat(radius) > 0).map(([name]) => name);
         return rounded.length ? [{ element: picture, message: `The picture's ${rounded.join(' and ')} ${rounded.length > 1 ? 'corners are' : 'corner is'} rounded where it meets the card.` }] : [];
       });
+    },
+  },
+  {
+    code: 'page.window-width',
+    rule: 'A page is never wider than its window: nothing reaches past either edge unless something it stands in cuts it off or scrolls it, so a phone never zooms the page out or slides it sideways.',
+    why: 'A phone widens a page that is too wide and zooms it out, words and all, so a piece one square too wide spoils every piece on the page; check it at every phone width from 320px up.',
+    components: ['ds-page'],
+    check: { file: 'tests/page.test.ts', test: 'every column of a page can shrink to the window, and below thirty squares every layout stacks' },
+    inspect(root) {
+      const page = (root as Node).ownerDocument ?? (root as Document);
+      const width = page.documentElement.clientWidth || page.defaultView?.innerWidth || 0;
+      if (!width) return [];
+      const past = (element: Element) => {
+        const box = element.getBoundingClientRect();
+        if (!box.width || !box.height) return 0;
+        return Math.max(box.right - width, -box.left, 0);
+      };
+      const findings: Finding[] = [];
+      for (const element of Array.from(root.querySelectorAll('body *'))) {
+        const reach = past(element);
+        if (reach <= 1 || getComputedStyle(element).position === 'fixed' || contained(element)) continue;
+        // Only the outermost: the element whose own box first passes the edge.
+        if (element.parentElement && past(element.parentElement) > 1) continue;
+        const box = element.getBoundingClientRect();
+        const side = box.right - width >= -box.left ? 'right' : 'left';
+        findings.push({ element, message: `It reaches ${px(reach)} past the window's ${side} edge, in a window ${px(width)} wide.` });
+      }
+      return findings;
     },
   },
 ];

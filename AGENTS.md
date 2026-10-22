@@ -76,6 +76,10 @@ The Swift package (`native/apple`) and the Kotlin package (`native/android`) are
 
 `vp run e2e:blackbox` (`scripts/e2e-blackbox.mjs`) checks Design system 1 as anyone on the internet meets it, signed out and over HTTP alone: every page in the navigation, the Overview's component directory and the sitemap, the redirects and hosts, every file those pages load, the hosted stylesheet and module from Use with HTML, Play, System CI where `/flags` sends, the owner-only hosts asking to sign in, and the published package: the version npm's `alpha` tag names, with its main entry, `one.css`, `grid.css`, fonts and chunks on jsDelivr. Each step is a contract from the Worker (`services/src/index.ts`, `dashboard.ts`), `website/astro.config.mjs`, `website/public/_headers`, the README and this file's Distribution; when one of those changes, change the step with it. It sends only GETs and HEADs, without credentials, so it is safe against production. It runs against `https://designsystem1.com` by default, `--local` against the docs dev server and `--base http://localhost:8787` against `wrangler dev`; every run is recorded for System → Tests as "Design system 1 black box". Run it after each site deploy and each release.
 
+## Phone check
+
+`vp run constraints:phone <address>` (`scripts/constraints-phone.ts`) runs every constraint in `DS1/0-face/constraints.ts` on every page in a site's sitemap. It opens each page in Playwright's WebKit as an iPhone 320, 375, 393 and 430px wide, and fails while any rule is broken. It sends GETs only, so it is safe against production. Run it before releasing a site built on a library; it needs `vp exec playwright install webkit` once.
+
 ## Integration
 
 The foundation 0001's products are built on; they copy it with Sync 1.

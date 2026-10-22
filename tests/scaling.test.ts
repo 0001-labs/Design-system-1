@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { afterEach, expect, test, vi } from "vite-plus/test";
-import { applyScaling, calculateScalingFactor, defaultScalingConfig, detectMobileDevice, startScaling, toDevicePixel, toLayoutStep } from "../DS1/0-face/scaling";
+import { applyScaling, calculateScalingFactor, defaultScalingConfig, detectMobileDevice, screenWidth, startScaling, toDevicePixel, toLayoutStep } from "../DS1/0-face/scaling";
 
 const PHONE = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1";
 const COMPUTER = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15";
@@ -16,6 +16,7 @@ afterEach(() => {
   vi.restoreAllMocks();
   delete (root as { clientWidth?: number }).clientWidth;
   delete (window as { devicePixelRatio?: number }).devicePixelRatio;
+  for (const key of ["width", "height", "orientation"]) delete (window.screen as unknown as Record<string, unknown>)[key];
   root.style.removeProperty("--sf");
   root.removeAttribute("data-mobile");
 });
@@ -55,6 +56,27 @@ test("a phone gets its scale and data-mobile on the root, snapped when asked", (
   applyScaling({ root: surface, snap: "pixel" });
   expect(Number(surface.style.getPropertyValue("--sf")) * 60).toBeCloseTo(80, 9);
   expect(surface.hasAttribute("data-mobile")).toBe(true);
+});
+
+function held(width: number, height: number, turn: string) {
+  for (const [key, value] of Object.entries({ width, height, orientation: { type: turn } })) {
+    Object.defineProperty(window.screen, key, { configurable: true, get: () => value });
+  }
+}
+
+test("a phone's scale never comes from a page wider than its screen, so a page it has zoomed out never grows", () => {
+  // iOS: the upright size whichever way the phone is turned.
+  screen(PHONE, 560, 3);
+  held(393, 852, "portrait-primary");
+  expect(screenWidth()).toBe(393);
+  expect(applyScaling()).toBe(calculateScalingFactor(393));
+  held(393, 852, "landscape-primary");
+  expect(screenWidth()).toBe(852);
+  expect(applyScaling()).toBe(2);
+  // A computer is never held to its screen.
+  screen(COMPUTER, 560);
+  held(393, 852, "portrait-primary");
+  expect(applyScaling()).toBe(1);
 });
 
 test("startScaling follows resizes and turns until stopped", () => {

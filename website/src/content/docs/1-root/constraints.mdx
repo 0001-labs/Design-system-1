@@ -92,6 +92,17 @@ The panel comes with the grid shortcut (`0-face/grid`, Sync 1's root `"modules":
 - **A site with sign-in** sets `data-ds-owner` on `<html>` once its server has said the person signed in owns it, and takes it off when they sign out.
 - **A site without sign-in** has no owner to ask, so the owner switches on each browser they check it in, once: open any page of the site with `?ds-owner=on` added to its address, and the browser remembers it for that site. `?ds-owner=off` forgets it. The panel measures the page and shows nothing else, so a browser switched on shows no one anything private. A product whose `package.json` lists its `sideEffects` must name the copied `0-face/grid.ts` and `0-face/constraint-panel.ts` there, or a bundler drops a script imported for what it does and the panel never reaches the page. `inspectConstraints()` returns the same list to a script or a test.
 
+### On every phone
+
+A page has to keep the rules at every phone width, not only on the phone in your hand. When anything on a page is wider than the window, a phone widens the whole page and zooms it out, so its words shrink and it slides sideways. A piece that fits at 393px can break at 320px. The phone check opens every page of a site, as its sitemap lists them, in WebKit as an iPhone 320, 375, 393 and 430px wide. It scrolls each page through, then runs every rule on it and lists what each page breaks at which width:
+
+```sh
+vp run constraints:phone https://example.com
+vp run constraints:phone https://example.com --widths 320,393 --pages /,/about/
+```
+
+It only reads the site, without cookies, so it is safe to run against production. It fails while anything is broken, so run it before releasing a site built on a library. The scale (`0-face/scaling`) keeps a page that a phone has zoomed out from getting worse: it never takes the page's width as wider than the screen's, so the scale cannot grow and widen the page further.
+
 A new small rule goes into `DS1/0-face/constraints.ts` with its `inspect`, which measures it on a page, and a source test that measures the component; the component keeps it in its own CSS, and `vp run constraints:write` copies the list into the design-system-1 skill.
 
 ## Checking it

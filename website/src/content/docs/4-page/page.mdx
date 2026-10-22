@@ -4,6 +4,7 @@ description: "A standard page: where units stand on the grid, in six layouts wit
 ---
 
 import ComponentExample from "../../../components/ComponentExample.astro";
+import ConstraintList from "../../../components/ConstraintList.astro";
 
 A page places units on the grid: navigation, content and optional supporting areas, in one of six layouts. See the full-page [Examples](/start-here/examples/) for all six.
 
@@ -55,6 +56,10 @@ Every column is a whole number of squares. Between columns there are two squares
 In a `column` or `centered` page, what you put in it stands one square apart, top to bottom, so a page needs no layout CSS of its own: a title, a paragraph, a table and a row of buttons (`ds-row`) follow one another on the squares. A button, a tag or a link keeps its own width. `--ds-page-flow` sets another distance.
 
 Below 30 squares of width every layout becomes one column, navigation first. The layout follows the width of its own container, not the window, so a page inside a panel stacks when the panel is narrow.
+
+## Constraints it keeps
+
+<ConstraintList component="ds-page" />
 
 ## Attributes
 

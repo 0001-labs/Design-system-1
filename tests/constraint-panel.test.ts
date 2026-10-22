@@ -78,3 +78,20 @@ test("on a site without sign-in, ?ds-owner=on switches this browser on as the ow
   history.replaceState(null, "", "/");
   expect(isPageOwner()).toBe(false);
 });
+
+test("a page wider than its window is found at the outermost piece that passes the edge, not inside a scroller", () => {
+  const width = document.documentElement.clientWidth || window.innerWidth;
+  const wide = document.createElement("section");
+  wide.innerHTML = "<p>Words</p>";
+  at(wide, { left: 0, top: 0, width: width + 40, height: 100 });
+  at(wide.querySelector("p")!, { left: 0, top: 0, width: width + 40, height: 20 });
+  const scroller = document.createElement("div");
+  scroller.style.overflowX = "auto";
+  scroller.innerHTML = "<div>Slides</div>";
+  at(scroller, { left: 0, top: 100, width, height: 100 });
+  at(scroller.firstElementChild!, { left: 0, top: 100, width: width * 3, height: 100 });
+  document.body.append(wide, scroller);
+  const found = inspectConstraints().filter(f => f.constraint.code === "page.window-width");
+  expect(found.map(f => f.element)).toEqual([wide]);
+  expect(found[0]!.message).toBe(`It reaches 40px past the window's right edge, in a window ${width}px wide.`);
+});
