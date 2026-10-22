@@ -13,12 +13,17 @@ export function cardMinimumHeight(target: HTMLElement, scale = 1): number {
     const partStyle = getComputedStyle(part);
     return sum + part.getBoundingClientRect().height + (Number.parseFloat(partStyle.marginTop) || 0) + (Number.parseFloat(partStyle.marginBottom) || 0);
   }, 0);
-  return Math.ceil((content + Number.parseFloat(style.paddingTop) + Number.parseFloat(style.paddingBottom) + 20 * scale) / scale / 20) * 20;
+  const media = surface.querySelector<HTMLElement>('.ds-card__media');
+  const mediaContent = media && !media.hidden ? Math.max(0, ...Array.from(target.querySelectorAll<HTMLElement>('[slot="media"]')).map(node => node.getBoundingClientRect().height)) + (Number.parseFloat(getComputedStyle(media).paddingTop) || 0) : 0;
+  return Math.ceil((content + Number.parseFloat(style.paddingTop) + Number.parseFloat(style.paddingBottom) + mediaContent) / scale / 20) * 20;
 }
 export function cardMinimumWidth(target: HTMLElement, scale = 1): number {
   const canvas = target.ownerDocument.createElement('canvas'), context = canvas.getContext('2d'); let widest = 0;
   for (const field of target.querySelectorAll<HTMLElement>('[slot="label"],[slot="title"],p,ds-tag')) { if (!context) break; const style = getComputedStyle(field.slot ? target.shadowRoot?.querySelector<HTMLElement>(`.ds-card__${field.slot}`) ?? field : field); context.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`; for (const word of (field.textContent ?? '').split(/\s+/)) if (!/^(https?:\/\/|www\.)/i.test(word)) widest = Math.max(widest, context.measureText(word).width); }
-  return Math.max(240, Math.ceil((widest / scale + 40) / 20) * 20);
+  const surface = target.shadowRoot?.querySelector<HTMLElement>('.ds-card');
+  const style = surface ? getComputedStyle(surface) : undefined;
+  const inset = Math.max(20, (Number.parseFloat(style?.paddingLeft ?? '') || 20) / scale) + Math.max(20, (Number.parseFloat(style?.paddingRight ?? '') || 20) / scale);
+  return Math.max(240, Math.ceil((widest / scale + inset) / 20) * 20);
 }
 /** Invisible edge targets share App's pointer, cancellation and keyboard lifecycle. */
 export class ResizingLayer {
