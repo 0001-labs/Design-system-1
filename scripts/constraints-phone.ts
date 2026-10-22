@@ -41,11 +41,9 @@ async function pagesOf(site: string): Promise<string[]> {
 const checker = (await build({
   stdin: {
     contents: `import { inspectConstraints } from './constraints.ts';
-window.__inspectConstraints = () => inspectConstraints(document).map(({ element, message, constraint }) => {
-  const name = element.localName + (element.id ? '#' + element.id : '') + Array.from(element.classList, c => '.' + c).join('');
-  const words = (element.textContent || '').trim().replace(/\\s+/g, ' ').slice(0, 40);
-  return { code: constraint.code, message, element: words ? name + ' "' + words + '"' : name };
-});`,
+import { describeElement } from './constraint-site.ts';
+window.__inspectConstraints = () => inspectConstraints(document).map(({ element, message, constraint }) =>
+  ({ code: constraint.code, message, element: describeElement(element) }));`,
     resolveDir: join(import.meta.dirname, '../DS1/0-face'),
     loader: 'ts',
   },

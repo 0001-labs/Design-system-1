@@ -1,0 +1,148 @@
+// The constraints on every page of a site, at every phone width, from inside the browser: the constraint
+// panel's Site check (constraint-panel.ts). Each page in the site's sitemap is opened in a frame of the
+// site's own, out of sight, as wide as a phone, drawn at the phone's scale, scrolled through so what loads
+// late is drawn, and measured with every rule in constraints.ts. scripts/constraints-phone.ts does the
+// same from a terminal, in WebKit as an iPhone.
+import { inspectConstraints } from './constraints';
+import { calculateScalingFactor, defaultScalingConfig } from './scaling';
+
+/** The narrowest phone still sold, the common ones and the widest. */
+export const PHONE_WIDTHS = [320, 375, 393, 430];
+
+/** A rule broken on a page at a width, said in words, since the element stays in its frame. */
+export type SiteFinding = { code: string; rule: string; message: string; element: string };
+export type PageResult = { url: string; width: number; findings: SiteFinding[]; error?: string };
+
+/** An element as a person finds it: its tag, id and classes, and the start of its words. */
+export function describeElement(element: Element): string {
+  const name = element.localName + (element.id ? `#${element.id}` : '') + Array.from(element.classList, c => `.${c}`).join('');
+  const words = (element.textContent ?? '').trim().replace(/\s+/g, ' ').slice(0, 40);
+  return words ? `${name} "${words}"` : name;
+}
+
+/** The pages a sitemap lists on the site's own origin, in its order and once each; none when it lists none. */
+export function sitemapPages(xml: string, origin: string): string[] {
+  const pages = [...xml.matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/g)].flatMap(([, loc]) => {
+    try {
+      const url = new URL(loc!.replace(/&amp;/g, '&'), origin);
+      return url.origin === origin ? [url.href] : [];
+    } catch {
+      return [];
+    }
+  });
+  return [...new Set(pages)];
+}
+
+/** The site's pages: its sitemap's, or else the page itself and every page it links to on the site. */
+export async function findSitePages(page: Document = document): Promise<string[]> {
+  const { origin } = page.location ?? window.location;
+  try {
+    const answer = await fetch(new URL('/sitemap.xml', origin));
+    if (answer.ok) {
+      const pages = sitemapPages(await answer.text(), origin);
+      if (pages.length) return pages;
+    }
+  } catch { /* No sitemap: the links below. */ }
+  const links = Array.from(page.querySelectorAll<HTMLAnchorElement>('a[href]'), link => new URL(link.href, origin))
+    .filter(url => url.origin === origin && !/\.\w+$/.test(url.pathname))
+    .map(url => `${url.origin}${url.pathname}`);
+  return [...new Set([`${origin}${(page.location ?? window.location).pathname}`, ...links])];
+}
+
+const wait = (ms: number) => new Promise(done => setTimeout(done, ms));
+
+/**
+ * Opens a page in a frame `width` pixels wide inside `host`, draws it at a phone's scale, scrolls it
+ * through, and returns the rules it breaks. The address carries `ph=out`, the analytics opt-out most
+ * trackers honour, so the check counts no visits.
+ */
+export async function inspectInFrame(host: Element | ShadowRoot, url: string, width: number, height = 844): Promise<SiteFinding[]> {
+  const frame = document.createElement('iframe');
+  frame.setAttribute('aria-hidden', 'true');
+  frame.tabIndex = -1;
+  frame.style.cssText = `position:absolute;top:0;left:${-width - 100}px;width:${width}px;height:${height}px;border:0;visibility:hidden;pointer-events:none`;
+  const address = new URL(url);
+  address.searchParams.set('ph', 'out');
+  try {
+    const loaded = new Promise<void>((done, fail) => {
+      frame.addEventListener('load', () => done(), { once: true });
+      setTimeout(() => fail(new Error('did not load in 30 seconds')), 30_000);
+    });
+    frame.src = address.href;
+    host.appendChild(frame);
+    await loaded;
+    const view = frame.contentWindow;
+    const page = frame.contentDocument;
+    if (!view || !page?.documentElement) throw new Error('could not be read');
+    await page.fonts?.ready;
+    // A computer's browser draws the frame at 1; a phone's has scaled it to the frame's width already.
+    const root = page.documentElement;
+    if (!root.hasAttribute('data-mobile')) {
+      root.style.setProperty('--sf', String(calculateScalingFactor(root.clientWidth || width, { ...defaultScalingConfig, snap: 'layout' })));
+      root.setAttribute('data-mobile', '');
+    }
+    for (let y = 0; y < root.scrollHeight; y += height / 2) {
+      view.scrollTo(0, y);
+      await wait(40);
+    }
+    view.scrollTo(0, 0);
+    await wait(300);
+    return inspectConstraints(page).map(({ constraint, message, element }) => ({
+      code: constraint.code,
+      rule: constraint.rule,
+      message,
+      element: describeElement(element),
+    }));
+  } finally {
+    frame.remove();
+  }
+}
+
+/**
+ * Checks every page at every width, a page at a time with its widths side by side, and reports each
+ * result as it comes. Stops when `signal` aborts. Whatever the pages store in this browser while they
+ * are checked is put back afterwards.
+ */
+export async function checkSite({ pages, widths = PHONE_WIDTHS, inspect, onResult, signal }: {
+  pages: string[];
+  widths?: number[];
+  inspect: (url: string, width: number) => Promise<SiteFinding[]>;
+  onResult: (result: PageResult, done: number, total: number) => void;
+  signal?: AbortSignal;
+}): Promise<PageResult[]> {
+  const kept = storedNow();
+  const results: PageResult[] = [];
+  const total = pages.length * widths.length;
+  try {
+    for (const url of pages) {
+      if (signal?.aborted) break;
+      await Promise.all(widths.map(async width => {
+        const result: PageResult = await inspect(url, width)
+          .then(findings => ({ url, width, findings }))
+          .catch((error: Error) => ({ url, width, findings: [], error: error.message }));
+        results.push(result);
+        if (!signal?.aborted) onResult(result, results.length, total);
+      }));
+    }
+  } finally {
+    putBack(kept);
+  }
+  return results;
+}
+
+/** This site's storage in this browser, to put back after the check. */
+function storedNow(): Map<string, string> | null {
+  try {
+    return new Map(Object.keys(localStorage).map(key => [key, localStorage.getItem(key)!]));
+  } catch {
+    return null;
+  }
+}
+
+function putBack(kept: Map<string, string> | null): void {
+  if (!kept) return;
+  try {
+    for (const key of Object.keys(localStorage)) if (!kept.has(key)) localStorage.removeItem(key);
+    for (const [key, value] of kept) if (localStorage.getItem(key) !== value) localStorage.setItem(key, value);
+  } catch { /* Storage blocked: nothing was kept either. */ }
+}

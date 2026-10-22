@@ -1,4 +1,5 @@
 import { inspectConstraints } from './constraints';
+import { PHONE_WIDTHS, checkSite, findSitePages, inspectInFrame, type PageResult } from './constraint-site';
 
 // appendChild, not append: a Worker project's types redefine append for its HTML rewriter.
 
@@ -9,8 +10,9 @@ export const CONSTRAINT_PRESSES = 5;
  * A panel at the page's end edge listing every small rule the page breaks
  * (constraints.ts), each with its code, what is wrong and the element ringed
  * on the page; pressing one scrolls to it. It measures the page as drawn when
- * it opens and again with Check. It draws over the page and changes nothing
- * in it.
+ * it opens and again with Page. Site measures every page of the site at every
+ * phone width (constraint-site.ts) and lists what each breaks, with a link to
+ * the page. It draws over the page and changes nothing in it.
  */
 export function createConstraintPanel() {
   const panel = document.createElement('div');
@@ -35,6 +37,7 @@ export function createConstraintPanel() {
     }
     :host([hidden]) { display: none !important; }
     .rings { position: absolute; inset: 0; overflow: hidden; }
+    .frames { position: absolute; width: 0; height: 0; overflow: hidden; }
     .ring {
       position: absolute;
       box-sizing: border-box;
@@ -82,21 +85,29 @@ export function createConstraintPanel() {
     button:focus-visible { outline: 2px solid var(--ds-focus-ring, var(--ink)); outline-offset: -2px; }
     ol { margin: 0; padding: 0; list-style: none; }
     li + li { border-top: 1px solid var(--line); }
-    li button { display: block; width: 100%; height: auto; padding-block: calc(var(--u) / 2); color: var(--ink); }
+    li > :is(button, a, div) { display: block; width: 100%; height: auto; padding-block: calc(var(--u) / 2); color: var(--ink); text-decoration: none; }
+    li > a:hover .page { color: var(--ink); }
+    li > a:focus-visible { outline: 2px solid var(--ds-focus-ring, var(--ink)); outline-offset: -2px; }
+    .page { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
+    .element { color: var(--muted); overflow-wrap: anywhere; }
+    [data-status] { color: var(--muted); margin-bottom: calc(var(--u) / 2); }
     .code { display: flex; gap: calc(var(--u) / 2); color: var(--muted); font-variant-numeric: tabular-nums; }
     .code b { color: var(--danger); font-weight: 400; }
     .rule { color: var(--muted); }
     p { margin: 0; }
     @media print { :host { display: none !important; } }
-  </style><div class="rings"></div><aside aria-label="Constraints">
-    <header><strong>Constraints</strong><button type="button" data-run>Check</button><button type="button" data-close aria-label="Close">Close</button></header>
-    <p data-empty hidden>This page keeps every constraint.</p>
+  </style><div class="rings"></div><div class="frames"></div><aside aria-label="Constraints">
+    <header><strong>Constraints</strong><button type="button" data-run>Page</button><button type="button" data-site>Site</button><button type="button" data-close aria-label="Close">Close</button></header>
+    <p data-status aria-live="polite"></p>
     <ol></ol>
   </aside>`;
   const rings = shadow.querySelector<HTMLDivElement>('.rings')!;
   const list = shadow.querySelector('ol')!;
-  const empty = shadow.querySelector<HTMLElement>('[data-empty]')!;
+  const status = shadow.querySelector<HTMLElement>('[data-status]')!;
   const title = shadow.querySelector('strong')!;
+  const frames = shadow.querySelector<HTMLDivElement>('.frames')!;
+  const siteButton = shadow.querySelector<HTMLButtonElement>('[data-site]')!;
+  let site: AbortController | null = null;
   let findings: ReturnType<typeof inspectConstraints> = [];
   let current = -1;
   let frame = 0;
@@ -117,11 +128,18 @@ export function createConstraintPanel() {
   };
   const schedule = () => { if (!frame) frame = requestAnimationFrame(place); };
 
+  const stopSite = () => {
+    site?.abort();
+    site = null;
+    siteButton.textContent = 'Site';
+  };
+
   const run = () => {
+    stopSite();
     findings = inspectConstraints(document);
     current = -1;
     title.textContent = findings.length ? `Constraints · ${findings.length} broken` : 'Constraints';
-    empty.hidden = findings.length > 0;
+    status.textContent = findings.length ? `This page at ${Math.round(document.documentElement.clientWidth)}px.` : 'This page keeps every constraint.';
     list.replaceChildren(...findings.map(({ constraint, message, element }, index) => {
       const item = document.createElement('li');
       const button = document.createElement('button');
@@ -149,25 +167,88 @@ export function createConstraintPanel() {
     place();
   };
 
-  const show = () => {
+  /** One broken rule on another page: its number, code and width, what is wrong, and a link to the page. */
+  const siteItem = (index: number, { url, width }: PageResult, code: string, message: string, detail: string) => {
+    const item = document.createElement('li');
+    const link = document.createElement('a');
+    const address = new URL(url);
+    address.searchParams.set('constraints', '1');
+    link.href = address.href;
+    const head = document.createElement('span');
+    head.className = 'code';
+    const number = document.createElement('b');
+    number.textContent = String(index);
+    head.appendChild(number);
+    head.appendChild(document.createTextNode(`${code} · ${width}px`));
+    const what = document.createElement('p');
+    what.textContent = message;
+    const page = document.createElement('p');
+    page.className = 'page';
+    page.textContent = decodeURI(new URL(url).pathname);
+    const element = document.createElement('p');
+    element.className = 'element';
+    element.textContent = detail;
+    for (const part of [head, what, page, element]) link.appendChild(part);
+    item.appendChild(link);
+    return item;
+  };
+
+  /** Every page of the site at every phone width, listed as each comes in. */
+  const runSite = async () => {
+    if (site) { stopSite(); status.textContent = 'Stopped.'; return; }
+    const controller = new AbortController();
+    site = controller;
+    siteButton.textContent = 'Stop';
+    findings = [];
+    current = -1;
+    place();
+    list.replaceChildren();
+    title.textContent = 'Constraints';
+    status.textContent = 'Finding the pages…';
+    const pages = await findSitePages();
+    const widths = `${PHONE_WIDTHS.slice(0, -1).join(', ')} and ${PHONE_WIDTHS.at(-1)}px`;
+    let broken = 0;
+    const results = await checkSite({
+      pages,
+      inspect: (url, width) => inspectInFrame(frames, url, width),
+      signal: controller.signal,
+      onResult(result, done, total) {
+        const found = result.error ? [{ code: 'page', message: `It could not be checked: ${result.error}.`, element: '' }] : result.findings;
+        for (const { code, message, element } of found) list.appendChild(siteItem(++broken, result, code, message, element));
+        title.textContent = broken ? `Constraints · ${broken} broken` : 'Constraints';
+        status.textContent = `Checking ${done} of ${total}: ${pages.length} pages at ${widths}…`;
+      },
+    });
+    if (controller.signal.aborted) return;
+    site = null;
+    siteButton.textContent = 'Site';
+    status.textContent = broken
+      ? `${pages.length} pages at ${widths}: ${broken} broken.`
+      : `Every page keeps every constraint at ${widths} (${results.length} checks).`;
+  };
+
+  const show = (mode: 'page' | 'site' = 'page') => {
     if (!panel.isConnected) document.body.appendChild(panel);
     panel.hidden = false;
-    run();
+    if (mode === 'site') void runSite(); else run();
     window.addEventListener('scroll', schedule, { passive: true, capture: true });
     window.addEventListener('resize', schedule);
   };
   const hide = () => {
+    stopSite();
     panel.hidden = true;
     window.removeEventListener('scroll', schedule, { capture: true });
     window.removeEventListener('resize', schedule);
   };
   shadow.querySelector('[data-run]')!.addEventListener('click', run);
+  siteButton.addEventListener('click', () => void runSite());
   shadow.querySelector('[data-close]')!.addEventListener('click', hide);
 
   return {
     show,
     hide,
     run,
+    runSite,
     toggle: () => (panel.hidden ? show() : hide()),
     get findings() { return findings; },
   };
@@ -199,11 +280,20 @@ const isOwnerDevice = () => {
 export const isPageOwner = () => document.documentElement.hasAttribute('data-ds-owner') || isOwnerDevice()
   || new URLSearchParams(window.location.search).get('ds-owner') === 'on';
 
+/** What the address asks the panel to show on load: `?constraints=1` this page, `?constraints=site` every page. */
+export function askedConstraints(search = window.location.search): 'page' | 'site' | null {
+  const asked = new URLSearchParams(search).get('constraints');
+  if (asked === 'site') return 'site';
+  return asked === '1' || asked === 'page' || asked === '' ? 'page' : null;
+}
+
 /**
  * Five presses of C toggle the constraint panel, for the page's owner only
- * (`isPageOwner`): for anyone else the presses do nothing. `?constraints=1` opens it on load for the
- * owner too. Escape hides it. Presses typed into a field, with a modifier or
- * held down never count, and any other key starts the count again.
+ * (`isPageOwner`): for anyone else the presses do nothing. `?constraints=1` in
+ * the address opens it for anyone once the page has loaded, since it only
+ * measures; `?constraints=site` opens it on the whole site's check. Escape
+ * hides it. Presses typed into a field, with a modifier or held down never
+ * count, and any other key starts the count again.
  */
 export function initConstraintShortcut(): void {
   if (typeof document === 'undefined') return;
@@ -214,10 +304,11 @@ export function initConstraintShortcut(): void {
   let panel: ReturnType<typeof createConstraintPanel> | null = null;
   const open = () => (panel ??= createConstraintPanel());
 
-  if (new URLSearchParams(window.location.search).get('constraints') === '1') {
-    // The owner is often known a moment after load, once the site has asked.
-    const observer = new MutationObserver(() => { if (isPageOwner()) { observer.disconnect(); open().show(); } });
-    if (isPageOwner()) open().show(); else observer.observe(root, { attributes: true, attributeFilter: ['data-ds-owner'] });
+  const asked = askedConstraints();
+  // Not in a frame of the site's own check, and only once the page and its pictures have drawn.
+  if (asked && window.parent === window) {
+    if (document.readyState === 'complete') open().show(asked);
+    else window.addEventListener('load', () => open().show(asked), { once: true });
   }
 
   let presses = 0;

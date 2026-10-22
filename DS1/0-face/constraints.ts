@@ -30,6 +30,8 @@ export type Constraint = {
 /** A pixel either way is the same place. */
 const near = (a: number, b: number) => Math.abs(a - b) <= 1;
 const px = (n: number) => `${Math.round(n)}px`;
+/** An element's style, from its own window: a page checked in a frame is measured by the frame's. */
+const styleOf = (element: Element) => (element.ownerDocument.defaultView ?? window).getComputedStyle(element);
 
 /** Every drawn card with its picture: `ds-card` and its slotted picture, or `.ds-card` and its media's. */
 function cards(root: ParentNode) {
@@ -49,7 +51,7 @@ function cards(root: ParentNode) {
 /** Whether something the element stands in cuts it off or scrolls it, so it cannot widen the page. */
 function contained(element: Element) {
   for (let box = element.parentElement; box && box !== element.ownerDocument.documentElement; box = box.parentElement) {
-    const style = getComputedStyle(box);
+    const style = styleOf(box);
     if (/hidden|clip|auto|scroll/.test(style.overflowX) || style.position === 'fixed') return true;
   }
   return false;
@@ -98,7 +100,7 @@ export const constraints: Constraint[] = [
         const bottom = face.bottom >= box.bottom - 1;
         const start = face.left <= box.left + 1;
         const end = face.right >= box.right - 1;
-        const style = getComputedStyle(picture);
+        const style = styleOf(picture);
         const corners: [string, string, boolean][] = [
           ['top left', style.borderTopLeftRadius, top || start],
           ['top right', style.borderTopRightRadius, top || end],
@@ -128,7 +130,7 @@ export const constraints: Constraint[] = [
       const findings: Finding[] = [];
       for (const element of Array.from(root.querySelectorAll('body *'))) {
         const reach = past(element);
-        if (reach <= 1 || getComputedStyle(element).position === 'fixed' || contained(element)) continue;
+        if (reach <= 1 || styleOf(element).position === 'fixed' || contained(element)) continue;
         // Only the outermost: the element whose own box first passes the edge.
         if (element.parentElement && past(element.parentElement) > 1) continue;
         const box = element.getBoundingClientRect();
