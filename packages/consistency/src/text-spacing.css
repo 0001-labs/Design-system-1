@@ -3,6 +3,6 @@
 .production-on .consistency-text-bounds .consistency-text-gap{background:transparent}
 .consistency-text-bounds .consistency-text-gap:is(:hover,:focus-visible,[data-spacing-active]){background:color-mix(in srgb,var(--ds-pink) 24%,transparent)}
 .consistency-text-bounds .consistency-text-gap[hidden]{display:none}
-.consistency-text-bounds .consistency-text-gap[aria-valuenow="0"]{height:calc(8px * var(--sf))!important;transform:translateY(-50%)}
+.consistency-text-bounds .consistency-text-gap[aria-valuenow="0"]{height:var(--u)!important;transform:translateY(-50%);background:transparent}
 .consistency-sheet [data-selectable][hidden]{display:none!important}
 .consistency-sheet [data-composition-selected]{outline:2px solid var(--ds-yellow);outline-offset:calc(4px * var(--sf))}

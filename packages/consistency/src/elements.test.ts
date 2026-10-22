@@ -84,3 +84,10 @@ it('keeps button destinations in source and rejects unsafe destinations', () => 
   const unsafe = readContentElement('```c9y-button\n{"label":"Go","secondary":false,"action":{"kind":"link","target":"javascript:alert(1)"}}\n```');
   expect(unsafe).toEqual({ kind: 'button', label: 'Go', secondary: false });
 });
+
+it('keeps card dimensions through text and appearance source changes', () => {
+  const card: ContentElement = { kind: 'card', label: 'Label', title: 'Title', body: 'Body', width: 300, height: 240 };
+  const read = readContentElement(writeContentElement(card));
+  expect(read).toEqual(card);
+  expect(readContentElement(writeContentElement({ ...card, title: 'Changed', tone: 'pink' }))).toMatchObject({ width: 300, height: 240, title: 'Changed', tone: 'pink' });
+});

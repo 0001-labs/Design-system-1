@@ -12,7 +12,7 @@ import cursorIcon from '../../../DS1/x-icon/cursor.svg?raw';
 provideIcons({ cursor: cursorIcon });
 import '../../../DS1/4-page/ds-overlay';
 
-export type ContentElement = { kind: 'button'; label: string; secondary: boolean; action?: { kind: 'link' | 'page'; target: string } } | { kind: 'card'; label: string; title: string; body: string; tone?: string; variant?: 'filled' | 'outlined' };
+export type ContentElement = { kind: 'button'; label: string; secondary: boolean; action?: { kind: 'link' | 'page'; target: string } } | { kind: 'card'; label: string; title: string; body: string; tone?: string; variant?: 'filled' | 'outlined'; width?: number; height?: number };
 const defaults: Record<ContentElement['kind'], ContentElement> = {
   button: { kind: 'button', label: 'Get in touch', secondary: false },
   card: { kind: 'card', label: 'A new idea', title: 'Something worth making', body: 'Write a little about it.' },
@@ -36,7 +36,7 @@ export function readContentElement(source: string): ContentElement | null {
     const data = value as Record<string, unknown>;
     if (!text(data.label, 200)) return null;
     if (match[1] === 'button') return typeof data.secondary === 'boolean' ? { kind: 'button', label: data.label, secondary: data.secondary, ...(readAction(data.action) ? { action: readAction(data.action)! } : {}) } : null;
-    return text(data.title, 500) && text(data.body, 5000) ? { kind: 'card', label: data.label, title: data.title, body: data.body, ...(typeof data.tone === 'string' && tones.includes(data.tone) ? { tone: data.tone } : {}), ...(data.variant === 'filled' || data.variant === 'outlined' ? { variant: data.variant } : {}) } : null;
+    return text(data.title, 500) && text(data.body, 5000) ? { kind: 'card', label: data.label, title: data.title, body: data.body, ...(typeof data.width === 'number' && Number.isFinite(data.width) && data.width >= 80 && data.width <= 2000 ? { width: data.width } : {}), ...(typeof data.height === 'number' && Number.isFinite(data.height) && data.height >= 80 && data.height <= 2000 ? { height: data.height } : {}), ...(typeof data.tone === 'string' && tones.includes(data.tone) ? { tone: data.tone } : {}), ...(data.variant === 'filled' || data.variant === 'outlined' ? { variant: data.variant } : {}) } : null;
   } catch { return null; }
 }
 export function writeContentElement(value: ContentElement): string {
@@ -52,7 +52,7 @@ function paint(face: HTMLElement, value: ContentElement) {
     const label = face.ownerDocument.createElement('span'); label.slot = 'label'; label.textContent = value.label;
     const title = face.ownerDocument.createElement('span'); title.slot = 'title'; title.textContent = value.title;
     const body = face.ownerDocument.createElement('p'); body.textContent = value.body;
-    face.append(label, title, body); face.setAttribute('variant', value.variant ?? 'outlined'); if (value.tone) face.setAttribute('tone', value.tone); face.setAttribute('data-ds-prose', ''); face.setAttribute('height', '8');
+    face.append(label, title, body); face.setAttribute('variant', value.variant ?? 'outlined'); if (value.tone) face.setAttribute('tone', value.tone); face.setAttribute('data-ds-prose', ''); face.setAttribute('height', String((value.height ?? 160) / 20)); if (value.width) face.style.width = `calc(${value.width}px * var(--sf))`; if (value.height) face.style.height = `calc(${value.height}px * var(--sf))`;
   }
 }
 /** Aa owns insertion, selection and undo; only this adapter knows component data. */
@@ -118,6 +118,8 @@ export function contentElementAtoms(canWrite: () => boolean, getHost: () => HTML
       });
       // Keep native text selection, paste and composition within the rendered face.
       // Commit at the end of a field edit so Aa records one normal atom history entry.
+      const resize = (event: Event) => { if (value?.kind !== 'card' || !canWrite()) return; const size = (event as CustomEvent<{ width: number; height: number }>).detail; value = { ...value, width: size.width, height: size.height }; commit(); };
+      element.addEventListener('consistency-resize', resize);
       const blur = (event: FocusEvent) => { if (nodes.some(node => node.contains(event.target as Node))) commit(); };
       element.addEventListener('focusout', blur);
       let actionBar: HTMLElement | undefined;
@@ -186,7 +188,7 @@ export function contentElementAtoms(canWrite: () => boolean, getHost: () => HTML
         if (event.key === 'Backspace' || event.key === 'Delete') { event.preventDefault(); event.stopPropagation(); element.dispatchEvent(new CustomEvent('aa-atom-source', { bubbles: true, detail: { source: '' } })); }
       };
       element.addEventListener('contextmenu', context); element.addEventListener('keydown', key);
-      return () => { observer.disconnect(); element.removeEventListener('focusin', focus); element.removeEventListener('focusout', leave); editors.forEach(editor => editor.destroy()); menu.remove(); element.removeEventListener('focusout', blur); element.removeEventListener('contextmenu', context); element.removeEventListener('keydown', key); };
+      return () => { observer.disconnect(); element.removeEventListener('consistency-resize', resize); element.removeEventListener('focusin', focus); element.removeEventListener('focusout', leave); editors.forEach(editor => editor.destroy()); menu.remove(); element.removeEventListener('focusout', blur); element.removeEventListener('contextmenu', context); element.removeEventListener('keydown', key); };
     },
   }));
 }

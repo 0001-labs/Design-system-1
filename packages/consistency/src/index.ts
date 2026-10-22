@@ -1,3 +1,4 @@
+import { ResizingLayer } from './resize';
 import { TextSpacingLayer } from './text-spacing';
 import './text-spacing.css';
 import { LitElement, html } from 'lit';
@@ -30,7 +31,7 @@ export class ConsistencyEditor extends LitElement {
   declare preview: Record<string, number>;
   declare selected: Dimension;
   declare selectedGap: string;
-  declare layers: { marquee: boolean; spacing: boolean; boundaries: boolean; reorder: boolean; place: boolean; production: boolean };
+  declare layers: { marquee: boolean; spacing: boolean; boundaries: boolean; reorder: boolean; place: boolean; production: boolean; resizing: boolean };
   declare selection: Set<string>;
   declare marquee: SelectionRect | null;
   declare editorError: string;
@@ -56,13 +57,14 @@ export class ConsistencyEditor extends LitElement {
   private spacingDisposers: (() => void)[] = [];
   private spacingBound = false;
   private textSpacing?: TextSpacingLayer;
+  private resizing?: ResizingLayer;
   private linkedEditors = new WeakSet<AaEditorElement>();
   private settle = new CompositionSettle();
   private interaction: "pointer" | "keyboard" = "keyboard";
   private cleanups: (() => void)[] = [];
-  constructor() { super(); this.revision = 0; this.preview = {}; this.selected = 'gap'; this.selectedGap = 'intro-actions'; this.layers = { marquee: true, spacing: true, boundaries: true, reorder: false, place: false, production: true }; this.selection = new Set(); this.marquee = null; this.editorError = ''; this.library = 'original'; }
+  constructor() { super(); this.revision = 0; this.preview = {}; this.selected = 'gap'; this.selectedGap = 'intro-actions'; this.layers = { marquee: true, spacing: true, boundaries: true, reorder: true, place: true, production: true, resizing: true }; this.selection = new Set(); this.marquee = null; this.editorError = ''; this.library = 'original'; }
   createRenderRoot() { return this; }
-  disconnectedCallback() { this.textSpacing?.destroy(); this.textSpacing = undefined; window.removeEventListener('keydown', this.onEscape); this.cancelMarquee?.(); this.sort?.destroy(); this.spacingDisposers.forEach(dispose => dispose()); this.settle.cancel(); this.cleanups.forEach(fn => fn()); this.cleanups = []; super.disconnectedCallback(); }
+  disconnectedCallback() { this.resizing?.destroy(); this.resizing = undefined; this.textSpacing?.destroy(); this.textSpacing = undefined; window.removeEventListener('keydown', this.onEscape); this.cancelMarquee?.(); this.sort?.destroy(); this.spacingDisposers.forEach(dispose => dispose()); this.settle.cancel(); this.cleanups.forEach(fn => fn()); this.cleanups = []; super.disconnectedCallback(); }
   private value(key: Dimension, gap = this.selectedGap) { return this.preview[key === 'gap' ? gap : key] ?? (key === 'gap' ? (this.history.value.gaps[gap] ?? this.textSpacing?.defaultValue(gap) ?? 20) : this.history.value[key]); }
   private commit(key: Dimension, value: number, gap = this.selectedGap) {
     if (key === 'gap') this.history.commit({ gaps: { ...this.history.value.gaps, [gap]: dimensionValue(key, value) } });
@@ -123,7 +125,7 @@ export class ConsistencyEditor extends LitElement {
     window.addEventListener('pointermove', move); window.addEventListener('pointerup', finish); window.addEventListener('pointercancel', cancel); window.addEventListener('blur', cancel);
   }
   private finishDrag(update: () => void) {
-    const leaves = Array.from(this.querySelectorAll<HTMLElement>('.consistency-text-bounds > aa-editor > *, .consistency-sample-actions > *, .ghost-surface--gap .ghost-measure, .ghost-surface--padding .ghost-measure, .ghost-surface--width'));
+    const leaves = Array.from(this.querySelectorAll<HTMLElement>('.consistency-text-bounds > aa-editor > .aa-block, .consistency-sample-actions > ds-button, .consistency-projects > ds-card, .consistency-statistics > ds-stat, .consistency-gap, .consistency-text-gap, [data-spacing-active] > .ghost-measure, .ghost-surface--padding .ghost-measure, .ghost-surface--width'));
     void this.settle.run(leaves, async () => { update(); await this.updateComplete; });
   }
   private number(key: Dimension, label: string) {
@@ -138,7 +140,7 @@ export class ConsistencyEditor extends LitElement {
       aria-label=${`Adjust ${gap ? gap.replaceAll('-', ' ') : label.toLowerCase()}`} role="slider" aria-valuenow=${Math.round(value)}
       aria-orientation=${key === 'gap' ? axis : 'horizontal'}
       aria-valuemin=${limits[key][0]} aria-valuemax=${limits[key][1]} aria-valuetext=${`${Math.round(value)} pixels`}
-      @focus=${() => { this.selected = key; if (gap) this.selectedGap = gap; }}><span class="ghost-measure" aria-hidden="true">${label} ${Math.round(value)}</span></div>`;
+      @focus=${() => { this.selected = key; if (gap) this.selectedGap = gap; }}><span class="ghost-measure" aria-hidden="true">${Math.round(value)}</span></div>`;
   }
   private sectionText(key: string, label: string) {
     return html`<div class="consistency-text-bounds" data-ds-area data-selectable=${key}><aa-editor toolbar class=${this.history.value.wrap ? '' : 'consistency-nowrap'} aria-label=${label} data-editor-key=${key}
@@ -193,6 +195,8 @@ export class ConsistencyEditor extends LitElement {
     if (document.fonts && typeof ResizeObserver !== 'undefined') initGridFit();
   }
   protected updated() {
+    this.resizing ??= new ResizingLayer(this, { enabled: () => this.layers.resizing, size: key => this.history.value.sizes[key], commit: (key, size) => { this.history.commit({ sizes: { ...this.history.value.sizes, [key]: size } }); this.revision++; } });
+    this.resizing.refresh();
     this.querySelectorAll<HTMLElement>('aa-editor[data-editor-key]').forEach(editor => {
       editor.querySelectorAll<HTMLElement>(':scope > .aa-block').forEach((block, index) => { block.dataset.selectable = `text:${editor.dataset.editorKey}:${index}`; });
     });
@@ -202,7 +206,7 @@ export class ConsistencyEditor extends LitElement {
       enabled: () => this.layers.spacing,
       select: id => { this.selected = 'gap'; this.selectedGap = id; },
       preview: (id, value) => { this.preview = { ...this.preview, [id]: value }; },
-      commit: (id, value) => this.commit('gap', value, id),
+      commit: (id, value, pointer) => { if (pointer) this.finishDrag(() => this.commit('gap', value, id)); else this.commit('gap', value, id); },
       cancel: () => { this.preview = {}; },
     });
     this.textSpacing.refresh();
@@ -289,7 +293,7 @@ export class ConsistencyEditor extends LitElement {
       </div></header>
       <div class="consistency-bar"><span>Words and the space around them.</span><span class="consistency-muted">Local experiment</span></div>
       <main class="consistency-workspace"><section class="consistency-stage" aria-label="Editable composition" @pointerdown=${this.startMarquee}>
-        <div class="consistency-sheet" data-ds-surface data-consistency-library=${this.library} style=${styleMap({ ...libraryTokens(this.library), color: 'var(--ds-text-color)', colorScheme: this.library === 'ink' ? 'dark' : this.library === 'blue' ? 'light' : undefined, width: `calc(${width}px * var(--sf))`, padding: `calc(${padding}px * var(--sf))`, '--composition-padding': `calc(${padding}px * var(--sf))`, '--composition-content-width': `calc(${width - padding * 2}px * var(--sf))`, '--composition-card-width': `calc(${Math.max(20, Math.floor((width - padding * 2 - 20) / 40) * 20)}px * var(--sf))` })}>
+        <div class="consistency-sheet" data-ds-grid-scroll data-ds-surface data-consistency-library=${this.library} style=${styleMap({ ...libraryTokens(this.library), color: 'var(--ds-text-color)', colorScheme: this.library === 'ink' ? 'dark' : this.library === 'blue' ? 'light' : undefined, width: `calc(${width}px * var(--sf))`, padding: `calc(${padding}px * var(--sf))`, '--composition-padding': `calc(${padding}px * var(--sf))`, '--composition-content-width': `calc(${width - padding * 2}px * var(--sf))`, '--composition-card-width': `calc(${Math.max(20, Math.floor((width - padding * 2 - 20) / 40) * 20)}px * var(--sf))` })}>
           <div class="consistency-width">${this.handle('width', 'Width')}</div>
           <div class="consistency-padding">${this.handle('padding', 'Padding')}</div>
           ${repeat(doc.order, id => id, id => this.group(id))}
@@ -297,7 +301,7 @@ export class ConsistencyEditor extends LitElement {
         ${this.marquee ? html`<div class="consistency-marquee" aria-hidden="true" style=${styleMap({ left: `${this.marquee.left}px`, top: `${this.marquee.top}px`, width: `${this.marquee.right - this.marquee.left}px`, height: `${this.marquee.bottom - this.marquee.top}px` })}></div>` : ''}
         <p class="consistency-hint">Edit the words. Drag the space or an edge to make room.</p>
       </section><aside class="consistency-inspector" aria-label="Composition bounds and spacing">
-        <h2>Composition</h2><label class="consistency-select-label">Library preset<ds-select><select aria-label="Library preset" .value=${this.library} @change=${(event: Event) => { this.library = (event.target as HTMLSelectElement).value as LibraryId; }}>${LIBRARY_PRESETS.map(preset => html`<option value=${preset.id}>${preset.label}</option>`)}</select></ds-select></label><div class="consistency-layers">${this.layerToggle('marquee', 'Marquee')}${this.layerToggle('spacing', 'Spacing')}${this.layerToggle('boundaries', 'Boundaries')}${this.layerToggle('reorder', 'Reorder')}${this.layerToggle('place', 'Place')}${this.layerToggle('production', 'Production')}</div><p role="status">${this.selection.size} elements selected</p>
+        <h2>Composition</h2><label class="consistency-select-label">Library preset<ds-select><select aria-label="Library preset" .value=${this.library} @change=${(event: Event) => { this.library = (event.target as HTMLSelectElement).value as LibraryId; }}>${LIBRARY_PRESETS.map(preset => html`<option value=${preset.id}>${preset.label}</option>`)}</select></ds-select></label><div class="consistency-layers">${this.layerToggle('marquee', 'Marquee')}${this.layerToggle('spacing', 'Spacing')}${this.layerToggle('boundaries', 'Boundaries')}${this.layerToggle('reorder', 'Reorder')}${this.layerToggle('place', 'Place')}${this.layerToggle('production', 'Production')}${this.layerToggle('resizing', 'Resizing')}</div><p role="status">${this.selection.size} elements selected</p>
         ${this.layers.reorder ? html`<div class="consistency-reorder-actions"><ds-button ?disabled=${!this.selectedGroup() || doc.order.indexOf(this.selectedGroup()) === 0} @click=${() => this.moveGroup(this.selectedGroup(), doc.order.indexOf(this.selectedGroup()) - 1)}>Move up</ds-button><ds-button ?disabled=${!this.selectedGroup() || doc.order.indexOf(this.selectedGroup()) === doc.order.length - 1} @click=${() => this.moveGroup(this.selectedGroup(), doc.order.indexOf(this.selectedGroup()) + 1)}>Move down</ds-button></div><p class="consistency-muted">Select a section, then drag its empty space. Space lifts a focused section; arrows move it.</p>` : ''}<p class="consistency-muted">A live layer over the things you make.</p>
         <div class="consistency-fields">${this.number('width', 'Width')}${this.number('padding', 'Padding')}<span class="consistency-gap-name">${this.selectedGap.replaceAll('-', ' ')}</span>${this.number('gap', 'Gap')}
           <label class="consistency-select-label">Text bounds<ds-select><select aria-label="Text bounds" .value=${doc.wrap ? 'wrap' : 'nowrap'} @change=${(e: Event) => { this.history.commit({ wrap: (e.target as HTMLSelectElement).value === 'wrap' }); this.revision++; }}><option value="wrap">Wrap to bounds</option><option value="nowrap">Keep one line</option></select></ds-select></label>

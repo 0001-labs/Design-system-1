@@ -11,11 +11,11 @@ consistency-editor{display:block;--ds-sf:var(--sf);color:var(--ds-text-color);fo
 .ghost-surface:focus-visible{outline:1px solid var(--ds-text-color);outline-offset:1px}
 .ghost-measure{position:absolute;pointer-events:none;white-space:nowrap;background:var(--ds-yellow);color:var(--ds-black);font-size:calc(12px * var(--sf));line-height:calc(16px * var(--sf));padding:0 calc(4px * var(--sf));border-radius:calc(2px * var(--sf))}
 .ghost-surface--width .ghost-measure{right:calc(10px * var(--sf));top:calc(-20px * var(--sf))}
-.ghost-surface--padding .ghost-measure{left:50%;top:calc(20px * var(--sf));transform:translateX(-50%)}
+.ghost-surface--padding .ghost-measure{left:50%;top:50%;transform:translate(-50%,-50%)}
 .ghost-surface--gap .ghost-measure{left:50%;top:50%;transform:translate(-50%,-50%)}
 .ghost-surface--width{border-left:0;background-image:linear-gradient(to right,transparent calc(50% - .5px),var(--ds-yellow) calc(50% - .5px),var(--ds-yellow) calc(50% + .5px),transparent calc(50% + .5px))}
 .ghost-surface--gap{height:max(calc(20px * var(--sf)),var(--composition-gap));bottom:auto}
-.consistency-story-section{min-height:calc(440px * var(--sf));scroll-margin-top:calc(40px * var(--sf))}
+.consistency-story-section{min-height:0;scroll-margin-top:calc(40px * var(--sf))}
 
 
 .consistency-projects{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--u)}
@@ -124,7 +124,7 @@ consistency-editor{display:block;--ds-sf:var(--sf);color:var(--ds-text-color);fo
 .consistency-sheet{height:max(calc(400px * var(--sf)),round(down,calc(100dvh - 180px * var(--sf)),var(--u)));overflow:auto;overscroll-behavior:contain;scrollbar-width:thin}
 .consistency-hint{display:none}
 .consistency-stage{height:max(calc(400px * var(--sf)),round(down,calc(100dvh - 180px * var(--sf)),var(--u)));align-self:start}
-.ghost-surface--padding[aria-valuenow="0"] .ghost-measure{left:0;transform:none}
+.ghost-surface--padding[aria-valuenow="0"] .ghost-measure{left:0;transform:translateY(-50%)}
 .production-on .ghost-surface--width .ghost-measure{top:0}
 /* Removing an element also removes the gap that no longer has two neighbours. */
 .consistency-projects:has(>ds-card[hidden]){grid-template-columns:minmax(0,1fr)}
@@ -133,3 +133,15 @@ consistency-editor{display:block;--ds-sf:var(--sf);color:var(--ds-text-color);fo
 .consistency-sample-actions:has(>ds-button[hidden])>.consistency-gap{display:none}
 .consistency-statistics:has(>ds-stat[hidden])>ds-stat:not([hidden]){flex:1;width:auto}
 .consistency-group.consistency-sheet{height:auto;overflow:visible;border-radius:0}
+/* Preview follows the pointer continuously; grid fitting resumes on release. */
+.consistency-shell:has([data-spacing-active],[data-resizing]) .consistency-text-bounds{min-height:0!important}
+/* Empty gaps still have an invisible target from which to pull space open. */
+.consistency-gap--horizontal .ghost-surface--gap[aria-valuenow="0"]{width:var(--u);left:50%;transform:translateX(-50%)}
+.consistency-shell .ghost-surface--gap[aria-valuenow="0"]{background:transparent;box-shadow:none}
+.ghost-surface--gap[aria-valuenow="0"]::after{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:var(--ds-pink);opacity:0;pointer-events:none}
+.consistency-gap--horizontal .ghost-surface--gap[aria-valuenow="0"]::after{left:50%;right:auto;top:0;bottom:0;width:1px;height:auto}
+.ghost-surface--gap[aria-valuenow="0"]:is(:hover,:focus-visible,[data-spacing-active])::after{opacity:1}
+.consistency-text-bounds .consistency-text-gap[aria-valuenow="0"]{height:var(--u)!important;background:transparent}
+/* The website grid belongs to its scrolling content, never the workspace. */
+.consistency-stage{background-image:none}
+.consistency-shell:not(.production-on) .consistency-sheet{background-image:radial-gradient(var(--ds-border-color,#ccc) .5px,transparent .5px);background-size:var(--u) var(--u);background-attachment:local}

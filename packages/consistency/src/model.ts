@@ -1,6 +1,6 @@
 export type Dimension = 'width' | 'padding' | 'gap';
-export interface Composition { width: number; padding: number; gap: number; wrap: boolean; text: string; sections: Record<string, string>; gaps: Record<string, number>; order: string[]; hidden: string[] }
-export const initialComposition: Composition = { width: 640, padding: 40, gap: 40, wrap: true,
+export interface Composition { sizes: Record<string, { width: number; height: number }>;  width: number; padding: number; gap: number; wrap: boolean; text: string; sections: Record<string, string>; gaps: Record<string, number>; order: string[]; hidden: string[] }
+export const initialComposition: Composition = { sizes: {}, width: 640, padding: 40, gap: 40, wrap: true,
   hidden: [],
   order: ['intro', 'work', 'approach', 'contact'],
   gaps: { 'intro-actions': 40, 'intro-work': 40, 'work-cards': 40, 'work-approach': 40, 'approach-stats': 40, 'approach-contact': 40, 'contact-card': 40, 'contact-action': 40, 'projects-columns': 20, 'stats-columns': 40, 'actions-columns': 20 },

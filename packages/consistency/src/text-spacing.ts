@@ -14,7 +14,7 @@ export class TextSpacingLayer {
     enabled: () => boolean;
     select: (id: string) => void;
     preview: (id: string, value: number) => void;
-    commit: (id: string, value: number) => void;
+    commit: (id: string, value: number, pointer: boolean) => void;
     cancel: () => void;
   }) {}
   defaultValue(id: string) { return this.defaults.get(id) ?? 20; }
@@ -44,12 +44,13 @@ export class TextSpacingLayer {
           const measure = document.createElement('span'); measure.className = 'ghost-measure'; measure.setAttribute('aria-hidden', 'true'); host.append(measure);
           host.addEventListener('focus', () => this.state.select(id));
           bounds.append(host);
+          let pointer = false;
           const dispose = bindSpacingHandle(host, () => ({
             value: this.state.value(id, fallback), disabled: !this.state.enabled(), min: 0, max: 2000, step: 20, shiftStep: 40,
             axis: 'vertical', snapPreview: false, gain: pointerGain('gap', Number(getComputedStyle(this.root).getPropertyValue('--sf'))),
             onPointerStart: () => { this.state.select(id); host.focus({ preventScroll: true }); },
-            onStart: () => { host.setAttribute('data-spacing-active', ''); this.state.select(id); },
-            onPreview: next => this.state.preview(id, next), onCommit: next => this.state.commit(id, next),
+            onStart: kind => { pointer = kind === 'pointer'; host.setAttribute('data-spacing-active', ''); this.state.select(id); },
+            onPreview: next => this.state.preview(id, next), onCommit: next => this.state.commit(id, next, pointer),
             onEnd: cancelled => { host.removeAttribute('data-spacing-active'); if (cancelled) this.state.cancel(); },
           }));
           handle = { host, dispose }; this.handles.set(id, handle);
@@ -58,7 +59,7 @@ export class TextSpacingLayer {
         Object.assign(handle.host.style, { top: `${previous.bottom - rect.top}px`, left: `${next.left - rect.left}px`, width: `${next.width}px`, height: `${Math.max(0, next.top - previous.bottom)}px` });
         handle.host.hidden = !this.state.enabled(); handle.host.tabIndex = this.state.enabled() ? 0 : -1;
         handle.host.setAttribute('aria-valuenow', String(Math.round(value))); handle.host.setAttribute('aria-valuetext', `${Math.round(value)} pixels`);
-        handle.host.firstElementChild!.textContent = `Gap ${Math.round(value)}`;
+        handle.host.firstElementChild!.textContent = String(Math.round(value));
       });
     });
     this.handles.forEach((handle, id) => { if (!present.has(id)) { handle.dispose(); handle.host.remove(); this.handles.delete(id); } });
