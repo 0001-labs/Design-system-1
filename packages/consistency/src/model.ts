@@ -1,7 +1,8 @@
+import type { StatDesign, ButtonDesign } from './surface-context';
 import { linkCardDesign, type CardDesign } from './card-design';
 export type Dimension = 'width' | 'padding' | 'gap';
-export interface Composition { pageTone?: string; consistency: boolean; cardDesigns: Record<string, CardDesign>; linkedCardDesign?: CardDesign; cardGaps: Record<string, Record<string, number>>; sizes: Record<string, { width: number; height: number }>;  width: number; padding: number; gap: number; wrap: boolean; text: string; sections: Record<string, string>; gaps: Record<string, number>; order: string[]; hidden: string[] }
-export const initialComposition: Composition = { linkedCardDesign: undefined, pageTone: '', consistency: true, cardDesigns: {}, cardGaps: {}, sizes: {}, width: 640, padding: 40, gap: 40, wrap: true,
+export interface Composition { statDesigns: Record<string, StatDesign>; buttonDesigns: Record<string, ButtonDesign>; pageTone?: string; consistency: boolean; cardDesigns: Record<string, CardDesign>; linkedCardDesign?: CardDesign; cardGaps: Record<string, Record<string, number>>; sizes: Record<string, { width: number; height: number }>;  width: number; padding: number; gap: number; wrap: boolean; text: string; sections: Record<string, string>; gaps: Record<string, number>; order: string[]; hidden: string[] }
+export const initialComposition: Composition = { statDesigns: {}, buttonDesigns: {}, linkedCardDesign: undefined, pageTone: '', consistency: true, cardDesigns: {}, cardGaps: {}, sizes: {}, width: 640, padding: 40, gap: 40, wrap: true,
   hidden: [],
   order: ['intro', 'work', 'approach', 'contact'],
   gaps: { 'intro-actions': 40, 'intro-work': 40, 'work-cards': 40, 'work-approach': 40, 'approach-stats': 40, 'approach-contact': 40, 'contact-card': 40, 'contact-action': 40, 'projects-columns': 20, 'stats-columns': 40, 'actions-columns': 20 },
@@ -25,7 +26,9 @@ export class CompositionHistory {
   get canUndo() { return this.past.length > 0; }
   get canRedo() { return this.future.length > 0; }
   commit(patch: Partial<Composition>) {
-    const next = linkCardDesign(this.value, { ...this.value, ...patch });
+    const candidate = { ...this.value, ...patch };
+    candidate.sizes = Object.fromEntries(Object.entries(candidate.sizes).map(([id, size]) => [id, { width: Math.max(READABLE_CARD_MIN, size.width), height: Math.max(80, size.height) }]));
+    const next = linkCardDesign(this.value, { ...candidate, ...compositionBounds(candidate.width, candidate.padding) });
     if (JSON.stringify(next) === JSON.stringify(this.value)) return;
     this.past.push(this.value); this.past = this.past.slice(-100);
     this.value = next; this.future = [];
@@ -45,4 +48,21 @@ export function removeSourceRanges(source: string, ranges: readonly { start: num
   let result = source;
   for (const range of [...ranges].sort((a, b) => b.start - a.start)) result = result.slice(0, range.start) + result.slice(range.end);
   return result.replace(/^\n+|\n+$/g, '');
+}
+
+export const READABLE_TEXT_MIN = 200;
+export const READABLE_CARD_MIN = 240;
+/** Authored bounds always leave a readable column; padding yields first. */
+export function compositionBounds(width: number, padding: number, snap = true, minimumWidth = limits.width[0]) {
+ const rawWidth = Number.isFinite(width) ? Math.min(limits.width[1], Math.max(minimumWidth, width)) : initialComposition.width;
+ const safeWidth = snap ? Math.round(rawWidth / 20) * 20 : rawWidth;
+ const room = Math.max(0, (safeWidth - READABLE_CARD_MIN) / 2);
+ const maxPadding = snap ? Math.floor(room / 20) * 20 : room;
+ const safePadding = snap ? dimensionValue('padding', padding) : Math.max(0, Math.min(80, padding));
+ return { width: safeWidth, padding: Math.min(safePadding, maxPadding) };
+}
+export function compositionRange(key: Dimension, width: number, padding: number): [number, number] {
+ if (key === 'width') return [Math.max(limits.width[0], READABLE_CARD_MIN + 2 * padding), limits.width[1]];
+ if (key === 'padding') return [0, Math.min(limits.padding[1], Math.max(0, Math.floor((width - READABLE_CARD_MIN) / 40) * 20))];
+ return limits.gap;
 }

@@ -174,9 +174,8 @@ consistency-editor{display:block;--ds-sf:var(--sf);color:var(--ds-text-color);fo
 .consistency-element-preview[data-consistency-library="bold"] ds-button{--ds-button-width:calc(8 * var(--ds-unit))}
 .consistency-element-preview[data-consistency-library="bold"] .consistency-element-preview-stage ds-button{grid-column:3 / span 8;grid-row:4 / span 2}
 .consistency-mobile-preview .consistency-sheet[data-consistency-library="bold"] .consistency-sample-actions{row-gap:var(--ds-unit)}
-/* Palette card fills are pastel even in the Ink library. Their words use the
-   public text roles locally; outlined cards retain the surrounding paper's ink. */
-:is(.consistency-sheet,.consistency-element-preview) ds-card[tone]:not([tone=""]):not([tone="ink"]):not([variant="outlined"]){--ds-text-color:var(--ds-black);--ds-text-color-muted:color-mix(in srgb,var(--ds-black) 65%,transparent)}
+/* Toned card fills follow the colour scheme, with matching readable ink. */
+:is(.consistency-sheet,.consistency-element-preview) ds-card[tone]:not([tone=""]):not([tone="ink"]):not([variant="outlined"]){--ds-text-color:light-dark(var(--ds-black),var(--ds-white));--ds-text-color-muted:color-mix(in srgb,var(--ds-text-color) 65%,transparent)}
 /* The editor never owns a page-wide horizontal scrollbar. Wide authored pages
    scroll inside their stage; chrome remains a shrinkable, wrapping layout. */
 consistency-editor,.consistency-shell{width:100%;max-width:100%;min-width:0}
@@ -185,3 +184,24 @@ consistency-editor,.consistency-shell{width:100%;max-width:100%;min-width:0}
 .consistency-top,.consistency-bar,.consistency-footer,.consistency-actions{min-width:0;max-width:100%;flex-wrap:wrap}
 .consistency-inspector,.consistency-inspector label,.consistency-inspector p{min-width:0;max-width:100%;overflow-wrap:anywhere}
 .consistency-inspector ds-select,.consistency-inspector ds-number{max-width:100%}
+
+/* Measurements belong to the highlighted space, without a separate badge. */
+.consistency-shell .ghost-measure{background:transparent;color:var(--ds-text-color);padding:0;border:0;border-radius:0}
+/* Readable content gets a column, never the few pixels left after a gap. */
+.consistency-text-bounds{min-width:calc(200px * var(--sf))}
+.consistency-sheet aa-editor,.consistency-sheet .aa-block{overflow-wrap:break-word;word-break:normal}
+.consistency-sheet ds-card{min-width:calc(240px * var(--sf));overflow-wrap:break-word;word-break:normal}
+.consistency-statistics>ds-stat:first-child,.consistency-statistics>ds-stat:last-child{width:auto;min-width:calc(200px * var(--sf));flex:1 0 calc(200px * var(--sf));--ds-stat-figure-white-space:normal;--ds-stat-figure-overflow-wrap:break-word}
+.consistency-projects:not(.consistency-stacked){grid-template-columns:minmax(calc(240px * var(--sf)),var(--resize-first,var(--composition-card-width))) auto minmax(calc(240px * var(--sf)),var(--resize-last,1fr))}
+.consistency-projects.consistency-stacked,.consistency-statistics.consistency-stacked{display:flex;flex-direction:column;align-items:stretch}
+.consistency-stacked>.consistency-gap{width:100%!important;height:var(--composition-gap)!important;flex:none;align-self:stretch}
+.consistency-stacked>.consistency-gap>.ghost-surface--gap{width:100%;height:max(var(--u),var(--composition-gap));left:0;top:50%;transform:translateY(-50%);cursor:ns-resize}
+.consistency-statistics.consistency-stacked>ds-stat{width:100%;flex:none}
+.consistency-mobile-preview .consistency-sheet{max-width:none;--composition-content-width:calc(100% - 2 * var(--composition-padding))}
+.consistency-mobile-preview .consistency-sheet aa-editor,.consistency-mobile-preview .consistency-sheet .aa-block,.consistency-mobile-preview .consistency-sheet ds-card{overflow-wrap:break-word;word-break:normal}
+.consistency-statistics>ds-stat{--ds-stat-text-overflow-wrap:break-word}
+/* Production selection rests on the authored element, never its empty gaps. */
+.production-on .consistency-sheet :is([data-composition-selected],[data-selectable][data-selected]:not(.aa-block)){position:relative;outline:none!important;box-shadow:none}
+.production-on .consistency-sheet :is([data-composition-selected],[data-selectable][data-selected]:not(.aa-block))::after{content:'';position:absolute;inset:0;z-index:20;pointer-events:none;border:0;outline:0;border-radius:inherit;background:color-mix(in srgb,var(--ds-pink) 14%,transparent)}
+
+.consistency-shell :is(.consistency-card-gap,.consistency-stat-gap)[aria-valuenow="0"]{background:linear-gradient(to bottom,transparent calc(50% - .5px),var(--ds-pink) calc(50% - .5px),var(--ds-pink) calc(50% + .5px),transparent calc(50% + .5px))}

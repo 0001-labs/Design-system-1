@@ -40,6 +40,50 @@ try {
     if (sheet.scroll > sheet.client + 1) throw Error(`${width}px: mobile website itself overflows (${sheet.scroll} > ${sheet.client})`);
     await page.getByRole('button', { name: 'Desktop preview', exact: true }).click(); await check('restored desktop');
     console.log(`Viewport ${width}px: initial, wide canvas, Bold, action toolbar and mobile preview passed`);
+    await page.reload(); await page.waitForSelector('.consistency-sheet');
+    await page.evaluate(async () => {
+      const editor = document.querySelector('consistency-editor');
+      editor.history.commit({ width: 280, padding: 80, gaps: { ...editor.history.value.gaps, 'projects-columns': 500, 'stats-columns': 500 }, sizes: { bookshop: { width: 80, height: 100 } } });
+      editor.requestUpdate(); await editor.updateComplete; await document.fonts.ready;
+    });
+    const readable = async label => {
+      await page.waitForTimeout(100);
+      const failures = await page.evaluate(() => {
+        const problems = [];
+        for (const element of document.querySelectorAll('.consistency-text-bounds, .consistency-sheet ds-stat, .consistency-sheet ds-card')) {
+          if (!element.getClientRects().length || element.hidden) continue;
+          const scale = Number.parseFloat(getComputedStyle(element).getPropertyValue('--sf')) || 1;
+          const minimum = element.tagName === 'DS-CARD' ? 240 : 200;
+          const actual = element.getBoundingClientRect().width / scale;
+          if (actual < minimum - 1) problems.push(`${element.tagName} ${actual}px < ${minimum}px`);
+          const figure = element.shadowRoot?.querySelector('.ds-stat__figure');
+          if (figure && figure.scrollWidth > figure.clientWidth + 1) problems.push('Stat figure is clipped');
+        }
+        return problems;
+      });
+      if (failures.length) throw Error(`${width}px ${label}: ${failures.join('; ')}`);
+      await check(label);
+    };
+    await readable('minimum width with excessive padding and gaps');
+    await page.getByRole('button', { name: 'Mobile preview', exact: true }).click();
+    await readable('minimum width in mobile preview');
+    await page.reload(); await page.waitForSelector('.consistency-sheet');
+    for (const preset of ['original', 'bold']) {
+      await page.locator('select[aria-label="Library preset"]').selectOption(preset);
+      await page.evaluate(() => { const e = document.querySelector('aa-editor'); e.editor.value = '/button'; e.editor.focus(); e.editor.selectRange(7); e.dispatchEvent(new Event('aa-change')); document.dispatchEvent(new Event('selectionchange')); });
+      await page.locator('.aa-menu button').filter({ hasText: 'Button' }).hover();
+      const preview = page.locator('.consistency-element-preview'); await preview.waitFor({ state: 'visible' });
+      await preview.locator('ds-button').evaluate(async element => { await element.updateComplete; });
+      const geometry = await preview.evaluate(element => {
+        const button = element.querySelector('ds-button'), inner = element.querySelector('.consistency-element-preview-inner');
+        const control = button.shadowRoot.querySelector('button') ?? button, caption = element.querySelector('.consistency-element-preview-label');
+        const scale = Number.parseFloat(getComputedStyle(button).getPropertyValue('--sf')) || 1;
+        return { zoom: getComputedStyle(inner).zoom, font: Number.parseFloat(getComputedStyle(control).fontSize) / scale, caption: Number.parseFloat(getComputedStyle(caption).fontSize) / scale, width: button.getBoundingClientRect().width / scale };
+      });
+      if (Number(geometry.zoom) !== 1 || geometry.font < 14 || geometry.caption < 14 || geometry.width < (preset === 'bold' ? 160 : 120) - 1) throw Error(`${width}px ${preset} undersized preview: ${JSON.stringify(geometry)}`);
+      await check('readable slash preview'); await page.keyboard.press('Escape');
+    }
+    console.log(`Viewport ${width}px: readable text/card/stat minimums and full-size preview type passed`);
     await page.close();
   }
 } finally { await browser.close(); await new Promise(resolve => server.close(resolve)); }

@@ -1,3 +1,5 @@
+import { SurfaceContextMenu } from './surface-context';
+import { StatSpacingLayer } from './stat-spacing';
 import { PageContextMenu } from './page-context';
 import { CardSpacingLayer } from './card-spacing';
 import { ResizingLayer } from './resize';
@@ -19,16 +21,17 @@ import '../../../DS1/2-core/ds-switch';
 import '../../../DS1/3-unit/ds-select';
 import { defineAaEditor, parseBlocks, type AaEditorElement } from '../../../website/src/vendor/aa/aa.js';
 import { bindSpacingHandle } from '../../app/src/2-core/spacing-handle';
-import { canStartMarquee, selectionRect, intersects, type SelectionRect } from './marquee';
+import { canStartMarquee, isMarqueeContent, selectionRect, intersects, type SelectionRect } from './marquee';
 import { CompositionSettle } from './settle';
 import { createPreviewEditorOptions } from './aa';
 import type { EditorOptions } from '../../../website/src/vendor/aa/aa';
-import { CompositionHistory, removeSourceRanges, pointerGain, initialComposition, dimensionValue, limits, type Dimension } from './model';
+import { CompositionHistory, removeSourceRanges, pointerGain, initialComposition, dimensionValue, limits, compositionBounds, compositionRange, READABLE_CARD_MIN, READABLE_TEXT_MIN, type Dimension } from './model';
 defineAaEditor();
 
 /** A reusable, document-owned ghost layer. It never mutates arbitrary page CSS. */
 export class ConsistencyEditor extends LitElement {
-  static properties = { mobilePreview: { state: true }, revision: { state: true }, preview: { state: true }, selected: { state: true }, selectedGap: { state: true }, layers: { state: true }, selection: { state: true }, marquee: { state: true }, editorError: { state: true }, library: { state: true } };
+  static properties = { mobilePreview: { state: true }, stageWidth: { state: true }, revision: { state: true }, preview: { state: true }, selected: { state: true }, selectedGap: { state: true }, layers: { state: true }, selection: { state: true }, marquee: { state: true }, editorError: { state: true }, library: { state: true } };
+  declare stageWidth: number;
   declare mobilePreview: boolean;
   declare revision: number;
   declare preview: Record<string, number>;
@@ -63,19 +66,24 @@ export class ConsistencyEditor extends LitElement {
   private resizing?: ResizingLayer;
   private cardSpacing?: CardSpacingLayer;
   private pageContext?: PageContextMenu;
+  private statSpacing?: StatSpacingLayer;
+  private surfaceContext?: SurfaceContextMenu;
+  private boundsObserver?: ResizeObserver;
   private linkedEditors = new WeakSet<AaEditorElement>();
   private settle = new CompositionSettle();
   private interaction: "pointer" | "keyboard" = "keyboard";
   private cleanups: (() => void)[] = [];
-  constructor() { super(); this.mobilePreview = false; this.revision = 0; this.preview = {}; this.selected = 'gap'; this.selectedGap = 'intro-actions'; this.layers = { marquee: true, spacing: true, boundaries: true, reorder: true, place: true, production: true, resizing: true }; this.selection = new Set(); this.marquee = null; this.editorError = ''; this.library = 'original'; }
+  constructor() { super(); this.stageWidth = 380; this.mobilePreview = false; this.revision = 0; this.preview = {}; this.selected = 'gap'; this.selectedGap = 'intro-actions'; this.layers = { marquee: true, spacing: true, boundaries: true, reorder: true, place: true, production: true, resizing: true }; this.selection = new Set(); this.marquee = null; this.editorError = ''; this.library = 'original'; }
   createRenderRoot() { return this; }
-  disconnectedCallback() { this.pageContext?.destroy(); this.pageContext = undefined; this.cardSpacing?.destroy(); this.cardSpacing = undefined; this.resizing?.destroy(); this.resizing = undefined; this.textSpacing?.destroy(); this.textSpacing = undefined; window.removeEventListener('keydown', this.onEscape); this.cancelMarquee?.(); this.sort?.destroy(); this.spacingDisposers.forEach(dispose => dispose()); this.settle.cancel(); this.cleanups.forEach(fn => fn()); this.cleanups = []; super.disconnectedCallback(); }
+  disconnectedCallback() { this.boundsObserver?.disconnect(); this.statSpacing?.destroy(); this.surfaceContext?.destroy(); this.pageContext?.destroy(); this.pageContext = undefined; this.cardSpacing?.destroy(); this.cardSpacing = undefined; this.resizing?.destroy(); this.resizing = undefined; this.textSpacing?.destroy(); this.textSpacing = undefined; window.removeEventListener('keydown', this.onEscape); this.cancelMarquee?.(); this.sort?.destroy(); this.spacingDisposers.forEach(dispose => dispose()); this.settle.cancel(); this.cleanups.forEach(fn => fn()); this.cleanups = []; super.disconnectedCallback(); }
   private value(key: Dimension, gap = this.selectedGap) { return this.preview[key === 'gap' ? gap : key] ?? (key === 'gap' ? (this.history.value.gaps[gap] ?? this.textSpacing?.defaultValue(gap) ?? 20) : this.history.value[key]); }
   private commit(key: Dimension, value: number, gap = this.selectedGap) {
     if (key === 'gap') this.history.commit({ gaps: { ...this.history.value.gaps, [gap]: dimensionValue(key, value) } });
     else this.history.commit({ [key]: dimensionValue(key, value) });
     this.preview = {}; this.revision++;
   }
+  private range(key: Dimension) { return compositionRange(key, this.mobilePreview ? Math.max(240, Math.min(380, this.stageWidth)) : this.history.value.width, this.history.value.padding); }
+  private stacked(id: string) { const width = this.mobilePreview ? Math.max(240, Math.min(380, this.stageWidth)) : this.value('width'); const bounds = compositionBounds(width, this.value('padding'), false, this.mobilePreview ? 240 : 280); const gap = this.value('gap', id); const minimum = id === 'stats-columns' ? READABLE_TEXT_MIN * 2 : ['bookshop', 'kitchen'].reduce((sum, key) => sum + Math.max(READABLE_CARD_MIN, this.history.value.sizes[key]?.width ?? READABLE_CARD_MIN), 0); return this.mobilePreview || minimum + gap > bounds.width - 2 * bounds.padding; }
   private enabled(key: Dimension) { if (key === 'width' && this.mobilePreview) return false; return key === 'gap' ? this.layers.spacing : this.layers.boundaries; }
   private toggle(layer: keyof typeof this.layers) {
     this.cancelMarquee?.(); this.sort?.cancel(); this.settle.cancel(); this.preview = {};
@@ -117,7 +125,7 @@ export class ConsistencyEditor extends LitElement {
       this.marquee = selectionRect(x, y, next.clientX, next.clientY);
       const chosen = new Set(base);
       this.querySelectorAll<HTMLElement>('[data-selectable]').forEach(element => {
-        if (element.hidden || element.querySelector('[data-selectable]') || !element.getClientRects().length) return;
+        if (element.hidden || !isMarqueeContent(element) || element.querySelector('[data-selectable]') || !element.getClientRects().length) return;
         if (intersects(this.marquee!, element.getBoundingClientRect())) chosen.add(element.dataset.selectable!);
       });
       this.selection = chosen;
@@ -137,7 +145,7 @@ export class ConsistencyEditor extends LitElement {
   }
   private number(key: Dimension, label: string) {
     return html`<ds-number label=${label} aria-label=${label} .value=${this.value(key)} ?disabled=${!this.enabled(key)}
-      .min=${limits[key][0]} .max=${limits[key][1]} .step=${20} .bigStep=${40} .width=${6} unit="px"
+      .min=${this.range(key)[0]} .max=${this.range(key)[1]} .step=${20} .bigStep=${40} .width=${6} unit="px"
       @input=${(e: Event) => { this.preview = { ...this.preview, [key === 'gap' ? this.selectedGap : key]: (e.currentTarget as HTMLInputElement).value as unknown as number }; }}
       @change=${(e: Event) => this.commit(key, Number((e.currentTarget as HTMLInputElement).value))}></ds-number>`;
   }
@@ -146,7 +154,7 @@ export class ConsistencyEditor extends LitElement {
     return html`<div class="ghost-surface ghost-surface--${key}" data-handle=${key} data-gap=${gap} data-axis=${axis} tabindex=${this.enabled(key) ? 0 : -1} ?hidden=${!this.enabled(key)} aria-disabled=${String(!this.enabled(key))}
       aria-label=${`Adjust ${gap ? gap.replaceAll('-', ' ') : label.toLowerCase()}`} role="slider" aria-valuenow=${Math.round(value)}
       aria-orientation=${key === 'gap' ? axis : 'horizontal'}
-      aria-valuemin=${limits[key][0]} aria-valuemax=${limits[key][1]} aria-valuetext=${`${Math.round(value)} pixels`}
+      aria-valuemin=${this.range(key)[0]} aria-valuemax=${this.range(key)[1]} aria-valuetext=${`${Math.round(value)} pixels`}
       @focus=${() => { this.selected = key; if (gap) this.selectedGap = gap; }}><span class="ghost-measure" aria-hidden="true">${Math.round(value)}</span></div>`;
   }
   private sectionText(key: string, label: string) {
@@ -155,7 +163,7 @@ export class ConsistencyEditor extends LitElement {
       @input=${(event: Event) => { this.history.commit({ sections: { ...this.history.value.sections, [key]: (event.currentTarget as AaEditorElement).value } }); this.revision++; }}></aa-editor></div>`;
   }
   private gap(id: string, horizontal = false) {
-    if (this.mobilePreview && ['projects-columns', 'stats-columns'].includes(id)) horizontal = false;
+    if (['projects-columns', 'stats-columns'].includes(id) && this.stacked(id)) horizontal = false;
     const value = this.value('gap', id);
     return html`<div class="consistency-gap ${horizontal ? 'consistency-gap--horizontal' : ''}" style=${styleMap({ [horizontal ? 'width' : 'height']: `calc(${value}px * var(--sf))`, '--composition-gap': `calc(${value}px * var(--sf))` })}>${this.handle('gap', 'Gap', id, horizontal ? 'horizontal' : 'vertical')}</div>`;
   }
@@ -183,13 +191,13 @@ export class ConsistencyEditor extends LitElement {
           <div class="consistency-sample-actions"><ds-button data-selectable="explore-action" secondary @click=${() => this.goTo('studio-work')}>Explore the studio</ds-button>${this.gap('actions-columns', true)}<ds-button data-selectable="contact-action-button" @click=${() => this.goTo('studio-contact')}>Get in touch</ds-button></div></section>
           ${this.gap('intro-work')}`,
       work: html`<section class="consistency-story-section" id="studio-work">${this.sectionText('work', 'Selected work text')}
-            ${this.gap('work-cards')}<div class="consistency-projects">
+            ${this.gap('work-cards')}<div class=${`consistency-projects ${this.stacked('projects-columns') ? 'consistency-stacked' : ''}`}>
               <ds-card data-ds-prose data-selectable="bookshop" tone=${doc.cardDesigns.bookshop?.tone ?? 'sharp-blue'} variant=${doc.cardDesigns.bookshop?.variant ?? 'filled'} height="14"><span slot="label">An independent bookshop</span><span slot="title">A shelf for every curiosity</span><p>A quieter way to discover a book, meet its maker and find your next read.</p><ds-tag>Identity and website</ds-tag></ds-card>
               ${this.gap('projects-columns', true)}<ds-card data-ds-prose data-selectable="kitchen" tone=${doc.cardDesigns.kitchen?.tone ?? 'apple-green'} variant=${doc.cardDesigns.kitchen?.variant ?? 'filled'} height="14"><span slot="label">A neighbourhood kitchen</span><span slot="title">Good food, close to home</span><p>A seasonal menu and a welcoming place for the people around the corner.</p><ds-tag>Website and words</ds-tag></ds-card>
             </div>
           </section>${this.gap('work-approach')}`,
       approach: html`<section class="consistency-story-section" id="studio-approach">${this.sectionText('approach', 'How we work text')}
-            ${this.gap('approach-stats')}<div class="consistency-statistics"><ds-stat data-selectable="starting-point" literal label="Our starting point" figure="A conversation" caption="Before the first sketch"></ds-stat>${this.gap('stats-columns', true)}<ds-stat data-selectable="next-version" literal label="Our favourite version" figure="The next one" caption="Made better by using it"></ds-stat></div>
+            ${this.gap('approach-stats')}<div class=${`consistency-statistics ${this.stacked('stats-columns') ? 'consistency-stacked' : ''}`}><ds-stat data-selectable="starting-point" literal label="Our starting point" figure="A conversation" caption="Before the first sketch"></ds-stat>${this.gap('stats-columns', true)}<ds-stat data-selectable="next-version" literal label="Our favourite version" figure="The next one" caption="Made better by using it"></ds-stat></div>
           </section>${this.gap('approach-contact')}`,
       contact: html`<section class="consistency-story-section" id="studio-contact">${this.sectionText('contact', 'Contact section text')}
             ${this.gap('contact-card')}<ds-card data-ds-prose data-selectable="contact-note" tone=${doc.cardDesigns['contact-note']?.tone ?? ''} variant=${doc.cardDesigns['contact-note']?.variant ?? 'outlined'} height="8"><span slot="label">A note for later</span><span slot="title">What would you like to make?</span><p>This is your page to shape. Edit the words above and leave the thought here.</p></ds-card>
@@ -200,9 +208,15 @@ export class ConsistencyEditor extends LitElement {
   }
   protected firstUpdated() {
     this.setAttribute('data-ds-grid-fit', '');
+    this.boundsObserver = new ResizeObserver(entries => { const width = Math.floor(entries[0].contentRect.width / 20) * 20; if (width !== this.stageWidth) this.stageWidth = width; });
+    this.boundsObserver.observe(this.querySelector('.consistency-stage')!);
     if (document.fonts && typeof ResizeObserver !== 'undefined') initGridFit();
   }
   protected updated() {
+    this.statSpacing ??= new StatSpacingLayer(this, { enabled: () => this.layers.spacing, value: id => this.history.value.gaps[id] ?? 0, commit: (id, value) => { this.history.commit({ gaps: { ...this.history.value.gaps, [id]: value } }); this.revision++; } });
+    this.statSpacing.refresh();
+    this.surfaceContext ??= new SurfaceContextMenu(this, { stats: () => this.history.value.statDesigns, buttons: () => this.history.value.buttonDesigns, commit: (kind, id, patch) => { const field = kind === 'card' ? 'cardDesigns' : kind === 'stat' ? 'statDesigns' : 'buttonDesigns'; this.history.commit({ [field]: { ...this.history.value[field], [id]: { ...this.history.value[field][id], ...patch } } }); this.revision++; } });
+    this.surfaceContext.refresh();
     this.pageContext ??= new PageContextMenu(this, { tone: () => this.history.value.pageTone ?? '', commit: pageTone => { this.history.commit({ pageTone }); this.revision++; } });
     this.pageContext.refresh();
     this.cardSpacing ??= new CardSpacingLayer(this, { enabled: () => this.layers.spacing, gaps: id => this.history.value.cardGaps[id] ?? {}, commit: (id, key, value, height) => { const card = this.querySelector<HTMLElement>(`ds-card[data-selectable="${id}"]`); const width = card ? card.getBoundingClientRect().width / (Number.parseFloat(getComputedStyle(card).getPropertyValue('--sf')) || 1) : 280; this.history.commit({ cardGaps: { ...this.history.value.cardGaps, [id]: { ...this.history.value.cardGaps[id], [key]: value } }, sizes: { ...this.history.value.sizes, [id]: { width, height } } }); this.revision++; } });
@@ -276,7 +290,7 @@ export class ConsistencyEditor extends LitElement {
       const gap = host.dataset.gap || '';
       const previewKey = key === 'gap' ? gap : key;
       this.spacingDisposers.push(bindSpacingHandle(host, () => ({
-        value: key === 'gap' ? (this.history.value.gaps[gap] ?? this.textSpacing?.defaultValue(gap) ?? 20) : this.history.value[key], disabled: !this.enabled(key), min: limits[key][0], max: limits[key][1], step: 20, shiftStep: 40,
+        value: key === 'gap' ? (this.history.value.gaps[gap] ?? this.textSpacing?.defaultValue(gap) ?? 20) : this.history.value[key], disabled: !this.enabled(key), min: this.range(key)[0], max: this.range(key)[1], step: 20, shiftStep: 40,
         axis: key === 'gap' ? host.dataset.axis as 'horizontal' | 'vertical' : 'horizontal', snapPreview: false,
         gain: pointerGain(key, Number(getComputedStyle(this).getPropertyValue('--sf'))),
         onPointerStart: event => { this.settle.cancel(); this.selected = key; if (gap) this.selectedGap = gap; (host.ownerDocument.activeElement as HTMLElement | null)?.blur?.(); },
@@ -296,7 +310,8 @@ export class ConsistencyEditor extends LitElement {
   }
   render() {
     const doc = this.history.value;
-    const width = this.mobilePreview ? 380 : this.value('width'), padding = this.value('padding');
+    const requestedWidth = this.mobilePreview ? Math.max(240, Math.min(380, this.stageWidth)) : this.value('width');
+    const { width, padding } = compositionBounds(requestedWidth, this.value('padding'), this.mobilePreview, this.mobilePreview ? 240 : 280);
     return html`<div class="consistency-shell ${this.mobilePreview ? 'consistency-mobile-preview' : ''} ${this.layers.spacing ? '' : 'spacing-off'} ${this.layers.boundaries ? '' : 'boundaries-off'} ${this.layers.reorder ? 'reorder-on' : ''} ${this.layers.production ? 'production-on' : ''}">
       <header class="consistency-top"><span class="consistency-name"><span class="consistency-tag">Consistency</span></span><div class="consistency-actions">
         <ds-button aria-pressed=${String(this.mobilePreview)} @click=${() => { this.mobilePreview = !this.mobilePreview; this.preview = {}; }}>${this.mobilePreview ? 'Desktop preview' : 'Mobile preview'}</ds-button>
@@ -306,7 +321,7 @@ export class ConsistencyEditor extends LitElement {
       </div></header>
       <div class="consistency-bar"><span>Words and the space around them.</span><span class="consistency-muted">Local experiment</span></div>
       <main class="consistency-workspace"><section class="consistency-stage" aria-label="Editable composition" @pointerdown=${this.startMarquee}>
-        <div class="consistency-sheet" data-ds-grid-scroll data-ds-surface data-consistency-library=${this.library} style=${styleMap({ ...libraryTokens(this.library), color: 'var(--ds-text-color)', colorScheme: this.library === 'ink' ? 'dark' : this.library === 'blue' ? 'light' : undefined, width: `calc(${width}px * var(--sf))`, padding: `calc(${padding}px * var(--sf))`, '--composition-padding': `calc(${padding}px * var(--sf))`, '--composition-content-width': `calc(${width - padding * 2}px * var(--sf))`, '--composition-card-width': `calc(${Math.max(20, Math.floor((width - padding * 2 - 20) / 40) * 20)}px * var(--sf))` })}>
+        <div class="consistency-sheet" data-ds-grid-scroll data-ds-surface data-consistency-library=${this.library} style=${styleMap({ ...libraryTokens(this.library), color: 'var(--ds-text-color)', colorScheme: this.library === 'ink' ? 'dark' : this.library === 'blue' ? 'light' : undefined, width: `calc(${width}px * var(--sf))`, padding: `calc(${padding}px * var(--sf))`, '--composition-padding': `calc(${padding}px * var(--sf))`, '--composition-content-width': `calc(${width - padding * 2}px * var(--sf))`, '--composition-card-width': `calc(${Math.max(READABLE_CARD_MIN, Math.floor((width - padding * 2 - 20) / 40) * 20)}px * var(--sf))` })}>
           <div class="consistency-width">${this.handle('width', 'Width')}</div>
           <div class="consistency-padding">${this.handle('padding', 'Padding')}</div>
           ${repeat(doc.order, id => id, id => this.group(id))}

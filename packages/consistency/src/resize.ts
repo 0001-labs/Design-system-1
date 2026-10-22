@@ -15,10 +15,10 @@ export function cardMinimumHeight(target: HTMLElement, scale = 1): number {
   }, 0);
   return Math.ceil((content + Number.parseFloat(style.paddingTop) + Number.parseFloat(style.paddingBottom) + 20 * scale) / scale / 20) * 20;
 }
-function cardMinimumWidth(target: HTMLElement, scale = 1): number {
+export function cardMinimumWidth(target: HTMLElement, scale = 1): number {
   const canvas = target.ownerDocument.createElement('canvas'), context = canvas.getContext('2d'); let widest = 0;
-  for (const field of target.querySelectorAll<HTMLElement>('[slot="label"],[slot="title"],p,ds-tag')) { if (!context) break; const style = getComputedStyle(field.slot ? target.shadowRoot?.querySelector<HTMLElement>(`.ds-card__${field.slot}`) ?? field : field); context.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`; for (const word of (field.textContent ?? '').split(/\s+/)) widest = Math.max(widest, context.measureText(word).width); }
-  return Math.ceil((widest / scale + 40) / 20) * 20;
+  for (const field of target.querySelectorAll<HTMLElement>('[slot="label"],[slot="title"],p,ds-tag')) { if (!context) break; const style = getComputedStyle(field.slot ? target.shadowRoot?.querySelector<HTMLElement>(`.ds-card__${field.slot}`) ?? field : field); context.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`; for (const word of (field.textContent ?? '').split(/\s+/)) if (!/^(https?:\/\/|www\.)/i.test(word)) widest = Math.max(widest, context.measureText(word).width); }
+  return Math.max(240, Math.ceil((widest / scale + 40) / 20) * 20);
 }
 /** Invisible edge targets share App's pointer, cancellation and keyboard lifecycle. */
 export class ResizingLayer {
@@ -45,6 +45,7 @@ export class ResizingLayer {
       if (!this.bindings.has(target) && card && !target.shadowRoot?.querySelector('.ds-card')) { if (!this.pending.has(target)) { this.pending.add(target); void (target as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete.then(() => { this.pending.delete(target); this.refresh(); }); } continue; }
       // A linked size is the requested design size. Each instance still needs
       // enough layout room for its own independent words at the applied width.
+      if (card) target.style.minWidth = `calc(${cardMinimumWidth(target, this.scaleOf(target))}px * var(--sf))`;
       if (card) target.style.minHeight = `calc(${cardMinimumHeight(target, Number.parseFloat(getComputedStyle(target).getPropertyValue('--sf')) || 1)}px * var(--sf))`;
       if (!this.bindings.has(target)) this.bind(target, card);
       for (const edge of this.bindings.get(target)!.edges) { edge.hidden = !this.options.enabled(); edge.tabIndex = this.options.enabled() ? 0 : -1; }

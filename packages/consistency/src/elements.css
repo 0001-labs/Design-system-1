@@ -1,5 +1,5 @@
-.aa-command-preview.consistency-element-preview:has(.consistency-element-preview-inner){width:calc(7 * var(--ds-unit));padding:0}
-.consistency-element-preview-inner{width:calc(14 * var(--ds-unit));padding:var(--ds-unit);box-sizing:border-box;zoom:.5}
+.aa-command-preview.consistency-element-preview:has(.consistency-element-preview-inner){width:calc(10 * var(--ds-unit));padding:0}
+.consistency-element-preview-inner{width:100%;padding:calc(var(--ds-unit)/2);box-sizing:border-box}
 .consistency-content-element [contenteditable]{outline:none;min-width:1ch;cursor:text;white-space:pre-wrap}
 .consistency-content-element ds-button{cursor:text}
 .consistency-content-element .aa-plain{display:inline-block;font:inherit;color:inherit;line-height:inherit}
@@ -15,3 +15,11 @@
 .consistency-button-action{--ds-control-size:16px;--ds-text-size:14px;--ds-corner-size:4px;--ds-button-inset:4px}
 .consistency-button-action{max-width:min(calc(18 * var(--ds-unit)),calc(100vw - 2 * var(--ds-unit)));flex-wrap:wrap}
 .consistency-button-action ds-input,.consistency-button-action ds-select{max-width:100%;min-width:0}
+
+/* Compact specimens retain real typography and component sizes. */
+.consistency-element-preview-inner .consistency-element-preview-stage{display:flex;width:100%;height:calc(4 * var(--ds-unit));align-items:center;justify-content:center}
+.consistency-element-preview-inner:has(ds-card) .consistency-element-preview-stage{height:auto;min-height:calc(10 * var(--ds-unit));overflow:visible}
+.aa-command-preview.consistency-element-preview:has(ds-card){width:calc(13 * var(--ds-unit))}
+.consistency-element-preview-inner .consistency-element-preview-stage ds-card{width:calc(12 * var(--ds-unit));height:auto;min-height:calc(10 * var(--ds-unit))}
+.consistency-element-preview-inner .consistency-element-preview-label{padding-top:calc(var(--ds-unit)/2);font-size:var(--ds-type-size-default);line-height:var(--ds-unit)}
+.consistency-element-preview-inner .consistency-element-preview-cursor{left:55%;top:45%}

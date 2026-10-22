@@ -29,6 +29,10 @@ The first preview lives at `https://neweditor.c9y.site`, using this site's exist
 
 The Consistency editor must never create a full-page horizontal scrollbar. Header, toolbars and inspector fit and wrap within the viewport. A deliberately wider authored website may scroll horizontally only inside its canvas stage; mobile preview fits the stage. Do not mask layout failures with root `overflow-x: hidden`. After changing the editor layout, library geometry or popups, run `vp run consistency:test:viewport` before release: the local browser contract covers 390, 768 and 1440px, a wide authored page, Bold controls, the open action toolbar and mobile preview.
 
+The private editor must keep text readable: ordinary text and stats need at least ten squares (200 logical pixels) of available width; cards also reserve their padding. Resizing, padding and gaps must stop or reflow before content becomes narrow strips. Text sections wrap at words, and rows stack when they cannot fit readable children. Check these bounds in the viewport regression test.
+
+Interactive previews retain the normal DS1 typography and control size for the selected library. Never reduce their text through zoom, transform scaling or smaller font overrides to fit the preview: reduce surrounding space or reflow the specimen instead. Film-kit compositions are the explicit exception to this preview scaling constraint. Measurements use plain numbers directly in soft hover highlights, without coloured label chips.
+
 Design system 1 is a general design system anyone can use. Never name 0001's products (Ezo, Link, Consistency, Peer, Ins, tau99, Visual, the 0001 site, …) anywhere in it: not in components, their comments, CSS, tests, examples, docs, the website or the skill's rules for a component. Describe what a component does and how it looks on its own terms ("filled with a colour", "one control high"), never by the product it came from ("Link's fill", "Ezo's badge size"). The products' own briefs are where they say what they take from it.
 
 ## Stack

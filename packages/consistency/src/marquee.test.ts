@@ -14,3 +14,10 @@ test('marquee never takes text selection or control drags', () => {
  }
  expect(canStartMarquee(document.createElement('section'))).toBe(true);
 });
+test('marquee chooses actual content rather than empty Aa lines or spacing chrome', async () => {
+ const { isMarqueeContent } = await import('./marquee');
+ const block = document.createElement('div');block.className='aa-block';block.innerHTML='<br>';
+ expect(isMarqueeContent(block)).toBe(false);block.textContent='A real paragraph';expect(isMarqueeContent(block)).toBe(true);
+ const gap=document.createElement('div');gap.className='consistency-gap';gap.append(block);expect(isMarqueeContent(block)).toBe(false);
+ block.remove();block.textContent='';block.innerHTML='<span class="aa-atom"></span>';expect(isMarqueeContent(block)).toBe(true);
+});

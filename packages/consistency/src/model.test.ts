@@ -47,3 +47,13 @@ it('deletes disjoint selected blocks as one undoable edit and preserves untouche
  const history = new CompositionHistory(); history.commit({ text, hidden: ['bookshop'] }); history.undo();
  expect(history.value.text).toBe(initialComposition.text); expect(history.value.hidden).toEqual([]);
 });
+it('keeps readable content when bounds are too narrow for requested padding', async () => {
+ const { compositionBounds, compositionRange } = await import('./model');
+ expect(compositionBounds(280,80)).toEqual({width:280,padding:20});
+ expect(compositionBounds(240,80,false,240)).toEqual({width:240,padding:0});
+ expect(compositionRange('width',640,80)[0]).toBe(400);
+ expect(compositionRange('padding',280,80)[1]).toBe(20);
+ expect(compositionBounds(301,31,false)).toEqual({width:301,padding:30.5});
+ const history = new CompositionHistory();history.commit({width:280,padding:80,sizes:{bookshop:{width:80,height:80}}});
+ expect(history.value.padding).toBe(20);expect(history.value.sizes.bookshop.width).toBe(240);
+});

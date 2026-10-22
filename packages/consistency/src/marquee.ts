@@ -9,3 +9,9 @@ export function intersects(a: SelectionRect, b: SelectionRect): boolean {
 export function canStartMarquee(target: Element): boolean {
   return !target.closest('aa-editor, ds-card, ds-button, ds-number, ds-select, ds-switch, [role="slider"], button, input, select, textarea, a, [contenteditable]');
 }
+/** Empty editor lines and composition chrome are space, not authored elements. */
+export function isMarqueeContent(element: HTMLElement): boolean {
+  if (element.closest('.consistency-gap,.consistency-text-gap,.consistency-card-gap,.consistency-stat-gap,.ghost-surface,.consistency-resize-edge,[data-handle]')) return false;
+  if (!element.classList.contains('aa-block')) return true;
+  return !!element.textContent?.trim() || element.dataset.kind === 'divider' || !!element.querySelector('.aa-atom,img,hr,video,canvas,ds-card,ds-button,table');
+}
