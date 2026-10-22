@@ -133,6 +133,7 @@ export default defineConfig({
             { label: "Icon", slug: "2-core/icon" },
             { label: "Image", slug: "2-core/image" },
             { label: "Input", slug: "2-core/input" },
+            { label: "Number", slug: "2-core/number" },
             { label: "Link", slug: "2-core/link" },
             { label: "Message", slug: "2-core/message" },
             { label: "Progress", slug: "2-core/progress" },

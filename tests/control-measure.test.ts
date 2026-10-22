@@ -345,3 +345,33 @@ test("a checkbox and a radio are a 16px box on the lower sixteen at the start of
     expect(switches[0]!.track).toBe("rgb(82, 157, 54)");
   }
 });
+
+test("a number field is one square high with its face one control high on the lower sixteen, whole squares wide, its lead a control square at least", async () => {
+  for (const scheme of SCHEMES) {
+    const page = pages[scheme];
+    await stage(page, `<div style="display:flex"><ds-number id="x" label="X" value="21"></ds-number><ds-number id="zoom" label="Zoom" value="1.03" step="0.05" width="3"></ds-number><ds-number id="eye" icon="eye" value="80" unit="%" aria-label="Opacity" width="5"></ds-number></div>`);
+    const boxes = await page.evaluate(() => Object.fromEntries(["x", "zoom", "eye"].map((id) => {
+      const host = document.getElementById(id)!, root = host.shadowRoot!;
+      const outer = host.getBoundingClientRect(), face = root.querySelector(".face")!.getBoundingClientRect();
+      const lead = root.querySelector(".lead")!.getBoundingClientRect(), input = root.querySelector("input")!;
+      const style = getComputedStyle(root.querySelector(".face")!);
+      return [id, { host: [outer.width, outer.height], face: [face.width, face.height, face.top - outer.top], lead: [lead.width, lead.left - face.left], text: input.getBoundingClientRect().left - lead.right + parseFloat(getComputedStyle(input).paddingLeft), radius: style.borderTopLeftRadius, figures: style.fontVariantNumeric, value: input.value }];
+    })));
+    expect(boxes.x!.host, scheme).toEqual([4 * UNIT, UNIT]);
+    expect(boxes.zoom!.host).toEqual([3 * UNIT, UNIT]);
+    expect(boxes.eye!.host).toEqual([5 * UNIT, UNIT]);
+    for (const box of Object.values(boxes)) {
+      expect(box.face.slice(1)).toEqual([16, 4]);
+      expect(box.lead[1]).toBe(0);
+      expect(box.lead[0]).toBeGreaterThanOrEqual(16);
+      expect(box.radius).toBe("4px");
+      expect(box.figures).toContain("tabular-nums");
+    }
+    expect(boxes.x!.lead[0]).toBe(16);
+    expect(boxes.eye!.lead[0]).toBe(16);
+    expect(boxes.x!.text, "a letter's value on the next square").toBe(4);
+    expect(boxes.eye!.text, "an icon's value on the next square").toBe(4);
+    expect(boxes.zoom!.text).toBe(4);
+    expect(boxes.zoom!.value).toBe("1.03");
+  }
+});

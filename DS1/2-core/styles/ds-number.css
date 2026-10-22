@@ -1,0 +1,120 @@
+@import "../../1-root/component-metrics.css";
+
+/* ds-number.css */
+/* A number field: one square high, its face one control high on the lower sixteen, a whole number of squares wide. */
+
+:host {
+  --ds-number-squares: 4;
+  display: inline-flex;
+  align-items: flex-end;
+  vertical-align: bottom;
+  box-sizing: border-box;
+  width: calc(var(--ds-number-squares) * var(--ds-unit));
+  min-width: 0;
+  height: var(--ds-unit);
+}
+
+:host([hidden]) {
+  display: none;
+}
+
+.face {
+  display: flex;
+  align-items: stretch;
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--ds-control-height);
+  border-radius: var(--ds-input-radius, var(--ds-radius));
+  corner-shape: var(--ds-corner-shape, round);
+  background: var(--ds-number-background, var(--ds-input-background));
+  color: var(--ds-number-color, var(--ds-input-color));
+  font-family: var(--ds-typeface-regular);
+  font-feature-settings: var(--ds-font-features);
+  font-size: var(--ds-type-size-default);
+  font-weight: var(--ds-type-weight-default);
+  letter-spacing: var(--ds-type-letterspacing-default);
+  line-height: var(--ds-control-height);
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+}
+
+/* Keyboard focus and typing ring the face inside its edge, so nothing around it moves. */
+.face:focus-within {
+  outline: 1px solid var(--ds-number-focus, var(--ds-focus-ring));
+  outline-offset: -1px;
+}
+
+/*
+ * The lead: a short label 4px in, or an icon on the face's first sixteen, in the title grey, a control
+ * square at least, the handle a drag scrubs. The value starts 4px after it, so after a letter or an
+ * icon it stands on the next square, as words do after a picture.
+ */
+.lead {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  min-width: var(--ds-control-height);
+  padding: 0 0 0 calc(4px * var(--ds-sf, 1));
+  color: var(--ds-number-lead-color, var(--ds-title-color));
+  --ds-icon-color: currentColor;
+  cursor: ew-resize;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.lead:has(ds-icon) {
+  justify-content: center;
+  padding: 0;
+}
+
+.lead__words {
+  white-space: nowrap;
+}
+
+:host(:hover:not([disabled]):not([readonly])) .lead,
+.face.scrubbing .lead {
+  color: var(--ds-number-color, var(--ds-input-color));
+}
+
+input {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  border: 0;
+  padding: 0 calc(4px * var(--ds-sf, 1));
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+  text-overflow: clip;
+}
+
+input::selection {
+  background: color-mix(in srgb, var(--ds-number-focus, var(--ds-focus-ring)) 30%, transparent);
+}
+
+.unit {
+  flex: none;
+  padding-inline-end: calc(4px * var(--ds-sf, 1));
+  color: var(--ds-number-lead-color, var(--ds-title-color));
+  white-space: nowrap;
+}
+
+:host([disabled]) .face {
+  opacity: 0.5;
+}
+
+:host([disabled]) .lead,
+:host([readonly]) .lead {
+  cursor: default;
+}
+
+:host([disabled]) input {
+  cursor: not-allowed;
+}

@@ -135,6 +135,14 @@
     "url": "https://designsystem1.com/2-core/input/"
   },
   {
+    "id": "component:/2-core/number/",
+    "code": "NUM",
+    "label": "Number",
+    "kind": "component",
+    "summary": "A number set by hand: scrubbed, stepped or typed as arithmetic.",
+    "url": "https://designsystem1.com/2-core/number/"
+  },
+  {
     "id": "component:/2-core/kbd/",
     "code": "KEY",
     "label": "Keyboard shortcut",

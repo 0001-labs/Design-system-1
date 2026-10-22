@@ -1,0 +1,61 @@
+---
+title: Number
+description: A number set by hand. Scrub it by dragging its label, step it with the arrows, or type it as arithmetic.
+---
+
+import ComponentExample from "../../../components/ComponentExample.astro";
+
+Number is the field for a value a person tunes: a position, a size, a zoom, a tempo. It draws the value on the field's fill, one control high on the lower sixteen of its square, and a whole number of squares wide. Its label stands inside the field at the start, in the title grey, and is the handle: drag it sideways and the value follows the pointer.
+
+<ComponentExample example="number-inspector" />
+
+## Use
+
+```html
+<ds-number label="X" value="21"></ds-number>
+<ds-number label="Zoom" value="1" step="0.05" big-step="0.5" min="0.5" max="4" default="1"></ds-number>
+<ds-number icon="eye" value="80" min="0" max="100" unit="%" aria-label="Opacity"></ds-number>
+```
+
+- **Scrub**: press the label (or icon) and drag sideways. Each pixel is one `step`; hold Shift for `big-step`. Escape while dragging puts the value back where the drag began.
+- **Step**: ↑ and ↓ add or take one `step`, Shift a `big-step` (ten steps unless set). A step adds exactly, so a typed 1.03 a step of 0.05 up is 1.08.
+- **Type**: a press on the value selects it. What is typed is read as arithmetic: `10 + 5`, `(3 − 1) × 4`. An operator first works on the value already there: `*2` doubles it, `/2` halves it, `+10` adds ten. A leading minus is a negative number. A unit typed after the figures is ignored. Enter takes the value and keeps the field selected for another; leaving the field takes it too; Escape puts the value back. Something that is not arithmetic leaves the value as it was.
+- **Reset**: with `default`, a double-click on the label puts that value back.
+
+The value is written with the step's decimals and no trailing zeros, in tabular figures, with a true minus sign (−9). `min` and `max` keep every way of changing it inside its range.
+
+## Attributes
+
+| Attribute | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `value` | number | `0` | The value. |
+| `min`, `max` | number | None | The range every change keeps inside. |
+| `step` | number | `1` | What an arrow or a pixel of dragging adds. Its decimals are the value's. |
+| `big-step` | number | Ten steps | What Shift with an arrow or a drag adds. |
+| `places` | number | From `step` | The decimals kept, when they differ from the step's. |
+| `default` | number | None | What a double-click on the label puts back. |
+| `label` | string | Empty | A short label inside the field at the start: the handle for dragging, and the field's name. Keep it to a letter or a word (X, W, Zoom). |
+| `icon` | string | Empty | An icon from the library in place of the label. Name the field with `aria-label`. |
+| `unit` | string | Empty | A unit at the end of the field, in the title grey, and read out with the value. |
+| `width` | number | `4` | The width in squares. |
+| `name` | string | Empty | The key in form data. |
+| `disabled`, `readonly` | boolean | false | A disabled field cannot be changed or focused; a read-only one can be focused and copied. |
+| `aria-label` | string | The label | The field's name, when the label is an icon or too short to say it. |
+
+## Events
+
+```js
+const zoom = document.querySelector('ds-number');
+zoom.addEventListener('input', () => preview(zoom.value));
+zoom.addEventListener('change', () => save(zoom.value));
+```
+
+`input` fires as a drag moves the value; `change` once a value is taken (a drag's end, Enter, leaving the field, an arrow). Both bubble through shadow boundaries, and `value` is a number. Typing fires neither until the value is taken, so a half-typed `10 +` never reaches the page.
+
+The field is a `spinbutton` to assistive technology, with its value, range and unit read out. It takes part in native forms through `ElementInternals`.
+
+## Tokens
+
+`--ds-number-background` (the field's fill, from `--ds-input-background`), `--ds-number-color`, `--ds-number-lead-color` (the label and unit, from `--ds-title-color`) and `--ds-number-focus` (the ring while typing, from `--ds-focus-ring`).
+
+Copy `number` through Sync 1. React consumers can import `NumberField` from `DS1/react/number` after registering `DS1/2-core/ds-number`; it takes `value`, `onInput` and `onChange` with the number itself.

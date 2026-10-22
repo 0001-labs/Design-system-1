@@ -51,6 +51,7 @@ export const ALL_LAYERS: DirectoryLayer[] = [
       { name: 'Icon', href: '/2-core/icon/', tag: 'ds-icon' },
       { name: 'Image', href: '/2-core/image/', tag: 'ds-image' },
       { name: 'Input', href: '/2-core/input/', tag: 'ds-input' },
+      { name: 'Number', href: '/2-core/number/', tag: 'ds-number' },
       { name: 'Keyboard shortcut', href: '/2-core/kbd/', tag: 'ds-kbd' },
       { name: 'Link', href: '/2-core/link/' },
       { name: 'Message', href: '/2-core/message/', tag: 'ds-message' },
