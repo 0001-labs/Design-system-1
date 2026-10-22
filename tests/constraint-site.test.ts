@@ -82,10 +82,10 @@ test("a check says what each rule kept, broke, or found nothing to measure, and 
     { url: "https://example.com/en/", width: 320, findings: [], measured: {}, error: "did not load in 30 seconds" },
   ];
   const rules = Object.fromEntries(summarizeRules(results).map(summary => [summary.constraint.code, ruleLine(summary, results.length)]));
-  expect(rules["card.media-level"]).toBe("Kept by 8 cards measured on 2 of 5 page views.");
+  expect(rules["card.media-level"]).toBe("Kept by 8 cards with a media picture measured on 2 of 5 page views.");
   expect(rules["page.window-width"]).toBe("Broken 2 times, among 4,200 pieces measured on 4 of 5 page views.");
   const [nothing] = summarizeRules([{ findings: [], measured: { "page.window-width": 30 } }]).filter(s => s.constraint.code === "card.media-corners");
-  expect(ruleLine(nothing!, 1)).toBe("Nothing to measure: no cards on this page.");
+  expect(ruleLine(nothing!, 1)).toBe("Nothing to measure: no cards with a media picture on this page.");
   expect(summarizePages(results)).toEqual([
     { url: "https://example.com/", widths: [{ width: 320, broken: 0, error: undefined }, { width: 393, broken: 0, error: undefined }] },
     { url: "https://example.com/de/", widths: [{ width: 320, broken: 2, error: undefined }, { width: 393, broken: 0, error: undefined }] },
@@ -99,7 +99,7 @@ test("the panel lists every rule with what it measured on this page", () => {
   const shadow = document.querySelector("[data-ds-constraint-panel]")!.shadowRoot!;
   const rows = [...shadow.querySelectorAll("[data-rules] li")].map(li => li.querySelector(".code")!.textContent);
   expect(rows).toEqual(["card.media-level", "card.media-corners", "page.window-width"]);
-  expect(shadow.querySelector("[data-rules]")!.textContent).toContain("Nothing to measure: no cards on this page.");
+  expect(shadow.querySelector("[data-rules]")!.textContent).toContain("Nothing to measure: no cards with a media picture on this page.");
   expect(shadow.querySelector<HTMLElement>("[data-pages]")!.hidden).toBe(true);
   panel.hide();
 });

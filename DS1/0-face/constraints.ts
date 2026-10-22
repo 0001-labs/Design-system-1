@@ -86,7 +86,7 @@ export const constraints: Constraint[] = [
     why: 'The room a taller card leaves goes above its picture, never below it.',
     components: ['ds-card'],
     check: { file: 'tests/card.test.ts', test: "a picture stands on the card's foot, so pictures side by side stand on one level" },
-    measures: ['card', 'cards'],
+    measures: ['card with a media picture', 'cards with a media picture'],
     count: root => cards(root).length,
     inspect(root) {
       const found = cards(root);
@@ -107,7 +107,7 @@ export const constraints: Constraint[] = [
     rule: "A picture is never rounded where it meets the card's edge: the card cuts it square there, and only a corner standing free inside the card, towards the words, keeps a picture's corner.",
     components: ['ds-card'],
     check: { file: 'tests/card.test.ts', test: "a picture is square where it meets the card's edge" },
-    measures: ['card', 'cards'],
+    measures: ['card with a media picture', 'cards with a media picture'],
     count: root => cards(root).length,
     inspect(root) {
       return cards(root).flatMap(({ picture, box, face }) => {
