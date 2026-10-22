@@ -1,7 +1,16 @@
 import { createLayoutInspector } from './layout-inspector';
 import { initGridFit } from './grid-fit';
 
-/** Triple G toggles the grid; triple L inspects named layout areas. */
+/** The presses of one key, each within 800ms of the last, that toggle an overlay. */
+export const GRID_PRESSES = 5;
+
+/**
+ * Five presses of G toggle the grid and five of L inspect the layout, on every
+ * page that loads this module and for everyone who reads it: never put them
+ * behind a user, an owner or a development check. Escape hides both. Presses
+ * typed into a field, with a modifier or held down never count, and any other
+ * key starts the count again.
+ */
 export function initGridShortcut(): void {
   if (typeof document === "undefined") return;
   const root = document.documentElement;
@@ -128,7 +137,7 @@ export function initGridShortcut(): void {
     presses = key === lastKey && now - lastPress <= 800 ? presses + 1 : 1;
     lastKey = key;
     lastPress = now;
-    if (presses === 3) {
+    if (presses === GRID_PRESSES) {
       reset();
       if (key === 'g') setVisible(overlay.hidden !== false);
       else layout.toggle();
