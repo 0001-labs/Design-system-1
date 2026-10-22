@@ -846,17 +846,46 @@ export function loadSharedWords(): Promise<void> {
   return sharedWordsLoad;
 }
 
+/**
+ * The words a page loads as it starts (the shared words, the translations file), announced once
+ * between them: each announcement redraws every translated word on the page, so three arrivals in
+ * the first half second used to redraw it three times. A load that never ends holds the
+ * announcement back no longer than `STARTUP_WAIT`.
+ */
+const startupLoads: Promise<unknown>[] = [];
+const STARTUP_WAIT = 1000;
+let announcement: Promise<void> | null = null;
+let announced = false;
+/** The window this module loaded into, which hears its announcements. */
+const page: Window | undefined = typeof window !== "undefined" ? window : undefined;
+
+function announceTranslations(): void {
+  if (announcement) return;
+  const wait = new Promise<void>((resolve) => setTimeout(resolve, STARTUP_WAIT));
+  announcement = Promise.race([Promise.allSettled(startupLoads.splice(0)), wait]).then(() => {
+    announcement = null;
+    announced = true;
+    if (!eventful() || !page) return;
+    page.dispatchEvent(new CustomEvent("translations-loaded"));
+    // Dispatch language-changed to update all components
+    dispatchLanguageChanged(currentLanguage.value);
+  });
+}
+
 applyRouting();
 if (i18nOptions.sharedWords) {
-  void loadSharedWords();
+  startupLoads.push(loadSharedWords());
 }
 
 // Auto-load translations when this module is imported (for CDN bundle).
 // Waits a task, so a product can configure the module first, even after a
 // dynamic import.
 if (typeof window !== "undefined" && typeof document !== "undefined") {
+  let started: () => void = () => {};
+  startupLoads.push(new Promise<void>((resolve) => (started = resolve)));
   const start = () => {
-    if (i18nOptions.autoLoad !== false) void loadExternalTranslations();
+    if (i18nOptions.autoLoad !== false) void loadExternalTranslations().finally(started);
+    else started();
   };
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", start);
@@ -871,24 +900,13 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
 // below would otherwise throw after the code that imported this has finished.
 const eventful = () => typeof window !== "undefined" && typeof window.addEventListener === "function" && typeof window.dispatchEvent === "function";
 if (eventful()) {
-  window.addEventListener("translations-ready", () => {
-    // Dispatch that translations are loaded
-    window.dispatchEvent(new CustomEvent("translations-loaded"));
+  // New words: translations-loaded and language-changed, once for everything still arriving.
+  window.addEventListener("translations-ready", announceTranslations);
 
-    // Dispatch language-changed to update all components
-    dispatchLanguageChanged(currentLanguage.value);
-  });
-
-  // Initialize translations on module load
-  // Use setTimeout to give other parts of the app time to set up event listeners first
+  // A page whose words were all there at once still hears translations-loaded once, after its
+  // listeners have had a moment to attach; one already announced or on its way is enough.
   setTimeout(() => {
-    if (!eventful()) {
-      return;
-    }
-    window.dispatchEvent(new CustomEvent("translations-loaded"));
-
-    // Also dispatch language-changed with the current language
-    dispatchLanguageChanged(currentLanguage.value);
+    if (eventful() && !announced && window === page) announceTranslations();
   }, 100);
 }
 

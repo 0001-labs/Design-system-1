@@ -590,3 +590,43 @@ describe("shared actions", () => {
     expect(i18n.textInLanguage("Undo", "nn")).toBe("Angre");
   });
 });
+
+describe("announcing the words", () => {
+  test("the words that arrive as the page starts are announced once, not once each", async () => {
+    // Earlier tests' modules finish their loads on whatever window is stubbed; let them settle first.
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    vi.useFakeTimers();
+    try {
+      // A translations file that answers after the shared words have arrived.
+      vi.stubGlobal("fetch", vi.fn(() => new Promise<Response>((resolve) => setTimeout(() => resolve(new Response(JSON.stringify(words), { status: 200 })), 300))));
+      const win = stubPage({ config: { sharedWords: true, translationsFile: "/translations.json" } });
+      let loaded = 0, changed = 0;
+      win.addEventListener("translations-loaded", () => loaded++);
+      win.addEventListener("language-changed", () => changed++);
+      const i18n = await loadModule();
+      await vi.advanceTimersByTimeAsync(2000);
+      expect(loaded).toBe(1);
+      expect(changed).toBe(1);
+      // A word added later is announced at once, on its own.
+      i18n.loadTranslations({ en: { Later: "Later" } });
+      await vi.advanceTimersByTimeAsync(10);
+      expect(loaded).toBe(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  test("a page whose words were there from the start still hears translations-loaded once", async () => {
+    vi.useFakeTimers();
+    try {
+      const win = stubPage({ translations: words });
+      let loaded = 0;
+      win.addEventListener("translations-loaded", () => loaded++);
+      await loadModule();
+      await vi.advanceTimersByTimeAsync(2000);
+      expect(loaded).toBe(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
