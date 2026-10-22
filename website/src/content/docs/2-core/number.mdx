@@ -58,7 +58,7 @@ zoom.addEventListener('change', () => save(zoom.value));
 
 `input` fires as a drag moves the value; `change` once a value is taken (a drag's end, Enter, leaving the field, an arrow). Both bubble through shadow boundaries, and `value` is a number. Typing fires neither until the value is taken, so a half-typed `10 +` never reaches the page.
 
-The field is a `spinbutton` to assistive technology, with its value, range and unit read out. It takes part in native forms through `ElementInternals`.
+The field is a `spinbutton` to assistive technology, with its value, range and unit read out. It takes part in native forms through `ElementInternals`, and a value outside `min` or `max` (a starting 0 under a `min`, say) keeps its form from being sent until a value is set, as a required field does.
 
 ## Tokens
 

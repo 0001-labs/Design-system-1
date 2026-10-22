@@ -147,3 +147,15 @@ test('drag="value" makes the field the handle: up raises it a step every three p
   face.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
   expect(element.value).toBe(112);
 });
+
+test('a value outside min or max keeps its form from being sent until it is set', async () => {
+  document.body.innerHTML = '<form><ds-number name="rate" min="0.0001" places="4"></ds-number></form>';
+  const element = document.querySelector('ds-number') as NumberField; await element.updateComplete;
+  const form = document.querySelector('form')!;
+  if (!('setValidity' in ((element as any).internals ?? {}))) return;
+  expect(element.checkValidity()).toBe(false);
+  expect(new FormData(form).get('rate')).toBe('0');
+  element.value = 22.4; await element.updateComplete;
+  expect(element.checkValidity()).toBe(true);
+  expect(new FormData(form).get('rate')).toBe('22.4');
+});

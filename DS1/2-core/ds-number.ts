@@ -266,6 +266,25 @@ export class NumberField extends LitElement {
   protected updated(changed: PropertyValues<this>) {
     if (changed.has("width")) this.style.setProperty("--ds-number-squares", String(Math.max(1, Math.round(this.width || 4))));
     if (changed.has("value") || changed.has("disabled")) this.internals?.setFormValue(this.disabled ? null : String(this.value));
+    this.validate();
+  }
+
+  /** A value outside `min` or `max` (one never set by hand, such as a starting 0 above a min) keeps its form from being sent. */
+  private validate() {
+    if (!this.internals?.setValidity) return;
+    const low = this.min !== undefined && this.value < this.min;
+    const high = this.max !== undefined && this.value > this.max;
+    const message = low ? `At least ${formatNumberValue(this.min!, this.decimals)}` : high ? `At most ${formatNumberValue(this.max!, this.decimals)}` : "";
+    if (low || high) this.internals.setValidity({ rangeUnderflow: low, rangeOverflow: high }, message, this.input ?? undefined);
+    else this.internals.setValidity({});
+  }
+
+  checkValidity() {
+    return this.internals?.checkValidity() ?? true;
+  }
+
+  reportValidity() {
+    return this.internals?.reportValidity() ?? true;
   }
 
   formResetCallback() {
