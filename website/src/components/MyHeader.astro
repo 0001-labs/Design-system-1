@@ -39,6 +39,8 @@ import '../../../shared/site-navigation.css';
     if (event.data.loading && event.data.authenticated !== true) return;
     const authenticated = event.data.authenticated === true;
     document.documentElement.toggleAttribute('data-signed-in', authenticated);
+    // The owner's constraint panel, five presses of C (DS1/0-face/constraint-panel.ts).
+    document.documentElement.toggleAttribute('data-ds-owner', authenticated && event.data.owner === true);
     window.dispatchEvent(new CustomEvent('ds1-navigation-auth', { detail: { ...event.data, authenticated } }));
   });
 </script>

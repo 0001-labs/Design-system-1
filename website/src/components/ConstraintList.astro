@@ -1,0 +1,58 @@
+---
+// The small rules from DS1/0-face/constraints.ts: all of them under their components on the
+// Constraints page, or one component's on its own page (`component="ds-card"`).
+import { byComponent, componentName, constraints } from '../../../DS1/0-face/constraints';
+
+const { component } = Astro.props as { component?: string };
+const groups = component
+  ? [[component, constraints.filter(c => c.components.includes(component))] as const]
+  : byComponent();
+// Each component's page, found by its name among the docs: `ds-card` is /2-core/card/.
+const pages = Object.keys(import.meta.glob('../content/docs/*/*.{md,mdx}'));
+const page = (tag: string) => pages.find(path => path.endsWith(`/${tag.replace(/^ds-/, '')}.mdx`) || path.endsWith(`/${tag.replace(/^ds-/, '')}.md`))
+  ?.replace('../content/docs', '').replace(/\.mdx?$/, '/');
+---
+
+<div class="constraint-list">
+  {groups.map(([tag, rules]) => (
+    <section id={component ? undefined : tag}>
+      {!component && <h3>{page(tag) ? <a href={page(tag)}>{componentName(tag)}</a> : componentName(tag)}</h3>}
+      <dl>
+        {rules.map(({ code, rule, why }) => (
+          <div class="constraint" id={code}>
+            <dt><code>{code}</code></dt>
+            <dd>{rule}{why && <> {why}</>}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  ))}
+</div>
+
+<style>
+  .constraint-list dl {
+    margin: 0;
+  }
+  .constraint {
+    display: grid;
+    grid-template-columns: calc(10 * var(--ds-unit)) minmax(0, 1fr);
+    column-gap: var(--ds-unit);
+    padding-block: calc(var(--ds-unit) / 2);
+  }
+  .constraint + .constraint {
+    border-top: 1px solid var(--ds-border-color);
+  }
+  .constraint dt,
+  .constraint dd {
+    margin: 0;
+    line-height: var(--ds-unit);
+  }
+  .constraint dt code {
+    color: var(--ds-text-color-muted);
+  }
+  @media (max-width: 600px) {
+    .constraint {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

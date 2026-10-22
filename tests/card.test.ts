@@ -54,11 +54,20 @@ test("the sheet pads the card a square and puts no shadow on a filled card", () 
   expect(card).not.toMatch(/box-shadow:\s*0 \d/);
 });
 
-test("a picture stands on the card's foot, so pictures side by side line up, and is square where it meets the card", () => {
+// card.media-level in DS1/0-face/constraints.ts
+test("a picture stands on the card's foot, so pictures side by side stand on one level", () => {
   const card = sheet("1-root/card.css");
+  // No padding at the foot: the third of the card's four paddings is a bento's inset alone.
+  const padding = /\n\.ds-card \{[^}]*\n  padding:([^;]*);/.exec(card)![1]!;
+  expect(padding).toMatch(/\)\s+var\(--ds-bento-inset-bottom, 0px\)\s+calc\(/);
   const media = /\.ds-card__media \{([^}]*)\}/.exec(card)![1]!;
   expect(media).toContain("margin-top: auto");
   expect(media).toContain("padding-top: var(--ds-unit)");
+});
+
+// card.media-corners in DS1/0-face/constraints.ts
+test("a picture is square where it meets the card's edge", () => {
+  const card = sheet("1-root/card.css");
   const foot = /\.ds-card \.ds-card__media > :is\(img, picture, video, canvas, svg\) \{([^}]*)\}/.exec(card)![1]!;
   expect(foot).toContain("border-end-start-radius: 0");
   expect(foot).toContain("border-end-end-radius: 0");

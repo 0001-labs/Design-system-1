@@ -21,6 +21,8 @@ import "./0-face/i18n";
 
 export * from "./0-face/device";
 export * from "./0-face/grid";
+export * from "./0-face/constraints";
+export * from "./0-face/constraint-panel";
 export * from "./0-face/tooltips";
 export * from "./0-face/i18n";
 export * from "./0-face/languages";

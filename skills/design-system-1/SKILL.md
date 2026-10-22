@@ -317,6 +317,19 @@ Every text is sentence case, in every language.
 - **Locale:** `localeTag(language)` gives the locale (`da` is `da-DK`, `pt` is `pt-PT`). `configureFormat({ locales: { en: "en-GB" }, timeZone })` sets a product's region and zone once, at startup.
 - **Servers:** pass the request's `language` on every call. `format.ts` and `pricing.ts` travel in the `languages` Sync 1 export.
 
+## Constraints
+
+The small rules every component keeps, each a sentence with a code that never changes, listed on https://designsystem1.com/1-root/constraints/ and on each component's page. Each is also a check of a page as drawn: on a Design system 1 page its owner (`<html data-ds-owner>`) presses C five times for a side panel of what the page breaks, and `inspectConstraints()` from `0-face/constraints.ts` returns the same list to a script. Keep them in any 0001 interface, whether or not it imports the component, and name a broken one by its code in a review. When a general rule for Design system 1 is given, add it to `DS1/0-face/constraints.ts` with its `inspect` (the check on a page) and a source test, make the component keep it, then run `vp run constraints:write`, which writes the list below.
+
+<!-- constraints:start (written by scripts/write-constraints.ts from DS1/0-face/constraints.ts) -->
+
+**Card** (`ds-card`)
+
+- `card.media-level`: A card's picture stands on the card's foot, a square below the words at least, so the pictures of cards side by side stand on one level whatever the words above them. The room a taller card leaves goes above its picture, never below it.
+- `card.media-corners`: A picture is never rounded where it meets the card's edge: the card cuts it square there, and only a corner standing free inside the card, towards the words, keeps a picture's corner.
+
+<!-- constraints:end -->
+
 ## Checking a design
 
 Measure, do not eyeball: in the browser, read each element's rendered width and height and its position. Widths and heights are whole squares (minus the 1px correction for items), and positions fall on the 20px grid. A row that is 32 or 36px tall, or a gap of 12px, is wrong. Then the sixteen: in any row, a 16px icon's bottom edge sits on the row's bottom grid line and the 14px capitals beside it start 7px below the row's top line (measure the baseline with a zero-height inline-block, the cap height from `measureText('H').actualBoundingBoxAscent`); words centred in the twenty, or an icon centred in its square, are wrong.

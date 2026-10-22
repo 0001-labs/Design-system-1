@@ -26,7 +26,7 @@ const rootFonts = ['GT-America-Standard-Regular.woff2', 'GT-America-Standard-Med
 const alwaysFonts = ['Inter-Arrows.woff2', 'Iosevka-Regular.woff2', 'Inter-LICENSE.md', 'Iosevka-LICENSE.md'];
 /** Page scripts in 0-face/, each with the modules it imports. */
 const rootModules = {
-  grid: ['grid.ts', 'layout-inspector.ts', 'grid-fit.ts'],
+  grid: ['grid.ts', 'layout-inspector.ts', 'grid-fit.ts', 'constraint-panel.ts', 'constraints.ts'],
   'grid-fit': ['grid-fit.ts'],
   'layout-inspector': ['layout-inspector.ts'],
   scaling: ['scaling.ts'],
@@ -175,7 +175,7 @@ export default {
      * footer.css, document.css, carousel.css, figures.css, progress.css and row.css it imports; `prose`
      * adds the prose sheet (prose.css) and `cjk` Noto Sans for Japanese and Chinese (cjk.css,
      * from Google Fonts), which `styles` may also name; `modules` names page scripts
-     * from 0-face/ (app-banner, carousel, grid, grid-fit, layout-inspector, scaling, theme,
+     * from 0-face/ (app-banner, carousel, grid (with the owner's constraint panel), grid-fit, layout-inspector, scaling, theme,
      * theme-bootstrap, tooltips, tree, header, keys, overlay-swipe, cut-fade), copied with what they import, into 0-face/;
      * `scriptsTo` puts that 0-face/ folder elsewhere, a path from `to`
      * (`"../../src/ds1"` puts the stylesheets in `public/ds1` and the scripts

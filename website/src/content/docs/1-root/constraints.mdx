@@ -4,6 +4,7 @@ description: The rules every piece keeps, seen up close - everything on the squa
 ---
 
 import Constraints from "../../../components/Constraints.astro";
+import ConstraintList from "../../../components/ConstraintList.astro";
 
 Constraints are the rules every piece of Design system 1 keeps, so a page never has to be corrected by eye. They are measured in pixels and squares, not judged. Each picture below is drawn with the system's own pieces and magnified under a glass, its pixels ruled in and the rule drawn in blue. Move the pointer over a picture and the glass follows it.
 
@@ -75,6 +76,20 @@ To put an added face on the same line, give its `@font-face` the same difference
 - **Match the baseline** with `ascent-override` and `descent-override` so that ascent minus descent is 0.742.
 - **Match the capitals** with `size-adjust`: 0.71 over the face's cap height. It scales the overrides too, so divide them by the same factor.
 - **Correct the face once**, in its `@font-face`. Never move its words with padding, `top` or a transform in each component: every component then sets the face right, and the system's own faces are left alone.
+
+## Small rules
+
+Under the big rules stand the small ones: a sentence each, kept by one component and measured by a test of its own. Each has a code that never changes, so a review can name the rule it finds broken. A component's page lists the rules it keeps.
+
+<ConstraintList />
+
+## Checking a page
+
+Every small rule is also a check that measures a page as it is drawn. On a page built on Design system 1, its owner presses **C five times** and a panel opens at the page's side, listing each place the page breaks a rule: the rule's code, what is wrong in pixels, and the element ringed on the page; press one to scroll to it, and **Check** to measure again after a change. Escape hides it. Add `?constraints=1` to the address to open it as the page loads.
+
+The panel comes with the grid shortcut (`0-face/grid`, Sync 1's root `"modules": ["grid"]`), but unlike the grid it answers the owner alone: the site sets `data-ds-owner` on `<html>` once it knows the person signed in owns it, and for anyone else five presses of C do nothing. `inspectConstraints()` returns the same list to a script or a test.
+
+A new small rule goes into `DS1/0-face/constraints.ts` with its `inspect`, which measures it on a page, and a source test that measures the component; the component keeps it in its own CSS, and `vp run constraints:write` copies the list into the design-system-1 skill.
 
 ## Checking it
 

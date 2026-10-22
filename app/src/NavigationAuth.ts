@@ -81,6 +81,8 @@ export class NavigationAuth extends AppElement {
     const libraries = this.#libraries.value;
     window.parent.postMessage({
       type: "ds1:navigation-auth", authenticated: ready, loading: isLoading || (ready && this.navigationLoading),
+      // App's places answer only the owner, so having them is being the owner.
+      owner: ready && token === this.appNavigation?.token,
       appComponents: ready && token === this.appNavigation?.token ? this.appNavigation.components : [],
       companyName: ready ? this.#profile.value?.companyName ?? "" : "",
       libraries: ready ? libraries?.map(({ _id, name, publishedVersion }) => ({ id: _id, name, publishedVersion })) ?? [] : [],

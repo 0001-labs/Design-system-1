@@ -57,6 +57,7 @@
     "generate:icons": "vp exec tsx scripts/generate-icons.ts",
     "generate:toast-assets": "node scripts/toast-assets.mjs",
     "native:tokens": "vp exec tsx scripts/write-native-tokens.ts",
+    "constraints:write": "vp exec tsx scripts/write-constraints.ts",
     "native:test": "vp run native:tokens && cd native/apple && swift test",
     "native:test:android": "vp run native:tokens && sh scripts/gradle.sh :ds1:testReleaseUnitTest :ds1:lintRelease :ds1:assembleRelease",
     "native:fonts": "python3 scripts/fonts/build-android-fonts.py",
