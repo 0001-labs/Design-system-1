@@ -94,7 +94,7 @@ export class Avatar extends LitElement {
       ? html`<ds-icon type=${this.icon} aria-hidden="true"></ds-icon>`
       : html`<span
           class="initial"
-          ?data-pair=${[...this.initial].length > 1}
+          ?data-pair=${[...this.initial].length > 1 && !/^\d{1,2}$/.test(this.initial)}
           style=${styleMap({ "--initial-count": String([...this.initial].length || 1) })}
           >${this.initial}</span
         >`;

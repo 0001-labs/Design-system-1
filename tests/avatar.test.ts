@@ -112,3 +112,19 @@ test("an avatar is filled with a colour, or lettered in an ink on the neutral fi
   expect(inkedFrame.style.backgroundColor).toBe("");
   expect(inkedFrame.style.color).toBe("var(--person-ink)");
 });
+
+
+test("one- and two-digit labels keep the normal type size while wide initials still fit", async () => {
+  const avatar = document.createElement("ds-avatar");
+  document.body.append(avatar);
+  for (const initial of ["1", "9", "10", "18", "19", "21", "31"]) {
+    avatar.initial = initial;
+    await avatar.updateComplete;
+    expect(avatar.shadowRoot!.querySelector(".initial")!.hasAttribute("data-pair")).toBe(false);
+  }
+  for (const initial of ["高橋", "WW", "123"]) {
+    avatar.initial = initial;
+    await avatar.updateComplete;
+    expect(avatar.shadowRoot!.querySelector(".initial")!.hasAttribute("data-pair")).toBe(true);
+  }
+});
