@@ -123,7 +123,7 @@
     "source": "client/design/2-core/generated/ds-icon-map.ts#arrange-check",
     "name": "arrange-check",
     "sourceHash": "80e9d48ee636d6f575f7afee177469116f1dda9f96330208241acf5a5b322ca1",
-    "iconHash": "46dde45973cecb4789112936d81b1c866a6d1904ffa47ab4f748c5e7b32df531"
+    "iconHash": "b595ee7d3a2b15704e8f5741fb3ff43e1a58d1897dd1afcea555cdac4571bf67"
   },
   {
     "product": "Ezo",
@@ -186,7 +186,7 @@
     "source": "client/design/2-core/generated/ds-icon-map.ts#arrange-page",
     "name": "arrange-page",
     "sourceHash": "06289e75a8852e097ee0b9b9b00a47f053245504fffdaffddf3b869801498495",
-    "iconHash": "2373ed307b0e02b83fbe08fb36a10c8673ae6c31a19abd55e3daf990b8122289"
+    "iconHash": "7134c169b440828a9d05b8352bcf39c5b489282c5314b51ff2043debb54f720c"
   },
   {
     "product": "Ezo",
@@ -911,13 +911,6 @@
   },
   {
     "product": "Ezo",
-    "source": "client/design/2-core/generated/ds-icon-map.ts#left",
-    "name": "left",
-    "sourceHash": "a7534e6fc863bf72917ced882341a32b83d4d3352ab1d790b8b16f603c693c3e",
-    "iconHash": "601aa7495cdaf9d018751df6ae704e600bef44c92e13d7ddfdc5e698c48ba186"
-  },
-  {
-    "product": "Ezo",
     "source": "client/design/2-core/generated/ds-icon-map.ts#life",
     "name": "life",
     "sourceHash": "c3f3e035ae92affe781accdf60d8cc2804f602779864f85dfe26508dd78c6fff",
@@ -1208,7 +1201,7 @@
     "source": "client/design/2-core/generated/ds-icon-map.ts#redo",
     "name": "redo",
     "sourceHash": "aaa0b9b439b6b08965c997c28b47915103ab93ed0d85e63e929d8292256e5022",
-    "iconHash": "a33cad60c8ae078837c3084b1403761e175df4f8415a2f3cb0ad3a1813c6a32a"
+    "iconHash": "5eeb0136dd8615617a87d7892f510d95256c1c777268dbc31ab5813ae039f5b3"
   },
   {
     "product": "Ezo",
