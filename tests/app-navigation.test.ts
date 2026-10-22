@@ -3,6 +3,7 @@ import { expect, test } from 'vite-plus/test';
 import { placeAppNavigation, readAppComponents, type AppComponent } from '../website/src/lib/app-navigation';
 import type { SidebarItem } from '../DS1/3-unit/ds-sidebar';
 const components: AppComponent[] = [
+  {name:'IndexedDB', layer:1, href:'/libraries/workspace/?internal=indexeddb'},
   {name:'Keyboard shortcut', layer:2, href:'/libraries/workspace/?internal=keyboard-shortcut'},
   {name:'Spacing handle', layer:2, href:'/libraries/workspace/?internal=spacing-handle'},
   {name:'Loading indicator', layer:2, href:'/libraries/workspace/?internal=loading-indicator'},
@@ -20,14 +21,14 @@ test('private names require owner metadata and a local workspace destination', (
   expect(readAppComponents({authenticated:false,appComponents:components})).toEqual([]);
   expect(readAppComponents({authenticated:true,appComponents:[...components,{name:'Elsewhere',layer:2,href:'https://elsewhere.example'}]})).toEqual(components);
 });
-test('owner-only links sit alphabetically in Core and disappear when collapsed or signed out', () => {
+test('owner-only links sit in Root and alphabetically in Core and disappear when collapsed or signed out', () => {
   const root = document.createElement('div');
   const items = placeAppNavigation(root, rows, components);
   const expanded = items.flatMap(item => [item.label, ...[...root.querySelectorAll(`[slot="${item.afterSlot}"] a`)].map(link=>link.querySelector('span')?.textContent)]);
-  expect(expanded).toEqual(['1 Root','2 Core','Input','Keyboard shortcut','Link','Loading indicator','Spacing handle','Stat','Switch','3 Unit']);
-  expect([...root.querySelectorAll('ds-tag')].map(tag => tag.textContent)).toEqual(['App', 'App', 'App']);
+  expect(expanded).toEqual(['1 Root','IndexedDB','2 Core','Input','Keyboard shortcut','Link','Loading indicator','Spacing handle','Stat','Switch','3 Unit']);
+  expect([...root.querySelectorAll('ds-tag')].map(tag => tag.textContent)).toEqual(['App', 'App', 'App', 'App']);
   expect([...root.querySelectorAll('a')].every(link=>link.classList.contains('private-component-link'))).toBe(true);
-  placeAppNavigation(root, rows.map(row=>({...row,expanded:row.label==='2 Core'?false:row.expanded})), components);
+  placeAppNavigation(root, rows.map(row=>({...row,expanded:false})), components);
   expect(root.querySelectorAll('a')).toHaveLength(0);
   placeAppNavigation(root, rows, components);
   placeAppNavigation(root, rows, readAppComponents({authenticated:false,appComponents:components}));

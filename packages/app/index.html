@@ -5,13 +5,59 @@
 body{margin:0;background:var(--ds1-docs-content-bg);color:var(--text-color);font-family:var(--typeface-regular)}
 main{box-sizing:border-box;width:100%;max-width:calc(40 * var(--ds-unit));padding:calc(2 * var(--ds-unit))}
 article{display:none}
-html[data-component="keyboard-shortcut"] [data-component="keyboard-shortcut"],html[data-component="spacing-handle"] [data-component="spacing-handle"],html[data-component="loading-indicator"] [data-component="loading-indicator"]{display:block}
+html[data-component="indexeddb"] [data-component="indexeddb"],html[data-component="keyboard-shortcut"] [data-component="keyboard-shortcut"],html[data-component="spacing-handle"] [data-component="spacing-handle"],html[data-component="loading-indicator"] [data-component="loading-indicator"]{display:block}
 .preview{display:flex;flex-wrap:wrap;align-items:flex-end;gap:var(--ds-unit);padding-block:var(--ds-unit)}
 .preview p{display:flex;align-items:flex-end;gap:calc(var(--ds-unit) / 2);margin:0}
 .example-view-toggle{display:flex;gap:calc(4px * var(--sf,1))}
 [data-example-preview][hidden],[data-example-source][hidden]{display:none}
 @media(max-width:768px){main{padding:var(--ds-unit)}}
 </style></head><body><main data-ds-surface>
+<article class="sl-markdown-content" data-component="indexeddb" data-ds-prose>
+<h1 id="_top" class="ds-text ds-text--display">IndexedDB</h1>
+<p>The app remembers its last server answers on this device, so a returning reader sees their content while fresh answers arrive.</p>
+<p>A ghost component in <strong>1 Root</strong>: it draws nothing, takes no space and has no focus or pointer target. The app starts its account runtime once from the root; pages read through that runtime. This owner-only App guide documents an existing application pattern, not an exported element or a storage service supplied by DS1.</p>
+<h2>Open, remember, refresh</h2>
+<ol>
+<li><strong>Identify the account.</strong> Scope snapshots by backend deployment and account ID. Visitors do not start the account download or edit transport.</li>
+<li><strong>Read what is already here.</strong> Memory, the tab’s session copy and a small allowlist of settings metadata can answer synchronously. IndexedDB hydrates asynchronously, once per scope. A late disk answer cannot replace a newer value or revive an invalidated record.</li>
+<li><strong>Draw, then listen.</strong> A page receives its cached answer immediately if one exists, with pending local changes projected over it. Its live query stays subscribed. The next server answer replaces the snapshot; a refused query removes its cached answer and reports the error. There is no global loading gate.</li>
+<li><strong>Refresh in the background.</strong> Startup reads the account’s lists and overview. Lists whose <code>updated_at</code> still matches reuse their held items; the next sync after six hours reads every list again. Up to four list reads run together. Reconnecting starts another sync.</li>
+<li><strong>Remember only the changes.</strong> Changed query keys are queued for persistence. Switching accounts or signing out clears the snapshot state and queues deletion of the stored account.</li>
+</ol>
+<h2>What lives where</h2>
+<table><thead><tr><th>Place</th><th>Purpose</th></tr></thead><tbody>
+<tr><td>Memory</td><td>The current scope’s query answers, timestamps, dirty keys and invalidations.</td></tr>
+<tr><td>IndexedDB</td><td><code>entries</code>: one <code>{ value, time }</code> record per query key. <code>meta</code>: the account scope. A scope change clears the previous account’s entries in the same write transaction.</td></tr>
+<tr><td>sessionStorage</td><td>A warm tab copy: the newest 40 eligible answers, trimmed until its serialized string is at most 1,000,000 characters. These limits apply to this copy, not the IndexedDB database.</td></tr>
+<tr><td>localStorage</td><td>Allowlisted settings display metadata and sync timestamps. Pending edits are separate records here, not in the IndexedDB snapshot store.</td></tr>
+</tbody></table>
+<p>A query key combines its function name and JSON arguments, with object keys sorted recursively. Use non-secret identifiers as arguments; never put credentials or access tokens in snapshot keys or values. The account scope separates caches; the server still decides access.</p>
+<h2>One record per query</h2>
+<p>The storage adapter opens a versioned database with two object stores. A read loads its scope, keys and values in one transaction. A write puts changed records and deletes removed keys in one read-write transaction, with relaxed durability. It resolves when the transaction completes and closes the database in <code>finally</code>.</p>
+<p>Do not serialize the whole account after every edit. A list already holds its items, so identical item and note snapshots are omitted from disk and derived from the list when it is read back. This deduplication belongs to the application’s data model.</p>
+<ul>
+<li>Small writes are grouped after 250 ms. Large overview records and the tab copy wait until edits settle for five seconds.</li>
+<li>Equal answers keep their existing value object and usually write nothing. A server-confirmed unchanged record is eligible for a disk timestamp refresh after one day.</li>
+<li>Snapshots older than seven days are not used. Expired records encountered during disk hydration are queued for removal.</li>
+<li><code>pagehide</code> and a hidden document trigger a full flush. These are best-effort opportunities, not a guarantee that a closing browser will finish writing.</li>
+</ul>
+<h2>Pending edits stay separate</h2>
+<p>The snapshot is the last confirmed answer. An edit queue persists local intent and projects it over that answer for immediate feedback. After the server accepts an edit, the queue marks it confirmed, folds it into the snapshots and waits for their quick flush before removing the queued record. If device storage fails, the confirmed record stays queued. A cached read alone is not an offline editing or conflict-resolution system.</p>
+<h2>Account and failure boundaries</h2>
+<p>Every asynchronous read, refresh and write checks that its captured scope still matches the active account. Sign-out clears memory, timers, session and settings copies, and serializes the IndexedDB clear after outstanding writes. Storage events detect account changes in other tabs. A profile preference change is not an account switch.</p>
+<p>Opening the database times out after two seconds and rejects blocked or failed opens. Startup refresh stops after 30 seconds. Failed snapshot reads are optional: the app continues with memory and live queries. Failed writes restore dirty keys for a later flush. Storage can be unavailable or cleared by the browser, so snapshots are a cache, never the only copy of the reader’s work.</p>
+<h2>Wiring in the app</h2>
+<p>These are the reference implementation’s module responsibilities, not imports from the App package:</p>
+<dl>
+<dt><code>initializeApp.ts</code></dt><dd>Starts the account runtime on initialization, account changes, navigation and reconnect; skips visitors.</dd>
+<dt><code>startupStorage.ts</code></dt><dd>Owns database opening, transactions, per-query records and clearing the stored scope.</dd>
+<dt><code>querySnapshots.ts</code></dt><dd>Owns memory, hydration, freshness, deduplication, batching and persistence failure handling.</dd>
+<dt><code>startupSync.ts</code></dt><dd>Collects account data, reuses unchanged lists and schedules full refreshes.</dd>
+<dt><code>cachedQueries.ts</code></dt><dd>Delivers cached answers, subscribes to live results and cleans up page subscriptions.</dd>
+<dt><code>localChanges.ts</code></dt><dd>Keeps the separate edit queue and projects pending changes over confirmed snapshots.</dd>
+</dl>
+<p>The guide is visible only to the system owner, through the same verified owner gate as the other App documents. The runtime pattern serves signed-in accounts generally; owner-only documentation does not make their caches owner-only.</p>
+</article>
 <article class="sl-markdown-content" data-component="keyboard-shortcut" data-ds-prose>
 <h1 id="_top" class="ds-text ds-text--display">Keyboard shortcut</h1>
 <p>A shortcut hint displays a command using the reader’s platform conventions. The application owns the action and its keyboard listener.</p>

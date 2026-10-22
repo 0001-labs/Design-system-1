@@ -20,8 +20,10 @@ test('internal navigation is returned only for the pinned, verified owner', asyn
   expect(response.status).toBe(200);
   expect(response.headers.get('cache-control')).toBe('private, no-store');
   const { components } = await response.json() as {components: {name:string; layer:number; href:string}[]};
-  expect(components.map(item => item.name)).toEqual(['Keyboard shortcut', 'Spacing handle', 'Loading indicator']);
-  expect(components.every(item => item.layer === 2 && item.href.startsWith('/libraries/workspace/?internal='))).toBe(true);
+  expect(components.map(item => item.name)).toEqual(['IndexedDB', 'Keyboard shortcut', 'Spacing handle', 'Loading indicator']);
+  expect(components[0]).toEqual({ name: 'IndexedDB', layer: 1, href: '/libraries/workspace/?internal=indexeddb' });
+  expect(components.every(item => item.href.startsWith('/libraries/workspace/?internal='))).toBe(true);
+  expect(components.slice(1).every(item => item.layer === 2)).toBe(true);
 });
 
 test('one same-origin owner request also establishes the private document session', async () => {

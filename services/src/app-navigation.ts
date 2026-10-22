@@ -11,6 +11,7 @@ export async function appNavigation(request: Request, env: ReportsEnv, send: typ
   const cookie = request.method === 'POST' ? ownerSessionCookie(request) : null;
   if (request.method === 'POST' && !cookie) return new Response(null, {status:401,headers});
   return Response.json({ components: [
+    { name: 'IndexedDB', layer: 1, href: '/libraries/workspace/?internal=indexeddb' },
     { name: 'Keyboard shortcut', layer: 2, href: '/libraries/workspace/?internal=keyboard-shortcut' },
     { name: 'Spacing handle', layer: 2, href: '/libraries/workspace/?internal=spacing-handle' },
     { name: 'Loading indicator', layer: 2, href: '/libraries/workspace/?internal=loading-indicator' },
