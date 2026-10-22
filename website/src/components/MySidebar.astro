@@ -133,7 +133,7 @@ const { sidebar } = Astro.locals.starlightRoute;
   window.addEventListener("translations-ready", () => { renderNavigation(); });
   window.addEventListener("language-changed", () => { renderNavigation(); });
   // Replay the authenticated summary after all sidebar listeners are ready.
-  document.querySelector<HTMLIFrameElement>('#navigation-auth')?.contentWindow?.postMessage({ type: 'ds1:navigation-auth-request' }, location.origin);
+  window.dispatchEvent(new Event('ds1:navigation-auth-request'));
   navigation.addEventListener('sidebar-toggle', event => {
     const { id, expanded } = (event as CustomEvent).detail;
     if (expanded) collapsed.delete(id); else collapsed.add(id);

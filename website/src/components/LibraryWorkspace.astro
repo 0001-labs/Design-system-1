@@ -27,7 +27,7 @@ const appPath = mode === 'editor' ? '/app/playground' : '/app/libraries';
   </nav>
   <iframe
     id="library-app"
-    src={`${appPath}?embed=docs`}
+    data-src={`${appPath}?embed=docs`}
     title={mode === 'editor' ? 'Design system 1 editor' : 'My libraries'}
   ></iframe>
 </section>
@@ -37,6 +37,7 @@ const appPath = mode === 'editor' ? '/app/playground' : '/app/libraries';
   import { libraryHeading, libraryHref, libraryWorkspaceHref, readLibraryNavigation, type LibraryNavigation } from '../../../shared/library-navigation';
   const frame = document.querySelector<HTMLIFrameElement>('#library-app');
   if (frame && !new URLSearchParams(location.search).has('internal')) {
+    frame.src = frame.dataset.src!;
     // The docs are static: read the current library from the browser URL, not build-time Astro.url.
     const query = new URLSearchParams(location.search);
     const libraryId = query.get('library');

@@ -56,7 +56,10 @@ import MarkdownContent from './MarkdownContent.astro';
       status.textContent = 'Loading component…';
       try {
         const response = await fetch(`/private-app/?component=${encodeURIComponent(requested)}`, { signal: current.signal, cache: 'no-store' });
-        if (!response.ok || response.redirected) throw new Error('Sign in with the owner account to view this component.');
+        if (!response.ok || response.redirected) {
+          if (response.redirected || response.status === 401 || response.status === 403) window.dispatchEvent(new Event('ds1:access-invalidated'));
+          throw new Error('Sign in with the owner account to view this component.');
+        }
         const document = new DOMParser().parseFromString(await response.text(), 'text/html');
         const article = [...document.querySelectorAll('article[data-component]')].find(article => (article as HTMLElement).dataset.component === requested);
         if (!article) throw new Error('This component could not be loaded.');
@@ -114,7 +117,7 @@ import MarkdownContent from './MarkdownContent.astro';
         status.textContent = error instanceof Error ? error.message : 'This component could not be loaded.';
       }
     });
-    document.querySelector<HTMLIFrameElement>('#navigation-auth')?.contentWindow?.postMessage({ type: 'ds1:navigation-auth-request' }, location.origin);
+    window.dispatchEvent(new Event('ds1:navigation-auth-request'));
   }
 </script>
 

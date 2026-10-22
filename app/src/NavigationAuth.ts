@@ -1,8 +1,10 @@
 import { nothing } from "lit";
 import { api } from "../../convex/_generated/api";
-import { authState, authToken, LiveQuery, mutation } from "./lib/backend";
+import { authState, authToken, authStorageKey, LiveQuery, mutation } from "./lib/backend";
 import { AppElement, defineElement } from "./lib/element";
 import { libraryTemplate, templateVersion } from "./lib/libraryTemplate";
+
+import { saveNavigationCache, clearNavigationCache, type NavigationSummary } from "../../shared/navigation-cache";
 
 type AppNavigation = { token: string; components: { name: string; href: string; layer: number }[] };
 
@@ -23,6 +25,7 @@ export class NavigationAuth extends AppElement {
   #profile = new LiveQuery(this, api.users.profile, () => this.#ready() ? {} : "skip");
   #libraries = new LiveQuery(this, api.libraries.list, () => this.#ready() ? {} : "skip");
   #pending = false;
+  #reportVersion = 0;
   /** The session the navigation was last asked for, so it is asked once per change. */
   #session: string | null = null;
   #controller: AbortController | null = null;
@@ -57,6 +60,8 @@ export class NavigationAuth extends AppElement {
     this.appNavigation = null;
     if (isLoading) return;
     if (!ready || !token) {
+      clearNavigationCache();
+      this.navigationLoading = false;
       void fetch("/api/dashboard/session", { method: "DELETE", cache: "no-store" }).catch(() => {});
       return;
     }
@@ -74,12 +79,13 @@ export class NavigationAuth extends AppElement {
       .finally(() => { if (!controller.signal.aborted) this.navigationLoading = false; });
   }
 
-  #report() {
+  async #report() {
+    const version = ++this.#reportVersion;
     const { isLoading } = authState.get();
     const ready = this.#ready();
     const token = authToken.get();
     const libraries = this.#libraries.value;
-    window.parent.postMessage({
+    const summary: NavigationSummary = {
       type: "ds1:navigation-auth", authenticated: ready, loading: isLoading || (ready && this.navigationLoading),
       // App's places answer only the owner, so having them is being the owner.
       owner: ready && token === this.appNavigation?.token,
@@ -87,7 +93,10 @@ export class NavigationAuth extends AppElement {
       companyName: ready ? this.#profile.value?.companyName ?? "" : "",
       libraries: ready ? libraries?.map(({ _id, name, publishedVersion }) => ({ id: _id, name, publishedVersion })) ?? [] : [],
       librariesLoaded: ready && libraries !== undefined, creating: this.creating, creationError: this.creationError,
-    }, window.location.origin);
+    };
+    const cacheExpiresAt = await saveNavigationCache(authStorageKey, token, summary);
+    if (version !== this.#reportVersion || token !== authToken.get() || isLoading !== authState.get().isLoading || ready !== this.#ready() || !this.isConnected) return;
+    window.parent.postMessage({ ...summary, cacheExpiresAt }, window.location.origin);
   }
 
   #request = async (event: MessageEvent) => {

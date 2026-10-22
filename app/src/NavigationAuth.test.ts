@@ -8,6 +8,7 @@ vi.mock('./lib/backend', async () => {
   return {
     authState: signal({ isAuthenticated: true, isLoading: false }),
     authToken: signal('test-session'),
+    authStorageKey: '__convexAuthJWT_test',
     mutation: (...args: unknown[]) => mocks.create(...args),
     LiveQuery: class {
       constructor(host: { addController(controller: unknown): void }, private ref: any, private args: () => unknown) { host.addController(this); }
@@ -21,12 +22,13 @@ vi.mock('./lib/backend', async () => {
 import type { Signal } from '@lit-labs/signals';
 import { authState } from './lib/backend';
 import './NavigationAuth';
+import { readNavigationCache, clearNavigationCache } from '../../shared/navigation-cache';
 
 void getFunctionName;
 const session = authState as unknown as Signal.State<{ isAuthenticated: boolean; isLoading: boolean }>;
 const settle = async () => { for (let tick = 0; tick < 8; tick++) await new Promise(resolve => setTimeout(resolve, 0)); };
 const mount = async () => { const element = document.createElement('ds1-navigation-auth'); document.body.append(element); await settle(); return element; };
-afterEach(() => { document.body.replaceChildren(); session.set({ isAuthenticated: true, isLoading: false }); vi.unstubAllGlobals(); mocks.create.mockReset(); });
+afterEach(() => { localStorage.clear(); clearNavigationCache(); document.body.replaceChildren(); session.set({ isAuthenticated: true, isLoading: false }); vi.unstubAllGlobals(); mocks.create.mockReset(); });
 
 test('workspace creation accepts only the parent and ignores duplicate or signed-out requests', async () => {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null, { status: 403 })));
@@ -88,5 +90,19 @@ test('restoring authentication does not delete an existing document session', as
     await mount();
     expect(fetch).not.toHaveBeenCalled();
     expect(sent.mock.calls.at(-1)?.[0]).toMatchObject({ loading: true });
+  } finally { sent.mockRestore(); }
+});
+
+
+test('a confirmed navigation summary is available to the next document without storing its token', async () => {
+  localStorage.setItem('__convexAuthJWT_test', 'test-session');
+  vi.stubGlobal('fetch', vi.fn().mockImplementation(async () => Response.json({ components: [{ name: 'IndexedDB', href: '/libraries/workspace/?internal=indexeddb', layer: 1 }] })));
+  const sent = vi.spyOn(window.parent, 'postMessage').mockImplementation(() => {});
+  try {
+    await mount();
+    const saved = await readNavigationCache();
+    expect(saved?.summary).toMatchObject({ authenticated: true, owner: true, companyName: 'Example', librariesLoaded: true });
+    expect(saved?.summary.appComponents[0].name).toBe('IndexedDB');
+    expect(JSON.stringify(saved)).not.toContain('test-session');
   } finally { sent.mockRestore(); }
 });

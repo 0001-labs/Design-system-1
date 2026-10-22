@@ -37,6 +37,9 @@ const stored = {
   remove(name: string) { try { localStorage.removeItem(storageKey(name)); } catch { /* Nothing kept. */ } },
 };
 
+/** Identifies the existing session without copying its token into navigation metadata. */
+export const authStorageKey = storageKey(JWT);
+
 /** The access token, or null signed out. */
 export const authToken = signal<string | null>(null);
 /** True until the stored session has been read, or a returning `?code=` spent. */

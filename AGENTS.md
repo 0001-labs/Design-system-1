@@ -145,6 +145,8 @@ Owner-only documentation opens inside the normal header and sidebar at `/librari
 
 Both the desktop rail and phone sidebar put the App tag before the component's grey name. Private documents use the same Starlight `TwoColumnContent`, `ContentPanel` and DS1 prose as public component pages, including the title and On this page column. Fetch the authored article only after owner authorization; do not put the document in a separate iframe layout. Examples load their private module and stylesheet only when present.
 
+The documentation navigation reuses a five-minute, tab-local presentation snapshot (`shared/navigation-cache.ts`), bound to a SHA-256 fingerprint of the existing auth token. It contains no token and grants no access. A cache hit does not load the auth iframe; expiry, session changes, sign-out or a denied private request trigger a fresh check. The Worker still revalidates every private document and asset. Private guides never load the hidden libraries app.
+
 The private document and assets use `/private-app/` on `designsystem1.com` (embedded in the shell) and `adoption.designsystem1.com` (legacy access). The existing session bridge sets a host-only HttpOnly cookie after verifying the pinned owner ID and verified account; the Worker revalidates through the same report authority on every document and asset request. Other hosts deny the prefix. Anonymous requests go to sign-in; nonowners are denied. Keep App files out of public search and sitemaps. Selected System parts: `auth`, `sharing`, `design`, `documentation`, `platform-web`, `themes`; this extends the existing owner-only surface without changing shared sign-in or public component visibility.
 
 ## Public font specimens

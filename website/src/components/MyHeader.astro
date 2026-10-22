@@ -7,10 +7,11 @@ import '../../../shared/site-navigation.css';
   <nav class="system-breadcrumb" aria-label="System breadcrumb"><a class="site-brand" href="/">Design system 1</a><span id="private-component-context" hidden>App</span></nav>
   <button id="mobile-menu-btn" class="site-brand docs-brand-menu" type="button" aria-label="Open documentation navigation" aria-controls="mobile-navigation-panel" aria-haspopup="dialog" aria-expanded="false"><ds-icon type="menu" aria-hidden="true"></ds-icon></button>
 </header>
-<iframe id="navigation-auth" src="/app/navigation-auth" title="Account status" hidden aria-hidden="true" tabindex="-1"></iframe>
+<iframe id="navigation-auth" title="Account status" hidden aria-hidden="true" tabindex="-1"></iframe>
 
 <script>
   import '../lib/public-preferences';
+  import { connectNavigationSession } from '../lib/navigation-session';
   import { connectCodeCopy } from '../lib/code-copy';
   connectCodeCopy();
   import '../../../DS1/0-face/device';
@@ -23,12 +24,13 @@ import '../../../shared/site-navigation.css';
   window.addEventListener('scaling-changed', updateLayout);
   window.addEventListener('resize', updateLayout);
 
-  const frame = document.querySelector<HTMLIFrameElement>('#navigation-auth');
-  const requestStatus = () => frame?.contentWindow?.postMessage({ type: 'ds1:navigation-auth-request' }, location.origin);
-  frame?.addEventListener('load', requestStatus);
-  window.addEventListener('pageshow', requestStatus);
-  window.addEventListener('focus', requestStatus);
-  requestStatus();
+  const frame = document.querySelector<HTMLIFrameElement>('#navigation-auth')!;
+  const navigation = connectNavigationSession(frame, detail => {
+    const authenticated = detail.authenticated === true;
+    document.documentElement.toggleAttribute('data-signed-in', authenticated);
+    document.documentElement.toggleAttribute('data-ds-owner', authenticated && detail.owner === true);
+    window.dispatchEvent(new CustomEvent('ds1-navigation-auth', { detail: { ...detail, authenticated } }));
+  });
   window.addEventListener('message', (event) => {
     if (event.origin !== location.origin || event.source !== frame?.contentWindow) return;
     if (event.data?.type === 'ds1:library-created' && typeof event.data.id === 'string') {
@@ -36,12 +38,7 @@ import '../../../shared/site-navigation.css';
       return;
     }
     if (event.data?.type !== 'ds1:navigation-auth') return;
-    if (event.data.loading && event.data.authenticated !== true) return;
-    const authenticated = event.data.authenticated === true;
-    document.documentElement.toggleAttribute('data-signed-in', authenticated);
-    // The owner's constraint panel, five presses of C (DS1/0-face/constraint-panel.ts).
-    document.documentElement.toggleAttribute('data-ds-owner', authenticated && event.data.owner === true);
-    window.dispatchEvent(new CustomEvent('ds1-navigation-auth', { detail: { ...event.data, authenticated } }));
+    navigation.receive(event.data);
   });
 </script>
 
