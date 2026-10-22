@@ -24,6 +24,7 @@ An arrow drawn inside an icon keeps the form of the Inter arrows the type uses: 
 ## Interface additions
 
 - `sign-in` and `sign-out` are the download and upload arrows turned towards a door frame; the sheet calls them Enter and Exit. `in` is a different drawing: two arrows meeting at a line.
+- `material` is the filled circle behind a rounded square, for a collection of samples or attachments. Its original vector geometry is centred on the 16-unit frame.
 - `stop` is the filled square of the media set, beside `play-alt` and `pause`.
 - File kinds are drawn as what they hold: `video`, `audio` (a waveform centred on the middle line, where `stats` stands on a baseline), `pdf` (the top of `page` with its text lines, above the letters), `page` for a generic file and `code` for a code file.
 - `flip` mirrors a shape across a dashed axis. `title-struck` is the title T crossed by a level line, where `untitle` is crossed diagonally.
