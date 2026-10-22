@@ -1,49 +1,127 @@
-<section id="private-component-workspace" class="private-component-workspace" hidden aria-label="Internal component documentation">
+---
+import TwoColumnContent from '@astrojs/starlight/components/TwoColumnContent.astro';
+import PageSidebar from '@astrojs/starlight/components/PageSidebar.astro';
+import ContentPanel from '@astrojs/starlight/components/ContentPanel.astro';
+import MarkdownContent from './MarkdownContent.astro';
+---
+<section id="private-component-workspace" hidden aria-label="Internal component documentation">
   <p id="private-component-status" role="status">Checking access…</p>
-  <iframe id="private-component-frame" title="Internal component documentation" hidden></iframe>
+  <div id="private-component-document" hidden>
+    <TwoColumnContent>
+      <div slot="right-sidebar" id="private-component-sidebar"></div>
+      <ContentPanel><h1 id="_top" class="ds-text ds-text--display"></h1></ContentPanel>
+      <ContentPanel><MarkdownContent><div id="private-component-body"></div></MarkdownContent></ContentPanel>
+    </TwoColumnContent>
+  </div>
+  <template id="private-component-sidebar-template"><PageSidebar /></template>
 </section>
 
 <script>
+  import '../../../DS1/3-unit/ds-table-of-contents';
   import { readAppComponents } from '../lib/app-navigation';
   const workspace = document.querySelector<HTMLElement>('#private-component-workspace')!;
-  const frame = document.querySelector<HTMLIFrameElement>('#private-component-frame')!;
+  const content = document.querySelector<HTMLElement>('#private-component-document')!;
+  const body = document.querySelector<HTMLElement>('#private-component-body')!;
+  const title = content.querySelector<HTMLElement>('h1')!;
+  const sidebar = document.querySelector<HTMLElement>('#private-component-sidebar')!;
+  const sidebarTemplate = document.querySelector<HTMLTemplateElement>('#private-component-sidebar-template')!;
   const status = document.querySelector<HTMLElement>('#private-component-status')!;
   const context = document.querySelector<HTMLElement>('#private-component-context');
   const requested = new URLSearchParams(location.search).get('internal');
+  let request: AbortController | undefined;
+  let loaded = false;
   if (requested !== null) {
     workspace.hidden = false;
-    const sendTheme = () => frame.contentWindow?.postMessage({
-      type: 'ds1:docs-theme', scale: getComputedStyle(document.documentElement).getPropertyValue('--sf').trim() || '1', theme: document.documentElement.classList.contains('dark-theme') ? 'dark' : 'light',
-    }, location.origin);
-    frame.addEventListener('load', sendTheme);
-    window.addEventListener('theme-changed', sendTheme);
-    new MutationObserver(sendTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'data-theme'] });
-    window.addEventListener('ds1-navigation-auth', event => {
+    document.documentElement.setAttribute('data-has-toc', '');
+    window.addEventListener('ds1-navigation-auth', async event => {
       const detail = (event as CustomEvent).detail;
-      if (detail.loading) { status.hidden = false; status.textContent = 'Checking access…'; return; }
+      if (detail.loading) return;
       const component = readAppComponents(detail).find(item => new URL(item.href, location.origin).searchParams.get('internal') === requested);
       if (context) context.hidden = !component;
       if (!component) {
-        frame.hidden = true;
-        frame.removeAttribute('src');
+        request?.abort();
+        loaded = false;
+        content.hidden = true;
+        body.replaceChildren();
+        title.textContent = '';
+        sidebar.replaceChildren();
         status.hidden = false;
         status.textContent = detail.authenticated ? 'This component is available only to the owner.' : 'Sign in with the owner account to view this component.';
         return;
       }
-      document.title = `${component.name} — Design system 1`;
-      frame.title = `${component.name} documentation`;
-      const src = `/private-app/?component=${encodeURIComponent(requested)}`;
-      if (frame.getAttribute('src') !== src) frame.src = src;
-      frame.hidden = false;
-      status.hidden = true;
+      if (loaded) return;
+      request?.abort();
+      const current = request = new AbortController();
+      status.hidden = false;
+      status.textContent = 'Loading component…';
+      try {
+        const response = await fetch(`/private-app/?component=${encodeURIComponent(requested)}`, { signal: current.signal, cache: 'no-store' });
+        if (!response.ok || response.redirected) throw new Error('Sign in with the owner account to view this component.');
+        const document = new DOMParser().parseFromString(await response.text(), 'text/html');
+        const article = [...document.querySelectorAll('article[data-component]')].find(article => (article as HTMLElement).dataset.component === requested);
+        if (!article) throw new Error('This component could not be loaded.');
+        if (current.signal.aborted) return;
+        article.querySelector('h1')?.remove();
+        // Only our authenticated, authored article enters the ordinary document layout.
+        article.querySelectorAll('script').forEach(script => script.remove());
+        body.replaceChildren(...article.childNodes);
+        title.textContent = component.name;
+        window.document.title = `${component.name} — Design system 1`;
+        sidebar.replaceChildren();
+        const sidebarContent = sidebarTemplate.content.cloneNode(true) as DocumentFragment;
+        const toc = sidebarContent.querySelector('ds-table-of-contents')!;
+        toc.replaceChildren();
+        const mobileList = sidebarContent.querySelector('mobile-starlight-toc ul')!;
+        const mobileItem = mobileList.firstElementChild!.cloneNode(true) as HTMLElement;
+        mobileList.replaceChildren();
+        for (const [index, heading] of [title, ...body.querySelectorAll<HTMLElement>('h2, h3')].entries()) {
+          heading.id ||= `section-${index}`;
+          const link = window.document.createElement('a');
+          link.href = `#${heading.id}`;
+          link.textContent = heading.textContent;
+          link.dataset.depth = heading.tagName === 'H3' ? '1' : '0';
+          toc.append(link);
+          const item = mobileItem.cloneNode(true) as HTMLElement;
+          const mobileLink = item.querySelector('a')!;
+          mobileLink.href = link.href;
+          mobileLink.querySelector('span')!.textContent = link.textContent;
+          mobileList.append(item);
+        }
+        sidebar.append(sidebarContent);
+        content.hidden = false;
+        status.hidden = true;
+        loaded = true;
+        if (body.querySelector('.preview')) {
+          if (!window.document.querySelector('link[data-private-app-styles]')) {
+            const styles = window.document.createElement('link');
+            styles.rel = 'stylesheet';
+            styles.href = '/private-app/app.css';
+            styles.dataset.privateAppStyles = '';
+            window.document.head.append(styles);
+          }
+          const moduleUrl = '/private-app/app.js';
+          const { mountPrivateExamples } = await import(/* @vite-ignore */ moduleUrl);
+          if (!current.signal.aborted) mountPrivateExamples(body);
+        }
+      } catch (error) {
+        if (current.signal.aborted) return;
+        loaded = false;
+        content.hidden = true;
+        body.replaceChildren();
+        title.textContent = '';
+        sidebar.replaceChildren();
+        status.hidden = false;
+        status.textContent = error instanceof Error ? error.message : 'This component could not be loaded.';
+      }
     });
     document.querySelector<HTMLIFrameElement>('#navigation-auth')?.contentWindow?.postMessage({ type: 'ds1:navigation-auth-request' }, location.origin);
   }
 </script>
 
 <style>
-  .private-component-workspace { height: 100%; min-width: 0; background: var(--ds1-docs-content-bg); }
-  .private-component-workspace[hidden], iframe[hidden], p[hidden] { display: none; }
-  iframe { display: block; width: 100%; height: 100%; border: 0; background: var(--ds1-docs-content-bg); }
-  p { margin: 0; padding: var(--site-unit); color: var(--ds-text-color-muted); font-size: var(--ds-type-size-default); line-height: var(--site-unit); }
+  #private-component-workspace { min-width: 0; background: var(--ds1-docs-content-bg); }
+  [hidden] { display: none; }
+  #private-component-status { margin: 0; padding: var(--site-unit); color: var(--ds-text-color-muted); font-size: var(--ds-type-size-default); line-height: var(--site-unit); }
+  #private-component-body :global(.preview) { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--ds-unit); padding-block: var(--ds-unit); }
+  #private-component-body :global(.preview p) { display: flex; align-items: flex-end; gap: calc(var(--ds-unit) / 2); margin: 0; }
 </style>

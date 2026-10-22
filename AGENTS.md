@@ -143,6 +143,8 @@ IndexedDB is a documentation-only ghost component in App, under **1 Root**, at `
 
 Owner-only documentation opens inside the normal header and sidebar at `/libraries/workspace/?internal=<component>`. The authenticated navigation response supplies each internal entry's numbered layer; the sidebar places its muted grey link alphabetically within that layer, aligned with sibling component labels and carrying an App tag. There is no separate App group. Keep these entries out of the public layer overview pages. App's label belongs in the owner document's header chrome.
 
+Both the desktop rail and phone sidebar put the App tag before the component's grey name. Private documents use the same Starlight `TwoColumnContent`, `ContentPanel` and DS1 prose as public component pages, including the title and On this page column. Fetch the authored article only after owner authorization; do not put the document in a separate iframe layout. Examples load their private module and stylesheet only when present.
+
 The private document and assets use `/private-app/` on `designsystem1.com` (embedded in the shell) and `adoption.designsystem1.com` (legacy access). The existing session bridge sets a host-only HttpOnly cookie after verifying the pinned owner ID and verified account; the Worker revalidates through the same report authority on every document and asset request. Other hosts deny the prefix. Anonymous requests go to sign-in; nonowners are denied. Keep App files out of public search and sitemaps. Selected System parts: `auth`, `sharing`, `design`, `documentation`, `platform-web`, `themes`; this extends the existing owner-only surface without changing shared sign-in or public component visibility.
 
 ## Public font specimens

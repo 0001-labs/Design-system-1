@@ -27,6 +27,7 @@ test('owner-only links sit in Root and alphabetically in Core and disappear when
   const expanded = items.flatMap(item => [item.label, ...[...root.querySelectorAll(`[slot="${item.afterSlot}"] a`)].map(link=>link.querySelector('span')?.textContent)]);
   expect(expanded).toEqual(['1 Root','IndexedDB','2 Core','Input','Keyboard shortcut','Link','Loading indicator','Spacing handle','Stat','Switch','3 Unit']);
   expect([...root.querySelectorAll('ds-tag')].map(tag => tag.textContent)).toEqual(['App', 'App', 'App', 'App']);
+  expect([...root.querySelectorAll('a')].every(link=>link.firstElementChild?.tagName === 'DS-TAG')).toBe(true);
   expect([...root.querySelectorAll('a')].every(link=>link.classList.contains('private-component-link'))).toBe(true);
   placeAppNavigation(root, rows.map(row=>({...row,expanded:false})), components);
   expect(root.querySelectorAll('a')).toHaveLength(0);

@@ -41,7 +41,8 @@ const here = Astro.url.pathname.replace(/\/$/, '');
 </nav>
 <script>
   import '../../../DS1/2-core/ds-icon';
-  import { readAppComponents } from '../lib/app-navigation';
+  import '../../../DS1/2-core/ds-tag';
+  import { readAppComponents, appComponentLink } from '../lib/app-navigation';
   const rail = document.querySelector<HTMLElement>('.rail-links');
   const account = document.querySelector<HTMLAnchorElement>('#rail-account');
   function renderAccount(signedIn: boolean) {
@@ -65,10 +66,7 @@ const here = Astro.url.pathname.replace(/\/$/, '');
       button.dataset.section = String(component.layer);
       button.dataset.privateRail = '';
       button.setAttribute('aria-label', component.name);
-      const link = document.createElement('a');
-      link.href = component.href;
-      link.setAttribute('aria-label', component.name);
-      link.textContent = component.name;
+      const link = appComponentLink(component);
       button.append(link);
       let next = heading.nextElementSibling;
       while (next && !next.hasAttribute('data-rail-layer') && (next.getAttribute('aria-label') ?? '').localeCompare(component.name, 'en') < 0) next = next.nextElementSibling;
@@ -89,6 +87,8 @@ const here = Astro.url.pathname.replace(/\/$/, '');
     .docs-navigation-rail :global(.rail-heading a) { display: inline-flex; align-items: flex-end; gap: calc(4px * var(--sf, 1)); }
     .docs-navigation-rail :global(.rail-swatch) { flex: none; width: calc(10px * var(--sf, 1)); height: calc(10px * var(--sf, 1)); margin-bottom: calc(3px * var(--sf, 1)); border-radius: calc(2px * var(--sf, 1)); background: var(--section-color); }
     .docs-navigation-rail :global(.rail-entry) { --section-color: var(--light-grey); --ds-button-text-color: var(--text-color); height: var(--site-unit); align-items: flex-end; align-self: flex-start; }
+    .docs-navigation-rail :global([data-private-rail]) { --ds-button-text-color: var(--ds-text-color-muted); }
+    .docs-navigation-rail :global(.private-component-link) { display: inline-flex; align-items: flex-end; gap: calc(4px * var(--sf, 1)); color: var(--ds-text-color-muted); }
     .docs-navigation-rail :global([data-section='1']) { --section-color: var(--yellow); }
     .docs-navigation-rail :global([data-section='2']) { --section-color: var(--apple-green); }
     .docs-navigation-rail :global([data-section='3']) { --section-color: var(--zenith-blue); }

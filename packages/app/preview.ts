@@ -9,8 +9,8 @@ import './src/index';
 import '../../DS1/1-root/prose.css';
 
 // The private guide's controlled example; applications supply their own state.
-if (typeof document !== 'undefined') {
-  document.querySelectorAll<HTMLElement>('.preview').forEach((preview, index) => {
+export function mountPrivateExamples(root: ParentNode = document): void {
+  root.querySelectorAll<HTMLElement>('.preview').forEach((preview, index) => {
     const section = document.createElement('section');
     section.className = 'component-example';
     section.setAttribute('data-ds-not-prose', '');
@@ -23,6 +23,15 @@ if (typeof document !== 'undefined') {
     wireExampleView(section, mountCodeEditors);
     wireCodeCopy(section.querySelector('[data-example-code]')!);
   });
+  const handle = root.querySelector<import('./src/2-core/ds-spacing-handle').SpacingHandle>('ds-spacing-handle');
+  if (handle) {
+    const update = (value: number) => { handle.options = { ...handle.options, value }; };
+    handle.options = { value: 20, min: 0, max: 100, step: 10, onPreview: update, onCommit: update };
+  }
+}
+
+if (typeof document !== 'undefined' && location.pathname.startsWith('/private-app/')) {
+  mountPrivateExamples();
   const component = document.documentElement.dataset.component ?? 'keyboard-shortcut';
   if (window.parent === window) location.replace(`https://designsystem1.com/libraries/workspace/?internal=${encodeURIComponent(component)}`);
   window.addEventListener('message', event => {
@@ -39,9 +48,4 @@ if (typeof document !== 'undefined') {
     document.documentElement.style.setProperty('--lightningcss-light', dark ? ' ' : 'initial');
     document.documentElement.style.setProperty('--lightningcss-dark', dark ? 'initial' : ' ');
   });
-  const handle = document.querySelector<import('./src/2-core/ds-spacing-handle').SpacingHandle>('ds-spacing-handle');
-  if (handle) {
-    const update = (value: number) => { handle.options = { ...handle.options, value }; };
-    handle.options = { value: 20, min: 0, max: 100, step: 10, onPreview: update, onCommit: update };
-  }
 }

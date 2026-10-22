@@ -2,6 +2,20 @@ import type { SidebarItem } from '../../../DS1/3-unit/ds-sidebar';
 
 export interface AppComponent { name: string; href: string; layer: number; }
 
+/** One private label for the desktop rail and the phone's sidebar. */
+export function appComponentLink(component: AppComponent): HTMLAnchorElement {
+  const link = document.createElement('a');
+  link.className = 'private-component-link';
+  link.href = component.href;
+  const tag = document.createElement('ds-tag');
+  tag.textContent = 'App';
+  const name = document.createElement('span');
+  name.textContent = component.name;
+  link.append(tag, name);
+  if (location.pathname + location.search === component.href) link.setAttribute('aria-current', 'page');
+  return link;
+}
+
 /** Only the authenticated bridge supplies private names; public catalogues stay unchanged. */
 export function readAppComponents(detail: unknown): AppComponent[] {
   const data = detail as { authenticated?: boolean; appComponents?: unknown[] } | null;
@@ -37,15 +51,8 @@ export function placeAppNavigation(root: HTMLElement, rows: SidebarItem[], compo
     slot.dataset.privateComponentSlot = '';
     slot.className = 'private-component-links';
     for (const component of components) {
-      const link = document.createElement('a');
-      link.className = 'ds-row ds-row--nav private-component-link';
-      link.href = component.href;
-      const name = document.createElement('span');
-      name.textContent = component.name;
-      const tag = document.createElement('ds-tag');
-      tag.textContent = 'App';
-      link.append(tag, name);
-      if (location.pathname + location.search === component.href) link.setAttribute('aria-current', 'page');
+      const link = appComponentLink(component);
+      link.classList.add('ds-row', 'ds-row--nav');
       slot.append(link);
     }
     items[anchor].afterSlot = slot.slot;

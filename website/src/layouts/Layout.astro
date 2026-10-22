@@ -100,6 +100,8 @@ const libraryMode = pathname === '/libraries/playground' ? 'editor'
         background: var(--ds1-docs-content-bg);
       }
 
+      html[data-private-app-document] .main-content--app { overflow-y: auto; }
+
       #mobile-navigation { --ds-overlay-paper: var(--ds1-docs-sidebar-bg); }
 
       /* Keep scroll geometry stable; only the thumb changes while active. */
