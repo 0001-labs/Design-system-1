@@ -13,6 +13,14 @@ Use the Lit `ds-*` components for web controls, including plain HTML pages: a st
 
 ## Propagating shared design
 
+### Direct editing surfaces
+
+For composition editing, make the space or boundary itself the interaction target. Use a quiet measurement label and an accessible precise control alongside it. Do not add dot-grid drag grips or floating plus-button rails beside blocks; Joachim rejected that pattern on 22 October 2026. Embedded editors must disable that chrome through their supported options, not CSS that reaches into their internals. Explore and test the direct interaction before propagating it to existing products.
+
+Pointer movement follows the hand continuously; snap to the grid only on release, with a short, interruptible settling motion. For a spacing measurement at the gap midpoint, change the gap by twice the pointer displacement (adjusted for device scale), so the midpoint stays under the pointer. Keep the label anchored to the actual measurement, never floating independently. Preserve that geometry in both axes; a dragged outer boundary follows at full speed. Keep text crisp, use transform/opacity for the settling animation, respect reduced motion, and keep keyboard adjustments immediate. Read the `animate` and `emil-design-eng` skills when implementing this motion.
+
+### Source-first workflow
+
 1. Identify the canonical component, token or interaction in `DS1/`. Move a reusable improvement discovered in a consumer into that source first, including its documented measure or behavior.
 2. Inventory applicable consumers from the System implementation guide, Sync 1 manifests and lockfiles, and targeted source searches, including copied or forked implementations and native ports. Record the scope in the work item's note.
 3. Commit the shared source, then copy it through each consumer's approved Sync 1 exports. Preserve product-owned code and reconcile legacy forks deliberately; remove superseded local design overrides. Keep content, domain behavior, intentional platform conventions and client branding in the consumer.

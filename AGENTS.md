@@ -15,12 +15,17 @@ The public website uses the shared mobile scale, with `--ds-sf` following `--sf`
 System node: `ds1` ([map](https://system.0001.dev/system?focus=ds1)). Follow the studio’s Selecting System requirements workflow; inspect current edges for Stack dependencies and their evidence.
 
 - Recorded relationships — shared: `auth`, `id1`, `documentation`; local: `design`, `language`, `themes`, `platform-web`; dependency: `sharing`.
+- The private composition workspace reuses the existing Aa build and takes Drag's `sortable` source through Sync 1. Composition selection, commands and history remain in that workspace pending the engine-ownership review.
 - Decisions/exceptions: Architecture, Distribution and Design rules below define the foundation source; Sign-in and Private font workspace define the separate application and private-data scope.
 - Text colour decision (`themes`): `--ds-danger-color` is Red for blood on light paper and Tuned red on dark. Red for blood's rule-derived dark version (#9c374c) reads at about 2:1 as 14px text on dark paper; Tuned red reads at 4.8:1. `tests/text-classes.test.ts` checks both contrasts.
 - Warning colour decision (`themes`): `--ds-warning-color` is Orange on dark paper and Orange's dim (#4c3f1a) on light. Orange (1.5:1) and its rule-derived dark version #9d8336 (3.3:1) are too light for 14px text on light paper; the dim reads at 9.4:1. `tests/text-classes.test.ts` checks both.
 - Coverage: relationships select guides, not proof of acceptance. Proposed (`opportunity`) and unknown (`unverified`) relationships stay distinct; verify applicable requirements for the current change.
 
 ## No product names
+
+Exception agreed 22 October 2026: the private `packages/consistency` workspace is named **Consistency**. It brings Aa text editing and DS1 composition together, identified by a yellow editing tag. This name belongs to that opt-in editor layer and its owner preview; public general-purpose components keep neutral names.
+
+The first preview lives at `https://neweditor.c9y.site`, using this site's existing server-checked owner session. Source is `packages/consistency`; its assets are excluded from the public npm package and denied on other hosts. It edits a page-local sample, not customer sites. Follow **Direct editing surfaces** in the design-system-1 skill: the interaction design is still being tested before adoption elsewhere.
 
 Design system 1 is a general design system anyone can use. Never name 0001's products (Ezo, Link, Consistency, Peer, Ins, tau99, Visual, the 0001 site, …) anywhere in it: not in components, their comments, CSS, tests, examples, docs, the website or the skill's rules for a component. Describe what a component does and how it looks on its own terms ("filled with a colour", "one control high"), never by the product it came from ("Link's fill", "Ezo's badge size"). The products' own briefs are where they say what they take from it.
 
@@ -38,6 +43,7 @@ Design system 1 is a general design system anyone can use. Never name 0001's pro
 ## Scripts
 
 - `vp dev` — Development server
+- `vp run consistency:build` — Build the private spacing and bounds editor into the site's gated assets
 - `vp run build` — Full production build
 - `vp run docs:dev` — Documentation site
 - `vp run build:bundle` — Standard + minified bundles

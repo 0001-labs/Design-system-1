@@ -1,3 +1,5 @@
+import { consistencyAI, type PreviewAIEnv } from "./consistency-ai";
+import { consistencyPreview, CONSISTENCY_HOST, isPrivatePreviewPath } from "./consistency";
 import { appNavigation } from './app-navigation';
 import { WorkerEntrypoint } from "cloudflare:workers";
 import { featureFlags, manageFeatureFlags, setFeatureFlag } from "./flags";
@@ -10,7 +12,7 @@ import assets from "./assets/index.ts";
 import publish, { type Env as PublishEnv } from "./publish/index.ts";
 import { componentReport, type ReportsEnv } from "./reports.ts";
 
-export interface Env extends PublishEnv, ReportsEnv {
+export interface Env extends PublishEnv, ReportsEnv, PreviewAIEnv {
   ASSETS: Fetcher;
 }
 
@@ -26,6 +28,9 @@ function reportPage(response: Response, path: string): Response {
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    if (url.pathname === '/api/consistency/ai') return consistencyAI(request, env);
+    // Dispatch before public assets and other APIs: this host has no public app routes.
+    if (url.hostname === CONSISTENCY_HOST || isPrivatePreviewPath(url.pathname)) return consistencyPreview(request, env);
     // Private App HTML and assets revalidate the owner on the two configured hosts.
     if (url.pathname.startsWith('/private-app')) {
       if (![DASHBOARD_HOST, 'designsystem1.com'].includes(url.hostname)) return new Response('Not found', { status: 404, headers: { 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex' } });

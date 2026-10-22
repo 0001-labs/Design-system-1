@@ -4,7 +4,7 @@
  * touched are read again, so a bullet typed at the start of a paragraph is a
  * bullet, and a paragraph that lost its `## ` is a paragraph.
  */
-import { serialize, type Block } from './markdown';
+import { serialize, type Block, type CalloutColor } from './markdown';
 /** A place in the document: a block, and a character offset into its source. */
 export type Pos = {
     block: number;
@@ -48,6 +48,13 @@ export type Wrapped = {
  * caret between them.
  */
 export declare function wrapSelection(blocks: readonly Block[], from: Pos, to: Pos, delimiter: string, closing?: string): Wrapped | null;
+/**
+ * Write the selected words in a colour (`<span color="red">`), or back in the
+ * text's own with `null`: a colour already round exactly these words is
+ * changed or taken off rather than nested, and colours wholly inside them go.
+ * Across blocks each block's part is coloured on its own, as a mark is.
+ */
+export declare function colorSelection(blocks: readonly Block[], from: Pos, to: Pos, color: string | null): Wrapped | null;
 /** Tick or untick a bullet's box. */
 export declare function toggleBox(blocks: readonly Block[], index: number): Change | null;
 export type TurnKind = 'paragraph' | 'h1' | 'h2' | 'h3' | 'todo' | 'bullet' | 'numbered' | 'quote' | 'code' | 'divider' | 'callout' | 'toggle' | 'toggle-h1' | 'toggle-h2' | 'toggle-h3' | 'table' | 'equation';
@@ -65,3 +72,14 @@ export declare function moveBlocks(blocks: readonly Block[], selection: BlockSel
 export declare function renumber(blocks: readonly Block[]): Block[];
 export declare function indentBlocks(blocks: readonly Block[], selection: BlockSelection, direction: -1 | 1): Change | null;
 export declare function toggleCallout(blocks: readonly Block[], index: number, open?: boolean): Change | null;
+/**
+ * The callout at `index` given an icon (an emoji or a picture's address; null
+ * takes it away) or a colour (`gray` written as such, so a product reading the
+ * Markdown knows it was chosen; null takes the word away, which draws grey
+ * too), or both: its brackets are written again and nothing else changes. An
+ * alert (`[!note]`) given either becomes a box, and its type word goes.
+ */
+export declare function setCallout(blocks: readonly Block[], index: number, head: {
+    icon?: string | null;
+    color?: CalloutColor | null;
+}): Change | null;

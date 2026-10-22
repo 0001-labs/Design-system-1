@@ -3,7 +3,7 @@
  * block by block, then run by run within a block, with every character kept,
  * so what is drawn on the screen reads straight back into the text.
  */
-export type BlockKind = 'paragraph' | 'heading' | 'bullet' | 'quote' | 'code' | 'divider' | 'callout' | 'table' | 'equation';
+export type BlockKind = 'paragraph' | 'heading' | 'bullet' | 'quote' | 'code' | 'divider' | 'callout' | 'table' | 'equation' | 'columns' | 'tabs' | 'toc';
 export type Block = {
     kind: BlockKind;
     /** The block's whole Markdown, prefixes and fences included. */
@@ -18,7 +18,14 @@ export type Block = {
     number?: number;
     depth?: number;
     indent?: number;
+    /** A callout's type word (`note`, `tip`, `warning`); '' when it has none. */
     callout?: string;
+    /** A callout's icon: an emoji, or a picture's address. */
+    icon?: string;
+    /** A callout's fill, one of `CALLOUT_COLORS`. */
+    color?: CalloutColor;
+    /** A callout drawn as Notion's box: one with an icon, a colour, or no type word. A type word alone is a Markdown alert, a hairline and the type's icon. */
+    box?: boolean;
     folded?: boolean;
 };
 /** A block with where its source started in the text it was read from. */
@@ -30,6 +37,70 @@ export declare const BULLET: RegExp;
 export declare const QUOTE: RegExp;
 export declare const FENCE: RegExp;
 export declare const DIVIDER: RegExp;
+/** The fills a callout's box can wear, Notion's names: grey when none is written; `white` is the paper in a hairline frame. */
+export declare const CALLOUT_COLORS: readonly ["gray", "brown", "orange", "yellow", "green", "blue", "purple", "pink", "red", "white"];
+export type CalloutColor = (typeof CALLOUT_COLORS)[number];
+/** What a callout's brackets say: `[!note]`, `[!💡]`, `[!💡 yellow]`, `[!https://… blue]`, `[!]`; a minus after them folds it. */
+export type CalloutHead = {
+    kind: string;
+    icon?: string;
+    color?: CalloutColor;
+    folded: boolean;
+};
+export declare const CALLOUT: RegExp;
+/**
+ * A callout's first line read: the words in its brackets are its type (a word
+ * in letters), its icon (an emoji, or a picture's address) and its colour (one
+ * of `CALLOUT_COLORS`), any of them in any order; `length` is how far the
+ * prefix reaches, its space included. Null for a line that is not a callout's.
+ */
+export declare function readCallout(line: string): (CalloutHead & {
+    length: number;
+}) | null;
+/** A callout's brackets written: `> [!💡 yellow]`, `> [!note]-`, `> [!]`. */
+export declare function writeCallout(head: CalloutHead): string;
+/** Whether a callout read as `head` is drawn as Notion's box rather than a Markdown alert. */
+export declare function calloutIsBox(head: {
+    kind: string;
+    icon?: string;
+    color?: string;
+}): boolean;
+export declare const COLUMNS_OPEN: RegExp;
+/**
+ * Columns, written as Notion writes them in Markdown: `<columns>` around a
+ * `<column>` for each, every column Markdown of its own. A column's lines may
+ * be indented by tabs, as Notion indents them; they are read without.
+ */
+export declare function readColumns(source: string): string[];
+/** Columns written back as one block. */
+export declare function writeColumns(columns: readonly string[]): string;
+export declare const TOC: RegExp;
+export declare const TABS_OPEN: RegExp;
+/** One tab of a tabs block: its name, an icon (an emoji, or a picture's address) and its Markdown. */
+export type Tab = {
+    name: string;
+    icon?: string;
+    content: string;
+};
+/**
+ * Tabs, written as columns are: `<tabs>` around a `<tab name="…">` for each,
+ * every tab Markdown of its own; `icon="💡"` gives a tab an icon. A tab's lines
+ * may be indented by tabs; they are read without.
+ */
+export declare function readTabs(source: string): Tab[];
+/** Tabs written back as one block. */
+export declare function writeTabs(tabs: readonly Tab[]): string;
+/**
+ * The block at `from` put at a side of the one at `to`, as Notion places a
+ * picture beside another: the two become columns, or it is one more column of
+ * columns already there. The change is the text from `start` to `end`
+ * rewritten; null where it cannot (the same block, or columns carried).
+ */
+export declare function besideChange(text: string, from: number, to: number, at: 'start' | 'end'): {
+    start: number;
+    end: number;
+    text: string;
+} | null;
 /** Read a text into its blocks. A text with nothing in it is one empty paragraph. */
 export declare function parseBlocks(text: string): Placed[];
 /** Write blocks back as one text: a blank line between blocks, none between two bullets, so a list stays a list. */
@@ -44,8 +115,12 @@ export type Run = {
     bold?: true;
     italic?: true;
     strike?: true;
+    /** `<u>words</u>`: Markdown has no underline, so it is written as HTML, as GitHub and Notion read it. */
+    underline?: true;
     code?: true;
     highlight?: true;
+    /** `<span color="red">words</span>`, Notion's way of writing a text colour: one of `TEXT_COLORS`. */
+    color?: string;
     href?: string;
     /**
      * Syntax belongs to a mark: the range of the whole mark, delimiters
@@ -74,9 +149,24 @@ export declare function fencedAtom<T extends AtomSyntax>(block: Block, atoms: re
 /** An atom found by a pattern, optionally only where `accept` agrees. */
 export declare function atomPattern(name: string, pattern: RegExp, accept?: (match: RegExpExecArray) => boolean): AtomSyntax;
 /** A Markdown picture, `![name](address)`. */
+/**
+ * A picture, `![caption](address)`, with its width in squares as the image's title where it has one,
+ * `![caption](address "w12")`: a title every Markdown reader takes, so the picture reads anywhere.
+ */
 export declare const IMAGE: AtomSyntax;
+/** A picture's source read: its caption, address and width in squares (none where it has no width of its own). */
+export declare function readPicture(source: string): {
+    alt: string;
+    src: string;
+    width: number | null;
+};
+/** A picture's source written: its width in squares as the title, or none. */
+export declare function writePicture(alt: string, src: string, width: number | null): string;
 export declare const EQUATION: AtomSyntax;
 /** The atoms an editor reads unless it is given others. */
 export declare const DEFAULT_ATOMS: readonly AtomSyntax[];
+/** The colours words can be written in, by Notion's names for them. */
+export declare const TEXT_COLORS: readonly ["gray", "red", "orange", "green", "blue", "purple"];
+export type TextColor = (typeof TEXT_COLORS)[number];
 /** Every run of a block, in order, covering its source from end to end. */
 export declare function blockRuns(block: Block, atoms?: readonly AtomSyntax[]): Run[];

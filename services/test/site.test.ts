@@ -6,6 +6,21 @@ beforeAll(async () => { site = await startAssets(); });
 afterAll(async () => { await site.dispose(); });
 
 describe("combined website routes", () => {
+  it("isolates private preview HTML and assets on every host", async () => {
+    const origin = "https://neweditor.c9y.site";
+    for (const path of ["/", "/private-consistency/index.html", "/private-consistency/assets/editor.js"]) {
+      const response = await site.fetch(origin + path, { redirect: "manual" });
+      expect(response.status).toBe(302);
+      expect(response.headers.get("location")).toBe("/app/signin");
+    }
+    expect(await (await site.fetch(origin + "/app/signin")).text()).toBe("Application");
+    for (const path of ["/api/libraries", "/app/", "/api/fonts", "/api/reports/components"]) expect((await site.fetch(origin + path)).status).toBe(404);
+    for (const host of ["https://designsystem1.com", "https://adoption.designsystem1.com", "https://ds-one-services.example.workers.dev"]) {
+      for (const path of ["/private-consistency/index.html", "/%70rivate-consistency/assets/editor.js", "/app/assets/%2f..%2f..%2fprivate-consistency/index.html", "/%2fprivate-consistency/index.html", "/PRIVATE-CONSISTENCY/index.html"]) {
+        expect((await site.fetch(host + path, { redirect: "manual" })).status).toBe(404);
+      }
+    }
+  });
   it("serves documentation and the app from the same Worker", async () => {
     expect(await (await site.fetch("/")).text()).toBe("Documentation");
     expect(await (await site.fetch("/app/")).text()).toBe("Application");

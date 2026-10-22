@@ -23,6 +23,7 @@ const PLAY = "https://play.designsystem1.com";
 const FLAGS_MATRIX = "https://system.0001.dev/system/ci";
 const ADOPTION = "https://adoption.designsystem1.com";
 const ICON = "https://icon.designsystem1.com";
+const EDITOR = "https://neweditor.c9y.site";
 const FONTS = "https://fonts.designsystem1.com";
 const PACKAGE = "@0001-labs/design-system-1";
 const REGISTRY = `https://registry.npmjs.org/${PACKAGE.replace("/", "%2f")}`;
@@ -609,7 +610,7 @@ if (PRODUCTION) {
   ]);
 
   await step("Private hosts", [
-    ...[ADOPTION, ICON].flatMap((origin) => [
+    ...[ADOPTION, ICON, EDITOR].flatMap((origin) => [
       [
         `${new URL(origin).hostname} asks to sign in`,
         async () => {
@@ -631,6 +632,12 @@ if (PRODUCTION) {
       ],
       [`${new URL(origin).hostname} has no other pages`, async () => expectStatus(await request(`${origin}/blackbox-no-such-page`), 404)],
     ]),
+    ["Private editor files require a session", async () => {
+      const answer = await request(`${EDITOR}/private-consistency/consistency.js`);
+      expectRedirect(answer, 302, `${EDITOR}/app/signin`);
+      expectPrivate(answer);
+    }],
+    ["Private editor has no public-host alias", async () => expectStatus(await request('/private-consistency/index.html'), 404)],
     [
       "fonts.designsystem1.com draws its sign-in shell privately",
       async () => {

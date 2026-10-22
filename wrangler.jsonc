@@ -4,6 +4,7 @@
   "main": "./services/src/index.ts",
   "compatibility_date": "2026-07-24",
   "workers_dev": true,
+  "ai": { "binding": "AI" },
   "observability": {
     "enabled": true
   },
@@ -24,6 +25,9 @@
     "MAX_CSS_BYTES": "524288"
   },
   "routes": [
+    // Specific route wins over the existing c9y.site wildcard site renderer.
+    { "pattern": "neweditor.c9y.site/*", "zone_name": "c9y.site" },
+    { "pattern": "neweditor.c9y.site", "custom_domain": true },
     // The owner's adoption dashboard; dash.designsystem1.com is the dash portal on 0001's System Worker.
     { "pattern": "adoption.designsystem1.com", "custom_domain": true },
     { "pattern": "fonts.designsystem1.com", "custom_domain": true },

@@ -90,7 +90,7 @@
     "test:e2e": "cd e2e && vp exec playwright test",
     "typecheck:all": "cd packages/css-validate && vp exec tsc --noEmit && cd ../../app && vp exec tsc --noEmit && cd ../services && vp exec tsc --noEmit",
     "services:dryrun": "cd services && vp run dryrun",
-    "site:build": "vp run docs:build && vp run app:build && vp run app-controls:build",
+    "site:build": "vp run docs:build && vp run app:build && vp run app-controls:build && vp run consistency:build",
     "site:deploy": "sync1 guard && vp run site:build && cd services && vp exec wrangler deploy --config ../wrangler.jsonc",
     "deploy": "vp run site:deploy",
     "check:versions": "node scripts/versions.mjs",
@@ -107,7 +107,8 @@
     "sync": "sync1",
     "sync:check": "sync1 check",
     "app-controls:build": "vp build --config packages/app/vite.config.ts && node scripts/copy-app-docs.mjs",
-    "package:check": "node scripts/check-public-package.mjs"
+    "package:check": "node scripts/check-public-package.mjs",
+    "consistency:build": "vp build --config packages/consistency/vite.config.ts"
   },
   "dependencies": {
     "@auth/core": "0.41.3",

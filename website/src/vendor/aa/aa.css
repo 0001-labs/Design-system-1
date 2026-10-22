@@ -1,6 +1,16 @@
-/* Aa. The editor takes the page's type and colour: its own rule weighs
-   nothing, so any rule of the page's wins. A product sets the --aa-*
-   properties or the Design system 1 tokens they fall back to. */
+/* Aa. Writing is drawn as Design system 1's prose sheet (prose.css) draws the
+   same Markdown read on a page: every line one square, one square between two
+   blocks and two before a heading, a title on two squares, code in 13px on the
+   same lines. Every measure and colour is a Design system 1 token, with its
+   value as the fallback, so a page without the tokens still gets them. The
+   editor's own rule weighs nothing, so any rule of the page's wins, and a
+   product changes one thing with the --aa-* properties. */
+/* The toolbar is Design system 1's context bar, drawn by its own sheet
+   (ds1/, copied with Sync 1), which draws without the tokens too. */
+@import "./ds1/context.css";
+/* On touch, Insert block and Turn into are a sheet from the foot of the
+   screen (sheet.ts): Design system 1's, its sheet drawn by overlay.css. */
+@import "./ds1/overlay.css";
 /* Arrows are always Inter: Inter's arrows alone (fonts/LICENSE.md), first in
    every font Aa sets, so the unicode-range draws only arrows with it. */
 @font-face {
@@ -24,14 +34,22 @@
 }
 
 :where(.aa, aa-editor) {
+  /* The square and the scale: Design system 1's, or the older copies' names. */
+  --aa-sf: var(--ds-sf, var(--sf, 1));
+  --aa-unit: var(--ds-unit, var(--1, calc(20px * var(--sf, 1))));
+  --aa-rule-color: var(--aa-rule, var(--ds-border-color, light-dark(#d8d8d8, #3d3d3d)));
   display: block;
-  font-family: "Inter Arrows", var(--aa-typeface, var(--typeface-regular, system-ui)), system-ui, sans-serif;
-  font-size: var(--aa-size, var(--type-size-default, 14px));
-  line-height: var(--aa-line, var(--type-lineheight-default, 1.45));
-  font-weight: var(--aa-weight, var(--type-weight-default, 400));
-  letter-spacing: var(--aa-letterspacing, var(--type-letterspacing-default, normal));
-  color: inherit;
+  font-family: "Inter Arrows", var(--aa-typeface, var(--ds-typeface-regular, var(--typeface-regular, system-ui))), system-ui, sans-serif;
+  font-feature-settings: var(--aa-font-features, var(--ds-font-features, normal));
+  font-size: var(--aa-size, var(--ds-type-size-default, calc(14px * var(--aa-sf))));
+  line-height: var(--aa-line, var(--aa-unit));
+  font-weight: var(--aa-weight, var(--ds-type-weight-default, 400));
+  letter-spacing: var(--aa-letterspacing, var(--ds-type-letterspacing-default, calc(-0.3px * var(--aa-sf))));
+  color: var(--aa-color, var(--ds-text-color, currentColor));
   -webkit-font-smoothing: antialiased;
+  /* On touch a double tap selects a word rather than zooming the page, and a tap is not flashed. */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 .aa-block {
   position: relative;
@@ -42,9 +60,20 @@
   overflow-wrap: anywhere;
   -webkit-user-modify: read-write-plaintext-only;
 }
-.aa-block + .aa-block { margin-top: var(--aa-gap, 1lh); }
-.aa-block[data-selected] { background: var(--aa-selection, var(--accent-color, var(--apple-green, Highlight))); }
-.aa-block[data-selected] { border-radius: calc(2px * var(--sf, 1)); }
+/* One square between two blocks, two before a heading, as prose.css. */
+.aa-block + .aa-block { margin-top: var(--aa-gap, var(--aa-unit)); }
+/* Two before a heading, or what --aa-heading-gap says; weighing no more than
+   the rule above, so a product's own heading rule still wins. */
+:where(.aa-block:not([data-kind="heading"])) + .aa-block[data-kind="heading"] { margin-top: var(--aa-heading-gap, calc(2 * var(--aa-gap, var(--aa-unit)))); }
+/* A selected or lifted block wears the same grey as selected words, never the accent. */
+.aa-block[data-selected], .aa-block[data-lifted] { background: var(--aa-selection, var(--aa-text-selection, color-mix(in srgb, currentColor 15%, transparent))); }
+.aa-block[data-selected], .aa-block[data-lifted] { border-radius: calc(2px * var(--aa-sf)); }
+/* No handle beside a block: a selected block is taken by the hand, any other
+   after a still press (drag.ts), and the hand holds while it is carried. */
+.aa[data-movable] > .aa-block[data-selected], .aa[data-movable] > .aa-block[data-grab] { cursor: grab; }
+.aa[data-dragging], .aa[data-dragging] *, .aa[data-dragging] *::before { cursor: grabbing; -webkit-user-select: none; user-select: none; }
+/* Selected blocks carried with the one lifted wait dimmed in their places. */
+.aa-block[data-ghost] { opacity: 0.4; }
 /* The mask joins wrapped lines into one softly rounded silhouette. The
    native selection still owns editing, copying and touch handles. */
 .aa-block[data-aa-selection] { isolation: isolate; }
@@ -61,6 +90,8 @@
 }
 .aa-block[data-aa-selection]::selection,
 .aa-block[data-aa-selection] ::selection { background: transparent; color: inherit; }
+/* The block's own grey already covers its selected words. */
+.aa-block[data-selected][data-aa-selection]::after, .aa-block[data-lifted][data-aa-selection]::after { display: none; }
 @media (forced-colors: active) {
   .aa-block[data-aa-selection]::after { display: none; }
   .aa-block[data-aa-selection]::selection,
@@ -68,44 +99,52 @@
 }
 .aa-block[data-kind="bullet"] + .aa-block[data-kind="bullet"] { margin-top: 0; }
 
-/* Markdown stays in the DOM for lossless storage. Active heading prefixes
-   hang beside the text, outside the line, so editing never shifts it. */
+/* Markdown stays in the DOM for lossless storage, and none of it shows while
+   writing: a heading is its size, a bullet its marker, never its # or -. */
 .aa-syntax { display: none; }
-.aa-syntax[data-hidden] { display: none; }
-.aa-syntax[data-heading-prefix] {
-  display: inline-block;
-  position: absolute;
-  right: 100%;
-  top: 0;
-  white-space: pre;
-  color: var(--aa-syntax, color-mix(in srgb, currentColor 38%, transparent));
-}
 
-.aa-b { font-family: "Inter Arrows", var(--aa-typeface-bold, var(--typeface-medium, var(--aa-typeface, var(--typeface-regular, system-ui)))), system-ui, sans-serif; font-weight: var(--aa-weight-bold, var(--type-weight-bold, 600)); }
+/* Words: the medium face for strong, the text's own colour for a link,
+   underlined, and code in the code face at 13px on the same line. */
+.aa-b { font-family: "Inter Arrows", var(--aa-typeface-bold, var(--ds-typeface-medium, var(--typeface-medium, var(--aa-typeface, var(--typeface-regular, system-ui))))), system-ui, sans-serif; font-weight: var(--aa-weight-bold, var(--ds-type-weight-bold, 500)); }
 .aa-i { font-style: italic; }
 .aa-s { text-decoration: line-through; }
-.aa-c, .aa-block[data-kind="code"] { font-family: "Inter Arrows", var(--aa-typeface-mono, var(--typeface-mono, "Aa Mono")), "Aa Mono", ui-monospace, "SF Mono", Menlo, monospace; font-variant-ligatures: none; }
-.aa-c { font-size: 0.92em; }
-a.aa-link { color: var(--aa-link, var(--base-blue, #1f5fd1)); text-decoration: none; cursor: text; }
+.aa-u { text-decoration-line: underline; text-underline-offset: 0.15em; }
+.aa-s.aa-u { text-decoration-line: underline line-through; }
+/* Text colours, by Notion's names (`<span color="red">`): Design system 1's palette, a dark ink of each
+   on light paper and a light one on dark, so words stay readable. A product changes one with --aa-color-<name>. A colour's
+   row in the menu wears it on its mark (controls.ts). */
+[data-color="gray"] { color: var(--aa-color-gray, var(--ds-darker-grey, #797979)); }
+[data-color="red"] { color: var(--aa-color-red, var(--ds-danger-color, light-dark(#de0331, #ff5f5f))); }
+[data-color="orange"] { color: var(--aa-color-orange, var(--ds-warning-color, light-dark(#4c3f1a, #fec20d))); }
+[data-color="green"] { color: var(--aa-color-green, light-dark(#026d5b, #99ff73)); }
+[data-color="blue"] { color: var(--aa-color-blue, light-dark(#0275fa, #69d8fb)); }
+[data-color="purple"] { color: var(--aa-color-purple, light-dark(#e63aaf, #f5aad1)); }
+.aa-c, .aa-block[data-kind="code"] { font-family: "Inter Arrows", var(--aa-typeface-mono, var(--typeface-mono, "Aa Mono")), "Aa Mono", ui-monospace, "SF Mono", Menlo, monospace; font-size: var(--aa-code-size, calc(var(--ds-code-text-size, 13px) * var(--aa-sf))); font-variant-ligatures: none; letter-spacing: 0; }
+.aa-c { padding: 0 calc(4px * var(--aa-sf)); border-radius: var(--ds-radius, calc(4px * var(--aa-sf))); background: var(--aa-code-fill, var(--ds-fill, light-dark(#e6e6e6, #3c3c3c))); }
+a.aa-link { color: var(--aa-link, currentColor); text-decoration-line: underline; text-decoration-thickness: 1px; text-underline-offset: calc(3px * var(--aa-sf)); cursor: text; }
 
-.aa-block[data-kind="heading"] { font-family: "Inter Arrows", var(--aa-typeface-heading, var(--typeface-medium, var(--aa-typeface, var(--typeface-regular, system-ui)))), system-ui, sans-serif; font-weight: var(--aa-weight-heading, var(--type-weight-heading, 600)); }
-.aa-block[data-kind="heading"][data-level="1"] { font-size: var(--aa-h1, var(--type-size-title-1, 1.6em)); line-height: 1.2; }
-.aa-block[data-kind="heading"][data-level="2"] { font-size: var(--aa-h2, var(--type-size-title-2, 1.3em)); line-height: 1.25; }
-.aa-block[data-kind="heading"][data-level="3"] { font-size: var(--aa-h3, var(--type-size-heading, 1.1em)); }
+/* Headings, in the medium face: a title (#) is 20px on two squares, ## and
+   ### 17px and 15px on one, the rest the text's size on one. */
+.aa-block[data-kind="heading"] { font-family: "Inter Arrows", var(--aa-typeface-heading, var(--ds-typeface-medium, var(--typeface-medium, var(--aa-typeface, var(--typeface-regular, system-ui))))), system-ui, sans-serif; font-weight: var(--aa-weight-heading, var(--ds-type-weight-bold, 500)); }
+.aa-block[data-kind="heading"][data-level="1"] { font-size: var(--aa-h1, var(--ds-type-size-display, calc(20px * var(--aa-sf)))); line-height: calc(2 * var(--aa-unit)); letter-spacing: calc(var(--ds-display-text-tracking, -0.4px) * var(--aa-sf)); }
+.aa-block[data-kind="heading"][data-level="2"] { font-size: var(--aa-h2, calc(var(--ds-prose-h2-size, 17px) * var(--aa-sf))); letter-spacing: calc(var(--ds-prose-h2-tracking, -0.34px) * var(--aa-sf)); }
+.aa-block[data-kind="heading"][data-level="3"] { font-size: var(--aa-h3, calc(var(--ds-prose-h3-size, 15px) * var(--aa-sf))); }
 
-.aa-block[data-kind="quote"] { padding-left: 0.75em; border-left: 2px solid var(--aa-rule, color-mix(in srgb, currentColor 25%, transparent)); font-style: italic; }
-.aa-block[data-kind="quote"] .aa-syntax { font-style: normal; }
+/* A quote stands a square in, on a hairline in the muted ink. */
+.aa-block[data-kind="quote"] { padding-left: var(--aa-unit); box-shadow: inset 1px 0 var(--aa-quote-rule, var(--ds-text-color-muted, light-dark(#5f5f5f, #cacaca))); }
 
-.aa-block[data-kind="code"] { padding: 0.5lh 0.75em; border-radius: 4px; background: var(--aa-code-paper, color-mix(in srgb, currentColor 6%, transparent)); font-size: 0.92em; }
+/* A block of code: a square of room around it, its frame a hairline. */
+.aa-block[data-kind="code"] { padding: var(--aa-unit); border-radius: var(--ds-radius, calc(4px * var(--aa-sf))); box-shadow: inset 0 0 0 1px var(--aa-rule-color); background: var(--aa-code-paper, transparent); }
 
-/* A bullet: the marker drawn while its `- ` is hidden, and a box for a tick. */
-.aa-block[data-kind="bullet"] { padding-left: var(--aa-indent, 1.5em); }
+/* A bullet: the marker drawn while its `- ` is hidden, and a box for a tick,
+   a square in from the text's edge. */
+.aa-block[data-kind="bullet"] { padding-left: var(--aa-indent, var(--aa-unit)); }
 .aa-block[data-kind="bullet"]::before {
   content: "";
   position: absolute;
   left: 0;
   top: 0;
-  width: var(--aa-indent, 1.5em);
+  width: var(--aa-indent, var(--aa-unit));
   height: 1lh;
   display: flex;
   align-items: center;
@@ -114,59 +153,93 @@ a.aa-link { color: var(--aa-link, var(--base-blue, #1f5fd1)); text-decoration: n
   pointer-events: none;
 }
 .aa-block[data-kind="bullet"]:not([data-checked])::before { content: "•"; }
+/* A box is Design system 1's checkbox: one control (16px) square on the lower
+   sixteen of its line's square, a hairline on the field's ground, filled with
+   the accent and checked in its ink. It stays while its words are edited. */
 .aa-block[data-kind="bullet"][data-checked]::before {
   content: "";
-  width: 0.8em;
-  height: 0.8em;
-  margin: calc((1lh - 0.8em) / 2) calc((var(--aa-indent, 1.5em) - 0.8em) / 2);
+  width: calc(16px * var(--aa-sf));
+  height: calc(16px * var(--aa-sf));
+  margin-top: calc(var(--aa-unit) - 16px * var(--aa-sf));
   box-sizing: border-box;
-  border: 1.5px solid currentColor;
-  border-radius: 2px;
+  border: 1px solid var(--aa-rule-color);
+  border-radius: var(--ds-radius, calc(4px * var(--aa-sf)));
+  background: var(--ds-input-background, light-dark(#e8e8e8, #303030));
   pointer-events: auto;
   cursor: pointer;
 }
-.aa-block[data-kind="bullet"][data-checked="true"]::before { background: currentColor; }
-.aa-block[data-kind="bullet"][data-checked="true"] { color: var(--aa-done, color-mix(in srgb, currentColor 55%, transparent)); }
-.aa-block[data-kind="bullet"][data-active] { padding-left: var(--aa-indent, 1.5em); }
+.aa-block[data-kind="bullet"][data-checked="true"]::before {
+  border-color: transparent;
+  background: var(--ds-accent-color, var(--accent-color, #99ff73)) url("data:image/svg+xml,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M6.68649%2011.884L12.443%206.13601L11.736%205.42715L6.68835%2010.4827L4.26399%208.0501L3.55696%208.74525L6.68649%2011.884Z%22%20fill%3D%22%232a2a2a%22%2F%3E%3C%2Fsvg%3E") center / 100% no-repeat;
+}
+.aa-block[data-kind="bullet"][data-checked="true"] { color: var(--aa-done, var(--ds-text-color-muted, color-mix(in srgb, currentColor 55%, transparent))); }
 
-/* A divider: a hairline while its --- is hidden. */
+/* A divider takes no room, as prose.css's rule: a hairline under the square
+   above it, so the writing around it stands two squares apart. */
+.aa-block + .aa-block[data-kind="divider"] { margin-top: 0; }
 .aa-block[data-kind="divider"] { min-height: 1lh; }
 .aa-block[data-kind="divider"]::before {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
-  top: calc(0.5lh - 0.5px);
+  top: 100%;
   height: 1px;
-  background: var(--aa-rule, color-mix(in srgb, currentColor 25%, transparent));
+  background: var(--aa-rule-color);
 }
 
-/* What to write, until something is. */
-.aa-block[data-placeholder]::before {
-  content: attr(data-placeholder);
+/* What to write, until something is; a heading with no words yet names its
+   level, since its # is never shown. */
+.aa-block[data-placeholder]::before { content: attr(data-placeholder); }
+.aa-block[data-kind="heading"][data-empty]::before { content: "Heading " attr(data-level); }
+/* At a sentence's end, the AI offered in the placeholder's grey, after the caret. */
+.aa-block[data-hint]::after {
+  content: attr(data-hint);
+  color: var(--aa-placeholder, var(--ds-input-placeholder-color, light-dark(#797979, #ababab)));
+  pointer-events: none;
+}
+.aa-block[data-placeholder]::before,
+.aa-block[data-kind="heading"][data-empty]::before {
   position: absolute;
   left: 0;
   top: 0;
-  color: var(--aa-placeholder, color-mix(in srgb, currentColor 38%, transparent));
+  color: var(--aa-placeholder, var(--ds-input-placeholder-color, light-dark(#797979, #ababab)));
   pointer-events: none;
   white-space: nowrap;
 }
 
-/* Checkboxes remain visible while their text is edited. */
-
 /* An atom: one thing to the caret, drawn by the product or as its own words. */
 .aa-atom { -webkit-user-modify: read-only; cursor: default; }
-.aa-atom[data-atom="image"] { display: inline-block; max-width: 100%; vertical-align: top; }
-.aa-atom[data-atom="image"] img { display: block; max-width: 100%; height: auto; border-radius: var(--aa-picture-radius, 4px); }
+.aa-atom[data-atom="image"] { position: relative; display: inline-block; max-width: 100%; vertical-align: top; }
+.aa-atom[data-atom="image"] img { display: block; max-width: 100%; height: auto; border-radius: var(--aa-picture-radius, var(--ds-radius, calc(4px * var(--aa-sf)))); }
+/* A picture is its own size, up to sixteen squares, until it is given a width; then that many whole
+   squares, never wider than its line. */
+.aa-atom[data-atom="image"]:not([data-width]) { max-width: min(100%, calc(var(--aa-picture-default, 16) * var(--aa-unit))); }
+.aa-atom[data-atom="image"][data-width] { width: calc(var(--aa-picture-width) * var(--aa-unit)); }
+.aa-atom[data-atom="image"][data-width] img { width: 100%; }
+/* The grip on its end edge, seen while the pointer is over the picture or it is being sized: a short
+   bar a square in from the edge, pulled sideways, in whole squares. */
+.aa-picture-grip { position: absolute; top: 50%; inset-inline-end: calc(6px * var(--aa-sf)); width: calc(4px * var(--aa-sf)); height: min(40%, calc(2 * var(--aa-unit))); border-radius: calc(2px * var(--aa-sf)); background: rgb(0 0 0 / 0.55); box-shadow: 0 0 0 1px rgb(255 255 255 / 0.8); cursor: ew-resize; opacity: 0; transform: translateY(-50%); transition: opacity 120ms ease-out; touch-action: none; }
+.aa-atom[data-atom="image"]:hover .aa-picture-grip, .aa-atom[data-atom="image"][data-sizing] .aa-picture-grip { opacity: 1; }
+.aa-block[data-readonly="true"] .aa-picture-grip { display: none; }
+@media (hover: none) { .aa-picture-grip { display: none; } }
+@media (prefers-reduced-motion: reduce) { .aa-picture-grip { transition: none; } }
 
-/* Controls share the page's square and ink. */
+/* Controls share the page's square. */
 .aa-controls {
-  --aa-square: var(--1, calc(20px * var(--sf, 1)));
+  --aa-sf: var(--ds-sf, var(--sf, 1));
+  --aa-square: var(--ds-unit, var(--1, calc(20px * var(--sf, 1))));
+  /* Design system 1's Context face: black rows with white words in both
+     themes (the slate in dark), a pixel apart, the pointer's row lighter. */
+  --aa-menu-fill: light-dark(var(--ds-black, #2a2a2a), var(--ds-slate, #1e1e1e));
+  --aa-menu-ink: var(--ds-white, #ffffff);
+  --aa-menu-hover: color-mix(in srgb, var(--aa-menu-fill) 78%, var(--aa-menu-ink));
   position: fixed;
   z-index: var(--aa-controls-layer, 1000);
-  color: var(--text-color, CanvasText);
-  background: var(--background, Canvas);
-  font: var(--type-weight-default, 400) var(--type-size-default, 14px)/var(--aa-square) var(--typeface-regular, system-ui);
+  -webkit-tap-highlight-color: transparent;
+  font: var(--ds-type-weight-default, 400) var(--ds-type-size-default, calc(14px * var(--aa-sf)))/var(--aa-square) "Inter Arrows", var(--ds-typeface-regular, var(--typeface-regular, system-ui)), system-ui, sans-serif;
+  font-feature-settings: var(--ds-font-features, normal);
+  letter-spacing: var(--ds-type-letterspacing-default, calc(-0.3px * var(--aa-sf)));
 }
 .aa-controls[hidden], .aa-drop-line[hidden] { display: none; }
 .aa-controls button {
@@ -175,82 +248,588 @@ a.aa-link { color: var(--aa-link, var(--base-blue, #1f5fd1)); text-decoration: n
   color: inherit; font: inherit; cursor: pointer; display: inline-flex;
   align-items: center; justify-content: center; flex-shrink: 0;
 }
-.aa-controls button:hover, .aa-controls button[data-current] { background: var(--accent-color, var(--apple-green, Highlight)); }
-.aa-controls button:focus-visible { outline: 1px solid currentColor; outline-offset: -1px; }
-.aa-icon { display: inline-block; width: calc(16px * var(--sf, 1)); height: calc(16px * var(--sf, 1)); background: currentColor; mask-size: contain; mask-repeat: no-repeat; mask-position: center; flex-shrink: 0; }
-.aa-toolbar {
-  display: flex; height: var(--aa-square); gap: calc(1px * var(--sf, 1)); border: 0;
-  border-radius: var(--aa-menu-radius, calc(4px * var(--sf, 1)));
-  clip-path: inset(0 round var(--aa-menu-radius, calc(4px * var(--sf, 1))));
-  overflow-x: auto; max-width: 100vw; background: transparent; color: var(--white, white);
-}
-.aa-toolbar button, .aa-toolbar button:hover, .aa-toolbar button[data-current] { background: var(--black, black); color: var(--white, white); }
-.aa-toolbar[data-docked] { width: 100%; }
+.aa-controls button[data-current] { background: var(--ds-accent-color, var(--accent-color, var(--apple-green, Highlight))); }
+/* The pointer's row, only where there is a pointer: a finger's tap leaves nothing lit behind it. */
+@media (hover: hover) { .aa-controls button:hover { background: var(--ds-accent-color, var(--accent-color, var(--apple-green, Highlight))); } }
+.aa-controls button:focus-visible { outline: 2px solid var(--ds-focus-ring, currentColor); outline-offset: -2px; }
+.aa-icon { display: inline-block; width: calc(16px * var(--aa-sf, var(--sf, 1))); height: calc(16px * var(--aa-sf, var(--sf, 1))); background: currentColor; mask-size: contain; mask-repeat: no-repeat; mask-position: center; flex-shrink: 0; }
+/* The toolbar is Design system 1's context bar itself (.ds-context--bar in
+   ds1/context.css): its cells one square, 19px with the pixel beside them.
+   Aa keeps it within the window, and on touch docks it above the keyboard. */
+.aa-toolbar { max-width: 100vw; }
+/* With a pointer the cells are a grid five squares wide, as Notion's bar is, a pixel apart both ways;
+   docked on touch they stay one row that scrolls. */
+.aa-toolbar:not([data-docked]) { flex-wrap: wrap; width: calc(5 * var(--aa-square) - 1px); height: auto; max-height: none; }
+/* With a row asking AI under the cells the bar is two rows of the gap face, a pixel apart, as long as its cells. */
+.aa-toolbar:has(.aa-toolbar-ask) { flex-wrap: wrap; height: auto; max-height: none; }
+
+/* As wide as the bar's cells, never wider: the row takes no width of its own to size the bar by. */
+.aa-toolbar-ask { display: flex; flex: 1 0 100%; contain: inline-size; box-sizing: border-box; height: var(--ds-context-row, calc(var(--aa-square) - 1px)); margin: 0; background: var(--aa-menu-fill); }
+.aa-toolbar-ask input { box-sizing: border-box; width: 100%; min-width: 0; height: 100%; padding: calc(3px * var(--aa-sf)) calc(4px * var(--aa-sf)) 0; border: 0; border-radius: 0; background: transparent; color: var(--aa-menu-ink); font: inherit; line-height: calc(16px * var(--aa-sf)); letter-spacing: inherit; outline: none; }
+.aa-toolbar-ask input::placeholder { color: color-mix(in srgb, var(--aa-menu-ink) 60%, var(--aa-menu-fill)); }
+.aa-toolbar-ask input:focus-visible { box-shadow: inset 0 0 0 2px var(--ds-focus-ring, #594dff); }
+/* Docked (controls.ts), a bar stands across the foot of the view, above the
+   keyboard, as wide as the view: its cells scroll sideways when more than
+   fit, and with no keyboard up it stands over the home indicator's inset. */
+.aa-controls[data-docked] { --aa-safe-bottom: env(safe-area-inset-bottom, 0px); max-width: none; }
+.aa-find[data-docked] { border-width: 1px 0 0; }
+/* The block menu is a Context menu: rows 19px with the pixel under them (a
+   square's pitch), words 4px in on the lower sixteen, the icon at the row's
+   end, the outer corners rounded as one silhouette; four squares wide, always,
+   words too long fading over their last square. Its commands scroll within
+   eight squares, and Close stays under them. */
 .aa-menu {
-  display: flex; flex-direction: column; gap: calc(1px * var(--sf, 1));
-  width: calc(4 * var(--aa-square)); max-height: calc(12 * var(--aa-square));
-  overflow-y: auto; border: 0; border-radius: var(--aa-menu-radius, calc(4px * var(--sf, 1)));
-  clip-path: inset(0 round var(--aa-menu-radius, calc(4px * var(--sf, 1))));
-  background: transparent; color: var(--white, white);
-  font-size: calc(13px * var(--sf, 1)); line-height: 1;
+  display: flex; flex-direction: column; gap: 1px;
+  width: calc(4 * var(--aa-square)); max-width: 100vw;
+  overflow: hidden; border: 0; border-radius: var(--aa-menu-radius, var(--ds-radius, calc(4px * var(--aa-sf))));
+  clip-path: inset(0 round var(--aa-menu-radius, var(--ds-radius, calc(4px * var(--aa-sf)))));
+  background: transparent; color: var(--aa-menu-ink);
+  line-height: calc(16px * var(--aa-sf));
 }
 .aa-menu button {
-  display: flex; width: 100%; justify-content: flex-start; text-align: left;
-  gap: calc(2px * var(--sf, 1)); padding: 0 calc(2px * var(--sf, 1)) 0 calc(3px * var(--sf, 1));
-  white-space: nowrap; background: var(--black, black); color: var(--white, white);
+  display: flex; width: 100%; height: calc(var(--aa-square) - 1px); align-items: flex-end; justify-content: space-between; text-align: start;
+  gap: calc(4px * var(--aa-sf)); padding: 0 calc(4px * var(--aa-sf));
+  white-space: nowrap; background: var(--aa-menu-fill); color: var(--aa-menu-ink);
 }
-.aa-menu button:hover, .aa-menu button[data-current], .aa-menu button:focus-visible { background: var(--black, black); color: var(--white, white); }
-.aa-menu button[data-current] { outline: 1px solid currentColor; outline-offset: -1px; }
-.aa-menu button[data-command="count"] { font-size: calc(10px * var(--sf, 1)); }
+.aa-menu button[data-current], .aa-menu button:focus-visible { background: var(--aa-menu-hover); color: var(--aa-menu-ink); }
+@media (hover: hover) { .aa-menu button:hover { background: var(--aa-menu-hover); color: var(--aa-menu-ink); } }
+.aa-menu button:focus-visible { outline: 0; box-shadow: inset 0 0 0 2px var(--ds-focus-ring, currentColor); }
+.aa-menu-list { display: flex; flex-direction: column; gap: 1px; max-height: calc(8 * var(--aa-square)); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+.aa-menu-list::-webkit-scrollbar { display: none; }
+.aa-menu button[data-command="close"] kbd { order: 2; font: inherit; color: color-mix(in srgb, var(--aa-menu-ink) 60%, var(--aa-menu-fill)); }
+.aa-menu button[data-command="count"] { font-size: var(--ds-type-size-small, calc(10px * var(--aa-sf))); }
 .aa-menu button .aa-icon { order: 2; }
-.aa-menu button span:last-child {
-  order: 1; flex: 1; min-width: 0; overflow: hidden;
-  mask-image: linear-gradient(to right, black calc(100% - 12px * var(--sf, 1)), transparent 100%);
+.aa-menu button > span:not(.aa-icon) { order: 1; flex: 1; min-width: 0; overflow: hidden; }
+.aa-menu button > span:not(.aa-icon)[data-cut] { mask-image: linear-gradient(to right, black calc(100% - var(--aa-square)), transparent 100%); }
+/* A person in the menu (the people to mention) is their round avatar, never stretched as the words are. */
+.aa-menu button > span.aa-avatar { order: 0; flex: 0 0 auto; }
+.aa-menu-empty { display: block; height: calc(var(--aa-square) - 1px); padding: calc(3px * var(--aa-sf)) calc(4px * var(--aa-sf)) 0; box-sizing: border-box; background: var(--aa-menu-fill); }
+/* The sheet (sheet.ts): ds1/overlay.css draws its shape, handle, motion and
+   backdrop on the frame Design system 1's controls.css gives a modal, drawn
+   here in the same tokens: the paper, a hairline, a square of padding; its
+   title on the first row with Cancel at the end; a group's label in the
+   muted ink on one square; rows one square high, the icon on the first
+   sixteen of its square, the words on the next square, the Markdown that
+   writes the same at the row's end in the code face. */
+dialog.aa-sheet {
+  --aa-sf: var(--ds-sf, var(--sf, 1));
+  --aa-square: var(--ds-unit, var(--1, calc(20px * var(--sf, 1))));
+  box-sizing: border-box; position: fixed; inset: 0; margin: auto;
+  width: 100%; height: fit-content; max-height: calc(100dvh - 2 * var(--aa-square));
+  padding: var(--aa-square); border: 1px solid var(--ds-border-color, light-dark(#d8d8d8, #3d3d3d)); border-radius: 0; box-shadow: none;
+  background: var(--ds-overlay-paper, var(--ds-paper, var(--background, Canvas))); color: var(--ds-text-color, var(--text-color, CanvasText));
+  overflow: auto; overscroll-behavior: contain;
+  font: var(--ds-type-weight-default, 400) var(--ds-type-size-default, calc(14px * var(--aa-sf)))/calc(16px * var(--aa-sf)) "Inter Arrows", var(--ds-typeface-regular, var(--typeface-regular, system-ui)), system-ui, sans-serif;
+  font-feature-settings: var(--ds-font-features, normal); letter-spacing: var(--ds-type-letterspacing-default, calc(-0.3px * var(--aa-sf)));
+  -webkit-tap-highlight-color: transparent;
 }
-.aa-menu-empty { display: block; padding-inline: calc(3px * var(--sf, 1)); line-height: var(--aa-square); background: var(--black, black); }
-.aa-grip { display: flex; background: transparent; }
-.aa-drop-line { position: fixed; z-index: 1000; height: 1px; background: var(--accent-color, var(--apple-green, Highlight)); pointer-events: none; }
-.aa-find { display: flex; flex-wrap: wrap; width: calc(16 * var(--aa-square)); max-width: calc(100vw - 2 * var(--aa-square) - 2px); border: 1px solid var(--aa-rule, currentColor); }
-.aa-find input { box-sizing: border-box; font: inherit; color: inherit; background: transparent; width: 50%; min-width: 0; height: var(--aa-square); padding: 0 calc(4px * var(--sf, 1)); border: 0; border-right: 1px solid currentColor; border-radius: 0; }
-.aa-find span[aria-live] { padding-inline: calc(4px * var(--sf, 1)); white-space: nowrap; }
-.aa-find-match, .aa-highlight { background: var(--aa-highlight, var(--yellow, Highlight)); color: var(--aa-highlight-ink, inherit); }
-.aa-block[data-kind="bullet"] { margin-left: calc(var(--aa-depth, 0) * var(--aa-indent, 1.5em)); }
+dialog.aa-sheet[open] { display: flex; flex-direction: column; gap: var(--aa-square); }
+dialog.aa-sheet:focus { outline: none; }
+dialog.aa-sheet::backdrop { background: color-mix(in srgb, var(--ds-black, #2a2a2a) 40%, transparent); }
+.aa-sheet-head { display: flex; align-items: flex-end; justify-content: space-between; flex: 0 0 auto; height: var(--aa-square); line-height: calc(16px * var(--aa-sf)); }
+.aa-sheet-title { margin: 0; font: inherit; font-family: "Inter Arrows", var(--ds-typeface-medium, var(--typeface-medium, inherit)), system-ui, sans-serif; font-weight: var(--ds-type-weight-bold, 500); }
+.aa-sheet-cancel { margin: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit; line-height: inherit; cursor: pointer; }
+.aa-sheet-group { display: flex; flex-direction: column; flex: 0 0 auto; }
+.aa-sheet-label { box-sizing: border-box; height: var(--aa-square); padding-top: calc(4px * var(--aa-sf)); line-height: calc(16px * var(--aa-sf)); color: var(--ds-text-color-muted, GrayText); }
+.aa-sheet-row { display: flex; align-items: flex-end; width: 100%; height: var(--aa-square); margin: 0; padding: 0; border: 0; border-radius: calc(2px * var(--aa-sf)); background: none; color: inherit; font: inherit; line-height: calc(16px * var(--aa-sf)); text-align: start; cursor: pointer; }
+.aa-sheet-row:active { background: var(--ds-row-fill-press, var(--ds-fill, light-dark(#e6e6e6, #3c3c3c))); }
+.aa-sheet-row:focus-visible { outline: 2px solid var(--ds-focus-ring, currentColor); outline-offset: -2px; }
+.aa-sheet-row > .aa-icon { margin-right: calc(var(--aa-square) - 16px * var(--aa-sf)); }
+.aa-sheet-words { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.aa-sheet-key { color: var(--ds-text-color-muted, GrayText); font-family: "Inter Arrows", var(--aa-typeface-mono, var(--typeface-mono, "Aa Mono")), "Aa Mono", ui-monospace, monospace; font-size: calc(var(--ds-code-text-size, 13px) * var(--aa-sf)); letter-spacing: 0; }
+.aa-drop-line { position: fixed; z-index: 1000; height: 1px; background: var(--ds-accent-color, var(--accent-color, var(--apple-green, Highlight))); pointer-events: none; }
+.aa-find { display: flex; flex-wrap: wrap; width: calc(16 * var(--aa-square)); max-width: calc(100vw - 2 * var(--aa-square) - 2px); border: 1px solid var(--aa-rule, var(--ds-border-color, currentColor)); color: var(--ds-text-color, var(--text-color, CanvasText)); background: var(--ds-paper, var(--background, Canvas)); }
+.aa-find input { box-sizing: border-box; font: inherit; color: inherit; background: transparent; width: 50%; min-width: 0; height: var(--aa-square); padding: 0 calc(4px * var(--aa-sf)); border: 0; border-right: 1px solid var(--ds-border-color, currentColor); border-radius: 0; }
+.aa-find span[aria-live] { padding-inline: calc(4px * var(--aa-sf)); white-space: nowrap; }
+.aa-find-match, .aa-highlight { background: var(--aa-highlight, var(--ds-yellow, var(--yellow, Highlight))); color: var(--aa-highlight-ink, var(--ds-black, inherit)); }
+.aa-block[data-kind="bullet"] { margin-left: calc(var(--aa-depth, 0) * var(--aa-indent, var(--aa-unit))); }
 .aa-block[data-kind="bullet"][data-number]::before { content: attr(data-number) "."; }
-.aa-block[data-kind="callout"] { padding-left: var(--1, calc(20px * var(--sf, 1))); border-left: 1px solid var(--aa-rule, currentColor); }
-.aa-block[data-kind="callout"]::before { content: ""; position: absolute; left: 0; top: 0; width: var(--1, calc(20px * var(--sf, 1))); height: var(--1, calc(20px * var(--sf, 1))); background: currentColor; mask: var(--aa-callout-icon) center / calc(16px * var(--sf, 1)) no-repeat; cursor: pointer; }
+/* A callout with a type word alone (`> [!note]`) is a Markdown alert: its
+   type's icon on the first square, the words on the next, a hairline at its
+   start; folded, it is a toggle. */
+.aa-block[data-kind="callout"] { padding-left: var(--aa-unit); box-shadow: inset 1px 0 var(--aa-rule-color); }
+.aa-block[data-kind="callout"]::before { content: ""; position: absolute; left: 0; top: 0; width: var(--aa-unit); height: var(--aa-unit); background: currentColor; mask: var(--aa-callout-icon) 50% 100% / calc(16px * var(--aa-sf)) no-repeat; cursor: pointer; }
 .aa-block[data-folded]:not([data-body-active]) .aa-callout-body { display: none; }
+/* A callout with an icon or a colour (`> [!💡 yellow]`, `> [!]`) is Notion's
+   box: a square of padding on the paper's fill in one of Notion's colours,
+   Design system 1's pastels, with the system's corners; its icon, an emoji or a
+   picture, on the sixteen of the first square inside, the words from the next
+   square; what it holds stays inside the box. A press on the icon's square
+   offers another. The fills are the `--aa-callout-fill-<colour>` properties. */
+[data-fill="gray"] { --aa-callout-fill: var(--aa-callout-fill-gray, color-mix(in srgb, var(--ds-fill, light-dark(#e6e6e6, #3c3c3c)) 50%, transparent)); }
+[data-fill="brown"] { --aa-callout-fill: var(--aa-callout-fill-brown, var(--one-sand-pastel, light-dark(#f3ecd8, #403926))); }
+[data-fill="orange"] { --aa-callout-fill: var(--aa-callout-fill-orange, var(--one-orange-pastel, light-dark(#fff2cc, #4c3f1a))); }
+[data-fill="yellow"] { --aa-callout-fill: var(--aa-callout-fill-yellow, var(--one-yellow-pastel, light-dark(#fbffcc, #484c1a))); }
+[data-fill="green"] { --aa-callout-fill: var(--aa-callout-fill-green, var(--one-apple-green-pastel, light-dark(#daffcc, #284c1a))); }
+[data-fill="blue"] { --aa-callout-fill: var(--aa-callout-fill-blue, var(--one-sharp-blue-pastel, light-dark(#ccccff, #1d1a4c))); }
+[data-fill="purple"] { --aa-callout-fill: var(--aa-callout-fill-purple, var(--one-purple-pastel, light-dark(#f9d2ed, #46203a))); }
+[data-fill="pink"] { --aa-callout-fill: var(--aa-callout-fill-pink, var(--one-pink-pastel, light-dark(#fad1e6, #471f34))); }
+[data-fill="red"] { --aa-callout-fill: var(--aa-callout-fill-red, var(--one-tuned-red-pastel, light-dark(#ffcccc, #4c1a1a))); }
+[data-fill="white"] { --aa-callout-fill: var(--aa-callout-fill-white, transparent); }
+.aa-block[data-kind="callout"][data-box] {
+  /* The grey is the fallback, never a declaration of --aa-callout-fill here: that would outweigh the [data-fill] rules above. */
+  --aa-callout-grey: var(--aa-callout-fill-gray, color-mix(in srgb, var(--ds-fill, light-dark(#e6e6e6, #3c3c3c)) 50%, transparent));
+  box-sizing: border-box;
+  padding: var(--aa-unit);
+  border-radius: var(--ds-radius, calc(4px * var(--aa-sf)));
+  background: var(--aa-callout-fill, var(--aa-callout-grey));
+  box-shadow: none;
+}
+.aa-block[data-kind="callout"][data-box][data-fill="white"] { box-shadow: inset 0 0 0 1px var(--aa-rule-color); }
+.aa-block[data-kind="callout"][data-box][data-icon], .aa-block[data-kind="callout"][data-box][data-picture] { padding-left: calc(2 * var(--aa-unit)); }
+.aa-block[data-kind="callout"][data-box]::before { content: none; left: var(--aa-unit); top: var(--aa-unit); background: none; mask: none; }
+.aa-block[data-kind="callout"][data-box][data-icon]::before { content: attr(data-icon); box-sizing: border-box; padding-top: calc(4px * var(--aa-sf)); font-size: var(--aa-size, var(--ds-type-size-default, calc(14px * var(--aa-sf)))); line-height: calc(16px * var(--aa-sf)); letter-spacing: 0; text-align: start; white-space: nowrap; overflow: hidden; -webkit-user-select: none; user-select: none; }
+.aa-block[data-kind="callout"][data-box][data-picture]::before { content: ""; background: var(--aa-callout-picture) 0 100% / calc(16px * var(--aa-sf)) calc(16px * var(--aa-sf)) no-repeat; }
+/* Selected or carried, the box darkens its own fill rather than taking the selection grey over it. */
+.aa-block[data-kind="callout"][data-box][data-selected], .aa-block[data-kind="callout"][data-box][data-lifted] { background: color-mix(in srgb, currentColor 15%, var(--aa-callout-fill, var(--aa-callout-grey))); }
+/* A fill's row in the block menu: its mark a square of the colour, in the system's corners. */
+.aa-icon[data-fill] { mask: none; -webkit-mask: none; border-radius: var(--ds-radius, calc(4px * var(--aa-sf))); background: var(--aa-callout-fill); }
+.aa-icon[data-fill="white"] { box-shadow: inset 0 0 0 1px var(--aa-rule-color); }
 .aa-block[data-kind="table"] { white-space: normal; }
-/* A table is Design system 1's: rows one square high, each on a hairline at
-   its foot (19px of words, 1px of line), no box and no column lines. The
-   header row keeps the text's weight in the title grey; Markdown's `---:`
-   sets a column of numbers to its end in tabular figures. */
-.aa-block[data-kind="table"] { --aa-table-row: calc(20px * var(--sf, 1)); font-variant-numeric: tabular-nums; }
+/* A table is prose.css's: each row two squares, the words on one square with
+   half a square around them, a hairline at its foot, no box and no column
+   lines; the header row in the medium face, Markdown's `---:` setting a
+   column of numbers to its end in tabular figures. */
+.aa-block[data-kind="table"] { font-variant-numeric: tabular-nums; }
 .aa-table-row { display: grid; grid-template-columns: repeat(var(--aa-columns), minmax(0, 1fr)); }
-.aa-table-cell { box-sizing: border-box; min-height: var(--aa-table-row); padding: 0 calc(var(--aa-table-row) / 2) 0 0; border-bottom: 1px solid var(--aa-table-rule, var(--ds-border-color, color-mix(in srgb, currentColor 15%, transparent))); line-height: calc(var(--aa-table-row) - 1px); white-space: pre-wrap; outline: none; -webkit-user-modify: read-write-plaintext-only; }
-.aa-table-cell:last-child { padding-inline-end: 0; }
+.aa-table-cell { box-sizing: border-box; min-height: calc(2 * var(--aa-unit)); padding: calc(var(--aa-unit) / 2); box-shadow: inset 0 -1px var(--aa-table-rule, var(--aa-rule-color)); line-height: var(--aa-unit); white-space: pre-wrap; outline: none; -webkit-user-modify: read-write-plaintext-only; }
 .aa-table-cell[data-align="center"] { text-align: center; }
 .aa-table-cell[data-align="end"] { text-align: end; }
-.aa-table-row:first-child { color: var(--aa-table-header, var(--ds-title-color, var(--base-darker-grey, color-mix(in srgb, currentColor 55%, transparent)))); }
+.aa-table-row:first-child { color: var(--aa-table-header, inherit); font-family: "Inter Arrows", var(--ds-typeface-medium, var(--typeface-medium, inherit)), system-ui, sans-serif; font-weight: var(--ds-type-weight-bold, 500); }
 .aa-atom video, .aa-atom audio { display: block; max-width: 100%; }
-.aa-caption { display: block; font: inherit; font-size: var(--type-size-small, 10px); min-height: 1lh; outline: none; cursor: text; -webkit-user-modify: read-write-plaintext-only; }
-.aa-caption:empty::before { content: attr(data-placeholder); color: var(--aa-placeholder, GrayText); }
+.aa-caption { display: block; font: inherit; font-size: var(--ds-type-size-small, calc(10px * var(--aa-sf))); color: var(--ds-text-color-muted, inherit); min-height: 1lh; outline: none; cursor: text; -webkit-user-modify: read-write-plaintext-only; }
+.aa-caption:empty::before { content: attr(data-placeholder); color: var(--aa-placeholder, var(--ds-input-placeholder-color, GrayText)); }
 .aa-atom[data-atom="equation-block"] { display: block; }
 
 /* A fenced block an atom draws whole, a diagram: the drawing on the paper, not
    in a code box, wider ones scrolled rather than cut; with the caret in it, its
-   words as code and the drawing half a line under them. The drawing starts at
+   words as code and the drawing a square under them. The drawing starts at
    the block's edge, as the words do. */
-.aa-block[data-fence][data-drawn] { padding: 0; border-radius: 0; background: none; font-size: inherit; }
-.aa-block[data-fence] > .aa-atom { display: block; max-width: 100%; overflow-x: auto; font-family: "Inter Arrows", var(--aa-typeface, var(--typeface-regular, system-ui)), system-ui, sans-serif; font-size: var(--aa-size, var(--type-size-default, 14px)); }
+.aa-block[data-fence][data-drawn] { padding: 0; border-radius: 0; box-shadow: none; background: none; font-size: inherit; letter-spacing: inherit; }
+.aa-block[data-fence] > .aa-atom { display: block; max-width: 100%; overflow-x: auto; font-family: "Inter Arrows", var(--aa-typeface, var(--ds-typeface-regular, var(--typeface-regular, system-ui))), system-ui, sans-serif; font-size: var(--aa-size, var(--ds-type-size-default, calc(14px * var(--aa-sf)))); letter-spacing: var(--aa-letterspacing, var(--ds-type-letterspacing-default, calc(-0.3px * var(--aa-sf)))); }
 .aa-block[data-fence] > .aa-atom > * { margin-inline-start: 0; }
-.aa-block[data-fence] > .aa-atom[data-preview] { margin-top: 0.5lh; }
 
-.aa-peer-caret { position: relative; display: inline; border-left: calc(1px * var(--sf, 1)) solid var(--aa-accent, Highlight); }
-.aa-peer-caret::after { content: attr(data-label); position: absolute; bottom: 100%; left: 0; font-size: calc(10px * var(--sf, 1)); white-space: nowrap; background: var(--aa-accent, Highlight); color: HighlightText; }
-.aa-block[data-kind=callout][data-level] > span:not(.aa-syntax):not(.aa-callout-body) { font-weight: bold; }
+/* A collaborator's selection: their caret's colour, faint, behind the words. */
+.aa-peer-selection { background: color-mix(in srgb, var(--aa-accent, var(--ds-sharp-blue, Highlight)) 20%, transparent); }
+.aa-peer-caret { position: relative; display: inline; border-left: calc(1px * var(--aa-sf)) solid var(--aa-accent, var(--ds-sharp-blue, Highlight)); }
+/* A collaborator's caret: a hairline in the accent, their avatar over it, 16px round with their
+   initial, as Design system 1 draws a person, filled so it reads over the line above. */
+.aa-peer-caret::after { content: attr(data-initial); position: absolute; bottom: 100%; left: 0; display: grid; place-items: center; box-sizing: border-box; width: calc(16px * var(--aa-sf, 1)); height: calc(16px * var(--aa-sf, 1)); border-radius: 50%; transform: translateX(-50%); background: var(--aa-accent, var(--ds-sharp-blue, Highlight)); color: var(--ds-white, HighlightText); font: var(--ds-type-weight-default, 400) var(--ds-type-size-small, calc(10px * var(--aa-sf, 1))) / 1 var(--aa-typeface, var(--ds-typeface-regular, var(--typeface-regular, system-ui))); letter-spacing: normal; font-style: normal; text-decoration: none; white-space: nowrap; pointer-events: none; user-select: none; }
+.aa-peer-caret:not([data-initial])::after { content: none; }
+.aa-block[data-kind=callout][data-level] > span:not(.aa-syntax):not(.aa-callout-body) { font-family: "Inter Arrows", var(--ds-typeface-medium, var(--typeface-medium, inherit)), system-ui, sans-serif; font-weight: var(--ds-type-weight-bold, 500); }
 
 .aa-link-editor input { flex: 1; width: auto; }
 
 /* A plain specimen inherits its surrounding face and size without controls. */
-:where(.aa-plain) { font: inherit; letter-spacing: inherit; }
+:where(.aa-plain) { font: inherit; font-feature-settings: inherit; letter-spacing: inherit; color: inherit; }
 :where(.aa-plain) > .aa-block { font: inherit; letter-spacing: inherit; }
+/* An empty plain field says its placeholder in the muted ink; listening, it says so in the prompt's colour, the dot after it. */
+.aa-plain[data-empty] > .aa-block[data-placeholder]::before { content: attr(data-placeholder); color: var(--ds-text-color-muted, #8a8a8a); pointer-events: none; }
+.aa-plain[data-listening] > .aa-block { caret-color: transparent; }
+.aa-plain[data-listening] > .aa-block[data-placeholder]::before { color: var(--aa-prompt, var(--ds-focus-ring, #594dff)); margin-inline-end: 0.25em; }
+
+/* A correction's words shimmer once: a band of the accent colour passes through their letters (`shimmer.ts`).
+   Screen on a light page and multiply on a dark one colour the letters and leave the paper as it is. */
+.aa-shimmer {
+  position: fixed;
+  z-index: 1000;
+  overflow: hidden;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: aa-shimmer-show 900ms ease-out both;
+}
+.aa-shimmer[data-dark] { mix-blend-mode: multiply; }
+.aa-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, var(--aa-shimmer-color, var(--ds-accent-color, var(--accent-color, var(--apple-green, Highlight)))) 50%, transparent);
+  transform: translateX(-100%);
+  animation: aa-shimmer-pass 900ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation-delay: inherit;
+}
+@keyframes aa-shimmer-pass { to { transform: translateX(100%); } }
+@keyframes aa-shimmer-show { 0% { opacity: 0; } 15%, 70% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .aa-shimmer::after { transform: none; animation: none; background: var(--aa-shimmer-color, var(--ds-accent-color, var(--accent-color, var(--apple-green, Highlight)))); }
+}
+@media (forced-colors: active) {
+  .aa-shimmer { display: none; }
+}
+
+/* Asking AI: a prompt stands over the empty block (or the board) in a live
+   colour, so it reads as said to the AI, not written into the page; words
+   heard are in italics, the ones still being heard fainter, and nothing more marks that it listens. Sent, it
+   glistens until the answer takes its place, and so does what it is about. */
+.aa-prompt {
+  --aa-prompt-color: var(--aa-prompt, var(--ds-focus-ring, #594dff));
+  position: fixed;
+  z-index: 1000;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  outline: none;
+  color: var(--aa-prompt-color);
+  caret-color: var(--aa-prompt-color);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: transparent;
+  /* Room at the line's end for an italic's lean, and nothing that cuts it. */
+  padding-inline-end: 0.2em;
+  overflow: visible;
+}
+/* On the page itself, with its block; in a dialog, fixed as the dialog is (prompt.ts). */
+.aa-prompt[data-placed="page"] { position: absolute; }
+.aa-prompt:empty::before {
+  content: attr(data-placeholder);
+  color: var(--aa-prompt-color);
+  opacity: 0.55;
+  pointer-events: none;
+}
+/* Listening, the caret is a dot breathing where it stands; it is the caret again once listening stops. */
+.aa-prompt[data-listening] { caret-color: transparent; }
+.aa-prompt-caret {
+  position: relative;
+  display: inline-block;
+  width: calc(6px * var(--aa-sf, 1));
+  height: calc(6px * var(--aa-sf, 1));
+  border-radius: 50%;
+  background: var(--aa-prompt, var(--ds-focus-ring, #594dff));
+  vertical-align: middle;
+  pointer-events: none;
+}
+/* After words, exactly one space stands between the last of them and the dot. */
+.aa-prompt-caret[data-after] { margin-inline-start: 0.25em; }
+.aa-prompt i {
+  font-style: italic;
+  /* An italic's last letters lean past its box: room for them at its end,
+     given back by the margin so the words stand where they did. A run drawn
+     fainter is painted in a layer the size of its box, which cut them off. */
+  padding-inline-end: 0.2em;
+  margin-inline-end: -0.2em;
+}
+.aa-prompt .aa-prompt-heard { opacity: 0.6; }
+.aa-prompt[data-loading] { cursor: progress; }
+.aa-prompt[data-failed] { text-decoration: underline wavy var(--ds-danger-color, #d33); text-underline-offset: 3px; }
+@keyframes aa-prompt-breathe { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
+
+/* The glisten runs through the letters alone: the accent as a band in a gradient clipped to the
+   text, the ink either side of it, moving by its position since a clipped gradient has no child
+   to move by transform. Fills within the words (code, a comment's tint) step aside meanwhile, so
+   the letters in them show. With less motion asked for, the words only breathe. */
+[data-aa-glisten] {
+  background-image: linear-gradient(105deg, currentColor 35%, var(--aa-shimmer-color, var(--ds-accent-color, var(--accent-color, var(--apple-green, Highlight)))) 50%, currentColor 65%);
+  background-size: 300% 100%;
+  background-repeat: no-repeat;
+  background-position: 100% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: aa-glisten-pass 1.8s ease-in-out infinite;
+  animation-delay: var(--aa-glisten-delay, 0ms);
+}
+[data-aa-glisten] :is(.aa-c, .aa-comment, .aa-highlight) { background: transparent; }
+@keyframes aa-glisten-pass { to { background-position: 0% 0; } }
+@media (prefers-reduced-motion: reduce) {
+  [data-aa-glisten] { background-image: none; -webkit-text-fill-color: currentColor; animation: aa-prompt-breathe 1.8s ease-in-out infinite; }
+}
+@media (forced-colors: active) {
+  [data-aa-glisten] { background-image: none; -webkit-text-fill-color: currentColor; animation: none; }
+}
+
+/* What an AI answer changed: a Sharp blue dot after a changed block, a soft
+   Zenith blue hold round a run of blocks it wrote. The dot grows into
+   Design system 1's button, one control high, to revert the change; it grows
+   and fades by transform and opacity alone. */
+.aa-ai-marks { position: fixed; inset: 0; z-index: 999; pointer-events: none; }
+.aa-ai-hold {
+  position: fixed;
+  box-sizing: border-box;
+  border: 1px solid color-mix(in srgb, var(--ds-sharp-blue, var(--sharp-blue, #594dff)) 45%, transparent);
+  border-radius: var(--ds-radius, calc(4px * var(--aa-sf, 1)));
+  background: color-mix(in srgb, var(--ds-zenith-blue, var(--zenith-blue, #ccccff)) 30%, transparent);
+  mix-blend-mode: multiply;
+  animation: aa-ai-appear 240ms cubic-bezier(0.2, 0, 0, 1) both;
+}
+@media (prefers-color-scheme: dark) { .aa-ai-hold { mix-blend-mode: screen; background: color-mix(in srgb, var(--ds-sharp-blue, var(--sharp-blue, #594dff)) 18%, transparent); } }
+.aa-ai-revert {
+  position: fixed;
+  display: block;
+  width: calc(16px * var(--aa-sf, 1));
+  height: calc(16px * var(--aa-sf, 1));
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  transform: translate(calc(2px * var(--aa-sf, 1)), -50%);
+  cursor: pointer;
+  pointer-events: auto;
+  animation: aa-ai-appear 240ms cubic-bezier(0.2, 0, 0, 1) both;
+}
+.aa-ai-dot {
+  position: absolute;
+  left: calc(4px * var(--aa-sf, 1));
+  top: calc(5px * var(--aa-sf, 1));
+  width: calc(6px * var(--aa-sf, 1));
+  height: calc(6px * var(--aa-sf, 1));
+  border-radius: 50%;
+  background: var(--ds-sharp-blue, var(--sharp-blue, #594dff));
+  transition: transform 180ms cubic-bezier(0.2, 0, 0, 1), opacity 180ms cubic-bezier(0.2, 0, 0, 1);
+}
+.aa-ai-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: calc(16px * var(--aa-sf, 1));
+  padding: 0 calc(4px * var(--aa-sf, 1));
+  border-radius: var(--ds-radius, calc(4px * var(--aa-sf, 1)));
+  background: var(--ds-sharp-blue, var(--sharp-blue, #594dff));
+  color: var(--ds-white, #fff);
+  font: inherit;
+  font-family: var(--aa-typeface, var(--ds-typeface-regular, var(--typeface-regular, system-ui))), system-ui, sans-serif;
+  font-size: var(--ds-type-size-default, calc(14px * var(--aa-sf, 1)));
+  line-height: calc(16px * var(--aa-sf, 1));
+  white-space: nowrap;
+  opacity: 0;
+  transform: scale(0.25);
+  transform-origin: calc(7px * var(--aa-sf, 1)) 50%;
+  transition: transform 220ms cubic-bezier(0.2, 0, 0, 1), opacity 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+.aa-ai-revert:hover .aa-ai-dot,
+.aa-ai-revert:focus-visible .aa-ai-dot { opacity: 0; transform: scale(2); }
+.aa-ai-revert:hover .aa-ai-label,
+.aa-ai-revert:focus-visible .aa-ai-label { opacity: 1; transform: none; }
+.aa-ai-revert:focus-visible { outline: none; }
+.aa-ai-revert:focus-visible .aa-ai-label { box-shadow: 0 0 0 2px var(--ds-focus-ring, #594dff), 0 0 0 3px var(--ds-white, #fff); }
+.aa-ai-mark[data-kind="section"] .aa-ai-revert { transform: translate(calc(-16px * var(--aa-sf, 1)), -50%); }
+.aa-ai-mark[data-kind="section"] .aa-ai-label { left: auto; right: 0; transform-origin: calc(100% - 7px * var(--aa-sf, 1)) 50%; }
+@keyframes aa-ai-appear { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .aa-ai-hold, .aa-ai-revert { animation: none; }
+  .aa-ai-dot, .aa-ai-label { transition: none; }
+}
+@media (forced-colors: active) { .aa-ai-hold { border-color: Highlight; background: none; } }
+
+/* The words an answer changed or wrote keep their ink: the dot after the block is the mark
+   (the `aa-ai-changed` layer still names them for a product that wants to). A box it ticked or
+   unticked is ringed in Sharp blue. Colour only: nothing moves or changes size. */
+.aa-block[data-kind="bullet"][data-checked][data-ai-box]::before { border-color: var(--ds-sharp-blue, var(--sharp-blue, #594dff)); box-shadow: 0 0 0 1px var(--ds-sharp-blue, var(--sharp-blue, #594dff)); }
+.aa[data-ai-fading] .aa-block[data-ai-box]::before { box-shadow: none; }
+.aa-ai-marks[data-fading] { opacity: 0; transition: opacity 400ms cubic-bezier(0.2, 0, 0, 1); }
+
+@media (prefers-reduced-motion: reduce) {
+  .aa-ai-changed, .aa-ai-marks[data-fading] { transition: none; }
+}
+
+
+/* Comments on ranges of the text (comments.ts, comments-view.ts). The
+   commented words wear orange's pastel (yellow is the highlight's, blue the
+   AI's), the open thread's words a stronger tint, an unread thread's a line
+   under them; a resolved or orphaned thread marks nothing. Colour only. */
+.aa-comment { background: var(--aa-comment-fill, color-mix(in srgb, var(--ds-orange, var(--orange, #fec20d)) 28%, transparent)); border-radius: calc(2px * var(--aa-sf, 1)); transition: background-color 180ms cubic-bezier(0.2, 0, 0, 1); }
+.aa-comment--open { background: var(--aa-comment-fill-open, color-mix(in srgb, var(--ds-orange, var(--orange, #fec20d)) 55%, transparent)); }
+.aa-comment--unread { box-shadow: inset 0 -1px var(--ds-orange, var(--orange, #fec20d)); }
+.aa-comment--draft { background: var(--aa-comment-fill-open, color-mix(in srgb, var(--ds-orange, var(--orange, #fec20d)) 55%, transparent)); }
+@media (forced-colors: active) { .aa-comment { background: none; outline: 1px solid Highlight; } }
+
+/* The threads: a popover at the words, a card on the paper (Design system
+   1's line, corners and shadow), 16 squares wide, padded
+   half a square; or a panel the product gives, which keeps the product's
+   frame and takes only the rows. Every row is one square, its words and
+   controls on the sixteen. */
+.aa-comments {
+  --aa-unit: var(--ds-unit, var(--1, calc(20px * var(--sf, 1))));
+  --aa-sf: var(--ds-sf, var(--sf, 1));
+  --aa-rule-color: var(--aa-rule, var(--ds-border-color, light-dark(#d8d8d8, #3d3d3d)));
+  --aa-muted: var(--ds-text-color-muted, light-dark(#797979, #ababab));
+  box-sizing: border-box;
+  color: var(--ds-text-color, light-dark(#1e1e1e, #fff));
+  font-family: "Inter Arrows", var(--aa-typeface, var(--ds-typeface-regular, var(--typeface-regular, system-ui))), system-ui, sans-serif;
+  font-feature-settings: var(--aa-font-features, var(--ds-font-features, normal));
+  font-size: var(--ds-type-size-default, calc(14px * var(--aa-sf, 1)));
+  font-weight: var(--ds-type-weight-default, 400);
+  letter-spacing: var(--ds-type-letterspacing-default, calc(-0.3px * var(--aa-sf, 1)));
+  line-height: var(--aa-unit);
+}
+.aa-comments[data-mode="popover"] {
+  position: fixed;
+  z-index: 1000;
+  max-height: calc(100vh - var(--aa-unit));
+  overflow-y: auto;
+  padding: calc(var(--aa-unit) / 2);
+  border: 1px solid var(--aa-rule-color);
+  border-radius: var(--ds-radius-card, calc(8px * var(--aa-sf, 1)));
+  background: var(--ds-background-color, light-dark(#fff, #1e1e1e));
+  box-shadow: var(--ds-shadow, 0 calc(4px * var(--aa-sf, 1)) calc(20px * var(--aa-sf, 1)) rgb(0 0 0 / 0.08));
+  animation: aa-comments-in 220ms cubic-bezier(0.2, 0, 0, 1) both;
+}
+@keyframes aa-comments-in { from { opacity: 0; transform: translateY(calc(4px * var(--aa-sf, 1))); } }
+/* Over the page the card is its own ground, exactly half a square inside its line all round, and its
+   rows stand centred in their squares rather than on the sixteen: nothing beside them to line up with. */
+.aa-comments[data-mode="popover"] :is(.aa-thread-head, .aa-comment-meta, .aa-composer, .aa-comment-reactions, .aa-thread-actions) { align-items: center; }
+.aa-comments[data-mode="popover"] .aa-composer textarea { padding: 0; }
+.aa-comments[data-mode="panel"] .aa-thread + .aa-thread { margin-top: calc(var(--aa-unit) / 2); }
+/* Design system 1's text tabs at a panel's head: the words alone with no fill, each tab padded 4px and
+   4px apart so the words stand twelve apart, the run 4px back so the first word starts on the edge,
+   the chosen one in the ink and the rest muted, all on the sixteen of one square. */
+.aa-comments-tabs { display: flex; align-items: flex-end; gap: calc(4px * var(--aa-sf, 1)); height: var(--aa-unit); margin: 0 0 0 calc(-4px * var(--aa-sf, 1)); line-height: calc(16px * var(--aa-sf, 1)); }
+.aa-comments-tabs [role="tab"] { height: calc(16px * var(--aa-sf, 1)); margin: 0; padding: 0 calc(4px * var(--aa-sf, 1)); border: 0; border-radius: var(--ds-radius, calc(4px * var(--aa-sf, 1))); background: none; color: var(--aa-muted); font: inherit; letter-spacing: inherit; line-height: calc(16px * var(--aa-sf, 1)); white-space: nowrap; cursor: pointer; }
+.aa-comments-tabs [role="tab"][aria-selected="true"] { color: inherit; }
+.aa-comments-tabs [role="tab"]:hover { color: inherit; }
+.aa-comments-tabs [role="tab"]:focus-visible { outline: 2px solid var(--ds-focus-ring, #594dff); outline-offset: -2px; }
+.aa-comments-tab-count { font-variant-numeric: tabular-nums; }
+.aa-comments-empty { color: var(--aa-muted); }
+.aa-comments[data-mode="panel"] .aa-comments-tabs + .aa-thread { margin-top: 0; }
+.aa-comments-empty { margin: 0; }
+/* A thread's head: the words it is on, muted and fading where they are cut, and its controls at the end. */
+.aa-thread-head { display: flex; align-items: flex-end; gap: calc(4px * var(--aa-sf, 1)); box-sizing: border-box; width: 100%; min-height: var(--aa-unit); margin: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; line-height: calc(16px * var(--aa-sf, 1)); text-align: start; }
+button.aa-thread-head { cursor: pointer; }
+button.aa-thread-head:focus-visible { outline: 2px solid var(--ds-focus-ring, #594dff); outline-offset: 1px; border-radius: calc(2px * var(--aa-sf, 1)); }
+.aa-thread-quote { flex: 1 1 auto; min-width: 0; overflow: hidden; color: var(--aa-muted); white-space: nowrap; mask-image: linear-gradient(to right, black calc(100% - var(--aa-unit)), transparent 100%); }
+.aa-thread[data-orphaned] .aa-thread-quote { font-style: italic; }
+.aa-thread[data-unread] .aa-thread-quote::before { content: ""; display: inline-block; width: calc(6px * var(--aa-sf, 1)); height: calc(6px * var(--aa-sf, 1)); margin-right: calc(4px * var(--aa-sf, 1)); border-radius: 50%; background: var(--ds-orange, var(--orange, #fec20d)); vertical-align: calc(2px * var(--aa-sf, 1)); }
+.aa-thread-count { flex: none; color: var(--aa-muted); font-variant-numeric: tabular-nums; }
+/* A long thread's title in a popover: its count in the medium weight, then a gap before the first comment. */
+.aa-thread-title { flex: 1 1 auto; min-width: 0; font-family: "Inter Arrows", var(--aa-typeface-bold, var(--ds-typeface-medium, var(--typeface-medium, inherit))), system-ui, sans-serif; font-weight: var(--ds-type-weight-bold, 500); white-space: nowrap; }
+.aa-thread[data-titled] > .aa-thread-head { margin-bottom: calc(var(--aa-unit) / 2); }
+.aa-thread-actions { display: flex; flex: none; align-items: flex-end; gap: calc(4px * var(--aa-sf, 1)); margin-left: auto; }
+/* Icon buttons one control high; a word on a button on the light fill, danger in red. */
+.aa-comments-button { display: inline-flex; align-items: center; justify-content: center; width: calc(16px * var(--aa-sf, 1)); height: calc(16px * var(--aa-sf, 1)); margin: 0; padding: 0; border: 0; border-radius: var(--ds-radius, calc(4px * var(--aa-sf, 1))); background: none; color: inherit; cursor: pointer; }
+.aa-comments-button:hover { background: var(--ds-fill, light-dark(#e6e6e6, #3c3c3c)); }
+.aa-comments-button:disabled { opacity: 0.5; cursor: default; }
+.aa-comments-word { height: calc(16px * var(--aa-sf, 1)); margin: 0; padding: 0 calc(4px * var(--aa-sf, 1)); border: 0; border-radius: var(--ds-radius, calc(4px * var(--aa-sf, 1))); background: var(--ds-fill, light-dark(#e6e6e6, #3c3c3c)); color: inherit; font: inherit; letter-spacing: inherit; line-height: calc(16px * var(--aa-sf, 1)); white-space: nowrap; cursor: pointer; }
+.aa-comments-word:hover { background: var(--ds-fill-hover, light-dark(#d8d8d8, #4a4a4a)); }
+.aa-thread-reopen { background: var(--ds-zenith-blue, var(--zenith-blue, #ccccff)); color: var(--ds-sharp-blue, var(--sharp-blue, #594dff)); }
+.aa-thread-delete { background: var(--ds-tuned-red, var(--tuned-red, #ff5f5f)); color: var(--ds-white, #fff); }
+.aa-comment-edit { margin-left: auto; background: none; color: var(--aa-muted); }
+.aa-comment-meta .aa-thread-actions { margin-left: auto; }
+.aa-comment-meta .aa-comment-edit + .aa-thread-actions { margin-left: 0; }
+.aa-comment-edit:hover { color: inherit; }
+.aa-comments-button:focus-visible, .aa-comments-word:focus-visible { outline: 2px solid var(--ds-focus-ring, #594dff); outline-offset: 1px; }
+/* Who, when: the avatar on the first sixteen of its square, the words from the next square. */
+.aa-comment-entry { margin-top: calc(var(--aa-unit) / 2); }
+.aa-thread-head + .aa-comment-entry { margin-top: 0; }
+.aa-comment-meta { display: flex; align-items: flex-end; gap: calc(4px * var(--aa-sf, 1)); min-height: var(--aa-unit); line-height: calc(16px * var(--aa-sf, 1)); }
+.aa-comment-author { font-family: "Inter Arrows", var(--aa-typeface-bold, var(--ds-typeface-medium, var(--typeface-medium, inherit))), system-ui, sans-serif; font-weight: var(--ds-type-weight-bold, 500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.aa-comment-time { color: var(--aa-muted); white-space: nowrap; }
+.aa-comment-body { margin: 0 0 0 var(--aa-unit); line-height: var(--aa-unit); white-space: pre-wrap; overflow-wrap: anywhere; }
+.aa-comment-mention { color: var(--aa-person, inherit); }
+/* Reactions under a comment: the emoji and its count as words, no button face around them, a
+   square apart; the one the reader gave in Sharp blue; a plus gives one more, from the sixteen
+   in the Context face, eight a row. */
+.aa-comment-reactions { display: flex; flex-wrap: wrap; align-items: flex-end; gap: calc(var(--aa-unit) / 2); min-height: var(--aa-unit); margin-left: var(--aa-unit); line-height: calc(16px * var(--aa-sf, 1)); }
+.aa-reaction { display: inline-flex; align-items: center; gap: calc(4px * var(--aa-sf, 1)); height: calc(16px * var(--aa-sf, 1)); margin: 0; padding: 0; border: 0; border-radius: var(--ds-radius, calc(4px * var(--aa-sf, 1))); background: none; color: var(--aa-muted); font: inherit; letter-spacing: inherit; line-height: calc(16px * var(--aa-sf, 1)); cursor: pointer; }
+.aa-reaction:hover:not(:disabled) { color: inherit; }
+.aa-reaction[aria-pressed="true"] { color: var(--ds-sharp-blue, var(--sharp-blue, #594dff)); }
+.aa-reaction:disabled { cursor: default; }
+/* No face on a reaction, pressed or hovered, whatever the page gives its buttons: the emoji and its count alone. */
+.aa-reaction:is(:hover, :active, [aria-pressed]) { background: none; }
+.aa-reaction-count { font-variant-numeric: tabular-nums; }
+.aa-reaction-add { color: var(--aa-muted); }
+.aa-reaction-add:hover { color: inherit; }
+.aa-reaction:focus-visible { outline: 2px solid var(--ds-focus-ring, #594dff); outline-offset: 1px; }
+.aa-reaction-picker { display: grid; grid-template-columns: repeat(8, var(--aa-square)); width: calc(8 * var(--aa-square)); gap: 1px; }
+.aa-reaction-picker button { width: calc(var(--aa-square) - 1px); min-width: 0; justify-content: center; padding: 0; }
+/* A callout's icons on offer: the same sixteen under the icon's square, and No icon on a row of its own. */
+.aa-callout-icons { position: fixed; }
+.aa-callout-icons .aa-callout-icons-none { grid-column: 1 / -1; width: auto; justify-content: flex-start; padding: 0 calc(4px * var(--aa-sf)); }
+.aa-thread-resolved { margin: 0 0 0 var(--aa-unit); min-height: var(--aa-unit); color: var(--aa-muted); }
+.aa-comments-error { margin: 0 0 0 var(--aa-unit); min-height: var(--aa-unit); color: var(--ds-tuned-red, var(--tuned-red, #ff5f5f)); }
+/* The avatar is Design system 1's `.ds-avatar` mark, as Ezo draws a person: round, one control
+   high, the initial in small type lettered in the person's ink inside a ring of it, no fill.
+   The same rules as DS1's sheet, so a page without it draws the same. */
+.aa-avatar { --ds-avatar-background: transparent; --ds-avatar-color: var(--aa-person, var(--ds-text-color-muted, #797979)); box-sizing: border-box; position: relative; display: inline-grid; place-items: center; flex: 0 0 auto; width: calc(16px * var(--aa-sf, 1)); height: calc(16px * var(--aa-sf, 1)); overflow: hidden; border-radius: 50%; background: transparent; color: var(--aa-person, var(--ds-text-color-muted, #797979)); box-shadow: inset 0 0 0 1px currentColor; font: var(--ds-type-weight-default, 400) var(--ds-type-size-small, calc(10px * var(--aa-sf, 1))) / 1 var(--aa-typeface, var(--ds-typeface-regular, var(--typeface-regular, system-ui))); letter-spacing: normal; text-align: center; white-space: nowrap; user-select: none; }
+/* The composer: one square high, growing a square a line; Enter sends. */
+.aa-composer { display: flex; align-items: flex-end; gap: calc(4px * var(--aa-sf, 1)); margin: calc(var(--aa-unit) / 2) 0 0; min-height: var(--aa-unit); }
+.aa-thread-head + .aa-composer, .aa-thread > .aa-composer:first-child { margin-top: 0; }
+.aa-composer textarea, .aa-comment-editing { box-sizing: border-box; flex: 1 1 auto; width: 100%; min-width: 0; min-height: var(--aa-unit); max-height: calc(8 * var(--aa-unit)); margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; color: inherit; font: inherit; letter-spacing: inherit; line-height: var(--aa-unit); resize: none; overflow: hidden; outline: none; }
+/* Editing your own comment: the field stands where the words stood, flush with them, no face. */
+.aa-comment-editing { display: block; width: calc(100% - var(--aa-unit)); margin-left: var(--aa-unit); background: transparent; padding: 0; }
+.aa-composer textarea::placeholder, .aa-comment-editing::placeholder { color: var(--aa-placeholder, var(--ds-input-placeholder-color, light-dark(#797979, #ababab))); }
+/* Asking AI from the field: what is asked in the prompt's live colour, as in a block. */
+.aa-composer textarea[data-asking] { color: var(--aa-prompt, var(--ds-focus-ring, #594dff)); caret-color: var(--aa-prompt, var(--ds-focus-ring, #594dff)); }
+/* However many lines a reply takes, the avatar stands on its first line and the send on its last. */
+.aa-composer > .aa-avatar { align-self: flex-start; margin-top: calc((var(--aa-unit) - 16px * var(--aa-sf, 1)) / 2); }
+.aa-composer > .aa-composer-send { align-self: flex-end; }
+.aa-composer-send { color: var(--aa-muted); }
+.aa-composer-field[hidden] { display: none; }
+/* The field and, behind it, a copy of its words with the people named in their colour: the same type, width and wrapping, so each letter lies on its own. */
+.aa-composer-field { position: relative; display: flex; flex: 1 1 auto; min-width: 0; }
+.aa-composer-backdrop { position: absolute; inset: 0; overflow: hidden; white-space: pre-wrap; overflow-wrap: break-word; line-height: var(--aa-unit); pointer-events: none; }
+.aa-composer textarea { position: relative; }
+.aa-composer textarea[data-mentions]:not([data-asking], [data-listening]) { color: transparent; caret-color: var(--ds-text-color, currentColor); }
+/* Listening, the words heard and the breathing dot are the copy's, in the prompt's colour; the field's own letters and caret are clear. */
+.aa-composer textarea[data-listening] { color: transparent; caret-color: transparent; }
+.aa-composer-field:has(textarea[data-listening]) .aa-composer-backdrop { color: var(--aa-prompt, var(--ds-focus-ring, #594dff)); }
+.aa-composer-listening { margin-inline-start: 0.25em; color: var(--aa-placeholder, var(--ds-input-placeholder-color, light-dark(#797979, #ababab))); }
+.aa-composer textarea[data-mentions]::selection { color: transparent; }
+.aa-composer-field:has(textarea[data-asking]) .aa-composer-backdrop { visibility: hidden; }
+.aa-composer-thinking { flex: 1 1 auto; min-width: 0; line-height: var(--aa-unit); }
+.aa-composer-send:hover { color: inherit; }
+/* The people menu under the composer: the Context face, a person a row. */
+/* The people to mention: four squares wide, as every menu is, a long name fading over its last square. */
+.aa-comments-people button { justify-content: flex-start; }
+.aa-comments-people button span:last-child { flex: 1; white-space: nowrap; mask-image: linear-gradient(to right, black calc(100% - var(--aa-square)), transparent 100%); }
+@media (prefers-reduced-motion: reduce) {
+  .aa-comments[data-mode="popover"] { animation: none; }
+  .aa-comment { transition: none; }
+}
+
+/* Columns, as Notion lays them out: side by side, sharing the measure, two
+   squares apart, each written where it stands as a page of its own; one under
+   another where the measure is too narrow for them. */
+.aa-atom.aa-columns {
+  display: grid;
+  grid-template-columns: repeat(var(--aa-columns, 2), minmax(0, 1fr));
+  gap: calc(2 * var(--aa-unit));
+  width: 100%;
+  vertical-align: top;
+}
+.aa-column { min-width: 0; }
+@media (max-width: 480px) {
+  .aa-atom.aa-columns { grid-template-columns: minmax(0, 1fr); gap: var(--aa-unit); }
+}
+
+/* Tabs: a row of Design system 1's text tabs, the words alone, each tab padded
+   4px so the words stand twelve apart and the run drawn 4px back so the first
+   starts on the column's edge, the open tab in the ink and the others muted,
+   all on the sixteen of one square; a row too wide scrolls sideways rather
+   than cutting its names. The open tab's page stands a square under it, an
+   editor of its own; the plus at the row's end adds a tab. */
+.aa-atom.aa-tabs { display: block; width: 100%; vertical-align: top; }
+.aa-tabs-row { display: flex; align-items: flex-end; gap: calc(4px * var(--aa-sf)); min-height: var(--aa-unit); margin-inline-start: calc(-4px * var(--aa-sf)); line-height: calc(16px * var(--aa-sf)); white-space: nowrap; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; }
+.aa-tabs-row::-webkit-scrollbar { display: none; }
+.aa-tab { flex: none; display: inline-flex; align-items: flex-end; gap: calc(4px * var(--aa-sf)); box-sizing: border-box; height: calc(16px * var(--aa-sf)); margin: 0; padding: 0 calc(4px * var(--aa-sf)); border: 0; border-radius: var(--ds-radius, calc(4px * var(--aa-sf))); background: none; color: var(--ds-text-color-muted, GrayText); font: inherit; letter-spacing: inherit; line-height: calc(16px * var(--aa-sf)); white-space: nowrap; cursor: pointer; -webkit-user-select: none; user-select: none; }
+.aa-tab[aria-selected="true"] { color: var(--ds-text-color, inherit); }
+.aa-tab:focus-visible { outline: 2px solid var(--ds-focus-ring, currentColor); outline-offset: -2px; }
+.aa-tab-add { color: var(--ds-text-color-muted, GrayText); }
+.aa-tab-add:hover, .aa-tab-add:focus-visible { color: var(--ds-text-color, inherit); }
+.aa-tab-field { box-sizing: border-box; height: calc(16px * var(--aa-sf)); min-width: calc(2 * var(--aa-unit)); margin: 0; padding: 0; border: 0; border-bottom: 1px solid currentColor; border-radius: 0; background: none; color: var(--ds-text-color, inherit); font: inherit; letter-spacing: inherit; line-height: calc(16px * var(--aa-sf)); outline: none; }
+.aa-tab-panel { margin-top: var(--aa-unit); min-height: var(--aa-unit); }
+.aa-block[data-readonly="true"] .aa-tab { cursor: default; }
+
+/* A carried block let go at another's side stands beside it: a line down that side shows where. */
+.aa-drop-line.aa-drop-side { width: calc(2px * var(--aa-sf)); }
+/* Let go on another column, the two trade places: that column is ringed in the line's colour. */
+.aa-drop-line.aa-drop-side[data-swap] { background: none; box-shadow: inset 0 0 0 calc(2px * var(--aa-sf)) var(--ds-accent-color, var(--accent-color, var(--apple-green, Highlight))); border-radius: var(--ds-radius, calc(4px * var(--aa-sf))); }
+
+/* Pictures in columns fill their column, a square apart down it, as Notion lays out a set of pictures. */
+.aa-column .aa-atom:has(> img):not([data-width]),
+.aa-column .aa-atom[data-atom="image"]:not([data-width]) { display: block; width: 100%; max-width: 100%; }
+.aa-column .aa-atom[data-atom="image"][data-width] { display: block; }
+.aa-column .aa-atom > img { width: 100%; }
+
+/* Contents are always visible, drawn by the shared component. */
+:where(.aa-toc) { display: block; white-space: normal; }
+:where(.aa-toc ds-table-of-contents) { --ds-toc-width: 100%; }
+:where(.aa-toc-empty) { color: var(--ds-text-color-muted, GrayText); }
+
+/* Inline component illustrations share the sentence's baseline and never run app actions. */
+:where(.aa-partial) { display: inline-block; vertical-align: baseline; max-width: 100%; cursor: pointer; }
+:where(.aa-partial > ds-button) { pointer-events: none; }
+:where(.aa-partial:focus-visible) { outline: 1px solid var(--ds-focus-color, Highlight); outline-offset: 2px; }
+:where(.aa-partial-properties) { --ds-overlay-width: calc(12 * var(--ds-unit, 20px)); }
+:where(.aa-partial-properties > *) { display: block; margin-bottom: var(--ds-unit, 20px); }
+:where(.aa-partial-properties > label > ds-select) { display: block; }
+:where(.aa-partial-properties > .aa-partial-actions) { display: flex; justify-content: flex-end; gap: var(--ds-half, 10px); margin-bottom: 0; }

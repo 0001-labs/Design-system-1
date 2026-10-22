@@ -1,3 +1,4 @@
+import { OwnerSession } from "./screens/AdoptionDashboard";
 import { html } from "lit";
 import { libraryWorkspaceRedirect } from "../../shared/library-navigation";
 import { authState } from "./lib/backend";
@@ -75,6 +76,7 @@ export class AppRoot extends AppElement {
     const { pathname, hostname } = window.location;
     if (["/flags", "/flags/", "/app/flags"].includes(pathname)) return html`<ds1-feature-flags></ds1-feature-flags>`;
     if (pathname === "/app/navigation-auth") return html`<ds1-navigation-auth></ds1-navigation-auth>`;
+    if (hostname === "neweditor.c9y.site") return html`<ds1-private-preview-signin></ds1-private-preview-signin>`;
     if (hostname === "adoption.designsystem1.com") return html`<ds1-adoption-dashboard></ds1-adoption-dashboard>`;
     if (hostname === "fonts.designsystem1.com") return html`<ds1-font-workspace></ds1-font-workspace>`;
     if (hostname === "icon.designsystem1.com") return html`<ds1-icon-builder></ds1-icon-builder>`;
@@ -82,3 +84,16 @@ export class AppRoot extends AppElement {
   }
 }
 defineElement("ds1-root", AppRoot);
+
+/** Bridges the existing owner sign-in to this host's protected root. */
+class PrivatePreviewSignIn extends AppElement {
+  #session = new OwnerSession(this, "Private preview");
+  override render() {
+    const { isLoading, isAuthenticated } = authState.get();
+    if (isLoading) return splash();
+    if (!isAuthenticated) return html`<ds1-sign-in private-title="Private preview" .redirectTo=${"/signin"}></ds1-sign-in>`;
+    if (this.#session.error) return html`<main class="auth-screen"><p role="alert">${this.#session.error}</p></main>`;
+    return splash();
+  }
+}
+defineElement("ds1-private-preview-signin", PrivatePreviewSignIn);

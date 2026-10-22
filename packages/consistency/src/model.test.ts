@@ -1,0 +1,40 @@
+import { describe, expect, it } from 'vite-plus/test';
+import { CompositionHistory, dimensionValue, initialComposition, limits } from './model';
+describe('composition edits', () => {
+  it('keeps bounds in whole squares and limits', () => {
+    expect(dimensionValue('width', 639)).toBe(640);
+    expect(dimensionValue('width', 20)).toBe(280);
+    expect(dimensionValue('padding', 900)).toBe(80);
+    expect(dimensionValue('gap', NaN)).toBe(40);
+    expect(dimensionValue('gap', 840)).toBe(840);
+    expect(dimensionValue('gap', 100000)).toBe(limits.gap[1]);
+    expect(dimensionValue('gap', -20)).toBe(limits.gap[0]);
+  });
+  it('undoes a committed drag and resets redo on a new edit', () => {
+    const h = new CompositionHistory(); h.commit({ gap: 80 }); h.undo();
+    expect(h.value.gap).toBe(40); expect(h.canRedo).toBe(true);
+    h.redo(); expect(h.value.gap).toBe(80);
+    h.undo(); h.commit({ width: 400 }); expect(h.canRedo).toBe(false);
+  });
+  it('restores text, bounds and wrapping together', () => {
+    const h = new CompositionHistory(); h.commit({ text: 'Changed', wrap: false, padding: 0 });
+    h.commit(initialComposition); h.undo();
+    expect(h.value).toMatchObject({ text: 'Changed', wrap: false, padding: 0 });
+    h.undo(); expect(h.value).toEqual(initialComposition);
+  });
+  it('ignores no-op commits', () => {
+    const h = new CompositionHistory(); h.commit({ gap: 40 }); expect(h.canUndo).toBe(false);
+  });
+});
+it('vertical and horizontal spacer centres follow one physical pointer unit without floating labels', async () => {
+ const { pointerGain } = await import('./model');
+ for (const scale of [1, 1.5, 2]) {
+  for (const axis of ['vertical', 'horizontal']) {
+   const pointerDelta = 25;
+   const physicalGapChange = pointerDelta * pointerGain('gap', scale) * scale;
+   expect(physicalGapChange / 2, axis).toBeCloseTo(pointerDelta);
+   expect(pointerDelta * pointerGain('padding', scale) * scale / 2).toBeCloseTo(pointerDelta);
+  }
+  expect(pointerGain('width', scale) * scale).toBe(1);
+ }
+});

@@ -13,7 +13,7 @@ export function ownerSessionCookie(request: Request): string | null {
   return /^[A-Za-z0-9._~-]{1,8192}$/.test(token) ? `${COOKIE}=${token}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=3600` : null;
 }
 
-function sessionRequest(request: Request): Request {
+export function sessionRequest(request: Request): Request {
   if (request.headers.has('authorization')) return request;
   const token = request.headers.get('cookie')?.split(';').map(value => value.trim()).find(value => value.startsWith(`${COOKIE}=`))?.slice(COOKIE.length + 1);
   const headers = new Headers(request.headers);

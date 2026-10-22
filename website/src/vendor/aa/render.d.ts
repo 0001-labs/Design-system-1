@@ -1,15 +1,17 @@
 /**
  * A block drawn from its source, and read back from the screen. Every
- * character of the source is in the DOM as text, syntax included; syntax
- * that is not being edited is not displayed, so the caret passes over it as
- * if it were not there, and the text still reads straight back.
+ * character of the source is in the DOM as text, syntax included; syntax is
+ * never displayed, while writing either, so the caret passes over it as if it
+ * were not there, and the text still reads straight back.
  */
 import { type AtomSyntax, type Block } from './markdown';
+/** A run of a block's words drawn with a class (and a title, and attributes a layer reads back, `data-comment` say); `from === to` is a caret. */
 export type Decoration = {
     from: number;
     to: number;
     className: string;
     label?: string;
+    attributes?: Record<string, string>;
 };
 /**
  * Makes the element an atom is drawn in: a `.aa-atom` that is not editable,

@@ -1,8 +1,14 @@
 {
   "sources": {
+    "Drag": {
+      "sortable": {
+        "to": "packages/consistency/src/vendor/drag"
+      }
+    },
     "Aa": {
       "build": {
-        "to": "website/src/vendor/aa"
+        "to": "website/src/vendor/aa",
+        "entries": ["diagram"]
       }
     },
     "Feature flags": {

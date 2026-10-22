@@ -6,7 +6,8 @@ declare const AaEditorElement_base: {
 /**
  * `<aa-editor>`: the editor as an element, in the page's own DOM so the
  * page's type and colours reach it. `value` is the Markdown; `input` fires
- * on every change the person makes.
+ * on every change the person makes. With `options.correct`, words are
+ * corrected as they are written, unless `correct="off"`.
  */
 export declare class AaEditorElement extends AaEditorElement_base {
     #private;
