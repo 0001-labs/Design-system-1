@@ -16,7 +16,7 @@ await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 const browser = await chromium.launch({ headless: true });
 try {
   const base = `http://127.0.0.1:${server.address().port}/private-consistency/`;
-  for (const width of [390, 768, 1440]) {
+  for (const width of [300, 390, 768, 1440]) {
     const page = await browser.newPage({ viewport: { width, height: 1000 } });
     await page.goto(base); await page.waitForSelector('.consistency-sheet');
     const check = async label => {
@@ -24,6 +24,23 @@ try {
       if (result.scroll > result.client || result.left !== 0) throw Error(`${width}px ${label}: document ${result.scroll}px exceeds viewport ${result.client}px`);
     };
     await check('initial');
+    const checkInset = async mobile => {
+      await page.waitForTimeout(100);
+      const result = await page.evaluate(() => {
+        const editor = document.querySelector('consistency-editor'), sheet = editor.querySelector('.consistency-sheet'), stage = editor.querySelector('.consistency-stage');
+        const style = getComputedStyle(sheet), scale = Number.parseFloat(style.getPropertyValue('--sf')) || 1;
+        const bounds = sheet.getBoundingClientRect(), text = editor.querySelector('.consistency-text-bounds').getBoundingClientRect();
+        return { savedPadding: editor.history.value.padding, left: Number.parseFloat(style.paddingLeft) / scale, right: Number.parseFloat(style.paddingRight) / scale, textInset: (text.left - bounds.left) / scale, stageClient: stage.clientWidth, stageScroll: stage.scrollWidth };
+      });
+      if (result.savedPadding < 20 || result.left < 20 || result.right < 20 || result.textInset < 20 - .5) throw Error(`${width}px: zero saved padding removed website text inset: ${JSON.stringify(result)}`);
+      if (mobile && result.stageScroll > result.stageClient + 1) throw Error(`${width}px: mobile preview scrolls sideways: ${JSON.stringify(result)}`);
+      await check(mobile ? 'zero padding mobile inset' : 'zero padding desktop inset');
+    };
+    await page.evaluate(async () => { const editor = document.querySelector('consistency-editor'); editor.history.commit({ padding: 0 }); editor.requestUpdate(); await editor.updateComplete; });
+    await checkInset(false);
+    await page.getByRole('button', { name: 'Mobile preview', exact: true }).click(); await checkInset(true);
+    await page.getByRole('button', { name: 'Desktop preview', exact: true }).click();
+
     await page.locator('select[aria-label="Library preset"]').selectOption('bold');
     await page.evaluate(() => { const editor = document.querySelector('consistency-editor'); editor.history.commit({ width: 960, sizes: { bookshop: { width: 800, height: 400 } }, text: '```c9y-button\n{"label":"Read more","secondary":false}\n```' }); editor.requestUpdate(); });
     await page.locator('.consistency-content-button').waitFor();
@@ -67,6 +84,9 @@ try {
     await readable('minimum width with excessive padding and gaps');
     await page.getByRole('button', { name: 'Mobile preview', exact: true }).click();
     await readable('minimum width in mobile preview');
+    // The narrow-phone addition covers inset, containment and readable content;
+    // the established hover-preview matrix remains 390, 768 and 1440px.
+    if (width === 300) { console.log('Viewport 300px: zero-padding inset, mobile stage fit and readable content passed'); await page.close(); continue; }
     await page.reload(); await page.waitForSelector('.consistency-sheet');
     for (const preset of ['original', 'bold']) {
       await page.locator('select[aria-label="Library preset"]').selectOption(preset);

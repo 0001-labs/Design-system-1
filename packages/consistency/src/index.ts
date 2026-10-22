@@ -82,8 +82,8 @@ export class ConsistencyEditor extends LitElement {
     else this.history.commit({ [key]: dimensionValue(key, value) });
     this.preview = {}; this.revision++;
   }
-  private range(key: Dimension) { return compositionRange(key, this.mobilePreview ? Math.max(240, Math.min(380, this.stageWidth)) : this.history.value.width, this.history.value.padding); }
-  private stacked(id: string) { const width = this.mobilePreview ? Math.max(240, Math.min(380, this.stageWidth)) : this.value('width'); const bounds = compositionBounds(width, this.value('padding'), false, this.mobilePreview ? 240 : 280); const gap = this.value('gap', id); const minimum = id === 'stats-columns' ? READABLE_TEXT_MIN * 2 : ['bookshop', 'kitchen'].reduce((sum, key) => sum + Math.max(READABLE_CARD_MIN, this.history.value.sizes[key]?.width ?? READABLE_CARD_MIN), 0); return this.mobilePreview || minimum + gap > bounds.width - 2 * bounds.padding; }
+  private range(key: Dimension) { return compositionRange(key, this.mobilePreview ? Math.max(280, Math.min(380, this.stageWidth)) : this.history.value.width, this.history.value.padding); }
+  private stacked(id: string) { const width = this.mobilePreview ? Math.max(280, Math.min(380, this.stageWidth)) : this.value('width'); const bounds = compositionBounds(width, this.value('padding'), false, 280); const gap = this.value('gap', id); const minimum = id === 'stats-columns' ? READABLE_TEXT_MIN * 2 : ['bookshop', 'kitchen'].reduce((sum, key) => sum + Math.max(READABLE_CARD_MIN, this.history.value.sizes[key]?.width ?? READABLE_CARD_MIN), 0); return this.mobilePreview || minimum + gap > bounds.width - 2 * bounds.padding; }
   private enabled(key: Dimension) { if (key === 'width' && this.mobilePreview) return false; return key === 'gap' ? this.layers.spacing : this.layers.boundaries; }
   private toggle(layer: keyof typeof this.layers) {
     this.cancelMarquee?.(); this.sort?.cancel(); this.settle.cancel(); this.preview = {};
@@ -310,8 +310,8 @@ export class ConsistencyEditor extends LitElement {
   }
   render() {
     const doc = this.history.value;
-    const requestedWidth = this.mobilePreview ? Math.max(240, Math.min(380, this.stageWidth)) : this.value('width');
-    const { width, padding } = compositionBounds(requestedWidth, this.value('padding'), this.mobilePreview, this.mobilePreview ? 240 : 280);
+    const requestedWidth = this.mobilePreview ? Math.max(280, Math.min(380, this.stageWidth)) : this.value('width');
+    const { width, padding } = compositionBounds(requestedWidth, this.value('padding'), this.mobilePreview, 280);
     return html`<div class="consistency-shell ${this.mobilePreview ? 'consistency-mobile-preview' : ''} ${this.layers.spacing ? '' : 'spacing-off'} ${this.layers.boundaries ? '' : 'boundaries-off'} ${this.layers.reorder ? 'reorder-on' : ''} ${this.layers.production ? 'production-on' : ''}">
       <header class="consistency-top"><span class="consistency-name"><span class="consistency-tag">Consistency</span></span><div class="consistency-actions">
         <ds-button aria-pressed=${String(this.mobilePreview)} @click=${() => { this.mobilePreview = !this.mobilePreview; this.preview = {}; }}>${this.mobilePreview ? 'Desktop preview' : 'Mobile preview'}</ds-button>

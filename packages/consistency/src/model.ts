@@ -12,7 +12,7 @@ export const initialComposition: Composition = { statDesigns: {}, buttonDesigns:
     contact: '## Have something in mind?\n\nA rough idea is enough to begin. Tell us what you are thinking about, who it is for and what you would like to change.\n\nThere is always room for a good conversation.',
   },
   text: '# A place for what comes next\n\nBring the words, the shape and the space between them together. A small studio for things worth making.\n\nMake room for a new idea.' };
-export const limits: Record<Dimension, [number, number]> = { width: [280, 960], padding: [0, 80], gap: [0, 2000] };
+export const limits: Record<Dimension, [number, number]> = { width: [280, 960], padding: [20, 80], gap: [0, 2000] };
 export function dimensionValue(key: Dimension, value: number): number {
   const [min, max] = limits[key];
   return Number.isFinite(value) ? Math.min(max, Math.max(min, Math.round(value / 20) * 20)) : initialComposition[key];
@@ -22,7 +22,7 @@ export class CompositionHistory {
   value: Composition;
   private past: Composition[] = [];
   private future: Composition[] = [];
-  constructor(value = initialComposition) { this.value = { ...value }; }
+  constructor(value = initialComposition) { this.value = { ...value, ...compositionBounds(value.width, value.padding) }; }
   get canUndo() { return this.past.length > 0; }
   get canRedo() { return this.future.length > 0; }
   commit(patch: Partial<Composition>) {
@@ -52,17 +52,17 @@ export function removeSourceRanges(source: string, ranges: readonly { start: num
 
 export const READABLE_TEXT_MIN = 200;
 export const READABLE_CARD_MIN = 240;
-/** Authored bounds always leave a readable column; padding yields first. */
+/** Every website keeps one square inside its edges and a readable column. */
 export function compositionBounds(width: number, padding: number, snap = true, minimumWidth = limits.width[0]) {
- const rawWidth = Number.isFinite(width) ? Math.min(limits.width[1], Math.max(minimumWidth, width)) : initialComposition.width;
+ const rawWidth = Number.isFinite(width) ? Math.min(limits.width[1], Math.max(280, minimumWidth, width)) : initialComposition.width;
  const safeWidth = snap ? Math.round(rawWidth / 20) * 20 : rawWidth;
  const room = Math.max(0, (safeWidth - READABLE_CARD_MIN) / 2);
  const maxPadding = snap ? Math.floor(room / 20) * 20 : room;
- const safePadding = snap ? dimensionValue('padding', padding) : Math.max(0, Math.min(80, padding));
+ const safePadding = snap ? dimensionValue('padding', padding) : Math.max(20, Math.min(80, padding));
  return { width: safeWidth, padding: Math.min(safePadding, maxPadding) };
 }
 export function compositionRange(key: Dimension, width: number, padding: number): [number, number] {
  if (key === 'width') return [Math.max(limits.width[0], READABLE_CARD_MIN + 2 * padding), limits.width[1]];
- if (key === 'padding') return [0, Math.min(limits.padding[1], Math.max(0, Math.floor((width - READABLE_CARD_MIN) / 40) * 20))];
+ if (key === 'padding') return [20, Math.min(limits.padding[1], Math.max(0, Math.floor((width - READABLE_CARD_MIN) / 40) * 20))];
  return limits.gap;
 }

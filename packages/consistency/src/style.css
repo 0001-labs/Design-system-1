@@ -205,3 +205,6 @@ consistency-editor,.consistency-shell{width:100%;max-width:100%;min-width:0}
 .production-on .consistency-sheet :is([data-composition-selected],[data-selectable][data-selected]:not(.aa-block))::after{content:'';position:absolute;inset:0;z-index:20;pointer-events:none;border:0;outline:0;border-radius:inherit;background:color-mix(in srgb,var(--ds-pink) 14%,transparent)}
 
 .consistency-shell :is(.consistency-card-gap,.consistency-stat-gap)[aria-valuenow="0"]{background:linear-gradient(to bottom,transparent calc(50% - .5px),var(--ds-pink) calc(50% - .5px),var(--ds-pink) calc(50% + .5px),transparent calc(50% + .5px))}
+/* Keep the phone website's one-square inner inset without buying that room
+   with a horizontal scrollbar: the surrounding workspace yields first. */
+@media(max-width:340px){.consistency-workspace{padding-inline:0}}

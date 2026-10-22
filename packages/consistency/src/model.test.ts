@@ -17,9 +17,9 @@ describe('composition edits', () => {
     h.undo(); h.commit({ width: 400 }); expect(h.canRedo).toBe(false);
   });
   it('restores text, bounds and wrapping together', () => {
-    const h = new CompositionHistory(); h.commit({ text: 'Changed', wrap: false, padding: 0 });
+    const h = new CompositionHistory(); h.commit({ text: 'Changed', wrap: false, padding: 20 });
     h.commit(initialComposition); h.undo();
-    expect(h.value).toMatchObject({ text: 'Changed', wrap: false, padding: 0 });
+    expect(h.value).toMatchObject({ text: 'Changed', wrap: false, padding: 20 });
     h.undo(); expect(h.value).toEqual(initialComposition);
   });
   it('ignores no-op commits', () => {
@@ -50,10 +50,19 @@ it('deletes disjoint selected blocks as one undoable edit and preserves untouche
 it('keeps readable content when bounds are too narrow for requested padding', async () => {
  const { compositionBounds, compositionRange } = await import('./model');
  expect(compositionBounds(280,80)).toEqual({width:280,padding:20});
- expect(compositionBounds(240,80,false,240)).toEqual({width:240,padding:0});
+ expect(compositionBounds(240,80,false,240)).toEqual({width:280,padding:20});
  expect(compositionRange('width',640,80)[0]).toBe(400);
  expect(compositionRange('padding',280,80)[1]).toBe(20);
  expect(compositionBounds(301,31,false)).toEqual({width:301,padding:30.5});
  const history = new CompositionHistory();history.commit({width:280,padding:80,sizes:{bookshop:{width:80,height:80}}});
  expect(history.value.padding).toBe(20);expect(history.value.sizes.bookshop.width).toBe(240);
+});
+
+it('keeps one square of inset for zero saved padding and mobile bounds', async () => {
+ const { compositionBounds, compositionRange } = await import('./model');
+ const history = new CompositionHistory({ ...initialComposition, width:280, padding:0 });
+ expect(history.value.padding).toBe(20);history.commit({padding:0});expect(history.value.padding).toBe(20);
+ expect(compositionBounds(260,0,true,240)).toEqual({width:280,padding:20});
+ expect(compositionBounds(640,20.5,false).padding).toBe(20.5);
+ expect(compositionRange('padding',280,0)).toEqual([20,20]);
 });
