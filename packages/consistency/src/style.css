@@ -145,3 +145,43 @@ consistency-editor{display:block;--ds-sf:var(--sf);color:var(--ds-text-color);fo
 /* The website grid belongs to its scrolling content, never the workspace. */
 .consistency-stage{background-image:none}
 .consistency-shell:not(.production-on) .consistency-sheet{background-image:radial-gradient(var(--ds-border-color,#ccc) .5px,transparent .5px);background-size:var(--u) var(--u);background-attachment:local}
+
+/* A presentation of this same document at nineteen squares; authored desktop
+   bounds and card sizes stay in document history and return with the wide view. */
+.consistency-mobile-preview .consistency-sheet{max-width:round(down,100%,var(--u));--composition-content-width:calc(380px * var(--sf) - 2 * var(--composition-padding))}
+.consistency-mobile-preview .consistency-projects{display:flex;flex-direction:column;align-items:stretch}
+.consistency-mobile-preview .consistency-projects>.consistency-gap--horizontal{width:100%!important;height:var(--composition-gap)}
+.consistency-mobile-preview .consistency-projects>.consistency-gap--horizontal .ghost-surface--gap{width:100%;height:max(var(--u),var(--composition-gap));left:0;top:50%;transform:translateY(-50%);cursor:ns-resize}
+.consistency-mobile-preview .consistency-sheet ds-card{width:100%!important;max-width:100%;height:auto!important;min-height:var(--ds-card-height,0px);overflow-wrap:anywhere}
+.consistency-mobile-preview .consistency-sheet .consistency-content-card{display:block;max-width:100%}
+.consistency-mobile-preview .consistency-sheet .aa-atom[data-atom="image"]{max-width:100%!important}
+.consistency-mobile-preview .consistency-sheet aa-editor,.consistency-mobile-preview .consistency-sheet .aa-block{max-width:100%;overflow-wrap:anywhere}
+.consistency-mobile-preview .consistency-sample-actions,.consistency-mobile-preview .consistency-statistics{flex-wrap:wrap}
+.consistency-mobile-preview .consistency-sample-actions>.consistency-gap--horizontal{max-width:var(--u)}
+.consistency-mobile-preview .consistency-statistics>ds-stat{width:100%!important;flex:none!important}
+.consistency-mobile-preview .consistency-statistics>.consistency-gap--horizontal{width:100%!important;height:var(--composition-gap)}
+.consistency-mobile-preview .consistency-width{display:none}
+.consistency-mobile-preview .consistency-button-action{max-width:100%;flex-wrap:wrap;white-space:normal}
+@media(max-width:760px){.consistency-top,.consistency-actions{flex-wrap:wrap}.consistency-top{align-items:flex-start}.consistency-actions{gap:var(--u);max-width:100%}.consistency-workspace{padding-inline:var(--u)}.consistency-bar>span:first-child{overflow-wrap:anywhere}.consistency-footer{overflow-wrap:anywhere}}
+.consistency-mobile-preview .consistency-statistics>.consistency-gap{width:100%}
+/* Device emulation uses the website's logical pixels, independently of the
+   editor chrome's enlarged touch scale. A narrower host still fits the canvas. */
+.consistency-mobile-preview .consistency-sheet{--sf:1;--ds-sf:1;--u:20px;--ds-unit:20px}
+.consistency-actions ds-button[aria-pressed]{--ds-button-width:calc(6 * var(--u))}
+/* Bold's public control token gives the real DS1 face two squares. Authored
+   website buttons use eight-square widths; the editor's own controls do not. */
+.consistency-sheet[data-consistency-library="bold"] ds-button{--ds-button-width:calc(8 * var(--ds-unit));min-width:min(calc(8 * var(--ds-unit)),100%)}
+.consistency-element-preview[data-consistency-library="bold"] ds-button{--ds-button-width:calc(8 * var(--ds-unit))}
+.consistency-element-preview[data-consistency-library="bold"] .consistency-element-preview-stage ds-button{grid-column:3 / span 8;grid-row:4 / span 2}
+.consistency-mobile-preview .consistency-sheet[data-consistency-library="bold"] .consistency-sample-actions{row-gap:var(--ds-unit)}
+/* Palette card fills are pastel even in the Ink library. Their words use the
+   public text roles locally; outlined cards retain the surrounding paper's ink. */
+:is(.consistency-sheet,.consistency-element-preview) ds-card[tone]:not([tone=""]):not([tone="ink"]):not([variant="outlined"]){--ds-text-color:var(--ds-black);--ds-text-color-muted:color-mix(in srgb,var(--ds-black) 65%,transparent)}
+/* The editor never owns a page-wide horizontal scrollbar. Wide authored pages
+   scroll inside their stage; chrome remains a shrinkable, wrapping layout. */
+consistency-editor,.consistency-shell{width:100%;max-width:100%;min-width:0}
+.consistency-workspace>*{min-width:0;max-width:100%}
+.consistency-stage{overflow-x:auto;min-width:0;max-width:100%}
+.consistency-top,.consistency-bar,.consistency-footer,.consistency-actions{min-width:0;max-width:100%;flex-wrap:wrap}
+.consistency-inspector,.consistency-inspector label,.consistency-inspector p{min-width:0;max-width:100%;overflow-wrap:anywhere}
+.consistency-inspector ds-select,.consistency-inspector ds-number{max-width:100%}

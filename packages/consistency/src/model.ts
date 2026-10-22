@@ -1,6 +1,7 @@
+import { linkCardDesign, type CardDesign } from './card-design';
 export type Dimension = 'width' | 'padding' | 'gap';
-export interface Composition { sizes: Record<string, { width: number; height: number }>;  width: number; padding: number; gap: number; wrap: boolean; text: string; sections: Record<string, string>; gaps: Record<string, number>; order: string[]; hidden: string[] }
-export const initialComposition: Composition = { sizes: {}, width: 640, padding: 40, gap: 40, wrap: true,
+export interface Composition { pageTone?: string; consistency: boolean; cardDesigns: Record<string, CardDesign>; linkedCardDesign?: CardDesign; cardGaps: Record<string, Record<string, number>>; sizes: Record<string, { width: number; height: number }>;  width: number; padding: number; gap: number; wrap: boolean; text: string; sections: Record<string, string>; gaps: Record<string, number>; order: string[]; hidden: string[] }
+export const initialComposition: Composition = { linkedCardDesign: undefined, pageTone: '', consistency: true, cardDesigns: {}, cardGaps: {}, sizes: {}, width: 640, padding: 40, gap: 40, wrap: true,
   hidden: [],
   order: ['intro', 'work', 'approach', 'contact'],
   gaps: { 'intro-actions': 40, 'intro-work': 40, 'work-cards': 40, 'work-approach': 40, 'approach-stats': 40, 'approach-contact': 40, 'contact-card': 40, 'contact-action': 40, 'projects-columns': 20, 'stats-columns': 40, 'actions-columns': 20 },
@@ -24,7 +25,7 @@ export class CompositionHistory {
   get canUndo() { return this.past.length > 0; }
   get canRedo() { return this.future.length > 0; }
   commit(patch: Partial<Composition>) {
-    const next = { ...this.value, ...patch };
+    const next = linkCardDesign(this.value, { ...this.value, ...patch });
     if (JSON.stringify(next) === JSON.stringify(this.value)) return;
     this.past.push(this.value); this.past = this.past.slice(-100);
     this.value = next; this.future = [];

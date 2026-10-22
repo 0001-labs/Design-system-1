@@ -12,7 +12,7 @@ import cursorIcon from '../../../DS1/x-icon/cursor.svg?raw';
 provideIcons({ cursor: cursorIcon });
 import '../../../DS1/4-page/ds-overlay';
 
-export type ContentElement = { kind: 'button'; label: string; secondary: boolean; action?: { kind: 'link' | 'page'; target: string } } | { kind: 'card'; label: string; title: string; body: string; tone?: string; variant?: 'filled' | 'outlined'; width?: number; height?: number };
+export type ContentElement = { kind: 'button'; label: string; secondary: boolean; action?: { kind: 'link' | 'page'; target: string } } | { kind: 'card'; label: string; title: string; body: string; tone?: string; variant?: 'filled' | 'outlined'; width?: number; height?: number; gaps?: Record<string, number> };
 const defaults: Record<ContentElement['kind'], ContentElement> = {
   button: { kind: 'button', label: 'Get in touch', secondary: false },
   card: { kind: 'card', label: 'A new idea', title: 'Something worth making', body: 'Write a little about it.' },
@@ -36,7 +36,7 @@ export function readContentElement(source: string): ContentElement | null {
     const data = value as Record<string, unknown>;
     if (!text(data.label, 200)) return null;
     if (match[1] === 'button') return typeof data.secondary === 'boolean' ? { kind: 'button', label: data.label, secondary: data.secondary, ...(readAction(data.action) ? { action: readAction(data.action)! } : {}) } : null;
-    return text(data.title, 500) && text(data.body, 5000) ? { kind: 'card', label: data.label, title: data.title, body: data.body, ...(typeof data.width === 'number' && Number.isFinite(data.width) && data.width >= 80 && data.width <= 2000 ? { width: data.width } : {}), ...(typeof data.height === 'number' && Number.isFinite(data.height) && data.height >= 80 && data.height <= 2000 ? { height: data.height } : {}), ...(typeof data.tone === 'string' && tones.includes(data.tone) ? { tone: data.tone } : {}), ...(data.variant === 'filled' || data.variant === 'outlined' ? { variant: data.variant } : {}) } : null;
+    return text(data.title, 500) && text(data.body, 5000) ? { kind: 'card', label: data.label, title: data.title, body: data.body, ...(data.gaps && typeof data.gaps === 'object' ? { gaps: Object.fromEntries(Object.entries(data.gaps).filter(([key, value]) => ['label', 'title', 'footer'].includes(key) && typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 2000)) as Record<string, number> } : {}), ...(typeof data.width === 'number' && Number.isFinite(data.width) && data.width >= 80 && data.width <= 2000 ? { width: data.width } : {}), ...(typeof data.height === 'number' && Number.isFinite(data.height) && data.height >= 80 && data.height <= 2000 ? { height: data.height } : {}), ...(typeof data.tone === 'string' && tones.includes(data.tone) ? { tone: data.tone } : {}), ...(data.variant === 'filled' || data.variant === 'outlined' ? { variant: data.variant } : {}) } : null;
   } catch { return null; }
 }
 export function writeContentElement(value: ContentElement): string {
@@ -52,6 +52,7 @@ function paint(face: HTMLElement, value: ContentElement) {
     const label = face.ownerDocument.createElement('span'); label.slot = 'label'; label.textContent = value.label;
     const title = face.ownerDocument.createElement('span'); title.slot = 'title'; title.textContent = value.title;
     const body = face.ownerDocument.createElement('p'); body.textContent = value.body;
+    for (const [key, gap] of Object.entries(value.gaps ?? {})) face.style.setProperty(`--ds-card-${key}-gap`, `calc(${gap}px * var(--sf))`);
     face.append(label, title, body); face.setAttribute('variant', value.variant ?? 'outlined'); if (value.tone) face.setAttribute('tone', value.tone); face.setAttribute('data-ds-prose', ''); face.setAttribute('height', String((value.height ?? 160) / 20)); if (value.width) face.style.width = `calc(${value.width}px * var(--sf))`; if (value.height) face.style.height = `calc(${value.height}px * var(--sf))`;
   }
 }
@@ -120,13 +121,15 @@ export function contentElementAtoms(canWrite: () => boolean, getHost: () => HTML
       // Commit at the end of a field edit so Aa records one normal atom history entry.
       const resize = (event: Event) => { if (value?.kind !== 'card' || !canWrite()) return; const size = (event as CustomEvent<{ width: number; height: number }>).detail; value = { ...value, width: size.width, height: size.height }; commit(); };
       element.addEventListener('consistency-resize', resize);
+      const gap = (event: Event) => { if (value?.kind !== 'card' || !canWrite()) return; const detail = (event as CustomEvent<{ key: string; value: number; height: number }>).detail; value = { ...value, gaps: { ...value.gaps, [detail.key]: detail.value }, height: detail.height }; commit(); };
+      element.addEventListener('consistency-card-gap', gap);
       const blur = (event: FocusEvent) => { if (nodes.some(node => node.contains(event.target as Node))) commit(); };
       element.addEventListener('focusout', blur);
       let actionBar: HTMLElement | undefined;
       let actionChoice: HTMLSelectElement | undefined;
       let actionTarget: HTMLElementTagNameMap['ds-input'] | undefined;
       if (value.kind === 'button') {
-        actionBar = doc.createElement('div'); actionBar.className = 'consistency-button-action'; actionBar.hidden = true;
+        actionBar = doc.createElement('div'); actionBar.className = 'consistency-button-action'; actionBar.inert = true; actionBar.setAttribute('aria-hidden', 'true');
         actionBar.setAttribute('role', 'toolbar'); actionBar.setAttribute('aria-label', 'Button action'); actionBar.setAttribute('data-aa-interactive', '');
         const select = doc.createElement('ds-select'); actionChoice = doc.createElement('select'); actionChoice.setAttribute('aria-label', 'Button action type');
         for (const [key, label] of [['none', 'No action'], ['link', 'Open a link'], ['page', 'Open a page']]) { const option = doc.createElement('option'); option.value = key; option.textContent = label; actionChoice.append(option); }
@@ -144,9 +147,24 @@ export function contentElementAtoms(canWrite: () => boolean, getHost: () => HTML
         actionTarget.placeholder = value.action?.kind === 'page' ? '/about' : 'https://example.com'; field.hidden = !value.action;
         actionBar.append(select, field); element.append(actionBar);
       }
-      const focus = () => { if (actionBar && canWrite()) actionBar.hidden = false; };
-      const leave = () => queueMicrotask(() => { if (actionBar && !element.contains(doc.activeElement)) actionBar.hidden = true; });
+      let hover = false, leaveTimer: ReturnType<typeof setTimeout> | undefined;
+      const showAction = (keyboard = false) => {
+        if (!actionBar || !canWrite()) return;
+        clearTimeout(leaveTimer); actionBar.inert = false; actionBar.removeAttribute('aria-hidden');
+        actionBar.toggleAttribute('data-keyboard', keyboard); actionBar.setAttribute('data-open', '');
+      };
+      const focus = () => showAction(true);
+      const leave = () => {
+        clearTimeout(leaveTimer);
+        leaveTimer = setTimeout(() => {
+          if (!actionBar || hover || element.contains(doc.activeElement)) return;
+          actionBar.removeAttribute('data-open'); actionBar.inert = true; actionBar.setAttribute('aria-hidden', 'true');
+        }, 150);
+      };
+      const enter = (event: PointerEvent) => { if (event.pointerType === 'touch') return; hover = true; showAction(); };
+      const pointerLeave = () => { hover = false; leave(); };
       element.addEventListener('focusin', focus); element.addEventListener('focusout', leave);
+      element.addEventListener('pointerenter', enter); element.addEventListener('pointerleave', pointerLeave);
       const menu = doc.createElement('ds-context');
       menu.setAttribute('data-aa-interactive', ''); menu.setAttribute('aria-label', `${kind} appearance`);
       const option = (label: string, change: () => void) => {
@@ -167,7 +185,7 @@ export function contentElementAtoms(canWrite: () => boolean, getHost: () => HTML
         element.setAttribute('role', 'group'); element.setAttribute('aria-label', kind === 'button' ? 'Button' : 'Card');
         editors.forEach(editor => { editor.readOnly = !canWrite(); });
         face.inert = !canWrite();
-        if (!canWrite()) menu.open = false;
+        if (!canWrite()) { menu.open = false; if (actionBar) { actionBar.inert = true; actionBar.removeAttribute('data-open'); actionBar.setAttribute('aria-hidden', 'true'); } }
       };
       refresh();
       const observer = new MutationObserver(refresh);
@@ -188,7 +206,7 @@ export function contentElementAtoms(canWrite: () => boolean, getHost: () => HTML
         if (event.key === 'Backspace' || event.key === 'Delete') { event.preventDefault(); event.stopPropagation(); element.dispatchEvent(new CustomEvent('aa-atom-source', { bubbles: true, detail: { source: '' } })); }
       };
       element.addEventListener('contextmenu', context); element.addEventListener('keydown', key);
-      return () => { observer.disconnect(); element.removeEventListener('consistency-resize', resize); element.removeEventListener('focusin', focus); element.removeEventListener('focusout', leave); editors.forEach(editor => editor.destroy()); menu.remove(); element.removeEventListener('focusout', blur); element.removeEventListener('contextmenu', context); element.removeEventListener('keydown', key); };
+      return () => { clearTimeout(leaveTimer); element.removeEventListener('pointerenter', enter); element.removeEventListener('pointerleave', pointerLeave); observer.disconnect(); element.removeEventListener('consistency-resize', resize); element.removeEventListener('consistency-card-gap', gap); element.removeEventListener('focusin', focus); element.removeEventListener('focusout', leave); editors.forEach(editor => editor.destroy()); menu.remove(); element.removeEventListener('focusout', blur); element.removeEventListener('contextmenu', context); element.removeEventListener('keydown', key); };
     },
   }));
 }

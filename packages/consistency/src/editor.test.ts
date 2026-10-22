@@ -153,7 +153,7 @@ test('Reorder and Place independently control every Aa instance without disablin
 test('library preset selector applies shared DS1 component roles only to the composition', async () => {
  const editor = new ConsistencyEditor(); document.body.append(editor); await editor.updateComplete;
  const select = editor.querySelector('[aria-label="Library preset"]') as HTMLSelectElement;
- expect(select.options.length).toBe(3); expect(editor.library).toBe('original');
+ expect(Array.from(select.options, option => option.value)).toEqual(['original', 'blue', 'ink', 'soft', 'bold', 'editorial']); expect(editor.library).toBe('original');
  select.value = 'blue'; select.dispatchEvent(new Event('change', { bubbles: true })); await editor.updateComplete;
  const sheet = editor.querySelector('.consistency-sheet') as HTMLElement;
  expect(sheet.dataset.consistencyLibrary).toBe('blue'); expect(sheet.style.getPropertyValue('--ds-button-background-color-primary')).toBe('var(--ds-sharp-blue)');

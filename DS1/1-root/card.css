@@ -105,7 +105,7 @@
 }
 
 .ds-card__label {
-  margin: 0;
+  margin: 0 0 var(--ds-card-label-gap, 0px);
   padding-top: calc(4px * var(--ds-sf, 1));
   color: var(--ds-card-muted);
   font: inherit;
@@ -113,7 +113,7 @@
 }
 
 .ds-card__title {
-  margin: 0;
+  margin: 0 0 var(--ds-card-title-gap, 0px);
   color: var(--ds-card-ink);
   font-family: var(--ds-typeface-medium);
   font-size: var(--ds-type-size-display);
@@ -207,3 +207,6 @@ a.ds-card:active::after,
 .ds-card[data-interactive]:active::after {
   background: color-mix(in srgb, var(--ds-card-ink) 8%, transparent);
 }
+
+/* Optional spacing before a slotted footer tag; zero preserves the normal card. */
+.ds-card__body ::slotted(ds-tag) { margin-block-start: var(--ds-card-footer-gap, 0px); }

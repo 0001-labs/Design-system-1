@@ -8,3 +8,10 @@
 .consistency-button-action{position:absolute;z-index:10;left:0;top:calc(100% + var(--ds-unit)/2);display:flex;align-items:center;gap:calc(var(--ds-unit)/2);padding:calc(var(--ds-unit)/2);background:var(--ds-paper);outline:1px solid var(--ds-border-color);border-radius:var(--ds-radius);white-space:nowrap}
 .consistency-button-action[hidden]{display:none}
 .consistency-button-action ds-input{--ds-input-width:calc(12 * var(--ds-unit))}
+.consistency-button-action{opacity:0;visibility:hidden;pointer-events:none}
+.consistency-button-action[data-open]{opacity:1;visibility:visible;pointer-events:auto}
+.consistency-button-action::before{content:'';position:absolute;left:0;right:0;top:calc(-1 * var(--ds-unit)/2);height:calc(var(--ds-unit)/2)}
+@media(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){.consistency-button-action:not([data-keyboard]){transition:opacity 100ms ease,visibility 0s linear 100ms}.consistency-button-action[data-open]{transition-delay:0s}}
+.consistency-button-action{--ds-control-size:16px;--ds-text-size:14px;--ds-corner-size:4px;--ds-button-inset:4px}
+.consistency-button-action{max-width:min(calc(18 * var(--ds-unit)),calc(100vw - 2 * var(--ds-unit)));flex-wrap:wrap}
+.consistency-button-action ds-input,.consistency-button-action ds-select{max-width:100%;min-width:0}

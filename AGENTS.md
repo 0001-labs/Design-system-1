@@ -27,6 +27,8 @@ Exception agreed 22 October 2026: the private `packages/consistency` workspace i
 
 The first preview lives at `https://neweditor.c9y.site`, using this site's existing server-checked owner session. Source is `packages/consistency`; its assets are excluded from the public npm package and denied on other hosts. It edits a page-local sample, not customer sites. Follow **Direct editing surfaces** in the design-system-1 skill: the interaction design is still being tested before adoption elsewhere.
 
+The Consistency editor must never create a full-page horizontal scrollbar. Header, toolbars and inspector fit and wrap within the viewport. A deliberately wider authored website may scroll horizontally only inside its canvas stage; mobile preview fits the stage. Do not mask layout failures with root `overflow-x: hidden`. After changing the editor layout, library geometry or popups, run `vp run consistency:test:viewport` before release: the local browser contract covers 390, 768 and 1440px, a wide authored page, Bold controls, the open action toolbar and mobile preview.
+
 Design system 1 is a general design system anyone can use. Never name 0001's products (Ezo, Link, Consistency, Peer, Ins, tau99, Visual, the 0001 site, …) anywhere in it: not in components, their comments, CSS, tests, examples, docs, the website or the skill's rules for a component. Describe what a component does and how it looks on its own terms ("filled with a colour", "one control high"), never by the product it came from ("Link's fill", "Ezo's badge size"). The products' own briefs are where they say what they take from it.
 
 ## Stack
