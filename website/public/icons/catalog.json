@@ -7,6 +7,13 @@
     "shapes": 3
   },
   {
+    "key": "android",
+    "name": "Android",
+    "source": "Library",
+    "url": "/icons/library/android.svg",
+    "shapes": 7
+  },
+  {
     "key": "app",
     "name": "App",
     "source": "Library",
@@ -243,6 +250,13 @@
     "source": "Library",
     "url": "/icons/library/chevron-up.svg",
     "shapes": 1
+  },
+  {
+    "key": "chrome",
+    "name": "Chrome",
+    "source": "Library",
+    "url": "/icons/library/chrome.svg",
+    "shapes": 5
   },
   {
     "key": "close",
@@ -560,6 +574,13 @@
     "shapes": 2
   },
   {
+    "key": "edge-brand",
+    "name": "Edge",
+    "source": "Library",
+    "url": "/icons/library/edge-brand.svg",
+    "shapes": 4
+  },
+  {
     "key": "email",
     "name": "Email",
     "source": "Library",
@@ -629,6 +650,13 @@
     "source": "Library",
     "url": "/icons/library/figma.svg",
     "shapes": 3
+  },
+  {
+    "key": "firefox",
+    "name": "Firefox",
+    "source": "Library",
+    "url": "/icons/library/firefox.svg",
+    "shapes": 2
   },
   {
     "key": "flame",
@@ -995,6 +1023,13 @@
     "shapes": 5
   },
   {
+    "key": "linux",
+    "name": "Linux",
+    "source": "Library",
+    "url": "/icons/library/linux.svg",
+    "shapes": 1
+  },
+  {
     "key": "list-line",
     "name": "List",
     "source": "Figma",
@@ -1243,6 +1278,13 @@
     "shapes": 1
   },
   {
+    "key": "opera",
+    "name": "Opera",
+    "source": "Library",
+    "url": "/icons/library/opera.svg",
+    "shapes": 2
+  },
+  {
     "key": "up-right",
     "name": "Outbound",
     "source": "Library",
@@ -1488,6 +1530,13 @@
     "node": "116:231",
     "url": "/icons/interface/row.svg",
     "shapes": 1
+  },
+  {
+    "key": "safari",
+    "name": "Safari",
+    "source": "Library",
+    "url": "/icons/library/safari.svg",
+    "shapes": 2
   },
   {
     "key": "safe",
@@ -1959,6 +2008,13 @@
     "source": "Library",
     "url": "/icons/library/window.svg",
     "shapes": 2
+  },
+  {
+    "key": "windows",
+    "name": "Windows",
+    "source": "Library",
+    "url": "/icons/library/windows.svg",
+    "shapes": 3
   },
   {
     "key": "work",

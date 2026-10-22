@@ -16,6 +16,7 @@ public enum DS1IconName: String, CaseIterable, Sendable {
     case icon2xlines = "2xlines"
     case icon4x4 = "4x4"
     case airtable
+    case android
     case app
     case apple
     case archive
@@ -110,6 +111,7 @@ public enum DS1IconName: String, CaseIterable, Sendable {
     case chevronLeft = "chevron-left"
     case chevronRight = "chevron-right"
     case chevronUp = "chevron-up"
+    case chrome
     case close
     case cloud
     case code
@@ -150,6 +152,7 @@ public enum DS1IconName: String, CaseIterable, Sendable {
     case dropbox
     case dumbbell
     case duplicate
+    case edgeBrand = "edge-brand"
     case email
     case equation
     case exercise
@@ -158,6 +161,7 @@ public enum DS1IconName: String, CaseIterable, Sendable {
     case eyeOff = "eye-off"
     case facebook
     case figma
+    case firefox
     case flame
     case flip
     case folder
@@ -201,6 +205,7 @@ public enum DS1IconName: String, CaseIterable, Sendable {
     case like
     case link
     case linkedin
+    case linux
     case listLine = "list-line"
     case lists
     case lock
@@ -234,6 +239,7 @@ public enum DS1IconName: String, CaseIterable, Sendable {
     case open
     case openAlt = "open-alt"
     case openSource = "open-source"
+    case opera
     case outdent
     case pad
     case page
@@ -275,6 +281,7 @@ public enum DS1IconName: String, CaseIterable, Sendable {
     case right
     case rotate
     case row
+    case safari
     case safe
     case school
     case schoolAlt = "school-alt"
@@ -309,6 +316,7 @@ public enum DS1IconName: String, CaseIterable, Sendable {
     case sup
     case system
     case table
+    case tabs
     case tag
     case template
     case templates
@@ -342,6 +350,7 @@ public enum DS1IconName: String, CaseIterable, Sendable {
     case warning
     case wifi
     case window
+    case windows
     case work
     case wrench
     case xBrand = "x-brand"
