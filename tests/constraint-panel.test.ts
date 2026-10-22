@@ -58,7 +58,7 @@ test("five presses of C open the panel with what the page breaks, for the owner 
   press("x");
   press("c", 5);
   expect(panel()!.hidden).toBe(false);
-  const items = panel()!.shadowRoot!.querySelectorAll("li");
+  const items = panel()!.shadowRoot!.querySelectorAll("[data-findings] li");
   expect(items).toHaveLength(1);
   expect(items[0]!.textContent).toContain("card.media-level");
   expect(panel()!.shadowRoot!.querySelectorAll(".ring")).toHaveLength(1);

@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { afterEach, expect, test } from "vite-plus/test";
 import { askedConstraints, createConstraintPanel } from "../DS1/0-face/constraint-panel";
-import { PHONE_WIDTHS, checkSite, describeElement, sitemapPages, type SiteFinding } from "../DS1/0-face/constraint-site";
+import { PHONE_WIDTHS, checkSite, describeElement, ruleLine, sitemapPages, summarizePages, summarizeRules, type PageResult, type SiteFinding } from "../DS1/0-face/constraint-site";
 
 afterEach(() => { document.body.replaceChildren(); localStorage.clear(); });
 
@@ -37,14 +37,14 @@ test("the site check measures every page at every phone width, a page at a time,
       seen.push(`${new URL(url).pathname} ${width}`);
       localStorage.setItem("ph-out", "1");
       localStorage.setItem("kept", "changed");
-      if (width === 320 && url.endsWith("/de/")) return [broken];
+      if (width === 320 && url.endsWith("/de/")) return { findings: [broken], measured: { "page.window-width": 10 } };
       if (width === 430) throw new Error("did not load in 30 seconds");
-      return [];
+      return { findings: [], measured: { "page.window-width": 10 } };
     },
     onResult: () => {},
   });
   expect(seen).toEqual([...PHONE_WIDTHS.map(w => `/ ${w}`), ...PHONE_WIDTHS.map(w => `/de/ ${w}`)]);
-  expect(results.filter(r => r.findings.length)).toEqual([{ url: "https://example.com/de/", width: 320, findings: [broken] }]);
+  expect(results.filter(r => r.findings.length)).toEqual([{ url: "https://example.com/de/", width: 320, findings: [broken], measured: { "page.window-width": 10 } }]);
   expect(results.filter(r => r.error).map(r => r.error)).toEqual(["did not load in 30 seconds", "did not load in 30 seconds"]);
   expect(localStorage.getItem("ph-out")).toBeNull();
   expect(localStorage.getItem("kept")).toBe("yes");
@@ -56,7 +56,7 @@ test("the site check stops when asked", async () => {
   await checkSite({
     pages: ["https://example.com/", "https://example.com/de/"],
     widths: [320],
-    async inspect(url) { seen.push(url); controller.abort(); return []; },
+    async inspect(url) { seen.push(url); controller.abort(); return { findings: [], measured: {} }; },
     onResult: () => {},
     signal: controller.signal,
   });
@@ -69,5 +69,37 @@ test("the panel says when this page keeps every constraint, and offers the site'
   const shadow = document.querySelector("[data-ds-constraint-panel]")!.shadowRoot!;
   expect(shadow.querySelector("[data-status]")!.textContent).toBe("This page keeps every constraint.");
   expect(shadow.querySelector("[data-site]")!.textContent).toBe("Site");
+  panel.hide();
+});
+
+test("a check says what each rule kept, broke, or found nothing to measure, and each page by its widths", () => {
+  const broken: SiteFinding = { code: "page.window-width", rule: "", message: "", element: "section" };
+  const results: PageResult[] = [
+    { url: "https://example.com/", width: 320, findings: [], measured: { "page.window-width": 1200, "card.media-level": 4 } },
+    { url: "https://example.com/", width: 393, findings: [], measured: { "page.window-width": 1200, "card.media-level": 4 } },
+    { url: "https://example.com/de/", width: 393, findings: [], measured: { "page.window-width": 900 } },
+    { url: "https://example.com/de/", width: 320, findings: [broken, broken], measured: { "page.window-width": 900 } },
+    { url: "https://example.com/en/", width: 320, findings: [], measured: {}, error: "did not load in 30 seconds" },
+  ];
+  const rules = Object.fromEntries(summarizeRules(results).map(summary => [summary.constraint.code, ruleLine(summary, results.length)]));
+  expect(rules["card.media-level"]).toBe("Kept by 8 cards measured on 2 of 5 page views.");
+  expect(rules["page.window-width"]).toBe("Broken 2 times, among 4,200 pieces measured on 4 of 5 page views.");
+  const [nothing] = summarizeRules([{ findings: [], measured: { "page.window-width": 30 } }]).filter(s => s.constraint.code === "card.media-corners");
+  expect(ruleLine(nothing!, 1)).toBe("Nothing to measure: no cards on this page.");
+  expect(summarizePages(results)).toEqual([
+    { url: "https://example.com/", widths: [{ width: 320, broken: 0, error: undefined }, { width: 393, broken: 0, error: undefined }] },
+    { url: "https://example.com/de/", widths: [{ width: 320, broken: 2, error: undefined }, { width: 393, broken: 0, error: undefined }] },
+    { url: "https://example.com/en/", widths: [{ width: 320, broken: 0, error: "did not load in 30 seconds" }] },
+  ]);
+});
+
+test("the panel lists every rule with what it measured on this page", () => {
+  const panel = createConstraintPanel();
+  panel.show();
+  const shadow = document.querySelector("[data-ds-constraint-panel]")!.shadowRoot!;
+  const rows = [...shadow.querySelectorAll("[data-rules] li")].map(li => li.querySelector(".code")!.textContent);
+  expect(rows).toEqual(["card.media-level", "card.media-corners", "page.window-width"]);
+  expect(shadow.querySelector("[data-rules]")!.textContent).toContain("Nothing to measure: no cards on this page.");
+  expect(shadow.querySelector<HTMLElement>("[data-pages]")!.hidden).toBe(true);
   panel.hide();
 });

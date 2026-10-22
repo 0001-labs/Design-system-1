@@ -3,7 +3,7 @@
 // site's own, out of sight, as wide as a phone, drawn at the phone's scale, scrolled through so what loads
 // late is drawn, and measured with every rule in constraints.ts. scripts/constraints-phone.ts does the
 // same from a terminal, in WebKit as an iPhone.
-import { inspectConstraints } from './constraints';
+import { constraints, measureConstraints, type Constraint } from './constraints';
 import { calculateScalingFactor, defaultScalingConfig } from './scaling';
 
 /** The narrowest phone still sold, the common ones and the widest. */
@@ -11,7 +11,9 @@ export const PHONE_WIDTHS = [320, 375, 393, 430];
 
 /** A rule broken on a page at a width, said in words, since the element stays in its frame. */
 export type SiteFinding = { code: string; rule: string; message: string; element: string };
-export type PageResult = { url: string; width: number; findings: SiteFinding[]; error?: string };
+/** What one page at one width kept and broke: each rule's count of what it measured, and its findings. */
+export type PageCheck = { findings: SiteFinding[]; measured: Record<string, number> };
+export type PageResult = PageCheck & { url: string; width: number; error?: string };
 
 /** An element as a person finds it: its tag, id and classes, and the start of its words. */
 export function describeElement(element: Element): string {
@@ -56,7 +58,7 @@ const wait = (ms: number) => new Promise(done => setTimeout(done, ms));
  * through, and returns the rules it breaks. The address carries `ph=out`, the analytics opt-out most
  * trackers honour, so the check counts no visits.
  */
-export async function inspectInFrame(host: Element | ShadowRoot, url: string, width: number, height = 844): Promise<SiteFinding[]> {
+export async function inspectInFrame(host: Element | ShadowRoot, url: string, width: number, height = 844): Promise<PageCheck> {
   const frame = document.createElement('iframe');
   frame.setAttribute('aria-hidden', 'true');
   frame.tabIndex = -1;
@@ -87,15 +89,21 @@ export async function inspectInFrame(host: Element | ShadowRoot, url: string, wi
     }
     view.scrollTo(0, 0);
     await wait(300);
-    return inspectConstraints(page).map(({ constraint, message, element }) => ({
-      code: constraint.code,
-      rule: constraint.rule,
-      message,
-      element: describeElement(element),
-    }));
+    return checkPage(page);
   } finally {
     frame.remove();
   }
+}
+
+/** Every rule on a page: what it measured, and each place it is broken, said in words. */
+export function checkPage(page: ParentNode): PageCheck {
+  const measured: Record<string, number> = {};
+  const findings: SiteFinding[] = [];
+  for (const { constraint, measured: count, findings: found } of measureConstraints(page)) {
+    measured[constraint.code] = count;
+    for (const { message, element } of found) findings.push({ code: constraint.code, rule: constraint.rule, message, element: describeElement(element) });
+  }
+  return { findings, measured };
 }
 
 /**
@@ -106,7 +114,7 @@ export async function inspectInFrame(host: Element | ShadowRoot, url: string, wi
 export async function checkSite({ pages, widths = PHONE_WIDTHS, inspect, onResult, signal }: {
   pages: string[];
   widths?: number[];
-  inspect: (url: string, width: number) => Promise<SiteFinding[]>;
+  inspect: (url: string, width: number) => Promise<PageCheck>;
   onResult: (result: PageResult, done: number, total: number) => void;
   signal?: AbortSignal;
 }): Promise<PageResult[]> {
@@ -118,8 +126,8 @@ export async function checkSite({ pages, widths = PHONE_WIDTHS, inspect, onResul
       if (signal?.aborted) break;
       await Promise.all(widths.map(async width => {
         const result: PageResult = await inspect(url, width)
-          .then(findings => ({ url, width, findings }))
-          .catch((error: Error) => ({ url, width, findings: [], error: error.message }));
+          .then(check => ({ url, width, ...check }))
+          .catch((error: Error) => ({ url, width, findings: [], measured: {}, error: error.message }));
         results.push(result);
         if (!signal?.aborted) onResult(result, results.length, total);
       }));
@@ -145,4 +153,39 @@ function putBack(kept: Map<string, string> | null): void {
     for (const key of Object.keys(localStorage)) if (!kept.has(key)) localStorage.removeItem(key);
     for (const [key, value] of kept) if (localStorage.getItem(key) !== value) localStorage.setItem(key, value);
   } catch { /* Storage blocked: nothing was kept either. */ }
+}
+
+/** A rule over a check: how many things it measured, on how many of the page views, and how often it broke. */
+export type RuleSummary = { constraint: Constraint; measured: number; views: number; broken: number };
+
+export function summarizeRules(results: PageCheck[]): RuleSummary[] {
+  return constraints.map(constraint => {
+    const counts = results.map(result => result.measured[constraint.code] ?? 0);
+    return {
+      constraint,
+      measured: counts.reduce((sum, count) => sum + count, 0),
+      views: counts.filter(count => count > 0).length,
+      broken: results.reduce((sum, result) => sum + result.findings.filter(finding => finding.code === constraint.code).length, 0),
+    };
+  });
+}
+
+const count = (n: number, [one, many]: [string, string]) => `${n.toLocaleString('en')} ${n === 1 ? one : many}`;
+
+/** What a rule did, in a sentence: kept, broken, or nothing on the pages for it to measure. `views` is how many page views were checked; one is this page. */
+export function ruleLine({ constraint, measured, views, broken }: RuleSummary, total: number): string {
+  if (!measured) return `Nothing to measure: no ${constraint.measures[1]} ${total === 1 ? 'on this page' : 'on these pages'}.`;
+  const where = total === 1 ? 'on this page' : `on ${views.toLocaleString('en')} of ${total.toLocaleString('en')} page views`;
+  return broken
+    ? `Broken ${broken === 1 ? 'once' : `${broken.toLocaleString('en')} times`}, among ${count(measured, constraint.measures)} measured ${where}.`
+    : `Kept by ${count(measured, constraint.measures)} measured ${where}.`;
+}
+
+/** Every page checked, in the order checked, with how much it broke at each width. */
+export function summarizePages(results: PageResult[]): { url: string; widths: { width: number; broken: number; error?: string }[] }[] {
+  const pages = new Map<string, { width: number; broken: number; error?: string }[]>();
+  for (const { url, width, findings, error } of results) {
+    pages.set(url, [...(pages.get(url) ?? []), { width, broken: findings.length, error }].sort((a, b) => a.width - b.width));
+  }
+  return [...pages].map(([url, widths]) => ({ url, widths }));
 }

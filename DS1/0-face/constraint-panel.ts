@@ -1,5 +1,5 @@
-import { inspectConstraints } from './constraints';
-import { PHONE_WIDTHS, checkSite, findSitePages, inspectInFrame, type PageResult } from './constraint-site';
+import { measureConstraints, type Constraint, type Finding } from './constraints';
+import { PHONE_WIDTHS, checkSite, findSitePages, inspectInFrame, ruleLine, summarizePages, summarizeRules, type PageResult } from './constraint-site';
 
 // appendChild, not append: a Worker project's types redefine append for its HTML rewriter.
 
@@ -12,7 +12,9 @@ export const CONSTRAINT_PRESSES = 5;
  * on the page; pressing one scrolls to it. It measures the page as drawn when
  * it opens and again with Page. Site measures every page of the site at every
  * phone width (constraint-site.ts) and lists what each breaks, with a link to
- * the page. It draws over the page and changes nothing in it.
+ * the page. Under what is broken it says what each rule measured and kept,
+ * and after a Site check every page it checked. It draws over the page and
+ * changes nothing in it.
  */
 export function createConstraintPanel() {
   const panel = document.createElement('div');
@@ -91,6 +93,15 @@ export function createConstraintPanel() {
     .page { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
     .element { color: var(--muted); overflow-wrap: anywhere; }
     [data-status] { color: var(--muted); margin-bottom: calc(var(--u) / 2); }
+    section { margin-top: var(--u); }
+    section[hidden] { display: none; }
+    h3 { margin: 0; height: var(--u); font: inherit; font-family: var(--ds-typeface-medium, inherit); border-bottom: 1px solid var(--line); }
+    li.rule-row > div { padding-block: calc(var(--u) / 2); }
+    li.page-row > a { display: flex; justify-content: space-between; align-items: flex-end; gap: calc(var(--u) / 2); padding-block: 0; min-height: var(--u); }
+    li.page-row .page { text-decoration: none; }
+    li.page-row > a:hover .page { text-decoration: underline; }
+    .kept { color: var(--muted); white-space: nowrap; }
+    .broke { color: var(--danger); white-space: nowrap; }
     .code { display: flex; gap: calc(var(--u) / 2); color: var(--muted); font-variant-numeric: tabular-nums; }
     .code b { color: var(--danger); font-weight: 400; }
     .rule { color: var(--muted); }
@@ -99,16 +110,22 @@ export function createConstraintPanel() {
   </style><div class="rings"></div><div class="frames"></div><aside aria-label="Constraints">
     <header><strong>Constraints</strong><button type="button" data-run>Page</button><button type="button" data-site>Site</button><button type="button" data-close aria-label="Close">Close</button></header>
     <p data-status aria-live="polite"></p>
-    <ol></ol>
+    <ol data-findings></ol>
+    <section data-rules hidden><h3>Rules</h3><ol></ol></section>
+    <section data-pages hidden><h3>Pages</h3><ol></ol></section>
   </aside>`;
   const rings = shadow.querySelector<HTMLDivElement>('.rings')!;
-  const list = shadow.querySelector('ol')!;
+  const list = shadow.querySelector<HTMLOListElement>('[data-findings]')!;
+  const rulesSection = shadow.querySelector<HTMLElement>('[data-rules]')!;
+  const rulesList = rulesSection.querySelector('ol')!;
+  const pagesSection = shadow.querySelector<HTMLElement>('[data-pages]')!;
+  const pagesList = pagesSection.querySelector('ol')!;
   const status = shadow.querySelector<HTMLElement>('[data-status]')!;
   const title = shadow.querySelector('strong')!;
   const frames = shadow.querySelector<HTMLDivElement>('.frames')!;
   const siteButton = shadow.querySelector<HTMLButtonElement>('[data-site]')!;
   let site: AbortController | null = null;
-  let findings: ReturnType<typeof inspectConstraints> = [];
+  let findings: (Finding & { constraint: Constraint })[] = [];
   let current = -1;
   let frame = 0;
 
@@ -134,9 +151,60 @@ export function createConstraintPanel() {
     siteButton.textContent = 'Site';
   };
 
+  /** What each rule measured and kept, over `total` page views (one: this page). */
+  const showRules = (summaries: ReturnType<typeof summarizeRules>, total: number) => {
+    rulesSection.hidden = false;
+    rulesList.replaceChildren(...summaries.map(summary => {
+      const item = document.createElement('li');
+      item.className = 'rule-row';
+      const box = document.createElement('div');
+      const code = document.createElement('span');
+      code.className = 'code';
+      code.textContent = summary.constraint.code;
+      const line = document.createElement('p');
+      line.textContent = ruleLine(summary, total);
+      const rule = document.createElement('p');
+      rule.className = 'rule';
+      rule.textContent = summary.constraint.rule;
+      for (const part of [code, line, rule]) box.appendChild(part);
+      item.appendChild(box);
+      return item;
+    }));
+  };
+
+  /** Every page the Site check opened, a row each: kept at every width, or how much it broke and where. */
+  const showPages = (results: PageResult[]) => {
+    const pages = summarizePages(results);
+    pagesSection.hidden = !pages.length;
+    pagesList.replaceChildren(...pages.map(({ url, widths }) => {
+      const item = document.createElement('li');
+      item.className = 'page-row';
+      const link = document.createElement('a');
+      const address = new URL(url);
+      address.searchParams.set('constraints', '1');
+      link.href = address.href;
+      const path = document.createElement('span');
+      path.className = 'page';
+      path.textContent = decodeURI(new URL(url).pathname);
+      const state = document.createElement('span');
+      const failed = widths.filter(width => width.broken || width.error);
+      state.className = failed.length ? 'broke' : 'kept';
+      state.textContent = failed.length
+        ? failed.map(({ width, broken, error }) => (error ? `${width}px not checked` : `${broken} at ${width}px`)).join(', ')
+        : `kept at ${widths.length} widths`;
+      link.appendChild(path);
+      link.appendChild(state);
+      item.appendChild(link);
+      return item;
+    }));
+  };
+
   const run = () => {
     stopSite();
-    findings = inspectConstraints(document);
+    const measured = measureConstraints(document);
+    findings = measured.flatMap(({ constraint, findings: found }) => found.map(finding => ({ ...finding, constraint })));
+    showRules(measured.map(({ constraint, measured: count, findings: found }) => ({ constraint, measured: count, views: count ? 1 : 0, broken: found.length })), 1);
+    pagesSection.hidden = true;
     current = -1;
     title.textContent = findings.length ? `Constraints · ${findings.length} broken` : 'Constraints';
     status.textContent = findings.length ? `This page at ${Math.round(document.documentElement.clientWidth)}px.` : 'This page keeps every constraint.';
@@ -203,6 +271,8 @@ export function createConstraintPanel() {
     current = -1;
     place();
     list.replaceChildren();
+    rulesSection.hidden = true;
+    pagesSection.hidden = true;
     title.textContent = 'Constraints';
     status.textContent = 'Finding the pages…';
     const pages = await findSitePages();
@@ -220,6 +290,8 @@ export function createConstraintPanel() {
       },
     });
     if (controller.signal.aborted) return;
+    showRules(summarizeRules(results), results.length);
+    showPages(results);
     site = null;
     siteButton.textContent = 'Site';
     status.textContent = broken
