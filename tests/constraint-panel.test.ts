@@ -65,3 +65,16 @@ test("five presses of C open the panel with what the page breaks, for the owner 
   press("Escape");
   expect(panel()!.hidden).toBe(true);
 });
+
+test("on a site without sign-in, ?ds-owner=on switches this browser on as the owner's and ?ds-owner=off forgets it", async () => {
+  const { isPageOwner } = await import("../DS1/0-face/constraint-panel");
+  localStorage.clear();
+  expect(isPageOwner()).toBe(false);
+  localStorage.setItem("ds-owner", "on");
+  expect(isPageOwner()).toBe(true);
+  localStorage.removeItem("ds-owner");
+  history.replaceState(null, "", "/?ds-owner=on");
+  expect(isPageOwner()).toBe(true);
+  history.replaceState(null, "", "/");
+  expect(isPageOwner()).toBe(false);
+});

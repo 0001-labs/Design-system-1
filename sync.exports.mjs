@@ -29,6 +29,8 @@ const rootModules = {
   grid: ['grid.ts', 'layout-inspector.ts', 'grid-fit.ts', 'constraint-panel.ts', 'constraints.ts'],
   'grid-fit': ['grid-fit.ts'],
   'layout-inspector': ['layout-inspector.ts'],
+  /** The owner's constraint checker alone, five presses of C, for a product that takes no grid; `grid` brings it too. */
+  constraints: ['constraint-panel.ts', 'constraints.ts'],
   scaling: ['scaling.ts'],
   /** The classic head script that puts the theme on before the first paint; also a root `modules` choice. */
   'theme-bootstrap': ['theme-bootstrap.js'],
@@ -175,7 +177,7 @@ export default {
      * footer.css, document.css, carousel.css, figures.css, progress.css and row.css it imports; `prose`
      * adds the prose sheet (prose.css) and `cjk` Noto Sans for Japanese and Chinese (cjk.css,
      * from Google Fonts), which `styles` may also name; `modules` names page scripts
-     * from 0-face/ (app-banner, carousel, grid (with the owner's constraint panel), grid-fit, layout-inspector, scaling, theme,
+     * from 0-face/ (app-banner, carousel, grid (with the owner's constraint panel), constraints (that panel alone), grid-fit, layout-inspector, scaling, theme,
      * theme-bootstrap, tooltips, tree, header, keys, overlay-swipe, cut-fade), copied with what they import, into 0-face/;
      * `scriptsTo` puts that 0-face/ folder elsewhere, a path from `to`
      * (`"../../src/ds1"` puts the stylesheets in `public/ds1` and the scripts

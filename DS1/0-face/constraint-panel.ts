@@ -170,13 +170,35 @@ export function createConstraintPanel() {
   };
 }
 
-/** Whether the page says its viewer owns it: `<html data-ds-owner>`, set by the site once it knows. */
-export const isPageOwner = () => document.documentElement.hasAttribute('data-ds-owner');
+/** The device switch a site without sign-in has instead: `?ds-owner=on` once in a browser, `?ds-owner=off` to forget it. */
+export const OWNER_DEVICE_KEY = 'ds-owner';
+
+/** Takes `?ds-owner=on` or `off` from the address into this browser's storage for the site. */
+function rememberOwnerDevice(): void {
+  const asked = new URLSearchParams(window.location.search).get('ds-owner');
+  if (asked !== 'on' && asked !== 'off') return;
+  try {
+    if (asked === 'on') localStorage.setItem(OWNER_DEVICE_KEY, 'on');
+    else localStorage.removeItem(OWNER_DEVICE_KEY);
+  } catch { /* Storage blocked: the switch lasts this page alone. */ }
+}
+
+/** A browser switched on as the owner's with `?ds-owner=on`. */
+const isOwnerDevice = () => {
+  try { return localStorage.getItem(OWNER_DEVICE_KEY) === 'on'; } catch { return false; }
+};
 
 /**
- * Five presses of C toggle the constraint panel, for the page's owner only:
- * the site sets `data-ds-owner` on `<html>` for its signed-in owner, and for
- * anyone else the presses do nothing. `?constraints=1` opens it on load for the
+ * Whether the viewer owns the page: `<html data-ds-owner>`, which a site with
+ * sign-in sets from its own server-checked owner, or a browser switched on as
+ * the owner's (`?ds-owner=on`) on a site without sign-in.
+ */
+export const isPageOwner = () => document.documentElement.hasAttribute('data-ds-owner') || isOwnerDevice()
+  || new URLSearchParams(window.location.search).get('ds-owner') === 'on';
+
+/**
+ * Five presses of C toggle the constraint panel, for the page's owner only
+ * (`isPageOwner`): for anyone else the presses do nothing. `?constraints=1` opens it on load for the
  * owner too. Escape hides it. Presses typed into a field, with a modifier or
  * held down never count, and any other key starts the count again.
  */
@@ -185,6 +207,7 @@ export function initConstraintShortcut(): void {
   const root = document.documentElement;
   if (root.hasAttribute('data-ds-constraints-ready')) return;
   root.setAttribute('data-ds-constraints-ready', '');
+  rememberOwnerDevice();
   let panel: ReturnType<typeof createConstraintPanel> | null = null;
   const open = () => (panel ??= createConstraintPanel());
 
@@ -222,4 +245,12 @@ export function initConstraintShortcut(): void {
       else panel?.hide();
     }
   });
+}
+
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initConstraintShortcut, { once: true });
+  } else {
+    initConstraintShortcut();
+  }
 }
