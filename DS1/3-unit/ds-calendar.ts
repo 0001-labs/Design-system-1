@@ -201,7 +201,12 @@ const openPickers = new Set<Calendar>();
  *   by default.
  * @prop {boolean} noHeader - Leave out the title and arrows (`no-header`).
  *   With a header, pressing the title travels by months and years: the
- *   twelve months of the year, then twelve years, and back down.
+ *   twelve months of the year, then twelve years, and back down. With a
+ *   header, a swipe sideways across the days (a finger or a pen), or a
+ *   trackpad's sideways scroll, does what the arrows do, the next month
+ *   towards the start and the one before towards the end, and stops where
+ *   they stop; the days take sideways touches for it, so a carousel or a
+ *   page around the calendar does not move with them.
  * @prop {boolean} noToday - Leave out the Today button (`no-today`).
  * @prop {string} min - The first day a person may choose.
  * @prop {string} max - The last day a person may choose.
@@ -708,6 +713,58 @@ export class Calendar extends CalendarBase {
     void this.focusCell(target);
   };
 
+  // A swipe sideways across the days or the months, as the arrows: by finger or pen, or a trackpad's
+  // sideways scroll. Read from the arrows themselves, so a swipe goes nowhere an arrow cannot.
+  private swipe?: { id: number; x: number; y: number; at: number };
+  private swipedAt = 0;
+  private wheel = { dx: 0, at: 0, locked: 0 };
+
+  private swipeTo(direction: -1 | 1) {
+    const arrow = this.renderRoot.querySelector<HTMLButtonElement>(`.header [part~="${direction < 0 ? "previous" : "next"}"]`);
+    if (!arrow || arrow.disabled) return false;
+    this.step(direction);
+    return true;
+  }
+
+  private get rtl() {
+    return getComputedStyle(this).direction === "rtl";
+  }
+
+  private onSwipeStart = (event: PointerEvent) => {
+    this.swipe = event.pointerType === "mouse" || !event.isPrimary ? undefined : { id: event.pointerId, x: event.clientX, y: event.clientY, at: event.timeStamp };
+  };
+
+  private onSwipeEnd = (event: PointerEvent) => {
+    const swipe = this.swipe;
+    this.swipe = undefined;
+    if (!swipe || event.pointerId !== swipe.id) return;
+    const dx = (event.clientX - swipe.x) * (this.rtl ? -1 : 1);
+    const dy = event.clientY - swipe.y;
+    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 2 || event.timeStamp - swipe.at > 800) return;
+    // A day the swipe started on is not pressed by it.
+    if (this.swipeTo(dx < 0 ? 1 : -1)) this.swipedAt = Date.now();
+  };
+
+  private onSwipeWheel = (event: WheelEvent) => {
+    if (Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
+    event.preventDefault();
+    const now = Date.now();
+    if (now < this.wheel.locked) return;
+    if (now - this.wheel.at > 200) this.wheel.dx = 0;
+    this.wheel.at = now;
+    this.wheel.dx += event.deltaX * (this.rtl ? -1 : 1);
+    if (Math.abs(this.wheel.dx) < 60) return;
+    const direction = this.wheel.dx > 0 ? 1 : -1;
+    this.wheel = { dx: 0, at: 0, locked: now + 500 };
+    this.swipeTo(direction);
+  };
+
+  private onSwipeClick = (event: MouseEvent) => {
+    if (Date.now() - this.swipedAt > 400) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  };
+
   private onClick = (event: MouseEvent) => {
     const path = event.composedPath() as HTMLElement[];
     const find = (selector: string) => path.find(node => node instanceof HTMLElement && node.matches(selector));
@@ -944,7 +1001,20 @@ export class Calendar extends CalendarBase {
         : weekdayNames(first, "short").map(name => (/^\p{Script=Latin}/u.test(name) ? name.replace(/\.$/, "").slice(0, 2) : name))
       : weekdayNames(first, "short");
     const long = weekdayNames(first, "long");
-    return html`<div class="calendar" part="calendar" @focusout=${this.onFocusOut} @pointerover=${this.onPointerOver} @pointerleave=${() => (this.hoverDay = undefined)}>
+    const swipes = !this.noHeader;
+    return html`<div
+      class="calendar"
+      part="calendar"
+      ?data-swipe=${swipes}
+      @focusout=${this.onFocusOut}
+      @pointerover=${this.onPointerOver}
+      @pointerleave=${() => (this.hoverDay = undefined)}
+      @pointerdown=${swipes ? this.onSwipeStart : nothing}
+      @pointerup=${swipes ? this.onSwipeEnd : nothing}
+      @pointercancel=${() => (this.swipe = undefined)}
+      @wheel=${swipes ? this.onSwipeWheel : nothing}
+      @click=${{ handleEvent: this.onSwipeClick, capture: true }}
+    >
       ${this.renderHeader()}
       ${this.level !== "days" && !this.noHeader ? this.renderPicks(weeks.length) : html`<div
         class="grid"

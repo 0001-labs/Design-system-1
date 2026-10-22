@@ -197,6 +197,9 @@
 }
 
 .grid { outline: none; }
+/* A calendar with a header takes sideways touches on its days and months for its swipe (ds-calendar.ts),
+   so a carousel or a page around it stays put; up and down still scroll the page. */
+[data-swipe] :is(.grid, .picks) { touch-action: pan-y; }
 .weekdays,
 .week {
   display: grid;

@@ -628,3 +628,33 @@ test("monthHeading names the month view's title, and leaves the week view, the m
   await calendar.updateComplete;
   expect(root.querySelector(".title-text")!.textContent).toBe("October 2026");
 });
+
+test("a swipe sideways across the days goes to the next month or the one before, where the arrows can", async () => {
+  const calendar = await mount<Calendar>(`<ds-calendar compact selectable month="2026-10" today="2026-10-22" max="2026-11-30"></ds-calendar>`);
+  const surface = calendar.shadowRoot!.querySelector<HTMLElement>(".calendar")!;
+  const swipe = async (from: number, to: number, type = "touch", dy = 0) => {
+    surface.dispatchEvent(new PointerEvent("pointerdown", { pointerId: 1, pointerType: type, isPrimary: true, clientX: from, clientY: 100, bubbles: true, composed: true }));
+    surface.dispatchEvent(new PointerEvent("pointerup", { pointerId: 1, pointerType: type, isPrimary: true, clientX: to, clientY: 100 + dy, bubbles: true, composed: true }));
+    await calendar.updateComplete;
+  };
+  expect(surface.hasAttribute("data-swipe")).toBe(true);
+  await swipe(200, 100);
+  expect(calendar.month).toBe("2026-11");
+  // The next arrow stops at max, and so does the swipe.
+  await swipe(200, 100);
+  expect(calendar.month).toBe("2026-11");
+  await swipe(100, 200);
+  expect(calendar.month).toBe("2026-10");
+  // Too short, too steep, or a mouse: no swipe.
+  await swipe(100, 120);
+  await swipe(200, 100, "touch", 120);
+  await swipe(200, 100, "mouse");
+  expect(calendar.month).toBe("2026-10");
+});
+
+test("a calendar without a header does not swipe, and its days take touches as the page does", async () => {
+  const calendar = await mount<Calendar>(`<ds-calendar compact no-header month="2026-10"></ds-calendar>`);
+  expect(calendar.shadowRoot!.querySelector(".calendar")!.hasAttribute("data-swipe")).toBe(false);
+  const sheet = readFileSync(join(import.meta.dirname, "../DS1/3-unit/styles/ds-calendar.css"), "utf8");
+  expect(sheet).toContain("[data-swipe] :is(.grid, .picks) { touch-action: pan-y; }");
+});

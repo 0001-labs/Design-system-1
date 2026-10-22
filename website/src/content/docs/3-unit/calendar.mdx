@@ -232,6 +232,7 @@ The day arithmetic the calendars use is `DS1/0-face/calendar.ts`, plain TypeScri
 ## Accessibility
 
 - Each calendar is a grid named by its month (or `label`), with one Tab stop on a day: the one moved to, the selected day, today, or the first. A selectable calendar is `aria-multiselectable`, and every day of the range is `aria-selected`.
+- A swipe sideways across the days or the months, by finger or pen, does what the arrows do: towards the start goes to the next month (year, twelve years), towards the end to the one before, and a trackpad's sideways scroll the same, stopping where the arrows stop. The days take sideways touches for it (`touch-action: pan-y`), so a carousel or a page around the calendar stays put while up and down still scroll. A calendar with `no-header` does not swipe.
 - The arrow keys move a day, or a week across the weeks; Home and End go to the week's first and last day; Page Up and Page Down move a month, with Shift a year. A month moves on when the focus leaves it, and right to left the arrows turn round.
 - Enter or Space presses the day. Each day is labelled with its whole date and what happens on it, and today is `aria-current="date"`; a selectable calendar marks the selected day with `aria-selected`.
 - The arrows are named "Previous month" and "Next month" ("Previous year", "Next year", "Earlier years" and "Later years" among the months and years), and the month's name is announced when it changes. The title button is named by the title and "Choose a month and year". All the words are the shared words, in every language.
