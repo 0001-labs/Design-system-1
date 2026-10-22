@@ -124,3 +124,38 @@ test('rich Aa options are stable per editor with isolated local comments and no 
  editor.revision++; await editor.updateComplete;
  editors.forEach((element, index) => expect(element.options).toBe(options[index]));
 });
+test('Production defaults on, toggles gap-label policy and keeps active drags identifiable outside their surface', async () => {
+ const editor = new ConsistencyEditor(); document.body.append(editor); await editor.updateComplete;
+ const production = editor.querySelector('[role="switch"][aria-label="Production"]') as HTMLElement;
+ expect(production.getAttribute('aria-checked')).toBe('true');
+ expect(editor.querySelector('.consistency-shell')?.classList.contains('production-on')).toBe(true);
+ const gap = editor.querySelector('[data-gap="intro-actions"]') as HTMLElement;
+ pointer(gap, 'pointerdown'); pointer(window, 'pointermove', 25);
+ expect(gap.hasAttribute('data-spacing-active')).toBe(true);
+ pointer(window, 'pointerup', 25); expect(gap.hasAttribute('data-spacing-active')).toBe(false);
+ production.click(); await editor.updateComplete;
+ expect(editor.layers.production).toBe(false); expect(editor.layers.spacing).toBe(true); expect(editor.layers.boundaries).toBe(true);
+ expect(editor.querySelector('.consistency-shell')?.classList.contains('production-on')).toBe(false);
+});
+test('Reorder and Place independently control every Aa instance without disabling normal editing', async () => {
+ const editor = new ConsistencyEditor(); document.body.append(editor); await editor.updateComplete;
+ const editors = Array.from(editor.querySelectorAll<any>('aa-editor'));
+ for (const text of editors) { expect(text.options.reordering).toBe(false); expect(text.options.placing).toBe(false); expect(text.editor.reordering).toBe(false); expect(text.editor.placing).toBe(false); }
+ (editor.querySelector('[role="switch"][aria-label="Reorder"]') as HTMLElement).click(); await editor.updateComplete;
+ for (const text of editors) { expect(text.editor.reordering).toBe(true); expect(text.editor.placing).toBe(false); expect(text.options.menus).toBe(true); expect(text.editor.readOnly).toBe(false); }
+ (editor.querySelector('[role="switch"][aria-label="Place"]') as HTMLElement).click(); await editor.updateComplete;
+ for (const text of editors) expect(text.editor.placing).toBe(true);
+ (editor.querySelector('[role="switch"][aria-label="Reorder"]') as HTMLElement).click(); await editor.updateComplete;
+ for (const text of editors) { expect(text.editor.reordering).toBe(false); expect(text.editor.placing).toBe(true); }
+});
+test('library preset selector applies shared DS1 component roles only to the composition', async () => {
+ const editor = new ConsistencyEditor(); document.body.append(editor); await editor.updateComplete;
+ const select = editor.querySelector('[aria-label="Library preset"]') as HTMLSelectElement;
+ expect(select.options.length).toBe(3); expect(editor.library).toBe('original');
+ select.value = 'blue'; select.dispatchEvent(new Event('change', { bubbles: true })); await editor.updateComplete;
+ const sheet = editor.querySelector('.consistency-sheet') as HTMLElement;
+ expect(sheet.dataset.consistencyLibrary).toBe('blue'); expect(sheet.style.getPropertyValue('--ds-button-background-color-primary')).toBe('var(--ds-sharp-blue)');
+ expect((editor.querySelector('.consistency-inspector') as HTMLElement).style.getPropertyValue('--ds-button-background-color-primary')).toBe('');
+ select.value = 'original'; select.dispatchEvent(new Event('change', { bubbles: true })); await editor.updateComplete;
+ expect(sheet.style.getPropertyValue('--ds-button-background-color-primary')).toBe('');
+});

@@ -15,6 +15,9 @@ export type Command = ToolbarAction & {
     ink?: string;
     swatch?: CalloutColor;
     enabled?(editor: Editor): boolean;
+    preview?(element: HTMLElement, context: {
+        input: 'pointer' | 'keyboard';
+    }): void | (() => void);
 };
 declare const AaToolbarElement_base: {
     new (): HTMLElement;

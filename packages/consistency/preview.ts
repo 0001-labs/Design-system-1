@@ -1,3 +1,4 @@
+import '../../DS1/1-root/prose.css';
 import './src/bootstrap';
 import '../../DS1/1-root/one.css';
 import '../../DS1/1-root/grid.css';

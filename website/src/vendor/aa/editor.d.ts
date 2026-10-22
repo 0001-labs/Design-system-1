@@ -25,6 +25,9 @@ export type Atom = AtomSyntax & {
         icon: string;
         source: string;
         keywords?: string;
+        preview?(element: HTMLElement, context: {
+            input: 'pointer' | 'keyboard';
+        }): void | (() => void);
     };
 };
 /**
@@ -56,6 +59,10 @@ export type EditorOptions = {
     commands?: readonly Command[];
     blockCommands?: readonly Command[];
     menus?: boolean;
+    /** Same-flow block shuffling by pointer, keyboard and block commands. Defaults to true. */
+    reordering?: boolean;
+    /** Side/column destinations and external file-drop placement. Defaults to true; paste stays available. */
+    placing?: boolean;
     drawEquation?: (element: HTMLElement, source: string, display: boolean) => void | (() => void);
     /**
      * Corrects the person's words as they write, in place: Aa sends a block's
@@ -118,6 +125,9 @@ export type Editor = {
     blockAction(action: 'delete' | 'duplicate' | 'up' | 'down'): void;
     /** Move `count` blocks from `from` so the first stands at `to` once they have left; they stay selected, the editor focused. */
     moveBlock(from: number, to: number, count?: number): void;
+    /** Runtime movement switches; disabling either cancels an active gesture. */
+    reordering: boolean;
+    placing: boolean;
     indent(direction: -1 | 1): void;
     toggle(open?: boolean): void;
     /**
