@@ -16,6 +16,8 @@ export type NumberFieldProps = Omit<HTMLAttributes<NumberElement>, "onChange" | 
   unit?: string;
   /** Width in squares, four by default. */
   width?: number;
+  /** `value` makes the whole field the handle, dragged up and down. */
+  drag?: "lead" | "value";
   name?: string;
   disabled?: boolean;
   readOnly?: boolean;
@@ -26,7 +28,7 @@ export type NumberFieldProps = Omit<HTMLAttributes<NumberElement>, "onChange" | 
 };
 
 export const NumberField = forwardRef<NumberElement, NumberFieldProps>(function NumberField(
-  { value, min, max, step, bigStep, places, defaultValue, label, icon, unit, width, name, disabled, readOnly, onInput, onChange, ...rest },
+  { value, min, max, step, bigStep, places, defaultValue, label, icon, unit, width, drag, name, disabled, readOnly, onInput, onChange, ...rest },
   ref,
 ) {
   const element = useRef<NumberElement>(null);
@@ -45,7 +47,7 @@ export const NumberField = forwardRef<NumberElement, NumberFieldProps>(function 
   useEffect(() => {
     const node = element.current;
     if (!node) return;
-    Object.assign(node, { value, min, max, step: step ?? 1, bigStep, places, defaultValue, label: label ?? "", icon: icon ?? "", unit: unit ?? "", width: width ?? 4, name: name ?? "", disabled: !!disabled, readonly: !!readOnly });
-  }, [value, min, max, step, bigStep, places, defaultValue, label, icon, unit, width, name, disabled, readOnly]);
+    Object.assign(node, { value, min, max, step: step ?? 1, bigStep, places, defaultValue, label: label ?? "", icon: icon ?? "", unit: unit ?? "", width: width ?? 4, dragMode: drag ?? "lead", name: name ?? "", disabled: !!disabled, readonly: !!readOnly });
+  }, [value, min, max, step, bigStep, places, defaultValue, label, icon, unit, width, drag, name, disabled, readOnly]);
   return createElement("ds-number", { ...rest, ref: element });
 });

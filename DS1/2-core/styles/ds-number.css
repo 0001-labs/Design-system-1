@@ -118,3 +118,10 @@ input::selection {
 :host([disabled]) input {
   cursor: not-allowed;
 }
+
+/* With the value as the handle (`drag="value"`), the field drags up and down until it is typed in. */
+:host([drag="value"]:not([disabled]):not([readonly])) .face:not(:focus-within),
+:host([drag="value"]:not([disabled]):not([readonly])) .face:not(:focus-within) :is(.lead, input) {
+  cursor: ns-resize;
+  touch-action: none;
+}

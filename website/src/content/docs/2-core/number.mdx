@@ -21,6 +21,11 @@ Number is the field for a value a person tunes: a position, a size, a zoom, a te
 - **Step**: ↑ and ↓ add or take one `step`, Shift a `big-step` (ten steps unless set). A step adds exactly, so a typed 1.03 a step of 0.05 up is 1.08.
 - **Type**: a press on the value selects it. What is typed is read as arithmetic: `10 + 5`, `(3 − 1) × 4`. An operator first works on the value already there: `*2` doubles it, `/2` halves it, `+10` adds ten. A leading minus is a negative number. A unit typed after the figures is ignored. Enter takes the value and keeps the field selected for another; leaving the field takes it too; Escape puts the value back. Something that is not arithmetic leaves the value as it was.
 - **Reset**: with `default`, a double-click on the label puts that value back.
+- **The value as the handle**: `drag="value"` makes the whole field the handle, as a music program's tempo is. Press the value and drag up to raise it, a step every three pixels (Shift: the big step); a press without a drag types, and a double-click puts back `default`. Use it for a value that stands alone, without a label to hold.
+
+```html
+<ds-number drag="value" value="112" min="70" max="160" default="112" aria-label="Tempo in beats per minute"></ds-number>
+```
 
 The value is written with the step's decimals and no trailing zeros, in tabular figures, with a true minus sign (−9). `min` and `max` keep every way of changing it inside its range.
 
@@ -38,6 +43,7 @@ The value is written with the step's decimals and no trailing zeros, in tabular 
 | `icon` | string | Empty | An icon from the library in place of the label. Name the field with `aria-label`. |
 | `unit` | string | Empty | A unit at the end of the field, in the title grey, and read out with the value. |
 | `width` | number | `4` | The width in squares. |
+| `drag` | string | `lead` | `lead`: the label is the handle, a step a pixel sideways. `value`: the whole field is, a step every three pixels up, and a press without a drag types. |
 | `name` | string | Empty | The key in form data. |
 | `disabled`, `readonly` | boolean | false | A disabled field cannot be changed or focused; a read-only one can be focused and copied. |
 | `aria-label` | string | The label | The field's name, when the label is an icon or too short to say it. |

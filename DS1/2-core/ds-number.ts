@@ -8,8 +8,10 @@ import { formatNumberValue, readNumberExpression, stepPlaces } from "./number-ex
 import "./ds-icon";
 import styles from "./styles/ds-number.css?inline";
 
-/** How far the pointer moves before a press on the lead becomes a drag. */
+/** How far the pointer moves before a press becomes a drag. */
 const DRAG_THRESHOLD = 3;
+/** With `drag="value"`, the pixels of upward travel a step takes, as a music program's tempo drags. */
+const VALUE_PIXELS = 3;
 
 /**
  * A number a person sets by hand, in the inspector's way: the value on the field's fill, one control
@@ -21,6 +23,9 @@ const DRAG_THRESHOLD = 3;
  *
  * `input` fires as a drag moves the value and `change` when a value is taken (the drag's end, Enter,
  * leaving the field, an arrow). `value` is a number; the field takes part in its form under `name`.
+ *
+ * `drag="value"` makes the whole field the handle, as a music program's tempo is: press the value and
+ * drag up to raise it, a step every three pixels (Shift: the big step); a press without a drag types.
  */
 export class NumberField extends LitElement {
   static formAssociated = true;
@@ -37,6 +42,7 @@ export class NumberField extends LitElement {
     icon: { type: String },
     unit: { type: String },
     width: { type: Number, reflect: true },
+    dragMode: { type: String, attribute: "drag", reflect: true },
     name: { type: String, reflect: true },
     disabled: { type: Boolean, reflect: true },
     readonly: { type: Boolean, reflect: true },
@@ -57,6 +63,7 @@ export class NumberField extends LitElement {
   declare icon: string;
   declare unit: string;
   declare width: number;
+  declare dragMode: "lead" | "value";
   declare name: string;
   declare disabled: boolean;
   declare readonly: boolean;
@@ -66,7 +73,7 @@ export class NumberField extends LitElement {
   declare _scrubbing: boolean;
 
   private internals = typeof this.attachInternals === "function" ? this.attachInternals() : null;
-  private drag: { id: number; x: number; from: number; moved: boolean; rest: number } | null = null;
+  private drag: { id: number; at: number; from: number; moved: boolean; rest: number; vertical: boolean } | null = null;
 
   constructor() {
     super();
@@ -76,6 +83,7 @@ export class NumberField extends LitElement {
     this.icon = "";
     this.unit = "";
     this.width = 4;
+    this.dragMode = "lead";
     this.name = "";
     this.disabled = false;
     this.readonly = false;
@@ -173,28 +181,33 @@ export class NumberField extends LitElement {
     this._text = (event.target as HTMLInputElement).value;
   };
 
+  /** Sideways from the lead, a step a pixel; up from the value (`drag="value"`), a step every three. */
   private onLeadDown = (event: PointerEvent) => {
-    if (this.locked || event.button !== 0) return;
+    if (this.locked || event.button !== 0 || this.drag) return;
+    const vertical = this.dragMode === "value";
+    // With the value as the handle, a press on a field already being typed in places the caret.
+    if (vertical && this._editing) return;
     event.preventDefault();
+    event.stopPropagation();
     (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
     if (this._editing) this.commitText();
-    this.drag = { id: event.pointerId, x: event.clientX, from: this.value, moved: false, rest: 0 };
+    this.drag = { id: event.pointerId, at: vertical ? -event.clientY : event.clientX, from: this.value, moved: false, rest: 0, vertical };
   };
 
   private onLeadMove = (event: PointerEvent) => {
     const drag = this.drag;
     if (!drag || drag.id !== event.pointerId) return;
-    const travel = event.clientX - drag.x;
-    if (!drag.moved && Math.abs(travel) < DRAG_THRESHOLD) return;
+    const at = drag.vertical ? -event.clientY : event.clientX;
+    if (!drag.moved && Math.abs(at - drag.at) < DRAG_THRESHOLD) return;
     if (!drag.moved) {
       drag.moved = true;
       this._scrubbing = true;
     }
     const size = event.shiftKey ? (this.bigStep ?? this.step * 10) : this.step;
-    const pixels = event.clientX - drag.x + drag.rest;
-    const steps = Math.trunc(pixels);
-    drag.rest = pixels - steps;
-    drag.x = event.clientX;
+    const travel = (at - drag.at) / (drag.vertical ? VALUE_PIXELS : 1) + drag.rest;
+    const steps = Math.trunc(travel);
+    drag.rest = travel - steps;
+    drag.at = at;
     if (steps) this.set(this.stepped(this.value, steps, size), "input");
   };
 
@@ -217,6 +230,8 @@ export class NumberField extends LitElement {
 
   private onLeadDouble = () => {
     if (this.locked || this.defaultValue === undefined) return;
+    // A double-click on the value began as a press that started typing: leave the typing first.
+    if (this._editing) { this._editing = false; this.input?.blur(); }
     if (this.value !== this.clamp(this.defaultValue)) this.set(this.defaultValue, "change");
   };
 
@@ -263,17 +278,27 @@ export class NumberField extends LitElement {
       ? html`<ds-icon type=${this.icon} size="large"></ds-icon>`
       : this.label ? html`<span class="lead__words">${this.label}</span>` : nothing;
     const valueText = this.unit ? `${this.written} ${this.unit}` : this.written;
-    return html`<span class=${this._scrubbing ? "face scrubbing" : "face"} part="face">
+    const handle = this.dragMode === "value";
+    return html`<span
+      class=${this._scrubbing ? "face scrubbing" : "face"}
+      part="face"
+      @pointerdown=${handle ? this.onLeadDown : nothing}
+      @pointermove=${handle ? this.onLeadMove : nothing}
+      @pointerup=${handle ? this.onLeadUp : nothing}
+      @pointercancel=${handle ? this.onLeadCancel : nothing}
+      @lostpointercapture=${handle ? this.onLeadCancel : nothing}
+      @dblclick=${handle ? this.onLeadDouble : nothing}
+    >
       ${lead === nothing ? nothing : html`<span
         class="lead"
         part="lead"
         aria-hidden="true"
-        @pointerdown=${this.onLeadDown}
-        @pointermove=${this.onLeadMove}
-        @pointerup=${this.onLeadUp}
-        @pointercancel=${this.onLeadCancel}
-        @lostpointercapture=${this.onLeadCancel}
-        @dblclick=${this.onLeadDouble}
+        @pointerdown=${handle ? nothing : this.onLeadDown}
+        @pointermove=${handle ? nothing : this.onLeadMove}
+        @pointerup=${handle ? nothing : this.onLeadUp}
+        @pointercancel=${handle ? nothing : this.onLeadCancel}
+        @lostpointercapture=${handle ? nothing : this.onLeadCancel}
+        @dblclick=${handle ? nothing : this.onLeadDouble}
       >${lead}</span>`}
       <input
         part="input"

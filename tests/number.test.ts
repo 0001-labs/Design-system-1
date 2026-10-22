@@ -127,3 +127,23 @@ test('a whole number of squares wide, four by default, and locked when disabled'
   lead!.dispatchEvent(new PointerEvent('pointermove', { pointerId: 1, clientX: 50 }));
   expect(element.value).toBe(3);
 });
+
+test('drag="value" makes the field the handle: up raises it a step every three pixels, a press without a drag types, a double-click puts back the default', async () => {
+  const { element, input } = await field('<ds-number drag="value" value="112" min="70" max="160" default="112" aria-label="Tempo"></ds-number>');
+  const face = element.shadowRoot!.querySelector('.face') as HTMLElement;
+  face.setPointerCapture = () => {};
+  const inputs: number[] = []; let changes = 0;
+  element.addEventListener('input', () => inputs.push(element.value));
+  element.addEventListener('change', () => changes++);
+  const pointer = (type: string, clientY: number) => face.dispatchEvent(new PointerEvent(type, { pointerId: 1, clientY, button: 0, bubbles: true }));
+  pointer('pointerdown', 100); pointer('pointermove', 98); expect(inputs).toEqual([]);
+  pointer('pointermove', 91); pointer('pointermove', 70); pointer('pointerup', 70);
+  expect(inputs).toEqual([115, 122]); expect(element.value).toBe(122); expect(changes).toBe(1);
+  pointer('pointerdown', 0); pointer('pointermove', 900); pointer('pointerup', 900);
+  expect(element.value).toBe(70);
+  let focused = false; input.focus = () => { focused = true; };
+  pointer('pointerdown', 50); pointer('pointerup', 50);
+  expect(focused).toBe(true); expect(element.value).toBe(70);
+  face.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
+  expect(element.value).toBe(112);
+});
