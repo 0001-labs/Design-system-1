@@ -1,5 +1,7 @@
 import { inspectConstraints } from './constraints';
 
+// appendChild, not append: a Worker project's types redefine append for its HTML rewriter.
+
 /** The presses of C, each within 800ms of the last, that toggle the panel. */
 export const CONSTRAINT_PRESSES = 5;
 
@@ -109,7 +111,7 @@ export function createConstraintPanel() {
       ring.style.cssText = `left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;height:${rect.height}px`;
       const number = document.createElement('span');
       number.textContent = String(index + 1);
-      ring.append(number);
+      ring.appendChild(number);
       return ring;
     }));
   };
@@ -128,19 +130,20 @@ export function createConstraintPanel() {
       code.className = 'code';
       const number = document.createElement('b');
       number.textContent = String(index + 1);
-      code.append(number, constraint.code);
+      code.appendChild(number);
+      code.appendChild(document.createTextNode(constraint.code));
       const what = document.createElement('p');
       what.textContent = message;
       const rule = document.createElement('p');
       rule.className = 'rule';
       rule.textContent = constraint.rule;
-      button.append(code, what, rule);
+      for (const part of [code, what, rule]) button.appendChild(part);
       button.addEventListener('click', () => {
         current = index;
         element.scrollIntoView({ block: 'center', behavior: 'smooth' });
         schedule();
       });
-      item.append(button);
+      item.appendChild(button);
       return item;
     }));
     place();

@@ -82,3 +82,8 @@ test('with the language runtime, the copy passes the same browser check', () => 
   expect(files.has('0-face/translations/da.json')).toBe(true);
   expect(typeCheck('browser-languages', files, { ...projects.browser, resolveJsonModule: true })).toBe('');
 }, 60_000);
+
+test.each(['browser', 'worker'])('the constraint checker (root module `constraints`) passes a strict type check in a %s project', (name) => {
+  const files = new Map(['constraint-panel.ts', 'constraints.ts'].map((file) => [`0-face/${file}`, read(`DS1/0-face/${file}`)]));
+  expect(typeCheck(`constraints-${name}`, files, projects[name]!)).toBe('');
+}, 60_000);
