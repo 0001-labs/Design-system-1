@@ -53,3 +53,14 @@ test("the sheet pads the card a square and puts no shadow on a filled card", () 
   expect(card).toContain("border-radius: var(--ds-radius-card)");
   expect(card).not.toMatch(/box-shadow:\s*0 \d/);
 });
+
+test("a picture stands on the card's foot, so pictures side by side line up, and is square where it meets the card", () => {
+  const card = sheet("1-root/card.css");
+  const media = /\.ds-card__media \{([^}]*)\}/.exec(card)![1]!;
+  expect(media).toContain("margin-top: auto");
+  expect(media).toContain("padding-top: var(--ds-unit)");
+  const foot = /\.ds-card \.ds-card__media > :is\(img, picture, video, canvas, svg\) \{([^}]*)\}/.exec(card)![1]!;
+  expect(foot).toContain("border-end-start-radius: 0");
+  expect(foot).toContain("border-end-end-radius: 0");
+  expect(sheet("2-core/styles/ds-card.css")).toMatch(/::slotted\(:is\(img, picture, video, canvas, svg\)\[slot="media"\]\) \{\s*border-end-start-radius: 0;\s*border-end-end-radius: 0;/);
+});

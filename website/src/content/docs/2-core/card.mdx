@@ -5,7 +5,7 @@ description: One thing shown on a fill of its own, with its name, a title and a 
 
 import ComponentExample from "../../../components/ComponentExample.astro";
 
-A card shows one thing among others: its name, a title, a line of writing and a picture of it that can run off the card's foot and end edge and be cut there, never framed. Cards stand side by side in a [slide](/3-unit/slide/) or a grid. Ordinary writing still sits straight on the paper; a card is not a box for a page's paragraphs.
+A card shows one thing among others: its name, a title, a line of writing and a picture of it that can run off the card's foot and end edge and be cut there, never framed. Cards stand side by side in a [slide](/3-unit/slide/) or a grid. The picture stands on the card's foot, so in a row of cards of one height, with pictures of one aspect ratio, the pictures stand on one level whatever the words above them. A picture is never rounded where it meets the card: its corners on the foot are square, and only the corners towards the words keep a picture's corner. Ordinary writing still sits straight on the paper; a card is not a box for a page's paragraphs.
 
 
 ## Design examples
@@ -36,7 +36,7 @@ A card shows one thing among others: its name, a title, a line of writing and a 
 | `variant` | `filled` (the default) or `outlined`, a 1px line and no fill. |
 | `width`, `height` | The size in whole squares. |
 | `padding` | `none`, `small` (half a square), `medium` (one, the default) or `large` (two). |
-| `media` | Where the picture stands: `start`, `center` or `bleed` (on to the end edge and down to the foot, its corners there the card's). |
+| `media` | Where the picture stands: `start`, `center` or `bleed` (on to the end edge and down to the foot, with no corners of its own: the card's edges cut it square). |
 | `disabled` | Neither pressed nor followed. |
 
 | Slot | Holds |
@@ -44,7 +44,7 @@ A card shows one thing among others: its name, a title, a line of writing and a 
 | `label` | The thing's name, muted, on one square. |
 | `title` | The title in the display size, a square and a half a line, so a title that wraps stays together. |
 | (default) | Writing, one square a line. |
-| `media` | A picture, a square below the words. |
+| `media` | A picture, on the card's foot and a square below the words at least. |
 
 The corners are a card's (`--ds-radius-card`, 4px by default); a product sets `--ds-card-corner-size` for rounder ones.
 

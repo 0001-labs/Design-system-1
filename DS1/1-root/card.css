@@ -22,7 +22,8 @@
  *   ds-card__label               its name, muted, on one square
  *   ds-card__title               the title, display size, a square and a half a line
  *   ds-card__body                writing, one square a line
- *   ds-card__media               the picture, a square below the words
+ *   ds-card__media               the picture, on the card's foot and a square below the words at
+ *                                least, so pictures side by side line up; square where it meets the card
  *   ds-card__media--center       standing in the card's middle
  *   ds-card__media--bleed        running on past the padding to the end edge
  *
@@ -128,13 +129,24 @@
   line-height: var(--ds-unit);
 }
 
+/* The picture stands on the card's foot, a square below the words at least: in a card taller than
+   its words the room goes above the picture, so the pictures of cards side by side (stretched to one
+   height by their row) stand on one level. */
 .ds-card__media {
   display: flex;
   flex: none;
   align-items: flex-start;
   justify-content: flex-start;
   min-width: 0;
-  margin-top: var(--ds-unit);
+  margin-top: auto;
+  padding-top: var(--ds-unit);
+}
+
+/* A picture has no corners of its own where it meets the card: on the foot the card's edge cuts it
+   square. Only a corner standing free inside the card, towards the words, keeps a picture's corner. */
+.ds-card .ds-card__media > :is(img, picture, video, canvas, svg) {
+  border-end-start-radius: 0;
+  border-end-end-radius: 0;
 }
 
 .ds-card__media--center {
@@ -144,8 +156,8 @@
 
 /* A picture that bleeds runs on to the end edge and stands on the foot, the space a taller card
    leaves going above it (or, taller than its room, it starts below the words and the foot cuts it).
-   Its corners on those edges are the card's, cut by them; only the corner towards the words keeps a
-   picture's corner. */
+   It has no corners of its own: the card's edges cut it square, and its corner towards the words
+   is square too, a picture or square never rounded where it meets the card. */
 .ds-card__media--bleed {
   flex: 1 0 auto;
   flex-direction: column;
@@ -153,12 +165,9 @@
   justify-content: safe flex-end;
   margin-inline-end: calc(-1 * (var(--ds-card-padding) + var(--ds-bento-inset-end, 0px)));
   margin-block-end: calc(-1 * var(--ds-bento-inset-bottom, 0px));
+  --ds-radius: 0px;
   --ds-image-end-radius: 0px;
   --ds-image-foot-radius: 0px;
-}
-
-.ds-card__media--bleed > img {
-  border-start-start-radius: var(--ds-radius);
 }
 
 .ds-card__media > * {
