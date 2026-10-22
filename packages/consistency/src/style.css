@@ -89,3 +89,14 @@ consistency-editor{display:block;--ds-sf:var(--sf);color:var(--ds-text-color);fo
 .ghost-surface--gap:hover,.ghost-surface--gap:focus-visible{background:transparent}
 .consistency-shell.production-on:not(.spacing-off) .consistency-gap:is(:hover,:has(:focus-visible),:has([data-spacing-active])){background:color-mix(in srgb,var(--ds-pink) 24%,transparent)}
 .consistency-shell.production-on:not(.spacing-off) .consistency-gap:is(:hover,:has(:focus-visible),:has([data-spacing-active]))::before{border-color:var(--ds-pink)}
+/* Production is the authored page; boundary tools reveal only a local guide. */
+.production-on .consistency-stage{background-image:none}
+.production-on .consistency-sheet{outline:0}
+.production-on .ghost-surface--width{background-image:none}
+.production-on .ghost-surface--padding,
+.production-on .ghost-surface--padding:hover,
+.production-on .ghost-surface--padding:focus-visible,
+.production-on .ghost-surface--width:hover,
+.production-on .ghost-surface--width:focus-visible{background-color:transparent}
+.production-on .ghost-surface--padding:is(:hover,:focus-visible,[data-spacing-active]){box-shadow:inset -1px 0 var(--ds-yellow)}
+.production-on .ghost-surface--width:is(:hover,:focus-visible,[data-spacing-active]){background-image:linear-gradient(to right,transparent calc(50% - .5px),var(--ds-yellow) calc(50% - .5px),var(--ds-yellow) calc(50% + .5px),transparent calc(50% + .5px))}
