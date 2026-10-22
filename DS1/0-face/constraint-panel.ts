@@ -280,7 +280,7 @@ export function createConstraintPanel() {
     let broken = 0;
     const results = await checkSite({
       pages,
-      inspect: (url, width) => inspectInFrame(frames, url, width),
+      inspect: (url, widths) => inspectInFrame(frames, url, widths),
       signal: controller.signal,
       onResult(result, done, total) {
         const found = result.error ? [{ code: 'page', message: `It could not be checked: ${result.error}.`, element: '' }] : result.findings;

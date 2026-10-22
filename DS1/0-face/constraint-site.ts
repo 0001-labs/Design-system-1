@@ -1,13 +1,15 @@
 // The constraints on every page of a site, at every phone width, from inside the browser: the constraint
-// panel's Site check (constraint-panel.ts). Each page in the site's sitemap is opened in a frame of the
-// site's own, out of sight, as wide as a phone, drawn at the phone's scale, scrolled through so what loads
-// late is drawn, and measured with every rule in constraints.ts. scripts/constraints-phone.ts does the
-// same from a terminal, in WebKit as an iPhone.
+// panel's Site check (constraint-panel.ts). Each page in the site's sitemap is opened once in a frame of
+// the site's own, out of sight, then made as wide as each phone in turn and drawn at that phone's scale,
+// and measured with every rule in constraints.ts at each width. Three pages are checked at a time.
+// scripts/constraints-phone.ts does the same from a terminal, in WebKit as an iPhone.
 import { constraints, measureConstraints, type Constraint } from './constraints';
 import { calculateScalingFactor, defaultScalingConfig } from './scaling';
 
 /** The narrowest phone still sold, the common ones and the widest. */
 export const PHONE_WIDTHS = [320, 375, 393, 430];
+/** Pages checked side by side, each in its own frame. */
+export const PAGES_AT_ONCE = 3;
 
 /** A rule broken on a page at a width, said in words, since the element stays in its frame. */
 export type SiteFinding = { code: string; rule: string; message: string; element: string };
@@ -54,15 +56,16 @@ export async function findSitePages(page: Document = document): Promise<string[]
 const wait = (ms: number) => new Promise(done => setTimeout(done, ms));
 
 /**
- * Opens a page in a frame `width` pixels wide inside `host`, draws it at a phone's scale, scrolls it
- * through, and returns the rules it breaks. The address carries `ph=out`, the analytics opt-out most
- * trackers honour, so the check counts no visits.
+ * Opens a page once in a frame inside `host`, then makes the frame as wide as each width in turn, draws
+ * the page at that width's phone scale, and returns what every rule measured and found at each, in the
+ * order of `widths`. The page reflows at each width without loading again. The address carries `ph=out`,
+ * the analytics opt-out most trackers honour, so the check counts no visits.
  */
-export async function inspectInFrame(host: Element | ShadowRoot, url: string, width: number, height = 844): Promise<PageCheck> {
+export async function inspectInFrame(host: Element | ShadowRoot, url: string, widths: number[] = PHONE_WIDTHS, height = 844): Promise<PageCheck[]> {
   const frame = document.createElement('iframe');
   frame.setAttribute('aria-hidden', 'true');
   frame.tabIndex = -1;
-  frame.style.cssText = `position:absolute;top:0;left:${-width - 100}px;width:${width}px;height:${height}px;border:0;visibility:hidden;pointer-events:none`;
+  frame.style.cssText = `position:absolute;top:0;left:-1000px;width:${widths[0]}px;height:${height}px;border:0;visibility:hidden;pointer-events:none`;
   const address = new URL(url);
   address.searchParams.set('ph', 'out');
   try {
@@ -73,23 +76,23 @@ export async function inspectInFrame(host: Element | ShadowRoot, url: string, wi
     frame.src = address.href;
     host.appendChild(frame);
     await loaded;
-    const view = frame.contentWindow;
     const page = frame.contentDocument;
-    if (!view || !page?.documentElement) throw new Error('could not be read');
+    if (!page?.documentElement) throw new Error('could not be read');
     await page.fonts?.ready;
-    // A computer's browser draws the frame at 1; a phone's has scaled it to the frame's width already.
     const root = page.documentElement;
-    if (!root.hasAttribute('data-mobile')) {
-      root.style.setProperty('--sf', String(calculateScalingFactor(root.clientWidth || width, { ...defaultScalingConfig, snap: 'layout' })));
+    const checks: PageCheck[] = [];
+    for (const width of widths) {
+      frame.style.width = `${width}px`;
+      // The phone's scale for this width, whichever browser draws the frame: a computer's would draw it
+      // at 1, and a page that scales once on load would keep the first width's.
+      root.style.setProperty('--sf', String(calculateScalingFactor(width, { ...defaultScalingConfig, snap: 'layout' })));
       root.setAttribute('data-mobile', '');
+      void root.scrollWidth;
+      // Room for what follows a resize on its own: resize observers, a carousel measuring its slides.
+      await wait(80);
+      checks.push(checkPage(page));
     }
-    for (let y = 0; y < root.scrollHeight; y += height / 2) {
-      view.scrollTo(0, y);
-      await wait(40);
-    }
-    view.scrollTo(0, 0);
-    await wait(300);
-    return checkPage(page);
+    return checks;
   } finally {
     frame.remove();
   }
@@ -107,31 +110,37 @@ export function checkPage(page: ParentNode): PageCheck {
 }
 
 /**
- * Checks every page at every width, a page at a time with its widths side by side, and reports each
- * result as it comes. Stops when `signal` aborts. Whatever the pages store in this browser while they
- * are checked is put back afterwards.
+ * Checks every page at every width, `PAGES_AT_ONCE` pages side by side, and reports each page's result at
+ * each width as it comes. Stops starting pages when `signal` aborts. Whatever the pages store in this
+ * browser while they are checked is put back afterwards.
  */
-export async function checkSite({ pages, widths = PHONE_WIDTHS, inspect, onResult, signal }: {
+export async function checkSite({ pages, widths = PHONE_WIDTHS, inspect, onResult, signal, atOnce = PAGES_AT_ONCE }: {
   pages: string[];
   widths?: number[];
-  inspect: (url: string, width: number) => Promise<PageCheck>;
+  /** One page at every width, in the order of `widths`. */
+  inspect: (url: string, widths: number[]) => Promise<PageCheck[]>;
   onResult: (result: PageResult, done: number, total: number) => void;
   signal?: AbortSignal;
+  atOnce?: number;
 }): Promise<PageResult[]> {
   const kept = storedNow();
   const results: PageResult[] = [];
   const total = pages.length * widths.length;
-  try {
-    for (const url of pages) {
-      if (signal?.aborted) break;
-      await Promise.all(widths.map(async width => {
-        const result: PageResult = await inspect(url, width)
-          .then(check => ({ url, width, ...check }))
-          .catch((error: Error) => ({ url, width, findings: [], measured: {}, error: error.message }));
+  const queue = [...pages];
+  const next = async (): Promise<void> => {
+    for (let url = queue.shift(); url && !signal?.aborted; url = queue.shift()) {
+      const checks = await inspect(url, widths).catch((error: Error) => error);
+      for (const [index, width] of widths.entries()) {
+        const result: PageResult = checks instanceof Error
+          ? { url, width, findings: [], measured: {}, error: checks.message }
+          : { url, width, ...(checks[index] ?? { findings: [], measured: {} }) };
         results.push(result);
         if (!signal?.aborted) onResult(result, results.length, total);
-      }));
+      }
     }
+  };
+  try {
+    await Promise.all(Array.from({ length: Math.max(1, atOnce) }, next));
   } finally {
     putBack(kept);
   }

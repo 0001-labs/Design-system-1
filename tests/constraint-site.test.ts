@@ -27,36 +27,44 @@ test("an element is named by its tag, id and classes, and the start of its words
   expect(describeElement(element)).toBe('section#hours.panel.panel--wide "Opening hours at the office, every day o"');
 });
 
-test("the site check measures every page at every phone width, a page at a time, and puts back what the pages stored", async () => {
+test("the site check opens each page once for every width, three pages at a time, and puts back what the pages stored", async () => {
   localStorage.setItem("kept", "yes");
   const seen: string[] = [];
+  let open = 0;
+  let most = 0;
   const broken: SiteFinding = { code: "page.window-width", rule: "", message: "It reaches 40px past the window's right edge.", element: "section" };
+  const pages = ["/", "/de/", "/en/", "/about/", "/jobs/"].map(path => `https://example.com${path}`);
   const results = await checkSite({
-    pages: ["https://example.com/", "https://example.com/de/"],
-    async inspect(url, width) {
-      seen.push(`${new URL(url).pathname} ${width}`);
+    pages,
+    async inspect(url, widths) {
+      seen.push(`${new URL(url).pathname} ${widths.join(",")}`);
+      most = Math.max(most, ++open);
+      await new Promise(done => setTimeout(done, 5));
+      open -= 1;
       localStorage.setItem("ph-out", "1");
       localStorage.setItem("kept", "changed");
-      if (width === 320 && url.endsWith("/de/")) return { findings: [broken], measured: { "page.window-width": 10 } };
-      if (width === 430) throw new Error("did not load in 30 seconds");
-      return { findings: [], measured: { "page.window-width": 10 } };
+      if (url.endsWith("/jobs/")) throw new Error("did not load in 30 seconds");
+      return widths.map(width => ({ findings: width === 320 && url.endsWith("/de/") ? [broken] : [], measured: { "page.window-width": 10 } }));
     },
     onResult: () => {},
   });
-  expect(seen).toEqual([...PHONE_WIDTHS.map(w => `/ ${w}`), ...PHONE_WIDTHS.map(w => `/de/ ${w}`)]);
+  expect(seen.sort()).toEqual(pages.map(url => `${new URL(url).pathname} ${PHONE_WIDTHS.join(",")}`).sort());
+  expect(most).toBe(3);
+  expect(results).toHaveLength(pages.length * PHONE_WIDTHS.length);
   expect(results.filter(r => r.findings.length)).toEqual([{ url: "https://example.com/de/", width: 320, findings: [broken], measured: { "page.window-width": 10 } }]);
-  expect(results.filter(r => r.error).map(r => r.error)).toEqual(["did not load in 30 seconds", "did not load in 30 seconds"]);
+  expect(results.filter(r => r.error).map(r => `${r.width} ${r.error}`)).toEqual(PHONE_WIDTHS.map(w => `${w} did not load in 30 seconds`));
   expect(localStorage.getItem("ph-out")).toBeNull();
   expect(localStorage.getItem("kept")).toBe("yes");
 });
 
-test("the site check stops when asked", async () => {
+test("the site check stops starting pages when asked", async () => {
   const controller = new AbortController();
   const seen: string[] = [];
   await checkSite({
     pages: ["https://example.com/", "https://example.com/de/"],
     widths: [320],
-    async inspect(url) { seen.push(url); controller.abort(); return { findings: [], measured: {} }; },
+    atOnce: 1,
+    async inspect(url) { seen.push(url); controller.abort(); return [{ findings: [], measured: {} }]; },
     onResult: () => {},
     signal: controller.signal,
   });
