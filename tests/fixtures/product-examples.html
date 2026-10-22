@@ -1,7 +1,8 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/DS1/1-root/one.css"><style>body{margin:0}#sample{min-height:100vh}</style></head><body><main id="sample"></main><script type="module">
 import '/DS1/index.ts';
+import { EXAMPLES } from '/website/src/lib/component-examples.ts';
 import { PRODUCT_EXAMPLES } from '/website/src/lib/product-examples.ts';
-const example=PRODUCT_EXAMPLES[new URLSearchParams(location.search).get('example') || 'shop'];
+const example={...PRODUCT_EXAMPLES,...EXAMPLES}[new URLSearchParams(location.search).get('example') || 'shop'];
 document.querySelector('#sample').innerHTML=example.html;
 if(example.script)new Function(example.script)();
 await document.fonts.ready;

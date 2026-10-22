@@ -40,3 +40,23 @@ test('finance searches and switches month',async()=>{
 test('product configuration changes the local purchase summary',async()=>{
  await open('product');await page.locator('[data-package="Headphones + travel case"]').click();await page.locator('#configure-add').click();expect(await page.locator('#product-status').textContent()).toContain('Headphones + travel case');
 });
+
+test('carousel examples load real photographs and navigate on both screen sizes',async()=>{
+ for(const name of ['carousel','carousel-full','slide','slide-loop','carousel-quotes']){
+  for(const width of [1280,390]){
+   await open(name,width);
+   await page.locator('ds-image img').evaluateAll(images=>Promise.all(images.map(image=>{const img=image as HTMLImageElement;img.loading='eager';return img.decode();})));
+   if(name==='carousel-quotes') expect(await page.locator('blockquote').count()).toBe(3);
+   else expect(await page.locator('ds-image img').count()).toBeGreaterThan(1);
+   expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+   const carousel=page.locator('ds-carousel');
+   if(name==='slide-loop'){
+    expect(await carousel.getByRole('button',{name:'Pause',exact:true}).count()).toBe(1);
+   }else{
+    await carousel.getByRole('button',{name:'Next slide',exact:true}).click();
+    await expect.poll(()=>carousel.evaluate((element:any)=>element.current)).toBe(1);
+   }
+   await page.screenshot({path:`/tmp/ds1-${name}-${width}.png`,fullPage:true});
+  }
+ }
+},60000);

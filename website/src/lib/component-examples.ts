@@ -420,72 +420,76 @@ matrix.marks = [
     height: 360,
   },
   'carousel': {
-    title: 'Slides twelve squares wide', hint: 'Swipe or scroll sideways, or use the buttons and the dots. Moving to another slide fires change.',
-    html: `<ds-carousel label="Colours" literal slide-width="12" buttons>
-  <figure style="margin:0;height:calc(var(--ds-unit) * 8);background:var(--ds-apple-green)"></figure>
-  <figure style="margin:0;height:calc(var(--ds-unit) * 8);background:var(--ds-zenith-blue)"></figure>
-  <figure style="margin:0;height:calc(var(--ds-unit) * 8);background:var(--ds-pink)"></figure>
-  <figure style="margin:0;height:calc(var(--ds-unit) * 8);background:var(--ds-orange)"></figure>
+    title: "A gallery of photographs",
+    hint: "Real photographs in twelve-square frames. Swipe, scroll, or use the arrows and dots.",
+    html: `<ds-carousel label="Places and objects" literal slide-width="12" buttons>
+  <ds-image src="/examples/images/forest.webp" alt="Sunlight falling across a forest path" ratio="4 / 3" caption="Into the woods"></ds-image>
+  <ds-image src="/examples/images/lake.jpg" alt="A mountain reflected in a still lake" ratio="4 / 3" caption="By the water"></ds-image>
+  <ds-image src="/examples/images/room.jpg" alt="A wooden chair in a bright white room" ratio="4 / 3" caption="A quiet corner"></ds-image>
+  <ds-image src="/examples/images/headphones.jpg" alt="Blue headphones on a pink and mint background" ratio="4 / 3" caption="A little colour"></ds-image>
 </ds-carousel>`,
-    height: 300,
+    height: 320,
   },
   'carousel-full': {
-    title: 'One slide at a time', hint: 'Without a slide width each slide is the carousel\'s own width. The last dot marks an end.',
-    html: `<ds-carousel label="What people say" literal end>
-  <blockquote style="margin:0;height:calc(var(--ds-unit) * 4)">It reads the way I think.</blockquote>
-  <blockquote style="margin:0;height:calc(var(--ds-unit) * 4)">Everything lines up, on every screen.</blockquote>
-  <blockquote style="margin:0;height:calc(var(--ds-unit) * 4)">The keyboard reaches every slide.</blockquote>
+    title: "One photograph at a time",
+    hint: "Each photograph fills the carousel. The last dot marks the end of the gallery.",
+    html: `<ds-carousel label="Quiet places" literal end buttons style="max-width:calc(var(--ds-unit) * 28)">
+  <ds-image src="/examples/images/forest.webp" alt="Sunlight falling across a forest path" ratio="16 / 9" caption="Into the woods"></ds-image>
+  <ds-image src="/examples/images/lake.jpg" alt="A mountain reflected in a still lake" ratio="16 / 9" caption="By the water"></ds-image>
+  <ds-image src="/examples/images/room.jpg" alt="A wooden chair in a bright white room" ratio="16 / 9" caption="A quiet corner"></ds-image>
 </ds-carousel>`,
-    height: 200,
+    height: 430,
   },
   'slide': {
-    title: 'A strip of cards of their own width', hint: 'slide-width="auto" gives each card its own width, several in view. Swipe or scroll sideways, or use the buttons; each card stops at the start.',
-    html: `<ds-carousel label="Features" literal slide-width="auto" no-dots buttons>
-  <ds-card href="#lists" tone="sharp-blue" width="12" height="16" media="center">
-    <span slot="label">Lists</span>
-    <span slot="title">Everything on one grid</span>
-    <span slot="media" style="display:block;width:calc(var(--ds-unit) * 8);height:calc(var(--ds-unit) * 10);border-radius:var(--ds-radius);background:var(--ds-zenith-blue)"></span>
+    title: "A collection of photo cards",
+    hint: "Cards keep their own widths. Product photos and editorial cards share one strip.",
+    html: `<ds-carousel label="Everyday collection" literal slide-width="auto" no-dots buttons>
+  <ds-card width="12" height="16" media="center">
+    <span slot="label">Furniture</span>
+    <span slot="title">Everyday chair</span>
+    <ds-image slot="media" src="/examples/images/chair.jpg" alt="A curved wooden chair" ratio="1" fit="contain"></ds-image>
   </ds-card>
-  <ds-card href="#notes" tone="apple-green" width="20" height="16" media="bleed">
-    <span slot="label">Notes</span>
-    <span slot="title">Every item opens into a note</span>
-    <span slot="media" style="display:block;width:calc(var(--ds-unit) * 24);height:calc(var(--ds-unit) * 10);border-radius:var(--ds-radius);background:var(--ds-apple-green)"></span>
+  <ds-card tone="apple-green" width="16" height="16" media="center">
+    <span slot="label">Made for slow mornings</span>
+    <span slot="title">A little room to breathe</span>
+    <ds-image slot="media" src="/examples/images/room.jpg" alt="A wooden chair beside a sunlit white wall" ratio="4 / 3"></ds-image>
   </ds-card>
-  <ds-card href="#people" tone="pink" width="12" height="16" media="center">
-    <span slot="label">People</span>
-    <span slot="title">Kept with others</span>
-    <span slot="media" style="display:block;width:calc(var(--ds-unit) * 8);height:calc(var(--ds-unit) * 10);border-radius:var(--ds-radius);background:var(--ds-pink)"></span>
+  <ds-card width="12" height="16" media="center">
+    <span slot="label">Objects</span>
+    <span slot="title">Your morning cup</span>
+    <ds-image slot="media" src="/examples/images/cup.jpg" alt="A ceramic cup on a white table" ratio="1" fit="contain"></ds-image>
   </ds-card>
-  <ds-card href="#calendar" tone="ink" width="12" height="16" media="center">
-    <span slot="label">Calendar</span>
-    <span slot="title">Dates in the dark</span>
-    <span slot="media" style="display:block;width:calc(var(--ds-unit) * 8);height:calc(var(--ds-unit) * 10);border-radius:var(--ds-radius);background:var(--ds-sharp-blue)"></span>
+  <ds-card tone="pink" width="12" height="16" media="center">
+    <span slot="label">Sound</span>
+    <span slot="title">Take a moment</span>
+    <ds-image slot="media" src="/examples/images/headphones.jpg" alt="Blue over-ear headphones" ratio="1"></ds-image>
   </ds-card>
 </ds-carousel>`,
     height: 420,
   },
   'slide-loop': {
-    title: 'Without an end, moving on by itself', hint: 'loop holds the cards three times over; autoplay moves on every five seconds, holds while you point, touch or focus, and always has a pause button.',
-    html: `<ds-carousel label="Features" literal slide-width="auto" loop autoplay>
-  <ds-card href="#lists" tone="sharp-blue" width="12" height="16" media="center">
-    <span slot="label">Lists</span>
-    <span slot="title">Everything on one grid</span>
-    <span slot="media" style="display:block;width:calc(var(--ds-unit) * 8);height:calc(var(--ds-unit) * 10);border-radius:var(--ds-radius);background:var(--ds-zenith-blue)"></span>
+    title: "A collection that keeps moving",
+    hint: "The photo cards loop every five seconds. Pause with the button, or hold by hovering or focusing the strip.",
+    html: `<ds-carousel label="Everyday collection" literal slide-width="auto" loop autoplay>
+  <ds-card width="12" height="16" media="center">
+    <span slot="label">Furniture</span>
+    <span slot="title">Everyday chair</span>
+    <ds-image slot="media" src="/examples/images/chair.jpg" alt="A curved wooden chair" ratio="1" fit="contain"></ds-image>
   </ds-card>
-  <ds-card href="#notes" tone="apple-green" width="20" height="16" media="bleed">
-    <span slot="label">Notes</span>
-    <span slot="title">Every item opens into a note</span>
-    <span slot="media" style="display:block;width:calc(var(--ds-unit) * 24);height:calc(var(--ds-unit) * 10);border-radius:var(--ds-radius);background:var(--ds-apple-green)"></span>
+  <ds-card tone="apple-green" width="16" height="16" media="center">
+    <span slot="label">Made for slow mornings</span>
+    <span slot="title">A little room to breathe</span>
+    <ds-image slot="media" src="/examples/images/room.jpg" alt="A wooden chair beside a sunlit white wall" ratio="4 / 3"></ds-image>
   </ds-card>
-  <ds-card href="#people" tone="pink" width="12" height="16" media="center">
-    <span slot="label">People</span>
-    <span slot="title">Kept with others</span>
-    <span slot="media" style="display:block;width:calc(var(--ds-unit) * 8);height:calc(var(--ds-unit) * 10);border-radius:var(--ds-radius);background:var(--ds-pink)"></span>
+  <ds-card width="12" height="16" media="center">
+    <span slot="label">Objects</span>
+    <span slot="title">Your morning cup</span>
+    <ds-image slot="media" src="/examples/images/cup.jpg" alt="A ceramic cup on a white table" ratio="1" fit="contain"></ds-image>
   </ds-card>
-  <ds-card href="#calendar" tone="ink" width="12" height="16" media="center">
-    <span slot="label">Calendar</span>
-    <span slot="title">Dates in the dark</span>
-    <span slot="media" style="display:block;width:calc(var(--ds-unit) * 8);height:calc(var(--ds-unit) * 10);border-radius:var(--ds-radius);background:var(--ds-sharp-blue)"></span>
+  <ds-card tone="pink" width="12" height="16" media="center">
+    <span slot="label">Sound</span>
+    <span slot="title">Take a moment</span>
+    <ds-image slot="media" src="/examples/images/headphones.jpg" alt="Blue over-ear headphones" ratio="1"></ds-image>
   </ds-card>
 </ds-carousel>`,
     height: 420,

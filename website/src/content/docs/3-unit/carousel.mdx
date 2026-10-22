@@ -16,19 +16,20 @@ Everything a carousel holds is in the page and reachable without it: never put t
 
 <ComponentExample example="carousel-quotes" />
 
+These examples use [Image](/2-core/image/) and [Card](/2-core/card/) with real photographs. [Photo credits](/start-here/examples/#photo-credits).
+
 ## Try it
 
 <ComponentExample example="carousel" />
 
-<ComponentExample example="carousel-full" compact />
+<ComponentExample example="carousel-full" />
 
 ## Use it
 
 ```html
-<ds-carousel label="Colours" slide-width="12" buttons>
-  <figure>…</figure>
-  <figure>…</figure>
-  <figure>…</figure>
+<ds-carousel label="Places" literal slide-width="12" buttons>
+  <ds-image src="/photos/forest.jpg" alt="A sunlit forest path" ratio="4 / 3"></ds-image>
+  <ds-image src="/photos/lake.jpg" alt="Mountains reflected in a lake" ratio="4 / 3"></ds-image>
 </ds-carousel>
 ```
 
