@@ -81,6 +81,8 @@ An app with a copied icon map beside its DS1 snapshot (`<snapshot>/2-core/genera
 
 Run `vp run reports:scan` from this repository. `ADOPTION_STUDIO_ROOT` names the studio folder and `ADOPTION_CONFIG` another configuration file, to try a scope without editing the studio's; a worktree is scanned as Design system 1's direct source when the configured folder resolves to it. It writes `.reports/component-adoption.json`, which is ignored by Git. An unavailable source makes the command fail so publishing cannot silently replace a complete snapshot with missing data. Refresh after component migrations; page reloads read the latest published snapshot and do not scan the developer's disk.
 
+The studio config also runs `reports:upload` after a successful Sync 1 copy, including a no-op. Checks and deployment guards do not publish. A failed upload is reported separately from the saved copies, with a retry command. Worktrees skip this refresh because the published report describes canonical checkouts. A data-only refresh needs no Worker deployment.
+
 Checks:
 
 ```sh
