@@ -3231,11 +3231,17 @@ function Sn(e, t) {
 	if (vn() && (i.actions = [...i.actions, ...m]), t.prompt) {
 		let t = document.createElement("form");
 		t.className = "aa-toolbar-ask";
-		let n = document.createElement("input");
-		n.type = "text", n.placeholder = "Ask AI", n.setAttribute("aria-label", "Ask AI about the selected words"), n.autocomplete = "off", t.append(n), t.addEventListener("submit", (t) => {
+		let n = document.createElement("textarea");
+		n.rows = 1, n.placeholder = "Ask AI", n.setAttribute("aria-label", "Ask AI about the selected words"), n.autocomplete = "off", t.append(n);
+		let r = (e) => {
+			i.toggleAttribute("data-asking", e);
+			for (let t of i.querySelectorAll("button")) t.inert = e;
+			e || (n.scrollTop = 0);
+		};
+		n.addEventListener("focus", () => r(!0)), n.addEventListener("blur", () => r(!1)), t.addEventListener("submit", (t) => {
 			t.preventDefault();
-			let r = n.value.trim(), i = a;
-			r && i && !n.disabled && (n.disabled = !0, e.selectRange(i.start, i.end), e.askAbout(r).then((e) => {
+			let i = n.value.trim(), o = a;
+			i && o && !n.disabled && !e.readOnly && (n.disabled = !0, r(!1), e.selectRange(o.start, o.end), e.askAbout(i).then((e) => {
 				n.value = e ? "" : n.value, e || (n.placeholder = "Not answered");
 			}).catch(() => {
 				n.placeholder = "Not answered";
@@ -3245,7 +3251,7 @@ function Sn(e, t) {
 				}, 2e3);
 			}));
 		}), n.addEventListener("keydown", (e) => {
-			e.key === "Escape" && (e.preventDefault(), n.value = "", s());
+			e.isComposing || e.key === "Enter" && !e.shiftKey && (e.preventDefault(), t.requestSubmit());
 		}), i.below = t;
 	}
 	vn() && (i.actions = [
@@ -3395,7 +3401,7 @@ function Sn(e, t) {
 		let o = e.bottom, s = e.top - a, c = o + a <= n.top + n.height;
 		g.style.top = `${c || s < n.top ? Math.max(n.top, Math.min(o, n.top + n.height - a)) : s}px`;
 	}, L = () => {
-		clearTimeout(F), i.hidden = !0;
+		clearTimeout(F), i.contains(document.activeElement) && document.activeElement.blur(), i.hidden = !0;
 		let t = e.selection();
 		o = t ? { ...t } : null;
 	}, R = () => {
@@ -3536,16 +3542,20 @@ function Sn(e, t) {
 		}, le([...B, ...t.commands ?? []].filter((e) => `${e.label} ${e.keywords ?? ""}`.toLocaleLowerCase().includes(s)), r.children[n.index]?.getBoundingClientRect() ?? r.getBoundingClientRect());
 	}, de = () => {
 		if (!i.hidden) {
-			if (vn()) bn(i);
+			if (vn()) i.below && i.lastElementChild !== i.below && i.append(i.below), bn(i);
 			else {
 				delete i.dataset.docked, i.style.width = "";
-				let t = a ? e.rangeOf(a.start, a.end) : null, n = Array.from(t?.getClientRects?.() ?? []).filter((e) => e.width > 0 && e.height > 0), o = n[0], s = o ? n.filter((e) => Math.abs(e.top - o.top) < 2) : [], c = t?.getBoundingClientRect?.() ?? r.getBoundingClientRect(), l = xn(s.length ? {
+				let t = a ? e.rangeOf(a.start, a.end) : null, n = Array.from(t?.getClientRects?.() ?? []).filter((e) => e.width > 0 && e.height > 0), o = n[0], s = o ? n.filter((e) => Math.abs(e.top - o.top) < 2) : [], c = t?.getBoundingClientRect?.() ?? r.getBoundingClientRect(), l = s.length ? {
 					left: Math.min(...s.map((e) => e.left)),
 					top: Math.min(...s.map((e) => e.top)),
 					width: Math.max(...s.map((e) => e.right)) - Math.min(...s.map((e) => e.left)),
 					bottom: c.bottom
-				} : c, i.getBoundingClientRect(), _n(), yn(r));
-				i.style.left = `${l.left}px`, i.style.top = `${l.top}px`;
+				} : c, u = xn(l, i.getBoundingClientRect(), _n(), yn(r));
+				if (i.below) {
+					let e = l.top - i.getBoundingClientRect().height < _n().top;
+					e && i.firstElementChild !== i.below ? i.prepend(i.below) : !e && i.lastElementChild !== i.below && i.append(i.below);
+				}
+				i.style.left = `${u.left}px`, i.style.top = `${u.top}px`;
 			}
 		}
 	}, fe = () => {
@@ -11130,8 +11140,8 @@ function sl(e, t) {
 		K.addEventListener("keydown", (e) => {
 			e.key === "Escape" && (e.preventDefault(), e.stopPropagation(), q(), t.focus());
 		}), a.append(K);
-		let s = t.getBoundingClientRect(), c = 20 * (parseFloat(getComputedStyle(e).getPropertyValue("--aa-sf")) || 1), l = 8 * c, u = 2 * c, d = 4 * c / 20, f = t.closest(".aa-comments")?.getBoundingClientRect(), p = Math.max(0, f?.left ?? 0), m = Math.min(i.innerWidth, f?.right ?? i.innerWidth);
-		K.style.left = `${Math.max(p, Math.min(s.left, m - l))}px`, K.style.top = `${s.bottom + d + u <= i.innerHeight ? s.bottom + d : Math.max(0, s.top - d - u)}px`, K.querySelector("button")?.focus();
+		let s = t.getBoundingClientRect(), c = 20 * (parseFloat(getComputedStyle(e).getPropertyValue("--aa-sf")) || 1), l = 8 * c, u = 2 * c, d = 4 * c / 20, f = t.closest(".aa-comments")?.getBoundingClientRect(), p = Math.max(0, f?.left ?? 0), m = Math.min(i.innerWidth, f?.right ?? i.innerWidth), h = s.right + d + l <= m ? s.right + d : s.left - d - l >= p ? s.left - d - l : null;
+		K.style.left = `${h ?? Math.max(p, Math.min(s.left, m - l))}px`, K.style.top = `${h === null ? s.bottom + d + u <= i.innerHeight ? s.bottom + d : Math.max(0, s.top - d - u) : Math.max(0, Math.min(s.top, i.innerHeight - u))}px`, K.querySelector("button")?.focus();
 	}, he = (e) => e.comments.length >= 3 && e.comments.reduce((e, t) => e + 1 + Math.ceil(t.body.length / 40), 0) >= 10, ge = (e, i) => {
 		let a = r.createElement("article");
 		a.className = "aa-thread", a.dataset.thread = e.id, a.toggleAttribute("data-open", i), a.toggleAttribute("data-resolved", !!e.resolvedAt), a.toggleAttribute("data-orphaned", e.orphaned), a.toggleAttribute("data-unread", !!e.unread);

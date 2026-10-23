@@ -22,6 +22,16 @@ try {
  await resizing.click();
  await page.locator('aa-editor[data-editor-key="intro"]').evaluate(e=>{e.editor.focus();e.editor.selectRange(2,12);});
  await page.locator('.aa-toolbar:not([hidden])').waitFor();
+ const toolbar = page.locator('.aa-toolbar:not([hidden])');
+ const before = await toolbar.boundingBox();
+ const prompt = toolbar.getByRole('textbox', { name: 'Ask AI about the selected words' });
+ await prompt.click();
+ await page.waitForTimeout(220);
+ const after = await toolbar.boundingBox(), writing = await prompt.boundingBox();
+ if (Math.abs(before.width-after.width)>0.1 || Math.abs(before.height-after.height)>0.1 || Math.abs(writing.y-after.y)>0.1 || Math.abs(writing.height-after.height)>0.1) throw Error('Prompt expansion changed panel footprint or did not fill its rows');
+ if (!(await toolbar.locator('button').evaluateAll(buttons=>buttons.every(button=>button.inert)))) throw Error('Covered formatting buttons remain interactive');
+ await prompt.evaluate(field=>field.blur());
+ await page.waitForTimeout(220);
  await page.waitForFunction(()=>document.querySelector('[role="switch"][aria-label="Spacing"]').disabled);
  if(await spacing.getAttribute('aria-checked')!=='false'||!(await resizing.isDisabled()))throw Error('Menu did not pause controls visibly');
  const preferences=await page.locator('consistency-editor').evaluate(e=>e.layers);
