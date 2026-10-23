@@ -5,7 +5,7 @@ const selector = '.consistency-story-section,.consistency-projects,.consistency-
 export function groupingName(element: HTMLElement): string {
  if (element.matches('.consistency-story-section')) {
   const group = element.closest('[data-sort-group]');
-  const heading = element.querySelector<HTMLElement>('.aa-block[data-kind="heading"]')?.textContent?.trim();
+  const heading = element.querySelector<HTMLElement>('.aa-block[data-kind="heading"]')?.textContent?.trim().replace(/^#{1,6}\s*/, '');
   return `Section · ${heading || group?.getAttribute('aria-label') || 'Content'} — moves together`;
  }
  if (element.matches('.consistency-projects')) return 'Cards · laid out together';
