@@ -155,6 +155,8 @@ The things in a strip are `<ds-card>` (`.ds-card`): `href` for one link, `tone` 
 
 ## Toasts
 
+**Save feedback:** Never show persistent save-status text or badges in the interface ("Saved", "Saving…", "All changes saved", or equivalents). Use the shared Sonner toast only when confirmation is useful, such as after an explicit save or recovery from a failed save. Routine autosave stays silent. Preserve pending-write protection, unsaved-change safeguards and actionable errors; do not replace them with a permanent status label.
+
 Message is one component with inline, banner, toast and assistant forms (`ds-message`, React `Message` from `DS1/react/message`). A toast is `<ds-message form="toast">` and `message()` from `DS1/2-core/ds-message.ts`, based on Sonner: Sonner's calls, options and stacking behaviour, drawn as the system's label: an ink chip one control high per line in the tooltip's colours, padded 4px, no line or shadow, actions as underlined words, as wide as its words up to sixteen squares, the pile advancing one square per toast and standing one square from the edge. In the window the pile stands in the browser's top layer (a manual popover, raised again for each new toast), so an open sheet, drawer or modal never covers it. Toasts persist until dismissed and show a close button by default; a finite duration is an explicit opt-in. An error is announced assertively. Never build a product's own toast or notification stack. Existing copies may import the same `toast()` from `DS1/0-face/feedback.ts`: its page toaster draws the same stack with `ds-toast`'s stylesheet, and a `<ds-toast>` in the page takes every toast, so a page never shows two stacks.
 
 ## Menus: Select and Context
