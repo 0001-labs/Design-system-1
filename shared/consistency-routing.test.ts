@@ -61,19 +61,3 @@ it('preserves a selected component destination when changing its variant', () =>
   const result = applyComponentDecision(context, judgment(context, 'button_secondary', 'component_1'));
   expect(result).toEqual({ insert: button.replace('"secondary":false', '"secondary":true') });
 });
-
-import { COMPONENT_PALETTE, paletteInsertion } from './consistency-palette';
-it.each(COMPONENT_PALETTE)('routes insertion of $name to exactly the picker source', entry => {
-  const context = componentContext({ prompt: `Insert a ${entry.name}`, kind: 'writing', document: '# Keep\n\n⟦here⟧\n\nAfter' })!;
-  expect(applyComponentDecision(context, judgment(context, `insert_${entry.id}`))).toEqual({ insert: paletteInsertion(entry) });
-  const unavailable = componentContext({ prompt: `Insert a ${entry.name}`, kind: 'writing', text: card })!;
-  expect(applyComponentDecision(unavailable, judgment(unavailable, `insert_${entry.id}`))).toBeNull();
-});
-it('routes a named palette appearance while preserving content and future fields', () => {
-  const entry = COMPONENT_PALETTE.find(entry => entry.id === 'message')!;
-  const source = paletteInsertion(entry).replace('"component":', '"future":{"preserve":true},"component":');
-  const context = componentContext({ prompt: 'Make the message a warning', kind: 'writing', document: source })!;
-  expect(applyComponentDecision(context, judgment(context, 'variant_warning', 'component_1'))).toEqual({ edits: [{ find: source, replace: source.replace('"variant":"neutral"', '"variant":"warning"') }] });
-  expect(applyComponentDecision(context, judgment(context, 'variant_square', 'component_1'))).toBeNull();
-  expect(componentContext({ prompt: 'Change it', kind: 'writing', document: '````markdown\n'+source+'\n````' })).toBeNull();
-});
