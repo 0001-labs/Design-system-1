@@ -175,7 +175,7 @@ consistency-editor{display:block;--ds-sf:var(--sf);color:var(--ds-text-color);fo
 .consistency-element-preview[data-consistency-library="bold"] .consistency-element-preview-stage ds-button{grid-column:3 / span 8;grid-row:4 / span 2}
 .consistency-mobile-preview .consistency-sheet[data-consistency-library="bold"] .consistency-sample-actions{row-gap:var(--ds-unit)}
 /* Toned card fills follow the colour scheme, with matching readable ink. */
-:is(.consistency-sheet,.consistency-element-preview) ds-card[tone]:not([tone=""]):not([tone="ink"]):not([variant="outlined"]){--ds-text-color:light-dark(var(--ds-black),var(--ds-white));--ds-text-color-muted:color-mix(in srgb,var(--ds-text-color) 65%,transparent)}
+:is(.consistency-sheet,.consistency-element-preview) ds-card[tone]:not([tone=""]):not([tone="ink"]):not([variant="outlined"]){--ds-text-color:light-dark(var(--ds-black),var(--ds-white));--ds-text-color-muted:color-mix(in srgb,var(--ds-text-color) 80%,transparent)}
 /* The editor never owns a page-wide horizontal scrollbar. Wide authored pages
    scroll inside their stage; chrome remains a shrinkable, wrapping layout. */
 consistency-editor,.consistency-shell{width:100%;max-width:100%;min-width:0}
@@ -238,3 +238,6 @@ consistency-editor,.consistency-shell{height:100dvh;min-height:0}
 
 /* Crossing an element during a gesture is not a request to edit its action. */
 consistency-editor[data-pointer-busy] :is(.consistency-button-action,.consistency-carousel-tools):not([data-keyboard]):not(:focus-within){visibility:hidden;pointer-events:none}
+
+/* Keep the current DS1 opaque muted role over tinted surfaces in this editor. */
+consistency-editor{--ds-text-color-muted:light-dark(#5f5f5f,#cacaca);--ds-number-lead-color:var(--ds-text-color-muted)}
