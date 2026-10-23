@@ -1,3 +1,4 @@
+import { PAGE_INSERTIONS } from './consistency-insertions';
 import { componentDefaults, readBasicContentElement, writeBasicContentElement, type BasicContentElement } from './consistency-content';
 
 export const COMPONENT_ROUTING_FLAG = 'consistency-component-routing';
@@ -41,7 +42,7 @@ export function componentContext(input: ComponentRequest): ComponentContext | nu
 }
 
 export function componentState(context: ComponentContext) {
-  return { request: context.input.prompt, insertionAvailable: context.insertion, components: context.candidates.map(({ id, value }) => ({ id, ...value })) };
+  return { request: context.input.prompt, insertionAvailable: context.insertion, insertionTemplates: context.insertion ? PAGE_INSERTIONS : [], components: context.candidates.map(({ id, value }) => ({ id, ...value })) };
 }
 
 export function componentQuestions(context: ComponentContext) {
@@ -49,6 +50,7 @@ export function componentQuestions(context: ComponentContext) {
     other: 'Anything not fully covered by ONE of the other operations: writing, explanation, questions, custom copy, labels or links, size, spacing, colours, deleting, moving, multiple edits, or unclear intent.',
   };
   if (context.insertion) {
+    for (const entry of PAGE_INSERTIONS) actions[`insert_${entry.id}`] = `Insert one default ${entry.label} here using its source in insertionTemplates. No custom content, destination, data or appearance.`;
     actions.insert_button = 'Insert one default primary button here. Default label: Get in touch. No custom label or destination.';
     actions.insert_card = 'Insert one default outlined card here, with the default placeholder copy. No custom content or design.';
   }
@@ -99,6 +101,8 @@ export function applyComponentDecision(context: ComponentContext, result: unknow
   if (action === 'insert_button' || action === 'insert_card') {
     return { insert: writeBasicContentElement(componentDefaults[action === 'insert_button' ? 'button' : 'card']) };
   }
+  const insertion = PAGE_INSERTIONS.find(entry => action === `insert_${entry.id}`);
+  if (insertion && context.insertion) return { insert: insertion.source };
   const [operation, target] = action.split('__');
   const candidate = context.candidates.find(candidate => candidate.id === target);
   if (!candidate || !operation?.startsWith(`${candidate.value.kind}_`)) return null;

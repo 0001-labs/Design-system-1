@@ -61,3 +61,10 @@ it('preserves a selected component destination when changing its variant', () =>
   const result = applyComponentDecision(context, judgment(context, 'button_secondary', 'component_1'));
   expect(result).toEqual({ insert: button.replace('"secondary":false', '"secondary":true') });
 });
+
+import { PAGE_INSERTIONS } from './consistency-insertions';
+it.each(PAGE_INSERTIONS)('routes the approved $label to the same native insertion source', entry => {
+ const context = componentContext({ prompt: `Add ${entry.label}`, kind: 'writing', document: 'Before\n\n⟦here⟧\n\nAfter' })!;
+ expect(applyComponentDecision(context, judgment(context, `insert_${entry.id}`))).toEqual({ insert: entry.source });
+ expect(componentQuestions(context).action.criteria).not.toHaveProperty('insert_context');
+});

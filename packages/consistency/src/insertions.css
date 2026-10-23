@@ -1,0 +1,2 @@
+.consistency-image-placeholder { display: grid; place-content: center; min-height: calc(8 * var(--ds-unit)); background: var(--ds-grey-05, color-mix(in srgb, currentColor 5%, transparent)); color: var(--ds-text-color-muted); cursor: pointer; }
+.consistency-icon-name { box-sizing: border-box; width: calc(8 * var(--ds-unit)); max-width: 100%; height: var(--ds-unit); font: inherit; color: inherit; background: var(--ds-paper); border: 0; outline: 1px solid var(--ds-border-color); }

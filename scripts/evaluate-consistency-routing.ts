@@ -1,12 +1,17 @@
 /** Opt-in synthetic provider evaluation; no owner documents or saved editor state. */
 import { componentContext, componentState, componentQuestions, applyComponentDecision, COMPONENT_ROUTING_MODEL } from '../shared/consistency-routing';
 import { componentDefaults, writeBasicContentElement } from '../shared/consistency-content';
+import { PAGE_INSERTIONS } from '../shared/consistency-insertions';
 const key = process.env.TYPESAFE_API_KEY;
 if (!key) throw new Error('Set the server-side TYPESAFE_API_KEY to evaluate routing.');
 const button = writeBasicContentElement(componentDefaults.button);
 const card = writeBasicContentElement(componentDefaults.card);
 const document = `${button}\n\n${card}\n\n⟦here⟧`;
 const cases: Array<{ prompt: string; expected: string; document?: string }> = [
+  ...PAGE_INSERTIONS.map(entry => ({ prompt: `Add a ${entry.label.toLowerCase()} here`, expected: `insert_${entry.id}` })),
+  { prompt: 'Add a context menu', expected: 'other' },
+  { prompt: 'Add a form', expected: 'other' },
+  { prompt: 'Add a list and an image', expected: 'other' },
   { prompt: 'Add a card titled Welcome', expected: 'other' },
   { prompt: 'Make the Subscribe button secondary', expected: 'other' },
   { prompt: 'Leave the card exactly as it is', expected: 'other' },
