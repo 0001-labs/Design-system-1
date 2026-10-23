@@ -45,7 +45,7 @@ export class ColumnSpacingLayer {
     columns.forEach((column,index)=>{column.classList.toggle('consistency-unit-column',!!units[index]);column.style.marginInlineStart=!stacked&&index?`calc(${gaps[index-1]}px * var(--sf))`:'0px';column.style.marginTop=stacked&&index?`calc(${gaps[index-1]}px * var(--sf))`:'0px';});
     ids.forEach((id,index)=>{
      const bounds=editor.parentElement!;let binding=this.handles.get(id);
-     if(binding&&(!binding.host.isConnected||binding.atom!==atom||binding.next!==columns[index+1])){binding.dispose();this.handles.delete(id);binding=undefined;}
+     if(binding&&(!binding.host.isConnected||binding.atom!==atom||binding.next!==columns[index+1])){binding.dispose();binding.host.remove();this.handles.delete(id);binding=undefined;}
      if(!binding){
       const host=document.createElement('div');host.className='consistency-column-gap ghost-surface ghost-surface--gap';host.setAttribute('role','slider');host.setAttribute('aria-label',`Adjust ${editor.dataset.editorKey} column gap ${atomIndex+1}.${index+1}`);host.setAttribute('aria-valuemin','0');host.setAttribute('aria-valuemax','2000');
       const measure=document.createElement('span');measure.className='ghost-measure';measure.setAttribute('aria-hidden','true');host.append(measure);bounds.append(host);host.addEventListener('focus',()=>this.state.select(id));let pointer=false;
