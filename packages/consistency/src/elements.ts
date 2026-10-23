@@ -168,10 +168,10 @@ export function contentElementAtoms(canWrite: () => boolean, getHost: () => HTML
         clearTimeout(leaveTimer); actionBar.removeAttribute('data-open'); actionBar.inert = true; actionBar.setAttribute('aria-hidden', 'true');
       };
       doc.addEventListener('pointerdown', dismissAction, true);
-      const enter = (event: PointerEvent) => { if (event.pointerType === 'touch') return; hover = true; showAction(); };
+      const enter = (event: PointerEvent) => { if (hover || event.pointerType === 'touch' || event.buttons || element.closest('[data-pointer-busy]')) return; hover = true; showAction(); };
       const pointerLeave = () => { hover = false; leave(); };
       element.addEventListener('focusin', focus); element.addEventListener('focusout', leave);
-      element.addEventListener('pointerenter', enter); element.addEventListener('pointerleave', pointerLeave);
+      element.addEventListener('pointerenter', enter); element.addEventListener('pointermove', enter); element.addEventListener('pointerleave', pointerLeave);
       const menu = doc.createElement('ds-context');
       menu.setAttribute('data-aa-interactive', ''); menu.setAttribute('data-consistency-context', ''); menu.setAttribute('aria-label', `${kind} appearance`);
       const option = (label: string, change: () => void) => {
@@ -213,7 +213,7 @@ export function contentElementAtoms(canWrite: () => boolean, getHost: () => HTML
         if (event.key === 'Backspace' || event.key === 'Delete') { event.preventDefault(); event.stopPropagation(); element.dispatchEvent(new CustomEvent('aa-atom-source', { bubbles: true, detail: { source: '' } })); }
       };
       element.addEventListener('contextmenu', context); element.addEventListener('keydown', key);
-      return () => { doc.removeEventListener('pointerdown', dismissAction, true); clearTimeout(leaveTimer); element.removeEventListener('pointerenter', enter); element.removeEventListener('pointerleave', pointerLeave); observer.disconnect(); element.removeEventListener('consistency-resize', resize); element.removeEventListener('consistency-card-gap', gap); element.removeEventListener('focusin', focus); element.removeEventListener('focusout', leave); editors.forEach(editor => editor.destroy()); menu.remove(); element.removeEventListener('focusout', blur); element.removeEventListener('contextmenu', context); element.removeEventListener('keydown', key); };
+      return () => { doc.removeEventListener('pointerdown', dismissAction, true); clearTimeout(leaveTimer); element.removeEventListener('pointerenter', enter); element.removeEventListener('pointermove', enter); element.removeEventListener('pointerleave', pointerLeave); observer.disconnect(); element.removeEventListener('consistency-resize', resize); element.removeEventListener('consistency-card-gap', gap); element.removeEventListener('focusin', focus); element.removeEventListener('focusout', leave); editors.forEach(editor => editor.destroy()); menu.remove(); element.removeEventListener('focusout', blur); element.removeEventListener('contextmenu', context); element.removeEventListener('keydown', key); };
     },
   }));
   return [...atoms, carouselAtom(canWrite, getHost)];

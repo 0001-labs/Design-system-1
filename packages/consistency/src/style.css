@@ -232,3 +232,6 @@ consistency-editor,.consistency-shell{height:100dvh;min-height:0}
 .consistency-sheet .aa-atom[data-atom="image"]{background:transparent}
 .context-active :is(.ghost-surface,.consistency-text-gap,.consistency-column-gap,.consistency-card-gap,.consistency-stat-gap,.consistency-resize-edge){visibility:hidden!important;pointer-events:none!important}
 .consistency-layer-toggle:has(button:disabled)>span{color:var(--ds-text-color-muted)}
+
+/* Crossing an element during a gesture is not a request to edit its action. */
+consistency-editor[data-pointer-busy] :is(.consistency-button-action,.consistency-carousel-tools):not([data-keyboard]):not(:focus-within){visibility:hidden;pointer-events:none}

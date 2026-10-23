@@ -21,3 +21,13 @@ test('marquee chooses actual content rather than empty Aa lines or spacing chrom
  const gap=document.createElement('div');gap.className='consistency-gap';gap.append(block);expect(isMarqueeContent(block)).toBe(false);
  block.remove();block.textContent='';block.innerHTML='<span class="aa-atom"></span>';expect(isMarqueeContent(block)).toBe(true);
 });
+
+test('explicit component tools win over background selection and reordering', () => {
+ for (const attribute of ['data-aa-interactive', 'data-handle']) {
+  const tool=document.createElement('span');tool.setAttribute(attribute,'');expect(canStartMarquee(tool)).toBe(false);
+ }
+ for (const role of ['slider','button','menu','toolbar']) {
+  const tool=document.createElement('div');tool.setAttribute('role',role);const child=document.createElement('span');tool.append(child);expect(canStartMarquee(child)).toBe(false);
+ }
+ const edge=document.createElement('span');edge.className='consistency-resize-edge';expect(canStartMarquee(edge)).toBe(false);
+});

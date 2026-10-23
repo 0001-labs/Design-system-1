@@ -64,8 +64,11 @@ test('marquee selects intersecting content, Escape clears, toggle disables it', 
  const stage = editor.querySelector('.consistency-stage')!;
  pointer(stage, 'pointerdown');
  window.dispatchEvent(new PointerEvent('pointermove', { pointerId: 1, clientX: 90, clientY: 90 }));
+ await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
+ expect(item.hasAttribute('data-selected')).toBe(true);
+ expect(editor.selection.size).toBe(0); // Gesture preview does not rebuild the composition.
+ window.dispatchEvent(new PointerEvent('pointerup', { pointerId: 1, clientX: 90, clientY: 90 }));
  expect(editor.selection.has('bookshop')).toBe(true);
- pointer(window, 'pointerup', 90);
  window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' })); expect(editor.selection.size).toBe(0);
  (editor.querySelector('[role="switch"][aria-label="Marquee"]') as HTMLElement).click(); await editor.updateComplete;
  pointer(stage, 'pointerdown'); window.dispatchEvent(new PointerEvent('pointermove', { pointerId: 1, clientX: 90, clientY: 90 }));
