@@ -19,6 +19,8 @@ For composition editing, make the space or boundary itself the interaction targe
 
 Pointer movement follows the hand continuously; snap to the grid only on release, with a short, interruptible settling motion. For a spacing measurement at the gap midpoint, change the gap by twice the pointer displacement (adjusted for device scale), so the midpoint stays under the pointer. Keep the label anchored to the actual measurement, never floating independently. Preserve that geometry in both axes; a dragged outer boundary follows at full speed. Keep text crisp, use transform/opacity for the settling animation, respect reduced motion, and keep keyboard adjustments immediate. Read the `animate` and `emil-design-eng` skills when implementing this motion.
 
+Linked component previews (`editing.linked-preview`): when consistency is enabled, a spacing drag updates the corresponding gap and required container growth in every matching component in the same preview frame, before release. Keep each instance’s text independent. Preview leaves authored content and history untouched; release commits the linked design once, and cancellation restores every instance. Verify with a pointer held down, including linked instances with different text lengths and with consistency disabled.
+
 Text must never render below its DS1 role size, including in interactive component previews. A preview uses the selected library's actual text and control sizing; reduce its surrounding padding or reflow the specimen instead of shrinking it with zoom, transforms or smaller fonts. Film-kit compositions are the explicit exception: their camera and composition may scale the design.
 
 ### Source-first workflow

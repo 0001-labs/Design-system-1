@@ -4,7 +4,7 @@ import './resize.css';
 import { CompositionSettle } from './settle';
 export type ElementSize = { width: number; height: number };
 export function resizeValue(value: number, min = 80, max = 2000) { return Math.min(max, Math.max(min, Math.round(value / 20) * 20)); }
-export function cardMinimumHeight(target: HTMLElement, scale = 1): number {
+export function cardMinimumHeight(target: HTMLElement, scale = 1, snap = true): number {
   const surface = target.shadowRoot?.querySelector<HTMLElement>('.ds-card'); if (!surface) return 80;
   const style = getComputedStyle(surface);
   const content = ['label', 'title', 'body'].reduce((sum, name) => {
@@ -15,7 +15,8 @@ export function cardMinimumHeight(target: HTMLElement, scale = 1): number {
   }, 0);
   const media = surface.querySelector<HTMLElement>('.ds-card__media');
   const mediaContent = media && !media.hidden ? Math.max(0, ...Array.from(target.querySelectorAll<HTMLElement>('[slot="media"]')).map(node => node.getBoundingClientRect().height)) + (Number.parseFloat(getComputedStyle(media).paddingTop) || 0) : 0;
-  return Math.ceil((content + Number.parseFloat(style.paddingTop) + Number.parseFloat(style.paddingBottom) + mediaContent) / scale / 20) * 20;
+  const minimum = (content + Number.parseFloat(style.paddingTop) + Number.parseFloat(style.paddingBottom) + mediaContent) / scale;
+  return snap ? Math.ceil(minimum / 20) * 20 : minimum;
 }
 export function cardMinimumWidth(target: HTMLElement, scale = 1): number {
   const canvas = target.ownerDocument.createElement('canvas'), context = canvas.getContext('2d'); let widest = 0;
@@ -42,6 +43,7 @@ export class ResizingLayer {
     for (const target of this.root.querySelectorAll<HTMLElement>('.consistency-sheet ds-card, .consistency-sheet .aa-atom[data-atom="image"]:has(>img), .consistency-sheet .consistency-carousel-frame')) {
       if (target.closest('.aa-command-preview')) continue;
       const card = target.tagName === 'DS-CARD', carousel = target.classList.contains('consistency-carousel-frame'); const key = target.dataset.selectable;
+      if (card && target.hasAttribute('data-card-spacing-preview')) continue;
       if (card && key && !target.closest('.aa-atom')) {
         const size = this.options.size(key); if (size) { target.style.width = `calc(${size.width}px * var(--sf))`; target.style.height = `calc(${size.height}px * var(--sf))`; target.style.flex = 'none'; }
         else { target.style.removeProperty('width'); target.style.removeProperty('height'); target.style.removeProperty('flex'); }
