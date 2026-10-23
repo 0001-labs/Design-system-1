@@ -201,8 +201,8 @@ consistency-editor,.consistency-shell{width:100%;max-width:100%;min-width:0}
 .consistency-mobile-preview .consistency-sheet aa-editor,.consistency-mobile-preview .consistency-sheet .aa-block,.consistency-mobile-preview .consistency-sheet ds-card{overflow-wrap:break-word;word-break:normal}
 .consistency-statistics>ds-stat{--ds-stat-text-overflow-wrap:break-word}
 /* Selection rests softly on the authored element, never its empty gaps. */
-.consistency-sheet :is([data-composition-selected],[data-selectable][data-selected]:not(.aa-block)){position:relative;outline:none!important;box-shadow:none}
-.consistency-sheet :is([data-composition-selected],[data-selectable][data-selected]:not(.aa-block))::after{content:'';position:absolute;inset:0;z-index:20;pointer-events:none;border:0;outline:0;border-radius:inherit;background:color-mix(in srgb,var(--ds-text-color) 15%,transparent)}
+.consistency-sheet :is([data-composition-selected],[data-selectable][data-selected]:not(.aa-block),[data-selection-face]){position:relative;outline:none!important;box-shadow:none}
+.consistency-sheet [data-selection-face]::after{content:'';position:absolute;inset:0;z-index:20;pointer-events:none;border:0;outline:0;border-radius:inherit;background:color-mix(in srgb,var(--ds-text-color) 15%,transparent)}
 
 .consistency-shell :is(.consistency-card-gap,.consistency-stat-gap)[aria-valuenow="0"]{background:linear-gradient(to bottom,transparent calc(50% - .5px),var(--ds-pink) calc(50% - .5px),var(--ds-pink) calc(50% + .5px),transparent calc(50% + .5px))}
 /* Keep the phone website's one-square inner inset without buying that room

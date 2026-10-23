@@ -24,6 +24,16 @@ try {
  });
  const button=page.locator('.consistency-button-action').first();
  await button.waitFor({state:'attached'});await page.waitForTimeout(100);
+ // Selecting a section retains command identity, but paints only its authored leaves.
+ await page.locator('consistency-editor').evaluate(async e=>{e.selection=new Set(['group-intro']);await e.updateComplete;});
+ const faces=await page.locator('[data-sort-group="intro"]').evaluate(group=>({
+  selected:group.hasAttribute('data-selected'), parentFace:getComputedStyle(group,'::after').content,
+  leaves:[...group.querySelectorAll('[data-selection-face]')].map(e=>({empty:!e.textContent.trim(),children:!!e.querySelector('[data-selectable],.aa-block'),paint:getComputedStyle(e,'::after').content})),
+  gapPaint:[...group.querySelectorAll('.consistency-gap,.consistency-text-gap')].some(e=>e.hasAttribute('data-selection-face'))
+ }));
+ if(!faces.selected||!['none','normal'].includes(faces.parentFace)||faces.gapPaint||faces.leaves.length<5||faces.leaves.some(e=>e.empty||e.children||e.paint!=='""'))throw Error('Selection painted group spacing '+JSON.stringify(faces));
+ await page.keyboard.press('Escape');
+ if(await page.locator('[data-selection-face]').count())throw Error('Escape left component selection faces');
  const before = await page.locator('consistency-editor').evaluate(e=>JSON.stringify(e.history.value));
  // Count full editor updates and hit-test layout reads, not machine-dependent timings.
  await page.locator('consistency-editor').evaluate(e=>{

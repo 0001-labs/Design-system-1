@@ -16,6 +16,22 @@ export function isMarqueeContent(element: HTMLElement): boolean {
   return !!element.textContent?.trim() || element.dataset.kind === 'divider' || !!element.querySelector('.aa-atom,img,hr,video,canvas,ds-card,ds-button,table');
 }
 
+/** Keep group identity for commands, but paint only authored component bounds. */
+export function paintCompositionSelection(root: HTMLElement, selection: Set<string>): void {
+  const elements = Array.from(root.querySelectorAll<HTMLElement>('[data-selectable]'));
+  const selected = elements.filter(element => selection.has(element.dataset.selectable!));
+  for (const element of elements) {
+    const attribute = element.classList.contains('aa-block') ? 'data-composition-selected' : 'data-selected';
+    const active = selection.has(element.dataset.selectable!);
+    if (element.hasAttribute(attribute) !== active) element.toggleAttribute(attribute, active);
+  }
+  for (const element of root.querySelectorAll<HTMLElement>('[data-selectable], .aa-block')) {
+    const leaf = !element.querySelector('[data-selectable], .aa-block');
+    const active = leaf && isMarqueeContent(element) && selected.some(parent => parent === element || parent.contains(element));
+    if (element.hasAttribute('data-selection-face') !== active) element.toggleAttribute('data-selection-face', active);
+  }
+}
+
 /** A gesture owns its overlay and geometry cache; the composition changes only at release. */
 export function beginMarquee(root: HTMLElement, event: PointerEvent, previous: Set<string>, commit: (selection: Set<string>) => void): () => void {
   const view = root.ownerDocument.defaultView!;
@@ -34,13 +50,7 @@ export function beginMarquee(root: HTMLElement, event: PointerEvent, previous: S
     scrollOwners.push({ element, x: element.scrollLeft, y: element.scrollTop });
   }
   const observed = new WeakSet<Element>();
-  const paintSelection = (selection: Set<string>) => {
-    root.querySelectorAll<HTMLElement>('[data-selectable]').forEach(element => {
-      const attribute = element.classList.contains('aa-block') ? 'data-composition-selected' : 'data-selected';
-      const selected = selection.has(element.dataset.selectable!);
-      if (element.hasAttribute(attribute) !== selected) element.toggleAttribute(attribute, selected);
-    });
-  };
+  const paintSelection = (selection: Set<string>) => paintCompositionSelection(root, selection);
   const draw = () => {
     frame = 0;
     if (ended) return;

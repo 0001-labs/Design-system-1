@@ -3045,7 +3045,7 @@ var mn = class extends (typeof HTMLElement > "u" ? class {} : HTMLElement) {
 			return t.classList.add("note-menu-row", "ds-context__item--icon"), t.dataset.action = e.id, t;
 		})), !vn()) for (let e = this.actions.length; e % 5; e++) {
 			let e = document.createElement("span");
-			e.className = "aa-toolbar-spacer", e.setAttribute("aria-hidden", "true"), this.append(e);
+			e.className = "aa-toolbar-spacer", e.setAttribute("aria-hidden", "true"), e.append(pn("Placeholder", "plus", () => {}).firstElementChild), this.append(e);
 		}
 		this.below && this.append(this.below);
 	}
@@ -3090,10 +3090,10 @@ function bn(e) {
 	e.style.top = `${t.top + t.height - e.getBoundingClientRect().height - n}px`;
 }
 function xn(e, t, n, r) {
-	let i = 10 * r, a = e.top - i - t.height;
+	let i = e.top - t.height;
 	return {
 		left: Math.max(n.left, Math.min(e.left + (e.width - t.width) / 2, n.left + n.width - t.width)),
-		top: Math.max(n.top, Math.min(a >= n.top ? a : e.bottom + i, n.top + n.height - t.height))
+		top: Math.max(n.top, Math.min(i >= n.top ? i : e.bottom + 0, n.top + n.height - t.height))
 	};
 }
 function Sn(e, t) {

@@ -32,13 +32,13 @@ export declare class AaToolbarElement extends AaToolbarElement_base {
     refresh(): void;
 }
 export declare function defineAaToolbar(): void;
-/** A fixed half-square gap, independent of how many rows the bar contains. */
+/** Sit directly against the selection, independent of how many rows the bar contains. */
 export declare function selectionToolbarPosition(rect: Pick<DOMRect, 'left' | 'top' | 'width' | 'bottom'>, box: Pick<DOMRect, 'width' | 'height'>, view: {
     left: number;
     top: number;
     width: number;
     height: number;
-}, scale: number): {
+}, _scale: number): {
     left: number;
     top: number;
 };

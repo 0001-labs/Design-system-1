@@ -27,7 +27,7 @@ import '../../../DS1/2-core/ds-switch';
 import '../../../DS1/3-unit/ds-select';
 import { defineAaEditor, parseBlocks, type AaEditorElement } from '../../../website/src/vendor/aa/aa.js';
 import { bindSpacingHandle } from '../../app/src/2-core/spacing-handle';
-import { canStartMarquee, beginMarquee, type SelectionRect } from './marquee';
+import { canStartMarquee, beginMarquee, paintCompositionSelection, type SelectionRect } from './marquee';
 import { CompositionSettle } from './settle';
 import { createPreviewEditorOptions } from './aa';
 import type { EditorOptions } from '../../../website/src/vendor/aa/aa';
@@ -229,7 +229,7 @@ export class ConsistencyEditor extends LitElement {
     if (document.fonts && typeof ResizeObserver !== 'undefined') initGridFit();
   }
   private paintSelection() {
-    this.querySelectorAll<HTMLElement>('[data-selectable]').forEach(element => element.toggleAttribute(element.classList.contains('aa-block') ? 'data-composition-selected' : 'data-selected', (this.layers.marquee || this.layers.reorder) && this.selection.has(element.dataset.selectable!)));
+    paintCompositionSelection(this, (this.layers.marquee || this.layers.reorder) ? this.selection : new Set());
   }
   protected updated(changed: PropertyValues) {
     // Selection and focused measures do not change document geometry or layer bindings.
