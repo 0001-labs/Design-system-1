@@ -56,10 +56,10 @@ test("shared heading styles and docs tables prevent inherited emergency word bre
       const prose = read('DS1/1-root/prose.css').replace(/^@import.*$/gm, '');
       const docs = read('website/src/styles/custom.css');
       const tableRules = docs.slice(docs.indexOf('.sl-markdown-content :is(th, td)'), docs.indexOf('.expressive-code pre'));
-      await page.setContent(`<style>${text}\n${prose}\n${tableRules}
+      await page.setContent(`<style>code { overflow-wrap:anywhere; } ${text}\n${prose}\n${tableRules}
         body { font:20px/30px monospace; overflow-wrap:anywhere; word-break:break-all; }
         h2 {font:inherit;width:78px} table{table-layout:fixed;width:78px}th{font:inherit}
-        </style><section data-ds-prose class="sl-markdown-content"><h2>Material</h2><table><tr><th>Material</th></tr></table></section>
+        </style><section data-ds-prose class="sl-markdown-content"><h2>Material</h2><table><tr><th>Material</th></tr><tr><th><code>Material</code></th></tr></table></section>
         <ds-text size="heading" wrap>Material</ds-text>`);
       const component = read('DS1/2-core/styles/ds-text.css').replace(/^@import.*$/gm, '');
       await page.evaluate(css => {
