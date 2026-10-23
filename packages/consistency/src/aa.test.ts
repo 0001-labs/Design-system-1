@@ -41,3 +41,10 @@ it('reports non-JSON API failures rather than applying an edit', async () => {
   vi.stubGlobal('fetch', async () => new Response('Service unavailable', { status: 503 }));
   await expect(previewPrompt('Write', { kind: 'writing', text: 'Keep this', signal: new AbortController().signal })).rejects.toThrow();
 });
+it('passes bounded component replacements to the existing exact-match and undo path', async () => {
+  const edits = [{ find: 'original component', replace: 'updated component' }];
+  vi.stubGlobal('fetch', async () => Response.json({ edits }));
+  expect(await previewPrompt('Change variant', { kind: 'writing', text: '', document: 'original component\n⟦here⟧', signal: new AbortController().signal })).toEqual({ edits });
+  vi.stubGlobal('fetch', async () => Response.json({ edits: [{ find: '', replace: 'bad' }] }));
+  await expect(previewPrompt('Change variant', { kind: 'writing', text: '', signal: new AbortController().signal })).rejects.toThrow('invalid edit');
+});

@@ -16,11 +16,11 @@ describe('owner flag management',()=>{
     expect((await featureFlags(request(),env,send)).status).toBe(403);
     expect(env.LIBRARIES.get).not.toHaveBeenCalled();
   });
-  it('reports no declared release switches without inventing a feature',async()=>{
+  it('reports the component trial disabled by default',async()=>{
     const {env,send}=setup();
     const response=await featureFlags(request(),env,send);
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual([]);
+    expect(await response.json()).toEqual([expect.objectContaining({key:'consistency-component-routing',enabled:false,inherited:true})]);
     expect(response.headers.get('cache-control')).toBe('private, no-store');
   });
   it('rejects undeclared flags without writing a rule',async()=>{
@@ -46,10 +46,10 @@ describe('shared HTTP and service-binding flag store', () => {
       expect(stored.has('feature-flags/test-release.json')).toBe(true);
       expect(await (await featureFlags(request(),env,send)).json()).toEqual(await manageFeatureFlags(env));
       expect((await featureFlags(request('PUT',{...rule,enabled:false}),env,send)).status).toBe(200);
-      expect((await manageFeatureFlags(env))[0]?.enabled).toBe(false);
+      expect((await manageFeatureFlags(env)).find(flag=>flag.key==='test-release')?.enabled).toBe(false);
       await expect(setFeatureFlag(env,{...rule,audience:'invalid'})).rejects.toThrow('Invalid feature flag');
       await expect(setFeatureFlag(env,{...rule,accountIds:Array(101).fill('account')})).rejects.toThrow('Invalid feature flag');
-      expect((await manageFeatureFlags(env))[0]?.enabled).toBe(false);
+      expect((await manageFeatureFlags(env)).find(flag=>flag.key==='test-release')?.enabled).toBe(false);
     } finally { Reflect.deleteProperty(FEATURE_FLAGS,'test-release'); }
   });
 
@@ -66,7 +66,7 @@ describe('shared HTTP and service-binding flag store', () => {
       const rule={key:'test-release',enabled:true,audience:'percentage',accountIds:[],percentage:25};
       expect((await featureFlags(request('PUT',rule),env,send)).status).toBe(200);
       expect(JSON.parse(stored.get('feature-flags/test-release.json')!)).toEqual({enabled:true,audience:'percentage',accountIds:[],percentage:25});
-      const [flag]=await manageFeatureFlags(env);
+      const flag=(await manageFeatureFlags(env)).find(flag=>flag.key==='test-release');
       expect(flag).toMatchObject({key:'test-release',enabled:true,audience:'percentage',percentage:25,inherited:false});
       const rules={'test-release':JSON.parse(stored.get('feature-flags/test-release.json')!)};
       const accounts=Array.from({length:400},(_,index)=>`account-${index}`);
@@ -77,11 +77,11 @@ describe('shared HTTP and service-binding flag store', () => {
       // A share without a whole percent from 1 to 99 is refused and the stored rule stays.
       await expect(setFeatureFlag(env,{...rule,percentage:undefined})).rejects.toThrow('Invalid feature flag');
       await expect(setFeatureFlag(env,{...rule,percentage:100})).rejects.toThrow('Invalid feature flag');
-      expect((await manageFeatureFlags(env))[0]?.percentage).toBe(25);
+      expect((await manageFeatureFlags(env)).find(flag=>flag.key==='test-release')?.percentage).toBe(25);
       // Another audience drops the percent.
       await setFeatureFlag(env,{...rule,audience:'owner'});
       expect(JSON.parse(stored.get('feature-flags/test-release.json')!)).toEqual({enabled:true,audience:'owner',accountIds:[]});
-      expect((await manageFeatureFlags(env))[0]).not.toHaveProperty('percentage');
+      expect((await manageFeatureFlags(env)).find(flag=>flag.key==='test-release')).not.toHaveProperty('percentage');
     } finally { Reflect.deleteProperty(FEATURE_FLAGS,'test-release'); }
   });
 });

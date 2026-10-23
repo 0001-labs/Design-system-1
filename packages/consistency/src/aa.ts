@@ -16,6 +16,11 @@ export const previewPrompt: Prompter = async (prompt, context) => {
     throw new Error(message);
   }
   if (!result || typeof result !== 'object') throw new Error('AI returned an invalid edit. Try again.');
+  if ('edits' in result && Array.isArray(result.edits) && result.edits.length === 1) {
+    const edit: unknown = result.edits[0];
+    if (edit && typeof edit === 'object' && 'find' in edit && 'replace' in edit && typeof edit.find === 'string' && !!edit.find && edit.find.length <= 24_000 && typeof edit.replace === 'string' && edit.replace.length <= 24_000) return { edits: [{ find: edit.find, replace: edit.replace }] } satisfies PromptAnswer;
+    throw new Error('AI returned an invalid edit. Try again.');
+  }
   if ('document' in result && typeof result.document === 'string') return { document: result.document } satisfies PromptAnswer;
   if ('insert' in result && typeof result.insert === 'string') return { insert: result.insert } satisfies PromptAnswer;
   throw new Error('AI returned an invalid edit. Try again.');

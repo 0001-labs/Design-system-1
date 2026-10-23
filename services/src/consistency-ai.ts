@@ -2,7 +2,8 @@
 import { authorizeReport, type ReportsEnv } from './reports';
 import { sessionRequest } from './dashboard';
 import { CONSISTENCY_HOST } from './consistency';
-export interface PreviewAIEnv extends ReportsEnv { AI?: Ai }
+import { routeComponentEdit, type ComponentRoutingEnv } from './consistency-routing';
+export interface PreviewAIEnv extends ReportsEnv, ComponentRoutingEnv { AI?: Ai }
 const headers = { 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow', 'X-Content-Type-Options': 'nosniff', Vary: 'Cookie, Authorization' };
 const error = (message: string, status: number) => Response.json({ error: message }, { status, headers });
 export async function consistencyAI(request: Request, env: PreviewAIEnv, send: typeof fetch = fetch): Promise<Response> {
@@ -12,7 +13,6 @@ export async function consistencyAI(request: Request, env: PreviewAIEnv, send: t
   if (request.headers.get('origin') !== url.origin) return error('Request origin is not allowed.', 403);
   const denied = await authorizeReport(sessionRequest(new Request(request.url, { headers: request.headers })), env, send);
   if (denied) return denied;
-  if (!env.AI) return error('AI is not configured.', 503);
   if (!request.headers.get('content-type')?.startsWith('application/json')) return error('Send JSON.', 415);
   // Bound streamed input too: Content-Length alone is not trustworthy.
   const reader = request.body?.getReader();
@@ -29,6 +29,11 @@ export async function consistencyAI(request: Request, env: PreviewAIEnv, send: t
   try { input = JSON.parse(await new Blob(chunks).text()); } catch { return error('Invalid JSON.', 400); }
   if (!input || typeof input !== 'object' || typeof input.prompt !== 'string' || !input.prompt.trim() || input.prompt.length > 4000 || !['writing', 'diagram'].includes(String(input.kind))) return error('Provide a prompt and editing kind.', 400);
   for (const name of ['text', 'before', 'after', 'document']) if (input[name] !== undefined && typeof input[name] !== 'string') return error('Invalid document context.', 400);
+  const routingStarted = Date.now();
+  const routed = await routeComponentEdit({ prompt: input.prompt, kind: String(input.kind), text: input.text as string | undefined, document: input.document as string | undefined }, env, send, request.signal);
+  if (request.signal.aborted) return error('The edit was cancelled.', 408);
+  if (routed) return Response.json(routed, { headers: { ...headers, 'Server-Timing': `component;dur=${Date.now() - routingStarted}` } });
+  if (!env.AI) return error('AI is not configured.', 503);
   const wholeDocument = input.kind === 'writing' && typeof input.document === 'string';
   const instruction = input.kind === 'diagram'
     ? 'Edit the supplied diagram according to the instruction. Return only its updated source. Preserve its source format. No explanation or surrounding code fences.'
