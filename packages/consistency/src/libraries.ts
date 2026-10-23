@@ -1,10 +1,18 @@
+import voyageStyles from '../../../website/public/examples/libraries/voyage.css?raw';
+// Read the canonical example library's root roles; never duplicate its palette here.
+const voyageTokens: Record<string, string> = {};
+for (const rule of voyageStyles.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+  if (!rule[1].trim().split(',').some(selector => selector.trim() === ':root')) continue;
+  for (const declaration of rule[2].matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)) voyageTokens[declaration[1]] = declaration[2].trim();
+}
 /** Local presets of DS1's public library token roles, not saved account libraries.
  * Geometry and component implementations stay DS1's; the selected map also travels
  * to authored atom previews that render outside the composition. */
-export type LibraryId = 'original' | 'blue' | 'ink' | 'soft' | 'bold' | 'editorial';
+export type LibraryId = 'original' | 'blue' | 'ink' | 'soft' | 'bold' | 'editorial' | 'voyage';
 export interface LibraryPreset { id: LibraryId; label: string; tokens: Record<string, string> }
 export const LIBRARY_PRESETS: readonly LibraryPreset[] = [
   { id: 'original', label: 'Original preset', tokens: {} },
+  { id: 'voyage', label: 'Voyage · Booking site', tokens: voyageTokens },
   { id: 'blue', label: 'Blue preset', tokens: {
     '--ds-accent-color': 'var(--ds-sharp-blue)', '--accent-color': 'var(--ds-sharp-blue)',
     '--ds-button-background-color-primary': 'var(--ds-sharp-blue)', '--button-background-color-primary': 'var(--ds-sharp-blue)',

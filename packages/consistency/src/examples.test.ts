@@ -13,6 +13,7 @@ it('offers the studio and ten DS1 pages as editable compositions', () => {
   if (page.id !== 'financial') expect(readFileSync(resolve(page.sourcePath), 'utf8')).toContain(`${page.id}:`);
   expect(page.sourceUrl).toBe(`https://designsystem1.com/examples/layouts/${page.id}/`);
   expect(page.composition.order[0]).toBe('intro');
+  if (page.id === 'booking') { expect(page.composition.sections).toEqual({}); continue; }
   expect(parseBlocks(page.composition.text).length).toBeGreaterThan(1);
   for (const id of page.composition.order.slice(1)) expect(page.composition.sections[id]).toBeTruthy();
   const all = page.composition.text + Object.values(page.composition.sections).join('\n');
@@ -24,7 +25,7 @@ it('offers the studio and ten DS1 pages as editable compositions', () => {
 it('keeps sourced headings in the DS1 example source and independent mutable drafts', () => {
  const source = readFileSync(resolve('website/src/lib/product-examples.ts'), 'utf8');
  for (const heading of ['A room is never really finished.', 'A good week starts here.', 'Nothing between you and the next track.', 'A little closer to the mountains.']) expect(source).toContain(heading);
- for (const [id, heading] of [['travel', 'Slow mornings by still water.'], ['booking', 'Get more from every work trip'], ['cafe', 'Something warm, something sweet.'], ['magazine', 'Getting there is the point.'], ['bike', 'Hills, flattened.']]) {
+ for (const [id, heading] of [['travel', 'Slow mornings by still water.'], ['cafe', 'Something warm, something sweet.'], ['magazine', 'Getting there is the point.'], ['bike', 'Hills, flattened.']]) {
   const page = EXAMPLE_PAGES.find(page => page.id === id)!;
   expect(readFileSync(resolve(page.sourcePath), 'utf8')).toContain(heading);
   expect(page.composition.text + Object.values(page.composition.sections).join('\n')).toContain(heading);

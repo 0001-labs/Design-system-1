@@ -110,22 +110,8 @@ export const EXAMPLE_PAGES: readonly ExamplePage[] = [
    ])].join('\n\n'),
   arrival: '## Arrive, and the lake does the rest.\n\n### How do I get the key?\n\nA code arrives the morning you travel. The door opens with it until you leave.\n\n### Is there a boat?\n\nEvery cabin has a rowing boat, life jackets and a map of the swimming spots.\n\n### Can I bring a dog?\n\nYes, in the pine cabins. Bring its bed; we leave a bowl by the door.',
  }, 800, 'website/src/lib/library-examples.ts'),
- page('booking', 'Booking site', [
-  '# Staywise', 'Stays, flights and everything between',
-  '## Get more from every work trip',
-  'It is easier with Staywise for work. Book, manage and track the team’s travel in one place.',
-  button('Open a free work account'),
-  writeColumns(['### Destination\n\nWhere are you going?', '### Dates\n\nCheck-in — check-out', '### Guests and rooms\n\n2 adults · 0 children · 1 room']), button('Search'),
- ].join('\n\n'), {
-  recent: ['## Your recent searches', photo('trip-wing.jpg', 'A plane’s wing over the sea', 16), card('Tokyo to Copenhagen', 'TYO to CPH', 'Thu, 29 Oct · 1 traveller')].join('\n\n'),
-  destinations: ['## Trending destinations', 'Most popular with travellers from Denmark',
-   writeColumns([
-    [photo('city-lisbon.jpg', 'Lisbon, Portugal', 14), card('Portugal', 'Lisbon', 'Trending destination')].join('\n\n'),
-    [photo('city-kyoto.jpg', 'Kyoto, Japan', 14), card('Japan', 'Kyoto', 'Trending destination')].join('\n\n'),
-    [photo('city-copenhagen.jpg', 'Copenhagen, Denmark', 14), card('Denmark', 'Copenhagen', 'Trending destination')].join('\n\n'),
-   ])].join('\n\n'),
-  deals: ['## Deals for the weekend', photo('trip-room.jpg', 'A bright hotel room with two beds', 18), card('Hakodate · 8.9', 'Harbour Hotel', 'From €96 a night'), button('See all deals', true)].join('\n\n'),
- }, 800, 'website/src/lib/library-brands.ts'),
+ // Booking mounts its complete authored page; sections hold its editable text overrides.
+ page('booking', 'Booking site', '', {}, 1120, 'website/src/lib/library-brands.ts'),
  page('cafe', 'Café', [
   '# Petal', 'Coffee, tea and things from the oven', '## Something warm, something sweet.',
   'Order ahead and it waits for you on the counter, still warm, with your name on the cup.',

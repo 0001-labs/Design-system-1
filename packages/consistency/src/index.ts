@@ -1,3 +1,4 @@
+import './booking';
 import { PointerActivity } from './pointer-activity';
 import { ContextActivity } from './context-activity';
 import { ColumnSpacingLayer } from './column-spacing';
@@ -77,7 +78,7 @@ export class ConsistencyEditor extends LitElement {
     this.spacingDisposers.forEach(dispose => dispose()); this.spacingDisposers = []; this.spacingBound = false;
     this.histories.set(this.selectedExample, this.history); this.history = this.histories.get(id) ?? new CompositionHistory(structuredClone(example.composition)); this.histories.set(id, this.history);
     this.textSpacing?.destroy(); this.textSpacing = undefined; this.columnSpacing?.destroy(); this.columnSpacing = undefined; this.selectedGap = id === 'studio' ? 'intro-actions' : 'section-intro';
-    this.selection = new Set(); this.preview = {}; this.selectedExample = id; this.revision++;
+    this.selection = new Set(); this.preview = {}; this.selectedExample = id; if (id === 'booking') this.library = 'voyage'; this.revision++;
   }
   private canvasWidth() { return Math.max(280, this.mobilePreview ? Math.min(380, Math.floor(this.stageWidth / 20) * 20) : this.stageWidth); }
   private sort?: SortableController;
@@ -197,6 +198,7 @@ export class ConsistencyEditor extends LitElement {
   }
   private group(id: string) {
     const doc = this.history.value;
+    if (this.selectedExample === 'booking') return id === 'intro' ? html`<consistency-booking .values=${doc.sections} .library=${this.library} @booking-history=${(event: CustomEvent<'undo' | 'redo'>) => { this.history[event.detail](); this.revision++; }} @booking-change=${(event: CustomEvent<Record<string, string>>) => { this.history.commit({ sections: event.detail }); this.revision++; }}></consistency-booking>` : html``;
     if (this.selectedExample !== 'studio') return html`<div data-sort-group=${id} data-selectable=${'group-' + id} class="consistency-group" @pointerdown=${(event: PointerEvent) => { if (this.layers.reorder && !event.shiftKey && canStartMarquee(event.target as Element)) this.selection = new Set(['group-' + id]); }} aria-label=${id}><section class="consistency-story-section">${this.sectionText(id, `${id} text`)}</section>${doc.order.indexOf(id) < doc.order.length - 1 ? this.gap(`section-${id}`) : ''}</div>`;
     const contents: Record<string, unknown> = {
       intro: html`<section class="consistency-story-section" id="studio-intro"><div class="consistency-text-bounds" data-ds-area data-selectable="intro"><aa-editor toolbar class=${this.mobilePreview || doc.wrap ? '' : 'consistency-nowrap'} aria-label="Composition text" data-editor-key="intro" .options=${this.optionsFor('intro')} .value=${doc.text}
@@ -341,7 +343,7 @@ export class ConsistencyEditor extends LitElement {
     const { width, padding } = compositionBounds(requestedWidth, this.value('padding'), this.mobilePreview, 280);
     return html`<div class="consistency-shell ${this.mobilePreview ? 'consistency-mobile-preview' : ''} ${this.enabled('gap') ? '' : 'spacing-off'} ${this.enabled('padding') ? '' : 'boundaries-off'} ${this.contextActive ? 'context-active' : ''} ${this.layers.reorder ? 'reorder-on' : ''} ${this.layers.production ? 'production-on' : ''}">
       <main class="consistency-workspace"><section class="consistency-stage" aria-label="Editable composition" @pointerdown=${this.startMarquee}>
-        <div class="consistency-sheet" data-ds-grid-scroll data-ds-surface data-consistency-library=${this.library} style=${styleMap({ ...libraryTokens(this.library), color: 'var(--ds-text-color)', colorScheme: this.library === 'ink' ? 'dark' : this.library === 'blue' ? 'light' : undefined, width: this.mobilePreview ? `calc(${width}px * var(--sf))` : '100%', padding: `calc(${padding}px * var(--sf))`, '--composition-padding': `calc(${padding}px * var(--sf))`, '--composition-content-width': `calc(${width - padding * 2}px * var(--sf))`, '--composition-card-width': `calc(${Math.max(READABLE_CARD_MIN, Math.floor((width - padding * 2 - 20) / 40) * 20)}px * var(--sf))` })}>
+        <div class="consistency-sheet" data-ds-grid-scroll data-ds-surface data-consistency-library=${this.library} style=${styleMap({ ...libraryTokens(this.library), color: 'var(--ds-text-color)', colorScheme: this.library === 'ink' ? 'dark' : this.library === 'blue' ? 'light' : undefined, width: this.mobilePreview ? `calc(${width}px * var(--sf))` : '100%', padding: this.selectedExample === 'booking' ? '0' : `calc(${padding}px * var(--sf))`, '--composition-padding': `calc(${padding}px * var(--sf))`, '--composition-content-width': `calc(${width - padding * 2}px * var(--sf))`, '--composition-card-width': `calc(${Math.max(READABLE_CARD_MIN, Math.floor((width - padding * 2 - 20) / 40) * 20)}px * var(--sf))` })}>
           <div class="consistency-padding">${this.handle('padding', 'Padding')}</div>
           ${repeat(doc.order, id => `${this.selectedExample}:${id}`, id => this.group(id))}
         </div>

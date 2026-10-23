@@ -241,3 +241,13 @@ consistency-editor[data-pointer-busy] :is(.consistency-button-action,.consistenc
 
 /* Keep the current DS1 opaque muted role over tinted surfaces in this editor. */
 consistency-editor{--ds-text-color-muted:light-dark(#5f5f5f,#cacaca);--ds-number-lead-color:var(--ds-text-color-muted)}
+
+/* The original booking page owns its responsive layout inside the editor stage. */
+consistency-booking { display:block; min-width:0; width:100%; container-type:inline-size; }
+consistency-booking .aa-plain { font:inherit; color:inherit; line-height:inherit; min-width:0; outline:none; }
+@container (max-width: 800px) {
+  consistency-booking ds-bento { grid-template-columns:minmax(0,1fr); }
+  consistency-booking ds-bento > [data-span] { grid-column:auto; }
+}
+
+consistency-booking .aa-plain > .aa-block { margin:0; padding:0; font:inherit; color:inherit; line-height:inherit; background:none; min-height:0; }
