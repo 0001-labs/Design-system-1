@@ -42,7 +42,7 @@ test("no DS1 stylesheet ends cut words with an ellipsis", () => {
 
 test("every fade is the one rule: a mask over the last square, only where marked cut", () => {
   const fade = "mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-unit)), transparent)";
-  for (const path of ["1-root/controls.css", "1-root/row.css", "2-core/styles/ds-text.css", "2-core/styles/ds-tag.css", "2-core/styles/ds-button.css", "3-unit/styles/ds-calendar.css", "3-unit/styles/ds-sidebar.css"]) {
+  for (const path of ["1-root/controls.css", "1-root/row.css", "2-core/styles/ds-text.css", "2-core/styles/ds-tag.css", "3-unit/styles/ds-calendar.css", "3-unit/styles/ds-sidebar.css"]) {
     const css = readFileSync(join(DS1, path), "utf8");
     expect(css, path).toContain(fade);
     expect(css, path).toContain("mask-image: linear-gradient(to left, #000 calc(100% - var(--ds-unit)), transparent)");
@@ -99,7 +99,7 @@ test("a row's slotted ds-text literal name is marked cut by the row and the text
   expect(name.hasAttribute("data-cut")).toBe(false);
 });
 
-test("a tag's and a button's words are marked, never the filled frame", async () => {
+test("tags may fade but button labels never do", async () => {
   document.body.innerHTML = `<ds-tag>A very long tag</ds-tag><ds-button primary text="Publish everything"></ds-button>`;
   const tag = document.querySelector("ds-tag") as HTMLElement & { updateComplete: Promise<unknown>; requestUpdate(): void };
   const button = document.querySelector("ds-button") as HTMLElement & { updateComplete: Promise<unknown>; requestUpdate(): void };
@@ -116,7 +116,7 @@ test("a tag's and a button's words are marked, never the filled frame", async ()
   await frame();
   expect(words.getAttribute("data-cut")).toBe("end");
   expect(tag.shadowRoot!.querySelector(".frame")!.hasAttribute("data-cut")).toBe(false);
-  expect(label.getAttribute("data-cut")).toBe("end");
+  expect(label.hasAttribute("data-cut")).toBe(false);
   expect(button.shadowRoot!.querySelector('[part="control"]')!.hasAttribute("data-cut")).toBe(false);
 });
 

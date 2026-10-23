@@ -1,3 +1,4 @@
+import { labelledButtons, inspectButtonLabels } from './button-label';
 import { inspectTextContrast, measureTextContrast } from "./text-contrast";
 import { inspectWordWrap, wordHeaders } from './word-wrap';
 
@@ -83,6 +84,14 @@ function rows(found: ReturnType<typeof cards>) {
 }
 
 export const constraints: Constraint[] = [
+  {
+    code: 'button.visible-label',
+    rule: 'Button labels stay fully visible, never faded, gradient-masked or truncated; round the required width up to whole grid squares.',
+    why: 'The action must remain readable; a chosen width cannot cut off its label.',
+    components: ['ds-button'],
+    check: { file: 'tests/button-cut-fade-measure.test.ts', test: 'button labels stay whole without gradients and snap up to the grid' },
+    measures: ['button', 'buttons'], count: root => labelledButtons(root).length, inspect: inspectButtonLabels,
+  },
   {
     code: 'text.whole-words',
     rule: 'Headings and table headers keep each word intact across lines; only a long word that cannot fit may split at a valid language-specific hyphenation point, with a visible hyphen.',
