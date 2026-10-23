@@ -26,11 +26,11 @@ try {
   if(await host.evaluate(host=>host.value)!==entry.source)throw Error(`${entry.label}: wrong source`);
   if(await page.locator('dialog[open]').count() || /Edit (list|tabs|table|carousel|image|link|icon)/i.test(await host.innerText()))throw Error('Unexpected edit control');
   if(entry.id==='icon'){
-   await host.locator('.aa-atom').dblclick();await host.getByRole('textbox',{name:'Icon name',exact:true}).fill('check');await page.keyboard.press('Enter');
+   await host.locator('.aa-atom').focus();await page.keyboard.press('Enter');await host.getByRole('textbox',{name:'Icon name',exact:true}).fill('check');await page.keyboard.press('Enter');
    if(await host.evaluate(host=>host.value)!==':icon[check]')throw Error('Icon did not change inline');await host.evaluate(host=>host.editor.undo());
   }
   if(entry.id==='image'){
-   await host.locator('input[type=file]').setInputFiles({name:'sample.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=','base64')});
+   const chooser=page.waitForEvent('filechooser');await host.locator('.consistency-image-placeholder').click();await (await chooser).setFiles({name:'sample.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=','base64')});
    await host.locator('img').waitFor();if(!(await host.evaluate(host=>host.value)).startsWith('![sample.png](data:image/png;base64,'))throw Error('Image was not stored as native Aa Markdown');await host.evaluate(host=>host.editor.undo());
   }
   await host.evaluate(host=>host.editor.undo());if(await host.evaluate(host=>host.value)!=='/'+entry.label)throw Error(`${entry.label}: undo failed`);
