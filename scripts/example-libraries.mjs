@@ -37,13 +37,13 @@ const mono = '"Inter Arrows", "Iosevka", "Iosevka Extended", ui-monospace, "SF M
 export const LIBRARIES = {
   slate: {
     name: 'Slate', note: 'A dark issue workspace on a 10px unit, with readable 14px text and 30px control rows.',
-    paper: ['#1e1e1e', '#1e1e1e'], text: ['#e6e6e6', '#e6e6e6'], muted: ['#b3b3b3', '#b3b3b3'],
-    fill: ['#2a2a2a', '#2a2a2a'], hover: ['#3c3c3c', '#3c3c3c'], border: ['#3c3c3c', '#3c3c3c'], input: ['#2a2a2a', '#2a2a2a'],
-    accent: ['#ccccff', '#ccccff'], onAccent: ['#1e1e1e', '#1e1e1e'], focus: ['#ccccff', '#ccccff'],
-    chart: ['#ccccff', '#ccccff'], chartInk: ['#1e1e1e', '#1e1e1e'],
+    paper: ['#101112', '#101112'], text: ['#bfc2c8', '#bfc2c8'], muted: ['#8a8e95', '#8a8e95'],
+    fill: ['#18191b', '#18191b'], hover: ['#222426', '#222426'], border: ['#292b2e', '#292b2e'], input: ['#18191b', '#18191b'],
+    accent: ['#8589eb', '#8589eb'], onAccent: ['#101112', '#101112'], focus: ['#8589eb', '#8589eb'],
+    chart: ['#8589eb', '#8589eb'], chartInk: ['#101112', '#101112'],
     corner: '4px', inset: '10px', card: '4px',
     componentRules: 'ds-text { --ds-1: 20px; --ds-control-size: 20px; }\nds-select { --ds-1: 20px; }',
-    metrics: { '--ds-1': '10px', '--ds-row-size': '30px', '--ds-control-size': '26px', '--ds-text-leading': '20px', '--ds-small-text-size': '12px', '--ds-card-text-inset-min': '10px', '--ds-icon-size': '16px', '--ds-warning-color': '#fec20d', '--ds-success-color': '#99ff73', '--ds-danger-color': '#ff5f5f', '--button-text-color': 'var(--ds-text-color)', '--button-color': 'var(--ds-text-color)', '--ds-input-height': 'calc(26px * var(--ds-sf))' },
+    metrics: { '--ds-1': '10px', '--ds-row-size': '30px', '--ds-control-size': '26px', '--ds-text-leading': '20px', '--ds-small-text-size': '12px', '--ds-card-text-inset-min': '10px', '--ds-icon-size': '16px', '--slate-icon-color': '#737780', '--slate-milestone-color': '#6871d8', '--ds-warning-color': '#d9b900', '--ds-success-color': '#4ea56a', '--ds-danger-color': '#df626b', '--button-text-color': 'var(--ds-text-color)', '--button-color': 'var(--ds-text-color)', '--ds-input-height': 'calc(26px * var(--ds-sf))' },
   },
   lagoon: {
     name: 'Lagoon', note: 'Hysteric blue water and Sharp blue, every control a pill and soft pictures.',

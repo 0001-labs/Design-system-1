@@ -54,16 +54,16 @@ export const ISSUE_TRACKER_EXAMPLE: LayoutExample = {
 .issue-card-body { display:flex; flex-direction:column; gap:var(--ds-unit); }
 .issue-card-top { align-items:center; gap:calc(var(--ds-unit) / 2); }
 .issue-card-top > ds-text { flex:1; min-width:0; }
-.issue-card-top > ds-icon { flex:none; color:var(--ds-text-color-muted); }
+.issue-card-top > ds-icon { flex:none; color:var(--slate-icon-color); }
 .issue-description { min-height:calc(40px * var(--ds-sf)); }
-.issue-card-foot { color:var(--ds-text-color-muted); gap:calc(var(--ds-unit) / 2); }
-.issue-indicators { display:flex; gap:calc(var(--ds-unit) / 2); align-items:center; flex:none; color:var(--ds-text-color-muted); }
+.issue-card-foot { color:var(--slate-icon-color); gap:calc(var(--ds-unit) / 2); }
+.issue-indicators { display:flex; gap:calc(var(--ds-unit) / 2); align-items:center; flex:none; color:var(--slate-icon-color); }
 .issue-health[data-status="Done"] { color:var(--ds-success-color); }
 .issue-health[data-status="In progress"] { color:var(--ds-warning-color); }
 .issue-health[data-status="At risk"] { color:var(--ds-danger-color); }
 .issue-milestone { color:var(--ds-warning-color); }
-.issue-milestone[data-status="Done"] { color:var(--ds-accent-color); }
-.issue-milestone[data-status="Planned"] { color:var(--ds-text-color-muted); }
+.issue-milestone[data-status="Done"] { color:var(--slate-milestone-color); }
+.issue-milestone[data-status="Planned"] { color:var(--slate-icon-color); }
 .issue-icon-library { grid-column:1 / -1; }
 .issue-icon-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(calc(14 * var(--ds-unit)),1fr)); gap:var(--ds-unit); }
 .issue-icon-link { display:flex; gap:var(--ds-unit); align-items:center; color:var(--ds-text-color); text-decoration:none; min-height:calc(4 * var(--ds-unit)); padding:var(--ds-unit); border:1px solid var(--ds-border-color); border-radius:var(--ds-radius); }
@@ -127,7 +127,7 @@ export const ISSUE_TRACKER_EXAMPLE: LayoutExample = {
   <section id="issue-library" hidden>
     <div class="issue-heading"><div><h1>Slate library</h1><div class="issue-subtitle">${text('The same components. A finer grid.', 'tone="muted" wrap')}</div></div><ds-button secondary control="slotted"><a href="/examples/libraries/slate.css" download="slate.css">${icon('download')}<span>Download CSS</span></a></ds-button></div>
     <div class="issue-library">
-      <section><h2>Colour</h2><div class="issue-swatches">${[['Paper','--ds-paper'],['Surface','--ds-fill'],['Border','--ds-border-color'],['Text','--ds-text-color'],['Muted','--ds-text-color-muted'],['Accent','--ds-accent-color']].map(([label,token]) => `<div><div class="issue-swatch" style="background:var(${token})"></div>${text(label,'size="small"')}</div>`).join('')}</div>${text('Dark paper, quiet surfaces and a lavender accent. Status colours always carry a label.', 'tone="muted" wrap')}</section>
+      <section><h2>Colour</h2><div class="issue-swatches">${[['Paper','--ds-paper'],['Surface','--ds-fill'],['Border','--ds-border-color'],['Text','--ds-text-color'],['Muted','--ds-text-color-muted'],['Accent','--ds-accent-color']].map(([label,token]) => `<div><div class="issue-swatch" style="background:var(${token})"></div>${text(label,'size="small"')}</div>`).join('')}</div>${text('Charcoal paper, quiet graphite surfaces and a muted periwinkle accent. Status colours always carry a label.', 'tone="muted" wrap')}</section>
       <section><h2>Space & type</h2><div class="issue-ruler" aria-label="10 pixel spacing grid"></div>${[['Base unit','10px'],['Control row','30px'],['Control face','26px'],['Body text','14px / 20px'],['Card inset','10px'],['Corner','4px']].map(([name,value])=>`<div class="issue-token">${text(name)}${text(value,'tone="muted"')}</div>`).join('')}</section>
       <section><h2>Components</h2><div class="issue-actions"><ds-button primary id="issue-specimen-new">New issue</ds-button><ds-button secondary id="issue-specimen-board">Back to roadmap</ds-button></div><ds-input variant="field" placeholder="A shared input" aria-label="Library input specimen"></ds-input>${select('issue-specimen-status','Library status specimen',statuses)}<div class="issue-actions">${statuses.map(status=>`<span class="issue-status" data-status="${status}" aria-hidden="true"></span>${text(status)}`).join('')}</div>${text('Buttons, cards, fields, menus and overlays use the shared DS1 elements. Slate changes their public tokens.', 'tone="muted" wrap')}</section>
       <section class="issue-icon-library"><h2>Icons</h2>${text('Ten original vectors, shared with the DS1 icon collection. Select one to download its SVG.', 'tone="muted" wrap')}<div class="issue-icon-grid">${['health','milestone','milestone-planned','priority-low','priority-medium','priority-high','project','network','prediction','scaling'].map(name => `<a class="issue-icon-link" href="/icons/library/${name}.svg" download="${name}.svg">${icon(name)}${text(name.replaceAll('-', ' '))}</a>`).join('')}</div></section>

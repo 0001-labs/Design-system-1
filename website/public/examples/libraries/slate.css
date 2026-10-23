@@ -65,7 +65,7 @@
   --ds-yellow: #eaff00;
   --ds-orange: #fec20d;
 
-  --ds-accent-color: light-dark(#ccccff, #ccccff);
+  --ds-accent-color: light-dark(#8589eb, #8589eb);
 
   /* ----------------------------------------------------------
    TYPE
@@ -97,10 +97,10 @@
    The chrome's `--chrome-panel-*` tokens read these.
    ---------------------------------------------------------- */
 
-  --ds-paper: light-dark(#1e1e1e, #1e1e1e);
-  --ds-text-color: light-dark(#e6e6e6, #e6e6e6);
-  --ds-text-color-muted: light-dark(#b3b3b3, #b3b3b3);
-  --ds-title-color: light-dark(#b3b3b3, #b3b3b3);
+  --ds-paper: light-dark(#101112, #101112);
+  --ds-text-color: light-dark(#bfc2c8, #bfc2c8);
+  --ds-text-color-muted: light-dark(#8a8e95, #8a8e95);
+  --ds-title-color: light-dark(#8a8e95, #8a8e95);
   /* Text that reports a failure or warns of a loss. Red for blood on light
      paper and Tuned red on dark: both palette colours, legible as 14px text. */
   --ds-danger-color: light-dark(var(--ds-red-for-blood), var(--ds-tuned-red));
@@ -113,10 +113,10 @@
      light paper, so light paper takes it deepened with the ink (Money's green
      for money in); dark paper takes Apple green itself. */
   --ds-success-color: light-dark(color-mix(in oklab, var(--ds-apple-green) 30%, var(--ds-black)), var(--ds-apple-green));
-  --ds-border-color: light-dark(#3c3c3c, #3c3c3c);
-  --ds-fill: light-dark(#2a2a2a, #2a2a2a);
-  --ds-fill-hover: light-dark(#3c3c3c, #3c3c3c);
-  --ds-focus-ring: light-dark(#ccccff, #ccccff);
+  --ds-border-color: light-dark(#292b2e, #292b2e);
+  --ds-fill: light-dark(#18191b, #18191b);
+  --ds-fill-hover: light-dark(#222426, #222426);
+  --ds-focus-ring: light-dark(#8589eb, #8589eb);
   /* A row a person presses (ds-row, .ds-row, a tree's rows, ds-sidebar): under
      the pointer, pressed, and the current destination or selected row, which
      also takes the medium weight. */
@@ -127,16 +127,16 @@
 
   --ds-button-text-color: var(--ds-text-color);
   --ds-button-background-color-primary: var(--ds-accent-color);
-  --ds-button-text-color-on-accent: light-dark(#1e1e1e, #1e1e1e);
+  --ds-button-text-color-on-accent: light-dark(#101112, #101112);
   --ds-button-background-color-secondary: var(--ds-fill);
   --ds-icon-color: currentColor;
 
   /* Shared fields, including the row treatment of a form's settings rows. */
-  --ds-input-background: light-dark(#2a2a2a, #2a2a2a);
-  --ds-input-color: light-dark(#e6e6e6, #e6e6e6);
-  --ds-input-placeholder-color: light-dark(#b3b3b3, #b3b3b3);
-  --ds-input-disabled-color: light-dark(#b3b3b3, #b3b3b3);
-  --ds-input-reveal-color: light-dark(#e6e6e6, #e6e6e6);
+  --ds-input-background: light-dark(#18191b, #18191b);
+  --ds-input-color: light-dark(#bfc2c8, #bfc2c8);
+  --ds-input-placeholder-color: light-dark(#8a8e95, #8a8e95);
+  --ds-input-disabled-color: light-dark(#8a8e95, #8a8e95);
+  --ds-input-reveal-color: light-dark(#bfc2c8, #bfc2c8);
 }
 
 /* A page written in Japanese or Chinese sets its labels in that language's
@@ -169,9 +169,11 @@
   --ds-small-text-size: 12px;
   --ds-card-text-inset-min: 10px;
   --ds-icon-size: 16px;
-  --ds-warning-color: #fec20d;
-  --ds-success-color: #99ff73;
-  --ds-danger-color: #ff5f5f;
+  --slate-icon-color: #737780;
+  --slate-milestone-color: #6871d8;
+  --ds-warning-color: #d9b900;
+  --ds-success-color: #4ea56a;
+  --ds-danger-color: #df626b;
   --button-text-color: var(--ds-text-color);
   --button-color: var(--ds-text-color);
   --ds-input-height: calc(26px * var(--ds-sf));
@@ -193,7 +195,7 @@ html {
 
 /* Charts and the heat of a month take the library's colour; they set these on themselves, so the library names them. */
 ds-chart, ds-bars, ds-spark, ds-ratio {
-  --ds-chart-up: light-dark(#ccccff, #ccccff);
+  --ds-chart-up: light-dark(#8589eb, #8589eb);
   --ds-chart-live: var(--ds-chart-up);
   --ds-chart-ink: var(--ds-text-color);
   --ds-chart-muted: var(--ds-text-color-muted);
@@ -244,13 +246,13 @@ ds-button[data-face="outlined"]:hover::part(control) {
 }
 
 ds-calendar, ds-calendar-large {
-  --ds-calendar-heat-1: color-mix(in oklab, light-dark(#ccccff, #ccccff) 20%, var(--ds-paper));
-  --ds-calendar-heat-2: color-mix(in oklab, light-dark(#ccccff, #ccccff) 40%, var(--ds-paper));
-  --ds-calendar-heat-3: light-dark(#ccccff, #ccccff);
-  --ds-calendar-heat-4: color-mix(in oklab, light-dark(#ccccff, #ccccff) 60%, var(--ds-text-color));
+  --ds-calendar-heat-1: color-mix(in oklab, light-dark(#8589eb, #8589eb) 20%, var(--ds-paper));
+  --ds-calendar-heat-2: color-mix(in oklab, light-dark(#8589eb, #8589eb) 40%, var(--ds-paper));
+  --ds-calendar-heat-3: light-dark(#8589eb, #8589eb);
+  --ds-calendar-heat-4: color-mix(in oklab, light-dark(#8589eb, #8589eb) 60%, var(--ds-text-color));
   --ds-calendar-heat-ink-1: var(--ds-text-color);
   --ds-calendar-heat-ink-2: var(--ds-text-color);
-  --ds-calendar-heat-ink-3: light-dark(#1e1e1e, #1e1e1e);
+  --ds-calendar-heat-ink-3: light-dark(#101112, #101112);
   --ds-calendar-heat-ink-4: var(--ds-paper);
 }
 
