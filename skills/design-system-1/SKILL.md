@@ -7,6 +7,12 @@ description: The exact rules of Design system 1, the 0001 design framework: the 
 
 Design system 1 (`/Users/joachim/0001/Design system 1`, source in `DS1/`) is the framework every 0001 product is drawn on. Products carry a copy or a fork of it (see the 0001 brief), so these rules hold even where the package is not imported. Client sites keep the client's own design unless 0001 is designing for them.
 
+## Design decisions
+
+Cut taglines, helper text and secondary labels. If a screen needs them to make sense, fix the layout.
+
+Always make the best decision that elevates all three: the user experience (UX), developer experience (DX), and agent experience (AX), without breaking anything.
+
 ## Web interface
 
 Use the Lit `ds-*` components for web controls, including plain HTML pages: a stylesheet link loads the foundations and a module script registers the elements. React uses the same components through adapters, which Sync 1's `components` export copies with them; a product without React leaves them out with `"react": false` beside its `"components"`. Libraries customize their public tokens. CLASSless and the vanilla stylesheet are retired. Native classes and page helpers mentioned below describe existing implementation/consumer compatibility; select the Lit component for new work. Keep semantic HTML inside/slotted into controls and for prose. Swift, Kotlin and email keep their platform renderers.
