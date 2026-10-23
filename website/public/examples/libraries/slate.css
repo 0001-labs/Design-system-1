@@ -167,7 +167,7 @@
   --ds-control-size: 26px;
   --ds-text-leading: 20px;
   --ds-small-text-size: 12px;
-  --ds-card-text-inset-min: 20px;
+  --ds-card-text-inset-min: 10px;
   --ds-icon-size: 16px;
   --ds-warning-color: #fec20d;
   --ds-success-color: #99ff73;

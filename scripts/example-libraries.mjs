@@ -43,7 +43,7 @@ export const LIBRARIES = {
     chart: ['#ccccff', '#ccccff'], chartInk: ['#1e1e1e', '#1e1e1e'],
     corner: '4px', inset: '10px', card: '4px',
     componentRules: 'ds-text { --ds-1: 20px; --ds-control-size: 20px; }\nds-select { --ds-1: 20px; }',
-    metrics: { '--ds-1': '10px', '--ds-row-size': '30px', '--ds-control-size': '26px', '--ds-text-leading': '20px', '--ds-small-text-size': '12px', '--ds-card-text-inset-min': '20px', '--ds-icon-size': '16px', '--ds-warning-color': '#fec20d', '--ds-success-color': '#99ff73', '--ds-danger-color': '#ff5f5f', '--button-text-color': 'var(--ds-text-color)', '--button-color': 'var(--ds-text-color)', '--ds-input-height': 'calc(26px * var(--ds-sf))' },
+    metrics: { '--ds-1': '10px', '--ds-row-size': '30px', '--ds-control-size': '26px', '--ds-text-leading': '20px', '--ds-small-text-size': '12px', '--ds-card-text-inset-min': '10px', '--ds-icon-size': '16px', '--ds-warning-color': '#fec20d', '--ds-success-color': '#99ff73', '--ds-danger-color': '#ff5f5f', '--button-text-color': 'var(--ds-text-color)', '--button-color': 'var(--ds-text-color)', '--ds-input-height': 'calc(26px * var(--ds-sf))' },
   },
   lagoon: {
     name: 'Lagoon', note: 'Hysteric blue water and Sharp blue, every control a pill and soft pictures.',

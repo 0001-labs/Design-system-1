@@ -2,17 +2,17 @@ import type { LayoutExample } from './layout-examples';
 import { icon, library, text } from './library-example-parts';
 
 const issues = [
-  ['Fleet connectivity resilience', 'Reduce rider impact during intermittent vehicle network connectivity.', 'Infrastructure', 1, 'Done', 'High', 'globe'],
+  ['Fleet connectivity resilience', 'Reduce rider impact during intermittent vehicle network connectivity.', 'Infrastructure', 1, 'Done', 'High', 'network'],
   ['Unprotected turn strategy', 'Improve planning for unprotected turns at busy intersections.', 'Vehicle intelligence', 1, 'In progress', 'High', 'car'],
   ['Incident response playbooks', 'Standardise procedures for handling production incidents.', 'Infrastructure', 1, 'Done', 'Medium', 'page'],
   ['Disaster recovery drills', 'Test regional recovery scenarios on a recurring basis.', 'Infrastructure', 1, 'Planned', 'Medium', 'refresh'],
   ['Map tile streaming', 'Reduce map loading delays under poor network conditions.', 'Mobile apps', 2, 'In progress', 'High', 'map'],
   ['Local payment methods', 'Support local payment methods and billing requirements in Japan.', 'Japan expansion', 2, 'At risk', 'High', 'bag'],
   ['Backend latency reduction', 'Improve response times for core ride and dispatch services.', 'Infrastructure', 2, 'In progress', 'High', 'building'],
-  ['Multi-agent prediction', 'Improve prediction accuracy in dense traffic situations.', 'Vehicle intelligence', 2, 'Planned', 'Medium', '2xgrid'],
+  ['Multi-agent prediction', 'Improve prediction accuracy in dense traffic situations.', 'Vehicle intelligence', 2, 'Planned', 'Medium', 'prediction'],
   ['Build pipeline hardening', 'Reduce flaky tests and keep release builds reliable.', 'Infrastructure', 2, 'Planned', 'Low', 'code'],
-  ['Offline mode', 'Keep essential trip information available when connectivity is lost.', 'Mobile apps', 3, 'Planned', 'High', 'phone'],
-  ['Autoscaling improvements', 'Tune capacity for peak demand periods.', 'Infrastructure', 3, 'Planned', 'Medium', 'building'],
+  ['Offline mode', 'Keep essential trip information available when connectivity is lost.', 'Mobile apps', 3, 'Planned', 'High', 'offline'],
+  ['Autoscaling improvements', 'Tune capacity for peak demand periods.', 'Infrastructure', 3, 'Planned', 'Medium', 'scaling'],
   ['Android interface parity', 'Align Android behaviour with the updated iOS designs.', 'Mobile apps', 3, 'Planned', 'Medium', 'phone'],
   ['Tokyo launch', 'Prepare the initial autonomous service rollout in Tokyo.', 'Japan expansion', 4, 'In progress', 'High', 'globe'],
   ['Geofencing boundaries', 'Define and validate initial service area boundaries.', 'Japan expansion', 4, 'Planned', 'Medium', 'map'],
@@ -26,7 +26,7 @@ const select = (id: string, label: string, values: string[]) => `<ds-select><sel
 export const ISSUE_TRACKER_EXAMPLE: LayoutExample = {
   name: 'Issue tracker',
   use: 'A quarterly roadmap and working issue list, drawn with Slate: a dark library on a finer 10px unit.',
-  height: 850,
+  height: 760,
   library: library('slate'),
   html: `<style>
 .issue-app { --ds-page-measure:100%; --ds-page-flow:calc(2 * var(--ds-unit)); min-height:100vh; }
@@ -34,14 +34,14 @@ export const ISSUE_TRACKER_EXAMPLE: LayoutExample = {
 .issue-app *, .issue-dialog * { box-sizing:border-box; }
 .issue-app [hidden], .issue-dialog [hidden] { display:none !important; }
 .issue-top, .issue-heading, .issue-toolbar, .issue-actions, .issue-quarter-head, .issue-card-top, .issue-card-foot { display:flex; align-items:center; gap:var(--ds-unit); min-width:0; }
-.issue-top { min-height:calc(5 * var(--ds-unit)); border-bottom:1px solid var(--ds-border-color); flex-wrap:wrap; padding-bottom:var(--ds-unit); }
+.issue-top { min-height:calc(4 * var(--ds-unit)); border-bottom:1px solid var(--ds-border-color); flex-wrap:wrap; padding-bottom:var(--ds-unit); }
 .issue-brand { display:flex; align-items:center; gap:var(--ds-unit); margin-right:calc(2 * var(--ds-unit)); }
 .issue-brand ds-icon { color:var(--ds-accent-color); }
 .issue-top > ds-text { margin-left:auto; }
-.issue-heading { justify-content:space-between; padding-top:calc(2 * var(--ds-unit)); flex-wrap:wrap; }
+.issue-heading { justify-content:space-between; padding-top:var(--ds-unit); flex-wrap:wrap; }
 .issue-heading h1 { font:500 calc(20px * var(--ds-sf))/calc(30px * var(--ds-sf)) var(--ds-typeface-medium); margin:0; }
-.issue-subtitle { margin-top:var(--ds-unit); }
-.issue-toolbar { justify-content:space-between; flex-wrap:wrap; border-bottom:1px solid var(--ds-border-color); padding-block:calc(2 * var(--ds-unit)); }
+.issue-subtitle { margin-top:0; }
+.issue-toolbar { justify-content:space-between; flex-wrap:wrap; border-bottom:1px solid var(--ds-border-color); padding-block:var(--ds-unit); }
 .issue-actions { flex-wrap:wrap; }
 .issue-search { width:calc(22 * var(--ds-unit)); max-width:100%; }
 .issue-count { color:var(--ds-text-color-muted); font-variant-numeric:tabular-nums; }
@@ -49,14 +49,26 @@ export const ISSUE_TRACKER_EXAMPLE: LayoutExample = {
 .issue-column { display:grid; gap:var(--ds-unit); min-width:0; }
 .issue-quarter-head { min-height:calc(4 * var(--ds-unit)); padding-inline:var(--ds-unit); }
 .issue-quarter-head ds-button { margin-left:auto; }
-.issue-card { min-height:calc(16 * var(--ds-unit)); }
-.issue-card::part(card) { border:1px solid var(--ds-border-color); }
-.issue-card-body { display:flex; flex-direction:column; gap:var(--ds-unit); min-height:calc(12 * var(--ds-unit)); }
-.issue-card-top { align-items:flex-start; }
-.issue-card-top > ds-text { flex:1; }
+.issue-card { min-height:calc(12 * var(--ds-unit)); }
+.issue-card::part(card) { box-shadow:inset 0 0 0 1px var(--ds-border-color); }
+.issue-card-body { display:flex; flex-direction:column; gap:var(--ds-unit); }
+.issue-card-top { align-items:center; gap:calc(var(--ds-unit) / 2); }
+.issue-card-top > ds-text { flex:1; min-width:0; }
 .issue-card-top > ds-icon { flex:none; color:var(--ds-text-color-muted); }
-.issue-description { flex:1; }
-.issue-card-foot { justify-content:space-between; color:var(--ds-text-color-muted); }
+.issue-description { min-height:calc(40px * var(--ds-sf)); }
+.issue-card-foot { color:var(--ds-text-color-muted); gap:calc(var(--ds-unit) / 2); }
+.issue-indicators { display:flex; gap:calc(var(--ds-unit) / 2); align-items:center; flex:none; color:var(--ds-text-color-muted); }
+.issue-health[data-status="Done"] { color:var(--ds-success-color); }
+.issue-health[data-status="In progress"] { color:var(--ds-warning-color); }
+.issue-health[data-status="At risk"] { color:var(--ds-danger-color); }
+.issue-milestone { color:var(--ds-warning-color); }
+.issue-milestone[data-status="Done"] { color:var(--ds-accent-color); }
+.issue-milestone[data-status="Planned"] { color:var(--ds-text-color-muted); }
+.issue-icon-library { grid-column:1 / -1; }
+.issue-icon-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(calc(14 * var(--ds-unit)),1fr)); gap:var(--ds-unit); }
+.issue-icon-link { display:flex; gap:var(--ds-unit); align-items:center; color:var(--ds-text-color); text-decoration:none; min-height:calc(4 * var(--ds-unit)); padding:var(--ds-unit); border:1px solid var(--ds-border-color); border-radius:var(--ds-radius); }
+.issue-icon-link:hover { background:var(--ds-fill); }
+.issue-icon-link:focus-visible { outline:2px solid var(--ds-focus-ring); outline-offset:2px; }
 .issue-status { width:calc(10px * var(--ds-sf)); height:calc(10px * var(--ds-sf)); border:1px dashed var(--ds-text-color-muted); border-radius:50%; display:inline-block; flex:none; margin-top:calc(5px * var(--ds-sf)); }
 .issue-status[data-status="In progress"] { border:2px solid var(--ds-warning-color); background:linear-gradient(90deg,var(--ds-warning-color) 50%,transparent 50%); }
 .issue-status[data-status="Done"] { border:0; background:var(--ds-success-color); }
@@ -116,8 +128,9 @@ export const ISSUE_TRACKER_EXAMPLE: LayoutExample = {
     <div class="issue-heading"><div><h1>Slate library</h1><div class="issue-subtitle">${text('The same components. A finer grid.', 'tone="muted" wrap')}</div></div><ds-button secondary control="slotted"><a href="/examples/libraries/slate.css" download="slate.css">${icon('download')}<span>Download CSS</span></a></ds-button></div>
     <div class="issue-library">
       <section><h2>Colour</h2><div class="issue-swatches">${[['Paper','--ds-paper'],['Surface','--ds-fill'],['Border','--ds-border-color'],['Text','--ds-text-color'],['Muted','--ds-text-color-muted'],['Accent','--ds-accent-color']].map(([label,token]) => `<div><div class="issue-swatch" style="background:var(${token})"></div>${text(label,'size="small"')}</div>`).join('')}</div>${text('Dark paper, quiet surfaces and a lavender accent. Status colours always carry a label.', 'tone="muted" wrap')}</section>
-      <section><h2>Space & type</h2><div class="issue-ruler" aria-label="10 pixel spacing grid"></div>${[['Base unit','10px'],['Control row','30px'],['Control face','26px'],['Body text','14px / 20px'],['Card inset','20px'],['Corner','4px']].map(([name,value])=>`<div class="issue-token">${text(name)}${text(value,'tone="muted"')}</div>`).join('')}</section>
+      <section><h2>Space & type</h2><div class="issue-ruler" aria-label="10 pixel spacing grid"></div>${[['Base unit','10px'],['Control row','30px'],['Control face','26px'],['Body text','14px / 20px'],['Card inset','10px'],['Corner','4px']].map(([name,value])=>`<div class="issue-token">${text(name)}${text(value,'tone="muted"')}</div>`).join('')}</section>
       <section><h2>Components</h2><div class="issue-actions"><ds-button primary id="issue-specimen-new">New issue</ds-button><ds-button secondary id="issue-specimen-board">Back to roadmap</ds-button></div><ds-input variant="field" placeholder="A shared input" aria-label="Library input specimen"></ds-input>${select('issue-specimen-status','Library status specimen',statuses)}<div class="issue-actions">${statuses.map(status=>`<span class="issue-status" data-status="${status}" aria-hidden="true"></span>${text(status)}`).join('')}</div>${text('Buttons, cards, fields, menus and overlays use the shared DS1 elements. Slate changes their public tokens.', 'tone="muted" wrap')}</section>
+      <section class="issue-icon-library"><h2>Icons</h2>${text('Ten original vectors, shared with the DS1 icon collection. Select one to download its SVG.', 'tone="muted" wrap')}<div class="issue-icon-grid">${['health','milestone','milestone-planned','priority-low','priority-medium','priority-high','project','network','prediction','scaling'].map(name => `<a class="issue-icon-link" href="/icons/library/${name}.svg" download="${name}.svg">${icon(name)}${text(name.replaceAll('-', ' '))}</a>`).join('')}</div></section>
     </div>
   </section>
 </ds-page>
@@ -147,7 +160,7 @@ function render() {
   const matches = issues.filter(issue => (team === 'All teams' || issue.team === team) && (issue.id + ' ' + issue.title + ' ' + issue.description).toLowerCase().includes(query));
   board.innerHTML = [1,2,3,4].map(quarter => {
     const group = matches.filter(issue => issue.quarter === quarter);
-    return '<section class="issue-column" aria-label="Quarter ' + quarter + '"><div class="issue-quarter-head"><ds-text literal strong>Q' + quarter + '</ds-text><ds-text literal tone="muted">2026</ds-text><span class="issue-count">' + group.length + '</span><ds-button icon data-quarter="' + quarter + '" label="Add issue to Q' + quarter + '"><ds-icon type="plus"></ds-icon></ds-button></div>' + group.map(issue => '<ds-card interactive class="issue-card" padding="large" data-id="' + issue.id + '" aria-label="' + escape(issue.id + ': ' + issue.title + ', ' + issue.status) + '"><div class="issue-card-body"><div class="issue-card-top"><ds-icon type="' + issue.glyph + '" aria-hidden="true"></ds-icon><ds-text literal wrap strong>' + escape(issue.title) + '</ds-text><span class="issue-status" data-status="' + issue.status + '" role="img" aria-label="' + issue.status + '" data-tooltip="' + issue.status + ' · ' + issue.priority + ' priority"></span></div><ds-text literal wrap tone="muted" class="issue-description">' + escape(issue.description) + '</ds-text><div class="issue-card-foot"><ds-text literal size="small">' + escape(issue.team) + '</ds-text><ds-text literal size="small" tone="muted">' + issue.id + '</ds-text></div></div></ds-card>').join('') + '</section>';
+    return '<section class="issue-column" aria-label="Quarter ' + quarter + '"><div class="issue-quarter-head"><ds-text literal strong>Q' + quarter + '</ds-text><ds-text literal tone="muted">2026</ds-text><span class="issue-count">' + group.length + '</span><ds-button icon data-quarter="' + quarter + '" label="Add issue to Q' + quarter + '"><ds-icon type="plus"></ds-icon></ds-button></div>' + group.map(issue => '<ds-card interactive class="issue-card" padding="medium" data-id="' + issue.id + '" aria-label="' + escape(issue.id + ': ' + issue.title + ', ' + issue.status) + '"><div class="issue-card-body"><div class="issue-card-top"><ds-icon type="' + issue.glyph + '" aria-hidden="true"></ds-icon><ds-text literal data-tooltip="' + escape(issue.title) + '">' + escape(issue.title) + '</ds-text><span class="issue-indicators"><ds-icon class="issue-health" data-status="' + issue.status + '" type="' + (issue.status === 'Planned' ? 'status' : 'health') + '" role="img" aria-label="' + issue.status + '" data-tooltip="' + issue.status + '"></ds-icon><ds-icon class="issue-milestone" data-status="' + issue.status + '" type="' + (issue.status === 'Planned' ? 'milestone-planned' : 'milestone') + '" aria-hidden="true"></ds-icon><ds-icon type="priority-' + issue.priority.toLowerCase() + '" role="img" aria-label="' + issue.priority + ' priority" data-tooltip="' + issue.priority + ' priority"></ds-icon></span></div><ds-text literal wrap tone="muted" class="issue-description">' + escape(issue.description) + '</ds-text><div class="issue-card-foot"><ds-icon type="project" aria-hidden="true"></ds-icon><ds-text literal tone="muted">' + escape(issue.team) + '</ds-text></div></div></ds-card>').join('') + '</section>';
   }).join('');
   field('empty').hidden = matches.length > 0;
   field('count').textContent = matches.length + ' of ' + issues.length + ' issues';

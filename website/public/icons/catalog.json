@@ -847,6 +847,13 @@
     "shapes": 1
   },
   {
+    "key": "health",
+    "name": "Health",
+    "source": "Library",
+    "url": "/icons/library/health.svg",
+    "shapes": 2
+  },
+  {
     "key": "heart",
     "name": "Heart",
     "source": "Library",
@@ -1128,6 +1135,20 @@
     "shapes": 2
   },
   {
+    "key": "milestone-planned",
+    "name": "Milestone",
+    "source": "Library",
+    "url": "/icons/library/milestone-planned.svg",
+    "shapes": 1
+  },
+  {
+    "key": "milestone",
+    "name": "Milestone",
+    "source": "Library",
+    "url": "/icons/library/milestone.svg",
+    "shapes": 2
+  },
+  {
     "key": "minimize",
     "name": "Minimize",
     "source": "Figma",
@@ -1192,6 +1213,13 @@
     "source": "Library",
     "url": "/icons/library/music.svg",
     "shapes": 3
+  },
+  {
+    "key": "network",
+    "name": "Network",
+    "source": "Library",
+    "url": "/icons/library/network.svg",
+    "shapes": 4
   },
   {
     "key": "neutral",
@@ -1430,11 +1458,46 @@
     "shapes": 2
   },
   {
+    "key": "prediction",
+    "name": "Prediction",
+    "source": "Library",
+    "url": "/icons/library/prediction.svg",
+    "shapes": 5
+  },
+  {
     "key": "present",
     "name": "Present",
     "source": "Library",
     "url": "/icons/library/present.svg",
     "shapes": 2
+  },
+  {
+    "key": "priority-high",
+    "name": "Priority",
+    "source": "Library",
+    "url": "/icons/library/priority-high.svg",
+    "shapes": 3
+  },
+  {
+    "key": "priority-low",
+    "name": "Priority",
+    "source": "Library",
+    "url": "/icons/library/priority-low.svg",
+    "shapes": 3
+  },
+  {
+    "key": "priority-medium",
+    "name": "Priority",
+    "source": "Library",
+    "url": "/icons/library/priority-medium.svg",
+    "shapes": 3
+  },
+  {
+    "key": "project",
+    "name": "Project",
+    "source": "Library",
+    "url": "/icons/library/project.svg",
+    "shapes": 1
   },
   {
     "key": "quote",
@@ -1551,6 +1614,13 @@
     "source": "Library",
     "url": "/icons/library/safe.svg",
     "shapes": 3
+  },
+  {
+    "key": "scaling",
+    "name": "Scaling",
+    "source": "Library",
+    "url": "/icons/library/scaling.svg",
+    "shapes": 2
   },
   {
     "key": "school",
