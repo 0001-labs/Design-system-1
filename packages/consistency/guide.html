@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Aa and Consistency — Editor guide</title>
+<link rel="stylesheet" href="/private-consistency/consistency.css">
+<style>
+html,body{margin:0;background:var(--ds-paper);color:var(--ds-text-color)}body{font-family:var(--ds-typeface-regular);font-size:calc(14px * var(--sf,1));line-height:calc(20px * var(--sf,1))}main{box-sizing:border-box;max-width:calc(800px * var(--sf,1));margin-inline:auto;padding:calc(20px * var(--sf,1));overflow-wrap:break-word}h1{font-size:calc(20px * var(--sf,1));line-height:calc(40px * var(--sf,1));margin:calc(20px * var(--sf,1)) 0}h2{font-size:calc(17px * var(--sf,1));line-height:calc(20px * var(--sf,1));margin:calc(40px * var(--sf,1)) 0 calc(20px * var(--sf,1))}p,ul{margin:0 0 calc(20px * var(--sf,1))}ul{padding-inline-start:calc(20px * var(--sf,1))}li+li{margin-top:calc(20px * var(--sf,1))}a{color:inherit;text-underline-offset:.2em}code{font-size:inherit}strong{font-weight:600}
+</style></head><body><main>
+<nav aria-label="Editor guide"><a href="/private-consistency/">Back to the editor</a></nav>
+<h1>Aa edits text. Consistency builds sites.</h1>
+<p>This is the guide for our main development editor. We develop and test the two layers together here, while keeping their responsibilities separate.</p>
+<h2>Aa: the vanilla text editor</h2>
+<p>Aa is a vanilla TypeScript editor with a framework-independent DOM API. It works on its own. The <code>&lt;aa-editor&gt;</code> element and optional adapters wrap that engine.</p>
+<ul><li><strong>Writing:</strong> typing, paste, IME composition, caret and native text selection, Markdown blocks, formatting and text undo.</li><li><strong>Text controls:</strong> the formatting toolbar, slash commands and the editor’s focus and dismissal behavior.</li><li><strong>Extension points:</strong> generic atoms, commands and optional block movement. Products provide their own content types, transport and permissions.</li></ul>
+<p><strong>Escape leaves editing.</strong> It closes Aa’s controls, clears its selection and removes the blinking caret without changing the document. Escape during IME composition remains with the input method. Click into the text to write again.</p>
+<p><a href="https://aa.0001.dev/" target="_blank" rel="noopener">Open the standalone Aa playground</a></p>
+<h2>Consistency: the site-building expansion</h2>
+<p>Consistency composes Aa text with website components. It owns page layout, responsive desktop/mobile previews, visual gaps and padding, resizing, page-level marquee selection and section reordering.</p>
+<p>Cards, buttons, image carousels, page destinations, library choices and linked component design belong to this expansion. With Consistency enabled, matching components share design while keeping their own text.</p>
+<h2>Shared foundations</h2>
+<p><strong>Design system 1</strong> supplies the grid, type, colours and reusable controls. <strong>Drag</strong> supplies movement and settling. Aa uses those foundations for text blocks; Consistency uses them for page composition. A shared foundation does not make the two editors one module.</p>
+<h2>Where a fix belongs</h2>
+<ul><li><strong>A blinking caret, text selection or formatting problem:</strong> fix Aa, test it without the site builder, then bring its committed build into the development editor with Sync 1.</li><li><strong>A page gap, card size or linked design problem:</strong> fix the Consistency expansion, using Aa’s public API for text.</li><li><strong>A shared control, grid or drag problem:</strong> fix the owning foundation, then update its consumers deliberately.</li></ul>
+<p>No Consistency workaround should duplicate Aa’s keyboard or focus logic. Text remains Markdown; site composition and component design remain the expansion’s responsibility.</p>
+<h2>Developing here</h2>
+<p>The owner-only editor at <a href="https://neweditor.c9y.site/">neweditor.c9y.site</a> is the main integration surface. The local preview uses <code>/private-consistency/</code>. This guide opens in a separate tab so reading it does not replace the current draft.</p>
+<p>Canonical text source: <code>Aa/src/</code>. Current expansion source: <code>Design system 1/packages/consistency/</code>. The expansion takes Aa’s built export through Sync 1; its vendored copy is not an independent editor source.</p>
+</main><script type="module" src="/private-consistency/consistency.js"></script></body></html>

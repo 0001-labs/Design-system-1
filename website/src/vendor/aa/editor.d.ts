@@ -102,6 +102,8 @@ export type Editor = {
     placeholder: string;
     focus(): void;
     blur(): void;
+    /** Leave editing: clear owned selection and transient controls without changing the document. */
+    dismiss(): void;
     /** Where the selection is, as offsets into `value`; null when it is not in the editor. */
     selection(): {
         start: number;
