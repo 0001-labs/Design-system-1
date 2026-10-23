@@ -109,6 +109,7 @@ export default defineConfig({
             { label: "Languages", slug: "1-root/languages" },
             { label: "Formatting", slug: "1-root/formatting" },
             { label: "Theming", slug: "1-root/theming" },
+            { label: "Material", slug: "1-root/material" },
             { label: "Shape", slug: "1-root/shape" },
             { label: "Prose", slug: "1-root/prose" },
             { label: "Feedback", slug: "1-root/feedback" },

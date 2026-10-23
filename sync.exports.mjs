@@ -18,7 +18,7 @@ const oneImports = ['fonts.css', 'palette.css'];
 /** The sheets controls.css imports besides the text classes: tables, empty states, notices, shortcut hints, the dialog's placements, the site chrome (header with its drawer, footer, document), carousels, cards, stats, progress, and rows. */
 const controlSheets = ['table.css', 'empty.css', 'notice.css', 'overlay.css', 'header.css', 'footer.css', 'document.css', 'bento.css', 'carousel.css', 'card.css', 'figures.css', 'progress.css', 'row.css', 'context.css'];
 /** Sheets for writing that a product asks for by name, as a flag or in `styles`. */
-const writingSheets = { prose: 'prose.css', cjk: 'cjk.css' };
+const writingSheets = { prose: 'prose.css', cjk: 'cjk.css', material: 'material.css' };
 const askedSheets = options => Object.entries(writingSheets).filter(([flag]) => options[flag]).map(([, file]) => file);
 /** The faces fonts.css (and so one.css) loads, by the file names its @font-face rules use, and their licences. */
 const rootFonts = ['GT-America-Standard-Regular.woff2', 'GT-America-Standard-Medium.woff2', 'GT-America-Compressed-Regular.woff2', 'GT-Canon-M-Standard-Medium-Trial.woff2', 'Inter-Arrows.woff2', 'Iosevka-Regular.woff2', 'Inter-LICENSE.md', 'Iosevka-LICENSE.md'];

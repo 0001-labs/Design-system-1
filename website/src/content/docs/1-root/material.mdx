@@ -1,0 +1,77 @@
+---
+title: Material
+description: Solid, paper, glass and wash. Four lightweight finishes for a surface.
+---
+
+import MaterialSamples from '../../../components/MaterialSamples.astro';
+
+Material is what a surface feels like. Choose **Solid**, **Paper**, **Glass** or **Wash**. Each keeps the same type, spacing and controls; only the surface changes. All four follow the page's light or dark theme.
+
+<MaterialSamples />
+
+## Four materials
+
+| Material | Character | Where it fits |
+| --- | --- | --- |
+| Solid | An opaque, even ground. | Everyday pages, forms and dense information. |
+| Paper | A warm ground with fine grain and soft fibre. | Reading, notes and quiet creative surfaces. |
+| Glass | A translucent ground that softly blurs what is behind it. | A small, temporary floating surface. |
+| Wash | An opaque tint with a gentle falloff of colour. | A sidebar, supporting panel or calm area of emphasis. |
+
+Solid is the default choice. Keep paper subtle so the writing stays clear. Use glass sparingly over a backdrop with something to reveal. Wash gives a surface colour without sampling anything behind it.
+
+## Apply a material
+
+Load the optional stylesheet **after** the normal root stylesheet. It adds no JavaScript and changes nothing until a surface asks for it.
+
+```css
+@import "./ds1/one.css";
+@import "./ds1/material.css";
+```
+
+```html
+<section data-ds-material="paper">
+  <h2>Notes from today</h2>
+  <p>A place to collect a thought.</p>
+</section>
+```
+
+The attribute paints that element's background. It adds no padding, border, corners, elevation or semantics. Compose the normal layout and controls inside it. A material on a custom element paints its host; it does not override a component's internal opaque face. Apply it to the surface that actually draws the background, outside a component's shadow root.
+
+With Sync 1, add `"material": true` to the `root` or `tokens` export, or include `"material.css"` in the root's `styles`. A token bundle includes it when requested. Existing consumers keep their current surfaces until they opt in. These finishes are web foundations; Swift, Kotlin and email do not acquire them automatically.
+
+## Adjust the surface
+
+| Token | Default | Purpose |
+| --- | --- | --- |
+| `--ds-material-base` | `--ds-paper` | The opaque ground shared by the finishes and their fallbacks. |
+| `--ds-material-ink` | `--ds-text-color` | The text on the surface. |
+| `--ds-material-tint` | `--ds-sharp-blue` | The wash's tint. |
+
+Keep base and ink as a readable pair in both themes. Set them on an embedded surface when that surface has its own colour scheme.
+
+```css
+.reading-surface {
+  --ds-material-base: light-dark(#f4f4f4, #2c2c2c);
+  --ds-material-ink: light-dark(#2a2a2a, #ffffff);
+  --ds-material-tint: var(--ds-pink);
+}
+```
+
+## Performance and accessibility
+
+Solid is a single fill. Wash is one static gradient. Paper repeats a baked 128 × 128 PNG tile embedded in the optional stylesheet: no canvas, procedural SVG filter, animation or extra request. The grain belongs to the background and never filters the writing.
+
+Glass uses one 8px backdrop blur. Keep it to a small surface; avoid full-page glass, scrolling layers of glass and animating the filter. Nested glass surfaces become opaque to avoid another blur pass. A browser without backdrop filtering gets solid automatically.
+
+Reduced transparency, increased contrast and printing remove texture and transparency. Forced colours uses the reader's canvas and text colours. A product can also turn off effects for one surface or an entire subtree:
+
+```html
+<main data-ds-material-effects="off">
+  <section data-ds-material="glass">An opaque surface.</section>
+</main>
+```
+
+This attribute is an explicit quality choice; there is no hardware sniffing, timer or animation loop.
+
+The separation of opaque, textured and translucent surfaces follows [Fluent's material guidance](https://fluent2.microsoft.design/material). These four finishes are Design system 1's own choices.

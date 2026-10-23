@@ -28,6 +28,22 @@ test('one.css always arrives with the faces and the palette it imports', () => {
   expect(Object.keys(files('root', { styles: ['one.css', 'grid.css'], fonts: false }))).toEqual(['one.css', 'grid.css', 'text.css', 'fonts.css', 'palette.css']);
 });
 
+test('materials stay opt-in and carry the same self-contained texture in root and token bundles', () => {
+  expect(files('root')).not.toHaveProperty(['material.css']);
+  expect(files('tokens')).not.toHaveProperty(['material.css']);
+  const material = read('DS1/1-root/material.css');
+  expect(files('root', { material: true, fonts: false })['material.css']).toBe(material);
+  expect(files('root', { styles: ['material.css'], fonts: false })).toEqual({ 'material.css': material });
+  expect(files('tokens', { material: true })['material.css']).toBe(material);
+  const bundle = String(files('tokens', { material: true, bundle: true })['bundle.css']);
+  expect(bundle).toContain(String(material));
+  expect(bundle).toContain('data:image/png;base64,');
+  const urls = [...String(material).matchAll(/url\("([^"]+)"\)/g)].map(match => match[1]);
+  expect(urls.length).toBe(1);
+  expect(urls.every(url => url.startsWith('data:image/png;base64,'))).toBe(true);
+  expect(String(material).includes('@import')).toBe(false);
+});
+
 test('fonts.css travels on its own: through root with its faces in fonts/, or through fonts beside them', () => {
   const root = files('root', { styles: ['fonts.css'] });
   expect(Object.keys(root)).toEqual(['fonts.css', ...['GT-America-Standard-Regular.woff2', 'GT-America-Standard-Medium.woff2', 'GT-America-Compressed-Regular.woff2', 'GT-Canon-M-Standard-Medium-Trial.woff2', 'Inter-Arrows.woff2', 'Iosevka-Regular.woff2', 'Inter-LICENSE.md', 'Iosevka-LICENSE.md'].map((font) => `fonts/${font}`)]);

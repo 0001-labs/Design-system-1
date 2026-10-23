@@ -27,6 +27,7 @@ export const ALL_LAYERS: DirectoryLayer[] = [
       { name: 'Languages', href: '/1-root/languages/' },
       { name: 'Formatting', href: '/1-root/formatting/' },
       { name: 'Theming', href: '/1-root/theming/' },
+      { name: 'Material', href: '/1-root/material/', tag: 'material.css' },
       { name: 'Shape', href: '/1-root/shape/' },
       { name: 'Device', href: '/1-root/device/' },
       { name: 'Preferences', href: '/1-root/preferences/' },

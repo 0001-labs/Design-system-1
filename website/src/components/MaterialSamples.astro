@@ -1,0 +1,32 @@
+---
+import '../../../DS1/1-root/material.css';
+const materials = [
+  ['solid', 'Solid', 'A quiet, opaque surface.'],
+  ['paper', 'Paper', 'Fine grain with a warm ground.'],
+  ['glass', 'Glass', 'A little of what lies beneath.'],
+  ['wash', 'Wash', 'Colour settling into the surface.'],
+];
+---
+<div class="materials not-content" data-ds-not-prose aria-label="Four material samples">
+  {materials.map(([id, name, description]) => (
+    <figure>
+      <div class="backdrop">
+        <div class="surface" data-ds-material={id}>
+          <ds-text literal size="display">{name}</ds-text>
+          <ds-text literal wrap>{description}</ds-text>
+          <ds-text literal>Words stay crisp.</ds-text>
+        </div>
+      </div>
+      <figcaption><code>{id}</code></figcaption>
+    </figure>
+  ))}
+</div>
+<style>
+  .materials { --u: var(--site-unit, 20px); display: flex; flex-wrap: wrap; gap: var(--u); margin-block: var(--u); }
+  figure { width: calc(14 * var(--u)); max-width: 100%; min-width: 0; margin: 0; }
+  .backdrop { box-sizing: border-box; padding: var(--u); background: linear-gradient(90deg, var(--ds-zenith-blue) 0% 33.333%, var(--ds-pink) 33.333% 66.666%, var(--ds-apple-green) 66.666%); }
+  .surface { box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: var(--u); min-height: calc(10 * var(--u)); padding: var(--u); }
+  ds-text { display: block; }
+  figcaption { margin-block-start: var(--u); line-height: var(--u); }
+  code { font-family: var(--ds-typeface-mono); font-size: calc(13px * var(--ds-sf, 1)); }
+</style>
