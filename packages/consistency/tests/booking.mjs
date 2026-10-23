@@ -40,6 +40,9 @@ try {
   await page.keyboard.press('Meta+Shift+z');
   if (await heading.innerText() !== 'A different work trip') throw Error('Booking redo failed');
   await page.getByRole('button', { name: 'Mobile preview', exact: true }).click(); await check();
+  const frame=await page.evaluate(()=>{const sheet=document.querySelector('.consistency-sheet'),stage=document.querySelector('.consistency-stage'),a=sheet.getBoundingClientRect(),b=stage.getBoundingClientRect(),style=getComputedStyle(sheet);return{dx:(a.left+a.right-b.left-b.right)/2,dy:(a.top+a.bottom-b.top-b.bottom)/2,inset:b.height-a.height,outline:style.outlineStyle,outlineWidth:parseFloat(style.outlineWidth)};});
+  if(Math.abs(frame.dx)>1||Math.abs(frame.dy)>1||frame.inset<39||frame.outline==='none'||frame.outlineWidth<1)throw Error(`Mobile frame ${width}: ${JSON.stringify(frame)}`);
+  if(width===1440)await page.screenshot({path:'/tmp/mobile-preview-frame.png',fullPage:false});
   if (width === 1440) { await heading.focus(); await page.keyboard.press('Meta+z'); await page.getByRole('button', { name: 'Desktop preview', exact: true }).click(); await page.screenshot({path:'/tmp/booking-editor.png', fullPage:false}); }
   console.log(`Booking ${width}: complete source, Voyage, editing, history and containment passed`);
   await page.close();

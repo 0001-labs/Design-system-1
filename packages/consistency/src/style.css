@@ -251,3 +251,7 @@ consistency-booking .aa-plain { font:inherit; color:inherit; line-height:inherit
 }
 
 consistency-booking .aa-plain > .aa-block { margin:0; padding:0; font:inherit; color:inherit; line-height:inherit; background:none; min-height:0; }
+
+/* Mobile is a framed viewport centered in the available editing canvas. */
+.consistency-mobile-preview .consistency-stage{display:grid;place-items:center}
+.consistency-mobile-preview .consistency-sheet{height:calc(100% - 40px);margin:0;outline:1px solid var(--ds-border-color,#aaa);border-radius:var(--ds-radius,4px);box-shadow:0 0 0 1px color-mix(in srgb,var(--ds-text-color) 12%,transparent)}

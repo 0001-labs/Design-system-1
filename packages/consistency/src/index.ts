@@ -80,7 +80,7 @@ export class ConsistencyEditor extends LitElement {
     this.textSpacing?.destroy(); this.textSpacing = undefined; this.columnSpacing?.destroy(); this.columnSpacing = undefined; this.selectedGap = id === 'studio' ? 'intro-actions' : 'section-intro';
     this.selection = new Set(); this.preview = {}; this.selectedExample = id; if (id === 'booking') this.library = 'voyage'; this.revision++;
   }
-  private canvasWidth() { return Math.max(280, this.mobilePreview ? Math.min(380, Math.floor(this.stageWidth / 20) * 20) : this.stageWidth); }
+  private canvasWidth() { return Math.max(280, this.mobilePreview ? Math.min(380, Math.floor((this.stageWidth - 20) / 20) * 20) : this.stageWidth); }
   private sort?: SortableController;
   private spacingDisposers: (() => void)[] = [];
   private spacingBound = false;
