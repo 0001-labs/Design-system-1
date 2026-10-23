@@ -11,13 +11,13 @@ const materials = [
   {materials.map(([id, name, description]) => (
     <figure>
       <div class="backdrop">
-        <div class="surface" data-ds-material={id}>
-          <ds-text literal size="display">{name}</ds-text>
-          <ds-text literal wrap>{description}</ds-text>
-          <ds-text literal>Words stay crisp.</ds-text>
-        </div>
+        <div class="surface" data-ds-material={id} aria-hidden="true"></div>
       </div>
-      <figcaption><code>{id}</code></figcaption>
+      <figcaption>
+        <ds-text literal size="display">{name}</ds-text>
+        <ds-text literal wrap>{description}</ds-text>
+        <code>{id}</code>
+      </figcaption>
     </figure>
   ))}
 </div>
@@ -25,8 +25,8 @@ const materials = [
   .materials { --u: var(--site-unit, 20px); display: flex; flex-wrap: wrap; gap: var(--u); margin-block: var(--u); }
   figure { width: calc(14 * var(--u)); max-width: 100%; min-width: 0; margin: 0; }
   .backdrop { box-sizing: border-box; padding: var(--u); background: linear-gradient(90deg, var(--ds-zenith-blue) 0% 33.333%, var(--ds-pink) 33.333% 66.666%, var(--ds-apple-green) 66.666%); }
-  .surface { box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: var(--u); min-height: calc(10 * var(--u)); padding: var(--u); }
+  .surface { box-sizing: border-box; min-height: calc(10 * var(--u)); }
   ds-text { display: block; }
-  figcaption { margin-block-start: var(--u); line-height: var(--u); }
+  figcaption { display: flex; flex-direction: column; gap: var(--u); margin-block-start: var(--u); line-height: var(--u); }
   code { font-family: var(--ds-typeface-mono); font-size: calc(13px * var(--ds-sf, 1)); }
 </style>

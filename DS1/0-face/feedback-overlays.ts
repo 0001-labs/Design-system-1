@@ -129,7 +129,7 @@ function show(spec: Spec): Promise<boolean | string | null> {
 
     const footer = element("div", { "data-ds-overlay": "footer" });
     const cancel = spec.cancel === undefined ? undefined : element("button", { type: "button", class: "ds-button ds-button--secondary", value: "cancel" }, spec.cancel);
-    const confirm = element("button", { type: "button", class: spec.danger ? "ds-button ds-button--secondary ds-button--danger" : "ds-button ds-button--primary", value: "confirm" }, spec.confirm);
+    const confirm = element("button", { type: "button", class: spec.danger ? "ds-button ds-button--danger" : "ds-button ds-button--primary", value: "confirm" }, spec.confirm);
     if (cancel) footer.appendChild(cancel);
     footer.appendChild(confirm);
     dialog.appendChild(footer);
