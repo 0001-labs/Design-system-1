@@ -47,3 +47,27 @@
 ::slotted(button:focus-visible) { outline: 2px solid var(--ds-focus-ring) !important; outline-offset: 1px !important; }
 ::slotted(button:disabled) { cursor: default !important; opacity: .5 !important; }
 @media (prefers-reduced-motion: reduce) { ::slotted(button)::after { transition: none; } }
+
+/* A smaller visible face on a two-square by one-square native hit target. */
+:host([monochrome]) ::slotted(button[aria-checked="true"]) { background: var(--ds-text-color) !important; }
+:host([monochrome]) ::slotted(button[aria-checked="true"])::after { background: var(--ds-paper); }
+:host([compact]) { width: calc(40px * var(--ds-sf)); height: calc(20px * var(--ds-sf)); }
+:host([compact]) ::slotted(button),
+:host([compact]) ::slotted(button[aria-checked="true"]) { padding: 0 !important; background: transparent !important; }
+:host([compact]) ::slotted(button)::before {
+ content: ""; position: absolute; inset-inline-end: 0; bottom: 0;
+ width: calc(24px * var(--ds-sf)); height: calc(12px * var(--ds-sf));
+ border-radius: calc(12px * var(--ds-sf)); background: var(--ds-fill);
+ box-shadow: inset 0 0 0 1px color-mix(in srgb,var(--ds-text-color) 24%,transparent);
+}
+:host([compact]) ::slotted(button)::after {
+ position: absolute; left: calc(18px * var(--ds-sf)); bottom: calc(2px * var(--ds-sf));
+ width: calc(8px * var(--ds-sf)); height: calc(8px * var(--ds-sf));
+ background: var(--ds-text-color-muted);
+}
+:host([compact]) ::slotted(button[aria-checked="true"])::before { background: var(--ds-switch-track-on); box-shadow: none; }
+:host([compact]) ::slotted(button[aria-checked="true"])::after { transform: translateX(calc(12px * var(--ds-sf))); background: var(--ds-white); }
+:host([compact][monochrome]) ::slotted(button[aria-checked="true"])::before { background: var(--ds-text-color); }
+:host([compact][monochrome]) ::slotted(button[aria-checked="true"])::after { background: var(--ds-paper); }
+:host([compact]:dir(rtl)) ::slotted(button)::after { left: auto; right: calc(18px * var(--ds-sf)); }
+:host([compact]:dir(rtl)) ::slotted(button[aria-checked="true"])::after { transform: translateX(calc(-12px * var(--ds-sf))); }

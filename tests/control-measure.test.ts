@@ -375,3 +375,20 @@ test("a number field is one square high with its face one control high on the lo
     expect(boxes.zoom!.value).toBe("1.03");
   }
 });
+
+test("compact monochrome switches keep a grid-sized hit target and native keyboard behavior", async () => {
+ for (const scheme of SCHEMES) {
+  const page=pages[scheme];
+  await stage(page, `<ds-switch compact monochrome id="compact"><button type="button" role="switch" aria-checked="false" aria-label="Spacing"></button></ds-switch>`);
+  const button=page.locator('#compact button');
+  await button.evaluate(el=>el.addEventListener('click',()=>el.setAttribute('aria-checked',String(el.getAttribute('aria-checked')!=='true'))));
+  const dimensions=await button.evaluate(el=>{const r=el.getBoundingClientRect(),track=getComputedStyle(el,'::before'),thumb=getComputedStyle(el,'::after');return [r.width,r.height,parseFloat(track.width),parseFloat(track.height),parseFloat(thumb.width),parseFloat(thumb.height)]});
+  expect(dimensions).toEqual([40,20,24,12,8,8]);
+  await button.focus();await page.keyboard.press('Space');await page.waitForTimeout(160);
+  expect(await button.getAttribute('aria-checked')).toBe('true');
+  const colours=await button.evaluate(el=>({track:getComputedStyle(el,'::before').backgroundColor,thumb:getComputedStyle(el,'::after').backgroundColor,ink:getComputedStyle(el).getPropertyValue('--ds-text-color').trim(),outline:getComputedStyle(el).outlineStyle,transform:getComputedStyle(el,'::after').transform}));
+  expect(colours.track).not.toBe('rgb(82, 157, 54)');expect(colours.track).not.toBe(colours.thumb);expect(colours.outline).toBe('solid');expect(colours.transform).toBe('matrix(1, 0, 0, 1, 12, 0)');
+  await page.keyboard.press('Enter');expect(await button.getAttribute('aria-checked')).toBe('false');
+  await button.evaluate(el=>el.disabled=true);await page.keyboard.press('Space');expect(await button.getAttribute('aria-checked')).toBe('false');
+ }
+});

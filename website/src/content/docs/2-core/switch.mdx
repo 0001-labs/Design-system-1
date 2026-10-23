@@ -32,6 +32,16 @@ visible text.
 
 On Apple it is `.toggleStyle(.ds1Switch)`, on Android `DS1Switch`, the same pill.
 
+## Compact control panels
+
+Use `compact monochrome` for a dense control panel: a 24 × 12px pill with an 8px thumb and 12px travel, inside a 40 × 20px native button. All measures follow the shared scale. On uses the text colour with a paper-colour thumb; off uses a quiet grey track. Focus and disabled states remain visible. Normal switches retain their 32 × 16px green face.
+
+```html
+<ds-switch compact monochrome><button type="button" role="switch" aria-checked="true" aria-label="Spacing"></button></ds-switch>
+```
+
+The React adapter accepts the same `compact` and `monochrome` boolean options. Native platform switches retain their standard size and appearance.
+
 ## Design examples
 
 <ComponentExample example="choice-switches" />

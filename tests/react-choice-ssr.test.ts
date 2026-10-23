@@ -20,3 +20,9 @@ test("choice adapters render usable native controls without browser globals", ()
   expect(select).toContain('<ds-select><select name="project">');
   expect(select).toContain('value="a" selected=""');
 });
+
+test('compact monochrome belongs to the switch host, not the native button', () => {
+ const markup=renderToStaticMarkup(h(Switch,{checked:true,compact:true,monochrome:true,'aria-label':'Spacing'}));
+ expect(markup).toMatch(/<ds-switch[^>]*compact[^>]*monochrome/);
+ expect(markup).not.toMatch(/<button[^>]*(compact|monochrome)/);
+});

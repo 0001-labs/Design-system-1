@@ -37,12 +37,14 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
 
 export type SwitchProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" | "role" | "aria-checked" | "onChange" | "type"> & {
   checked: boolean;
+  compact?: boolean;
+  monochrome?: boolean;
   onCheckedChange?: (checked: boolean, event: MouseEvent<HTMLButtonElement>) => void;
 };
 export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(function Switch(
-  { checked, onCheckedChange, onClick, className, style, hidden, ...props }, ref,
+  { checked, onCheckedChange, onClick, className, style, hidden, compact, monochrome, ...props }, ref,
 ) {
-  return createElement("ds-switch", { className, style, hidden }, createElement("button", {
+  return createElement("ds-switch", { className, style, hidden, compact: compact || undefined, monochrome: monochrome || undefined }, createElement("button", {
     ...props, ref, hidden, type: "button", role: "switch", "aria-checked": checked,
     onClick: (event: MouseEvent<HTMLButtonElement>) => {
       onClick?.(event);
