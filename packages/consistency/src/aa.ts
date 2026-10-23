@@ -1,4 +1,5 @@
 import { contentElementAtoms } from './elements';
+import { paletteAtoms } from './palette';
 import type { Prompter, PromptAnswer } from '../../../website/src/vendor/aa/aa';
 
 /** Aa owns prompt, selection, retry and undo; this adapter owns authenticated transport. */
@@ -36,7 +37,7 @@ const MAX_BATCH_BYTES = 8 * 1024 * 1024;
 export function createPreviewEditorOptions(getHost: () => AaEditorElement | null, onError: (message: string) => void): EditorOptions {
   const comments = memoryCommentStore({ me: { id: 'owner', name: 'Joachim' } });
   return {
-    atoms: [imageAtom, diagramAtom, ...contentElementAtoms(() => { const editor = getHost()?.editor; return !!editor && !editor.readOnly; }, getHost)], comments, prompt: previewPrompt, correcting: false, toolbar: true, menus: true,
+    atoms: [imageAtom, diagramAtom, ...contentElementAtoms(() => { const editor = getHost()?.editor; return !!editor && !editor.readOnly; }, getHost), ...paletteAtoms(() => { const editor = getHost()?.editor; return !!editor && !editor.readOnly; }, getHost)], comments, prompt: previewPrompt, correcting: false, toolbar: true, menus: true,
     correct: async (text, context) => {
       const answer = await previewPrompt('Correct spelling, grammar and punctuation only. Preserve meaning, Markdown structure and language. Return only the corrected selected text.', { ...context, kind: 'writing', text });
       if (typeof answer === 'string') return answer;

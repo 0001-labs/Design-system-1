@@ -1,0 +1,12 @@
+.consistency-palette-element { display: block; position: relative; min-width: 0; max-width: 100%; }
+.consistency-palette-face { display: block; position: relative; min-width: 0; max-width: 100%; overflow-x: auto; }
+.consistency-palette-face > * { max-width: 100%; box-sizing: border-box; }
+.consistency-palette-face > ds-text { min-width: min(100%, calc(10 * var(--ds-unit))); }
+.consistency-palette-face > ds-overlay { display: block; padding: var(--ds-unit); border: 1px solid var(--ds-border-color); }
+.consistency-palette-edit { margin-block-start: calc(var(--ds-unit) / 2); }
+.consistency-palette-preview { width: calc(16 * var(--ds-unit)); max-width: 100%; }
+.consistency-palette-fields { display: grid; gap: var(--ds-unit); width: calc(16 * var(--ds-unit)); max-width: 100%; }
+.consistency-palette-fields h2, .consistency-palette-fields p { margin: 0; }
+.consistency-palette-fields > *, .consistency-palette-fields ds-input { min-width: 0; max-width: 100%; }
+.consistency-palette-fields label { display: grid; gap: calc(var(--ds-unit) / 2); }
+.consistency-palette-actions { display: flex; flex-wrap: wrap; gap: var(--ds-unit); }

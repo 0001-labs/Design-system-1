@@ -1,12 +1,18 @@
 /** Opt-in synthetic provider evaluation; no owner documents or saved editor state. */
 import { componentContext, componentState, componentQuestions, applyComponentDecision, COMPONENT_ROUTING_MODEL } from '../shared/consistency-routing';
 import { componentDefaults, writeBasicContentElement } from '../shared/consistency-content';
+import { COMPONENT_PALETTE, paletteInsertion } from '../shared/consistency-palette';
 const key = process.env.TYPESAFE_API_KEY;
 if (!key) throw new Error('Set the server-side TYPESAFE_API_KEY to evaluate routing.');
 const button = writeBasicContentElement(componentDefaults.button);
 const card = writeBasicContentElement(componentDefaults.card);
 const document = `${button}\n\n${card}\n\n⟦here⟧`;
 const cases: Array<{ prompt: string; expected: string; document?: string }> = [
+  ...COMPONENT_PALETTE.map(entry => ({ prompt: `Insert a default ${entry.name} component here`, expected: `insert_${entry.id}` })),
+  { prompt: 'Make the message a warning', expected: 'variant_warning', document: paletteInsertion(COMPONENT_PALETTE.find(entry => entry.id === 'message')!) },
+  { prompt: 'Add a chart using my sales figures', expected: 'other' },
+  { prompt: 'Add a calendar and a form', expected: 'other' },
+  { prompt: 'Do not insert a sidebar', expected: 'other' },
   { prompt: 'Add a card titled Welcome', expected: 'other' },
   { prompt: 'Make the Subscribe button secondary', expected: 'other' },
   { prompt: 'Leave the card exactly as it is', expected: 'other' },
