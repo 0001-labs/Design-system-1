@@ -35,6 +35,16 @@ const mono = '"Inter Arrows", "Iosevka", "Iosevka Extended", ui-monospace, "SF M
 
 // Each value is [light, dark].
 export const LIBRARIES = {
+  slate: {
+    name: 'Slate', note: 'A dark issue workspace on a 10px unit, with readable 14px text and 30px control rows.',
+    paper: ['#1e1e1e', '#1e1e1e'], text: ['#e6e6e6', '#e6e6e6'], muted: ['#b3b3b3', '#b3b3b3'],
+    fill: ['#2a2a2a', '#2a2a2a'], hover: ['#3c3c3c', '#3c3c3c'], border: ['#3c3c3c', '#3c3c3c'], input: ['#2a2a2a', '#2a2a2a'],
+    accent: ['#ccccff', '#ccccff'], onAccent: ['#1e1e1e', '#1e1e1e'], focus: ['#ccccff', '#ccccff'],
+    chart: ['#ccccff', '#ccccff'], chartInk: ['#1e1e1e', '#1e1e1e'],
+    corner: '4px', inset: '10px', card: '4px',
+    componentRules: 'ds-text { --ds-1: 20px; --ds-control-size: 20px; }\nds-select { --ds-1: 20px; }',
+    metrics: { '--ds-1': '10px', '--ds-row-size': '30px', '--ds-control-size': '26px', '--ds-text-leading': '20px', '--ds-small-text-size': '12px', '--ds-card-text-inset-min': '20px', '--ds-icon-size': '16px', '--ds-warning-color': '#fec20d', '--ds-success-color': '#99ff73', '--ds-danger-color': '#ff5f5f', '--button-text-color': 'var(--ds-text-color)', '--button-color': 'var(--ds-text-color)', '--ds-input-height': 'calc(26px * var(--ds-sf))' },
+  },
   lagoon: {
     name: 'Lagoon', note: 'Hysteric blue water and Sharp blue, every control a pill and soft pictures.',
     paper: ['#cdf2fe', '#1b3f4b'], text: ['#0d2c38', '#e3f7fe'], muted: ['#2f5868', '#a9d5e4'],
@@ -132,6 +142,7 @@ export function draft(lib) {
     `  --ds-corner-size: ${lib.corner};`,
     `  --ds-card-corner-size: ${lib.card};`,
     `  --ds-button-inset: ${lib.inset};`,
+    ...Object.entries(lib.metrics ?? {}).map(([name, value]) => `  ${name}: ${value};`),
     ...(lib.tracking ? [`  --ds-text-tracking: ${lib.tracking};`] : []),
     // The page's own paper and words, which prose and the page's background read.
     '  --background: var(--ds-paper);',
@@ -213,7 +224,7 @@ export function draft(lib) {
     '}',
     '',
   ].join('\n');
-  return `${css.trimEnd()}\n\n${extra}`;
+  return `${css.trimEnd()}\n\n${extra}${lib.componentRules ? `\n${lib.componentRules}\n` : ''}`;
 }
 
 /** The pairs that carry words and read below 4.5:1, as "<library> <scheme> <pair>: <ratio>". */

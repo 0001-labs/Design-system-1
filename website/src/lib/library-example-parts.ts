@@ -4,6 +4,7 @@
 // pinned, so an edit to a library never changes an example until it names the new version.
 
 export const LIBRARIES = {
+  slate: { name: 'Slate', id: 'SLATE_ID', version: 1 },
   lagoon: { name: 'Lagoon', id: 'LAGOON_ID', version: 1 },
   bloom: { name: 'Bloom', id: 'BLOOM_ID', version: 1 },
   grove: { name: 'Grove', id: 'GROVE_ID', version: 1 },
