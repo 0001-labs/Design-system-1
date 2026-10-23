@@ -1109,7 +1109,7 @@ export class Calendar extends CalendarBase {
     month.renderRoot.querySelector<HTMLElement>('[data-day][tabindex="0"]')?.focus({ preventScroll: true });
   }
 
-  /** Below the field, half a square from it, or above when there is more room there; held inside the screen. */
+  /** Directly against the field, or above when there is more room there; held inside the screen. */
   private place = () => {
     const panel = this.panel, trigger = this.trigger;
     if (!this.shown || !panel || !trigger) return;
@@ -1119,7 +1119,7 @@ export class Calendar extends CalendarBase {
     const left = viewport?.offsetLeft ?? 0, top = viewport?.offsetTop ?? 0;
     const width = viewport?.width ?? view.innerWidth, height = viewport?.height ?? view.innerHeight;
     const box = panel.getBoundingClientRect();
-    const gap = (parseFloat(getComputedStyle(panel).paddingTop) || 9) + 1;
+    const gap = 0;
     // The face is one control high at the foot of its square: measure from that square.
     const square = Math.max(rect.height, gap * 2);
     const foot = rect.bottom, head = rect.bottom - square;

@@ -13,7 +13,7 @@ Use the Lit `ds-*` components for web controls, including plain HTML pages: a st
 
 ## Non-modal apps
 
-Keep the working page usable. Edit values inline; open small choices in an anchored dropdown; use a page or a non-modal side panel for larger work. Link follows this rule alongside Money and Ezo. A date opens the compact DS1 calendar dropdown, with single-day/range selection and Clear; a status opens DS1 Select. Neither gets a centred form with a backdrop or a separate Cancel/Save ceremony.
+Keep the working page usable. Edit values inline; open small choices in an anchored dropdown; use a page or a non-modal side panel for larger work. Link follows this rule alongside Money and Ezo. A date opens the compact DS1 calendar dropdown, with no outer border or padding, no gap from its trigger or between its control groups, and single-day/range selection and Clear; a status opens DS1 Select. Neither gets a centred form with a backdrop or a separate Cancel/Save ceremony.
 
 Compose existing DS1 controls. For a side panel or sheet, set `ds-overlay.nonModal = true`, `holdScroll = false` and `blockOutside = false`; choose `type="drawer"`, `"sheet"` or an anchored `"popover"` explicitly. Keep the surrounding page interactive, with no dimming backdrop, focus trap or page scroll lock. Full-screen document viewing is a deliberate viewer mode. Keep dismissal, focus return, unsaved work and pending saves safe; a failed automatic edit restores the accepted value and shows an actionable error. Confirm destructive actions inline or in an anchored non-modal confirmation before executing them.
 

@@ -452,8 +452,8 @@
   inset: auto;
   box-sizing: border-box;
   margin: 0;
-  padding: calc(var(--ds-unit) / 2 - 1px);
-  border: 1px solid var(--ds-border-color);
+  padding: 0;
+  border: 0;
   border-radius: var(--ds-radius-card);
   background: var(--ds-paper);
   color: var(--ds-text-color);
@@ -463,7 +463,7 @@
 .popover:not(:popover-open) { display: none; }
 
 /* The days to type: a row of one square for each end, its time on the row below; one square spare after. */
-.fields { margin-block-end: var(--ds-unit); }
+.fields { margin-block-end: 0; }
 .field-row {
   display: flex;
   align-items: flex-end;
@@ -499,10 +499,11 @@
 .option:disabled { color: var(--ds-title-color); cursor: default; }
 .option .ds-switch { flex: 0 0 auto; }
 
-/* A separator: one square with a 1px line through its middle. */
+/* Adjacent picker controls share one continuous menu surface. */
 .separator {
+  display: none;
   position: relative;
-  height: var(--ds-unit);
+  height: 0;
 }
 .separator::after {
   position: absolute;
