@@ -81,7 +81,7 @@ test('the root export can leave the faces to the product and add controls and pa
 });
 
 test('every root page script travels with what it imports', () => {
-  const modules = ['carousel', 'grid', 'grid-fit', 'layout-inspector', 'scaling', 'theme', 'theme-bootstrap', 'tooltips', 'sidebar', 'header', 'keys', 'overlay-swipe', 'cut-fade'];
+  const modules = ['carousel', 'grid', 'constraints', 'grid-fit', 'layout-inspector', 'scaling', 'theme', 'theme-bootstrap', 'tooltips', 'sidebar', 'header', 'keys', 'overlay-swipe', 'cut-fade'];
   for (const name of modules) {
     const copy = files('root', { styles: [], fonts: false, modules: [name] });
     for (const [file, content] of Object.entries(copy)) {

@@ -109,7 +109,7 @@ export const ISSUE_TRACKER_EXAMPLE: LayoutExample = {
       <ds-button control="host" data-page="library" aria-pressed="false">Library</ds-button>
     </ds-tabs>
     ${text('Workspace / Engineering', 'tone="muted"')}
-    <ds-avatar initial="AK" label="Alex Kim" color="var(--ds-accent-color)"></ds-avatar>
+    <ds-avatar initial="AK" label="Alex Kim" color="var(--ds-accent-color)" ink="var(--ds-button-text-color-on-accent)"></ds-avatar>
   </div>
   <section id="issue-roadmap">
     <div class="issue-heading"><div><h1>Product roadmap</h1><div class="issue-subtitle">${text('From the next release to the next city.', 'tone="muted" wrap')}</div></div>

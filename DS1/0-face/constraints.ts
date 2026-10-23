@@ -1,3 +1,5 @@
+import { inspectTextContrast, measureTextContrast } from "./text-contrast";
+
 // Design system 1's small rules: one list, each rule a sentence a component keeps and a check that
 // measures it on a page as it is drawn. Five presses of C show what a page breaks, in a panel at
 // its side, for the page's owner (constraint-panel.ts). The Constraints page
@@ -80,6 +82,16 @@ function rows(found: ReturnType<typeof cards>) {
 }
 
 export const constraints: Constraint[] = [
+  {
+    code: 'color.text-contrast',
+    rule: 'Visible text, including muted labels, placeholders and avatar initials, has at least 4.5:1 contrast against the background it is drawn on.',
+    why: 'Measure resolved colours through slots and open shadow roots, including transparency and opacity; image backgrounds and effects that cannot be measured need a visual review.',
+    components: ['ds-color', 'ds-text', 'ds-avatar'],
+    check: { file: 'tests/text-contrast.test.ts', test: 'rendered text contrast catches component overrides, slots, alpha and opacity' },
+    measures: ['text sample', 'text samples'],
+    count: root => measureTextContrast(root).length,
+    inspect: inspectTextContrast,
+  },
   {
     code: 'card.media-level',
     rule: "A card's picture stands on the card's foot, a square below the words at least, so the pictures of cards side by side stand on one level whatever the words above them.",

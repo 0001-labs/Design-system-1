@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 import { afterEach, expect, test } from "vite-plus/test";
+import { constraints } from "../DS1/0-face/constraints";
 import { askedConstraints, createConstraintPanel } from "../DS1/0-face/constraint-panel";
 import { PHONE_WIDTHS, checkSite, describeElement, ruleLine, sitemapPages, summarizePages, summarizeRules, type PageResult, type SiteFinding } from "../DS1/0-face/constraint-site";
 
@@ -106,7 +107,7 @@ test("the panel lists every rule with what it measured on this page", () => {
   panel.show();
   const shadow = document.querySelector("[data-ds-constraint-panel]")!.shadowRoot!;
   const rows = [...shadow.querySelectorAll("[data-rules] li")].map(li => li.querySelector(".code")!.textContent);
-  expect(rows).toEqual(["card.media-level", "card.media-corners", "page.window-width"]);
+  expect(rows).toEqual(constraints.map(constraint => constraint.code));
   expect(shadow.querySelector("[data-rules]")!.textContent).toContain("Nothing to measure: no cards with a media picture on this page.");
   expect(shadow.querySelector<HTMLElement>("[data-pages]")!.hidden).toBe(true);
   panel.hide();

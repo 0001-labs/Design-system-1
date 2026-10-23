@@ -338,6 +338,10 @@ The small rules every component keeps, each a sentence with a code that never ch
 
 <!-- constraints:start (written by scripts/write-constraints.ts from DS1/0-face/constraints.ts) -->
 
+**Color** (`ds-color`)
+
+- `color.text-contrast`: Visible text, including muted labels, placeholders and avatar initials, has at least 4.5:1 contrast against the background it is drawn on. Measure resolved colours through slots and open shadow roots, including transparency and opacity; image backgrounds and effects that cannot be measured need a visual review.
+
 **Card** (`ds-card`)
 
 - `card.media-level`: A card's picture stands on the card's foot, a square below the words at least, so the pictures of cards side by side stand on one level whatever the words above them. The room a taller card leaves goes above its picture, never below it.

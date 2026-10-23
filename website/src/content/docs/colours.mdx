@@ -10,3 +10,17 @@ import Tool from "../../components/ColourPalette.astro";
 ## Using the colours
 
 Every colour here is a token: `--one-<colour>` and `--one-<colour>-pastel` (`--one-apple-green`, `--one-purple-pastel`), each written `light-dark(light, dark)`, plus `--one-zenith-blue` and `--one-comfortable-green` for the two named pastels. They live in `palette.css` (`DS1/1-root/palette.css`), which `one.css` imports and Sync 1's `root` and `tokens` exports copy, so components and page content share the same palette. `light-dark()` follows the page's `color-scheme`, which `one.css` sets. `palette.css` is written from `DS1/1-root/palette.ts` by `vp exec tsx scripts/write-palette-css.ts`; never edit them by hand.
+
+
+## Text contrast
+
+A palette colour is not automatically a readable text colour. Every visible text label, including muted text, placeholders and avatar initials, must keep **4.5:1** contrast against its actual surface. Pair a coloured fill with an explicit readable ink, and check both themes and interactive states. For example:
+
+```html
+<ds-avatar initial="AK" color="var(--ds-accent-color)"
+  ink="var(--ds-button-text-color-on-accent)" label="Alex Kim"></ds-avatar>
+```
+
+The `color.text-contrast` [constraint](/1-root/constraints/) measures resolved colours inside components, not just library token pairs. It composites transparent colours and opacity through slots and open shadow roots. Image and gradient backgrounds or filters that it cannot measure are reported for visual review. Hidden text and inactive controls are excluded; `aria-hidden` alone does not exempt visible writing.
+
+The page panel, Site check and `vp run constraints:phone <address>` all use this same rule. Recheck after opening menus or dialogs and in each supported theme: a pass covers only the rendered state. Closed shadow roots, canvas text, text in images and overlapping unrelated layers require visual review. The rule uses the [WCAG contrast calculation](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html); DS1 keeps the 4.5:1 minimum for large text too.

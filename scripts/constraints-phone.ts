@@ -40,10 +40,16 @@ async function pagesOf(site: string): Promise<string[]> {
 // The rules as one script for the page, which puts its inspector on window.
 const checker = (await build({
   stdin: {
-    contents: `import { inspectConstraints } from './constraints.ts';
+    contents: `import { measureConstraints } from './constraints.ts';
 import { describeElement } from './constraint-site.ts';
-window.__inspectConstraints = () => inspectConstraints(document).map(({ element, message, constraint }) =>
-  ({ code: constraint.code, message, element: describeElement(element) }));`,
+window.__inspectConstraints = () => {
+  const results = measureConstraints(document);
+  return {
+    findings: results.flatMap(({ constraint, findings }) => findings.map(({ element, message }) =>
+      ({ code: constraint.code, message, element: describeElement(element) }))),
+    measured: Object.fromEntries(results.map(({ constraint, measured }) => [constraint.code, measured])),
+  };
+};`,
     resolveDir: join(import.meta.dirname, '../DS1/0-face'),
     loader: 'ts',
   },
@@ -60,6 +66,7 @@ const browser = await webkit.launch();
 const queue = widths.flatMap(width => pages.map(url => ({ width, url })));
 const report: string[] = [];
 let broken = 0;
+const measured: Record<string, number> = {};
 
 async function open({ width, url }: { width: number; url: string }) {
   const context = await browser.newContext({ ...devices['iPhone 14'], viewport: { width, height: 844 }, screen: { width, height: 844 } });
@@ -75,7 +82,9 @@ async function open({ width, url }: { width: number; url: string }) {
     });
     await page.waitForTimeout(300);
     await page.addScriptTag({ content: checker });
-    const found = await page.evaluate(() => (window as unknown as { __inspectConstraints: () => Broken[] }).__inspectConstraints());
+    const result = await page.evaluate(() => (window as unknown as { __inspectConstraints: () => { findings: Broken[]; measured: Record<string, number> } }).__inspectConstraints());
+    for (const [code, count] of Object.entries(result.measured)) measured[code] = (measured[code] ?? 0) + count;
+    const found = result.findings;
     if (found.length) {
       broken += found.length;
       report.push(`${width}px ${url}`, ...found.map(({ code, message, element }) => `  ${code}  ${element}: ${message}`));
@@ -94,5 +103,6 @@ await Promise.all(Array.from({ length: 6 }, async () => {
 await browser.close();
 
 console.log(report.join('\n'));
+for (const [code, count] of Object.entries(measured)) console.log(`${code}: ${count} measured.`);
 console.log(`${pages.length} pages at ${widths.join(', ')}px: ${broken ? `${broken} broken` : 'every rule kept'}.`);
 process.exit(broken ? 1 : 0);

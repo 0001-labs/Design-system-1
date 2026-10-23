@@ -3,6 +3,8 @@ title: Avatar
 description: A person's or workspace's mark, one control high, round or square.
 ---
 
+import ConstraintList from "../../../components/ConstraintList.astro";
+
 import ComponentExample from "../../../components/ComponentExample.astro";
 
 <ComponentExample example="avatar-borderless" />
@@ -83,3 +85,9 @@ Without a picture it shows its `initial`.
 `ds-avatar-group` overlaps avatars by 3px. Copy `avatar` and
 `avatar-group` through Sync 1; React products import `Avatar`, `Logo` and
 `AvatarGroup` from `DS1/react/avatar` and `DS1/react/avatar-group`.
+
+## Contrast
+
+<ConstraintList component="ds-avatar" />
+
+For a CSS-variable or other non-hex fill, pair `color` with `ink`. Automatic ink selection only handles hex identity colours; the text-contrast constraint checks the resolved pair on the page.

@@ -26,11 +26,11 @@ const rootFonts = ['GT-America-Standard-Regular.woff2', 'GT-America-Standard-Med
 const alwaysFonts = ['Inter-Arrows.woff2', 'Iosevka-Regular.woff2', 'Inter-LICENSE.md', 'Iosevka-LICENSE.md'];
 /** Page scripts in 0-face/, each with the modules it imports. */
 const rootModules = {
-  grid: ['grid.ts', 'layout-inspector.ts', 'grid-fit.ts', 'constraint-panel.ts', 'constraint-site.ts', 'constraints.ts', 'scaling.ts'],
+  grid: ['grid.ts', 'layout-inspector.ts', 'grid-fit.ts', 'constraint-panel.ts', 'constraint-site.ts', 'constraints.ts', 'text-contrast.ts', 'scaling.ts'],
   'grid-fit': ['grid-fit.ts'],
   'layout-inspector': ['layout-inspector.ts'],
   /** The constraint checker alone, five presses of C or ?constraints=1, for a product that takes no grid; `grid` brings it too. */
-  constraints: ['constraint-panel.ts', 'constraint-site.ts', 'constraints.ts', 'scaling.ts'],
+  constraints: ['constraint-panel.ts', 'constraint-site.ts', 'constraints.ts', 'text-contrast.ts', 'scaling.ts'],
   scaling: ['scaling.ts'],
   /** The classic head script that puts the theme on before the first paint; also a root `modules` choice. */
   'theme-bootstrap': ['theme-bootstrap.js'],
