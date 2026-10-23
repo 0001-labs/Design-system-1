@@ -11948,19 +11948,34 @@ function ml(e, t = {}) {
 		o && o.parentElement === e && Fe(o);
 	}, Qe = (e, t = !1) => {
 		if (n[e.focus.block].kind === "table") {
-			let t = e.focus.block, r = [
-				...n.slice(0, t + 1),
+			let r = e.focus.block, i = n[r], a = Ie(i.source), o = a.at(-1)?.at(-1);
+			if (!t && G(e.anchor, e.focus) === 0 && o && e.focus.offset >= o.from && e.focus.offset <= o.to) {
+				let e = Ve(i, "add-row", a.length - 1, 0), t = q(n, {
+					block: r,
+					offset: 0
+				}, {
+					block: r,
+					offset: i.source.length
+				}, e), o = {
+					block: r,
+					offset: Ie(e).at(-1)[0].from
+				};
+				Y(t.blocks, o, o, "edit");
+				return;
+			}
+			let s = [
+				...n.slice(0, r + 1),
 				{
 					kind: "paragraph",
 					source: "",
 					prefix: 0
 				},
-				...n.slice(t + 1)
-			], i = {
-				block: t + 1,
+				...n.slice(r + 1)
+			], c = {
+				block: r + 1,
 				offset: 0
 			};
-			Y(r, i, i, "edit");
+			Y(s, c, c, "edit");
 			return;
 		}
 		if (n[e.focus.block].kind === "callout" && !t) {

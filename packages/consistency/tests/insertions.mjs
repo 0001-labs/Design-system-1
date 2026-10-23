@@ -25,6 +25,15 @@ try {
   await page.locator(`.aa-menu button[aria-label="${entry.label}"]`).click();
   if(await host.evaluate(host=>host.value)!==entry.source)throw Error(`${entry.label}: wrong source`);
   if(await page.locator('dialog[open]').count() || /Edit (list|tabs|table|carousel|image|link|icon)/i.test(await host.innerText()))throw Error('Unexpected edit control');
+  if(entry.id==='table'){
+   await host.locator('[data-cell]').last().click();await page.keyboard.press('Enter');
+   if(await host.locator('[data-cell]').count()!==6)throw Error('Enter did not add a table row');
+   await page.keyboard.type('B');
+   if(await host.locator('[data-cell]').nth(4).innerText()!=='B')throw Error('New row did not receive the caret: '+JSON.stringify(await host.evaluate(host=>({value:host.value,active:document.activeElement?.outerHTML,selection:host.editor.selection(),cells:[...host.querySelectorAll('[data-cell]')].map(c=>c.innerText)}))));
+   if((await host.innerText()).includes('|'))throw Error('Table exposed source syntax');
+   await host.evaluate(host=>host.editor.undo());await host.evaluate(host=>host.editor.undo());
+   if(await host.evaluate(host=>host.value)!==entry.source)throw Error('Table row undo failed');
+  }
   if(entry.id==='icon'){
    await host.locator('.aa-atom').focus();await page.keyboard.press('Enter');await host.getByRole('textbox',{name:'Icon name',exact:true}).fill('check');await page.keyboard.press('Enter');
    if(await host.evaluate(host=>host.value)!==':icon[check]')throw Error('Icon did not change inline');await host.evaluate(host=>host.editor.undo());
