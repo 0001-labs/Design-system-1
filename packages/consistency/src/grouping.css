@@ -1,0 +1,5 @@
+.consistency-grouping{position:fixed;inset:0;z-index:19;overflow:clip;contain:strict;pointer-events:none;user-select:none}
+.consistency-grouping[hidden]{display:none}
+.consistency-group-box{position:absolute;box-sizing:border-box;overflow:hidden;pointer-events:none;border:1px dashed var(--ds-text-color);border-radius:var(--ds-radius);background:color-mix(in srgb,var(--ds-text-color) 3%,transparent)}
+.consistency-group-box[data-depth="0"]{border-style:solid}
+.consistency-group-box>span{position:absolute;inset-inline-start:0;max-width:100%;box-sizing:border-box;padding-inline:calc(4px * var(--sf,1));color:var(--ds-text-color);background:var(--ds-paper);font-family:var(--ds-typeface-regular);font-size:calc(14px * var(--sf,1));line-height:calc(20px * var(--sf,1));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
