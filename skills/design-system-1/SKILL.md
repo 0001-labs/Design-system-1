@@ -338,6 +338,10 @@ The small rules every component keeps, each a sentence with a code that never ch
 
 <!-- constraints:start (written by scripts/write-constraints.ts from DS1/0-face/constraints.ts) -->
 
+**Text** (`ds-text`)
+
+- `text.whole-words`: Headings and table headers keep each word intact across lines; only a long word that cannot fit may split at a valid language-specific hyphenation point, with a visible hyphen. Wrap between words or give the heading more room; never leave a final letter on its own, use break-all or anywhere, or insert an arbitrary line break inside a word. Use the correct lang with automatic hyphenation, or a soft hyphen at an editorially verified break; scripts with other line-breaking conventions keep their own typesetting rules.
+
 **Color** (`ds-color`)
 
 - `color.text-contrast`: Visible text, including muted labels, placeholders and avatar initials, has at least 4.5:1 contrast against the background it is drawn on. Measure resolved colours through slots and open shadow roots, including transparency and opacity; image backgrounds and effects that cannot be measured need a visual review.

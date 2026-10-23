@@ -313,6 +313,11 @@ body.sidebar-open {
   border: 0;
   overflow-wrap: anywhere;
 }
+.sl-markdown-content th {
+  word-break: normal;
+  overflow-wrap: normal;
+  hyphens: manual;
+}
 .expressive-code pre {
   overflow: visible;
 }

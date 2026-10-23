@@ -1,4 +1,5 @@
 import { inspectTextContrast, measureTextContrast } from "./text-contrast";
+import { inspectWordWrap, wordHeaders } from './word-wrap';
 
 // Design system 1's small rules: one list, each rule a sentence a component keeps and a check that
 // measures it on a page as it is drawn. Five presses of C show what a page breaks, in a panel at
@@ -82,6 +83,16 @@ function rows(found: ReturnType<typeof cards>) {
 }
 
 export const constraints: Constraint[] = [
+  {
+    code: 'text.whole-words',
+    rule: 'Headings and table headers keep each word intact across lines; only a long word that cannot fit may split at a valid language-specific hyphenation point, with a visible hyphen.',
+    why: 'Wrap between words or give the heading more room; never leave a final letter on its own, use break-all or anywhere, or insert an arbitrary line break inside a word. Use the correct lang with automatic hyphenation, or a soft hyphen at an editorially verified break; scripts with other line-breaking conventions keep their own typesetting rules.',
+    components: ['ds-text', 'ds-table'],
+    check: { file: 'tests/word-wrap.test.ts', test: 'headings and table headers keep whole words or use a typesetting hyphen' },
+    measures: ['heading or table header', 'headings and table headers'],
+    count: root => wordHeaders(root).length,
+    inspect: inspectWordWrap,
+  },
   {
     code: 'color.text-contrast',
     rule: 'Visible text, including muted labels, placeholders and avatar initials, has at least 4.5:1 contrast against the background it is drawn on.',
