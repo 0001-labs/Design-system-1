@@ -85,6 +85,21 @@ function rows(found: ReturnType<typeof cards>) {
 
 export const constraints: Constraint[] = [
   {
+    code: 'select.hug',
+    rule: 'Select and date-picker triggers use hug sizing, never fill sizing or growing to occupy the available row.',
+    components: ['ds-select', 'ds-calendar'],
+    check: { file: 'tests/select-hug.test.ts', test: 'select triggers hug instead of filling their row' },
+    measures: ['select', 'selects'],
+    count: root => root.querySelectorAll('ds-select[data-field]:not([data-listbox]), ds-calendar[picker]').length,
+    inspect: root => Array.from(root.querySelectorAll<HTMLElement>('ds-select[data-field]:not([data-listbox]), ds-calendar[picker]')).flatMap(element => {
+      const control = element.querySelector('select') ?? element.shadowRoot?.querySelector('.trigger');
+      if (!control || !element.getBoundingClientRect().width) return [];
+      const fills = Number(styleOf(element).flexGrow) > 0 || element.getBoundingClientRect().width > control.getBoundingClientRect().width + 1;
+      return fills ? [{ element, message: 'Use hug sizing; the select must not fill its row.' }] : [];
+    }),
+  },
+
+  {
     code: 'button.visible-label',
     rule: 'Button labels stay fully visible, never faded, gradient-masked or truncated; round the required width up to whole grid squares.',
     why: 'The action must remain readable; a chosen width cannot cut off its label.',

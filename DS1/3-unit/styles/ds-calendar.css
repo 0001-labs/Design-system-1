@@ -416,6 +416,9 @@
 /* The picker: a field that opens the small month. */
 :host([picker]) {
   display: inline-flex;
+  width: max-content !important;
+  flex: 0 0 auto !important;
+  justify-self: start !important;
   max-width: 100%;
   align-items: flex-end;
   vertical-align: bottom;
@@ -426,7 +429,7 @@
   display: inline-flex;
   align-items: center;
   gap: calc(4px * var(--ds-sf, 1));
-  width: var(--ds-calendar-picker-width, max-content);
+  width: max-content !important;
   max-width: 100%;
   padding-inline: calc(4px * var(--ds-sf, 1)) calc(2px * var(--ds-sf, 1));
   text-align: start;

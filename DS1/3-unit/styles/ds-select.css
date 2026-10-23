@@ -11,7 +11,9 @@
   display: inline-flex;
   position: relative;
   vertical-align: bottom;
-  width: max-content;
+  width: max-content !important;
+  flex: 0 0 auto !important;
+  justify-self: start !important;
   max-width: 100%;
   min-width: 0;
   max-height: none;

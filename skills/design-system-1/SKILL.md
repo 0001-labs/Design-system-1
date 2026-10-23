@@ -41,6 +41,10 @@ Text must never render below its DS1 role size, including in interactive compone
 4. Run source and consumer checks, follow each project's release procedure and deployment policy, and verify released assets over HTTP. Browser verification follows the project's brief and the user's request.
 5. Finish with an explicit account of consumers migrated and released, consumers with no applicable usage, intentional exceptions and blocked consumers. Source checks and copied files alone do not establish live adoption. Keep unfinished propagation visible in the work item.
 
+## Sizing modes: fill and hug
+
+Name the modes **fill** and **hug**. Fill occupies the available width; hug sizes to the control’s content. Select triggers and date-picker triggers always use hug, never fill: no full-row stretch, growing flex item, fixed wide variant or width token that expands them. Status tags remain tags when clickable; do not wrap them in a filled select face or add an arrow. Their anchored menu still provides the choices.
+
 ## Measures (get these exactly right)
 
 Everything is counted in **squares**: one square is 20px (`--unit`, `--1`), multiplied by `--sf` on phones and tablets. Never invent a size: take it from this table, or from the code it names.
@@ -345,6 +349,10 @@ Every text is sentence case, in every language.
 The small rules every component keeps, each a sentence with a code that never changes, listed on https://designsystem1.com/1-root/constraints/ and on each component's page. Each is also a check of a page as drawn: on a Design system 1 page its owner presses C five times (a site with sign-in sets `<html data-ds-owner>` from its server-checked owner; a site without sign-in is switched on per browser with `?ds-owner=on`; Sync 1's root module `grid` or `constraints` brings it) for a side panel of what the page breaks; `?constraints=1` in the address opens the same panel for anyone, and its Site button (or `?constraints=site`) checks every page in the sitemap at 320, 375, 393 and 430px in frames and lists each failure with its page. `inspectConstraints()` from `0-face/constraints.ts` returns the same list to a script. Keep them in any 0001 interface, whether or not it imports the component, and name a broken one by its code in a review. When a general rule for Design system 1 is given, add it to `DS1/0-face/constraints.ts` with its `inspect` (the check on a page) and a source test, make the component keep it, then run `vp run constraints:write`, which writes the list below. Before releasing a site built on Design system 1 or a library, run `vp run constraints:phone <address>` in Design system 1. It opens every page in its sitemap in WebKit as an iPhone 320, 375, 393 and 430px wide, runs every rule, and fails while one is broken. A page wider than its window (`page.window-width`) is zoomed out by the phone, so fix the piece it names rather than hiding the overflow on `body`.
 
 <!-- constraints:start (written by scripts/write-constraints.ts from DS1/0-face/constraints.ts) -->
+
+**Select** (`ds-select`)
+
+- `select.hug`: Select and date-picker triggers use hug sizing, never fill sizing or growing to occupy the available row.
 
 **Button** (`ds-button`)
 
