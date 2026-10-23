@@ -50,5 +50,13 @@ try {
  await page.waitForFunction(()=>!document.querySelector('[role="switch"][aria-label="Spacing"]').disabled);
  if(await resizing.getAttribute('aria-checked')!=='false')throw Error('Context close changed disabled resize preference');
  console.log('Context: formatting stays open; outside closes; spacing/resize visibly pause and restore saved preferences');
+ const tableEditor = page.locator('aa-editor[data-editor-key="intro"]');
+ await tableEditor.evaluate(element => { element.editor.value = '| Name | Value |\n| --- | --- |\n| Milk | 2 |'; });
+ await tableEditor.locator('[data-cell="1:0"]').click();
+ await page.keyboard.press(process.platform === 'darwin' ? 'Meta+A' : 'Control+A');
+ await page.keyboard.type('Another year for this');
+ const tableValue = await tableEditor.evaluate(element => element.editor.value);
+ if (!tableValue.includes('| Another year for this | 2 |')) throw Error('Typing spaces moved the caret out of the table cell: '+tableValue);
+ console.log('Table typing: spaces remain in the edited cell and adjacent contents stay unchanged');
  await page.close();
 }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}

@@ -1030,7 +1030,7 @@ function Ie(e) {
 		for (let t = 1; t < i.length; t++) {
 			let n = i[t - 1] + 1, a = i[t];
 			if ((t === 1 || t === i.length - 1) && !e.slice(n, a).trim()) continue;
-			let s = e.slice(n, a), c = n + (s.match(/^\s*/)?.[0].length ?? 0), l = Math.max(c, a - (s.match(/\s*$/)?.[0].length ?? 0));
+			let s = e.slice(n, a), c = n + (s.match(/^[ \t]?/)?.[0].length ?? 0), l = Math.max(c, a - (s.match(/[ \t]?$/)?.[0].length ?? 0));
 			o.push({
 				text: e.slice(c, l),
 				from: r + c,
