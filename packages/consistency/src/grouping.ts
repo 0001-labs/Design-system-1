@@ -46,7 +46,9 @@ export class GroupingLayer {
   for (const target of targets) if (!this.observed.has(target)) { this.resize.observe(target); this.observed.add(target); }
   // Read all layout before painting; overlays cannot change authored geometry.
   const records = targets.map(target => ({ target, box: visibleComponentBox(target.getBoundingClientRect(), clips), name: groupingName(target) }));
-  const boxes: HTMLElement[] = [], occupied: { top: number; bottom: number; left: number; right: number }[] = [];
+  const boxes: HTMLElement[] = [];
+  // Both diagnostic layers can be on: reserve component labels before placing group names.
+  const occupied = Array.from(this.root.ownerDocument.querySelectorAll<HTMLElement>('.consistency-component-names:not([hidden]) .consistency-component-name > span')).map(label => label.getBoundingClientRect()).map(({top,bottom,left,right}) => ({top,bottom,left,right}));
   const scale = parseFloat(getComputedStyle(sheet).getPropertyValue('--sf')) || 1;
   this.overlay.style.setProperty('--sf', String(scale));
   const unit = 20 * scale;
