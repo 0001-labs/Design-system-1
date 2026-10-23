@@ -30,6 +30,9 @@ try {
  if(!passThrough)throw Error('Grouping intercepted the pointer');
  await page.getByRole('switch',{name:'Component names',exact:true}).click();
  if(await toggle.getAttribute('aria-checked')!=='true')throw Error('Component names changed grouping');
+ await page.waitForTimeout(60);
+ const overlap=await page.evaluate(()=>{const groups=[...document.querySelectorAll('.consistency-group-box>span')].map(e=>e.getBoundingClientRect()),names=[...document.querySelectorAll('.consistency-component-name>span')].map(e=>e.getBoundingClientRect());return groups.some(a=>names.some(b=>a.left<b.right&&a.right>b.left&&a.top<b.bottom-.5&&a.bottom>b.top+.5))});
+ if(overlap)throw Error('Grouping obscured component names');
  const after=await page.locator('consistency-editor').evaluate(e=>JSON.stringify(e.history.value));
  if(before!==after)throw Error('Grouping or component names changed authored page');
  await page.getByRole('button',{name:'Mobile preview',exact:true}).click();
