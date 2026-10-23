@@ -36,7 +36,7 @@ export class SurfaceContextMenu {
  private keyboard = (event: KeyboardEvent) => { if (!(event.target instanceof Element) || !(event.key === 'ContextMenu' || event.shiftKey && event.key === 'F10')) return; const surface = editableSurface(event.target); if (!surface) return; event.preventDefault(); event.stopPropagation(); const rect = surface.getBoundingClientRect(); this.open(surface, rect.left, rect.bottom); };
  private open(surface: HTMLElement, x: number, y: number) {
   this.menu?.remove(); const menu = this.menu = new Context(); const kind = surface.tagName === 'DS-CARD' ? 'card' : surface.tagName === 'DS-STAT' ? 'stat' : 'button';
-  menu.setAttribute('aria-label', `${kind[0].toUpperCase() + kind.slice(1)} appearance`); applyLibraryTokens(menu, surface.closest<HTMLElement>('[data-consistency-library]')?.dataset.consistencyLibrary ?? 'original');
+  menu.setAttribute('data-consistency-context', ''); menu.setAttribute('aria-label', `${kind[0].toUpperCase() + kind.slice(1)} appearance`); applyLibraryTokens(menu, surface.closest<HTMLElement>('[data-consistency-library]')?.dataset.consistencyLibrary ?? 'original');
   const option = (label: string, patch: Record<string, unknown>) => { const row = document.createElement('button'); row.type = 'button'; row.setAttribute('role', 'menuitem'); row.textContent = label; row.addEventListener('click', () => this.state.commit(kind, surface.dataset.selectable!, patch)); menu.append(row); };
   if (kind === 'card') {
    option('Filled card', { variant: 'filled' }); option('Outlined card', { variant: 'outlined' });

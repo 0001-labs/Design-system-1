@@ -6,7 +6,7 @@
 .consistency-carousel-slide{height:calc(var(--consistency-carousel-height) - 2 * var(--ds-unit));min-width:0;overflow:hidden}
 .consistency-carousel-slide img{display:block;width:100%;height:100%;min-width:0;max-width:100%;margin:0;object-fit:cover}
 .consistency-carousel-tools{position:absolute;z-index:12;left:0;top:calc(100% + var(--ds-unit)/2);box-sizing:border-box;width:min(calc(24 * var(--ds-unit)),calc(100vw - 2 * var(--ds-unit)));max-width:100%;padding:var(--ds-unit);border:1px solid var(--ds-border-color);border-radius:var(--ds-radius);background:var(--ds-paper);display:flex;flex-wrap:wrap;align-items:flex-end;gap:calc(var(--ds-unit)/2);opacity:0;visibility:hidden;pointer-events:none}
-.consistency-content-carousel:is(:hover,:focus-within) .consistency-carousel-tools{opacity:1;visibility:visible;pointer-events:auto}
+.consistency-content-carousel:not([data-tools-dismissed]):is(:hover,:focus-within) .consistency-carousel-tools{opacity:1;visibility:visible;pointer-events:auto}
 .consistency-carousel-tools[hidden]{display:none}
 .consistency-carousel-tools::before{content:'';position:absolute;left:0;right:0;top:calc(-1 * var(--ds-unit)/2);height:calc(var(--ds-unit)/2)}
 .consistency-carousel-actions{display:flex;flex-wrap:wrap;align-items:flex-end;gap:calc(var(--ds-unit)/2);width:100%}

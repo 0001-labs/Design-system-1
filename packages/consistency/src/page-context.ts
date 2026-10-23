@@ -9,6 +9,7 @@ export class PageContextMenu {
  private menu = new Context();
  private sheet?: HTMLElement;
  constructor(private root: HTMLElement, private state: { tone: () => string; commit: (tone: string) => void }) {
+  this.menu.setAttribute('data-consistency-context', '');
   this.menu.setAttribute('aria-label', 'Page background colour');
   for (const tone of PAGE_TONES) {
    const row = document.createElement('button'); row.type = 'button'; row.setAttribute('role', 'menuitem');

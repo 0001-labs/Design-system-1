@@ -6,3 +6,6 @@
 .consistency-text-bounds .consistency-column-gap[aria-valuenow="0"][data-axis="vertical"]{height:var(--u)!important;transform:translateY(-50%)}
 .consistency-unit-column>.aa-block:has(>.aa-atom)>.aa-atom{display:block}
 .consistency-sheet .aa-column.consistency-unit-column{min-width:0}
+/* Zero still has a generous hit area, but only its centre line is visible. */
+.consistency-text-bounds .consistency-column-gap[aria-valuenow="0"]{background:transparent}
+.consistency-column-gap[aria-valuenow="0"][data-axis="horizontal"]::after{left:50%;right:auto;top:0;bottom:0;width:1px;height:auto}

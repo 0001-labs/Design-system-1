@@ -230,3 +230,5 @@ consistency-editor,.consistency-shell{height:100dvh;min-height:0}
 .consistency-sheet .aa-block:has(> .aa-atom[data-atom="image"]){width:fit-content;max-width:100%}
 .consistency-sheet .aa-column .aa-atom[data-atom="image"]:not([data-width]){display:inline-block;width:fit-content;max-width:min(100%,calc(16 * var(--aa-unit)))}
 .consistency-sheet .aa-atom[data-atom="image"]{background:transparent}
+.context-active :is(.ghost-surface,.consistency-text-gap,.consistency-column-gap,.consistency-card-gap,.consistency-stat-gap,.consistency-resize-edge){visibility:hidden!important;pointer-events:none!important}
+.consistency-layer-toggle:has(button:disabled)>span{color:var(--ds-text-color-muted)}

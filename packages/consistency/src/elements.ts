@@ -98,7 +98,7 @@ export function contentElementAtoms(canWrite: () => boolean, getHost: () => HTML
       if (!value || value.kind === 'carousel') { element.textContent = source; return; }
       const doc = element.ownerDocument;
       element.classList.add('consistency-content-element', `consistency-content-${kind}`);
-      element.setAttribute('data-aa-interactive', '');
+      if (kind === 'button') element.setAttribute('data-aa-interactive', '');
       const face = doc.createElement(kind === 'button' ? 'ds-button' : 'ds-card');
       paint(face, value); element.append(face);
       const editors: ReturnType<typeof createPlainEditor>[] = [];
@@ -163,12 +163,17 @@ export function contentElementAtoms(canWrite: () => boolean, getHost: () => HTML
           actionBar.removeAttribute('data-open'); actionBar.inert = true; actionBar.setAttribute('aria-hidden', 'true');
         }, 150);
       };
+      const dismissAction = (event: PointerEvent) => {
+        if (!actionBar || event.composedPath().includes(element)) return;
+        clearTimeout(leaveTimer); actionBar.removeAttribute('data-open'); actionBar.inert = true; actionBar.setAttribute('aria-hidden', 'true');
+      };
+      doc.addEventListener('pointerdown', dismissAction, true);
       const enter = (event: PointerEvent) => { if (event.pointerType === 'touch') return; hover = true; showAction(); };
       const pointerLeave = () => { hover = false; leave(); };
       element.addEventListener('focusin', focus); element.addEventListener('focusout', leave);
       element.addEventListener('pointerenter', enter); element.addEventListener('pointerleave', pointerLeave);
       const menu = doc.createElement('ds-context');
-      menu.setAttribute('data-aa-interactive', ''); menu.setAttribute('aria-label', `${kind} appearance`);
+      menu.setAttribute('data-aa-interactive', ''); menu.setAttribute('data-consistency-context', ''); menu.setAttribute('aria-label', `${kind} appearance`);
       const option = (label: string, change: () => void) => {
         const row = doc.createElement('button'); row.type = 'button'; row.setAttribute('role', 'menuitem'); row.textContent = label;
         row.addEventListener('click', () => { if (!canWrite()) return; commit(); change(); commit(); }); menu.append(row);
@@ -208,7 +213,7 @@ export function contentElementAtoms(canWrite: () => boolean, getHost: () => HTML
         if (event.key === 'Backspace' || event.key === 'Delete') { event.preventDefault(); event.stopPropagation(); element.dispatchEvent(new CustomEvent('aa-atom-source', { bubbles: true, detail: { source: '' } })); }
       };
       element.addEventListener('contextmenu', context); element.addEventListener('keydown', key);
-      return () => { clearTimeout(leaveTimer); element.removeEventListener('pointerenter', enter); element.removeEventListener('pointerleave', pointerLeave); observer.disconnect(); element.removeEventListener('consistency-resize', resize); element.removeEventListener('consistency-card-gap', gap); element.removeEventListener('focusin', focus); element.removeEventListener('focusout', leave); editors.forEach(editor => editor.destroy()); menu.remove(); element.removeEventListener('focusout', blur); element.removeEventListener('contextmenu', context); element.removeEventListener('keydown', key); };
+      return () => { doc.removeEventListener('pointerdown', dismissAction, true); clearTimeout(leaveTimer); element.removeEventListener('pointerenter', enter); element.removeEventListener('pointerleave', pointerLeave); observer.disconnect(); element.removeEventListener('consistency-resize', resize); element.removeEventListener('consistency-card-gap', gap); element.removeEventListener('focusin', focus); element.removeEventListener('focusout', leave); editors.forEach(editor => editor.destroy()); menu.remove(); element.removeEventListener('focusout', blur); element.removeEventListener('contextmenu', context); element.removeEventListener('keydown', key); };
     },
   }));
   return [...atoms, carouselAtom(canWrite, getHost)];

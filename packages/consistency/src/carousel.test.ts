@@ -53,3 +53,21 @@ it('readonly carousel never accepts source changes and exposes no image controls
  address(host, 'https://example.com/one.png'); click(host, 'Add address');
  expect(change).not.toHaveBeenCalled(); expect(host.querySelector<HTMLElement>('.consistency-carousel-tools')!.hidden).toBe(true); dispose?.();
 });
+it('dismisses tools immediately outside despite retained input focus and restores on fresh entry', async () => {
+ const host = document.createElement('div'); document.body.append(host);
+ const editor = createEditor(host, { value: writeCarousel(EMPTY_CAROUSEL), atoms: [carouselAtom(() => true, () => host)] });
+ const atom = host.querySelector<HTMLElement>('.consistency-content-carousel')!, tools = atom.querySelector<HTMLElement>('.consistency-carousel-tools')!;
+ const original = editor.value, input = tools.querySelector('ds-input')!;
+ input.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+ document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+ expect(atom.hasAttribute('data-tools-dismissed')).toBe(true);
+ expect(editor.value).toBe(original);
+ atom.dispatchEvent(new PointerEvent('pointerenter'));
+ expect(atom.hasAttribute('data-tools-dismissed')).toBe(false);
+ tools.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true }));
+ expect(atom.hasAttribute('data-tools-dismissed')).toBe(false);
+ document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+ input.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+ expect(atom.hasAttribute('data-tools-dismissed')).toBe(false);
+ editor.destroy();
+});

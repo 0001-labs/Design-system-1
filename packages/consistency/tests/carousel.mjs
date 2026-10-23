@@ -30,6 +30,15 @@ try {
  if((await model()).slides.length!==0||await page.locator('.consistency-carousel-frame img').count())throw Error('Carousel did not insert empty');
  const tools=page.locator('.consistency-carousel-tools');
  const add=async(name)=>{await page.locator('.consistency-content-carousel').hover();await tools.locator('ds-input[aria-label="Image address"] input').fill(base+'/'+name+'.png');await tools.getByRole('button',{name:'Add address',exact:true}).click();await page.waitForTimeout(60);};
+ await page.locator('.consistency-content-carousel').hover();
+ const addressInput=tools.locator('ds-input[aria-label="Image address"] input');await addressInput.focus();
+ if(!await addressInput.evaluate(el=>el===el.getRootNode().activeElement))throw Error('Carousel input was not focused before dismissal');
+ const beforeDismiss=await source();
+ await page.locator('body').dispatchEvent('pointerdown');
+ if(await tools.evaluate(el=>getComputedStyle(el).visibility)!=='hidden')throw Error('Outside press retained focused carousel toolbar');
+ if(await source()!==beforeDismiss)throw Error('Toolbar dismissal changed source');
+ await page.mouse.move(0,0);await page.locator('.consistency-content-carousel').hover();
+ if(await tools.evaluate(el=>getComputedStyle(el).visibility)!=='visible')throw Error('Fresh pointer entry did not restore toolbar');
  await add('one');await add('two');
  if((await model()).slides.length!==2)throw Error('Images did not persist');
  await page.locator('.consistency-content-carousel').hover();await tools.getByRole('button',{name:'Previous',exact:true}).click();

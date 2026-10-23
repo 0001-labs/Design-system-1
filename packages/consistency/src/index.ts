@@ -1,3 +1,4 @@
+import { ContextActivity } from './context-activity';
 import { ColumnSpacingLayer } from './column-spacing';
 import { ComponentNamesLayer } from './component-names';
 import { EXAMPLE_PAGES } from './examples';
@@ -33,7 +34,9 @@ defineAaEditor();
 
 /** A reusable, document-owned ghost layer. It never mutates arbitrary page CSS. */
 export class ConsistencyEditor extends LitElement {
-  static properties = { selectedExample: { state: true }, mobilePreview: { state: true }, stageWidth: { state: true }, revision: { state: true }, preview: { state: true }, selected: { state: true }, selectedGap: { state: true }, layers: { state: true }, selection: { state: true }, marquee: { state: true }, editorError: { state: true }, library: { state: true } };
+  static properties = { contextActive: { state: true }, selectedExample: { state: true }, mobilePreview: { state: true }, stageWidth: { state: true }, revision: { state: true }, preview: { state: true }, selected: { state: true }, selectedGap: { state: true }, layers: { state: true }, selection: { state: true }, marquee: { state: true }, editorError: { state: true }, library: { state: true } };
+  private contextActivity?: ContextActivity;
+  private contextActive = false;
   declare selectedExample: string;
   declare stageWidth: number;
   declare mobilePreview: boolean;
@@ -92,7 +95,7 @@ export class ConsistencyEditor extends LitElement {
   private cleanups: (() => void)[] = [];
   constructor() { super(); this.selectedExample = 'studio'; this.stageWidth = 380; this.mobilePreview = false; this.revision = 0; this.preview = {}; this.selected = 'gap'; this.selectedGap = 'intro-actions'; this.layers = { marquee: true, spacing: true, boundaries: true, reorder: true, place: true, production: true, resizing: true, componentNames: false }; this.selection = new Set(); this.marquee = null; this.editorError = ''; this.library = 'original'; }
   createRenderRoot() { return this; }
-  disconnectedCallback() { this.columnSpacing?.destroy(); this.columnSpacing = undefined; this.componentNames?.destroy(); this.componentNames = undefined; this.boundsObserver?.disconnect(); this.statSpacing?.destroy(); this.surfaceContext?.destroy(); this.pageContext?.destroy(); this.pageContext = undefined; this.cardSpacing?.destroy(); this.cardSpacing = undefined; this.resizing?.destroy(); this.resizing = undefined; this.textSpacing?.destroy(); this.textSpacing = undefined; window.removeEventListener('keydown', this.onEscape); this.cancelMarquee?.(); this.sort?.destroy(); this.spacingDisposers.forEach(dispose => dispose()); this.settle.cancel(); this.cleanups.forEach(fn => fn()); this.cleanups = []; super.disconnectedCallback(); }
+  disconnectedCallback() { this.contextActivity?.destroy(); this.contextActivity = undefined; this.columnSpacing?.destroy(); this.columnSpacing = undefined; this.componentNames?.destroy(); this.componentNames = undefined; this.boundsObserver?.disconnect(); this.statSpacing?.destroy(); this.surfaceContext?.destroy(); this.pageContext?.destroy(); this.pageContext = undefined; this.cardSpacing?.destroy(); this.cardSpacing = undefined; this.resizing?.destroy(); this.resizing = undefined; this.textSpacing?.destroy(); this.textSpacing = undefined; window.removeEventListener('keydown', this.onEscape); this.cancelMarquee?.(); this.sort?.destroy(); this.spacingDisposers.forEach(dispose => dispose()); this.settle.cancel(); this.cleanups.forEach(fn => fn()); this.cleanups = []; super.disconnectedCallback(); }
   private value(key: Dimension, gap = this.selectedGap) { return this.preview[key === 'gap' ? gap : key] ?? (key === 'gap' ? (this.history.value.gaps[gap] ?? this.columnSpacing?.defaultValue(gap) ?? this.textSpacing?.defaultValue(gap) ?? 20) : this.history.value[key]); }
   private commit(key: Dimension, value: number, gap = this.selectedGap) {
     if (key === 'gap') this.history.commit({ gaps: { ...this.history.value.gaps, [gap]: dimensionValue(key, value) } });
@@ -101,15 +104,17 @@ export class ConsistencyEditor extends LitElement {
   }
   private range(key: Dimension) { return compositionRange(key, this.canvasWidth(), this.history.value.padding); }
   private stacked(id: string) { const width = this.canvasWidth(); const bounds = compositionBounds(width, this.value('padding'), false, 280); const gap = this.value('gap', id); const minimum = id === 'stats-columns' ? READABLE_TEXT_MIN * 2 : ['bookshop', 'kitchen'].reduce((sum, key) => sum + Math.max(READABLE_CARD_MIN, this.history.value.sizes[key]?.width ?? READABLE_CARD_MIN), 0); return this.mobilePreview || minimum + gap > bounds.width - 2 * bounds.padding; }
-  private enabled(key: Dimension) { if (key === 'width') return false; return key === 'gap' ? this.layers.spacing : this.layers.boundaries; }
+  private enabled(key: Dimension) { if (key === 'width' || this.contextActive) return false; return key === 'gap' ? this.layers.spacing : this.layers.boundaries; }
   private toggle(layer: keyof typeof this.layers) {
     this.cancelMarquee?.(); this.sort?.cancel(); this.settle.cancel(); this.preview = {};
     this.spacingDisposers.forEach(dispose => dispose()); this.spacingDisposers = []; this.spacingBound = false;
     this.layers = { ...this.layers, [layer]: !this.layers[layer] };
   }
   private layerToggle(layer: keyof typeof this.layers, label: string) {
+    const contextPaused = this.contextActive && ['spacing', 'resizing', 'boundaries'].includes(layer);
+    const paused = contextPaused || layer === 'resizing' && this.mobilePreview;
     const descriptions = { marquee: 'Drag across elements to select them.', spacing: 'Adjust the space between elements.', boundaries: 'Adjust page padding and text wrapping.', reorder: 'Shuffle elements within their group.', place: 'Place elements in columns and groups.', production: 'Show editing guides only when needed.', resizing: 'Resize cards and images from their edges.', componentNames: 'See the component names over the page.' };
-    return html`<label class="consistency-layer-toggle"><span>${label}</span><ds-switch><button type="button" role="switch" aria-label=${label} aria-describedby=${`helper-${layer}`} aria-checked=${String(this.layers[layer])} @click=${() => this.toggle(layer)}></button></ds-switch><small id=${`helper-${layer}`} class="consistency-toggle-help">${descriptions[layer]}</small></label>`;
+    return html`<label class="consistency-layer-toggle"><span>${label}</span><ds-switch><button type="button" role="switch" aria-label=${label} aria-describedby=${`helper-${layer}`} aria-checked=${String(this.layers[layer] && !paused)} ?disabled=${paused} @click=${() => this.toggle(layer)}></button></ds-switch><small id=${`helper-${layer}`} class="consistency-toggle-help">${contextPaused ? 'Paused while a menu is open.' : paused ? 'Resize in desktop preview.' : descriptions[layer]}</small></label>`;
   }
   private deleteSelection(event: KeyboardEvent) {
     if (!['Delete', 'Backspace'].includes(event.key) || !this.selection.size || event.altKey || event.metaKey || event.ctrlKey) return;
@@ -226,25 +231,26 @@ export class ConsistencyEditor extends LitElement {
     return html`<div data-sort-group=${id} data-selectable=${'group-' + id} class="consistency-group" @pointerdown=${(event: PointerEvent) => { if (this.layers.reorder && canStartMarquee(event.target as Element)) this.selection = new Set(['group-' + id]); }} aria-label=${id === 'intro' ? 'Introduction' : id === 'work' ? 'Selected work' : id === 'approach' ? 'How we work' : 'Contact'}>${contents[id]}</div>`;
   }
   protected firstUpdated() {
+    this.contextActivity = new ContextActivity(this, active => { this.contextActive = active; if (active) { this.settle.cancel(); this.preview = {}; } });
     this.setAttribute('data-ds-grid-fit', '');
     this.boundsObserver = new ResizeObserver(entries => { const width = entries[0].contentRect.width; if (width !== this.stageWidth) this.stageWidth = width; });
     this.boundsObserver.observe(this.querySelector('.consistency-stage')!);
     if (document.fonts && typeof ResizeObserver !== 'undefined') initGridFit();
   }
   protected updated() {
-    this.columnSpacing ??= new ColumnSpacingLayer(this, { enabled: () => this.layers.spacing, value: (id,fallback) => this.preview[id] ?? this.history.value.gaps[id] ?? fallback, select: id => { this.selected = 'gap'; this.selectedGap = id; }, preview: (id,value) => { this.preview = { ...this.preview, [id]:value }; }, commit: (id,value,pointer) => { if(pointer)this.finishDrag(() => this.commit('gap',value,id)); else this.commit('gap',value,id); }, cancel: () => { this.preview = {}; } });
+    this.columnSpacing ??= new ColumnSpacingLayer(this, { enabled: () => this.enabled('gap'), value: (id,fallback) => this.preview[id] ?? this.history.value.gaps[id] ?? fallback, select: id => { this.selected = 'gap'; this.selectedGap = id; }, preview: (id,value) => { this.preview = { ...this.preview, [id]:value }; }, commit: (id,value,pointer) => { if(pointer)this.finishDrag(() => this.commit('gap',value,id)); else this.commit('gap',value,id); }, cancel: () => { this.preview = {}; } });
     this.columnSpacing.refresh();
     this.componentNames ??= new ComponentNamesLayer(this, { enabled: () => this.layers.componentNames }); this.componentNames.refresh();
     if (this.history.value.width !== Math.max(280, this.stageWidth)) this.history.value = { ...this.history.value, width: Math.max(280, this.stageWidth) };
-    this.statSpacing ??= new StatSpacingLayer(this, { enabled: () => this.layers.spacing, value: id => this.history.value.gaps[id] ?? 0, commit: (id, value) => { this.history.commit({ gaps: { ...this.history.value.gaps, [id]: value } }); this.revision++; } });
+    this.statSpacing ??= new StatSpacingLayer(this, { enabled: () => this.enabled('gap'), value: id => this.history.value.gaps[id] ?? 0, commit: (id, value) => { this.history.commit({ gaps: { ...this.history.value.gaps, [id]: value } }); this.revision++; } });
     this.statSpacing.refresh();
     this.surfaceContext ??= new SurfaceContextMenu(this, { stats: () => this.history.value.statDesigns, buttons: () => this.history.value.buttonDesigns, commit: (kind, id, patch) => { const field = kind === 'card' ? 'cardDesigns' : kind === 'stat' ? 'statDesigns' : 'buttonDesigns'; this.history.commit({ [field]: { ...this.history.value[field], [id]: { ...this.history.value[field][id], ...patch } } }); this.revision++; } });
     this.surfaceContext.refresh();
     this.pageContext ??= new PageContextMenu(this, { tone: () => this.history.value.pageTone ?? '', commit: pageTone => { this.history.commit({ pageTone }); this.revision++; } });
     this.pageContext.refresh();
-    this.cardSpacing ??= new CardSpacingLayer(this, { enabled: () => this.layers.spacing, gaps: id => this.history.value.cardGaps[id] ?? {}, commit: (id, key, value, height) => { const card = this.querySelector<HTMLElement>(`ds-card[data-selectable="${id}"]`); const width = card ? card.getBoundingClientRect().width / (Number.parseFloat(getComputedStyle(card).getPropertyValue('--sf')) || 1) : 280; this.history.commit({ cardGaps: { ...this.history.value.cardGaps, [id]: { ...this.history.value.cardGaps[id], [key]: value } }, sizes: { ...this.history.value.sizes, [id]: { width, height } } }); this.revision++; } });
+    this.cardSpacing ??= new CardSpacingLayer(this, { enabled: () => this.enabled('gap'), gaps: id => this.history.value.cardGaps[id] ?? {}, commit: (id, key, value, height) => { const card = this.querySelector<HTMLElement>(`ds-card[data-selectable="${id}"]`); const width = card ? card.getBoundingClientRect().width / (Number.parseFloat(getComputedStyle(card).getPropertyValue('--sf')) || 1) : 280; this.history.commit({ cardGaps: { ...this.history.value.cardGaps, [id]: { ...this.history.value.cardGaps[id], [key]: value } }, sizes: { ...this.history.value.sizes, [id]: { width, height } } }); this.revision++; } });
     this.cardSpacing.refresh();
-    this.resizing ??= new ResizingLayer(this, { consistency: () => this.history.value.consistency, enabled: () => this.layers.resizing && !this.mobilePreview, size: key => this.history.value.sizes[key], commit: (key, size) => { this.history.commit({ sizes: { ...this.history.value.sizes, [key]: size } }); this.revision++; } });
+    this.resizing ??= new ResizingLayer(this, { consistency: () => this.history.value.consistency, enabled: () => this.layers.resizing && !this.mobilePreview && !this.contextActive, size: key => this.history.value.sizes[key], commit: (key, size) => { this.history.commit({ sizes: { ...this.history.value.sizes, [key]: size } }); this.revision++; } });
     this.resizing.refresh();
     this.querySelectorAll<HTMLElement>('aa-editor[data-editor-key]').forEach(editor => {
       editor.querySelectorAll<HTMLElement>(':scope > .aa-block').forEach((block, index) => { block.dataset.selectable = `text:${editor.dataset.editorKey}:${index}`; });
@@ -252,7 +258,7 @@ export class ConsistencyEditor extends LitElement {
     this.querySelectorAll<HTMLElement>('[data-selectable]').forEach(element => { element.hidden = this.history.value.hidden.includes(element.dataset.selectable!); });
     this.textSpacing ??= new TextSpacingLayer(this, {
       value: (id, fallback) => this.preview[id] ?? this.history.value.gaps[id] ?? fallback,
-      enabled: () => this.layers.spacing,
+      enabled: () => this.enabled('gap'),
       select: id => { this.selected = 'gap'; this.selectedGap = id; },
       preview: (id, value) => { this.preview = { ...this.preview, [id]: value }; },
       commit: (id, value, pointer) => { if (pointer) this.finishDrag(() => this.commit('gap', value, id)); else this.commit('gap', value, id); },
@@ -286,11 +292,12 @@ export class ConsistencyEditor extends LitElement {
           return preview;
         },
         onDragStart: start => { this.cancelMarquee?.(); this.settle.cancel(); this.selection = new Set(['group-' + start.draggableId]); },
-        onDragEnd: result => {
+        prepareDrop: result => {
           if (result.reason === 'DROP' && result.destination && this.layers.reorder) {
             this.moveGroup(result.draggableId, result.destination.index);
             this.performUpdate();
           }
+          return this.querySelector<HTMLElement>(`[data-sort-group="${CSS.escape(result.draggableId)}"]`);
         },
         outOfTheWay: { duration: 180, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' },
         drop: { minDuration: 150, maxDuration: 200, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' },
@@ -335,7 +342,7 @@ export class ConsistencyEditor extends LitElement {
     const doc = this.history.value;
     const requestedWidth = this.canvasWidth();
     const { width, padding } = compositionBounds(requestedWidth, this.value('padding'), this.mobilePreview, 280);
-    return html`<div class="consistency-shell ${this.mobilePreview ? 'consistency-mobile-preview' : ''} ${this.layers.spacing ? '' : 'spacing-off'} ${this.layers.boundaries ? '' : 'boundaries-off'} ${this.layers.reorder ? 'reorder-on' : ''} ${this.layers.production ? 'production-on' : ''}">
+    return html`<div class="consistency-shell ${this.mobilePreview ? 'consistency-mobile-preview' : ''} ${this.enabled('gap') ? '' : 'spacing-off'} ${this.enabled('padding') ? '' : 'boundaries-off'} ${this.contextActive ? 'context-active' : ''} ${this.layers.reorder ? 'reorder-on' : ''} ${this.layers.production ? 'production-on' : ''}">
       <main class="consistency-workspace"><section class="consistency-stage" aria-label="Editable composition" @pointerdown=${this.startMarquee}>
         <div class="consistency-sheet" data-ds-grid-scroll data-ds-surface data-consistency-library=${this.library} style=${styleMap({ ...libraryTokens(this.library), color: 'var(--ds-text-color)', colorScheme: this.library === 'ink' ? 'dark' : this.library === 'blue' ? 'light' : undefined, width: this.mobilePreview ? `calc(${width}px * var(--sf))` : '100%', padding: `calc(${padding}px * var(--sf))`, '--composition-padding': `calc(${padding}px * var(--sf))`, '--composition-content-width': `calc(${width - padding * 2}px * var(--sf))`, '--composition-card-width': `calc(${Math.max(READABLE_CARD_MIN, Math.floor((width - padding * 2 - 20) / 40) * 20)}px * var(--sf))` })}>
           <div class="consistency-padding">${this.handle('padding', 'Padding')}</div>

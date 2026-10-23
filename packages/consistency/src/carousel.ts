@@ -56,6 +56,15 @@ export function carouselAtom(canWrite: () => boolean, getHost: () => HTMLElement
     const empty = doc.createElement('ds-empty'); empty.literal = true; empty.heading = 'Add your first image'; empty.text = 'Upload an image or add its address.';
     frame.append(face, empty); element.append(frame);
     const toolbar = doc.createElement('div'); toolbar.className = 'consistency-carousel-tools'; toolbar.setAttribute('data-aa-interactive', ''); toolbar.setAttribute('role', 'toolbar'); toolbar.setAttribute('aria-label', 'Carousel images'); element.append(toolbar);
+    // An outside press wins over :focus-within until a fresh entry or focus.
+    const showTools = () => element.removeAttribute('data-tools-dismissed');
+    const focusTools = (event: FocusEvent) => { if (toolbar.contains(event.target as Node)) showTools(); };
+    const dismissTools = (event: PointerEvent) => {
+      if (!event.composedPath().includes(toolbar)) element.setAttribute('data-tools-dismissed', '');
+    };
+    element.addEventListener('pointerenter', showTools);
+    element.addEventListener('focusin', focusTools);
+    doc.addEventListener('pointerdown', dismissTools);
     const status = doc.createElement('span'); status.className = 'consistency-carousel-status'; status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite'); toolbar.append(status);
     const actions = doc.createElement('div'); actions.className = 'consistency-carousel-actions'; toolbar.append(actions);
     const button = (label: string, action: () => void) => {
@@ -139,7 +148,7 @@ export function carouselAtom(canWrite: () => boolean, getHost: () => HTMLElement
     const observer = new MutationObserver(syncControls);
     queueMicrotask(() => { const block = element.closest('.aa-block'); if (element.isConnected && block) observer.observe(block, { attributes: true, attributeFilter: ['data-readonly'] }); });
     paint();
-    return () => { destroyed = true; observer.disconnect(); element.removeEventListener('consistency-resize', resize); element.removeEventListener('keydown', key); face.removeEventListener('change', changed); picker.removeEventListener('change', files); };
+    return () => { destroyed = true; observer.disconnect(); element.removeEventListener('pointerenter', showTools); element.removeEventListener('focusin', focusTools); doc.removeEventListener('pointerdown', dismissTools); element.removeEventListener('consistency-resize', resize); element.removeEventListener('keydown', key); face.removeEventListener('change', changed); picker.removeEventListener('change', files); };
   },
  };
 }
