@@ -18,6 +18,7 @@ try {
  const base = `http://127.0.0.1:${server.address().port}/private-consistency/`;
  const page = await browser.newPage({ viewport: { width:1440, height:1000 } });
  await page.goto(base);await page.waitForSelector('.consistency-sheet');
+ await page.locator('select[aria-label="Example page"]').selectOption('studio');
  const verify = async (selector, label) => {
   const failures = await page.locator(selector).evaluateAll(cards => cards.flatMap(card => {
    const scale = Number.parseFloat(getComputedStyle(card).getPropertyValue('--sf')) || 1;

@@ -17,6 +17,7 @@ const browser = await chromium.launch({ headless: true });
 try {
  const page=await browser.newPage({viewport:{width:1440,height:1100}});
  await page.goto(`http://127.0.0.1:${server.address().port}/private-consistency/`);await page.waitForSelector('.consistency-layer-toggle');
+ await page.locator('select[aria-label="Example page"]').selectOption('studio');
  const measures=await page.locator('.consistency-layer-toggle').evaluateAll(rows=>rows.map(row=>{const button=row.querySelector('button'),r=button.getBoundingClientRect(),track=getComputedStyle(button,'::before');return {height:row.getBoundingClientRect().height,target:[r.width,r.height],track:[parseFloat(track.width),parseFloat(track.height)],font:parseFloat(getComputedStyle(row.querySelector('span')).fontSize),colour:track.backgroundColor,helper:row.querySelector('small').textContent.trim()}}));
  for(const m of measures)if(m.height!==40||m.target[0]!==40||m.target[1]!==20||m.track[0]!==24||m.track[1]!==12||m.font!==14||!m.helper||m.colour==='rgb(82, 157, 54)')throw Error('Compact panel contract: '+JSON.stringify(m));
  const spacing=page.getByRole('switch',{name:'Spacing',exact:true});await spacing.focus();await page.keyboard.press('Space');if(await spacing.getAttribute('aria-checked')!=='false')throw Error('Keyboard toggle failed');await page.keyboard.press('Enter');

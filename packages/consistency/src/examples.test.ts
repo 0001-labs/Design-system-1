@@ -5,10 +5,10 @@ import { expect, it } from 'vite-plus/test';
 import { EXAMPLE_PAGES, exampleComposition } from './examples';
 import { initialComposition } from './model';
 import { parseBlocks } from '../../../website/src/vendor/aa/aa';
-it('offers the studio and ten DS1 pages as editable compositions', () => {
- expect(EXAMPLE_PAGES.map(page => page.id)).toEqual(['studio', 'shop', 'product', 'planner', 'finance', 'travel', 'booking', 'cafe', 'magazine', 'bike', 'financial']);
+it('offers the editor introduction, Studio and ten DS1 pages as editable compositions', () => {
+ expect(EXAMPLE_PAGES.map(page => page.id)).toEqual(['editor', 'studio', 'shop', 'product', 'planner', 'finance', 'travel', 'booking', 'cafe', 'magazine', 'bike', 'financial']);
  expect(exampleComposition('studio')).toEqual(initialComposition);
- for (const page of EXAMPLE_PAGES.slice(1)) {
+ for (const page of EXAMPLE_PAGES.slice(2)) {
   expect(existsSync(resolve(page.sourcePath))).toBe(true);
   if (page.id !== 'financial') expect(readFileSync(resolve(page.sourcePath), 'utf8')).toContain(`${page.id}:`);
   expect(page.sourceUrl).toBe(`https://designsystem1.com/examples/layouts/${page.id}/`);
@@ -33,5 +33,5 @@ it('keeps sourced headings in the DS1 example source and independent mutable dra
  const first = exampleComposition('shop'), second = exampleComposition('shop');
  first.sections.collection = 'Changed'; first.order.pop(); first.gaps.example = 100;
  expect(second.sections.collection).toContain('The everyday collection'); expect(second.order).toHaveLength(3); expect(second.gaps.example).toBeUndefined();
- expect(exampleComposition('unknown')).toEqual(initialComposition);
+ expect(exampleComposition('unknown')).toEqual(exampleComposition('editor'));
 });

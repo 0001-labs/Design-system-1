@@ -19,6 +19,7 @@ try {
   for (const width of [300, 390, 768, 1440, 1920]) {
     const page = await browser.newPage({ viewport: { width, height: 1000 } });
     await page.goto(base); await page.waitForSelector('.consistency-sheet');
+ await page.locator('select[aria-label="Example page"]').selectOption('studio');
     const check = async label => {
       const result = await page.evaluate(() => { window.scrollTo(100, window.scrollY); return { client: document.documentElement.clientWidth, scroll: document.documentElement.scrollWidth, left: window.scrollX }; });
       if (result.scroll > result.client || result.left !== 0) throw Error(`${width}px ${label}: document ${result.scroll}px exceeds viewport ${result.client}px`);

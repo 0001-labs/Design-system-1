@@ -24,6 +24,7 @@ try {
  })));
  for (const inserted of [false, true]) {
   await page.goto(`http://127.0.0.1:${server.address().port}/private-consistency/`);
+  await page.locator('select[aria-label="Example page"]').selectOption('studio');
   await page.waitForSelector('ds-card[data-selectable="bookshop"]');
   if (inserted) await page.locator('consistency-editor').evaluate(async e => {
    const card = (label,body) => '```c9y-card\n'+JSON.stringify({label,title:label+' title',body,width:280,height:300})+'\n```';

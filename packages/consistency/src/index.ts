@@ -4,7 +4,7 @@ import { ContextActivity } from './context-activity';
 import { ColumnSpacingLayer } from './column-spacing';
 import { GroupingLayer } from './grouping';
 import { ComponentNamesLayer } from './component-names';
-import { EXAMPLE_PAGES } from './examples';
+import { DEFAULT_EXAMPLE, EXAMPLE_PAGES, exampleComposition } from './examples';
 import { SurfaceContextMenu } from './surface-context';
 import { StatSpacingLayer } from './stat-spacing';
 import { PageContextMenu } from './page-context';
@@ -70,8 +70,8 @@ export class ConsistencyEditor extends LitElement {
   private cancelMarquee?: () => void;
   private onEscape = (event: KeyboardEvent) => { if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'z' && !event.defaultPrevented && !event.composedPath().some(target => target instanceof HTMLElement && (target.isContentEditable || target.matches('input,textarea,select')))) { event.preventDefault(); if (event.shiftKey) this.history.redo(); else this.history.undo(); this.revision++; return; } this.deleteSelection(event); if (event.key === 'Escape') { this.cancelMarquee?.(); this.selection = new Set(); this.marquee = null; } };
   connectedCallback() { super.connectedCallback(); window.addEventListener('keydown', this.onEscape); }
-  history = new CompositionHistory();
-  private histories = new Map<string, CompositionHistory>([['studio', this.history]]);
+  history = new CompositionHistory(exampleComposition(DEFAULT_EXAMPLE));
+  private histories = new Map<string, CompositionHistory>([[DEFAULT_EXAMPLE, this.history]]);
   private selectExample(id: string) {
     const example = EXAMPLE_PAGES.find(page => page.id === id); if (!example || id === this.selectedExample) return;
     this.cancelMarquee?.(); this.settle.cancel(); this.sort?.destroy(); this.sort = undefined; this.cleanups.forEach(dispose => dispose()); this.cleanups = [];
@@ -98,7 +98,7 @@ export class ConsistencyEditor extends LitElement {
   private settle = new CompositionSettle();
   private interaction: "pointer" | "keyboard" = "keyboard";
   private cleanups: (() => void)[] = [];
-  constructor() { super(); this.selectedExample = 'studio'; this.stageWidth = 380; this.mobilePreview = false; this.revision = 0; this.preview = {}; this.selected = 'gap'; this.selectedGap = 'intro-actions'; this.layers = { marquee: true, spacing: true, boundaries: true, reorder: true, place: true, production: true, resizing: true, componentNames: false, grouping: false }; this.selection = new Set(); this.marquee = null; this.editorError = ''; this.library = 'original'; }
+  constructor() { super(); this.selectedExample = DEFAULT_EXAMPLE; this.stageWidth = 380; this.mobilePreview = false; this.revision = 0; this.preview = {}; this.selected = 'gap'; this.selectedGap = 'section-intro'; this.layers = { marquee: true, spacing: true, boundaries: true, reorder: true, place: true, production: true, resizing: true, componentNames: false, grouping: false }; this.selection = new Set(); this.marquee = null; this.editorError = ''; this.library = 'original'; }
   createRenderRoot() { return this; }
   disconnectedCallback() { this.pointerActivity?.destroy(); this.pointerActivity = undefined; this.contextActivity?.destroy(); this.contextActivity = undefined; this.columnSpacing?.destroy(); this.columnSpacing = undefined; this.grouping?.destroy(); this.grouping = undefined; this.componentNames?.destroy(); this.componentNames = undefined; this.boundsObserver?.disconnect(); this.statSpacing?.destroy(); this.surfaceContext?.destroy(); this.pageContext?.destroy(); this.pageContext = undefined; this.cardSpacing?.destroy(); this.cardSpacing = undefined; this.resizing?.destroy(); this.resizing = undefined; this.textSpacing?.destroy(); this.textSpacing = undefined; window.removeEventListener('keydown', this.onEscape); this.cancelMarquee?.(); this.sort?.destroy(); this.spacingDisposers.forEach(dispose => dispose()); this.settle.cancel(); this.cleanups.forEach(fn => fn()); this.cleanups = []; super.disconnectedCallback(); }
   private value(key: Dimension, gap = this.selectedGap) { return this.preview[key === 'gap' ? gap : key] ?? (key === 'gap' ? (this.history.value.gaps[gap] ?? this.columnSpacing?.defaultValue(gap) ?? this.textSpacing?.defaultValue(gap) ?? 20) : this.history.value[key]); }

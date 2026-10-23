@@ -5,7 +5,7 @@ import { ConsistencyEditor } from './index';
 afterEach(() => document.body.replaceChildren());
 const pointer = (target: EventTarget, type: string, y = 0) => target.dispatchEvent(new PointerEvent(type, { pointerId: 1, isPrimary: true, button: 0, clientY: y, bubbles: true }));
 test('ghost gap previews, cancels, commits once, then undoes', async () => {
-  const editor = new ConsistencyEditor(); document.body.append(editor); await editor.updateComplete;
+  const editor = new ConsistencyEditor(); (editor as any).selectExample('studio'); document.body.append(editor); await editor.updateComplete;
   const handle = editor.querySelector('[data-handle="gap"]')!;
   pointer(handle, 'pointerdown'); pointer(window, 'pointermove', 25);
   expect(editor.preview['intro-actions']).toBe(90); expect(editor.history.value.gaps['intro-actions']).toBe(40);
@@ -16,21 +16,21 @@ test('ghost gap previews, cancels, commits once, then undoes', async () => {
   editor.history.undo(); expect(editor.history.value.gaps['intro-actions']).toBe(40);
 });
 test('desktop width is automatic and obsolete width controls are absent', async () => {
- const editor = new ConsistencyEditor(); document.body.append(editor); await editor.updateComplete;
+ const editor = new ConsistencyEditor(); (editor as any).selectExample('studio'); document.body.append(editor); await editor.updateComplete;
  expect(editor.querySelector('[data-handle="width"]')).toBeNull();
  expect(editor.querySelector('ds-number[aria-label="Width"]')).toBeNull();
  expect((editor.querySelector('.consistency-sheet') as HTMLElement).style.width).toBe('100%');
 });
 
 test('Aa enables normal editing and AI while measurements stay passive', async () => {
- const editor = new ConsistencyEditor(); document.body.append(editor); await editor.updateComplete;
+ const editor = new ConsistencyEditor(); (editor as any).selectExample('studio'); document.body.append(editor); await editor.updateComplete;
  expect((editor.querySelector('aa-editor') as any).options).toMatchObject({ prompt: expect.any(Function), correcting: false });
  expect(editor.querySelectorAll('.ghost-measure button').length).toBe(0);
  expect(editor.querySelectorAll('[role="slider"][tabindex="0"]').length).toBeGreaterThan(3);
 });
 
 test('lower editorial groups edit and undo through the same document history', async () => {
- const editor = new ConsistencyEditor(); document.body.append(editor); await editor.updateComplete;
+ const editor = new ConsistencyEditor(); (editor as any).selectExample('studio'); document.body.append(editor); await editor.updateComplete;
  const lower = editor.querySelector('[aria-label="Contact section text"]') as any;
  expect(lower).not.toBeNull(); expect(lower.options.prompt).toEqual(expect.any(Function));
  lower.value = 'A new invitation'; lower.dispatchEvent(new Event('input', { bubbles: true }));
@@ -39,7 +39,7 @@ test('lower editorial groups edit and undo through the same document history', a
 });
 
 test('spacer midpoint follows pointer movement and compensates for device scale', async () => {
- const editor = new ConsistencyEditor(); editor.style.setProperty('--sf', '2'); document.body.append(editor); await editor.updateComplete;
+ const editor = new ConsistencyEditor(); (editor as any).selectExample('studio'); editor.style.setProperty('--sf', '2'); document.body.append(editor); await editor.updateComplete;
  const gap = editor.querySelector('[data-handle="gap"]')!;
  (gap as HTMLElement).style.setProperty('--sf', '2');
  pointer(gap, 'pointerdown'); pointer(window, 'pointermove', 25);
@@ -47,7 +47,7 @@ test('spacer midpoint follows pointer movement and compensates for device scale'
  pointer(window, 'pointercancel'); expect(editor.history.value.gaps['intro-actions']).toBe(40);
 });
 test('spacing edits are independent and disabled layers cannot react', async () => {
- const editor = new ConsistencyEditor(); document.body.append(editor); await editor.updateComplete;
+ const editor = new ConsistencyEditor(); (editor as any).selectExample('studio'); document.body.append(editor); await editor.updateComplete;
  const first = editor.querySelector('[data-gap="intro-actions"]')!;
  first.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' })); first.dispatchEvent(new KeyboardEvent('keyup', { key: 'ArrowUp' }));
  expect(editor.history.value.gaps['intro-actions']).toBe(60); expect(editor.history.value.gaps['work-cards']).toBe(40);
@@ -58,7 +58,7 @@ test('spacing edits are independent and disabled layers cannot react', async () 
  expect(editor.layers.boundaries).toBe(true);
 });
 test('marquee selects intersecting content, Escape clears, toggle disables it', async () => {
- const editor = new ConsistencyEditor(); document.body.append(editor); await editor.updateComplete;
+ const editor = new ConsistencyEditor(); (editor as any).selectExample('studio'); document.body.append(editor); await editor.updateComplete;
  const item = editor.querySelector('[data-selectable="bookshop"]') as HTMLElement;
  item.getBoundingClientRect = () => ({ left: 10, top: 10, right: 80, bottom: 80 }) as DOMRect;
  const stage = editor.querySelector('.consistency-stage')!;
@@ -75,7 +75,7 @@ test('marquee selects intersecting content, Escape clears, toggle disables it', 
  expect(editor.selection.size).toBe(0);
 });
 test('reorder starts on, can be disabled, commits one order change and preserves text, gaps and selection on undo', async () => {
- const editor = new ConsistencyEditor(); document.body.append(editor); await editor.updateComplete;
+ const editor = new ConsistencyEditor(); (editor as any).selectExample('studio'); document.body.append(editor); await editor.updateComplete;
  const first = editor.querySelector('[data-sort-group="intro"]') as HTMLElement;
  expect(first.tabIndex).toBe(0);
  (editor.querySelector('[role="switch"][aria-label="Reorder"]') as HTMLElement).click(); await editor.updateComplete;
@@ -93,7 +93,7 @@ test('reorder starts on, can be disabled, commits one order change and preserves
  expect(editor.history.value.order[0]).toBe('intro'); expect(editor.history.canUndo).toBe(false);
 });
 test('repeated layer toggles keep one keyboard commit per input and cancel an active preview', async () => {
- const editor = new ConsistencyEditor(); document.body.append(editor); await editor.updateComplete;
+ const editor = new ConsistencyEditor(); (editor as any).selectExample('studio'); document.body.append(editor); await editor.updateComplete;
  const toggle = editor.querySelector('[role="switch"][aria-label="Spacing"]') as HTMLElement;
  for (let index = 0; index < 4; index++) { toggle.click(); await editor.updateComplete; }
  const handle = editor.querySelector('[data-gap="intro-actions"]')!;
@@ -106,7 +106,7 @@ test('repeated layer toggles keep one keyboard commit per input and cancel an ac
  expect(editor.history.value.gaps['intro-actions']).toBe(40);
 });
 test('shared Drag keyboard cancellation never changes the composition', async () => {
- const editor = new ConsistencyEditor(); document.body.append(editor); await editor.updateComplete;
+ const editor = new ConsistencyEditor(); (editor as any).selectExample('studio'); document.body.append(editor); await editor.updateComplete;
  (editor.querySelector('[role="switch"][aria-label="Reorder"]') as HTMLElement).click(); await editor.updateComplete;
  const groups = Array.from(editor.querySelectorAll<HTMLElement>('[data-sort-group]'));
  groups.forEach((group, index) => { group.getBoundingClientRect = () => ({ left: 20, top: 20 + index * 480, right: 660, bottom: 460 + index * 480, width: 640, height: 440, x: 20, y: 20 + index * 480, toJSON() {} }); });
@@ -119,7 +119,7 @@ test('shared Drag keyboard cancellation never changes the composition', async ()
 });
 
 test('rich Aa options are stable per editor with isolated local comments and no automatic correction', async () => {
- const editor = new ConsistencyEditor(); document.body.append(editor); await editor.updateComplete;
+ const editor = new ConsistencyEditor(); (editor as any).selectExample('studio'); document.body.append(editor); await editor.updateComplete;
  const editors = Array.from(editor.querySelectorAll<any>('aa-editor'));
  expect(editors).toHaveLength(4);
  const options = editors.map(element => element.options);
@@ -129,7 +129,7 @@ test('rich Aa options are stable per editor with isolated local comments and no 
  editors.forEach((element, index) => expect(element.options).toBe(options[index]));
 });
 test('Production defaults on, toggles gap-label policy and keeps active drags identifiable outside their surface', async () => {
- const editor = new ConsistencyEditor(); document.body.append(editor); await editor.updateComplete;
+ const editor = new ConsistencyEditor(); (editor as any).selectExample('studio'); document.body.append(editor); await editor.updateComplete;
  const production = editor.querySelector('[role="switch"][aria-label="Production"]') as HTMLElement;
  expect(production.getAttribute('aria-checked')).toBe('true');
  expect(editor.querySelector('.consistency-shell')?.classList.contains('production-on')).toBe(true);
@@ -142,7 +142,7 @@ test('Production defaults on, toggles gap-label policy and keeps active drags id
  expect(editor.querySelector('.consistency-shell')?.classList.contains('production-on')).toBe(false);
 });
 test('Reorder and Place independently control every Aa instance without disabling normal editing', async () => {
- const editor = new ConsistencyEditor(); document.body.append(editor); await editor.updateComplete;
+ const editor = new ConsistencyEditor(); (editor as any).selectExample('studio'); document.body.append(editor); await editor.updateComplete;
  const editors = Array.from(editor.querySelectorAll<any>('aa-editor'));
  for (const text of editors) { expect(text.options.reordering).toBe(true); expect(text.options.placing).toBe(true); expect(text.editor.reordering).toBe(true); expect(text.editor.placing).toBe(true); }
  (editor.querySelector('[role="switch"][aria-label="Reorder"]') as HTMLElement).click(); await editor.updateComplete;
@@ -153,9 +153,9 @@ test('Reorder and Place independently control every Aa instance without disablin
  for (const text of editors) { expect(text.editor.reordering).toBe(true); expect(text.editor.placing).toBe(false); }
 });
 test('library preset selector applies shared DS1 component roles only to the composition', async () => {
- const editor = new ConsistencyEditor(); document.body.append(editor); await editor.updateComplete;
+ const editor = new ConsistencyEditor(); (editor as any).selectExample('studio'); document.body.append(editor); await editor.updateComplete;
  const select = editor.querySelector('[aria-label="Library preset"]') as HTMLSelectElement;
- expect(Array.from(select.options, option => option.value)).toEqual(['original', 'blue', 'ink', 'soft', 'bold', 'editorial']); expect(editor.library).toBe('original');
+ expect(Array.from(select.options, option => option.value)).toEqual(['original', 'voyage', 'blue', 'ink', 'soft', 'bold', 'editorial']); expect(editor.library).toBe('original');
  select.value = 'blue'; select.dispatchEvent(new Event('change', { bubbles: true })); await editor.updateComplete;
  const sheet = editor.querySelector('.consistency-sheet') as HTMLElement;
  expect(sheet.dataset.consistencyLibrary).toBe('blue'); expect(sheet.style.getPropertyValue('--ds-button-background-color-primary')).toBe('var(--ds-sharp-blue)');

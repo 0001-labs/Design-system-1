@@ -19,6 +19,7 @@ try {
  const page = await browser.newPage({ viewport: { width: 390, height: 1000 } });
  const errors=[];page.on('pageerror',error=>errors.push(error.message));
  await page.goto(`http://127.0.0.1:${server.address().port}/private-consistency/`);await page.waitForSelector('aa-editor[data-editor-key="intro"] .aa-block');
+ await page.locator('select[aria-label="Example page"]').selectOption('studio');
  for (const entry of PAGE_INSERTIONS) {
   await page.evaluate(async label => { const shell=document.querySelector('consistency-editor');shell.history.commit({text:'/'+label});shell.requestUpdate();await shell.updateComplete;const host=shell.querySelector('aa-editor[data-editor-key="intro"]');await host.updateComplete;host.editor.focus();host.editor.selectRange(host.value.length);host.dispatchEvent(new Event('aa-change'));document.dispatchEvent(new Event('selectionchange')); },entry.label);
   const host=page.locator('aa-editor[data-editor-key="intro"]');

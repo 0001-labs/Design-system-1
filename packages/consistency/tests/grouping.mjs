@@ -17,6 +17,7 @@ const browser = await chromium.launch({ headless: true });
 try {
  const page=await browser.newPage({viewport:{width:1440,height:1000}});
  await page.goto(`http://127.0.0.1:${server.address().port}/private-consistency/`);await page.waitForSelector('aa-editor');
+ await page.locator('select[aria-label="Example page"]').selectOption('studio');
  const toggle=page.getByRole('switch',{name:'Grouping',exact:true});
  if(await toggle.getAttribute('aria-checked')!=='false')throw Error('Grouping should start off');
  const before=await page.locator('consistency-editor').evaluate(e=>JSON.stringify(e.history.value));

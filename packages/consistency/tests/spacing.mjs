@@ -16,6 +16,7 @@ await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 const browser = await chromium.launch({ headless: true });
 try {
  const page=await browser.newPage({viewport:{width:1440,height:1000}});await page.goto(`http://127.0.0.1:${server.address().port}/private-consistency/`);await page.waitForSelector('aa-editor');
+ await page.locator('select[aria-label="Example page"]').selectOption('studio');
  await page.locator('consistency-editor').evaluate(async e=>{const button='```c9y-button\n'+JSON.stringify({label:'New button',secondary:false})+'\n```';const card='```c9y-card\n'+JSON.stringify({label:'New card',title:'A card title',body:'Independent words.'})+'\n```';e.history.commit({text:['# Newly inserted elements',button,card,'<columns>\n<column>\n## First column\n\nFirst paragraph\n\n'+button+'\n</column>\n<column>\n## Second column\n\nSecond paragraph\n</column>\n</columns>'].join('\n\n')});e.requestUpdate();await e.updateComplete;});await page.waitForTimeout(100);
  const top=page.locator('.consistency-text-gap[aria-label="Adjust intro block gap 1"]');const nested=page.locator('.consistency-text-gap[aria-label="Adjust intro nested 1 block gap 1"]');await top.waitFor();await nested.waitFor();
  const original=Number(await top.getAttribute('aria-valuenow'));await top.focus();await page.keyboard.press('ArrowUp');await page.waitForTimeout(100);if(Number(await top.getAttribute('aria-valuenow'))!==original+20)throw Error('Inserted component gap did not edit');

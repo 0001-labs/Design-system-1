@@ -18,6 +18,7 @@ try {
  const page = await browser.newPage({viewport:{width:1440,height:1000}});
  await page.goto(`http://127.0.0.1:${server.address().port}/private-consistency/`);
  await page.waitForSelector('aa-editor');
+ await page.locator('select[aria-label="Example page"]').selectOption('studio');
  await page.locator('consistency-editor').evaluate(async e=>{
   e.history.commit({text:'## Heading\n\nA paragraph\n\n```c9y-button\n'+JSON.stringify({label:'Open a page',secondary:false})+'\n```'});
   e.requestUpdate();await e.updateComplete;

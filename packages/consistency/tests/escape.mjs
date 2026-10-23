@@ -31,6 +31,7 @@ try {
   if(await page.evaluate(()=>editor.value)!=='Keep these words!')throw Error('Aa could not resume after dismissal');
  }
  await page.goto(`${base}/private-consistency/`);await page.waitForSelector('aa-editor[data-editor-key="intro"]');
+ await page.locator('select[aria-label="Example page"]').selectOption('studio');
  const intro=page.locator('aa-editor[data-editor-key="intro"]');
  for(const selected of [false,true]) {
   await intro.evaluate((e,selected)=>{e.editor.focus();e.editor.selectRange(2,selected?12:2)},selected);
