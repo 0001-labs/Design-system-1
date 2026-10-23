@@ -15,13 +15,11 @@ test('ghost gap previews, cancels, commits once, then undoes', async () => {
   expect(editor.history.value.gaps['intro-actions']).toBe(100);
   editor.history.undo(); expect(editor.history.value.gaps['intro-actions']).toBe(40);
 });
-test('ghost width supports keyboard commit and constraints', async () => {
-  const editor = new ConsistencyEditor(); document.body.append(editor); await editor.updateComplete;
-  const handle = editor.querySelector('[data-handle="width"]')!;
-  handle.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
-  expect(editor.preview.width).toBe(660); expect(editor.history.value.width).toBe(640);
-  handle.dispatchEvent(new KeyboardEvent('keyup', { key: 'ArrowRight' }));
-  expect(editor.history.value.width).toBe(660);
+test('desktop width is automatic and obsolete width controls are absent', async () => {
+ const editor = new ConsistencyEditor(); document.body.append(editor); await editor.updateComplete;
+ expect(editor.querySelector('[data-handle="width"]')).toBeNull();
+ expect(editor.querySelector('ds-number[aria-label="Width"]')).toBeNull();
+ expect((editor.querySelector('.consistency-sheet') as HTMLElement).style.width).toBe('100%');
 });
 
 test('Aa enables normal editing and AI while measurements stay passive', async () => {
@@ -43,6 +41,7 @@ test('lower editorial groups edit and undo through the same document history', a
 test('spacer midpoint follows pointer movement and compensates for device scale', async () => {
  const editor = new ConsistencyEditor(); editor.style.setProperty('--sf', '2'); document.body.append(editor); await editor.updateComplete;
  const gap = editor.querySelector('[data-handle="gap"]')!;
+ (gap as HTMLElement).style.setProperty('--sf', '2');
  pointer(gap, 'pointerdown'); pointer(window, 'pointermove', 25);
  expect(editor.preview['intro-actions']).toBe(65);
  pointer(window, 'pointercancel'); expect(editor.history.value.gaps['intro-actions']).toBe(40);

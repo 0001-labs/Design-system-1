@@ -1,3 +1,4 @@
+import { carouselAtom, readCarousel, type CarouselContent } from './carousel';
 import { applyLibraryTokens } from './libraries';
 import type { Atom } from '../../../website/src/vendor/aa/aa';
 import '../../../DS1/2-core/ds-button';
@@ -12,8 +13,8 @@ import cursorIcon from '../../../DS1/x-icon/cursor.svg?raw';
 provideIcons({ cursor: cursorIcon });
 import '../../../DS1/4-page/ds-overlay';
 
-export type ContentElement = { kind: 'button'; label: string; secondary: boolean; action?: { kind: 'link' | 'page'; target: string } } | { kind: 'card'; label: string; title: string; body: string; tone?: string; variant?: 'filled' | 'outlined'; width?: number; height?: number; gaps?: Record<string, number> };
-const defaults: Record<ContentElement['kind'], ContentElement> = {
+export type ContentElement = CarouselContent | { kind: 'button'; label: string; secondary: boolean; action?: { kind: 'link' | 'page'; target: string } } | { kind: 'card'; label: string; title: string; body: string; tone?: string; variant?: 'filled' | 'outlined'; width?: number; height?: number; gaps?: Record<string, number> };
+const defaults: Record<'button' | 'card', Exclude<ContentElement, CarouselContent>> = {
   button: { kind: 'button', label: 'Get in touch', secondary: false },
   card: { kind: 'card', label: 'A new idea', title: 'Something worth making', body: 'Write a little about it.' },
 };
@@ -28,6 +29,7 @@ function readAction(value: unknown): { kind: 'link' | 'page'; target: string } |
 const text = (value: unknown, limit: number): value is string => typeof value === 'string' && value.length <= limit;
 /** Closed fenced Markdown keeps the component data local, readable and lossless. */
 export function readContentElement(source: string): ContentElement | null {
+  if (source.startsWith('```c9y-carousel')) return readCarousel(source);
   const match = /^```c9y-(button|card)\r?\n([\s\S]*)\r?\n```$/.exec(source);
   if (!match) return null;
   try {
@@ -44,7 +46,7 @@ export function writeContentElement(value: ContentElement): string {
   // A literal closing fence inside JSON would otherwise close the Markdown atom.
   return `\`\`\`c9y-${kind}\n${JSON.stringify(fields).replaceAll('`', '\\u0060')}\n\`\`\``;
 }
-function paint(face: HTMLElement, value: ContentElement) {
+function paint(face: HTMLElement, value: Exclude<ContentElement, CarouselContent>) {
   face.replaceChildren();
   if (value.kind === 'button') {
     const label = face.ownerDocument.createElement('span'); label.textContent = value.label; face.append(label); face.setAttribute('control', 'host'); face.toggleAttribute('secondary', value.secondary); face.toggleAttribute('primary', !value.secondary);
@@ -58,7 +60,7 @@ function paint(face: HTMLElement, value: ContentElement) {
 }
 /** Aa owns insertion, selection and undo; only this adapter knows component data. */
 export function contentElementAtoms(canWrite: () => boolean, getHost: () => HTMLElement | null = () => null): Atom[] {
-  return (['button', 'card'] as const).map(kind => ({
+  const atoms: Atom[] = (['button', 'card'] as const).map(kind => ({
     name: `consistency-${kind}`, fence: `c9y-${kind}`, match: () => 0,
     insert: { label: kind === 'button' ? 'Button' : 'Card', icon: kind === 'button' ? 'plus' : 'square', source: writeContentElement(defaults[kind]), keywords: kind, preview: (target: HTMLElement, context?: { input: 'pointer' | 'keyboard' }) => {
       const owner = getHost()?.closest<HTMLElement>('[data-consistency-library]');
@@ -93,7 +95,7 @@ export function contentElementAtoms(canWrite: () => boolean, getHost: () => HTML
     } },
     draw(element, initialSource) {
       let source = initialSource, value = readContentElement(source);
-      if (!value) { element.textContent = source; return; }
+      if (!value || value.kind === 'carousel') { element.textContent = source; return; }
       const doc = element.ownerDocument;
       element.classList.add('consistency-content-element', `consistency-content-${kind}`);
       element.setAttribute('data-aa-interactive', '');
@@ -209,4 +211,5 @@ export function contentElementAtoms(canWrite: () => boolean, getHost: () => HTML
       return () => { clearTimeout(leaveTimer); element.removeEventListener('pointerenter', enter); element.removeEventListener('pointerleave', pointerLeave); observer.disconnect(); element.removeEventListener('consistency-resize', resize); element.removeEventListener('consistency-card-gap', gap); element.removeEventListener('focusin', focus); element.removeEventListener('focusout', leave); editors.forEach(editor => editor.destroy()); menu.remove(); element.removeEventListener('focusout', blur); element.removeEventListener('contextmenu', context); element.removeEventListener('keydown', key); };
     },
   }));
+  return [...atoms, carouselAtom(canWrite, getHost)];
 }

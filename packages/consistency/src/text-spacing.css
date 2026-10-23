@@ -5,4 +5,4 @@
 .consistency-text-bounds .consistency-text-gap[hidden]{display:none}
 .consistency-text-bounds .consistency-text-gap[aria-valuenow="0"]{height:var(--u)!important;transform:translateY(-50%);background:transparent}
 .consistency-sheet [data-selectable][hidden]{display:none!important}
-.consistency-sheet [data-composition-selected]{outline:2px solid var(--ds-yellow);outline-offset:calc(4px * var(--sf))}
+.consistency-sheet [data-composition-selected]{outline:none}

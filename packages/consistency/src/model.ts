@@ -12,7 +12,7 @@ export const initialComposition: Composition = { statDesigns: {}, buttonDesigns:
     contact: '## Have something in mind?\n\nA rough idea is enough to begin. Tell us what you are thinking about, who it is for and what you would like to change.\n\nThere is always room for a good conversation.',
   },
   text: '# A place for what comes next\n\nBring the words, the shape and the space between them together. A small studio for things worth making.\n\nMake room for a new idea.' };
-export const limits: Record<Dimension, [number, number]> = { width: [280, 960], padding: [20, 80], gap: [0, 2000] };
+export const limits: Record<Dimension, [number, number]> = { width: [280, 10000], padding: [20, 80], gap: [0, 2000] };
 export function dimensionValue(key: Dimension, value: number): number {
   const [min, max] = limits[key];
   return Number.isFinite(value) ? Math.min(max, Math.max(min, Math.round(value / 20) * 20)) : initialComposition[key];

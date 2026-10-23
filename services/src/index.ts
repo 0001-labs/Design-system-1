@@ -4,6 +4,7 @@ import { appNavigation } from './app-navigation';
 import { WorkerEntrypoint } from "cloudflare:workers";
 import { featureFlags, manageFeatureFlags, setFeatureFlag } from "./flags";
 import { dashboard, DASHBOARD_HOST, ICON_HOST } from "./dashboard";
+import { filterDocExamples, listExamples, setExample } from './doc-examples';
 
 const PLAY_HOST = "play.designsystem1.com";
 import { libraryApi } from "./libraries";
@@ -152,6 +153,7 @@ export default {
       shell.headers.set('X-Robots-Tag', 'noindex, nofollow');
       return shell;
     }
+    if (url.pathname.replace(/\/$/, '') === '/start-here/examples') return filterDocExamples(response, env);
     return reportPage(response, url.pathname);
   },
 } satisfies ExportedHandler<Env>;
@@ -160,4 +162,6 @@ export default {
 export class FeatureFlagsService extends WorkerEntrypoint<Env> {
   async manage() { return manageFeatureFlags(this.env); }
   async set(input: unknown) { return setFeatureFlag(this.env, input); }
+  async listExamples() { return listExamples(this.env); }
+  async setExample(input: unknown) { return setExample(this.env, input); }
 }

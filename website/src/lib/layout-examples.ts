@@ -2,6 +2,7 @@ import { LIBRARY_EXAMPLES } from './library-examples';
 import { LIBRARY_SITES } from './library-sites';
 import { LIBRARY_BRANDS } from './library-brands';
 import { PRODUCT_EXAMPLES } from './product-examples';
+import { FINANCIAL_EXAMPLE } from './financial-example';
 import { SETTINGS_EXAMPLE } from './settings-example';
 // The standard page layouts, each filled with the core and unit components a
 // real page would hold. The preview and the copyable code share one source;
@@ -56,6 +57,7 @@ document.querySelector('ds-table').data = [
 
 export const LAYOUT_EXAMPLES: Record<string, LayoutExample> = {
   settings: SETTINGS_EXAMPLE,
+  financial: FINANCIAL_EXAMPLE,
   ...PRODUCT_EXAMPLES,
   ...LIBRARY_EXAMPLES,
   ...LIBRARY_SITES,

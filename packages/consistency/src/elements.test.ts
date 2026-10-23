@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 import { afterEach, expect, it, vi } from 'vite-plus/test';
+vi.hoisted(() => { globalThis.fetch = async () => new Response('{}'); });
 import { contentElementAtoms, readContentElement, writeContentElement, type ContentElement } from './elements';
 afterEach(() => document.body.replaceChildren());
 it('round-trips component Markdown with quotes, newlines and closing fences', () => {
@@ -9,12 +10,12 @@ it('round-trips component Markdown with quotes, newlines and closing fences', ()
 });
 it('offers slash insertions with real DS1 faces and read-only permissions', () => {
   for (const atom of contentElementAtoms(() => false)) {
-    expect(atom.insert?.label).toMatch(/Button|Card/);
+    expect(atom.insert?.label).toMatch(/Button|Card|Carousel/);
     expect(readContentElement(atom.insert!.source)?.kind).toBe(atom.fence!.slice(4));
     const host = document.createElement('span'); document.body.append(host);
     atom.draw!(host, atom.insert!.source);
-    const face = host.querySelector(atom.fence === 'c9y-button' ? 'ds-button' : 'ds-card');
-    expect(face).not.toBeNull(); expect(face!.inert).toBe(true);
+    const face = host.querySelector(atom.fence === 'c9y-button' ? 'ds-button' : atom.fence === 'c9y-carousel' ? 'ds-carousel' : 'ds-card');
+    expect(face).not.toBeNull(); if (atom.fence === 'c9y-carousel') expect(host.querySelector<HTMLElement>('.consistency-carousel-tools')!.hidden).toBe(true); else expect(face!.inert).toBe(true);
     host.click(); expect(document.querySelector('ds-overlay')).toBeNull(); expect(host.tabIndex).toBe(-1);
   }
 });
@@ -49,7 +50,7 @@ it('changes card appearance from its context menu without a second text editor',
   cleanup?.();
 });
 
-it.each(['button', 'card'])('inserts /%s through Aa slash menu and undoes through its standard history', async kind => {
+it.each(['button', 'card', 'carousel'])('inserts /%s through Aa slash menu and undoes through its standard history', async kind => {
   const { createEditor } = await import('../../../website/src/vendor/aa/aa');
   const host = document.createElement('div'); document.body.append(host);
   const editor = createEditor(host, { value: '/' + kind, atoms: contentElementAtoms(() => true) });
@@ -57,7 +58,7 @@ it.each(['button', 'card'])('inserts /%s through Aa slash menu and undoes throug
   host.dispatchEvent(new Event('aa-change'));
   document.dispatchEvent(new Event('selectionchange'));
   await new Promise(resolve => setTimeout(resolve, 0));
-  const choice = Array.from(document.querySelectorAll<HTMLButtonElement>('.aa-menu button')).find(button => button.textContent?.includes(kind === 'button' ? 'Button' : 'Card'));
+  const choice = Array.from(document.querySelectorAll<HTMLButtonElement>('.aa-menu button')).find(button => button.textContent?.includes(kind === 'button' ? 'Button' : kind === 'carousel' ? 'Carousel' : 'Card'));
   expect(choice).toBeDefined(); choice!.click();
   expect(editor.value).toContain('```c9y-' + kind); expect(host.querySelector('ds-' + kind)).not.toBeNull();
   editor.undo(); expect(editor.value).toBe('/' + kind); editor.destroy();

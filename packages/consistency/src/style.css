@@ -26,8 +26,8 @@ consistency-editor{display:block;--ds-sf:var(--sf);color:var(--ds-text-color);fo
 .consistency-text-bounds{width:100%;min-width:0;overflow-x:auto}
 .consistency-sheet aa-editor.consistency-nowrap{width:max-content;min-width:100%;overflow:visible}
 .consistency-layers{display:flex;flex-direction:column;gap:var(--u);margin:var(--u) 0 calc(40px * var(--sf))}.consistency-layer-toggle{display:flex;align-items:flex-end;justify-content:space-between;line-height:calc(16px * var(--sf));min-height:var(--u)}
-.consistency-marquee{position:fixed;z-index:30;border:1px solid var(--ds-yellow);background:color-mix(in srgb,var(--ds-yellow) 12%,transparent);pointer-events:none}
-.consistency-shell [data-selected]{outline:2px solid var(--ds-yellow);outline-offset:calc(4px * var(--sf))}
+.consistency-marquee{position:fixed;z-index:30;border:0;background:color-mix(in srgb,var(--ds-text-color) 15%,transparent);pointer-events:none}
+.consistency-shell [data-selected]{outline:none}
 .spacing-off .consistency-gap,.spacing-off .ghost-surface--gap{background:none}.spacing-off .consistency-gap::before{display:none}.boundaries-off .consistency-sheet{outline:0}
 .consistency-gap--horizontal{flex:none;min-height:var(--u);align-self:stretch}.consistency-gap--horizontal::before{border:0;border-left:1px dashed var(--ds-pink);border-right:1px dashed var(--ds-pink)}
 .consistency-gap--horizontal .ghost-surface--gap{inset:0;min-height:var(--u);height:100%;transform:none;cursor:ew-resize}
@@ -200,11 +200,33 @@ consistency-editor,.consistency-shell{width:100%;max-width:100%;min-width:0}
 .consistency-mobile-preview .consistency-sheet{max-width:none;--composition-content-width:calc(100% - 2 * var(--composition-padding))}
 .consistency-mobile-preview .consistency-sheet aa-editor,.consistency-mobile-preview .consistency-sheet .aa-block,.consistency-mobile-preview .consistency-sheet ds-card{overflow-wrap:break-word;word-break:normal}
 .consistency-statistics>ds-stat{--ds-stat-text-overflow-wrap:break-word}
-/* Production selection rests on the authored element, never its empty gaps. */
-.production-on .consistency-sheet :is([data-composition-selected],[data-selectable][data-selected]:not(.aa-block)){position:relative;outline:none!important;box-shadow:none}
-.production-on .consistency-sheet :is([data-composition-selected],[data-selectable][data-selected]:not(.aa-block))::after{content:'';position:absolute;inset:0;z-index:20;pointer-events:none;border:0;outline:0;border-radius:inherit;background:color-mix(in srgb,var(--ds-pink) 14%,transparent)}
+/* Selection rests softly on the authored element, never its empty gaps. */
+.consistency-sheet :is([data-composition-selected],[data-selectable][data-selected]:not(.aa-block)){position:relative;outline:none!important;box-shadow:none}
+.consistency-sheet :is([data-composition-selected],[data-selectable][data-selected]:not(.aa-block))::after{content:'';position:absolute;inset:0;z-index:20;pointer-events:none;border:0;outline:0;border-radius:inherit;background:color-mix(in srgb,var(--ds-text-color) 15%,transparent)}
 
 .consistency-shell :is(.consistency-card-gap,.consistency-stat-gap)[aria-valuenow="0"]{background:linear-gradient(to bottom,transparent calc(50% - .5px),var(--ds-pink) calc(50% - .5px),var(--ds-pink) calc(50% + .5px),transparent calc(50% + .5px))}
 /* Keep the phone website's one-square inner inset without buying that room
    with a horizontal scrollbar: the surrounding workspace yields first. */
 @media(max-width:340px){.consistency-workspace{padding-inline:0}}
+/* The page is the workspace: controls occupy their own scrolling column. */
+consistency-editor,.consistency-shell{height:100dvh;min-height:0}
+.consistency-workspace{height:100%;padding:0;gap:0;grid-template-columns:minmax(0,1fr) calc(240px * var(--sf));align-items:stretch}
+.consistency-stage{height:100%;min-height:0;border-radius:0}
+.consistency-sheet{--sf:1;--ds-sf:1;--u:20px;--ds-unit:20px;height:100%;border-radius:0}
+.consistency-inspector{height:100%;overflow:auto;padding:var(--u);box-sizing:border-box;display:flex;flex-direction:column;gap:var(--u)}
+.consistency-inspector>h2{padding:0}
+.consistency-layers{display:flex;flex-direction:column;gap:var(--u)}
+.consistency-layer-toggle{display:grid;grid-template-columns:1fr auto;gap:0 var(--u);align-items:end;width:100%}
+.consistency-toggle-help{grid-column:1 / -1;font-size:var(--ds-type-size-small);line-height:var(--u);color:var(--ds-text-color-muted);white-space:normal;font-weight:400}
+@media(max-width:760px){.consistency-workspace{grid-template-columns:minmax(0,1fr);grid-template-rows:60dvh minmax(0,1fr)}.consistency-stage,.consistency-inspector{height:100%;min-height:0}}
+/* Authored nested columns keep readable measures independently of the window;
+   tables keep their own horizontal scrolling region. */
+.consistency-sheet .aa-atom.aa-columns{grid-template-columns:repeat(auto-fit,minmax(calc(200px * var(--sf)),1fr))}
+.consistency-sheet .aa-column{min-width:calc(200px * var(--sf));overflow-wrap:break-word;word-break:normal}
+.consistency-sheet .aa-block[data-kind="table"]{overflow-x:auto;max-width:100%;white-space:normal}
+.consistency-sheet .aa-table-row{grid-template-columns:repeat(var(--aa-columns),minmax(calc(200px * var(--sf)),1fr))}
+/* A picture and its caption own one snug box; native selection never paints
+   the unused width of a paragraph row beside a portrait. */
+.consistency-sheet .aa-block:has(> .aa-atom[data-atom="image"]){width:fit-content;max-width:100%}
+.consistency-sheet .aa-column .aa-atom[data-atom="image"]:not([data-width]){display:inline-block;width:fit-content;max-width:min(100%,calc(16 * var(--aa-unit)))}
+.consistency-sheet .aa-atom[data-atom="image"]{background:transparent}

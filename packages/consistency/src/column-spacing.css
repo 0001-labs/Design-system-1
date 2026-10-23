@@ -1,0 +1,8 @@
+.consistency-text-bounds .consistency-column-gap{position:absolute;inset:auto;transform:none;min-height:0;z-index:4;background:transparent;border-radius:var(--ds-radius)}
+.consistency-column-gap[data-axis="horizontal"]{cursor:ew-resize}
+.consistency-text-bounds .consistency-column-gap:is(:hover,:focus-visible,[data-spacing-active]){background:color-mix(in srgb,var(--ds-pink) 16%,transparent)}
+.consistency-text-bounds .consistency-column-gap[hidden]{display:none}
+.consistency-text-bounds .consistency-column-gap[aria-valuenow="0"][data-axis="horizontal"]{width:var(--u)!important;transform:translateX(-50%)}
+.consistency-text-bounds .consistency-column-gap[aria-valuenow="0"][data-axis="vertical"]{height:var(--u)!important;transform:translateY(-50%)}
+.consistency-unit-column>.aa-block:has(>.aa-atom)>.aa-atom{display:block}
+.consistency-sheet .aa-column.consistency-unit-column{min-width:0}

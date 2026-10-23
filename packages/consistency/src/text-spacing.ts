@@ -26,20 +26,24 @@ export class TextSpacingLayer {
         this.observed.add(editor); this.observer.observe(editor, { childList: true, characterData: true, subtree: true }); this.resize.observe(editor);
       }
       const bounds = editor.parentElement!;
-      const blocks = Array.from(editor.querySelectorAll<HTMLElement>(':scope > .aa-block'));
+      const containers = [editor, ...editor.querySelectorAll<HTMLElement>('.aa-column,.aa-tab-panel')];
+      containers.forEach((container, containerIndex) => {
+      if (!this.observed.has(container)) { this.observed.add(container); this.resize.observe(container); }
+      const blocks = Array.from(container.querySelectorAll<HTMLElement>(':scope > .aa-block'));
       blocks.slice(1).forEach((block, index) => {
-        const id = `${editor.dataset.editorKey}-text-${index + 1}`;
+        const id = container === editor ? `${editor.dataset.editorKey}-text-${index + 1}` : `${editor.dataset.editorKey}-nested-${containerIndex}-text-${index + 1}`;
         present.add(id);
-        const scale = Number(getComputedStyle(this.root).getPropertyValue('--sf')) || 1;
-        if (!this.defaults.has(id)) this.defaults.set(id, Math.round(parseFloat(getComputedStyle(block).marginTop) / scale / 20) * 20 || 20);
+        const scale = Number(getComputedStyle(editor).getPropertyValue('--sf')) || 1;
+        if (!this.defaults.has(id)) { const margin = Number.parseFloat(getComputedStyle(block).marginTop); this.defaults.set(id, Math.max(0, Math.round((Number.isFinite(margin) ? margin : 20) / scale / 20) * 20)); }
         const fallback = this.defaults.get(id)!;
         const value = this.state.value(id, fallback);
         block.style.marginTop = `calc(${value}px * var(--sf))`;
         let handle = this.handles.get(id);
+        if (handle && !handle.host.isConnected) { handle.dispose(); this.handles.delete(id); handle = undefined; }
         if (!handle) {
           const host = document.createElement('div');
           host.className = 'consistency-text-gap ghost-surface ghost-surface--gap';
-          host.setAttribute('role', 'slider'); host.setAttribute('aria-label', `Adjust ${editor.dataset.editorKey} text gap ${index + 1}`);
+          host.setAttribute('role', 'slider'); host.setAttribute('aria-label', `Adjust ${editor.dataset.editorKey}${container === editor ? '' : ` nested ${containerIndex}`} block gap ${index + 1}`);
           host.setAttribute('aria-orientation', 'vertical'); host.setAttribute('aria-valuemin', '0'); host.setAttribute('aria-valuemax', '2000');
           const measure = document.createElement('span'); measure.className = 'ghost-measure'; measure.setAttribute('aria-hidden', 'true'); host.append(measure);
           host.addEventListener('focus', () => this.state.select(id));
@@ -47,7 +51,7 @@ export class TextSpacingLayer {
           let pointer = false;
           const dispose = bindSpacingHandle(host, () => ({
             value: this.state.value(id, fallback), disabled: !this.state.enabled(), min: 0, max: 2000, step: 20, shiftStep: 40,
-            axis: 'vertical', snapPreview: false, gain: pointerGain('gap', Number(getComputedStyle(this.root).getPropertyValue('--sf'))),
+            axis: 'vertical', snapPreview: false, gain: pointerGain('gap', Number(getComputedStyle(editor).getPropertyValue('--sf'))),
             onPointerStart: () => { this.state.select(id); (host.ownerDocument.activeElement as HTMLElement | null)?.blur?.(); },
             onStart: kind => { pointer = kind === 'pointer'; host.setAttribute('data-spacing-active', ''); this.state.select(id); },
             onPreview: next => this.state.preview(id, next), onCommit: next => this.state.commit(id, next, pointer),
@@ -60,6 +64,7 @@ export class TextSpacingLayer {
         handle.host.hidden = !this.state.enabled(); handle.host.tabIndex = this.state.enabled() ? 0 : -1;
         handle.host.setAttribute('aria-valuenow', String(Math.round(value))); handle.host.setAttribute('aria-valuetext', `${Math.round(value)} pixels`);
         handle.host.firstElementChild!.textContent = String(Math.round(value));
+      });
       });
     });
     this.handles.forEach((handle, id) => { if (!present.has(id)) { handle.dispose(); handle.host.remove(); this.handles.delete(id); } });

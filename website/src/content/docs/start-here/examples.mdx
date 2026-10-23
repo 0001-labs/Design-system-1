@@ -18,7 +18,7 @@ Full pages built with Design system 1. Try each example here, switch between Com
 
 <div className="examples-grid">
 
-<section className="examples-card">
+<section className="examples-card" data-doc-example="settings">
 
 ## General settings
 
@@ -26,7 +26,7 @@ Full pages built with Design system 1. Try each example here, switch between Com
 
 </section>
 
-<section className="examples-card">
+<section className="examples-card" data-doc-example="shop">
 
 ## Shop
 
@@ -34,7 +34,7 @@ Full pages built with Design system 1. Try each example here, switch between Com
 
 </section>
 
-<section className="examples-card">
+<section className="examples-card" data-doc-example="planner">
 
 ## Planning app
 
@@ -42,7 +42,7 @@ Full pages built with Design system 1. Try each example here, switch between Com
 
 </section>
 
-<section className="examples-card">
+<section className="examples-card" data-doc-example="finance">
 
 ## Finance app
 
@@ -50,7 +50,7 @@ Full pages built with Design system 1. Try each example here, switch between Com
 
 </section>
 
-<section className="examples-card">
+<section className="examples-card" data-doc-example="product">
 
 ## Product showcase
 
@@ -60,13 +60,21 @@ Full pages built with Design system 1. Try each example here, switch between Com
 
 </div>
 
+<section className="examples-card" data-doc-example="financial">
+
+## Financial services
+
+<LayoutExample layout="financial" />
+
+</section>
+
 ## Drawn with a library
 
 The same components on the same squares, each site and app drawn by a different published [library](/libraries/): its own paper, accent, corners and type. Each page loads Design system 1, then one pinned library version.
 
 <div className="examples-grid">
 
-<section className="examples-card">
+<section className="examples-card" data-doc-example="booking">
 
 ### Booking site · Voyage
 
@@ -74,7 +82,7 @@ The same components on the same squares, each site and app drawn by a different 
 
 </section>
 
-<section className="examples-card">
+<section className="examples-card" data-doc-example="canvas">
 
 ### Design tool · Studio
 
@@ -82,7 +90,7 @@ The same components on the same squares, each site and app drawn by a different 
 
 </section>
 
-<section className="examples-card">
+<section className="examples-card" data-doc-example="speaker">
 
 ### Speaker launch · Graphite
 
@@ -90,7 +98,7 @@ The same components on the same squares, each site and app drawn by a different 
 
 </section>
 
-<section className="examples-card">
+<section className="examples-card" data-doc-example="bike">
 
 ### Bike maker · Grove
 
@@ -98,7 +106,7 @@ The same components on the same squares, each site and app drawn by a different 
 
 </section>
 
-<section className="examples-card">
+<section className="examples-card" data-doc-example="festival">
 
 ### Festival · Bloom
 
@@ -106,7 +114,7 @@ The same components on the same squares, each site and app drawn by a different 
 
 </section>
 
-<section className="examples-card">
+<section className="examples-card" data-doc-example="platform">
 
 ### Developer platform · Signal
 
@@ -114,7 +122,7 @@ The same components on the same squares, each site and app drawn by a different 
 
 </section>
 
-<section className="examples-card">
+<section className="examples-card" data-doc-example="magazine">
 
 ### Travel magazine · Lagoon
 
@@ -122,7 +130,7 @@ The same components on the same squares, each site and app drawn by a different 
 
 </section>
 
-<section className="examples-card">
+<section className="examples-card" data-doc-example="travel">
 
 ### Travel stays · Lagoon
 
@@ -130,7 +138,7 @@ The same components on the same squares, each site and app drawn by a different 
 
 </section>
 
-<section className="examples-card">
+<section className="examples-card" data-doc-example="cafe">
 
 ### Café · Bloom
 
@@ -138,7 +146,7 @@ The same components on the same squares, each site and app drawn by a different 
 
 </section>
 
-<section className="examples-card">
+<section className="examples-card" data-doc-example="trails">
 
 ### Walking log · Grove
 
@@ -146,7 +154,7 @@ The same components on the same squares, each site and app drawn by a different 
 
 </section>
 
-<section className="examples-card">
+<section className="examples-card" data-doc-example="console">
 
 ### Deploy console · Signal
 
@@ -160,7 +168,7 @@ The same components on the same squares, each site and app drawn by a different 
 
 <div className="examples-grid">
 
-<section className="examples-card">
+<section className="examples-card" data-doc-example="sidebar">
 
 ### Sidebar
 
@@ -168,7 +176,7 @@ The same components on the same squares, each site and app drawn by a different 
 
 </section>
 
-<section className="examples-card">
+<section className="examples-card" data-doc-example="split">
 
 ### List and detail
 
@@ -176,7 +184,7 @@ The same components on the same squares, each site and app drawn by a different 
 
 </section>
 
-<section className="examples-card">
+<section className="examples-card" data-doc-example="inspector">
 
 ### Inspector
 
@@ -184,7 +192,7 @@ The same components on the same squares, each site and app drawn by a different 
 
 </section>
 
-<section className="examples-card">
+<section className="examples-card" data-doc-example="column">
 
 ### Column
 
@@ -192,7 +200,7 @@ The same components on the same squares, each site and app drawn by a different 
 
 </section>
 
-<section className="examples-card">
+<section className="examples-card" data-doc-example="centered">
 
 ### Centred
 
@@ -200,7 +208,7 @@ The same components on the same squares, each site and app drawn by a different 
 
 </section>
 
-<section className="examples-card">
+<section className="examples-card" data-doc-example="tiles">
 
 ### Tiles
 
@@ -218,7 +226,7 @@ The files load the Design system 1 stylesheet and bundled Lit module from this s
 
 <div className="examples-grid">
 
-{HTML_EXAMPLES.map(example => <section className="examples-card">
+{HTML_EXAMPLES.map(example => <section className="examples-card" data-doc-example={`html-${example.id}`}>
   <h2>{example.title}</h2>
   <p><a href={`/examples/files/${example.id}.html`} target="_blank" rel="noopener">View example</a> · <a href={`/examples/files/${example.id}.html`} download={`${example.id}.html`}>Download HTML</a></p>
   <div class="not-content" data-ds-not-prose><ExampleDevice src={`/examples/files/${example.id}.html`} title={example.title} height={480} /></div>

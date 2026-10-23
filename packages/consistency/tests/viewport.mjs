@@ -16,7 +16,7 @@ await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 const browser = await chromium.launch({ headless: true });
 try {
   const base = `http://127.0.0.1:${server.address().port}/private-consistency/`;
-  for (const width of [300, 390, 768, 1440]) {
+  for (const width of [300, 390, 768, 1440, 1920]) {
     const page = await browser.newPage({ viewport: { width, height: 1000 } });
     await page.goto(base); await page.waitForSelector('.consistency-sheet');
     const check = async label => {
@@ -45,7 +45,8 @@ try {
     await page.evaluate(() => { const editor = document.querySelector('consistency-editor'); editor.history.commit({ width: 960, sizes: { bookshop: { width: 800, height: 400 } }, text: '```c9y-button\n{"label":"Read more","secondary":false}\n```' }); editor.requestUpdate(); });
     await page.locator('.consistency-content-button').waitFor();
     await check('wide authored website and Bold library');
-    if (width < 1000) { const canvas = await page.locator('.consistency-stage').evaluate(element => ({ overflow: getComputedStyle(element).overflowX, client: element.clientWidth, scroll: element.scrollWidth })); if (canvas.overflow !== 'auto' || canvas.scroll <= canvas.client) throw Error(`${width}px: wide canvas must scroll inside its stage`); }
+    const desktop = await page.locator('.consistency-stage').evaluate(stage => ({ stage:stage.clientWidth,sheet:stage.querySelector('.consistency-sheet').getBoundingClientRect().width }));
+    if(Math.abs(desktop.sheet-desktop.stage)>1)throw Error(`${width}px: desktop website does not fill available width: ${JSON.stringify(desktop)}`);
     const text = page.locator('.consistency-content-button [contenteditable="plaintext-only"]');
     await text.focus(); await page.getByRole('toolbar', { name: 'Button action', exact: true }).waitFor({ state: 'visible' });
     await check('open button action toolbar');

@@ -57,6 +57,7 @@ async function start(entry: string, bindings: Record<string, string> = {}): Prom
         if (path === "/") return new Response("Documentation");
         if (path === "/app/") return new Response("Application");
         if (path === "/play/") return new Response("Play");
+        if (path === '/start-here/examples/') return new Response('<main><section data-doc-example="shop">Shop specimen<iframe src="/examples/layouts/shop/"></iframe></section><section data-doc-example="financial">Financial specimen<iframe src="/examples/layouts/financial/"></iframe></section><p>Other content</p></main>', { headers: { 'Content-Type': 'text/html' } });
         if (path === "/resources/design-system-1.js") return new Response("Components");
         return new Response("Missing asset", { status: 404 });
       },
