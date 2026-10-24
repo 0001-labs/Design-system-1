@@ -47,8 +47,7 @@
 /* The chosen title's rest after the words, muted, as a name finishing itself. */
 .completion { color: var(--ds-text-color-muted, var(--text-color)); }
 
-/* What it would open, under the words: two lines a row, the title and where
-   it is, each one square high; the chosen row shaded as a selection is. */
+/* Results share one square per row: icon, title and context in columns. */
 .rows {
   margin-top: var(--ds-unit);
   display: grid;
@@ -58,11 +57,12 @@
 }
 .row {
   display: grid;
-  grid-template-columns: calc(2 * var(--ds-unit)) 1fr;
-  grid-template-rows: var(--ds-unit) var(--ds-unit);
+  grid-template-columns: var(--ds-unit) minmax(0, 2fr) minmax(0, 1fr);
+  grid-template-rows: var(--ds-unit);
   align-items: end;
-  padding-block: calc(var(--ds-unit) / 2);
-  border-radius: calc(4px * var(--ds-sf, 1));
+  height: var(--ds-unit);
+  padding: 0;
+  border-radius: 0;
   font-family: var(--ds-typeface-regular, var(--typeface-regular));
   font-size: var(--ds-type-size-default);
   line-height: var(--ds-unit);
@@ -73,12 +73,13 @@
   background: color-mix(in srgb, var(--ds-text-color, currentColor) 10%, transparent);
 }
 .icon {
-  grid-row: 1 / span 2;
-  align-self: center;
+  grid-row: 1;
+  align-self: end;
   justify-self: center;
   color: var(--ds-text-color-muted, var(--text-color));
 }
 .title, .detail {
+  min-width: 0;
   overflow: hidden;
   white-space: nowrap;
   mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-unit)), transparent);
