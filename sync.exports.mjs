@@ -232,7 +232,7 @@ export default {
           for (const [, imported] of String(files[file]).matchAll(/^@import\s+"\.\/([^"]+)";/gm)) visit(imported);
         };
         for (const file of options.sheets) {
-          if (!controlSheets.includes(file)) throw new Error(`Unknown sheet: ${file}; the sheets are ${controlSheets.join(', ')}`);
+          if (![...controlSheets, 'guide.css'].includes(file)) throw new Error(`Unknown sheet: ${file}; the sheets are ${controlSheets.join(', ')}`);
           visit(file);
         }
         return files;
