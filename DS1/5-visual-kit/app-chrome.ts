@@ -1,7 +1,6 @@
 import { LitElement, css, html, nothing } from 'lit';
 import { define } from '../0-face/define';
 import '../2-core/ds-icon';
-import { browserIcon, loadBrowserIcons } from './browser-icons';
 import { browserStyles } from './browser-styles';
 import { mobileChromeStyles, cellularSignal } from './mobile-chrome';
 
@@ -70,15 +69,21 @@ export class DsAppChrome extends LitElement {
     .mobile .address { height:44px; border-radius:22px; }
     .mobile-actions { display:flex; justify-content:space-between; margin-top:8px; }
   `, browserStyles, mobileChromeStyles];
+  private drawIcon?: typeof import('./browser-icons').browserIcon;
   protected updated(changed: Map<string, unknown>) {
-    if (changed.has('kind') && (this.kind === 'chrome' || this.kind === 'edge')) {
-      void loadBrowserIcons(this.kind).then(() => this.requestUpdate()).catch(() => {
-        this.dispatchEvent(new CustomEvent('chrome-error', { detail: { kind: this.kind }, bubbles: true, composed: true }));
-      });
-    }
+    if (!changed.has('kind') && !changed.has('interactive')) return;
+    if (this.kind === 'ios' || this.kind === 'ipados') return;
+    if ((this.kind === 'macos' || this.kind === 'macos-compact') && !this.interactive) return;
+    void import('./browser-icons').then(async (icons) => {
+      await icons.loadBrowserIcons(this.kind);
+      this.drawIcon = icons.browserIcon;
+      this.requestUpdate();
+    }).catch(() => {
+      this.dispatchEvent(new CustomEvent('chrome-error', { detail: { kind: this.kind }, bubbles: true, composed: true }));
+    });
   }
   private icon(name: string) {
-    return browserIcon(name, this.kind);
+    return this.drawIcon?.(name, this.kind) ?? nothing;
   }
   private control(action: string, label: string, available = true) {
     return html`<button type="button" aria-label=${label} class=${available?'':'unavailable'} ?disabled=${!this.interactive || !available} tabindex=${this.interactive&&available?0:-1} @click=${()=>this.dispatchEvent(new CustomEvent('chrome-action',{detail:{action},bubbles:true,composed:true}))}>${this.icon(action)}</button>`;
