@@ -1,3 +1,4 @@
+import { appIdentity } from "../../../shared/component-adoption";
 import { html, nothing } from "lit";
 import { repeat } from "lit/directives/repeat.js";
 import "../../../DS1/1-root/controls.css";
@@ -103,7 +104,7 @@ export class IconMatrix extends AppElement {
         <table class="adoption-matrix ds-table" data-sticky style=${`width: calc(${apps.length + 9} * var(--report-unit))`}>
           <caption class="adoption-sr">Icons by app. Counts are source sites${kind === "all" ? "" : `, ${kindName(kind)} only`}.</caption>
           <colgroup><col style="width: calc(8 * var(--report-unit))" />${apps.map(() => html`<col style="width: var(--report-unit)" />`)}<col style="width: var(--report-unit)" /></colgroup>
-          <thead><tr class="adoption-column-names"><th class="adoption-app-column" scope="col" aria-label="Icon"></th>${apps.map(app => html`<th scope="col"><span>${app.name}</span></th>`)}<th class="adoption-total" scope="col" data-numeric>Total</th></tr></thead>
+          <thead><tr class="adoption-column-names"><th class="adoption-app-column" scope="col" aria-label="Icon"></th>${apps.map(app => html`<th scope="col"><span data-tooltip=${appIdentity(app)}>${app.name}</span></th>`)}<th class="adoption-total" scope="col" data-numeric>Total</th></tr></thead>
           <tbody>${groups.map(group => html`
             <tr class="adoption-app-group"><th colspan=${apps.length + 2} scope="rowgroup">${group.name}</th></tr>
             ${repeat(group.rows, name => name, name => {

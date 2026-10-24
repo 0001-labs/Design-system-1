@@ -6,10 +6,11 @@ import "../../../DS1/1-root/controls.css";
 import "../../../DS1/2-core/ds-checkbox";
 import "../../../DS1/3-unit/ds-list";
 import "../../../DS1/3-unit/ds-row";
-import { totalSites, type AdoptionReport, type ComponentCell } from "../../../shared/component-adoption";
+import { appIdentity, componentIdentity, totalSites, type AdoptionReport, type ComponentCell } from "../../../shared/component-adoption";
 import { authToken, signOut } from "../lib/backend";
 import { AppElement, defineElement } from "../lib/element";
 import { accordion, accordionId, button, loading, notice, splitButton } from "../lib/ui";
+import "../../../DS1/0-face/tooltips";
 import "./IconAdoption";
 import "./component-adoption.css";
 
@@ -159,12 +160,12 @@ export class ComponentMatrix extends AppElement {
           <colgroup><col style="width: calc(8 * var(--report-unit))" />${columns.map(() => html`<col style="width: var(--report-unit)" />`)}<col style="width: calc(4 * var(--report-unit))" /></colgroup>
           <thead>
             <tr class="adoption-groups"><th class="adoption-app-column"></th>${groups.map(group => { const span = columns.filter(c => c.group === group).length; return html`<th colspan=${span} style=${`width: calc(${span} * var(--report-unit))`} class=${`group-${group.toLowerCase()}`} scope="colgroup">${group}</th>`; })}<th></th></tr>
-            <tr class="adoption-column-names"><th class="adoption-app-column" scope="col">App</th>${columns.map(column => html`<th scope="col" class=${`group-${column.group.toLowerCase()}`}><span>${column.name}</span></th>`)}<th class="adoption-total" scope="col" data-numeric>Total</th></tr>
+            <tr class="adoption-column-names"><th class="adoption-app-column" scope="col">App</th>${columns.map(column => html`<th scope="col" class=${`group-${column.group.toLowerCase()}`}><span data-tooltip=${componentIdentity(column)}>${column.name}</span></th>`)}<th class="adoption-total" scope="col" data-numeric>Total</th></tr>
           </thead>
           <tbody>${appGroups.map(appGroup => html`
             <tr class="adoption-app-group"><th colspan=${columns.length + 2} scope="rowgroup">${appGroup}</th></tr>
             ${repeat(report.apps.filter(app => (app.group ?? "Products") === appGroup), app => app.id, app => html`<tr>
-              <th class="adoption-app-column" scope="row">${app.name}${app.migration === "deferred" ? html`<span class="adoption-deferred"> · Deferred</span>` : nothing}</th>
+              <th class="adoption-app-column" scope="row" data-tooltip=${appIdentity(app)}>${app.name}${app.migration === "deferred" ? html`<span class="adoption-deferred"> · Deferred</span>` : nothing}</th>
               ${columns.map(column => {
                 const cell = app.cells[column.id];
                 if (app.status !== "scanned" || !cell) return html`<td class="unavailable" aria-label=${`${app.name}, ${column.name}: not scanned`}>?</td>`;

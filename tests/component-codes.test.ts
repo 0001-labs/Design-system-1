@@ -18,3 +18,10 @@ describe('component versions', () => {
     }
   });
 });
+
+import { COMPONENT_COLUMNS, componentIdentity } from '../shared/component-adoption';
+test('every matrix component has a canonical tag and version', () => {
+  for (const column of COMPONENT_COLUMNS) {
+    expect(componentIdentity(column), column.id).toMatch(/^[A-Z0-9]{1,4} .+ \d+\.\d+\.\d+$/);
+  }
+});

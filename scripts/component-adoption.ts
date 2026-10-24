@@ -16,7 +16,7 @@ const git = (root: string, ...args: string[]) => execFileSync("git", args, { cwd
 export const excluded = /^(?:(?:client|src|web)\/)?(?:design|ds1)\/|^src\/pages\/design\/|(?:^|\/)(?:vendor|signIn|_generated|generated|node_modules|dist|__surface|surface|design-lab|designLab|dev|experiments|previews|__tests__|tests|test|fixtures|stories)(?:\/|$)|(?:\.test|\.spec|\.stories|\.d)\.[^.]+$/i;
 
 /** `source: "direct"` is Design system 1 itself: its app and site import DS1/ from the same commit, so there is no copy to verify. */
-export interface AppSpec { id: string; name: string; directory: string; roots: string[]; manifest?: string; source?: "direct"; group?: "Products" | "Clients"; excludes?: string[]; migration?: "deferred"; migrationReason?: string }
+export interface AppSpec { code?: string; version?: string; id: string; name: string; directory: string; roots: string[]; manifest?: string; source?: "direct"; group?: "Products" | "Clients"; excludes?: string[]; migration?: "deferred"; migrationReason?: string }
 /** The studio owns product names and scan scope; the reusable scanner owns recognition. */
 /** `ADOPTION_CONFIG` names another configuration file, to try a scope without editing the studio's. */
 export function loadAppSpecs(studio: string, configPath = process.env.ADOPTION_CONFIG ? resolve(process.env.ADOPTION_CONFIG) : join(studio, "0001/server/component-adoption.config.json")): AppSpec[] {
@@ -27,7 +27,12 @@ export function loadAppSpecs(studio: string, configPath = process.env.ADOPTION_C
     if (!app.id || ids.has(app.id) || !app.name || !app.directory || !app.roots?.length || [app.directory, ...app.roots].some(path => path.startsWith("/") || path.split("/").includes(".."))) throw new Error("Invalid or duplicate adoption app scope.");
     ids.add(app.id);
   }
-  return config.apps;
+  const inventoryPath = join(studio, "0001/server/system-inventory.json");
+  const nodes = existsSync(inventoryPath) ? (JSON.parse(readFileSync(inventoryPath, "utf8")) as { nodes: { id: string; code?: string; version?: string }[] }).nodes : [];
+  return config.apps.map(app => {
+    const node = nodes.find(node => node.id === app.id);
+    return { ...app, ...(node?.code ? { code: node.code } : {}), ...(node?.version ? { version: node.version } : {}) };
+  });
 }
 const known = new Set(IMPLEMENTATION_COLUMNS.map(c => c.id));
 /** The site chrome's native blocks: the header (its drawer drawn by drawer.css, which header.css imports), the footer, and the document page with its definition table. */
@@ -965,7 +970,7 @@ const ds1Icons = (dsRoot: string) => readIconMap(join(dsRoot, "DS1/2-core/genera
 
 export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): AdoptionApp {
   const root = join(studio, spec.directory);
-  const app: AdoptionApp = { id: spec.id, name: spec.name, status: "unavailable", commit: null, dirty: false, files: 0, scope: spec.roots, snapshotCommit: null, cells: {}, otherCustomElements: {}, group: spec.group ?? "Products", ...(spec.migration ? { migration: spec.migration, migrationReason: spec.migrationReason } : {}) };
+  const app: AdoptionApp = { id: spec.id, name: spec.name, code: spec.code, version: spec.version, status: "unavailable", commit: null, dirty: false, files: 0, scope: spec.roots, snapshotCommit: null, cells: {}, otherCustomElements: {}, group: spec.group ?? "Products", ...(spec.migration ? { migration: spec.migration, migrationReason: spec.migrationReason } : {}) };
   try {
     app.commit = git(root, "rev-parse", "HEAD");
     // Several products share one repository: only this app's own folder counts.

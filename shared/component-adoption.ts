@@ -1,3 +1,4 @@
+import componentCodes from "./component-codes.json";
 import { ALL_LAYERS } from "./component-directory";
 /** Source evidence only. A site in a loop still counts once. */
 export type AdoptionKind = "shared" | "styled" | "local" | "unverified";
@@ -52,6 +53,8 @@ export interface IconAdoption {
 }
 
 export interface AdoptionApp {
+  code?: string;
+  version?: string;
   id: string;
   name: string;
   status: "scanned" | "unavailable";
@@ -134,3 +137,11 @@ export function catalogueApp(app: AdoptionApp): AdoptionApp {
 }
 
 export const totalSites = (cell: ComponentCell): number => cell.shared + cell.styled + cell.local + cell.unverified;
+
+/** Canonical identity, independent of an older usage report's publication date. */
+export function componentIdentity(column: ComponentColumn): string {
+  const entry = componentCodes.find(entry => ('columnId' in entry && entry.columnId === column.id) || entry.label.toLowerCase() === column.name.toLowerCase());
+  return entry ? `${entry.code} ${column.name} ${entry.version}` : column.name;
+}
+
+export const appIdentity = (app: AdoptionApp): string => [app.code, app.name, app.version].filter(Boolean).join(" ");

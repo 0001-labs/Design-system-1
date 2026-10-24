@@ -1,11 +1,10 @@
 ---
 import '../../../DS1/1-root/one.css';
-import { version } from '../../../package.json';
 import '../../../shared/site-navigation.css';
 ---
 
 <header class="ds-header ds-header--app site-navigation docs-header docs-header--with-sidebar">
-  <nav class="system-breadcrumb" aria-label="System breadcrumb"><a class="site-brand" href="/"><code class="internal-identity">DS1 </code>Design system 1<span class="internal-identity"> {version}</span></a><span id="private-component-context" hidden>App</span></nav>
+  <nav class="system-breadcrumb" aria-label="System breadcrumb"><a class="site-brand" href="/">Design system 1</a><span id="private-component-context" hidden>App</span></nav>
   <button id="mobile-menu-btn" class="site-brand docs-brand-menu" type="button" aria-label="Open documentation navigation" aria-controls="mobile-navigation-panel" aria-haspopup="dialog" aria-expanded="false"><ds-icon type="menu" aria-hidden="true"></ds-icon></button>
 </header>
 <iframe id="navigation-auth" title="Account status" hidden aria-hidden="true" tabindex="-1"></iframe>
@@ -44,9 +43,6 @@ import '../../../shared/site-navigation.css';
 </script>
 
 <style>
-  .internal-identity { display: none; font-size: var(--ds-type-size-default); color: inherit; }
-  code.internal-identity { font-family: var(--ds-typeface-mono); }
-  :global(html[data-ds-owner]) .internal-identity { display: inline; }
   .docs-header { display: flex; align-items: center; }
   .docs-header .system-breadcrumb .site-brand { text-decoration: none; }
   #private-component-context { color: var(--ds-text-color-muted); }
