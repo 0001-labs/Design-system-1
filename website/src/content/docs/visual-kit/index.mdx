@@ -37,12 +37,12 @@ The `viewport` CSS part owns the app area. A slotted iframe fills it. Add `inter
 
 ### Compact Mac
 
-A one-square title bar with three muted window controls and a centred address. Use `kind="macos-compact"` for this simplified presentation frame.
+A 30px title bar, multiplied by DS1’s `--sf`, with three muted window controls and a centred title or address. Use `kind="macos-compact"` and set `href` to make the title a normal link that opens in a new tab. Without `href`, the title is plain text. Set `--ds-window-chrome-background` and `--ds-window-chrome-color` to match the content.
 
 <CompactWindowExample />
 
 ```html
-<ds-window kind="macos-compact" address="shop.example" style="height:500px">
+<ds-window kind="macos-compact" label="Room shop" href="/examples/layouts/shop/" style="height:500px">
   <iframe title="Shop design" src="/examples/layouts/shop/"></iframe>
 </ds-window>
 ```

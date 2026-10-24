@@ -27,7 +27,14 @@ try{
  await page.locator('#mobile-reference').screenshot({path:'/tmp/visualkit-mobile-reference.png'});
  await page.locator('#mobile-reference').evaluate(el=>el.remove());
  const compact=await page.evaluate(()=>{const w=document.querySelector('#window'),bar=w.shadowRoot.querySelector('ds-app-chrome').shadowRoot.querySelector('.compact');return {height:bar.getBoundingClientRect().height,colours:[...bar.querySelectorAll('.lights button')].map(b=>getComputedStyle(b).backgroundColor),shadow:getComputedStyle(w).boxShadow};});
- assert.equal(compact.height,20);assert.equal(new Set(compact.colours).size,1);assert.equal(compact.shadow,'none');
+ assert.equal(compact.height,30);assert.equal(new Set(compact.colours).size,1);assert.equal(compact.shadow,'none');
+ await page.evaluate(()=>{const w=document.querySelector('#window');w.href='/examples/layouts/shop/';w.style.setProperty('--sf','1.5');});
+ const compactLink=page.locator('#window ds-app-chrome').getByRole('link');
+ await compactLink.waitFor();assert.equal(await compactLink.getAttribute('href'),'/examples/layouts/shop/');assert.equal(await compactLink.getAttribute('target'),'_blank');
+ assert.equal(await page.locator('#window ds-app-chrome').evaluate(c=>c.shadowRoot.querySelector('.compact').getBoundingClientRect().height),45);
+ await page.keyboard.press('Tab');await compactLink.focus();assert(await compactLink.evaluate(a=>a.matches(':focus-visible')));
+ await page.evaluate(()=>{const w=document.querySelector('#window');w.href='';w.style.removeProperty('--sf');});
+ await page.waitForFunction(()=>!document.querySelector('#window').shadowRoot.querySelector('ds-app-chrome').shadowRoot.querySelector('a'));
  const expectedHeight={safari:52,chrome:86,edge:80};
  for (const kind of ['safari','chrome','edge']) for(const appearance of ['light','dark']) {
    const specimen=page.locator(`#browsers ds-app-chrome[kind="${kind}"][appearance="${appearance}"]`);

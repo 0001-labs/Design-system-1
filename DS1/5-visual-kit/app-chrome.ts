@@ -9,7 +9,7 @@ export type AppChromeKind = 'macos' | 'macos-compact' | 'ios' | 'ipados' | 'safa
 /** Platform presentation chrome. Controls emit requests; they never navigate or close the host app. */
 export class DsAppChrome extends LitElement {
   static properties = {
-    kind: { reflect: true }, appearance: { reflect: true }, time: {}, address: {}, label: {},
+    kind: { reflect: true }, appearance: { reflect: true }, time: {}, address: {}, label: {}, href: {},
     network: {}, battery: {type:Number}, dualSim: {type:Boolean,attribute:'dual-sim'},
     favicon: {}, backAvailable: {type:Boolean, attribute:'back-available'}, forwardAvailable: {type:Boolean, attribute:'forward-available'},
     assetBase: { attribute: 'asset-base' }, interactive: { type: Boolean, reflect: true },
@@ -19,6 +19,7 @@ export class DsAppChrome extends LitElement {
   declare time: string;
   declare address: string;
   declare label: string;
+  declare href: string;
   declare assetBase: string;
   declare interactive: boolean;
   declare favicon: string;
@@ -27,7 +28,7 @@ export class DsAppChrome extends LitElement {
   declare dualSim: boolean;
   declare backAvailable: boolean;
   declare forwardAvailable: boolean;
-  constructor(){super();this.kind='macos';this.appearance='light';this.time='00:01';this.address='';this.label='Application';this.assetBase='';this.interactive=false;this.favicon='';this.network='4G';this.battery=80;this.dualSim=true;this.backAvailable=true;this.forwardAvailable=false;}
+  constructor(){super();this.kind='macos';this.appearance='light';this.time='00:01';this.address='';this.label='Application';this.href='';this.assetBase='';this.interactive=false;this.favicon='';this.network='4G';this.battery=80;this.dualSim=true;this.backAvailable=true;this.forwardAvailable=false;}
   static styles = [css`
     :host { display:block; color:#202124; background:#f4f4f4; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; font-size:13px; --chrome-line:#d6d6d6; --chrome-field:#fff; --chrome-selected:#fff; }
     :host([appearance=dark]) { color:#efefef; background:#292a2d; --chrome-line:#444; --chrome-field:#202124; --chrome-selected:#35363a; }
@@ -38,11 +39,13 @@ export class DsAppChrome extends LitElement {
     .lights button { width:12px; height:12px; border:1px solid #0002; border-radius:50%; background:#ff5f57; }
     .lights button:nth-child(2) { background:#febc2e; } .lights button:nth-child(3) { background:#28c840; }
     .lights svg { --chrome-icon-size:8px; opacity:0; width:8px; height:8px; stroke:#333; } :host([interactive]) .lights:hover svg { opacity:1; }
-    .compact { height:20px; box-sizing:border-box; position:relative; display:flex; justify-content:center; align-items:flex-start; padding-top:3px; border-bottom:1px solid var(--chrome-line); font:12px/16px var(--ds-typeface-regular,system-ui,sans-serif); }
-    .compact .lights { position:absolute; left:0; top:3px; width:60px; height:16px; padding:0; gap:0; }
-    .compact .lights button { flex:none; width:10px; height:10px; margin:0 7px 0 3px; border:0; background:color-mix(in srgb,var(--chrome-ink,#26251e) 18%,transparent); }
-    .compact .title { flex:initial; max-width:calc(100% - 120px); padding:0; font-weight:400; }
-    :host([appearance=dark]) .compact { --chrome-ink:#eee; }
+    .compact { --compact-scale:var(--sf,1); height:calc(30px * var(--compact-scale)); position:relative; display:flex; justify-content:center; align-items:center; border-bottom:1px solid var(--chrome-line); background:var(--ds-window-chrome-background,#f4f4f4); color:var(--ds-window-chrome-color,#26251e); font:calc(14px * var(--compact-scale))/calc(20px * var(--compact-scale)) var(--ds-typeface-regular,system-ui,sans-serif); }
+    .compact .lights { position:absolute; left:calc(8px * var(--compact-scale)); top:0; width:auto; height:100%; padding:0; gap:calc(6px * var(--compact-scale)); }
+    .compact .lights button { flex:none; width:calc(10px * var(--compact-scale)); height:calc(10px * var(--compact-scale)); border:0; background:color-mix(in srgb,currentColor 18%,transparent); }
+    .compact .title { flex:initial; max-width:calc(100% - 120px * var(--compact-scale)); padding:0 calc(4px * var(--compact-scale)); font-weight:400; color:inherit; text-decoration:none; border-radius:calc(4px * var(--compact-scale)); }
+    .compact a.title:hover { background:color-mix(in srgb,currentColor 8%,transparent); }
+    .compact a.title:focus-visible { outline:2px solid currentColor; outline-offset:1px; }
+    :host([appearance=dark]) .compact { --ds-window-chrome-background:#292a2d; --ds-window-chrome-color:#efefef; }
     .native { height:38px; display:flex; align-items:center; border-bottom:1px solid var(--chrome-line); }
     .title { text-align:center; flex:1; padding-right:72px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; font-weight:600; }
     .tabs { display:flex; align-items:center; height:38px; gap:8px; padding-right:8px; }
@@ -75,7 +78,7 @@ export class DsAppChrome extends LitElement {
   private lights() { return html`<div class="lights">${this.control('close','Close window')}${this.control('minimize','Minimize window')}${this.control('zoom','Zoom window')}</div>`; }
   render() {
     if(this.kind==='ios'||this.kind==='ipados') return html`<div class="status"><span class="clock">${this.time}</span><span class="island-space"></span><span class="levels">${cellularSignal(this.dualSim)}${this.network==='wifi' ? (this.assetBase ? html`<img class="wifi" alt="Wi-Fi" src=${this.assetBase+'status-wifi.svg'}>` : html`<ds-icon type="wifi" class="wifi" aria-label="Wi-Fi" style="--ds-icon-size:19px"></ds-icon>`) : html`<span class="network">${this.network}</span>`}<span class="battery-meter" role="img" aria-label=${`Battery ${Math.min(100,Math.max(0,this.battery))}%`} style=${`--battery-charge:${Math.min(100,Math.max(0,this.battery))}%`}><span class="charge"></span></span></span></div>`;
-    if(this.kind==='macos-compact') return html`<div class="compact">${this.lights()}<span class="title">${this.address || this.label}</span></div>`;
+    if(this.kind==='macos-compact') return html`<div class="compact">${this.lights()}${this.href?html`<a class="title" href=${this.href} target="_blank" rel="noopener noreferrer" title=${this.href}>${this.address || this.label}</a>`:html`<span class="title">${this.address || this.label}</span>`}</div>`;
     if(this.kind==='macos') return html`<div class="native">${this.lights()}<span class="title">${this.label}</span><slot name="controls"></slot></div>`;
     if(this.kind==='safari-ios') return html`<div class="mobile">${this.control('back','Back',this.backAvailable)}<div class="address">${this.control('page-menu','Page menu')}<span>${this.address}</span>${this.control('reload','Reload')}</div>${this.control('tabs','Tabs')}</div>`;
     if(this.kind==='safari') return html`<div class="toolbar safari-toolbar">${this.lights()}<div class="safari-group sidebar-group">${this.control('sidebar','Sidebar')}${this.control('chevron-down','Tab groups')}</div><div class="safari-group history">${this.control('back','Back',this.backAvailable)}${this.control('forward','Forward',this.forwardAvailable)}</div><div class="address safari-address">${this.favicon?html`<img class="favicon" src=${this.favicon} alt="">`:nothing}<span>${this.address}</span>${this.control('page-menu','Page menu')}</div><div class="safari-group safari-actions">${this.control('share','Share')}${this.control('plus','New tab')}${this.control('tabs','Tab overview')}</div></div>`;
