@@ -92,6 +92,13 @@ function moduleGraph(read, entry) {
 
 export default {
   exports: {
+    /** Internal on-page Ask face and speech input; hosts supply their own authorized data. */
+    ask: {
+      files({ read }) {
+        return Object.fromEntries(['2-core/ds-ask.ts', '2-core/styles/ds-ask.css', '0-face/ask-listen.ts']
+          .map(file => [file, read(`packages/app/src/${file}`)]));
+      },
+    },
     /**
      * Published design libraries. `library-styles.ts` connects one by address at run time. `id` and
      * `version` pin a published version instead: its stylesheet as
