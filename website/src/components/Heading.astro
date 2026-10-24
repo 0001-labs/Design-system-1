@@ -2,23 +2,16 @@
 // The page's title, in place of Starlight's PageTitle: Design system 1's display
 // text, 20px on two squares. Starlight's "On this page" links to it as #_top.
 // A layer's overview leads with the layer's colour square, as the directory and the rail do.
-import codes from '../../../shared/component-codes.json';
 import { ALL_LAYERS } from '../../../shared/component-directory';
 const { entry } = Astro.locals.starlightRoute;
 const { title } = entry.data;
-const component = codes.find(item => item.url === `https://designsystem1.com/${entry.id.replace(/\/$/, '')}/`);
 const layerColours: Record<string, string> = { yellow: '#eaff00', 'light-green': '#99ff73', 'light-blue': '#ccccff', pink: '#f5aad1' };
 const layer = ALL_LAYERS.find(layer => entry.id === `${layer.number}-${layer.name.toLowerCase()}/overview`);
 ---
 
-<h1 id="_top" class="ds-text ds-text--display" class:list={{ 'layer-title': layer }}>{layer && <span class="layer-swatch" aria-hidden="true" style={`background:${layerColours[layer.color]}`}></span>}{component && <code class="internal-component-code">{component.code} </code>}{title}{component && <span class="internal-component-version"> {component.version}</span>}</h1>
+<h1 id="_top" class="ds-text ds-text--display" class:list={{ 'layer-title': layer }}>{layer && <span class="layer-swatch" aria-hidden="true" style={`background:${layerColours[layer.color]}`}></span>}{title}</h1>
 
 <style>
-  .internal-component-code, .internal-component-version { display: none; }
-  :global(html[data-ds-owner]) .internal-component-code,
-  :global(html[data-ds-owner]) .internal-component-version { display: inline; color: var(--ds-text-color-muted); font-size: var(--ds-type-size-default); }
-  .internal-component-code { font-family: var(--ds-typeface-mono); }
-  .internal-component-version { font-variant-numeric: tabular-nums; }
   .layer-title { display: flex; align-items: center; gap: calc(8px * var(--sf, 1)); }
   .layer-swatch { flex: none; width: calc(16px * var(--sf, 1)); height: calc(16px * var(--sf, 1)); }
 </style>

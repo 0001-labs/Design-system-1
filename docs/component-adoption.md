@@ -8,6 +8,10 @@ Only `/app/signin` and its data-free static shell/assets are public on the dashb
 
 ## Component glossary
 
+Component codes and individual versions appear only in Adoption, including its glossary. Official documentation headings show the component name alone, including for the signed-in owner. `shared/component-codes.json` owns both values.
+
+Component versions start at `0.1.0` when individual tracking begins; they do not reconstruct earlier releases. They are independent of the package version. Increment the affected component's patch for a compatible fix, minor for a new compatible capability, and major for a breaking change. Keep a component's version unchanged when only another component changes.
+
 Dash links to a searchable component glossary at `/#glossary`, with Root, Core, Unit and Page tabs taken from the canonical component directory. Search and counts apply to the selected layer. `shared/component-codes.json` owns the existing uppercase codes, with at most four characters each. Preserve assigned codes when names change; add a unique code when adding a directory entry. Codes use the DS1 monospace font. The same owner gate protects both dashboard views.
 
 ## Catalogue and layout
