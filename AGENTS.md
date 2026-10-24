@@ -26,6 +26,8 @@ System node: `ds1` ([map](https://system.0001.dev/system?focus=ds1)). Follow the
 
 Exception agreed 22 October 2026: the private `packages/consistency` workspace is named **Consistency**. It brings Aa text editing and DS1 composition together, identified by a yellow editing tag. This name belongs to that opt-in editor layer and its owner preview; public general-purpose components keep neutral names.
 
+This private workspace is the new editor intended to merge with Team CMS (`/Users/joachim/0001/0001/system/parts/team-cms/AGENTS.md`) into the replacement Consistency. Useful functionality is being ported from the legacy React/Convex app; porting and the Team/editor merge remain ongoing ([plan](https://ezo.gs/YN97NN)). The old app in `/Users/joachim/0001/Consistency` will be abandoned after that merge, not migrated to Lit. This private editor and the active `Consistency/platform` hosting foundation are not the legacy app. Existing owner gating and editor acceptance requirements still apply.
+
 The first preview lives at `https://neweditor.c9y.site`, using this site's existing server-checked owner session. Source is `packages/consistency`; its assets are excluded from the public npm package and denied on other hosts. It edits a page-local sample, not customer sites. Follow **Direct editing surfaces** in the design-system-1 skill: the interaction design is still being tested before adoption elsewhere.
 
 Reordering must settle once into its final grid-aligned position. Resolve final sizing, spacing, wrapping and column membership before measuring the drop target; never animate to an intermediate layout and correct it afterward. Keep a pointer regression that compares the landing endpoint and committed layout.
