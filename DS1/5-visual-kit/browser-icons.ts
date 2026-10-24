@@ -3,6 +3,8 @@ import { chromiumIcons, edgeIcons } from './native-icon-paths';
 
 /** Presentation glyphs drawn in each browser's native icon vocabulary, not DS1 UI icons. */
 export function browserIcon(name: string, kind: string) {
+  if (kind === 'safari-ios' && name === 'tabs') return svg`<svg viewBox="0 0 20 20" aria-hidden="true"><rect x="2" y="2" width="12" height="12" rx="2"/><rect x="6" y="6" width="12" height="12" rx="2"/></svg>`;
+  if (kind === 'safari-ios' && name === 'back') return svg`<svg viewBox="0 0 20 20" aria-hidden="true"><path d="m13 3-7 7 7 7"/></svg>`;
   const native = (kind === 'chrome' ? chromiumIcons : kind === 'edge' ? edgeIcons : {}) as Record<string, {size:number;path:string}>;
   if (native[name]) { const glyph=native[name]; return svg`<svg viewBox=${`0 0 ${glyph.size} ${glyph.size}`} aria-hidden="true" style="fill:currentColor;stroke:none"><path d=${glyph.path}/></svg>`; }
   const apple = kind === 'safari' || kind === 'safari-ios' || kind === 'macos';

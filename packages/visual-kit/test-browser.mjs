@@ -18,6 +18,14 @@ try{
  await page.evaluate(()=>{const w=document.querySelector('#window');w.interactive=false;});
  await page.waitForFunction(()=>document.querySelector('#window').shadowRoot.querySelector('ds-app-chrome').shadowRoot.querySelector('button').disabled);
  for(const kind of ['macos','safari','chrome','edge','macos-compact']){await page.evaluate(k=>document.querySelector('#window').kind=k,kind);await page.waitForFunction(k=>document.querySelector('#window').shadowRoot.querySelector('ds-app-chrome').kind===k,kind);}
+ const mobile=page.locator('#phone ds-app-chrome[kind="safari-ios"]');
+ assert.deepEqual(await mobile.getByRole('button').evaluateAll(bs=>bs.map(b=>b.getAttribute('aria-label'))),['Back','Page menu','Reload','Tabs']);
+ const overlay=await page.locator('#phone').evaluate(d=>{const s=d.shadowRoot;const content=s.querySelector('.content').getBoundingClientRect(),bar=s.querySelector('.browser').getBoundingClientRect();return bar.top<content.bottom&&bar.bottom<=content.bottom;});
+ assert(overlay,'Safari floats over the app viewport');
+ assert.equal(await page.locator('#phone ds-app-chrome[kind="ios"]').getByText('4G',{exact:true}).count(),1);
+ await page.evaluate(()=>{const demo=document.createElement('div');demo.id='mobile-reference';demo.style.cssText='position:relative;width:393px;height:852px;background:repeating-linear-gradient(0deg,transparent 0 27px,#ddd 27px 28px),repeating-linear-gradient(90deg,white 0 27px,#ddd 27px 28px);color:black';demo.innerHTML='<ds-app-chrome kind="ios"></ds-app-chrome><ds-app-chrome kind="safari-ios" address="ezo.gs" style="position:absolute;bottom:34px;left:0;right:0"></ds-app-chrome>';document.body.append(demo);});
+ await page.locator('#mobile-reference').screenshot({path:'/tmp/visualkit-mobile-reference.png'});
+ await page.locator('#mobile-reference').evaluate(el=>el.remove());
  const compact=await page.evaluate(()=>{const w=document.querySelector('#window'),bar=w.shadowRoot.querySelector('ds-app-chrome').shadowRoot.querySelector('.compact');return {height:bar.getBoundingClientRect().height,colours:[...bar.querySelectorAll('.lights button')].map(b=>getComputedStyle(b).backgroundColor),shadow:getComputedStyle(w).boxShadow};});
  assert.equal(compact.height,20);assert.equal(new Set(compact.colours).size,1);assert.equal(compact.shadow,'none');
  const expectedHeight={safari:52,chrome:86,edge:80};

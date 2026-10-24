@@ -3,12 +3,14 @@ import { define } from '../0-face/define';
 import '../2-core/ds-icon';
 import { browserIcon } from './browser-icons';
 import { browserStyles } from './browser-styles';
+import { mobileChromeStyles, cellularSignal } from './mobile-chrome';
 
 export type AppChromeKind = 'macos' | 'macos-compact' | 'ios' | 'ipados' | 'safari' | 'chrome' | 'edge' | 'safari-ios';
 /** Platform presentation chrome. Controls emit requests; they never navigate or close the host app. */
 export class DsAppChrome extends LitElement {
   static properties = {
     kind: { reflect: true }, appearance: { reflect: true }, time: {}, address: {}, label: {},
+    network: {}, battery: {type:Number}, dualSim: {type:Boolean,attribute:'dual-sim'},
     favicon: {}, backAvailable: {type:Boolean, attribute:'back-available'}, forwardAvailable: {type:Boolean, attribute:'forward-available'},
     assetBase: { attribute: 'asset-base' }, interactive: { type: Boolean, reflect: true },
   };
@@ -20,6 +22,9 @@ export class DsAppChrome extends LitElement {
   assetBase = '';
   interactive = false;
   favicon = '';
+  network = '4G';
+  battery = 80;
+  dualSim = true;
   backAvailable = true;
   forwardAvailable = false;
   static styles = [css`
@@ -59,7 +64,7 @@ export class DsAppChrome extends LitElement {
     .mobile { padding:8px 16px; background:var(--chrome-selected); }
     .mobile .address { height:44px; border-radius:22px; }
     .mobile-actions { display:flex; justify-content:space-between; margin-top:8px; }
-  `, browserStyles];
+  `, browserStyles, mobileChromeStyles];
   private icon(name: string) {
     return browserIcon(name, this.kind);
   }
@@ -69,10 +74,10 @@ export class DsAppChrome extends LitElement {
   private lights() { return html`<div class="lights">${this.control('close','Close window')}${this.control('minimize','Minimize window')}${this.control('zoom','Zoom window')}</div>`; }
   private location() { return html`<div class="address">${this.icon('lock')}<span>${this.address}</span>${this.control('reload','Reload')}</div>`; }
   render() {
-    if(this.kind==='ios'||this.kind==='ipados') return html`<div class="status"><span class="clock">${this.time}</span><span class="island-space"></span><span class="levels"><span class="cellular" aria-label="Full signal"><i></i><i></i><i></i><i></i></span>${this.assetBase ? html`<img class="wifi" alt="Wi-Fi" src=${this.assetBase+'status-wifi.svg'}><img class="battery" alt="Full battery" src=${this.assetBase+'status-battery.svg'}>` : html`<ds-icon type="wifi" class="wifi" aria-label="Wi-Fi" style="--ds-icon-size:19px"></ds-icon><span class="battery-fallback" role="img" aria-label="Full battery"></span>`}</span></div>`;
+    if(this.kind==='ios'||this.kind==='ipados') return html`<div class="status"><span class="clock">${this.time}</span><span class="island-space"></span><span class="levels">${cellularSignal(this.dualSim)}${this.network==='wifi' ? (this.assetBase ? html`<img class="wifi" alt="Wi-Fi" src=${this.assetBase+'status-wifi.svg'}>` : html`<ds-icon type="wifi" class="wifi" aria-label="Wi-Fi" style="--ds-icon-size:19px"></ds-icon>`) : html`<span class="network">${this.network}</span>`}<span class="battery-meter" role="img" aria-label=${`Battery ${Math.min(100,Math.max(0,this.battery))}%`} style=${`--battery-charge:${Math.min(100,Math.max(0,this.battery))}%`}><span class="charge"></span></span></span></div>`;
     if(this.kind==='macos-compact') return html`<div class="compact">${this.lights()}<span class="title">${this.address || this.label}</span></div>`;
     if(this.kind==='macos') return html`<div class="native">${this.lights()}<span class="title">${this.label}</span><slot name="controls"></slot></div>`;
-    if(this.kind==='safari-ios') return html`<div class="mobile">${this.location()}<div class="mobile-actions">${this.control('back','Back')}${this.control('forward','Forward')}${this.control('share','Share')}${this.control('tabs','Tabs')}</div></div>`;
+    if(this.kind==='safari-ios') return html`<div class="mobile">${this.control('back','Back',this.backAvailable)}<div class="address">${this.control('page-menu','Page menu')}<span>${this.address}</span>${this.control('reload','Reload')}</div>${this.control('tabs','Tabs')}</div>`;
     if(this.kind==='safari') return html`<div class="toolbar safari-toolbar">${this.lights()}<div class="safari-group sidebar-group">${this.control('sidebar','Sidebar')}${this.control('chevron-down','Tab groups')}</div><div class="safari-group history">${this.control('back','Back',this.backAvailable)}${this.control('forward','Forward',this.forwardAvailable)}</div><div class="address safari-address">${this.favicon?html`<img class="favicon" src=${this.favicon} alt="">`:nothing}<span>${this.address}</span>${this.control('page-menu','Page menu')}</div><div class="safari-group safari-actions">${this.control('share','Share')}${this.control('plus','New tab')}${this.control('tabs','Tab overview')}</div></div>`;
     const edge=this.kind==='edge';
     return html`<div class="tabs">${this.lights()}${this.control('chevron-down','Search tabs')}<div class="tab">${this.favicon?html`<img class="favicon" src=${this.favicon} alt="">`:this.icon('globe')}<span>${this.label}</span>${this.control('close-tab','Close tab')}</div>${this.control('plus','New tab')}</div><div class="toolbar browser-toolbar">${this.control('back','Back',this.backAvailable)}${!edge||this.forwardAvailable?this.control('forward','Forward',this.forwardAvailable):nothing}${this.control('reload','Reload')}<div class="address">${this.control(edge?'lock':'tune','Site information')}<span>${this.address}</span>${edge?this.control('reading','Reading mode'):nothing}${this.control('star',edge?'Add to favorites':'Bookmark this tab')}</div>${this.control(edge?'favorites':'extensions',edge?'Favorites':'Extensions')}${this.control('profile','Profile')}${this.control(edge?'more-horizontal':'more','Settings and more')}</div>`;
