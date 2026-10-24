@@ -11,6 +11,8 @@ Design system 1 (`/Users/joachim/0001/Design system 1`, source in `DS1/`) is the
 
 Cut taglines, helper text and secondary labels. If a screen needs them to make sense, fix the layout.
 
+Keep data current automatically on entry, after changes and when returning to the page or reconnecting. Never add Reload or Refresh buttons, including icon-only equivalents. Preserve focused fields, unsaved edits and pending writes during background updates; show failures inline and recover reads automatically without replaying writes.
+
 Always make the best decision that elevates all three: the user experience (UX), developer experience (DX), and agent experience (AX), without breaking anything.
 
 ## Web interface
