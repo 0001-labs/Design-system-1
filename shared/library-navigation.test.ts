@@ -25,7 +25,10 @@ test('direct links retain library/component selection without redirecting embedd
   expect(destination.searchParams.get('library')).toBe('library-one');
   expect(destination.searchParams.get('component')).toBe('/2-core/input/');
   expect(libraryWorkspaceRedirect('/l/library-one', new URLSearchParams(), true, false)).toBeNull();
-  expect(libraryWorkspaceRedirect('/libraries', new URLSearchParams(), false, true)).toBeNull();
+  expect(libraryWorkspaceRedirect('/libraries', new URLSearchParams(), false, true)).toBe('/libraries/workspace/');
+  expect(libraryWorkspaceRedirect('/profile', query, false, false)).toBe('/account/');
+  expect(libraryWorkspaceRedirect('/playground', query, false, true)).toBe('/libraries/playground/');
+  expect(libraryWorkspaceRedirect('/profile', query, true, false)).toBeNull();
   expect(libraryWorkspaceRedirect('/signin', query, false, false)).toBeNull();
 });
 

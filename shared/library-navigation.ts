@@ -25,8 +25,10 @@ export function libraryWorkspaceHref(library: LibraryNavigation, component = lib
 }
 
 /** Normal library links share the docs shell; embedded and explicit full-screen apps stay put. */
-export function libraryWorkspaceRedirect(path: string, query: URLSearchParams, embedded: boolean, standalone: boolean): string | null {
-  if (embedded || standalone) return null;
+export function libraryWorkspaceRedirect(path: string, query: URLSearchParams, embedded: boolean, _standalone: boolean): string | null {
+  if (embedded) return null;
+  if (path === '/profile') return '/account/';
+  if (path === '/' || path === '/playground') return '/libraries/playground/';
   const match = /^\/l\/([^/]+)$/.exec(path);
   if (path !== '/libraries' && !match) return null;
   const destination = new URLSearchParams();

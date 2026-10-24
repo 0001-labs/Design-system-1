@@ -8,7 +8,8 @@ const pathname = Astro.url.pathname.replace(/\/$/, '');
 const isTool = ['/2-core/icon/collection', '/components'].includes(pathname);
 const isExamples = pathname === '/start-here/examples';
 const libraryMode = pathname === '/libraries/playground' ? 'editor'
-  : pathname === '/libraries/workspace' ? 'libraries' : null;
+  : pathname === '/libraries/workspace' ? 'libraries'
+  : pathname === '/account' ? 'account' : null;
 // Starlight's PageFrame: drawn inside Starlight's own body, whose head is MyHead.
 ---
 

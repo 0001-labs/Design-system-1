@@ -47,7 +47,7 @@ const here = Astro.url.pathname.replace(/\/$/, '');
   const account = document.querySelector<HTMLAnchorElement>('#rail-account');
   function renderAccount(signedIn: boolean) {
     if (!account) return;
-    account.href = signedIn ? '/app/profile' : '/app/signin';
+    account.href = signedIn ? '/account/' : '/app/signin';
     account.textContent = signedIn ? 'Profile' : 'Sign in';
   }
   renderAccount(document.documentElement.hasAttribute('data-signed-in'));

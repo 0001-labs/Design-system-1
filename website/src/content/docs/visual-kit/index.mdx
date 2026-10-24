@@ -3,6 +3,7 @@ title: VisualKit
 description: Real app content, presented in windows and device frames.
 ---
 
+import PlatformExamples from "../../../components/PlatformExamples.astro";
 import CompactWindowExample from "../../../components/CompactWindowExample.astro";
 import DeviceBezelExample from "../../../components/DeviceBezelExample.astro";
 
@@ -22,6 +23,8 @@ Public Lit components live in `DS1/5-visual-kit/`, with `2-core` entry points fo
 The default device clock is **00:01**. Browser addresses are empty until supplied. Controls are presentation-only by default. Opting into interaction emits requests for the scene to handle; it does not close or navigate the host page.
 
 ## Windows
+
+<PlatformExamples mode="windows" />
 
 `ds-window` wraps app content in a macOS application window or a Safari, Google Chrome or Microsoft Edge browser window.
 
@@ -71,6 +74,8 @@ The catalogue includes 20 colour variants: iPhone 17 Pro Max, iPhone 17 Pro, iPh
 The inline example is public and includes the iPhone 17 Pro Max Deep Blue artwork and status icons. The remaining artwork is available in the owner preview through its authenticated asset route. Original artwork is not included in npm. Obtain and use artwork under the source terms; importing it does not grant redistribution rights. Missing artwork is reported explicitly rather than replaced with a different device.
 
 ## App chrome
+
+<PlatformExamples mode="chrome" />
 
 `ds-app-chrome` draws the controls independently of the window or device artwork. Available kinds are `macos`, `macos-compact`, `safari`, `chrome`, `edge`, `ios`, `ipados` and `safari-ios`.
 

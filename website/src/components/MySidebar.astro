@@ -85,7 +85,7 @@ const { sidebar } = Astro.locals.starlightRoute;
   const signInLabel = account.querySelector<HTMLElement>('[data-account-signin]')!;
   const avatar = account.querySelector<HTMLElement>('[data-account-avatar]')!;
   function renderAccount() {
-    account.href = signedIn ? '/app/profile' : '/app/signin';
+    account.href = signedIn ? '/account/' : '/app/signin';
     account.setAttribute('aria-label', signedIn ? 'Profile' : 'Sign in');
     signInLabel.hidden = signedIn;
     avatar.hidden = !signedIn;

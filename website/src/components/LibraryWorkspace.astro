@@ -1,11 +1,11 @@
 ---
 import PrivateAppWorkspace from './PrivateAppWorkspace.astro';
 interface Props {
-  mode: 'editor' | 'libraries';
+  mode: 'editor' | 'libraries' | 'account';
 }
 
 const { mode } = Astro.props;
-const appPath = mode === 'editor' ? '/app/playground' : '/app/libraries';
+const appPath = mode === 'editor' ? '/app/playground' : mode === 'account' ? '/app/profile' : '/app/libraries';
 ---
 
 <script is:inline>
@@ -15,20 +15,21 @@ const appPath = mode === 'editor' ? '/app/playground' : '/app/libraries';
 <section class="library-workspace" aria-labelledby="library-title" data-pagefind-body>
   <div class="library-heading">
     <div>
-      <h1 id="library-title">Design system 1</h1>
-      <p>Lit components. Your design. One library.</p>
+      <h1 id="library-title">{mode === 'account' ? 'Account' : 'Design system 1'}</h1>
+      {mode !== 'account' && <p>Lit components. Your design. One library.</p>}
     </div>
-    <a href={`${appPath}?standalone=1`} target="_blank" rel="noopener">Open full screen</a>
+
   </div>
   <nav class="library-tabs" aria-label="Design system 1">
     <a href="/">Overview</a>
     <a data-requires-signin href="/libraries/workspace/" aria-current="page">My libraries</a>
-    <span>{mode === 'editor' ? 'Playground · changes are temporary' : 'Saved stylesheets'}</span>
+    <span>{mode === 'editor' ? 'Playground · changes are temporary' : mode === 'account' ? 'Account' : 'Saved stylesheets'}</span>
   </nav>
   <iframe
     id="library-app"
+    data-mode={mode}
     data-src={`${appPath}?embed=docs`}
-    title={mode === 'editor' ? 'Design system 1 editor' : 'My libraries'}
+    title={mode === 'editor' ? 'Design system 1 editor' : mode === 'account' ? 'Account' : 'My libraries'}
   ></iframe>
 </section>
 {mode === 'libraries' && <PrivateAppWorkspace />}
@@ -41,7 +42,7 @@ const appPath = mode === 'editor' ? '/app/playground' : '/app/libraries';
     // The docs are static: read the current library from the browser URL, not build-time Astro.url.
     const query = new URLSearchParams(location.search);
     const libraryId = query.get('library');
-    if (libraryId) {
+    if (libraryId && frame.dataset.mode !== 'account') {
       const appQuery = new URLSearchParams({ embed: 'docs' });
       if (query.get('view') === 'overview') appQuery.set('view', 'overview');
       if (query.has('component')) appQuery.set('component', query.get('component')!);
@@ -59,6 +60,7 @@ const appPath = mode === 'editor' ? '/app/playground' : '/app/libraries';
     requestLibrary();
     window.addEventListener('theme-changed', sendTheme);
     const renderLibrary = (library: LibraryNavigation | null) => {
+      if (frame.dataset.mode === 'account') return;
       document.documentElement.toggleAttribute('data-library-workspace', library !== null);
       window.dispatchEvent(new CustomEvent('ds1-library-navigation', { detail: { library } }));
       const heading = document.querySelector('#library-title');
@@ -78,7 +80,7 @@ const appPath = mode === 'editor' ? '/app/playground' : '/app/libraries';
       if (event.origin !== location.origin || event.source !== frame.contentWindow || event.data?.type !== 'ds1:library-navigation') return;
       const library = document.documentElement.hasAttribute('data-signed-in') ? readLibraryNavigation(event.data.library) : null;
       renderLibrary(library);
-      if (event.data.libraryId === null && location.search) history.replaceState({}, '', location.pathname);
+      if (frame.dataset.mode !== 'account' && event.data.libraryId === null && location.search) history.replaceState({}, '', location.pathname);
     });
     new MutationObserver(sendTheme).observe(document.documentElement, {
       attributes: true, attributeFilter: ['class', 'data-theme'],

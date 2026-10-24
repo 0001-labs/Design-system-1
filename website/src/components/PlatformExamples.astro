@@ -1,0 +1,37 @@
+---
+interface Props { mode: 'windows' | 'chrome'; }
+const { mode } = Astro.props;
+const kinds = mode === 'windows'
+  ? [['macos', 'macOS'], ['safari', 'Safari'], ['chrome', 'Google Chrome'], ['edge', 'Microsoft Edge']]
+  : [['macos', 'macOS'], ['macos-compact', 'Compact Mac'], ['safari', 'Safari'], ['chrome', 'Google Chrome'], ['edge', 'Microsoft Edge'], ['ios', 'iPhone status'], ['ipados', 'iPad status'], ['safari-ios', 'iPhone Safari']];
+---
+<div class="platform-examples not-content" data-ds-not-prose>
+  {kinds.map(([kind, label]) => <section aria-label={`${label} ${mode === 'windows' ? 'window' : 'controls'}`}>
+    <h3>{label}</h3>
+    {['light', 'dark'].map(appearance => <figure>
+      <figcaption>{appearance === 'light' ? 'Light' : 'Dark'}</figcaption>
+      <div class="platform-scroll" tabindex="0" aria-label={`${label}, ${appearance} appearance`}>
+        {mode === 'windows' ? <ds-window kind={kind} appearance={appearance} label="Room shop" address="shop.example" class="window-example">
+          <iframe title={`${label} shop preview, ${appearance}`} src="/examples/layouts/shop/" loading="lazy"></iframe>
+        </ds-window> : <div class:list={['chrome-example', { phone: kind === 'ios' || kind === 'safari-ios' }]} data-appearance={appearance}>
+          <ds-app-chrome kind={kind} appearance={appearance} label="Room shop" address="shop.example" time="00:01"></ds-app-chrome>
+        </div>}
+      </div>
+    </figure>)}
+  </section>)}
+</div>
+<script>
+  import '../../../DS1/2-core/ds-window';
+  import '../../../DS1/2-core/ds-app-chrome';
+</script>
+<style>
+  .platform-examples { min-width: 0; margin-block: var(--site-unit); }
+  section { margin-block: calc(2 * var(--site-unit)); }
+  h3, figcaption { margin: 0 0 var(--site-unit); font: inherit; }
+  figure { margin: 0 0 var(--site-unit); min-width: 0; }
+  .platform-scroll { max-width: 100%; overflow-x: auto; border: 1px solid var(--ds-line); }
+  .window-example { min-width: 600px; height: 400px; }
+  .chrome-example { min-width: 600px; background: white; color: black; }
+  .chrome-example.phone { min-width: 393px; }
+  .chrome-example[data-appearance="dark"] { background: #1c1c1e; color: white; }
+</style>
