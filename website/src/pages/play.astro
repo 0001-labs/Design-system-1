@@ -6,6 +6,7 @@
 import '../../../DS1/1-root/one.css';
 import '../vendor/aa/aa.css';
 import '../../../DS1/1-root/row.css';
+import '../../../DS1/1-root/header.css';
 import PublicPreferences from '../components/PublicPreferences.astro';
 import ExampleDevice from '../components/ExampleDevice.astro';
 import { LIBRARIES } from '../lib/library-example-parts';
@@ -23,10 +24,13 @@ const libraries = (['graphite', 'studio', 'voyage', 'lagoon', 'bloom', 'grove', 
     <PublicPreferences />
   </head>
   <body>
-    <header class="play-bar">
-      <p class="play-title"><span>Garden club using</span>
+    <header class="ds-header ds-header--app play-bar">
+      <div class="play-heading">
+      <ds-button icon href="https://designsystem1.com/" aria-label="Back to Design system 1"><ds-icon type="left" aria-hidden="true"></ds-icon></ds-button>
+      <p class="play-title"><span>Garden club</span><span class="play-using">using</span>
         <ds-button id="play-library-button" aria-label="Design library"><span data-library-name>Design system 1</span><ds-icon type="chevron-down" aria-hidden="true"></ds-icon></ds-button>
       </p>
+      </div>
       <ds-select for="play-library-button" aria-label="Design library">
         <ds-button menu-item role="menuitemradio" aria-checked="true" data-library="" data-name="Design system 1"><span>Design system 1</span><ds-icon type="check" class="play-check" aria-hidden="true"></ds-icon></ds-button>
         <hr data-ds-menu-separator>
@@ -275,11 +279,13 @@ const libraries = (['graphite', 'studio', 'voyage', 'lagoon', 'bloom', 'grove', 
     font-size: var(--ds-type-size-default, 14px);
     line-height: var(--ds-unit, 20px);
   }
-  /* One row of one square with a square around it, as a header is. */
-  .play-bar { display: flex; align-items: flex-end; gap: var(--ds-unit); padding: var(--ds-unit); border-bottom: 1px solid var(--ds-border-color); line-height: calc(16px * var(--sf, 1)); }
+  /* Reuse the compact app header; Play owns only its contents. */
+  .play-bar { display: flex; line-height: calc(16px * var(--sf, 1)); }
+  .play-heading { display: flex; align-items: flex-end; gap: 0; }
   /* The title: the site's name, then the design library as a text button that opens its menu. */
   .play-title { display: flex; align-items: flex-end; gap: calc(4px * var(--sf, 1)); margin: 0; font-family: var(--typeface-medium); white-space: nowrap; }
-  .play-title #play-library-button { font-family: var(--typeface-regular); }
+  .play-using { font-family: var(--typeface-regular); }
+  .play-title [data-library-name] { font-family: var(--typeface-medium); }
   .play-check { margin-inline-start: auto; }
   [aria-checked='false'] > .play-check { visibility: hidden; }
   .play-grow { flex: 1; }
@@ -310,7 +316,7 @@ const libraries = (['graphite', 'studio', 'voyage', 'lagoon', 'bloom', 'grove', 
     color-scheme: dark;
   }
   #play-editor:focus-within { box-shadow: inset 0 0 0 2px var(--ds-focus-ring); }
-  .play-lines { position: sticky; left: 0; z-index: 1; flex: none; display: flex; flex-direction: column; align-self: flex-start; min-width: calc(2 * var(--ds-unit)); min-height: 100%; padding: var(--ds-unit) calc(var(--ds-unit) / 2); background: #1e1e1e; color: #5f5f5f; text-align: end; user-select: none; }
+  .play-lines { position: sticky; left: 0; z-index: 1; flex: none; display: flex; flex-direction: column; align-self: flex-start; min-width: calc(2 * var(--ds-unit)); min-height: 100%; padding: var(--ds-unit) calc(var(--ds-unit) / 2); background: #1e1e1e; color: #8a8a8a; text-align: end; user-select: none; }
   .play-lines span { height: var(--ds-unit); }
   .play-lines .play-line-current { color: #cacaca; }
   .play-aa { flex: 1; min-width: max-content; padding: var(--ds-unit) var(--ds-unit) var(--ds-unit) calc(var(--ds-unit) / 2); }
@@ -336,7 +342,8 @@ const libraries = (['graphite', 'studio', 'voyage', 'lagoon', 'bloom', 'grove', 
     .play { grid-template-columns: calc(8 * var(--ds-unit)) minmax(0, 1fr) minmax(0, 1fr); }
   }
   @media (max-width: 900px) {
-    .play-bar { flex-wrap: wrap; }
+    .play-bar { flex-wrap: wrap; height: auto; padding-block: calc(var(--ds-unit) / 2); row-gap: var(--ds-unit); }
+    .play-heading { flex-basis: 100%; }
     .play-grow { display: none; }
     .play-panes { display: inline-flex; }
     .play { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
@@ -344,7 +351,7 @@ const libraries = (['graphite', 'studio', 'voyage', 'lagoon', 'bloom', 'grove', 
     .play-files { flex-direction: row; align-items: flex-end; gap: calc(var(--ds-unit) / 2); padding: calc(var(--ds-unit) / 2) var(--ds-unit); overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--ds-border-color); }
     .play-files-title { display: none; }
     .play-files #play-file-list { display: flex; gap: calc(var(--ds-unit) / 2); margin: 0; }
-    .play-file { width: auto; white-space: nowrap; }
+    .play-file { flex: none; width: auto; white-space: nowrap; }
     .play-code { border-right: 0; }
     .play[data-pane='code'] .play-preview, .play[data-pane='preview'] :is(.play-code, .play-files) { display: none; }
   }
