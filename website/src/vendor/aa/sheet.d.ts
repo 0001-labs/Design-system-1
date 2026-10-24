@@ -11,6 +11,7 @@ export type SheetGroup = {
 };
 export type SheetOptions = {
     title: string;
+    nonModal?: boolean;
     groups: readonly SheetGroup[];
     /** Where the sheet is appended: the page's body, or the dialog the editor is in. */
     root: Element;

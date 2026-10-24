@@ -1,3 +1,4 @@
+import { type SourceCommentsOptions } from './comments-editor';
 /**
  * The editor: one editable element a block, each drawn from the document and
  * read back from the screen after every change, the way Notion's blocks are.
@@ -55,6 +56,8 @@ export type EditorOptions = {
     partials?: boolean;
     /** Files pasted or dropped into the editor. Without it, they are ignored. */
     onFiles?: (files: File[]) => void;
+    /** Keep touch formatting sheets modeless so the host page stays interactive. */
+    nonModalSheets?: boolean;
     toolbar?: boolean | readonly ToolbarAction[];
     commands?: readonly Command[];
     blockCommands?: readonly Command[];
@@ -87,6 +90,8 @@ export type EditorOptions = {
      * at the words or in the store's `panel`. Without it, nothing is commented.
      */
     comments?: CommentStore;
+    /** Keep threads in editable Markdown; author identity and permissions belong to the host. */
+    sourceComments?: SourceCommentsOptions;
 };
 /** The comments from outside: open a thread, start one on the selection, close what is open. */
 export type EditorComments = {
@@ -98,6 +103,8 @@ export type EditorComments = {
 export type Editor = {
     readonly element: HTMLElement;
     value: string;
+    /** Downloadable Markdown, with comment markers and metadata removed. */
+    exportMarkdown(): string;
     readOnly: boolean;
     placeholder: string;
     focus(): void;

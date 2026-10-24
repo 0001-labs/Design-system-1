@@ -43,6 +43,8 @@ export type Comment = {
 /** The reactions on offer, Link's sixteen. */
 export declare const REACTION_EMOJIS: readonly ["👍", "❤️", "😂", "🎉", "🙏", "👏", "😊", "🔥", "✅", "👀", "🤔", "💡", "🚀", "✨", "🙌", "💯"];
 export type CommentThread = CommentRange & {
+    /** An explicitly missing source anchor must never be guessed from a duplicate quote. */
+    orphaned?: boolean;
     id: string;
     comments: readonly Comment[];
     createdAt: number;
