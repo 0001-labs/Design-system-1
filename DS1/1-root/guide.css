@@ -1,7 +1,8 @@
 /* Product guides: semantic prose beside real, captioned device examples.
    Load after the foundation and before product styles. Device chrome stays
    in ds-device-bezel and ds-window; screenshots and words belong to the app. */
-.ds-guide { --ds-guide-read: calc(32 * var(--ds-unit)); }
+.ds-guide { --ds-guide-read: calc(32 * var(--ds-unit)); --ds-title-color: var(--ds-text-color-muted); }
+.ds-guide .ds-guide-footer { color: var(--ds-text-color-muted); }
 .ds-guide-illustrated {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
