@@ -6,8 +6,9 @@ import styles from "./styles/ds-switch.css?inline";
     whatever the page's accent. Compact and monochrome are opt-in control-panel variants. The slotted button retains native activation and refs. */
 export class Switch extends LitElement {
   static properties = { compact: { type: Boolean, reflect: true }, monochrome: { type: Boolean, reflect: true } };
-  compact = false;
-  monochrome = false;
+  declare compact: boolean;
+  declare monochrome: boolean;
+  constructor() { super(); this.compact = false; this.monochrome = false; }
   static styles = unsafeCSS(styles);
   focus(options?: FocusOptions) { this.querySelector<HTMLButtonElement>(":scope > button")?.focus(options); }
   render() { return html`<slot></slot>`; }
