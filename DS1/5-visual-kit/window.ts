@@ -8,6 +8,7 @@ export class DsWindow extends LitElement {
   static styles=css`
     :host { display:flex; flex-direction:column; min-width:0; height:var(--ds-window-height,100%); overflow:hidden; border-radius:12px; border:1px solid #0003; background:var(--ds-window-paper,#fff); box-shadow:0 20px 50px #0002; }
     :host([appearance=dark]) { border-color:#ffffff40; --ds-window-paper:#1c1c1e; }
+    :host([kind=macos-compact]) { border-radius:10px; box-shadow:none; border-color:color-mix(in srgb,var(--ds-text-color,#26251e) 10%,transparent); }
     ds-app-chrome { flex:none; } .viewport { position:relative; flex:1; min-height:0; overflow:hidden; }
     ::slotted(iframe) { display:block; width:100%; height:100%; border:0; }
   `;

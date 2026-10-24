@@ -17,7 +17,9 @@ try{
  const action=page.locator('#window').locator('ds-app-chrome').getByRole('button',{name:'Reload',exact:true});await action.click();await page.getByText('Chrome action: reload',{exact:true}).waitFor();
  await page.evaluate(()=>{const w=document.querySelector('#window');w.interactive=false;});
  await page.waitForFunction(()=>document.querySelector('#window').shadowRoot.querySelector('ds-app-chrome').shadowRoot.querySelector('button').disabled);
- for(const kind of ['macos','safari','chrome','edge']){await page.evaluate(k=>document.querySelector('#window').kind=k,kind);await page.waitForFunction(k=>document.querySelector('#window').shadowRoot.querySelector('ds-app-chrome').kind===k,kind);}
+ for(const kind of ['macos','safari','chrome','edge','macos-compact']){await page.evaluate(k=>document.querySelector('#window').kind=k,kind);await page.waitForFunction(k=>document.querySelector('#window').shadowRoot.querySelector('ds-app-chrome').kind===k,kind);}
+ const compact=await page.evaluate(()=>{const w=document.querySelector('#window'),bar=w.shadowRoot.querySelector('ds-app-chrome').shadowRoot.querySelector('.compact');return {height:bar.getBoundingClientRect().height,colours:[...bar.querySelectorAll('.lights button')].map(b=>getComputedStyle(b).backgroundColor),shadow:getComputedStyle(w).boxShadow};});
+ assert.equal(compact.height,20);assert.equal(new Set(compact.colours).size,1);assert.equal(compact.shadow,'none');
  const expectedHeight={safari:52,chrome:86,edge:80};
  for (const kind of ['safari','chrome','edge']) for(const appearance of ['light','dark']) {
    const specimen=page.locator(`#browsers ds-app-chrome[kind="${kind}"][appearance="${appearance}"]`);

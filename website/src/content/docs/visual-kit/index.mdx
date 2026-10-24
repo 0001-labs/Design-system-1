@@ -3,6 +3,7 @@ title: VisualKit
 description: Real app content, presented in windows and device frames.
 ---
 
+import CompactWindowExample from "../../../components/CompactWindowExample.astro";
 import DeviceBezelExample from "../../../components/DeviceBezelExample.astro";
 
 VisualKit supplies the surroundings for showing an app: desktop windows, device bezels and platform controls. It replaces the name FilmKit. The app content remains the product’s own code on sample records.
@@ -34,6 +35,18 @@ Choose `kind="macos|safari|chrome|edge"` and `appearance="light|dark"`. Use a re
 
 The `viewport` CSS part owns the app area. A slotted iframe fills it. Add `interactive` to emit `chrome-action` requests such as `back`, `reload` and `close`; the scene decides what those requests do.
 
+### Compact Mac
+
+A one-square title bar with three muted window controls and a centred address. Use `kind="macos-compact"` for this simplified presentation frame.
+
+<CompactWindowExample />
+
+```html
+<ds-window kind="macos-compact" address="shop.example" style="height:500px">
+  <iframe title="Shop design" src="/examples/layouts/shop/"></iframe>
+</ds-window>
+```
+
 ## Device bezels
 
 The catalogue includes 20 colour variants: iPhone 17 Pro Max, iPhone 17 Pro, iPhone 17, iPhone Air, iPad Pro 13, iPad Pro 11 and iPad mini. Measurements and artwork provenance follow the [supplied Figma community file](https://www.figma.com/design/8azymSnKt4pnYTZqdzQ7tF/?node-id=507-24672).
@@ -59,7 +72,7 @@ The inline example is public and includes the iPhone 17 Pro Max Deep Blue artwor
 
 ## App chrome
 
-`ds-app-chrome` draws the controls independently of the window or device artwork. Available kinds are `macos`, `safari`, `chrome`, `edge`, `ios`, `ipados` and `safari-ios`.
+`ds-app-chrome` draws the controls independently of the window or device artwork. Available kinds are `macos`, `macos-compact`, `safari`, `chrome`, `edge`, `ios`, `ipados` and `safari-ios`.
 
 ```html
 <ds-app-chrome kind="ios" time="00:01"></ds-app-chrome>

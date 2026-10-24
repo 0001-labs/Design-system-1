@@ -4,7 +4,7 @@ import '../2-core/ds-icon';
 import { browserIcon } from './browser-icons';
 import { browserStyles } from './browser-styles';
 
-export type AppChromeKind = 'macos' | 'ios' | 'ipados' | 'safari' | 'chrome' | 'edge' | 'safari-ios';
+export type AppChromeKind = 'macos' | 'macos-compact' | 'ios' | 'ipados' | 'safari' | 'chrome' | 'edge' | 'safari-ios';
 /** Platform presentation chrome. Controls emit requests; they never navigate or close the host app. */
 export class DsAppChrome extends LitElement {
   static properties = {
@@ -32,6 +32,11 @@ export class DsAppChrome extends LitElement {
     .lights button { width:12px; height:12px; border:1px solid #0002; border-radius:50%; background:#ff5f57; }
     .lights button:nth-child(2) { background:#febc2e; } .lights button:nth-child(3) { background:#28c840; }
     .lights svg { --chrome-icon-size:8px; opacity:0; width:8px; height:8px; stroke:#333; } :host([interactive]) .lights:hover svg { opacity:1; }
+    .compact { height:20px; box-sizing:border-box; position:relative; display:flex; justify-content:center; align-items:flex-start; padding-top:3px; border-bottom:1px solid var(--chrome-line); font:12px/16px var(--ds-typeface-regular,system-ui,sans-serif); }
+    .compact .lights { position:absolute; left:0; top:3px; width:60px; height:16px; padding:0; gap:0; }
+    .compact .lights button { flex:none; width:10px; height:10px; margin:0 7px 0 3px; border:0; background:color-mix(in srgb,var(--chrome-ink,#26251e) 18%,transparent); }
+    .compact .title { flex:initial; max-width:calc(100% - 120px); padding:0; font-weight:400; }
+    :host([appearance=dark]) .compact { --chrome-ink:#eee; }
     .native { height:38px; display:flex; align-items:center; border-bottom:1px solid var(--chrome-line); }
     .title { text-align:center; flex:1; padding-right:72px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; font-weight:600; }
     .tabs { display:flex; align-items:center; height:38px; gap:8px; padding-right:8px; }
@@ -65,6 +70,7 @@ export class DsAppChrome extends LitElement {
   private location() { return html`<div class="address">${this.icon('lock')}<span>${this.address}</span>${this.control('reload','Reload')}</div>`; }
   render() {
     if(this.kind==='ios'||this.kind==='ipados') return html`<div class="status"><span class="clock">${this.time}</span><span class="island-space"></span><span class="levels"><span class="cellular" aria-label="Full signal"><i></i><i></i><i></i><i></i></span>${this.assetBase ? html`<img class="wifi" alt="Wi-Fi" src=${this.assetBase+'status-wifi.svg'}><img class="battery" alt="Full battery" src=${this.assetBase+'status-battery.svg'}>` : html`<ds-icon type="wifi" class="wifi" aria-label="Wi-Fi" style="--ds-icon-size:19px"></ds-icon><span class="battery-fallback" role="img" aria-label="Full battery"></span>`}</span></div>`;
+    if(this.kind==='macos-compact') return html`<div class="compact">${this.lights()}<span class="title">${this.address || this.label}</span></div>`;
     if(this.kind==='macos') return html`<div class="native">${this.lights()}<span class="title">${this.label}</span><slot name="controls"></slot></div>`;
     if(this.kind==='safari-ios') return html`<div class="mobile">${this.location()}<div class="mobile-actions">${this.control('back','Back')}${this.control('forward','Forward')}${this.control('share','Share')}${this.control('tabs','Tabs')}</div></div>`;
     if(this.kind==='safari') return html`<div class="toolbar safari-toolbar">${this.lights()}<div class="safari-group sidebar-group">${this.control('sidebar','Sidebar')}${this.control('chevron-down','Tab groups')}</div><div class="safari-group history">${this.control('back','Back',this.backAvailable)}${this.control('forward','Forward',this.forwardAvailable)}</div><div class="address safari-address">${this.favicon?html`<img class="favicon" src=${this.favicon} alt="">`:nothing}<span>${this.address}</span>${this.control('page-menu','Page menu')}</div><div class="safari-group safari-actions">${this.control('share','Share')}${this.control('plus','New tab')}${this.control('tabs','Tab overview')}</div></div>`;
