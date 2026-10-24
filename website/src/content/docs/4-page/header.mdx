@@ -79,3 +79,9 @@ import { Header } from "./design/react/header";
 The adapter does not register the element: import `4-page/ds-header` once in the browser entry. Sync 1 copies `react/header.ts` when a product names `header` in its `components`.
 
 [Footer](/4-page/footer/) · [Document](/4-page/document/) · [Layout](/4-page/layout/) · [Overlay](/4-page/overlay/)
+
+### Internal component identity
+
+The owner's documentation view shows each component's glossary code and version beside its title. The private Component glossary lists the same canonical values from `shared/component-codes.json`. Public titles keep their usual names.
+
+Component versions start at `0.1.0` when individual tracking begins; they do not reconstruct earlier releases. They are independent of the package version. Increment the affected component's patch for a compatible fix, minor for a new compatible capability, and major for a breaking change. Keep a component's version unchanged when only another component changes.

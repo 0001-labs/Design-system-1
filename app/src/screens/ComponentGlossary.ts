@@ -26,7 +26,7 @@ export class ComponentGlossary extends AppElement {
   override render() {
     const selected = ALL_LAYERS.find(entry => entry.number === this.layer)!;
     const layerCodes = codes.filter(code => selected.entries.some(entry => code.url === `https://designsystem1.com${entry.href}`));
-    const matches = layerCodes.filter(entry => `${entry.code} ${entry.label}`.toLowerCase().includes(this.query.trim().toLowerCase())).sort((a, b) => a.code.localeCompare(b.code));
+    const matches = layerCodes.filter(entry => `${entry.code} ${entry.label} ${entry.version}`.toLowerCase().includes(this.query.trim().toLowerCase())).sort((a, b) => a.code.localeCompare(b.code));
     return html`<main class="adoption">
       <header class="adoption-heading">
         <div><p class="adoption-eyebrow"><a href="#adoption">Component adoption</a> · Private</p><h1>Component glossary</h1></div>
@@ -42,8 +42,8 @@ export class ComponentGlossary extends AppElement {
           <label>Find a code or component <input class="ds-input" type="search" .value=${live(this.query)} @input=${(event: Event) => { this.query = (event.target as HTMLInputElement).value; }} /></label>
         </div>
         <p role="status">${matches.length} of ${layerCodes.length} ${selected.name} codes</p>
-        <table class="ds-table"><thead><tr><th scope="col">Code</th><th scope="col">Component</th></tr></thead>
-          <tbody>${repeat(matches, entry => entry.id, entry => html`<tr><td style="font-family: var(--ds-typeface-mono, var(--typeface-mono))">${entry.code}</td><td><a href=${entry.url}>${entry.label}</a></td></tr>`)}</tbody>
+        <table class="ds-table"><thead><tr><th scope="col">Code</th><th scope="col">Component</th><th scope="col">Version</th></tr></thead>
+          <tbody>${repeat(matches, entry => entry.id, entry => html`<tr><td style="font-family: var(--ds-typeface-mono, var(--typeface-mono))">${entry.code}</td><td><a href=${entry.url}>${entry.label}</a></td><td>${entry.version}</td></tr>`)}</tbody>
         </table>
       </section>
     </main>`;

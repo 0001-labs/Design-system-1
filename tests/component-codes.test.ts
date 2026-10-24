@@ -10,3 +10,11 @@ describe('component glossary', () => {
     }
   });
 });
+
+describe('component versions', () => {
+  test('every component has an independent semantic version', () => {
+    for (const entry of codes) {
+      expect(entry.version, entry.label).toMatch(/^\d+\.\d+\.\d+$/);
+    }
+  });
+});
