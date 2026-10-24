@@ -1,21 +1,13 @@
+@import "../DS1/1-root/header.css";
 :root {
   --site-unit: calc(20px * var(--sf, 1));
   --site-header-height: calc(2 * var(--site-unit));
 }
 .site-navigation {
-  display: grid;
+  --ds-header-brand: auto;
   grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: var(--site-unit);
-  height: var(--site-header-height);
-  padding: 0 var(--site-unit);
-  background: var(--background);
-  color: var(--text-color);
-  box-shadow: inset 0 -1px color-mix(in srgb, var(--text-color) 20%, transparent);
-  font-family: var(--typeface-regular);
-  font-size: calc(14px * var(--sf, 1));
-  line-height: var(--site-unit);
 }
+
 .site-navigation .site-brand,
 .site-navigation .site-links a,
 .site-navigation .site-account {

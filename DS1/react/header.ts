@@ -2,7 +2,7 @@ import { createElement, forwardRef, type HTMLAttributes } from "react";
 import type { Header as HeaderElement } from "../4-page/ds-header";
 
 export type HeaderProps = HTMLAttributes<HeaderElement> &
-  Partial<Pick<HeaderElement, "brand" | "href" | "label" | "literal" | "sticky">>;
+  Partial<Pick<HeaderElement, "variant" | "brand" | "href" | "label" | "literal" | "sticky">>;
 /**
  * A site header. Its navigation is the children: `<a href>` links, in the
  * light DOM so they render on the server; actions take `slot="actions"`, a

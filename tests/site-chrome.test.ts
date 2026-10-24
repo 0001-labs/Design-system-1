@@ -282,3 +282,20 @@ test("a footer's preferences, and a document's heading ids and levels, read thei
   expect(documentLevels("3 2")).toEqual([2, 3]);
   expect(documentLevels("1 7 x")).toEqual([2]);
 });
+
+
+test("app header uses the compact variant while preserving its home link", async () => {
+  const header = document.createElement('ds-header');
+  header.variant = 'app';
+  header.brand = 'Workspace';
+  header.literal = true;
+  header.href = '/workspace';
+  document.body.append(header);
+  await header.updateComplete;
+  expect(header.shadowRoot!.querySelector('header')!.classList.contains('ds-header--app')).toBe(true);
+  expect(header.shadowRoot!.querySelector('[part="brand"]')!.getAttribute('href')).toBe('/workspace');
+  expect(header.shadowRoot!.querySelector('[part="toggle"]')!.hasAttribute('hidden')).toBe(true);
+  header.variant = 'site';
+  await header.updateComplete;
+  expect(header.shadowRoot!.querySelector('header')!.classList.contains('ds-header--app')).toBe(false);
+});

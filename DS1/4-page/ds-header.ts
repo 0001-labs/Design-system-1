@@ -23,6 +23,7 @@ export const MENU_LABEL = "Menu";
  * @prop {string} href - Where the brand links. `/` by default.
  * @prop {string} label - The navigation's accessible name, when a page has more than one.
  * @prop {boolean} literal - Show `brand` as written, never looked up.
+ * @prop {"site" | "app"} variant - Site navigation or a compact app title bar.
  * @prop {boolean} sticky - Stay at the top of the page as it scrolls, on the paper.
  *
  * @slot - The navigation: `<a href>` links, one square high. The link to the
@@ -46,6 +47,7 @@ export const MENU_LABEL = "Menu";
  */
 export class Header extends LitElement {
   static properties = {
+    variant: { type: String, reflect: true },
     brand: { type: String },
     href: { type: String },
     label: { type: String },
@@ -55,6 +57,7 @@ export class Header extends LitElement {
 
   static styles = [unsafeCSS(metrics), unsafeCSS(controls), unsafeCSS(styles)];
 
+  declare variant: "site" | "app";
   declare brand: string | undefined;
   declare href: string;
   declare label: string | undefined;
@@ -66,6 +69,7 @@ export class Header extends LitElement {
 
   constructor() {
     super();
+    this.variant = "site";
     this.href = "/";
     this.literal = false;
     this.sticky = false;
@@ -146,7 +150,7 @@ export class Header extends LitElement {
       : this.brand
         ? html`<a class="ds-header__brand" part="brand" href=${this.href || "/"}>${this.words(this.brand)}</a>`
         : html`<slot name="brand" @slotchange=${this.relabel}></slot>`;
-    return html`<header class="ds-header${this.sticky ? " ds-header--sticky" : ""}" part="header">
+    return html`<header class="ds-header${this.variant === "app" ? " ds-header--app" : ""}${this.sticky ? " ds-header--sticky" : ""}" part="header">
       ${brand}
       <nav class="ds-header__nav" part="nav" id="nav" aria-label=${this.label ? this.words(this.label) : nothing} ?hidden=${!hasNav}><slot @slotchange=${this.onNavChange}></slot></nav>
       <div class="ds-header__actions" part="actions" ?hidden=${!hasActions}><slot name="actions" @slotchange=${this.relabel}></slot></div>

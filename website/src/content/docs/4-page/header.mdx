@@ -10,6 +10,16 @@ A site header is one row of one square with a square of room around it: the bran
 Below thirty squares of width the navigation and actions fold away. A menu button, an icon button in the row's last square, opens them over the whole screen, [Overlay](/4-page/overlay/#the-screen)'s screen type on the page's paper, its close button where the menu button stood, the links one square each. While it is open, Tab and Shift+Tab go round its controls and never leave it, Escape, the close button, a link or the screen widening close it, and the page behind holds its scroll and gets it back as it was. Closing returns focus to the menu button.
 
 
+## App header
+
+Use `variant="app"` for a simple app title bar: two squares high, one square of horizontal inset, the regular title weight and a bottom hairline. It follows the current theme. The title links home; actions and navigation retain the header’s existing responsive behavior.
+
+```html
+<ds-header variant="app" brand="Workspace" literal></ds-header>
+```
+
+The matching server-rendered compatibility form is `<header class="ds-header ds-header--app">` with a `ds-header__brand` link. Both forms use the same canonical `header.css` rules.
+
 ## Design examples
 
 <ComponentExample example="header-gallery" />
@@ -32,6 +42,7 @@ The links are the page's own `<a href>` elements, in the page, so they render wi
 
 | Attribute | Type | Default | What it does |
 | --- | --- | --- | --- |
+| `variant` | `site` or `app` | `site` | Full site navigation or compact app title bar. |
 | `brand` | string | Empty | The site's name, a link home: a translation key, or the words with `literal`. |
 | `href` | string | `/` | Where the brand links. |
 | `label` | string | Empty | The navigation's accessible name, when a page has more than one. |
@@ -41,6 +52,7 @@ The links are the page's own `<a href>` elements, in the page, so they render wi
 | Slot | What it holds |
 | --- | --- |
 | Default | The navigation's links. |
+| `variant` | `site` or `app` | `site` | Full site navigation or compact app title bar. |
 | `brand` | A brand of the page's own: a logo, one square high. |
 | `actions` | Buttons or links at the end of the row. |
 

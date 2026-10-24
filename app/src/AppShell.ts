@@ -71,7 +71,7 @@ export class AppShell extends AppElement {
       ? { id: editor.id!, name: library.name, publishedVersion: library.publishedVersion, component: libraryComponent(search.get("component")), ...(search.get("view") === "overview" ? { view: "overview" as const } : {}) } : null;
     const account = isAuthenticated ? "/profile" : signInPath;
     return html`<div class="app-shell">
-      <header class="site-navigation" data-ds-area="Navigation">
+      <header class="ds-header ds-header--app site-navigation" data-ds-area="Navigation">
         <div class="system-breadcrumb" aria-label="System breadcrumb">
           <a class="site-brand" href="/" target=${ifDefined(embedded ? "_top" : undefined)}>Design system 1</a>
         </div>
