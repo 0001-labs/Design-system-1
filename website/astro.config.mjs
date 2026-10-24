@@ -8,6 +8,7 @@ export default defineConfig({
   site: "https://designsystem1.com",
   // Checkbox and Switch were one page; the old address goes to the checkbox (19 October 2026).
   redirects: {
+    "/advanced/film-kit/": "/visual-kit/",
     "/2-core/choice/": "/2-core/checkbox/",
     // Pricing became part of Formatting (21 October 2026).
     "/1-root/pricing/": "/1-root/formatting/#prices",
@@ -183,7 +184,13 @@ export default defineConfig({
           items: [
             { label: "Native", slug: "advanced/native" },
             { label: "Email kit", slug: "email" },
-            { label: "Film kit", slug: "advanced/film-kit" },
+            { label: "VisualKit", items: [
+              { label: "Overview", slug: "visual-kit" },
+              { label: "Windows", slug: "visual-kit/windows" },
+              { label: "Device Bezels", slug: "visual-kit/device-bezels" },
+              { label: "AppChrome", slug: "visual-kit/app-chrome" },
+              { label: "App content", slug: "visual-kit/app-content" },
+            ] },
             { label: "Text editor", link: "https://aa.0001.dev" },
           ],
         },

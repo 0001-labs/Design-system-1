@@ -62,7 +62,7 @@ describe("combined website routes", () => {
   });
 
   it("gates App docs and every asset on the docs and dashboard hosts", async () => {
-    for (const path of ['/private-app/', '/private-app/app.js', '/private-app/app.css', '/private-app/index.html']) {
+    for (const path of ['/private-app/', '/private-app/app.js', '/private-app/app.css', '/private-app/visual-kit.html', '/private-app/visual-kit.js', '/private-app/iphone-17-pro-max-deep-blue.png', '/private-app/status-wifi.svg', '/private-app/index.html']) {
       expect((await site.fetch(path, { redirect: 'manual' })).status).toBe(302);
       expect((await site.fetch('https://www.designsystem1.com' + path, { redirect: 'manual' })).status).toBe(404);
       expect((await site.fetch('https://adoption.designsystem1.com' + path, { redirect: 'manual' })).status).toBe(302);

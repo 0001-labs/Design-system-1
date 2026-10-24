@@ -1,0 +1,402 @@
+[
+  {
+    "id": "iphone-17-pro-max-deep-blue",
+    "label": "iPhone 17 Pro Max \u00b7 Deep Blue",
+    "width": 490,
+    "height": 1000,
+    "screen": {
+      "x": 25,
+      "y": 22,
+      "width": 440,
+      "height": 956,
+      "radius": 58
+    },
+    "kind": "phone",
+    "asset": "assets/iphone-17-pro-max-deep-blue.png",
+    "source": {
+      "file": "8azymSnKt4pnYTZqdzQ7tF",
+      "node": "6316:14156"
+    },
+    "sha256": "5201a518fd2d3c6f968ad522a195c24793d7583e1d011d618aa705383bdde4da"
+  },
+  {
+    "id": "iphone-17-pro-max-cosmic-orange",
+    "label": "iPhone 17 Pro Max \u00b7 Cosmic Orange",
+    "width": 490,
+    "height": 1000,
+    "screen": {
+      "x": 25,
+      "y": 22,
+      "width": 440,
+      "height": 956,
+      "radius": 58
+    },
+    "kind": "phone",
+    "asset": "assets/iphone-17-pro-max-cosmic-orange.png",
+    "source": {
+      "file": "8azymSnKt4pnYTZqdzQ7tF",
+      "node": "6316:14158"
+    },
+    "sha256": "9adbcbd505c9432249b578028a55807399f45a5d8e56280cffe9d16e9f02aabc"
+  },
+  {
+    "id": "iphone-17-pro-max-silver",
+    "label": "iPhone 17 Pro Max \u00b7 Silver",
+    "width": 490,
+    "height": 1000,
+    "screen": {
+      "x": 25,
+      "y": 22,
+      "width": 440,
+      "height": 956,
+      "radius": 58
+    },
+    "kind": "phone",
+    "asset": "assets/iphone-17-pro-max-silver.png",
+    "source": {
+      "file": "8azymSnKt4pnYTZqdzQ7tF",
+      "node": "6316:14160"
+    },
+    "sha256": "171f0a393dc89af4b7d72ba13fe0faa210adec904debcb1657abade46d52792a"
+  },
+  {
+    "id": "iphone-17-pro-deep-blue",
+    "label": "iPhone 17 Pro \u00b7 Deep Blue",
+    "width": 450,
+    "height": 920,
+    "screen": {
+      "x": 24,
+      "y": 23,
+      "width": 402,
+      "height": 874,
+      "radius": 58
+    },
+    "kind": "phone",
+    "asset": "assets/iphone-17-pro-deep-blue.png",
+    "source": {
+      "file": "8azymSnKt4pnYTZqdzQ7tF",
+      "node": "6316:14139"
+    },
+    "sha256": "be6e86313b4ae73abc5066f2c118ff122577d798a2c4f12acd4cf8f5615138cd"
+  },
+  {
+    "id": "iphone-17-pro-cosmic-orange",
+    "label": "iPhone 17 Pro \u00b7 Cosmic Orange",
+    "width": 450,
+    "height": 920,
+    "screen": {
+      "x": 24,
+      "y": 23,
+      "width": 402,
+      "height": 874,
+      "radius": 58
+    },
+    "kind": "phone",
+    "asset": "assets/iphone-17-pro-cosmic-orange.png",
+    "source": {
+      "file": "8azymSnKt4pnYTZqdzQ7tF",
+      "node": "6316:14141"
+    },
+    "sha256": "99dd842e1f0f55106329cb72486231e6275c76d8ff266f12402be5c0c35ec417"
+  },
+  {
+    "id": "iphone-17-pro-silver",
+    "label": "iPhone 17 Pro \u00b7 Silver",
+    "width": 450,
+    "height": 920,
+    "screen": {
+      "x": 24,
+      "y": 23,
+      "width": 402,
+      "height": 874,
+      "radius": 58
+    },
+    "kind": "phone",
+    "asset": "assets/iphone-17-pro-silver.png",
+    "source": {
+      "file": "8azymSnKt4pnYTZqdzQ7tF",
+      "node": "6316:14148"
+    },
+    "sha256": "5b5219661fea8955d72e5e9f0d6c81b6b0631f86f57967b66fb10a614e940763"
+  },
+  {
+    "id": "iphone-17-black",
+    "label": "iPhone 17 \u00b7 Black",
+    "width": 450,
+    "height": 920,
+    "screen": {
+      "x": 24,
+      "y": 23,
+      "width": 402,
+      "height": 874,
+      "radius": 58
+    },
+    "kind": "phone",
+    "asset": "assets/iphone-17-black.png",
+    "source": {
+      "file": "8azymSnKt4pnYTZqdzQ7tF",
+      "node": "6316:14214"
+    },
+    "sha256": "d764eef3dea74910c02ad1c0cef2da6150964c422e1ccc16bb63f75cb8a03dde"
+  },
+  {
+    "id": "iphone-17-lavender",
+    "label": "iPhone 17 \u00b7 Lavender",
+    "width": 450,
+    "height": 920,
+    "screen": {
+      "x": 24,
+      "y": 23,
+      "width": 402,
+      "height": 874,
+      "radius": 58
+    },
+    "kind": "phone",
+    "asset": "assets/iphone-17-lavender.png",
+    "source": {
+      "file": "8azymSnKt4pnYTZqdzQ7tF",
+      "node": "6316:14201"
+    },
+    "sha256": "14fb88dbb7a9e8d49a0295d4a4f69c53043aed325cf087cdf4c7be56b3c07aa8"
+  },
+  {
+    "id": "iphone-17-mist-blue",
+    "label": "iPhone 17 \u00b7 Mist Blue",
+    "width": 450,
+    "height": 920,
+    "screen": {
+      "x": 24,
+      "y": 23,
+      "width": 402,
+      "height": 874,
+      "radius": 58
+    },
+    "kind": "phone",
+    "asset": "assets/iphone-17-mist-blue.png",
+    "source": {
+      "file": "8azymSnKt4pnYTZqdzQ7tF",
+      "node": "6316:14203"
+    },
+    "sha256": "3aeda397a767db837446974661b8e7b04a01e332a206f3f5fe9dbaa0a45ad95c"
+  },
+  {
+    "id": "iphone-17-sage",
+    "label": "iPhone 17 \u00b7 Sage",
+    "width": 450,
+    "height": 920,
+    "screen": {
+      "x": 24,
+      "y": 23,
+      "width": 402,
+      "height": 874,
+      "radius": 58
+    },
+    "kind": "phone",
+    "asset": "assets/iphone-17-sage.png",
+    "source": {
+      "file": "8azymSnKt4pnYTZqdzQ7tF",
+      "node": "6316:14210"
+    },
+    "sha256": "cededf6b27f8adb9a6d3aa455b243f8a83357d973e1a9bca9b7fea9d260e7a0f"
+  },
+  {
+    "id": "iphone-17-white",
+    "label": "iPhone 17 \u00b7 White",
+    "width": 450,
+    "height": 920,
+    "screen": {
+      "x": 24,
+      "y": 23,
+      "width": 402,
+      "height": 874,
+      "radius": 58
+    },
+    "kind": "phone",
+    "asset": "assets/iphone-17-white.png",
+    "source": {
+      "file": "8azymSnKt4pnYTZqdzQ7tF",
+      "node": "6316:14212"
+    },
+    "sha256": "fb93a0b6e95e8c3c5ad923a8437e598746f5d4fa63ea971650172cb93727006a"
+  },
+  {
+    "id": "iphone-air-space-black",
+    "label": "iPhone Air \u00b7 Space Black",
+    "width": 460,
+    "height": 960,
+    "screen": {
+      "x": 20,
+      "y": 24,
+      "width": 420,
+      "height": 912,
+      "radius": 58
+    },
+    "kind": "phone",
+    "asset": "assets/iphone-air-space-black.png",
+    "source": {
+      "file": "8azymSnKt4pnYTZqdzQ7tF",
+      "node": "6316:14177"
+    },
+    "sha256": "ead07eae45490fd6ab268cb9d831bd21eb532668323660be94eda26ef5896044"
+  },
+  {
+    "id": "iphone-air-cloud-white",
+    "label": "iPhone Air \u00b7 Cloud White",
+    "width": 460,
+    "height": 960,
+    "screen": {
+      "x": 20,
+      "y": 24,
+      "width": 420,
+      "height": 912,
+      "radius": 58
+    },
+    "kind": "phone",
+    "asset": "assets/iphone-air-cloud-white.png",
+    "source": {
+      "file": "8azymSnKt4pnYTZqdzQ7tF",
+      "node": "6316:14173"
+    },
+    "sha256": "f9f36f8a17082e2873e1a7f2468239764f7285783c2e7f4aacc4a87121f904e2"
+  },
+  {
+    "id": "iphone-air-light-gold",
+    "label": "iPhone Air \u00b7 Light Gold",
+    "width": 460,
+    "height": 960,
+    "screen": {
+      "x": 20,
+      "y": 24,
+      "width": 420,
+      "height": 912,
+      "radius": 58
+    },
+    "kind": "phone",
+    "asset": "assets/iphone-air-light-gold.png",
+    "source": {
+      "file": "8azymSnKt4pnYTZqdzQ7tF",
+      "node": "6316:14179"
+    },
+    "sha256": "2d55104121567ee2dc5e2c1cfec97e8ff785fefabd640dbf5bb7601b73ae3cbe"
+  },
+  {
+    "id": "iphone-air-sky-blue",
+    "label": "iPhone Air \u00b7 Sky Blue",
+    "width": 460,
+    "height": 960,
+    "screen": {
+      "x": 20,
+      "y": 24,
+      "width": 420,
+      "height": 912,
+      "radius": 58
+    },
+    "kind": "phone",
+    "asset": "assets/iphone-air-sky-blue.png",
+    "source": {
+      "file": "8azymSnKt4pnYTZqdzQ7tF",
+      "node": "6316:14175"
+    },
+    "sha256": "c46ed05b51e682d0cdc8b98c024f184052b83e98b50b996776affc26e30f702b"
+  },
+  {
+    "id": "ipad-pro-13-silver",
+    "label": "iPad Pro 13 M4 \u00b7 Silver",
+    "width": 1500,
+    "height": 1150,
+    "screen": {
+      "x": 62,
+      "y": 58,
+      "width": 1376,
+      "height": 1034,
+      "radius": 28
+    },
+    "kind": "tablet",
+    "asset": "assets/ipad-pro-13-silver.png",
+    "source": {
+      "file": "8azymSnKt4pnYTZqdzQ7tF",
+      "node": "5456:18569"
+    },
+    "sha256": "3e4b8861eb65fb1cccccd0c801a87cf64ebc32f6e7d7958cfdbbc71e38342786"
+  },
+  {
+    "id": "ipad-pro-13-space-gray",
+    "label": "iPad Pro 13 M4 \u00b7 Space Gray",
+    "width": 1500,
+    "height": 1150,
+    "screen": {
+      "x": 62,
+      "y": 58,
+      "width": 1376,
+      "height": 1034,
+      "radius": 28
+    },
+    "kind": "tablet",
+    "asset": "assets/ipad-pro-13-space-gray.png",
+    "source": {
+      "file": "8azymSnKt4pnYTZqdzQ7tF",
+      "node": "6316:14233"
+    },
+    "sha256": "3726ce8044fd2e9f324a16d3052bb50df2c465907bb0e4c685b23b5b184bbb51"
+  },
+  {
+    "id": "ipad-pro-11-silver",
+    "label": "iPad Pro 11 M4 \u00b7 Silver",
+    "width": 1320,
+    "height": 940,
+    "screen": {
+      "x": 55,
+      "y": 53,
+      "width": 1210,
+      "height": 834,
+      "radius": 28
+    },
+    "kind": "tablet",
+    "asset": "assets/ipad-pro-11-silver.png",
+    "source": {
+      "file": "8azymSnKt4pnYTZqdzQ7tF",
+      "node": "6318:14240"
+    },
+    "sha256": "56f18a846b4550daaa467a2a109ca782bfb181f6cc5550aedb24603d593173ba"
+  },
+  {
+    "id": "ipad-pro-11-space-gray",
+    "label": "iPad Pro 11 M4 \u00b7 Space Gray",
+    "width": 1320,
+    "height": 940,
+    "screen": {
+      "x": 55,
+      "y": 53,
+      "width": 1210,
+      "height": 834,
+      "radius": 28
+    },
+    "kind": "tablet",
+    "asset": "assets/ipad-pro-11-space-gray.png",
+    "source": {
+      "file": "8azymSnKt4pnYTZqdzQ7tF",
+      "node": "6316:14230"
+    },
+    "sha256": "d99fc01ae74ca902b367bea3030a539a0eaa33499d0d63755123350a80be93a5"
+  },
+  {
+    "id": "ipad-mini-starlight",
+    "label": "iPad mini \u00b7 Starlight",
+    "width": 1275,
+    "height": 890,
+    "screen": {
+      "x": 71,
+      "y": 73,
+      "width": 1133,
+      "height": 744,
+      "radius": 28
+    },
+    "kind": "tablet",
+    "asset": "assets/ipad-mini-starlight.png",
+    "source": {
+      "file": "8azymSnKt4pnYTZqdzQ7tF",
+      "node": "5456:18828"
+    },
+    "sha256": "0aa306bc59f442d913b1d996e59c4b31a5347a1119360acfbbbc249be913ee18"
+  }
+]

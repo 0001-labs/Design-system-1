@@ -54,7 +54,7 @@ describe('private dashboard HTML and session bridge', () => {
 });
 
 describe('private App documentation and assets', () => {
-  for (const path of ['/private-app/', '/private-app/app.js', '/private-app/app.css']) for (const host of [origin, 'https://designsystem1.com']) {
+  for (const path of ['/private-app/', '/private-app/app.js', '/private-app/app.css', '/private-app/visual-kit.html', '/private-app/visual-kit.js', '/private-app/iphone-17-pro-max-deep-blue.png', '/private-app/status-wifi.svg']) for (const host of [origin, 'https://designsystem1.com']) {
     it(`gates ${host}${path} using the verified pinned owner`, async () => {
       const { env, send, assets } = setup();
       const url = host + path;

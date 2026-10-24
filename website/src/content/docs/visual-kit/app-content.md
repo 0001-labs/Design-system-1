@@ -1,11 +1,11 @@
 ---
-title: Film kit
+title: App content
 description: A product's films play its real, deployed app, published as a kit with every deploy.
 ---
 
-A product film shows the app as it is deployed today. Film kit makes that so: with every deploy the product publishes its own app as a **kit**, and the film loads that kit from the product's site. Nobody rebuilds the app inside the film, and every render records the revision it showed.
+A product film shows the app as it is deployed today. VisualKit makes that so: with every deploy the product publishes its own app as a **kit**, and the film loads that kit from the product's site. Nobody rebuilds the app inside the film, and every render records the revision it showed.
 
-**Status: first version.** Film kit is a part of the 0001 System, copied with Sync 1 like any other shared source. Any product that builds with Vite (Vite+, plain Vite or Astro) and serves static files can publish one.
+**Status: first version.** VisualKit is a part of the 0001 System, copied with Sync 1 like any other shared source. Any product that builds with Vite (Vite+, plain Vite or Astro) and serves static files can publish one.
 
 ## What a kit is
 
@@ -15,13 +15,13 @@ The product's real app on made-up records: the app's own root component, every s
 - **Published with every deploy** at `https://<site>/kit/`: `latest.json`, which names the current revision, and `<revision>/` with `kit.js`, `kit.css`, the files the stylesheet takes from `public/`, and `manifest.json`.
 - **The revision is the content's hash.** The manifest lists every file with its sha256 and the commit it was built from. An unchanged kit keeps its revision across deploys.
 
-Film kit has four files, each a Sync 1 export:
+VisualKit has four files, each a Sync 1 export:
 
 | File | Export | Taken by | What it does |
 | --- | --- | --- | --- |
 | `build.mjs` | `build` | The product | Bundles the kit entry with the product's own Vite and writes `dist/kit/` |
 | `serve.ts` | `serve` | The product, when a Worker answers first | `filmKit(request, env.ASSETS)` answers `/kit/` for every origin |
-| `player.js` | `player` | The film project | `window.FilmKits`: finds a kit, loads it into the film's page and pins its revision |
+| `player.js` | `player` | The film project | `window.VisualKits`: finds a kit, loads it into the film's page and pins its revision |
 | `pull.mjs` | `pull` | The film project | Keeps a checked local copy of a kit |
 
 ## In the product
@@ -30,10 +30,10 @@ The example is a React app served by a Worker, its kit named `ledger`.
 
 ### 1. Take the build through Sync 1
 
-Add Film kit to `sync.json`. Take `serve` as well when a Worker answers requests before the static files.
+Add VisualKit to `sync.json`. Take `serve` as well when a Worker answers requests before the static files.
 
 ```json
-"Film kit": {
+"VisualKit": {
   "build": { "to": "scripts/film-kit" },
   "serve": { "to": "server/film-kit" }
 }
@@ -55,7 +55,7 @@ createRoot(document.getElementById("root")!).render(<App />);
 
 ### 3. Write the kit entry
 
-The entry imports the root, answers the app's network from sample records, and sets `window.FilmKit`. `mount(element, options)` is all a film must have. Anything else the films drive, such as how many requests are still open, is the product's own.
+The entry imports the root, answers the app's network from sample records, and sets `window.VisualKit`. `mount(element, options)` is all a film must have. Anything else the films drive, such as how many requests are still open, is the product's own.
 
 ```tsx
 // src/film/kit.tsx
@@ -85,7 +85,7 @@ function mount(element: HTMLElement, options: { today: string }) {
   flushSync(() => root!.render(<App />));
 }
 
-window.FilmKit = { name: "ledger", mount };
+window.VisualKit = { name: "ledger", mount };
 ```
 
 Answer a save with the app's own validation and keep the result, so what the app does to its records in a film is the app's own code.
@@ -149,7 +149,7 @@ curl -sI https://<site>/kit/<revision>/manifest.json
 Add one line to `scenes/kits/hosts.js`, the list of where each product publishes its kit:
 
 ```js
-FilmKits.register('ledger', 'https://<site>/kit/');
+VisualKits.register('ledger', 'https://<site>/kit/');
 ```
 
 ### Load the kit
@@ -157,14 +157,14 @@ FilmKits.register('ledger', 'https://<site>/kit/');
 A scene loads `../film-kit/player.js` and `../kits/hosts.js`, resolves the kit, and writes its tags into the app's own page, an iframe's `srcdoc`. Anything that must run before the app, such as a film clock, goes before the kit's tags.
 
 ```js
-const kit = await FilmKits.resolve('ledger', story.kit);
+const kit = await VisualKits.resolve('ledger', story.kit);
 frame.srcdoc = `<!doctype html><html><head><meta charset="utf-8"></head><body>
   <div id="root"></div>
   <script src="../my-film/clock.js"></script>
-  ${FilmKits.tags(kit)}
+  ${VisualKits.tags(kit)}
 </body></html>`;
 frame.addEventListener('load', () => {
-  frame.contentWindow.FilmKit.mount(frame.contentDocument.getElementById('root'), { today: '2026-10-19' });
+  frame.contentWindow.VisualKit.mount(frame.contentDocument.getElementById('root'), { today: '2026-10-19' });
 }, { once: true });
 ```
 
@@ -172,10 +172,10 @@ frame.addEventListener('load', () => {
 
 ### Typefaces
 
-Captions drawn beside the app take the app's typefaces from the same kit. `FilmKits.fontFaces()` returns the kit's `@font-face` rules for the named families, with their addresses made absolute, as CSS for the film's own page:
+Captions drawn beside the app take the app's typefaces from the same kit. `VisualKits.fontFaces()` returns the kit's `@font-face` rules for the named families, with their addresses made absolute, as CSS for the film's own page:
 
 ```js
-style.textContent = await FilmKits.fontFaces(kit, ['GT-America-Standard-Regular', 'Iosevka']);
+style.textContent = await VisualKits.fontFaces(kit, ['GT-America-Standard-Regular', 'Iosevka']);
 ```
 
 ### Choose a version
@@ -192,7 +192,7 @@ Each kit resolves once per page load, so a page never mixes two revisions. When 
 
 ### Renders pin their revision
 
-The renderer reads the revisions its first page took (`FilmKits.settled()`, or `FilmKits.pinQuery()` as a `kit=` query) and opens every other capture page on the same ones. The render's manifest records them under `kits`.
+The renderer reads the revisions its first page took (`VisualKits.settled()`, or `VisualKits.pinQuery()` as a `kit=` query) and opens every other capture page on the same ones. The render's manifest records them under `kits`.
 
 ### Keep a local copy
 
@@ -206,3 +206,7 @@ vp run kit:pull ledger
 
 1. **A host keeps only its current revision.** Each deploy replaces the last kit. A film pinned to an older revision plays only from a pulled copy.
 2. **Films find controls by their labels.** A film presses the app's controls by their accessible names (`[aria-label="Show the calendar"]`) and finds rows by their words. Renaming a label in the product breaks the film that uses it, from the next deploy on. Play the product's films after changing words they use, or pin them to a pulled revision.
+
+## Existing kits
+
+The former `Film kit` Sync 1 source and `FilmKit` / `FilmKits` globals remain compatible aliases. Existing `/kit/` URLs, revision hashes and recorded films keep their meaning. New entries use `VisualKit`; new players use `VisualKits`. The source folder remains `0001/system/parts/film-kit` so existing copies continue to resolve.

@@ -1,0 +1,24 @@
+import { chromium } from 'playwright';
+import { createServer } from 'node:http';
+import { readFile } from 'node:fs/promises';
+import { resolve, extname } from 'node:path';
+import assert from 'node:assert/strict';
+const root=resolve('website/dist');
+const server=createServer(async(req,res)=>{try{const path=resolve(root,'.'+new URL(req.url,'http://localhost').pathname);if(!path.startsWith(root+'/'))throw Error();const data=await readFile(path);res.setHeader('Content-Type',({'.js':'text/javascript','.css':'text/css','.png':'image/png','.svg':'image/svg+xml','.html':'text/html'})[extname(path)]||'application/octet-stream');res.end(data);}catch{res.writeHead(404).end();}});
+await new Promise(r=>server.listen(0,'127.0.0.1',r));
+const browser=await chromium.launch({headless:true});
+try{
+ const page=await browser.newPage({viewport:{width:1440,height:1100}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(`http://127.0.0.1:${server.address().port}/private-app/visual-kit.html`);
+ await page.waitForFunction(()=>[...document.querySelectorAll('ds-device-bezel')].length===21&&[...document.querySelectorAll('ds-device-bezel')].every(d=>d.shadowRoot?.querySelector('img')?.naturalWidth>0));
+ const geometry=await page.evaluate(()=>[...document.querySelectorAll('ds-device-bezel')].map(d=>{const screen=d.shadowRoot.querySelector('.screen').getBoundingClientRect(),frame=d.getBoundingClientRect();return {inside:screen.left>=frame.left&&screen.right<=frame.right+1&&screen.top>=frame.top&&screen.bottom<=frame.bottom+1,clock:d.shadowRoot.querySelector('ds-app-chrome').shadowRoot.querySelector('.clock').textContent};}));
+ assert(geometry.every(g=>g.inside&&g.clock==='00:01'));
+ const action=page.locator('#window').locator('ds-app-chrome').getByRole('button',{name:'Reload',exact:true});await action.click();await page.getByText('Chrome action: reload',{exact:true}).waitFor();
+ await page.evaluate(()=>{const w=document.querySelector('#window');w.interactive=false;});
+ await page.waitForFunction(()=>document.querySelector('#window').shadowRoot.querySelector('ds-app-chrome').shadowRoot.querySelector('button').disabled);
+ for(const kind of ['macos','safari','chrome','edge']){await page.evaluate(k=>document.querySelector('#window').kind=k,kind);await page.waitForFunction(k=>document.querySelector('#window').shadowRoot.querySelector('ds-app-chrome').kind===k,kind);}
+ await page.screenshot({path:'/tmp/visual-kit-desktop.png',fullPage:false});
+ for(const width of [320,375,393,430]){await page.setViewportSize({width,height:900});await page.waitForTimeout(80);assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`overflow at ${width}`);}
+ assert.deepEqual(errors,[]);await page.screenshot({path:'/tmp/visual-kit-phone.png'});
+ console.log('VisualKit: all 20 assets, viewport bounds, 00:01 clocks, controls, and four phone widths passed.');
+}finally{await browser.close();server.close();}

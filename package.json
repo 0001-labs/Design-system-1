@@ -90,7 +90,7 @@
     "test:e2e": "cd e2e && vp exec playwright test",
     "typecheck:all": "cd packages/css-validate && vp exec tsc --noEmit && cd ../../app && vp exec tsc --noEmit && cd ../services && vp exec tsc --noEmit",
     "services:dryrun": "cd services && vp run dryrun",
-    "site:build": "vp run docs:build && vp run app:build && vp run app-controls:build && vp run consistency:build",
+    "site:build": "vp run docs:build && vp run app:build && vp run app-controls:build && vp run consistency:build && vp run visual-kit:build",
     "site:deploy": "sync1 guard && vp run site:build && cd services && vp exec wrangler deploy --config ../wrangler.jsonc",
     "deploy": "vp run site:deploy",
     "check:versions": "node scripts/versions.mjs",
@@ -109,7 +109,9 @@
     "app-controls:build": "vp build --config packages/app/vite.config.ts && node scripts/copy-app-docs.mjs",
     "package:check": "node scripts/check-public-package.mjs",
     "consistency:build": "vp build --config packages/consistency/vite.config.ts",
-    "consistency:test:viewport": "vp run consistency:build && node packages/consistency/tests/viewport.mjs && node packages/consistency/tests/card-inset.mjs && node packages/consistency/tests/examples.mjs && node packages/consistency/tests/booking.mjs && node packages/consistency/tests/spacing.mjs && node packages/consistency/tests/card-spacing.mjs && node packages/consistency/tests/carousel.mjs && node packages/consistency/tests/reorder.mjs && node packages/consistency/tests/group-gaps.mjs && node packages/consistency/tests/context.mjs && node packages/consistency/tests/interactions.mjs && node packages/consistency/tests/escape.mjs && node packages/consistency/tests/grouping.mjs && node packages/consistency/tests/compact-panel.mjs && vp exec tsx packages/consistency/tests/insertions.mjs"
+    "consistency:test:viewport": "vp run consistency:build && node packages/consistency/tests/viewport.mjs && node packages/consistency/tests/card-inset.mjs && node packages/consistency/tests/examples.mjs && node packages/consistency/tests/booking.mjs && node packages/consistency/tests/spacing.mjs && node packages/consistency/tests/card-spacing.mjs && node packages/consistency/tests/carousel.mjs && node packages/consistency/tests/reorder.mjs && node packages/consistency/tests/group-gaps.mjs && node packages/consistency/tests/context.mjs && node packages/consistency/tests/interactions.mjs && node packages/consistency/tests/escape.mjs && node packages/consistency/tests/grouping.mjs && node packages/consistency/tests/compact-panel.mjs && vp exec tsx packages/consistency/tests/insertions.mjs",
+    "visual-kit:build": "node packages/visual-kit/build.mjs",
+    "visual-kit:test": "node packages/visual-kit/test-browser.mjs"
   },
   "dependencies": {
     "@auth/core": "0.41.3",

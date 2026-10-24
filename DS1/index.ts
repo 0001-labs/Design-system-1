@@ -115,3 +115,8 @@ export * from "./2-core/ds-image";
 
 export { reportFailure, FAILURE_EVENT } from "./0-face/failures";
 export type { Failure } from "./0-face/failures";
+
+export * from "./2-core/ds-window";
+export * from "./2-core/ds-device-bezel";
+export * from "./2-core/ds-app-chrome";
+export { BEZELS, bezelById, screenGeometry } from "./5-visual-kit/bezels";

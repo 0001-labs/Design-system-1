@@ -438,5 +438,33 @@
     "kind": "component",
     "summary": "Responsive images, crops and captions.",
     "url": "https://designsystem1.com/2-core/image/"
+  },
+  {
+    "id": "component:/visual-kit/",
+    "label": "VisualKit",
+    "code": "VSKT",
+    "kind": "component",
+    "url": "https://designsystem1.com/visual-kit/"
+  },
+  {
+    "id": "component:/visual-kit/windows/",
+    "label": "Windows",
+    "code": "WNDW",
+    "kind": "component",
+    "url": "https://designsystem1.com/visual-kit/windows/"
+  },
+  {
+    "id": "component:/visual-kit/device-bezels/",
+    "label": "Device Bezels",
+    "code": "BZEL",
+    "kind": "component",
+    "url": "https://designsystem1.com/visual-kit/device-bezels/"
+  },
+  {
+    "id": "component:/visual-kit/app-chrome/",
+    "label": "AppChrome",
+    "code": "APCH",
+    "kind": "component",
+    "url": "https://designsystem1.com/visual-kit/app-chrome/"
   }
 ]
