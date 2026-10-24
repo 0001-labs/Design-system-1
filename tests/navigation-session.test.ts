@@ -64,3 +64,18 @@ test('signed-out pages can reuse a result but signing in invalidates it', async 
   localStorage.setItem(key, 'session-a');
   expect(await readNavigationCache()).toBeNull();
 });
+
+test('token refresh keeps the running bridge alive until its new owner check finishes', async () => {
+  const { frame, publish, session } = page();
+  await session.ready;
+  session.receive(summary);
+  const reload = vi.spyOn(frame, 'src', 'set');
+  localStorage.setItem(key, 'refreshed-session');
+  window.dispatchEvent(new StorageEvent('storage', { storageArea: localStorage, key, oldValue: 'previous-session', newValue: 'refreshed-session' }));
+  expect(publish.mock.calls.at(-1)?.[0]).toMatchObject({ owner: false });
+  // Convex refreshes on connection. Reloading here starts another refresh and
+  // interrupts the bridge before it can report the server's owner decision.
+  expect(reload).not.toHaveBeenCalled();
+  session.receive(summary);
+  expect(publish.mock.calls.at(-1)?.[0]).toMatchObject({ authenticated: true, owner: true });
+});

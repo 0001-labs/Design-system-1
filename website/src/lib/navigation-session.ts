@@ -8,8 +8,8 @@ export function connectNavigationSession(frame: HTMLIFrameElement, publish: (sum
   let bridgeStarted = false;
   let generation = 0;
   let refresh: ReturnType<typeof setTimeout> | undefined;
-  const startBridge = (restart = false) => {
-    if (bridgeStarted && !restart) return;
+  const startBridge = () => {
+    if (bridgeStarted) return;
     bridgeStarted = true;
     frame.src = '/app/navigation-auth';
   };
@@ -36,7 +36,9 @@ export function connectNavigationSession(frame: HTMLIFrameElement, publish: (sum
     clearTimeout(refresh);
     summary = { type: 'ds1:navigation-auth', authenticated: false, loading: false, owner: false, appComponents: [], companyName: '', libraries: [], librariesLoaded: false, creating: false, creationError: null };
     publish(summary);
-    startBridge(true);
+    // The running bridge follows storage changes itself. Reloading it on token
+    // refresh reconnects Convex and starts another refresh before it can reply.
+    startBridge();
   };
   frame.addEventListener('load', request, options);
   window.addEventListener('ds1:navigation-auth-request', request, options);
