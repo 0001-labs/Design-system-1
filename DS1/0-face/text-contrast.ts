@@ -86,7 +86,7 @@ function textSamples(root: ParentNode): TextSample[] {
             else if (input.placeholder) samples.push({ element: e, text: input.placeholder, pseudo: '::placeholder' });
           }
         } else if (e.localName === 'select') {
-          const text = (e as HTMLSelectElement).selectedOptions[0]?.textContent?.trim();
+          const text = (e as unknown as HTMLSelectElement).selectedOptions[0]?.textContent?.trim();
           if (text) samples.push({ element: e, text });
         }
         for (const pseudo of ['::before', '::after']) {
