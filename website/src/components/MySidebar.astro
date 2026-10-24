@@ -42,7 +42,7 @@ const { sidebar } = Astro.locals.starlightRoute;
   let library: LibraryNavigation | null = null;
   let appComponents: AppComponent[] = [];
   const collapsed = new Set<string>();
-  let owner = false;
+  let owner = document.documentElement.hasAttribute("data-ds-owner");
   let signedIn = document.documentElement.hasAttribute("data-signed-in");
   const translationKeys: Record<string, string> = {
     'Start Here': 'startHere', 'Built-ins': 'builtIns', Root: 'root', Core: 'core', Unit: 'unit', Page: 'page',

@@ -33,6 +33,9 @@ const here = Astro.url.pathname.replace(/\/$/, '');
         <a href={row.href} aria-label={row.name} aria-current={row.href.replace(/\/$/, '') === here ? 'page' : undefined}>{row.layer && <span class="rail-swatch" aria-hidden="true"></span>}{row.name}</a>
       </ds-button>
     : <p class:list={['rail-group', { 'rail-gap': row.gap }]}>{row.name}</p>)}
+    <ds-button control="slotted" fit class="rail-entry rail-gap rail-adoption">
+      <a href="/adoption/" aria-current={here === '/adoption' ? 'page' : undefined}>Adoption</a>
+    </ds-button>
   </div>
   <footer class="rail-footer">
     <ds-button control="slotted" fit><a href="https://github.com/0001-labs/Design-system-1">GitHub</a></ds-button>
@@ -56,17 +59,6 @@ const here = Astro.url.pathname.replace(/\/$/, '');
     if (detail.loading) return;
     renderAccount(detail.authenticated === true);
     rail?.querySelectorAll('[data-private-rail]').forEach(button => button.remove());
-    if (detail.authenticated === true && detail.owner === true) {
-      const button = document.createElement('ds-button');
-      button.className = 'rail-entry rail-gap';
-      button.setAttribute('control', 'slotted');
-      button.setAttribute('fit', '');
-      button.dataset.privateRail = '';
-      const link = document.createElement('a');
-      link.href = '/adoption/'; link.textContent = 'Adoption';
-      if (location.pathname === '/adoption/') link.setAttribute('aria-current', 'page');
-      button.append(link); rail?.append(button);
-    }
     for (const component of readAppComponents(detail)) {
       const heading = rail?.querySelector(`[data-rail-layer="${component.layer}"]`);
       if (!heading) continue;
@@ -84,9 +76,13 @@ const here = Astro.url.pathname.replace(/\/$/, '');
       rail!.insertBefore(button, next);
     }
   });
+  // The header may already have restored its cached owner summary.
+  window.dispatchEvent(new Event('ds1:navigation-auth-request'));
 </script>
 <style>
   .docs-navigation-rail { display: none; }
+  .rail-adoption { display: none !important; }
+  :global(html[data-ds-owner]) .rail-adoption { display: inline-flex !important; }
   @media (min-width: 769px) {
     :global(html[data-sidebar-collapsed]) .docs-navigation-rail { display: flex; flex-direction: column; width: calc(8 * var(--site-unit)); height: 100%; padding: var(--site-unit) calc(var(--site-unit) / 2) var(--site-unit) var(--site-unit); }
     .rail-links { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; }
