@@ -1,10 +1,15 @@
-<figure class="phone-video not-content" data-ds-not-prose>
-  <video controls playsinline preload="metadata" poster="/examples/visual-kit/phone-video.png" width="1080" height="1920" aria-label="Money sample screen playing inside its original iPhone frame">
-    <source src="/examples/visual-kit/phone-video.mp4" type="video/mp4" />
-    <a href="/examples/visual-kit/phone-video.mp4">Download the phone video</a>
+---
+interface Props { product?: string; file?: string; download?: string; }
+const { product = 'Money', file = 'phone-video', download = 'VisualKit-phone-example.mp4' } = Astro.props;
+const base = `/examples/visual-kit/${file}`;
+---
+<figure class="phone-video not-content" data-ds-not-prose data-product={product}>
+  <video controls playsinline preload="metadata" poster={`${base}.png`} width="1080" height="1920" aria-label={`${product} sample screen playing inside its original iPhone frame`}>
+    <source src={`${base}.mp4`} type="video/mp4" />
+    <a href={`${base}.mp4`}>Download the phone video</a>
   </video>
-  <figcaption>Money’s sample screen inside the original iPhone frame. Eight seconds, with the status and Safari bars included.</figcaption>
-  <p><a href="/examples/visual-kit/phone-video.mp4" download="VisualKit-phone-example.mp4">Download MP4</a></p>
+  <figcaption>{product}’s sample screen inside the original iPhone frame. Eight seconds, with the status and Safari bars included.</figcaption>
+  <p><a href={`${base}.mp4`} download={download}>Download MP4</a></p>
 </figure>
 <style>
   .phone-video { margin:calc(20px * var(--sf,1)) 0; }
