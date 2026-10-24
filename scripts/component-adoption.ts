@@ -28,9 +28,9 @@ export function loadAppSpecs(studio: string, configPath = process.env.ADOPTION_C
     ids.add(app.id);
   }
   const inventoryPath = join(studio, "0001/server/system-inventory.json");
-  const nodes = existsSync(inventoryPath) ? (JSON.parse(readFileSync(inventoryPath, "utf8")) as { nodes: { id: string; code?: string; version?: string }[] }).nodes : [];
+  const nodes = existsSync(inventoryPath) ? (JSON.parse(readFileSync(inventoryPath, "utf8")) as { nodes: { id: string; code?: string; version?: string; instructions?: { path: string }[] }[] }).nodes : [];
   return config.apps.map(app => {
-    const node = nodes.find(node => node.id === app.id);
+    const node = nodes.find(node => node.id === app.id) ?? nodes.find(node => node.instructions?.some(brief => resolve(brief.path) === resolve(studio, app.directory, "AGENTS.md")));
     return { ...app, ...(node?.code ? { code: node.code } : {}), ...(node?.version ? { version: node.version } : {}) };
   });
 }
