@@ -1,0 +1,34 @@
+/* Product guides: semantic prose beside real, captioned device examples.
+   Load after the foundation and before product styles. Device chrome stays
+   in ds-device-bezel and ds-window; screenshots and words belong to the app. */
+.ds-guide { --ds-guide-read: calc(32 * var(--ds-unit)); }
+.ds-guide-illustrated {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: calc(2 * var(--ds-unit));
+  min-width: 0;
+}
+.ds-guide-illustrated--phone {
+  grid-template-columns: minmax(0, calc(14 * var(--ds-unit))) minmax(0, var(--ds-guide-read));
+}
+.ds-guide-words { min-width: 0; max-width: var(--ds-guide-read); }
+.ds-guide-example { min-width: 0; margin: 0; }
+.ds-guide-example img { display: block; width: 100%; height: auto; }
+.ds-guide-example figcaption {
+  margin-top: var(--ds-unit);
+  font-size: calc(12px * var(--ds-sf, 1));
+  line-height: var(--ds-unit);
+  color: var(--ds-text-color-muted);
+}
+.ds-guide-example-note { display: block; margin-top: calc(var(--ds-unit) / 2); }
+.ds-guide-example--phone { width: calc(14 * var(--ds-unit)); max-width: 100%; }
+.ds-guide .aa-partial { display: inline-block; vertical-align: baseline; max-width: 100%; }
+.ds-guide .aa-partial > ds-button { pointer-events: none; }
+@media (max-width: 1199px) {
+  .ds-guide-illustrated:not(.ds-guide-illustrated--phone) { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 680px) {
+  .ds-guide-illustrated--phone { grid-template-columns: minmax(0, 1fr); }
+  .ds-guide-example--phone { position: static; margin-inline: auto; }
+}
