@@ -20,3 +20,8 @@ await copyFile(resolve(here,'index.html'),resolve(out,'visual-kit.html'));
 console.log(`VisualKit: ${bezels.length} verified bezels in the owner-only preview.`);
 
 await build({entryPoints:[resolve(here,'../../DS1/1-root/one.css')],outfile:resolve(out,'visual-kit.css'),bundle:true,minify:true,loader:{'.woff2':'file','.woff':'file'},assetNames:'[name]-[hash]'});
+
+// Keep third-party notices beside the hosted component bundle as well as copied source.
+const resources=resolve(here,'../../website/dist/resources');
+await mkdir(resources,{recursive:true});
+await copyFile(resolve(here,'../../DS1/5-visual-kit/browser-icons.LICENSE'),resolve(resources,'browser-icons.LICENSE'));
