@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { resolve, extname } from 'node:path';
 import assert from 'node:assert/strict';
 const root=resolve('website/dist');
-const server=createServer(async(req,res)=>{try{const path=resolve(root,'.'+new URL(req.url,'http://localhost').pathname);if(!path.startsWith(root+'/'))throw Error();const data=await readFile(path);res.setHeader('Content-Type',({'.js':'text/javascript','.css':'text/css','.png':'image/png','.svg':'image/svg+xml','.html':'text/html'})[extname(path)]||'application/octet-stream');res.end(data);}catch{res.writeHead(404).end();}});
+const server=createServer(async(req,res)=>{try{const path=resolve(root,'.'+new URL(req.url,'http://localhost').pathname);if(!path.startsWith(root+'/'))throw Error();const target=!extname(path)?resolve(path,'index.html'):path;const data=await readFile(target);res.setHeader('Content-Type',({'.js':'text/javascript','.css':'text/css','.png':'image/png','.svg':'image/svg+xml','.html':'text/html'})[extname(target)]||'application/octet-stream');res.end(data);}catch{res.writeHead(404).end();}});
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
 const browser=await chromium.launch({headless:true});
 try{
@@ -70,6 +70,7 @@ try{
  await publicDemo.getByRole('combobox',{name:'Network',exact:true}).selectOption('5G');
  await publicDemo.locator('ds-device-bezel ds-app-chrome[kind="ios"]').getByText('5G',{exact:true}).waitFor();
  await publicDemo.getByRole('combobox',{name:'Network',exact:true}).selectOption('wifi');
+ await page.waitForTimeout(500);
  await publicDemo.screenshot({path:'/tmp/visualkit-public-network.png'});
  console.log('VisualKit: all 20 assets, viewport bounds, 00:01 clocks, controls, and four phone widths passed.');
 }finally{await browser.close();server.close();}
