@@ -8,12 +8,19 @@
     "Aa": {
       "build": {
         "to": "website/src/vendor/aa",
-        "entries": ["diagram"]
+        "entries": [
+          "diagram"
+        ]
       }
     },
     "Feature flags": {
       "runtime": {
         "to": "shared/feature-flags-runtime"
+      }
+    },
+    "Consistency CMS": {
+      "workspace": {
+        "to": "packages/consistency/src/vendor/cms"
       }
     }
   }

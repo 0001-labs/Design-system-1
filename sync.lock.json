@@ -51,6 +51,17 @@
       "website/src/vendor/aa/table.d.ts": "918cd9b8b04c0649ea23219711c33eddb808b49df42e0c7ded7bc35638b18f37"
     }
   },
+  "Consistency CMS": {
+    "commit": "56fcf9fc6b39163c9106cc055ee5c6303f3c7989",
+    "version": null,
+    "owned": ["packages/consistency/src/vendor/cms"],
+    "files": {
+      "packages/consistency/src/vendor/cms/README.md": "b0c02dd51c41dc454915fb856b742b7870086fa8fef111a7b5fa466ad13fd985",
+      "packages/consistency/src/vendor/cms/composition-workspace.css": "9578db478d72ff20b07ced0c895557b9c5570a9da230883c1603f02d0f905f8c",
+      "packages/consistency/src/vendor/cms/composition-workspace.ts": "ad3b554144c1e2bdb2ae1684f6a014947b8dae73b6ef6dea5916f33715ec0e4c",
+      "packages/consistency/src/vendor/cms/dom.ts": "42c4cb6c5ad6d8dc0de74aaa958345ead73d0ecac50d8b7472c46439db03b265"
+    }
+  },
   "Drag": {
     "commit": "b0d053e5d4eb697b62abd2dbae1550f71c8ac735",
     "version": "0.2.0-alpha.0",

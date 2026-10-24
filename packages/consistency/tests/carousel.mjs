@@ -1,3 +1,4 @@
+import { componentFixture } from './component-fixture.mjs';
 /** Local-only rendered carousel contract. Build first; no accounts or production writes. */
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
@@ -11,7 +12,7 @@ const server = createServer(async (request, response) => {
  if (/^\/(one|two)\.png$/.test(pathname)) { response.setHeader('content-type', 'image/png'); response.end(pixel); return; }
  const file = resolve(root, '.' + (pathname.endsWith('/') ? pathname + 'index.html' : pathname));
  if (!file.startsWith(root)) { response.writeHead(403).end(); return; }
- try { const body = await readFile(file); response.setHeader('content-type', ({ '.js':'text/javascript','.css':'text/css','.html':'text/html' })[extname(file)] ?? 'application/octet-stream'); response.end(body); }
+ try { const body = await componentFixture(file); response.setHeader('content-type', ({ '.js':'text/javascript','.css':'text/css','.html':'text/html' })[extname(file)] ?? 'application/octet-stream'); response.end(body); }
  catch { response.writeHead(404).end(); }
 });
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));

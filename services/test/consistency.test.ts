@@ -62,3 +62,21 @@ it.each(['/app/assets/%2f..%2f..%2fprivate-consistency/index.html', '/app/assets
   expect((await consistencyPreview(new Request(origin + path), env, send)).status).toBe(404);
   expect(assets).not.toHaveBeenCalled();
 });
+
+it('protects workspace reads and writes and forwards only bounded same-origin owner requests',async()=>{
+ const {env,send}=setup(); const workspace={fetch:vi.fn(async()=>Response.json({pages:[]}))};const bound={...env,CONSISTENCY_WORKSPACE:workspace} as unknown as Parameters<typeof consistencyPreview>[1];
+ const url='https://c9y.site/api/consistency/pages';
+ expect((await consistencyPreview(new Request(url),bound,send)).status).toBe(401);
+ expect(workspace.fetch).not.toHaveBeenCalled();
+ expect((await consistencyPreview(new Request(url,{headers}),bound,send)).status).toBe(200);
+ const write=(origin:string,body:string)=>new Request(url+'/home',{method:'PUT',headers:{...headers,origin,'Content-Type':'application/json'},body});
+ expect((await consistencyPreview(write('https://evil.test','{}'),bound,send)).status).toBe(403);
+ expect((await consistencyPreview(write('https://c9y.site','x'.repeat(800001)),bound,send)).status).toBe(413);
+ expect(workspace.fetch).toHaveBeenCalledTimes(1);
+ expect((await consistencyPreview(write('https://c9y.site','{}'),bound,send)).status).toBe(200);
+});
+it('denies a non-owner workspace account before invoking storage',async()=>{
+ const {env,send}=setup('other');const workspace={fetch:vi.fn()};
+ const response=await consistencyPreview(new Request('https://c9y.site/api/consistency/pages',{headers}),{...env,CONSISTENCY_WORKSPACE:workspace} as unknown as Parameters<typeof consistencyPreview>[1],send);
+ expect(response.status).toBe(403);expect(workspace.fetch).not.toHaveBeenCalled();
+});

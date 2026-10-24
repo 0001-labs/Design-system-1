@@ -1,14 +1,14 @@
 /** The private editor's inference transport. Provider credentials never reach the browser. */
 import { authorizeReport, type ReportsEnv } from './reports';
 import { sessionRequest } from './dashboard';
-import { CONSISTENCY_HOST } from './consistency';
+import { isConsistencyHost } from './consistency';
 import { routeComponentEdit, type ComponentRoutingEnv } from './consistency-routing';
 export interface PreviewAIEnv extends ReportsEnv, ComponentRoutingEnv { AI?: Ai }
 const headers = { 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow', 'X-Content-Type-Options': 'nosniff', Vary: 'Cookie, Authorization' };
 const error = (message: string, status: number) => Response.json({ error: message }, { status, headers });
 export async function consistencyAI(request: Request, env: PreviewAIEnv, send: typeof fetch = fetch): Promise<Response> {
   const url = new URL(request.url);
-  if (url.hostname !== CONSISTENCY_HOST || url.protocol !== 'https:') return error('Not found.', 404);
+  if (!isConsistencyHost(url.hostname) || url.protocol !== 'https:') return error('Not found.', 404);
   if (request.method !== 'POST') return error('Use POST.', 405);
   if (request.headers.get('origin') !== url.origin) return error('Request origin is not allowed.', 403);
   const denied = await authorizeReport(sessionRequest(new Request(request.url, { headers: request.headers })), env, send);

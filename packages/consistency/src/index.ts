@@ -33,7 +33,7 @@ import { canStartMarquee, beginMarquee, paintCompositionSelection, type Selectio
 import { CompositionSettle } from './settle';
 import { createPreviewEditorOptions } from './aa';
 import type { EditorOptions } from '../../../website/src/vendor/aa/aa';
-import { CompositionHistory, removeSourceRanges, pointerGain, initialComposition, dimensionValue, limits, compositionBounds, compositionRange, READABLE_CARD_MIN, READABLE_TEXT_MIN, type Dimension } from './model';
+import { CompositionHistory, removeSourceRanges, pointerGain, initialComposition, dimensionValue, limits, compositionBounds, compositionRange, READABLE_CARD_MIN, READABLE_TEXT_MIN, type Dimension, type Composition } from './model';
 defineAaEditor();
 
 /** A reusable, document-owned ghost layer. It never mutates arbitrary page CSS. */
@@ -73,6 +73,15 @@ export class ConsistencyEditor extends LitElement {
   connectedCallback() { super.connectedCallback(); window.addEventListener('keydown', this.onEscape); }
   history = new CompositionHistory(exampleComposition(DEFAULT_EXAMPLE));
   private histories = new Map<string, CompositionHistory>([[DEFAULT_EXAMPLE, this.history]]);
+  /** Durable document boundary; load before connecting a fresh editor. */
+  readDocument(): Record<string,unknown> { return structuredClone({ schema:1, example:this.selectedExample, library:this.library, composition:this.history.value }); }
+  loadDocument(document: Record<string,unknown>) {
+    if(this.isConnected) throw new Error('Load a document before mounting the editor.');
+    if(document.schema!==1 || !EXAMPLE_PAGES.some(p=>p.id===document.example) || !LIBRARY_PRESETS.some(p=>p.id===document.library)) throw new Error('Unsupported page document.');
+    this.selectedExample=document.example as string; this.library=document.library as LibraryId;
+    this.history=new CompositionHistory(structuredClone(document.composition as Composition));
+    this.histories=new Map([[this.selectedExample,this.history]]);
+  }
   private selectExample(id: string) {
     const example = EXAMPLE_PAGES.find(page => page.id === id); if (!example || id === this.selectedExample) return;
     this.cancelMarquee?.(); this.settle.cancel(); this.sort?.destroy(); this.sort = undefined; this.cleanups.forEach(dispose => dispose()); this.cleanups = [];
@@ -235,6 +244,7 @@ export class ConsistencyEditor extends LitElement {
     paintCompositionSelection(this, (this.layers.marquee || this.layers.reorder) ? this.selection : new Set());
   }
   protected updated(changed: PropertyValues) {
+    if (['revision','library','selectedExample'].some(key=>changed.has(key)&&changed.get(key)!==undefined)) this.dispatchEvent(new CustomEvent('consistency-change',{bubbles:true}));
     // Selection and focused measures do not change document geometry or layer bindings.
     if (changed.size && Array.from(changed.keys()).every(key => ['selection', 'marquee', 'selected', 'selectedGap'].includes(String(key)))) { this.paintSelection(); return; }
     this.columnSpacing ??= new ColumnSpacingLayer(this, { enabled: () => this.enabled('gap'), value: (id,fallback) => this.preview[id] ?? this.history.value.gaps[id] ?? fallback, select: id => { this.selected = 'gap'; this.selectedGap = id; }, preview: (id,value) => { this.preview = { ...this.preview, [id]:value }; }, commit: (id,value,pointer) => { if(pointer)this.finishDrag(() => this.commit('gap',value,id)); else this.commit('gap',value,id); }, cancel: () => { this.preview = {}; } });
