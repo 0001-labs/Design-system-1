@@ -1,0 +1,17 @@
+<div class="instagram-example not-content" data-ds-not-prose>
+  <ds-device-bezel static edge-to-edge appearance="dark" network="wifi" asset-base="/examples/visual-kit/" chrome-assets="/examples/visual-kit/" role="img" aria-label="Instagram Reels presentation inside an iPhone">
+    <ds-app-chrome kind="instagram" username="studio" caption="A moment in motion." likes="20.7K" comments="9" reposts="808" shares="10.9K" progress="0.6">
+      <div class="reel-art"><span>Make<br />a move.</span></div>
+    </ds-app-chrome>
+  </ds-device-bezel>
+</div>
+<script>
+  import '../../../DS1/2-core/ds-device-bezel';
+</script>
+<style>
+  .instagram-example { display:flex; justify-content:center; padding:calc(20px * var(--sf,1)); background:var(--ds-fill); margin-block:calc(20px * var(--sf,1)); }
+  ds-device-bezel { --ds-device-width:400px; }
+  ds-app-chrome { height:100%; }
+  .reel-art { display:grid !important; place-items:center; background:#5241a5; color:white; }
+  .reel-art span { font:700 64px/1 -apple-system,BlinkMacSystemFont,sans-serif; letter-spacing:-3px; }
+</style>

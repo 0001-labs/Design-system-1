@@ -3,6 +3,7 @@ title: VisualKit
 description: Real app content, presented in windows and device frames.
 ---
 
+import InstagramExample from "../../../components/InstagramExample.astro";
 import PlatformExamples from "../../../components/PlatformExamples.astro";
 import CompactWindowExample from "../../../components/CompactWindowExample.astro";
 import PhoneVideoExample from "../../../components/PhoneVideoExample.astro";
@@ -85,6 +86,22 @@ Complete an item in a sample Weekend list. The video uses Ezo’s actual compone
 <PhoneVideoExample product="Ezo" file="ezo-phone-video" download="VisualKit-Ezo-phone-example.mp4" />
 
 The downloadable video includes the complete frame. Playback cannot scroll or interact with the app. Its editable `.vis` source is created and rendered through the Visual CLI.
+
+## Instagram Reels
+
+<InstagramExample />
+
+Use `ds-app-chrome kind="instagram"` around a video, image or live animation. The Reels header, action rail, account, caption, progress line and floating navigation follow the supplied October 2026 iPhone screenshot. This is presentation chrome; it has no account connection or publishing behavior.
+
+```html
+<ds-device-bezel edge-to-edge appearance="dark" network="wifi" asset-base="/licensed-device-art/">
+  <ds-app-chrome kind="instagram" username="studio" caption="A moment in motion." likes="20.7K" progress="0.6">
+    <video src="/film.mp4" muted playsinline></video>
+  </ds-app-chrome>
+</ds-device-bezel>
+```
+
+Set `username`, `avatar`, `caption`, `verified`, `likes`, `comments`, `reposts` and `shares` from the scene. Counts default empty; `progress` is a fraction from 0 to 1. Slot content fills the viewport. The device’s `edge-to-edge` mode overlays its status bar and omits the separate home strip. Set `interactive` on AppChrome to emit `chrome-action` requests; no social actions happen automatically.
 
 ## App chrome
 

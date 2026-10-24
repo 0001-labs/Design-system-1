@@ -5,16 +5,19 @@ import { bezelById, screenGeometry } from './bezels';
 import './app-chrome';
 /** Artwork and a measured, native-size screen. The entire screen scales uniformly into the bezel. */
 export class DsDeviceBezel extends LitElement {
-  static properties={ staticFrame:{type:Boolean,attribute:"static",reflect:true}, frameless:{type:Boolean,reflect:true}, responsive:{type:Boolean,reflect:true}, device:{}, assetBase:{attribute:'asset-base'}, chromeAssets:{attribute:'chrome-assets'}, network:{}, battery:{type:Number}, dualSim:{type:Boolean,attribute:'dual-sim'}, time:{}, address:{}, browser:{}, appearance:{reflect:true}, interactive:{type:Boolean}, status:{type:Boolean}, measuredWidth:{state:true} };
-  declare frameless: boolean; declare responsive: boolean;
+  static properties={ edgeToEdge:{type:Boolean,attribute:"edge-to-edge",reflect:true}, staticFrame:{type:Boolean,attribute:"static",reflect:true}, frameless:{type:Boolean,reflect:true}, responsive:{type:Boolean,reflect:true}, device:{}, assetBase:{attribute:'asset-base'}, chromeAssets:{attribute:'chrome-assets'}, network:{}, battery:{type:Number}, dualSim:{type:Boolean,attribute:'dual-sim'}, time:{}, address:{}, browser:{}, appearance:{reflect:true}, interactive:{type:Boolean}, status:{type:Boolean}, measuredWidth:{state:true} };
+  declare edgeToEdge:boolean; declare frameless: boolean; declare responsive: boolean;
   declare staticFrame: boolean; declare device: string; declare assetBase: string; declare chromeAssets: string; declare network: string; declare battery: number; declare dualSim: boolean; declare time: string; declare address: string; declare browser: string; declare appearance: string; declare interactive: boolean; declare status: boolean;
   declare private measuredWidth: number;
   private observer?:ResizeObserver;
-  constructor(){super();this.staticFrame=false;this.frameless=false;this.responsive=false;this.device='iphone-17-pro-max-deep-blue';this.assetBase='';this.chromeAssets='';this.network='4G';this.battery=80;this.dualSim=false;this.time='00:01';this.address='';this.browser='';this.appearance='light';this.interactive=false;this.status=true;this.measuredWidth=0;}
+  constructor(){super();this.edgeToEdge=false;this.staticFrame=false;this.frameless=false;this.responsive=false;this.device='iphone-17-pro-max-deep-blue';this.assetBase='';this.chromeAssets='';this.network='4G';this.battery=80;this.dualSim=false;this.time='00:01';this.address='';this.browser='';this.appearance='light';this.interactive=false;this.status=true;this.measuredWidth=0;}
   static styles=css`
     :host { display:block; width:var(--ds-device-width,280px); max-width:100%; }
     :host([frameless]) { display:contents; }
     .status-wrap { flex:none; }
+    :host([edge-to-edge]) .status-wrap { position:absolute; top:0; left:0; right:0; z-index:2; pointer-events:none; }
+    :host([edge-to-edge]) .home { display:none; }
+    :host([edge-to-edge]) ds-app-chrome { --chrome-screen:transparent; --chrome-ink:white; background:transparent; }
     .scaled-chrome { transform-origin:top left; }
     .device.compact { box-shadow:inset 0 0 0 3px #202124; border-radius:32px; background:#202124; }
     .compact .art { display:none; }

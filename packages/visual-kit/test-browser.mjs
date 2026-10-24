@@ -75,6 +75,15 @@ try{
  for(const width of [320,375,393,430]){await page.setViewportSize({width,height:900});await page.waitForTimeout(80);assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`overflow at ${width}`);}
  assert.deepEqual(errors,[]);await page.screenshot({path:'/tmp/visual-kit-phone.png'});
  await page.goto(`http://127.0.0.1:${server.address().port}/visual-kit/index.html`);
+ const reels=page.locator('.instagram-example ds-app-chrome[kind="instagram"]');
+ await reels.getByText('Reels',{exact:true}).waitFor();
+ assert(await reels.getByRole('button',{name:'Like',exact:true}).isDisabled());
+ await reels.evaluate(el=>{el.interactive=true;el.addEventListener('chrome-action',e=>el.dataset.action=e.detail.action);});
+ await reels.getByRole('button',{name:'Like',exact:true}).evaluate(el=>el.click());
+ assert.equal(await reels.getAttribute('data-action'),'heart');
+ const fullScreen=await page.locator('.instagram-example ds-device-bezel').evaluate(el=>{const root=el.shadowRoot;return {screen:root.querySelector('.screen').getBoundingClientRect().height,content:root.querySelector('.content').getBoundingClientRect().height,home:getComputedStyle(root.querySelector('.home')).display};});
+ assert(Math.abs(fullScreen.screen-fullScreen.content)<1);assert.equal(fullScreen.home,'none');
+ await page.locator('.instagram-example').screenshot({path:'/tmp/visualkit-instagram.png'});
  const publicDemo=page.locator('.bezel-example');
  await publicDemo.locator('ds-device-bezel ds-app-chrome[kind="ios"] img.wifi').waitFor();
  await publicDemo.getByRole('combobox',{name:'Network',exact:true}).selectOption('5G');
