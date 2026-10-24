@@ -70,7 +70,9 @@ The time defaults to **00:01** and remains editable. The address has no default.
 
 For interactive scenes, set `interactive` and listen for `chrome-action`. Its `detail.action` identifies the requested action. Buttons stay disabled in presentation mode; the component never navigates, closes a page or mutates app records itself.
 
-Platform chrome intentionally uses native typography and dimensions. DS1’s surrounding documentation and editor controls retain DS1’s own sizing and typography. Safari and Chromium toolbar templates use DS1 icons and need visual review against the particular OS/browser version a film targets.
+Platform chrome intentionally uses native typography and dimensions. DS1’s surrounding documentation and editor controls retain DS1’s own sizing and typography. Browser toolbars have separate macOS layouts: Safari 27 compact (52px), Google Chrome 155 (86px) and Microsoft Edge 156 (80px), with browser-specific vector controls, native tab curves and light/dark surfaces. Chrome uses site controls; Edge uses site information and a favorites toolbar; Safari groups sidebar, history and sharing controls in compact capsules. These presets show a normal webpage without profile-specific extensions or optional assistant buttons.
+
+Set `favicon` to the scene’s icon URL. The `backAvailable` and `forwardAvailable` properties control history availability (defaults: true and false). Edge hides unavailable Forward; the other browsers dim it. `ds-window` forwards these properties. Browser updates, custom themes and OS font rendering can change the appearance; these are versioned presentation presets, not a running browser.
 
 ## App content
 

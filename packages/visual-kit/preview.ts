@@ -17,3 +17,12 @@ document.querySelector('#time')!.addEventListener('input-change',e=>phone.time=(
 document.querySelector('#address')!.addEventListener('input-change',e=>{desktop.address=phone.address=(e as CustomEvent).detail.value;});
 document.addEventListener('chrome-action',(e:Event)=>{document.querySelector('#event')!.textContent=`Chrome action: ${(e as CustomEvent).detail.action}`;});
 document.querySelector('#count')!.textContent=`${BEZELS.length} original variants, each with a measured app viewport.`;
+
+for (const kind of ['safari', 'chrome', 'edge'] as const) for (const appearance of ['light', 'dark']) {
+  const specimen = document.createElement('section');
+  const caption = document.createElement('p'); caption.textContent = `${kind === 'chrome' ? 'Google Chrome 155' : kind === 'edge' ? 'Microsoft Edge 156' : 'Safari 27 compact'} · ${appearance}`;
+  const chrome = document.createElement('ds-app-chrome');
+  chrome.kind = kind; chrome.appearance = appearance; chrome.label = 'Example Domain'; chrome.address = kind === 'edge' ? 'https://example.com' : 'example.com'; chrome.interactive = true;
+  chrome.style.cssText = 'width:100%;min-width:600px;max-width:1000px;border-radius:12px 12px 0 0;overflow:hidden';
+  specimen.append(caption, chrome); document.querySelector('#browsers')!.append(specimen);
+}

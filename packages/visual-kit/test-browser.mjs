@@ -13,11 +13,25 @@ try{
  await page.waitForFunction(()=>[...document.querySelectorAll('ds-device-bezel')].length===21&&[...document.querySelectorAll('ds-device-bezel')].every(d=>d.shadowRoot?.querySelector('img')?.naturalWidth>0));
  const geometry=await page.evaluate(()=>[...document.querySelectorAll('ds-device-bezel')].map(d=>{const screen=d.shadowRoot.querySelector('.screen').getBoundingClientRect(),frame=d.getBoundingClientRect();return {inside:screen.left>=frame.left&&screen.right<=frame.right+1&&screen.top>=frame.top&&screen.bottom<=frame.bottom+1,clock:d.shadowRoot.querySelector('ds-app-chrome').shadowRoot.querySelector('.clock').textContent};}));
  assert(geometry.every(g=>g.inside&&g.clock==='00:01'));
+ await page.evaluate(()=>document.querySelector('#window').kind='chrome');
  const action=page.locator('#window').locator('ds-app-chrome').getByRole('button',{name:'Reload',exact:true});await action.click();await page.getByText('Chrome action: reload',{exact:true}).waitFor();
  await page.evaluate(()=>{const w=document.querySelector('#window');w.interactive=false;});
  await page.waitForFunction(()=>document.querySelector('#window').shadowRoot.querySelector('ds-app-chrome').shadowRoot.querySelector('button').disabled);
  for(const kind of ['macos','safari','chrome','edge']){await page.evaluate(k=>document.querySelector('#window').kind=k,kind);await page.waitForFunction(k=>document.querySelector('#window').shadowRoot.querySelector('ds-app-chrome').kind===k,kind);}
- await page.screenshot({path:'/tmp/visual-kit-desktop.png',fullPage:false});
+ const expectedHeight={safari:52,chrome:86,edge:80};
+ for (const kind of ['safari','chrome','edge']) for(const appearance of ['light','dark']) {
+   const specimen=page.locator(`#browsers ds-app-chrome[kind="${kind}"][appearance="${appearance}"]`);
+   assert.equal(Math.round((await specimen.boundingBox()).height),expectedHeight[kind],`${kind} native toolbar height`);
+   assert.equal(await specimen.getByRole('button',{name:'Reload',exact:true}).count(),kind==='safari'?0:1);
+   assert.equal(await specimen.getByRole('button',{name:'Share',exact:true}).count(),kind==='safari'?1:0);
+   assert.equal(await specimen.getByRole('button',{name:'Forward',exact:true}).count(),kind==='edge'?0:1);
+   if(kind!=='edge') assert(await specimen.getByRole('button',{name:'Forward',exact:true}).isDisabled());
+   await specimen.screenshot({path:`/tmp/visualkit-${kind}-${appearance}.png`});
+ }
+ await page.evaluate(()=>{const w=document.querySelector('#window');w.kind='edge';w.interactive=true;w.forwardAvailable=true;});
+ await page.locator('#window').getByRole('button',{name:'Forward',exact:true}).click();
+ await page.getByText('Chrome action: forward',{exact:true}).waitFor();
+ await page.screenshot({path:'/tmp/visual-kit-desktop.png' ,fullPage:false});
  for(const width of [320,375,393,430]){await page.setViewportSize({width,height:900});await page.waitForTimeout(80);assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`overflow at ${width}`);}
  assert.deepEqual(errors,[]);await page.screenshot({path:'/tmp/visual-kit-phone.png'});
  console.log('VisualKit: all 20 assets, viewport bounds, 00:01 clocks, controls, and four phone widths passed.');
