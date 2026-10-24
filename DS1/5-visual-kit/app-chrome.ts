@@ -1,7 +1,7 @@
 import { LitElement, css, html, nothing } from 'lit';
 import { define } from '../0-face/define';
 import '../2-core/ds-icon';
-import { browserIcon } from './browser-icons';
+import { browserIcon, loadBrowserIcons } from './browser-icons';
 import { browserStyles } from './browser-styles';
 import { mobileChromeStyles, cellularSignal } from './mobile-chrome';
 
@@ -70,6 +70,13 @@ export class DsAppChrome extends LitElement {
     .mobile .address { height:44px; border-radius:22px; }
     .mobile-actions { display:flex; justify-content:space-between; margin-top:8px; }
   `, browserStyles, mobileChromeStyles];
+  protected updated(changed: Map<string, unknown>) {
+    if (changed.has('kind') && (this.kind === 'chrome' || this.kind === 'edge')) {
+      void loadBrowserIcons(this.kind).then(() => this.requestUpdate()).catch(() => {
+        this.dispatchEvent(new CustomEvent('chrome-error', { detail: { kind: this.kind }, bubbles: true, composed: true }));
+      });
+    }
+  }
   private icon(name: string) {
     return browserIcon(name, this.kind);
   }

@@ -1,5 +1,17 @@
 import { svg } from 'lit';
-import { chromiumIcons, edgeIcons } from './native-icon-paths';
+type NativeGlyphs = Record<string, { size: number; path: string }>;
+let chromiumIcons: NativeGlyphs = {};
+let edgeIcons: NativeGlyphs = {};
+let loading: Promise<void> | undefined;
+
+/** Native browser glyphs are unnecessary for Apple windows and device status bars. */
+export function loadBrowserIcons(kind: string): Promise<void> {
+  if (kind !== 'chrome' && kind !== 'edge') return Promise.resolve();
+  return loading ??= import('./native-icon-paths').then((icons) => {
+    chromiumIcons = icons.chromiumIcons;
+    edgeIcons = icons.edgeIcons;
+  }).catch((error) => { loading = undefined; throw error; });
+}
 
 /** Presentation glyphs drawn in each browser's native icon vocabulary, not DS1 UI icons. */
 export function browserIcon(name: string, kind: string) {
