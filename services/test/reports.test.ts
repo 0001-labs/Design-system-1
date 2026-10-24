@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from "vite-plus/test";
 import { componentReport, REPORT_KEY, type ReportsEnv } from "../src/reports";
 
+import { sessionRequest } from "../src/dashboard";
+
 const request = (token = "owner-token") => new Request("https://designsystem1.com/api/reports/components", { headers: { authorization: `Bearer ${token}` } });
 const setup = () => {
   const get = vi.fn().mockResolvedValue({ body: '{"private":true}' });
@@ -64,4 +66,17 @@ describe("owner-only component report", () => {
     get.mockResolvedValue(null);
     expect((await componentReport(request(), env, send)).status).toBe(404);
   });
+});
+
+it('revalidates the document cookie before reading data and rejects a forged owner session', async () => {
+  const { env, get, send } = setup();
+  const input = new Request('https://designsystem1.com/api/reports/components', { headers: { cookie: '__Host-ds1-dashboard=owner-token' } });
+  const response = await componentReport(sessionRequest(input), env, send);
+  expect(response.status).toBe(200);
+  expect(response.headers.get('vary')).toBe('Cookie, Authorization');
+  expect(send).toHaveBeenCalledWith(expect.any(String), expect.objectContaining({ headers: { authorization: 'Bearer owner-token', 'Content-Type': 'application/json' } }));
+  get.mockClear();
+  send.mockResolvedValue(Response.json({ status: 'success', value: { _id: 'other', email: 'jaa90@icloud.com', emailVerified: true } }));
+  expect((await componentReport(sessionRequest(input), env, send)).status).toBe(403);
+  expect(get).not.toHaveBeenCalled();
 });

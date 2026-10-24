@@ -2,12 +2,8 @@
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 ---
 <StarlightPage frontmatter={{ title: 'Adoption', tableOfContents: false, editUrl: false }}>
-  <iframe src="/app/adoption" title="Component adoption matrix" class="adoption-matrix"></iframe>
+  <ds1-adoption-document></ds1-adoption-document>
 </StarlightPage>
 <script>
-  const frame = document.querySelector<HTMLIFrameElement>('.adoption-matrix')!;
-  if (location.hash === '#glossary') frame.src = '/app/adoption#glossary';
+  import '../lib/adoption-document';
 </script>
-<style>
-  .adoption-matrix { display: block; width: 100%; height: calc(100dvh - 8 * var(--site-unit)); min-height: calc(20 * var(--site-unit)); border: 0; }
-</style>

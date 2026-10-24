@@ -3,7 +3,7 @@ import { consistencyPreview, CONSISTENCY_HOST, isPrivatePreviewPath } from "./co
 import { appNavigation } from './app-navigation';
 import { WorkerEntrypoint } from "cloudflare:workers";
 import { featureFlags, manageFeatureFlags, setFeatureFlag } from "./flags";
-import { dashboard, DASHBOARD_HOST, ICON_HOST } from "./dashboard";
+import { dashboard, sessionRequest, DASHBOARD_HOST, ICON_HOST } from "./dashboard";
 import { filterDocExamples, listExamples, setExample } from './doc-examples';
 
 const PLAY_HOST = "play.designsystem1.com";
@@ -124,7 +124,7 @@ export default {
       return publish.fetch(request, env);
     }
 
-    if (url.pathname === "/api/reports/components") return componentReport(request, env);
+    if (url.pathname === "/api/reports/components") return componentReport(sessionRequest(request), env);
 
     if (/^\/(?:app\/)?reports(?:\/components)?\/?$/.test(url.pathname)) {
       return new Response(null, { status: 302, headers: { Location: "https://designsystem1.com/adoption/", "X-Robots-Tag": "noindex, nofollow", "Cache-Control": "private, no-store" } });

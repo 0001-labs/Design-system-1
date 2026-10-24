@@ -94,3 +94,13 @@
 .adoption-column-names .group-root { background: color-mix(in srgb, var(--one-drip-yellow) 16%, var(--report-paper)); }
 
 .adoption-icons .adoption-matrix .adoption-total { width: var(--report-unit); min-width: var(--report-unit); max-width: var(--report-unit); padding: 0; text-align: center; white-space: nowrap; }
+
+/* In documentation, the site owns the paper, title, spacing and page scroll. */
+.adoption.adoption-document { padding: 0; min-height: 0; background: transparent; --report-paper: var(--ds1-docs-content-bg, var(--background)); }
+.adoption-document :is(ds1-component-matrix, ds1-icon-matrix, ds1-component-glossary) { min-width: 0; }
+.adoption-document h2 { font-family: inherit; font-size: var(--ds-type-size-heading, calc(20px * var(--sf, 1))); line-height: calc(2 * var(--report-unit)); }
+.adoption-document #glossary { margin-top: calc(2 * var(--report-unit)); }
+
+.adoption-document .adoption-scroll > .adoption-matrix { min-width: 0; table-layout: fixed; }
+.adoption-document .adoption-column-names th { height: calc(9 * var(--report-unit)); }
+.adoption-document .adoption-matrix :is(th, td) { padding: 0; }

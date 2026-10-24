@@ -12,7 +12,7 @@ const headers = {
   "Cache-Control": "private, no-store",
   "X-Robots-Tag": "noindex, nofollow",
   "X-Content-Type-Options": "nosniff",
-  "Vary": "Authorization",
+  "Vary": "Cookie, Authorization",
 };
 const failure = (error: string, status: number) => Response.json({ error }, { status, headers });
 
