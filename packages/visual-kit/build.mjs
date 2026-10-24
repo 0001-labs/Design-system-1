@@ -25,3 +25,10 @@ await build({entryPoints:[resolve(here,'../../DS1/1-root/one.css')],outfile:reso
 const resources=resolve(here,'../../website/dist/resources');
 await mkdir(resources,{recursive:true});
 await copyFile(resolve(here,'../../DS1/5-visual-kit/browser-icons.LICENSE'),resolve(resources,'browser-icons.LICENSE'));
+
+// The inline documentation example is public; the rest of the gallery stays owner-only.
+const publicExample=resolve(here,'../../website/dist/examples/visual-kit');
+await mkdir(publicExample,{recursive:true});
+for(const file of ['iphone-17-pro-max-deep-blue.png','status-wifi.svg','status-battery.svg']) {
+ await copyFile(resolve(out,file),resolve(publicExample,file));
+}

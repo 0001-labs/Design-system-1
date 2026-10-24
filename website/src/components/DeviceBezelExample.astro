@@ -1,38 +1,21 @@
 <section class="bezel-example not-content" data-ds-not-prose aria-label="Shop design inside an iPhone bezel">
-  <div class="bezel-stage" hidden></div>
-  <p class="bezel-status"><a href="/private-app/visual-kit.html">Sign in with the owner account to see the device example.</a></p>
-  <template>
-    <ds-device-bezel device="iphone-17-pro-max-deep-blue" asset-base="/private-app/" chrome-assets="/private-app/" time="00:01" browser="safari" address="shop.example">
+  <div class="bezel-stage">
+    <ds-device-bezel device="iphone-17-pro-max-deep-blue" asset-base="/examples/visual-kit/" chrome-assets="/examples/visual-kit/" time="00:01" browser="safari" address="shop.example">
       <iframe src="/examples/layouts/shop/" title="Shop example design" loading="lazy"></iframe>
     </ds-device-bezel>
-  </template>
+  </div>
+  <p class="bezel-status" role="status" hidden>The device artwork could not be loaded. Reload this page to try again.</p>
 </section>
 <script>
   import '../../../DS1/2-core/ds-device-bezel';
   const example = document.querySelector<HTMLElement>('.bezel-example')!;
-  const stage = example.querySelector<HTMLElement>('.bezel-stage')!;
-  const status = example.querySelector<HTMLElement>('.bezel-status')!;
-  const template = example.querySelector<HTMLTemplateElement>('template')!;
-  const update = (owner: boolean) => {
-    stage.hidden = !owner;
-    status.hidden = owner;
-    if (owner && !stage.firstElementChild) stage.append(template.content.cloneNode(true));
-    if (!owner) stage.replaceChildren();
-  };
-  stage.addEventListener('bezel-error', () => {
-    update(false);
-    status.textContent = 'The device artwork could not be loaded. Open the owner preview to sign in again.';
+  example.addEventListener('bezel-error', () => {
+    example.querySelector<HTMLElement>('.bezel-status')!.hidden = false;
   });
-  window.addEventListener('ds1-navigation-auth', event => {
-    const detail = (event as CustomEvent).detail;
-    if (!detail.loading) update(detail.authenticated === true && detail.owner === true);
-  });
-  update(document.documentElement.hasAttribute('data-ds-owner'));
-  window.dispatchEvent(new Event('ds1:navigation-auth-request'));
 </script>
 <style>
   .bezel-example { margin-block: calc(20px * var(--sf, 1)); }
   .bezel-stage { display: flex; justify-content: center; padding: calc(20px * var(--sf, 1)); background: var(--ds-fill); }
-  .bezel-stage[hidden], .bezel-status[hidden] { display: none; }
+  .bezel-status[hidden] { display: none; }
   .bezel-stage :global(ds-device-bezel) { --ds-device-width: 400px; }
 </style>
