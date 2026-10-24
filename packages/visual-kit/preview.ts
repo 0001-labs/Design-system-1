@@ -26,3 +26,5 @@ for (const kind of ['safari', 'chrome', 'edge'] as const) for (const appearance 
   chrome.style.cssText = 'width:100%;min-width:600px;max-width:1000px;border-radius:12px 12px 0 0;overflow:hidden';
   specimen.append(caption, chrome); document.querySelector('#browsers')!.append(specimen);
 }
+
+document.querySelector<HTMLSelectElement>('#network')!.onchange=e=>phone.network=(e.target as HTMLSelectElement).value;

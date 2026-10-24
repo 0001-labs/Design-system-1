@@ -1,0 +1,14 @@
+[
+  {
+    "file": "status-wifi.svg",
+    "fileKey": "8azymSnKt4pnYTZqdzQ7tF",
+    "nodeId": "13016:20027",
+    "sha256": "986c69dbd99e719b05d990f8fe5c1ed95e6b4f748a45461e036411f4451892fd"
+  },
+  {
+    "file": "status-battery.svg",
+    "fileKey": "8azymSnKt4pnYTZqdzQ7tF",
+    "nodeId": "13016:20028",
+    "sha256": "bc361a45e4a0bca4a1a3127010fb4e6c41f43320ab01c3c9371f7ceb5b1ae22a"
+  }
+]

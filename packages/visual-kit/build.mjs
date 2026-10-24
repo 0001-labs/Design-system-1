@@ -14,7 +14,7 @@ for(const bezel of bezels){
  if(createHash('sha256').update(bytes).digest('hex')!==bezel.sha256)throw new Error(`Bezel source differs: ${filename}`);
  await copyFile(source,resolve(out,filename));
 }
-for(const file of ['status-wifi.svg','status-battery.svg']){await access(resolve(here,'private-assets',file));await copyFile(resolve(here,'private-assets',file),resolve(out,file));}
+for(const asset of JSON.parse(await readFile(resolve(here,'status-imports.json'),'utf8'))){const source=resolve(here,'private-assets',asset.file);if(createHash('sha256').update(await readFile(source)).digest('hex')!==asset.sha256)throw new Error(`Status source differs: ${asset.file}`);await copyFile(source,resolve(out,asset.file));}
 await build({entryPoints:[resolve(here,'preview.ts')],outfile:resolve(out,'visual-kit.js'),bundle:true,format:'esm',minify:true,loader:{'.css':'text','.svg':'dataurl'},plugins:[{name:'inline-css',setup(b){b.onLoad({filter:/\.css$/,namespace:'inline'},async a=>{const result=await build({entryPoints:[a.path],bundle:true,write:false,loader:{'.svg':'dataurl'}});return {contents:result.outputFiles[0].text,loader:'text'};});b.onLoad({filter:/\.svg$/,namespace:'raw'},async a=>({contents:await readFile(a.path,'utf8'),loader:'text'}));b.onResolve({filter:/\.(css|svg)\?(inline|raw|url)$/},a=>({path:resolve(a.resolveDir,a.path.replace(/\?(inline|raw|url)$/,'')),namespace:a.path.endsWith('?raw')?'raw':a.path.endsWith('?inline')?'inline':'file'}));}}]});
 await copyFile(resolve(here,'index.html'),resolve(out,'visual-kit.html'));
 console.log(`VisualKit: ${bezels.length} verified bezels in the owner-only preview.`);

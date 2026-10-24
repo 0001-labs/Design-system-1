@@ -10,7 +10,7 @@ export class DsDeviceBezel extends LitElement {
   declare device: string; declare assetBase: string; declare chromeAssets: string; declare network: string; declare battery: number; declare dualSim: boolean; declare time: string; declare address: string; declare browser: string; declare appearance: string; declare interactive: boolean; declare status: boolean;
   declare private measuredWidth: number;
   private observer?:ResizeObserver;
-  constructor(){super();this.frameless=false;this.responsive=false;this.device='iphone-17-pro-max-deep-blue';this.assetBase='';this.chromeAssets='';this.network='4G';this.battery=80;this.dualSim=true;this.time='00:01';this.address='';this.browser='';this.appearance='light';this.interactive=false;this.status=true;this.measuredWidth=0;}
+  constructor(){super();this.frameless=false;this.responsive=false;this.device='iphone-17-pro-max-deep-blue';this.assetBase='';this.chromeAssets='';this.network='4G';this.battery=80;this.dualSim=false;this.time='00:01';this.address='';this.browser='';this.appearance='light';this.interactive=false;this.status=true;this.measuredWidth=0;}
   static styles=css`
     :host { display:block; width:var(--ds-device-width,280px); max-width:100%; }
     :host([frameless]) { display:contents; }

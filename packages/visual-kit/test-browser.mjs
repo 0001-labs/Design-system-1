@@ -23,6 +23,19 @@ try{
  const overlay=await page.locator('#phone').evaluate(d=>{const s=d.shadowRoot;const content=s.querySelector('.content').getBoundingClientRect(),bar=s.querySelector('.browser').getBoundingClientRect();return bar.top<content.bottom&&bar.bottom<=content.bottom;});
  assert(overlay,'Safari floats over the app viewport');
  assert.equal(await page.locator('#phone ds-app-chrome[kind="ios"]').getByText('4G',{exact:true}).count(),1);
+ for(const network of ['5G','wifi','LTE','4G']) {
+   await page.selectOption('#network',network);
+   const status=page.locator('#phone ds-app-chrome[kind="ios"]');
+   if(network==='wifi') { await status.getByRole('img',{name:'Wi-Fi',exact:true}).waitFor(); assert(await status.locator('img.wifi').evaluate(img=>img.complete&&img.naturalWidth>0)); }
+   else await status.getByText(network,{exact:true}).waitFor();
+ }
+ for(const appearance of ['light','dark']) {
+   await page.selectOption('#appearance',appearance);
+   await page.evaluate(()=>document.querySelector('#phone').battery=25);
+   const battery=page.locator('#phone ds-app-chrome[kind="ios"]').getByRole('img',{name:'Battery 25%',exact:true});
+   await battery.waitFor(); assert(await battery.locator('img').evaluateAll(imgs=>imgs.every(img=>img.complete&&img.naturalWidth>0)));
+ }
+ await page.selectOption('#appearance','light');
  await page.evaluate(()=>{const demo=document.createElement('div');demo.id='mobile-reference';demo.style.cssText='position:relative;width:393px;height:852px;background:repeating-linear-gradient(0deg,transparent 0 27px,#ddd 27px 28px),repeating-linear-gradient(90deg,white 0 27px,#ddd 27px 28px);color:black';demo.innerHTML='<ds-app-chrome kind="ios"></ds-app-chrome><ds-app-chrome kind="safari-ios" address="ezo.gs" style="position:absolute;bottom:34px;left:0;right:0"></ds-app-chrome>';document.body.append(demo);});
  await page.locator('#mobile-reference').screenshot({path:'/tmp/visualkit-mobile-reference.png'});
  await page.locator('#mobile-reference').evaluate(el=>el.remove());
@@ -51,5 +64,12 @@ try{
  await page.screenshot({path:'/tmp/visual-kit-desktop.png' ,fullPage:false});
  for(const width of [320,375,393,430]){await page.setViewportSize({width,height:900});await page.waitForTimeout(80);assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`overflow at ${width}`);}
  assert.deepEqual(errors,[]);await page.screenshot({path:'/tmp/visual-kit-phone.png'});
+ await page.goto(`http://127.0.0.1:${server.address().port}/visual-kit/index.html`);
+ const publicDemo=page.locator('.bezel-example');
+ await publicDemo.locator('ds-device-bezel ds-app-chrome[kind="ios"] img.wifi').waitFor();
+ await publicDemo.getByRole('combobox',{name:'Network',exact:true}).selectOption('5G');
+ await publicDemo.locator('ds-device-bezel ds-app-chrome[kind="ios"]').getByText('5G',{exact:true}).waitFor();
+ await publicDemo.getByRole('combobox',{name:'Network',exact:true}).selectOption('wifi');
+ await publicDemo.screenshot({path:'/tmp/visualkit-public-network.png'});
  console.log('VisualKit: all 20 assets, viewport bounds, 00:01 clocks, controls, and four phone widths passed.');
 }finally{await browser.close();server.close();}

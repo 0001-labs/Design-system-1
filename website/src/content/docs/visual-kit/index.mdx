@@ -84,6 +84,8 @@ The inline example is public and includes the iPhone 17 Pro Max Deep Blue artwor
 <ds-app-chrome kind="safari" label="Orders" address="shop.example"></ds-app-chrome>
 ```
 
+`network="wifi"`, `network="5G"`, `network="4G"` or `network="LTE"` chooses the connection indicator on AppChrome and Device Bezels. Single-SIM signal bars follow the Figma status component; `dual-sim` opts into the separately drawn dual-SIM variant. With `chrome-assets` (or AppChrome’s `asset-base`), Wi-Fi and battery use the original Figma vectors. Battery level remains adjustable with `battery="80"`. SF Pro is the typeface; SF Symbols is Apple’s symbol library.
+
 The time defaults to **00:01** and remains editable. The address has no default. Both light and dark appearances are supported. iOS status geometry follows the source status component; device artwork supplies the camera island. `asset-base` can supply `status-wifi.svg` and `status-battery.svg` from appropriately licensed assets.
 
 For interactive scenes, set `interactive` and listen for `chrome-action`. Its `detail.action` identifies the requested action. Buttons stay disabled in presentation mode; the component never navigates, closes a page or mutates app records itself.

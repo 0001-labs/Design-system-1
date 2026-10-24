@@ -1,6 +1,7 @@
 <section class="bezel-example not-content" data-ds-not-prose aria-label="Shop design inside an iPhone bezel">
+  <label>Network<ds-select><select aria-label="Network" class="network-select"><option value="wifi">Wi-Fi</option><option value="5G">5G</option><option value="4G">4G</option><option value="LTE">LTE</option></select></ds-select></label>
   <div class="bezel-stage">
-    <ds-device-bezel device="iphone-17-pro-max-deep-blue" asset-base="/examples/visual-kit/" chrome-assets="/examples/visual-kit/" time="00:01" browser="safari" address="shop.example">
+    <ds-device-bezel device="iphone-17-pro-max-deep-blue" asset-base="/examples/visual-kit/" chrome-assets="/examples/visual-kit/" network="wifi" time="00:01" browser="safari" address="shop.example">
       <iframe src="/examples/layouts/shop/" title="Shop example design" loading="lazy"></iframe>
     </ds-device-bezel>
   </div>
@@ -8,7 +9,11 @@
 </section>
 <script>
   import '../../../DS1/2-core/ds-device-bezel';
+  import '../../../DS1/3-unit/ds-select';
   const example = document.querySelector<HTMLElement>('.bezel-example')!;
+  example.querySelector<HTMLSelectElement>('.network-select')!.addEventListener('change', event => {
+    example.querySelector('ds-device-bezel')!.network = (event.target as HTMLSelectElement).value;
+  });
   example.addEventListener('bezel-error', () => {
     example.querySelector<HTMLElement>('.bezel-status')!.hidden = false;
   });
@@ -16,6 +21,8 @@
 <style>
   .bezel-example { margin-block: calc(20px * var(--sf, 1)); }
   .bezel-stage { display: flex; justify-content: center; padding: calc(20px * var(--sf, 1)); background: var(--ds-fill); }
+  label { display:flex; flex-wrap:wrap; align-items:center; gap:calc(20px * var(--sf,1)); margin-bottom:calc(20px * var(--sf,1)); }
+  ds-select { width:calc(120px * var(--sf,1)); }
   .bezel-status[hidden] { display: none; }
   .bezel-stage :global(ds-device-bezel) { --ds-device-width: 400px; }
 </style>
