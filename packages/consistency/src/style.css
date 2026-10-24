@@ -255,3 +255,10 @@ consistency-booking .aa-plain > .aa-block { margin:0; padding:0; font:inherit; c
 /* Mobile is a framed viewport centered in the available editing canvas. */
 .consistency-mobile-preview .consistency-stage{display:grid;place-items:center}
 .consistency-mobile-preview .consistency-sheet{height:calc(100% - 40px);margin:0;outline:1px solid var(--ds-border-color,#aaa);border-radius:var(--ds-radius,4px);box-shadow:0 0 0 1px color-mix(in srgb,var(--ds-text-color) 12%,transparent)}
+
+/* Shared hardware and chrome; authored content stays at its readable 1× scale. */
+.consistency-mobile-preview .consistency-stage{min-height:640px;container-type:size;padding:20px;}
+.consistency-mobile-preview .consistency-device{--ds-device-width:min(420px,100%,calc((100cqh - 40px) * .49));width:var(--ds-device-width)}
+.consistency-mobile-preview .consistency-sheet{height:100%;width:100%;margin:0;outline:0;border-radius:0;box-shadow:none;padding-bottom:100px!important}
+
+@media(max-width:360px){.consistency-mobile-preview .consistency-stage{padding:0}.consistency-mobile-preview .consistency-device{--ds-device-width:100%}}

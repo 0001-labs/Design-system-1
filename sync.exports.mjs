@@ -92,6 +92,12 @@ function moduleGraph(read, entry) {
 
 export default {
   exports: {
+    /** Approved documentation artwork; components are selected separately through components. */
+    'device-artwork': {
+      files({ read }) {
+        return Object.fromEntries(['iphone-17-pro-max-deep-blue.png','status-wifi.svg','status-battery.svg'].map(file=>[file,read(`packages/visual-kit/private-assets/${file}`)]));
+      },
+    },
     /** Internal on-page Ask face and speech input; hosts supply their own authorized data. */
     ask: {
       files({ read }) {

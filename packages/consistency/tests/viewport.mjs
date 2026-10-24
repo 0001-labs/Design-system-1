@@ -40,6 +40,8 @@ try {
     await page.evaluate(async () => { const editor = document.querySelector('consistency-editor'); editor.history.commit({ padding: 0 }); editor.requestUpdate(); await editor.updateComplete; });
     await checkInset(false);
     await page.getByRole('button', { name: 'Mobile preview', exact: true }).click(); await checkInset(true);
+    await page.locator('ds-device-bezel ds-app-chrome[kind=ios]').getByText('00:01',{exact:true}).waitFor();
+    await page.locator('ds-device-bezel ds-app-chrome[kind=safari-ios]').getByText('preview.example',{exact:true}).waitFor();
     await page.getByRole('button', { name: 'Desktop preview', exact: true }).click();
 
     await page.locator('select[aria-label="Library preset"]').selectOption('bold');
