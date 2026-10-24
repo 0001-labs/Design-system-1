@@ -1,5 +1,5 @@
 ---
-title: Native packages
+title: DS1 native
 description: Design system 1 in Swift and Kotlin, generated from the same sources as the CSS.
 ---
 
