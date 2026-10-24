@@ -5,6 +5,7 @@ description: Real app content, presented in windows and device frames.
 
 import PlatformExamples from "../../../components/PlatformExamples.astro";
 import CompactWindowExample from "../../../components/CompactWindowExample.astro";
+import PhoneVideoExample from "../../../components/PhoneVideoExample.astro";
 import DeviceBezelExample from "../../../components/DeviceBezelExample.astro";
 
 VisualKit supplies the surroundings for showing an app: desktop windows, device bezels and platform controls. It replaces the name FilmKit. The app content remains the product’s own code on sample records.
@@ -72,6 +73,12 @@ The catalogue includes 20 colour variants: iPhone 17 Pro Max, iPhone 17 Pro, iPh
 `BEZELS` exports each artwork size, screen rectangle and source node. `screenGeometry` scales the viewport uniformly without changing its logical app dimensions. `asset-base` names the folder containing the artwork filenames in the catalogue. `chrome-assets` optionally supplies the separately licensed status icons. `appearance` changes the screen surroundings; `browser="safari"` adds the mobile toolbar. Set the `status` JavaScript property to `false` when the app content already includes a status bar.
 
 The inline example is public and includes the iPhone 17 Pro Max Deep Blue artwork and status icons. The remaining artwork is available in the owner preview through its authenticated asset route. Original artwork is not included in npm. Obtain and use artwork under the source terms; importing it does not grant redistribution rights. Missing artwork is reported explicitly rather than replaced with a different device.
+
+### Video in the original phone frame
+
+<PhoneVideoExample />
+
+The downloadable video includes the complete frame. Playback cannot scroll or interact with the app. Its editable `.vis` source is created and rendered through the Visual CLI.
 
 ## App chrome
 
