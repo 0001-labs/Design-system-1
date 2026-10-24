@@ -1,7 +1,7 @@
-/** Owner dashboard (component adoption and the glossary) at adoption.designsystem1.com: the public sign-in shell contains no report data. dash.designsystem1.com is now Design system 1's dash portal on 0001's System Worker. */
+/** Owner-only adoption inside the documentation site. The public sign-in shell contains no report data. */
 import { authorizeReport, type ReportsEnv } from './reports';
 
-export const DASHBOARD_HOST = 'adoption.designsystem1.com';
+export const DASHBOARD_HOST = 'adoption.designsystem1.com'; // Retired host: deny requests if still routed.
 /** The owner's icon builder: the same gate and session as the dashboard, on its own host. */
 export const ICON_HOST = 'icon.designsystem1.com';
 const COOKIE = '__Host-ds1-dashboard';
@@ -35,8 +35,9 @@ export async function dashboard(request: Request, env: ReportsEnv & { ASSETS: Fe
   }
   if (!['GET', 'HEAD'].includes(request.method)) return new Response(null, { status: 404, headers: security });
   if (url.pathname.startsWith('/app/assets/') || url.pathname === '/icons/design-system-1.svg') return env.ASSETS.fetch(request);
+  const adoption = url.pathname === '/adoption/' || url.pathname === '/adoption' || url.pathname === '/app/adoption';
   const privateApp = url.pathname === '/private-app/' || /^\/private-app\/[a-zA-Z0-9._-]+$/.test(url.pathname);
-  if (!privateApp && !['/', '/app/', '/app/signin', '/app/reports/components'].includes(url.pathname)) return new Response(null, { status: 404, headers: security });
+  if (!adoption && !privateApp && !['/', '/app/', '/app/signin', '/app/reports/components'].includes(url.pathname)) return new Response(null, { status: 404, headers: security });
   if (url.pathname !== '/app/signin') {
     // Revalidate the token with Convex on every HTML request; cookies confer no authority alone.
     const denied = await authorizeReport(sessionRequest(request), env, send);
@@ -45,7 +46,8 @@ export async function dashboard(request: Request, env: ReportsEnv & { ASSETS: Fe
       return denied;
     }
   }
-  if (!privateApp) url.pathname = '/app/';
+  if (url.pathname === '/adoption') url.pathname = '/adoption/';
+  else if (!privateApp && url.pathname !== '/adoption/') url.pathname = '/app/';
   const original = await env.ASSETS.fetch(new Request(url, request));
   const response = new Response(original.body, original);
   for (const [name, value] of Object.entries(security)) response.headers.set(name, value);

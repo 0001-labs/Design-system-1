@@ -60,7 +60,7 @@ export class AppRoutes extends AppElement {
     }
     if (path === "/libraries") return html`<ds1-library-list></ds1-library-list>`;
     if (path === "/profile") return html`<ds1-profile></ds1-profile>`;
-    if (path === "/reports/components") { window.location.replace("https://adoption.designsystem1.com/"); return splash(); }
+    if (path === "/reports/components") { window.location.replace("https://designsystem1.com/adoption/"); return splash(); }
     if (editor) return html`<ds1-library-editor .libraryId=${editor.id!}></ds1-library-editor>`;
     return html`<div class="route-splash">
       <p class="ds-text">That page does not exist.</p>
@@ -77,7 +77,7 @@ export class AppRoot extends AppElement {
     if (["/flags", "/flags/", "/app/flags"].includes(pathname)) return html`<ds1-feature-flags></ds1-feature-flags>`;
     if (pathname === "/app/navigation-auth") return html`<ds1-navigation-auth></ds1-navigation-auth>`;
     if (hostname === "neweditor.c9y.site") return html`<ds1-private-preview-signin></ds1-private-preview-signin>`;
-    if (hostname === "adoption.designsystem1.com") return html`<ds1-adoption-dashboard></ds1-adoption-dashboard>`;
+    if (pathname === "/app/adoption") return html`<ds1-adoption-dashboard></ds1-adoption-dashboard>`;
     if (hostname === "fonts.designsystem1.com") return html`<ds1-font-workspace></ds1-font-workspace>`;
     if (hostname === "icon.designsystem1.com") return html`<ds1-icon-builder></ds1-icon-builder>`;
     return html`<ds1-shell .content=${html`<ds1-routes></ds1-routes>`}></ds1-shell>`;

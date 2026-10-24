@@ -29,6 +29,11 @@ function reportPage(response: Response, path: string): Response {
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    if (url.hostname === DASHBOARD_HOST) return new Response('Not found', { status: 404 });
+    if (/^\/adoption(?:\/|$)/i.test(decodeURIComponent(url.pathname)) || url.pathname === '/app/adoption') {
+      if (url.hostname !== 'designsystem1.com') return new Response('Not found', { status: 404 });
+      return dashboard(request, env);
+    }
     if (url.pathname === '/api/consistency/ai') return consistencyAI(request, env);
     // Dispatch before public assets and other APIs: this host has no public app routes.
     if (url.hostname === CONSISTENCY_HOST || isPrivatePreviewPath(url.pathname)) return consistencyPreview(request, env);
@@ -46,7 +51,6 @@ export default {
     if (["/flags", "/flags/", "/app/flags"].includes(url.pathname)) {
       return new Response(null, { status: 308, headers: { Location: "https://system.0001.dev/system/ci", "Cache-Control": "private, no-store", "X-Robots-Tag": "noindex, nofollow" } });
     }
-    if (url.hostname === DASHBOARD_HOST && url.pathname !== "/api/reports/components") return dashboard(request, env);
     if (url.hostname === ICON_HOST) return dashboard(request, env);
     if (url.pathname === "/api/libraries" || url.pathname.startsWith("/api/libraries/") || url.pathname.startsWith("/api/library-auth/")) return libraryApi(request, env);
     if (url.pathname === "/api/fonts" || url.pathname.startsWith("/api/fonts/")) return fontWorkspace(request, env);
@@ -123,7 +127,7 @@ export default {
     if (url.pathname === "/api/reports/components") return componentReport(request, env);
 
     if (/^\/(?:app\/)?reports(?:\/components)?\/?$/.test(url.pathname)) {
-      return new Response(null, { status: 302, headers: { Location: `https://${DASHBOARD_HOST}/`, "X-Robots-Tag": "noindex, nofollow", "Cache-Control": "private, no-store" } });
+      return new Response(null, { status: 302, headers: { Location: "https://designsystem1.com/adoption/", "X-Robots-Tag": "noindex, nofollow", "Cache-Control": "private, no-store" } });
     }
 
     if (url.pathname.startsWith("/api/")) {

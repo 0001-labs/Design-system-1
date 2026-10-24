@@ -49,7 +49,7 @@ export class OwnerSession implements ReactiveController {
           this.ready = true;
           this.host.requestUpdate();
           // Prove the protected HTML route before showing anything after sign-in.
-          if (window.location.pathname !== "/") window.location.replace(this.#destination);
+          if (window.location.pathname !== "/" && window.location.pathname !== "/app/adoption") window.location.replace(this.#destination);
         }
       }).catch(caught => {
         if (controller.signal.aborted) return;

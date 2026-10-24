@@ -56,6 +56,17 @@ const here = Astro.url.pathname.replace(/\/$/, '');
     if (detail.loading) return;
     renderAccount(detail.authenticated === true);
     rail?.querySelectorAll('[data-private-rail]').forEach(button => button.remove());
+    if (detail.authenticated === true && detail.owner === true) {
+      const button = document.createElement('ds-button');
+      button.className = 'rail-entry rail-gap';
+      button.setAttribute('control', 'slotted');
+      button.setAttribute('fit', '');
+      button.dataset.privateRail = '';
+      const link = document.createElement('a');
+      link.href = '/adoption/'; link.textContent = 'Adoption';
+      if (location.pathname === '/adoption/') link.setAttribute('aria-current', 'page');
+      button.append(link); rail?.append(button);
+    }
     for (const component of readAppComponents(detail)) {
       const heading = rail?.querySelector(`[data-rail-layer="${component.layer}"]`);
       if (!heading) continue;

@@ -48,7 +48,7 @@ export default defineConfig({
     // Starlight adds a sitemap of every page unless one is given. This one leaves out the
     // example preview frames, which ask not to be indexed, and /play/, which the Worker
     // sends to play.designsystem1.com (services/src/index.ts).
-    sitemap({ filter: (page) => !/^https:\/\/designsystem1\.com\/(examples|play)\//.test(page) }),
+    sitemap({ filter: (page) => !/^https:\/\/designsystem1\.com\/(examples|play|adoption)\//.test(page) }),
     starlight({
       title: "Design system 1",
       expressiveCode: {

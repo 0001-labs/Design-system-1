@@ -22,7 +22,8 @@ describe("single Worker deployment", () => {
   });
   it("attaches the product hostnames and legacy domain", () => {
     expect(config.routes).toEqual([
-      { pattern: "adoption.designsystem1.com", custom_domain: true },
+      { pattern: "neweditor.c9y.site/*", zone_name: "c9y.site" },
+      { pattern: "neweditor.c9y.site", custom_domain: true },
       { pattern: "fonts.designsystem1.com", custom_domain: true },
       { pattern: "icon.designsystem1.com", custom_domain: true },
       { pattern: "play.designsystem1.com", custom_domain: true },

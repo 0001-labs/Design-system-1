@@ -21,7 +21,7 @@ import process from "node:process";
 const PUBLIC = "https://designsystem1.com";
 const PLAY = "https://play.designsystem1.com";
 const FLAGS_MATRIX = "https://system.0001.dev/system/ci";
-const ADOPTION = "https://adoption.designsystem1.com";
+const ADOPTION = "https://designsystem1.com/adoption";
 const ICON = "https://icon.designsystem1.com";
 const EDITOR = "https://neweditor.c9y.site";
 const FONTS = "https://fonts.designsystem1.com";
@@ -610,7 +610,7 @@ if (PRODUCTION) {
   ]);
 
   await step("Private hosts", [
-    ...[ADOPTION, ICON, EDITOR].flatMap((origin) => [
+    ...[ICON, EDITOR].flatMap((origin) => [
       [
         `${new URL(origin).hostname} asks to sign in`,
         async () => {
