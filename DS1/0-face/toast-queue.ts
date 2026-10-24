@@ -148,7 +148,7 @@ export const toast = Object.assign(
       Promise.resolve(typeof promise === "function" ? promise() : promise)
         .then(
           value => { show(typeof success === "function" ? success(value) : success, "success", { ...options, id }); },
-          reason => { show(typeof error === "function" ? error(reason) : error, "error", { ...options, id }); },
+          reason => { show(typeof error === "function" ? error(reason) : error, "error", { ...options, id, ...(options.failure ? { failure: { ...options.failure, error: reason } } : {}) }); },
         )
         .finally(() => done?.());
       return id;
