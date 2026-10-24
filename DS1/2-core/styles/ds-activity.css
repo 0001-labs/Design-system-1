@@ -1,0 +1,16 @@
+/* One square; its four-by-four mark stands on the lower sixteen. */
+:host { display: inline-flex; align-items: flex-end; min-height: var(--ds-unit); gap: calc(var(--ds-unit) / 2); color: var(--ds-activity-color, var(--ds-text-color)); }
+:host([hidden]) { display: none; }
+.mark { position: relative; display: block; flex: none; width: var(--ds-control-height); height: var(--ds-control-height); }
+.frame { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); opacity: 0; }
+.frame:first-child { opacity: 1; }
+i { display: block; }
+i.ink { background: currentColor; }
+.words { font-family: var(--ds-typeface-regular); font-size: var(--ds-type-size-default); line-height: var(--ds-type-lineheight-default); color: var(--ds-text-color); }
+/* Eight held poses, 200ms each. No spinner, percentage or synthetic progress. */
+:host([active]) .frame { animation: ds-activity-pose 1600ms linear infinite; }
+@keyframes ds-activity-pose { 0%, 12.49% { opacity: 1; } 12.5%, 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  :host([active]) .frame { animation: none; opacity: 0; }
+  :host([active]) .frame:first-child { opacity: 1; }
+}

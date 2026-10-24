@@ -1,0 +1,16 @@
+---
+title: Activity
+description: A small grid mark for work that is running.
+---
+
+Activity is a working mark, one square high. Four-pixel cells rearrange inside the lower sixteen, holding each arrangement for 200ms. It has no spinning ring or implied percentage. The text names the operation the application knows is happening.
+
+```html
+<ds-activity active role="status">Checking the changes</ds-activity>
+```
+
+Set `active` only while work is running. Remove it for a question, failure, pause or completion. With reduced motion the mark stays still; the status text remains. Change `--ds-activity-color` to a library ink for the mark. Text keeps the library's text colour.
+
+For an unlabelled decorative mark, use `aria-hidden="true"` and announce the operation separately. The component does not invent status messages, track elapsed time, or announce each animation frame.
+
+Copy `activity` with Sync 1's `components` export. The page owns the state; use [Message](/2-core/message/) for explanations, failures and actions.
