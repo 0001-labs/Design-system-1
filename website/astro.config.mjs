@@ -185,7 +185,7 @@ export default defineConfig({
             { label: "Native", slug: "advanced/native" },
             { label: "Email kit", slug: "email" },
             { label: "VisualKit", items: [
-              { label: "Overview", slug: "visual-kit" },
+              { label: "VisualKit", slug: "visual-kit" },
               { label: "Windows", slug: "visual-kit/windows" },
               { label: "Device Bezels", slug: "visual-kit/device-bezels" },
               { label: "AppChrome", slug: "visual-kit/app-chrome" },
