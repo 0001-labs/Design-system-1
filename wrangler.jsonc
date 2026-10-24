@@ -25,7 +25,7 @@
   "vars": {
     "MAX_CSS_BYTES": "524288"
   },
-  "routes": [{"pattern":"c9y.site","custom_domain":true},{"pattern":"c9y.site/*","zone_name":"c9y.site"},
+  "routes": [{"pattern":"c9y.site/*","zone_name":"c9y.site"},
     // Specific route wins over the existing c9y.site wildcard site renderer.
     { "pattern": "neweditor.c9y.site/*", "zone_name": "c9y.site" },
     { "pattern": "neweditor.c9y.site", "custom_domain": true },
