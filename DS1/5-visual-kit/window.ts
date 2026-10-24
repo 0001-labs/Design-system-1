@@ -4,7 +4,8 @@ import './app-chrome';
 /** Window shell around real app DOM or an iframe. The default slot owns the viewport. */
 export class DsWindow extends LitElement {
   static properties = { frameless:{type:Boolean,reflect:true}, kind:{reflect:true}, appearance:{reflect:true}, label:{}, address:{}, interactive:{type:Boolean}, favicon:{}, backAvailable:{type:Boolean,attribute:'back-available'}, forwardAvailable:{type:Boolean,attribute:'forward-available'} };
-  frameless=false; kind='macos'; appearance='light'; label='Application'; address=''; interactive=false; favicon=''; backAvailable=true; forwardAvailable=false;
+  declare frameless: boolean; declare kind: string; declare appearance: string; declare label: string; declare address: string; declare interactive: boolean; declare favicon: string; declare backAvailable: boolean; declare forwardAvailable: boolean;
+  constructor(){super();this.frameless=false;this.kind='macos';this.appearance='light';this.label='Application';this.address='';this.interactive=false;this.favicon='';this.backAvailable=true;this.forwardAvailable=false;}
   static styles=css`
     :host { display:flex; flex-direction:column; min-width:0; height:var(--ds-window-height,100%); overflow:hidden; border-radius:12px; border:1px solid #0003; background:var(--ds-window-paper,#fff); box-shadow:0 20px 50px #0002; }
     :host([frameless]) { display:contents; }

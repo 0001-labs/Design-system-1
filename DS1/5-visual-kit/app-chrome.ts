@@ -14,19 +14,20 @@ export class DsAppChrome extends LitElement {
     favicon: {}, backAvailable: {type:Boolean, attribute:'back-available'}, forwardAvailable: {type:Boolean, attribute:'forward-available'},
     assetBase: { attribute: 'asset-base' }, interactive: { type: Boolean, reflect: true },
   };
-  kind: AppChromeKind = 'macos';
-  appearance = 'light';
-  time = '00:01';
-  address = '';
-  label = 'Application';
-  assetBase = '';
-  interactive = false;
-  favicon = '';
-  network = '4G';
-  battery = 80;
-  dualSim = true;
-  backAvailable = true;
-  forwardAvailable = false;
+  declare kind: AppChromeKind;
+  declare appearance: string;
+  declare time: string;
+  declare address: string;
+  declare label: string;
+  declare assetBase: string;
+  declare interactive: boolean;
+  declare favicon: string;
+  declare network: string;
+  declare battery: number;
+  declare dualSim: boolean;
+  declare backAvailable: boolean;
+  declare forwardAvailable: boolean;
+  constructor(){super();this.kind='macos';this.appearance='light';this.time='00:01';this.address='';this.label='Application';this.assetBase='';this.interactive=false;this.favicon='';this.network='4G';this.battery=80;this.dualSim=true;this.backAvailable=true;this.forwardAvailable=false;}
   static styles = [css`
     :host { display:block; color:#202124; background:#f4f4f4; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; font-size:13px; --chrome-line:#d6d6d6; --chrome-field:#fff; --chrome-selected:#fff; }
     :host([appearance=dark]) { color:#efefef; background:#292a2d; --chrome-line:#444; --chrome-field:#202124; --chrome-selected:#35363a; }

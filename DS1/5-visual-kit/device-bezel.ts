@@ -6,10 +6,11 @@ import './app-chrome';
 /** Artwork and a measured, native-size screen. The entire screen scales uniformly into the bezel. */
 export class DsDeviceBezel extends LitElement {
   static properties={ frameless:{type:Boolean,reflect:true}, responsive:{type:Boolean,reflect:true}, device:{}, assetBase:{attribute:'asset-base'}, chromeAssets:{attribute:'chrome-assets'}, network:{}, battery:{type:Number}, dualSim:{type:Boolean,attribute:'dual-sim'}, time:{}, address:{}, browser:{}, appearance:{reflect:true}, interactive:{type:Boolean}, status:{type:Boolean}, measuredWidth:{state:true} };
-  frameless=false; responsive=false;
-  device='iphone-17-pro-max-deep-blue'; assetBase=''; chromeAssets=''; network='4G'; battery=80; dualSim=true; time='00:01'; address=''; browser=''; appearance='light'; interactive=false; status=true;
-  private measuredWidth=0;
+  declare frameless: boolean; declare responsive: boolean;
+  declare device: string; declare assetBase: string; declare chromeAssets: string; declare network: string; declare battery: number; declare dualSim: boolean; declare time: string; declare address: string; declare browser: string; declare appearance: string; declare interactive: boolean; declare status: boolean;
+  declare private measuredWidth: number;
   private observer?:ResizeObserver;
+  constructor(){super();this.frameless=false;this.responsive=false;this.device='iphone-17-pro-max-deep-blue';this.assetBase='';this.chromeAssets='';this.network='4G';this.battery=80;this.dualSim=true;this.time='00:01';this.address='';this.browser='';this.appearance='light';this.interactive=false;this.status=true;this.measuredWidth=0;}
   static styles=css`
     :host { display:block; width:var(--ds-device-width,280px); max-width:100%; }
     :host([frameless]) { display:contents; }
