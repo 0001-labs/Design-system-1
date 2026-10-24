@@ -84,6 +84,8 @@ The inline example is public and includes the iPhone 17 Pro Max Deep Blue artwor
 <ds-app-chrome kind="safari" label="Orders" address="shop.example"></ds-app-chrome>
 ```
 
+Add `static` to a Device Bezel used as an illustration. Its content becomes inert: wheel, touch, keyboard focus and clicks cannot interact with the embedded app; the surrounding page still scrolls. Give the frame `role="img"` and an `aria-label` describing the illustration. Leave `static` off for live previews.
+
 `network="wifi"`, `network="5G"`, `network="4G"` or `network="LTE"` chooses the connection indicator on AppChrome and Device Bezels. Single-SIM signal bars follow the Figma status component; `dual-sim` opts into the separately drawn dual-SIM variant. With `chrome-assets` (or AppChrome’s `asset-base`), Wi-Fi and battery use the original Figma vectors. Battery level remains adjustable with `battery="80"`. SF Pro is the typeface; SF Symbols is Apple’s symbol library.
 
 The time defaults to **00:01** and remains editable. The address has no default. Both light and dark appearances are supported. iOS status geometry follows the source status component; device artwork supplies the camera island. `asset-base` can supply `status-wifi.svg` and `status-battery.svg` from appropriately licensed assets.

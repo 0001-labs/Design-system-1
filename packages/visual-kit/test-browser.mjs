@@ -18,6 +18,16 @@ try{
  await page.evaluate(()=>{const w=document.querySelector('#window');w.interactive=false;});
  await page.waitForFunction(()=>document.querySelector('#window').shadowRoot.querySelector('ds-app-chrome').shadowRoot.querySelector('button').disabled);
  for(const kind of ['macos','safari','chrome','edge','macos-compact']){await page.evaluate(k=>document.querySelector('#window').kind=k,kind);await page.waitForFunction(k=>document.querySelector('#window').shadowRoot.querySelector('ds-app-chrome').kind===k,kind);}
+ await page.evaluate(()=>{const d=document.querySelector('#phone');d.staticFrame=true;d.interactive=true;const sample=d.querySelector('.sample');sample.style.cssText='height:100%;overflow:auto';sample.innerHTML='<button>Example action</button><div style="height:3000px">Scrollable sample</div>';});
+ await page.waitForFunction(()=>document.querySelector('#phone').shadowRoot.querySelector('.content').inert);
+ const sample=page.locator('#phone .sample');await sample.scrollIntoViewIfNeeded();await sample.hover({force:true});await page.mouse.wheel(0,300);await page.waitForTimeout(100);
+ assert.equal(await sample.evaluate(el=>el.scrollTop),0,'static content does not scroll');
+ assert(await page.locator('#phone ds-app-chrome[kind="safari-ios"]').getByRole('button',{name:'Back',exact:true}).isDisabled());
+ await page.evaluate(()=>{document.querySelector('#phone').staticFrame=false;});
+ await page.waitForFunction(()=>!document.querySelector('#phone').shadowRoot.querySelector('.content').inert);
+ await sample.hover();await page.mouse.wheel(0,300);await page.waitForTimeout(100);
+ assert(await sample.evaluate(el=>el.scrollTop>0),'live content remains scrollable');
+ await page.evaluate(()=>{const d=document.querySelector('#phone');d.staticFrame=true;d.querySelector('.sample').scrollTop=0;});
  const mobile=page.locator('#phone ds-app-chrome[kind="safari-ios"]');
  assert.deepEqual(await mobile.getByRole('button').evaluateAll(bs=>bs.map(b=>b.getAttribute('aria-label'))),['Back','Page menu','Reload','Tabs']);
  const overlay=await page.locator('#phone').evaluate(d=>{const s=d.shadowRoot;const content=s.querySelector('.content').getBoundingClientRect(),bar=s.querySelector('.browser').getBoundingClientRect();return bar.top<content.bottom&&bar.bottom<=content.bottom;});
