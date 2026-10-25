@@ -1,10 +1,11 @@
 /** Private editor preview. Every preview file is authorized before reaching Assets. */
 import { dashboard, sessionRequest } from './dashboard';
 import { authorizeReport, type ReportsEnv } from './reports';
+import { hasOwnerSignIn, ownerRoutes, ownerSignOut, systemOwner, type OwnerEnv } from './consistency-owner';
 
 export const CONSISTENCY_HOST = 'c9y.site';
 export const isConsistencyHost = (host:string) => [CONSISTENCY_HOST,'neweditor.c9y.site'].includes(host);
-export interface WorkspaceEnv { CONSISTENCY_WORKSPACE?: Fetcher }
+export interface WorkspaceEnv extends OwnerEnv { CONSISTENCY_WORKSPACE?: Fetcher }
 const prefix = '/private-consistency/';
 /** Normalize only for interception. Assets must never decode a private path on another host. */
 export function isPrivatePreviewPath(path: string): boolean {
@@ -20,6 +21,11 @@ export function isPrivatePreviewPath(path: string): boolean {
   return canonical.startsWith('/private-consistency');
 }
 const security = { 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow', 'Referrer-Policy': 'same-origin', 'X-Content-Type-Options': 'nosniff', Vary: 'Cookie, Authorization' };
+/** The owner: System's owner session on an address that takes it, else the existing verified owner session. */
+async function authorizeOwner(request: Request, env: ReportsEnv & WorkspaceEnv, send: typeof fetch): Promise<Response | null> {
+  if (await systemOwner(request, env)) return null;
+  return authorizeReport(sessionRequest(request), env, send);
+}
 function protect(response: Response): Response {
   const result = new Response(response.body, response);
   for (const [key, value] of Object.entries(security)) result.headers.set(key, value);
@@ -28,15 +34,26 @@ function protect(response: Response): Response {
 export async function consistencyPreview(request: Request, env: ReportsEnv & WorkspaceEnv & { ASSETS: Fetcher }, send: typeof fetch = fetch): Promise<Response> {
   const url = new URL(request.url);
   if (!isConsistencyHost(url.hostname) || url.protocol !== 'https:') return new Response(null, { status: 404, headers: security });
+  const signingIn = await ownerRoutes(request, env);
+  if (signingIn) return protect(signingIn);
+  // Signing out ends the System session behind the owner's token too, on every Consistency site.
+  if (url.pathname === '/api/dashboard/session' && request.method === 'DELETE') {
+    const cleared = await ownerSignOut(request, env).then(value => ({ value }), () => null);
+    if (!cleared) return protect(Response.json({ error: 'Could not sign out. Try again.' }, { status: 503 }));
+    const response = protect(await dashboard(request, env, send));
+    if (cleared.value) response.headers.append('Set-Cookie', cleared.value);
+    return response;
+  }
   if (url.pathname === '/api/dashboard/session' || url.pathname === '/app/signin' || /^\/app\/assets\/[A-Za-z0-9][A-Za-z0-9._-]*$/.test(url.pathname) || url.pathname === '/icons/design-system-1.svg') return protect(await dashboard(request, env, send));
   if ((url.pathname.startsWith('/api/consistency/pages') || url.pathname==='/api/consistency/sites')) return protect(await workspaceApi(request,env,send));
   if (url.pathname === '/api/consistency/domains' || url.pathname.startsWith('/api/consistency/domains/')) return protect(await domainsApi(request, env, send));
   if (url.pathname === '/api/consistency/profile') return protect(await profileApi(request, env, send));
   if (!['GET', 'HEAD'].includes(request.method)) return new Response(null, { status: 404, headers: security });
   if (url.pathname !== '/' && !url.pathname.startsWith(prefix)) return new Response(null, { status: 404, headers: security });
-  const denied = await authorizeReport(sessionRequest(request), env, send);
+  const denied = await authorizeOwner(request, env, send);
   if (denied) {
-    if (denied.status === 401) return new Response(null, { status: 302, headers: { ...security, Location: '/app/signin', 'Set-Cookie': '__Host-ds1-dashboard=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0' } });
+    // Where the owner signs in through System, ask it quietly first: signed in there, signed in here.
+    if (denied.status === 401) return new Response(null, { status: 302, headers: { ...security, Location: hasOwnerSignIn(url) ? '/auth/start?silent=1' : '/app/signin', 'Set-Cookie': '__Host-ds1-dashboard=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0' } });
     return protect(denied);
   }
   // The home lists the projects; the page editor stays at the prefix itself.
@@ -75,7 +92,7 @@ async function profileApi(request: Request, env: ReportsEnv, send: typeof fetch)
 async function workspaceApi(request:Request,env:ReportsEnv & WorkspaceEnv,send:typeof fetch):Promise<Response>{
   const url=new URL(request.url);
   if(url.pathname!=='/api/consistency/sites'&&!/^\/api\/consistency\/pages(?:\/[a-zA-Z0-9][a-zA-Z0-9_-]{0,79})?$/.test(url.pathname))return Response.json({error:'Not found'},{status:404});
-  const denied=await authorizeReport(sessionRequest(new Request(request.url,{headers:request.headers})),env,send);if(denied)return denied;
+  const denied=await authorizeOwner(new Request(request.url,{headers:request.headers}),env,send);if(denied)return denied;
   if(!['GET','PUT'].includes(request.method))return Response.json({error:'Method not allowed'},{status:405});
   if(request.method==='PUT'&&(request.headers.get('Origin')!==url.origin||request.headers.get('Content-Type')?.split(';')[0]!=='application/json'))return Response.json({error:'Forbidden'},{status:403});
   if(!env.CONSISTENCY_WORKSPACE)return Response.json({error:'Workspace unavailable'},{status:503});

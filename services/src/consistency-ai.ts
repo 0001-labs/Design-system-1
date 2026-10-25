@@ -3,7 +3,8 @@ import { authorizeReport, type ReportsEnv } from './reports';
 import { sessionRequest } from './dashboard';
 import { isConsistencyHost } from './consistency';
 import { routeComponentEdit, type ComponentRoutingEnv } from './consistency-routing';
-export interface PreviewAIEnv extends ReportsEnv, ComponentRoutingEnv { AI?: Ai }
+import { systemOwner, type OwnerEnv } from './consistency-owner';
+export interface PreviewAIEnv extends ReportsEnv, ComponentRoutingEnv, OwnerEnv { AI?: Ai }
 const headers = { 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow', 'X-Content-Type-Options': 'nosniff', Vary: 'Cookie, Authorization' };
 const error = (message: string, status: number) => Response.json({ error: message }, { status, headers });
 export async function consistencyAI(request: Request, env: PreviewAIEnv, send: typeof fetch = fetch): Promise<Response> {
@@ -11,7 +12,7 @@ export async function consistencyAI(request: Request, env: PreviewAIEnv, send: t
   if (!isConsistencyHost(url.hostname) || url.protocol !== 'https:') return error('Not found.', 404);
   if (request.method !== 'POST') return error('Use POST.', 405);
   if (request.headers.get('origin') !== url.origin) return error('Request origin is not allowed.', 403);
-  const denied = await authorizeReport(sessionRequest(new Request(request.url, { headers: request.headers })), env, send);
+  const denied = (await systemOwner(request, env)) ? null : await authorizeReport(sessionRequest(new Request(request.url, { headers: request.headers })), env, send);
   if (denied) return denied;
   if (!request.headers.get('content-type')?.startsWith('application/json')) return error('Send JSON.', 415);
   // Bound streamed input too: Content-Length alone is not trustworthy.
