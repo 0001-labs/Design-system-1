@@ -30,13 +30,13 @@ describe("combined website routes", () => {
     for (const path of ["/", "/app/signin", "/api/reports/components"]) {
       expect((await site.fetch("https://adoption.designsystem1.com" + path, { redirect: "manual" })).status).toBe(404);
     }
-    for (const path of ["/adoption", "/adoption/", "/app/adoption"]) {
+    for (const path of ["/adoption", "/adoption/", "/app/adoption", "/architecture", "/architecture/"]) {
       const response = await site.fetch(path, { redirect: "manual" });
       expect(response.status).toBe(302);
       expect(response.headers.get("location")).toBe("/app/signin");
       expect(response.headers.get("cache-control")).toBe("private, no-store");
     }
-    for (const path of ["/adoption/index.html", "/Adoption/", "/%61doption/index.html"]) {
+    for (const path of ["/adoption/index.html", "/Adoption/", "/%61doption/index.html", "/architecture/index.html", "/Architecture/"]) {
       expect((await site.fetch(path, { redirect: "manual" })).status).toBe(404);
     }
   });
@@ -61,7 +61,7 @@ describe("combined website routes", () => {
     expect(page.headers.get("location")).toBe("/app/signin");
     expect(page.headers.get("cache-control")).toBe("private, no-store");
     expect(await (await site.fetch(origin + "/app/signin")).text()).toBe("Application");
-    for (const path of ["/app/libraries", "/api/libraries", "/api/fonts", "/api/reports/components", "/2-core/icon/collection/", "/reports/component-adoption.json"]) {
+    for (const path of ["/app/libraries", "/api/libraries", "/api/fonts", "/api/reports/components", "/api/reports/architecture", "/2-core/icon/collection/", "/reports/component-adoption.json"]) {
       expect((await site.fetch(origin + path)).status, path).toBe(404);
     }
   });

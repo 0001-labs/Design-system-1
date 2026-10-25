@@ -36,6 +36,9 @@ const here = Astro.url.pathname.replace(/\/$/, '');
     <ds-button control="slotted" fit class="rail-entry rail-gap rail-adoption">
       <a href="/adoption/" aria-current={here === '/adoption' ? 'page' : undefined}>Adoption</a>
     </ds-button>
+    <ds-button control="slotted" fit class="rail-entry rail-adoption">
+      <a href="/architecture/" aria-current={here === '/architecture' ? 'page' : undefined}>Architecture</a>
+    </ds-button>
   </div>
   <footer class="rail-footer">
     <ds-button control="slotted" fit><a href="https://github.com/0001-labs/Design-system-1">GitHub</a></ds-button>

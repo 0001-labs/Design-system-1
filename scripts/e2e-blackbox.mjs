@@ -657,9 +657,18 @@ if (PRODUCTION) {
         expectPrivate(answer);
       },
     ],
+    ...["/adoption/", "/architecture/"].map((path) => [
+      `${path} asks to sign in`,
+      async () => {
+        const answer = await request(path);
+        expectRedirect(answer, 302, `${PUBLIC}/app/signin`);
+        expectPrivate(answer);
+      },
+    ]),
     ...[
       [FONTS, "/api/fonts"],
       [PUBLIC, "/api/reports/components"],
+      [PUBLIC, "/api/reports/architecture"],
       [PUBLIC, "/api/flags"],
       [PUBLIC, "/api/app-navigation"],
     ].map(([origin, path]) => [

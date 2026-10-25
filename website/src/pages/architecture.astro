@@ -1,0 +1,9 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+---
+<StarlightPage frontmatter={{ title: 'Architecture', tableOfContents: false, editUrl: false }}>
+  <ds1-architecture-document></ds1-architecture-document>
+</StarlightPage>
+<script>
+  import '../lib/architecture-document';
+</script>

@@ -35,7 +35,9 @@ export async function dashboard(request: Request, env: ReportsEnv & { ASSETS: Fe
   }
   if (!['GET', 'HEAD'].includes(request.method)) return new Response(null, { status: 404, headers: security });
   if (url.pathname.startsWith('/app/assets/') || url.pathname === '/icons/design-system-1.svg') return env.ASSETS.fetch(request);
-  const adoption = url.pathname === '/adoption/' || url.pathname === '/adoption' || url.pathname === '/app/adoption';
+  // Owner documents in the docs: Adoption and Architecture.
+  const ownerPage = ['/adoption/', '/architecture/'].find(page => url.pathname === page || url.pathname === page.slice(0, -1));
+  const adoption = Boolean(ownerPage) || url.pathname === '/app/adoption';
   const privateApp = url.pathname === '/private-app/' || /^\/private-app\/[a-zA-Z0-9._-]+$/.test(url.pathname);
   if (!adoption && !privateApp && !['/', '/app/', '/app/signin', '/app/reports/components'].includes(url.pathname)) return new Response(null, { status: 404, headers: security });
   if (url.pathname !== '/app/signin') {
@@ -46,8 +48,8 @@ export async function dashboard(request: Request, env: ReportsEnv & { ASSETS: Fe
       return denied;
     }
   }
-  if (url.pathname === '/adoption') url.pathname = '/adoption/';
-  else if (!privateApp && url.pathname !== '/adoption/') url.pathname = '/app/';
+  if (ownerPage) url.pathname = ownerPage;
+  else if (!privateApp) url.pathname = '/app/';
   const original = await env.ASSETS.fetch(new Request(url, request));
   const response = new Response(original.body, original);
   for (const [name, value] of Object.entries(security)) response.headers.set(name, value);

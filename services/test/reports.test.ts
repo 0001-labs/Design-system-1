@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vite-plus/test";
-import { componentReport, REPORT_KEY, type ReportsEnv } from "../src/reports";
+import { ARCHITECTURE_KEY, architectureReport, componentReport, REPORT_KEY, type ReportsEnv } from "../src/reports";
 
 import { sessionRequest } from "../src/dashboard";
 
@@ -79,4 +79,29 @@ it('revalidates the document cookie before reading data and rejects a forged own
   send.mockResolvedValue(Response.json({ status: 'success', value: { _id: 'other', email: 'jaa90@icloud.com', emailVerified: true } }));
   expect((await componentReport(sessionRequest(input), env, send)).status).toBe(403);
   expect(get).not.toHaveBeenCalled();
+});
+
+describe("owner-only architecture document", () => {
+  const architecture = (token?: string) => new Request("https://designsystem1.com/api/reports/architecture", token ? { headers: { authorization: `Bearer ${token}` } } : {});
+  it("never reads the document for anonymous or other accounts", async () => {
+    const { env, get, send } = setup();
+    expect((await architectureReport(architecture(), env, send)).status).toBe(401);
+    send.mockResolvedValue(Response.json({ status: "success", value: { _id: "other", email: "jaa90@icloud.com", emailVerified: true } }));
+    expect((await architectureReport(architecture("token"), env, send)).status).toBe(403);
+    expect(get).not.toHaveBeenCalled();
+  });
+  it("reads its own private key as Markdown, and explains a missing document", async () => {
+    const { env, get, send } = setup();
+    send.mockImplementation(async () => Response.json({ status: "success", value: { _id: "owner", email: "jaa90@icloud.com", emailVerified: true } }));
+    get.mockResolvedValue({ body: "# Architecture" });
+    const response = await architectureReport(architecture("owner-token"), env, send);
+    expect(get).toHaveBeenCalledWith(ARCHITECTURE_KEY);
+    expect(response.status).toBe(200);
+    expect(await response.text()).toBe("# Architecture");
+    expect(response.headers.get("content-type")).toBe("text/markdown; charset=utf-8");
+    expect(response.headers.get("cache-control")).toBe("private, no-store");
+    get.mockResolvedValue(null);
+    expect((await architectureReport(architecture("owner-token"), env, send)).status).toBe(404);
+    expect((await architectureReport(new Request(architecture("owner-token"), { method: "POST" }), env, send)).status).toBe(405);
+  });
 });

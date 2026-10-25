@@ -105,7 +105,9 @@ const { sidebar } = Astro.locals.starlightRoute;
       }),
     ] : rows(groups);
     navigation.items = placeAppNavigation(navigation, items, appComponents);
-    if (owner) navigation.items = [...navigation.items, { id: 'adoption', label: 'Adoption', href: '/adoption/', current: location.pathname === '/adoption/' }];
+    if (owner) navigation.items = [...navigation.items,
+      { id: 'adoption', label: 'Adoption', href: '/adoption/', current: location.pathname === '/adoption/' },
+      { id: 'architecture', label: 'Architecture', href: '/architecture/', current: location.pathname === '/architecture/' }];
   }
   renderAccount();
   renderWorkspace();

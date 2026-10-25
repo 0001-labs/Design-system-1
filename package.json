@@ -51,6 +51,7 @@
     "reports:configure": "node scripts/configure-report-access.mjs",
     "reports:upload:local": "cd services && vp exec wrangler r2 object put ds-one-libraries-preview/reports/component-adoption.json --file ../.reports/component-adoption.json --local --config ../wrangler.jsonc",
     "reports:upload": "vp run reports:scan && cd services && vp exec wrangler r2 object put ds-one-libraries/reports/component-adoption.json --file ../.reports/component-adoption.json --remote --config ../wrangler.jsonc",
+    "architecture:upload": "cd services && vp exec wrangler r2 object put ds-one-libraries/reports/architecture.md --file ../.reports/architecture.md --content-type 'text/markdown; charset=utf-8' --remote --config ../wrangler.jsonc",
     "dev": "vp dev --host",
     "build": "vp run build:bundle",
     "check": "sync1 check && vp check",

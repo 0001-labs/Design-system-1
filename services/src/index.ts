@@ -11,7 +11,7 @@ import { libraryApi } from "./libraries";
 import { fontWorkspace } from "./fonts";
 import assets from "./assets/index.ts";
 import publish, { type Env as PublishEnv } from "./publish/index.ts";
-import { componentReport, type ReportsEnv } from "./reports.ts";
+import { architectureReport, componentReport, type ReportsEnv } from "./reports.ts";
 
 export interface Env extends PublishEnv, ReportsEnv, PreviewAIEnv, WorkspaceEnv {
   ASSETS: Fetcher;
@@ -30,7 +30,7 @@ export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
     if (url.hostname === DASHBOARD_HOST) return new Response('Not found', { status: 404 });
-    if (/^\/adoption(?:\/|$)/i.test(decodeURIComponent(url.pathname)) || url.pathname === '/app/adoption') {
+    if (/^\/(?:adoption|architecture)(?:\/|$)/i.test(decodeURIComponent(url.pathname)) || url.pathname === '/app/adoption') {
       if (url.hostname !== 'designsystem1.com') return new Response('Not found', { status: 404 });
       return dashboard(request, env);
     }
@@ -125,6 +125,7 @@ export default {
     }
 
     if (url.pathname === "/api/reports/components") return componentReport(sessionRequest(request), env);
+    if (url.pathname === "/api/reports/architecture") return architectureReport(sessionRequest(request), env);
 
     if (/^\/(?:app\/)?reports(?:\/components)?\/?$/.test(url.pathname)) {
       return new Response(null, { status: 302, headers: { Location: "https://designsystem1.com/adoption/", "X-Robots-Tag": "noindex, nofollow", "Cache-Control": "private, no-store" } });

@@ -79,7 +79,7 @@ describe('private App documentation and assets', () => {
   }
 });
 
-for (const path of ['/adoption/', '/app/adoption']) it(`revalidates owner identity for ${path}`, async () => {
+for (const path of ['/adoption/', '/app/adoption', '/architecture/']) it(`revalidates owner identity for ${path}`, async () => {
   const { env, send, assets } = setup();
   const request = new Request('https://designsystem1.com' + path, { headers: { cookie: '__Host-ds1-dashboard=token' } });
   for (const user of [
@@ -93,5 +93,5 @@ for (const path of ['/adoption/', '/app/adoption']) it(`revalidates owner identi
   }
   send.mockResolvedValue(Response.json({ status: 'success', value: { _id: 'owner', email: 'jaa90@icloud.com', emailVerified: true } }));
   expect((await dashboard(request, env, send)).status).toBe(200);
-  expect(new URL(assets.mock.calls[0]![0].url).pathname).toBe(path === '/adoption/' ? path : '/app/');
+  expect(new URL(assets.mock.calls[0]![0].url).pathname).toBe(path === '/app/adoption' ? '/app/' : path);
 });

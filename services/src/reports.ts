@@ -40,10 +40,20 @@ export async function authorizeReport(request: Request, env: ReportsEnv, send: t
 }
 
 export async function componentReport(request: Request, env: ReportsEnv, send: typeof fetch = fetch): Promise<Response> {
+  return privateReport(request, env, send, REPORT_KEY, "No source snapshot has been published yet.");
+}
+
+/** The architecture document, published from its Ezo note by `vp run architecture:upload`. It names products, so it never enters the repository. */
+export const ARCHITECTURE_KEY = "reports/architecture.md";
+export async function architectureReport(request: Request, env: ReportsEnv, send: typeof fetch = fetch): Promise<Response> {
+  return privateReport(request, env, send, ARCHITECTURE_KEY, "The architecture has not been published yet.", "text/markdown; charset=utf-8");
+}
+
+async function privateReport(request: Request, env: ReportsEnv, send: typeof fetch, key: string, missing: string, type = headers["Content-Type"]): Promise<Response> {
   if (request.method !== "GET") return new Response(null, { status: 405, headers: { ...headers, Allow: "GET" } });
   const denied = await authorizeReport(request, env, send);
   if (denied) return denied;
-  const report = await env.LIBRARIES.get(REPORT_KEY);
-  if (!report) return failure("No source snapshot has been published yet.", 404);
-  return new Response(report.body, { headers });
+  const report = await env.LIBRARIES.get(key);
+  if (!report) return failure(missing, 404);
+  return new Response(report.body, { headers: { ...headers, "Content-Type": type } });
 }
