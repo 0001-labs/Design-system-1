@@ -1,13 +1,13 @@
 {
   "Aa": {
-    "commit": "7dd4c200af319b47c0a6596b3127d1062b0bc259",
-    "version": "0.8.1",
+    "commit": "256a466d10e874ae25cecfd13cc30c4b60aaa513",
+    "version": "0.9.0",
     "owned": ["website/src/vendor/aa"],
     "files": {
       "website/src/vendor/aa/README.md": "1f81b66577d7c7674a3acf4f0e25bf541380f7cc259c03c244e9558a06159da7",
-      "website/src/vendor/aa/aa.css": "740f6d468c93a6097e91f1073ffce0ed3108fbe054cc2f7d66cb84bdf1f31e67",
+      "website/src/vendor/aa/aa.css": "1b9744829d24a3e07ccbd2ff7e6ed9293618d27615325a4d968f43d970e54237",
       "website/src/vendor/aa/aa.d.ts": "e867e00711b211669304137592ba42382802a8c2618da4f7971f66907a78c029",
-      "website/src/vendor/aa/aa.js": "6861ba7c738b00cab0455c7be5c17deeecbef9ff09359aaaf334a81a98703ed3",
+      "website/src/vendor/aa/aa.js": "dbab9fa211d57657077327f6a4a64c7b9f137ea2d2e11e011a7bc266e7b08d26",
       "website/src/vendor/aa/button-partial.d.ts": "d576194fdc3d5bda54e0e72b5b016ed604ab51dfebb54b5752f467c1266777bd",
       "website/src/vendor/aa/comments-editor.d.ts": "0126819dee58ff74a6f16d6c18598db8259099f6beccd0aefe3e5aee75112d08",
       "website/src/vendor/aa/comments-memory.d.ts": "25906fc3dd1d057a44674f65153ccec59b5400376f7e1e7a8b5a4d767fdfc40b",
@@ -47,6 +47,7 @@
       "website/src/vendor/aa/sheet.d.ts": "c0fa22b14c41ce10a0c4dc79efcb6813f2718dd6f8090e01830377ca5c884f08",
       "website/src/vendor/aa/shimmer.d.ts": "8dabab5415b27f9e02bffc3a576fa400979d277cdaabde1ca92576375bae78de",
       "website/src/vendor/aa/span.d.ts": "0045b10b634fdbc3d8a42f2b2585d7ebb2cd231fbb1a5a8a6ae33b5a43ae4bf6",
+      "website/src/vendor/aa/styles.d.ts": "1ea68ab07effefad9a27de74209f5562df9270754be106d3faf68c787b635580",
       "website/src/vendor/aa/table-of-contents.d.ts": "6df68d8c8763e24d3de33a9def58e77ecb75634483307a8339c1a4aa6140d1bf",
       "website/src/vendor/aa/table.d.ts": "918cd9b8b04c0649ea23219711c33eddb808b49df42e0c7ded7bc35638b18f37"
     }
