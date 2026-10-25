@@ -29,8 +29,12 @@ export function libraryWorkspaceRedirect(path: string, query: URLSearchParams, e
   if (embedded) return null;
   if (path === '/profile') return '/account/';
   if (path === '/' || path === '/playground') return '/libraries/playground/';
-  // The base system is Design system 1 among the owner's libraries; only its view travels.
-  if (path === '/base') return `/libraries/design-system-1/${query.has('view') ? `?${new URLSearchParams({ view: query.get('view')! })}` : ''}`;
+  // The base system is Design system 1 among the owner's libraries; its component or view travels.
+  if (path === '/base') {
+    const kept = new URLSearchParams();
+    for (const key of ['component', 'view']) if (query.get(key)) kept.set(key, query.get(key)!);
+    return `/libraries/design-system-1/${kept.size ? `?${kept}` : ''}`;
+  }
   const match = /^\/l\/([^/]+)$/.exec(path);
   if (path !== '/libraries' && !match) return null;
   const destination = new URLSearchParams();

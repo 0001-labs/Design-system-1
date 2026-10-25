@@ -36,11 +36,14 @@ const { sidebar } = Astro.locals.starlightRoute;
   import { LAYERS } from '../../../shared/component-directory';
   import { libraryWorkspaceHref, type LibraryNavigation } from '../../../shared/library-navigation';
   import { ownerLibraryItems, readOwnerLibraries, MY_LIBRARIES_ID, type OwnerLibrary } from '../lib/owner-libraries';
+  import { editorChoice, editorSidebarItems, EDITOR_COMPONENTS_ID, type EditorNavigation } from '../../../shared/editor-navigation';
   import type { SidebarItem } from '../../../DS1/3-unit/ds-sidebar';
   const navigation = document.querySelector('ds-sidebar#docs-navigation')!;
   type Entry = { label: string; href?: string; isCurrent?: boolean; entries?: Entry[] };
   const groups: Entry[] = JSON.parse(navigation.dataset.groups ?? '[]');
   let library: LibraryNavigation | null = null;
+  // Design system 1's component editor, framed on its docs page: its components take the docs groups' place.
+  let editor: EditorNavigation | null = null;
   let appComponents: AppComponent[] = [];
   let ownerLibraries: OwnerLibrary[] = [];
   const collapsed = new Set<string>();
@@ -94,8 +97,8 @@ const { sidebar } = Astro.locals.starlightRoute;
     avatar.hidden = !signedIn;
   }
   function renderNavigation() {
-    navigation.label = library ? `${library.name} navigation` : 'Documentation';
-    const items: SidebarItem[] = library ? [
+    navigation.label = library ? `${library.name} navigation` : editor ? 'Design system 1 components' : 'Documentation';
+    const items: SidebarItem[] = editor ? editorSidebarItems(editor, !collapsed.has(EDITOR_COMPONENTS_ID), location.pathname) : library ? [
       { id: 'base-system', label: 'Design system 1', href: '/' },
       { id: 'library-overview', label: library.name, href: libraryWorkspaceHref({ ...library, view: 'overview' }), current: library.view === 'overview' },
       ...LAYERS.flatMap(layer => {
@@ -122,8 +125,20 @@ const { sidebar } = Astro.locals.starlightRoute;
     renderWorkspace();
     renderNavigation();
   });
+  window.addEventListener('ds1-editor-navigation', event => {
+    editor = (event as CustomEvent).detail.editor;
+    renderNavigation();
+  });
   navigation.addEventListener('sidebar-activate', event => {
     const id = (event as CustomEvent).detail.id;
+    const choice = editor ? editorChoice(id) : null;
+    if (choice) {
+      const frame = document.querySelector<HTMLIFrameElement>('#library-app');
+      if (!frame?.contentWindow) return;
+      event.preventDefault();
+      frame.contentWindow.postMessage({ type: 'ds1:editor-open', ...choice }, location.origin);
+      return;
+    }
     if (!library || (id !== 'library-overview' && !LAYERS.some(layer => layer.entries.some(entry => entry.href === id)))) return;
     const frame = document.querySelector<HTMLIFrameElement>('#library-app');
     if (!frame?.contentWindow) return;
@@ -137,7 +152,7 @@ const { sidebar } = Astro.locals.starlightRoute;
     owner = signedIn && detail.owner === true && !detail.loading;
     if (!detail.loading) appComponents = readAppComponents(detail);
     if (!detail.loading) ownerLibraries = owner ? readOwnerLibraries(detail.libraries) : [];
-    if (!signedIn) library = null;
+    if (!signedIn) { library = null; editor = null; }
     workspaceName = typeof detail.companyName === 'string' && detail.companyName.trim() ? detail.companyName : 'My company';
     renderWorkspace(); renderNavigation(); renderAccount();
   });

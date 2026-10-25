@@ -38,6 +38,7 @@ const frameTitle = mode === 'editor' ? 'Design system 1 editor' : mode === 'acco
 
 <script>
   import { libraryHeading, libraryHref, libraryWorkspaceHref, readLibraryNavigation, type LibraryNavigation } from '../../../shared/library-navigation';
+  import { editorSearch, readEditorNavigation, readEditorView } from '../../../shared/editor-navigation';
   const frame = document.querySelector<HTMLIFrameElement>('#library-app');
   if (frame && !new URLSearchParams(location.search).has('internal')) {
     frame.src = frame.dataset.src!;
@@ -46,7 +47,8 @@ const frameTitle = mode === 'editor' ? 'Design system 1 editor' : mode === 'acco
     const libraryId = query.get('library');
     // The base system's editor names no library: it keeps only its view (`?view=tokens`).
     const libraryNavigation = frame.dataset.mode !== 'base';
-    if (!libraryNavigation && query.get('view')) frame.src = `${frame.dataset.src}&${new URLSearchParams({ view: query.get('view')! })}`;
+    // The editor opens on the component or view the address names, and reports what it edits.
+    if (!libraryNavigation && (query.get('view') || query.get('component'))) frame.src = `${frame.dataset.src}&${editorSearch(query.get('component'), readEditorView(query.get('view')))}`;
     if (libraryId && libraryNavigation && frame.dataset.mode !== 'account') {
       const appQuery = new URLSearchParams({ embed: 'docs' });
       if (query.get('view') === 'overview') appQuery.set('view', 'overview');
@@ -61,7 +63,18 @@ const frameTitle = mode === 'editor' ? 'Design system 1 editor' : mode === 'acco
       frame.contentWindow?.postMessage({ type: 'ds1:docs-theme', theme }, window.location.origin);
     };
     const requestLibrary = () => { if (libraryNavigation) frame.contentWindow?.postMessage({ type: 'ds1:library-navigation-request' }, location.origin); };
-    frame.addEventListener('load', () => { sendTheme(); requestLibrary(); });
+    const requestEditor = () => { if (!libraryNavigation) frame.contentWindow?.postMessage({ type: 'ds1:editor-navigation-request' }, location.origin); };
+    frame.addEventListener('load', () => { sendTheme(); requestLibrary(); requestEditor(); });
+    window.addEventListener('message', (event) => {
+      if (libraryNavigation || event.origin !== location.origin || event.source !== frame.contentWindow || event.data?.type !== 'ds1:editor-navigation') return;
+      const editor = readEditorNavigation(event.data);
+      if (!editor) return;
+      const search = editorSearch(editor.view ? null : editor.component, editor.view);
+      // The first component is the editor's own default: the address stays plain for it.
+      const address = !editor.view && editor.component === editor.components[0]?.id ? location.pathname : `${location.pathname}?${search}`;
+      if (`${location.pathname}${location.search}` !== address) history.replaceState({}, '', address);
+      window.dispatchEvent(new CustomEvent('ds1-editor-navigation', { detail: { editor } }));
+    });
     requestLibrary();
     window.addEventListener('theme-changed', sendTheme);
     const renderLibrary = (library: LibraryNavigation | null) => {

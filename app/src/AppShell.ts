@@ -4,7 +4,9 @@ import { siteNavigation, isNavigationCurrent } from "../../shared/site-navigatio
 import "../../shared/site-navigation.css";
 import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
+import { editorSearch, type EditorNavigation, type EditorView } from "../../shared/editor-navigation";
 import { libraryComponent, libraryHref, type LibraryNavigation } from "../../shared/library-navigation";
+import { COMPONENTS, componentSpec } from "./component-specs";
 import { authState, LiveQuery } from "./lib/backend";
 import { AppElement, defineElement } from "./lib/element";
 import { currentLocation, follow, href, matchRoute, navigate } from "./router";
@@ -21,6 +23,7 @@ export class AppShell extends AppElement {
   });
   #reported: string | null = null;
   #current: LibraryNavigation | null = null;
+  #editorReported: string | null = null;
 
   #embedded() {
     return document.documentElement.hasAttribute("data-docs-embed");
@@ -30,10 +33,30 @@ export class AppShell extends AppElement {
     window.parent.postMessage({ type: "ds1:library-navigation", ...JSON.parse(this.#reported ?? "{}") }, window.location.origin);
   };
 
+  /** Design system 1's component editor: what it edits and what is open, for the docs sidebar. */
+  #editor(): EditorNavigation | null {
+    const { path, search } = currentLocation.get();
+    if (path !== "/base") return null;
+    const view: EditorView = search.get("view") === "history" || search.get("view") === "tokens" ? search.get("view") as EditorView : null;
+    return { components: COMPONENTS.map(({ id, name }) => ({ id, name })), component: componentSpec(search.get("component")).id, view };
+  }
+
+  #reportEditor = () => {
+    const editor = this.#editor();
+    if (editor) window.parent.postMessage({ type: "ds1:editor-navigation", ...editor }, window.location.origin);
+  };
+
   #receive = (event: MessageEvent) => {
     if (event.origin !== window.location.origin || event.source !== window.parent) return;
     const current = this.#current;
     if (event.data?.type === "ds1:library-navigation-request") this.#report();
+    if (event.data?.type === "ds1:editor-navigation-request") this.#reportEditor();
+    if (event.data?.type === "ds1:editor-open" && currentLocation.get().path === "/base") {
+      const { component, view } = event.data as { component?: unknown; view?: unknown };
+      const chosen: EditorView = view === "history" || view === "tokens" ? view : null;
+      const search = editorSearch(typeof component === "string" ? componentSpec(component).id : null, chosen, currentLocation.get().search);
+      navigate(`/base?${search}`);
+    }
     if (event.data?.type === "ds1:library-overview" && current) navigate(`${libraryHref({ ...current, view: "overview" }).slice(4)}&embed=docs`);
     if (event.data?.type === "ds1:library-component" && current && typeof event.data.component === "string") {
       navigate(`${libraryHref({ ...current, view: undefined }, libraryComponent(event.data.component)).slice(4)}&embed=docs`);
@@ -48,6 +71,7 @@ export class AppShell extends AppElement {
   override disconnectedCallback() {
     window.removeEventListener("message", this.#receive);
     this.#reported = null;
+    this.#editorReported = null;
     super.disconnectedCallback();
   }
 
@@ -55,6 +79,8 @@ export class AppShell extends AppElement {
   override updated() {
     if (!this.#embedded() || !this.isConnected) return;
     const context = JSON.stringify({ library: this.#current, libraryId: matchRoute("/l/:id", currentLocation.get().path)?.id ?? null });
+    const editor = JSON.stringify(this.#editor());
+    if (editor !== this.#editorReported) { this.#editorReported = editor; this.#reportEditor(); }
     if (context === this.#reported) return;
     this.#reported = context;
     this.#report();
