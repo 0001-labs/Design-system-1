@@ -121,3 +121,14 @@ it('the compatibility address has no System sign-in and ignores an owner cookie'
   expect(home.status).toBe(302);
   expect(home.headers.get('location')).toBe('/app/signin');
 });
+
+it('Settings → Domains reaches the platform with the One key session alone, and refuses without it', async () => {
+  const { env, visit, signIn } = setup();
+  const workspace = { fetch: vi.fn(async () => Response.json({ target: 'connect.c9y.site', ready: true, sites: [] })) };
+  (env as unknown as { CONSISTENCY_WORKSPACE: typeof workspace }).CONSISTENCY_WORKSPACE = workspace;
+  expect((await visit('/api/consistency/domains')).status).toBe(401);
+  const { owner } = await signIn();
+  expect((await visit('/api/consistency/domains', { headers: { Cookie: owner! } })).status).toBe(200);
+  expect((await visit('/api/consistency/domains/www.example.com', { method: 'DELETE', headers: { Cookie: owner!, Origin: 'https://evil.test' } })).status).toBe(403);
+  expect(workspace.fetch).toHaveBeenCalledTimes(1);
+});

@@ -46,8 +46,8 @@ try {
   });
   const base = `http://127.0.0.1:${server.address().port}/private-consistency/home.html`;
   await page.goto(base); await page.locator('consistency-home ds-card').first().waitFor();
-  await page.locator('consistency-home ds-sidebar[label="Settings"]').getByText('Domains', { exact: true }).click();
-  await page.waitForURL('**#domains'); await page.locator('consistency-domains ds-list').first().waitFor();
+  await page.locator('consistency-home ds-sidebar[label="Settings"]').getByText('Settings', { exact: true }).click();
+  await page.waitForURL('**#settings/domains'); await page.locator('consistency-domains ds-list').first().waitFor();
   if (await page.locator('consistency-home ds-card').count()) throw Error('Projects still shown on Domains');
   const flavo = page.locator('consistency-domains ds-list[heading="Flavo"]');
   if (!(await flavo.innerText()).includes('flavo.flowers') || await flavo.getByRole('button', { name: /More for/ }).count()) throw Error('A Worker custom domain must show without actions');
@@ -78,7 +78,7 @@ try {
 
   for (const width of [300, 390, 768, 1440]) { await page.setViewportSize({ width, height: 800 }); await page.waitForTimeout(100); if (await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)) throw Error(`Domains overflows at ${width}`); }
   await page.setViewportSize({ width: 1440, height: 800 });
-  await page.getByRole('link', { name: 'Projects' }).click(); await page.locator('consistency-home ds-card').first().waitFor();
+  await page.locator('consistency-home ds-sidebar[label="Places"]').getByText('Sites', { exact: true }).click(); await page.locator('consistency-home ds-card').first().waitFor();
 
   state.ready = false;
   await page.goto(base + '#domains'); await page.reload(); await page.locator('consistency-domains ds-message[text="Connecting domains is not set up yet."]').waitFor();

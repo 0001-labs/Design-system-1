@@ -2,6 +2,12 @@ consistency-home{display:block;height:100dvh}
 consistency-home>ds-page{height:100%}
 .home-nav{display:flex;flex-direction:column;gap:var(--ds-unit);height:100%}
 .home-nav>ds-sidebar[label="Settings"]{margin-top:auto}
+/* Each page opens with its title at display size, as Money's pages do, a square above what it holds. */
+.home-main{display:flex;flex-direction:column;gap:var(--ds-unit);min-width:0}
+/* Settings, as Money's: the text tabs a square under the title, the tab's content a square under them, in a settings column of 32 squares. */
+.home-settings{display:flex;flex-direction:column;gap:var(--ds-unit);max-width:calc(32 * var(--ds-unit))}
+.home-account{display:flex;flex-direction:column;gap:var(--ds-unit)}
+.home-sign-out{display:flex;margin-top:var(--ds-unit)}
 /* The workspace on the first row: its avatar, name and menu, the notifications bell at the end. */
 .home-workspace{display:flex;align-items:flex-end;justify-content:space-between;gap:calc(var(--ds-unit) / 2);min-height:var(--ds-unit)}
 .home-workspace :is(.home-workspace-name, [menu-item]) ds-avatar{margin-inline-end:calc(4px * var(--ds-sf, 1))}
@@ -9,7 +15,6 @@ consistency-home>ds-page{height:100%}
 .home-bar{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--ds-unit);min-height:var(--ds-unit)}
 .home-grid{display:grid;grid-template-columns:repeat(auto-fill,calc(12 * var(--ds-unit)));gap:var(--ds-unit)}
 @media(max-width:600px){.home-grid{grid-template-columns:minmax(0,1fr)}.home-grid>ds-card{width:auto}}
-.home-bar--page{justify-content:flex-start}
 /* Settings → Domains: a settings column of 32 squares; the connect row on the sixteen; each waiting domain's record under its row. */
 consistency-domains{display:block;max-width:calc(32 * var(--ds-unit))}
 .domains{display:flex;flex-direction:column;gap:var(--ds-unit)}

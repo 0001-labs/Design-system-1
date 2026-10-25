@@ -10,22 +10,25 @@ import '../../../DS1/2-core/ds-text';
 import '../../../DS1/2-core/ds-avatar';
 import '../../../DS1/2-core/ds-icon';
 import '../../../DS1/3-unit/ds-select';
+import '../../../DS1/2-core/ds-message';
 import './domains';
 import './home.css';
 
 /** The owner's sites. Each opens in its editor, `/team/`: the site beside its sidebar, ready to edit. */
-export const PROJECTS = [
+export const SITES = [
   { id: 'flavo', name: 'Flavo', url: 'https://flavo.c9y.site/team/' },
   { id: 'cph-raft', name: 'CPH Raft', url: 'https://cphraft.c9y.site/team/' },
   { id: 'soendergaarden', name: 'Søndergården', url: 'https://soendergaarden.c9y.site/team/' },
 ] as const;
 
-type View = 'grid' | 'list';
-/** Which page the home shows: its projects, or a settings page named by the address's hash (`#domains`). */
-type Page = 'projects' | 'domains';
-const pageOf = (hash: string): Page => hash === '#domains' ? 'domains' : 'projects';
-const VIEW_KEY = 'consistency-home-view';
-function storedView(): View { try { return localStorage.getItem(VIEW_KEY) === 'list' ? 'list' : 'grid'; } catch { return 'grid'; } }
+/** What the home shows, from the address's hash: the sites, or Settings at one of its tabs (`#settings/domains`, `#settings/account`). */
+export type Place = { page: 'sites' } | { page: 'settings'; tab: SettingsTab };
+export type SettingsTab = 'domains' | 'account';
+export function placeOf(hash: string): Place {
+  if (hash === '#domains' || hash === '#settings' || hash === '#settings/domains') return { page: 'settings', tab: 'domains' };
+  if (hash === '#settings/account') return { page: 'settings', tab: 'account' };
+  return { page: 'sites' };
+}
 
 // The workspace's name as last read, so the header draws it at once and the profile only confirms it.
 const WORKSPACE_KEY = 'consistency-home-workspace';
@@ -33,15 +36,14 @@ function storedWorkspace(): string { try { return localStorage.getItem(WORKSPACE
 /** The avatar's letter: a name's first letter, a number's first figure after its leading zeros (0001 is 1). */
 export function workspaceInitial(name: string): string { return (name.trim().replace(/^0+(?=.)/, '')[0] ?? '?').toUpperCase(); }
 
-/** The home at c9y.site: the owner's projects, nothing else to choose yet. */
+/** The home at c9y.site: the owner's sites, and Settings. */
 export class ConsistencyHome extends LitElement {
-  static properties = { view: { state: true }, error: { state: true }, workspace: { state: true }, page: { state: true } };
-  declare page: Page;
-  private readonly onHash = () => { this.page = pageOf(location.hash); };
-  declare view: View;
+  static properties = { error: { state: true }, workspace: { state: true }, place: { state: true } };
+  declare place: Place;
+  private readonly onHash = () => { this.place = placeOf(location.hash); };
   declare error: string;
   declare workspace: string;
-  constructor() { super(); this.view = storedView(); this.error = ''; this.workspace = storedWorkspace(); this.page = pageOf(location.hash); }
+  constructor() { super(); this.error = ''; this.workspace = storedWorkspace(); this.place = placeOf(location.hash); }
   protected createRenderRoot() { return this; }
 
   connectedCallback() { super.connectedCallback(); addEventListener('hashchange', this.onHash); void this.readWorkspace(); }
@@ -56,8 +58,6 @@ export class ConsistencyHome extends LitElement {
     try { localStorage.setItem(WORKSPACE_KEY, this.workspace); } catch { /* read again next visit */ }
   }
 
-  private setView(view: View) { this.view = view; try { localStorage.setItem(VIEW_KEY, view); } catch { /* the choice lasts this visit */ } }
-
   private async signOut() {
     this.error = '';
     const response = await fetch('/api/dashboard/session', { method: 'DELETE' }).catch(() => null);
@@ -66,8 +66,8 @@ export class ConsistencyHome extends LitElement {
   }
 
   render() {
-    const host = (url: string) => new URL(url).host;
     const name = this.workspace || 'My company';
+    const settings = this.place.page === 'settings';
     return html`<ds-page layout="sidebar" fill drawer>
       <nav slot="nav" class="home-nav" aria-label="Consistency">
         <div class="home-workspace" aria-label="Workspace">
@@ -82,31 +82,33 @@ export class ConsistencyHome extends LitElement {
             <ds-text data-ds-menu-label tone="muted" literal text="No notifications yet"></ds-text>
           </ds-select>
         </div>
-        <ds-sidebar narrow label="Settings" .items=${[{ id: 'domains', label: 'Domains', href: '#domains', current: this.page === 'domains' }, { id: 'account', label: 'Account', disabled: true }, { id: 'sign-out', label: 'Sign out' }]}
-          @sidebar-activate=${(event: CustomEvent<{ id: string }>) => { if (event.detail.id === 'sign-out') void this.signOut(); }}>
-          <ds-text slot="header" literal tone="muted" text="Settings"></ds-text>
-        </ds-sidebar>
-        ${this.error ? html`<ds-text role="alert" literal tone="danger" wrap text=${this.error}></ds-text>` : ''}
+        <ds-sidebar narrow label="Places" .items=${[{ id: 'sites', label: 'Sites', href: '#', current: !settings }]}></ds-sidebar>
+        <ds-sidebar narrow label="Settings" .items=${[{ id: 'settings', label: 'Settings', href: '#settings/domains', current: settings }]}></ds-sidebar>
       </nav>
-      ${this.page === 'domains' ? html`<div slot="header" class="home-bar home-bar--page">
-        <ds-button href="#" label="Projects"><ds-icon type="chevron-left"></ds-icon>Projects</ds-button>
-        <ds-text literal size="heading" text="Domains"></ds-text>
+      <div class="home-main">
+        <ds-text class="home-title" role="heading" aria-level="1" literal size="display" text=${settings ? 'Settings' : 'Sites'}></ds-text>
+        ${this.place.page === 'settings' ? this.settings(this.place.tab, name) : this.sites()}
       </div>
-      <consistency-domains></consistency-domains>` : this.projects(host)}
     </ds-page>`;
   }
 
-  private projects(host: (url: string) => string) {
-    return html`<div slot="header" class="home-bar">
-        <ds-button primary disabled>New</ds-button>
-        <ds-tabs role="group" aria-label="View">
-          <ds-button ?active=${this.view === 'grid'} ?primary=${this.view === 'grid'} ?secondary=${this.view !== 'grid'} aria-pressed=${String(this.view === 'grid')} @click=${() => this.setView('grid')}>Grid</ds-button>
-          <ds-button ?active=${this.view === 'list'} ?primary=${this.view === 'list'} ?secondary=${this.view !== 'list'} aria-pressed=${String(this.view === 'list')} @click=${() => this.setView('list')}>List</ds-button>
-        </ds-tabs>
-      </div>
-      ${this.view === 'grid'
-        ? html`<div class="home-grid">${PROJECTS.map(project => html`<ds-card href=${project.url} width="12" height="8"><span slot="label">${host(project.url)}</span><span slot="title">${project.name}</span></ds-card>`)}</div>`
-        : html`<ds-list aria-label="Projects">${PROJECTS.map(project => html`<ds-row href=${project.url}><span class="ds-row__name">${project.name}</span><span class="ds-row__value">${host(project.url)}</span></ds-row>`)}</ds-list>`}`;
+  /** The owner's sites as cards, each opening its editor. */
+  private sites() {
+    return html`<div class="home-grid">${SITES.map(site => html`<ds-card href=${site.url} width="12" height="8"><span slot="label">${new URL(site.url).host}</span><span slot="title">${site.name}</span></ds-card>`)}</div>`;
+  }
+
+  /** Settings as Money draws it: text tabs under the title, each tab its own address. */
+  private settings(tab: SettingsTab, name: string) {
+    const tabs: { id: SettingsTab; label: string }[] = [{ id: 'domains', label: 'Domains' }, { id: 'account', label: 'Account' }];
+    return html`<div class="home-settings">
+      <ds-tabs text class="home-settings-tabs" aria-label="Settings">${tabs.map(item => html`<ds-button control="host" role="tab" ?active=${tab === item.id} aria-selected=${String(tab === item.id)} tabindex=${tab === item.id ? 0 : -1}
+        @click=${() => { location.hash = `#settings/${item.id}`; }}>${item.label}</ds-button>`)}</ds-tabs>
+      ${tab === 'domains' ? html`<consistency-domains></consistency-domains>` : html`<section class="home-account" aria-label="Account">
+        <ds-list aria-label="Account"><ds-row><span class="ds-row__name">Workspace</span><span class="ds-row__value">${name}</span></ds-row></ds-list>
+        <div class="home-sign-out"><ds-button secondary @click=${() => void this.signOut()}>Sign out</ds-button></div>
+        ${this.error ? html`<ds-message role="alert" tone="danger" literal text=${this.error}></ds-message>` : ''}
+      </section>`}
+    </div>`;
   }
 }
 if (!customElements.get('consistency-home')) customElements.define('consistency-home', ConsistencyHome);

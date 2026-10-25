@@ -113,7 +113,7 @@ async function domainsApi(request: Request, env: ReportsEnv & WorkspaceEnv, send
   const url = new URL(request.url);
   const item = /^\/api\/consistency\/domains\/([a-z0-9.-]{1,253})(\/check)?$/.exec(url.pathname);
   if (url.pathname !== '/api/consistency/domains' && !item) return Response.json({ error: 'Not found' }, { status: 404 });
-  const denied = await authorizeReport(sessionRequest(new Request(request.url, { headers: request.headers })), env, send); if (denied) return denied;
+  const denied = await authorizeOwner(new Request(request.url, { headers: request.headers }), env, send); if (denied) return denied;
   const allowed = item ? (item[2] ? ['POST'] : ['DELETE']) : ['GET', 'POST'];
   if (!allowed.includes(request.method)) return Response.json({ error: 'Method not allowed' }, { status: 405 });
   const body = request.method === 'POST' && !item ? await request.text() : undefined;
