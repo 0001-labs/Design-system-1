@@ -75,7 +75,6 @@ export * from "./3-unit/ds-accordion";
 export * from "./2-core/ds-avatar";
 export * from "./3-unit/ds-avatar-group";
 export * from "./3-unit/ds-calendar";
-export * from "./3-unit/ds-calendar-large";
 export * from "./3-unit/ds-bento";
 export * from "./3-unit/ds-carousel";
 export * from "./3-unit/ds-form";

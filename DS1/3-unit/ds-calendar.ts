@@ -56,6 +56,15 @@ import styles from "./styles/ds-calendar.css?inline";
 
 export * from "./calendar-base";
 
+/** An activity day's fill: one colour, or bands side by side when several share it. */
+function activityFill(events: readonly CalendarEvent[]): string | undefined {
+  if (!events.length) return undefined;
+  const colours = [...new Set(events.map(event => event.color || "var(--ds-calendar-event-fill, var(--ds-apple-green))"))];
+  if (colours.length === 1) return colours[0];
+  const share = 100 / colours.length;
+  return `linear-gradient(90deg, ${colours.map((colour, index) => `${colour} ${index * share}% ${(index + 1) * share}%`).join(", ")})`;
+}
+
 const whole = (value: number | undefined, least: number, most: number, fallback: number) =>
   typeof value === "number" && Number.isFinite(value) ? Math.max(least, Math.min(most, Math.floor(value))) : fallback;
 
@@ -254,6 +263,13 @@ const openPickers = new Set<Calendar>();
  *   it, so nothing under the calendar moves when the view changes.
  * @prop {boolean} outsideDays - Draw the days of the months before and after
  *   in the title grey (`outside-days`); pressing one moves there.
+ * @prop {boolean} activity - The days as quiet squares, a contribution grid:
+ *   weeks across a square each, as the swimlane runs, and the days down them,
+ *   every other weekday named before them and the month over its weeks; a
+ *   day on which something happens is filled with its events' colours, split
+ *   into bands when several share it. Dates stay in each day's name and
+ *   tooltip. Takes the place of the large calendar's months in squares.
+ * @prop {number} months - How many months activity draws from `month`: 1 by default.
  * @prop {boolean} heat - Light each day by how much happens on it, as a
  *   contribution graph does: the events' `count`s added up (one each by
  *   default), in four steps of the busiest day shown.
@@ -329,6 +345,8 @@ export class Calendar extends CalendarBase {
     noHeader: { type: Boolean, attribute: "no-header", reflect: true },
     noToday: { type: Boolean, attribute: "no-today", reflect: true },
     heat: { type: Boolean, reflect: true },
+    activity: { type: Boolean, reflect: true },
+    months: { type: Number },
     heatMax: { type: Number, attribute: "heat-max" },
     picker: { type: Boolean, reflect: true },
     name: { type: String, reflect: true },
@@ -366,6 +384,8 @@ export class Calendar extends CalendarBase {
   declare noHeader: boolean;
   declare noToday: boolean;
   declare heat: boolean;
+  declare activity: boolean;
+  declare months: number | undefined;
   declare heatMax: number | undefined;
   declare picker: boolean;
   declare name: string | undefined;
@@ -408,6 +428,7 @@ export class Calendar extends CalendarBase {
     this.noHeader = false;
     this.noToday = false;
     this.heat = false;
+    this.activity = false;
     this.picker = false;
     this.time = false;
     this.required = false;
@@ -1109,6 +1130,90 @@ export class Calendar extends CalendarBase {
       </div>`);
   }
 
+  /** The first day of each week activity draws: from the week holding the month's first to the one holding its last month's last day. */
+  private get activityWeeks(): Day[] {
+    const first = this.shownMonth;
+    const end = addDays(addMonths(first, whole(this.months, 1, 36, 1)), -1);
+    const weeks: Day[] = [];
+    for (let day = addDays(first, -((weekdayOf(first) - this.firstDay + 7) % 7)); day <= end; day = addDays(day, 7)) weeks.push(day);
+    return weeks;
+  }
+
+  /**
+   * The days as quiet squares: every other weekday named down the start, the
+   * months over their weeks, and a week to a column a square wide, its days
+   * down it, each a square drawn two pixels in with a picture's corners,
+   * filled with its events' colours. Days outside the months stay empty.
+   */
+  private renderActivity() {
+    const weeks = this.activityWeeks;
+    const first = this.shownMonth;
+    const end = addMonths(first, whole(this.months, 1, 36, 1));
+    this.byDay = eventsByDay(this.events ?? [], weeks[0], addDays(weeks.at(-1)!, 6));
+    const short = weekdayNames(this.firstDay, "short");
+    const narrow = weekdayNames(this.firstDay, "narrow");
+    const long = weekdayNames(this.firstDay, "long");
+    const today = this.todayDay;
+    const months: { column: number; span: number; month: Day }[] = [];
+    // A week is named by the month owning most of it, held to the months drawn.
+    const lastMonth = addMonths(end, -1);
+    weeks.forEach((start, column) => {
+      const owner = this.ownerOf(start);
+      const month = owner < first ? first : owner > lastMonth ? lastMonth : owner;
+      const last = months.at(-1);
+      if (last && last.month === month) last.span++;
+      else months.push({ column, span: 1, month });
+    });
+    return html`<div class="calendar" part="calendar">
+      ${this.renderHeader()}
+      <div class="activity" part="activity" style=${`--ds-calendar-weeks: ${weeks.length}`}>
+        <div class="activity-rail" part="weekdays" aria-hidden="true">
+          ${short.map((name, row) => html`<span class="activity-weekday" data-narrow=${narrow[row]}>${row % 2 === 1 ? name : ""}</span>`)}
+        </div>
+        <div class="activity-weeks">
+          <div class="activity-months" part="months" aria-hidden="true">
+            ${months.map(({ column, span, month }, index) => html`<span class="activity-month" style=${`grid-column: ${column + 1} / span ${span}`}>${
+              index === 0 || month.slice(5, 7) === "01" ? monthTitle(month, "short") : monthName(month, "short")
+            }</span>`)}
+          </div>
+          <div
+            class="activity-grid"
+            part="grid"
+            role="grid"
+            aria-label=${this.nameOr(months.length > 1 ? this.monthRangeTitle(weeks) : monthTitle(first))}
+            @click=${this.onClick}
+          >
+            ${short.map((_, row) => html`<div role="row" class="activity-row">
+              <span role="rowheader" class="activity-hidden">${long[row]}</span>
+              ${weeks.map((start, column) => {
+                const day = addDays(start, row);
+                const style = `grid-row: ${row + 1}; grid-column: ${column + 1}`;
+                if (day < first || day >= end) return html`<span role="gridcell" class="activity-day" aria-hidden="true" style=${style}></span>`;
+                const events = this.eventsOn(day);
+                const fill = activityFill(events);
+                const label = this.cellLabel(day, events);
+                const { selected } = this.selection(day);
+                return html`<span
+                  role="gridcell"
+                  class="activity-day"
+                  part=${["day", day === today ? "today" : "", events.length ? "filled" : ""].filter(Boolean).join(" ")}
+                  data-day=${day}
+                  aria-label=${label}
+                  title=${label}
+                  aria-current=${day === today ? "date" : nothing}
+                  aria-selected=${this.selectable ? String(selected) : nothing}
+                  ?data-filled=${events.length > 0}
+                  ?data-selected=${selected}
+                  style=${`${style};${fill ? ` --ds-calendar-cell-fill: ${fill};` : ""}`}
+                ></span>`;
+              })}
+            </div>`)}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+
   /** A view drawn under the header that swipes as the arrows move: the swimlane and a page's own view. */
   private swipeFrame(content: unknown) {
     const swipes = !this.noHeader;
@@ -1183,6 +1288,7 @@ export class Calendar extends CalendarBase {
 
   render() {
     if (this.picker) return this.renderPicker();
+    if (this.activity && this.level === "days") return this.renderActivity();
     const month = this.shownMonth;
     const first = this.firstDay;
     const view = this.shownView;

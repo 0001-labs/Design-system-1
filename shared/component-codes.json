@@ -608,15 +608,6 @@
     "columnId": "avatar-group"
   },
   {
-    "id": "component:ds-calendar-large",
-    "label": "Calendar-large",
-    "code": "CALL",
-    "kind": "component",
-    "url": "https://designsystem1.com/3-unit/calendar/",
-    "version": "0.1.0",
-    "columnId": "calendar-large"
-  },
-  {
     "id": "component:ds-navigation",
     "label": "Navigation",
     "code": "NAVG",

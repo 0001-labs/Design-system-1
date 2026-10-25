@@ -7,9 +7,7 @@ vi.stubGlobal("fetch", vi.fn(async () => new Response("{}")));
 const { setLanguage } = await import("../DS1/0-face/i18n");
 const days = await import("../DS1/0-face/calendar");
 const calendarModule = await import("../DS1/3-unit/ds-calendar");
-await import("../DS1/3-unit/ds-calendar-large");
 type Calendar = HTMLElementTagNameMap["ds-calendar"];
-type Large = HTMLElementTagNameMap["ds-calendar-large"];
 
 afterEach(() => { document.body.replaceChildren(); setLanguage("en"); });
 
@@ -161,29 +159,33 @@ test("a compact month is one square a day and names its days in a letter", async
   expect(calendar.shadowRoot!.querySelector(".today-button")).toBeNull();
 });
 
-test("the large calendar runs weeks in columns and fills a day's colours in bands", async () => {
-  const large = await mount<Large>(`<ds-calendar-large start="2026-10" months="2" week-start="1" today="2026-10-18"></ds-calendar-large>`);
-  large.events = [
+test("activity runs weeks in columns a square each and fills a day's colours in bands", async () => {
+  const calendar = await mount<Calendar>(`<ds-calendar activity no-header month="2026-10" months="2" week-start="1" today="2026-10-18"></ds-calendar>`);
+  calendar.events = [
     { title: "A", start: "2026-10-05", end: "2026-10-07", color: "red" },
     { title: "B", start: "2026-10-07", color: "blue" },
+    { title: "C", start: "2026-10-20" },
   ];
-  await large.updateComplete;
-  const first = cell(large, "2026-09-28");
-  expect(first.style.gridRow).toBe("1");
+  await calendar.updateComplete;
+  const root = calendar.shadowRoot!;
+  // The week holding October's first starts on Monday 28 September; its September days stay empty.
+  expect(root.querySelector('[data-day="2026-09-28"]')).toBeNull();
+  const first = cell(calendar, "2026-10-01");
+  expect(first.style.gridRow).toBe("4");
   expect(first.style.gridColumn).toBe("1");
-  expect(cell(large, "2026-10-04").style.gridRow).toBe("7");
-  expect(cell(large, "2026-10-05").style.gridColumn).toBe("2");
-  expect(cell(large, "2026-10-06").style.getPropertyValue("--ds-calendar-cell-fill")).toBe("red");
-  expect(cell(large, "2026-10-07").style.getPropertyValue("--ds-calendar-cell-fill")).toContain("linear-gradient");
-  // A date is written on today and where an event starts or ends.
-  expect(cell(large, "2026-10-05").textContent!.trim()).toBe("5");
-  expect(cell(large, "2026-10-06").textContent!.trim()).toBe("");
-  expect(cell(large, "2026-10-18").textContent!.trim()).toBe("18");
-  // Arrow down is the next day, arrow right the next week.
-  key(cell(large, "2026-10-18"), "ArrowRight");
-  expect(large.focusDay).toBe("2026-10-25");
-  key(cell(large, "2026-10-18"), "ArrowDown");
-  expect(large.focusDay).toBe("2026-10-19");
+  expect(cell(calendar, "2026-10-04").style.gridRow).toBe("7");
+  expect(cell(calendar, "2026-10-05").style.gridColumn).toBe("2");
+  expect(cell(calendar, "2026-10-06").style.getPropertyValue("--ds-calendar-cell-fill")).toBe("red");
+  expect(cell(calendar, "2026-10-07").style.getPropertyValue("--ds-calendar-cell-fill")).toContain("linear-gradient");
+  expect(cell(calendar, "2026-10-20").style.getPropertyValue("--ds-calendar-cell-fill")).toContain("--ds-apple-green");
+  // Two months: October and November over their weeks, in order.
+  expect([...root.querySelectorAll(".activity-month")].map(month => month.textContent)).toEqual(["Oct 2026", "Nov"]);
+  expect(cell(calendar, "2026-11-30")).not.toBeNull();
+  expect(root.querySelector('[data-day="2026-12-01"]')).toBeNull();
+  // No dates are written; each day says its date and events in its name.
+  expect(cell(calendar, "2026-10-06").textContent!.trim()).toBe("");
+  expect(cell(calendar, "2026-10-06").getAttribute("aria-label")).toContain("A");
+  expect(cell(calendar, "2026-10-18").getAttribute("aria-current")).toBe("date");
 });
 
 test("a picker opens its month, takes a day and gives it to its form", async () => {
@@ -508,26 +510,27 @@ test("a compact range's band is the marks' height on their line, from the middle
 });
 
 test("no calendar names a product", () => {
-  for (const file of ["0-face/calendar.ts", "3-unit/calendar-base.ts", "3-unit/ds-calendar.ts", "3-unit/ds-calendar-large.ts", "3-unit/styles/ds-calendar.css", "3-unit/styles/ds-calendar-large.css"]) {
+  for (const file of ["0-face/calendar.ts", "3-unit/calendar-base.ts", "3-unit/ds-calendar.ts", "3-unit/styles/ds-calendar.css"]) {
     expect(readFileSync(join(import.meta.dirname, "../DS1", file), "utf8")).not.toMatch(/\b(Ezo|Link|Consistency|Peer|Ins|tau99)\b/);
   }
 });
 
 
 test("activity squares retain date labels and update their event fills", async () => {
-  const calendar = await mount<Large>('<ds-calendar-large activity no-header start="2026-10" months="1"></ds-calendar-large>');
+  const calendar = await mount<Calendar>('<ds-calendar activity no-header month="2026-10"></ds-calendar>');
   calendar.events = [{ title: "Purchase", start: "2026-10-08", color: "var(--ds-yellow)" }];
   await calendar.updateComplete;
-  expect(calendar.style.getPropertyValue("--ds-calendar-scale")).toBe("1");
   expect(cell(calendar, "2026-10-08")?.hasAttribute("data-filled")).toBe(true);
   expect(cell(calendar, "2026-10-09")?.hasAttribute("data-filled")).toBe(false);
   expect(cell(calendar, "2026-10-08")?.getAttribute("title")).toContain("Purchase");
   calendar.events = [];
   await calendar.updateComplete;
   expect(cell(calendar, "2026-10-08")?.hasAttribute("data-filled")).toBe(false);
+  // Without activity it is the month again.
   calendar.activity = false;
   await calendar.updateComplete;
-  expect(calendar.style.getPropertyValue("--ds-calendar-scale")).toBe("1.5");
+  expect(calendar.shadowRoot!.querySelector(".activity")).toBeNull();
+  expect(calendar.shadowRoot!.querySelector(".grid")).not.toBeNull();
 });
 
 test("an event over several days is one bar on one line, its name written once, broken only at the week's end", async () => {

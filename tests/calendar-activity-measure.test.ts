@@ -12,12 +12,12 @@ test("activity days keep their grid and category colour in both themes and scale
     for (const colorScheme of ["light", "dark"] as const) {
       const page = await browser.newPage({ colorScheme });
       await page.goto(`http://127.0.0.1:${(server.httpServer!.address() as AddressInfo).port}/tests/fixtures/calendar-activity.html`);
-      await page.evaluate(() => customElements.whenDefined("ds-calendar-large"));
+      await page.evaluate(() => customElements.whenDefined("ds-calendar"));
       for (const scale of [1, 1.5]) {
         const measured = await page.evaluate(async scale => {
           const surface = document.querySelector<HTMLElement>("[data-ds-surface]")!;
           surface.style.setProperty("--ds-sf", String(scale));
-          const calendar = document.querySelector("ds-calendar-large")!;
+          const calendar = document.querySelector("ds-calendar")!;
           calendar.events = [{ title: "Purchase", start: "2026-10-08", color: "var(--ds-yellow)" }];
           await calendar.updateComplete;
           const cell = calendar.shadowRoot!.querySelector<HTMLElement>('[data-day="2026-10-08"]')!;

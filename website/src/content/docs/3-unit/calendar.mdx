@@ -1,14 +1,15 @@
 ---
 title: Calendar
-description: Days on whole squares, two ways — a month four squares a day, or months side by side as squares — and the picker, a field that opens the small month to choose one day or a range.
+description: Days on whole squares — a month four squares a day, a week, a day, a swimlane of weeks or a grid of activity squares — and the picker, a field that opens the small month to choose one day or a range.
 ---
 
 import ComponentExample from "../../../components/ComponentExample.astro";
 
-There are two calendars, drawn from the same days and keys.
+There is one calendar, `ds-calendar`, and every way of drawing days is a mode of it.
 
-- **`ds-calendar`** draws a month the way a list draws its items: seven days across, a week to a row, each day a hairline box four squares wide and four high. Its date stands on the first square, two lines of events below it and one square to spare. With `compact`, a day is one square and the month becomes the small one, one of twelve in a year. With `picker`, it is a field that opens that small month to choose a date: see [the picker](#picker).
-- **`ds-calendar-large`** draws months side by side as squares: a week to a column and the seven days down it, one and a half times the grid, in a rounded frame that scrolls sideways. A day on which something happens is filled with its colour, so a long piece of work reads as a band across the weeks.
+- **A month** the way a list draws its items: seven days across, a week to a row, each day a hairline box four squares wide and four high. Its date stands on the first square, two lines of events below it and one square to spare. With `compact`, a day is one square and the month becomes the small one, one of twelve in a year. With `picker`, it is a field that opens that small month to choose a date: see [the picker](#picker).
+- **A week, a day or a swimlane** with `view`, changed in the header with `views`: see [Swimlane](#swimlane) for work that runs for weeks or months, a week to a square and a row to a piece of work.
+- **Activity squares** with `activity`: the days as quiet squares, a week to a column a square wide, a day on which something happens filled with its colour. See [Activity squares](#activity-squares).
 
 
 ## Design examples
@@ -31,7 +32,9 @@ There are two calendars, drawn from the same days and keys.
 
 <ComponentExample example="calendar-picker" />
 
-<ComponentExample example="calendar-large" />
+<ComponentExample example="calendar-swimlane" />
+
+<ComponentExample example="calendar-activity" compact />
 
 ## A month
 
@@ -100,25 +103,6 @@ calendar.events = [
 | 4 | The accent deepened with 40% of the ink | The full accent | The ink |
 
 The fill is the date's mark, the same size as today's disc and the selected square, with a picture's corners, so it stays inside the day's square and the grid; in a compact month the marks stand a pixel apart, as a contribution graph's squares do. Every step keeps its date at 4.5:1 or more. Today and the selection draw over the heat. The fills are the palette's tokens (`--one-apple-green-pastel`, `--one-apple-green`), each `light-dark()`; a page lights the month in another colour by setting `--ds-calendar-heat-1` … `-4` and their `--ds-calendar-heat-ink-1` … `-4` from the palette.
-
-## Months in squares
-
-```html
-<ds-calendar-large start="2026-09" months="6"></ds-calendar-large>
-```
-
-| Measure | Size |
-| --- | --- |
-| A day | One square times `scale` (one and a half: 30px). |
-| Lines | 1px times the scale, inside a frame whose corners are four tenths of a day. |
-| Words | The heading size times the scale (19.5px). |
-| The weekday names | Down the start, outside the scroll, every other one named; a letter each on a narrow screen. |
-| The months | Each name over the week holding its first day; January and the first month carry the year. |
-| A date | Written only on today, the selected day, and where an event starts or ends. |
-| Today | A disc nine tenths of a day across in red for blood; the selected day a square of the ink. |
-| A filled day | The event's `color`, Apple green by default; days two or more events share are split into equal bands. |
-
-The title names the month at the start of the view as it scrolls. The arrows move a month at a time and Today scrolls to today's month; past the months drawn, `start` moves with them and `navigate` says so.
 
 ## Choosing a day or a range
 
@@ -282,6 +266,8 @@ The day arithmetic the calendars use is `DS1/0-face/calendar.ts`, plain TypeScri
 | `lines` | number | `2` | Lines of events under a date. |
 | `week-numbers` | boolean | `false` | The week's number on its first day. |
 | `fixed` | boolean | `false` | Always six weeks, and every view at that height. |
+| `activity` | boolean | `false` | Activity squares: weeks across, the days down them as quiet squares. |
+| `months` | number | `1` | How many months activity draws from `month`. |
 | `outside-days` | boolean | `false` | The days of the months before and after, in the title grey. |
 | `heat` | boolean | `false` | Light each day by how much happens on it. |
 | `heat-max` | number | The busiest day shown | The amount that lights a day fully. |
@@ -300,15 +286,6 @@ The day arithmetic the calendars use is `DS1/0-face/calendar.ts`, plain TypeScri
 | `open` | boolean | `false` | A picker's panel is open. |
 
 Properties only: `events`, the days' events; `viewNames`, `Record<string, string>`, the words for each view in the switch; `monthHeading`, `(month: Date, view: string) => string`, the month view's title and a page's own view's (see [the month's title](#the-months-title)); and `dayAllowed`, `(day: string) => boolean`, the days that may be chosen between `min` and `max` (see [days and weeks](#days-and-weeks)).
-
-### `ds-calendar-large`
-
-| Attribute | Type | Default | What it does |
-| --- | --- | --- | --- |
-| `start` | string | The month before today's | The first month drawn, `YYYY-MM`. |
-| `months` | number | `6` | How many months are drawn. |
-| `scale` | number | `1.5` | How many times the grid it is drawn. |
-| `value`, `selectable`, `min`, `max`, `week-start`, `today`, `label`, `no-header` | | | As in a month. |
 
 | Event | Detail | What it means |
 | --- | --- | --- |
@@ -333,33 +310,30 @@ Properties only: `events`, the days' events; `viewNames`, `Record<string, string
 | `picks`, `pick`, `foot`, `clear` | The months or years, one of them (with `selected` and `today`), and Clear's row and button. |
 | `grid`, `weekdays` | The grid and its weekday names. |
 | `day`, `week`, `event`, `more` | A month's days, weeks, events and the `+2` line; a day also carries `today`, `selected` and `heat`. |
-| `cell`, `frame`, `scroller` | The large calendar's days, frame and scroller. |
+| `swimlane`, `months`, `dates`, `scroll` | A swimlane, its months and week dates over the weeks, and the rows that scroll past a fixed height. |
+| `activity` | Activity squares; their days are `day` (with `today` and `filled`) and their weekdays `weekdays`. |
+| `own-view` | Where a page's own view is drawn, from its slot. |
 | `trigger`, `popover`, `field`, `options`, `clear` | A picker's field, its panel, a row of a day or a time to type, and Include time and Clear. |
 
 | Custom property | Default | What it sets |
 | --- | --- | --- |
 | `--ds-calendar-today` | `var(--ds-red-for-blood)` | Today's disc. |
 | `--ds-calendar-selected` | `var(--ds-sharp-blue)` | The selected day and a range's ends; the band between is it at 16%. |
-| `--ds-calendar-event-fill` | The fill (Apple green in the large calendar) | An event without a colour. |
+| `--ds-calendar-event-fill` | The fill (Apple green on activity squares) | An event without a colour. |
 | `--ds-calendar-line` | `1px solid var(--ds-border-color)` | A month's lines. |
-| `--ds-calendar-ink` | `var(--ds-text-color)` | The large calendar's lines and selected day. |
 | `--ds-calendar-picker-width` | Its words' width | A picker's field. |
 | `--ds-calendar-heat-1` … `-4` | The accent's four steps | Heat's fills. |
 | `--ds-calendar-heat-ink-1` … `-4` | The ink, or white on the dark steps | The date on each step. |
 
 ### Activity squares
 
-Use `activity` on `ds-calendar-large` for a compact contribution-style grid.
-It defaults to one grid square per day, separates the squares, and fills dates
-with their event colours. Dates and event descriptions remain available to
-assistive technology and in a tooltip. Use `no-header` for a fixed month.
+`activity` draws the days as a contribution grid on the swimlane's footing: a week to a column a square wide and the seven days down it, every other weekday named before them and the month over its weeks. Each day is a square drawn two pixels in with a picture's corners, quiet in the fill, or filled with its events' colours (split into bands when several share a day, Apple green for an event without a colour). Days outside the months are left empty. Dates and events stay in each day's name and tooltip. `month` is the first month and `months` how many (one by default); use `no-header` for a fixed month.
 
 ```html
-<ds-calendar-large activity no-header start="2026-10" months="1"></ds-calendar-large>
+<ds-calendar activity no-header month="2026-10"></ds-calendar>
 ```
 
-Set `events` as a property, as with the full calendar. Days without events stay
-quiet; repeated events on one day do not increase the colour intensity.
+Set `events` as a property, as with a month. Days without events stay quiet; more events on one day do not deepen the colour (use [`heat`](#heat) for amounts). This replaces the large calendar's months in squares, which is retired: a long piece of work over weeks is a [swimlane](#swimlane).
 
 
 import ConstraintList from "../../../components/ConstraintList.astro";

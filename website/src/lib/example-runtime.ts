@@ -77,7 +77,8 @@ sample.addEventListener('change', event => {
 // The calendars hold the events their published scripts show, in the month being read.
 sample.querySelectorAll('ds-calendar[heat]:not([data-showcase-props])').forEach(calendar => { (calendar as HTMLElement & { events: unknown }).events = calendarEvents('heat'); });
 sample.querySelectorAll('ds-calendar:not([compact])').forEach(calendar => { (calendar as HTMLElement & { events: unknown }).events = calendarEvents('month'); });
-sample.querySelectorAll('ds-calendar-large').forEach(calendar => { (calendar as HTMLElement & { events: unknown }).events = calendarEvents('large'); });
+sample.querySelectorAll('ds-calendar[view="swimlane"]').forEach(calendar => { (calendar as HTMLElement & { events: unknown }).events = calendarEvents('swimlane'); });
+sample.querySelectorAll('ds-calendar[activity]').forEach(calendar => { (calendar as HTMLElement & { events: unknown }).events = calendarEvents('activity'); });
 sample.querySelectorAll('ds-matrix:not([data-showcase-props])').forEach(matrix => { Object.assign(matrix, MATRIX_DATA); });
 sample.addEventListener('cell-press', event => { const { row, column, cell } = (event as CustomEvent).detail; output.textContent = `cell-press: ${row.label}, ${column.label}${cell ? ` (${cell.mark})` : ''}`; });
 for (const name of ['row-press', 'column-press']) sample.addEventListener(name, event => { const detail = (event as CustomEvent).detail; output.textContent = `${name}: ${(detail.row ?? detail.column).label}`; });
@@ -87,7 +88,7 @@ for (const name of ['day-press', 'event-press', 'navigate']) sample.addEventList
 });
 sample.addEventListener('change', event => {
   const target = (event.target as HTMLElement).localName;
-  if (target === 'ds-calendar' || target === 'ds-calendar-large') output.textContent = `change: ${(event as CustomEvent).detail.value || '(cleared)'}`;
+  if (target === 'ds-calendar') output.textContent = `change: ${(event as CustomEvent).detail.value || '(cleared)'}`;
 });
 // An open picker's month stands over the page: the page grows to hold it while it is open, so the frame shows it whole.
 sample.addEventListener('ds-calendar-toggle', event => {

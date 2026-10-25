@@ -212,7 +212,7 @@ export function draft(lib) {
     '  background: var(--ds-fill);',
     '}',
     '',
-    'ds-calendar, ds-calendar-large {',
+    'ds-calendar {',
     `  --ds-calendar-heat-1: color-mix(in oklab, ${chart} 20%, var(--ds-paper));`,
     `  --ds-calendar-heat-2: color-mix(in oklab, ${chart} 40%, var(--ds-paper));`,
     `  --ds-calendar-heat-3: ${chart};`,

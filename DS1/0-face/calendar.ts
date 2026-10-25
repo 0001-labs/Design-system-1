@@ -2,7 +2,7 @@
 // Days as the calendars count them: a day is written `YYYY-MM-DD` and read on
 // its own date in every zone, a month is the whole weeks that hold it, and the
 // week starts where the language starts it. Shared by ds-calendar (its
-// picker too) and ds-calendar-large; no Lit, so a page can use it alone.
+// picker too); no Lit, so a page can use it alone.
 
 import { currentLanguage } from "./i18n";
 import { dateFormatter, localeTag } from "./format";

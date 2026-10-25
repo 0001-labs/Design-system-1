@@ -233,7 +233,7 @@ ds-button[data-face="outlined"]:hover::part(control) {
   background: var(--ds-fill);
 }
 
-ds-calendar, ds-calendar-large {
+ds-calendar {
   --ds-calendar-heat-1: color-mix(in oklab, light-dark(#594dff, #ccccff) 20%, var(--ds-paper));
   --ds-calendar-heat-2: color-mix(in oklab, light-dark(#594dff, #ccccff) 40%, var(--ds-paper));
   --ds-calendar-heat-3: light-dark(#594dff, #ccccff);

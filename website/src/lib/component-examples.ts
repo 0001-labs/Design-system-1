@@ -65,7 +65,7 @@ export const MATRIX_DATA = {
 /** How much happened on each day of the month, as the heat example's script writes it. */
 export const HEAT_COUNTS = [0, 2, 5, 1, 0, 0, 3, 8, 4, 0, 1, 6, 12, 2, 0, 0, 7, 3, 9, 1, 0, 0, 2, 10, 5, 4, 0, 0, 1, 3, 6];
 
-export function calendarEvents(kind: 'month' | 'large' | 'heat') {
+export function calendarEvents(kind: 'month' | 'swimlane' | 'activity' | 'heat') {
   const now = new Date();
   const month = (offset: number) => {
     const at = new Date(now.getFullYear(), now.getMonth() + offset, 1);
@@ -76,7 +76,12 @@ export function calendarEvents(kind: 'month' | 'large' | 'heat') {
     const last = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
     return HEAT_COUNTS.slice(0, last).flatMap((count, index) => count ? [{ title: `${count} changes`, start: `${m}-${String(index + 1).padStart(2, '0')}`, count }] : []);
   }
-  if (kind === 'large') return [
+  if (kind === 'activity') {
+    const last = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const colours = ['var(--ds-apple-green)', 'var(--ds-yellow)', 'var(--ds-pink)'];
+    return HEAT_COUNTS.slice(0, last).flatMap((count, index) => count ? [{ title: 'Purchase', start: `${m}-${String(index + 1).padStart(2, '0')}`, color: colours[count % colours.length] }] : []);
+  }
+  if (kind === 'swimlane') return [
     { title: 'Identity', start: `${month(-1)}-08`, end: `${m}-06`, color: 'var(--ds-zenith-blue)' },
     { title: 'Website', start: `${m}-02`, end: `${month(1)}-13`, color: 'var(--ds-apple-green)' },
     { title: 'Campaign', start: `${month(1)}-09`, end: `${month(2)}-04`, color: 'var(--ds-pink)' },
@@ -374,16 +379,28 @@ calendar.events = counts.flatMap((count, index) => count ? [{ title: count + ' c
     html: `<ds-calendar compact selectable fixed outside-days day-width="2"></ds-calendar>`,
     height: 400,
   },
-  'calendar-large': {
-    title: 'Months in squares', hint: 'Weeks run sideways and the days down them. Scroll, or use the arrows and Today; a day several things share is split into bands.',
-    html: `<ds-calendar-large months="6" selectable></ds-calendar-large>`,
-    script: `const calendar = document.querySelector('ds-calendar-large');
+  'calendar-swimlane': {
+    title: 'Projects over weeks', hint: 'The swimlane: a week to each square across, a project to each row, one bar from its first week to its last. Calendar and Swimlane in the header change the view; the arrows move a month.',
+    html: `<ds-calendar views="month swimlane" view="swimlane" fixed></ds-calendar>`,
+    script: `const calendar = document.querySelector('ds-calendar');
+calendar.viewNames = { month: 'Calendar' };
 calendar.events = [
   { title: 'Identity', start: '2026-09-08', end: '2026-10-06', color: 'var(--ds-zenith-blue)' },
   { title: 'Website', start: '2026-10-02', end: '2026-11-13', color: 'var(--ds-apple-green)' },
   { title: 'Campaign', start: '2026-11-09', end: '2026-12-04', color: 'var(--ds-pink)' },
 ];`,
-    height: 420,
+    height: 640,
+  },
+  'calendar-activity': {
+    title: 'Activity squares', hint: 'A contribution grid: weeks across a square each, the days down them as quiet squares, a day something happened on filled with its colour. Hover a day for its date.',
+    html: `<ds-calendar activity no-header></ds-calendar>`,
+    script: `const calendar = document.querySelector('ds-calendar');
+calendar.events = [
+  { title: 'Purchase', start: '2026-10-03', color: 'var(--ds-apple-green)' },
+  { title: 'Purchase', start: '2026-10-08', color: 'var(--ds-yellow)' },
+  { title: 'Purchase', start: '2026-10-21', color: 'var(--ds-pink)' },
+];`,
+    height: 220,
   },
   'calendar-picker': {
     title: 'Pick a day or a range', hint: 'Open it with a click, Enter or the down arrow. Press a first day and a last; press one day twice, or leave, for a single day. Escape closes it.',
@@ -719,7 +736,7 @@ export const PAGE_EXAMPLES: Record<string, string[]> = {
   '2-core/gap': ['gap'],
   '3-unit/row': ['row', 'row-centered'], '3-unit/list': ["list", "list-reading", "list-files", "list-schedule", "list-people", "list-details"], '3-unit/sidebar': ['sidebar', 'tree'],
   '3-unit/accordion': ['accordion'], '3-unit/form': ['form'], '3-unit/carousel': ['carousel', 'carousel-full', 'slide', 'slide-loop'],
-  '3-unit/calendar': ['calendar', 'calendar-compact', 'calendar-heat', 'calendar-range', 'calendar-picker', 'calendar-large'], '3-unit/matrix': ['matrix'],
+  '3-unit/calendar': ['calendar', 'calendar-compact', 'calendar-heat', 'calendar-range', 'calendar-picker', 'calendar-swimlane', 'calendar-activity'], '3-unit/matrix': ['matrix'],
   '3-unit/table': ['table'],
   '4-page/container': ['container'], '4-page/grid': ['grid'],
   '4-page/page': ['page'],

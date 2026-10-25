@@ -1,5 +1,5 @@
 // calendar-base.ts
-// What ds-calendar and ds-calendar-large share: the days a person may reach,
+// What ds-calendar's month, picker and activity share: the days a person may reach,
 // today, the selected day, the week's start, events, words in the current
 // language and the grid's keys. Each element draws its own grid; the month
 // calendar lays weeks in rows, the large calendar weeks in columns, and the
