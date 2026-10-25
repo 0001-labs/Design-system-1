@@ -66,7 +66,7 @@ A day outside the month is an empty box. `fixed` always draws six weeks, so movi
 
 ### The month's title
 
-The title names the month and year ("October 2026"). Give `monthHeading` a function to write it in your own words: it is a property, given the first of the month shown as a `Date`, and returns the title's text. The week and day views, the twelve months and the twelve years keep their own titles, and the title stays the button that opens the months, its name saying so.
+The title names the month and year ("October 2026"). Give `monthHeading` a function to write it in your own words: it is a property, given the first of the month shown as a `Date`, and returns the title's text. The week, day and waterfall views, the twelve months and the twelve years keep their own titles, and the title stays the button that opens the months, its name saying so.
 
 ```js
 const calendar = document.querySelector("ds-calendar");
@@ -211,11 +211,21 @@ A day lists its events longest first, then by time. An event over several days k
 
 `view="week"` shows the week `date` falls in (today's by default), with every event of each day: the week is as many lines deep as its fullest day, and nothing folds behind "+N". `view="day"` shows one day: its events without a `time` across the top, a day wide each, then its hours, one square each in an area twelve squares high that scrolls, each timed event at its hour beside the others of that hour; it opens an hour before the first one, or at seven. The arrows move a week or a day, Today goes to today's, and the title still travels up to the months and years.
 
-`views` puts Day, Week and Month on a split button in the middle of the header, which sets `view` and fires `view-change` with `{ view }`. A compact calendar and a picker are always a month.
+`views` puts Day, Week, Month and Waterfall on a split button in the middle of the header, which sets `view` and fires `view-change` with `{ view }`. A compact calendar and a picker are always a month.
 
 ```html
 <ds-calendar views view="week"></ds-calendar>
 ```
+
+## Waterfall
+
+`view="waterfall"` shows the events over weeks rather than days, for plans and projects that run for weeks or months. The weeks run across from the one holding the month's first day, each half a day wide (two squares at the default), so the waterfall is as wide as the month: fourteen weeks. Above them stand the months, each named where the month owning most of a week changes (with its year on the first and on January), and each week's first date in the title grey; today's week writes today's date in its red disc instead. Each event has a row of its own, two squares high, in the month's hairline boxes and rounded frame, and is one bar from the week of its first day to the week of its last, filled with its `color`, its name written once and fading where the bar cuts it. Rows run by first day, the longer first; there are always at least six, and one to spare under the last event. Pressing a bar fires `event-press` with the event and its first day. The arrows move a month and the title names the months shown ("Oct – Dec 2026").
+
+```html
+<ds-calendar views view="waterfall"></ds-calendar>
+```
+
+`waterfallBars(events, weeks)`, exported beside the calendar, gives the rows and weeks each event takes, for a page that draws its own legend or summary.
 
 ## Days and weeks
 
@@ -250,8 +260,8 @@ The day arithmetic the calendars use is `DS1/0-face/calendar.ts`, plain TypeScri
 | `picker` | boolean | `false` | A field that opens the small month. |
 | `compact` | boolean | `false` | One square per day. |
 | `day-width` | number | `4` (`1` compact) | Squares per day. |
-| `view` | string | `month` | `month`, `week` or `day`. |
-| `views` | boolean | `false` | Day, Week and Month in the header. |
+| `view` | string | `month` | `month`, `week`, `day` or `waterfall`. |
+| `views` | boolean | `false` | Day, Week, Month and Waterfall in the header. |
 | `date` | string | Today, or the month's first | The day the week or day view shows. |
 | `lines` | number | `2` | Lines of events under a date. |
 | `week-numbers` | boolean | `false` | The week's number on its first day. |

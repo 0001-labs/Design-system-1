@@ -6,7 +6,7 @@ import { afterEach, expect, test, vi } from "vite-plus/test";
 vi.stubGlobal("fetch", vi.fn(async () => new Response("{}")));
 const { setLanguage } = await import("../DS1/0-face/i18n");
 const days = await import("../DS1/0-face/calendar");
-await import("../DS1/3-unit/ds-calendar");
+const calendarModule = await import("../DS1/3-unit/ds-calendar");
 await import("../DS1/3-unit/ds-calendar-large");
 type Calendar = HTMLElementTagNameMap["ds-calendar"];
 type Large = HTMLElementTagNameMap["ds-calendar-large"];
@@ -576,7 +576,7 @@ test("the week view shows one week with every event, and the day view its hours"
 
   const views = calendar.shadowRoot!.querySelector<HTMLElement & { options: string; value: string }>("ds-button.views")!;
   expect(views.hasAttribute("split")).toBe(true);
-  expect(views.options).toBe("day:Day,week:Week,month:Month");
+  expect(views.options).toBe("day:Day,week:Week,month:Month,waterfall:Waterfall");
   expect(views.value).toBe("week");
   const changed = vi.fn();
   const chosenDay = vi.fn();
@@ -657,4 +657,51 @@ test("a calendar without a header does not swipe, and its days take touches as t
   expect(calendar.shadowRoot!.querySelector(".calendar")!.hasAttribute("data-swipe")).toBe(false);
   const sheet = readFileSync(join(import.meta.dirname, "../DS1/3-unit/styles/ds-calendar.css"), "utf8");
   expect(sheet).toContain("[data-swipe] :is(.grid, .picks) { touch-action: pan-y; }");
+});
+
+test("a waterfall lays each event on its own row, a bar from its first week to its last, held inside the weeks drawn", () => {
+  const { waterfallBars } = calendarModule;
+  const weeks = ["2026-09-28", "2026-10-05", "2026-10-12", "2026-10-19"];
+  const bars = waterfallBars([
+    { title: "Late", start: "2026-10-20" },
+    { title: "Long", start: "2026-09-01", end: "2026-10-08" },
+    { title: "Short", start: "2026-10-06", end: "2026-10-14" },
+    { title: "Outside", start: "2026-12-01" },
+  ], weeks);
+  expect(bars.map(({ event, row, from, to }) => [event.title, row, from, to])).toEqual([
+    ["Long", 0, 0, 1],
+    ["Short", 1, 1, 2],
+    ["Late", 2, 3, 3],
+  ]);
+});
+
+test("the waterfall view: months in order over the weeks, today in its disc, a bar per event that opens it", async () => {
+  const calendar = await mount<Calendar>(`<ds-calendar view="waterfall" month="2026-10" today="2026-10-25" week-start="1" views></ds-calendar>`);
+  calendar.events = [
+    { id: "a", title: "Platform migration", start: "2026-10-05", end: "2026-10-30", color: "var(--ds-apple-green)" },
+    { id: "b", title: "App launch", start: "2026-11-23", end: "2027-01-10" },
+  ];
+  await calendar.updateComplete;
+  const root = calendar.shadowRoot!;
+  const weeks = [...root.querySelectorAll(".waterfall-date")];
+  expect(weeks).toHaveLength(14);
+  expect(root.querySelector(".title-text")!.textContent).toMatch(/Sep.*2026.*Dec.*2026|Oct.*Dec/);
+  const months = [...root.querySelectorAll(".waterfall-month")].map(month => month.textContent);
+  expect(months).toEqual(["Oct 2026", "Nov", "Dec"]);
+  const today = root.querySelector(".waterfall-date[data-today]")!;
+  expect(today.textContent!.trim()).toBe("25");
+  expect(weeks.indexOf(today)).toBe(3);
+  const bars = [...root.querySelectorAll<HTMLButtonElement>(".waterfall-grid .event")];
+  expect(bars.map(bar => bar.textContent)).toEqual(["Platform migration", "App launch"]);
+  expect(bars[0].style.gridColumn).toBe("2 / 6");
+  expect(bars[1].getAttribute("aria-label")).toContain("App launch");
+  expect(root.querySelectorAll(".waterfall-grid .cell")).toHaveLength(14 * 6);
+  const pressed = vi.fn();
+  calendar.addEventListener("event-press", pressed);
+  bars[1].click();
+  expect(pressed.mock.calls[0][0].detail.event.id).toBe("b");
+  root.querySelector<HTMLButtonElement>('[part="next"]')!.click();
+  await calendar.updateComplete;
+  expect(calendar.month).toBe("2026-11");
+  expect(calendar.shownView).toBe("waterfall");
 });

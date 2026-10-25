@@ -123,8 +123,8 @@
 .title-text { min-width: 0; overflow: hidden; text-overflow: clip; white-space: nowrap; }
 /* Cut words fade over their last square, never an ellipsis: the title, a weekday's name and
    the picker's value (0-face/cut-fade.ts marks them; an event's name is drawn below). */
-:is(.title, .title-text, .weekday, .trigger .text)[data-cut="end"] { mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-unit)), transparent); }
-:host(:dir(rtl)) :is(.title, .title-text, .weekday, .trigger .text)[data-cut="end"] { mask-image: linear-gradient(to left, #000 calc(100% - var(--ds-unit)), transparent); }
+:is(.title, .title-text, .weekday, .trigger .text, .waterfall-month)[data-cut="end"] { mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-unit)), transparent); }
+:host(:dir(rtl)) :is(.title, .title-text, .weekday, .trigger .text, .waterfall-month)[data-cut="end"] { mask-image: linear-gradient(to left, #000 calc(100% - var(--ds-unit)), transparent); }
 
 /* The months of a year, or twelve years: cells whole squares wide, three across a narrow month
  * and four across a wider one, each row one square, one square apart. The area keeps the days'
@@ -189,7 +189,7 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  :is(.grid, .picks)[data-travel] { animation: ds-calendar-level 160ms cubic-bezier(0.22, 1, 0.36, 1); }
+  :is(.grid, .picks, .waterfall)[data-travel] { animation: ds-calendar-level 160ms cubic-bezier(0.22, 1, 0.36, 1); }
 }
 @keyframes ds-calendar-level {
   from { opacity: 0; transform: scale(0.98); }
@@ -592,3 +592,74 @@
 .hour-events .event,
 .all-day .event { width: calc(var(--ds-calendar-day) - 1.5px); }
 
+
+/* A waterfall: weeks across, each half a day wide (two squares at the
+ * default), so it is as wide as the month. Over them the months, one square,
+ * a name where the month owning the week changes, and each week's first date,
+ * one square, in the title grey (today's week writes today in its disc). Then
+ * a row to an event, as high as a week is wide, in the month's hairline boxes
+ * and rounded frame; an event is one bar from its first week to its last,
+ * filled with its colour, its name written once and fading where it is cut. */
+.waterfall {
+  --ds-calendar-week: calc(var(--ds-calendar-day) / 2);
+  width: calc(var(--ds-calendar-weeks) * var(--ds-calendar-week));
+}
+[data-swipe] .waterfall { touch-action: pan-y; }
+.waterfall-months,
+.waterfall-dates,
+.waterfall-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--ds-calendar-weeks), var(--ds-calendar-week));
+}
+.waterfall-months,
+.waterfall-dates { height: var(--ds-unit); }
+.waterfall-month {
+  box-sizing: border-box;
+  min-width: 0;
+  height: var(--ds-unit);
+  padding: calc(4px * var(--ds-sf, 1)) var(--ds-calendar-pad) 0;
+  overflow: hidden;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+.waterfall-date {
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-end;
+  height: var(--ds-unit);
+  padding-inline: var(--ds-calendar-pad);
+}
+.waterfall-date .date { color: var(--ds-title-color); }
+.waterfall-date:not([data-today]) .date { min-width: 0; height: auto; }
+.waterfall-date[data-today] { align-items: center; padding-inline: calc(var(--ds-unit) * 0.05); }
+.waterfall-date[data-today] .date { background: var(--ds-calendar-today); color: var(--ds-calendar-today-ink); letter-spacing: 0; }
+.waterfall-grid { grid-template-rows: repeat(var(--ds-calendar-rows), var(--ds-calendar-week)); }
+.waterfall-grid .cell { position: relative; box-sizing: border-box; min-width: 0; }
+.waterfall-grid .cell::after {
+  position: absolute;
+  inset: -0.5px;
+  border-block-start: var(--ds-calendar-line);
+  border-inline-start: var(--ds-calendar-line);
+  content: "";
+  pointer-events: none;
+}
+.waterfall-grid .cell[data-last-column]::after { border-inline-end: var(--ds-calendar-line); }
+.waterfall-grid .cell[data-last-row]::after { border-block-end: var(--ds-calendar-line); }
+.waterfall-grid .cell[data-first-row][data-first-column]::after { border-start-start-radius: var(--ds-calendar-radius); }
+.waterfall-grid .cell[data-first-row][data-last-column]::after { border-start-end-radius: var(--ds-calendar-radius); }
+.waterfall-grid .cell[data-last-row][data-first-column]::after { border-end-start-radius: var(--ds-calendar-radius); }
+.waterfall-grid .cell[data-last-row][data-last-column]::after { border-end-end-radius: var(--ds-calendar-radius); }
+.waterfall-grid .event {
+  position: relative;
+  z-index: 1;
+  align-items: center;
+  height: calc(var(--ds-calendar-week) - 1px);
+  min-width: 0;
+  padding-block: 0;
+  border: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: start;
+}
+.waterfall-grid .event:hover { background: color-mix(in srgb, var(--ds-calendar-event-fill, var(--ds-fill)) 88%, var(--ds-text-color)); }
+.waterfall-grid .event:focus-visible { outline: 2px solid var(--ds-focus-ring); outline-offset: -2px; }
