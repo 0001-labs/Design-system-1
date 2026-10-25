@@ -165,6 +165,18 @@ test("hover menus preserve link navigation and page focus, while keyboard openin
 });
 
 
+test("a hover menu leaves a button link's press to its link", async () => {
+  const trigger = document.createElement("ds-button"), menu = document.createElement("ds-menu");
+  trigger.setAttribute("href", "#sites"); menu.hover = menu.floating = true; menu.trigger = menu.anchor = trigger;
+  menu.innerHTML = '<button role="menuitem">Settings</button>';
+  document.body.append(trigger, menu); await menu.updateComplete;
+  const request = vi.fn(); menu.addEventListener("ds-menu-toggle", request);
+  trigger.dispatchEvent(new MouseEvent("click", {bubbles: true, cancelable: true})); await menu.updateComplete;
+  expect(request).not.toHaveBeenCalled(); expect(menu.open).toBe(false);
+  trigger.dispatchEvent(new PointerEvent("pointerenter", {pointerType: "mouse"})); await menu.updateComplete; expect(menu.open).toBe(true);
+  menu.remove(); trigger.remove();
+});
+
 test("rectangle anchors share viewport placement and return focus to the invoking control", async () => {
   const opener = document.createElement("button"), menu = document.createElement("ds-menu");
   document.body.append(opener); opener.focus();

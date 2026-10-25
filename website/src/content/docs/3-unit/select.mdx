@@ -109,7 +109,9 @@ a square on each side, so n entries are n + 1 squares high, and every entry is
 one square high whatever button styles surround it. A separator takes one
 square with its line. `compact` entries are filled rows on a square's pitch,
 19px with the 1px between them. `hover` opens it while the pointer rests on its
-button (a breadcrumb), with a grace across the half-square gap. `columns` makes
+button (a breadcrumb), with a grace across the half-square gap; a button that
+is a link (`a href` or `ds-button href`) then follows its link when pressed, and
+the arrow keys open the menu. `columns` makes
 a small grid of one-square cells with two-dimensional arrows (a palette;
 `data-ds-menu-row` for a full-width action, `data-ds-menu-start` to start a
 section).
