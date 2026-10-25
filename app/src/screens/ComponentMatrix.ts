@@ -10,6 +10,7 @@ import { appIdentity, componentIdentity, totalSites, type AdoptionReport, type C
 import { AppElement, defineElement } from "../lib/element";
 import { accordion, accordionId, splitButton } from "../lib/ui";
 import "../../../DS1/0-face/tooltips";
+import "../../../DS1/2-core/ds-icon";
 import "./IconAdoption";
 import "./component-adoption.css";
 
@@ -108,7 +109,7 @@ export class ComponentMatrix extends AppElement {
           <tbody>${appGroups.map(appGroup => html`
             <tr class="adoption-app-group"><th colspan=${columns.length + 2} scope="rowgroup">${appGroup}</th></tr>
             ${repeat(report.apps.filter(app => (app.group ?? "Products") === appGroup), app => app.id, app => html`<tr>
-              <th class="adoption-app-column" scope="row"><span class="adoption-identity" tabindex="0" aria-label=${appIdentity(app)}><span class="adoption-name" aria-hidden="true">${app.name}</span><span class="adoption-code-version" aria-hidden="true">${appIdentity(app, false)}</span></span>${app.migration === "deferred" ? html`<span class="adoption-deferred"> · Deferred</span>` : nothing}</th>
+              <th class="adoption-app-column" scope="row">${app.liveBase?.length ? html`<ds-icon type="bolt" class="adoption-live" role="img" aria-label="Live base" data-tooltip=${`Live base: takes the token values saved on designsystem1.com without a release (${app.liveBase.join(", ")})`}></ds-icon>` : nothing}<span class="adoption-identity" tabindex="0" aria-label=${appIdentity(app)}><span class="adoption-name" aria-hidden="true">${app.name}</span><span class="adoption-code-version" aria-hidden="true">${appIdentity(app, false)}</span></span>${app.migration === "deferred" ? html`<span class="adoption-deferred"> · Deferred</span>` : nothing}</th>
               ${columns.map(column => {
                 const cell = app.cells[column.id];
                 if (app.status !== "scanned" || !cell) return html`<td class="unavailable" aria-label=${`${app.name}, ${column.name}: not scanned`}>?</td>`;
@@ -139,7 +140,7 @@ export class ComponentMatrix extends AppElement {
       <section class="adoption-next"><h2>Next to consolidate</h2>
         ${needsReview > 0 ? html`<p>Verify the ${needsReview} DS1 uses marked for review before treating them as shared. Open a cell to see which files differ or lack source evidence.</p>` : nothing}
         <ds-list role="list" class="adoption-list">${priorities.map(row => html`<ds-row auto role="listitem"><p><strong>${row.column.name}</strong> · ${row.total} local sites across ${row.apps.map(a => a.name).join(", ")}. Inspect the local view and move common behavior into DS1.</p></ds-row>`)}</ds-list>
-        <p class="adoption-meta">These are consolidation leads. Native HTML can be intentional; inspect its role before replacing it. Apps marked Deferred remain measured but are excluded from migration recommendations.</p>
+        <p class="adoption-meta">These are consolidation leads. Native HTML can be intentional; inspect its role before replacing it. Apps marked Deferred remain measured but are excluded from migration recommendations. A bolt marks an app linked to the live base: the token values saved on designsystem1.com reach it without a release.</p>
       </section>
       ${this.#accordion(this.#ids.method, "Source snapshots and counting rules", html`
         <p>DS1 reference: <code>${report.sourceCommit.slice(0, 10)}</code>${report.sourceDirty ? " + working changes" : ""}. This snapshot describes local source, not what is deployed.</p>

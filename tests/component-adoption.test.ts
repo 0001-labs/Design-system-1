@@ -4,7 +4,7 @@ import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { sourceSites, scanApp, checkSnapshots, checkLockedControls, checkLockedText } from "../scripts/component-adoption";
+import { sourceSites, scanApp, checkSnapshots, checkLockedControls, checkLockedText, liveBaseLinks } from "../scripts/component-adoption";
 
 const temporary: string[] = [];
 afterEach(() => { for (const dir of temporary.splice(0)) rmSync(dir, { recursive: true, force: true }); });
@@ -858,5 +858,24 @@ describe("stats and progress", () => {
     expect(scanned().cells.progress).toMatchObject({ shared: 2, unverified: 0, local: 0 });
     write(app2, "design/react/progress.ts", files["react/progress.ts"] + "\n// Local modification");
     expect(scanned().cells.progress).toMatchObject({ shared: 1, unverified: 1 });
+  });
+});
+
+describe("live base", () => {
+  it("names the tracked files that link the live base sheet, and nothing that only mentions it", () => {
+    const { app } = fixture();
+    write(app, "client/app.html", '<body>\n<link rel="stylesheet" href="https://designsystem1.com/ds1/base/latest.css" data-ds1-base />');
+    write(app, "scripts/build.ts", "const base='<link rel=\"stylesheet\" href=\"/ds1/base/latest.css\">';");
+    write(app, "AGENTS.md", "Products link `/ds1/base/latest.css` first in the body.");
+    write(app, "tests/page.test.ts", '<link href="/ds1/base/latest.css">');
+    write(app, "client/untracked.html", '<link href="/ds1/base/latest.css">');
+    git(app, "add", "client/app.html", "scripts/build.ts", "AGENTS.md", "tests/page.test.ts");
+    expect(liveBaseLinks(app)).toEqual(["client/app.html", "scripts/build.ts"]);
+    git(app, "-c", "user.name=Test", "-c", "user.email=test@example.com", "commit", "-m", "Link the live base");
+    expect(liveBaseLinks(app)).toEqual(["client/app.html", "scripts/build.ts"]);
+  });
+  it("finds none in an app that does not link it", () => {
+    const { app } = fixture();
+    expect(liveBaseLinks(app)).toEqual([]);
   });
 });

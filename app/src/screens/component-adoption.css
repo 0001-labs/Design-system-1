@@ -75,6 +75,8 @@
 
 .adoption-app-group th { text-align: left; font-weight: normal; height: var(--1); background: var(--report-paper); }
 .adoption-deferred { font-weight: normal; }
+/* The live base: a bolt before the app's name, which stays aligned to the column's edge. */
+.adoption-live { --ds-icon-size: calc(.8 * var(--report-unit)); margin-right: calc(.25 * var(--report-unit)); vertical-align: -.125em; }
 
 /* The icon matrix: its own section, each DS1 icon drawn one square high beside its name. */
 .adoption-icons { padding-block: var(--report-unit); border-top: 1px solid var(--report-line); }

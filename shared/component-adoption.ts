@@ -73,6 +73,8 @@ export interface AdoptionApp {
   /** Local sites with no DS1 column yet, kept out of the matrix so it holds only what DS1 can replace: `range`. */
   gaps?: Record<string, UsageSite[]>;
   error?: string;
+  /** The app's own files that link Design system 1's live base (`/ds1/base/latest.css`): its saved token values reach the app without a release. */
+  liveBase?: string[];
   group?: "Products" | "Clients";
   migration?: "deferred";
   migrationReason?: string;

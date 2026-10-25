@@ -968,6 +968,15 @@ function importedAdapters(root: string, file: string, source: string): Record<st
 
 const ds1Icons = (dsRoot: string) => readIconMap(join(dsRoot, "DS1/2-core/generated/ds-icon-map.ts")) ?? new Map<string, string>();
 
+/** A stylesheet link to the live base, in markup or in a string a build writes into its pages. */
+const LIVE_BASE_LINK = String.raw`href=["'][^"']*/ds1/base/latest\.css["']`;
+
+/** The app's tracked files that link the live base sheet; none when nothing matches (git grep then exits 1). */
+export function liveBaseLinks(root: string): string[] {
+  try { return git(root, "grep", "-l", "-E", LIVE_BASE_LINK, "--", ".").split("\n").filter(file => file && !excluded.test(file)); }
+  catch { return []; }
+}
+
 export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): AdoptionApp {
   const root = join(studio, spec.directory);
   const app: AdoptionApp = { id: spec.id, name: spec.name, code: spec.code, version: spec.version, status: "unavailable", commit: null, dirty: false, files: 0, scope: spec.roots, snapshotCommit: null, cells: {}, otherCustomElements: {}, group: spec.group ?? "Products", ...(spec.migration ? { migration: spec.migration, migrationReason: spec.migrationReason } : {}) };
@@ -975,6 +984,8 @@ export function scanApp(spec: AppSpec, studio: string, dsRoot = repository): Ado
     app.commit = git(root, "rev-parse", "HEAD");
     // Several products share one repository: only this app's own folder counts.
     app.dirty = Boolean(git(root, "status", "--porcelain", "--", "."));
+    const liveBase = liveBaseLinks(root);
+    if (liveBase.length) app.liveBase = liveBase;
     if (spec.source === "direct" && realpathSync(root) !== realpathSync(dsRoot)) throw new Error("Only Design system 1 itself can be scanned as direct source.");
     const manifest = spec.source === "direct" ? directManifest : spec.manifest;
     const snapshots = spec.source === "direct" ? directSnapshots(dsRoot) : checkSnapshots(root, spec.manifest, dsRoot);

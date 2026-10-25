@@ -51,3 +51,16 @@ it('chooses the count with the shared split button and shows unused columns with
   expect(unused.checked).toBe(true);
   expect(columns()).toEqual(['Button', 'Input']);
 });
+
+it('marks an app linked to the live base with a bolt, and no other', async () => {
+  const host = document.createElement('ds1-component-matrix') as ComponentMatrix;
+  host.report = { ...report, apps: [{ ...report.apps[0]!, liveBase: ['client/app.html'] }, { ...report.apps[0]!, id: 'other', name: 'Other' }] };
+  document.body.append(host);
+  await settle();
+  const rows = [...host.querySelectorAll('tbody tr:not(.adoption-app-group) th.adoption-app-column')].slice(0, 2);
+  const bolt = rows[0]!.querySelector('ds-icon.adoption-live')!;
+  expect(bolt.getAttribute('type')).toBe('bolt');
+  expect(bolt.getAttribute('aria-label')).toBe('Live base');
+  expect(bolt.getAttribute('data-tooltip')).toContain('client/app.html');
+  expect(rows[1]!.querySelector('.adoption-live')).toBeNull();
+});
