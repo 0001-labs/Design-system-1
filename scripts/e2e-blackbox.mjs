@@ -615,7 +615,8 @@ if (PRODUCTION) {
         `${new URL(origin).hostname} asks to sign in`,
         async () => {
           const answer = await request(`${origin}/`);
-          expectRedirect(answer, 302, `${origin}/app/signin`);
+          // c9y.site asks the owner's System sign-in quietly first; the icon host keeps its sign-in shell.
+          expectRedirect(answer, 302, origin === EDITOR ? `${origin}/auth/start?silent=1` : `${origin}/app/signin`);
           expectPrivate(answer);
           expectHeader(answer, "referrer-policy", /^same-origin$/);
         },
@@ -634,8 +635,15 @@ if (PRODUCTION) {
     ]),
     ["Private editor files require a session", async () => {
       const answer = await request(`${EDITOR}/private-consistency/consistency.js`);
-      expectRedirect(answer, 302, `${EDITOR}/app/signin`);
+      // c9y.site asks the owner's System sign-in quietly first (services/src/consistency-owner.ts).
+      expectRedirect(answer, 302, `${EDITOR}/auth/start?silent=1`);
       expectPrivate(answer);
+    }],
+    ["The owner's sign-in asks System quietly, for c9y.site's own client", async () => {
+      const answer = await request(`${EDITOR}/auth/start?silent=1`);
+      expectStatus(answer, 303);
+      const to = new URL(answer.headers.get("location") ?? "");
+      if (to.origin + to.pathname !== "https://system.0001.dev/auth/authorize" || to.searchParams.get("client") !== "c9y" || to.searchParams.get("prompt") !== "none") throw new Error(`went to ${to}`);
     }],
     ["Private editor has no public-host alias", async () => expectStatus(await request('/private-consistency/index.html'), 404)],
     [
