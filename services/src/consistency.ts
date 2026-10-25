@@ -2,6 +2,7 @@
 import { dashboard, sessionRequest } from './dashboard';
 import { authorizeReport, type ReportsEnv } from './reports';
 import { hasOwnerSignIn, ownerRoutes, ownerSignOut, systemOwner, type OwnerEnv } from './consistency-owner';
+import { sitesApi } from './consistency-sites';
 
 export const CONSISTENCY_HOST = 'c9y.site';
 /** The owner's editor lab: the page editor alone, at its root, behind the verified owner session. */
@@ -26,7 +27,7 @@ export function isPrivatePreviewPath(path: string): boolean {
 }
 const security = { 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow', 'Referrer-Policy': 'same-origin', 'X-Content-Type-Options': 'nosniff', Vary: 'Cookie, Authorization' };
 /** The owner: System's owner session on an address that takes it, else the existing verified owner session. */
-async function authorizeOwner(request: Request, env: ReportsEnv & WorkspaceEnv, send: typeof fetch): Promise<Response | null> {
+export async function authorizeOwner(request: Request, env: ReportsEnv & WorkspaceEnv, send: typeof fetch): Promise<Response | null> {
   if (await systemOwner(request, env)) return null;
   return authorizeReport(sessionRequest(request), env, send);
 }
@@ -51,6 +52,8 @@ export async function consistencyPreview(request: Request, env: ReportsEnv & Wor
   }
   if (url.pathname === '/api/dashboard/session' || url.pathname === '/app/signin' || /^\/app\/assets\/[A-Za-z0-9][A-Za-z0-9._-]*$/.test(url.pathname) || url.pathname === '/icons/design-system-1.svg') return protect(await dashboard(request, env, send));
   if ((url.pathname.startsWith('/api/consistency/pages') || url.pathname==='/api/consistency/sites')) return protect(await workspaceApi(request,env,send));
+  // A site's words, edited in the editor as the owner; its page and files for the editor's sandboxed frame.
+  if (url.pathname.startsWith('/api/consistency/sites/')) return protect(await sitesApi(request, env, owner => authorizeOwner(owner, env, send)));
   if (url.pathname === '/api/consistency/domains' || url.pathname.startsWith('/api/consistency/domains/')) return protect(await domainsApi(request, env, send));
   if (url.pathname === '/api/consistency/profile') return protect(await profileApi(request, env, send));
   if (!['GET', 'HEAD'].includes(request.method)) return new Response(null, { status: 404, headers: security });
