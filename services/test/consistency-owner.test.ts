@@ -4,7 +4,8 @@ import { consistencyAI } from '../src/consistency-ai';
 import type { ReportsEnv } from '../src/reports';
 import type { OwnerIdentity } from '../src/consistency-owner';
 
-const origin = 'https://c9y.site';
+// The app's address; c9y.site's home leads here.
+const origin = 'https://consistency.site';
 const SYSTEM = 'https://system.0001.dev';
 /** Every Set-Cookie of an answer (the Workers types leave `getSetCookie` out). */
 const setCookies = (response: Response): string[] => (response.headers as unknown as { getSetCookie(): string[] }).getSetCookie();
@@ -44,16 +45,20 @@ function setup() {
   return { env, assets, send, calls, tokens, visit, signIn };
 }
 
-it('asks System quietly when the home is opened signed out', async () => {
+it('shows a signed-out visitor the landing, and asks System for the app client on sign-in', async () => {
   const { visit, assets } = setup();
+  const pages = vi.fn(async (_request: Request) => new Response('Landing'));
+  vi.stubGlobal('fetch', pages);
   const home = await visit('/');
-  expect(home.status).toBe(302);
-  expect(home.headers.get('location')).toBe('/auth/start?silent=1');
+  expect(await home.text()).toBe('Landing');
+  expect(new URL(pages.mock.calls[0]![0].url).href).toBe(`${origin}/`);
+  expect(await (await visit('/examples/')).text()).toBe('Landing');
+  vi.unstubAllGlobals();
   expect(assets).not.toHaveBeenCalled();
   const start = await visit('/auth/start?silent=1');
   const authorize = new URL(start.headers.get('location')!);
   expect(authorize.origin + authorize.pathname).toBe(`${SYSTEM}/auth/authorize`);
-  expect(authorize.searchParams.get('client')).toBe('c9y');
+  expect(authorize.searchParams.get('client')).toBe('c9y-app');
   expect(authorize.searchParams.get('prompt')).toBe('none');
   expect(setCookies(start).join()).toMatch(/__Host-c9y_pending=[^;]+; Path=\/; Secure; HttpOnly; SameSite=None; Max-Age=600/);
 });
@@ -91,7 +96,19 @@ it('asks System on every request, and a sign-out anywhere ends it here', async (
   await visit('/api/consistency/sites', { headers: { Cookie: owner! } });
   expect(calls.validate - before).toBe(2);
   tokens.clear();
-  expect((await visit('/', { headers: { Cookie: owner! } })).status).toBe(302);
+  vi.stubGlobal('fetch', vi.fn(async () => new Response('Landing')));
+  expect(await (await visit('/', { headers: { Cookie: owner! } })).text()).toBe('Landing');
+  vi.unstubAllGlobals();
+  expect((await visit('/private-consistency/home.html', { headers: { Cookie: owner! } })).status).toBe(302);
+});
+
+it("leads c9y.site's home to the app, and keeps its own sign-in client", async () => {
+  const { env, send } = setup();
+  const home = await consistencyPreview(new Request('https://c9y.site/'), env, send);
+  expect(home.status).toBe(302);
+  expect(home.headers.get('location')).toBe('https://consistency.site/');
+  const start = await consistencyPreview(new Request('https://c9y.site/auth/start'), env, send);
+  expect(new URL(start.headers.get('location')!).searchParams.get('client')).toBe('c9y');
 });
 
 it('signing out here revokes the System session behind it', async () => {
@@ -101,7 +118,7 @@ it('signing out here revokes the System session behind it', async () => {
   expect(out.status).toBe(204);
   expect(calls.revoke).toBe(1);
   expect(setCookies(out).join('\n')).toMatch(/__Host-c9y_owner=; .*Max-Age=0/);
-  expect((await visit('/', { headers: { Cookie: owner! } })).status).toBe(302);
+  expect((await visit('/private-consistency/home.html', { headers: { Cookie: owner! } })).status).toBe(302);
 });
 
 it("the editor's AI takes the System owner too, still only from its own origin", async () => {

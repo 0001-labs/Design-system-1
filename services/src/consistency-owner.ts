@@ -23,7 +23,7 @@ export const OWNER_COOKIE = '__Host-c9y_owner';
 export const PENDING_COOKIE = '__Host-c9y_pending';
 const SYSTEM = 'https://system.0001.dev';
 /** The System client each origin signs in as; any other origin has no owner sign-in here. */
-const CLIENTS: Record<string, string> = { 'https://c9y.site': 'c9y' };
+const CLIENTS: Record<string, string> = { 'https://c9y.site': 'c9y', 'https://consistency.site': 'c9y-app' };
 const PENDING_TTL = 600_000;
 const headers = { 'Cache-Control': 'private, no-store', 'Referrer-Policy': 'same-origin' };
 

@@ -9,7 +9,16 @@ export const CONSISTENCY_HOST = 'c9y.site';
 export const EDITOR_HOST = 'editor.c9y.site';
 /** The lab's first address, which now leads to EDITOR_HOST. */
 const FORMER_EDITOR_HOST = 'neweditor.c9y.site';
-export const isConsistencyHost = (host:string) => [CONSISTENCY_HOST, EDITOR_HOST, FORMER_EDITOR_HOST].includes(host);
+/**
+ * Consistency's product address: its app for a signed-in owner, at the front page and the addresses below; every
+ * other address of it (the landing, the legacy app's API, admin and pages) is the Pages project's, passed on.
+ */
+export const APP_HOST = 'consistency.site';
+export const isConsistencyHost = (host:string) => [CONSISTENCY_HOST, APP_HOST, EDITOR_HOST, FORMER_EDITOR_HOST].includes(host);
+/** The addresses the app answers on consistency.site, besides its front page. */
+export function isAppPath(path: string): boolean {
+  return /^\/(?:auth|private-consistency)(?:\/|$)/.test(path) || path.startsWith('/api/consistency/') || path === '/api/dashboard/session' || path === '/app/signin' || /^\/app\/assets\//.test(path) || path === '/icons/design-system-1.svg';
+}
 export interface WorkspaceEnv extends OwnerEnv { CONSISTENCY_WORKSPACE?: Fetcher }
 const prefix = '/private-consistency/';
 /** Normalize only for interception. Assets must never decode a private path on another host. */
@@ -31,6 +40,8 @@ export async function authorizeOwner(request: Request, env: ReportsEnv & Workspa
   if (await systemOwner(request, env)) return null;
   return authorizeReport(sessionRequest(request), env, send);
 }
+/** An address of consistency.site that is not the app's, to the Pages project behind it, as it came. */
+const pass = (request: Request) => fetch(request);
 function protect(response: Response): Response {
   const result = new Response(response.body, response);
   for (const [key, value] of Object.entries(security)) result.headers.set(key, value);
@@ -40,6 +51,9 @@ export async function consistencyPreview(request: Request, env: ReportsEnv & Wor
   const url = new URL(request.url);
   if (!isConsistencyHost(url.hostname) || url.protocol !== 'https:') return new Response(null, { status: 404, headers: security });
   if (url.hostname === FORMER_EDITOR_HOST) return new Response(null, { status: 301, headers: { ...security, Location: `https://${EDITOR_HOST}${url.pathname}${url.search}` } });
+  // c9y.site is where customers' sites live; its home is the app at consistency.site now.
+  if (url.hostname === CONSISTENCY_HOST && url.pathname === '/' && ['GET', 'HEAD'].includes(request.method)) return new Response(null, { status: 302, headers: { ...security, Location: `https://${APP_HOST}/` } });
+  if (url.hostname === APP_HOST && url.pathname !== '/' && !isAppPath(url.pathname)) return pass(request);
   const signingIn = await ownerRoutes(request, env);
   if (signingIn) return protect(signingIn);
   // Signing out ends the System session behind the owner's token too, on every Consistency site.
@@ -59,6 +73,8 @@ export async function consistencyPreview(request: Request, env: ReportsEnv & Wor
   if (!['GET', 'HEAD'].includes(request.method)) return new Response(null, { status: 404, headers: security });
   if (url.pathname !== '/' && !url.pathname.startsWith(prefix)) return new Response(null, { status: 404, headers: security });
   const denied = await authorizeOwner(request, env, send);
+  // Signed out, consistency.site's front page is the landing.
+  if (denied && url.hostname === APP_HOST && url.pathname === '/') return pass(request);
   if (denied) {
     // Where the owner signs in through System, ask it quietly first: signed in there, signed in here.
     if (denied.status === 401) return new Response(null, { status: 302, headers: { ...security, Location: hasOwnerSignIn(url) ? '/auth/start?silent=1' : '/app/signin', 'Set-Cookie': '__Host-ds1-dashboard=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0' } });

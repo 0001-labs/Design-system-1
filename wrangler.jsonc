@@ -32,6 +32,15 @@
     { "pattern": "editor.c9y.site", "custom_domain": true },
     { "pattern": "neweditor.c9y.site/*", "zone_name": "c9y.site" },
     { "pattern": "neweditor.c9y.site", "custom_domain": true },
+    // Consistency's app at consistency.site: its front page (the landing for anyone signed out, passed on to the
+    // Pages project) and the app's own addresses. Every other address of consistency.site stays the Pages project's.
+    { "pattern": "consistency.site/", "zone_name": "consistency.site" },
+    { "pattern": "consistency.site/auth/*", "zone_name": "consistency.site" },
+    { "pattern": "consistency.site/api/consistency/*", "zone_name": "consistency.site" },
+    { "pattern": "consistency.site/api/dashboard/*", "zone_name": "consistency.site" },
+    { "pattern": "consistency.site/app/*", "zone_name": "consistency.site" },
+    { "pattern": "consistency.site/private-consistency/*", "zone_name": "consistency.site" },
+    { "pattern": "consistency.site/icons/design-system-1.svg", "zone_name": "consistency.site" },
     { "pattern": "fonts.designsystem1.com", "custom_domain": true },
     { "pattern": "icon.designsystem1.com", "custom_domain": true },
     // Play: a small site and the pages it makes (website/src/pages/play.astro).

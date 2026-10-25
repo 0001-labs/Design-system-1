@@ -26,9 +26,9 @@ it('revalidates owner on every HTML and asset and maps root', async () => {
   }
   expect(send).toHaveBeenCalledTimes(2); expect(new URL(assets.mock.calls[0]![0].url).pathname).toBe('/private-consistency/index.html');
 });
-it('opens c9y.site on its home and leads the former editor address to the lab', async () => {
+it('opens the app at consistency.site and leads the former editor address to the lab', async () => {
   const { env, assets, send } = setup();
-  expect((await consistencyPreview(new Request('https://c9y.site/', { headers }), env, send)).status).toBe(200);
+  expect((await consistencyPreview(new Request('https://consistency.site/', { headers }), env, send)).status).toBe(200);
   expect(new URL(assets.mock.calls[0]![0].url).pathname).toBe('/private-consistency/home.html');
   const moved = await consistencyPreview(new Request('https://neweditor.c9y.site/private-consistency/guide/?a=1', { headers }), env, send);
   expect(moved.status).toBe(301); expect(moved.headers.get('location')).toBe('https://editor.c9y.site/private-consistency/guide/?a=1'); expect(assets).toHaveBeenCalledTimes(1);
