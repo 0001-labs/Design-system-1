@@ -22,6 +22,7 @@
 ::slotted(input[type="checkbox"]) {
   appearance: none !important;
   box-sizing: border-box !important;
+  position: relative !important;
   display: grid !important;
   place-items: center !important;
   width: var(--_checkbox-box, var(--ds-control-height)) !important;
@@ -39,16 +40,21 @@
   cursor: pointer !important;
 }
 ::slotted(input:checked), ::slotted(input:indeterminate) { background: var(--ds-checkbox-fill, var(--ds-accent-color)) !important; }
+/* The mark covers the whole box, its line included, so it stands in the middle: an input lays out
+   no grid around its ::before, which otherwise starts inside the 1px line. The tick's own drawing
+   sits 0.66 of its 16 below the middle, so it is lifted by that share of the box. */
 ::slotted(input)::before {
   content: "";
-  width: var(--_checkbox-box, var(--ds-control-height));
-  height: var(--_checkbox-box, var(--ds-control-height));
+  position: absolute;
+  inset: -1px;
   background: currentColor;
-  mask: var(--ds-checkbox-mark) center / contain no-repeat;
+  mask: var(--ds-checkbox-mark) 0 calc(var(--_checkbox-box, var(--ds-control-height)) * -0.041) / 100% 100% no-repeat;
   opacity: 0;
 }
 ::slotted(input:checked)::before { opacity: 1; }
 ::slotted(input:indeterminate)::before {
+  inset: 0;
+  margin: auto;
   width: calc(var(--_checkbox-box, var(--ds-control-height)) / 2);
   height: calc(2px * var(--ds-sf));
   mask: none;
