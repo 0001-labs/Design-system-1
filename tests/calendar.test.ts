@@ -576,7 +576,7 @@ test("the week view shows one week with every event, and the day view its hours"
 
   const views = calendar.shadowRoot!.querySelector<HTMLElement & { options: string; value: string }>("ds-button.views")!;
   expect(views.hasAttribute("split")).toBe(true);
-  expect(views.options).toBe("day:Day,week:Week,month:Month,waterfall:Waterfall");
+  expect(views.options).toBe("day:Day,week:Week,month:Month,swimlane:Swimlane");
   expect(views.value).toBe("week");
   const changed = vi.fn();
   const chosenDay = vi.fn();
@@ -659,10 +659,10 @@ test("a calendar without a header does not swipe, and its days take touches as t
   expect(sheet).toContain("[data-swipe] :is(.grid, .picks) { touch-action: pan-y; }");
 });
 
-test("a waterfall lays each event on its own row, a bar from its first week to its last, held inside the weeks drawn", () => {
-  const { waterfallBars } = calendarModule;
+test("a swimlane lays each event on its own row, a bar from its first week to its last, held inside the weeks drawn", () => {
+  const { swimlaneBars } = calendarModule;
   const weeks = ["2026-09-28", "2026-10-05", "2026-10-12", "2026-10-19"];
-  const bars = waterfallBars([
+  const bars = swimlaneBars([
     { title: "Late", start: "2026-10-20" },
     { title: "Long", start: "2026-09-01", end: "2026-10-08" },
     { title: "Short", start: "2026-10-06", end: "2026-10-14" },
@@ -675,27 +675,27 @@ test("a waterfall lays each event on its own row, a bar from its first week to i
   ]);
 });
 
-test("the waterfall view: months in order over the weeks, today in its disc, a bar per event that opens it", async () => {
-  const calendar = await mount<Calendar>(`<ds-calendar view="waterfall" month="2026-10" today="2026-10-25" week-start="1" views></ds-calendar>`);
+test("the swimlane view: months in order over the weeks, today in its disc, a bar per event that opens it", async () => {
+  const calendar = await mount<Calendar>(`<ds-calendar view="swimlane" month="2026-10" today="2026-10-25" week-start="1" views></ds-calendar>`);
   calendar.events = [
     { id: "a", title: "Platform migration", start: "2026-10-05", end: "2026-10-30", color: "var(--ds-apple-green)" },
     { id: "b", title: "App launch", start: "2026-11-23", end: "2027-01-10" },
   ];
   await calendar.updateComplete;
   const root = calendar.shadowRoot!;
-  const weeks = [...root.querySelectorAll(".waterfall-date")];
+  const weeks = [...root.querySelectorAll(".swimlane-date")];
   expect(weeks).toHaveLength(14);
   expect(root.querySelector(".title-text")!.textContent).toMatch(/Sep.*2026.*Dec.*2026|Oct.*Dec/);
-  const months = [...root.querySelectorAll(".waterfall-month")].map(month => month.textContent);
+  const months = [...root.querySelectorAll(".swimlane-month")].map(month => month.textContent);
   expect(months).toEqual(["Oct 2026", "Nov", "Dec"]);
-  const today = root.querySelector(".waterfall-date[data-today]")!;
+  const today = root.querySelector(".swimlane-date[data-today]")!;
   expect(today.textContent!.trim()).toBe("25");
   expect(weeks.indexOf(today)).toBe(3);
-  const bars = [...root.querySelectorAll<HTMLButtonElement>(".waterfall-grid .event")];
+  const bars = [...root.querySelectorAll<HTMLButtonElement>(".swimlane-grid .event")];
   expect(bars.map(bar => bar.textContent)).toEqual(["Platform migration", "App launch"]);
   expect(bars[0].style.gridColumn).toBe("2 / 6");
   expect(bars[1].getAttribute("aria-label")).toContain("App launch");
-  expect(root.querySelectorAll(".waterfall-grid .cell")).toHaveLength(14 * 6);
+  expect(root.querySelectorAll(".swimlane-grid .cell")).toHaveLength(14 * 6);
   const pressed = vi.fn();
   calendar.addEventListener("event-press", pressed);
   bars[1].click();
@@ -703,5 +703,36 @@ test("the waterfall view: months in order over the weeks, today in its disc, a b
   root.querySelector<HTMLButtonElement>('[part="next"]')!.click();
   await calendar.updateComplete;
   expect(calendar.month).toBe("2026-11");
-  expect(calendar.shownView).toBe("waterfall");
+  expect(calendar.shownView).toBe("swimlane");
+});
+
+test("views can be a list with the page's own words, and a name the calendar does not draw is the page's own view in its slot", async () => {
+  const calendar = await mount<Calendar>(`<ds-calendar month="2026-10" today="2026-10-25" views="month swimlane earnings"><div slot="earnings">Money</div></ds-calendar>`);
+  calendar.viewNames = { month: "Calendar", earnings: "Earnings" };
+  const headings: string[] = [];
+  calendar.monthHeading = (month, view) => { headings.push(view); return `${view} ${month.getMonth() + 1}`; };
+  await calendar.updateComplete;
+  const root = calendar.shadowRoot!;
+  const views = root.querySelector<HTMLElement & { options: string }>("ds-button.views")!;
+  expect(views.options).toBe("month:Calendar,swimlane:Swimlane,earnings:Earnings");
+  expect(root.querySelector(".title-text")!.textContent).toBe("month 10");
+  views.dispatchEvent(new CustomEvent("change", { detail: { value: "earnings" }, bubbles: true, composed: true }));
+  await calendar.updateComplete;
+  expect(calendar.view).toBe("earnings");
+  expect(calendar.shownView).toBe("earnings");
+  expect(root.querySelector(".grid")).toBeNull();
+  expect(root.querySelector<HTMLSlotElement>('.own-view slot[name="earnings"]')!.assignedElements()[0].textContent).toBe("Money");
+  expect(root.querySelector(".title-text")!.textContent).toBe("earnings 10");
+  root.querySelector<HTMLButtonElement>('[part="next"]')!.click();
+  await calendar.updateComplete;
+  expect(calendar.month).toBe("2026-11");
+  // A view the calendar draws is drawn through view alone, offered or not.
+  calendar.view = "day";
+  await calendar.updateComplete;
+  expect(calendar.shownView).toBe("day");
+  calendar.views = false;
+  calendar.view = "earnings";
+  await calendar.updateComplete;
+  expect(calendar.shownView).toBe("month");
+  expect(root.querySelector("ds-button.views")).toBeNull();
 });

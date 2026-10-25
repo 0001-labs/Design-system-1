@@ -2,9 +2,9 @@
 // A month on whole squares: seven days across, a week to a row. `view` shows
 // one week instead (every event of each day, nothing folded behind "+N") or one
 // day (its events without a time across the top, then its hours, one square
-// each, with the timed events at their hour) or a waterfall (weeks across, a
+// each, with the timed events at their hour) or a swimlane (weeks across, a
 // row to an event, each event one bar from its first week to its last);
-// `views` puts Day, Week, Month and Waterfall in the header to change between
+// `views` puts Day, Week, Month and Swimlane in the header to change between
 // them. An event over several days is one bar
 // with its name written once, and words that do not fit fade out at the end.
 // By default a
@@ -64,16 +64,26 @@ const whole = (value: number | undefined, least: number, most: number, fallback:
  * line (and how many days the bar runs), `"on"` where a bar from an earlier
  * day passes over the line, or null where the line is empty.
  */
-/** What a full calendar shows: a month, a week, a day, or the events as a waterfall over weeks. */
-export type CalendarView = "month" | "week" | "day" | "waterfall";
+/** What a full calendar shows: a month, a week, a day, or the events as a swimlane over weeks. */
+export type CalendarView = "month" | "week" | "day" | "swimlane";
 
 /** The views in the header, the shortest first, with their shared words. */
-const VIEWS: readonly (readonly [CalendarView, string])[] = [["day", "Day"], ["week", "Week"], ["month", "Month"], ["waterfall", "Waterfall"]];
+const VIEWS: readonly (readonly [CalendarView, string])[] = [["day", "Day"], ["week", "Week"], ["month", "Month"], ["swimlane", "Swimlane"]];
 
 const isView = (value: unknown): value is CalendarView => VIEWS.some(([view]) => view === value);
 
-/** One event's bar in a waterfall: its row, and the first and last week (counted from 0) it covers in view. */
-export interface WaterfallBar {
+/** `views` as an attribute: present and empty for every view the calendar draws, or the views to offer, in order. */
+const viewsConverter = {
+  fromAttribute: (value: string | null): boolean | string[] => {
+    if (value === null || value === "false") return false;
+    const list = value.split(/[\s,]+/).filter(Boolean);
+    return list.length === 0 || value === "true" ? true : list;
+  },
+  toAttribute: (value: boolean | string[]) => (Array.isArray(value) ? value.join(" ") : value ? "" : null),
+};
+
+/** One event's bar in a swimlane: its row, and the first and last week (counted from 0) it covers in view. */
+export interface SwimlaneBar {
   event: CalendarEvent;
   row: number;
   from: number;
@@ -81,13 +91,13 @@ export interface WaterfallBar {
 }
 
 /**
- * Lays events out as a waterfall over `weeks` (each the first day of a week
+ * Lays events out as a swimlane over `weeks` (each the first day of a week
  * of seven): one row each, in the order `eventsByDay` lists them (by first
  * day, the longer first), each a bar from the week holding its first day to
  * the week holding its last, held inside the weeks drawn. Events wholly
  * outside them are left out.
  */
-export function waterfallBars(events: readonly CalendarEvent[], weeks: readonly Day[]): WaterfallBar[] {
+export function swimlaneBars(events: readonly CalendarEvent[], weeks: readonly Day[]): SwimlaneBar[] {
   if (!weeks.length) return [];
   const first = weeks[0], last = addDays(weeks.at(-1)!, 6);
   const seen = new Set<CalendarEvent>();
@@ -219,11 +229,19 @@ const openPickers = new Set<Calendar>();
  *   small month.
  * @prop {number} dayWidth - Squares per day (`day-width`): 4 by default, 1
  *   when compact.
- * @prop {string} view - `month` (the default), `week`, `day` or `waterfall`:
+ * @prop {string} view - `month` (the default), `week`, `day` or `swimlane`:
  *   the weeks from the month shown across (a week half a day wide, so it is
  *   as wide as the month), each event one row with one bar from its first
  *   week to its last. A compact calendar and a picker are always a month.
- * @prop {boolean} views - Day, Week, Month and Waterfall in the header, to change `view`.
+ * @prop {boolean | string[]} views - Day, Week, Month and Swimlane in the
+ *   header, to change `view`; or the views to offer, in order
+ *   (`views="month swimlane"`). A name the calendar does not draw is the
+ *   page's own view: chosen, the calendar keeps its header (the month's title,
+ *   the arrows moving a month) and shows what the page puts in its slot of
+ *   that name (`<div slot="earnings">`) in place of the days.
+ * @prop {Record<string, string>} viewNames - The words for each view in the
+ *   switch (property only), over the shared Day, Week, Month and Swimlane;
+ *   a page's own view is named by its name when left out.
  * @prop {string} date - The day the week or day view shows, `YYYY-MM-DD`;
  *   today, or the first of the month shown, by default.
  * @prop {number} lines - Lines of events under a day's date: 2 by default.
@@ -264,7 +282,7 @@ const openPickers = new Set<Calendar>();
  * @prop {boolean} disabled - A picker cannot be opened.
  * @prop {boolean} open - A picker's month is open.
  * @prop {CalendarEvent[]} events - What happens on the days (property only).
- * @prop {(month: Date) => string} monthHeading - Names the month view's title
+ * @prop {(month: Date, view: string) => string} monthHeading - Names the month view's title, and a page's own view's,
  *   (property only): given the first of the month shown, it returns the words,
  *   so a product can write "Events in October" instead of "October 2026". The
  *   week and day views, the twelve months and the twelve years keep their own
@@ -299,7 +317,8 @@ export class Calendar extends CalendarBase {
     lines: { type: Number },
     weekNumbers: { type: Boolean, attribute: "week-numbers", reflect: true },
     view: { type: String, reflect: true },
-    views: { type: Boolean, reflect: true },
+    views: { reflect: true, converter: viewsConverter },
+    viewNames: { attribute: false },
     date: { type: String, reflect: true },
     fixed: { type: Boolean, reflect: true },
     outsideDays: { type: Boolean, attribute: "outside-days", reflect: true },
@@ -325,17 +344,18 @@ export class Calendar extends CalendarBase {
 
   static styles = [unsafeCSS(metrics), unsafeCSS(controls), unsafeCSS(styles)];
   /** Words cut short (the title, a weekday, the picker's value, an event's name on its bar) fade over their last square, never "…": marks them `data-cut="end"` while they do not fit. */
-  protected readonly cuts = new CutFades(this, { selector: ".title:not(.title-button), .title-text, .weekday, .trigger .text, .event .name, .waterfall-month" });
+  protected readonly cuts = new CutFades(this, { selector: ".title:not(.title-button), .title-text, .weekday, .trigger .text, .event .name, .swimlane-month" });
 
   declare month: string | undefined;
   /** Names the month view's title from the first of the month shown; the month and year when unset. */
-  declare monthHeading: ((month: Date) => string) | undefined;
+  declare monthHeading: ((month: Date, view: string) => string) | undefined;
   declare compact: boolean;
   declare dayWidth: number | undefined;
   declare lines: number | undefined;
   declare weekNumbers: boolean;
-  declare view: CalendarView;
-  declare views: boolean;
+  declare view: CalendarView | (string & {});
+  declare views: boolean | string[];
+  declare viewNames: Record<string, string> | undefined;
   declare date: string | undefined;
   declare fixed: boolean;
   declare outsideDays: boolean;
@@ -431,10 +451,32 @@ export class Calendar extends CalendarBase {
 
   /** The view drawn: a compact calendar and a picker are always a month. */
   get shownView(): CalendarView {
-    return !this.picker && !this.compact && isView(this.view) ? this.view : "month";
+    if (this.picker || this.compact) return "month";
+    if (isView(this.view)) return this.view;
+    return this.viewChoices.includes(this.view) ? (this.view as CalendarView) : "month";
   }
 
-  /** Whether the view moves by days (a week or a day) rather than by months (a month or a waterfall). */
+  /** The views offered in the header, in order: every one the calendar draws, or the page's list. */
+  get viewChoices(): string[] {
+    const views = this.views;
+    if (Array.isArray(views)) return [...new Set(views.map(view => String(view).trim()).filter(Boolean))];
+    return views ? VIEWS.map(([view]) => view) : [];
+  }
+
+  /** Whether the view shown is the page's own, drawn in its slot. */
+  private get ownView() {
+    return !isView(this.shownView);
+  }
+
+  /** A view's words in the switch: the page's, else the shared ones, else its name. */
+  private viewName(view: string): string {
+    const shared = VIEWS.find(([choice]) => choice === view)?.[1];
+    const word = this.viewNames?.[view] ?? (shared ? this.words(shared) : view);
+    // The switch's options are written `value:words,value:words`.
+    return word.replace(/,/g, " ");
+  }
+
+  /** Whether the view moves by days (a week or a day) rather than by months (a month or a swimlane). */
   private get byDays() {
     const view = this.shownView;
     return view === "week" || view === "day";
@@ -475,7 +517,7 @@ export class Calendar extends CalendarBase {
   private onViewChange = (event: Event) => {
     event.stopPropagation();
     const view = (event as CustomEvent<{ value: string }>).detail?.value;
-    if (isView(view)) this.showView(view);
+    if (view && (isView(view) || this.viewChoices.includes(view))) this.showView(view as CalendarView);
   };
 
   /** Brings a day into view: its month, its week or the day itself. */
@@ -879,15 +921,16 @@ export class Calendar extends CalendarBase {
         ? this.rangeTitle(shownDays[0], shownDays[6])
         : view === "day"
           ? dayLabel(this.shownDay)
-          : view === "waterfall"
-            ? this.monthRangeTitle(this.waterfallWeeks)
+          : view === "swimlane"
+            ? this.monthRangeTitle(this.swimlaneWeeks)
             : this.monthHeading
-            ? this.monthHeading(new Date(Number(month.slice(0, 4)), Number(month.slice(5, 7)) - 1, 1))
+            ? this.monthHeading(new Date(Number(month.slice(0, 4)), Number(month.slice(5, 7)) - 1, 1), view)
             : monthTitle(month, this.compact ? "short" : "long")
       : level === "months"
         ? this.yearName(year)
         : `${this.yearName(span[0])} – ${this.yearName(span[0] + 11)}`;
-    return html`<div class="header" part="header" ?data-views=${this.views && !this.compact && !this.picker}>
+    const switchable = this.viewChoices.length > 1 && !this.compact && !this.picker;
+    return html`<div class="header" part="header" ?data-views=${switchable}>
       ${level === "years"
         ? html`<span class="title" id="title" aria-live="polite">${title}</span>`
         : html`<button
@@ -897,13 +940,13 @@ export class Calendar extends CalendarBase {
             aria-label=${`${title}, ${this.words("Choose a month and year")}`}
             @click=${this.levelUp}
           ><span class="title-text" id="title" aria-live="polite">${title}</span></button>`}
-      ${this.views && !this.compact && !this.picker ? html`<ds-button
+      ${switchable ? html`<ds-button
         class="views"
         part="views"
         split
         literal
         aria-label=${this.words("View")}
-        .options=${VIEWS.map(([choice, word]) => `${choice}:${this.words(word)}`).join(",")}
+        .options=${this.viewChoices.map(choice => `${choice}:${this.viewName(choice)}`).join(",")}
         .value=${view}
         @change=${this.onViewChange}
       ></ds-button>` : nothing}
@@ -971,8 +1014,8 @@ export class Calendar extends CalendarBase {
     return typeof format.formatRange === "function" ? format.formatRange(at(from), at(to)) : `${format.format(at(from))} – ${format.format(at(to))}`;
   }
 
-  /** The first day of each week a waterfall draws: from the week holding the month's first, half as many weeks as the month has squares across. */
-  private get waterfallWeeks(): Day[] {
+  /** The first day of each week a swimlane draws: from the week holding the month's first, half as many weeks as the month has squares across. */
+  private get swimlaneWeeks(): Day[] {
     const first = this.shownMonth;
     const start = addDays(first, -((weekdayOf(first) - this.firstDay + 7) % 7));
     const count = Math.max(4, Math.floor((7 * this.squaresPerDay) / 2));
@@ -984,7 +1027,7 @@ export class Calendar extends CalendarBase {
     return startOfMonth(addDays(weekStart, 3));
   }
 
-  /** The months a waterfall covers as one title: "Oct 2026 – Jan 2027". */
+  /** The months a swimlane covers as one title: "Oct 2026 – Jan 2027". */
   private monthRangeTitle(weeks: readonly Day[]): string {
     const from = this.ownerOf(weeks[0]), to = this.ownerOf(weeks.at(-1)!);
     const format = dateFormatter({ month: "short", year: "numeric", timeZone: "UTC" });
@@ -994,14 +1037,14 @@ export class Calendar extends CalendarBase {
   }
 
   /**
-   * The events as a waterfall: weeks across, two squares each; over them the
+   * The events as a swimlane: weeks across, two squares each; over them the
    * months, named where the month owning the week changes, and each week's
    * first date (today's date in its disc on today's week); then a row to an
    * event, two squares high, each one bar from its first week to its last.
    */
-  private renderWaterfall() {
-    const weeks = this.waterfallWeeks;
-    const bars = waterfallBars(this.events ?? [], weeks);
+  private renderSwimlane() {
+    const weeks = this.swimlaneWeeks;
+    const bars = swimlaneBars(this.events ?? [], weeks);
     const rows = Math.max(6, bars.length + 1);
     const today = this.todayDay;
     const todayWeek = weeks.findIndex(start => today >= start && today <= addDays(start, 6));
@@ -1012,41 +1055,29 @@ export class Calendar extends CalendarBase {
       if (last && last.month === month) last.span++;
       else months.push({ column, span: 1, month });
     });
-    const swipes = !this.noHeader;
     const range = (event: CalendarEvent) => {
       const end = event.end && isDay(event.end) && event.end > event.start ? event.end : event.start;
       return end === event.start ? dayLabel(event.start) : this.rangeTitle(event.start, end);
     };
-    return html`<div
-      class="calendar"
-      part="calendar"
-      ?data-swipe=${swipes}
-      @pointerdown=${swipes ? this.onSwipeStart : nothing}
-      @pointerup=${swipes ? this.onSwipeEnd : nothing}
-      @pointercancel=${() => (this.swipe = undefined)}
-      @wheel=${swipes ? this.onSwipeWheel : nothing}
-      @click=${{ handleEvent: this.onSwipeClick, capture: true }}
-    >
-      ${this.renderHeader()}
-      <div
-        class="waterfall"
-        part="waterfall"
+    return this.swipeFrame(html`<div
+        class="swimlane"
+        part="swimlane"
         role="group"
         ?data-travel=${this.travelled}
         aria-label=${this.nameOr(this.monthRangeTitle(weeks))}
         style=${`--ds-calendar-weeks: ${weeks.length}; --ds-calendar-rows: ${rows}`}
       >
-        <div class="waterfall-months" part="months" aria-hidden="true">
-          ${months.map(({ column, span, month }, index) => html`<span class="waterfall-month" style=${`grid-column: ${column + 1} / span ${span}`}>${
+        <div class="swimlane-months" part="months" aria-hidden="true">
+          ${months.map(({ column, span, month }, index) => html`<span class="swimlane-month" style=${`grid-column: ${column + 1} / span ${span}`}>${
             index === 0 || month.slice(5, 7) === "01" ? monthTitle(month, "short") : monthName(month, "short")
           }</span>`)}
         </div>
-        <div class="waterfall-dates" part="dates" aria-hidden="true">
+        <div class="swimlane-dates" part="dates" aria-hidden="true">
           ${weeks.map((start, column) => column === todayWeek
-            ? html`<span class="waterfall-date" data-today><span class="date">${dateNumber(today)}</span></span>`
-            : html`<span class="waterfall-date"><span class="date">${dateNumber(start)}</span></span>`)}
+            ? html`<span class="swimlane-date" data-today><span class="date">${dateNumber(today)}</span></span>`
+            : html`<span class="swimlane-date"><span class="date">${dateNumber(start)}</span></span>`)}
         </div>
-        <div class="waterfall-grid" part="grid">
+        <div class="swimlane-grid" part="grid">
           ${Array.from({ length: rows }, (_, row) => weeks.map((_, column) => html`<span
             class="cell"
             aria-hidden="true"
@@ -1069,8 +1100,31 @@ export class Calendar extends CalendarBase {
             ><span class="name">${event.title}</span></button>`;
           })}
         </div>
-      </div>
+      </div>`);
+  }
+
+  /** A view drawn under the header that swipes as the arrows move: the swimlane and a page's own view. */
+  private swipeFrame(content: unknown) {
+    const swipes = !this.noHeader;
+    return html`<div
+      class="calendar"
+      part="calendar"
+      ?data-swipe=${swipes}
+      @pointerdown=${swipes ? this.onSwipeStart : nothing}
+      @pointerup=${swipes ? this.onSwipeEnd : nothing}
+      @pointercancel=${() => (this.swipe = undefined)}
+      @wheel=${swipes ? this.onSwipeWheel : nothing}
+      @click=${{ handleEvent: this.onSwipeClick, capture: true }}
+    >
+      ${this.renderHeader()}
+      ${content}
     </div>`;
+  }
+
+  /** A page's own view: what it puts in the slot named after the view, as wide as the month. */
+  private renderOwnView() {
+    const view = this.shownView;
+    return this.swipeFrame(html`<div class="own-view" part="own-view" data-view=${view} ?data-travel=${this.travelled}><slot name=${view}></slot></div>`);
   }
 
   /**
@@ -1127,7 +1181,8 @@ export class Calendar extends CalendarBase {
     const first = this.firstDay;
     const view = this.shownView;
     if (view === "day" && this.level === "days") return this.renderDayView();
-    if (view === "waterfall" && this.level === "days") return this.renderWaterfall();
+    if (view === "swimlane" && this.level === "days") return this.renderSwimlane();
+    if (this.ownView && this.level === "days") return this.renderOwnView();
     const weeks = view === "week" ? [this.weekOf(this.shownDay)] : monthWeeks(month, first, this.fixed);
     this.byDay = eventsByDay(this.events ?? [], weeks[0][0], weeks.at(-1)![6]);
     this.laidOut = new Map();
