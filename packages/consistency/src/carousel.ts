@@ -42,7 +42,7 @@ export function carouselAtom(canWrite: () => boolean, getHost: () => HTMLElement
  return {
   name: 'consistency-carousel', fence: 'c9y-carousel', match: () => 0,
   insert: { label: 'Carousel', icon: 'image', keywords: 'carousel slides slideshow gallery images', source: writeCarousel(EMPTY_CAROUSEL), preview(target) {
-    applyLibraryTokens(target, getHost()?.closest<HTMLElement>('[data-consistency-library]')?.dataset.consistencyLibrary ?? 'original');
+    { const owner = getHost()?.closest<HTMLElement>('[data-consistency-library]'); applyLibraryTokens(target, owner?.dataset.consistencyLibrary ?? 'original', owner?.dataset.consistencyFonts); }
     const empty = target.ownerDocument.createElement('ds-empty'); empty.literal = true; empty.heading = 'An empty carousel'; empty.text = 'Add your own images.'; target.append(empty);
     return () => target.replaceChildren();
   } },

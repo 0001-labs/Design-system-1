@@ -43,10 +43,10 @@ export function contentElementAtoms(canWrite: () => boolean, getHost: () => HTML
     name: `consistency-${kind}`, fence: `c9y-${kind}`, match: () => 0,
     insert: { label: kind === 'button' ? 'Button' : 'Card', icon: kind === 'button' ? 'plus' : 'square', source: writeContentElement(defaults[kind]), keywords: kind, preview: (target: HTMLElement, context?: { input: 'pointer' | 'keyboard' }) => {
       const owner = getHost()?.closest<HTMLElement>('[data-consistency-library]');
-      const update = () => applyLibraryTokens(target, owner?.dataset.consistencyLibrary ?? 'original');
+      const update = () => applyLibraryTokens(target, owner?.dataset.consistencyLibrary ?? 'original', owner?.dataset.consistencyFonts);
       update();
       const observer = new MutationObserver(update);
-      if (owner) observer.observe(owner, { attributes: true, attributeFilter: ['data-consistency-library'] });
+      if (owner) observer.observe(owner, { attributes: true, attributeFilter: ['data-consistency-library', 'data-consistency-fonts'] });
       target.classList.add('consistency-element-preview');
       const frame = target.ownerDocument.createElement('div'); frame.className = 'consistency-element-preview-stage';
       const face = target.ownerDocument.createElement(kind === 'button' ? 'ds-button' : 'ds-card');

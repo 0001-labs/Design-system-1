@@ -1,4 +1,5 @@
 import voyageStyles from '../../../website/public/examples/libraries/voyage.css?raw';
+import { decodePageFonts, encodePageFonts, fontTokens } from './fonts';
 // Read the canonical example library's root roles; never duplicate its palette here.
 const voyageTokens: Record<string, string> = {};
 for (const rule of voyageStyles.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
@@ -76,11 +77,14 @@ export const LIBRARY_PRESETS: readonly LibraryPreset[] = [
 export function libraryTokens(id: string): Record<string, string> {
   return { ...(LIBRARY_PRESETS.find(preset => preset.id === id) ?? LIBRARY_PRESETS[0]).tokens };
 }
-/** Switching back to Original clears every previously applied role. */
-export function applyLibraryTokens(element: HTMLElement, id: string): void {
-  const keys = new Set(LIBRARY_PRESETS.flatMap(preset => Object.keys(preset.tokens)));
+/** Switching back to Original clears every previously applied role. The page's faces (`heading|text`, as the
+ * sheet's `data-consistency-fonts` carries them) go over the library's. */
+export function applyLibraryTokens(element: HTMLElement, id: string, fonts?: string): void {
+  const keys = new Set([...LIBRARY_PRESETS.flatMap(preset => Object.keys(preset.tokens)), '--ds-typeface-medium', '--ds-typeface-regular']);
   for (const key of keys) element.style.removeProperty(key);
-  for (const [key, value] of Object.entries(libraryTokens(id))) element.style.setProperty(key, value);
+  const faces = decodePageFonts(fonts);
+  for (const [key, value] of Object.entries({ ...libraryTokens(id), ...fontTokens(faces) })) element.style.setProperty(key, value);
+  if (fonts !== undefined) element.dataset.consistencyFonts = encodePageFonts(faces);
   element.style.colorScheme = id === 'ink' ? 'dark' : ['blue', 'soft', 'bold', 'editorial'].includes(id) ? 'light' : '';
   element.dataset.consistencyLibrary = LIBRARY_PRESETS.find(preset => preset.id === id)?.id ?? 'original';
 }
