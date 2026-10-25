@@ -35,12 +35,14 @@ const { sidebar } = Astro.locals.starlightRoute;
   import { translate } from '../../../DS1/0-face/i18n';
   import { LAYERS } from '../../../shared/component-directory';
   import { libraryWorkspaceHref, type LibraryNavigation } from '../../../shared/library-navigation';
+  import { ownerLibraryItems, readOwnerLibraries, MY_LIBRARIES_ID, type OwnerLibrary } from '../lib/owner-libraries';
   import type { SidebarItem } from '../../../DS1/3-unit/ds-sidebar';
   const navigation = document.querySelector('ds-sidebar#docs-navigation')!;
   type Entry = { label: string; href?: string; isCurrent?: boolean; entries?: Entry[] };
   const groups: Entry[] = JSON.parse(navigation.dataset.groups ?? '[]');
   let library: LibraryNavigation | null = null;
   let appComponents: AppComponent[] = [];
+  let ownerLibraries: OwnerLibrary[] = [];
   const collapsed = new Set<string>();
   let owner = document.documentElement.hasAttribute("data-ds-owner");
   let signedIn = document.documentElement.hasAttribute("data-signed-in");
@@ -108,7 +110,9 @@ const { sidebar } = Astro.locals.starlightRoute;
     if (owner) navigation.items = [...navigation.items,
       { id: 'adoption', label: 'Adoption', href: '/adoption/', current: location.pathname === '/adoption/' },
       { id: 'architecture', label: 'Architecture', href: '/architecture/', current: location.pathname === '/architecture/' },
-      { id: 'base-system-editor', label: 'Base system', href: '/app/base' }];
+      // The owner's libraries come last: Design system 1, the base system, then each library.
+      // The frame reports the open library before the address catches up with it.
+      ...ownerLibraryItems(ownerLibraries, { pathname: location.pathname, search: library ? `?${new URLSearchParams({ library: library.id })}` : location.search }, !collapsed.has(MY_LIBRARIES_ID))];
   }
   renderAccount();
   renderWorkspace();
@@ -132,6 +136,7 @@ const { sidebar } = Astro.locals.starlightRoute;
     signedIn = detail.authenticated;
     owner = signedIn && detail.owner === true && !detail.loading;
     if (!detail.loading) appComponents = readAppComponents(detail);
+    if (!detail.loading) ownerLibraries = owner ? readOwnerLibraries(detail.libraries) : [];
     if (!signedIn) library = null;
     workspaceName = typeof detail.companyName === 'string' && detail.companyName.trim() ? detail.companyName : 'My company';
     renderWorkspace(); renderNavigation(); renderAccount();

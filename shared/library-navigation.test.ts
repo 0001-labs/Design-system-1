@@ -38,3 +38,10 @@ test('direct links retain library/component selection without redirecting embedd
    expect(libraryWorkspaceRedirect('/l/one', new URLSearchParams('view=overview'), false, false)).toContain('view=overview');
    expect(libraryHref({ ...library, view: undefined }, '/2-core/input/')).not.toContain('view=');
  });
+
+test('the base system opens as Design system 1 in the documentation shell, keeping only its view', () => {
+  expect(libraryWorkspaceRedirect('/base', new URLSearchParams(), false, false)).toBe('/libraries/design-system-1/');
+  expect(libraryWorkspaceRedirect('/base', new URLSearchParams('view=tokens&library=one'), false, false)).toBe('/libraries/design-system-1/?view=tokens');
+  expect(libraryWorkspaceRedirect('/base', new URLSearchParams(), false, true)).toBe('/libraries/design-system-1/');
+  expect(libraryWorkspaceRedirect('/base', new URLSearchParams('embed=docs'), true, false)).toBeNull();
+});

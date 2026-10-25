@@ -1,4 +1,5 @@
 ---
+import { ownerLibraryItems } from '../lib/owner-libraries';
 const { sidebar } = Astro.locals.starlightRoute;
 type Entry = { label: string; href?: string; entries?: Entry[] };
 // The documentation's one navigation on a wider screen, always shown: each group a square below the
@@ -25,6 +26,9 @@ function flatten(entries: Entry[], section = ''): RailRow[] {
 }
 const rows = flatten(sidebar);
 const here = Astro.url.pathname.replace(/\/$/, '');
+// The owner's libraries, last: My libraries, then Design system 1. Each library joins once the
+// signed-in summary names them; everyone else never sees these rows.
+const ownerRows = ownerLibraryItems([], { pathname: Astro.url.pathname });
 ---
 <nav class="docs-navigation-rail" aria-label="Documentation shortcuts">
   <div class="rail-links">
@@ -33,15 +37,17 @@ const here = Astro.url.pathname.replace(/\/$/, '');
         <a href={row.href} aria-label={row.name} aria-current={row.href.replace(/\/$/, '') === here ? 'page' : undefined}>{row.layer && <span class="rail-swatch" aria-hidden="true"></span>}{row.name}</a>
       </ds-button>
     : <p class:list={['rail-group', { 'rail-gap': row.gap }]}>{row.name}</p>)}
-    <ds-button control="slotted" fit class="rail-entry rail-gap rail-adoption">
+    <ds-button control="slotted" fit class="rail-entry rail-gap rail-owner">
       <a href="/adoption/" aria-current={here === '/adoption' ? 'page' : undefined}>Adoption</a>
     </ds-button>
-    <ds-button control="slotted" fit class="rail-entry rail-adoption">
+    <ds-button control="slotted" fit class="rail-entry rail-owner">
       <a href="/architecture/" aria-current={here === '/architecture' ? 'page' : undefined}>Architecture</a>
     </ds-button>
-    <ds-button control="slotted" fit class="rail-entry rail-adoption">
-      <a href="/app/base">Base system</a>
-    </ds-button>
+    {ownerRows.map(row => (
+      <ds-button control="slotted" fit class:list={['rail-entry', 'rail-owner', { 'rail-gap rail-heading': row.depth === 0 }]} data-owner-row={row.id}>
+        <a href={row.href} aria-current={row.current ? 'page' : undefined}>{row.label}</a>
+      </ds-button>
+    ))}
   </div>
   <footer class="rail-footer">
     <ds-button control="slotted" fit><a href="https://github.com/0001-labs/Design-system-1">GitHub</a></ds-button>
@@ -52,6 +58,7 @@ const here = Astro.url.pathname.replace(/\/$/, '');
   import '../../../DS1/2-core/ds-icon';
   import '../../../DS1/2-core/ds-tag';
   import { readAppComponents, appComponentLink } from '../lib/app-navigation';
+  import { ownerLibraryItems, readOwnerLibraries, BASE_LIBRARY_ID, type OwnerLibrary } from '../lib/owner-libraries';
   const rail = document.querySelector<HTMLElement>('.rail-links');
   const account = document.querySelector<HTMLAnchorElement>('#rail-account');
   function renderAccount(signedIn: boolean) {
@@ -60,10 +67,45 @@ const here = Astro.url.pathname.replace(/\/$/, '');
     account.textContent = signedIn ? 'Profile' : 'Sign in';
   }
   renderAccount(document.documentElement.hasAttribute('data-signed-in'));
+  let ownerLibraries: OwnerLibrary[] = [];
+  // The library open in the workspace's frame, once it says; until then the address names it.
+  let openLibrary: string | null | undefined;
+  function renderOwnerLibraries() {
+    if (!rail) return;
+    rail.querySelectorAll('[data-owner-library]').forEach(row => row.remove());
+    const search = openLibrary === undefined ? location.search : openLibrary ? `?${new URLSearchParams({ library: openLibrary })}` : '';
+    let last = rail.querySelector(`[data-owner-row="${BASE_LIBRARY_ID}"]`);
+    for (const item of ownerLibraryItems(ownerLibraries, { pathname: location.pathname, search })) {
+      let link = rail.querySelector<HTMLAnchorElement>(`[data-owner-row="${CSS.escape(item.id)}"] > a`);
+      if (!link) {
+        const button = document.createElement('ds-button');
+        button.className = 'rail-entry rail-owner';
+        button.setAttribute('control', 'slotted');
+        button.setAttribute('fit', '');
+        button.dataset.ownerRow = item.id;
+        button.dataset.ownerLibrary = '';
+        link = document.createElement('a');
+        link.href = item.href;
+        link.textContent = item.label;
+        button.append(link);
+        last?.after(button);
+        last = button;
+      }
+      if (item.current) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    }
+  }
+  renderOwnerLibraries();
+  window.addEventListener('ds1-library-navigation', event => {
+    openLibrary = (event as CustomEvent).detail.library?.id ?? null;
+    renderOwnerLibraries();
+  });
   window.addEventListener('ds1-navigation-auth', event => {
     const detail = (event as CustomEvent).detail;
     if (detail.loading) return;
     renderAccount(detail.authenticated === true);
+    ownerLibraries = detail.authenticated === true && detail.owner === true ? readOwnerLibraries(detail.libraries) : [];
+    renderOwnerLibraries();
     rail?.querySelectorAll('[data-private-rail]').forEach(button => button.remove());
     for (const component of readAppComponents(detail)) {
       const heading = rail?.querySelector(`[data-rail-layer="${component.layer}"]`);
@@ -87,8 +129,9 @@ const here = Astro.url.pathname.replace(/\/$/, '');
 </script>
 <style>
   .docs-navigation-rail { display: none; }
-  .rail-adoption { display: none !important; }
-  :global(html[data-ds-owner]) .rail-adoption { display: inline-flex !important; }
+  /* Owner rows, the libraries added later too, stay hidden from everyone else. */
+  .docs-navigation-rail :global(.rail-owner) { display: none !important; }
+  :global(html[data-ds-owner]) .docs-navigation-rail :global(.rail-owner) { display: inline-flex !important; }
   @media (min-width: 769px) {
     :global(html[data-sidebar-collapsed]) .docs-navigation-rail { display: flex; flex-direction: column; width: calc(8 * var(--site-unit)); height: 100%; padding: var(--site-unit) calc(var(--site-unit) / 2) var(--site-unit) var(--site-unit); }
     .rail-links { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; }

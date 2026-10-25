@@ -1,18 +1,20 @@
 ---
 import PrivateAppWorkspace from './PrivateAppWorkspace.astro';
 interface Props {
-  mode: 'editor' | 'libraries' | 'account';
+  mode: 'editor' | 'libraries' | 'account' | 'base';
 }
 
 const { mode } = Astro.props;
-const appPath = mode === 'editor' ? '/app/playground' : mode === 'account' ? '/app/profile' : '/app/libraries';
+// `base` is Design system 1 itself, the owner's base system, open in the component editor.
+const appPath = mode === 'editor' ? '/app/playground' : mode === 'account' ? '/app/profile' : mode === 'base' ? '/app/base' : '/app/libraries';
+const frameTitle = mode === 'editor' ? 'Design system 1 editor' : mode === 'account' ? 'Account' : mode === 'base' ? 'Design system 1' : 'My libraries';
 ---
 
 <script is:inline>
   document.documentElement.toggleAttribute('data-private-app-document', new URLSearchParams(location.search).has('internal'));
 </script>
 
-<section class="library-workspace" aria-labelledby="library-title" data-pagefind-body>
+<section class="library-workspace" aria-labelledby="library-title" data-pagefind-body={mode === 'base' ? undefined : ''}>
   <div class="library-heading">
     <div>
       <h1 id="library-title">{mode === 'account' ? 'Account' : 'Design system 1'}</h1>
@@ -23,13 +25,13 @@ const appPath = mode === 'editor' ? '/app/playground' : mode === 'account' ? '/a
   <nav class="library-tabs" aria-label="Design system 1">
     <a href="/">Overview</a>
     <a data-requires-signin href="/libraries/workspace/" aria-current="page">My libraries</a>
-    <span>{mode === 'editor' ? 'Playground · changes are temporary' : mode === 'account' ? 'Account' : 'Saved stylesheets'}</span>
+    {mode !== 'base' && <span>{mode === 'editor' ? 'Playground · changes are temporary' : mode === 'account' ? 'Account' : 'Saved stylesheets'}</span>}
   </nav>
   <iframe
     id="library-app"
     data-mode={mode}
     data-src={`${appPath}?embed=docs`}
-    title={mode === 'editor' ? 'Design system 1 editor' : mode === 'account' ? 'Account' : 'My libraries'}
+    title={frameTitle}
   ></iframe>
 </section>
 {mode === 'libraries' && <PrivateAppWorkspace />}
@@ -42,7 +44,10 @@ const appPath = mode === 'editor' ? '/app/playground' : mode === 'account' ? '/a
     // The docs are static: read the current library from the browser URL, not build-time Astro.url.
     const query = new URLSearchParams(location.search);
     const libraryId = query.get('library');
-    if (libraryId && frame.dataset.mode !== 'account') {
+    // The base system's editor names no library: it keeps only its view (`?view=tokens`).
+    const libraryNavigation = frame.dataset.mode !== 'base';
+    if (!libraryNavigation && query.get('view')) frame.src = `${frame.dataset.src}&${new URLSearchParams({ view: query.get('view')! })}`;
+    if (libraryId && libraryNavigation && frame.dataset.mode !== 'account') {
       const appQuery = new URLSearchParams({ embed: 'docs' });
       if (query.get('view') === 'overview') appQuery.set('view', 'overview');
       if (query.has('component')) appQuery.set('component', query.get('component')!);
@@ -55,12 +60,12 @@ const appPath = mode === 'editor' ? '/app/playground' : mode === 'account' ? '/a
         : root.dataset.theme === 'light' ? 'light' : 'dark';
       frame.contentWindow?.postMessage({ type: 'ds1:docs-theme', theme }, window.location.origin);
     };
-    const requestLibrary = () => frame.contentWindow?.postMessage({ type: 'ds1:library-navigation-request' }, location.origin);
+    const requestLibrary = () => { if (libraryNavigation) frame.contentWindow?.postMessage({ type: 'ds1:library-navigation-request' }, location.origin); };
     frame.addEventListener('load', () => { sendTheme(); requestLibrary(); });
     requestLibrary();
     window.addEventListener('theme-changed', sendTheme);
     const renderLibrary = (library: LibraryNavigation | null) => {
-      if (frame.dataset.mode === 'account') return;
+      if (frame.dataset.mode === 'account' || !libraryNavigation) return;
       document.documentElement.toggleAttribute('data-library-workspace', library !== null);
       window.dispatchEvent(new CustomEvent('ds1-library-navigation', { detail: { library } }));
       const heading = document.querySelector('#library-title');
@@ -77,7 +82,7 @@ const appPath = mode === 'editor' ? '/app/playground' : mode === 'account' ? '/a
     window.addEventListener('message', (event) => {
       if (event.origin === window.location.origin && event.source === frame.contentWindow
         && event.data?.type === 'ds1:docs-ready') { sendTheme(); requestLibrary(); }
-      if (event.origin !== location.origin || event.source !== frame.contentWindow || event.data?.type !== 'ds1:library-navigation') return;
+      if (!libraryNavigation || event.origin !== location.origin || event.source !== frame.contentWindow || event.data?.type !== 'ds1:library-navigation') return;
       const library = document.documentElement.hasAttribute('data-signed-in') ? readLibraryNavigation(event.data.library) : null;
       renderLibrary(library);
       if (frame.dataset.mode !== 'account' && event.data.libraryId === null && location.search) history.replaceState({}, '', location.pathname);
