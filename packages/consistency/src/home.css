@@ -9,3 +9,13 @@ consistency-home>ds-page{height:100%}
 .home-bar{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--ds-unit);min-height:var(--ds-unit)}
 .home-grid{display:grid;grid-template-columns:repeat(auto-fill,calc(12 * var(--ds-unit)));gap:var(--ds-unit)}
 @media(max-width:600px){.home-grid{grid-template-columns:minmax(0,1fr)}.home-grid>ds-card{width:auto}}
+.home-bar--page{justify-content:flex-start}
+/* Settings → Domains: a settings column of 32 squares; the connect row on the sixteen; each waiting domain's record under its row. */
+consistency-domains{display:block;max-width:calc(32 * var(--ds-unit))}
+.domains{display:flex;flex-direction:column;gap:var(--ds-unit)}
+.domains-connect{display:flex;flex-wrap:wrap;align-items:flex-end;gap:calc(var(--ds-unit) / 2);min-height:var(--ds-unit)}
+.domains-host{flex:1 1 calc(12 * var(--ds-unit));min-width:0}
+.domain-row .ds-row__value{display:flex;align-items:flex-end;gap:calc(4px * var(--ds-sf, 1))}
+.domain-record{display:grid;grid-template-columns:calc(4 * var(--ds-unit)) minmax(0,1fr) minmax(0,1fr);align-items:end;min-height:var(--ds-unit);line-height:calc(16px * var(--ds-sf, 1))}
+.domain-detail{display:block}
+@media(max-width:600px){.domain-record{grid-template-columns:calc(4 * var(--ds-unit)) minmax(0,1fr)}.domain-record>:last-child{grid-column:2}}

@@ -96,3 +96,29 @@ it('gives the owner their company name for the home, and nobody else anything', 
   expect(other.mock.calls.some(([, init]) => JSON.parse(String(init?.body)).path === 'users:profile')).toBe(false);
   expect((await consistencyPreview(new Request(url, { method: 'POST', headers }), env, owner as unknown as typeof fetch)).status).toBe(405);
 });
+
+it('domains: only the owner, same-origin writes, and only the domain routes reach the platform',async()=>{
+ const {env,send}=setup();const workspace={fetch:vi.fn(async(request:Request)=>Response.json({path:new URL(request.url).pathname,method:request.method}))};
+ const bound={...env,CONSISTENCY_WORKSPACE:workspace} as unknown as Parameters<typeof consistencyPreview>[1];
+ const base='https://c9y.site/api/consistency/domains';
+ const call=(path:string,init:RequestInit={})=>consistencyPreview(new Request(base+path,init),bound,send);
+ expect((await call('')).status).toBe(401);
+ expect((await call('',{method:'POST',headers:{origin:'https://c9y.site','Content-Type':'application/json'},body:'{}'})).status).toBe(401);
+ expect(workspace.fetch).not.toHaveBeenCalled();
+ expect((await call('',{headers})).status).toBe(200);
+ const json={...headers,'Content-Type':'application/json'};
+ expect((await call('',{method:'POST',headers:{...json,origin:'https://evil.test'},body:'{}'})).status).toBe(403);
+ expect((await call('',{method:'POST',headers:{...headers,origin:'https://c9y.site','Content-Type':'text/plain'},body:'{}'})).status).toBe(403);
+ expect((await call('',{method:'POST',headers:{...json,origin:'https://c9y.site'},body:'x'.repeat(2001)})).status).toBe(413);
+ expect((await call('/www.example.com',{method:'DELETE',headers:{...headers,origin:'https://evil.test'}})).status).toBe(403);
+ expect((await call('',{method:'DELETE',headers:{...headers,origin:'https://c9y.site'}})).status).toBe(405);
+ expect((await call('/www.example.com/check',{method:'GET',headers})).status).toBe(405);
+ expect((await call('/WWW.example.com',{method:'DELETE',headers:{...headers,origin:'https://c9y.site'}})).status).toBe(404);
+ expect(workspace.fetch).toHaveBeenCalledTimes(1);
+ expect(await (await call('',{method:'POST',headers:{...json,origin:'https://c9y.site'},body:'{"site":"flavo","host":"a.com"}'})).json()).toEqual({path:'/api/consistency/domains',method:'POST'});
+ expect(await (await call('/www.example.com/check',{method:'POST',headers:{...headers,origin:'https://c9y.site'}})).json()).toEqual({path:'/api/consistency/domains/www.example.com/check',method:'POST'});
+ expect(await (await call('/www.example.com',{method:'DELETE',headers:{...headers,origin:'https://c9y.site'}})).json()).toEqual({path:'/api/consistency/domains/www.example.com',method:'DELETE'});
+ const other=setup('other');
+ expect((await consistencyPreview(new Request(base,{headers}),{...other.env,CONSISTENCY_WORKSPACE:workspace} as unknown as Parameters<typeof consistencyPreview>[1],other.send)).status).toBe(403);
+ expect(workspace.fetch).toHaveBeenCalledTimes(4);
+});

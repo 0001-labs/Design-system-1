@@ -30,6 +30,7 @@ export async function consistencyPreview(request: Request, env: ReportsEnv & Wor
   if (!isConsistencyHost(url.hostname) || url.protocol !== 'https:') return new Response(null, { status: 404, headers: security });
   if (url.pathname === '/api/dashboard/session' || url.pathname === '/app/signin' || /^\/app\/assets\/[A-Za-z0-9][A-Za-z0-9._-]*$/.test(url.pathname) || url.pathname === '/icons/design-system-1.svg') return protect(await dashboard(request, env, send));
   if ((url.pathname.startsWith('/api/consistency/pages') || url.pathname==='/api/consistency/sites')) return protect(await workspaceApi(request,env,send));
+  if (url.pathname === '/api/consistency/domains' || url.pathname.startsWith('/api/consistency/domains/')) return protect(await domainsApi(request, env, send));
   if (url.pathname === '/api/consistency/profile') return protect(await profileApi(request, env, send));
   if (!['GET', 'HEAD'].includes(request.method)) return new Response(null, { status: 404, headers: security });
   if (url.pathname !== '/' && !url.pathname.startsWith(prefix)) return new Response(null, { status: 404, headers: security });
@@ -85,4 +86,25 @@ async function workspaceApi(request:Request,env:ReportsEnv & WorkspaceEnv,send:t
     body=new Uint8Array(size);let offset=0;for(const chunk of chunks){body.set(chunk,offset);offset+=chunk.length;}
   }
   return env.CONSISTENCY_WORKSPACE.fetch(new Request('https://workspace.internal'+url.pathname,{method:request.method,body,headers:{'Content-Type':'application/json'}}));
+}
+
+/**
+ * Settings → Domains: the owner connects their own domains to their sites. The platform talks to Cloudflare and
+ * decides when a domain is connected; this gateway only checks the owner, the origin and the request's shape.
+ */
+async function domainsApi(request: Request, env: ReportsEnv & WorkspaceEnv, send: typeof fetch): Promise<Response> {
+  const url = new URL(request.url);
+  const item = /^\/api\/consistency\/domains\/([a-z0-9.-]{1,253})(\/check)?$/.exec(url.pathname);
+  if (url.pathname !== '/api/consistency/domains' && !item) return Response.json({ error: 'Not found' }, { status: 404 });
+  const denied = await authorizeReport(sessionRequest(new Request(request.url, { headers: request.headers })), env, send); if (denied) return denied;
+  const allowed = item ? (item[2] ? ['POST'] : ['DELETE']) : ['GET', 'POST'];
+  if (!allowed.includes(request.method)) return Response.json({ error: 'Method not allowed' }, { status: 405 });
+  const body = request.method === 'POST' && !item ? await request.text() : undefined;
+  if (request.method !== 'GET') {
+    if (request.headers.get('Origin') !== url.origin) return Response.json({ error: 'Forbidden' }, { status: 403 });
+    if (body !== undefined && request.headers.get('Content-Type')?.split(';')[0] !== 'application/json') return Response.json({ error: 'Forbidden' }, { status: 403 });
+    if (body !== undefined && body.length > 2_000) return Response.json({ error: 'Too large' }, { status: 413 });
+  }
+  if (!env.CONSISTENCY_WORKSPACE) return Response.json({ error: 'Workspace unavailable' }, { status: 503 });
+  return env.CONSISTENCY_WORKSPACE.fetch(new Request('https://workspace.internal' + url.pathname, { method: request.method, body, headers: { 'Content-Type': 'application/json' } }));
 }
