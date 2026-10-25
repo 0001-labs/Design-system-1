@@ -53,14 +53,16 @@
     }
   },
   "Consistency CMS": {
-    "commit": "56fcf9fc6b39163c9106cc055ee5c6303f3c7989",
+    "commit": "f32dcbcca2574978df67df92db022eb8a82a5297",
     "version": null,
     "owned": ["packages/consistency/src/vendor/cms"],
     "files": {
       "packages/consistency/src/vendor/cms/README.md": "b0c02dd51c41dc454915fb856b742b7870086fa8fef111a7b5fa466ad13fd985",
-      "packages/consistency/src/vendor/cms/composition-workspace.css": "9578db478d72ff20b07ced0c895557b9c5570a9da230883c1603f02d0f905f8c",
-      "packages/consistency/src/vendor/cms/composition-workspace.ts": "ad3b554144c1e2bdb2ae1684f6a014947b8dae73b6ef6dea5916f33715ec0e4c",
-      "packages/consistency/src/vendor/cms/dom.ts": "42c4cb6c5ad6d8dc0de74aaa958345ead73d0ecac50d8b7472c46439db03b265"
+      "packages/consistency/src/vendor/cms/composition-workspace.css": "167c43fda98601efab91656d9f32f9094e38e8bfb2d9931827fbce3042d66701",
+      "packages/consistency/src/vendor/cms/composition-workspace.ts": "f95cd6c9ab34bb92dbf95a78ac105f5d66572c52d159c759eb903e252ca61473",
+      "packages/consistency/src/vendor/cms/dom.ts": "42c4cb6c5ad6d8dc0de74aaa958345ead73d0ecac50d8b7472c46439db03b265",
+      "packages/consistency/src/vendor/cms/markdown.ts": "a7b3b1119a414ba4b919f1119efb288c7d4827ac009388a19194f08b0958603f",
+      "packages/consistency/src/vendor/cms/placing.ts": "d2c4bbb206f59a0cb6fca0d4d89f7ccfa6bc097bccbc2b313a013b0045018f22"
     }
   },
   "Drag": {

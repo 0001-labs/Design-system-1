@@ -3,6 +3,8 @@
 .composition-shell>ds-sidebar [slot=header]{display:flex;flex-direction:column;gap:var(--ds-unit);padding-bottom:var(--ds-unit)}
 .composition-content{min-width:0;min-height:0;display:flex;flex-direction:column}
 .composition-document-bar{display:flex;align-items:center;flex-wrap:wrap;gap:var(--ds-unit);padding:var(--ds-unit);border-bottom:1px solid var(--ds-border-color)}
+/* The draft's bar is away while a site is open; a hidden control stays hidden whatever its face says. */
+.composition-document-bar[hidden],.composition-document-bar [hidden]{display:none}
 .composition-document-bar input{max-width:100%;width:calc(12 * var(--ds-unit))}
 .composition-status{font-size:var(--ds-type-size-small);color:var(--ds-text-color-muted)}
 .composition-work{min-height:0;min-width:0;flex:1;overflow:auto}
@@ -11,3 +13,4 @@
 @media(max-width:600px){.composition-shell{grid-template-columns:minmax(0,1fr);height:auto;min-height:calc(100dvh - 2 * var(--ds-unit))}.composition-shell>ds-sidebar{width:auto;max-height:calc(8 * var(--ds-unit));padding:var(--ds-unit)}.composition-content{min-height:70dvh}}
 
 .composition-sites{display:flex;flex-direction:column;gap:calc(4px * var(--sf));padding-block:var(--ds-unit)}
+.composition-sites:has(>.ds-row){gap:0}

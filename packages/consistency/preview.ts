@@ -10,6 +10,11 @@ import { compositionWorkspace } from './src/vendor/cms/composition-workspace';
 import './src/vendor/cms/composition-workspace.css';
 import '../../DS1/0-face/grid';
 import './src/home';
+import { ConsistencySiteEditor } from './src/site-editor';
 
 const workspace=document.getElementById('consistency-workspace');
-if(workspace) compositionWorkspace(workspace,{create(document){const element=new ConsistencyEditor();if(document)element.loadDocument(document);return {element,read:()=>element.readDocument()};}});
+if(workspace) compositionWorkspace(workspace,{
+  create(document){const element=new ConsistencyEditor();if(document)element.loadDocument(document);return {element,read:()=>element.readDocument()};},
+  // A site's words, edited on its real page and saved to the live site; its layout stays as published.
+  openSite(site){const element=new ConsistencySiteEditor();element.site=site;return {element,flush:()=>element.flush(),destroy:()=>element.remove()};},
+});
