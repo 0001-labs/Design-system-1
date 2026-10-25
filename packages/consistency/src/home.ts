@@ -9,11 +9,11 @@ import '../../../DS1/2-core/ds-card';
 import '../../../DS1/2-core/ds-text';
 import './home.css';
 
-/** The owner's sites. Each opens at its c9y.site address. */
+/** The owner's sites. Each opens in its editor, `/team/`: the site beside its sidebar, ready to edit. */
 export const PROJECTS = [
-  { id: 'flavo', name: 'Flavo', url: 'https://flavo.c9y.site/' },
-  { id: 'cph-raft', name: 'CPH Raft', url: 'https://cphraft.c9y.site/' },
-  { id: 'soendergaarden', name: 'Søndergården', url: 'https://soendergaarden.c9y.site/' },
+  { id: 'flavo', name: 'Flavo', url: 'https://flavo.c9y.site/team/' },
+  { id: 'cph-raft', name: 'CPH Raft', url: 'https://cphraft.c9y.site/team/' },
+  { id: 'soendergaarden', name: 'Søndergården', url: 'https://soendergaarden.c9y.site/team/' },
 ] as const;
 
 type View = 'grid' | 'list';

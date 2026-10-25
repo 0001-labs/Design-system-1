@@ -20,7 +20,7 @@ try {
  await page.goto(`http://127.0.0.1:${server.address().port}/private-consistency/home.html`);await page.locator('consistency-home ds-card').first().waitFor();
  if(!await page.getByRole('button',{name:'New',exact:true}).isDisabled())throw Error('New is not disabled');
  const cards=await page.locator('consistency-home ds-card').evaluateAll(cards=>cards.map(card=>card.getAttribute('href')));
- if(cards.join()!=='https://flavo.c9y.site/,https://cphraft.c9y.site/,https://soendergaarden.c9y.site/')throw Error('Projects: '+cards.join());
+ if(cards.join()!=='https://flavo.c9y.site/team/,https://cphraft.c9y.site/team/,https://soendergaarden.c9y.site/team/')throw Error('Projects: '+cards.join());
  await page.getByRole('button',{name:'List',exact:true}).click();await page.locator('consistency-home ds-list ds-row').first().waitFor();
  if(await page.locator('consistency-home ds-list ds-row').count()!==3)throw Error('List view missing projects');
  await page.reload();await page.locator('consistency-home ds-list ds-row').first().waitFor();
