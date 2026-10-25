@@ -26,7 +26,10 @@
     "MAX_CSS_BYTES": "524288"
   },
   "routes": [{"pattern":"c9y.site/*","zone_name":"c9y.site"},
-    // Specific route wins over the existing c9y.site wildcard site renderer.
+    // Specific routes win over the existing c9y.site wildcard site renderer. editor.c9y.site is the owner's
+    // editor lab; neweditor.c9y.site, its first address, leads there (services/src/consistency.ts).
+    { "pattern": "editor.c9y.site/*", "zone_name": "c9y.site" },
+    { "pattern": "editor.c9y.site", "custom_domain": true },
     { "pattern": "neweditor.c9y.site/*", "zone_name": "c9y.site" },
     { "pattern": "neweditor.c9y.site", "custom_domain": true },
     { "pattern": "fonts.designsystem1.com", "custom_domain": true },

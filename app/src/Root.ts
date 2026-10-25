@@ -80,7 +80,7 @@ export class AppRoot extends AppElement {
     const { pathname, hostname } = window.location;
     if (["/flags", "/flags/", "/app/flags"].includes(pathname)) return html`<ds1-feature-flags></ds1-feature-flags>`;
     if (pathname === "/app/navigation-auth") return html`<ds1-navigation-auth></ds1-navigation-auth>`;
-    if (["c9y.site", "neweditor.c9y.site"].includes(hostname)) return html`<ds1-private-preview-signin></ds1-private-preview-signin>`;
+    if (["c9y.site", "editor.c9y.site"].includes(hostname)) return html`<ds1-private-preview-signin></ds1-private-preview-signin>`;
     if (pathname === "/app/adoption") return html`<ds1-adoption-dashboard></ds1-adoption-dashboard>`;
     if (hostname === "fonts.designsystem1.com") return html`<ds1-font-workspace></ds1-font-workspace>`;
     if (hostname === "icon.designsystem1.com") return html`<ds1-icon-builder></ds1-icon-builder>`;

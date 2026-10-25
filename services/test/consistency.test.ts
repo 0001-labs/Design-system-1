@@ -1,7 +1,7 @@
 import { expect, it, vi } from 'vite-plus/test';
 import { consistencyPreview } from '../src/consistency';
 import type { ReportsEnv } from '../src/reports';
-const origin = 'https://neweditor.c9y.site';
+const origin = 'https://editor.c9y.site';
 function setup(id = 'owner', verified = true) {
   const assets = vi.fn(async (_request: Request) => new Response('private bytes'));
   const env = { REPORTS_OWNER_ID: 'owner', REPORTS_AUTH_URL: 'https://example.convex.cloud', ASSETS: { fetch: assets } } as unknown as ReportsEnv & { ASSETS: Fetcher };
@@ -24,9 +24,16 @@ it('revalidates owner on every HTML and asset and maps root', async () => {
     const result = await consistencyPreview(new Request(origin + path, { headers }), env, send);
     expect(result.status).toBe(200); expect(result.headers.get('cache-control')).toBe('private, no-store');
   }
-  expect(send).toHaveBeenCalledTimes(2); expect(new URL(assets.mock.calls[0]![0].url).pathname).toBe('/private-consistency/home.html');
+  expect(send).toHaveBeenCalledTimes(2); expect(new URL(assets.mock.calls[0]![0].url).pathname).toBe('/private-consistency/index.html');
 });
-it.each(['https://designsystem1.com', 'https://worker.workers.dev', 'https://adoption.designsystem1.com', 'http://neweditor.c9y.site'])('blocks alternate origin %s', async host => {
+it('opens c9y.site on its home and leads the former editor address to the lab', async () => {
+  const { env, assets, send } = setup();
+  expect((await consistencyPreview(new Request('https://c9y.site/', { headers }), env, send)).status).toBe(200);
+  expect(new URL(assets.mock.calls[0]![0].url).pathname).toBe('/private-consistency/home.html');
+  const moved = await consistencyPreview(new Request('https://neweditor.c9y.site/private-consistency/guide/?a=1', { headers }), env, send);
+  expect(moved.status).toBe(301); expect(moved.headers.get('location')).toBe('https://editor.c9y.site/private-consistency/guide/?a=1'); expect(assets).toHaveBeenCalledTimes(1);
+});
+it.each(['https://designsystem1.com', 'https://worker.workers.dev', 'https://adoption.designsystem1.com', 'http://editor.c9y.site'])('blocks alternate origin %s', async host => {
   const { env, assets, send } = setup();
   expect((await consistencyPreview(new Request(host + '/private-consistency/index.html', { headers }), env, send)).status).toBe(404); expect(assets).not.toHaveBeenCalled();
 });

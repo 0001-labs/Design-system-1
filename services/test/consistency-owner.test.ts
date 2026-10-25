@@ -112,10 +112,10 @@ it("the editor's AI takes the System owner too, still only from its own origin",
   expect((await ask(origin)).status).toBe(415); // past the owner check, refused only for its body
 });
 
-it('the compatibility address has no System sign-in and ignores an owner cookie', async () => {
+it('the editor lab has no System sign-in and ignores an owner cookie', async () => {
   const { env, send, signIn } = setup();
   const { owner } = await signIn();
-  const other = (path: string) => consistencyPreview(new Request('https://neweditor.c9y.site' + path, { headers: { Cookie: owner! } }), env, send);
+  const other = (path: string) => consistencyPreview(new Request('https://editor.c9y.site' + path, { headers: { Cookie: owner! } }), env, send);
   expect((await other('/auth/start')).status).toBe(404);
   const home = await other('/');
   expect(home.status).toBe(302);

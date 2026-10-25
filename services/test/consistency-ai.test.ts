@@ -1,6 +1,6 @@
 import { afterEach, expect, it, vi } from 'vite-plus/test';
 import { consistencyAI, type PreviewAIEnv } from '../src/consistency-ai';
-const origin = 'https://neweditor.c9y.site';
+const origin = 'https://editor.c9y.site';
 function setup(id = 'owner') {
   const run = vi.fn(async () => ({ response: 'Updated writing' }));
   const send = vi.fn(async () => Response.json({ status: 'success', value: { _id: id, email: 'jaa90@icloud.com', emailVerified: true } }));

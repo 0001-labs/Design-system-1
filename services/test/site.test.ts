@@ -7,7 +7,7 @@ afterAll(async () => { await site.dispose(); });
 
 describe("combined website routes", () => {
   it("isolates private preview HTML and assets on every host", async () => {
-    const origin = "https://neweditor.c9y.site";
+    const origin = "https://editor.c9y.site";
     for (const path of ["/", "/private-consistency/index.html", "/private-consistency/assets/editor.js"]) {
       const response = await site.fetch(origin + path, { redirect: "manual" });
       expect(response.status).toBe(302);

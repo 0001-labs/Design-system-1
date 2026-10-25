@@ -1,7 +1,7 @@
 import { afterEach, expect, it, vi } from 'vite-plus/test';
 import { consistencyAI, type PreviewAIEnv } from '../src/consistency-ai';
 import { componentContext, componentQuestions } from '../../shared/consistency-routing';
-const origin = 'https://neweditor.c9y.site';
+const origin = 'https://editor.c9y.site';
 const body = { prompt: 'Add a button', kind: 'writing', document: '# Keep\n\n⟦here⟧' };
 function setup(enabled = true, owner = true) {
   const run = vi.fn(async () => ({ response: 'Fallback writing' }));

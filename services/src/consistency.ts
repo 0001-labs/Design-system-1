@@ -4,7 +4,11 @@ import { authorizeReport, type ReportsEnv } from './reports';
 import { hasOwnerSignIn, ownerRoutes, ownerSignOut, systemOwner, type OwnerEnv } from './consistency-owner';
 
 export const CONSISTENCY_HOST = 'c9y.site';
-export const isConsistencyHost = (host:string) => [CONSISTENCY_HOST,'neweditor.c9y.site'].includes(host);
+/** The owner's editor lab: the page editor alone, at its root, behind the verified owner session. */
+export const EDITOR_HOST = 'editor.c9y.site';
+/** The lab's first address, which now leads to EDITOR_HOST. */
+const FORMER_EDITOR_HOST = 'neweditor.c9y.site';
+export const isConsistencyHost = (host:string) => [CONSISTENCY_HOST, EDITOR_HOST, FORMER_EDITOR_HOST].includes(host);
 export interface WorkspaceEnv extends OwnerEnv { CONSISTENCY_WORKSPACE?: Fetcher }
 const prefix = '/private-consistency/';
 /** Normalize only for interception. Assets must never decode a private path on another host. */
@@ -34,6 +38,7 @@ function protect(response: Response): Response {
 export async function consistencyPreview(request: Request, env: ReportsEnv & WorkspaceEnv & { ASSETS: Fetcher }, send: typeof fetch = fetch): Promise<Response> {
   const url = new URL(request.url);
   if (!isConsistencyHost(url.hostname) || url.protocol !== 'https:') return new Response(null, { status: 404, headers: security });
+  if (url.hostname === FORMER_EDITOR_HOST) return new Response(null, { status: 301, headers: { ...security, Location: `https://${EDITOR_HOST}${url.pathname}${url.search}` } });
   const signingIn = await ownerRoutes(request, env);
   if (signingIn) return protect(signingIn);
   // Signing out ends the System session behind the owner's token too, on every Consistency site.
@@ -56,8 +61,8 @@ export async function consistencyPreview(request: Request, env: ReportsEnv & Wor
     if (denied.status === 401) return new Response(null, { status: 302, headers: { ...security, Location: hasOwnerSignIn(url) ? '/auth/start?silent=1' : '/app/signin', 'Set-Cookie': '__Host-ds1-dashboard=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0' } });
     return protect(denied);
   }
-  // The home lists the projects; the page editor stays at the prefix itself.
-  if (url.pathname === '/') url.pathname = `${prefix}home.html`;
+  // c9y.site's home lists the sites; the editor lab opens on the page editor itself.
+  if (url.pathname === '/') url.pathname = url.hostname === EDITOR_HOST ? `${prefix}index.html` : `${prefix}home.html`;
   const original = await env.ASSETS.fetch(new Request(url, request));
   // This marker enables owner-only diagnostics; it grants no server access. Only
   // trusted built HTML is rewritten, after the authority has validated the owner.

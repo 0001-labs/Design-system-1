@@ -43,10 +43,10 @@ const editorExample = page(DEFAULT_EXAMPLE, 'Consistency editor', [
   'Choose another Example page to explore a different layout. Your edits stay with each example while you switch during this session. Reloading starts a fresh example.',
  ].join('\n\n'),
 }, 800, 'packages/consistency/src/examples.ts');
-editorExample.sourceUrl = 'https://neweditor.c9y.site/';
+editorExample.sourceUrl = 'https://editor.c9y.site/';
 export const EXAMPLE_PAGES: readonly ExamplePage[] = [
  editorExample,
- { id: 'studio', label: 'Studio', sourcePath: 'packages/consistency/src/model.ts', sourceUrl: 'https://neweditor.c9y.site/', composition: structuredClone(initialComposition) },
+ { id: 'studio', label: 'Studio', sourcePath: 'packages/consistency/src/model.ts', sourceUrl: 'https://editor.c9y.site/', composition: structuredClone(initialComposition) },
  page('shop', 'Shop', [
   '# Room',
   'Furniture, objects & everyday rituals',
