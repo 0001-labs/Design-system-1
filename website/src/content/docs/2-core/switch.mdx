@@ -6,8 +6,8 @@ description: A setting that is on or off, around a native button, the one pill w
 import ComponentExample from "../../../components/ComponentExample.astro";
 
 `ds-switch` draws a switch around a native button: a pill two control heights
-wide (32 × 16px), with a white round thumb 12px across, 2px in, travelling one
-control height. Off it is grey; on it is a darker green whatever the page's
+wide less 4px (28 × 16px), with a white round thumb 12px across, 2px in, travelling
+12px. Off it is grey; on it is a darker green whatever the page's
 accent, so the white thumb stays clear in light and dark. There is one switch;
 there is no square one. Its measures follow the shared scale and it keeps its
 focus ring visible.
@@ -50,4 +50,4 @@ The React adapter accepts the same `compact` and `monochrome` boolean options. N
 
 ## Its own tokens
 
-`--ds-switch-size` (its height: two heights wide, the thumb and its travel following), `--ds-switch-track-on` and `--ds-switch-track-off`. They are unset by default: each face reads its token first and falls back to its own measure, so a page that sets none draws exactly as before. Lengths are unscaled pixels, multiplied by the surface scale (`--ds-sf`) where the component is drawn. Design system 1's component editor sets them live for every page that links the base sheet; a page can also set them itself. The compact face keeps its own measures.
+`--ds-switch-size` (its height: two heights wide less 4px, the thumb and its travel following), `--ds-switch-track-on` and `--ds-switch-track-off`. They are unset by default: each face reads its token first and falls back to its own measure, so a page that sets none draws exactly as before. Lengths are unscaled pixels, multiplied by the surface scale (`--ds-sf`) where the component is drawn. Design system 1's component editor sets them live for every page that links the base sheet; a page can also set them itself. The compact face keeps its own measures.

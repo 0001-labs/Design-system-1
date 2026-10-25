@@ -16,11 +16,11 @@ test('every native control class has a focus ring and a disabled state', () => {
   }
 });
 
-test('a native switch is two control heights wide and its thumb travels one', () => {
+test('a native switch is two control heights wide less 4px and its thumb travels 12px', () => {
   const track = rule('.ds-switch');
-  expect(track).toContain('width: calc(2 * var(--ds-choice-unit))');
+  expect(track).toContain('width: calc(2 * var(--ds-choice-unit) - 4px * var(--ds-sf))');
   expect(track).toContain('height: var(--ds-choice-unit)');
-  expect(rule('.ds-switch[aria-checked="true"]::after')).toContain('translateX(var(--ds-choice-unit))');
+  expect(rule('.ds-switch[aria-checked="true"]::after')).toContain('translateX(calc(var(--ds-choice-unit) - 4px * var(--ds-sf)))');
 });
 
 test('a native text area spans whole rows and a dialog is twenty squares wide', () => {

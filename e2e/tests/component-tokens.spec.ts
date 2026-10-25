@@ -122,7 +122,7 @@ const cases: { token: string; value: string; may: RegExp; must: Record<string, s
   { token: "--ds-checkbox-fill", value: "rgb(255, 0, 0)", may: /^checkbox-on\.face\.background$/, must: { "checkbox-on.face.background": "rgb(255, 0, 0)" } },
 
   { token: "--ds-switch-size", value: "20px", may: /^switch-(on|off)\.((host|face)\.(width|height)|face\.radius|thumb\.(width|transform))$/,
-    must: { "switch-on.host.width": "40", "switch-on.host.height": "20", "switch-off.thumb.width": "16px", "switch-on.thumb.transform": "matrix(1, 0, 0, 1, 20, 0)" } },
+    must: { "switch-on.host.width": "36", "switch-on.host.height": "20", "switch-off.thumb.width": "16px", "switch-on.thumb.transform": "matrix(1, 0, 0, 1, 16, 0)" } },
   { token: "--ds-switch-track-off", value: "rgb(255, 0, 0)", may: /^switch-off\.face\.background$/, must: { "switch-off.face.background": "rgb(255, 0, 0)" } },
   { token: "--ds-switch-track-on", value: "rgb(255, 0, 0)", may: /^switch-on\.face\.background$/, must: { "switch-on.face.background": "rgb(255, 0, 0)" } },
 

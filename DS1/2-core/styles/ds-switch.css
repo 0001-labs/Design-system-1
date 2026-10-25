@@ -1,8 +1,8 @@
 @import "../../1-root/component-metrics.css";
 
 :host {
-  /* The switch's own tokens, unset by default: its height in unscaled px (two heights wide, the
-     thumb and its travel following) and the track's colour when off; --ds-switch-track-on is
+  /* The switch's own tokens, unset by default: its height in unscaled px (two heights wide less
+     4px, the thumb and its travel following) and the track's colour when off; --ds-switch-track-on is
      the track's colour when on. The compact face keeps its own measures. */
   --_switch-size: var(--ds-switch-size);
   --_switch-unit: calc(var(--_switch-size) * var(--ds-sf));
@@ -10,7 +10,8 @@
   display: inline-flex;
   flex: 0 0 auto;
   vertical-align: middle;
-  width: calc(2 * var(--ds-choice-unit));
+  /* Two heights wide less 4px: 28 × 16 at base scale, the thumb travelling 12px. */
+  width: calc(2 * var(--ds-choice-unit) - 4px * var(--ds-sf));
   height: var(--ds-choice-unit);
 }
 :host([hidden]) { display: none !important; }
@@ -48,7 +49,7 @@
 ::slotted(button[aria-checked="true"]) {
   background: var(--ds-switch-track-on) !important;
 }
-::slotted(button[aria-checked="true"])::after { transform: translateX(var(--ds-choice-unit)); }
+::slotted(button[aria-checked="true"])::after { transform: translateX(calc(var(--ds-choice-unit) - 4px * var(--ds-sf))); }
 ::slotted(button:focus-visible) { outline: 2px solid var(--ds-focus-ring) !important; outline-offset: 1px !important; }
 ::slotted(button:disabled) { cursor: default !important; opacity: .5 !important; }
 @media (prefers-reduced-motion: reduce) { ::slotted(button)::after { transition: none; } }
