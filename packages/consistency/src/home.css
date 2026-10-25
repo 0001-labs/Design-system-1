@@ -23,3 +23,5 @@ consistency-domains{display:block;max-width:calc(32 * var(--ds-unit))}
 .domain-record{display:grid;grid-template-columns:calc(4 * var(--ds-unit)) minmax(0,1fr) minmax(0,1fr);align-items:end;min-height:var(--ds-unit);line-height:calc(16px * var(--ds-sf, 1))}
 .domain-detail{display:block}
 @media(max-width:600px){.domain-record{grid-template-columns:calc(4 * var(--ds-unit)) minmax(0,1fr)}.domain-record>:last-child{grid-column:2}}
+/* The page title stands half a square higher, level with the workspace row. */
+.home-title{margin-top:calc(var(--ds-unit) / -2)}

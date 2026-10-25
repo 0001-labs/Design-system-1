@@ -21,7 +21,7 @@ try {
  await page.goto(`http://127.0.0.1:${server.address().port}/private-consistency/home.html`);await page.locator('consistency-home ds-card').first().waitFor();
  if(await page.getByRole('button',{name:/^(New|Grid|List)$/}).count())throw Error('Sites still has New or the view switch');
  if(await page.locator('consistency-home .home-title[text="Sites"]').count()!==1)throw Error('The page is not titled Sites');
- await page.getByRole('button',{name:'Workspace: 0001'}).waitFor();
+ await page.getByRole('link',{name:'Workspace: 0001'}).waitFor();
  if(await page.locator('consistency-home .home-workspace-name ds-avatar').getAttribute('initial')!=='1')throw Error('The workspace avatar is not 1');
  await page.getByRole('button',{name:'Notifications',exact:true}).waitFor();
  if(await page.locator('consistency-home ds-sidebar').getByText('Projects',{exact:true}).count())throw Error('Projects is still in the sidebar');
@@ -32,7 +32,7 @@ try {
  if(await page.locator('consistency-home ds-sidebar').count())throw Error('The sidebar still has rows of places');
  for(const width of [300,390,768,1440]){await page.setViewportSize({width,height:800});await page.waitForTimeout(100);if(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth))throw Error(`Home overflows at ${width}`);}
  await page.setViewportSize({width:1440,height:800});
- await page.locator('#home-workspace').click();const menu=page.locator('consistency-home ds-select[aria-label="Workspace"]');if((await menu.locator('ds-button[menu-item]').allInnerTexts()).map(t=>t.trim()).join()!=='Settings'||await menu.locator('ds-avatar, hr').count())throw Error('The workspace menu holds more than Settings');await page.locator('consistency-home ds-select[aria-label="Workspace"] ds-button[menu-item]',{hasText:'Settings'}).click();await page.waitForURL('**#settings/domains');
+ await page.locator('#home-workspace').hover();const menu=page.locator('consistency-home ds-select[aria-label="Workspace"]');if((await menu.locator('ds-button[menu-item]').allInnerTexts()).map(t=>t.trim()).join()!=='Settings'||await menu.locator('ds-avatar, hr').count())throw Error('The workspace menu holds more than Settings');await page.locator('consistency-home ds-select[aria-label="Workspace"] ds-button[menu-item]',{hasText:'Settings'}).click();await page.waitForURL('**#settings/domains');await page.locator('#home-workspace').click();await page.locator('consistency-home ds-card').first().waitFor();if(await page.locator('consistency-home .home-title[text="Sites"]').count()!==1)throw Error('Pressing the workspace does not show Sites');await page.mouse.move(700,500);await page.locator('#home-workspace').hover();await page.locator('consistency-home ds-select[aria-label="Workspace"] ds-button[menu-item]',{hasText:'Settings'}).click();await page.waitForURL('**#settings/domains');
  await page.locator('consistency-home consistency-domains').waitFor();
  if(await page.locator('consistency-home .home-title[text="Settings"]').count()!==1)throw Error('The page is not titled Settings');
  const tabs=await page.locator('consistency-home ds-tabs[aria-label="Settings"] [role="tab"]').evaluateAll(tabs=>tabs.map(tab=>tab.textContent.trim()+':'+tab.getAttribute('aria-selected')));

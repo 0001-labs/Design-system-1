@@ -71,10 +71,10 @@ export class ConsistencyHome extends LitElement {
     return html`<ds-page layout="sidebar" fill drawer>
       <nav slot="nav" class="home-nav" aria-label="Consistency">
         <div class="home-workspace" aria-label="Workspace">
-          <ds-button id="home-workspace" class="home-workspace-name" label=${`Workspace: ${name}`}>
+          <ds-button id="home-workspace" class="home-workspace-name" href="#" label=${`Workspace: ${name}`}>
             <ds-avatar initial=${workspaceInitial(name)} outlined plain aria-hidden="true"></ds-avatar>${name}<ds-icon type="chevron-down"></ds-icon>
           </ds-button>
-          <ds-select for="home-workspace" aria-label="Workspace">
+          <ds-select for="home-workspace" hover aria-label="Workspace">
             <ds-button menu-item href="#settings/domains">Settings</ds-button>
           </ds-select>
           <ds-button id="home-notifications" icon label="Notifications"><ds-icon type="notifications"></ds-icon></ds-button>
