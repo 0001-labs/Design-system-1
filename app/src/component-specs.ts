@@ -77,7 +77,7 @@ export const COMPONENTS: ComponentSpec[] = [
     id: "input", name: "Input", tag: "ds-input", href: "/2-core/input/",
     properties: [
       { token: "--ds-input-inline-size", label: "Width", lead: "W", kind: "width", group: "Layout", modes: ["fill", "fixed"], step: 1, bigStep: 4, min: 2, max: 32, default: 12, unit: "sq" },
-      height("--ds-input-size", "row", 3 * SQUARE),
+      height("--ds-input-size", "control", 3 * SQUARE - 4),
       padding("--ds-input-padding-size"),
       corner("--ds-input-corner-size"),
       colour("--ds-input-field-background", "Fill"),

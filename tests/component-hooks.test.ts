@@ -67,7 +67,7 @@ const READERS: [sheet: string, declaration: string][] = [
   ["2-core/styles/ds-button-host.css", "--ds-button-background: var(--ds-button-secondary-fill, var(--ds-button-background-color-secondary));"],
   ["2-core/styles/ds-button-host.css", "width: var(--ds-button-width, var(--_button-inline-size, max-content));"],
   ["2-core/styles/ds-input.css", ':host([variant="field"]) { width: var(--ds-input-inline-size, 100%); }'],
-  ["2-core/styles/ds-input.css", "height: var(--ds-input-height, var(--_input-height, var(--ds-row-height)));"],
+  ["2-core/styles/ds-input.css", "--_field-height: var(--ds-input-height, var(--_input-height, var(--ds-control-height)));"],
   ["2-core/styles/ds-input.css", "padding: var(--ds-input-padding, 0 var(--_input-padding, calc(4px * var(--ds-sf))));"],
   ["2-core/styles/ds-input.css", "border-radius: var(--ds-input-radius, var(--_input-radius, var(--ds-radius)));"],
   ["2-core/styles/ds-input.css", "background: var(--ds-input-field-background, var(--ds-fill));"],

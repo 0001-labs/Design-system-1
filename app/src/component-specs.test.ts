@@ -56,11 +56,11 @@ describe("component specs", () => {
     expect("overrides" in result && result.overrides.length).toBe(properties.length);
   });
 
-  test("heights stand on whole squares: a control's face N × 20 − 4, a field's N × 20", () => {
+  test("heights stand on whole squares: every face N × 20 − 4, a field's as a button's", () => {
     const button = componentSpec("button").properties.find(p => p.token === "--ds-button-size")!;
     expect([16, 25, 30, 36, 47, 56, 90].map(px => tokenValue(button, px))).toEqual(["", "", "36px", "36px", "56px", "56px", "56px"]);
     const input = componentSpec("input").properties.find(p => p.token === "--ds-input-size")!;
-    expect([20, 31, 40, 60, 0].map(px => tokenValue(input, px))).toEqual(["", "40px", "40px", "60px", ""]);
+    expect([16, 20, 31, 36, 56, 0].map(px => tokenValue(input, px))).toEqual(["", "", "36px", "36px", "56px", ""]);
   });
 
   test("lengths keep their step and range, and the default writes nothing", () => {
