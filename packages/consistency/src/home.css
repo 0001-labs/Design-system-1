@@ -25,3 +25,9 @@ consistency-domains{display:block;max-width:calc(32 * var(--ds-unit))}
 @media(max-width:600px){.domain-record{grid-template-columns:calc(4 * var(--ds-unit)) minmax(0,1fr)}.domain-record>:last-child{grid-column:2}}
 /* The page title stands half a square higher, level with the workspace row. */
 .home-title{margin-top:calc(var(--ds-unit) / -2)}
+/* A site open in the editor fills the work beside the sidebar. */
+.home-main--site{height:100%;gap:0}
+.home-stage{flex:1;min-height:0;display:flex;flex-direction:column}
+.home-stage[hidden]{display:none}
+.home-stage>consistency-site-editor{flex:1;min-height:0}
+.home-stage>consistency-site-editor[hidden]{display:none}

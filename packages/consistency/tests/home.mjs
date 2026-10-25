@@ -18,6 +18,8 @@ try {
  let signedOut=false;await page.route('**/api/dashboard/session',async route=>{signedOut=route.request().method()==='DELETE';await route.fulfill({status:204});});
  await page.route('**/app/signin',route=>route.fulfill({status:200,contentType:'text/html',body:'signed out'}));
  await page.route('**/api/consistency/profile',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({companyName:'0001'})}));
+ await page.route('**/api/consistency/sites',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({sites:[{id:'flavo',name:'Flavo',url:'https://flavo.c9y.site/team/'},{id:'cph-raft',name:'CPH Raft',url:'https://cphraft.c9y.site/team/'},{id:'soendergaarden',name:'Søndergården',url:'https://soendergaarden.c9y.site/team/'}]})}));
+ await page.route('**/api/consistency/sites/*/pages',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({pages:[]})}));
  await page.goto(`http://127.0.0.1:${server.address().port}/private-consistency/home.html`);await page.locator('consistency-home ds-card').first().waitFor();
  if(await page.getByRole('button',{name:/^(New|Grid|List)$/}).count())throw Error('Sites still has New or the view switch');
  if(await page.locator('consistency-home .home-title[text="Sites"]').count()!==1)throw Error('The page is not titled Sites');
@@ -27,7 +29,16 @@ try {
  if(await page.locator('consistency-home ds-sidebar').getByText('Projects',{exact:true}).count())throw Error('Projects is still in the sidebar');
  if(process.env.HOME_SHOT)await page.locator('consistency-home nav.home-nav').screenshot({path:process.env.HOME_SHOT});
  const cards=await page.locator('consistency-home ds-card').evaluateAll(cards=>cards.map(card=>card.getAttribute('href')));
- if(cards.join()!=='https://flavo.c9y.site/team/,https://cphraft.c9y.site/team/,https://soendergaarden.c9y.site/team/')throw Error('Projects: '+cards.join());
+ if(cards.join()!=='#sites/flavo,#sites/cph-raft,#sites/soendergaarden')throw Error('Projects: '+cards.join());
+ // A site opens here, in the editor, and stays open while hidden: going back to it is the same editor, at once.
+ await page.locator('consistency-home ds-card',{hasText:'CPH Raft'}).click();await page.waitForURL('**#sites/cph-raft');await page.locator('consistency-home consistency-site-editor:not([hidden])').waitFor();
+ await page.evaluate(()=>{document.querySelector('consistency-site-editor').dataset.first='yes';});
+ await page.locator('#home-workspace').click();await page.locator('consistency-home ds-card').first().waitFor();
+ if(await page.locator('consistency-home consistency-site-editor[hidden]').count()!==1)throw Error('Leaving a site took its editor out of the page');
+ await page.locator('consistency-home ds-card',{hasText:'CPH Raft'}).click();await page.waitForURL('**#sites/cph-raft');
+ await page.locator('consistency-home consistency-site-editor:not([hidden])').waitFor({timeout:2000});{const seen=await page.locator('consistency-home consistency-site-editor').evaluateAll(list=>list.map(e=>[e.dataset.first,e.hidden,e.isConnected]));if(seen.length!==1||seen[0][0]!=='yes'||seen[0][1])throw Error('Going back to a site made a new editor: '+JSON.stringify(seen));}
+ if(await page.locator('consistency-home .home-title').count())throw Error('An open site still shows the page title');
+ await page.locator('#home-workspace').click();await page.locator('consistency-home ds-card').first().waitFor();
  if(await page.locator('consistency-home ds-sidebar').getByText('Sites',{exact:true}).count())throw Error('Sites is still in the sidebar');
  if(await page.locator('consistency-home ds-sidebar').count())throw Error('The sidebar still has rows of places');
  for(const width of [300,390,768,1440]){await page.setViewportSize({width,height:800});await page.waitForTimeout(100);if(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth))throw Error(`Home overflows at ${width}`);}
