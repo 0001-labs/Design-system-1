@@ -100,7 +100,7 @@ export class ConsistencySiteEditor extends LitElement {
 
   private async load() {
     try {
-      const { pages } = await request<{ pages: SitePage[] }>(siteAddress.pages(this.site.id));
+      const { pages } = await request<{ pages: SitePage[] }>(siteAddress.pages(this.site.code));
       this.pages = pages;
       const first = firstPage(pages);
       if (first) await this.open(first);
@@ -115,13 +115,13 @@ export class ConsistencySiteEditor extends LitElement {
     if (!(await this.flush())) return false;
     const ticket = ++this.opening;
     try {
-      const page = await request<PageDetail>(siteAddress.page(this.site.id, path));
+      const page = await request<PageDetail>(siteAddress.page(this.site.code, path));
       if (ticket !== this.opening) return false;
       this.fields = new Map(page.fields.map(field => [field.key, field]));
       this.path = page.path;
       this.problem = '';
       this.frame.title = `${page.title || page.path}, to edit`;
-      this.frame.src = siteAddress.document(this.site.id, page.path);
+      this.frame.src = siteAddress.document(this.site.code, page.path);
       return true;
     } catch (error) {
       if (ticket === this.opening) this.problem = (error as Error).message;
@@ -138,7 +138,7 @@ export class ConsistencySiteEditor extends LitElement {
     this.detach = null;
     const doc = this.frame.contentDocument;
     // A page that left for the site's own address cannot be edited from here: back to the page being edited.
-    if (!doc || !this.path || !doc.location.pathname.endsWith('/document')) { if (this.path) this.frame.src = siteAddress.document(this.site.id, this.path); return; }
+    if (!doc || !this.path || !doc.location.pathname.endsWith('/document')) { if (this.path) this.frame.src = siteAddress.document(this.site.code, this.path); return; }
     const dark = document.documentElement.classList.contains('dark-theme') || (!document.documentElement.classList.contains('light-theme') && matchMedia('(prefers-color-scheme: dark)').matches);
     // The page's own head script set its theme before; the editor sets it now, as the editor's.
     doc.documentElement.classList.add(dark ? 'dark-theme' : 'light-theme');
@@ -282,7 +282,7 @@ export class ConsistencySiteEditor extends LitElement {
     if (markdown.length > MARKDOWN_LIMIT) { toast.error(failureWords(413)); return false; }
     state.busy = true; state.save.disabled = true;
     try {
-      const answer = await request<{ html: string; edit: { markdown: string } }>(siteAddress.edit(this.site.id), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: this.path, key: field.key, markdown }) });
+      const answer = await request<{ html: string; edit: { markdown: string } }>(siteAddress.edit(this.site.code), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: this.path, key: field.key, markdown }) });
       field.markdown = answer.edit?.markdown ?? markdown;
       field.edited = true;
       if (this.editing === state) this.finish(answer.html);

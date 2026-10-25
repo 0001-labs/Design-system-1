@@ -1,8 +1,8 @@
 import { h } from './dom';
 export interface Draft { id:string; name:string; revision:number; updatedAt:number; document?:Record<string,unknown> }
 export interface EditorAdapter { element:HTMLElement; read():Record<string,unknown>; destroy?():void }
-/** One of the workspace's sites, from `/api/consistency/sites`. */
-export interface WorkspaceSite { id:string; name:string; url:string }
+/** One of the workspace's sites, from `/api/consistency/sites`, by its IDv1 code. */
+export interface WorkspaceSite { code:string; name:string; url:string }
 /** A site opened in the work: its words saved as it goes; `flush` settles a word being edited before leaving, false to stay. */
 export interface SiteAdapter { element:HTMLElement; flush?():Promise<boolean>; destroy?():void }
 export interface WorkspaceOptions {
@@ -15,7 +15,7 @@ export function compositionWorkspace(root:HTMLElement,options:WorkspaceOptions):
   let current:Draft|null=null,editor:EditorAdapter|undefined,dirty=false,saving:Promise<boolean>|null=null,conflict=false,disposed=false;
   let timer:ReturnType<typeof setTimeout>|undefined;
   let pages:Draft[]=[];
-  let site:{id:string;adapter:SiteAdapter}|null=null;
+  let site:{code:string;adapter:SiteAdapter}|null=null;
   const siteButtons=new Map<string,HTMLElement>();
   const status=h('span',{role:'status','aria-live':'polite',class:'composition-status'});
   const title=h('input',{class:'ds-input','aria-label':'Page name',maxlength:'160',value:'Untitled'});
@@ -29,19 +29,19 @@ export function compositionWorkspace(root:HTMLElement,options:WorkspaceOptions):
   const sites=h('div',{slot:'footer',class:'composition-sites'},h('strong',{},'Sites'));sidebar.append(sites);
   void fetch('/api/consistency/sites').then(async response=>{if(!response.ok)return;const data=await response.json() as {sites:WorkspaceSite[]};for(const entry of data.sites){const url=new URL(entry.url);if(url.protocol!=='https:')continue;
     if(!options.openSite){sites.append(h('a',{href:url.href,target:'_blank',rel:'noopener'},entry.name));continue;}
-    const button=h('button',{type:'button',class:'ds-row','data-site':entry.id,onclick:()=>void openSite(entry)},h('span',{class:'ds-row__name'},entry.name));siteButtons.set(entry.id,button);sites.append(button);}}).catch(()=>{sites.append(h('span',{},'Sites unavailable'));});
+    const button=h('button',{type:'button',class:'ds-row','data-site':entry.code,onclick:()=>void openSite(entry)},h('span',{class:'ds-row__name'},entry.name));siteButtons.set(entry.code,button);sites.append(button);}}).catch(()=>{sites.append(h('span',{},'Sites unavailable'));});
   const bar=h('div',{class:'composition-document-bar'},title,status,retry,copy);
   const content=h('div',{class:'composition-content'},bar,stage);
   const header=h('header',{class:'ds-header ds-header--app'},h('a',{class:'ds-header__brand',href:'/'},'Consistency'));
   root.replaceChildren(header,h('div',{class:'composition-shell'},sidebar,content));
   async function api(path:string,init?:RequestInit){const r=await fetch('/api/consistency/pages'+path,{credentials:'same-origin',...init});const body=await r.json();if(!r.ok)throw Object.assign(new Error(r.status===409?'This page changed in another tab. Save a copy to keep these edits.':r.status===401||r.status===403?'Your session expired. Your edits are still here; sign in in another tab, then try again.':body.error||'Could not save. Try again.'),{status:r.status});return body;}
-  function draw(){sidebar.items=pages.map(page=>({id:page.id,label:page.name,current:page.id===current?.id}));title.hidden=!current;bar.hidden=Boolean(site);for(const [id,button] of siteButtons){if(id===site?.id)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');}}
+  function draw(){sidebar.items=pages.map(page=>({id:page.id,label:page.name,current:page.id===current?.id}));title.hidden=!current;bar.hidden=Boolean(site);for(const [id,button] of siteButtons){if(id===site?.code)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');}}
   /** Leaves the open site, once its word being edited is settled; false keeps it open. */
   async function leaveSite():Promise<boolean>{if(!site)return true;if(site.adapter.flush&&!await site.adapter.flush())return false;site.adapter.destroy?.();site=null;draw();return true;}
   /** A site in the work: the draft is saved and put away first, and no draft is current while it is open. */
-  async function openSite(entry:WorkspaceSite){if(navigating||!options.openSite||site?.id===entry.id)return;navigating=true;
+  async function openSite(entry:WorkspaceSite){if(navigating||!options.openSite||site?.code===entry.code)return;navigating=true;
     try{if(!await flush()||!await leaveSite())return;editor?.destroy?.();editor=undefined;current=null;dirty=false;conflict=false;retry.hidden=true;copy.hidden=true;status.textContent='';
-      const adapter=options.openSite(entry);site={id:entry.id,adapter};stage.replaceChildren(adapter.element);draw();}
+      const adapter=options.openSite(entry);site={code:entry.code,adapter};stage.replaceChildren(adapter.element);draw();}
     finally{navigating=false;}}
   function changed(){if(!current)return;dirty=true;status.textContent='Unsaved';clearTimeout(timer);if(!conflict)timer=setTimeout(()=>void save(),700);}
   title.addEventListener('input',changed);

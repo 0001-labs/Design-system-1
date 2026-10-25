@@ -8,10 +8,10 @@ const key = (key: string, more: Partial<KeyboardEvent> = {}) => ({ key, metaKey:
 
 describe('editing a site in the editor', () => {
   it('asks the gateway for a site by its id and a page by its path', () => {
-    expect(siteAddress.pages('cph-raft')).toBe('/api/consistency/sites/cph-raft/pages');
-    expect(siteAddress.page('cph-raft', '/en/blue raft/')).toBe('/api/consistency/sites/cph-raft/page?path=%2Fen%2Fblue%20raft%2F');
-    expect(siteAddress.document('cph-raft', '/')).toBe('/api/consistency/sites/cph-raft/document?path=%2F');
-    expect(siteAddress.edit('cph-raft')).toBe('/api/consistency/sites/cph-raft/edit');
+    expect(siteAddress.pages('10VNDG')).toBe('/api/consistency/sites/10VNDG/pages');
+    expect(siteAddress.page('10VNDG', '/en/blue raft/')).toBe('/api/consistency/sites/10VNDG/page?path=%2Fen%2Fblue%20raft%2F');
+    expect(siteAddress.document('10VNDG', '/')).toBe('/api/consistency/sites/10VNDG/document?path=%2F');
+    expect(siteAddress.edit('10VNDG')).toBe('/api/consistency/sites/10VNDG/edit');
   });
 
   it('edits a page\'s words here, and leaves its title, description and share image to their rules elsewhere', () => {

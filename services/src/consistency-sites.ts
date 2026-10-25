@@ -12,7 +12,8 @@
  *
  * Every route checks the owner as the other workspace routes do; a write is same-origin JSON, bounded.
  */
-export const SITE_ROUTE = /^\/api\/consistency\/sites\/([a-z0-9](?:[a-z0-9-]{0,46}[a-z0-9])?)\/(pages|page|edit|document|files\/[^?#]{1,512})$/;
+// A site by its IDv1 code, a list's shape (`12ABCD`); the platform alone knows its id.
+export const SITE_ROUTE = /^\/api\/consistency\/sites\/(\d{2}[A-Za-z]{4})\/(pages|page|edit|document|files\/[^?#]{1,512})$/;
 const METHODS: Record<string, string[]> = { pages: ['GET'], page: ['GET'], document: ['GET'], edit: ['POST'], files: ['GET', 'HEAD'] };
 /** A Team CMS field takes 10,000 characters of Markdown; the JSON around it fits in this. */
 export const EDIT_BYTES = 64 * 1024;

@@ -18,29 +18,42 @@ import type { SiteSummary } from './site-editing';
 import './home.css';
 
 /**
- * Consistency's app, at consistency.site (and c9y.site's home, which leads there): the workspace's sites as cards,
- * each opened here in the editor (`#sites/<id>`), and Settings; pressing the workspace shows the sites again. A site once opened stays open,
- * hidden while another is shown, so going back to it is instant: no reload and no sign-in again.
+ * Consistency's app, at consistency.site (c9y.site's home leads there): the workspace's sites as cards, each opened
+ * here in the editor, and Settings; pressing the workspace shows the sites again. The address is consistency.site and
+ * nothing more (Joachim, 26 October 2026): where the app stands is its own state, kept in the history so Back and
+ * Forward still move between places. Sites are known by their IDv1 codes. A site once opened stays open, hidden
+ * while another is shown, so going back to it is instant: no reload and no sign-in again.
  */
 
-/** What the app shows, from the address's hash: the sites, one site in the editor, or Settings at one of its tabs. */
-export type Place = { page: 'sites' } | { page: 'site'; id: string } | { page: 'settings'; tab: SettingsTab };
+/** What the app shows: the sites, one site in the editor (by its IDv1 code), or Settings at one of its tabs. */
+export type Place = { page: 'sites' } | { page: 'site'; code: string } | { page: 'settings'; tab: SettingsTab };
 export type SettingsTab = 'domains' | 'account';
-export function placeOf(hash: string): Place {
-  if (hash === '#domains' || hash === '#settings' || hash === '#settings/domains') return { page: 'settings', tab: 'domains' };
-  if (hash === '#settings/account') return { page: 'settings', tab: 'account' };
-  const site = /^#sites\/([a-z0-9](?:[a-z0-9-]{0,46}[a-z0-9])?)$/.exec(hash);
-  if (site) return { page: 'site', id: site[1]! };
+const SITE_CODE = /^\d{2}[A-Za-z]{4}$/;
+/** A place as the history keeps it, or the sites for anything else. */
+export function placeFrom(state: unknown): Place {
+  const place = state as Partial<Place> | null;
+  if (place?.page === 'settings') return { page: 'settings', tab: (place as { tab?: unknown }).tab === 'account' ? 'account' : 'domains' };
+  if (place?.page === 'site' && typeof (place as { code?: unknown }).code === 'string' && SITE_CODE.test((place as { code: string }).code)) return { page: 'site', code: (place as { code: string }).code };
   return { page: 'sites' };
 }
-export const siteHash = (id: string) => `#sites/${id}`;
+/**
+ * Where the app opens: a site named in the address once (`?open=12ABCD`, from a site's own /edit) or an older address
+ * (`#settings/account`), both taken off at once; otherwise the place the history kept, else the sites.
+ */
+export function openingPlace(search: string, hash: string, state: unknown): Place {
+  const open = new URLSearchParams(search).get('open');
+  if (open && SITE_CODE.test(open)) return { page: 'site', code: open };
+  if (hash === '#domains' || hash === '#settings' || hash === '#settings/domains') return { page: 'settings', tab: 'domains' };
+  if (hash === '#settings/account') return { page: 'settings', tab: 'account' };
+  return placeFrom(state);
+}
 
 // The sites as last read, so the sidebar and the cards are drawn at once and the registry only confirms them.
 const SITES_KEY = 'consistency-home-sites';
 function storedSites(): SiteSummary[] {
   try {
     const value = JSON.parse(localStorage.getItem(SITES_KEY) ?? '[]') as unknown;
-    return Array.isArray(value) ? value.filter((site): site is SiteSummary => !!site && typeof site.id === 'string' && typeof site.name === 'string' && typeof site.url === 'string') : [];
+    return Array.isArray(value) ? value.filter((site): site is SiteSummary => !!site && typeof site.code === 'string' && typeof site.name === 'string' && typeof site.url === 'string') : [];
   } catch { return []; }
 }
 /** A site's own address, for its card: its host without the editor's path. */
@@ -61,16 +74,34 @@ export class ConsistencyHome extends LitElement {
   declare sites: SiteSummary[];
   /** Every site opened so far, kept alive while hidden. */
   private readonly editors = new Map<string, ConsistencySiteEditor>();
-  private readonly onHash = () => void this.go(placeOf(location.hash));
-  constructor() { super(); this.error = ''; this.workspace = storedWorkspace(); this.sites = storedSites(); this.place = placeOf(location.hash); }
+  /** Back and Forward: the place the history kept, after the word being edited is saved. */
+  private readonly onPop = (event: PopStateEvent) => void this.move(placeFrom(event.state), 'none');
+  /** An older address with a place in its hash, followed inside the app and then taken off. */
+  private readonly onHash = () => {
+    if (!location.hash) return;
+    const next = openingPlace('', location.hash, null);
+    history.replaceState(this.place, '', location.pathname);
+    this.go(next);
+  };
+  constructor() {
+    super(); this.error = ''; this.workspace = storedWorkspace(); this.sites = storedSites();
+    this.place = openingPlace(location.search, location.hash, history.state);
+    // The address stays the app's own: what opened it is kept as history state instead.
+    history.replaceState(this.place, '', location.pathname);
+  }
   protected createRenderRoot() { return this; }
 
-  connectedCallback() { super.connectedCallback(); addEventListener('hashchange', this.onHash); void this.readWorkspace(); void this.readSites(); }
+  connectedCallback() { super.connectedCallback(); addEventListener('popstate', this.onPop); addEventListener('hashchange', this.onHash); void this.readWorkspace(); void this.readSites(); }
+
+  /** Goes to a place inside the app, the address unchanged. */
+  go(next: Place) { void this.move(next, 'push'); }
 
   /** Moves to a place, first saving a word being edited on the site being left; a failed save stays put. */
-  private async go(next: Place) {
-    const leaving = this.place.page === 'site' && (next.page !== 'site' || next.id !== this.place.id) ? this.editors.get(this.place.id) : undefined;
-    if (leaving && !(await leaving.flush())) { history.replaceState(null, '', siteHash((this.place as { id: string }).id)); return; }
+  private async move(next: Place, record: 'push' | 'none') {
+    const current = this.place;
+    const leaving = current.page === 'site' && (next.page !== 'site' || next.code !== current.code) ? this.editors.get(current.code) : undefined;
+    if (leaving && !(await leaving.flush())) { if (record === 'none') history.pushState(current, '', location.pathname); return; }
+    if (record === 'push' && JSON.stringify(next) !== JSON.stringify(current)) history.pushState(next, '', location.pathname);
     this.place = next;
   }
 
@@ -85,8 +116,8 @@ export class ConsistencyHome extends LitElement {
 
   /** The editor for a site, made once and kept. */
   private editorFor(site: SiteSummary): ConsistencySiteEditor {
-    let editor = this.editors.get(site.id);
-    if (!editor) { editor = new ConsistencySiteEditor(); editor.site = site; this.editors.set(site.id, editor); }
+    let editor = this.editors.get(site.code);
+    if (!editor) { editor = new ConsistencySiteEditor(); editor.site = site; this.editors.set(site.code, editor); }
     return editor;
   }
 
@@ -94,11 +125,11 @@ export class ConsistencyHome extends LitElement {
   protected updated() {
     const stage = this.querySelector<HTMLElement>('.home-stage');
     if (!stage) return;
-    const current = this.place.page === 'site' ? this.sites.find(site => site.id === (this.place as { id: string }).id) : undefined;
+    const current = this.place.page === 'site' ? this.sites.find(site => site.code === (this.place as { code: string }).code) : undefined;
     if (current) { const editor = this.editorFor(current); if (editor.parentElement !== stage) stage.append(editor); }
-    for (const [id, editor] of this.editors) editor.hidden = id !== current?.id;
+    for (const [code, editor] of this.editors) editor.hidden = code !== current?.code;
   }
-  disconnectedCallback() { super.disconnectedCallback(); removeEventListener('hashchange', this.onHash); }
+  disconnectedCallback() { super.disconnectedCallback(); removeEventListener('popstate', this.onPop); removeEventListener('hashchange', this.onHash); }
 
   /** The company name on the owner's own account (Account in the docs sets it). */
   private async readWorkspace() {
@@ -120,15 +151,15 @@ export class ConsistencyHome extends LitElement {
   render() {
     const name = this.workspace || 'My company';
     const settings = this.place.page === 'settings';
-    const open = this.place.page === 'site' ? (this.place as { id: string }).id : '';
+    const open = this.place.page === 'site' ? (this.place as { code: string }).code : '';
     return html`<ds-page layout="sidebar" fill drawer>
       <nav slot="nav" class="home-nav" aria-label="Consistency">
         <div class="home-workspace" aria-label="Workspace">
-          <ds-button id="home-workspace" class="home-workspace-name" href="#" label=${`Workspace: ${name}`}>
+          <ds-button id="home-workspace" class="home-workspace-name" label=${`Workspace: ${name}`} @click=${() => this.go({ page: 'sites' })}>
             <ds-avatar initial=${workspaceInitial(name)} outlined plain aria-hidden="true"></ds-avatar>${name}<ds-icon type="chevron-down"></ds-icon>
           </ds-button>
           <ds-select for="home-workspace" hover aria-label="Workspace">
-            <ds-button menu-item href="#settings/domains">Settings</ds-button>
+            <ds-button menu-item @click=${() => this.go({ page: 'settings', tab: 'domains' })}>Settings</ds-button>
           </ds-select>
           <ds-button id="home-notifications" icon label="Notifications"><ds-icon type="notifications"></ds-icon></ds-button>
           <ds-select for="home-notifications" aria-label="Notifications" role="dialog">
@@ -138,7 +169,7 @@ export class ConsistencyHome extends LitElement {
       </nav>
       <div class=${open ? 'home-main home-main--site' : 'home-main'}>
         ${open ? '' : html`<ds-text class="home-title" role="heading" aria-level="1" literal size="display" text=${settings ? 'Settings' : 'Sites'}></ds-text>`}
-        ${this.place.page === 'settings' ? this.settings(this.place.tab, name) : open ? (this.sites.some(site => site.id === open) ? '' : html`<ds-empty literal heading="This site is not in your workspace"></ds-empty>`) : this.siteCards()}
+        ${this.place.page === 'settings' ? this.settings(this.place.tab, name) : open ? (this.sites.some(site => site.code === open) ? '' : html`<ds-empty literal heading="This site is not in your workspace"></ds-empty>`) : this.siteCards()}
         <div class="home-stage" ?hidden=${!open}></div>
       </div>
     </ds-page>`;
@@ -146,7 +177,7 @@ export class ConsistencyHome extends LitElement {
 
   /** The owner's sites as cards, each opening in the editor here. */
   private siteCards() {
-    return html`<div class="home-grid">${this.sites.map(site => html`<ds-card href=${siteHash(site.id)} width="12" height="8"><span slot="label">${siteHost(site)}</span><span slot="title">${site.name}</span></ds-card>`)}</div>`;
+    return html`<div class="home-grid">${this.sites.map(site => html`<ds-card interactive data-site=${site.code} width="12" height="8" @ds-card-press=${() => this.go({ page: 'site', code: site.code })}><span slot="label">${siteHost(site)}</span><span slot="title">${site.name}</span></ds-card>`)}</div>`;
   }
 
   /** Settings as Money draws it: text tabs under the title, each tab its own address. */
@@ -154,7 +185,7 @@ export class ConsistencyHome extends LitElement {
     const tabs: { id: SettingsTab; label: string }[] = [{ id: 'domains', label: 'Domains' }, { id: 'account', label: 'Account' }];
     return html`<div class="home-settings">
       <ds-tabs text class="home-settings-tabs" aria-label="Settings">${tabs.map(item => html`<ds-button control="host" role="tab" ?active=${tab === item.id} aria-selected=${String(tab === item.id)} tabindex=${tab === item.id ? 0 : -1}
-        @click=${() => { location.hash = `#settings/${item.id}`; }}>${item.label}</ds-button>`)}</ds-tabs>
+        @click=${() => this.go({ page: 'settings', tab: item.id })}>${item.label}</ds-button>`)}</ds-tabs>
       ${tab === 'domains' ? html`<consistency-domains></consistency-domains>` : html`<section class="home-account" aria-label="Account">
         <ds-list aria-label="Account"><ds-row><span class="ds-row__name">Workspace</span><span class="ds-row__value">${name}</span></ds-row></ds-list>
         <div class="home-sign-out"><ds-button secondary @click=${() => void this.signOut()}>Sign out</ds-button></div>

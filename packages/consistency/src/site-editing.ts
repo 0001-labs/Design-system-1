@@ -5,7 +5,8 @@
  * are Team CMS's fields, saved one by one as Team CMS edits.
  */
 
-export interface SiteSummary { id: string; name: string; url: string }
+/** One of the workspace's sites by its IDv1 code (a list's shape), as `/api/consistency/sites` gives it. */
+export interface SiteSummary { code: string; name: string; url: string }
 export interface SitePage { path: string; lang: string; title: string; fields: number; edited: number }
 export interface SiteField { key: string; tag: string; kind: 'text' | 'meta' | 'image'; label: string; markdown: string; built?: string; edited?: boolean }
 export interface PageDetail { path: string; lang: string; title: string; fields: SiteField[] }

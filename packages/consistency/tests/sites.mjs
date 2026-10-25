@@ -28,7 +28,7 @@ const fields = {
   '/en/': [{ key: 'eeeeeeeeeeee', tag: 'h1', kind: 'text', label: 'h1', markdown: 'Welcome' }],
 };
 const documents = {
-  '/': `<!doctype html><html><head><title>CPH Raft</title><link rel="stylesheet" href="/api/consistency/sites/cph-raft/files/assets/site.css"></head><body>
+  '/': `<!doctype html><html><head><title>CPH Raft</title><link rel="stylesheet" href="/api/consistency/sites/10VNDG/files/assets/site.css"></head><body>
     <h1 data-cms="${H1}">Hello</h1><p data-cms="${P}">Some <strong>words</strong></p><p class="copy" data-cms="${P}">Some <strong>words</strong></p>
     <a class="ds-button" href="https://cphraft.c9y.site/book/"><span data-cms="${BTN}">Book</span></a>
     <nav><a id="english" href="https://cphraft.c9y.site/en/">English</a><a id="away" href="https://example.com/">Away</a></nav>
@@ -44,11 +44,11 @@ try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
   const edits = [], asked = [];
   await page.route('**/api/consistency/pages**', route => route.fulfill({ json: { pages: [] } }));
-  await page.route('**/api/consistency/sites', route => route.fulfill({ json: { sites: [{ id: 'cph-raft', name: 'CPH Raft', url: 'https://cphraft.c9y.site/team/' }, { id: 'flavo', name: 'Flavo', url: 'https://flavo.c9y.site/team/' }] } }));
+  await page.route('**/api/consistency/sites', route => route.fulfill({ json: { sites: [{ code: '10VNDG', name: 'CPH Raft', url: 'https://cphraft.c9y.site/team/' }, { code: '20FLAV', name: 'Flavo', url: 'https://flavo.c9y.site/team/' }] } }));
   await page.route('**/api/consistency/sites/*/**', async route => {
     const request = route.request(), url = new URL(request.url()), [, , , , site, ...rest] = url.pathname.split('/'), what = rest.join('/');
     asked.push(`${request.method()} ${what}${url.search}`);
-    if (site === 'flavo') return route.fulfill({ status: 409, json: { error: 'not-editable' } });
+    if (site === '20FLAV') return route.fulfill({ status: 409, json: { error: 'not-editable' } });
     if (what === 'pages') return route.fulfill({ json: { site: 'CPH Raft', pages: [{ path: '/', lang: 'da', title: 'Forside', fields: 4, edited: 0 }, { path: '/en/', lang: 'en', title: 'Home', fields: 1, edited: 0 }], images: [] } });
     const path = url.searchParams.get('path');
     if (what === 'page') return route.fulfill({ json: { path, lang: path === '/' ? 'da' : 'en', title: 'CPH Raft', fields: fields[path] } });

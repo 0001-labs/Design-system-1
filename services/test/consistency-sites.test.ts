@@ -19,63 +19,63 @@ const edit = (init: { origin?: string; type?: string; body?: string } = {}) => (
 
 it('asks the owner first, and nothing reaches the platform for anyone else', async () => {
   const { call, workspace } = setup();
-  expect((await call('cph-raft/pages')).status).toBe(401);
-  expect((await call('cph-raft/edit', { ...edit(), headers: { origin, 'Content-Type': 'application/json' } })).status).toBe(401);
-  expect((await call('cph-raft/document?path=/')).status).toBe(401);
-  expect((await call('cph-raft/files/assets/site.css')).status).toBe(401);
+  expect((await call('10VNDG/pages')).status).toBe(401);
+  expect((await call('10VNDG/edit', { ...edit(), headers: { origin, 'Content-Type': 'application/json' } })).status).toBe(401);
+  expect((await call('10VNDG/document?path=/')).status).toBe(401);
+  expect((await call('10VNDG/files/assets/site.css')).status).toBe(401);
   const other = setup('other');
-  expect((await other.call('cph-raft/pages', { headers })).status).toBe(403);
+  expect((await other.call('10VNDG/pages', { headers })).status).toBe(403);
   expect(workspace.fetch).not.toHaveBeenCalled(); expect(other.workspace.fetch).not.toHaveBeenCalled();
 });
 
 it('passes the owner\'s reads and bounded, same-origin JSON writes on to the platform, and only those', async () => {
   const { call, workspace } = setup();
-  expect(await (await call('cph-raft/pages', { headers })).json()).toEqual({ path: '/api/consistency/sites/cph-raft/pages', method: 'GET' });
-  expect(await (await call('cph-raft/page?path=%2Fen%2F&other=1', { headers })).json()).toEqual({ path: '/api/consistency/sites/cph-raft/page?path=%2Fen%2F', method: 'GET' });
-  expect((await call('cph-raft/edit', edit({ origin: 'https://c9y.site' }))).status).toBe(403);
-  expect((await call('cph-raft/edit', edit({ origin: 'https://evil.test' }))).status).toBe(403);
-  expect((await call('cph-raft/edit', edit({ type: 'text/plain' }))).status).toBe(403);
-  expect((await call('cph-raft/edit', edit({ body: 'x'.repeat(EDIT_BYTES + 1) }))).status).toBe(413);
+  expect(await (await call('10VNDG/pages', { headers })).json()).toEqual({ path: '/api/consistency/sites/10VNDG/pages', method: 'GET' });
+  expect(await (await call('10VNDG/page?path=%2Fen%2F&other=1', { headers })).json()).toEqual({ path: '/api/consistency/sites/10VNDG/page?path=%2Fen%2F', method: 'GET' });
+  expect((await call('10VNDG/edit', edit({ origin: 'https://c9y.site' }))).status).toBe(403);
+  expect((await call('10VNDG/edit', edit({ origin: 'https://evil.test' }))).status).toBe(403);
+  expect((await call('10VNDG/edit', edit({ type: 'text/plain' }))).status).toBe(403);
+  expect((await call('10VNDG/edit', edit({ body: 'x'.repeat(EDIT_BYTES + 1) }))).status).toBe(413);
   expect(workspace.fetch).toHaveBeenCalledTimes(2);
-  const saved = await call('cph-raft/edit', edit());
-  expect(await saved.json()).toEqual({ path: '/api/consistency/sites/cph-raft/edit', method: 'POST' });
+  const saved = await call('10VNDG/edit', edit());
+  expect(await saved.json()).toEqual({ path: '/api/consistency/sites/10VNDG/edit', method: 'POST' });
   expect(await workspace.fetch.mock.calls[2]![0].text()).toBe('{"path":"/","key":"0123456789ab","markdown":"Hej"}');
   expect(saved.headers.get('cache-control')).toBe('private, no-store');
 });
 
 it('refuses other methods, routes, sites and paths before the platform', async () => {
   const { call, workspace } = setup();
-  expect((await call('cph-raft/pages', { method: 'POST', headers: { ...headers, origin } })).status).toBe(405);
-  expect((await call('cph-raft/edit', { headers })).status).toBe(405);
-  expect((await call('cph-raft/files/a.css', { method: 'DELETE', headers: { ...headers, origin } })).status).toBe(405);
-  expect((await call('cph-raft/reset', { method: 'POST', headers: { ...headers, origin } })).status).toBe(404);
-  expect((await call('cph-raft/editors', { headers })).status).toBe(404);
+  expect((await call('10VNDG/pages', { method: 'POST', headers: { ...headers, origin } })).status).toBe(405);
+  expect((await call('10VNDG/edit', { headers })).status).toBe(405);
+  expect((await call('10VNDG/files/a.css', { method: 'DELETE', headers: { ...headers, origin } })).status).toBe(405);
+  expect((await call('10VNDG/reset', { method: 'POST', headers: { ...headers, origin } })).status).toBe(404);
+  expect((await call('10VNDG/editors', { headers })).status).toBe(404);
   expect((await call('Cph_Raft/pages', { headers })).status).toBe(404);
-  expect((await call('cph-raft/page', { headers })).status).toBe(400);
-  expect((await call('cph-raft/document?path=//evil.test/', { headers })).status).toBe(400);
-  expect((await call('cph-raft/document?path=https://evil.test/', { headers })).status).toBe(400);
+  expect((await call('10VNDG/page', { headers })).status).toBe(400);
+  expect((await call('10VNDG/document?path=//evil.test/', { headers })).status).toBe(400);
+  expect((await call('10VNDG/document?path=https://evil.test/', { headers })).status).toBe(400);
   expect(workspace.fetch).not.toHaveBeenCalled();
 });
 
 it('serves the page sandboxed, with no script source, even opened on its own', async () => {
   const { call } = setup('owner', () => new Response('<!doctype html><html><body><h1 data-cms="k">Hello</h1></body></html>', { headers: { 'Content-Type': 'text/html; charset=utf-8' } }));
-  const page = await call('cph-raft/document?path=/', { headers });
+  const page = await call('10VNDG/document?path=/', { headers });
   expect(page.status).toBe(200);
   expect(page.headers.get('content-security-policy')).toBe(DOCUMENT_POLICY);
   expect(DOCUMENT_POLICY).toMatch(/^sandbox allow-same-origin;/); expect(DOCUMENT_POLICY).not.toMatch(/allow-scripts|script-src/);
   expect(page.headers.get('x-content-type-options')).toBe('nosniff');
   expect(page.headers.get('cache-control')).toBe('private, no-store');
   const wrong = setup('owner', () => new Response('alert(1)', { headers: { 'Content-Type': 'text/javascript' } }));
-  expect((await wrong.call('cph-raft/document?path=/', { headers })).status).toBe(502);
+  expect((await wrong.call('10VNDG/document?path=/', { headers })).status).toBe(502);
 });
 
 it('serves only the files a page draws with, each sandboxed', async () => {
   const typed = (type: string) => setup('owner', () => new Response('bytes', { headers: { 'Content-Type': type } }));
   for (const type of ['text/css; charset=utf-8', 'font/woff2', 'image/svg+xml', 'image/jpeg', 'video/mp4']) {
-    const file = await typed(type).call('cph-raft/files/assets/x', { headers });
+    const file = await typed(type).call('10VNDG/files/assets/x', { headers });
     expect(file.status).toBe(200); expect(file.headers.get('content-security-policy')).toBe(FILE_POLICY);
   }
-  for (const type of ['text/html', 'text/javascript', 'application/json', 'application/octet-stream', '']) expect((await typed(type).call('cph-raft/files/assets/x', { headers })).status).toBe(415);
+  for (const type of ['text/html', 'text/javascript', 'application/json', 'application/octet-stream', '']) expect((await typed(type).call('10VNDG/files/assets/x', { headers })).status).toBe(415);
   const missing = setup('owner', () => Response.json({ error: 'not-found' }, { status: 404 }));
-  expect((await missing.call('cph-raft/files/nope.css', { headers })).status).toBe(404);
+  expect((await missing.call('10VNDG/files/nope.css', { headers })).status).toBe(404);
 });
