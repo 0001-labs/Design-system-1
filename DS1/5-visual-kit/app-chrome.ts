@@ -1,5 +1,5 @@
-import { LitElement, css, html, nothing } from 'lit';
-import { instagram, instagramStyles } from './instagram';
+import { LitElement, adoptStyles, css, html, nothing, type PropertyValues } from 'lit';
+import { instagramFrame, instagramFrameStyles } from './instagram-frame';
 import { define } from '../0-face/define';
 import '../2-core/ds-icon';
 import { browserStyles } from './browser-styles';
@@ -71,8 +71,29 @@ export class DsAppChrome extends LitElement {
     .mobile { padding:8px 16px; background:var(--chrome-selected); }
     .mobile .address { height:44px; border-radius:22px; }
     .mobile-actions { display:flex; justify-content:space-between; margin-top:8px; }
-  `, browserStyles, mobileChromeStyles, instagramStyles];
+  `, browserStyles, mobileChromeStyles, instagramFrameStyles];
   private drawIcon?: typeof import('./browser-icons').browserIcon;
+  /** The Reels overlay, loaded only when this chrome is Instagram: no other presentation carries it. */
+  private reels?: typeof import('./instagram');
+  private reelsLoading?: Promise<void>;
+  protected willUpdate(changed: PropertyValues<this>) {
+    if (!changed.has('kind') || this.kind !== 'instagram' || this.reelsLoading) return;
+    this.reelsLoading = import('./instagram').then((reels) => {
+      adoptStyles(this.renderRoot as ShadowRoot, [...DsAppChrome.elementStyles, reels.instagramStyles]);
+      this.reels = reels;
+      this.requestUpdate();
+    }).catch(() => {
+      this.reelsLoading = undefined;
+      this.dispatchEvent(new CustomEvent('chrome-error', { detail: { kind: this.kind }, bubbles: true, composed: true }));
+    });
+  }
+  /** Settles once Instagram's overlay is drawn too, so a capture never takes the frame without it. */
+  protected async getUpdateComplete(): Promise<boolean> {
+    const settled = await super.getUpdateComplete();
+    if (this.kind !== 'instagram' || this.reels || !this.reelsLoading) return settled;
+    await this.reelsLoading;
+    return super.getUpdateComplete();
+  }
   protected updated(changed: Map<string, unknown>) {
     if (!changed.has('kind') && !changed.has('interactive')) return;
     if (this.kind === 'instagram') return;
@@ -94,7 +115,7 @@ export class DsAppChrome extends LitElement {
   }
   private lights() { return html`<div class="lights">${this.control('close','Close window')}${this.control('minimize','Minimize window')}${this.control('zoom','Zoom window')}</div>`; }
   render() {
-    if(this.kind==='instagram') return instagram({...this, interactive:this.interactive, username:this.username, caption:this.caption, avatar:this.avatar, verified:this.verified, likes:this.likes, comments:this.comments, reposts:this.reposts, shares:this.shares, progress:this.progress, action:(action:string)=>this.dispatchEvent(new CustomEvent('chrome-action',{detail:{action},bubbles:true,composed:true}))});
+    if(this.kind==='instagram') return !this.reels ? instagramFrame() : this.reels.instagram({...this, interactive:this.interactive, username:this.username, caption:this.caption, avatar:this.avatar, verified:this.verified, likes:this.likes, comments:this.comments, reposts:this.reposts, shares:this.shares, progress:this.progress, action:(action:string)=>this.dispatchEvent(new CustomEvent('chrome-action',{detail:{action},bubbles:true,composed:true}))});
     if(this.kind==='ios'||this.kind==='ipados') return html`<div class="status"><span class="clock">${this.time}</span><span class="island-space"></span><span class="levels">${this.dualSim ? cellularSignal(true) : html`<span class="cellular" role="img" aria-label="Full signal"><i></i><i></i><i></i><i></i></span>`}${this.network==='wifi' ? (this.assetBase ? html`<img class="wifi" alt="Wi-Fi" src=${this.assetBase+'status-wifi.svg'}>` : html`<ds-icon type="wifi" class="wifi" aria-label="Wi-Fi" style="--ds-icon-size:19px"></ds-icon>`) : html`<span class="network">${this.network}</span>`}${this.assetBase ? html`<span class="battery-art" role="img" aria-label=${`Battery ${Math.min(100,Math.max(0,this.battery))}%`}><img class="battery" alt="" src=${this.assetBase+'status-battery.svg'}><img class="battery charge-art" alt="" src=${this.assetBase+'status-battery.svg'} style=${`clip-path:inset(0 ${100-Math.min(100,Math.max(0,this.battery))}% 0 0)`}></span>` : html`<span class="battery-meter" role="img" aria-label=${`Battery ${Math.min(100,Math.max(0,this.battery))}%`} style=${`--battery-charge:${Math.min(100,Math.max(0,this.battery))}%`}><span class="charge"></span></span>`}</span></div>`;
     if(this.kind==='macos-compact') return html`<div class="compact">${this.lights()}${this.href?html`<a class="title" href=${this.href} target="_blank" rel="noopener noreferrer" title=${this.href}>${this.address || this.label}</a>`:html`<span class="title">${this.address || this.label}</span>`}</div>`;
     if(this.kind==='macos') return html`<div class="native">${this.lights()}<span class="title">${this.label}</span><slot name="controls"></slot></div>`;

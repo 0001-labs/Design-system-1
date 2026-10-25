@@ -1,11 +1,7 @@
 import { css, html, svg, nothing } from 'lit';
 
-/** Presentation based on the supplied October 2026 iPhone Reels reference. */
+/** Presentation based on the supplied October 2026 iPhone Reels reference. Its frame and media are `instagram-frame.ts`, drawn before this loads. */
 export const instagramStyles = css`
-  :host([kind=instagram]) { height:100%; background:transparent; color:white; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
-  .reels { position:relative; height:100%; overflow:hidden; isolation:isolate; }
-  .reels-media { position:absolute; inset:0; z-index:-2; }
-  .reels ::slotted(*) { width:100%; height:100%; display:block; object-fit:cover; }
   .reels::before { content:''; position:absolute; inset:0; z-index:-1; pointer-events:none; background:linear-gradient(#0005,transparent 23%,transparent 55%,#0009); }
   .reels button { width:44px; height:44px; border-radius:8px; color:white; }
   .reels svg { width:27px; height:27px; stroke-width:1.8; }
