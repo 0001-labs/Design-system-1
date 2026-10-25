@@ -76,14 +76,14 @@ export class ConsistencyHome extends LitElement {
           </ds-button>
           <ds-select for="home-workspace" aria-label="Workspaces">
             <ds-button menu-item role="menuitemradio" aria-checked="true"><ds-avatar initial=${workspaceInitial(name)} outlined plain aria-hidden="true"></ds-avatar>${name}</ds-button>
+            <hr data-ds-menu-separator />
+            <ds-button menu-item href="#settings/domains">Settings</ds-button>
           </ds-select>
           <ds-button id="home-notifications" icon label="Notifications"><ds-icon type="notifications"></ds-icon></ds-button>
           <ds-select for="home-notifications" aria-label="Notifications" role="dialog">
             <ds-text data-ds-menu-label tone="muted" literal text="No notifications yet"></ds-text>
           </ds-select>
         </div>
-        <ds-sidebar narrow label="Places" .items=${[{ id: 'sites', label: 'Sites', href: '#', current: !settings }]}></ds-sidebar>
-        <ds-sidebar narrow label="Settings" .items=${[{ id: 'settings', label: 'Settings', href: '#settings/domains', current: settings }]}></ds-sidebar>
       </nav>
       <div class="home-main">
         <ds-text class="home-title" role="heading" aria-level="1" literal size="display" text=${settings ? 'Settings' : 'Sites'}></ds-text>

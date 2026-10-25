@@ -1,7 +1,6 @@
 consistency-home{display:block;height:100dvh}
 consistency-home>ds-page{height:100%}
 .home-nav{display:flex;flex-direction:column;gap:var(--ds-unit);height:100%}
-.home-nav>ds-sidebar[label="Settings"]{margin-top:auto}
 /* Each page opens with its title at display size, as Money's pages do, a square above what it holds. */
 .home-main{display:flex;flex-direction:column;gap:var(--ds-unit);min-width:0}
 /* Settings, as Money's: the text tabs a square under the title, the tab's content a square under them, in a settings column of 32 squares. */

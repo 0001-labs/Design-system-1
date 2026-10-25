@@ -28,11 +28,11 @@ try {
  if(process.env.HOME_SHOT)await page.locator('consistency-home nav.home-nav').screenshot({path:process.env.HOME_SHOT});
  const cards=await page.locator('consistency-home ds-card').evaluateAll(cards=>cards.map(card=>card.getAttribute('href')));
  if(cards.join()!=='https://flavo.c9y.site/team/,https://cphraft.c9y.site/team/,https://soendergaarden.c9y.site/team/')throw Error('Projects: '+cards.join());
- if(await page.locator('consistency-home ds-sidebar[label="Places"]').getByText('Sites',{exact:true}).count()!==1)throw Error('Sites is not in the sidebar');
- if(await page.locator('consistency-home ds-sidebar[label="Settings"]').getByText(/^(Domains|Account|Sign out)$/).count())throw Error('Settings items are still in the sidebar');
+ if(await page.locator('consistency-home ds-sidebar').getByText('Sites',{exact:true}).count())throw Error('Sites is still in the sidebar');
+ if(await page.locator('consistency-home ds-sidebar').count())throw Error('The sidebar still has rows of places');
  for(const width of [300,390,768,1440]){await page.setViewportSize({width,height:800});await page.waitForTimeout(100);if(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth))throw Error(`Home overflows at ${width}`);}
  await page.setViewportSize({width:1440,height:800});
- await page.locator('consistency-home ds-sidebar[label="Settings"]').getByText('Settings',{exact:true}).click();await page.waitForURL('**#settings/domains');
+ await page.locator('#home-workspace').click();await page.locator('consistency-home ds-select[aria-label="Workspaces"] ds-button[menu-item]',{hasText:'Settings'}).click();await page.waitForURL('**#settings/domains');
  await page.locator('consistency-home consistency-domains').waitFor();
  if(await page.locator('consistency-home .home-title[text="Settings"]').count()!==1)throw Error('The page is not titled Settings');
  const tabs=await page.locator('consistency-home ds-tabs[aria-label="Settings"] [role="tab"]').evaluateAll(tabs=>tabs.map(tab=>tab.textContent.trim()+':'+tab.getAttribute('aria-selected')));
@@ -42,7 +42,7 @@ try {
  await page.reload();await page.locator('consistency-home .home-account').waitFor();
  for(const width of [300,390,768,1440]){await page.setViewportSize({width,height:800});await page.waitForTimeout(100);if(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth))throw Error(`Settings overflows at ${width}`);}
  await page.setViewportSize({width:1440,height:800});
- await page.locator('consistency-home ds-sidebar[label="Places"]').getByText('Sites',{exact:true}).click();await page.locator('consistency-home ds-card').first().waitFor();
+ await page.goto(page.url().replace(/#.*$/,''));await page.locator('consistency-home ds-card').first().waitFor();
  await page.goto(page.url().replace(/#.*$/,'')+'#settings/account');await page.reload();await page.getByRole('button',{name:'Sign out',exact:true}).click();await page.waitForURL('**/app/signin');
  if(!signedOut)throw Error('Sign out did not end the session');
  console.log('Home workspace header, Sites as cards only, Settings with Domains and Account tabs, sign out and viewports passed');
