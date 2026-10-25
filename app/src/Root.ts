@@ -10,6 +10,7 @@ import "./NavigationAuth";
 import "./SystemWorkbench";
 import "./screens/AdoptionDashboard";
 import "./screens/BaseEditor";
+import "./screens/ComponentEditor";
 import "./screens/FeatureFlags";
 import "./screens/FontWorkspace";
 import "./screens/iconBuilder/IconBuilder";
@@ -27,7 +28,7 @@ const splash = () => html`<div class="route-splash" data-testid="route-splash">$
  *   /signin       the shared sign-in screen: the email, then the code or the owner's password
  *   /libraries    dashboard
  *   /l/:id        editor
- *   /base         the base system, the owner's live edits
+ *   /base         the base system's components, edited live by the owner (`?view=tokens`: every token)
  *
  * `/playground` keeps the product's current front door working and gives people
  * something to try before creating an account.
@@ -62,7 +63,7 @@ export class AppRoutes extends AppElement {
     }
     if (path === "/libraries") return html`<ds1-library-list></ds1-library-list>`;
     if (path === "/profile") return html`<ds1-profile></ds1-profile>`;
-    if (path === "/base") return html`<ds1-base-editor></ds1-base-editor>`;
+    if (path === "/base") return currentLocation.get().search.get("view") === "tokens" ? html`<ds1-base-editor></ds1-base-editor>` : html`<ds1-component-editor></ds1-component-editor>`;
     if (path === "/reports/components") { window.location.replace("https://designsystem1.com/adoption/"); return splash(); }
     if (editor) return html`<ds1-library-editor .libraryId=${editor.id!}></ds1-library-editor>`;
     return html`<div class="route-splash">

@@ -1,7 +1,12 @@
 @import "../../1-root/component-metrics.css";
 
 :host {
-  --ds-choice-unit: var(--ds-control-height);
+  /* The switch's own tokens, unset by default: its height in unscaled px (two heights wide, the
+     thumb and its travel following) and the track's colour when off; --ds-switch-track-on is
+     the track's colour when on. The compact face keeps its own measures. */
+  --_switch-size: var(--ds-switch-size);
+  --_switch-unit: calc(var(--_switch-size) * var(--ds-sf));
+  --ds-choice-unit: var(--_switch-unit, var(--ds-control-height));
   display: inline-flex;
   flex: 0 0 auto;
   vertical-align: middle;
@@ -23,7 +28,7 @@
   border: 0 !important;
   border-radius: var(--ds-choice-unit) !important;
   corner-shape: round !important;
-  background: var(--ds-fill) !important;
+  background: var(--ds-switch-track-off, var(--ds-fill)) !important;
   color: var(--ds-white) !important;
   box-shadow: none !important;
   cursor: pointer !important;
@@ -51,7 +56,7 @@
 /* A smaller visible face on a two-square by one-square native hit target. */
 :host([monochrome]) ::slotted(button[aria-checked="true"]) { background: var(--ds-text-color) !important; }
 :host([monochrome]) ::slotted(button[aria-checked="true"])::after { background: var(--ds-paper); }
-:host([compact]) { width: calc(40px * var(--ds-sf)); height: calc(20px * var(--ds-sf)); }
+:host([compact]) { --ds-choice-unit: var(--ds-control-height); width: calc(40px * var(--ds-sf)); height: calc(20px * var(--ds-sf)); }
 :host([compact]) ::slotted(button),
 :host([compact]) ::slotted(button[aria-checked="true"]) { padding: 0 !important; background: transparent !important; }
 :host([compact]) ::slotted(button)::before {

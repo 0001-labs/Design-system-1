@@ -47,3 +47,7 @@ The React adapter accepts the same `compact` and `monochrome` boolean options. N
 <ComponentExample example="choice-switches" />
 
 <ComponentExample example="toggle" />
+
+## Its own tokens
+
+`--ds-switch-size` (its height: two heights wide, the thumb and its travel following), `--ds-switch-track-on` and `--ds-switch-track-off`. They are unset by default: each face reads its token first and falls back to its own measure, so a page that sets none draws exactly as before. Lengths are unscaled pixels, multiplied by the surface scale (`--ds-sf`) where the component is drawn. Design system 1's component editor sets them live for every page that links the base sheet; a page can also set them itself. The compact face keeps its own measures.

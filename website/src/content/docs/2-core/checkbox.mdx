@@ -36,3 +36,7 @@ for those parts.
 ## Design examples
 
 <ComponentExample example="choice-checklist" />
+
+## Its own tokens
+
+`--ds-checkbox-size` (the box, at most the square it stands in), `--ds-checkbox-corner-size` and `--ds-checkbox-fill` (ticked or mixed). They are unset by default: each face reads its token first and falls back to its own measure, so a page that sets none draws exactly as before. Lengths are unscaled pixels, multiplied by the surface scale (`--ds-sf`) where the component is drawn. Design system 1's component editor sets them live for every page that links the base sheet; a page can also set them itself.

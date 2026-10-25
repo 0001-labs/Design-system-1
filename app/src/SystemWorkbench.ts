@@ -152,7 +152,8 @@ export class SystemWorkbench extends AppElement {
     const { path, search } = currentLocation.get();
     const query = new URLSearchParams(search);
     query.set("component", component);
-    query.delete("view");
+    // A library's publish panel closes; the base's token view (`view=tokens`) stays open.
+    if (query.get("view") === "overview") query.delete("view");
     navigate(`${path}?${query}`);
   }
 

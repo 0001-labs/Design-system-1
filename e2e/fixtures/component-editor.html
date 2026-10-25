@@ -1,0 +1,33 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Component editor</title>
+<style>body { margin: 0; }</style>
+<script type="module">
+  // The base API answered in the page: the owner's saved base, and every save recorded.
+  const TOKENS = '/* ds1:tokens:start */';
+  const END = '/* ds1:tokens:end */';
+  const saved = new URLSearchParams(location.search).get('saved');
+  let rev = saved ? 1 : 0;
+  let base = saved ? { css: `${TOKENS}\n:root {\n${saved}\n}\n${END}\n`, rev: 1, version: 1, updatedAt: 1, sheet: '', contentHash: 'h1' } : null;
+  window.saves = [];
+  window.fetch = async (path, init = {}) => {
+    const json = (body, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
+    if (path === '/api/base' && (init.method ?? 'GET') === 'GET') return json({ base, history: base ? [{ version: 1, createdAt: 1, contentHash: 'h1', restoredFrom: null, overrides: 1 }] : [] });
+    if (path === '/api/base' && init.method === 'PUT') {
+      const body = JSON.parse(init.body);
+      window.saves.push(body);
+      if (body.baseRev !== rev) return json({ error: { code: 'draft_conflict', message: 'Saved somewhere else.' } }, 409);
+      rev += 1;
+      base = { css: body.css, rev, version: rev, updatedAt: Date.now(), sheet: '', contentHash: `h${rev}` };
+      return json({ base });
+    }
+    return json({ error: 'Not found' }, 404);
+  };
+  await import('/DS1/1-root/one.css');
+  await import('/DS1/2-core/ds-icon.ts');
+  const { startScaling } = await import('/DS1/0-face/scaling.ts');
+  startScaling();
+  if (new URLSearchParams(location.search).has('embed')) document.documentElement.dataset.docsEmbed = '';
+  await import('/app/src/screens/ComponentEditor.ts');
+  document.body.append(document.createElement('ds1-component-editor'));
+  window.ready = customElements.whenDefined('ds1-component-editor');
+</script></head>
+<body></body></html>

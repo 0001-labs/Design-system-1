@@ -7,20 +7,30 @@
   max-width: 100%;
   min-width: 0;
   vertical-align: bottom;
+  /* The tag's own tokens, unset by default and in unscaled px: its height, side padding,
+     corners and text size; --ds-tag-accent colours it. */
+  --_tag-size: var(--ds-tag-size);
+  --_tag-height: calc(var(--_tag-size) * var(--ds-sf, 1));
+  --_tag-padding-size: var(--ds-tag-padding-size);
+  --_tag-padding: calc(var(--_tag-padding-size) * var(--ds-sf, 1));
+  --_tag-corner-size: var(--ds-tag-corner-size);
+  --_tag-radius: calc(var(--_tag-corner-size) * var(--ds-sf, 1));
+  --_tag-text-size: var(--ds-tag-text-size);
+  --_tag-font-size: calc(var(--_tag-text-size) * var(--ds-sf, 1));
 }
 :host([hidden]) { display: none !important; }
 .frame {
   display: block;
   box-sizing: border-box;
   max-width: 100%;
-  padding-inline: calc(4px * var(--ds-sf, 1));
-  border-radius: var(--ds-radius);
+  padding-inline: var(--_tag-padding, calc(4px * var(--ds-sf, 1)));
+  border-radius: var(--_tag-radius, var(--ds-radius));
   background: var(--ds-tag-background, light-dark(color-mix(in srgb, var(--ds-tag-accent, var(--ds-grey, #7a7a7a)) 28%, white), color-mix(in srgb, var(--ds-tag-accent, var(--ds-grey, #7a7a7a)) 20%, var(--ds-black, #2a2a2a))));
   color: var(--ds-tag-color, light-dark(color-mix(in srgb, var(--ds-tag-accent, var(--ds-grey, #7a7a7a)) 45%, black), var(--ds-tag-accent, var(--ds-grey, #7a7a7a))));
   font-family: var(--ds-typeface-regular);
   font-feature-settings: var(--ds-font-features);
-  font-size: var(--ds-type-size-default);
-  line-height: var(--ds-control-height);
+  font-size: var(--_tag-font-size, var(--ds-type-size-default));
+  line-height: var(--_tag-height, var(--ds-control-height));
   letter-spacing: var(--ds-type-letterspacing-default);
   overflow: hidden;
   text-overflow: clip;

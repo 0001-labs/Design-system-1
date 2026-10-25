@@ -4,6 +4,12 @@
    stands, so the words begin on the next square (Joachim, 19 October 2026). */
 :host {
   --ds-choice-unit: calc(var(--ds-1) * var(--ds-sf));
+  /* The box's own tokens, unset by default and in unscaled px: its size (at most the square it
+     stands in), its corners and the fill when ticked or mixed. */
+  --_checkbox-size: var(--ds-checkbox-size);
+  --_checkbox-box: calc(var(--_checkbox-size) * var(--ds-sf));
+  --_checkbox-corner-size: var(--ds-checkbox-corner-size);
+  --_checkbox-radius: calc(var(--_checkbox-corner-size) * var(--ds-sf));
   display: inline-grid;
   align-items: end;
   justify-items: start;
@@ -18,32 +24,32 @@
   box-sizing: border-box !important;
   display: grid !important;
   place-items: center !important;
-  width: var(--ds-control-height) !important;
+  width: var(--_checkbox-box, var(--ds-control-height)) !important;
   min-width: 0 !important;
-  height: var(--ds-control-height) !important;
+  height: var(--_checkbox-box, var(--ds-control-height)) !important;
   min-height: 0 !important;
   margin: 0 !important;
   padding: 0 !important;
   border: 1px solid var(--ds-border-color) !important;
-  border-radius: var(--ds-radius) !important;
+  border-radius: var(--_checkbox-radius, var(--ds-radius)) !important;
   corner-shape: var(--ds-corner-shape, round) !important;
   background: var(--ds-input-background) !important;
   color: var(--ds-button-text-color-on-accent) !important;
   box-shadow: none !important;
   cursor: pointer !important;
 }
-::slotted(input:checked), ::slotted(input:indeterminate) { background: var(--ds-accent-color) !important; }
+::slotted(input:checked), ::slotted(input:indeterminate) { background: var(--ds-checkbox-fill, var(--ds-accent-color)) !important; }
 ::slotted(input)::before {
   content: "";
-  width: var(--ds-control-height);
-  height: var(--ds-control-height);
+  width: var(--_checkbox-box, var(--ds-control-height));
+  height: var(--_checkbox-box, var(--ds-control-height));
   background: currentColor;
   mask: var(--ds-checkbox-mark) center / contain no-repeat;
   opacity: 0;
 }
 ::slotted(input:checked)::before { opacity: 1; }
 ::slotted(input:indeterminate)::before {
-  width: calc(var(--ds-control-height) / 2);
+  width: calc(var(--_checkbox-box, var(--ds-control-height)) / 2);
   height: calc(2px * var(--ds-sf));
   mask: none;
   opacity: 1;

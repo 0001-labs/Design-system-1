@@ -163,6 +163,10 @@ Supplying `value` keeps the choice controlled; omitting it selects repeated acti
 There is no separate split element: select `button` in Sync 1 and write `<ds-button split>` or `<Button split>`.
 
 
+## Its own tokens
+
+`--ds-button-size` (the face's height), `--ds-button-padding-size` (its side padding on a filled face), `--ds-button-corner-size`, `--ds-button-text-size`, `--ds-button-inline-size` (unset hugs the label, `100%` fills, a length is fixed), `--ds-button-primary-fill`, `--ds-button-primary-text` and `--ds-button-secondary-fill`. They are unset by default: each face reads its token first and falls back to its own measure, so a page that sets none draws exactly as before. Lengths are unscaled pixels, multiplied by the surface scale (`--ds-sf`) where the component is drawn. Design system 1's component editor sets them live for every page that links the base sheet; a page can also set them itself. Icon and square buttons, menu entries, tabs and split runs keep their own measures and follow only the colours; `fixed` and `wide` keep their widths, and a context that sets `--ds-button-height` or `--ds-button-width` keeps its own.
+
 import ConstraintList from "../../../components/ConstraintList.astro";
 
 <ConstraintList component="ds-button" />

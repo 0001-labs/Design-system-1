@@ -18,3 +18,7 @@ Set `--ds-tag-accent` to a system colour for a pale fill and coloured text in bo
 A tag is a label, with no click action or tab stop. Put it inside a link or button when the containing item is interactive. Use [Badge](/2-core/badge/) when you need a grid-sized status marker or an icon.
 
 Copy `tag` through Sync 1. React consumers can use `Tag` from `DS1/react/tag` after registering `DS1/2-core/ds-tag`.
+
+## Its own tokens
+
+`--ds-tag-size` (its height), `--ds-tag-padding-size` (its side padding), `--ds-tag-corner-size`, `--ds-tag-text-size` and `--ds-tag-accent`. They are unset by default: each face reads its token first and falls back to its own measure, so a page that sets none draws exactly as before. Lengths are unscaled pixels, multiplied by the surface scale (`--ds-sf`) where the component is drawn. Design system 1's component editor sets them live for every page that links the base sheet; a page can also set them itself.

@@ -1,0 +1,81 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Component tokens</title>
+<style>
+  body { margin: 0; padding: 40px; }
+  section { margin-bottom: 40px; display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end; }
+  #fill-row { width: 400px; }
+</style>
+<script type="module">
+  import '/DS1/1-root/one.css';
+  import '/DS1/1-root/component-tokens.css';
+  import '/DS1/1-root/controls.css';
+  import '/DS1/2-core/ds-button.ts';
+  import '/DS1/2-core/ds-icon.ts';
+  import '/DS1/2-core/ds-input.ts';
+  import '/DS1/2-core/ds-checkbox.ts';
+  import '/DS1/2-core/ds-switch.ts';
+  import '/DS1/2-core/ds-tag.ts';
+  import '/DS1/3-unit/ds-menu.ts';
+  import '/DS1/3-unit/ds-tabs.ts';
+  const tags = ['ds-button', 'ds-input', 'ds-checkbox', 'ds-switch', 'ds-tag', 'ds-menu', 'ds-tabs'];
+  window.ready = Promise.all(tags.map(tag => customElements.whenDefined(tag)))
+    .then(() => Promise.all([...document.querySelectorAll(tags.join(','))].map(element => element.updateComplete)));
+</script></head>
+<body>
+<!-- The Button page's examples ("Button styles", "An icon and an action"), as written there. -->
+<section id="button-page">
+  <ds-button id="button-primary" primary>Save changes</ds-button>
+  <ds-button id="button-secondary" secondary>Cancel</ds-button>
+  <ds-button id="button-text">Text button</ds-button>
+  <ds-button id="button-disabled" primary disabled>Disabled</ds-button>
+  <ds-button id="button-icon-words" primary>
+    <ds-icon type="check"></ds-icon> Save
+  </ds-button>
+</section>
+<!-- The Button page's form and host faces. -->
+<section id="button-faces">
+  <ds-button id="button-slotted" control="slotted" primary><button type="submit">Save</button></ds-button>
+  <ds-button id="button-slotted-secondary" control="slotted" secondary><button type="button">Cancel</button></ds-button>
+  <ds-button id="button-host" control="host" secondary>Host</ds-button>
+  <ds-button id="button-key" primary text="actions.save"></ds-button>
+</section>
+<section id="fill-row">
+  <ds-button id="button-in-row" secondary>Fill me</ds-button>
+</section>
+<!-- Other controls drawn on the button's face, which keep their own measures. -->
+<section id="button-contexts">
+  <ds-button id="button-icon" icon aria-label="Close"><ds-icon type="close"></ds-icon></ds-button>
+  <ds-button id="button-square" square secondary>3</ds-button>
+  <ds-button id="button-fixed" fixed secondary>Fixed</ds-button>
+  <ds-button id="button-wide" wide primary>Wide</ds-button>
+  <ds-tabs id="tabs" aria-label="Views">
+    <ds-button id="tab-current" control="host" role="tab" active aria-selected="true">Overview</ds-button>
+    <ds-button id="tab-other" control="host" role="tab" aria-selected="false">Activity</ds-button>
+  </ds-tabs>
+  <ds-menu id="menu" role="menu">
+    <ds-button id="menu-entry" role="menuitem">Rename</ds-button>
+    <ds-button id="menu-item" menu-item>Duplicate</ds-button>
+  </ds-menu>
+</section>
+<!-- The Input page's field variant. -->
+<section id="input-page">
+  <ds-input id="input-field" variant="field" aria-label="Your name" placeholder="Enter your name"></ds-input>
+  <ds-input id="input-row" variant="row" aria-label="Row" value="Row"></ds-input>
+  <ds-input id="input-default" label="Your name" placeholder="Enter your name"></ds-input>
+</section>
+<!-- The Checkbox page's markup. -->
+<section id="checkbox-page">
+  <label><ds-checkbox id="checkbox-off"><input type="checkbox" name="updates" /></ds-checkbox>Updates</label>
+  <label><ds-checkbox id="checkbox-on"><input type="checkbox" name="news" checked /></ds-checkbox>News</label>
+</section>
+<!-- The Switch page's markup ("Turn a setting on or off" and the compact panel). -->
+<section id="switch-page">
+  <ds-switch id="switch-on"><button type="button" role="switch" aria-label="Notifications" aria-checked="true"></button></ds-switch>
+  <ds-switch id="switch-off"><button type="button" role="switch" aria-label="Unavailable" aria-checked="false"></button></ds-switch>
+  <ds-switch id="switch-compact" compact monochrome><button type="button" role="switch" aria-checked="true" aria-label="Spacing"></button></ds-switch>
+</section>
+<!-- The Tag page's markup. -->
+<section id="tag-page">
+  <ds-tag id="tag-accent" style="--ds-tag-accent: var(--ds-pink)">App</ds-tag>
+  <ds-tag id="tag-plain">Draft</ds-tag>
+</section>
+</body></html>
