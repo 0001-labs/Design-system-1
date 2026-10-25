@@ -12,6 +12,7 @@ import { fontWorkspace } from "./fonts";
 import assets from "./assets/index.ts";
 import publish, { type Env as PublishEnv } from "./publish/index.ts";
 import { architectureReport, componentReport, type ReportsEnv } from "./reports.ts";
+import { baseApi } from "./base.ts";
 
 export interface Env extends PublishEnv, ReportsEnv, PreviewAIEnv, WorkspaceEnv {
   ASSETS: Fetcher;
@@ -126,6 +127,7 @@ export default {
 
     if (url.pathname === "/api/reports/components") return componentReport(sessionRequest(request), env);
     if (url.pathname === "/api/reports/architecture") return architectureReport(sessionRequest(request), env);
+    if (url.pathname === "/api/base" || url.pathname === "/api/base/restore") return baseApi(request, env, ctx);
 
     if (/^\/(?:app\/)?reports(?:\/components)?\/?$/.test(url.pathname)) {
       return new Response(null, { status: 302, headers: { Location: "https://designsystem1.com/adoption/", "X-Robots-Tag": "noindex, nofollow", "Cache-Control": "private, no-store" } });

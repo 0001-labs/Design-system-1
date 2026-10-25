@@ -16,11 +16,11 @@ describe('owner flag management',()=>{
     expect((await featureFlags(request(),env,send)).status).toBe(403);
     expect(env.LIBRARIES.get).not.toHaveBeenCalled();
   });
-  it('reports the component trial disabled by default',async()=>{
+  it('reports the private trials disabled by default',async()=>{
     const {env,send}=setup();
     const response=await featureFlags(request(),env,send);
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual([expect.objectContaining({key:'consistency-component-routing',enabled:false,inherited:true})]);
+    expect(await response.json()).toEqual([expect.objectContaining({key:'base-live-editing',enabled:false,inherited:true}),expect.objectContaining({key:'consistency-component-routing',enabled:false,inherited:true})]);
     expect(response.headers.get('cache-control')).toBe('private, no-store');
   });
   it('rejects undeclared flags without writing a rule',async()=>{

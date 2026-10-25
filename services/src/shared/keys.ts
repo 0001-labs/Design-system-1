@@ -25,6 +25,12 @@ export function isPublicId(value: string): boolean {
   return PUBLIC_ID_PATTERN.test(value);
 }
 
+/**
+ * The base system's own folder, `ds1/base/`, written only by the owner's base saves
+ * (services/src/base.ts). It is readable like a library and never a publish target.
+ */
+export const BASE_ID = "base";
+
 export function isVersion(value: string): boolean {
   return VERSION_PATTERN.test(value);
 }
@@ -57,7 +63,7 @@ export function parseArtifactPath(pathname: string, prefix = "/ds1"): ArtifactRe
 
   const segments = pathname.slice(prefix.length + 1).split("/");
   const publicId = segments[0];
-  if (publicId === undefined || !isPublicId(publicId)) return null;
+  if (publicId === undefined || !(isPublicId(publicId) || publicId === BASE_ID)) return null;
 
   if (segments.length === 2 && segments[1] === "latest.css") {
     return { publicId, key: latestKey(publicId), immutable: false };

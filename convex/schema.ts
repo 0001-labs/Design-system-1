@@ -121,4 +121,32 @@ export default defineSchema({
     failureStage: v.optional(v.string()),
     issues: v.optional(v.string()),
   }).index("by_library", ["libraryId"]),
+
+  /**
+   * The base system as the owner edits it on designsystem1.com: one row, the truth that live
+   * products read through `/ds1/base/latest.css`. Owner-only; see convex/base.ts.
+   */
+  baseSystem: defineTable({
+    /** The whole workbench stylesheet: the component template and its final override block. */
+    css: v.string(),
+    /** Optimistic-concurrency token, as a library draft's. */
+    rev: v.number(),
+    /** The live version, a row of baseVersions. */
+    version: v.number(),
+    updatedAt: v.number(),
+    updatedBy: v.id("users"),
+  }),
+
+  /** Every saved base, immutable, so any of them can be made live again. */
+  baseVersions: defineTable({
+    version: v.number(),
+    css: v.string(),
+    /** The served bytes: the override block alone (shared/base-sheet.ts). */
+    sheet: v.string(),
+    contentHash: v.string(),
+    createdAt: v.number(),
+    createdBy: v.id("users"),
+    /** Set when this version restored an earlier one. */
+    restoredFrom: v.optional(v.number()),
+  }).index("by_version", ["version"]),
 });

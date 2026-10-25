@@ -107,7 +107,8 @@ const { sidebar } = Astro.locals.starlightRoute;
     navigation.items = placeAppNavigation(navigation, items, appComponents);
     if (owner) navigation.items = [...navigation.items,
       { id: 'adoption', label: 'Adoption', href: '/adoption/', current: location.pathname === '/adoption/' },
-      { id: 'architecture', label: 'Architecture', href: '/architecture/', current: location.pathname === '/architecture/' }];
+      { id: 'architecture', label: 'Architecture', href: '/architecture/', current: location.pathname === '/architecture/' },
+      { id: 'base-system-editor', label: 'Base system', href: '/app/base' }];
   }
   renderAccount();
   renderWorkspace();

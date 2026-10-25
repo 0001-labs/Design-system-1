@@ -12,6 +12,8 @@ const sample = EXAMPLES[example];
 <html lang="en" class="light-theme">
   <head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="robots" content="noindex" /><title>{sample.title} — example</title></head>
   <body data-example-id={example}>
+    {/* The live base, after Design system 1's stylesheets in the head, so its tokens win. */}
+    <link rel="stylesheet" href="/ds1/base/latest.css" data-ds1-base />
     <main id="sample" set:html={sample.html}></main>
     <output id="event-output" aria-live="polite"></output>
     <script>import '../../lib/example-runtime';</script>
