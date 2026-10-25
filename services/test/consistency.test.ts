@@ -24,7 +24,7 @@ it('revalidates owner on every HTML and asset and maps root', async () => {
     const result = await consistencyPreview(new Request(origin + path, { headers }), env, send);
     expect(result.status).toBe(200); expect(result.headers.get('cache-control')).toBe('private, no-store');
   }
-  expect(send).toHaveBeenCalledTimes(2); expect(new URL(assets.mock.calls[0]![0].url).pathname).toBe('/private-consistency/index.html');
+  expect(send).toHaveBeenCalledTimes(2); expect(new URL(assets.mock.calls[0]![0].url).pathname).toBe('/private-consistency/home.html');
 });
 it.each(['https://designsystem1.com', 'https://worker.workers.dev', 'https://adoption.designsystem1.com', 'http://neweditor.c9y.site'])('blocks alternate origin %s', async host => {
   const { env, assets, send } = setup();

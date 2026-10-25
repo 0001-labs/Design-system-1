@@ -37,7 +37,8 @@ export async function consistencyPreview(request: Request, env: ReportsEnv & Wor
     if (denied.status === 401) return new Response(null, { status: 302, headers: { ...security, Location: '/app/signin', 'Set-Cookie': '__Host-ds1-dashboard=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0' } });
     return protect(denied);
   }
-  if (url.pathname === '/') url.pathname = `${prefix}index.html`;
+  // The home lists the projects; the page editor stays at the prefix itself.
+  if (url.pathname === '/') url.pathname = `${prefix}home.html`;
   const original = await env.ASSETS.fetch(new Request(url, request));
   // This marker enables owner-only diagnostics; it grants no server access. Only
   // trusted built HTML is rewritten, after the authority has validated the owner.
