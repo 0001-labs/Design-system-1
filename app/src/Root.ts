@@ -95,8 +95,8 @@ class PrivatePreviewSignIn extends AppElement {
   override render() {
     const { isLoading, isAuthenticated } = authState.get();
     if (isLoading) return splash();
-    if (!isAuthenticated) return html`<ds1-sign-in private-title="Consistency" .redirectTo=${"/signin"}></ds1-sign-in>`;
-    if (this.#session.error) return html`<main class="auth-screen"><p role="alert">${this.#session.error}</p></main>`;
+    if (!isAuthenticated) return html`<div class="app-shell"><ds1-sign-in private-title="Consistency" .redirectTo=${"/signin"}></ds1-sign-in></div>`;
+    if (this.#session.error) return html`<div class="app-shell"><main class="auth-screen"><p role="alert">${this.#session.error}</p></main></div>`;
     return splash();
   }
 }
