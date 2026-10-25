@@ -62,7 +62,7 @@ calendar.addEventListener("change", event => console.log(event.detail.value));
 | A week number | `W42` in the compressed face, at the start of the week's first day, with `week-numbers`. |
 | Lines | 1px in the line colour, centred on the grid lines. |
 
-A day outside the month is an empty box. `fixed` always draws six weeks, so moving between months never changes the calendar's height.
+A day outside the month is an empty box. `fixed` always draws six weeks, so moving between months never changes the calendar's height. With `views`, it also keeps every view at that height, so nothing under the calendar moves when a person changes the view: the week's days grow to it, the day's hours fill what its untimed events leave, the swimlane's rows fill it under the months and dates and scroll past it, and a page's own view gets it and scrolls inside.
 
 ### The month's title
 
@@ -281,7 +281,7 @@ The day arithmetic the calendars use is `DS1/0-face/calendar.ts`, plain TypeScri
 | `date` | string | Today, or the month's first | The day the week or day view shows. |
 | `lines` | number | `2` | Lines of events under a date. |
 | `week-numbers` | boolean | `false` | The week's number on its first day. |
-| `fixed` | boolean | `false` | Always six weeks. |
+| `fixed` | boolean | `false` | Always six weeks, and every view at that height. |
 | `outside-days` | boolean | `false` | The days of the months before and after, in the title grey. |
 | `heat` | boolean | `false` | Light each day by how much happens on it. |
 | `heat-max` | number | The busiest day shown | The amount that lights a day fully. |

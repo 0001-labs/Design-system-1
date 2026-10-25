@@ -247,7 +247,11 @@ const openPickers = new Set<Calendar>();
  * @prop {number} lines - Lines of events under a day's date: 2 by default.
  * @prop {boolean} weekNumbers - Write the week's number (`week-numbers`) on
  *   its first day.
- * @prop {boolean} fixed - Always draw six weeks, so the month keeps its height.
+ * @prop {boolean} fixed - Always draw six weeks, so the month keeps its height,
+ *   and every other view stands in that same height (the weekdays and six
+ *   weeks): the week's days grow to it, the day's hours fill it, the
+ *   swimlane's rows fill it and scroll beyond it, and a page's own view gets
+ *   it, so nothing under the calendar moves when the view changes.
  * @prop {boolean} outsideDays - Draw the days of the months before and after
  *   in the title grey (`outside-days`); pressing one moves there.
  * @prop {boolean} heat - Light each day by how much happens on it, as a
@@ -1045,7 +1049,10 @@ export class Calendar extends CalendarBase {
   private renderSwimlane() {
     const weeks = this.swimlaneWeeks;
     const bars = swimlaneBars(this.events ?? [], weeks);
-    const rows = Math.max(6, bars.length + 1);
+    // Fixed, the rows fill the month's height under the months and dates, and scroll past it.
+    const rowSquares = this.squaresPerDay / 2;
+    const fit = this.fixed ? Math.max(1, Math.floor((6 * (this.eventLines + 2) - 1) / rowSquares)) : 6;
+    const rows = Math.max(fit, bars.length + 1);
     const today = this.todayDay;
     const todayWeek = weeks.findIndex(start => today >= start && today <= addDays(start, 6));
     const months: { column: number; span: number; month: Day }[] = [];
@@ -1065,7 +1072,7 @@ export class Calendar extends CalendarBase {
         role="group"
         ?data-travel=${this.travelled}
         aria-label=${this.nameOr(this.monthRangeTitle(weeks))}
-        style=${`--ds-calendar-weeks: ${weeks.length}; --ds-calendar-rows: ${rows}`}
+        style=${`--ds-calendar-weeks: ${weeks.length}; --ds-calendar-rows: ${rows}; --ds-calendar-fit: ${fit}`}
       >
         <div class="swimlane-months" part="months" aria-hidden="true">
           ${months.map(({ column, span, month }, index) => html`<span class="swimlane-month" style=${`grid-column: ${column + 1} / span ${span}`}>${
@@ -1077,7 +1084,7 @@ export class Calendar extends CalendarBase {
             ? html`<span class="swimlane-date" data-today><span class="date">${dateNumber(today)}</span></span>`
             : html`<span class="swimlane-date"><span class="date">${dateNumber(start)}</span></span>`)}
         </div>
-        <div class="swimlane-grid" part="grid">
+        <div class="swimlane-scroll" part="scroll"><div class="swimlane-grid" part="grid">
           ${Array.from({ length: rows }, (_, row) => weeks.map((_, column) => html`<span
             class="cell"
             aria-hidden="true"
@@ -1099,7 +1106,7 @@ export class Calendar extends CalendarBase {
               @click=${() => this.pressEvent(event, event.start)}
             ><span class="name">${event.title}</span></button>`;
           })}
-        </div>
+        </div></div>
       </div>`);
   }
 
@@ -1225,6 +1232,7 @@ export class Calendar extends CalendarBase {
         class="grid"
         part="grid"
         role="grid"
+        data-view=${view}
         ?data-travel=${this.travelled}
         aria-label=${this.nameOr(view === "week" ? this.rangeTitle(weeks[0][0], weeks[0][6]) : monthTitle(month))}
         style=${view === "week" ? `--ds-calendar-lines: ${depth}` : nothing}

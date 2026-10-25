@@ -17,6 +17,8 @@
 :host {
   --ds-calendar-day: calc(var(--ds-unit) * var(--ds-calendar-day-squares, 4));
   --ds-calendar-day-height: calc(var(--ds-unit) * (var(--ds-calendar-lines, 2) + 2));
+  /* The month's height under its header, fixed: the weekdays and six weeks. Every view takes it with `fixed`. */
+  --ds-calendar-area: calc(var(--ds-unit) + 6 * var(--ds-calendar-day-height));
   --ds-calendar-line: 1px solid var(--ds-border-color);
   --ds-calendar-radius: var(--ds-radius-card, calc(4px * var(--ds-sf, 1)));
   --ds-calendar-today: var(--ds-red-for-blood);
@@ -667,3 +669,23 @@
 /* A page's own view, chosen in the switch: what the page puts in the slot of
  * its name, under the header and as wide as the month. */
 .own-view { width: calc(7 * var(--ds-calendar-day)); }
+
+/* Fixed, every view stands in the six-week month's height (--ds-calendar-area),
+ * so nothing under the calendar moves when the view changes: the week's days
+ * grow to it, the day's hours fill what the untimed events leave, the
+ * swimlane's rows fill it under the months and dates and scroll past it, and a
+ * page's own view gets it and scrolls inside. */
+:host([fixed]:not([compact])) .grid[data-view="week"] .week .day { height: calc(var(--ds-calendar-area) - var(--ds-unit)); }
+:host([fixed]) :is(.swimlane, .own-view, .day-view) { box-sizing: border-box; height: var(--ds-calendar-area); }
+:host([fixed]) .own-view { overflow: auto; }
+:host([fixed]) .day-view { display: flex; flex-direction: column; }
+:host([fixed]) .day-view .hours { flex: 1 1 auto; min-height: 0; height: auto; }
+:host([fixed]) .swimlane-scroll {
+  max-height: calc(var(--ds-calendar-fit) * var(--ds-calendar-week));
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  /* Room for the frame's hairlines, which stand half a pixel outside the cells. */
+  margin: -0.5px;
+  padding: 0.5px;
+}
