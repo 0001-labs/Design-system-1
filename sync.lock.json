@@ -1,13 +1,13 @@
 {
   "Aa": {
-    "commit": "256a466d10e874ae25cecfd13cc30c4b60aaa513",
+    "commit": "76f3c5c8caacd0598daa294f7c5731b01f61d2cb",
     "version": "0.9.0",
     "owned": ["website/src/vendor/aa"],
     "files": {
       "website/src/vendor/aa/README.md": "1f81b66577d7c7674a3acf4f0e25bf541380f7cc259c03c244e9558a06159da7",
       "website/src/vendor/aa/aa.css": "1b9744829d24a3e07ccbd2ff7e6ed9293618d27615325a4d968f43d970e54237",
       "website/src/vendor/aa/aa.d.ts": "e867e00711b211669304137592ba42382802a8c2618da4f7971f66907a78c029",
-      "website/src/vendor/aa/aa.js": "dbab9fa211d57657077327f6a4a64c7b9f137ea2d2e11e011a7bc266e7b08d26",
+      "website/src/vendor/aa/aa.js": "327d89cf2923e5785d7661fb4c56448d44847315580e761addc7e0f9e71e5ee2",
       "website/src/vendor/aa/button-partial.d.ts": "d576194fdc3d5bda54e0e72b5b016ed604ab51dfebb54b5752f467c1266777bd",
       "website/src/vendor/aa/comments-editor.d.ts": "0126819dee58ff74a6f16d6c18598db8259099f6beccd0aefe3e5aee75112d08",
       "website/src/vendor/aa/comments-memory.d.ts": "25906fc3dd1d057a44674f65153ccec59b5400376f7e1e7a8b5a4d767fdfc40b",

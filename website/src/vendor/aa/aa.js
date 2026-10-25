@@ -9702,7 +9702,12 @@ var kl, Al, jl = t((() => {
 		Total: "I alt",
 		"End date": "Slutdato",
 		"Include time": "Medtag klokkeslæt",
-		Time: "Klokkeslæt"
+		Time: "Klokkeslæt",
+		Day: "Dag",
+		Week: "Uge",
+		Month: "Måned",
+		Swimlane: "Baner",
+		View: "Visning"
 	}, Al = { da: kl };
 })), Ml, Nl, Pl = t((() => {
 	Ml = {
@@ -9834,7 +9839,12 @@ var kl, Al, jl = t((() => {
 		Total: "Gesamt",
 		"End date": "Enddatum",
 		"Include time": "Uhrzeit hinzufügen",
-		Time: "Uhrzeit"
+		Time: "Uhrzeit",
+		Day: "Tag",
+		Week: "Woche",
+		Month: "Monat",
+		Swimlane: "Bahnen",
+		View: "Ansicht"
 	}, Nl = { de: Ml };
 })), Fl, Il, Ll = t((() => {
 	Fl = {
@@ -9966,7 +9976,12 @@ var kl, Al, jl = t((() => {
 		Total: "Total",
 		"End date": "End date",
 		"Include time": "Include time",
-		Time: "Time"
+		Time: "Time",
+		Day: "Day",
+		Week: "Week",
+		Month: "Month",
+		Swimlane: "Swimlane",
+		View: "View"
 	}, Il = { en: Fl };
 })), Rl, zl, Bl = t((() => {
 	Rl = {
@@ -10098,7 +10113,12 @@ var kl, Al, jl = t((() => {
 		Total: "Total",
 		"End date": "Fecha de fin",
 		"Include time": "Incluir hora",
-		Time: "Hora"
+		Time: "Hora",
+		Day: "Día",
+		Week: "Semana",
+		Month: "Mes",
+		Swimlane: "Carriles",
+		View: "Vista"
 	}, zl = { es: Rl };
 })), Vl, Hl, Ul = t((() => {
 	Vl = {
@@ -10230,7 +10250,12 @@ var kl, Al, jl = t((() => {
 		Total: "Yhteensä",
 		"End date": "Päättymispäivä",
 		"Include time": "Sisällytä kellonaika",
-		Time: "Kellonaika"
+		Time: "Kellonaika",
+		Day: "Päivä",
+		Week: "Viikko",
+		Month: "Kuukausi",
+		Swimlane: "Kaistat",
+		View: "Näkymä"
 	}, Hl = { fi: Vl };
 })), Wl, Gl, Kl = t((() => {
 	Wl = {
@@ -10362,7 +10387,12 @@ var kl, Al, jl = t((() => {
 		Total: "Total",
 		"End date": "Date de fin",
 		"Include time": "Inclure l’heure",
-		Time: "Heure"
+		Time: "Heure",
+		Day: "Jour",
+		Week: "Semaine",
+		Month: "Mois",
+		Swimlane: "Couloirs",
+		View: "Vue"
 	}, Gl = { fr: Wl };
 })), ql, Jl, Yl = t((() => {
 	ql = {
@@ -10487,7 +10517,12 @@ var kl, Al, jl = t((() => {
 		Total: "Samtals",
 		"End date": "Lokadagur",
 		"Include time": "Taka með tíma",
-		Time: "Tími"
+		Time: "Tími",
+		Day: "Dagur",
+		Week: "Vika",
+		Month: "Mánuður",
+		Swimlane: "Brautir",
+		View: "Yfirlit"
 	}, Jl = { is: ql };
 })), Xl, Zl, Ql = t((() => {
 	Xl = {
@@ -10619,7 +10654,12 @@ var kl, Al, jl = t((() => {
 		Total: "Totale",
 		"End date": "Data di fine",
 		"Include time": "Includi ora",
-		Time: "Ora"
+		Time: "Ora",
+		Day: "Giorno",
+		Week: "Settimana",
+		Month: "Mese",
+		Swimlane: "Corsie",
+		View: "Vista"
 	}, Zl = { it: Xl };
 })), $l, eu, tu = t((() => {
 	$l = {
@@ -10751,7 +10791,12 @@ var kl, Al, jl = t((() => {
 		Total: "合計",
 		"End date": "終了日",
 		"Include time": "時刻を含める",
-		Time: "時刻"
+		Time: "時刻",
+		Day: "日",
+		Week: "週",
+		Month: "月",
+		Swimlane: "スイムレーン",
+		View: "表示"
 	}, eu = { ja: $l };
 })), nu, ru, iu = t((() => {
 	nu = {
@@ -10883,7 +10928,12 @@ var kl, Al, jl = t((() => {
 		Total: "합계",
 		"End date": "종료일",
 		"Include time": "시간 포함",
-		Time: "시간"
+		Time: "시간",
+		Day: "일",
+		Week: "주",
+		Month: "월",
+		Swimlane: "스윔레인",
+		View: "보기"
 	}, ru = { ko: nu };
 })), au, ou, su = t((() => {
 	au = {
@@ -11015,7 +11065,12 @@ var kl, Al, jl = t((() => {
 		Total: "Totalt",
 		"End date": "Sluttdato",
 		"Include time": "Ta med klokkeslett",
-		Time: "Klokkeslett"
+		Time: "Klokkeslett",
+		Day: "Dag",
+		Week: "Uke",
+		Month: "Måned",
+		Swimlane: "Baner",
+		View: "Visning"
 	}, ou = { nb: au };
 })), cu, lu, uu = t((() => {
 	cu = {
@@ -11147,7 +11202,12 @@ var kl, Al, jl = t((() => {
 		Total: "Total",
 		"End date": "Data de fim",
 		"Include time": "Incluir hora",
-		Time: "Hora"
+		Time: "Hora",
+		Day: "Dia",
+		Week: "Semana",
+		Month: "Mês",
+		Swimlane: "Raias",
+		View: "Vista"
 	}, lu = { pt: cu };
 })), du, fu = t((() => {
 	du = { "pt-BR": {
@@ -11279,7 +11339,12 @@ var kl, Al, jl = t((() => {
 		Total: "Total",
 		"End date": "Data de término",
 		"Include time": "Incluir horário",
-		Time: "Horário"
+		Time: "Horário",
+		Day: "Dia",
+		Week: "Semana",
+		Month: "Mês",
+		Swimlane: "Raias",
+		View: "Visualização"
 	} };
 })), pu, mu, hu = t((() => {
 	pu = {
@@ -11411,7 +11476,12 @@ var kl, Al, jl = t((() => {
 		Total: "Totalt",
 		"End date": "Slutdatum",
 		"Include time": "Inkludera tid",
-		Time: "Tid"
+		Time: "Tid",
+		Day: "Dag",
+		Week: "Vecka",
+		Month: "Månad",
+		Swimlane: "Banor",
+		View: "Vy"
 	}, mu = { sv: pu };
 })), gu, _u, vu = t((() => {
 	gu = {
@@ -11543,7 +11613,12 @@ var kl, Al, jl = t((() => {
 		Total: "合计",
 		"End date": "结束日期",
 		"Include time": "包含时间",
-		Time: "时间"
+		Time: "时间",
+		Day: "日",
+		Week: "周",
+		Month: "月",
+		Swimlane: "泳道",
+		View: "视图"
 	}, _u = { zh: gu };
 })), yu = /* @__PURE__ */ n({ SHARED_WORDS: () => bu }), bu, xu = t((() => {
 	jl(), Pl(), Ll(), Bl(), Ul(), Kl(), Yl(), Ql(), tu(), iu(), su(), uu(), fu(), hu(), vu(), bu = {
