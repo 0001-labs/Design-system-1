@@ -74,9 +74,7 @@ export class ConsistencyHome extends LitElement {
           <ds-button id="home-workspace" class="home-workspace-name" label=${`Workspace: ${name}`}>
             <ds-avatar initial=${workspaceInitial(name)} outlined plain aria-hidden="true"></ds-avatar>${name}<ds-icon type="chevron-down"></ds-icon>
           </ds-button>
-          <ds-select for="home-workspace" aria-label="Workspaces">
-            <ds-button menu-item role="menuitemradio" aria-checked="true"><ds-avatar initial=${workspaceInitial(name)} outlined plain aria-hidden="true"></ds-avatar>${name}</ds-button>
-            <hr data-ds-menu-separator />
+          <ds-select for="home-workspace" aria-label="Workspace">
             <ds-button menu-item href="#settings/domains">Settings</ds-button>
           </ds-select>
           <ds-button id="home-notifications" icon label="Notifications"><ds-icon type="notifications"></ds-icon></ds-button>
