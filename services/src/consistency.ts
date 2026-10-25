@@ -30,6 +30,7 @@ export async function consistencyPreview(request: Request, env: ReportsEnv & Wor
   if (!isConsistencyHost(url.hostname) || url.protocol !== 'https:') return new Response(null, { status: 404, headers: security });
   if (url.pathname === '/api/dashboard/session' || url.pathname === '/app/signin' || /^\/app\/assets\/[A-Za-z0-9][A-Za-z0-9._-]*$/.test(url.pathname) || url.pathname === '/icons/design-system-1.svg') return protect(await dashboard(request, env, send));
   if ((url.pathname.startsWith('/api/consistency/pages') || url.pathname==='/api/consistency/sites')) return protect(await workspaceApi(request,env,send));
+  if (url.pathname === '/api/consistency/profile') return protect(await profileApi(request, env, send));
   if (!['GET', 'HEAD'].includes(request.method)) return new Response(null, { status: 404, headers: security });
   if (url.pathname !== '/' && !url.pathname.startsWith(prefix)) return new Response(null, { status: 404, headers: security });
   const denied = await authorizeReport(sessionRequest(request), env, send);
@@ -49,6 +50,25 @@ export async function consistencyPreview(request: Request, env: ReportsEnv & Wor
     return protect(marked);
   }
   return protect(original);
+}
+
+/** The owner's company name for the home's workspace header, read from their own account's profile. */
+async function profileApi(request: Request, env: ReportsEnv, send: typeof fetch): Promise<Response> {
+  if (request.method !== 'GET') return Response.json({ error: 'Method not allowed' }, { status: 405, headers: { Allow: 'GET' } });
+  const session = sessionRequest(new Request(request.url, { headers: request.headers }));
+  const denied = await authorizeReport(session, env, send);
+  if (denied) return denied;
+  try {
+    const response = await send(`${env.REPORTS_AUTH_URL}/api/query`, {
+      method: 'POST', headers: { authorization: session.headers.get('authorization')!, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path: 'users:profile', args: [{}], format: 'convex_encoded_json' }),
+      signal: AbortSignal.timeout(8_000), redirect: 'manual',
+    });
+    const answer = response.ok ? await response.json() as { status?: string; value?: { companyName?: unknown } | null } : null;
+    if (answer?.status !== 'success') return Response.json({ error: 'The profile could not be read.' }, { status: 503 });
+    const companyName = typeof answer.value?.companyName === 'string' ? answer.value.companyName.slice(0, 80) : '';
+    return Response.json({ companyName }, { headers: { 'Cache-Control': 'no-store' } });
+  } catch { return Response.json({ error: 'The profile could not be read.' }, { status: 503 }); }
 }
 
 async function workspaceApi(request:Request,env:ReportsEnv & WorkspaceEnv,send:typeof fetch):Promise<Response>{

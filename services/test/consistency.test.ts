@@ -80,3 +80,19 @@ it('denies a non-owner workspace account before invoking storage',async()=>{
  const response=await consistencyPreview(new Request('https://c9y.site/api/consistency/pages',{headers}),{...env,CONSISTENCY_WORKSPACE:workspace} as unknown as Parameters<typeof consistencyPreview>[1],send);
  expect(response.status).toBe(403);expect(workspace.fetch).not.toHaveBeenCalled();
 });
+it('gives the owner their company name for the home, and nobody else anything', async () => {
+  const url = 'https://c9y.site/api/consistency/profile';
+  const answers = (id: string, companyName: string) => vi.fn(async (_url: string, init?: RequestInit) => JSON.parse(String(init?.body)).path === 'users:profile'
+    ? Response.json({ status: 'success', value: { companyName } })
+    : Response.json({ status: 'success', value: { _id: id, email: 'jaa90@icloud.com', emailVerified: true } }));
+  const { env } = setup();
+  const owner = answers('owner', '0001');
+  const read = await consistencyPreview(new Request(url, { headers }), env, owner as unknown as typeof fetch);
+  expect(read.status).toBe(200); expect(await read.json()).toEqual({ companyName: '0001' });
+  expect(owner.mock.calls.every(([, init]) => new Headers(init?.headers).get('authorization') === 'Bearer valid-token')).toBe(true);
+  expect((await consistencyPreview(new Request(url), env, owner as unknown as typeof fetch)).status).toBe(401);
+  const other = answers('other', 'Elsewhere');
+  expect((await consistencyPreview(new Request(url, { headers }), env, other as unknown as typeof fetch)).status).toBe(403);
+  expect(other.mock.calls.some(([, init]) => JSON.parse(String(init?.body)).path === 'users:profile')).toBe(false);
+  expect((await consistencyPreview(new Request(url, { method: 'POST', headers }), env, owner as unknown as typeof fetch)).status).toBe(405);
+});
