@@ -139,9 +139,9 @@ export function catalogueApp(app: AdoptionApp): AdoptionApp {
 export const totalSites = (cell: ComponentCell): number => cell.shared + cell.styled + cell.local + cell.unverified;
 
 /** Canonical identity, independent of an older usage report's publication date. */
-export function componentIdentity(column: ComponentColumn): string {
+export function componentIdentity(column: ComponentColumn, includeName = true): string {
   const entry = componentCodes.find(entry => ('columnId' in entry && entry.columnId === column.id) || entry.label.toLowerCase() === column.name.toLowerCase());
-  return entry ? `${entry.code} ${column.name} ${entry.version}` : column.name;
+  return entry ? [entry.code, ...(includeName ? [column.name] : []), entry.version].join(" ") : column.name;
 }
 
-export const appIdentity = (app: AdoptionApp): string => [app.code, app.name, app.version].filter(Boolean).join(" ");
+export const appIdentity = (app: AdoptionApp, includeName = true): string => [app.code, ...(includeName ? [app.name] : []), app.version].filter(Boolean).join(" ") || app.name;

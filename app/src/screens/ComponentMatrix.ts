@@ -103,12 +103,12 @@ export class ComponentMatrix extends AppElement {
           <colgroup><col style="width: calc(8 * var(--report-unit))" />${columns.map(() => html`<col style="width: var(--report-unit)" />`)}<col style="width: calc(4 * var(--report-unit))" /></colgroup>
           <thead>
             <tr class="adoption-groups"><th class="adoption-app-column"></th>${groups.map(group => { const span = columns.filter(c => c.group === group).length; return html`<th colspan=${span} style=${`width: calc(${span} * var(--report-unit))`} class=${`group-${group.toLowerCase()}`} scope="colgroup">${group}</th>`; })}<th></th></tr>
-            <tr class="adoption-column-names"><th class="adoption-app-column" scope="col">App</th>${columns.map(column => html`<th scope="col" class=${`group-${column.group.toLowerCase()}`}><span data-tooltip=${componentIdentity(column)}>${column.name}</span></th>`)}<th class="adoption-total" scope="col" data-numeric>Total</th></tr>
+            <tr class="adoption-column-names"><th class="adoption-app-column" scope="col">App</th>${columns.map(column => html`<th scope="col" class=${`group-${column.group.toLowerCase()}`}><span class="adoption-identity" tabindex="0" aria-label=${componentIdentity(column)}><span class="adoption-name" aria-hidden="true">${column.name}</span><span class="adoption-code-version" aria-hidden="true">${componentIdentity(column, false)}</span></span></th>`)}<th class="adoption-total" scope="col" data-numeric>Total</th></tr>
           </thead>
           <tbody>${appGroups.map(appGroup => html`
             <tr class="adoption-app-group"><th colspan=${columns.length + 2} scope="rowgroup">${appGroup}</th></tr>
             ${repeat(report.apps.filter(app => (app.group ?? "Products") === appGroup), app => app.id, app => html`<tr>
-              <th class="adoption-app-column" scope="row" data-tooltip=${appIdentity(app)}>${app.name}${app.migration === "deferred" ? html`<span class="adoption-deferred"> · Deferred</span>` : nothing}</th>
+              <th class="adoption-app-column" scope="row"><span class="adoption-identity" tabindex="0" aria-label=${appIdentity(app)}><span class="adoption-name" aria-hidden="true">${app.name}</span><span class="adoption-code-version" aria-hidden="true">${appIdentity(app, false)}</span></span>${app.migration === "deferred" ? html`<span class="adoption-deferred"> · Deferred</span>` : nothing}</th>
               ${columns.map(column => {
                 const cell = app.cells[column.id];
                 if (app.status !== "scanned" || !cell) return html`<td class="unavailable" aria-label=${`${app.name}, ${column.name}: not scanned`}>?</td>`;

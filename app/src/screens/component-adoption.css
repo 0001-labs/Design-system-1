@@ -34,7 +34,7 @@
 .adoption-groups .group-page { background: var(--pink); color: var(--base-slate); }
 .adoption-column-names th { height: calc(7 * var(--report-unit)); position: relative; vertical-align: bottom; }
 .adoption-column-names th:not(.adoption-app-column):not(.adoption-total) { width: var(--report-unit); min-width: var(--report-unit); max-width: var(--report-unit); }
-.adoption-column-names span { position: absolute; z-index: 1; bottom: calc(.5 * var(--report-unit)); left: calc(.5 * var(--report-unit)); transform: rotate(-48deg); transform-origin: bottom left; white-space: nowrap; }
+.adoption-column-names th > span { position: absolute; z-index: 1; bottom: calc(.5 * var(--report-unit)); left: calc(.5 * var(--report-unit)); transform: rotate(-48deg); transform-origin: bottom left; white-space: nowrap; }
 .adoption-column-names .group-core { background: color-mix(in srgb, var(--apple-green) 16%, var(--report-paper)); }
 .adoption-column-names .group-unit { background: color-mix(in srgb, var(--zenith-blue) 16%, var(--report-paper)); }
 .adoption-column-names .group-page { background: color-mix(in srgb, var(--pink) 16%, var(--report-paper)); }
@@ -104,3 +104,10 @@
 .adoption-document .adoption-scroll > .adoption-matrix { min-width: 0; table-layout: fixed; }
 .adoption-document .adoption-column-names th { height: calc(9 * var(--report-unit)); }
 .adoption-document .adoption-matrix :is(th, td) { padding: 0; }
+
+/* Names and metadata share one footprint, so hovering never moves the matrix. */
+.adoption-identity { display: inline-grid; }
+.adoption-identity > span { grid-area: 1 / 1; }
+.adoption-code-version { visibility: hidden; }
+.adoption-identity:is(:hover, :focus-visible) > .adoption-name { visibility: hidden; }
+.adoption-identity:is(:hover, :focus-visible) > .adoption-code-version { visibility: visible; }

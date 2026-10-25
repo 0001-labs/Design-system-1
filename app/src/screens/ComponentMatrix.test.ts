@@ -36,7 +36,7 @@ it('chooses the count with the shared split button and shows unused columns with
   expect(segments()[3]!.getAttribute('aria-pressed')).toBe('true');
   expect(total()).toBe('2');
 
-  const columns = () => [...host.querySelectorAll('.adoption-column-names th span')].map(name => name.textContent);
+  const columns = () => [...host.querySelectorAll('.adoption-column-names .adoption-name')].map(name => name.textContent);
   // The whole catalogue shows by default, unused columns included; the checkbox hides them.
   expect(columns()).toEqual(['Button', 'Input']);
   const unused = host.querySelector<HTMLInputElement>('.adoption-controls ds-checkbox > input[type="checkbox"]')!;
