@@ -595,15 +595,16 @@
 .all-day .event { width: calc(var(--ds-calendar-day) - 1.5px); }
 
 
-/* A swimlane: weeks across, each half a day wide (two squares at the
- * default), so it is as wide as the month. Over them the months, one square,
- * a name where the month owning the week changes, and each week's first date,
- * one square, in the title grey (today's week writes today in its disc). Then
- * a row to an event, as high as a week is wide, in the month's hairline boxes
- * and rounded frame; an event is one bar from its first week to its last,
- * filled with its colour, its name written once and fading where it is cut. */
+/* A swimlane: weeks across, a square each (20 by 20), so the month's width
+ * holds a week to each of its squares, 28 at the default. Over them the
+ * months, one square, a name where the month owning the week changes, and
+ * each week's first date, one square, centred in the title grey (today's
+ * week writes today in its disc). Then a row to an event, a square high, in
+ * the month's hairline boxes and rounded frame; an event is one bar from its
+ * first week to its last, filled with its colour, its name on the sixteen,
+ * written once and fading where it is cut. */
 .swimlane {
-  --ds-calendar-week: calc(var(--ds-calendar-day) / 2);
+  --ds-calendar-week: var(--ds-unit);
   width: calc(var(--ds-calendar-weeks) * var(--ds-calendar-week));
 }
 [data-swipe] .swimlane { touch-action: pan-y; }
@@ -628,12 +629,14 @@
   box-sizing: border-box;
   display: flex;
   align-items: flex-end;
+  justify-content: center;
   height: var(--ds-unit);
-  padding-inline: var(--ds-calendar-pad);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
 }
 .swimlane-date .date { color: var(--ds-title-color); }
 .swimlane-date:not([data-today]) .date { min-width: 0; height: auto; }
-.swimlane-date[data-today] { align-items: center; padding-inline: calc(var(--ds-unit) * 0.05); }
+.swimlane-date[data-today] { align-items: center; }
 .swimlane-date[data-today] .date { background: var(--ds-calendar-today); color: var(--ds-calendar-today-ink); letter-spacing: 0; }
 .swimlane-grid { grid-template-rows: repeat(var(--ds-calendar-rows), var(--ds-calendar-week)); }
 .swimlane-grid .cell { position: relative; box-sizing: border-box; min-width: 0; }
@@ -654,7 +657,6 @@
 .swimlane-grid .event {
   position: relative;
   z-index: 1;
-  align-items: center;
   height: calc(var(--ds-calendar-week) - 1px);
   min-width: 0;
   padding-block: 0;

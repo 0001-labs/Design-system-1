@@ -1018,11 +1018,11 @@ export class Calendar extends CalendarBase {
     return typeof format.formatRange === "function" ? format.formatRange(at(from), at(to)) : `${format.format(at(from))} – ${format.format(at(to))}`;
   }
 
-  /** The first day of each week a swimlane draws: from the week holding the month's first, half as many weeks as the month has squares across. */
+  /** The first day of each week a swimlane draws: from the week holding the month's first, a week to each square the month has across. */
   private get swimlaneWeeks(): Day[] {
     const first = this.shownMonth;
     const start = addDays(first, -((weekdayOf(first) - this.firstDay + 7) % 7));
-    const count = Math.max(4, Math.floor((7 * this.squaresPerDay) / 2));
+    const count = Math.max(4, 7 * this.squaresPerDay);
     return Array.from({ length: count }, (_, index) => addDays(start, index * 7));
   }
 
@@ -1041,17 +1041,16 @@ export class Calendar extends CalendarBase {
   }
 
   /**
-   * The events as a swimlane: weeks across, two squares each; over them the
+   * The events as a swimlane: weeks across, a square each; over them the
    * months, named where the month owning the week changes, and each week's
    * first date (today's date in its disc on today's week); then a row to an
-   * event, two squares high, each one bar from its first week to its last.
+   * event, a square high, each one bar from its first week to its last.
    */
   private renderSwimlane() {
     const weeks = this.swimlaneWeeks;
     const bars = swimlaneBars(this.events ?? [], weeks);
-    // Fixed, the rows fill the month's height under the months and dates, and scroll past it.
-    const rowSquares = this.squaresPerDay / 2;
-    const fit = this.fixed ? Math.max(1, Math.floor((6 * (this.eventLines + 2) - 1) / rowSquares)) : 6;
+    // Fixed, the rows (a square each) fill the month's height under the months and dates, and scroll past it.
+    const fit = this.fixed ? Math.max(1, 6 * (this.eventLines + 2) - 1) : 6;
     const rows = Math.max(fit, bars.length + 1);
     const today = this.todayDay;
     const todayWeek = weeks.findIndex(start => today >= start && today <= addDays(start, 6));

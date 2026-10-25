@@ -684,10 +684,11 @@ test("the swimlane view: months in order over the weeks, today in its disc, a ba
   await calendar.updateComplete;
   const root = calendar.shadowRoot!;
   const weeks = [...root.querySelectorAll(".swimlane-date")];
-  expect(weeks).toHaveLength(14);
-  expect(root.querySelector(".title-text")!.textContent).toMatch(/Sep.*2026.*Dec.*2026|Oct.*Dec/);
+  // A week to each square of the month's width: 28 weeks, Oct 2026 to Apr 2027.
+  expect(weeks).toHaveLength(28);
+  expect(root.querySelector(".title-text")!.textContent).toMatch(/Oct.*2026.*Apr.*2027/);
   const months = [...root.querySelectorAll(".swimlane-month")].map(month => month.textContent);
-  expect(months).toEqual(["Oct 2026", "Nov", "Dec"]);
+  expect(months).toEqual(["Oct 2026", "Nov", "Dec", "Jan 2027", "Feb", "Mar", "Apr"]);
   const today = root.querySelector(".swimlane-date[data-today]")!;
   expect(today.textContent!.trim()).toBe("25");
   expect(weeks.indexOf(today)).toBe(3);
@@ -695,7 +696,7 @@ test("the swimlane view: months in order over the weeks, today in its disc, a ba
   expect(bars.map(bar => bar.textContent)).toEqual(["Platform migration", "App launch"]);
   expect(bars[0].style.gridColumn).toBe("2 / 6");
   expect(bars[1].getAttribute("aria-label")).toContain("App launch");
-  expect(root.querySelectorAll(".swimlane-grid .cell")).toHaveLength(14 * 6);
+  expect(root.querySelectorAll(".swimlane-grid .cell")).toHaveLength(28 * 6);
   const pressed = vi.fn();
   calendar.addEventListener("event-press", pressed);
   bars[1].click();
