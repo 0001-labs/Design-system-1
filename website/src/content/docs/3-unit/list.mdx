@@ -29,9 +29,31 @@ Put `ds-row` elements directly in the list. `ds-list` supplies the containing la
 
 <ComponentExample example="list-records" />
 
+<ComponentExample example="list-dated" />
+
+<ComponentExample example="list-icons" />
+
+<ComponentExample example="list-words" />
+
 A list of records (payments under their day, events under their month) is the same list with `heading`, the group's name drawn on the square above its rows in the muted ink, and rows with `href` whose parts are classes: a 16px picture before the name (an [Avatar](/2-core/avatar/) tile, `shape="square"` with `icon` and `color`, or a large [Icon](/2-core/icon/)) on the first sixteen of its square, the words in `ds-row__name` on the next square, a [Tag](/2-core/tag/) after them, and the figure or date in `ds-row__value` at the row's end. The name hugs its words and gives way first: cut, it fades over its last square (the row measures it and marks it `data-cut="end"`). The rows stack edge to edge with no lines between them; the pointer and a press fill the row's layer, two pixels around what it holds. Give the list `--ds-row-padding: 0px` where its pictures and values stand on the column's edges.
 
-The heading names the list (`aria-label`), so the drawn words are hidden from assistive technology; a page that writes its own `aria-label` keeps it. Each group is its own list, one square apart on a page.
+### Alignment
+
+Every row in these lists stands on the same measures, so a picture, a name and a value line up from row to row and list to list:
+
+| What | Where it stands |
+| --- | --- |
+| The row | One square high (20px at the base scale); rows stack edge to edge with no lines between them. |
+| The picture | A tile, an avatar, a logo or a large icon, in `ds-row__picture`: exactly 16px square on the lower sixteen of the row's first square, its start on the column's edge with `--ds-row-padding: 0px`. A button around it (a date to change) adds no width, padding or margin. |
+| The gap | The row's 4px gap, and nothing else, between the picture and the words, so the words start on the next square: 20px from the row's start. |
+| The words | `ds-row__name`, on the lower sixteen of the square, hugging their words and fading over the last square when cut. Muted words for context (a client, a place) follow in the same line. |
+| A tag | After the words, the same 4px on; a column of tags (a status) is one fixed width at the row's end, so the tags line up. |
+| The value | `ds-row__value`, at the row's end in tabular figures. |
+| The fill | Under the pointer, a press, the current row and focus: from 2px above the sixteen to 2px below the row's foot, and 2px past the first and last thing the row holds at each side, with 6px corners that hug the tiles. With no picture it reaches 2px past the words. |
+
+A picture that opens something of its own (a date tile that changes the date) stands over the row's press layer, so pressing the tile opens it and pressing the words opens the row. A plain tile lets the press through to the row.
+
+, so the drawn words are hidden from assistive technology; a page that writes its own `aria-label` keeps it. Each group is its own list, one square apart on a page.
 
 ```html
 <ds-list heading="Monday" style="--ds-row-padding: 0px">

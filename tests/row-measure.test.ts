@@ -324,3 +324,28 @@ for (const scheme of SCHEMES) for (const sf of SCALES) {
     expect(await page.locator("ds-row").evaluate(el => getComputedStyle(el.shadowRoot!.querySelector(".target")!, "::after").backgroundColor)).toBe("rgba(0, 0, 0, 0)");
   });
 }
+
+test("a record's picture is sixteen square at the start of its square and the words start on the next, even inside a button", async () => {
+  const picture = (id: string, element: boolean) => {
+    const tile = `<span class="ds-row__picture" id="${id}-picture"><ds-button control="slotted" fit icon><button type="button"><ds-avatar shape="square" initial="19" label="19 October"></ds-avatar></button></ds-button></span>`;
+    const name = `<span class="ds-row__name" id="${id}-name">Platform migration</span>`;
+    return element
+      ? `<ds-row id="${id}" href="#record" style="--ds-row-padding: 0px">${tile}${name}</ds-row>`
+      : `<div id="${id}" class="ds-row" style="--ds-row-padding: 0px">${tile}${name}</div>`;
+  };
+  for (const sf of SCALES) {
+    const page = pages.light;
+    await stage(page, picture("element", true) + picture("native", false), sf);
+    const square = UNIT * sf;
+    for (const id of ["element", "native"]) {
+      const row = await box(page, `#${id}`);
+      const tile = await box(page, `#${id}-picture`);
+      const words = await box(page, `#${id}-name`);
+      expect(tile.width, `${id} picture width at ${sf}`).toBeCloseTo(16 * sf, 2);
+      expect(tile.height, `${id} picture height at ${sf}`).toBeCloseTo(16 * sf, 2);
+      expect(tile.left - row.left, `${id} picture start at ${sf}`).toBeCloseTo(0, 2);
+      expect(row.top + row.height - (tile.top + tile.height), `${id} picture on the foot at ${sf}`).toBeCloseTo(0, 2);
+      expect(words.left - row.left, `${id} words on the next square at ${sf}`).toBeCloseTo(square, 2);
+    }
+  }
+});
