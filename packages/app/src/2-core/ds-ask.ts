@@ -158,7 +158,7 @@ export class Ask extends LitElement {
 
   protected updated(changed: PropertyValues) {
     super.updated(changed);
-    if (changed.has("rows") || changed.has("state")) this.markCuts();
+    if (changed.has("rows") || changed.has("state") || changed.has("text") || changed.has("completion")) this.markCuts();
     if (changed.has("chosen") || changed.has("rows")) this.reveal();
   }
 
@@ -166,6 +166,8 @@ export class Ask extends LitElement {
   private markCuts() {
     for (const words of this.renderRoot.querySelectorAll<HTMLElement>(".prose, .lines"))
       words.toggleAttribute("data-cut", words.scrollHeight > words.clientHeight + 1);
+    const line = this.renderRoot.querySelector<HTMLElement>(".line");
+    line?.toggleAttribute("data-cut", line.scrollWidth > line.clientWidth + 1);
   }
 
   /** The chosen card stands whole in the strip. */

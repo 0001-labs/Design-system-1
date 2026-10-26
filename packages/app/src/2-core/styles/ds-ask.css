@@ -175,6 +175,9 @@
   font-weight: var(--ds-type-weight-bold, 500);
 }
 .lines { height: 100%; overflow: hidden; }
+.line[data-cut] {
+  mask-image: linear-gradient(to right, #000 calc(100% - 2 * var(--ds-unit)), transparent);
+}
 .prose[data-cut], .lines[data-cut] {
   mask-image: linear-gradient(to bottom, #000 calc(100% - var(--ds-unit)), transparent);
 }
@@ -252,19 +255,20 @@
   text-underline-offset: calc(3px * var(--sf, 1));
 }
 
-/* The words, at the display size, under the cards and on the page's column. */
-.line, .answer {
-  margin-inline-start: var(--ds-ask-start);
-  max-width: min(var(--ds-ask-width, calc(32 * var(--ds-unit))), calc(100% - var(--ds-ask-start) - var(--ds-unit)));
-}
+/* The words, at the display size, under the cards and on the page's column:
+   always one line, running on towards the window's end, and fading over its
+   last squares only if even that is too short. */
+.line, .answer { margin-inline-start: var(--ds-ask-start); }
+.answer { max-width: min(var(--ds-ask-width, calc(32 * var(--ds-unit))), calc(100% - var(--ds-ask-start) - var(--ds-unit))); }
 .line {
-  min-height: calc(2 * var(--ds-unit));
+  max-width: calc(100% - var(--ds-ask-start) - var(--ds-unit));
+  height: calc(2 * var(--ds-unit));
+  overflow: hidden;
   font-size: var(--ds-type-size-display);
   font-weight: var(--ds-type-weight-default, 400);
   line-height: calc(2 * var(--ds-unit));
   letter-spacing: calc(var(--ds-display-text-tracking, -0.4px) * var(--sf, 1));
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
+  white-space: pre;
   animation: ds-ask-rise 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
