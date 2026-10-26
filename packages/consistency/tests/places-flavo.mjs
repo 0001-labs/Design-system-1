@@ -1,8 +1,9 @@
 // Flavo's own places in Consistency's app (Flavo's `places` export, taken into `src/sites/flavo/`): the menus under
 // Flavo's name, Produkter's list and filters, a product edited and saved in its drawer, published at once and put back
 // when refused, a failed save that keeps what was typed, closing with unsaved changes asked in place, Udlejning as the
-// rental products alone, Flavo team's members and a role saved, Kunder with Link, and Designretning's choice saved and
-// put back when refused. Every gateway answer is a stand-in: `api/business` the business store, `api/design` Flavo's.
+// rental products alone, Flavo team's members and a role saved, Kunder with Link, and Flavo's content and project pages
+// under the shared Pages (the `flavo` page source), edited and saved there; no Projekter, Indhold or Designretning.
+// Every gateway answer is a stand-in: `api/business` the business store, `api/pages` the site engine's pages.
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -31,11 +32,9 @@ let members = [
   { _id: 'm1', name: 'Ida Hansen', company: 'Flavo', phone: '+45 1', cvr: '', roles: ['editor'] },
   { _id: 'm2', name: 'Ole Berg', company: 'Studio Nord', phone: '', cvr: '12345678', roles: [] },
 ];
-let design = 'gallery';
-const designs = [
-  { id: 'gallery', name: 'Gallery', description: 'Hvidt lærred.', image: '/media/concepts/vase-blue.png', color: '#ffffff' },
-  { id: 'studio', name: 'Flower studio', description: 'Flavos gule farve.', image: '/media/site/a.webp', color: '#f2d81c' },
-  { id: 'portfolio', name: 'Portfolio', description: 'Store fotografier.', image: '/media/site/b.webp', color: '#eeeeee' },
+let contentPages = [
+  { _id: 'c2', path: '/projekter/hotel', title: 'Hotel', text: '', images: ['/media/site/hotel.webp'], published: false, updatedAt: 1 },
+  { _id: 'c1', path: '/om', title: 'Om Flavo', text: 'Hej', images: [], published: true, updatedAt: 1 },
 ];
 const calls = [];
 const fail = new Set();
@@ -50,24 +49,21 @@ try {
   // The owner's one workspace, which holds the site (the app shows a workspace's sites only).
   await page.route('**/api/consistency/workspaces', route => route.fulfill({ json: { owner: true, workspaces: [{ code: '01STDO', name: '0001', plan: 'free', role: 'owner', sites: 1, siteCodes: ['92KTNN'], limits: { sites: 10, customDomains: true } }] } }));
   await page.route('**/api/consistency/sites', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ sites: [{ code: '92KTNN', name: 'Flavo', url: 'https://flavo.c9y.site/' }] }) }));
-  await page.route('**/api/consistency/sites/*/pages', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ pages: [] }) }));
   await page.route('**/api/consistency/sites/*/places', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ places: [
-    { id: 'pages', label: 'Pages' }, { id: 'orders', label: 'Orders' }, { id: 'products', label: 'Produkter' }, { id: 'rentals', label: 'Udlejning' }, { id: 'clients', label: 'Kunder' },
-    { id: 'projects', label: 'Projekter' }, { id: 'content', label: 'Indhold' }, { id: 'media', label: 'Medier' }, { id: 'team', label: 'Flavo team' }, { id: 'profile', label: 'Profil' }, { id: 'layout', label: 'Designretning' },
+    // As the platform gives them: Flavo's pages come under Pages from the `flavo` source; Flavo team and Profil are kept
+    // here to test their elements, which Flavo still exports.
+    { id: 'pages', label: 'Pages', sources: ['flavo'] }, { id: 'orders', label: 'Orders' }, { id: 'products', label: 'Produkter' }, { id: 'rentals', label: 'Udlejning' }, { id: 'clients', label: 'Kunder' },
+    { id: 'media', label: 'Medier' }, { id: 'team', label: 'Flavo team' }, { id: 'profile', label: 'Profil' },
   ] }) }));
   await page.route('**/api/consistency/sites/92KTNN/api/**', async route => {
     const request = route.request();
     const path = new URL(request.url()).pathname.split('/api/').pop();
     const body = request.postData() ? JSON.parse(request.postData()) : null;
     const json = (value, status = 200) => route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(value) });
-    if (path === 'design') {
-      calls.push({ method: request.method(), path, body });
-      if (request.method() === 'PUT') {
-        if (fail.has('design')) { fail.delete('design'); return json({ error: 'owner-required' }, 403); }
-        design = body.design;
-      }
-      return json({ design, designs });
-    }
+    // The site engine's pages: Flavo's homepage alone, Gallery.
+    if (path === 'pages') return json({ site: 'Flavo', pages: [{ path: '/shop', lang: 'da', title: 'Blomster i København', fields: 7, edited: 0 }], images: [] });
+    if (path.startsWith('page')) return json({ path: '/shop', lang: 'da', title: 'Blomster i København', fields: [] });
+    if (path === 'detached') return json({ edits: [] });
     if (path !== 'business' || request.method() !== 'POST') return json({ error: 'unknown' }, 404);
     const { operation, args } = body;
     calls.push({ operation, args });
@@ -84,7 +80,8 @@ try {
           products = args.id ? products.map(each => each._id === id ? { ...each, ...args.data } : each) : [{ ...args.data, _id: id }, ...products];
           return id;
         }
-        case 'catalogue:pages': return [{ _id: 'c1', path: '/om', title: 'Om Flavo', text: 'Hej', images: [], published: true, updatedAt: 1 }, { _id: 'c2', path: '/projekter/hotel', title: 'Hotel', text: '', images: [], published: false, updatedAt: 1 }];
+        case 'catalogue:pages': return contentPages;
+        case 'catalogue:savePage': contentPages = contentPages.map(each => each._id === args.id ? { ...each, ...args.data } : each); return null;
         case 'accounts:members': return members;
         case 'accounts:me': return { email: 'jaa90@icloud.com', roles: ['admin', 'editor'], profile: null, flags: { 'flavo-profile-flags': true } };
         case 'accounts:setRoles': members = members.map(each => each._id === args.id ? { ...each, roles: args.roles } : each); return null;
@@ -97,9 +94,10 @@ try {
 
   await page.goto(`http://127.0.0.1:${server.address().port}/private-consistency/home.html?open=92KTNN`);
   const sidebar = page.locator('consistency-home ds-sidebar.home-places');
-  for (const menu of ['Produkter', 'Udlejning', 'Kunder', 'Projekter', 'Indhold', 'Medier', 'Flavo team', 'Profil', 'Designretning', 'Orders'])
+  for (const menu of ['Pages', 'Produkter', 'Udlejning', 'Kunder', 'Medier', 'Flavo team', 'Profil', 'Orders'])
     await sidebar.getByText(menu, { exact: true }).waitFor();
   if (await sidebar.getByText('Forespørgsler', { exact: true }).count()) throw Error('Requests have a menu of their own beside Orders');
+  for (const gone of ['Projekter', 'Indhold', 'Designretning']) if (await sidebar.getByText(gone, { exact: true }).count()) throw Error(`${gone} is still a menu`);
 
   // Produkter: the catalogue, newest first as the store gives it, filtered; the Notion line; no reload button.
   await sidebar.getByText('Produkter', { exact: true }).click();
@@ -191,28 +189,42 @@ try {
   await clients.getByRole('button', { name: 'Ny kunde' }).waitFor();
   await shot('clients');
 
-  // Designretning: the choice saved; a refusal keeps the design the site uses.
-  await sidebar.getByText('Designretning', { exact: true }).click();
-  const layout = page.locator('flavo-place-design:not([hidden])');
-  await layout.locator('button[data-design="studio"]').click();
-  if (!(await layout.locator('iframe').getAttribute('src')).endsWith('/design-preview/studio?ph=out')) throw Error('The preview does not follow the choice');
-  await shot('layout');
-  await layout.getByRole('button', { name: 'Brug design' }).click();
-  await page.getByText('Flower studio bruges nu på hjemmesiden.').waitFor();
-  if (design !== 'studio') throw Error('The design was not saved');
-  fail.add('design');
-  await layout.locator('button[data-design="portfolio"]').click();
-  await layout.getByRole('button', { name: 'Brug design' }).click();
-  await layout.getByText('Log ind med System igen for at fortsætte.').waitFor();
-  if (design !== 'studio' || !(await layout.locator('button[data-design="studio"]').innerText()).includes('Bruges nu')) throw Error('A refused design choice was not kept as it was');
+  // Pages: the homepage, then Flavo's content and project pages, each with its address; a page edited in the middle,
+  // saved, a failed save kept, words typed kept while another page is chosen.
+  await sidebar.getByText('Pages', { exact: true }).click();
+  const pages = page.locator('consistency-place-pages:not([hidden])');
+  const rows = pages.locator('.place-pages-list > ds-row');
+  await pages.locator('ds-row[data-source="flavo"][data-path="/projekter/hotel"]').waitFor();
+  if ((await rows.evaluateAll(each => each.map(row => row.dataset.path))).join() !== '/shop,/om,/projekter/hotel') throw Error('Pages does not list the homepage, then the content and project pages');
+  if (!(await pages.locator('ds-row[data-path="/projekter/hotel"]').innerText()).includes('Skjult')) throw Error('A hidden page is not marked');
+  await pages.locator('ds-row[data-path="/om"]').click();
+  const editor = pages.locator('.place-pages-page flavo-page-editor');
+  await editor.locator('a.ds-link', { hasText: '/om' }).waitFor();
+  if (await editor.locator('a.ds-link').getAttribute('href') !== 'https://flavo.c9y.site/om') throw Error('The page\'s address is not on the site');
+  await editor.locator('ds-input[aria-label="Titel"] input').fill('Om Flavo og os');
+  await pages.locator('ds-row[data-path="/projekter/hotel"]').click();
+  await pages.locator('.place-pages-page flavo-page-editor img').waitFor();
+  await pages.locator('ds-row[data-path="/om"]').click();
+  if (await editor.locator('ds-input[aria-label="Titel"]').evaluate(input => input.value) !== 'Om Flavo og os') throw Error('Words typed were lost when another page was chosen');
+  await shot('pages');
+  fail.add('catalogue:savePage');
+  await editor.getByRole('button', { name: 'Gem side' }).click();
+  await editor.getByText('Adressen eller placeringen findes allerede.').waitFor();
+  if (await editor.locator('ds-input[aria-label="Titel"]').evaluate(input => input.value) !== 'Om Flavo og os') throw Error('A failed save did not keep what was typed');
+  const listed = calls.filter(call => call.operation === 'catalogue:pages').length;
+  await editor.getByRole('button', { name: 'Gem side' }).click();
+  await page.getByText('Siden er gemt.').waitFor();
+  const savedPage = calls.findLast(call => call.operation === 'catalogue:savePage');
+  if (savedPage?.args.id !== 'c1' || savedPage.args.data.title !== 'Om Flavo og os' || savedPage.args.data.path !== '/om') throw Error('The page was not saved as typed: ' + JSON.stringify(savedPage));
+  await pages.locator('ds-row[data-path="/om"]', { hasText: 'Om Flavo og os' }).waitFor();
+  if (calls.filter(call => call.operation === 'catalogue:pages').length <= listed) throw Error('A save did not read the pages again');
+  await pages.locator('ds-row[data-path="/shop"]').click();
+  await pages.locator('.place-details').waitFor();
 
-  // Indhold and Profil draw from the store too.
-  await sidebar.getByText('Indhold', { exact: true }).click();
-  await page.locator('flavo-place-pages:not([hidden]) ds-row[data-page="/om"]').waitFor();
   await sidebar.getByText('Profil', { exact: true }).click();
   await page.locator('flavo-place-profile:not([hidden]) ds-input[aria-label="E-mail"]').waitFor();
 
   for (const width of [390, 1440]) { await page.setViewportSize({ width, height: 900 }); await page.waitForTimeout(100); if (await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)) throw Error(`The place overflows at ${width}`); }
   if (errors.length) throw Error('The page threw: ' + errors.join('; '));
-  console.log('Flavo\'s places (the menus, Produkter listed, filtered, edited, saved, published and put back, a failed save kept, unsaved changes asked about, Udlejning, Flavo team\'s roles, Kunder with Link, Designretning saved and kept when refused, Indhold, Profil) passed');
+  console.log('Flavo\'s places (the menus, Produkter listed, filtered, edited, saved, published and put back, a failed save kept, unsaved changes asked about, Udlejning, Flavo team\'s roles, Kunder with Link, Flavo\'s content and project pages under Pages edited and saved, Profil) passed');
 } finally { await browser.close(); await new Promise(done => server.close(done)); }

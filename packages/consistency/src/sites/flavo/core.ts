@@ -3,18 +3,15 @@
  * and run the same in Flavo and in the app, where Sync 1 copies this folder (`places` in `sync.exports.mjs`).
  *
  * A place reaches Flavo only through what the app hands it (`FlavoPlaceContext`): `transport(operation, args)` for
- * Flavo's business store (`/team/api/business` as the owner, through the platform), `route(path, init)` for the site's
- * own routes (`design`), the site's origin for its pictures and pages, and `say` for the app's toast.
+ * Flavo's business store (`/team/api/business` as the owner, through the platform), the site's origin for its pictures
+ * and pages, and `say` for the app's toast.
  */
 
 /** One of Flavo's business operations, answered with its `value`; a refusal throws with Flavo's own words. */
 export type Transport = (operation: string, args?: Record<string, unknown>) => Promise<unknown>;
-/** One of the site's own routes under `/team/api/`, as JSON. */
-export type SiteRoute = <T>(route: string, init?: RequestInit & { json?: unknown }) => Promise<T>;
 
 export interface FlavoPlaceContext {
   transport: Transport;
-  route: SiteRoute;
   /** The site's address, `https://flavo.c9y.site`: its pictures and pages are read there. */
   origin: string;
   /** The app's toast, for what was done; an error stays until it is closed. */
@@ -249,11 +246,16 @@ export const linkCustomersOf = (customers: readonly LinkCustomer[], search: stri
   return customers.filter(customer => `${customer.name} ${customer.projects.map(project => project.name).join(" ")}`.toLowerCase().includes(needle));
 };
 
-/** Content pages, or the projects among them (under `/projekter/`), searched by title and address. */
-export function pagesOf(pages: readonly ContentPage[], projects: boolean, search = ""): ContentPage[] {
-  const needle = search.trim().toLowerCase();
-  return pages.filter(page => page.path.startsWith("/projekter/") === projects && `${page.title} ${page.path}`.toLowerCase().includes(needle));
+/** Flavo's pages in the order Pages lists them: the content pages, then the projects (under `/projekter/`), each by address. */
+export function sortedPages(pages: readonly ContentPage[]): ContentPage[] {
+  const project = (page: ContentPage) => (page.path.startsWith("/projekter/") ? 1 : 0);
+  return [...pages].filter(page => typeof page.path === "string" && page.path.startsWith("/")).sort((a, b) => project(a) - project(b) || a.path.localeCompare(b.path, "da"));
 }
+
+/** One of Flavo's pages as a row of the app's Pages: its address on the site, its title, and a word when it is hidden. */
+export interface FlavoPageRow { path: string; title: string; tag?: string }
+export const pageRowsOf = (pages: readonly ContentPage[]): FlavoPageRow[] =>
+  pages.map(page => ({ path: page.path, title: page.title || page.path, ...(page.published ? {} : { tag: "Skjult" }) }));
 
 /** The fields `catalogue:savePage` takes. */
 export const pageFields = (page: ContentPage) => ({ path: page.path, title: page.title, text: page.text, images: page.images, imageFiles: page.imageFiles, published: page.published, updatedAt: page.updatedAt });
@@ -262,12 +264,6 @@ export const pageFields = (page: ContentPage) => ({ path: page.path, title: page
 export function mediaOf(products: readonly Product[], search = "") {
   const needle = search.trim().toLowerCase();
   return products.flatMap(product => product.images.map((url, index) => ({ product, url, key: `${product.sourceId}-${index}` }))).filter(image => image.product.title.toLowerCase().includes(needle));
-}
-
-/** One of Flavo's homepage designs, as `design` answers them. */
-export interface Design { id: string; name: string; description: string; image: string; color: string }
-export function designWords(selected: string, active: string | null): string {
-  return selected === active ? "Dette design bruges på hjemmesiden." : "Forhåndsvisning. Hjemmesiden ændres først, når du vælger Brug design.";
 }
 
 /** Whether two values differ as the store would keep them. */

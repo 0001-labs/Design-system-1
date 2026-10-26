@@ -96,19 +96,18 @@
     }
   },
   "Flavo website": {
-    "commit": "68d6b41d6cec5c8749f27f250ce39b057d9cfd88",
+    "commit": "c8e106f6b569888ccb2d9aad1612fe8f1b45279a",
     "version": "0.5.1",
     "owned": ["packages/consistency/src/sites/flavo"],
     "files": {
       "packages/consistency/src/sites/flavo/README.md": "5329adcd56576dea8e3e13b708f5d2a55b0c513bd45d9ac333d318a72cdae4f8",
-      "packages/consistency/src/sites/flavo/core.ts": "0dd9d26388296023e1d61f97047b20cfd0d25dbbe5fac21ee5554179fa36e910",
-      "packages/consistency/src/sites/flavo/design.ts": "ecf63f59653d9e5aa6bb490c9bd98053d795f00f97f71b5ccec32fed41202db9",
-      "packages/consistency/src/sites/flavo/index.ts": "9c80aaf5ccd5e0b85b776e84b9be62ffb8fc0fbaa7d0e46d20b1d7d347086777",
+      "packages/consistency/src/sites/flavo/core.ts": "b67a0938058f85629d5b58b864383136ae5bbcaa6556bd43e63cc43e60986156",
+      "packages/consistency/src/sites/flavo/index.ts": "9dc22353d7c8ebd6496eaad23b766bf2facbab177c47742a12814aed9613c621",
       "packages/consistency/src/sites/flavo/keep.ts": "7fa8630dd2b63e5801eb0906fa95ea5fce944d20c8c67a2e18af7fba09356e5d",
       "packages/consistency/src/sites/flavo/media.ts": "da850f2bef2150449d56f557bfa4ef78ca4c16ef880fe311beeb035bb4266e33",
       "packages/consistency/src/sites/flavo/members.ts": "f97f778992bf856ca2f86800d15423ff06df7332b13d5714728bebaecf04a4a7",
-      "packages/consistency/src/sites/flavo/pages.ts": "da3c847ca9b5dffaa55ff98a542c7e3b2efd9b17394de468abf6d8cdb0a35645",
-      "packages/consistency/src/sites/flavo/places.css": "313e237f550ce436aca9702d0448014e3c740a05460783da18dd6487833cef4d",
+      "packages/consistency/src/sites/flavo/pages.ts": "e69d5572fea8742d7f243354b20caf5bd2d9cfc1d498189be6112ee036edb799",
+      "packages/consistency/src/sites/flavo/places.css": "c0917313d7d9031c9016888d3473c17f1d2aa069520c08be2d87bf82670a7668",
       "packages/consistency/src/sites/flavo/products.ts": "f1a47676eca1936fa0bb8226d6d27c53e98dcdbec0374dd47b6e1d5955860ce1",
       "packages/consistency/src/sites/flavo/profile.ts": "d2c25ec5fb2ad4f81cfb1fb034f5963925be7e48b798e054ec484fabde4d4d73"
     }
