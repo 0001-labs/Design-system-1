@@ -55,3 +55,5 @@ consistency-members{display:block;max-width:calc(32 * var(--ds-unit))}
 .home-site-people:focus-visible{outline:2px solid var(--ds-focus-color, currentColor);outline-offset:2px}
 /* The people panel's list fills the drawer's column. */
 .home-people consistency-members{max-width:none}
+/* Settings at the sidebar's foot, its row on whole squares as the site's menus are, its words on the column's edge. */
+.home-foot{flex:none;margin-top:auto;margin-bottom:calc(var(--ds-unit) / -2);margin-inline-start:calc(-4px * var(--ds-sf, 1))}

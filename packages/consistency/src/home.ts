@@ -326,16 +326,17 @@ export class ConsistencyHome extends LitElement {
           <ds-button id="home-workspace" class="home-workspace-name" label=${`Workspace: ${name}`} @click=${() => this.go({ page: 'sites' })}>
             <ds-avatar initial=${workspaceInitial(name)} outlined plain aria-hidden="true"></ds-avatar>${name}<ds-icon type="chevron-down"></ds-icon>
           </ds-button>
-          <ds-select for="home-workspace" hover aria-label="Workspace">
+          ${others.length ? html`<ds-select for="home-workspace" hover aria-label="Workspace">
             ${others.map(each => html`<ds-button menu-item data-workspace=${each.code} @click=${() => { this.choose(each.code); this.go({ page: 'sites' }); }}>${each.name}</ds-button>`)}
-            ${others.length ? html`<hr>` : ''}
-            <ds-button menu-item @click=${() => this.go({ page: 'settings', tab: 'domains' })}>Settings</ds-button>
-          </ds-select>
+          </ds-select>` : ''}
           <ds-button id="home-notifications" icon label="Notifications"><ds-icon type="notifications"></ds-icon></ds-button>
           <ds-select for="home-notifications" aria-label="Notifications" role="dialog">
             <ds-text data-ds-menu-label tone="muted" literal text="No notifications yet"></ds-text>
           </ds-select>
         </div>
+        <!-- The workspace's own Settings at the sidebar's foot: each workspace has its people, domains and account. -->
+        <ds-sidebar class="home-foot" label="Workspace" .items=${[{ id: 'settings', label: 'Settings', current: settings }]}
+          @sidebar-activate=${() => this.go({ page: 'settings', tab: 'domains' })}></ds-sidebar>
       </nav>`}
       <div class=${open ? 'home-main home-main--site' : 'home-main'}>
         ${open ? '' : html`<ds-text class="home-title" role="heading" aria-level="1" literal size="display" text=${settings ? 'Settings' : 'Sites'}></ds-text>`}

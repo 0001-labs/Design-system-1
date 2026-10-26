@@ -79,16 +79,16 @@ try {
  if(await page.locator('consistency-home .home-title').count())throw Error('An open site still shows the page title');
  await allSites();
  if(await page.locator('consistency-home ds-sidebar').getByText('Sites',{exact:true}).count())throw Error('Sites is still in the sidebar');
- if(await page.locator('consistency-home ds-sidebar').count())throw Error('The sidebar still has rows of places');
+ if(await page.locator('consistency-home ds-sidebar.home-places').count())throw Error('The sidebar still has rows of places');
  for(const width of [300,390,768,1440]){await page.setViewportSize({width,height:800});await page.waitForTimeout(100);if(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth))throw Error(`Home overflows at ${width}`);}
  await page.setViewportSize({width:1440,height:800});
- await page.locator('#home-workspace').hover();const menu=page.locator('consistency-home ds-select[aria-label="Workspace"]');if((await menu.locator('ds-button[menu-item]').allInnerTexts()).map(t=>t.trim()).join()!=='Raft & Co,Settings'||await menu.locator('ds-avatar').count())throw Error('The workspace menu is not the other workspaces and Settings');
+ await page.locator('#home-workspace').hover();const menu=page.locator('consistency-home ds-select[aria-label="Workspace"]');if((await menu.locator('ds-button[menu-item]').allInnerTexts()).map(t=>t.trim()).join()!=='Raft & Co'||await menu.locator('ds-avatar').count())throw Error('The workspace menu is not the other workspaces');
  // Switching shows the other workspace's sites alone, and back again.
  await menu.locator('ds-button[menu-item]',{hasText:'Raft & Co'}).click();await page.getByRole('button',{name:'Workspace: Raft & Co'}).waitFor();await page.locator('consistency-home ds-card[data-site="40RAFT"]').waitFor();same();
  if(await page.locator('consistency-home ds-card').count()!==1)throw Error('Another workspace\'s sites show beside Raft & Co\'s');
  if(await page.evaluate(()=>localStorage.getItem('consistency-active-workspace'))!=='02RAFT')throw Error('The workspace chosen is not kept');
  await page.mouse.move(700,500);await page.locator('#home-workspace').hover();await menu.locator('ds-button[menu-item]',{hasText:'0001'}).click();await page.getByRole('button',{name:'Workspace: 0001'}).waitFor();await page.locator('consistency-home ds-card[data-site="10VNDG"]').waitFor();
- await page.mouse.move(700,500);await page.locator('#home-workspace').hover();await page.locator('consistency-home ds-select[aria-label="Workspace"] ds-button[menu-item]',{hasText:'Settings'}).click();await page.locator('consistency-home consistency-domains').waitFor();same();await page.locator('#home-workspace').click();await page.locator('consistency-home ds-card').first().waitFor();if(await page.locator('consistency-home .home-title[text="Sites"]').count()!==1)throw Error('Pressing the workspace does not show Sites');await page.mouse.move(700,500);await page.locator('#home-workspace').hover();await page.locator('consistency-home ds-select[aria-label="Workspace"] ds-button[menu-item]',{hasText:'Settings'}).click();await page.locator('consistency-home consistency-domains').waitFor();same();
+ await page.mouse.move(700,500);await page.locator('consistency-home ds-sidebar.home-foot').getByText('Settings',{exact:true}).click();await page.locator('consistency-home consistency-domains').waitFor();same();await page.locator('#home-workspace').click();await page.locator('consistency-home ds-card').first().waitFor();if(await page.locator('consistency-home .home-title[text="Sites"]').count()!==1)throw Error('Pressing the workspace does not show Sites');await page.mouse.move(700,500);await page.locator('consistency-home ds-sidebar.home-foot').getByText('Settings',{exact:true}).click();await page.locator('consistency-home consistency-domains').waitFor();same();
  await page.locator('consistency-home consistency-domains').waitFor();
  if(await page.locator('consistency-home .home-title[text="Settings"]').count()!==1)throw Error('The page is not titled Settings');
  const tabs=await page.locator('consistency-home ds-tabs[aria-label="Settings"] [role="tab"]').evaluateAll(tabs=>tabs.map(tab=>tab.textContent.trim()+':'+tab.getAttribute('aria-selected')));
@@ -109,7 +109,7 @@ try {
  await page.waitForTimeout(200);
  for(const words of ['Forside','Om os','English'])if(await page.locator('consistency-home nav.home-nav').getByText(words,{exact:true}).count())throw Error('The sidebar still lists the site\'s pages: '+words);
  // No place the app has no element for is shown: with neither of the site's two registered, there is no list at all.
- if(await page.locator('consistency-home ds-sidebar').count())throw Error('Places the app cannot show are listed');
+ if(await page.locator('consistency-home ds-sidebar.home-places').count())throw Error('Places the app cannot show are listed');
  // A place the app has an element for is listed under the name, in the site's words; one it has not is left out.
  await page.evaluate(()=>{const home=document.querySelector('consistency-home');home.constructor.places.set('lab',site=>Object.assign(document.createElement('div'),{className:'test-place',textContent:'Lab of '+site.name}));home.requestUpdate();});
  const places=page.locator('consistency-home ds-sidebar.home-places');await places.getByText('Lab',{exact:true}).waitFor();
@@ -130,7 +130,7 @@ try {
  await page.locator('#home-site').hover();const sitesMenu=page.locator('consistency-home ds-select[aria-label="Sites"]');
  if((await sitesMenu.locator('ds-button[menu-item]').allInnerTexts()).map(t=>t.trim()).join()!=='Flavo,CPH Raft,All sites')throw Error('The site menu is not the other sites and All sites');
  await sitesMenu.locator('ds-button[menu-item]',{hasText:'CPH Raft'}).click();await page.getByRole('button',{name:'Site: CPH Raft'}).waitFor();same();
- if(await page.locator('consistency-home ds-sidebar').count())throw Error('A site without places lists some');
+ if(await page.locator('consistency-home ds-sidebar.home-places').count())throw Error('A site without places lists some');
  await page.mouse.move(700,500);await allSites();
  if(await page.locator('consistency-home .home-title[text="Sites"]').count()!==1)throw Error('All sites does not show Sites');
  // The workspace is renamed where it is shown, in Account.
