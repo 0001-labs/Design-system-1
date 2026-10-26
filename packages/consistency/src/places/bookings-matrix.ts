@@ -8,7 +8,7 @@
  * draft changed against what was saved; and prices written and read as
  * whole kroner ("149 / 249").
  */
-import { WEEKDAYS, wordsIn, type OfferKind, type OfferOverride, type ResolvedOffer, type Season, type Weekday, type Words } from "./bookings-shared";
+import { WEEKDAYS, wordsIn, type OfferKind, type OfferOverride, type ResolvedOffer, type Season, type Weekday, type Words } from "../vendor/site-engine/bookings-shared";
 import { cleanTimes, fractionDigits, parseAmount } from "./bookings-view";
 
 // Times

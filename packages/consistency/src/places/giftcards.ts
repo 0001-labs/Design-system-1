@@ -20,7 +20,7 @@ import '../../../../DS1/2-core/ds-text';
 import '../../../../DS1/4-page/ds-overlay';
 import type { SiteSummary } from '../site-editing';
 import { siteApi } from './api';
-import { GIFT_MESSAGE_LIMIT, type TeamGiftCardView } from './bookings-shared';
+import { GIFT_MESSAGE_LIMIT, type TeamGiftCardView } from '../vendor/site-engine/bookings-shared';
 import { formatMoney, localeOfCurrency, when } from './bookings-view';
 import { checkIssueAmount, chooseCards, dateName, giftEventName, giftStatusName, messageCount, momentName, sentTo, useName, type GiftCardEvent, type GiftCardsView } from './giftcards-view';
 import { failed, KeepCurrent, say, toneStyle } from './place';

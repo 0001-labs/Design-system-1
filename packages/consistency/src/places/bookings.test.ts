@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vite-plus/test";
-import { addDays, localDate, type ResolvedOffer, type TeamBookingView } from "./bookings-shared";
+import { addDays, localDate, type ResolvedOffer, type TeamBookingView } from "../vendor/site-engine/bookings-shared";
 import {
   applyLimits,
   changesOf,

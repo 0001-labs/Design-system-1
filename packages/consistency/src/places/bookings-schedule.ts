@@ -34,7 +34,7 @@ import '../../../../DS1/2-core/ds-text';
 import '../../../../DS1/4-page/ds-overlay';
 import type { SiteSummary } from '../site-editing';
 import { siteApi } from './api';
-import { WEEKDAYS, wordsIn, type ResolvedOffer, type Weekday } from './bookings-shared';
+import { WEEKDAYS, wordsIn, type ResolvedOffer, type Weekday } from '../vendor/site-engine/bookings-shared';
 import {
   applyLimits, changesOf, closedDayName, formatTimes, groupLimits, groupOffers, limitsOf, overrideOf, ownLimits, parsePrices, parseTimes,
   priceNames, pricesText, sameTimesAs, seasonText, shortName, timesInput, type Limits, type OfferGroup,

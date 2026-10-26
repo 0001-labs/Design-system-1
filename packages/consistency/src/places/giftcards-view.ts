@@ -6,7 +6,7 @@
  * Bookings' own (`formatMoney` in bookings-view.ts), so a card's amount reads
  * as a booking's does. Every status, balance and code is the Worker's.
  */
-import type { GiftCardStatus, GiftCardUse, TeamGiftCardView } from "./bookings-shared";
+import type { GiftCardStatus, GiftCardUse, TeamGiftCardView } from "../vendor/site-engine/bookings-shared";
 import { formatMoney, parseAmount } from "./bookings-view";
 
 export type GiftCardsView = "active" | "used" | "all";

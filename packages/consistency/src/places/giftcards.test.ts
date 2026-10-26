@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vite-plus/test";
-import type { TeamGiftCardView } from "./bookings-shared";
+import type { TeamGiftCardView } from "../vendor/site-engine/bookings-shared";
 import { formatMoney, localeOf } from "./bookings-view";
 import {
   checkIssueAmount,

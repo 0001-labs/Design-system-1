@@ -24,7 +24,7 @@ import '../../../../DS1/2-core/ds-text';
 import '../../../../DS1/4-page/ds-overlay';
 import type { SiteSummary } from '../site-editing';
 import { siteApi } from './api';
-import { addDays, localDate, MAX_NIGHTS, suggestedRefund, wordsIn, type BookingEvent, type BookingOpen, type Cancellation, type ResolvedOffer, type TeamBookingView } from './bookings-shared';
+import { addDays, localDate, MAX_NIGHTS, suggestedRefund, wordsIn, type BookingEvent, type BookingOpen, type Cancellation, type ResolvedOffer, type TeamBookingView } from '../vendor/site-engine/bookings-shared';
 import { amountInput, bookingPageOf, checkRefund, chooseBookings, dayName, eventName, formatMoney, groupByDay, guestsName, localeOfCurrency, ruleName, statusName, when, whenOnDay, type BookingsView } from './bookings-view';
 import { failed, KeepCurrent, say, toneStyle } from './place';
 import './bookings-schedule';

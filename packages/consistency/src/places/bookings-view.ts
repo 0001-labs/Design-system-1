@@ -6,7 +6,7 @@
  * The site's days, times and the suggested refund are bookings-shared.ts's,
  * the same functions the Worker decides with.
  */
-import { addDays, type BookingEvent, type BookingStatus, type Cancellation, type TeamBookingView, type Weekday } from "./bookings-shared";
+import { addDays, type BookingEvent, type BookingStatus, type Cancellation, type TeamBookingView, type Weekday } from "../vendor/site-engine/bookings-shared";
 
 export type BookingsView = "upcoming" | "past" | "cancelled";
 
