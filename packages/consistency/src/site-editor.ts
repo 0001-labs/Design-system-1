@@ -71,7 +71,7 @@ export class ConsistencySiteEditor extends LitElement {
   declare problem: string;
   declare unsupported: boolean;
   site!: SiteSummary;
-  /** Whether the bar holds the page picker; Consistency's app lists the pages in its sidebar instead. */
+  /** Whether the bar (the page picker, Open the page and the note) stands over the site; Consistency's app has none. */
   picker = true;
   private fields = new Map<string, SiteField>();
   private editing: Editing | null = null;
@@ -321,14 +321,15 @@ export class ConsistencySiteEditor extends LitElement {
   render() {
     if (this.unsupported) return html`<ds-empty literal heading=${this.site.name} text="This site keeps its words in its own editor."><ds-button slot="actions" href=${this.site.url} blank secondary>Open its editor</ds-button></ds-empty>`;
     const live = this.path ? new URL(this.path, this.origin).href : this.site.url;
+    // In Consistency's app the site stands alone: its pages are reached by its own links, with no bar over it.
     return html`
-      <div class="consistency-site-bar">
-        ${this.picker && this.pages?.length ? html`<ds-select><select aria-label="Page" .value=${this.path ?? ''} @change=${this.choose}>
+      ${this.picker ? html`<div class="consistency-site-bar">
+        ${this.pages?.length ? html`<ds-select><select aria-label="Page" .value=${this.path ?? ''} @change=${this.choose}>
           ${pageGroups(this.pages).map(group => html`<optgroup label=${group.lang}>${group.pages.map(page => html`<option value=${page.path} ?selected=${page.path === this.path} data-details=${page.path}>${page.title || page.path}</option>`)}</optgroup>`)}
         </select></ds-select>` : nothing}
         <ds-button href=${live} blank secondary>Open the page</ds-button>
         <span class="ds-text ds-text--muted">Words save to the live site. Layout can’t be published yet.</span>
-      </div>
+      </div>` : nothing}
       ${this.problem ? html`<ds-message tone="danger" literal text=${this.problem}></ds-message>` : nothing}
       ${this.pages && !this.pages.length ? html`<ds-empty literal heading="No pages" text="This site has no pages with words to edit yet."></ds-empty>` : nothing}
       <div class="consistency-site-stage" ?hidden=${!this.path}>${this.frame}</div>`;

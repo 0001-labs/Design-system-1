@@ -15,7 +15,8 @@ import '../../../DS1/2-core/ds-message';
 import '../../../DS1/2-core/ds-empty';
 import './domains';
 import { ConsistencySiteEditor } from './site-editor';
-import { pageRows, type SiteSummary } from './site-editing';
+import type { SiteSummary } from './site-editing';
+import { PLACES, shownPlaces, sitePlaces, type SitePlace } from './places/index';
 import type { SidebarItem } from '../../../DS1/3-unit/ds-sidebar';
 import './home.css';
 
@@ -25,19 +26,24 @@ import './home.css';
  * nothing more (Joachim, 26 October 2026): where the app stands is its own state, kept in the history so Back and
  * Forward still move between places. Sites are known by their IDv1 codes. A site once opened stays open, hidden
  * while another is shown, so going back to it is instant: no reload and no sign-in again. With a site open, the
- * sidebar is that site's: its name at the top (pressing it shows every site again; its menu switches to another)
- * and its pages under it, not the workspace.
+ * sidebar is that site's: its name at the top (pressing it shows the site itself; its menu switches to another or
+ * to all sites) and the site's places under it, the menus the platform says it has and the app has an element for
+ * (`places/`). There is no list of pages: the owner moves between pages by the site's own links.
  */
 
-/** What the app shows: the sites, one site in the editor (by its IDv1 code), or Settings at one of its tabs. */
-export type Place = { page: 'sites' } | { page: 'site'; code: string } | { page: 'settings'; tab: SettingsTab };
+/** What the app shows: the sites, one site (by its IDv1 code) on its canvas or at one of its places, or Settings at one of its tabs. */
+export type Place = { page: 'sites' } | { page: 'site'; code: string; place?: string } | { page: 'settings'; tab: SettingsTab };
 export type SettingsTab = 'domains' | 'account';
 const SITE_CODE = /^\d{2}[A-Za-z]{4}$/;
+const PLACE_ID = /^[a-z][a-z0-9-]{0,31}$/;
 /** A place as the history keeps it, or the sites for anything else. */
 export function placeFrom(state: unknown): Place {
   const place = state as Partial<Place> | null;
   if (place?.page === 'settings') return { page: 'settings', tab: (place as { tab?: unknown }).tab === 'account' ? 'account' : 'domains' };
-  if (place?.page === 'site' && typeof (place as { code?: unknown }).code === 'string' && SITE_CODE.test((place as { code: string }).code)) return { page: 'site', code: (place as { code: string }).code };
+  if (place?.page === 'site' && typeof (place as { code?: unknown }).code === 'string' && SITE_CODE.test((place as { code: string }).code)) {
+    const at = (place as { place?: unknown }).place;
+    return typeof at === 'string' && PLACE_ID.test(at) ? { page: 'site', code: (place as { code: string }).code, place: at } : { page: 'site', code: (place as { code: string }).code };
+  }
   return { page: 'sites' };
 }
 /**
@@ -60,6 +66,15 @@ function storedSites(): SiteSummary[] {
     return Array.isArray(value) ? value.filter((site): site is SiteSummary => !!site && typeof site.code === 'string' && typeof site.name === 'string' && typeof site.url === 'string') : [];
   } catch { return []; }
 }
+// Each site's places as last read, so its sidebar draws at once and the platform only confirms them.
+const PLACES_KEY = (code: string) => `consistency-site-places:${code}`;
+function storedPlaces(code: string): SitePlace[] | undefined {
+  try {
+    const value = JSON.parse(localStorage.getItem(PLACES_KEY(code)) ?? 'null') as unknown;
+    return Array.isArray(value) ? value.filter((place): place is SitePlace => !!place && typeof place.id === 'string' && typeof place.label === 'string') : undefined;
+  } catch { return undefined; }
+}
+
 /** A site's own address, for its card: its host without the editor's path. */
 export const siteHost = (site: SiteSummary) => { try { return new URL(site.url).host; } catch { return ''; } };
 
@@ -72,19 +87,23 @@ export function workspaceInitial(name: string): string { return (name.trim().rep
 /** Consistency's app: the owner's sites, each in the editor, and Settings. */
 export class ConsistencyHome extends LitElement {
   static properties = { error: { state: true }, workspace: { state: true }, place: { state: true }, sites: { state: true }, naming: { state: true } };
+  /** The places the app can show, by id (`places/index.ts`), here too for a place defined outside the app's modules. */
+  static readonly places = PLACES;
   declare place: Place;
   declare error: string;
   declare workspace: string;
   declare sites: SiteSummary[];
   /** The workspace's name as typed in Account, while it is being saved or has failed. */
   declare naming: { value: string; busy: boolean; error: string } | null;
-  /** The further languages opened in the sidebar, per site. */
-  private readonly languages = new Map<string, Set<string>>();
   /** Every site opened so far, kept alive while hidden. */
   private readonly editors = new Map<string, ConsistencySiteEditor>();
+  /** Each site's places, as stored or read, by site code. */
+  private readonly places = new Map<string, SitePlace[]>();
+  /** The sites whose places have been asked of the platform in this visit. */
+  private readonly placesAsked = new Set<string>();
+  /** Every place opened so far, by site code and place id, kept alive while hidden. */
+  private readonly placeElements = new Map<string, HTMLElement>();
   /** Back and Forward: the place the history kept, after the word being edited is saved. */
-  /** An open site's pages or page changed: its sidebar follows. */
-  private readonly onSite = () => this.requestUpdate();
   private readonly onPop = (event: PopStateEvent) => void this.move(placeFrom(event.state), 'none');
   /** An older address with a place in its hash, followed inside the app and then taken off. */
   private readonly onHash = () => {
@@ -101,7 +120,7 @@ export class ConsistencyHome extends LitElement {
   }
   protected createRenderRoot() { return this; }
 
-  connectedCallback() { super.connectedCallback(); this.addEventListener('consistency-site-change', this.onSite); addEventListener('popstate', this.onPop); addEventListener('hashchange', this.onHash); void this.readWorkspace(); void this.readSites(); }
+  connectedCallback() { super.connectedCallback(); addEventListener('popstate', this.onPop); addEventListener('hashchange', this.onHash); void this.readWorkspace(); void this.readSites(); }
 
   /** Goes to a place inside the app, the address unchanged. */
   go(next: Place) { void this.move(next, 'push'); }
@@ -109,7 +128,8 @@ export class ConsistencyHome extends LitElement {
   /** Moves to a place, first saving a word being edited on the site being left; a failed save stays put. */
   private async move(next: Place, record: 'push' | 'none') {
     const current = this.place;
-    const leaving = current.page === 'site' && (next.page !== 'site' || next.code !== current.code) ? this.editors.get(current.code) : undefined;
+    // The site's canvas is left for another site, one of its places, or anywhere else.
+    const leaving = current.page === 'site' && !this.placeOf(current) && (next.page !== 'site' || next.code !== current.code || this.placeOf(next)) ? this.editors.get(current.code) : undefined;
     if (leaving && !(await leaving.flush())) { if (record === 'none') history.pushState(current, '', location.pathname); return; }
     if (record === 'push' && JSON.stringify(next) !== JSON.stringify(current)) history.pushState(next, '', location.pathname);
     this.place = next;
@@ -131,15 +151,40 @@ export class ConsistencyHome extends LitElement {
     return editor;
   }
 
-  /** Shows the site being edited in the stage and hides the others there, never taking them out of the page. */
+  /** A site's places, drawn at once from the last visit; asked of the platform once a visit, which confirms them. */
+  private placesFor(code: string): SitePlace[] {
+    if (!this.places.has(code)) { const stored = storedPlaces(code); if (stored) this.places.set(code, stored); }
+    if (!this.placesAsked.has(code)) {
+      this.placesAsked.add(code);
+      void sitePlaces(code).then(places => {
+        if (JSON.stringify(places) !== JSON.stringify(this.places.get(code))) { this.places.set(code, places); this.requestUpdate(); }
+        try { localStorage.setItem(PLACES_KEY(code), JSON.stringify(places)); } catch { /* read again next visit */ }
+      }, () => { /* kept as stored; asked again next visit */ });
+    }
+    return this.places.get(code) ?? [];
+  }
+
+  /** The place of a site being shown, when it is one the site has and the app can show; the canvas otherwise. */
+  private placeOf(place: Place): string | undefined {
+    if (place.page !== 'site' || !place.place || !PLACES.has(place.place)) return undefined;
+    return (this.places.get(place.code) ?? storedPlaces(place.code))?.some(each => each.id === place.place) ? place.place : undefined;
+  }
+
+  /** Shows the site's canvas or the place being shown in the stage and hides the others, never taking them out of the page. */
   protected updated() {
     const stage = this.querySelector<HTMLElement>('.home-stage');
     if (!stage) return;
     const current = this.place.page === 'site' ? this.sites.find(site => site.code === (this.place as { code: string }).code) : undefined;
+    const at = current ? this.placeOf(this.place) : undefined;
+    const key = current && at ? `${current.code}:${at}` : '';
     if (current) { const editor = this.editorFor(current); if (editor.parentElement !== stage) stage.append(editor); }
-    for (const [code, editor] of this.editors) editor.hidden = code !== current?.code;
+    if (current && at && !this.placeElements.has(key)) this.placeElements.set(key, PLACES.get(at)!(current));
+    const shown = key ? this.placeElements.get(key) : undefined;
+    if (shown && shown.parentElement !== stage) stage.append(shown);
+    for (const [code, editor] of this.editors) editor.hidden = code !== current?.code || Boolean(at);
+    for (const [each, element] of this.placeElements) element.hidden = each !== key;
   }
-  disconnectedCallback() { super.disconnectedCallback(); this.removeEventListener('consistency-site-change', this.onSite); removeEventListener('popstate', this.onPop); removeEventListener('hashchange', this.onHash); }
+  disconnectedCallback() { super.disconnectedCallback(); removeEventListener('popstate', this.onPop); removeEventListener('hashchange', this.onHash); }
 
   /** The company name on the owner's own account (Account in the docs sets it). */
   private async readWorkspace() {
@@ -201,34 +246,22 @@ export class ConsistencyHome extends LitElement {
     </ds-page>`;
   }
 
-  /** An open site's sidebar: its name, whose menu goes to another site, and its pages. */
+  /** An open site's sidebar: its name, which shows the site and whose menu goes to another, and its places. */
   private siteNav(site: SiteSummary) {
-    const editor = this.editors.get(site.code);
-    const open = this.languages.get(site.code) ?? new Set<string>();
-    const items: SidebarItem[] = pageRows(editor?.pages ?? [], editor?.path ?? null, open);
+    const current = this.placeOf(this.place);
+    const items = shownPlaces(this.placesFor(site.code)).map(place => ({ id: place.id, label: place.label, current: place.id === current }));
     const others = this.sites.filter(item => item.code !== site.code);
-    const activate = (event: CustomEvent<{ id: string }>) => {
-      const id = event.detail.id;
-      if (id.startsWith('page:')) void editor?.open(id.slice(5));
-      else if (id.startsWith('lang:')) toggle(id.slice(5));
-    };
-    const toggle = (lang: string) => {
-      const next = new Set(open);
-      if (next.has(lang)) next.delete(lang); else next.add(lang);
-      this.languages.set(site.code, next);
-      this.requestUpdate();
-    };
     return html`<nav slot="nav" class="home-nav" aria-label=${site.name}>
       <div class="home-workspace" aria-label="Site">
-        <ds-button id="home-site" class="home-workspace-name" label=${`Site: ${site.name}`} @click=${() => this.go({ page: 'sites' })}>${site.name}<ds-icon type="chevron-down"></ds-icon></ds-button>
+        <ds-button id="home-site" class="home-workspace-name" label=${`Site: ${site.name}`} @click=${() => this.go({ page: 'site', code: site.code })}>${site.name}<ds-icon type="chevron-down"></ds-icon></ds-button>
         <ds-select for="home-site" hover aria-label="Sites">
           ${others.map(item => html`<ds-button menu-item @click=${() => this.go({ page: 'site', code: item.code })}>${item.name}</ds-button>`)}
           ${others.length ? html`<hr>` : ''}
           <ds-button menu-item @click=${() => this.go({ page: 'sites' })}>All sites</ds-button>
         </ds-select>
       </div>
-      <ds-sidebar class="home-pages" label="Pages" .items=${items} @sidebar-activate=${activate}
-        @sidebar-toggle=${(event: CustomEvent<{ id: string }>) => toggle(event.detail.id.slice(5))}></ds-sidebar>
+      ${items.length ? html`<ds-sidebar class="home-places" label=${site.name} .items=${items}
+        @sidebar-activate=${(event: CustomEvent<{ id: string }>) => this.go({ page: 'site', code: site.code, place: event.detail.id })}></ds-sidebar>` : ''}
     </nav>`;
   }
 

@@ -52,32 +52,6 @@ export function pageGroups(pages: SitePage[]): { lang: string; pages: SitePage[]
   });
 }
 
-/** A language's name in its own words ("Dansk", "English"), or its code where the browser has no name for it. */
-export function languageName(lang: string): string {
-  try { const name = new Intl.DisplayNames([lang], { type: 'language' }).of(lang); if (name) return name.charAt(0).toLocaleUpperCase(lang) + name.slice(1); } catch { /* not a language code */ }
-  return lang;
-}
-
-/** A row of the site's pages in the sidebar: a page (`page:<path>`) or a further language (`lang:<code>`). */
-export interface PageRow { id: string; label: string; depth?: number; current?: boolean; expanded?: boolean }
-
-/**
- * The open site's pages for the app's sidebar: the first language's pages at the root, front page first; each
- * further language a row of its own name, its pages under it while it is open (always so when it holds the page
- * being edited).
- */
-export function pageRows(pages: SitePage[], current: string | null, open: ReadonlySet<string>): PageRow[] {
-  const groups = pageGroups(pages);
-  const row = (page: SitePage, depth: number): PageRow => ({ id: `page:${page.path}`, label: page.title || page.path, depth, current: page.path === current });
-  const rows = (groups[0]?.pages ?? []).map(page => row(page, 0));
-  for (const group of groups.slice(1)) {
-    const expanded = open.has(group.lang) || group.pages.some(page => page.path === current);
-    rows.push({ id: `lang:${group.lang}`, label: languageName(group.lang), depth: 0, expanded });
-    if (expanded) rows.push(...group.pages.map(page => row(page, 1)));
-  }
-  return rows;
-}
-
 /** The page the editor opens first: the site's root, else its first page. */
 export const firstPage = (pages: SitePage[]) => pages.find(page => page.path === '/')?.path ?? pages[0]?.path ?? null;
 

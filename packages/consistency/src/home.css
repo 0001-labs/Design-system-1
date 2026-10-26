@@ -29,9 +29,9 @@ consistency-domains{display:block;max-width:calc(32 * var(--ds-unit))}
 .home-main--site{height:100%;gap:0}
 .home-stage{flex:1;min-height:0;display:flex;flex-direction:column}
 .home-stage[hidden]{display:none}
-.home-stage>consistency-site-editor{flex:1;min-height:0}
-.home-stage>consistency-site-editor[hidden]{display:none}
-/* An open site's pages fill the sidebar under its name and scroll on their own. */
-.home-pages{flex:1;min-height:0;overflow:auto}
+.home-stage>*{flex:1;min-height:0}
+.home-stage>[hidden]{display:none}
+/* An open site's places fill the sidebar under its name and scroll on their own. */
+.home-places{flex:1;min-height:0;overflow:auto}
 /* The workspace's name in Account is a field that hugs a name of up to twelve squares. */
 .home-workspace-field{width:calc(12 * var(--ds-unit))}

@@ -25,6 +25,9 @@ try {
  await page.route('**/api/consistency/sites/30SDGA/pages',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({pages:sdg})}));
  await page.route('**/api/consistency/sites/30SDGA/page?**',route=>{const path=new URL(route.request().url()).searchParams.get('path');route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({path,lang:path==='/en/'?'en':'da',title:'Søndergården',fields:[]})});});
  await page.route('**/api/consistency/sites/30SDGA/document?**',route=>route.fulfill({status:200,contentType:'text/html',body:'<!doctype html><title>Søndergården</title><h1>Hej</h1>'}));
+ // The sites' places: Søndergården names one the app has an element for and one it has not; the others none.
+ let slowPlaces=false;
+ await page.route('**/api/consistency/sites/*/places',async route=>{const code=new URL(route.request().url()).pathname.split('/')[4];if(code==='30SDGA'&&slowPlaces)await new Promise(resolve=>setTimeout(resolve,1500));await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({places:code==='30SDGA'?[{id:'pages',label:'Pages'},{id:'made-up',label:'Made up'}]:[]})});});
  let renamed=null;await page.route('**/api/consistency/profile',async route=>{if(route.request().method()==='PUT'){renamed=route.request().postDataJSON().companyName;await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({companyName:renamed})});}else await route.fallback();});
  const home=`http://127.0.0.1:${server.address().port}/private-consistency/home.html`;
  await page.goto(home);await page.locator('consistency-home ds-card').first().waitFor();
@@ -43,12 +46,13 @@ try {
  // Back goes to the sites, Forward to the site again.
  await page.goBack();await page.locator('consistency-home ds-card').first().waitFor();same();await page.goForward();await page.locator('consistency-home consistency-site-editor:not([hidden])').waitFor();same();
  await page.evaluate(()=>{document.querySelector('consistency-site-editor').dataset.first='yes';});
- await page.locator('#home-site').click();await page.locator('consistency-home ds-card').first().waitFor();
+ const allSites=async()=>{await page.locator('#home-site').hover();await page.locator('consistency-home ds-select[aria-label="Sites"] ds-button[menu-item]',{hasText:'All sites'}).click();await page.locator('consistency-home ds-card').first().waitFor();await page.mouse.move(700,500);};
+ await allSites();
  if(await page.locator('consistency-home consistency-site-editor[hidden]').count()!==1)throw Error('Leaving a site took its editor out of the page');
  await page.locator('consistency-home ds-card',{hasText:'CPH Raft'}).click();
  await page.locator('consistency-home consistency-site-editor:not([hidden])').waitFor({timeout:2000});{const seen=await page.locator('consistency-home consistency-site-editor').evaluateAll(list=>list.map(e=>[e.dataset.first,e.hidden,e.isConnected]));if(seen.length!==1||seen[0][0]!=='yes'||seen[0][1])throw Error('Going back to a site made a new editor: '+JSON.stringify(seen));}
  if(await page.locator('consistency-home .home-title').count())throw Error('An open site still shows the page title');
- await page.locator('#home-site').click();await page.locator('consistency-home ds-card').first().waitFor();
+ await allSites();
  if(await page.locator('consistency-home ds-sidebar').getByText('Sites',{exact:true}).count())throw Error('Sites is still in the sidebar');
  if(await page.locator('consistency-home ds-sidebar').count())throw Error('The sidebar still has rows of places');
  for(const width of [300,390,768,1440]){await page.setViewportSize({width,height:800});await page.waitForTimeout(100);if(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth))throw Error(`Home overflows at ${width}`);}
@@ -65,19 +69,38 @@ try {
  await page.setViewportSize({width:1440,height:800});
  // A site's /edit opens the app on that site once, ?open=CODE, and the address is the app's again at once.
  await page.goto(home+'?open=30SDGA');await page.locator('consistency-home consistency-site-editor:not([hidden])').waitFor();same();
- // An open site's sidebar is the site's: its name at the top, not the workspace, and its pages, a further language folded.
+ // An open site's sidebar is the site's: its name at the top, not the workspace, and no rows of its pages.
  await page.getByRole('button',{name:'Site: Søndergården'}).waitFor();
  if(await page.locator('#home-workspace').count())throw Error('The workspace stays in the sidebar of an open site');
- if(await page.locator('consistency-site-editor ds-select select').count())throw Error('The editor still has its own page picker');
- const pages=page.locator('consistency-home ds-sidebar.home-pages');await pages.getByText('Om os').waitFor();
- if(await pages.getByText('Home',{exact:true}).count())throw Error('A further language is open before it is asked for');
- await pages.getByText('English').click();await pages.getByText('Home',{exact:true}).click();
- await page.waitForFunction(()=>document.querySelector('consistency-site-editor:not([hidden])')?.path==='/en/');same();
+ const editor=page.locator('consistency-home consistency-site-editor:not([hidden])');await editor.locator('iframe').waitFor({state:'attached'});
+ if(await editor.locator('.consistency-site-bar, ds-select select').count()||await editor.getByText('Open the page').count()||await editor.getByText(/Words save/).count())throw Error('A bar still stands over the site');
+ await page.waitForTimeout(200);
+ for(const words of ['Forside','Om os','English'])if(await page.locator('consistency-home nav.home-nav').getByText(words,{exact:true}).count())throw Error('The sidebar still lists the site\'s pages: '+words);
+ // No place the app has no element for is shown: with none registered, there is no list at all.
+ if(await page.locator('consistency-home ds-sidebar').count())throw Error('Places the app cannot show are listed');
+ // A place the app has an element for is listed under the name, in the site's words; one it has not is left out.
+ await page.evaluate(()=>{const home=document.querySelector('consistency-home');home.constructor.places.set('pages',site=>Object.assign(document.createElement('div'),{className:'test-place',textContent:'Pages of '+site.name}));home.requestUpdate();});
+ const places=page.locator('consistency-home ds-sidebar.home-places');await places.getByText('Pages',{exact:true}).waitFor();
+ if(await places.getByText('Made up').count())throw Error('A place the app has no element for is listed');
+ await places.getByText('Pages',{exact:true}).click();await page.locator('consistency-home .home-stage .test-place:not([hidden])').waitFor();same();
+ if(await page.locator('consistency-home consistency-site-editor:not([hidden])').count())throw Error('The site\'s canvas still shows beside a place');
+ if(await page.locator('consistency-home consistency-site-editor').count()!==1)throw Error('Showing a place took the site\'s canvas out of the page');
+ if(await page.evaluate(()=>history.state?.place)!=='pages')throw Error('The place is not kept in the history');
+ // Pressing the site's name shows the site itself again; the place stays, hidden.
+ await page.locator('#home-site').click();await page.locator('consistency-home consistency-site-editor:not([hidden])').waitFor();same();
+ if(await page.locator('consistency-home .home-stage .test-place[hidden]').count()!==1)throw Error('Leaving a place took it out of the page');
+ await page.goBack();await page.locator('consistency-home .home-stage .test-place:not([hidden])').waitFor();await page.goForward();await page.locator('consistency-home consistency-site-editor:not([hidden])').waitFor();
+ if(!(await page.evaluate(()=>localStorage.getItem('consistency-site-places:30SDGA')))?.includes('"pages"'))throw Error('The site\'s places are not kept for the next visit');
+ // The next visit draws the places at once from the last, before the platform answers again.
+ slowPlaces=true;await page.reload();await page.evaluate(()=>{const home=document.querySelector('consistency-home');home.constructor.places.set('pages',()=>document.createElement('div'));home.requestUpdate();});
+ await page.locator('consistency-home ds-sidebar.home-places').getByText('Pages',{exact:true}).waitFor({timeout:500});slowPlaces=false;
+ await page.mouse.move(700,500);
  await page.locator('#home-site').hover();const sitesMenu=page.locator('consistency-home ds-select[aria-label="Sites"]');
  if((await sitesMenu.locator('ds-button[menu-item]').allInnerTexts()).map(t=>t.trim()).join()!=='Flavo,CPH Raft,All sites')throw Error('The site menu is not the other sites and All sites');
  await sitesMenu.locator('ds-button[menu-item]',{hasText:'CPH Raft'}).click();await page.getByRole('button',{name:'Site: CPH Raft'}).waitFor();same();
- await page.mouse.move(700,500);await page.locator('#home-site').click();await page.locator('consistency-home ds-card').first().waitFor();
- if(await page.locator('consistency-home .home-title[text="Sites"]').count()!==1)throw Error('Pressing the site name does not show Sites');
+ if(await page.locator('consistency-home ds-sidebar').count())throw Error('A site without places lists some');
+ await page.mouse.move(700,500);await allSites();
+ if(await page.locator('consistency-home .home-title[text="Sites"]').count()!==1)throw Error('All sites does not show Sites');
  // The workspace is renamed where it is shown, in Account.
  await page.evaluate(()=>document.querySelector('consistency-home').go({page:'settings',tab:'account'}));
  const field=page.locator('consistency-home ds-input.home-workspace-field input');await field.waitFor();await field.fill('0001 labs');await field.press('Enter');
@@ -85,5 +108,5 @@ try {
  // An older address still opens its place and is taken off.
  await page.goto(home+'#settings/account');await page.locator('consistency-home .home-account').waitFor();same();await page.getByRole('button',{name:'Sign out',exact:true}).click();await page.waitForURL('**/app/signin');
  if(!signedOut)throw Error('Sign out did not end the session');
- console.log('Home workspace header, an open site\'s own sidebar, renaming the workspace, Sites as cards only, Settings with Domains and Account tabs, sign out and viewports passed');
+ console.log('Home workspace header, an open site\'s own sidebar of places with no bar over the site, renaming the workspace, Sites as cards only, Settings with Domains and Account tabs, sign out and viewports passed');
 } finally {await browser.close();await new Promise(resolve=>server.close(resolve));}
