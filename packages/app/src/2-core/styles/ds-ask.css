@@ -24,15 +24,16 @@
 }
 :host([open]) { display: block; }
 
-/* The progressive blur: six layers, each a band of the veil, each blurring
-   more than the one above it, so the page goes soft by degrees towards the
-   foot and stays readable just above the cards. A wash of the paper under the
-   cards keeps their words legible. */
+/* The progressive blur: six layers, each starting lower than the one before
+   and running on to the foot, each blurring what the ones above it already
+   blurred, so the page goes soft by degrees and never shows through sharp
+   where one layer gives way to the next. The row just above the cards stays
+   readable; a wash of the paper under the cards keeps their words legible. */
 .veil {
   position: absolute;
   inset-inline: 0;
   bottom: 0;
-  height: min(100%, var(--ds-ask-veil, calc(30 * var(--ds-unit))));
+  height: min(100%, var(--ds-ask-veil, calc(28 * var(--ds-unit))));
   pointer-events: none;
 }
 .veil > i {
@@ -40,17 +41,17 @@
   inset: 0;
   animation: ds-ask-fade 220ms ease-out both;
 }
-.veil > i:nth-child(1) { backdrop-filter: blur(calc(1px * var(--sf, 1))); mask-image: linear-gradient(to bottom, transparent 0%, #000 15%, #000 25%, transparent 35%); }
-.veil > i:nth-child(2) { backdrop-filter: blur(calc(2px * var(--sf, 1))); mask-image: linear-gradient(to bottom, transparent 15%, #000 25%, #000 35%, transparent 45%); }
-.veil > i:nth-child(3) { backdrop-filter: blur(calc(3px * var(--sf, 1))); mask-image: linear-gradient(to bottom, transparent 25%, #000 35%, #000 45%, transparent 55%); }
-.veil > i:nth-child(4) { backdrop-filter: blur(calc(5px * var(--sf, 1))); mask-image: linear-gradient(to bottom, transparent 35%, #000 45%, #000 55%, transparent 65%); }
-.veil > i:nth-child(5) { backdrop-filter: blur(calc(8px * var(--sf, 1))); mask-image: linear-gradient(to bottom, transparent 45%, #000 55%, #000 65%, transparent 75%); }
+.veil > i:nth-child(1) { backdrop-filter: blur(calc(1px * var(--sf, 1))); mask-image: linear-gradient(to bottom, transparent 0%, #000 15%); }
+.veil > i:nth-child(2) { backdrop-filter: blur(calc(1px * var(--sf, 1))); mask-image: linear-gradient(to bottom, transparent 15%, #000 30%); }
+.veil > i:nth-child(3) { backdrop-filter: blur(calc(2px * var(--sf, 1))); mask-image: linear-gradient(to bottom, transparent 25%, #000 40%); }
+.veil > i:nth-child(4) { backdrop-filter: blur(calc(3px * var(--sf, 1))); mask-image: linear-gradient(to bottom, transparent 35%, #000 50%); }
+.veil > i:nth-child(5) { backdrop-filter: blur(calc(6px * var(--sf, 1))); mask-image: linear-gradient(to bottom, transparent 45%, #000 60%); }
 .veil > i:nth-child(6) {
-  backdrop-filter: blur(calc(16px * var(--sf, 1)));
-  mask-image: linear-gradient(to bottom, transparent 60%, #000 70%);
+  backdrop-filter: blur(calc(12px * var(--sf, 1)));
+  mask-image: linear-gradient(to bottom, transparent 55%, #000 70%);
   background: linear-gradient(to bottom,
-    transparent 45%,
-    color-mix(in srgb, var(--ds-ask-paper) 50%, transparent) 75%,
+    transparent 0%,
+    color-mix(in srgb, var(--ds-ask-paper) 50%, transparent) 40%,
     color-mix(in srgb, var(--ds-ask-paper) 80%, transparent) 100%);
 }
 
@@ -84,9 +85,9 @@
   --ds-ask-tone: var(--ds-fill, light-dark(#ebebeb, #383838));
   flex: none;
   display: grid;
-  grid-template-rows: calc(3 * var(--ds-unit)) calc(6 * var(--ds-unit)) calc(3 * var(--ds-unit));
-  width: calc(12 * var(--ds-unit));
-  height: calc(12 * var(--ds-unit));
+  grid-template-rows: calc(2.5 * var(--ds-unit)) calc(5 * var(--ds-unit)) calc(2.5 * var(--ds-unit));
+  width: calc(10 * var(--ds-unit));
+  height: calc(10 * var(--ds-unit));
   box-sizing: border-box;
   overflow: hidden;
   border-radius: var(--ds-radius-card, calc(4px * var(--sf, 1)));
@@ -96,9 +97,11 @@
   cursor: pointer;
 }
 .card:hover { background: color-mix(in srgb, var(--ds-ask-paper) 94%, var(--ds-ask-ink)); }
-.card[aria-selected="true"] {
-  outline: calc(2px * var(--sf, 1)) solid var(--ds-ask-ink);
-  outline-offset: calc(2px * var(--sf, 1));
+/* The chosen card at full strength; the others dimmer the further they stand
+   from it, so the choice is seen without a ring. */
+.card {
+  opacity: max(0.4, calc(1 - 0.2 * var(--ds-ask-distance, 0)));
+  transition: opacity 160ms ease-out;
 }
 
 /* The head: what kind of thing it is, and its detail, on a palette pastel. */
@@ -132,7 +135,7 @@
   grid-template-columns: minmax(0, 1fr) var(--ds-unit);
   grid-template-rows: var(--ds-unit) var(--ds-unit);
   align-items: end;
-  padding: var(--ds-half);
+  padding: var(--ds-half) var(--ds-half) 0;
   background: var(--ds-ask-tone);
 }
 .label { font-weight: var(--ds-type-weight-bold, 500); }
@@ -192,12 +195,13 @@
   object-fit: contain;
 }
 
-/* A month, a square a day, as the compact calendar draws it: days with
-   something on them on the accent's pastel, today in today's red. */
+/* A month, a day a column and its weeks sharing the card's middle: days
+   with something on them on the accent's pastel, today in today's red. */
 .month {
   display: grid;
+  height: 100%;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  grid-auto-rows: var(--ds-unit);
+  grid-auto-rows: minmax(0, 1fr);
   font-variant-numeric: tabular-nums;
 }
 .day {
@@ -228,7 +232,7 @@
   display: grid;
   grid-template-rows: var(--ds-unit) var(--ds-unit);
   align-content: end;
-  padding: var(--ds-half);
+  padding: 0 var(--ds-half) var(--ds-half);
 }
 .title { font-weight: var(--ds-type-weight-bold, 500); }
 .caption { color: var(--ds-ask-muted); }
@@ -316,4 +320,5 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .veil > i, .cards, .line, .caret, .answer, .dot, :host([state="thinking"]) .words { animation: none; }
+  .card { transition: none; }
 }

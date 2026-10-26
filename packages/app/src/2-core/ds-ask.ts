@@ -173,7 +173,8 @@ export class Ask extends LitElement {
     if (this.state !== "writing" || !this.rows.length) return null;
     return html`<div class="cards" role="listbox" aria-label="Results">${this.rows.map((row, index) => html`
       <div class="card" role="option" data-index=${index} data-kind=${row.kind} data-tone=${row.tone ?? nothing}
-        aria-selected=${index === this.chosen ? "true" : "false"} aria-label=${`${row.label ?? row.detail}: ${row.title}`}>
+        aria-selected=${index === this.chosen ? "true" : "false"} aria-label=${`${row.label ?? row.detail}: ${row.title}`}
+        style=${`--ds-ask-distance: ${Math.abs(index - this.chosen)}`}>
         <div class="head">
           <span class="label">${row.label ?? row.detail}</span>
           <ds-icon class="icon" type=${row.icon}></ds-icon>
