@@ -52,19 +52,6 @@
       "website/src/vendor/aa/table.d.ts": "918cd9b8b04c0649ea23219711c33eddb808b49df42e0c7ded7bc35638b18f37"
     }
   },
-  "Consistency CMS": {
-    "commit": "02e9cb6d6d785a160fb9a5f2092f924f72289c51",
-    "version": null,
-    "owned": ["packages/consistency/src/vendor/cms"],
-    "files": {
-      "packages/consistency/src/vendor/cms/README.md": "b0c02dd51c41dc454915fb856b742b7870086fa8fef111a7b5fa466ad13fd985",
-      "packages/consistency/src/vendor/cms/composition-workspace.css": "167c43fda98601efab91656d9f32f9094e38e8bfb2d9931827fbce3042d66701",
-      "packages/consistency/src/vendor/cms/composition-workspace.ts": "b0863f81b43c44198269baf276274984e7e5a69f2859095630d40e5a60ed49c2",
-      "packages/consistency/src/vendor/cms/dom.ts": "42c4cb6c5ad6d8dc0de74aaa958345ead73d0ecac50d8b7472c46439db03b265",
-      "packages/consistency/src/vendor/cms/markdown.ts": "a7b3b1119a414ba4b919f1119efb288c7d4827ac009388a19194f08b0958603f",
-      "packages/consistency/src/vendor/cms/placing.ts": "d2c4bbb206f59a0cb6fca0d4d89f7ccfa6bc097bccbc2b313a013b0045018f22"
-    }
-  },
   "Drag": {
     "commit": "b0d053e5d4eb697b62abd2dbae1550f71c8ac735",
     "version": "0.2.0-alpha.0",
@@ -88,6 +75,19 @@
       "shared/feature-flags-runtime/manage.ts": "a71825d7c466441e10e8b2415208a4b0774e8853e9c6f26895364fa857266af5",
       "shared/feature-flags-runtime/matrix.css": "3a8d2fd710cb7af2bf755e2b77b35225cd5d2ad2b68ecae3fe92e9cbbc0ac3b4",
       "shared/feature-flags-runtime/matrix.ts": "2af65f779906c2ec65c893d6651d2977151ae74eb56e88773e072a3d261fd419"
+    }
+  },
+  "Site engine": {
+    "commit": "69888c64739df53d9b529b59833ecdba2951a50d",
+    "version": null,
+    "owned": ["packages/consistency/src/vendor/site-engine"],
+    "files": {
+      "packages/consistency/src/vendor/site-engine/README.md": "b142d32c36c2180c989a63e139f4e6e654ce666bcea377fd6dfe42998eb334a9",
+      "packages/consistency/src/vendor/site-engine/composition-workspace.css": "167c43fda98601efab91656d9f32f9094e38e8bfb2d9931827fbce3042d66701",
+      "packages/consistency/src/vendor/site-engine/composition-workspace.ts": "b0863f81b43c44198269baf276274984e7e5a69f2859095630d40e5a60ed49c2",
+      "packages/consistency/src/vendor/site-engine/dom.ts": "42c4cb6c5ad6d8dc0de74aaa958345ead73d0ecac50d8b7472c46439db03b265",
+      "packages/consistency/src/vendor/site-engine/markdown.ts": "4f39d2a2661dd71f8608320cda6562f7a6ebc22dc127514116d0ec4ab0f4de72",
+      "packages/consistency/src/vendor/site-engine/placing.ts": "d2c4bbb206f59a0cb6fca0d4d89f7ccfa6bc097bccbc2b313a013b0045018f22"
     }
   }
 }

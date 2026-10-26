@@ -18,9 +18,9 @@
         "to": "shared/feature-flags-runtime"
       }
     },
-    "Consistency CMS": {
+    "Site engine": {
       "workspace": {
-        "to": "packages/consistency/src/vendor/cms"
+        "to": "packages/consistency/src/vendor/site-engine"
       }
     }
   }

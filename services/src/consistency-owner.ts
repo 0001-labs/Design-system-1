@@ -1,7 +1,7 @@
 /**
  * c9y.site's owner through System's One key: the same owner session as every Consistency site editor, so
  * signing in here opens them all, and signing out here ends them all. The protocol is the shared CMS's
- * (`system/parts/team-cms/worker/owner.ts` in the studio):
+ * (`system/parts/site-engine/worker/owner.ts` in the studio):
  *
  * - `GET /auth/start` goes to System's `/auth/authorize` for the `c9y` client with a fresh state and an S256
  *   challenge, kept in a ten-minute pending cookie (SameSite=None: System answers by a cross-site POST).

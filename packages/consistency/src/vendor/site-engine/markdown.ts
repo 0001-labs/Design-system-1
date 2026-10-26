@@ -1,5 +1,5 @@
 /**
- * Team CMS's Markdown, shared by the Worker (which renders every saved edit),
+ * The site engine's Markdown, shared by the Worker (which renders every saved edit),
  * the app (which shows the words live as they are typed) and the build step
  * (which writes the built words as Markdown into the manifest).
  *

@@ -2,7 +2,7 @@
  * Editing a site's words in the editor: the pure parts of `site-editor.ts`, kept apart from the DOM so they test
  * in Node. A site is one of the workspace's Consistency sites; its page is shown from the owner gateway
  * (`/api/consistency/sites/<id>/document`) in a frame on this origin, sandboxed without scripts, and its words
- * are Team CMS's fields, saved one by one as Team CMS edits.
+ * are the site engine's fields, saved one by one as the site engine edits.
  */
 
 /** One of the workspace's sites by its IDv1 code (a list's shape), as `/api/consistency/sites` gives it. */
@@ -21,12 +21,12 @@ export const siteAddress = {
 
 /**
  * Which fields are edited here: a page's words (`text`). The title, the description (`meta`) and the share image
- * (`image`) are not on the page; the platform still takes them under Team CMS's rules, and Pages in each site's
+ * (`image`) are not on the page; the platform still takes them under the site engine's rules, and Pages in each site's
  * own editor edits them.
  */
 export const isWordsField = (field: Pick<SiteField, 'kind'>) => field.kind === 'text';
 
-/** One line of words, saved on Enter: a heading or a button, as Team CMS decides. */
+/** One line of words, saved on Enter: a heading or a button, as the site engine decides. */
 export const isPlainField = (field: Pick<SiteField, 'kind' | 'tag' | 'label'>) =>
   field.kind === 'meta' || /^h[1-6]$/i.test(field.tag) || field.tag.toLowerCase() === 'button' || field.label.toLowerCase() === 'button';
 
@@ -35,7 +35,7 @@ const NAMES: Record<string, string> = {
   p: 'Paragraph', li: 'List item', dt: 'Term', dd: 'Meaning', summary: 'Question', figcaption: 'Caption',
   caption: 'Caption', td: 'Table cell', th: 'Table heading', blockquote: 'Quote', span: 'Words', a: 'Link', button: 'Button',
 };
-/** A field's name in the bar over it, in Team CMS's words. */
+/** A field's name in the bar over it, in the site engine's words. */
 export function fieldName(field: Pick<SiteField, 'tag' | 'label'>): string {
   const label = field.label?.trim();
   if (label && !NAMES[label.toLowerCase()]) return label.charAt(0).toUpperCase() + label.slice(1);

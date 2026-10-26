@@ -1,5 +1,5 @@
 // A site's words in the editor: its real page in a sandboxed frame, words edited in place with Aa and saved as
-// Team CMS edits, its links followed, its scripts never run. Every gateway answer is a stand-in.
+// The site engine edits, its links followed, its scripts never run. Every gateway answer is a stand-in.
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -71,7 +71,7 @@ try {
   if (await frame.locator('body').getAttribute('data-ran')) fail('A script of the site ran');
   if (await page.locator('consistency-editor').count()) fail('The composition tools are on in site mode');
 
-  // A heading: pressed, typed, Enter saves it as a Team CMS edit.
+  // A heading: pressed, typed, Enter saves it as a the site engine edit.
   await frame.locator(`h1[data-cms="${H1}"]`).click();
   await page.locator('.consistency-site-bar-over').waitFor();
   await page.keyboard.press('End'); await page.keyboard.type(' there');

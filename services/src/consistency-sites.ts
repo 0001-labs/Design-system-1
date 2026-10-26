@@ -2,8 +2,8 @@
  * The owner's editor editing a site's words: `/api/consistency/sites/<id>/…` on the Consistency hosts, answered by
  * the platform's `ConsistencyWorkspace` through the service binding and nothing else.
  *
- * - `GET pages`, `GET page?path=` and `POST edit { path, key, markdown }`: Team CMS's data and a save, made by the
- *   platform as the owner in that site's own object, with Team CMS's own rules for the key, images and meta.
+ * - `GET pages`, `GET page?path=` and `POST edit { path, key, markdown }`: the site engine's data and a save, made by the
+ *   platform as the owner in that site's own object, with the site engine's own rules for the key, images and meta.
  * - `GET document?path=`: the site's page for the editor's frame, and `GET files/<path>` the styles, fonts,
  *   pictures and video it loads. Both are served on this origin, so this answer carries the sandbox: the page is
  *   `sandbox allow-same-origin` with no script source at all, so nothing of the site's runs here with the
@@ -15,7 +15,7 @@
 // A site by its IDv1 code, a list's shape (`12ABCD`); the platform alone knows its id.
 export const SITE_ROUTE = /^\/api\/consistency\/sites\/(\d{2}[A-Za-z]{4})\/(pages|page|edit|document|files\/[^?#]{1,512})$/;
 const METHODS: Record<string, string[]> = { pages: ['GET'], page: ['GET'], document: ['GET'], edit: ['POST'], files: ['GET', 'HEAD'] };
-/** A Team CMS field takes 10,000 characters of Markdown; the JSON around it fits in this. */
+/** A the site engine field takes 10,000 characters of Markdown; the JSON around it fits in this. */
 export const EDIT_BYTES = 64 * 1024;
 
 /** The page in the editor's frame: drawn with its own styles and pictures, never a script, a form, a frame or a plugin. */

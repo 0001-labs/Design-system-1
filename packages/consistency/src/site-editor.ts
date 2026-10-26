@@ -1,6 +1,6 @@
 /**
  * A Consistency site, opened in the editor: one of its pages, as its visitors see it, in a frame the work's
- * width, and its words edited where they stand with Aa's plain editor, each save a Team CMS edit on the live
+ * width, and its words edited where they stand with Aa's plain editor, each save a the site engine edit on the live
  * site (through the owner gateway, `/api/consistency/sites/<id>/…`).
  *
  * The frame is the gateway's `document` route on this origin, sandboxed with `allow-same-origin` and nothing
@@ -11,7 +11,7 @@
  *
  * Over the word stands Design system 1's context bar with the field's name, Save and Cancel. Escape cancels,
  * Mod+Enter saves, and so does Enter in one line of words. Other copies of the same words show them as typed,
- * drawn by Team CMS's own Markdown, and a save puts the HTML the site rendered in every copy.
+ * drawn by the site engine's own Markdown, and a save puts the HTML the site rendered in every copy.
  *
  * Only words: the page's layout and spacing cannot be published to a site yet, so the composition tools are not
  * here at all, and the page's title, description and share image stay in each site's own editor.
@@ -25,8 +25,8 @@ import '../../../DS1/2-core/ds-message';
 import '../../../DS1/3-unit/ds-select';
 import { toast } from '../../../DS1/0-face/feedback';
 import { createPlainEditor } from '../../../website/src/vendor/aa/aa';
-import { MARKDOWN_LIMIT, renderMarkdown } from './vendor/cms/markdown';
-import { placeBar } from './vendor/cms/placing';
+import { MARKDOWN_LIMIT, renderMarkdown } from './vendor/site-engine/markdown';
+import { placeBar } from './vendor/site-engine/placing';
 import { editKey, failureWords, fieldName, firstPage, isPlainField, isWordsField, pageGroups, pressAction, siteAddress, type PageDetail, type SiteField, type SitePage, type SiteSummary } from './site-editing';
 import './site-editor.css';
 
@@ -272,7 +272,7 @@ export class ConsistencySiteEditor extends LitElement {
     state.copies.forEach((element, index) => { element.removeAttribute('data-cms-open'); element.innerHTML = drawn ?? state.before[index] ?? element.innerHTML; });
   }
 
-  /** Saves the words being edited as a Team CMS edit; whether the editing has ended, saved or unchanged. */
+  /** Saves the words being edited as a the site engine edit; whether the editing has ended, saved or unchanged. */
   private async commit(): Promise<boolean> {
     const state = this.editing;
     if (!state) return true;
