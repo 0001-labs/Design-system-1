@@ -13,7 +13,8 @@ import '../../../DS1/2-core/ds-empty';
 /**
  * The people in the workspace, in Settings → People and in the people panel a site card's avatars open. Everyone
  * in the workspace sees them; its admins and the owner (`manage`) invite and remove them. An invite is sent by
- * email; the person is in once they sign in at consistency.site with that address. The platform decides who may
+ * email, and sent again from an invited person's menu; the person is in once they sign in at consistency.site with
+ * that address. The platform decides who may
  * do what; this shows what it says, and tells the page when the people change (`members-change`).
  */
 export interface Member { email: string; role: 'admin' | 'editor'; status: 'invited' | 'active' }
@@ -63,14 +64,19 @@ export class ConsistencyMembers extends LitElement {
     event.preventDefault();
     const email = this.email.trim();
     if (this.busy || !email) return;
+    if (await this.send(email, this.role)) this.email = '';
+  }
+
+  /** Invites the address, or sends a waiting invite again: the platform emails it to anyone not yet in. */
+  private async send(email: string, role: Member['role'], again = false): Promise<boolean> {
     this.busy = true; this.error = ''; this.notice = '';
     try {
-      const response = await fetch(this.api, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, role: this.role }) }).catch(() => null);
+      const response = await fetch(this.api, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, role }) }).catch(() => null);
       const body = response ? await response.json().catch(() => null) as { email?: string; status?: string; sent?: boolean; error?: string } | null : null;
-      if (!response?.ok || !body?.email) { this.error = (body?.error && MESSAGES[body.error]) || 'The invite could not be sent. Try again.'; return; }
-      this.notice = body.status === 'active' ? `${body.email} is now ${ROLE_WORDS[this.role].toLowerCase()}.` : body.sent ? `Invite sent to ${body.email}.` : `${body.email} is invited, but the email could not be sent. They can sign in at consistency.site.`;
-      this.email = '';
+      if (!response?.ok || !body?.email) { this.error = (body?.error && MESSAGES[body.error]) || 'The invite could not be sent. Try again.'; return false; }
+      this.notice = body.status === 'active' ? (again ? `${body.email} is already in.` : `${body.email} is now ${ROLE_WORDS[role].toLowerCase()}.`) : body.sent ? `Invite sent ${again ? 'again ' : ''}to ${body.email}.` : `${body.email} is invited, but the email could not be sent. They can sign in at consistency.site.`;
       await this.load();
+      return true;
     } finally { this.busy = false; }
   }
 
@@ -89,7 +95,7 @@ export class ConsistencyMembers extends LitElement {
       <span class="ds-row__name">${member.email}</span>
       <span class="ds-row__value">${member.status === 'invited' ? html`<ds-tag>Invited</ds-tag>` : ''}<ds-tag>${ROLE_WORDS[member.role]}</ds-tag>
         ${this.manage ? html`<ds-button id=${id} icon label=${`More for ${member.email}`}><ds-icon type="more"></ds-icon></ds-button>
-        <ds-select for=${id} aria-label=${`Actions for ${member.email}`}><ds-button menu-item role="menuitem" @click=${() => void this.removeMember(member)}>Remove</ds-button></ds-select>` : ''}</span>
+        <ds-select for=${id} aria-label=${`Actions for ${member.email}`}>${member.status === 'invited' ? html`<ds-button menu-item role="menuitem" ?disabled=${this.busy} @click=${() => void this.send(member.email, member.role, true)}>Send the invite again</ds-button>` : ''}<ds-button menu-item role="menuitem" @click=${() => void this.removeMember(member)}>Remove</ds-button></ds-select>` : ''}</span>
     </ds-row>`;
   }
 
