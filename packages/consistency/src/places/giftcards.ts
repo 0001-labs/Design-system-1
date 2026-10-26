@@ -192,7 +192,7 @@ export class ConsistencyPlaceGiftCards extends LitElement {
       } finally { this.acting = false; }
     };
     return html`<ds-list heading="Resend">
-        <ds-row><span class="ds-row__name">Send it to</span><span class="ds-row__value"><ds-input class="place-address" type="email" aria-label="Send it to" autocomplete="off" ?disabled=${this.acting}
+        <ds-row><span class="ds-row__name">Send it to</span><span class="ds-row__value"><ds-input class="place-recipient" type="email" aria-label="Send it to" autocomplete="off" ?disabled=${this.acting}
           .value=${this.resendTo} @input-change=${(event: CustomEvent<{ value: string }>) => { this.resendTo = event.detail.value; this.asking = null; }}></ds-input></span></ds-row>
       </ds-list>
       ${asking ? html`<div class="place-confirm" role="group" aria-label="Confirm sending">
@@ -252,8 +252,8 @@ export class ConsistencyPlaceGiftCards extends LitElement {
     return html`<div data-ds-overlay="header"><h2 data-ds-overlay="title" id="place-card-title">Issue a card</h2><p data-ds-overlay="description">A card given without payment, sent to the recipient at once and marked as issued by you.</p></div>
       <ds-list heading="Card">
         ${field(`Amount in ${currency.toUpperCase()}`, html`<ds-input class="place-amount" aria-label=${`Amount in ${currency.toUpperCase()}`} inputmode="numeric" placeholder="500" autocomplete="off" ?disabled=${issuing.busy} .value=${issuing.amount} @input-change=${(event: CustomEvent<{ value: string }>) => set({ amount: event.detail.value })}></ds-input>`)}
-        ${field('Recipient’s name', html`<ds-input class="place-address" aria-label="Recipient’s name" autocomplete="off" maxlength="120" ?disabled=${issuing.busy} .value=${issuing.name} @input-change=${(event: CustomEvent<{ value: string }>) => set({ name: event.detail.value })}></ds-input>`)}
-        ${field('Recipient’s email', html`<ds-input class="place-address" type="email" aria-label="Recipient’s email" autocomplete="off" placeholder="name@example.com" ?disabled=${issuing.busy} .value=${issuing.email} @input-change=${(event: CustomEvent<{ value: string }>) => set({ email: event.detail.value })}></ds-input>`)}
+        ${field('Recipient’s name', html`<ds-input class="place-recipient" aria-label="Recipient’s name" autocomplete="off" maxlength="120" ?disabled=${issuing.busy} .value=${issuing.name} @input-change=${(event: CustomEvent<{ value: string }>) => set({ name: event.detail.value })}></ds-input>`)}
+        ${field('Recipient’s email', html`<ds-input class="place-recipient" type="email" aria-label="Recipient’s email" autocomplete="off" placeholder="name@example.com" ?disabled=${issuing.busy} .value=${issuing.email} @input-change=${(event: CustomEvent<{ value: string }>) => set({ email: event.detail.value })}></ds-input>`)}
       </ds-list>
       <ds-list heading="Message">
         <ds-input multiline rows="4" aria-label="Message" maxlength=${GIFT_MESSAGE_LIMIT} ?disabled=${issuing.busy} .value=${issuing.message} @input-change=${(event: CustomEvent<{ value: string }>) => set({ message: event.detail.value })}></ds-input>
