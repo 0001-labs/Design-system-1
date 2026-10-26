@@ -34,6 +34,7 @@ import type * as signIn_password from "../signIn/password.js";
 import type * as signIn_providers from "../signIn/providers.js";
 import type * as signIn_redirect from "../signIn/redirect.js";
 import type * as signIn_social from "../signIn/social.js";
+import type * as signIn_systemOwner from "../signIn/systemOwner.js";
 import type * as signIn_users from "../signIn/users.js";
 import type * as users from "../users.js";
 import type * as versions from "../versions.js";
@@ -71,6 +72,7 @@ declare const fullApi: ApiFromModules<{
   "signIn/providers": typeof signIn_providers;
   "signIn/redirect": typeof signIn_redirect;
   "signIn/social": typeof signIn_social;
+  "signIn/systemOwner": typeof signIn_systemOwner;
   "signIn/users": typeof signIn_users;
   users: typeof users;
   versions: typeof versions;
