@@ -28,8 +28,18 @@ export type AskRow = {
   caption?: string;
   /** A palette colour for the head (`sharp-blue`, `apple-green`, …). */
   tone?: string;
+  /** A colour of its own for the head (a project's), in place of `tone`; `ink` is its words' colour on it. */
+  color?: string;
+  ink?: string;
+  /** Where it lives: pressing the address at the card's foot, or ⌘Return on the chosen card, copies it. */
+  href?: string;
+  /** Open to anyone with the address: a globe stands before it. */
+  public?: boolean;
   preview?: AskPreview;
 };
+
+/** How long "Copied" stands in place of a copied card's address. */
+const COPIED_MS = 1400;
 
 const WEEKS = 6;
 
@@ -55,6 +65,7 @@ export class Ask extends LitElement {
     rows: { attribute: false },
     chosen: { type: Number },
     completion: { type: String },
+    copied: { state: true },
   };
 
   static styles = [unsafeCSS(styles)];
@@ -65,8 +76,11 @@ export class Ask extends LitElement {
   declare answer: string;
   declare placeholder: string;
   declare rows: AskRow[];
+  /** The chosen card, or -1 for none: Return then asks rather than opens. */
   declare chosen: number;
   declare completion: string;
+  declare copied: number;
+  #copiedTimer: ReturnType<typeof setTimeout> | undefined;
 
   constructor() {
     super();
@@ -78,6 +92,24 @@ export class Ask extends LitElement {
     this.rows = [];
     this.chosen = 0;
     this.completion = "";
+    this.copied = -1;
+  }
+
+  /** Copy a card's address, the chosen one's by default; false when it has none or the clipboard refuses. */
+  async copyLink(index = this.chosen): Promise<boolean> {
+    const href = this.rows[index]?.href;
+    if (!href) return false;
+    const url = new URL(href, location.href).href;
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      return false;
+    }
+    this.copied = index;
+    clearTimeout(this.#copiedTimer);
+    this.#copiedTimer = setTimeout(() => { this.copied = -1; }, COPIED_MS);
+    this.dispatchEvent(new CustomEvent("ask-copy", { detail: { index, url }, bubbles: true, composed: true }));
+    return true;
   }
 
   connectedCallback() {
@@ -94,8 +126,16 @@ export class Ask extends LitElement {
 
   private readonly dismiss = (event: PointerEvent) => {
     if (!this.open) return;
-    // A card pressed opens it; anywhere else lets go.
-    const row = event.composedPath().find((node) => node instanceof HTMLElement && node.dataset.index !== undefined) as HTMLElement | undefined;
+    // A card's address pressed copies it; a card pressed opens it; anywhere else lets go.
+    const path = event.composedPath();
+    const address = path.find((node) => node instanceof HTMLElement && node.dataset.copy !== undefined) as HTMLElement | undefined;
+    if (address) {
+      event.preventDefault();
+      event.stopPropagation();
+      void this.copyLink(Number(address.dataset.copy));
+      return;
+    }
+    const row = path.find((node) => node instanceof HTMLElement && node.dataset.index !== undefined) as HTMLElement | undefined;
     if (row) {
       event.preventDefault();
       event.stopPropagation();
@@ -169,12 +209,33 @@ export class Ask extends LitElement {
       week.map((day) => html`<span class="day" ?data-mark=${day !== null && marks.has(day)} ?data-today=${day !== null && day === today}>${day ?? ""}</span>`))}</div>`;
   }
 
+  /**
+   * How far the card stands from the chosen one, and its own colour where it
+   * has one. With none chosen (Return will ask instead), every card stands a
+   * step back.
+   */
+  private cardStyle(row: AskRow, index: number): string {
+    return [
+      `--ds-ask-distance: ${this.chosen < 0 ? 1 : Math.abs(index - this.chosen)}`,
+      row.color ? `--ds-ask-tone: ${row.color}` : "",
+      row.ink ? `--ds-ask-head-ink: ${row.ink}` : "",
+    ].filter(Boolean).join("; ");
+  }
+
+  /** The foot's second line: the address, which copies itself when pressed, with a globe when it is public. */
+  private address(row: AskRow, index: number) {
+    const globe = row.public ? html`<ds-icon class="globe" type="globe" aria-label="Public"></ds-icon>` : nothing;
+    const words = this.copied === index ? "Copied" : row.caption ?? "";
+    if (!row.href) return html`<span class="caption">${globe}<span class="address">${words}</span></span>`;
+    return html`<span class="caption" data-copy=${index} role="button" title="Copy link" aria-label=${`Copy link: ${row.caption ?? row.href}`}>${globe}<span class="address">${words}</span></span>`;
+  }
+
   private cards() {
     if (this.state !== "writing" || !this.rows.length) return null;
     return html`<div class="cards" role="listbox" aria-label="Results">${this.rows.map((row, index) => html`
       <div class="card" role="option" data-index=${index} data-kind=${row.kind} data-tone=${row.tone ?? nothing}
         aria-selected=${index === this.chosen ? "true" : "false"} aria-label=${`${row.label ?? row.detail}: ${row.title}`}
-        style=${`--ds-ask-distance: ${Math.abs(index - this.chosen)}`}>
+        style=${this.cardStyle(row, index)}>
         <div class="head">
           <span class="label">${row.label ?? row.detail}</span>
           <ds-icon class="icon" type=${row.icon}></ds-icon>
@@ -183,7 +244,7 @@ export class Ask extends LitElement {
         <div class="body" data-preview=${row.preview?.type ?? "title"}>${this.preview(row)}</div>
         <div class="foot">
           <span class="title">${row.title}</span>
-          <span class="caption">${row.caption ?? ""}</span>
+          ${this.address(row, index)}
         </div>
       </div>`)}</div>`;
   }

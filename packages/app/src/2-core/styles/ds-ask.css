@@ -137,15 +137,16 @@
   align-items: end;
   padding: var(--ds-half) var(--ds-half) 0;
   background: var(--ds-ask-tone);
+  color: var(--ds-ask-head-ink, var(--ds-ask-ink));
 }
 .label { font-weight: var(--ds-type-weight-bold, 500); }
-.detail { grid-column: 1 / -1; color: color-mix(in srgb, var(--ds-ask-ink) 70%, transparent); }
+.detail { grid-column: 1 / -1; color: color-mix(in srgb, var(--ds-ask-head-ink, var(--ds-ask-ink)) 70%, transparent); }
 .icon {
   grid-row: 1;
   grid-column: 2;
   justify-self: end;
   align-self: end;
-  color: var(--ds-ask-ink);
+  color: inherit;
 }
 
 /* The peek at what it opens. */
@@ -235,7 +236,21 @@
   padding: 0 var(--ds-half) var(--ds-half);
 }
 .title { font-weight: var(--ds-type-weight-bold, 500); }
-.caption { color: var(--ds-ask-muted); }
+.caption {
+  display: flex;
+  align-items: flex-end;
+  gap: calc(4px * var(--sf, 1));
+  color: var(--ds-ask-muted);
+}
+/* A public address: the globe on the sixteen, the words after it. */
+.globe { flex: none; }
+/* An address that copies itself: the pointer says so, and it takes the ink and a hairline underneath. */
+.caption[data-copy] { cursor: copy; }
+.caption[data-copy]:hover .address {
+  color: var(--ds-ask-ink);
+  text-decoration: underline 1px;
+  text-underline-offset: calc(3px * var(--sf, 1));
+}
 
 /* The words, at the display size, under the cards and on the page's column. */
 .line, .answer {
