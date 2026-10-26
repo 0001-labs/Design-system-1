@@ -168,10 +168,209 @@ function N(e, t, n) {
 }
 //#endregion
 //#region src/icons/note.svg?raw
-var ee = "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M13.9653 3.31348V12.6865H2.03467V3.31348H13.9653ZM3.03467 11.6865H12.9653V4.31348H3.03467V11.6865Z\" fill=\"#1E1E1E\"/>\n<path d=\"M8.00641 7.08004V7.99996H3.71344V7.08004H8.00641ZM9.9527 5.08004V5.99996H3.71344V5.08004H9.9527Z\" fill=\"#1E1E1E\"/>\n</svg>\n", te = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\">\n<g id=\"Icons\">\n<g id=\"Delete\">\n<g id=\"Vector\">\n<path d=\"M7.0972 3.47745L13.9422 3.48149L13.9424 12.7615L7.09744 12.7655L2.31717 8.121L7.0972 3.47745ZM3.75174 8.12003L7.43924 11.7021H12.9422V4.51944H7.45877L3.75174 8.12003Z\" fill=\"currentColor\" />\n<path d=\"M8.16022 10.2823L7.45988 9.58199L8.92933 8.11177L7.45877 6.64608L8.16207 5.94278L9.63109 7.41184L11.1002 5.94278L11.8005 6.64312L10.3309 8.11372L11.8009 9.58047L11.0982 10.2827L9.62915 8.81366L8.16022 10.2823Z\" fill=\"currentColor\" />\n</g>\n</g>\n</g>\n</svg>\n", ne = "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M11.7982 7.99673L7.65899 12.1359L6.94737 11.4243L9.87875 8.50597L3.88054 8.51223L3.88054 7.49375L9.87875 7.48749L6.9539 4.56264L7.66552 3.86407L11.7982 7.99673Z\" fill=\"black\"/>\n<path d=\"M3.37131 7.99987C3.37131 8.81187 2.71305 9.47013 1.90105 9.47013C1.08904 9.47013 0.430786 8.81187 0.430786 7.99987C0.430786 7.18787 1.08904 6.52961 1.90105 6.52961C2.71305 6.52961 3.37131 7.18787 3.37131 7.99987Z\" fill=\"black\"/>\n<path d=\"M15.5692 7.99987C15.5692 8.81187 14.911 9.47013 14.099 9.47013C13.2869 9.47013 12.6287 8.81187 12.6287 7.99987C12.6287 7.18787 13.2869 6.52961 14.099 6.52961C14.911 6.52961 15.5692 7.18787 15.5692 7.99987Z\" fill=\"black\"/>\n</svg>\n";
+var ee = "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M13.9653 3.31348V12.6865H2.03467V3.31348H13.9653ZM3.03467 11.6865H12.9653V4.31348H3.03467V11.6865Z\" fill=\"#1E1E1E\"/>\n<path d=\"M8.00641 7.08004V7.99996H3.71344V7.08004H8.00641ZM9.9527 5.08004V5.99996H3.71344V5.08004H9.9527Z\" fill=\"#1E1E1E\"/>\n</svg>\n", te = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\">\n<g id=\"Icons\">\n<g id=\"Delete\">\n<g id=\"Vector\">\n<path d=\"M7.0972 3.47745L13.9422 3.48149L13.9424 12.7615L7.09744 12.7655L2.31717 8.121L7.0972 3.47745ZM3.75174 8.12003L7.43924 11.7021H12.9422V4.51944H7.45877L3.75174 8.12003Z\" fill=\"currentColor\" />\n<path d=\"M8.16022 10.2823L7.45988 9.58199L8.92933 8.11177L7.45877 6.64608L8.16207 5.94278L9.63109 7.41184L11.1002 5.94278L11.8005 6.64312L10.3309 8.11372L11.8009 9.58047L11.0982 10.2827L9.62915 8.81366L8.16022 10.2823Z\" fill=\"currentColor\" />\n</g>\n</g>\n</g>\n</svg>\n", ne = "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M11.7982 7.99673L7.65899 12.1359L6.94737 11.4243L9.87875 8.50597L3.88054 8.51223L3.88054 7.49375L9.87875 7.48749L6.9539 4.56264L7.66552 3.86407L11.7982 7.99673Z\" fill=\"black\"/>\n<path d=\"M3.37131 7.99987C3.37131 8.81187 2.71305 9.47013 1.90105 9.47013C1.08904 9.47013 0.430786 8.81187 0.430786 7.99987C0.430786 7.18787 1.08904 6.52961 1.90105 6.52961C2.71305 6.52961 3.37131 7.18787 3.37131 7.99987Z\" fill=\"black\"/>\n<path d=\"M15.5692 7.99987C15.5692 8.81187 14.911 9.47013 14.099 9.47013C13.2869 9.47013 12.6287 8.81187 12.6287 7.99987C12.6287 7.18787 13.2869 6.52961 14.099 6.52961C14.911 6.52961 15.5692 7.18787 15.5692 7.99987Z\" fill=\"black\"/>\n</svg>\n", re = { da: {
+	"Add a caption": "Tilføj billedtekst",
+	"Add a comment": "Tilføj en kommentar",
+	"Add headings to show them here.": "Tilføj overskrifter for at vise dem her.",
+	"Add reaction": "Tilføj reaktion",
+	"Add tab": "Tilføj fane",
+	"Added {name}": "Tilføjede {name}",
+	Apply: "Anvend",
+	"Arrow (A)": "Pil (A)",
+	"Ask AI": "Spørg AI",
+	"Ask AI about the selected words": "Spørg AI om de markerede ord",
+	"Ask AI about these words": "Spørg AI om disse ord",
+	"Ask AI or press space to speak": "Spørg AI, eller tryk mellemrum for at tale",
+	"Ask AI to write": "Bed AI om at skrive",
+	"Asking AI is not set up here": "AI er ikke sat op her",
+	"Block commands": "Blokkommandoer",
+	Blocks: "Blokke",
+	Blue: "Blå",
+	"Blue fill": "Blå baggrund",
+	Bold: "Fed",
+	Brown: "Brun",
+	"Brown fill": "Brun baggrund",
+	"Bulleted list": "Punktliste",
+	Button: "Knap",
+	"Button label": "Knaptekst",
+	"Button state": "Knaptilstand",
+	"Button: {label}, {state}": "Knap: {label}, {state}",
+	Callout: "Fremhævet boks",
+	"Callout icon": "Ikon til boksen",
+	Cancel: "Annullér",
+	chart: "diagram",
+	Close: "Luk",
+	"Close find": "Luk søgning",
+	Code: "Kode",
+	Colour: "Farve",
+	Columns: "Kolonner",
+	Comment: "Kommentér",
+	Comments: "Kommentarer",
+	Default: "Standard",
+	Delete: "Slet",
+	"Delete thread": "Slet tråd",
+	"Delete?": "Slet?",
+	"Deleted {name}": "Slettede {name}",
+	Diagram: "Diagram",
+	Divider: "Skillelinje",
+	Drawn: "Tegnet",
+	Duplicate: "Duplikér",
+	Edit: "Redigér",
+	"Edit button": "Redigér knap",
+	"Edit button: {label}, {state}": "Redigér knap: {label}, {state}",
+	"Edit comment": "Redigér kommentar",
+	"Edit link": "Redigér link",
+	Edited: "Redigeret",
+	Editing: "Redigerer",
+	Equation: "Ligning",
+	Find: "Find",
+	"Fit the width": "Tilpas bredden",
+	"Fits the width": "Tilpasser bredden",
+	Green: "Grøn",
+	"Green fill": "Grøn baggrund",
+	Grey: "Grå",
+	"Grey fill": "Grå baggrund",
+	grid: "gitter",
+	group: "gruppe",
+	Heading: "Overskrift",
+	"Heading 1": "Overskrift 1",
+	"Heading 2": "Overskrift 2",
+	"Heading 3": "Overskrift 3",
+	"Icon {emoji}": "Ikon {emoji}",
+	"Image or file": "Billede eller fil",
+	Indent: "Ryk ind",
+	"Insert block": "Indsæt blok",
+	Italic: "Kursiv",
+	Item: "Punkt",
+	item: "punkt",
+	"Item (I)": "Punkt (I)",
+	"Joined {name} to {end}": "Forbandt {name} med {end}",
+	"Joining {name}. Tab to the one to join it to, then Enter. Escape stops.": "Forbinder {name}. Tab til det, den skal forbindes med, og tryk Enter. Escape stopper.",
+	"Keeps its layout": "Beholder sit layout",
+	Label: "Tekst",
+	"Line (L)": "Linje (L)",
+	Link: "Link",
+	"Link URL": "Linkadresse",
+	"Listening…": "Lytter…",
+	"Made a line": "Lavede en linje",
+	"Made an arrow": "Lavede en pil",
+	month: "måned",
+	More: "Mere",
+	"Move down": "Flyt ned",
+	"Move up": "Flyt op",
+	"Moved {name}": "Flyttede {name}",
+	Name: "Navn",
+	"Named {name}": "Navngav {name}",
+	"Next comment": "Næste kommentar",
+	"Next match": "Næste resultat",
+	"No colour": "Ingen farve",
+	"No comments yet.": "Ingen kommentarer endnu.",
+	"No icon": "Intet ikon",
+	"No matching commands": "Ingen kommandoer passer",
+	"No microphone was found": "Der blev ikke fundet en mikrofon",
+	"Nobody to mention": "Ingen at nævne",
+	"Not answered": "Intet svar",
+	"Not joined": "Ikke forbundet",
+	"Not saved": "Ikke gemt",
+	Note: "Note",
+	note: "note",
+	"Note (N)": "Note (N)",
+	"Nothing here": "Intet her",
+	"Nothing resolved yet.": "Intet er løst endnu.",
+	"Nothing was heard: press Space twice to try again": "Intet blev hørt: tryk mellemrum to gange for at prøve igen",
+	"Numbered list": "Nummereret liste",
+	Open: "Åbne",
+	Orange: "Orange",
+	"Orange fill": "Orange baggrund",
+	Outdent: "Ryk ud",
+	"People to mention": "Personer at nævne",
+	"Picture width": "Billedbredde",
+	Pink: "Lyserød",
+	"Pink fill": "Lyserød baggrund",
+	"Press space for AI": "Tryk mellemrum for AI",
+	"Press space for AI or / for commands": "Tryk mellemrum for AI eller / for kommandoer",
+	"Press space for AI, or {action}": "Tryk mellemrum for AI, eller {action}",
+	"Press space to speak, or {action}": "Tryk mellemrum for at tale, eller {action}",
+	"Previous comment": "Forrige kommentar",
+	"Previous match": "Forrige resultat",
+	Purple: "Lilla",
+	"Purple fill": "Lilla baggrund",
+	Quote: "Citat",
+	"React with {emoji}": "Reagér med {emoji}",
+	Red: "Rød",
+	"Red fill": "Rød baggrund",
+	Reopen: "Genåbn",
+	Replace: "Erstat",
+	"Replace all": "Erstat alle",
+	Reply: "Svar",
+	Resolve: "Løs",
+	Resolved: "Løste",
+	"Resolved by {name}.": "Løst af {name}.",
+	"Resolved.": "Løst.",
+	Revert: "Fortryd",
+	"Revert what AI changed here": "Fortryd det, AI ændrede her",
+	"Revert what AI wrote here": "Fortryd det, AI skrev her",
+	"Select words and press Comment to start a thread.": "Markér ord, og tryk Kommentér for at starte en tråd.",
+	"Sized {name}": "Ændrede størrelsen på {name}",
+	"Speaking could not start here": "Tale kunne ikke starte her",
+	"Speaking is not available in this browser": "Tale virker ikke i denne browser",
+	"Speaking is turned off in this browser": "Tale er slået fra i denne browser",
+	"Speaking needs a connection": "Tale kræver forbindelse",
+	State: "Tilstand",
+	Strikethrough: "Gennemstreget",
+	"Tab chooses each item and line. Arrows move what is chosen, Alt and arrows size it, Enter or a click writes in it, L or A joins it to another, I adds an item, N a note, Delete takes it away.": "Tab vælger hvert punkt og hver linje. Pile flytter det valgte, Alt og pile ændrer størrelsen, Enter eller et klik skriver i det, L eller A forbinder det med et andet, I tilføjer et punkt, N en note, Delete fjerner det.",
+	"Tab name": "Fanenavn",
+	"Tab {number}": "Fane {number}",
+	Table: "Tabel",
+	"Table of contents": "Indholdsfortegnelse",
+	Tabs: "Faner",
+	Text: "Tekst",
+	"Text colour": "Tekstfarve",
+	"Text formatting": "Tekstformatering",
+	"The microphone is blocked: allow it for this site in Safari › Settings › Websites › Microphone": "Mikrofonen er blokeret: tillad den for siden i Safari › Indstillinger › Websteder › Mikrofon",
+	"The microphone is blocked: allow it for this site in the browser’s settings": "Mikrofonen er blokeret: tillad den for siden i browserens indstillinger",
+	"Thinking…": "Tænker…",
+	"To-do": "To do",
+	Toggle: "Fold ud",
+	"Toggle heading 1": "Fold ud-overskrift 1",
+	"Toggle heading 2": "Fold ud-overskrift 2",
+	"Toggle heading 3": "Fold ud-overskrift 3",
+	"Turn into": "Lav om til",
+	"Turn on Dictation in System Settings › Keyboard to speak here": "Slå Diktering til i Systemindstillinger › Tastatur for at tale her",
+	"Type / for commands": "Skriv / for kommandoer",
+	Underline: "Understreget",
+	Unnamed: "Unavngivet",
+	White: "Hvid",
+	"White fill": "Hvid baggrund",
+	write: "skriv",
+	Yellow: "Gul",
+	"Yellow fill": "Gul baggrund",
+	"{count} comment": "{count} kommentar",
+	"{count} comments": "{count} kommentarer",
+	"{count} matches": "{count} resultater",
+	"{count} resolved": "{count} løst",
+	"{number} of {count}": "{number} af {count}",
+	"{words} words, {characters} characters": "{words} ord, {characters} tegn"
+} }, ie = Symbol.for("design-system-1.translate"), P = null;
+function ae() {
+	return (typeof document > "u" ? "" : document.documentElement.lang || "").trim().toLowerCase() || "en";
+}
+function F(e, t) {
+	let n = ae(), r = typeof P == "function" ? P(e, n) : P?.[e];
+	if (r === void 0) {
+		let t = globalThis[ie];
+		if (typeof t == "function") {
+			let n = String(t(e));
+			n !== e && (r = n);
+		}
+	}
+	r === void 0 && (r = re[n]?.[e] ?? re[n.split("-")[0]]?.[e]);
+	let i = r ?? e;
+	return t ? i.replace(/\{(\w+)\}/g, (e, n) => n in t ? String(t[n]) : e) : i;
+}
 //#endregion
 //#region src/shimmer.ts
-function re(e) {
+function oe(e) {
 	let t = /^rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)/.exec(e);
 	if (t) return (.2126 * t[1] + .7152 * t[2] + .0722 * t[3]) / 255;
 	let n = /^color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)/.exec(e);
@@ -183,23 +382,23 @@ function re(e) {
 }
 //#endregion
 //#region src/prompt.ts
-var P = typeof navigator < "u" && /^((?!chrome|chromium|android|crios|fxios|edg).)*safari/i.test(navigator.userAgent);
-function ie(e) {
-	return e === "not-allowed" ? P ? "The microphone is blocked: allow it for this site in Safari › Settings › Websites › Microphone" : "The microphone is blocked: allow it for this site in the browser’s settings" : e === "service-not-allowed" ? P ? "Turn on Dictation in System Settings › Keyboard to speak here" : "Speaking is turned off in this browser" : e === "audio-capture" ? "No microphone was found" : e === "network" ? "Speaking needs a connection" : e === "no-speech" ? "Nothing was heard: press Space twice to try again" : null;
+var I = typeof navigator < "u" && /^((?!chrome|chromium|android|crios|fxios|edg).)*safari/i.test(navigator.userAgent);
+function se(e) {
+	return e === "not-allowed" ? F(I ? "The microphone is blocked: allow it for this site in Safari › Settings › Websites › Microphone" : "The microphone is blocked: allow it for this site in the browser’s settings") : e === "service-not-allowed" ? F(I ? "Turn on Dictation in System Settings › Keyboard to speak here" : "Speaking is turned off in this browser") : e === "audio-capture" ? F("No microphone was found") : e === "network" ? F("Speaking needs a connection") : e === "no-speech" ? F("Nothing was heard: press Space twice to try again") : null;
 }
-function ae() {
+function ce() {
 	let e = globalThis, t = e.SpeechRecognition ?? e.webkitSpeechRecognition;
 	return t ? new t() : null;
 }
-function oe(e, t, n) {
+function le(e, t, n) {
 	return e ? .85 : Math.min(1, .55 + .3 * t + .3 * n);
 }
-function se(e, t) {
+function ue(e, t) {
 	if (t.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return {
 		followVoice: null,
 		stop: () => {}
 	};
-	let n = 0, r = !1, i = 0, a = oe(!1, 0, 0), o = null, s, c, l = /* @__PURE__ */ new Float32Array(512), u = performance.now(), d = -Infinity, f = !1, p = null, m = (t) => {
+	let n = 0, r = !1, i = 0, a = le(!1, 0, 0), o = null, s, c, l = /* @__PURE__ */ new Float32Array(512), u = performance.now(), d = -Infinity, f = !1, p = null, m = (t) => {
 		if (r) return;
 		o && (o.getFloatTimeDomainData(l), i += (Math.min(1, Math.sqrt(l.reduce((e, t) => e + t * t, 0) / l.length) * 8) - i) * .15);
 		let s = e.getBoundingClientRect();
@@ -210,11 +409,11 @@ function se(e, t) {
 		let c = t - d < 500;
 		f && !c && (u = t), f = c;
 		let h = .5 - .5 * Math.cos((t - u) / 2400 * 2 * Math.PI);
-		a += (oe(c, h, i) - a) * .12, e.style.opacity = a.toFixed(3), n = requestAnimationFrame(m);
+		a += (le(c, h, i) - a) * .12, e.style.opacity = a.toFixed(3), n = requestAnimationFrame(m);
 	};
 	return n = requestAnimationFrame(m), {
 		followVoice: async () => {
-			if (!P && navigator.mediaDevices?.getUserMedia && typeof AudioContext < "u") try {
+			if (!I && navigator.mediaDevices?.getUserMedia && typeof AudioContext < "u") try {
 				let e = await navigator.mediaDevices.getUserMedia({ audio: !0 });
 				if (r) {
 					e.getTracks().forEach((e) => e.stop());
@@ -228,9 +427,9 @@ function se(e, t) {
 		}
 	};
 }
-function ce(e) {
+function de(e) {
 	let t = e.type.ownerDocument, n = t.defaultView, r = t.createElement("div");
-	r.className = "aa-prompt", r.setAttribute("role", "textbox"), r.setAttribute("aria-label", "Ask AI"), r.dataset.placeholder = e.placeholder ?? "Ask AI or press space to speak", r.spellcheck = !1;
+	r.className = "aa-prompt", r.setAttribute("role", "textbox"), r.setAttribute("aria-label", F("Ask AI")), r.dataset.placeholder = e.placeholder ?? F("Ask AI or press space to speak"), r.spellcheck = !1;
 	try {
 		r.contentEditable = "plaintext-only";
 	} catch {
@@ -245,7 +444,7 @@ function ce(e) {
 		"letter-spacing",
 		"line-height"
 	]) r.style.setProperty(e, i.getPropertyValue(e));
-	let a = re(i.color);
+	let a = oe(i.color);
 	a !== null && a > .5 && (r.dataset.dark = "");
 	let o = e.root ?? t.body;
 	o.append(r);
@@ -292,7 +491,7 @@ function ce(e) {
 		g?.remove(), g = null, _ &&= (_.stop(), null);
 	}, x = () => {
 		if (!g) return null;
-		let e = se(g, n);
+		let e = ue(g, n);
 		return _ = {
 			frame: 0,
 			stop: e.stop
@@ -300,15 +499,15 @@ function ce(e) {
 	}, S = () => (r.textContent ?? "").replace(/\s+/g, " ").trim(), C = (t = !1) => {
 		d || (d = !0, f?.abort(), m?.abort(), b(), p(), s?.disconnect(), r.remove(), e.grow?.(0), n.removeEventListener("scroll", u, !0), n.removeEventListener("resize", u), e.close(t));
 	}, w = () => {
-		let i = ae();
+		let i = ce();
 		if (!i) {
-			r.dataset.placeholder = "Speaking is not available in this browser";
+			r.dataset.placeholder = F("Speaking is not available in this browser");
 			return;
 		}
 		m = i, r.dataset.listening = "", g = Object.assign(t.createElement("span"), {
 			className: "aa-prompt-caret",
 			contentEditable: "false"
-		}), g.setAttribute("aria-hidden", "true"), r.append(g), y(), v(), r.dataset.placeholder = "Listening…", i.lang = t.documentElement.lang || navigator.language, i.continuous = !0, i.interimResults = !0;
+		}), g.setAttribute("aria-hidden", "true"), r.append(g), y(), v(), r.dataset.placeholder = F("Listening…"), i.lang = t.documentElement.lang || navigator.language, i.continuous = !0, i.interimResults = !0;
 		let a = null;
 		i.onresult = (e) => {
 			for (let n = e.resultIndex; n < e.results.length; n++) {
@@ -322,14 +521,14 @@ function ce(e) {
 			let i = n.getSelection();
 			i?.rangeCount && r.contains(i.anchorNode) && !(i.isCollapsed && g && i.anchorNode === r && r.childNodes[i.anchorOffset] === g) || v();
 		}, i.onend = () => {
-			m = null, b(), delete r.dataset.listening, r.dataset.placeholder = a ?? e.placeholder ?? "Ask AI to write";
+			m = null, b(), delete r.dataset.listening, r.dataset.placeholder = a ?? e.placeholder ?? F("Ask AI to write");
 		}, i.onerror = (e) => {
-			a = ie(e.error) ?? a, i.onend?.();
+			a = se(e.error) ?? a, i.onend?.();
 		};
 		try {
 			i.start();
 		} catch {
-			a = "Speaking could not start here", i.onend?.();
+			a = F("Speaking could not start here"), i.onend?.();
 			return;
 		}
 		let o = x();
@@ -339,7 +538,7 @@ function ce(e) {
 	}, T = async () => {
 		let t = S();
 		if (t && !f) {
-			m?.stop(), f = new AbortController(), r.contentEditable = "false", r.dataset.loading = "", r.setAttribute("aria-busy", "true"), p = le([r, ...e.about()]);
+			m?.stop(), f = new AbortController(), r.contentEditable = "false", r.dataset.loading = "", r.setAttribute("aria-busy", "true"), p = fe([r, ...e.about()]);
 			try {
 				await e.send(t, f.signal), C(!0);
 			} catch {
@@ -370,7 +569,7 @@ function ce(e) {
 		close: () => C()
 	};
 }
-function le(e, t) {
+function fe(e, t) {
 	let n = [];
 	for (let t of e) {
 		if (!(t instanceof HTMLElement) || !t.isConnected) continue;
@@ -383,24 +582,24 @@ function le(e, t) {
 }
 //#endregion
 //#region src/vendor/drag/util.ts
-function ue(e) {
+function pe(e) {
 	let t = !1, n;
 	return ((...r) => (t || (t = !0, n = e(...r)), n));
 }
 //#endregion
 //#region src/vendor/drag/grid.ts
-var F = {
+var L = {
 	dragDistance: 5,
 	touchHold: 250,
 	autoScrollEdge: 40,
 	step: 4
-}, de = 20, I = "data-0001-drag-grid-style", fe = ":root[data-drag-grid],:root[data-drag-grid] *{-webkit-user-select:none!important;user-select:none!important}";
-function pe(e = {}) {
+}, me = 20, he = "data-0001-drag-grid-style", ge = ":root[data-drag-grid],:root[data-drag-grid] *{-webkit-user-select:none!important;user-select:none!important}";
+function _e(e = {}) {
 	let t = {
-		dragDistance: e.dragDistance ?? F.dragDistance,
-		touchHold: e.touchHold ?? F.touchHold,
-		autoScrollEdge: e.autoScrollEdge ?? F.autoScrollEdge,
-		step: e.step ?? F.step
+		dragDistance: e.dragDistance ?? L.dragDistance,
+		touchHold: e.touchHold ?? L.touchHold,
+		autoScrollEdge: e.autoScrollEdge ?? L.autoScrollEdge,
+		step: e.step ?? L.step
 	}, n = e.pointerPoint ?? ((e) => ({
 		x: e.clientX,
 		y: e.clientY
@@ -415,7 +614,7 @@ function pe(e = {}) {
 		let n = (e) => {
 			t.press && u(e, t, t.press);
 		};
-		return e.element.addEventListener("pointerdown", n), ue(() => {
+		return e.element.addEventListener("pointerdown", n), pe(() => {
 			e.element.removeEventListener("pointerdown", n), r.get(e.element) === t && r.delete(e.element), i?.surface === t && S(), a?.surface === t && E("cancel");
 		});
 	}
@@ -424,14 +623,14 @@ function pe(e = {}) {
 			let n = r.get(e.surface);
 			n && u(t, n, e.press);
 		};
-		return e.element.addEventListener("pointerdown", t), ue(() => e.element.removeEventListener("pointerdown", t));
+		return e.element.addEventListener("pointerdown", t), pe(() => e.element.removeEventListener("pointerdown", t));
 	}
 	function u(e, r, s) {
 		if (o || a || i || e.pointerType === "mouse" && e.button !== 0) return;
-		let c = e.pointerType === "touch" || e.pointerType === "pen" ? e.pointerType : "mouse", l = n(e), u = L(r, l.x, l.y), f = e.composedPath?.()[0], p = f instanceof Element ? f : e.target instanceof Element ? e.target : null, m = s({
+		let c = e.pointerType === "touch" || e.pointerType === "pen" ? e.pointerType : "mouse", l = n(e), u = R(r, l.x, l.y), f = e.composedPath?.()[0], p = f instanceof Element ? f : e.target instanceof Element ? e.target : null, m = s({
 			input: c,
 			point: u.point,
-			square: R(u.point),
+			square: z(u.point),
 			inside: u.inside,
 			target: p,
 			event: e
@@ -462,7 +661,7 @@ function pe(e = {}) {
 			point: e.origin,
 			landed: -1,
 			scrollFrame: null
-		}, ge(e.surface.element.ownerDocument), e.surface.element.ownerDocument.documentElement.setAttribute("data-drag-grid", "");
+		}, be(e.surface.element.ownerDocument), e.surface.element.ownerDocument.documentElement.setAttribute("data-drag-grid", "");
 		let t = O(a);
 		e.gesture.onStart?.(t), e.gesture.onMove?.(t);
 	}
@@ -499,8 +698,8 @@ function pe(e = {}) {
 			if (e.key === "Escape") E("cancel");
 			else if (n.input !== "keyboard") return;
 			else if (e.key === "Enter" || e.key === " ") E("drop");
-			else if (e.key in me) {
-				let r = e.shiftKey ? t.step : 1, i = me[e.key];
+			else if (e.key in ve) {
+				let r = e.shiftKey ? t.step : 1, i = ve[e.key];
 				n.point = {
 					x: Math.max(0, n.point.x + i.x * r),
 					y: Math.max(0, n.point.y + i.y * r)
@@ -570,7 +769,7 @@ function pe(e = {}) {
 		e.gesture.onStart?.(n), e.gesture.onMove?.(n), M(e.gesture.announce?.(n, "start"));
 	}
 	function T(e, t) {
-		e.input !== "keyboard" && (e.point = L(e.surface, e.clientX, e.clientY).point);
+		e.input !== "keyboard" && (e.point = R(e.surface, e.clientX, e.clientY).point);
 		let n = O(e);
 		e.gesture.onMove?.(n), t && M(e.gesture.announce?.(n, t));
 	}
@@ -589,18 +788,18 @@ function pe(e = {}) {
 		E("cancel");
 	}
 	function O(e) {
-		let t = e.input === "keyboard" || L(e.surface, e.clientX, e.clientY).inside;
+		let t = e.input === "keyboard" || R(e.surface, e.clientX, e.clientY).inside;
 		return {
 			input: e.input,
 			origin: e.origin,
 			point: e.point,
-			square: R(e.point),
+			square: z(e.point),
 			moved: {
 				x: Math.round(e.point.x - e.origin.x),
 				y: Math.round(e.point.y - e.origin.y)
 			},
 			inside: t,
-			target: e.input === "keyboard" ? null : he(e.surface.element.ownerDocument, e.clientX, e.clientY)
+			target: e.input === "keyboard" ? null : ye(e.surface.element.ownerDocument, e.clientX, e.clientY)
 		};
 	}
 	function k(e) {
@@ -608,7 +807,7 @@ function pe(e = {}) {
 			input: e.input,
 			origin: e.origin,
 			point: e.origin,
-			square: R(e.origin),
+			square: z(e.origin),
 			moved: {
 				x: 0,
 				y: 0
@@ -645,7 +844,7 @@ function pe(e = {}) {
 	function j(e) {
 		let n = t.autoScrollEdge, r = (e, t, r) => {
 			let i = e - t, a = t + r - e;
-			return i < n ? -20 * ((n - Math.max(i, 0)) / n) ** 2 : a < n ? de * ((n - Math.max(a, 0)) / n) ** 2 : 0;
+			return i < n ? -20 * ((n - Math.max(i, 0)) / n) ** 2 : a < n ? me * ((n - Math.max(a, 0)) / n) ** 2 : 0;
 		}, i = e.surface.element, a = i.getBoundingClientRect();
 		if (e.clientX >= a.left && e.clientX < a.right && e.clientY >= a.top && e.clientY < a.bottom) {
 			let t = i.scrollWidth > i.clientWidth ? r(e.clientX, a.left, a.width) : 0, n = i.scrollHeight > i.clientHeight ? r(e.clientY, a.top, a.height) : 0;
@@ -663,7 +862,7 @@ function pe(e = {}) {
 		} : null;
 	}
 	function M(e) {
-		e && (s ??= _e(document), s.textContent = e);
+		e && (s ??= xe(document), s.textContent = e);
 	}
 	function N() {
 		o || (D(), o = !0, r.clear(), x(), s?.remove(), s = null);
@@ -677,7 +876,7 @@ function pe(e = {}) {
 		destroy: N
 	};
 }
-var me = {
+var ve = {
 	ArrowUp: {
 		x: 0,
 		y: -1
@@ -695,7 +894,7 @@ var me = {
 		y: 0
 	}
 };
-function L(e, t, n) {
+function R(e, t, n) {
 	let r = e.element, i = r.getBoundingClientRect(), a = r.offsetWidth > 0 && i.width > 0 && Math.abs(i.width / r.offsetWidth - 1) >= .02 ? i.width / r.offsetWidth : 1, o = e.unit() || 1;
 	return {
 		point: {
@@ -705,13 +904,13 @@ function L(e, t, n) {
 		inside: t >= i.left && t < i.left + i.width && n >= i.top && n < i.top + i.height
 	};
 }
-function R(e) {
+function z(e) {
 	return {
 		x: Math.floor(e.x),
 		y: Math.floor(e.y)
 	};
 }
-function he(e, t, n) {
+function ye(e, t, n) {
 	let r = e.elementFromPoint?.(t, n) ?? null;
 	for (; r?.shadowRoot;) {
 		let e = r.shadowRoot.elementFromPoint?.(t, n) ?? null;
@@ -720,12 +919,12 @@ function he(e, t, n) {
 	}
 	return r;
 }
-function ge(e) {
-	if (e.querySelector(`style[${I}]`)) return;
+function be(e) {
+	if (e.querySelector(`style[${he}]`)) return;
 	let t = e.createElement("style");
-	t.setAttribute(I, ""), t.textContent = fe, e.head.appendChild(t);
+	t.setAttribute(he, ""), t.textContent = ge, e.head.appendChild(t);
 }
-function _e(e) {
+function xe(e) {
 	let t = e.createElement("div");
 	return t.setAttribute("aria-live", "assertive"), t.setAttribute("aria-atomic", "true"), Object.assign(t.style, {
 		position: "absolute",
@@ -741,7 +940,7 @@ function _e(e) {
 }
 //#endregion
 //#region src/diagram-board.css?inline
-var ve = ":host{--board-unit:var(--aa-diagram-unit,var(--ds-grid-unit,calc(20px * var(--sf,1))));--board-sf:var(--ds-sf,var(--sf,1));--board-ring:var(--ds-focus-ring,#594dff);--board-rule:var(--lightningcss-light,#1e1e1e1a)var(--lightningcss-dark,#ffffff1a);--board-fill:var(--lightningcss-light,#1e1e1e0f)var(--lightningcss-dark,#ffffff14);--board-ink:var(--ds-text-color,var(--lightningcss-light,#1e1e1e)var(--lightningcss-dark,#fff));--board-hover:var(--lightningcss-light,#1e1e1e1f)var(--lightningcss-dark,#ffffff29);--board-paper:var(--lightningcss-light,var(--ds-white,#fff))var(--lightningcss-dark,var(--ds-slate,#1e1e1e));--board-text:var(--ds-text-color,var(--lightningcss-light,#1e1e1e)var(--lightningcss-dark,#fff));--board-rule-strong:var(--lightningcss-light,#1e1e1e33)var(--lightningcss-dark,#fff3);-webkit-user-select:none;user-select:none;outline:none;display:block;position:relative}.probe{width:var(--board-unit);visibility:hidden;pointer-events:none;height:0;position:absolute}.paper{max-width:100%;position:relative;overflow:auto hidden}::slotted(*){margin-inline-start:0}.paper{background-image:linear-gradient(to right, var(--board-rule) 1px, transparent 1px), linear-gradient(to bottom, var(--board-rule) 1px, transparent 1px);background-size:var(--board-unit) var(--board-unit);background-position:-.5px -.5px;background-attachment:local}:host([data-active]) .paper{height:calc(var(--board-rows) * var(--board-unit));background-image:linear-gradient(to right, var(--board-rule) 1px, transparent 1px), linear-gradient(to bottom, var(--board-rule) 1px, transparent 1px);background-size:var(--board-unit) var(--board-unit);background-position:-.5px -.5px;background-attachment:local}:host([data-active]) .layer{width:max(100%, calc(var(--board-columns) * var(--board-unit)));right:auto}:host([data-editable]) .paper{cursor:default}:host([data-editable][data-over]) .paper{cursor:grab}:host([data-mode=line]) .paper,:host([data-mode=arrow]) .paper,:host([data-joining]) .paper{cursor:crosshair}:host([data-moving]),:host([data-moving]) .paper{cursor:grabbing}:host([data-sizing]),:host([data-sizing]) .paper{cursor:ew-resize}.layer{z-index:2;pointer-events:none;position:absolute;inset:0}.ring,.ghost-box,.grip{width:calc(var(--w) * var(--board-unit));height:calc(var(--h) * var(--board-unit));box-sizing:border-box;transform:translate(calc(var(--x) * var(--board-unit)), calc(var(--y) * var(--board-unit)));position:absolute;top:0;left:0}:host([data-moving]) .ring,.ghost-box{transition:transform .14s cubic-bezier(.2,.7,.3,1)}:host([data-moving]) .grip{display:none}@media (prefers-reduced-motion:reduce){:host([data-moving]) .ring,.ghost-box{transition:none}}.ghost-box{box-shadow:inset 0 0 0 1px var(--board-ring);opacity:.6}.ring[hidden],.ghost-box[hidden],.grip[hidden]{display:none}.grip{transform:translate(calc((var(--x) + var(--w)) * var(--board-unit) - 4px * var(--board-sf)), calc(var(--y) * var(--board-unit) + (var(--h) * var(--board-unit) - 16px * var(--board-sf)) / 2));width:calc(8px * var(--board-sf));height:calc(16px * var(--board-sf));border-radius:calc(2px * var(--board-sf));background:var(--board-ring);cursor:ew-resize;pointer-events:auto;touch-action:none}.grip[data-corner]{transform:translate(calc((var(--x) + var(--w)) * var(--board-unit) - 4px * var(--board-sf)), calc((var(--y) + var(--h)) * var(--board-unit) - 4px * var(--board-sf)));height:calc(8px * var(--board-sf));cursor:nwse-resize}.lines{fill:none;width:100%;height:100%;stroke:var(--board-ring);stroke-width:2px;position:absolute;inset:0;overflow:visible}.rename{left:calc(var(--x) * var(--board-unit));top:calc(var(--y) * var(--board-unit));width:calc(var(--w) * var(--board-unit));height:var(--board-unit);box-sizing:border-box;padding:0 calc(4px * var(--board-sf));color:inherit;font:inherit;line-height:var(--board-unit);letter-spacing:inherit;pointer-events:auto;-webkit-user-select:text;user-select:text;background:var(--lightningcss-light,#fff)var(--lightningcss-dark,#000);border:0;border-radius:0;outline:none;margin:0;position:absolute}.rename[hidden]{display:none}:host([data-editable]:not([data-active])) .paper{padding-bottom:var(--board-unit)}.tools{width:max-content;max-width:100%;height:calc(var(--board-unit) - 1px);margin-top:calc(1px - var(--board-unit));scrollbar-width:none;clip-path:inset(0 round var(--ds-radius,calc(4px * var(--board-sf))));gap:1px;margin-inline:auto;display:flex;position:relative;overflow-x:auto}.tools button{flex:none}:host(:not([data-editable])) .tools{display:none}.tools{opacity:0;visibility:hidden;transition:opacity .14s ease-out,visibility 0s linear .14s}:host([data-active]) .tools,:host(:focus-within) .tools{opacity:1;visibility:visible;transition:opacity .14s ease-out,visibility}@media (hover:hover){:host(:hover) .tools{opacity:1;visibility:visible;transition:opacity .14s ease-out,visibility}}@media (prefers-reduced-motion:reduce){.tools,:host(:hover) .tools,:host([data-active]) .tools,:host(:focus-within) .tools{transition:none}}.tools button{box-sizing:border-box;width:var(--board-unit);height:calc(var(--board-unit) - 1px);background:var(--board-fill);color:var(--board-ink);cursor:pointer;border:0;border-radius:0;justify-content:center;align-items:flex-end;margin:0;padding:0;display:inline-flex}.tools button:hover,.tools button[aria-pressed=true]{background:var(--board-hover)}.tools button:focus-visible{box-shadow:inset 0 0 0 2px var(--board-ring);outline:0}.tools button:disabled{cursor:default}.tools button:disabled>*{opacity:.4}.tools .gap{width:1px}.icon{width:calc(16px * var(--board-sf));height:calc(16px * var(--board-sf));-webkit-mask:var(--icon) center / contain no-repeat;mask:var(--icon) center / contain no-repeat;background:currentColor}.chip{width:calc(12px * var(--board-sf));height:calc(12px * var(--board-sf));margin-bottom:calc(2px * var(--board-sf));border-radius:calc(2px * var(--board-sf));background:var(--chip)}.chip[data-none]{background:0 0;box-shadow:inset 0 0 0 1px}.colors{z-index:4;box-sizing:border-box;width:calc(6 * var(--board-unit));padding:calc(var(--board-unit) / 2 - 1px) 0;border:1px solid var(--board-rule-strong);border-radius:var(--ds-radius,calc(4px * var(--board-sf)));background:var(--board-paper);color:var(--board-text);margin:0;position:fixed;inset:auto}.colors[hidden]{display:none}.colors button{align-items:flex-end;gap:calc(4px * var(--board-sf));box-sizing:border-box;width:100%;height:var(--board-unit);padding:0 calc(var(--board-unit) / 2 - 1px);color:inherit;font:inherit;line-height:calc(16px * var(--board-sf));text-align:start;cursor:pointer;background:0 0;border:0;margin:0;display:flex}.colors .chip{margin:0 calc(2px * var(--board-sf)) calc(2px * var(--board-sf));flex:none}.colors button:hover,.colors button[aria-checked=true]{background:var(--board-rule)}.colors button:focus-visible{box-shadow:inset 0 0 0 2px var(--board-ring);outline:0}@media (hover:hover) and (pointer:fine){.tools .for-touch{display:none}}", ye = "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<g stroke=\"currentColor\" stroke-width=\"0.92\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M2.25 5L8 2.25L13.75 5V11L8 13.75L2.25 11Z\"/><path d=\"M2.25 5L8 7.75L13.75 5M8 7.75V13.75\"/><path d=\"M5.1 3.6L10.9 6.4\"/></g>\n</svg>\n", be = "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M13.1566 8.60594H0V9.61651L13.1562 9.61791L10.249 12.5251L10.9558 13.219L15.0636 9.11123L10.9524 5L10.245 5.70734L13.1566 8.60594Z\" fill=\"currentColor\"/>\n</svg>\n", xe = "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M4.67614 12.123L0.536957 7.98382L4.66961 3.85117L5.38124 4.54974L2.45639 7.47459L13.5436 7.50693L10.6122 4.5886L11.3239 3.87698L15.463 8.01616L11.3304 12.1488L10.6188 11.4503L13.5436 8.5254L2.45639 8.49306L5.38777 11.4114L4.67614 12.123Z\" fill=\"currentColor\"/>\n</svg>\n", z = {
+var Se = ":host{--board-unit:var(--aa-diagram-unit,var(--ds-grid-unit,calc(20px * var(--sf,1))));--board-sf:var(--ds-sf,var(--sf,1));--board-ring:var(--ds-focus-ring,#594dff);--board-rule:var(--lightningcss-light,#1e1e1e1a)var(--lightningcss-dark,#ffffff1a);--board-fill:var(--lightningcss-light,#1e1e1e0f)var(--lightningcss-dark,#ffffff14);--board-ink:var(--ds-text-color,var(--lightningcss-light,#1e1e1e)var(--lightningcss-dark,#fff));--board-hover:var(--lightningcss-light,#1e1e1e1f)var(--lightningcss-dark,#ffffff29);--board-paper:var(--lightningcss-light,var(--ds-white,#fff))var(--lightningcss-dark,var(--ds-slate,#1e1e1e));--board-text:var(--ds-text-color,var(--lightningcss-light,#1e1e1e)var(--lightningcss-dark,#fff));--board-rule-strong:var(--lightningcss-light,#1e1e1e33)var(--lightningcss-dark,#fff3);-webkit-user-select:none;user-select:none;outline:none;display:block;position:relative}.probe{width:var(--board-unit);visibility:hidden;pointer-events:none;height:0;position:absolute}.paper{max-width:100%;position:relative;overflow:auto hidden}::slotted(*){margin-inline-start:0}.paper{background-image:linear-gradient(to right, var(--board-rule) 1px, transparent 1px), linear-gradient(to bottom, var(--board-rule) 1px, transparent 1px);background-size:var(--board-unit) var(--board-unit);background-position:-.5px -.5px;background-attachment:local}:host([data-active]) .paper{height:calc(var(--board-rows) * var(--board-unit));background-image:linear-gradient(to right, var(--board-rule) 1px, transparent 1px), linear-gradient(to bottom, var(--board-rule) 1px, transparent 1px);background-size:var(--board-unit) var(--board-unit);background-position:-.5px -.5px;background-attachment:local}:host([data-active]) .layer{width:max(100%, calc(var(--board-columns) * var(--board-unit)));right:auto}:host([data-editable]) .paper{cursor:default}:host([data-editable][data-over]) .paper{cursor:grab}:host([data-mode=line]) .paper,:host([data-mode=arrow]) .paper,:host([data-joining]) .paper{cursor:crosshair}:host([data-moving]),:host([data-moving]) .paper{cursor:grabbing}:host([data-sizing]),:host([data-sizing]) .paper{cursor:ew-resize}.layer{z-index:2;pointer-events:none;position:absolute;inset:0}.ring,.ghost-box,.grip{width:calc(var(--w) * var(--board-unit));height:calc(var(--h) * var(--board-unit));box-sizing:border-box;transform:translate(calc(var(--x) * var(--board-unit)), calc(var(--y) * var(--board-unit)));position:absolute;top:0;left:0}:host([data-moving]) .ring,.ghost-box{transition:transform .14s cubic-bezier(.2,.7,.3,1)}:host([data-moving]) .grip{display:none}@media (prefers-reduced-motion:reduce){:host([data-moving]) .ring,.ghost-box{transition:none}}.ghost-box{box-shadow:inset 0 0 0 1px var(--board-ring);opacity:.6}.ring[hidden],.ghost-box[hidden],.grip[hidden]{display:none}.grip{transform:translate(calc((var(--x) + var(--w)) * var(--board-unit) - 4px * var(--board-sf)), calc(var(--y) * var(--board-unit) + (var(--h) * var(--board-unit) - 16px * var(--board-sf)) / 2));width:calc(8px * var(--board-sf));height:calc(16px * var(--board-sf));border-radius:calc(2px * var(--board-sf));background:var(--board-ring);cursor:ew-resize;pointer-events:auto;touch-action:none}.grip[data-corner]{transform:translate(calc((var(--x) + var(--w)) * var(--board-unit) - 4px * var(--board-sf)), calc((var(--y) + var(--h)) * var(--board-unit) - 4px * var(--board-sf)));height:calc(8px * var(--board-sf));cursor:nwse-resize}.lines{fill:none;width:100%;height:100%;stroke:var(--board-ring);stroke-width:2px;position:absolute;inset:0;overflow:visible}.rename{left:calc(var(--x) * var(--board-unit));top:calc(var(--y) * var(--board-unit));width:calc(var(--w) * var(--board-unit));height:var(--board-unit);box-sizing:border-box;padding:0 calc(4px * var(--board-sf));color:inherit;font:inherit;line-height:var(--board-unit);letter-spacing:inherit;pointer-events:auto;-webkit-user-select:text;user-select:text;background:var(--lightningcss-light,#fff)var(--lightningcss-dark,#000);border:0;border-radius:0;outline:none;margin:0;position:absolute}.rename[hidden]{display:none}:host([data-editable]:not([data-active])) .paper{padding-bottom:var(--board-unit)}.tools{width:max-content;max-width:100%;height:calc(var(--board-unit) - 1px);margin-top:calc(1px - var(--board-unit));scrollbar-width:none;clip-path:inset(0 round var(--ds-radius,calc(4px * var(--board-sf))));gap:1px;margin-inline:auto;display:flex;position:relative;overflow-x:auto}.tools button{flex:none}:host(:not([data-editable])) .tools{display:none}.tools{opacity:0;visibility:hidden;transition:opacity .14s ease-out,visibility 0s linear .14s}:host([data-active]) .tools,:host(:focus-within) .tools{opacity:1;visibility:visible;transition:opacity .14s ease-out,visibility}@media (hover:hover){:host(:hover) .tools{opacity:1;visibility:visible;transition:opacity .14s ease-out,visibility}}@media (prefers-reduced-motion:reduce){.tools,:host(:hover) .tools,:host([data-active]) .tools,:host(:focus-within) .tools{transition:none}}.tools button{box-sizing:border-box;width:var(--board-unit);height:calc(var(--board-unit) - 1px);background:var(--board-fill);color:var(--board-ink);cursor:pointer;border:0;border-radius:0;justify-content:center;align-items:flex-end;margin:0;padding:0;display:inline-flex}.tools button:hover,.tools button[aria-pressed=true]{background:var(--board-hover)}.tools button:focus-visible{box-shadow:inset 0 0 0 2px var(--board-ring);outline:0}.tools button:disabled{cursor:default}.tools button:disabled>*{opacity:.4}.tools .gap{width:1px}.icon{width:calc(16px * var(--board-sf));height:calc(16px * var(--board-sf));-webkit-mask:var(--icon) center / contain no-repeat;mask:var(--icon) center / contain no-repeat;background:currentColor}.chip{width:calc(12px * var(--board-sf));height:calc(12px * var(--board-sf));margin-bottom:calc(2px * var(--board-sf));border-radius:calc(2px * var(--board-sf));background:var(--chip)}.chip[data-none]{background:0 0;box-shadow:inset 0 0 0 1px}.colors{z-index:4;box-sizing:border-box;width:calc(6 * var(--board-unit));padding:calc(var(--board-unit) / 2 - 1px) 0;border:1px solid var(--board-rule-strong);border-radius:var(--ds-radius,calc(4px * var(--board-sf)));background:var(--board-paper);color:var(--board-text);margin:0;position:fixed;inset:auto}.colors[hidden]{display:none}.colors button{align-items:flex-end;gap:calc(4px * var(--board-sf));box-sizing:border-box;width:100%;height:var(--board-unit);padding:0 calc(var(--board-unit) / 2 - 1px);color:inherit;font:inherit;line-height:calc(16px * var(--board-sf));text-align:start;cursor:pointer;background:0 0;border:0;margin:0;display:flex}.colors .chip{margin:0 calc(2px * var(--board-sf)) calc(2px * var(--board-sf));flex:none}.colors button:hover,.colors button[aria-checked=true]{background:var(--board-rule)}.colors button:focus-visible{box-shadow:inset 0 0 0 2px var(--board-ring);outline:0}@media (hover:hover) and (pointer:fine){.tools .for-touch{display:none}}", Ce = "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<g stroke=\"currentColor\" stroke-width=\"0.92\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M2.25 5L8 2.25L13.75 5V11L8 13.75L2.25 11Z\"/><path d=\"M2.25 5L8 7.75L13.75 5M8 7.75V13.75\"/><path d=\"M5.1 3.6L10.9 6.4\"/></g>\n</svg>\n", we = "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M13.1566 8.60594H0V9.61651L13.1562 9.61791L10.249 12.5251L10.9558 13.219L15.0636 9.11123L10.9524 5L10.245 5.70734L13.1566 8.60594Z\" fill=\"currentColor\"/>\n</svg>\n", Te = "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M4.67614 12.123L0.536957 7.98382L4.66961 3.85117L5.38124 4.54974L2.45639 7.47459L13.5436 7.50693L10.6122 4.5886L11.3239 3.87698L15.463 8.01616L11.3304 12.1488L10.6188 11.4503L13.5436 8.5254L2.45639 8.49306L5.38777 11.4114L4.67614 12.123Z\" fill=\"currentColor\"/>\n</svg>\n", B = {
 	"light-green": "Green",
 	"light-blue": "Blue",
 	pink: "Pink",
@@ -749,7 +948,7 @@ var ve = ":host{--board-unit:var(--aa-diagram-unit,var(--ds-grid-unit,calc(20px 
 	orange: "Orange",
 	red: "Red",
 	white: "White"
-}, B = {
+}, Ee = {
 	"light-green": "var(--ds-apple-green, var(--apple-green, #99ff73))",
 	"light-blue": "var(--ds-zenith-blue, var(--zenith-blue, #ccccff))",
 	pink: "var(--ds-pink, var(--pink, #f5aad1))",
@@ -757,14 +956,14 @@ var ve = ":host{--board-unit:var(--aa-diagram-unit,var(--ds-grid-unit,calc(20px 
 	orange: "var(--ds-orange, var(--orange, #fec20d))",
 	red: "var(--ds-tuned-red, var(--tuned-red, #ff5f5f))",
 	white: "light-dark(var(--ds-slate-light, #e6e6e6), var(--ds-white, #fff))"
-}, Se = {
+}, De = {
 	box: "item",
 	stack: "group",
 	"post-it": "note",
 	month: "month",
 	grid: "grid",
 	chart: "chart"
-}, V = .3, Ce = 330, H = {
+}, V = .3, Oe = 330, H = {
 	box: {
 		w: 4,
 		h: 1
@@ -773,7 +972,7 @@ var ve = ":host{--board-unit:var(--aa-diagram-unit,var(--ds-grid-unit,calc(20px 
 		w: 8,
 		h: 8
 	}
-}, we = "Tab chooses each item and line. Arrows move what is chosen, Alt and arrows size it, Enter or a click writes in it, L or A joins it to another, I adds an item, N a note, Delete takes it away.", U = /* @__PURE__ */ new WeakMap(), Te = typeof navigator < "u" && /Mac|iPhone|iPad/.test(navigator.platform), Ee = (e) => `url("data:image/svg+xml,${encodeURIComponent(e)}")`, De = (e, t) => JSON.stringify(e) === JSON.stringify(t), W;
+}, ke = "Tab chooses each item and line. Arrows move what is chosen, Alt and arrows size it, Enter or a click writes in it, L or A joins it to another, I adds an item, N a note, Delete takes it away.", U = /* @__PURE__ */ new WeakMap(), Ae = typeof navigator < "u" && /Mac|iPhone|iPad/.test(navigator.platform), je = (e) => `url("data:image/svg+xml,${encodeURIComponent(e)}")`, Me = (e, t) => JSON.stringify(e) === JSON.stringify(t), W;
 function G(e) {
 	e && typeof document < "u" && (W?.isConnected || (W = document.createElement("div"), W.setAttribute("aria-live", "polite"), W.setAttribute("aria-atomic", "true"), Object.assign(W.style, {
 		position: "absolute",
@@ -787,7 +986,7 @@ function G(e) {
 		border: "0"
 	}), document.body.append(W)), W.textContent = e);
 }
-var Oe = typeof HTMLElement > "u" ? class {} : HTMLElement, ke = class extends Oe {
+var Ne = typeof HTMLElement > "u" ? class {} : HTMLElement, Pe = class extends Ne {
 	#e = "```diagram";
 	#t = "```";
 	#n = "";
@@ -823,42 +1022,42 @@ var Oe = typeof HTMLElement > "u" ? class {} : HTMLElement, ke = class extends O
 	}
 	#x(e) {
 		let n = this.attachShadow({ mode: "open" }), r = document.createElement("style");
-		r.textContent = ve;
+		r.textContent = Se;
 		let i = (e, t, n = !1) => Object.assign(document.createElement(e), {
 			className: t,
 			hidden: n
 		});
-		this.#m = i("div", "probe"), this.#f = i("div", "tools"), this.#f.setAttribute("role", "toolbar"), this.#f.setAttribute("aria-label", "Diagram"), this.#p = i("div", "colors", !0), this.#p.setAttribute("role", "menu"), this.#p.setAttribute("aria-label", "Colour"), "popover" in HTMLElement.prototype && this.#p.setAttribute("popover", "manual"), this.#a = i("div", "paper"), this.#i = document.createElement(e);
+		this.#m = i("div", "probe"), this.#f = i("div", "tools"), this.#f.setAttribute("role", "toolbar"), this.#f.setAttribute("aria-label", F("Diagram")), this.#p = i("div", "colors", !0), this.#p.setAttribute("role", "menu"), this.#p.setAttribute("aria-label", F("Colour")), "popover" in HTMLElement.prototype && this.#p.setAttribute("popover", "manual"), this.#a = i("div", "paper"), this.#i = document.createElement(e);
 		let a = i("div", "layer");
 		this.#o = i("div", "ring", !0), this.#s = i("div", "ring aim", !0), this.#c = i("div", "grip", !0), this.#l = i("div", "ghost-box", !0), this.#u = document.createElementNS("http://www.w3.org/2000/svg", "svg"), this.#u.setAttribute("class", "lines"), this.#u.setAttribute("aria-hidden", "true"), this.#d = Object.assign(i("input", "rename", !0), {
 			type: "text",
 			spellcheck: !1
-		}), this.#d.setAttribute("aria-label", "Name"), a.append(this.#o, this.#s, this.#l, this.#u, this.#c, this.#d), this.#a.append(document.createElement("slot"), a), n.append(r, this.#m, this.#a, this.#f, this.#p), this.append(this.#i);
+		}), this.#d.setAttribute("aria-label", F("Name")), a.append(this.#o, this.#s, this.#l, this.#u, this.#c, this.#d), this.#a.append(document.createElement("slot"), a), n.append(r, this.#m, this.#a, this.#f, this.#p), this.append(this.#i);
 		let o = (e, t, n) => {
-			let r = document.createElement("button");
-			return r.type = "button", r.title = e, r.setAttribute("aria-label", e), r.append(n), r.addEventListener("click", (e) => {
+			let r = F(e), i = document.createElement("button");
+			return i.type = "button", i.title = r, i.setAttribute("aria-label", r), i.append(n), i.addEventListener("click", (e) => {
 				e.stopPropagation(), t();
-			}), r;
+			}), i;
 		}, s = (e) => {
 			let t = i("span", "icon");
-			return t.style.setProperty("--icon", Ee(e)), t;
+			return t.style.setProperty("--icon", je(e)), t;
 		}, c = () => i("span", "gap"), l = (e) => {
 			let t = i("span", "chip");
-			return e ? t.style.setProperty("--chip", B[e]) : t.dataset.none = "", t;
+			return e ? t.style.setProperty("--chip", Ee[e]) : t.dataset.none = "", t;
 		};
 		this.#h = {
-			box: o("Item (I)", () => this.#re("box"), s(ye)),
+			box: o("Item (I)", () => this.#re("box"), s(Ce)),
 			postIt: o("Note (N)", () => this.#re("post-it"), s(ee)),
 			line: o("Line (L)", () => this.#P("line"), s(ne)),
-			arrow: o("Arrow (A)", () => this.#P("arrow"), s(be)),
+			arrow: o("Arrow (A)", () => this.#P("arrow"), s(we)),
 			color: o("Colour", () => this.#A(), l(null)),
 			colors: [null, ...t].map((e) => {
-				let t = o(e ? z[e] : "No colour", () => {
+				let t = o(e ? B[e] : "No colour", () => {
 					this.#j(), this.#de(e);
 				}, l(e));
-				return t.setAttribute("role", "menuitemradio"), t.append(Object.assign(document.createElement("span"), { textContent: e ? z[e] : "No colour" })), t;
+				return t.setAttribute("role", "menuitemradio"), t.append(Object.assign(document.createElement("span"), { textContent: F(e ? B[e] : "No colour") })), t;
 			}),
-			wrap: o("Fit the width", () => this.#fe(), s(xe)),
+			wrap: o("Fit the width", () => this.#fe(), s(Te)),
 			delete: o("Delete", () => this.#me(), s(te))
 		};
 		let { box: u, postIt: d, line: f, arrow: p, color: m, colors: h } = this.#h;
@@ -869,7 +1068,7 @@ var Oe = typeof HTMLElement > "u" ? class {} : HTMLElement, ke = class extends O
 	connectedCallback() {
 		let e = this.#S(), t = this.#C(), n = !!e && !!t && t.dataset.readonly !== "true";
 		if (this.toggleAttribute("data-editable", n), this.toggleAttribute("data-aa-interactive", n), !n || !e || !t) return;
-		this.tabIndex = 0, this.setAttribute("role", "application"), this.setAttribute("aria-roledescription", "diagram"), this.setAttribute("aria-label", "Diagram"), this.setAttribute("aria-description", we);
+		this.tabIndex = 0, this.setAttribute("role", "application"), this.setAttribute("aria-roledescription", "diagram"), this.setAttribute("aria-label", F("Diagram")), this.setAttribute("aria-description", F(ke));
 		let r = Array.from(e.children).indexOf(t), i = U.get(e);
 		this.#g = i && i.block === r ? i : {
 			block: r,
@@ -882,7 +1081,7 @@ var Oe = typeof HTMLElement > "u" ? class {} : HTMLElement, ke = class extends O
 		}, U.set(e, this.#g);
 		let a = (e, t, n, r) => {
 			e.addEventListener(t, n, r), this.#b.push(() => e.removeEventListener(t, n, r));
-		}, o = this.#_ = pe();
+		}, o = this.#_ = _e();
 		this.#b.push(o.surface({
 			element: this.#a,
 			unit: () => this.#T(),
@@ -994,11 +1193,11 @@ var Oe = typeof HTMLElement > "u" ? class {} : HTMLElement, ke = class extends O
 		let u = e && "group" in e && n ? e.box === void 0 ? n.color : n.boxes[e.box]?.color ?? n.color : void 0;
 		c.disabled = !r, r || this.#j();
 		let d = c.querySelector(".chip");
-		u ? (d.style.setProperty("--chip", B[u]), delete d.dataset.none) : (d.style.removeProperty("--chip"), d.dataset.none = ""), l.forEach((e, n) => e.setAttribute("aria-checked", String(([null, ...t][n] ?? void 0) === u))), this.#h.delete.disabled = !e, this.#h.wrap.setAttribute("aria-pressed", String(o(this.#e)));
+		u ? (d.style.setProperty("--chip", Ee[u]), delete d.dataset.none) : (d.style.removeProperty("--chip"), d.dataset.none = ""), l.forEach((e, n) => e.setAttribute("aria-checked", String(([null, ...t][n] ?? void 0) === u))), this.#h.delete.disabled = !e, this.#h.wrap.setAttribute("aria-pressed", String(o(this.#e)));
 	}
 	#P(e) {
 		let t = this.#g.target;
-		t && "join" in t ? this.#G(A(this.#n, this.#r, t, e === "arrow" ? "->" : "--"), { target: t }, e === "arrow" ? "Made an arrow" : "Made a line") : this.#F(this.#g.mode === e ? "choose" : e);
+		t && "join" in t ? this.#G(A(this.#n, this.#r, t, e === "arrow" ? "->" : "--"), { target: t }, F(e === "arrow" ? "Made an arrow" : "Made a line")) : this.#F(this.#g.mode === e ? "choose" : e);
 	}
 	#F(e) {
 		this.#g.mode = e, this.dataset.mode = e, this.#l.hidden = !0, this.#N(), this.shadowRoot?.activeElement !== this.#d && this.focus({ preventScroll: !0 });
@@ -1073,7 +1272,7 @@ var Oe = typeof HTMLElement > "u" ? class {} : HTMLElement, ke = class extends O
 		return n.setAttribute("d", e.replace(/-?\d+(\.\d+)?/g, (e) => String(Number(e) * t))), n;
 	}
 	#U(e) {
-		De(e, this.#g.target) || (this.#g.target = e, this.#N(), this.#B(), e && G(this.#W(e)));
+		Me(e, this.#g.target) || (this.#g.target = e, this.#N(), this.#B(), e && G(this.#W(e)));
 	}
 	#W(e) {
 		if ("join" in e) {
@@ -1081,7 +1280,7 @@ var Oe = typeof HTMLElement > "u" ? class {} : HTMLElement, ke = class extends O
 			return t ? `${t.from} to ${t.to}, ${this.#r.lines[e.join]?.arrow ? "arrow" : "line"}` : "";
 		}
 		let t = this.#r.groups[e.group];
-		return t ? `${this.#se(e) ?? "Unnamed"}, ${e.box === void 0 ? Se[t.kind] : "item"}` : "";
+		return t ? `${this.#se(e) ?? F("Unnamed")}, ${F(e.box === void 0 ? De[t.kind] : "item")}` : "";
 	}
 	#G(e, t = {}, n = "", r = this.#e) {
 		if (e === this.#n && r === this.#e) {
@@ -1150,14 +1349,14 @@ var Oe = typeof HTMLElement > "u" ? class {} : HTMLElement, ke = class extends O
 			x: 0,
 			y: 0
 		}, i = [], a = () => !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches, o = (e, t, n) => {
-			for (let { element: r, transform: o } of i) r.style.transition = n && !a() ? `transform ${Ce}ms cubic-bezier(.2, 1, .1, 1)` : "none", r.style.transform = `translate(${e}px, ${t}px) ${o}`.trim();
+			for (let { element: r, transform: o } of i) r.style.transition = n && !a() ? `transform ${Oe}ms cubic-bezier(.2, 1, .1, 1)` : "none", r.style.transform = `translate(${e}px, ${t}px) ${o}`.trim();
 		}, c = (e) => {
 			let t = () => {
 				this.removeAttribute("data-moving");
 				for (let { element: e } of i) e.style.transition = "", e.style.transform = "", e.style.zIndex = "";
 				i = [], e();
 			};
-			a() ? t() : setTimeout(t, Ce);
+			a() ? t() : setTimeout(t, Oe);
 		};
 		return {
 			onStart: () => {
@@ -1187,7 +1386,7 @@ var Oe = typeof HTMLElement > "u" ? class {} : HTMLElement, ke = class extends O
 			onDrop: () => {
 				let t = n, i = this.#T();
 				o(r.x * i, r.y * i, !0), c(() => {
-					t === this.#n ? this.#B() : this.#G(t, { target: e }, `Moved ${this.#se(e) ?? ""}`.trim());
+					t === this.#n ? this.#B() : this.#G(t, { target: e }, F("Moved {name}", { name: this.#se(e) ?? "" }).trim());
 				});
 			},
 			onCancel: () => {
@@ -1208,7 +1407,7 @@ var Oe = typeof HTMLElement > "u" ? class {} : HTMLElement, ke = class extends O
 	}
 	#Z(e) {
 		let t = this.#r.groups[e];
-		return this.#J(({ point: n }) => D(this.#n, this.#r, e, t.kind === "post-it" ? Math.max(n.x - t.x, n.y - t.y) : n.x - t.x), { group: e }, `Sized ${this.#se({ group: e }) ?? ""}`.trim(), "data-sizing");
+		return this.#J(({ point: n }) => D(this.#n, this.#r, e, t.kind === "post-it" ? Math.max(n.x - t.x, n.y - t.y) : n.x - t.x), { group: e }, F("Sized {name}", { name: this.#se({ group: e }) ?? "" }).trim(), "data-sizing");
 	}
 	#Q(e, t) {
 		let n = this.#I(e), r = {
@@ -1240,18 +1439,21 @@ var Oe = typeof HTMLElement > "u" ? class {} : HTMLElement, ke = class extends O
 				this.#G(l, {
 					target: u >= 0 ? { join: u } : e,
 					mode: "choose"
-				}, `Joined ${i} to ${c}`);
+				}, F("Joined {name} to {end}", {
+					name: i,
+					end: c
+				}));
 			},
 			onCancel: o,
 			onClick: () => this.#U(e),
 			targets: () => this.#z().filter((e) => !("join" in e) && a(this.#$(e))).map((e) => this.#$(e)),
 			announce: (e, t) => {
-				if (t === "start") return `Joining ${i}. Tab to the one to join it to, then Enter. Escape stops.`;
+				if (t === "start") return F("Joining {name}. Tab to the one to join it to, then Enter. Escape stops.", { name: i });
 				if (t === "move") {
 					let t = a(e.point);
-					return t ? this.#W(t) : "Nothing here";
+					return t ? this.#W(t) : F("Nothing here");
 				}
-				return t === "cancel" ? "Not joined" : void 0;
+				return t === "cancel" ? F("Not joined") : void 0;
 			}
 		};
 	}
@@ -1313,12 +1515,12 @@ var Oe = typeof HTMLElement > "u" ? class {} : HTMLElement, ke = class extends O
 	#re(e, t = this.#ne(e)) {
 		if (!this.#w()) return;
 		this.#E();
-		let n = _(this.#r, e === "box" ? "Item" : "Note"), r = O(this.#n, this.#r, e, n, t.x, t.y), i = s(r).groups.findIndex((e) => (e.kind === "box" ? e.boxes[0]?.text : e.name) === n), a = i >= 0 ? { group: i } : null;
+		let n = _(this.#r, F(e === "box" ? "Item" : "Note")), r = O(this.#n, this.#r, e, n, t.x, t.y), i = s(r).groups.findIndex((e) => (e.kind === "box" ? e.boxes[0]?.text : e.name) === n), a = i >= 0 ? { group: i } : null;
 		this.#G(r, {
 			target: a,
 			renaming: a,
 			mode: "choose"
-		}, `Added ${n}`);
+		}, F("Added {name}", { name: n }));
 	}
 	#ie(e) {
 		let t = this.#a.getBoundingClientRect(), n = this.#T();
@@ -1370,15 +1572,15 @@ var Oe = typeof HTMLElement > "u" ? class {} : HTMLElement, ke = class extends O
 		this.#d.hidden = !0, this.#g.renaming = null, t && (e && n.trim() && n.trim() !== this.#se(t) ? this.#G(j(this.#n, this.#r, t, n), {
 			target: t,
 			renaming: null
-		}, `Named ${n.trim()}`) : this.focus({ preventScroll: !0 }));
+		}, F("Named {name}", { name: n.trim() })) : this.focus({ preventScroll: !0 }));
 	}
 	#de(e) {
 		let t = this.#g.target;
-		t && this.#G(M(this.#n, this.#r, t, e), { target: t }, e ? z[e] : "No colour");
+		t && this.#G(M(this.#n, this.#r, t, e), { target: t }, F(e ? B[e] : "No colour"));
 	}
 	#fe() {
 		let e = !o(this.#e);
-		this.#G(this.#n, {}, e ? "Fits the width" : "Keeps its layout", a(this.#e, e));
+		this.#G(this.#n, {}, F(e ? "Fits the width" : "Keeps its layout"), a(this.#e, e));
 	}
 	#pe() {
 		let e = { available: !1 };
@@ -1386,7 +1588,7 @@ var Oe = typeof HTMLElement > "u" ? class {} : HTMLElement, ke = class extends O
 			bubbles: !0,
 			composed: !0,
 			detail: e
-		})), e.available ? (this.#v?.close(), this.#v = ce({
+		})), e.available ? (this.#v?.close(), this.#v = de({
 			place: () => {
 				let e = this.getBoundingClientRect(), t = this.#f.getBoundingClientRect(), n = this.#T();
 				return new DOMRect(e.left, (t.height ? t.bottom : this.#a.getBoundingClientRect().bottom) + 1, e.width, n);
@@ -1395,7 +1597,7 @@ var Oe = typeof HTMLElement > "u" ? class {} : HTMLElement, ke = class extends O
 			grow: (e) => {
 				this.style.paddingBottom = e ? `${e + 1}px` : "";
 			},
-			placeholder: "Ask AI or press space to speak",
+			placeholder: F("Ask AI or press space to speak"),
 			about: () => this.#i ? [this.#i] : [],
 			send: async (e, t) => {
 				let n = {
@@ -1409,17 +1611,17 @@ var Oe = typeof HTMLElement > "u" ? class {} : HTMLElement, ke = class extends O
 					detail: n
 				}));
 				let r = (await n.answer)?.replace(/^\s*```[^\n]*\n|\n```\s*$/g, "").trim();
-				if (!r || !this.isConnected) throw Error("Not answered");
-				this.#G(r, { target: null }, "Drawn");
+				if (!r || !this.isConnected) throw Error(F("Not answered"));
+				this.#G(r, { target: null }, F("Drawn"));
 			},
 			close: (e) => {
 				this.#v = null, !e && this.isConnected && this.focus({ preventScroll: !0 });
 			}
-		})) : G("Asking AI is not set up here");
+		})) : G(F("Asking AI is not set up here"));
 	}
 	#me() {
 		let e = this.#g.target;
-		e && this.#G(N(this.#n, this.#r, e), { target: null }, `Deleted ${this.#W(e)}`);
+		e && this.#G(N(this.#n, this.#r, e), { target: null }, F("Deleted {name}", { name: this.#W(e) }));
 	}
 	#he(e) {
 		let t = e.composedPath()[0];
@@ -1427,7 +1629,7 @@ var Oe = typeof HTMLElement > "u" ? class {} : HTMLElement, ke = class extends O
 			e.stopPropagation(), e.key === "Enter" ? (e.preventDefault(), this.#ue(!0)) : e.key === "Escape" && (e.preventDefault(), this.#ue(!1));
 			return;
 		}
-		let n = Te ? e.metaKey : e.ctrlKey;
+		let n = Ae ? e.metaKey : e.ctrlKey;
 		if (n && /^[zy]$/i.test(e.key) || (e.stopPropagation(), t !== this || !this.#w() || e.isComposing)) return;
 		let r = this.#g.target, i = r && "group" in r ? this.#r.groups[r.group] : void 0, a = e.key.toLowerCase();
 		if (e.key === "Escape") {
@@ -1435,7 +1637,7 @@ var Oe = typeof HTMLElement > "u" ? class {} : HTMLElement, ke = class extends O
 			return;
 		}
 		if (e.key === "Tab" && !n && !e.altKey) {
-			let t = this.#z(), n = r ? t.findIndex((e) => De(e, r)) : -1, i = n < 0 ? e.shiftKey ? t.length - 1 : 0 : n + (e.shiftKey ? -1 : 1);
+			let t = this.#z(), n = r ? t.findIndex((e) => Me(e, r)) : -1, i = n < 0 ? e.shiftKey ? t.length - 1 : 0 : n + (e.shiftKey ? -1 : 1);
 			if (i < 0 || i >= t.length) return;
 			e.preventDefault(), this.#U(t[i]);
 			return;
@@ -1462,11 +1664,11 @@ var Oe = typeof HTMLElement > "u" ? class {} : HTMLElement, ke = class extends O
 			if (!i || !("group" in r)) return;
 			if (e.altKey) {
 				let e = (i.kind === "post-it" ? o[0] + o[1] : o[0]) * 4;
-				e && this.#G(D(this.#n, this.#r, r.group, i.w + e), { target: { group: r.group } }, `Sized ${this.#se(r) ?? ""}`.trim());
+				e && this.#G(D(this.#n, this.#r, r.group, i.w + e), { target: { group: r.group } }, F("Sized {name}", { name: this.#se(r) ?? "" }).trim());
 				return;
 			}
 			let t = e.shiftKey ? 4 : 1;
-			this.#G(E(this.#n, this.#r, r.group, Math.max(0, i.x + o[0] * t), Math.max(0, i.y + o[1] * t)), { target: { group: r.group } }, `Moved ${this.#se(r) ?? ""}`.trim());
+			this.#G(E(this.#n, this.#r, r.group, Math.max(0, i.x + o[0] * t), Math.max(0, i.y + o[1] * t)), { target: { group: r.group } }, F("Moved {name}", { name: this.#se(r) ?? "" }).trim());
 		} else if (!(n || e.altKey)) {
 			if (e.key === " " && !this.#g.renaming) e.preventDefault(), this.#pe();
 			else if (a === "i" || a === "n") e.preventDefault(), this.#re(a === "i" ? "box" : "post-it");
@@ -1482,13 +1684,13 @@ var Oe = typeof HTMLElement > "u" ? class {} : HTMLElement, ke = class extends O
 		}
 	}
 };
-function Ae() {
+function Fe() {
 	let e = "aa-diagram-board";
-	return typeof customElements < "u" && !customElements.get(e) && customElements.define(e, ke), e;
+	return typeof customElements < "u" && !customElements.get(e) && customElements.define(e, Pe), e;
 }
 //#endregion
 //#region src/diagram.css?inline
-var je = ":host{--aa-diagram-radius:4px;--diagram-unit:var(--aa-diagram-unit,var(--ds-grid-unit,calc(20px * var(--sf,1))));--diagram-ink:var(--aa-diagram-ink,var(--ds-text-color,var(--text-color,var(--lightningcss-light,#1e1e1e)var(--lightningcss-dark,#fff))));--diagram-stroke:var(--aa-diagram-stroke,1px);box-sizing:border-box;width:calc(var(--diagram-columns,0) * var(--diagram-unit));height:calc(var(--diagram-rows,1) * var(--diagram-unit));color:var(--diagram-ink);caret-color:var(--lightningcss-light,#000)var(--lightningcss-dark,#fff);font-family:var(--ds-typeface-regular,var(--typeface-regular));font-feature-settings:var(--ds-font-features,normal);font-size:var(--ds-type-size-default,var(--type-size-default));font-weight:var(--ds-type-weight-default,var(--type-weight-default));letter-spacing:var(--ds-type-letterspacing-default,calc(var(--type-letterspacing-default) * var(--sf,1)));line-height:var(--diagram-unit);font-synthesis:none;-webkit-font-smoothing:antialiased;margin-inline-start:min(0px, round(calc((100% - var(--diagram-columns,0) * var(--diagram-unit)) / 2), var(--diagram-unit)));display:block;position:relative}:host([hidden]){display:none}:host([data-narrow]){scrollbar-width:none;max-width:100%;margin-inline-start:0;overflow:auto hidden}:host([data-narrow]) .lines,:host([data-narrow]) .chart-ink{width:calc(var(--diagram-columns,0) * var(--diagram-unit));right:auto}.lines{z-index:1;pointer-events:none;fill:none;stroke:currentColor;width:100%;height:100%;stroke-width:var(--diagram-stroke);stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;position:absolute;inset:0;overflow:visible}.label,.box,.day{left:calc(var(--x) * var(--diagram-unit));top:calc(var(--y) * var(--diagram-unit));width:calc(var(--w) * var(--diagram-unit));height:var(--diagram-unit);box-sizing:border-box;white-space:nowrap;position:absolute}.label{width:max-content;min-width:calc(var(--w) * var(--diagram-unit))}.label>span{padding-inline-start:var(--item-text-padding,4px)}.box{--box-fill:var(--aa-diagram-cell,var(--lightningcss-light,#fff)var(--lightningcss-dark,#000));--box-radius:var(--aa-diagram-radius,0px);--box-top-left:var(--box-radius);--box-top-right:var(--box-radius);--box-bottom-right:var(--box-radius);--box-bottom-left:var(--box-radius);background-color:var(--box-fill);border-radius:var(--box-top-left) var(--box-top-right) var(--box-bottom-right) var(--box-bottom-left);transition:border-radius .16s ease-out}.day{--box-radius:var(--aa-diagram-radius,0px);--box-top-left:var(--box-radius);--box-top-right:var(--box-radius);--box-bottom-right:var(--box-radius);--box-bottom-left:var(--box-radius);border-radius:var(--box-top-left) var(--box-top-right) var(--box-bottom-right) var(--box-bottom-left);color:var(--lightningcss-light,#c4c4c4)var(--lightningcss-dark,#5c5c5c);font-variant-numeric:tabular-nums;text-align:center}.day[data-name]{color:inherit}.day[data-color]{background-color:var(--box-fill);color:var(--black,#2a2a2a)}.day[data-head]:after{content:\"\";inset:calc(var(--diagram-stroke) / -2);border:var(--diagram-stroke) solid color-mix(in srgb, var(--diagram-ink) 28%, transparent);pointer-events:none;border-left-width:0;position:absolute}.day[data-head]:not([data-shared-left]):after{border-left-width:var(--diagram-stroke)}.day[data-slant]{text-align:start;transform-origin:0 100%;overflow:visible;translate:50%;rotate:-45deg}.day[data-row]{font-family:var(--ds-typeface-compressed,var(--typeface-compressed,var(--ds-typeface-regular,var(--typeface-regular))))}.day[data-edge]{transform:translateY(-50%)}.chart-ink{pointer-events:none;width:100%;height:100%;position:absolute;inset:0;overflow:visible}.chart-rules{fill:none;stroke:var(--lightningcss-light,#d6d6d6)var(--lightningcss-dark,#3a3a3a);stroke-width:1px}.chart-frame{--marker:var(--lightningcss-light,var(--base-darker-grey,#797979))var(--lightningcss-dark,#9a9a9a)}.chart-line,.marker-fill{--marker:var(--diagram-ink);opacity:.94;mix-blend-mode:multiply}:host([data-dark]) :is(.chart-line,.marker-fill){mix-blend-mode:normal}.marker-pass[data-tone=body]{fill:var(--marker)}.marker-pass[data-tone=pass]{fill:color-mix(in oklab, var(--marker) 72%, #000)}.marker-pass[data-tone=edge]{fill:color-mix(in oklab, var(--marker) 60%, #000)}.marker-pass[data-tone=paper]{fill:var(--aa-diagram-paper,var(--ds-paper,var(--lightningcss-light,#fff)var(--lightningcss-dark,#1e1e1e)))}.marker-fill[data-color=light-green]{--marker:var(--lightningcss-light,color-mix(in oklab, var(--apple-green,#99ff73) 88%, #1e1e1e))var(--lightningcss-dark,var(--ds-apple-green,var(--apple-green,#99ff73)))}.marker-fill[data-color=light-blue]{--marker:var(--lightningcss-light,color-mix(in oklab, var(--zenith-blue,#ccf) 75%, #4a5ae0))var(--lightningcss-dark,color-mix(in oklab, var(--zenith-blue,#ccf) 85%, #4a5ae0))}.marker-fill[data-color=pink]{--marker:var(--lightningcss-light,color-mix(in oklab, var(--pink,#f5aad1) 90%, #1e1e1e))var(--lightningcss-dark,var(--pink,#f5aad1))}.marker-fill[data-color=yellow]{--marker:var(--lightningcss-light,color-mix(in oklab, var(--yellow,#eaff00) 88%, #1e1e1e))var(--lightningcss-dark,var(--yellow,#eaff00))}.marker-fill[data-color=orange]{--marker:var(--lightningcss-light,color-mix(in oklab, var(--orange,#fec20d) 85%, #e0602a))var(--lightningcss-dark,var(--orange,#fec20d))}.marker-fill[data-color=red]{--marker:var(--tuned-red,#ff5f5f)}.marker-fill[data-color=white]{--marker:var(--lightningcss-light,#cfccc4)var(--lightningcss-dark,#55534e)}.day[data-marker]{background-color:#0000}.chart-line[data-color=light-green],.chart-name[data-color=light-green]{--marker:var(--lightningcss-light,color-mix(in oklab, var(--apple-green,#99ff73) 82%, #1e1e1e))var(--lightningcss-dark,var(--apple-green,#99ff73))}.chart-line[data-color=light-blue],.chart-name[data-color=light-blue]{--marker:var(--lightningcss-light,color-mix(in oklab, var(--zenith-blue,#ccf) 55%, #4a5ae0))var(--lightningcss-dark,color-mix(in oklab, var(--zenith-blue,#ccf) 80%, #4a5ae0))}.chart-line[data-color=pink],.chart-name[data-color=pink]{--marker:var(--lightningcss-light,color-mix(in oklab, var(--pink,#f5aad1) 85%, #1e1e1e))var(--lightningcss-dark,var(--pink,#f5aad1))}.chart-line[data-color=yellow],.chart-name[data-color=yellow]{--marker:var(--lightningcss-light,color-mix(in oklab, var(--yellow,#eaff00) 82%, #1e1e1e))var(--lightningcss-dark,var(--yellow,#eaff00))}.chart-line[data-color=orange],.chart-name[data-color=orange]{--marker:var(--lightningcss-light,color-mix(in oklab, var(--orange,#fec20d) 72%, #e0602a))var(--lightningcss-dark,var(--orange,#fec20d))}.chart-line[data-color=red],.chart-name[data-color=red]{--marker:var(--tuned-red,#ff5f5f)}.chart-line[data-color=white],.chart-name[data-color=white]{--marker:var(--lightningcss-light,#8c8c8c)var(--lightningcss-dark,#a8a8a8)}.chart-name{left:calc(var(--x) * var(--diagram-unit));top:calc(var(--y) * var(--diagram-unit));height:var(--diagram-unit);font-family:var(--ds-typeface-compressed,var(--typeface-compressed,var(--ds-typeface-regular,var(--typeface-regular))));font-variant-numeric:tabular-nums;white-space:nowrap;color:color-mix(in srgb, var(--diagram-ink) 55%, transparent);position:absolute}.chart-name[data-side=down]{width:var(--diagram-unit);text-align:end;box-sizing:border-box;padding-inline-end:calc(var(--diagram-unit) / 4);translate:0 -50%}.chart-name[data-side=across][data-align=middle]{translate:-50%}.chart-name[data-side=across][data-align=end]{translate:-100%}.chart-name[data-side=end]{translate:calc(var(--diagram-unit) / 2) -50%;color:var(--lightningcss-light,color-mix(in oklab, var(--marker) 70%, #1e1e1e))var(--lightningcss-dark,var(--marker))}.post-it{--box-fill:var(--aa-diagram-cell,var(--lightningcss-light,#fff)var(--lightningcss-dark,#000));--box-edge:var(--diagram-ink);left:calc(var(--x) * var(--diagram-unit));top:calc(var(--y) * var(--diagram-unit));width:calc(var(--w) * var(--diagram-unit));height:calc(var(--h) * var(--diagram-unit));background-color:var(--box-fill);position:absolute}.post-it:after{content:\"\";inset:calc(-.5 * var(--diagram-stroke));border:var(--diagram-stroke) solid var(--box-edge);pointer-events:none;position:absolute}.post-it[data-color]{--box-edge:var(--post-it-fill);--post-it-fill:var(--lightningcss-light,color-mix(in srgb, var(--box-fill) 45%, #fff))var(--lightningcss-dark,color-mix(in srgb, var(--box-fill) 22%, #000));background-color:var(--post-it-fill)}.box[data-color]{color:var(--black,#2a2a2a)}.box[data-color]:after{border-color:var(--box-fill)}:is(.box,.post-it,.day)[data-color=light-green]{--box-fill:var(--ds-apple-green,var(--apple-green,#99ff73))}:is(.box,.post-it,.day)[data-color=light-blue]{--box-fill:var(--ds-zenith-blue,var(--zenith-blue,#ccf))}:is(.box,.post-it,.day)[data-color=pink]{--box-fill:var(--ds-pink,var(--pink,#f5aad1))}:is(.box,.post-it,.day)[data-color=yellow]{--box-fill:var(--ds-yellow,var(--yellow,#eaff00))}:is(.box,.post-it,.day)[data-color=orange]{--box-fill:var(--ds-orange,var(--orange,#fec20d))}:is(.box,.post-it,.day)[data-color=red]{--box-fill:var(--ds-tuned-red,var(--tuned-red,#ff5f5f))}:is(.box,.post-it,.day)[data-color=white]{--box-fill:var(--lightningcss-light,var(--slate-light,#e6e6e6))var(--lightningcss-dark,var(--white,#fff))}:is(.box,.day)[data-shared-top]{--box-top-left:0px;--box-top-right:0px}:is(.box,.day)[data-shared-right]{--box-top-right:0px;--box-bottom-right:0px}:is(.box,.day)[data-shared-bottom]{--box-bottom-right:0px;--box-bottom-left:0px}:is(.box,.day)[data-shared-left]{--box-top-left:0px;--box-bottom-left:0px}.box>span{height:100%;padding:0 var(--item-text-padding,4px);box-sizing:border-box;text-overflow:clip;-webkit-mask-image:var(--text-fade-mask);-webkit-mask-image:var(--text-fade-mask);mask-image:var(--text-fade-mask);display:block;overflow:hidden}.box:after{content:\"\";inset:calc(-.5 * var(--diagram-stroke));border:var(--outline-stroke,1px solid var(--lightningcss-light,#e5e5e5)var(--lightningcss-dark,#333));border-width:var(--diagram-stroke);border-radius:inherit;box-sizing:border-box;pointer-events:none;position:absolute}.box[data-shared-right]:after{border-right-width:0}.box[data-shared-bottom]:after{border-bottom-width:0}@supports (corner-shape:squircle){.box,.box:after,.day{corner-shape:squircle}}@media (prefers-reduced-motion:reduce){.box{transition:none}}", K, Me, Ne = .2, Pe = 35 * Math.PI / 180, Fe = Ne * Math.cos(Pe), Ie = Ne * Math.sin(Pe), q = 20, Le = 5, Re = typeof HTMLElement > "u" ? class {} : HTMLElement, J, Y = class extends Re {
+var Ie = ":host{--aa-diagram-radius:4px;--diagram-unit:var(--aa-diagram-unit,var(--ds-grid-unit,calc(20px * var(--sf,1))));--diagram-ink:var(--aa-diagram-ink,var(--ds-text-color,var(--text-color,var(--lightningcss-light,#1e1e1e)var(--lightningcss-dark,#fff))));--diagram-stroke:var(--aa-diagram-stroke,1px);box-sizing:border-box;width:calc(var(--diagram-columns,0) * var(--diagram-unit));height:calc(var(--diagram-rows,1) * var(--diagram-unit));color:var(--diagram-ink);caret-color:var(--lightningcss-light,#000)var(--lightningcss-dark,#fff);font-family:var(--ds-typeface-regular,var(--typeface-regular));font-feature-settings:var(--ds-font-features,normal);font-size:var(--ds-type-size-default,var(--type-size-default));font-weight:var(--ds-type-weight-default,var(--type-weight-default));letter-spacing:var(--ds-type-letterspacing-default,calc(var(--type-letterspacing-default) * var(--sf,1)));line-height:var(--diagram-unit);font-synthesis:none;-webkit-font-smoothing:antialiased;margin-inline-start:min(0px, round(calc((100% - var(--diagram-columns,0) * var(--diagram-unit)) / 2), var(--diagram-unit)));display:block;position:relative}:host([hidden]){display:none}:host([data-narrow]){scrollbar-width:none;max-width:100%;margin-inline-start:0;overflow:auto hidden}:host([data-narrow]) .lines,:host([data-narrow]) .chart-ink{width:calc(var(--diagram-columns,0) * var(--diagram-unit));right:auto}.lines{z-index:1;pointer-events:none;fill:none;stroke:currentColor;width:100%;height:100%;stroke-width:var(--diagram-stroke);stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;position:absolute;inset:0;overflow:visible}.label,.box,.day{left:calc(var(--x) * var(--diagram-unit));top:calc(var(--y) * var(--diagram-unit));width:calc(var(--w) * var(--diagram-unit));height:var(--diagram-unit);box-sizing:border-box;white-space:nowrap;position:absolute}.label{width:max-content;min-width:calc(var(--w) * var(--diagram-unit))}.label>span{padding-inline-start:var(--item-text-padding,4px)}.box{--box-fill:var(--aa-diagram-cell,var(--lightningcss-light,#fff)var(--lightningcss-dark,#000));--box-radius:var(--aa-diagram-radius,0px);--box-top-left:var(--box-radius);--box-top-right:var(--box-radius);--box-bottom-right:var(--box-radius);--box-bottom-left:var(--box-radius);background-color:var(--box-fill);border-radius:var(--box-top-left) var(--box-top-right) var(--box-bottom-right) var(--box-bottom-left);transition:border-radius .16s ease-out}.day{--box-radius:var(--aa-diagram-radius,0px);--box-top-left:var(--box-radius);--box-top-right:var(--box-radius);--box-bottom-right:var(--box-radius);--box-bottom-left:var(--box-radius);border-radius:var(--box-top-left) var(--box-top-right) var(--box-bottom-right) var(--box-bottom-left);color:var(--lightningcss-light,#c4c4c4)var(--lightningcss-dark,#5c5c5c);font-variant-numeric:tabular-nums;text-align:center}.day[data-name]{color:inherit}.day[data-color]{background-color:var(--box-fill);color:var(--black,#2a2a2a)}.day[data-head]:after{content:\"\";inset:calc(var(--diagram-stroke) / -2);border:var(--diagram-stroke) solid color-mix(in srgb, var(--diagram-ink) 28%, transparent);pointer-events:none;border-left-width:0;position:absolute}.day[data-head]:not([data-shared-left]):after{border-left-width:var(--diagram-stroke)}.day[data-slant]{text-align:start;transform-origin:0 100%;overflow:visible;translate:50%;rotate:-45deg}.day[data-row]{font-family:var(--ds-typeface-compressed,var(--typeface-compressed,var(--ds-typeface-regular,var(--typeface-regular))))}.day[data-edge]{transform:translateY(-50%)}.chart-ink{pointer-events:none;width:100%;height:100%;position:absolute;inset:0;overflow:visible}.chart-rules{fill:none;stroke:var(--lightningcss-light,#d6d6d6)var(--lightningcss-dark,#3a3a3a);stroke-width:1px}.chart-frame{--marker:var(--lightningcss-light,var(--base-darker-grey,#797979))var(--lightningcss-dark,#9a9a9a)}.chart-line,.marker-fill{--marker:var(--diagram-ink);opacity:.94;mix-blend-mode:multiply}:host([data-dark]) :is(.chart-line,.marker-fill){mix-blend-mode:normal}.marker-pass[data-tone=body]{fill:var(--marker)}.marker-pass[data-tone=pass]{fill:color-mix(in oklab, var(--marker) 72%, #000)}.marker-pass[data-tone=edge]{fill:color-mix(in oklab, var(--marker) 60%, #000)}.marker-pass[data-tone=paper]{fill:var(--aa-diagram-paper,var(--ds-paper,var(--lightningcss-light,#fff)var(--lightningcss-dark,#1e1e1e)))}.marker-fill[data-color=light-green]{--marker:var(--lightningcss-light,color-mix(in oklab, var(--apple-green,#99ff73) 88%, #1e1e1e))var(--lightningcss-dark,var(--ds-apple-green,var(--apple-green,#99ff73)))}.marker-fill[data-color=light-blue]{--marker:var(--lightningcss-light,color-mix(in oklab, var(--zenith-blue,#ccf) 75%, #4a5ae0))var(--lightningcss-dark,color-mix(in oklab, var(--zenith-blue,#ccf) 85%, #4a5ae0))}.marker-fill[data-color=pink]{--marker:var(--lightningcss-light,color-mix(in oklab, var(--pink,#f5aad1) 90%, #1e1e1e))var(--lightningcss-dark,var(--pink,#f5aad1))}.marker-fill[data-color=yellow]{--marker:var(--lightningcss-light,color-mix(in oklab, var(--yellow,#eaff00) 88%, #1e1e1e))var(--lightningcss-dark,var(--yellow,#eaff00))}.marker-fill[data-color=orange]{--marker:var(--lightningcss-light,color-mix(in oklab, var(--orange,#fec20d) 85%, #e0602a))var(--lightningcss-dark,var(--orange,#fec20d))}.marker-fill[data-color=red]{--marker:var(--tuned-red,#ff5f5f)}.marker-fill[data-color=white]{--marker:var(--lightningcss-light,#cfccc4)var(--lightningcss-dark,#55534e)}.day[data-marker]{background-color:#0000}.chart-line[data-color=light-green],.chart-name[data-color=light-green]{--marker:var(--lightningcss-light,color-mix(in oklab, var(--apple-green,#99ff73) 82%, #1e1e1e))var(--lightningcss-dark,var(--apple-green,#99ff73))}.chart-line[data-color=light-blue],.chart-name[data-color=light-blue]{--marker:var(--lightningcss-light,color-mix(in oklab, var(--zenith-blue,#ccf) 55%, #4a5ae0))var(--lightningcss-dark,color-mix(in oklab, var(--zenith-blue,#ccf) 80%, #4a5ae0))}.chart-line[data-color=pink],.chart-name[data-color=pink]{--marker:var(--lightningcss-light,color-mix(in oklab, var(--pink,#f5aad1) 85%, #1e1e1e))var(--lightningcss-dark,var(--pink,#f5aad1))}.chart-line[data-color=yellow],.chart-name[data-color=yellow]{--marker:var(--lightningcss-light,color-mix(in oklab, var(--yellow,#eaff00) 82%, #1e1e1e))var(--lightningcss-dark,var(--yellow,#eaff00))}.chart-line[data-color=orange],.chart-name[data-color=orange]{--marker:var(--lightningcss-light,color-mix(in oklab, var(--orange,#fec20d) 72%, #e0602a))var(--lightningcss-dark,var(--orange,#fec20d))}.chart-line[data-color=red],.chart-name[data-color=red]{--marker:var(--tuned-red,#ff5f5f)}.chart-line[data-color=white],.chart-name[data-color=white]{--marker:var(--lightningcss-light,#8c8c8c)var(--lightningcss-dark,#a8a8a8)}.chart-name{left:calc(var(--x) * var(--diagram-unit));top:calc(var(--y) * var(--diagram-unit));height:var(--diagram-unit);font-family:var(--ds-typeface-compressed,var(--typeface-compressed,var(--ds-typeface-regular,var(--typeface-regular))));font-variant-numeric:tabular-nums;white-space:nowrap;color:color-mix(in srgb, var(--diagram-ink) 55%, transparent);position:absolute}.chart-name[data-side=down]{width:var(--diagram-unit);text-align:end;box-sizing:border-box;padding-inline-end:calc(var(--diagram-unit) / 4);translate:0 -50%}.chart-name[data-side=across][data-align=middle]{translate:-50%}.chart-name[data-side=across][data-align=end]{translate:-100%}.chart-name[data-side=end]{translate:calc(var(--diagram-unit) / 2) -50%;color:var(--lightningcss-light,color-mix(in oklab, var(--marker) 70%, #1e1e1e))var(--lightningcss-dark,var(--marker))}.post-it{--box-fill:var(--aa-diagram-cell,var(--lightningcss-light,#fff)var(--lightningcss-dark,#000));--box-edge:var(--diagram-ink);left:calc(var(--x) * var(--diagram-unit));top:calc(var(--y) * var(--diagram-unit));width:calc(var(--w) * var(--diagram-unit));height:calc(var(--h) * var(--diagram-unit));background-color:var(--box-fill);position:absolute}.post-it:after{content:\"\";inset:calc(-.5 * var(--diagram-stroke));border:var(--diagram-stroke) solid var(--box-edge);pointer-events:none;position:absolute}.post-it[data-color]{--box-edge:var(--post-it-fill);--post-it-fill:var(--lightningcss-light,color-mix(in srgb, var(--box-fill) 45%, #fff))var(--lightningcss-dark,color-mix(in srgb, var(--box-fill) 22%, #000));background-color:var(--post-it-fill)}.box[data-color]{color:var(--black,#2a2a2a)}.box[data-color]:after{border-color:var(--box-fill)}:is(.box,.post-it,.day)[data-color=light-green]{--box-fill:var(--ds-apple-green,var(--apple-green,#99ff73))}:is(.box,.post-it,.day)[data-color=light-blue]{--box-fill:var(--ds-zenith-blue,var(--zenith-blue,#ccf))}:is(.box,.post-it,.day)[data-color=pink]{--box-fill:var(--ds-pink,var(--pink,#f5aad1))}:is(.box,.post-it,.day)[data-color=yellow]{--box-fill:var(--ds-yellow,var(--yellow,#eaff00))}:is(.box,.post-it,.day)[data-color=orange]{--box-fill:var(--ds-orange,var(--orange,#fec20d))}:is(.box,.post-it,.day)[data-color=red]{--box-fill:var(--ds-tuned-red,var(--tuned-red,#ff5f5f))}:is(.box,.post-it,.day)[data-color=white]{--box-fill:var(--lightningcss-light,var(--slate-light,#e6e6e6))var(--lightningcss-dark,var(--white,#fff))}:is(.box,.day)[data-shared-top]{--box-top-left:0px;--box-top-right:0px}:is(.box,.day)[data-shared-right]{--box-top-right:0px;--box-bottom-right:0px}:is(.box,.day)[data-shared-bottom]{--box-bottom-right:0px;--box-bottom-left:0px}:is(.box,.day)[data-shared-left]{--box-top-left:0px;--box-bottom-left:0px}.box>span{height:100%;padding:0 var(--item-text-padding,4px);box-sizing:border-box;text-overflow:clip;-webkit-mask-image:var(--text-fade-mask);-webkit-mask-image:var(--text-fade-mask);mask-image:var(--text-fade-mask);display:block;overflow:hidden}.box:after{content:\"\";inset:calc(-.5 * var(--diagram-stroke));border:var(--outline-stroke,1px solid var(--lightningcss-light,#e5e5e5)var(--lightningcss-dark,#333));border-width:var(--diagram-stroke);border-radius:inherit;box-sizing:border-box;pointer-events:none;position:absolute}.box[data-shared-right]:after{border-right-width:0}.box[data-shared-bottom]:after{border-bottom-width:0}@supports (corner-shape:squircle){.box,.box:after,.day{corner-shape:squircle}}@media (prefers-reduced-motion:reduce){.box{transition:none}}", K, Le, Re = .2, ze = 35 * Math.PI / 180, Be = Re * Math.cos(ze), Ve = Re * Math.sin(ze), q = 20, He = 5, Ue = typeof HTMLElement > "u" ? class {} : HTMLElement, J, Y = class extends Ue {
 	static observedAttributes = [
 		"source",
 		"wrap",
@@ -1520,14 +1722,14 @@ var je = ":host{--aa-diagram-radius:4px;--diagram-unit:var(--aa-diagram-unit,var
 		if (!this.shadowRoot) {
 			let e = this.attachShadow({ mode: "open" });
 			try {
-				J ??= new CSSStyleSheet(), J.cssRules.length || J.replaceSync(je), e.adoptedStyleSheets = [J];
+				J ??= new CSSStyleSheet(), J.cssRules.length || J.replaceSync(Ie), e.adoptedStyleSheets = [J];
 			} catch {
-				this.#r = document.createElement("style"), this.#r.textContent = je;
+				this.#r = document.createElement("style"), this.#r.textContent = Ie;
 			}
 		}
-		this.hasAttribute("role") || this.setAttribute("role", "img"), this.#e === void 0 && this.textContent?.trim() && (this.source = Ue(this.textContent)), document.fonts?.ready.then(() => {
+		this.hasAttribute("role") || this.setAttribute("role", "img"), this.#e === void 0 && this.textContent?.trim() && (this.source = Je(this.textContent)), document.fonts?.ready.then(() => {
 			this.isConnected && this.requestUpdate();
-		}), Q.add(this), We(), typeof ResizeObserver < "u" && this.parentElement && (this.#s ??= new ResizeObserver(() => this.requestUpdate()), this.#s.observe(this.parentElement)), this.requestUpdate();
+		}), Q.add(this), Ye(), typeof ResizeObserver < "u" && this.parentElement && (this.#s ??= new ResizeObserver(() => this.requestUpdate()), this.#s.observe(this.parentElement)), this.requestUpdate();
 	}
 	disconnectedCallback() {
 		Q.delete(this), this.#s?.disconnect();
@@ -1550,13 +1752,13 @@ var je = ":host{--aa-diagram-radius:4px;--diagram-unit:var(--aa-diagram-unit,var
 		if (this.#t) {
 			this.#t = !1, this.#u(), this.style.setProperty("--diagram-columns", String(this.#i.columns)), this.style.setProperty("--diagram-rows", String(this.#i.rows));
 			let e = [...this.#i.labels.map((e) => e.text), ...this.#i.boxes.map((e) => e.text)];
-			this.setAttribute("aria-label", e.join(", ") || "Diagram");
+			this.setAttribute("aria-label", e.join(", ") || F("Diagram"));
 		}
 		this.shadowRoot.replaceChildren(...this.#r ? [this.#r] : [], ...this.#m()), this.#f();
 	}
 	#f() {
 		let e = this.shadowRoot;
-		this.toggleAttribute("data-dark", He(getComputedStyle(this).caretColor));
+		this.toggleAttribute("data-dark", qe(getComputedStyle(this).caretColor));
 		let t = [...e.querySelectorAll(".label > span")], n = e.querySelector(".label, .box")?.getBoundingClientRect().height ?? 0;
 		if (!n) return;
 		let r = this.#i.columns * n, i = this.parentElement?.getBoundingClientRect(), a = !this.hasAttribute("data-editing") && !!i && r > i.width && r - i.width > 2 * Math.min(i.left, window.innerWidth - i.right);
@@ -1569,7 +1771,7 @@ var je = ":host{--aa-diagram-radius:4px;--diagram-unit:var(--aa-diagram-unit,var
 		[...c].some(([e, t]) => Math.round(t) !== Math.round(this.#a.get(e) ?? NaN)) && (this.#a = c, this.#u(), this.requestUpdate());
 	}
 	#p(e, t, n, r) {
-		return K ? [ze(Be(K, e, t, n, r))] : (Me ??= import("./marker.js").then((e) => K = e), Me.then(() => {
+		return K ? [We(Ge(K, e, t, n, r))] : (Le ??= import("./marker.js").then((e) => K = e), Le.then(() => {
 			this.isConnected && this.requestUpdate();
 		}), []);
 	}
@@ -1587,10 +1789,10 @@ var je = ":host{--aa-diagram-radius:4px;--diagram-unit:var(--aa-diagram-unit,var
 		}));
 		let f = s.map((e) => {
 			let t = e.segments[e.segments.length - 1];
-			return t ? `<path d="${Ge(e.segments, this.#c)}" vector-effect="non-scaling-stroke"></path>${e.arrow ? Ke(t) : ""}` : "";
+			return t ? `<path d="${Xe(e.segments, this.#c)}" vector-effect="non-scaling-stroke"></path>${e.arrow ? Ze(t) : ""}` : "";
 		}).join("");
-		d.push(ze(`<svg class="lines" viewBox="0 0 ${Math.max(e, 1)} ${Math.max(t, 1)}" preserveAspectRatio="none" aria-hidden="true">${f}</svg>`)), (o.length || c.length) && d.push(...this.#p(o, c, e, t));
-		for (let e of o) d.push(...Ve(e));
+		d.push(We(`<svg class="lines" viewBox="0 0 ${Math.max(e, 1)} ${Math.max(t, 1)}" preserveAspectRatio="none" aria-hidden="true">${f}</svg>`)), (o.length || c.length) && d.push(...this.#p(o, c, e, t));
+		for (let e of o) d.push(...Ke(e));
 		for (let e of n) d.push(X("div", "label", {
 			part: e.title ? "title" : "label",
 			style: l(e.x, e.y, e.w)
@@ -1622,11 +1824,11 @@ function X(e, t, n, r) {
 	for (let [e, t] of Object.entries(n)) t !== void 0 && t !== !1 && i.setAttribute(e, t === !0 ? "" : t);
 	return typeof r == "string" ? i.textContent = r : r && i.append(r), i;
 }
-function ze(e) {
+function We(e) {
 	let t = document.createElement("template");
 	return t.innerHTML = e, t.content.firstElementChild ?? document.createTextNode("");
 }
-function Be({ MARKER_FILTERS: e, markerSquare: t, markerFrame: n, markerLine: r }, i, a, o, s) {
+function Ge({ MARKER_FILTERS: e, markerSquare: t, markerFrame: n, markerLine: r }, i, a, o, s) {
 	let c = (e) => e ? ` data-color="${e}"` : "";
 	return `<svg class="chart-ink" viewBox="0 0 ${o * q} ${s * q}" aria-hidden="true">
     <defs>${e}</defs>
@@ -1636,13 +1838,13 @@ function Be({ MARKER_FILTERS: e, markerSquare: t, markerFrame: n, markerLine: r 
     ${i.map((e, t) => e.series.map((e, n) => `<g class="chart-line"${c(e.color)} filter="url(#aa-marker)">${r(e.points.map((e) => ({
 		x: e.x * q,
 		y: e.y * q
-	})), Le, 101 + t * 13 + n * 5).map(Z).join("")}</g>`).join("")).join("")}
+	})), He, 101 + t * 13 + n * 5).map(Z).join("")}</g>`).join("")).join("")}
   </svg>`;
 }
 function Z(e) {
 	return `<path class="marker-pass" data-tone="${e.tone}" fill-opacity="${e.opacity}" d="${e.d}"></path>`;
 }
-function Ve(e) {
+function Ke(e) {
 	let t = e.across.length - 1;
 	return [
 		...e.down.map((t) => X("div", "chart-name", {
@@ -1664,11 +1866,11 @@ function Ve(e) {
 		})
 	];
 }
-function He(e) {
+function qe(e) {
 	let [t = 0, n = 0, r = 0] = (e.match(/[\d.]+/g) ?? []).map(Number);
 	return .2126 * t + .7152 * n + .0722 * r > 140;
 }
-function Ue(e) {
+function Je(e) {
 	let t = e.replace(/\t/g, "  ").split("\n");
 	for (; t.length && !t[0].trim();) t.shift();
 	for (; t.length && !t[t.length - 1].trim();) t.pop();
@@ -1676,10 +1878,10 @@ function Ue(e) {
 	return t.map((e) => e.slice(n)).join("\n");
 }
 var Q = /* @__PURE__ */ new Set(), $;
-function We() {
+function Ye() {
 	$ || typeof MutationObserver > "u" || ($ = new MutationObserver(() => Q.forEach((e) => e.shapeChanged())), $.observe(document.documentElement, { attributes: !0 }), globalThis.matchMedia?.("(prefers-color-scheme: dark)").addEventListener?.("change", () => Q.forEach((e) => e.shapeChanged())));
 }
-function Ge(e, t) {
+function Xe(e, t) {
 	if (!e.length) return "";
 	let n = [`M${e[0].x1},${e[0].y1}`];
 	return e.forEach((r, i) => {
@@ -1687,15 +1889,15 @@ function Ge(e, t) {
 		p <= 0 ? n.push(`L${r.x2},${r.y2}`) : (n.push(`L${r.x2 - c * p},${r.y2 - l * p}`), n.push(`A${p},${p} 0 0 ${+(f > 0)} ${r.x2 + u * p},${r.y2 + d * p}`));
 	}), n.join(" ");
 }
-function Ke(e) {
-	let t = Math.sign(e.x2 - e.x1), n = Math.sign(e.y2 - e.y1), r = e.x2 - t * Fe, i = e.y2 - n * Fe, a = n * Ie, o = t * Ie;
+function Ze(e) {
+	let t = Math.sign(e.x2 - e.x1), n = Math.sign(e.y2 - e.y1), r = e.x2 - t * Be, i = e.y2 - n * Be, a = n * Ve, o = t * Ve;
 	return `<polyline class="arrow" points="${r + a},${i + o} ${e.x2},${e.y2} ${r - a},${i - o}" vector-effect="non-scaling-stroke"></polyline>`;
 }
-var qe = "";
-function Je(e = "aa-diagram") {
-	return qe = e, typeof customElements > "u" || customElements.get(e) || customElements.define(e, e === "aa-diagram" ? Y : class extends Y {}), e;
+var Qe = "";
+function $e(e = "aa-diagram") {
+	return Qe = e, typeof customElements > "u" || customElements.get(e) || customElements.define(e, e === "aa-diagram" ? Y : class extends Y {}), e;
 }
-var Ye = "```diagram\n[Idea]\n[Plan] @ 6 0\nIdea -> Plan\n```", Xe = {
+var et = "```diagram\n[Idea]\n[Plan] @ 6 0\nIdea -> Plan\n```", tt = {
 	name: "diagram",
 	fence: "diagram",
 	match: () => 0,
@@ -1703,16 +1905,16 @@ var Ye = "```diagram\n[Idea]\n[Plan] @ 6 0\nIdea -> Plan\n```", Xe = {
 		label: "Diagram",
 		icon: "connect",
 		keywords: "chart boxes lines flow draw",
-		source: Ye
+		source: et
 	},
 	draw(e, t) {
-		let n = document.createElement(Ae());
+		let n = document.createElement(Fe());
 		n.block = {
 			source: t,
-			tag: qe || Je()
+			tag: Qe || $e()
 		}, e.append(n);
 	}
 };
 //#endregion
-export { ke as AaDiagramBoardElement, Y as AaDiagramElement, Ye as DIAGRAM_START, O as addGroup, k as addJoin, M as colorTarget, Je as defineAaDiagram, Ae as defineAaDiagramBoard, N as deleteTarget, Xe as diagramAtom, _ as freeName, A as joinKind, Ge as linePath, E as moveGroup, v as referenceOf, j as renameTarget, D as resizeGroup };
+export { Pe as AaDiagramBoardElement, Y as AaDiagramElement, et as DIAGRAM_START, O as addGroup, k as addJoin, M as colorTarget, $e as defineAaDiagram, Fe as defineAaDiagramBoard, N as deleteTarget, tt as diagramAtom, _ as freeName, A as joinKind, Xe as linePath, E as moveGroup, v as referenceOf, j as renameTarget, D as resizeGroup };
 
