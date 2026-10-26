@@ -1,4 +1,5 @@
 import { LitElement, html } from 'lit';
+import { keyed } from 'lit/directives/keyed.js';
 import '../../../DS1/4-page/ds-page';
 import '../../../DS1/3-unit/ds-sidebar';
 import '../../../DS1/3-unit/ds-tabs';
@@ -14,6 +15,8 @@ import '../../../DS1/2-core/ds-input';
 import '../../../DS1/2-core/ds-message';
 import '../../../DS1/2-core/ds-empty';
 import './domains';
+import './members';
+import { activeWorkspace, canManage, draftWords, readWorkspaces, setActiveWorkspace, storeWorkspaces, storedWorkspaces, workspaceHeaders, type WorkspaceSummary } from './workspace-choice';
 import { ConsistencySiteEditor } from './site-editor';
 import type { SiteSummary } from './site-editing';
 import { PLACES, shownPlaces, sitePlaces, type SitePlace } from './places/index';
@@ -23,7 +26,9 @@ import './home.css';
 
 /**
  * Consistency's app, at consistency.site (c9y.site's home leads there): the workspace's sites as cards, each opened
- * here in the editor, and Settings; pressing the workspace shows the sites again. The address is consistency.site and
+ * here in the editor, and Settings; pressing the workspace shows the sites again. Each client has a workspace of its
+ * own (`workspace-choice.ts`): the owner moves between all of them from the workspace's menu, and the people invited
+ * to one see only theirs. The address is consistency.site and
  * nothing more (Joachim, 26 October 2026): where the app stands is its own state, kept in the history so Back and
  * Forward still move between places. Sites are known by their IDv1 codes. A site once opened stays open, hidden
  * while another is shown, so going back to it is instant: no reload and no sign-in again. With a site open, the
@@ -34,13 +39,14 @@ import './home.css';
 
 /** What the app shows: the sites, one site (by its IDv1 code) on its canvas or at one of its places, or Settings at one of its tabs. */
 export type Place = { page: 'sites' } | { page: 'site'; code: string; place?: string } | { page: 'settings'; tab: SettingsTab };
-export type SettingsTab = 'domains' | 'account';
+export type SettingsTab = 'members' | 'domains' | 'account';
+const TABS: SettingsTab[] = ['members', 'domains', 'account'];
 const SITE_CODE = /^\d{2}[A-Za-z]{4}$/;
 const PLACE_ID = /^[a-z][a-z0-9-]{0,31}$/;
 /** A place as the history keeps it, or the sites for anything else. */
 export function placeFrom(state: unknown): Place {
   const place = state as Partial<Place> | null;
-  if (place?.page === 'settings') return { page: 'settings', tab: (place as { tab?: unknown }).tab === 'account' ? 'account' : 'domains' };
+  if (place?.page === 'settings') { const tab = (place as { tab?: unknown }).tab; return { page: 'settings', tab: TABS.includes(tab as SettingsTab) ? tab as SettingsTab : 'domains' }; }
   if (place?.page === 'site' && typeof (place as { code?: unknown }).code === 'string' && SITE_CODE.test((place as { code: string }).code)) {
     const at = (place as { place?: unknown }).place;
     return typeof at === 'string' && PLACE_ID.test(at) ? { page: 'site', code: (place as { code: string }).code, place: at } : { page: 'site', code: (place as { code: string }).code };
@@ -59,11 +65,12 @@ export function openingPlace(search: string, hash: string, state: unknown): Plac
   return placeFrom(state);
 }
 
-// The sites as last read, so the sidebar and the cards are drawn at once and the registry only confirms them.
-const SITES_KEY = 'consistency-home-sites';
-function storedSites(): SiteSummary[] {
+// Each workspace's sites as last read, so the sidebar and the cards are drawn at once and the registry only confirms them.
+const SITES_KEY = (workspace: string) => `consistency-home-sites:${workspace}`;
+function storedSites(workspace: string): SiteSummary[] {
+  if (!workspace) return [];
   try {
-    const value = JSON.parse(localStorage.getItem(SITES_KEY) ?? '[]') as unknown;
+    const value = JSON.parse(localStorage.getItem(SITES_KEY(workspace)) ?? '[]') as unknown;
     return Array.isArray(value) ? value.filter((site): site is SiteSummary => !!site && typeof site.code === 'string' && typeof site.name === 'string' && typeof site.url === 'string') : [];
   } catch { return []; }
 }
@@ -83,21 +90,23 @@ const siteLabel = (site: SiteSummary) => site.domain
   ? html`<span slot="label" class="home-site-domain"><ds-icon type="globe" size="large" role="img" aria-label="Connected domain"></ds-icon>${site.domain}</span>`
   : html`<span slot="label">${site.address ?? siteHost(site)}</span>`;
 
-// The workspace's name as last read, so the header draws it at once and the profile only confirms it.
-const WORKSPACE_KEY = 'consistency-home-workspace';
-function storedWorkspace(): string { try { return localStorage.getItem(WORKSPACE_KEY) ?? ''; } catch { return ''; } }
 /** The avatar's letter: a name's first letter, a number's first figure after its leading zeros (0001 is 1). */
 export function workspaceInitial(name: string): string { return (name.trim().replace(/^0+(?=.)/, '')[0] ?? '?').toUpperCase(); }
 
-/** Consistency's app: the owner's sites, each in the editor, and Settings. */
+/** Consistency's app: a workspace's sites, each in the editor, and Settings. */
 export class ConsistencyHome extends LitElement {
-  static properties = { error: { state: true }, workspace: { state: true }, place: { state: true }, sites: { state: true }, naming: { state: true } };
+  static properties = { error: { state: true }, workspaces: { state: true }, workspace: { state: true }, place: { state: true }, sites: { state: true }, naming: { state: true }, unread: { state: true } };
   /** The places the app can show, by id (`places/index.ts`), here too for a place defined outside the app's modules. */
   static readonly places = PLACES;
   declare place: Place;
   declare error: string;
+  /** Every workspace the person may open, as last read. */
+  declare workspaces: WorkspaceSummary[];
+  /** The workspace the app is in, by its code. */
   declare workspace: string;
   declare sites: SiteSummary[];
+  /** True once the workspaces have been read and the person has none: invited nowhere yet. */
+  declare unread: boolean;
   /** The workspace's name as typed in Account, while it is being saved or has failed. */
   declare naming: { value: string; busy: boolean; error: string } | null;
   /** Every site opened so far, kept alive while hidden. */
@@ -118,7 +127,11 @@ export class ConsistencyHome extends LitElement {
     this.go(next);
   };
   constructor() {
-    super(); this.error = ''; this.naming = null; this.workspace = storedWorkspace(); this.sites = storedSites();
+    super(); this.error = ''; this.naming = null; this.unread = false;
+    this.workspaces = storedWorkspaces();
+    this.workspace = this.workspaces.some(each => each.code === activeWorkspace()) ? activeWorkspace() : this.workspaces[0]?.code ?? '';
+    setActiveWorkspace(this.workspace);
+    this.sites = storedSites(this.workspace);
     this.place = openingPlace(location.search, location.hash, history.state);
     // The address stays the app's own: what opened it is kept as history state instead.
     history.replaceState(this.place, '', location.pathname);
@@ -134,7 +147,7 @@ export class ConsistencyHome extends LitElement {
     void this.editors.get(code)?.open(path);
   };
 
-  connectedCallback() { super.connectedCallback(); addEventListener('popstate', this.onPop); addEventListener('hashchange', this.onHash); this.addEventListener(OPEN_PAGE, this.onOpenPage); void this.readWorkspace(); void this.readSites(); }
+  connectedCallback() { super.connectedCallback(); addEventListener('popstate', this.onPop); addEventListener('hashchange', this.onHash); this.addEventListener(OPEN_PAGE, this.onOpenPage); void this.readWorkspaces(); }
 
   /** Goes to a place inside the app, the address unchanged. */
   go(next: Place) { void this.move(next, 'push'); }
@@ -149,13 +162,41 @@ export class ConsistencyHome extends LitElement {
     this.place = next;
   }
 
+  /**
+   * The workspaces the person may open, then the sites of the one the app is in: the one chosen last, else the one
+   * holding a site asked for by its code, else the first.
+   */
+  private async readWorkspaces() {
+    const read = await readWorkspaces();
+    if (!read) { if (this.workspace) void this.readSites(); return; }
+    this.workspaces = read.workspaces;
+    storeWorkspaces(read.workspaces);
+    this.unread = !read.workspaces.length;
+    const asked = this.place.page === 'site' ? (this.place as { code: string }).code : '';
+    const holding = asked ? read.workspaces.find(each => each.siteCodes.includes(asked)) : undefined;
+    const next = holding?.code ?? (read.workspaces.some(each => each.code === this.workspace) ? this.workspace : read.workspaces[0]?.code ?? '');
+    if (next !== this.workspace) this.choose(next);
+    else void this.readSites();
+  }
+
+  /** Moves the app into another workspace: its sites as last read at once, confirmed by the registry. */
+  private choose(code: string) {
+    setActiveWorkspace(code);
+    this.workspace = code;
+    this.sites = storedSites(code);
+    this.naming = null;
+    void this.readSites();
+  }
+
   /** The workspace's sites from the registry: their names and their own addresses. */
   private async readSites() {
-    const response = await fetch('/api/consistency/sites', { cache: 'no-store' }).catch(() => null);
+    const workspace = this.workspace;
+    if (!workspace) { this.sites = []; return; }
+    const response = await fetch('/api/consistency/sites', { cache: 'no-store', headers: workspaceHeaders() }).catch(() => null);
     const body = response?.ok ? await response.json().catch(() => null) as { sites?: SiteSummary[] } | null : null;
-    if (!Array.isArray(body?.sites)) return;
+    if (!Array.isArray(body?.sites) || workspace !== this.workspace) return;
     this.sites = body.sites;
-    try { localStorage.setItem(SITES_KEY, JSON.stringify(this.sites)); } catch { /* read again next visit */ }
+    try { localStorage.setItem(SITES_KEY(workspace), JSON.stringify(this.sites)); } catch { /* read again next visit */ }
   }
 
   /** The editor for a site, made once and kept. */
@@ -200,28 +241,24 @@ export class ConsistencyHome extends LitElement {
   }
   disconnectedCallback() { super.disconnectedCallback(); removeEventListener('popstate', this.onPop); removeEventListener('hashchange', this.onHash); this.removeEventListener(OPEN_PAGE, this.onOpenPage); }
 
-  /** The company name on the owner's own account (Account in the docs sets it). */
-  private async readWorkspace() {
-    const response = await fetch('/api/consistency/profile', { cache: 'no-store' }).catch(() => null);
-    const body = response?.ok ? await response.json().catch(() => null) as { companyName?: unknown } | null : null;
-    if (typeof body?.companyName !== 'string') return;
-    this.workspace = body.companyName.trim();
-    try { localStorage.setItem(WORKSPACE_KEY, this.workspace); } catch { /* read again next visit */ }
-  }
+  /** The workspace the app is in, as last read. */
+  private get current(): WorkspaceSummary | undefined { return this.workspaces.find(each => each.code === this.workspace); }
 
-  /** Renames the workspace on the owner's account: saved on Enter or on leaving the field; a failure keeps the words typed. */
+  /** Renames the workspace, for its admins and the owner: saved on Enter or on leaving the field; a failure keeps the words typed. */
   private async rename() {
     const naming = this.naming;
-    if (!naming || naming.busy) return;
+    const current = this.current;
+    if (!naming || naming.busy || !current) return;
     const value = naming.value.trim();
-    if (!value || value === this.workspace) { this.naming = null; return; }
+    if (!value || value === current.name) { this.naming = null; return; }
     this.naming = { ...naming, busy: true, error: '' };
-    const response = await fetch('/api/consistency/profile', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ companyName: value }) }).catch(() => null);
-    const body = response?.ok ? await response.json().catch(() => null) as { companyName?: unknown } | null : null;
-    if (typeof body?.companyName !== 'string') { this.naming = { value, busy: false, error: 'The name could not be saved. Try again.' }; return; }
-    this.workspace = body.companyName;
+    const response = await fetch(`/api/consistency/workspaces/${current.code}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: value }) }).catch(() => null);
+    const body = response?.ok ? await response.json().catch(() => null) as { name?: unknown } | null : null;
+    if (typeof body?.name !== 'string') { this.naming = { value, busy: false, error: 'The name could not be saved. Try again.' }; return; }
+    const name = body.name;
+    this.workspaces = this.workspaces.map(each => each.code === current.code ? { ...each, name } : each);
+    storeWorkspaces(this.workspaces);
     this.naming = null;
-    try { localStorage.setItem(WORKSPACE_KEY, this.workspace); } catch { /* read again next visit */ }
   }
 
   private async signOut() {
@@ -233,10 +270,13 @@ export class ConsistencyHome extends LitElement {
   }
 
   render() {
-    const name = this.workspace || 'My company';
+    const current = this.current;
+    const name = current?.name || 'Workspace';
     const settings = this.place.page === 'settings';
     const open = this.place.page === 'site' ? (this.place as { code: string }).code : '';
     const site = open ? this.sites.find(item => item.code === open) : undefined;
+    const others = this.workspaces.filter(each => each.code !== this.workspace);
+    const drafts = draftWords(current);
     return html`<ds-page layout="sidebar" fill drawer>
       ${site ? this.siteNav(site) : html`<nav slot="nav" class="home-nav" aria-label="Consistency">
         <div class="home-workspace" aria-label="Workspace">
@@ -244,6 +284,8 @@ export class ConsistencyHome extends LitElement {
             <ds-avatar initial=${workspaceInitial(name)} outlined plain aria-hidden="true"></ds-avatar>${name}<ds-icon type="chevron-down"></ds-icon>
           </ds-button>
           <ds-select for="home-workspace" hover aria-label="Workspace">
+            ${others.map(each => html`<ds-button menu-item data-workspace=${each.code} @click=${() => { this.choose(each.code); this.go({ page: 'sites' }); }}>${each.name}</ds-button>`)}
+            ${others.length ? html`<hr>` : ''}
             <ds-button menu-item @click=${() => this.go({ page: 'settings', tab: 'domains' })}>Settings</ds-button>
           </ds-select>
           <ds-button id="home-notifications" icon label="Notifications"><ds-icon type="notifications"></ds-icon></ds-button>
@@ -254,7 +296,8 @@ export class ConsistencyHome extends LitElement {
       </nav>`}
       <div class=${open ? 'home-main home-main--site' : 'home-main'}>
         ${open ? '' : html`<ds-text class="home-title" role="heading" aria-level="1" literal size="display" text=${settings ? 'Settings' : 'Sites'}></ds-text>`}
-        ${this.place.page === 'settings' ? this.settings(this.place.tab, name) : open ? (this.sites.some(site => site.code === open) ? '' : html`<ds-empty literal heading="This site is not in your workspace"></ds-empty>`) : this.siteCards()}
+        ${!open && !settings && drafts ? html`<ds-text class="home-drafts" tone="muted" literal text=${drafts}></ds-text>` : ''}
+        ${this.place.page === 'settings' ? this.settings(this.place.tab, current) : open ? (this.sites.some(site => site.code === open) ? '' : html`<ds-empty literal heading="This site is not in your workspace"></ds-empty>`) : this.unread ? html`<ds-empty literal heading="You are not in a workspace yet" text="Ask whoever invited you to Consistency to invite this address."></ds-empty>` : this.siteCards()}
         <div class="home-stage" ?hidden=${!open}></div>
       </div>
     </ds-page>`;
@@ -279,21 +322,24 @@ export class ConsistencyHome extends LitElement {
     </nav>`;
   }
 
-  /** The owner's sites as cards, each opening in the editor here. */
+  /** The workspace's sites as cards, each opening in the editor here. */
   private siteCards() {
     return html`<div class="home-grid">${this.sites.map(site => html`<ds-card interactive data-site=${site.code} width="12" height="8" @ds-card-press=${() => this.go({ page: 'site', code: site.code })}>${siteLabel(site)}<span slot="title">${site.name}</span></ds-card>`)}</div>`;
   }
 
-  /** Settings as Money draws it: text tabs under the title, each tab its own address. */
-  private settings(tab: SettingsTab, name: string) {
-    const tabs: { id: SettingsTab; label: string }[] = [{ id: 'domains', label: 'Domains' }, { id: 'account', label: 'Account' }];
+  /** Settings as Money draws it: text tabs under the title, each tab its own address. Members is for the workspace's admins and the owner. */
+  private settings(asked: SettingsTab, current: WorkspaceSummary | undefined) {
+    const manage = canManage(current);
+    const tabs: { id: SettingsTab; label: string }[] = [...(manage ? [{ id: 'members' as const, label: 'Members' }] : []), { id: 'domains', label: 'Domains' }, { id: 'account', label: 'Account' }];
+    const tab = tabs.some(item => item.id === asked) ? asked : 'domains';
+    const name = current?.name ?? '';
     return html`<div class="home-settings">
       <ds-tabs text class="home-settings-tabs" aria-label="Settings">${tabs.map(item => html`<ds-button control="host" role="tab" ?active=${tab === item.id} aria-selected=${String(tab === item.id)} tabindex=${tab === item.id ? 0 : -1}
         @click=${() => this.go({ page: 'settings', tab: item.id })}>${item.label}</ds-button>`)}</ds-tabs>
-      ${tab === 'domains' ? html`<consistency-domains></consistency-domains>` : html`<section class="home-account" aria-label="Account">
+      ${tab === 'members' ? html`<consistency-members .workspace=${this.workspace}></consistency-members>` : tab === 'domains' ? html`${keyed(this.workspace, html`<consistency-domains></consistency-domains>`)}` : html`<section class="home-account" aria-label="Account">
         <ds-list aria-label="Account"><ds-row><span class="ds-row__name">Workspace</span><span class="ds-row__value">
-          <ds-input class="home-workspace-field" aria-label="Workspace" maxlength="80" autocomplete="organization" ?disabled=${this.naming?.busy ?? false}
-            placeholder="My company" .value=${this.naming?.value ?? this.workspace}
+          <ds-input class="home-workspace-field" aria-label="Workspace" maxlength="80" autocomplete="organization" ?disabled=${(this.naming?.busy ?? false) || !manage}
+            placeholder="My company" .value=${this.naming?.value ?? name}
             @input-change=${(event: CustomEvent<{ value: string }>) => { this.naming = { value: event.detail.value, busy: false, error: '' }; }}
             @input-blur=${() => void this.rename()}
             @keydown=${(event: KeyboardEvent) => { if (event.key === 'Enter') void this.rename(); if (event.key === 'Escape') this.naming = null; }}></ds-input>

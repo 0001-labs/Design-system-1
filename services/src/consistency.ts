@@ -1,8 +1,8 @@
 /** Private editor preview. Every preview file is authorized before reaching Assets. */
-import { dashboard, sessionRequest } from './dashboard';
-import { authorizeReport, type ReportsEnv } from './reports';
+import { dashboard, ownerSessionCookie, sessionRequest } from './dashboard';
+import { authorizeReport, isStudioOwner, signedIn, type ReportsEnv } from './reports';
 import { hasOwnerSignIn, ownerRoutes, ownerSignOut, systemOwner, type OwnerEnv } from './consistency-owner';
-import { sitesApi } from './consistency-sites';
+import { personHeaders, sitesApi, type Person } from './consistency-sites';
 
 export const CONSISTENCY_HOST = 'c9y.site';
 /** The owner's editor lab: the page editor alone, at its root, behind the verified owner session. */
@@ -35,10 +35,19 @@ export function isPrivatePreviewPath(path: string): boolean {
   return canonical.startsWith('/private-consistency');
 }
 const security = { 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow', 'Referrer-Policy': 'same-origin', 'X-Content-Type-Options': 'nosniff', Vary: 'Cookie, Authorization' };
-/** The owner: System's owner session on an address that takes it, else the existing verified owner session. */
-export async function authorizeOwner(request: Request, env: ReportsEnv & WorkspaceEnv, send: typeof fetch): Promise<Response | null> {
-  if (await systemOwner(request, env)) return null;
-  return authorizeReport(sessionRequest(request), env, send);
+/**
+ * Who asks in Consistency's app: the owner, who sees every workspace, or, at consistency.site alone, anyone signed in
+ * with a verified address, who sees the workspaces they were invited to (the platform decides which). The lab and
+ * c9y.site stay the owner's.
+ */
+export async function authorizePerson(request: Request, env: ReportsEnv & WorkspaceEnv, send: typeof fetch): Promise<Person | Response> {
+  if (await systemOwner(request, env)) return { owner: true };
+  const identity = await signedIn(sessionRequest(request), env, send);
+  if (identity instanceof Response) return identity;
+  if (isStudioOwner(identity, env)) return { owner: true };
+  const email = identity.email?.trim().toLowerCase();
+  if (new URL(request.url).hostname !== APP_HOST || identity.emailVerified !== true || !email) return Response.json({ error: 'This is private to the studio owner.' }, { status: 403 });
+  return { owner: false, email };
 }
 /** An address of consistency.site that is not the app's, to the Pages project behind it, as it came. */
 const pass = (request: Request) => fetch(request);
@@ -64,15 +73,25 @@ export async function consistencyPreview(request: Request, env: ReportsEnv & Wor
     if (cleared.value) response.headers.append('Set-Cookie', cleared.value);
     return response;
   }
+  // At consistency.site anyone signed in with a verified address keeps a session; the platform decides what they open.
+  if (url.hostname === APP_HOST && url.pathname === '/api/dashboard/session' && request.method === 'POST') {
+    if (request.headers.get('origin') !== url.origin) return protect(new Response(null, { status: 403 }));
+    const person = await authorizePerson(request, env, send);
+    if (person instanceof Response) return protect(person);
+    const session = ownerSessionCookie(request);
+    if (!session) return protect(new Response(null, { status: 401 }));
+    return protect(new Response(null, { status: 204, headers: { 'Set-Cookie': session } }));
+  }
   if (url.pathname === '/api/dashboard/session' || url.pathname === '/app/signin' || /^\/app\/assets\/[A-Za-z0-9][A-Za-z0-9._-]*$/.test(url.pathname) || url.pathname === '/icons/design-system-1.svg') return protect(await dashboard(request, env, send));
-  if ((url.pathname.startsWith('/api/consistency/pages') || url.pathname==='/api/consistency/sites')) return protect(await workspaceApi(request,env,send));
-  // A site's words, edited in the editor as the owner; its page and files for the editor's sandboxed frame.
-  if (url.pathname.startsWith('/api/consistency/sites/')) return protect(await sitesApi(request, env, owner => authorizeOwner(owner, env, send)));
+  if (url.pathname.startsWith('/api/consistency/pages') || url.pathname === '/api/consistency/sites' || url.pathname === '/api/consistency/workspaces' || url.pathname.startsWith('/api/consistency/workspaces/')) return protect(await workspaceApi(request,env,send));
+  // A site's words, edited in the editor as the person asking; its page and files for the editor's sandboxed frame.
+  if (url.pathname.startsWith('/api/consistency/sites/')) return protect(await sitesApi(request, env, asking => authorizePerson(asking, env, send)));
   if (url.pathname === '/api/consistency/domains' || url.pathname.startsWith('/api/consistency/domains/')) return protect(await domainsApi(request, env, send));
   if (url.pathname === '/api/consistency/profile') return protect(await profileApi(request, env, send));
   if (!['GET', 'HEAD'].includes(request.method)) return new Response(null, { status: 404, headers: security });
   if (url.pathname !== '/' && !url.pathname.startsWith(prefix)) return new Response(null, { status: 404, headers: security });
-  const denied = await authorizeOwner(request, env, send);
+  const person = await authorizePerson(request, env, send);
+  const denied = person instanceof Response ? person : null;
   // Signed out, consistency.site's front page is the landing.
   if (denied && url.hostname === APP_HOST && url.pathname === '/') return pass(request);
   if (denied) {
@@ -85,6 +104,7 @@ export async function consistencyPreview(request: Request, env: ReportsEnv & Wor
   const original = await env.ASSETS.fetch(new Request(url, request));
   // This marker enables owner-only diagnostics; it grants no server access. Only
   // trusted built HTML is rewritten, after the authority has validated the owner.
+  if (!(person as Person).owner) return protect(original);
   if (request.method === 'GET' && original.ok && original.headers.get('Content-Type')?.split(';')[0]?.trim().toLowerCase() === 'text/html') {
     const html = (await original.text()).replace(/<html(?=[\s>])/i, '<html data-ds-owner');
     const marked = new Response(html, original);
@@ -134,31 +154,39 @@ async function profileApi(request: Request, env: ReportsEnv, send: typeof fetch)
   } catch { return Response.json({ error: 'The profile could not be read.' }, { status: 503 }); }
 }
 
+/**
+ * The workspace's own routes: its sites and its composition drafts, and the workspaces themselves (`workspaces`,
+ * `workspaces/<code>` to rename, `workspaces/<code>/members[/<address>]`). The platform decides what each person may do.
+ */
+const WORKSPACE_ROUTE = /^\/api\/consistency\/(?:sites|workspaces(?:\/\d{2}[A-Za-z]{4}(?:\/members(?:\/[^/]{3,254})?)?)?|pages(?:\/[a-zA-Z0-9][a-zA-Z0-9_-]{0,79})?)$/;
 async function workspaceApi(request:Request,env:ReportsEnv & WorkspaceEnv,send:typeof fetch):Promise<Response>{
   const url=new URL(request.url);
-  if(url.pathname!=='/api/consistency/sites'&&!/^\/api\/consistency\/pages(?:\/[a-zA-Z0-9][a-zA-Z0-9_-]{0,79})?$/.test(url.pathname))return Response.json({error:'Not found'},{status:404});
-  const denied=await authorizeOwner(new Request(request.url,{headers:request.headers}),env,send);if(denied)return denied;
-  if(!['GET','PUT'].includes(request.method))return Response.json({error:'Method not allowed'},{status:405});
-  if(request.method==='PUT'&&(request.headers.get('Origin')!==url.origin||request.headers.get('Content-Type')?.split(';')[0]!=='application/json'))return Response.json({error:'Forbidden'},{status:403});
+  if(!WORKSPACE_ROUTE.test(url.pathname))return Response.json({error:'Not found'},{status:404});
+  const person=await authorizePerson(new Request(request.url,{headers:request.headers}),env,send);if(person instanceof Response)return person;
+  const methods=url.pathname.startsWith('/api/consistency/pages/')?['GET','PUT']:/\/members\/[^/]+$/.test(url.pathname)?['DELETE']:url.pathname.endsWith('/members')?['GET','POST']:/\/workspaces\/[^/]+$/.test(url.pathname)?['PUT']:['GET'];
+  if(!methods.includes(request.method))return Response.json({error:'Method not allowed'},{status:405,headers:{Allow:methods.join(', ')}});
+  if(request.method!=='GET'&&request.headers.get('Origin')!==url.origin)return Response.json({error:'Forbidden'},{status:403});
+  if((request.method==='PUT'||request.method==='POST')&&request.headers.get('Content-Type')?.split(';')[0]!=='application/json')return Response.json({error:'Forbidden'},{status:403});
   if(!env.CONSISTENCY_WORKSPACE)return Response.json({error:'Workspace unavailable'},{status:503});
   let body:Uint8Array|undefined;
-  if(request.method==='PUT'){
+  if(request.method==='PUT'||request.method==='POST'){
     const reader=request.body?.getReader();const chunks:Uint8Array[]=[];let size=0;
     if(reader)for(;;){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>800_000){await reader.cancel();return Response.json({error:'Document too large'},{status:413});}chunks.push(value);}
     body=new Uint8Array(size);let offset=0;for(const chunk of chunks){body.set(chunk,offset);offset+=chunk.length;}
   }
-  return env.CONSISTENCY_WORKSPACE.fetch(new Request('https://workspace.internal'+url.pathname,{method:request.method,body,headers:{'Content-Type':'application/json'}}));
+  return env.CONSISTENCY_WORKSPACE.fetch(new Request('https://workspace.internal'+url.pathname,{method:request.method,body,headers:personHeaders(person,request,{'Content-Type':'application/json'})}));
 }
 
 /**
- * Settings → Domains: the owner connects their own domains to their sites. The platform talks to Cloudflare and
- * decides when a domain is connected; this gateway only checks the owner, the origin and the request's shape.
+ * Settings → Domains: a workspace's own domains on its sites, on a plan that has them. The platform talks to
+ * Cloudflare and decides when a domain is connected and who may; this gateway only checks who asks, the origin and the
+ * request's shape.
  */
 async function domainsApi(request: Request, env: ReportsEnv & WorkspaceEnv, send: typeof fetch): Promise<Response> {
   const url = new URL(request.url);
   const item = /^\/api\/consistency\/domains\/([a-z0-9.-]{1,253})(\/check)?$/.exec(url.pathname);
   if (url.pathname !== '/api/consistency/domains' && !item) return Response.json({ error: 'Not found' }, { status: 404 });
-  const denied = await authorizeOwner(new Request(request.url, { headers: request.headers }), env, send); if (denied) return denied;
+  const person = await authorizePerson(new Request(request.url, { headers: request.headers }), env, send); if (person instanceof Response) return person;
   const allowed = item ? (item[2] ? ['POST'] : ['DELETE']) : ['GET', 'POST'];
   if (!allowed.includes(request.method)) return Response.json({ error: 'Method not allowed' }, { status: 405 });
   const body = request.method === 'POST' && !item ? await request.text() : undefined;
@@ -168,5 +196,5 @@ async function domainsApi(request: Request, env: ReportsEnv & WorkspaceEnv, send
     if (body !== undefined && body.length > 2_000) return Response.json({ error: 'Too large' }, { status: 413 });
   }
   if (!env.CONSISTENCY_WORKSPACE) return Response.json({ error: 'Workspace unavailable' }, { status: 503 });
-  return env.CONSISTENCY_WORKSPACE.fetch(new Request('https://workspace.internal' + url.pathname, { method: request.method, body, headers: { 'Content-Type': 'application/json' } }));
+  return env.CONSISTENCY_WORKSPACE.fetch(new Request('https://workspace.internal' + url.pathname, { method: request.method, body, headers: personHeaders(person, request, { 'Content-Type': 'application/json' }) }));
 }

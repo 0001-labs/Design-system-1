@@ -37,3 +37,11 @@ consistency-domains{display:block;max-width:calc(32 * var(--ds-unit))}
 .home-places{flex:1;min-height:0;overflow:auto}
 /* The workspace's name in Account is a field that hugs a name of up to twelve squares. */
 .home-workspace-field{width:calc(12 * var(--ds-unit))}
+/* The plan's draft sites under the title, half a square up so they sit with it. */
+.home-drafts{margin-top:calc(var(--ds-unit) / -2)}
+/* Settings → Members: the settings column of 32 squares; the invite row on the sixteen, as Domains' connect row. */
+consistency-members{display:block;max-width:calc(32 * var(--ds-unit))}
+.members{display:flex;flex-direction:column;gap:var(--ds-unit)}
+.members-invite{display:flex;flex-wrap:wrap;align-items:flex-end;gap:calc(var(--ds-unit) / 2);min-height:var(--ds-unit)}
+.members-email{flex:1 1 calc(12 * var(--ds-unit));min-width:0}
+.member-row .ds-row__value{display:flex;align-items:flex-end;gap:calc(4px * var(--ds-sf, 1))}

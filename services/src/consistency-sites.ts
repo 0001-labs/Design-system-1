@@ -13,7 +13,8 @@
  *   owner's cookies even when the address is opened on its own; a file is sandboxed too and only of the types a
  *   page draws with (an SVG opened alone cannot run either).
  *
- * Every route checks the owner first, as the other workspace routes do; a write is same-origin JSON, bounded.
+ * Every route checks who asks first, as the other workspace routes do, and the platform opens the site only for the
+ * owner or a member of its workspace; a write is same-origin JSON, bounded.
  */
 // A site by its IDv1 code, a list's shape (`12ABCD`); the platform alone knows its id.
 export const SITE_ROUTE = /^\/api\/consistency\/sites\/(\d{2}[A-Za-z]{4})\/(pages|page|edit|document|places|api\/[\w/-]{1,160}|files\/[^?#]{1,512})$/;
@@ -51,6 +52,23 @@ const CANVAS_TYPE = /^(?:text\/css|font\/[\w.+-]+|application\/font-woff|image\/
 
 interface Gateway { CONSISTENCY_WORKSPACE?: Fetcher }
 
+/** Who asks in Consistency's app, as `authorizePerson` (consistency.ts) finds them. */
+export type Person = { owner: true } | { owner: false; email: string };
+/** A workspace's IDv1 code, as the app names the one it is in. */
+const WORKSPACE_CODE = /^\d{2}[A-Za-z]{4}$/;
+/**
+ * The headers the platform is asked with: who asks, set here alone, and the workspace the app is in, which the
+ * platform checks they may open. Nothing else of the browser's request is passed on.
+ */
+export function personHeaders(person: Person, request: Request, extra: Record<string, string> = {}): Headers {
+  const headers = new Headers(extra);
+  headers.set('X-C9y-Actor', person.owner ? 'owner' : `member ${person.email}`);
+  const workspace = request.headers.get('X-C9y-Workspace');
+  if (workspace && WORKSPACE_CODE.test(workspace)) headers.set('X-C9y-Workspace', workspace);
+  return headers;
+}
+
+
 const refuse = (error: string, status: number, headers: Record<string, string> = {}) => Response.json({ error }, { status, headers });
 
 /** Whether `path=` is a page's address as the manifest writes it. */
@@ -63,7 +81,7 @@ async function bounded(request: Request, limit: number): Promise<Uint8Array | nu
   return body;
 }
 
-export async function sitesApi(request: Request, env: Gateway, authorize: (request: Request) => Promise<Response | null>): Promise<Response> {
+export async function sitesApi(request: Request, env: Gateway, authorize: (request: Request) => Promise<Response | Person>): Promise<Response> {
   const url = new URL(request.url);
   const match = SITE_ROUTE.exec(url.pathname);
   if (!match) return refuse('Not found', 404);
@@ -72,7 +90,7 @@ export async function sitesApi(request: Request, env: Gateway, authorize: (reque
   const path = route === 'api' ? (named.startsWith('api/') ? named.slice(4) : named) : '';
   const allowed = route === 'api' ? apiRoute(path) : null;
   if (route === 'api' && !allowed) return refuse('Not found', 404);
-  const denied = await authorize(new Request(request.url, { headers: request.headers })); if (denied) return denied;
+  const person = await authorize(new Request(request.url, { headers: request.headers })); if (person instanceof Response) return person;
   const methods = allowed ? [...allowed.methods] : METHODS[route]!;
   if (!methods.includes(request.method)) return refuse('Method not allowed', 405, { Allow: methods.join(', ') });
   if (url.search.length > QUERY_LIMIT) return refuse('Bad query', 400);
@@ -89,7 +107,7 @@ export async function sitesApi(request: Request, env: Gateway, authorize: (reque
   // A route of the API takes its whole query; the page routes take the page's path alone.
   const search = route === 'api' && path !== 'page' ? url.search : path === 'page' || route === 'document' ? `?path=${encodeURIComponent(page!)}` : '';
   const target = route === 'api' ? `/api/consistency/sites/${match[1]}/api/${path}` : url.pathname;
-  const answer = await env.CONSISTENCY_WORKSPACE.fetch(new Request(`https://workspace.internal${target}${search}`, { method: request.method, body, headers: body ? { 'Content-Type': 'application/json' } : {} }));
+  const answer = await env.CONSISTENCY_WORKSPACE.fetch(new Request(`https://workspace.internal${target}${search}`, { method: request.method, body, headers: personHeaders(person, request, body ? { 'Content-Type': 'application/json' } : {}) }));
   if (route !== 'document' && route !== 'files') {
     const result = new Response(answer.body, answer);
     result.headers.set('X-Content-Type-Options', 'nosniff');

@@ -81,6 +81,7 @@ export class AppRoot extends AppElement {
     if (["/flags", "/flags/", "/app/flags"].includes(pathname)) return html`<ds1-feature-flags></ds1-feature-flags>`;
     if (pathname === "/app/navigation-auth") return html`<ds1-navigation-auth></ds1-navigation-auth>`;
     if (["c9y.site", "editor.c9y.site"].includes(hostname)) return html`<ds1-private-preview-signin></ds1-private-preview-signin>`;
+    if (hostname === "consistency.site") return html`<ds1-private-preview-signin anyone></ds1-private-preview-signin>`;
     if (pathname === "/app/adoption") return html`<ds1-adoption-dashboard></ds1-adoption-dashboard>`;
     if (hostname === "fonts.designsystem1.com") return html`<ds1-font-workspace></ds1-font-workspace>`;
     if (hostname === "icon.designsystem1.com") return html`<ds1-icon-builder></ds1-icon-builder>`;
@@ -89,13 +90,19 @@ export class AppRoot extends AppElement {
 }
 defineElement("ds1-root", AppRoot);
 
-/** Bridges the existing owner sign-in to this host's protected root. */
+/**
+ * Bridges the existing owner sign-in to this host's protected root. At consistency.site (`anyone`) it is the
+ * sign-in of everyone invited to a workspace there, by the emailed code; the Worker decides what they may open.
+ */
 class PrivatePreviewSignIn extends AppElement {
+  static properties = { anyone: { type: Boolean } };
+  declare anyone: boolean;
   #session = new OwnerSession(this, "Consistency");
+  constructor() { super(); this.anyone = false; }
   override render() {
     const { isLoading, isAuthenticated } = authState.get();
     if (isLoading) return splash();
-    if (!isAuthenticated) return html`<div class="app-shell"><ds1-sign-in private-title="Consistency" .redirectTo=${"/signin"}></ds1-sign-in></div>`;
+    if (!isAuthenticated) return html`<div class="app-shell"><ds1-sign-in private-title="Consistency" ?anyone=${this.anyone} .redirectTo=${"/signin"}></ds1-sign-in></div>`;
     if (this.#session.error) return html`<div class="app-shell"><main class="auth-screen"><p role="alert">${this.#session.error}</p></main></div>`;
     return splash();
   }

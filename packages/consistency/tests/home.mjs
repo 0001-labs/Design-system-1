@@ -18,7 +18,13 @@ try {
  let signedOut=false;await page.route('**/api/dashboard/session',async route=>{signedOut=route.request().method()==='DELETE';await route.fulfill({status:204});});
  await page.route('**/app/signin',route=>route.fulfill({status:200,contentType:'text/html',body:'signed out'}));
  await page.route('**/api/consistency/profile',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({companyName:'0001'})}));
- await page.route('**/api/consistency/sites',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({sites:[{code:'20FLAV',name:'Flavo',url:'https://flavo.flowers/',address:'ghost-dew-rose.c9y.site',domain:'flavo.flowers'},{code:'10VNDG',name:'CPH Raft',url:'https://cphraft.c9y.site/',address:'alice-steel-blue.c9y.site'},{code:'30SDGA',name:'Søndergården',url:'https://soendergaarden.c9y.site/'}]})}));
+ // Two workspaces: 0001, the owner's own with three sites, and a client's, Raft & Co, with one.
+ const limits={sites:2,customDomains:false};
+ const workspaces=[{code:'01STDO',name:'0001',plan:'free',role:'owner',sites:3,siteCodes:['10VNDG','20FLAV','30SDGA'],limits},{code:'02RAFT',name:'Raft & Co',plan:'free',role:'owner',sites:1,siteCodes:['40RAFT'],limits}];
+ await page.route('**/api/consistency/workspaces',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({owner:true,workspaces})}));
+ const workspaceSites={'01STDO':[{code:'20FLAV',name:'Flavo',url:'https://flavo.flowers/',address:'ghost-dew-rose.c9y.site',domain:'flavo.flowers'},{code:'10VNDG',name:'CPH Raft',url:'https://cphraft.c9y.site/',address:'alice-steel-blue.c9y.site'},{code:'30SDGA',name:'Søndergården',url:'https://soendergaarden.c9y.site/'}],'02RAFT':[{code:'40RAFT',name:'Raft',url:'https://amber-rose-teal.c9y.site/',address:'amber-rose-teal.c9y.site'}]};
+ const asked=[];
+ await page.route('**/api/consistency/sites',route=>{const workspace=route.request().headers()['x-c9y-workspace'];asked.push(workspace);route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({workspace,sites:workspaceSites[workspace]??[]})});});
  await page.route('**/api/consistency/sites/*/pages',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({pages:[]})}));
  // Søndergården's pages, in two languages, and their documents, for the site's own sidebar.
  const sdg=[{path:'/',lang:'da',title:'Forside',fields:1,edited:0},{path:'/om/',lang:'da',title:'Om os',fields:1,edited:0},{path:'/en/',lang:'en',title:'Home',fields:1,edited:0}];
@@ -28,9 +34,12 @@ try {
  // The sites' places: Søndergården names one the app has an element for and one it has not; the others none.
  let slowPlaces=false;
  await page.route('**/api/consistency/sites/*/places',async route=>{const code=new URL(route.request().url()).pathname.split('/')[4];if(code==='30SDGA'&&slowPlaces)await new Promise(resolve=>setTimeout(resolve,1500));await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({places:code==='30SDGA'?[{id:'lab',label:'Lab'},{id:'made-up',label:'Made up'}]:[]})});});
- let renamed=null;await page.route('**/api/consistency/profile',async route=>{if(route.request().method()==='PUT'){renamed=route.request().postDataJSON().companyName;await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({companyName:renamed})});}else await route.fallback();});
+ let renamed=null;await page.route('**/api/consistency/workspaces/01STDO',async route=>{renamed=route.request().postDataJSON().name;await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({code:'01STDO',name:renamed})});});
+ await page.route('**/api/consistency/workspaces/*/members',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({members:[{email:'ada@example.com',role:'admin',status:'active'}]})}));
  const home=`http://127.0.0.1:${server.address().port}/private-consistency/home.html`;
  await page.goto(home);await page.locator('consistency-home ds-card').first().waitFor();
+ if(asked.some(code=>code!=='01STDO'))throw Error('Sites were asked outside the workspace: '+asked.join());
+ if(await page.locator('consistency-home .home-drafts').getAttribute('text')!=='3 of 2 draft sites')throw Error('The plan\'s draft sites are not under the title');
  if(await page.getByRole('button',{name:/^(New|Grid|List)$/}).count())throw Error('Sites still has New or the view switch');
  if(await page.locator('consistency-home .home-title[text="Sites"]').count()!==1)throw Error('The page is not titled Sites');
  await page.getByRole('button',{name:'Workspace: 0001'}).waitFor();
@@ -60,11 +69,18 @@ try {
  if(await page.locator('consistency-home ds-sidebar').count())throw Error('The sidebar still has rows of places');
  for(const width of [300,390,768,1440]){await page.setViewportSize({width,height:800});await page.waitForTimeout(100);if(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth))throw Error(`Home overflows at ${width}`);}
  await page.setViewportSize({width:1440,height:800});
- await page.locator('#home-workspace').hover();const menu=page.locator('consistency-home ds-select[aria-label="Workspace"]');if((await menu.locator('ds-button[menu-item]').allInnerTexts()).map(t=>t.trim()).join()!=='Settings'||await menu.locator('ds-avatar, hr').count())throw Error('The workspace menu holds more than Settings');await page.locator('consistency-home ds-select[aria-label="Workspace"] ds-button[menu-item]',{hasText:'Settings'}).click();await page.locator('consistency-home consistency-domains').waitFor();same();await page.locator('#home-workspace').click();await page.locator('consistency-home ds-card').first().waitFor();if(await page.locator('consistency-home .home-title[text="Sites"]').count()!==1)throw Error('Pressing the workspace does not show Sites');await page.mouse.move(700,500);await page.locator('#home-workspace').hover();await page.locator('consistency-home ds-select[aria-label="Workspace"] ds-button[menu-item]',{hasText:'Settings'}).click();await page.locator('consistency-home consistency-domains').waitFor();same();
+ await page.locator('#home-workspace').hover();const menu=page.locator('consistency-home ds-select[aria-label="Workspace"]');if((await menu.locator('ds-button[menu-item]').allInnerTexts()).map(t=>t.trim()).join()!=='Raft & Co,Settings'||await menu.locator('ds-avatar').count())throw Error('The workspace menu is not the other workspaces and Settings');
+ // Switching shows the other workspace's sites alone, and back again.
+ await menu.locator('ds-button[menu-item]',{hasText:'Raft & Co'}).click();await page.getByRole('button',{name:'Workspace: Raft & Co'}).waitFor();await page.locator('consistency-home ds-card[data-site="40RAFT"]').waitFor();same();
+ if(await page.locator('consistency-home ds-card').count()!==1)throw Error('Another workspace\'s sites show beside Raft & Co\'s');
+ if(await page.evaluate(()=>localStorage.getItem('consistency-active-workspace'))!=='02RAFT')throw Error('The workspace chosen is not kept');
+ await page.mouse.move(700,500);await page.locator('#home-workspace').hover();await menu.locator('ds-button[menu-item]',{hasText:'0001'}).click();await page.getByRole('button',{name:'Workspace: 0001'}).waitFor();await page.locator('consistency-home ds-card[data-site="10VNDG"]').waitFor();
+ await page.mouse.move(700,500);await page.locator('#home-workspace').hover();await page.locator('consistency-home ds-select[aria-label="Workspace"] ds-button[menu-item]',{hasText:'Settings'}).click();await page.locator('consistency-home consistency-domains').waitFor();same();await page.locator('#home-workspace').click();await page.locator('consistency-home ds-card').first().waitFor();if(await page.locator('consistency-home .home-title[text="Sites"]').count()!==1)throw Error('Pressing the workspace does not show Sites');await page.mouse.move(700,500);await page.locator('#home-workspace').hover();await page.locator('consistency-home ds-select[aria-label="Workspace"] ds-button[menu-item]',{hasText:'Settings'}).click();await page.locator('consistency-home consistency-domains').waitFor();same();
  await page.locator('consistency-home consistency-domains').waitFor();
  if(await page.locator('consistency-home .home-title[text="Settings"]').count()!==1)throw Error('The page is not titled Settings');
  const tabs=await page.locator('consistency-home ds-tabs[aria-label="Settings"] [role="tab"]').evaluateAll(tabs=>tabs.map(tab=>tab.textContent.trim()+':'+tab.getAttribute('aria-selected')));
- if(tabs.join()!=='Domains:true,Account:false')throw Error('Tabs: '+tabs.join());
+ if(tabs.join()!=='Members:false,Domains:true,Account:false')throw Error('Tabs: '+tabs.join());
+ await page.getByRole('tab',{name:'Members'}).click();await page.locator('consistency-home consistency-members ds-row',{hasText:'ada@example.com'}).waitFor();same();
  await page.getByRole('tab',{name:'Account'}).click();await page.locator('consistency-home .home-account').waitFor();same();
  if(await page.locator('consistency-home ds-input.home-workspace-field input').inputValue()!=='0001')throw Error('Account does not show the workspace');
  await page.reload();await page.locator('consistency-home .home-account').waitFor();
@@ -108,8 +124,11 @@ try {
  await page.evaluate(()=>document.querySelector('consistency-home').go({page:'settings',tab:'account'}));
  const field=page.locator('consistency-home ds-input.home-workspace-field input');await field.waitFor();await field.fill('0001 labs');await field.press('Enter');
  await page.getByRole('button',{name:'Workspace: 0001 labs'}).waitFor();if(renamed!=='0001 labs')throw Error('The workspace name was not saved');
+ // A site of another workspace, asked for by its code, opens in that workspace.
+ await page.goto(home+'?open=40RAFT');await page.getByRole('button',{name:'Site: Raft'}).waitFor();same();
+ if(await page.evaluate(()=>localStorage.getItem('consistency-active-workspace'))!=='02RAFT')throw Error('Opening a site did not move to its workspace');
  // An older address still opens its place and is taken off.
  await page.goto(home+'#settings/account');await page.locator('consistency-home .home-account').waitFor();same();await page.getByRole('button',{name:'Sign out',exact:true}).click();await page.waitForURL('**/app/signin');
  if(!signedOut)throw Error('Sign out did not end the session');
- console.log('Home workspace header, an open site\'s own sidebar of places with no bar over the site, renaming the workspace, Sites as cards only, Settings with Domains and Account tabs, sign out and viewports passed');
+ console.log('Home workspaces: switching, each one\'s own sites and drafts, Members, a site opening in its own workspace; an open site\'s own sidebar of places with no bar over the site, renaming the workspace, Sites as cards only, Settings with Domains and Account tabs, sign out and viewports passed');
 } finally {await browser.close();await new Promise(resolve=>server.close(resolve));}

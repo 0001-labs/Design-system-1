@@ -16,13 +16,14 @@ const browser = await chromium.launch({ headless: true });
 try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   // The platform as the gateway forwards it: sites, a Worker custom domain it cannot manage, and Cloudflare's word on each check.
-  const state = { ready: true, sites: [{ id: 'cph-raft', name: 'CPH Raft', domains: [] }, { id: 'flavo', name: 'Flavo', domains: [{ host: 'flavo.flowers', state: 'active', detail: null, managed: false, checkedAt: null }] }] };
+  const state = { ready: true, allowed: true, sites: [{ code: '10VNDG', name: 'CPH Raft', domains: [] }, { code: '20FLAV', name: 'Flavo', domains: [{ host: 'flavo.flowers', state: 'active', detail: null, managed: false, checkedAt: null }] }] };
   const calls = [];
   let checks = 0;
-  await page.route('**/api/consistency/profile', route => route.fulfill({ json: { companyName: '0001' } }));
+  await page.route('**/api/consistency/workspaces', route => route.fulfill({ json: { owner: true, workspaces: [{ code: '01STDO', name: '0001', plan: 'plus', role: 'owner', sites: 2, siteCodes: ['10VNDG', '20FLAV'], limits: { sites: null, customDomains: true } }] } }));
   await page.route('**/api/consistency/sites', route => route.fulfill({ json: { sites: [{ code: '10VNDG', name: 'CPH Raft', url: 'https://cphraft.c9y.site/' }, { code: '20FLAV', name: 'Flavo', url: 'https://flavo.c9y.site/' }] } }));
   await page.route('**/api/consistency/domains**', async route => {
     const request = route.request(); const path = new URL(request.url()).pathname; calls.push(`${request.method()} ${path}`);
+    if (request.headers()['x-c9y-workspace'] !== '01STDO') return route.fulfill({ status: 404, json: { error: 'unknown-workspace' } });
     if (request.method() === 'GET') return route.fulfill({ json: { target: 'connect.c9y.site', ...state } });
     if (request.method() === 'POST' && path.endsWith('/check')) {
       checks++;
@@ -35,7 +36,7 @@ try {
       const body = request.postDataJSON();
       if (body.host === 'taken.com') return route.fulfill({ status: 409, json: { error: 'host-taken' } });
       const domain = { host: body.host.toLowerCase(), state: 'pending', detail: null, managed: true, checkedAt: 1 };
-      state.sites.find(site => site.id === body.site).domains.push(domain);
+      state.sites.find(site => site.code === body.site).domains.push(domain);
       return route.fulfill({ status: 201, json: domain });
     }
     if (request.method() === 'DELETE') {
@@ -85,5 +86,9 @@ try {
 
   state.ready = false;
   await page.goto(base + '#settings/domains'); await page.reload(); await page.locator('consistency-domains ds-message[text="Connecting domains is not set up yet."]').waitFor();
-  console.log('Domains: listing, refused domain, connect with its record, automatic check, disconnect, unset state and viewports passed');
+  // On Free, the sites stay on their built-in addresses: no form to connect one.
+  state.ready = true; state.allowed = false;
+  await page.reload(); await page.locator('consistency-domains ds-message[text*="comes with Plus"]').waitFor();
+  if (await page.getByRole('button', { name: 'Connect', exact: true }).count()) throw Error('Free still offers to connect a domain');
+  console.log('Domains: listing, refused domain, connect with its record, automatic check, disconnect, unset state, Free without domains and viewports passed');
 } finally { await browser.close(); await new Promise(done => server.close(done)); }

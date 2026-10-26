@@ -148,3 +148,51 @@ it('domains: only the owner, same-origin writes, and only the domain routes reac
  expect((await consistencyPreview(new Request(base,{headers}),{...other.env,CONSISTENCY_WORKSPACE:workspace} as unknown as Parameters<typeof consistencyPreview>[1],other.send)).status).toBe(403);
  expect(workspace.fetch).toHaveBeenCalledTimes(4);
 });
+
+it('takes anyone signed in with a verified address at consistency.site alone, naming them to the platform itself', async () => {
+  const person = (email: string, verified = true) => vi.fn(async () => Response.json({ status: 'success', value: { _id: 'client', email, emailVerified: verified } })) as unknown as typeof fetch;
+  const { env } = setup();
+  const workspace = { fetch: vi.fn(async (request: Request) => Response.json({ actor: request.headers.get('X-C9y-Actor'), workspace: request.headers.get('X-C9y-Workspace') })) };
+  const bound = { ...env, CONSISTENCY_WORKSPACE: workspace } as unknown as Parameters<typeof consistencyPreview>[1];
+  const ask = (url: string, send: typeof fetch, extra: Record<string, string> = {}) => consistencyPreview(new Request(url, { headers: { ...headers, ...extra } }), bound, send);
+  // The browser cannot name someone else, and the workspace it names is passed on only as a code.
+  const asked = await ask('https://consistency.site/api/consistency/sites', person(' Ada@Example.com '), { 'X-C9y-Actor': 'owner', 'X-C9y-Workspace': '12ABCD' });
+  expect(await asked.json()).toEqual({ actor: 'member ada@example.com', workspace: '12ABCD' });
+  expect(await (await ask('https://consistency.site/api/consistency/workspaces', person('ada@example.com'), { 'X-C9y-Workspace': '../x' })).json()).toEqual({ actor: 'member ada@example.com', workspace: null });
+  expect(await (await ask('https://consistency.site/api/consistency/sites', setup().send)).json()).toEqual({ actor: 'owner', workspace: null });
+  // Unverified, or on the lab or c9y.site, they are refused before the platform.
+  const calls = workspace.fetch.mock.calls.length;
+  expect((await ask('https://consistency.site/api/consistency/sites', person('ada@example.com', false))).status).toBe(403);
+  expect((await ask('https://c9y.site/api/consistency/sites', person('ada@example.com'))).status).toBe(403);
+  expect((await ask('https://editor.c9y.site/api/consistency/pages', person('ada@example.com'))).status).toBe(403);
+  expect(workspace.fetch.mock.calls.length).toBe(calls);
+});
+
+it('passes members\' workspace routes on by their methods, writes same-origin JSON only', async () => {
+  const { env, send } = setup();
+  const workspace = { fetch: vi.fn(async (request: Request) => Response.json({ path: new URL(request.url).pathname, method: request.method })) };
+  const bound = { ...env, CONSISTENCY_WORKSPACE: workspace } as unknown as Parameters<typeof consistencyPreview>[1];
+  const base = 'https://consistency.site/api/consistency/workspaces/12ABCD';
+  const call = (path: string, init: RequestInit = {}) => consistencyPreview(new Request(base + path, { ...init, headers: { ...headers, ...(init.headers as Record<string, string>) } }), bound, send);
+  const json = { origin: 'https://consistency.site', 'Content-Type': 'application/json' };
+  expect((await call('/members')).status).toBe(200);
+  expect((await call('/members', { method: 'POST', headers: json, body: '{"email":"bo@example.com"}' })).status).toBe(200);
+  expect((await call('/members', { method: 'POST', headers: { ...json, origin: 'https://evil.test' }, body: '{}' })).status).toBe(403);
+  expect((await call('/members/bo%40example.com', { method: 'DELETE', headers: { origin: 'https://consistency.site' } })).status).toBe(200);
+  expect((await call('', { method: 'PUT', headers: json, body: '{"name":"Raft"}' })).status).toBe(200);
+  expect((await call('', { method: 'DELETE', headers: json })).status).toBe(405);
+  expect((await call('/members', { method: 'PUT', headers: json, body: '{}' })).status).toBe(405);
+  expect((await consistencyPreview(new Request('https://consistency.site/api/consistency/workspaces/nope', { headers }), bound, send)).status).toBe(404);
+});
+
+it('keeps a member\'s session at consistency.site and opens the app for them, unmarked', async () => {
+  const { env, assets } = setup();
+  const send = vi.fn(async () => Response.json({ status: 'success', value: { _id: 'client', email: 'ada@example.com', emailVerified: true } })) as unknown as typeof fetch;
+  const session = await consistencyPreview(new Request('https://consistency.site/api/dashboard/session', { method: 'POST', headers: { origin: 'https://consistency.site', authorization: 'Bearer client-token' } }), env, send);
+  expect(session.status).toBe(204); expect(session.headers.get('set-cookie')).toContain('__Host-ds1-dashboard=client-token');
+  expect((await consistencyPreview(new Request('https://consistency.site/api/dashboard/session', { method: 'POST', headers: { origin: 'https://evil.test', authorization: 'Bearer client-token' } }), env, send)).status).toBe(403);
+  assets.mockImplementation(async () => new Response('<!doctype html><html lang="en"></html>', { headers: { 'Content-Type': 'text/html' } }));
+  const home = await consistencyPreview(new Request('https://consistency.site/', { headers }), env, send);
+  expect(home.status).toBe(200); expect(await home.text()).not.toContain('data-ds-owner');
+  expect(new URL(assets.mock.calls[0]![0].url).pathname).toBe('/private-consistency/home.html');
+});

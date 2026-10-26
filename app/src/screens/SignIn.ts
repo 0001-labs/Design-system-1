@@ -18,11 +18,14 @@ export class SignIn extends AppElement {
     fontsOnly: { type: Boolean, attribute: "fonts-only" },
     dashboardOnly: { type: Boolean, attribute: "dashboard-only" },
     privateTitle: { type: String, attribute: "private-title" },
+    anyone: { type: Boolean },
   };
   declare redirectTo: string | undefined;
   declare fontsOnly: boolean;
   declare dashboardOnly: boolean;
   declare privateTitle: string | undefined;
+  /** A private product's sign-in open to every address, by the emailed code alone: Consistency's invited people. */
+  declare anyone: boolean;
   #screen: SignInScreenElement | null = null;
   #mounted: string | null = null;
 
@@ -32,21 +35,23 @@ export class SignIn extends AppElement {
     this.fontsOnly = false;
     this.dashboardOnly = false;
     this.privateTitle = undefined;
+    this.anyone = false;
   }
 
   /** A private host takes the owner's email alone, without Google or Apple. */
   #ownerOnly() {
-    return this.fontsOnly || this.dashboardOnly || Boolean(this.privateTitle);
+    return this.fontsOnly || this.dashboardOnly || (Boolean(this.privateTitle) && !this.anyone);
   }
 
   override updated() {
-    const settings = JSON.stringify([this.redirectTo, this.fontsOnly, this.dashboardOnly, this.privateTitle]);
+    const settings = JSON.stringify([this.redirectTo, this.fontsOnly, this.dashboardOnly, this.privateTitle, this.anyone]);
     if (settings === this.#mounted && this.#screen?.isConnected) return;
     this.#mounted = settings;
     this.#screen?.remove();
     const host = this.querySelector<HTMLElement>("[data-sign-in-host]")!;
     defineSignInScreen();
     const ownerOnly = this.#ownerOnly();
+    const codeOnly = ownerOnly || this.anyone;
     const { privateTitle, dashboardOnly, redirectTo } = this;
     const screen = document.createElement("sign-in-screen") as SignInScreenElement;
     screen.adapter = signInAdapter({
@@ -56,7 +61,7 @@ export class SignIn extends AppElement {
       },
       providers: async () => {
         const available = await query(api.auth.providers, {});
-        return ownerOnly ? { ...available, google: false, apple: false } : available;
+        return codeOnly ? { ...available, google: false, apple: false } : available;
       },
       passwordSignIn: email => query(api.auth.passwordSignIn, { email }),
       redirectTo: () => `${window.location.origin}${window.location.pathname}`,

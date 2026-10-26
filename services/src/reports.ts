@@ -17,6 +17,20 @@ const headers = {
 const failure = (error: string, status: number) => Response.json({ error }, { status, headers });
 
 export async function authorizeReport(request: Request, env: ReportsEnv, send: typeof fetch = fetch): Promise<Response | null> {
+  const identity = await signedIn(request, env, send);
+  if (identity instanceof Response) return identity;
+  return isStudioOwner(identity, env) ? null : failure("This report is private to the studio owner.", 403);
+}
+
+/** Who a session belongs to, as Convex validates it: their user, address and whether the address is verified. */
+export interface SignedIn { _id: string; email?: string; emailVerified?: boolean }
+
+/** The studio owner's own account, by its user ID and its verified address. */
+export const isStudioOwner = (identity: SignedIn, env: ReportsEnv) =>
+  identity._id === env.REPORTS_OWNER_ID && identity.email?.trim().toLowerCase() === "jaa90@icloud.com" && identity.emailVerified === true;
+
+/** The account behind the request's session, or the answer that refuses it. */
+export async function signedIn(request: Request, env: ReportsEnv, send: typeof fetch = fetch): Promise<SignedIn | Response> {
   const authorization = request.headers.get("authorization") ?? "";
   if (!/^Bearer [^\s]{1,8192}$/.test(authorization)) return failure("Sign in to view this report.", 401);
   if (!env.REPORTS_OWNER_ID || !env.REPORTS_AUTH_URL || !/^https:\/\/[a-z0-9-]+\.convex\.cloud$/.test(env.REPORTS_AUTH_URL)) {
@@ -35,8 +49,7 @@ export async function authorizeReport(request: Request, env: ReportsEnv, send: t
     identity = await response.json();
   } catch { return failure("Sign-in could not be checked. Try again.", 503); }
   if (identity.status !== "success" || !identity.value?._id) return failure("Your session has expired. Sign in again.", 401);
-  if (identity.value._id !== env.REPORTS_OWNER_ID || identity.value.email?.trim().toLowerCase() !== "jaa90@icloud.com" || identity.value.emailVerified !== true) return failure("This report is private to the studio owner.", 403);
-  return null;
+  return identity.value as SignedIn;
 }
 
 export async function componentReport(request: Request, env: ReportsEnv, send: typeof fetch = fetch): Promise<Response> {
