@@ -18,7 +18,9 @@ interface Props {
 const { embedded = false } = Astro.props;
 
 // Each row is five big squares wide; a row of smaller squares fits more.
+// Three rows of the big squares make the cover as tall as it is wide.
 const rows: { size: number; colors: Color[] }[] = [
+  { size: 80, colors: ['blue', 'red', 'green', 'red', 'green'] },
   { size: 80, colors: ['blue', 'red', 'green', 'red', 'green'] },
   { size: 80, colors: ['blue', 'red', 'green', 'red', 'green'] },
   { size: 40, colors: ['apple', 'stealth', 'soft', 'sand', 'ochre', 'stealth', 'red', 'blood', 'green', 'white'] },
@@ -39,7 +41,7 @@ const tiles = rows.flatMap((row) => {
 
 <div class:list={{ 'landing-hero-frame': embedded }}>
 <section class:list={['landing-hero', { 'landing-hero--embedded': embedded }]} aria-label={embedded ? 'Design system 1' : undefined} aria-labelledby={embedded ? undefined : 'landing-title'}>
-  <svg class="landing-hero-blocks" viewBox="0 0 400 320" preserveAspectRatio="xMinYMin slice" shape-rendering="crispEdges" aria-hidden="true">
+  <svg class="landing-hero-blocks" viewBox="0 0 400 400" preserveAspectRatio="xMinYMin slice" shape-rendering="crispEdges" aria-hidden="true">
     {tiles.map((tile) => <rect x={tile.x} y={tile.y} width={tile.size + 0.5} height={tile.size + 0.5} fill={tile.fill} />)}
   </svg>
   <PaperMaterial />
@@ -58,8 +60,8 @@ const tiles = rows.flatMap((row) => {
 <style>
   .landing-hero {
     /* One unit of the artwork, which always covers the screen from its top left corner. */
-    --hero-scale: max(100vw / 400, 100vh / 320);
-    --hero-scale: max(100vw / 400, 100dvh / 320);
+    --hero-scale: max(100vw / 400, 100vh / 400);
+    --hero-scale: max(100vw / 400, 100dvh / 400);
     --hero-title-column: 280;
     --hero-title-size: min(12.5vh, 56 * var(--hero-scale));
     --hero-title-size: min(12.5dvh, 56 * var(--hero-scale));
@@ -133,11 +135,11 @@ const tiles = rows.flatMap((row) => {
   .landing-hero-button:hover { background: rgb(255 255 255 / 0.9); color: #1e1e1e; text-decoration: none; }
   .landing-hero-button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 
-  /* In the Overview the whole cover stands in the column, five units across to four down, the name
-     down its fourth column and short enough to fit; a picture's corners. */
+  /* In the Overview the whole cover stands in the column, a square of five units each way, above
+     the page's title; the name down its fourth column and short enough to fit; a picture's corners. */
   .landing-hero-frame {
     container-type: inline-size;
-    margin-block: 0 calc(2 * var(--site-unit, 20px));
+    margin-block: 0 var(--site-unit, 20px);
   }
   .landing-hero--embedded {
     --hero-scale: calc(100cqw / 400);
@@ -146,7 +148,7 @@ const tiles = rows.flatMap((row) => {
     --hero-edge: calc(10 * var(--hero-scale));
     height: auto;
     min-height: 0;
-    aspect-ratio: 400 / 320;
+    aspect-ratio: 1;
     border-radius: var(--ds-radius, 4px);
   }
   .landing-hero--embedded .landing-hero-title { top: var(--hero-edge); }

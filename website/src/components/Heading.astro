@@ -2,6 +2,8 @@
 // The page's title, in place of Starlight's PageTitle: Design system 1's display
 // text, 20px on two squares. Starlight's "On this page" links to it as #_top.
 // A layer's overview leads with the layer's colour square, as the directory and the rail do.
+// The Overview's title stands under the cover.
+import LandingHero from './LandingHero.astro';
 import { ALL_LAYERS } from '../../../shared/component-directory';
 const { entry } = Astro.locals.starlightRoute;
 const { title } = entry.data;
@@ -9,6 +11,7 @@ const layerColours: Record<string, string> = { yellow: '#eaff00', 'light-green':
 const layer = ALL_LAYERS.find(layer => entry.id === `${layer.number}-${layer.name.toLowerCase()}/overview`);
 ---
 
+{entry.id === 'index' && <LandingHero embedded />}
 <h1 id="_top" class="ds-text ds-text--display" class:list={{ 'layer-title': layer }}>{layer && <span class="layer-swatch" aria-hidden="true" style={`background:${layerColours[layer.color]}`}></span>}{title}</h1>
 
 <style>
