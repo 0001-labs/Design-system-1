@@ -1,0 +1,26 @@
+---
+// Design system 1's report to the Feedback loop, 0001's own usage analytics, read in System at
+// https://system.0001.dev/system/feedback?product=ds1. The client is the copy Sync 1 keeps in
+// src/vendor/feedback-loop; it records pages, presses, changes, errors, the leave and what a load
+// cost on its own. Loaded by every docs page (MyHead.astro) and by Play (play.astro), never by the
+// example frames, which are pages inside those pages.
+//
+// Started on the live hosts only, once the page has loaded. Nobody signs in on these pages, so it
+// sends no account. What a reader writes in Play (its files, the editor and the page) and the
+// owner's private workspace are named "private", never by their words.
+---
+
+<script>
+  import { startFeedbackLoop } from '../vendor/feedback-loop/client';
+  import { version } from '../../../package.json';
+
+  const HOSTS = new Set(['designsystem1.com', 'www.designsystem1.com', 'play.designsystem1.com']);
+  const PRIVATE = '#play-file-list, #play-editor, .play-preview, #private-component-workspace, [data-private]';
+
+  function start() {
+    if (!HOSTS.has(location.hostname) || window.top !== window) return;
+    startFeedbackLoop({ product: 'ds1', version, privateSelector: PRIVATE });
+  }
+  if (document.readyState === 'complete') start();
+  else window.addEventListener('load', start, { once: true });
+</script>

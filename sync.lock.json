@@ -78,6 +78,23 @@
       "shared/feature-flags-runtime/matrix.ts": "2af65f779906c2ec65c893d6651d2977151ae74eb56e88773e072a3d261fd419"
     }
   },
+  "Feedback loop": {
+    "commit": "25bdf3884cdb34f87d9f670749d06a96efdb5564",
+    "version": null,
+    "owned": ["website/src/vendor/feedback-loop"],
+    "files": {
+      "website/src/vendor/feedback-loop/README.md": "18628e25dc23a90715383a435c82684b582ca714c131a0d049e3ce26891fa892",
+      "website/src/vendor/feedback-loop/client.ts": "19d746c0e76c2d81b7e51edbdddf20b35d7093d982e853f34de16e058606ba9d",
+      "website/src/vendor/feedback-loop/error-outbox.ts": "b583a096726c2db38ee5868d1374bdefb1f800a585790168f1ed055490a858bd",
+      "website/src/vendor/feedback-loop/events.ts": "0d5e05a2dcaa4ce84105f7f9e557f57d047a8910f0131cfee46cffa2c37ae3d5",
+      "website/src/vendor/feedback-loop/idv1/advanced.ts": "9516a1706baf856caaabbb4ca62521aeb0ac0c12120347496d834874148d9f55",
+      "website/src/vendor/feedback-loop/idv1/shapes.ts": "847786dd6a9cac468a9c39742385897aa7975b825c8c73b99032dbdc988df8b7",
+      "website/src/vendor/feedback-loop/idv1/words.ts": "d68e87838ec0e406e2f127289bf8f71e4ee094931696e2611e0d5247ba47cd6a",
+      "website/src/vendor/feedback-loop/report-sheet.ts": "9c16301a59a7ff1a7dd50ee1c85821039eefde6dc9b14cb58da3674061bca96d",
+      "website/src/vendor/feedback-loop/report.ts": "9499f129736ed4ab5a5289fd87661fef6fad22f68cce203a0efeb8dac3c7f326",
+      "website/src/vendor/feedback-loop/stale-reload.ts": "66adbc662403afd3bba5924cbd8e72382042af8feb6a28214d7df2c84e9572a5"
+    }
+  },
   "Flavo website": {
     "commit": "68d6b41d6cec5c8749f27f250ce39b057d9cfd88",
     "version": "0.5.1",

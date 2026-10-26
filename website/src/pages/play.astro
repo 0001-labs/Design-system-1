@@ -1,13 +1,14 @@
 ---
 // Play, served at play.designsystem1.com: a small website to edit, its files in a
 // sidebar, the selected one in Aa on the left, and the page on the right in a computer's window or
-// on a phone, its links between pages working. Nothing is sent anywhere; the reader's site is kept
-// in this browser until they start again.
+// on a phone, its links between pages working. The reader's site is never sent anywhere; it is kept
+// in this browser until they start again. The Feedback loop counts the visit, never the site's words.
 import '../../../DS1/1-root/one.css';
 import '../vendor/aa/aa.css';
 import '../../../DS1/1-root/row.css';
 import '../../../DS1/1-root/header.css';
 import PublicPreferences from '../components/PublicPreferences.astro';
+import FeedbackLoop from '../components/FeedbackLoop.astro';
 import ExampleDevice from '../components/ExampleDevice.astro';
 import { LIBRARIES } from '../lib/library-example-parts';
 // The libraries a reader can try the site in, after Design system 1 itself.
@@ -22,6 +23,7 @@ const libraries = (['graphite', 'studio', 'voyage', 'lagoon', 'bloom', 'grove', 
     <meta name="description" content="Edit a small website built with Design system 1 and see its pages as you write, on a computer or a phone." />
     <link rel="icon" type="image/svg+xml" href="/icons/design-system-1.svg" />
     <PublicPreferences />
+    <FeedbackLoop />
   </head>
   <body>
     <header class="ds-header ds-header--app play-bar">

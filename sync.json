@@ -27,6 +27,11 @@
       "places": {
         "to": "packages/consistency/src/sites/flavo"
       }
+    },
+    "Feedback loop": {
+      "client": {
+        "to": "website/src/vendor/feedback-loop"
+      }
     }
   }
 }

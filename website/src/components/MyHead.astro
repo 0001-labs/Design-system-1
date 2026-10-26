@@ -2,6 +2,7 @@
 // Import the default Starlight Head component
 import Default from '@astrojs/starlight/components/Head.astro';
 import PublicPreferences from './PublicPreferences.astro';
+import FeedbackLoop from './FeedbackLoop.astro';
 // The Languages page and the language picker show Japanese and Chinese. cjk.css is linked
 // as its own file, so its @import rules stay first in their sheet.
 import cjkStylesheet from '../../../DS1/1-root/cjk.css?url';
@@ -13,6 +14,7 @@ import cjkStylesheet from '../../../DS1/1-root/cjk.css?url';
 <link rel="stylesheet" href={cjkStylesheet} />
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
 <script is:inline src="/google-analytics.js" defer />
+<FeedbackLoop />
 
 <script>
   import '../../../DS1/1-root/one.css';
