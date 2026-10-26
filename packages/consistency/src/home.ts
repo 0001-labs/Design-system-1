@@ -322,9 +322,12 @@ export class ConsistencyHome extends LitElement {
     </nav>`;
   }
 
-  /** The workspace's sites as cards, each opening in the editor here. */
+  /**
+   * The workspace's sites as cards, each opening in the editor here: its address, a draft's mark before its name
+   * (a site on its built-in address alone, as Free's are), and its avatar on the card's foot.
+   */
   private siteCards() {
-    return html`<div class="home-grid">${this.sites.map(site => html`<ds-card interactive data-site=${site.code} width="12" height="8" @ds-card-press=${() => this.go({ page: 'site', code: site.code })}>${siteLabel(site)}<span slot="title">${site.name}</span></ds-card>`)}</div>`;
+    return html`<div class="home-grid">${this.sites.map(site => html`<ds-card interactive data-site=${site.code} width="12" height="8" @ds-card-press=${() => this.go({ page: 'site', code: site.code })}>${siteLabel(site)}<span slot="title" class="home-site-title">${site.domain ? '' : html`<ds-icon type="arrange-draft" size="large" role="img" aria-label="Draft"></ds-icon>`}${site.name}</span><ds-avatar slot="media" class="home-site-avatar" size="large" outlined initial=${workspaceInitial(site.name)} aria-hidden="true"></ds-avatar></ds-card>`)}</div>`;
   }
 
   /** Settings as Money draws it: text tabs under the title, each tab its own address. Members is for the workspace's admins and the owner. */

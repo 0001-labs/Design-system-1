@@ -47,3 +47,8 @@ consistency-members{display:block;max-width:calc(32 * var(--ds-unit))}
 .members-invite{display:flex;flex-wrap:wrap;align-items:flex-end;gap:calc(var(--ds-unit) / 2);min-height:var(--ds-unit)}
 .members-email{flex:1 1 calc(12 * var(--ds-unit));min-width:0}
 .member-row .ds-row__value{display:flex;align-items:flex-end;gap:calc(4px * var(--ds-sf, 1))}
+/* A draft's mark before a site's name on its card, 16px and 4px from the name, with its capitals. */
+.home-site-title{display:flex;align-items:center;gap:calc(4px * var(--ds-sf, 1))}
+.home-site-title ds-icon{flex:none}
+/* The site's avatar on the card's foot, two squares, as a picture stands there. */
+.home-site-avatar{display:block}

@@ -50,6 +50,10 @@ try {
  // A connected domain after a globe; otherwise the built-in colour address, never a named c9y.site host.
  const labels=await page.locator('consistency-home ds-card [slot="label"]').evaluateAll(spans=>spans.map(span=>(span.querySelector('ds-icon[type="globe"]')?'globe ':'')+span.textContent.trim()));
  if(labels.join()!=='globe flavo.flowers,alice-steel-blue.c9y.site,soendergaarden.c9y.site')throw Error('The cards label their sites '+labels.join());
+ // Each card wears its site's avatar on its foot, and a draft (no domain of its own) the draft mark before its name.
+ const marks=await page.locator('consistency-home ds-card').evaluateAll(cards=>cards.map(card=>card.dataset.site+':'+(card.querySelector('ds-avatar[slot="media"]')?.getAttribute('initial')??'')+':'+(card.querySelector('[slot="title"] ds-icon[type="arrange-draft"]')?'draft':'')));
+ if(marks.join()!=='20FLAV:F:,10VNDG:C:draft,30SDGA:S:draft')throw Error('Cards: '+marks.join());
+ if(process.env.CARD_SHOT)await page.locator('consistency-home ds-card[data-site="10VNDG"]').screenshot({path:process.env.CARD_SHOT});
  const cards=await page.locator('consistency-home ds-card').evaluateAll(cards=>cards.map(card=>card.dataset.site+':'+(card.getAttribute('href')??'')));
  if(cards.join()!=='20FLAV:,10VNDG:,30SDGA:')throw Error('Sites: '+cards.join());
  // The address is the app's and nothing more: a site opens here, by its code, and the address does not change.
