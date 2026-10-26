@@ -25,8 +25,9 @@
 :host([open]) { display: block; }
 
 /* The progressive blur: six layers, each a band of the veil, each blurring
-   twice as much as the one above it, so the page goes soft by degrees towards
-   the foot. A wash of the paper under the cards keeps their words legible. */
+   more than the one above it, so the page goes soft by degrees towards the
+   foot and stays readable just above the cards. A wash of the paper under the
+   cards keeps their words legible. */
 .veil {
   position: absolute;
   inset-inline: 0;
@@ -39,17 +40,17 @@
   inset: 0;
   animation: ds-ask-fade 220ms ease-out both;
 }
-.veil > i:nth-child(1) { backdrop-filter: blur(calc(1px * var(--sf, 1))); mask-image: linear-gradient(to bottom, transparent 0%, #000 10%, #000 20%, transparent 30%); }
-.veil > i:nth-child(2) { backdrop-filter: blur(calc(2px * var(--sf, 1))); mask-image: linear-gradient(to bottom, transparent 10%, #000 20%, #000 30%, transparent 40%); }
-.veil > i:nth-child(3) { backdrop-filter: blur(calc(4px * var(--sf, 1))); mask-image: linear-gradient(to bottom, transparent 20%, #000 30%, #000 40%, transparent 50%); }
-.veil > i:nth-child(4) { backdrop-filter: blur(calc(8px * var(--sf, 1))); mask-image: linear-gradient(to bottom, transparent 30%, #000 40%, #000 50%, transparent 60%); }
-.veil > i:nth-child(5) { backdrop-filter: blur(calc(16px * var(--sf, 1))); mask-image: linear-gradient(to bottom, transparent 40%, #000 50%, #000 60%, transparent 70%); }
+.veil > i:nth-child(1) { backdrop-filter: blur(calc(1px * var(--sf, 1))); mask-image: linear-gradient(to bottom, transparent 0%, #000 15%, #000 25%, transparent 35%); }
+.veil > i:nth-child(2) { backdrop-filter: blur(calc(2px * var(--sf, 1))); mask-image: linear-gradient(to bottom, transparent 15%, #000 25%, #000 35%, transparent 45%); }
+.veil > i:nth-child(3) { backdrop-filter: blur(calc(3px * var(--sf, 1))); mask-image: linear-gradient(to bottom, transparent 25%, #000 35%, #000 45%, transparent 55%); }
+.veil > i:nth-child(4) { backdrop-filter: blur(calc(5px * var(--sf, 1))); mask-image: linear-gradient(to bottom, transparent 35%, #000 45%, #000 55%, transparent 65%); }
+.veil > i:nth-child(5) { backdrop-filter: blur(calc(8px * var(--sf, 1))); mask-image: linear-gradient(to bottom, transparent 45%, #000 55%, #000 65%, transparent 75%); }
 .veil > i:nth-child(6) {
-  backdrop-filter: blur(calc(32px * var(--sf, 1)));
-  mask-image: linear-gradient(to bottom, transparent 50%, #000 60%);
+  backdrop-filter: blur(calc(16px * var(--sf, 1)));
+  mask-image: linear-gradient(to bottom, transparent 60%, #000 70%);
   background: linear-gradient(to bottom,
-    transparent 40%,
-    color-mix(in srgb, var(--ds-ask-paper) 55%, transparent) 70%,
+    transparent 45%,
+    color-mix(in srgb, var(--ds-ask-paper) 50%, transparent) 75%,
     color-mix(in srgb, var(--ds-ask-paper) 80%, transparent) 100%);
 }
 
