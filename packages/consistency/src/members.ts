@@ -11,7 +11,7 @@ import '../../../DS1/2-core/ds-avatar';
 import '../../../DS1/2-core/ds-empty';
 
 /**
- * The people in the workspace, in Settings → Members and in the people panel a site card's avatars open. Everyone
+ * The people in the workspace, in Settings → People and in the people panel a site card's avatars open. Everyone
  * in the workspace sees them; its admins and the owner (`manage`) invite and remove them. An invite is sent by
  * email; the person is in once they sign in at consistency.site with that address. The platform decides who may
  * do what; this shows what it says, and tells the page when the people change (`members-change`).
@@ -94,7 +94,7 @@ export class ConsistencyMembers extends LitElement {
   }
 
   render() {
-    return html`<section class="members" aria-label="Members">
+    return html`<section class="members" aria-label="People">
       ${this.manage ? html`<form class="members-invite" @submit=${(event: Event) => void this.invite(event)}>
         <ds-input class="members-email" name="email" aria-label="Email" placeholder="name@example.com" autocomplete="off" spellcheck="false" .value=${this.email}
           @input-change=${(event: CustomEvent<{ value: string }>) => { this.email = event.detail.value; }}></ds-input>
@@ -105,7 +105,7 @@ export class ConsistencyMembers extends LitElement {
       </form>` : ''}
       ${this.error ? html`<ds-message role="alert" tone="danger" literal text=${this.error}></ds-message>` : ''}
       ${this.notice ? html`<ds-message role="status" literal text=${this.notice}></ds-message>` : ''}
-      ${this.members?.length ? html`<ds-list aria-label="Members">${this.members.map(member => this.row(member))}</ds-list>` : this.members ? html`<ds-empty literal heading="No one is invited yet"></ds-empty>` : ''}
+      ${this.members?.length ? html`<ds-list aria-label="People">${this.members.map(member => this.row(member))}</ds-list>` : this.members ? html`<ds-empty literal heading="No one is invited yet"></ds-empty>` : ''}
     </section>`;
   }
 }

@@ -92,8 +92,8 @@ try {
  await page.locator('consistency-home consistency-domains').waitFor();
  if(await page.locator('consistency-home .home-title[text="Settings"]').count()!==1)throw Error('The page is not titled Settings');
  const tabs=await page.locator('consistency-home ds-tabs[aria-label="Settings"] [role="tab"]').evaluateAll(tabs=>tabs.map(tab=>tab.textContent.trim()+':'+tab.getAttribute('aria-selected')));
- if(tabs.join()!=='Members:false,Domains:true,Account:false')throw Error('Tabs: '+tabs.join());
- await page.getByRole('tab',{name:'Members'}).click();await page.locator('consistency-home consistency-members ds-row',{hasText:'ada@example.com'}).waitFor();same();
+ if(tabs.join()!=='People:false,Domains:true,Account:false')throw Error('Tabs: '+tabs.join());
+ await page.getByRole('tab',{name:'People'}).click();await page.locator('consistency-home consistency-members ds-row',{hasText:'ada@example.com'}).waitFor();same();
  await page.getByRole('tab',{name:'Account'}).click();await page.locator('consistency-home .home-account').waitFor();same();
  if(await page.locator('consistency-home ds-input.home-workspace-field input').inputValue()!=='0001')throw Error('Account does not show the workspace');
  await page.reload();await page.locator('consistency-home .home-account').waitFor();
@@ -143,5 +143,5 @@ try {
  // An older address still opens its place and is taken off.
  await page.goto(home+'#settings/account');await page.locator('consistency-home .home-account').waitFor();same();await page.getByRole('button',{name:'Sign out',exact:true}).click();await page.waitForURL('**/app/signin');
  if(!signedOut)throw Error('Sign out did not end the session');
- console.log('Home workspaces: switching, each one\'s own sites and drafts, Members, a site opening in its own workspace; an open site\'s own sidebar of places with no bar over the site, renaming the workspace, Sites as cards only, Settings with Domains and Account tabs, sign out and viewports passed');
+ console.log('Home workspaces: switching, each one\'s own sites and drafts, People, a site opening in its own workspace; an open site\'s own sidebar of places with no bar over the site, renaming the workspace, Sites as cards only, Settings with Domains and Account tabs, sign out and viewports passed');
 } finally {await browser.close();await new Promise(resolve=>server.close(resolve));}

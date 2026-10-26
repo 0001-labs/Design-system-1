@@ -401,10 +401,10 @@ export class ConsistencyHome extends LitElement {
     </ds-overlay>`;
   }
 
-  /** Settings as Money draws it: text tabs under the title, each tab its own address. Members is for the workspace's admins and the owner. */
+  /** Settings as Money draws it: text tabs under the title, each tab its own address. People is for the workspace's admins and the owner. */
   private settings(asked: SettingsTab, current: WorkspaceSummary | undefined) {
     const manage = canManage(current);
-    const tabs: { id: SettingsTab; label: string }[] = [...(manage ? [{ id: 'members' as const, label: 'Members' }] : []), { id: 'domains', label: 'Domains' }, { id: 'account', label: 'Account' }];
+    const tabs: { id: SettingsTab; label: string }[] = [...(manage ? [{ id: 'members' as const, label: 'People' }] : []), { id: 'domains', label: 'Domains' }, { id: 'account', label: 'Account' }];
     const tab = tabs.some(item => item.id === asked) ? asked : 'domains';
     const name = current?.name ?? '';
     return html`<div class="home-settings">
