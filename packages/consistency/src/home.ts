@@ -10,11 +10,13 @@ import '../../../DS1/2-core/ds-text';
 import '../../../DS1/2-core/ds-avatar';
 import '../../../DS1/2-core/ds-icon';
 import '../../../DS1/3-unit/ds-select';
+import '../../../DS1/2-core/ds-input';
 import '../../../DS1/2-core/ds-message';
 import '../../../DS1/2-core/ds-empty';
 import './domains';
 import { ConsistencySiteEditor } from './site-editor';
-import type { SiteSummary } from './site-editing';
+import { pageRows, type SiteSummary } from './site-editing';
+import type { SidebarItem } from '../../../DS1/3-unit/ds-sidebar';
 import './home.css';
 
 /**
@@ -22,7 +24,9 @@ import './home.css';
  * here in the editor, and Settings; pressing the workspace shows the sites again. The address is consistency.site and
  * nothing more (Joachim, 26 October 2026): where the app stands is its own state, kept in the history so Back and
  * Forward still move between places. Sites are known by their IDv1 codes. A site once opened stays open, hidden
- * while another is shown, so going back to it is instant: no reload and no sign-in again.
+ * while another is shown, so going back to it is instant: no reload and no sign-in again. With a site open, the
+ * sidebar is that site's: its name at the top (pressing it shows every site again; its menu switches to another)
+ * and its pages under it, not the workspace.
  */
 
 /** What the app shows: the sites, one site in the editor (by its IDv1 code), or Settings at one of its tabs. */
@@ -67,14 +71,20 @@ export function workspaceInitial(name: string): string { return (name.trim().rep
 
 /** Consistency's app: the owner's sites, each in the editor, and Settings. */
 export class ConsistencyHome extends LitElement {
-  static properties = { error: { state: true }, workspace: { state: true }, place: { state: true }, sites: { state: true } };
+  static properties = { error: { state: true }, workspace: { state: true }, place: { state: true }, sites: { state: true }, naming: { state: true } };
   declare place: Place;
   declare error: string;
   declare workspace: string;
   declare sites: SiteSummary[];
+  /** The workspace's name as typed in Account, while it is being saved or has failed. */
+  declare naming: { value: string; busy: boolean; error: string } | null;
+  /** The further languages opened in the sidebar, per site. */
+  private readonly languages = new Map<string, Set<string>>();
   /** Every site opened so far, kept alive while hidden. */
   private readonly editors = new Map<string, ConsistencySiteEditor>();
   /** Back and Forward: the place the history kept, after the word being edited is saved. */
+  /** An open site's pages or page changed: its sidebar follows. */
+  private readonly onSite = () => this.requestUpdate();
   private readonly onPop = (event: PopStateEvent) => void this.move(placeFrom(event.state), 'none');
   /** An older address with a place in its hash, followed inside the app and then taken off. */
   private readonly onHash = () => {
@@ -84,14 +94,14 @@ export class ConsistencyHome extends LitElement {
     this.go(next);
   };
   constructor() {
-    super(); this.error = ''; this.workspace = storedWorkspace(); this.sites = storedSites();
+    super(); this.error = ''; this.naming = null; this.workspace = storedWorkspace(); this.sites = storedSites();
     this.place = openingPlace(location.search, location.hash, history.state);
     // The address stays the app's own: what opened it is kept as history state instead.
     history.replaceState(this.place, '', location.pathname);
   }
   protected createRenderRoot() { return this; }
 
-  connectedCallback() { super.connectedCallback(); addEventListener('popstate', this.onPop); addEventListener('hashchange', this.onHash); void this.readWorkspace(); void this.readSites(); }
+  connectedCallback() { super.connectedCallback(); this.addEventListener('consistency-site-change', this.onSite); addEventListener('popstate', this.onPop); addEventListener('hashchange', this.onHash); void this.readWorkspace(); void this.readSites(); }
 
   /** Goes to a place inside the app, the address unchanged. */
   go(next: Place) { void this.move(next, 'push'); }
@@ -117,7 +127,7 @@ export class ConsistencyHome extends LitElement {
   /** The editor for a site, made once and kept. */
   private editorFor(site: SiteSummary): ConsistencySiteEditor {
     let editor = this.editors.get(site.code);
-    if (!editor) { editor = new ConsistencySiteEditor(); editor.site = site; this.editors.set(site.code, editor); }
+    if (!editor) { editor = new ConsistencySiteEditor(); editor.site = site; editor.picker = false; this.editors.set(site.code, editor); }
     return editor;
   }
 
@@ -129,7 +139,7 @@ export class ConsistencyHome extends LitElement {
     if (current) { const editor = this.editorFor(current); if (editor.parentElement !== stage) stage.append(editor); }
     for (const [code, editor] of this.editors) editor.hidden = code !== current?.code;
   }
-  disconnectedCallback() { super.disconnectedCallback(); removeEventListener('popstate', this.onPop); removeEventListener('hashchange', this.onHash); }
+  disconnectedCallback() { super.disconnectedCallback(); this.removeEventListener('consistency-site-change', this.onSite); removeEventListener('popstate', this.onPop); removeEventListener('hashchange', this.onHash); }
 
   /** The company name on the owner's own account (Account in the docs sets it). */
   private async readWorkspace() {
@@ -137,6 +147,21 @@ export class ConsistencyHome extends LitElement {
     const body = response?.ok ? await response.json().catch(() => null) as { companyName?: unknown } | null : null;
     if (typeof body?.companyName !== 'string') return;
     this.workspace = body.companyName.trim();
+    try { localStorage.setItem(WORKSPACE_KEY, this.workspace); } catch { /* read again next visit */ }
+  }
+
+  /** Renames the workspace on the owner's account: saved on Enter or on leaving the field; a failure keeps the words typed. */
+  private async rename() {
+    const naming = this.naming;
+    if (!naming || naming.busy) return;
+    const value = naming.value.trim();
+    if (!value || value === this.workspace) { this.naming = null; return; }
+    this.naming = { ...naming, busy: true, error: '' };
+    const response = await fetch('/api/consistency/profile', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ companyName: value }) }).catch(() => null);
+    const body = response?.ok ? await response.json().catch(() => null) as { companyName?: unknown } | null : null;
+    if (typeof body?.companyName !== 'string') { this.naming = { value, busy: false, error: 'The name could not be saved. Try again.' }; return; }
+    this.workspace = body.companyName;
+    this.naming = null;
     try { localStorage.setItem(WORKSPACE_KEY, this.workspace); } catch { /* read again next visit */ }
   }
 
@@ -152,8 +177,9 @@ export class ConsistencyHome extends LitElement {
     const name = this.workspace || 'My company';
     const settings = this.place.page === 'settings';
     const open = this.place.page === 'site' ? (this.place as { code: string }).code : '';
+    const site = open ? this.sites.find(item => item.code === open) : undefined;
     return html`<ds-page layout="sidebar" fill drawer>
-      <nav slot="nav" class="home-nav" aria-label="Consistency">
+      ${site ? this.siteNav(site) : html`<nav slot="nav" class="home-nav" aria-label="Consistency">
         <div class="home-workspace" aria-label="Workspace">
           <ds-button id="home-workspace" class="home-workspace-name" label=${`Workspace: ${name}`} @click=${() => this.go({ page: 'sites' })}>
             <ds-avatar initial=${workspaceInitial(name)} outlined plain aria-hidden="true"></ds-avatar>${name}<ds-icon type="chevron-down"></ds-icon>
@@ -166,13 +192,44 @@ export class ConsistencyHome extends LitElement {
             <ds-text data-ds-menu-label tone="muted" literal text="No notifications yet"></ds-text>
           </ds-select>
         </div>
-      </nav>
+      </nav>`}
       <div class=${open ? 'home-main home-main--site' : 'home-main'}>
         ${open ? '' : html`<ds-text class="home-title" role="heading" aria-level="1" literal size="display" text=${settings ? 'Settings' : 'Sites'}></ds-text>`}
         ${this.place.page === 'settings' ? this.settings(this.place.tab, name) : open ? (this.sites.some(site => site.code === open) ? '' : html`<ds-empty literal heading="This site is not in your workspace"></ds-empty>`) : this.siteCards()}
         <div class="home-stage" ?hidden=${!open}></div>
       </div>
     </ds-page>`;
+  }
+
+  /** An open site's sidebar: its name, whose menu goes to another site, and its pages. */
+  private siteNav(site: SiteSummary) {
+    const editor = this.editors.get(site.code);
+    const open = this.languages.get(site.code) ?? new Set<string>();
+    const items: SidebarItem[] = pageRows(editor?.pages ?? [], editor?.path ?? null, open);
+    const others = this.sites.filter(item => item.code !== site.code);
+    const activate = (event: CustomEvent<{ id: string }>) => {
+      const id = event.detail.id;
+      if (id.startsWith('page:')) void editor?.open(id.slice(5));
+      else if (id.startsWith('lang:')) toggle(id.slice(5));
+    };
+    const toggle = (lang: string) => {
+      const next = new Set(open);
+      if (next.has(lang)) next.delete(lang); else next.add(lang);
+      this.languages.set(site.code, next);
+      this.requestUpdate();
+    };
+    return html`<nav slot="nav" class="home-nav" aria-label=${site.name}>
+      <div class="home-workspace" aria-label="Site">
+        <ds-button id="home-site" class="home-workspace-name" label=${`Site: ${site.name}`} @click=${() => this.go({ page: 'sites' })}>${site.name}<ds-icon type="chevron-down"></ds-icon></ds-button>
+        <ds-select for="home-site" hover aria-label="Sites">
+          ${others.map(item => html`<ds-button menu-item @click=${() => this.go({ page: 'site', code: item.code })}>${item.name}</ds-button>`)}
+          ${others.length ? html`<hr>` : ''}
+          <ds-button menu-item @click=${() => this.go({ page: 'sites' })}>All sites</ds-button>
+        </ds-select>
+      </div>
+      <ds-sidebar class="home-pages" label="Pages" .items=${items} @sidebar-activate=${activate}
+        @sidebar-toggle=${(event: CustomEvent<{ id: string }>) => toggle(event.detail.id.slice(5))}></ds-sidebar>
+    </nav>`;
   }
 
   /** The owner's sites as cards, each opening in the editor here. */
@@ -187,7 +244,14 @@ export class ConsistencyHome extends LitElement {
       <ds-tabs text class="home-settings-tabs" aria-label="Settings">${tabs.map(item => html`<ds-button control="host" role="tab" ?active=${tab === item.id} aria-selected=${String(tab === item.id)} tabindex=${tab === item.id ? 0 : -1}
         @click=${() => this.go({ page: 'settings', tab: item.id })}>${item.label}</ds-button>`)}</ds-tabs>
       ${tab === 'domains' ? html`<consistency-domains></consistency-domains>` : html`<section class="home-account" aria-label="Account">
-        <ds-list aria-label="Account"><ds-row><span class="ds-row__name">Workspace</span><span class="ds-row__value">${name}</span></ds-row></ds-list>
+        <ds-list aria-label="Account"><ds-row><span class="ds-row__name">Workspace</span><span class="ds-row__value">
+          <ds-input class="home-workspace-field" aria-label="Workspace" maxlength="80" autocomplete="organization" ?disabled=${this.naming?.busy ?? false}
+            placeholder="My company" .value=${this.naming?.value ?? this.workspace}
+            @input-change=${(event: CustomEvent<{ value: string }>) => { this.naming = { value: event.detail.value, busy: false, error: '' }; }}
+            @input-blur=${() => void this.rename()}
+            @keydown=${(event: KeyboardEvent) => { if (event.key === 'Enter') void this.rename(); if (event.key === 'Escape') this.naming = null; }}></ds-input>
+        </span></ds-row></ds-list>
+        ${this.naming?.error ? html`<ds-message role="alert" tone="danger" literal text=${this.naming.error}></ds-message>` : ''}
         <div class="home-sign-out"><ds-button secondary @click=${() => void this.signOut()}>Sign out</ds-button></div>
         ${this.error ? html`<ds-message role="alert" tone="danger" literal text=${this.error}></ds-message>` : ''}
       </section>`}

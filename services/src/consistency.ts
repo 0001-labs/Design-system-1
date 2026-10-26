@@ -94,13 +94,34 @@ export async function consistencyPreview(request: Request, env: ReportsEnv & Wor
   return protect(original);
 }
 
-/** The owner's company name for the home's workspace header, read from their own account's profile. */
+/**
+ * The owner's company name for the home's workspace header, read from their own account's profile; `PUT
+ * { companyName }` from the app's own origin renames it (Settings → Account), as Account in the docs does.
+ */
 async function profileApi(request: Request, env: ReportsEnv, send: typeof fetch): Promise<Response> {
-  if (request.method !== 'GET') return Response.json({ error: 'Method not allowed' }, { status: 405, headers: { Allow: 'GET' } });
+  if (request.method !== 'GET' && request.method !== 'PUT') return Response.json({ error: 'Method not allowed' }, { status: 405, headers: { Allow: 'GET, PUT' } });
+  const write = request.method === 'PUT';
+  if (write && (request.headers.get('Origin') !== new URL(request.url).origin || request.headers.get('Content-Type')?.split(';')[0] !== 'application/json')) return Response.json({ error: 'Forbidden' }, { status: 403 });
+  let companyName = '';
+  if (write) {
+    const body = await request.text().then(text => text.length <= 1_000 ? JSON.parse(text) as { companyName?: unknown } : null).catch(() => null);
+    companyName = typeof body?.companyName === 'string' ? body.companyName.trim() : '';
+    if (!companyName || companyName.length > 80) return Response.json({ error: 'Use a name between 1 and 80 characters.' }, { status: 400 });
+  }
   const session = sessionRequest(new Request(request.url, { headers: request.headers }));
   const denied = await authorizeReport(session, env, send);
   if (denied) return denied;
   try {
+    if (write) {
+      const saved = await send(`${env.REPORTS_AUTH_URL}/api/mutation`, {
+        method: 'POST', headers: { authorization: session.headers.get('authorization')!, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: 'users:setCompanyName', args: [{ companyName }], format: 'convex_encoded_json' }),
+        signal: AbortSignal.timeout(8_000), redirect: 'manual',
+      });
+      const answer = saved.ok ? await saved.json() as { status?: string } : null;
+      if (answer?.status !== 'success') return Response.json({ error: 'The name could not be saved.' }, { status: 503 });
+      return Response.json({ companyName }, { headers: { 'Cache-Control': 'no-store' } });
+    }
     const response = await send(`${env.REPORTS_AUTH_URL}/api/query`, {
       method: 'POST', headers: { authorization: session.headers.get('authorization')!, 'Content-Type': 'application/json' },
       body: JSON.stringify({ path: 'users:profile', args: [{}], format: 'convex_encoded_json' }),
@@ -108,7 +129,7 @@ async function profileApi(request: Request, env: ReportsEnv, send: typeof fetch)
     });
     const answer = response.ok ? await response.json() as { status?: string; value?: { companyName?: unknown } | null } : null;
     if (answer?.status !== 'success') return Response.json({ error: 'The profile could not be read.' }, { status: 503 });
-    const companyName = typeof answer.value?.companyName === 'string' ? answer.value.companyName.slice(0, 80) : '';
+    companyName = typeof answer.value?.companyName === 'string' ? answer.value.companyName.slice(0, 80) : '';
     return Response.json({ companyName }, { headers: { 'Cache-Control': 'no-store' } });
   } catch { return Response.json({ error: 'The profile could not be read.' }, { status: 503 }); }
 }

@@ -1,6 +1,6 @@
 /**
  * A Consistency site, opened in the editor: one of its pages, as its visitors see it, in a frame the work's
- * width, and its words edited where they stand with Aa's plain editor, each save a the site engine edit on the live
+ * width, and its words edited where they stand with Aa's plain editor, each save a site engine edit on the live
  * site (through the owner gateway, `/api/consistency/sites/<id>/…`).
  *
  * The frame is the gateway's `document` route on this origin, sandboxed with `allow-same-origin` and nothing
@@ -14,7 +14,7 @@
  * drawn by the site engine's own Markdown, and a save puts the HTML the site rendered in every copy.
  *
  * Only words: the page's layout and spacing cannot be published to a site yet, so the composition tools are not
- * here at all, and the page's title, description and share image stay in each site's own editor.
+ * here at all, and the page's title, description and share image have no place yet.
  */
 import { LitElement, html, nothing } from 'lit';
 import '../../../DS1/1-root/context.css';
@@ -71,6 +71,8 @@ export class ConsistencySiteEditor extends LitElement {
   declare problem: string;
   declare unsupported: boolean;
   site!: SiteSummary;
+  /** Whether the bar holds the page picker; Consistency's app lists the pages in its sidebar instead. */
+  picker = true;
   private fields = new Map<string, SiteField>();
   private editing: Editing | null = null;
   private opening = 0;
@@ -94,6 +96,10 @@ export class ConsistencySiteEditor extends LitElement {
     super.disconnectedCallback();
     this.finish(null);
     this.detach?.();
+  }
+  /** Tells what lists the site's pages beside the editor that they, or the page open, have changed. */
+  protected updated(changed: Map<string, unknown>) {
+    if (changed.has('pages') || changed.has('path')) this.dispatchEvent(new Event('consistency-site-change', { bubbles: true }));
   }
 
   private get origin() { return new URL(this.site.url).origin; }
@@ -272,7 +278,7 @@ export class ConsistencySiteEditor extends LitElement {
     state.copies.forEach((element, index) => { element.removeAttribute('data-cms-open'); element.innerHTML = drawn ?? state.before[index] ?? element.innerHTML; });
   }
 
-  /** Saves the words being edited as a the site engine edit; whether the editing has ended, saved or unchanged. */
+  /** Saves the words being edited as a site engine edit; whether the editing has ended, saved or unchanged. */
   private async commit(): Promise<boolean> {
     const state = this.editing;
     if (!state) return true;
@@ -317,7 +323,7 @@ export class ConsistencySiteEditor extends LitElement {
     const live = this.path ? new URL(this.path, this.origin).href : this.site.url;
     return html`
       <div class="consistency-site-bar">
-        ${this.pages?.length ? html`<ds-select><select aria-label="Page" .value=${this.path ?? ''} @change=${this.choose}>
+        ${this.picker && this.pages?.length ? html`<ds-select><select aria-label="Page" .value=${this.path ?? ''} @change=${this.choose}>
           ${pageGroups(this.pages).map(group => html`<optgroup label=${group.lang}>${group.pages.map(page => html`<option value=${page.path} ?selected=${page.path === this.path} data-details=${page.path}>${page.title || page.path}</option>`)}</optgroup>`)}
         </select></ds-select>` : nothing}
         <ds-button href=${live} blank secondary>Open the page</ds-button>

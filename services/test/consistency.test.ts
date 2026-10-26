@@ -103,6 +103,25 @@ it('gives the owner their company name for the home, and nobody else anything', 
   expect(other.mock.calls.some(([, init]) => JSON.parse(String(init?.body)).path === 'users:profile')).toBe(false);
   expect((await consistencyPreview(new Request(url, { method: 'POST', headers }), env, owner as unknown as typeof fetch)).status).toBe(405);
 });
+it('renames the owner\'s workspace from the app\'s own origin only', async () => {
+  const url = 'https://c9y.site/api/consistency/profile';
+  const { env } = setup();
+  const calls: string[] = [];
+  const send = vi.fn(async (_url: string, init?: RequestInit) => {
+    const body = JSON.parse(String(init?.body)); calls.push(body.path);
+    if (body.path === 'users:setCompanyName') return Response.json({ status: 'success', value: null });
+    return Response.json({ status: 'success', value: { _id: 'owner', email: 'jaa90@icloud.com', emailVerified: true } });
+  });
+  const put = (body: unknown, from = 'https://c9y.site') => consistencyPreview(new Request(url, { method: 'PUT', headers: { ...headers, Origin: from, 'Content-Type': 'application/json' }, body: JSON.stringify(body) }), env, send as unknown as typeof fetch);
+  const saved = await put({ companyName: ' 0001 ' });
+  expect(saved.status).toBe(200); expect(await saved.json()).toEqual({ companyName: '0001' });
+  expect(calls.at(-1)).toBe('users:setCompanyName');
+  calls.length = 0;
+  expect((await put({ companyName: '0001' }, 'https://evil.test')).status).toBe(403);
+  expect((await put({ companyName: '  ' })).status).toBe(400);
+  expect((await put({ companyName: 'x'.repeat(81) })).status).toBe(400);
+  expect(calls).toEqual([]);
+});
 
 it('domains: only the owner, same-origin writes, and only the domain routes reach the platform',async()=>{
  const {env,send}=setup();const workspace={fetch:vi.fn(async(request:Request)=>Response.json({path:new URL(request.url).pathname,method:request.method}))};
