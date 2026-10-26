@@ -1,35 +1,274 @@
-/* Ask: words over the page, no box. A pane over the window while open, so a
-   press lets go of it; the words stand where the page puts them. */
+/* Ask: a pane over the window while open, so a press lets go of it. What it
+   finds stands as cards in a strip at the window's foot, the words written
+   under them, and the page above stays in view: a blur rises from the foot,
+   deepening as it goes, so the cards and words read over a page that is still
+   there. */
 :host {
   --ds-unit: calc(20px * var(--sf, 1));
+  --ds-half: calc(var(--ds-unit) / 2);
+  --ds-line: calc(16px * var(--sf, 1));
   --ds-type-size-display: calc(20px * var(--sf, 1));
   --ds-type-size-default: calc(14px * var(--sf, 1));
+  --ds-ask-ink: var(--ds-text-color, var(--text-color));
+  --ds-ask-muted: var(--ds-text-color-muted, var(--text-color));
+  --ds-ask-paper: var(--ds-paper, light-dark(#f4f4f4, #2c2c2c));
+  --ds-ask-start: var(--ds-ask-left, calc(2 * var(--ds-unit)));
   position: fixed;
   inset: 0;
   z-index: 9000;
   display: none;
   cursor: text;
   pointer-events: auto;
+  font-family: var(--ds-typeface-regular, var(--typeface-regular));
+  color: var(--ds-ask-ink);
 }
 :host([open]) { display: block; }
 
-.stack {
+/* The progressive blur: six layers, each starting lower than the one before
+   and running on to the foot, each blurring what the ones above it already
+   blurred, so the page goes soft by degrees and never shows through sharp
+   where one layer gives way to the next. The row just above the cards stays
+   readable; a wash of the paper under the cards keeps their words legible. */
+.veil {
   position: absolute;
-  top: var(--ds-ask-top, calc(4 * var(--ds-unit)));
-  left: var(--ds-ask-left, var(--ds-unit));
-  max-width: var(--ds-ask-width, calc(12 * var(--ds-unit)));
+  inset-inline: 0;
+  bottom: 0;
+  height: min(100%, var(--ds-ask-veil, calc(28 * var(--ds-unit))));
+  pointer-events: none;
+}
+.veil > i {
+  position: absolute;
+  inset: 0;
+  animation: ds-ask-fade 220ms ease-out both;
+}
+.veil > i:nth-child(1) { backdrop-filter: blur(calc(1px * var(--sf, 1))); mask-image: linear-gradient(to bottom, transparent 0%, #000 15%); }
+.veil > i:nth-child(2) { backdrop-filter: blur(calc(1px * var(--sf, 1))); mask-image: linear-gradient(to bottom, transparent 15%, #000 30%); }
+.veil > i:nth-child(3) { backdrop-filter: blur(calc(2px * var(--sf, 1))); mask-image: linear-gradient(to bottom, transparent 25%, #000 40%); }
+.veil > i:nth-child(4) { backdrop-filter: blur(calc(3px * var(--sf, 1))); mask-image: linear-gradient(to bottom, transparent 35%, #000 50%); }
+.veil > i:nth-child(5) { backdrop-filter: blur(calc(6px * var(--sf, 1))); mask-image: linear-gradient(to bottom, transparent 45%, #000 60%); }
+.veil > i:nth-child(6) {
+  backdrop-filter: blur(calc(12px * var(--sf, 1)));
+  mask-image: linear-gradient(to bottom, transparent 55%, #000 70%);
+  background: linear-gradient(to bottom,
+    transparent 0%,
+    color-mix(in srgb, var(--ds-ask-paper) 50%, transparent) 40%,
+    color-mix(in srgb, var(--ds-ask-paper) 80%, transparent) 100%);
 }
 
+/* The foot of the window: the strip of cards, the answer, then the words. */
+.dock {
+  position: absolute;
+  inset-inline: 0;
+  bottom: var(--ds-ask-bottom, calc(2 * var(--ds-unit)));
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-unit);
+}
+
+/* Cards a square apart, from the page's column on to the window's end,
+   sliding sideways; the chosen one is ringed. */
+.cards {
+  position: relative;
+  display: flex;
+  gap: var(--ds-unit);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  padding-block: calc(4px * var(--sf, 1));
+  padding-inline: var(--ds-ask-start) var(--ds-unit);
+  scroll-padding-inline: var(--ds-ask-start) var(--ds-unit);
+  animation: ds-ask-rise 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.cards::-webkit-scrollbar { display: none; }
+
+.card {
+  --ds-ask-tone: var(--ds-fill, light-dark(#ebebeb, #383838));
+  flex: none;
+  display: grid;
+  grid-template-rows: calc(2.5 * var(--ds-unit)) calc(5 * var(--ds-unit)) calc(2.5 * var(--ds-unit));
+  width: calc(10 * var(--ds-unit));
+  height: calc(10 * var(--ds-unit));
+  box-sizing: border-box;
+  overflow: hidden;
+  border-radius: var(--ds-radius-card, calc(4px * var(--sf, 1)));
+  background: var(--ds-ask-paper);
+  box-shadow: inset 0 0 0 1px var(--ds-border-color, light-dark(#d8d8d8, #3d3d3d));
+  font-size: var(--ds-type-size-default);
+  cursor: pointer;
+}
+.card:hover { background: color-mix(in srgb, var(--ds-ask-paper) 94%, var(--ds-ask-ink)); }
+/* The chosen card at full strength; the others dimmer the further they stand
+   from it, so the choice is seen without a ring. */
+.card {
+  opacity: max(0.4, calc(1 - 0.2 * var(--ds-ask-distance, 0)));
+  transition: opacity 160ms ease-out;
+}
+
+/* The head: what kind of thing it is, and its detail, on a palette pastel. */
+.card[data-tone="sharp-blue"] { --ds-ask-tone: var(--one-sharp-blue-pastel, light-dark(#ccccff, #1d1a4c)); }
+.card[data-tone="winning-blue"] { --ds-ask-tone: var(--one-winning-blue-pastel, light-dark(#cce4ff, #1a314c)); }
+.card[data-tone="hysteric-blue"] { --ds-ask-tone: var(--one-hysteric-blue-pastel, light-dark(#cdf2fe, #1b3f4b)); }
+.card[data-tone="apple-green"] { --ds-ask-tone: var(--one-apple-green-pastel, light-dark(#daffcc, #284c1a)); }
+.card[data-tone="chartreuse"] { --ds-ask-tone: var(--one-chartreuse-pastel, light-dark(#f2ffcf, #3e4c1a)); }
+.card[data-tone="yellow"] { --ds-ask-tone: var(--one-yellow-pastel, light-dark(#fbffcc, #484c1a)); }
+.card[data-tone="orange"] { --ds-ask-tone: var(--one-orange-pastel, light-dark(#fff2cc, #4c3f1a)); }
+.card[data-tone="sand"] { --ds-ask-tone: var(--one-sand-pastel, light-dark(#f3ecd8, #403926)); }
+.card[data-tone="tuned-red"] { --ds-ask-tone: var(--one-tuned-red-pastel, light-dark(#ffcccc, #4c1a1a)); }
+.card[data-tone="pink"] { --ds-ask-tone: var(--one-pink-pastel, light-dark(#fad1e6, #471f34)); }
+.card[data-tone="purple"] { --ds-ask-tone: var(--one-purple-pastel, light-dark(#f9d2ed, #46203a)); }
+
+/* Every line in a card is one square, its words on the lower sixteen. */
+.label, .detail, .title, .caption, .entry {
+  display: block;
+  min-width: 0;
+  height: var(--ds-unit);
+  box-sizing: border-box;
+  padding-top: calc(4px * var(--sf, 1));
+  line-height: var(--ds-line);
+  white-space: nowrap;
+  overflow: hidden;
+  mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-unit)), transparent);
+}
+
+.head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--ds-unit);
+  grid-template-rows: var(--ds-unit) var(--ds-unit);
+  align-items: end;
+  padding: var(--ds-half) var(--ds-half) 0;
+  background: var(--ds-ask-tone);
+  color: var(--ds-ask-head-ink, var(--ds-ask-ink));
+}
+.label { font-weight: var(--ds-type-weight-bold, 500); }
+.detail { grid-column: 1 / -1; color: color-mix(in srgb, var(--ds-ask-head-ink, var(--ds-ask-ink)) 70%, transparent); }
+.icon {
+  grid-row: 1;
+  grid-column: 2;
+  justify-self: end;
+  align-self: end;
+  color: inherit;
+}
+
+/* The peek at what it opens. */
+.body {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  padding-inline: var(--ds-half);
+}
+.body[data-preview="picture"] { padding: 0; }
+
+.prose {
+  height: 100%;
+  overflow: hidden;
+  padding-top: calc(4px * var(--sf, 1));
+  box-sizing: border-box;
+  line-height: var(--ds-unit);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+/* Nothing to peek at: the name itself, at the display size. */
+.prose.named {
+  font-size: var(--ds-type-size-display);
+  line-height: calc(1.5 * var(--ds-unit));
+  letter-spacing: calc(var(--ds-display-text-tracking, -0.4px) * var(--sf, 1));
+  font-weight: var(--ds-type-weight-bold, 500);
+}
+.lines { height: 100%; overflow: hidden; }
+.line[data-cut] {
+  mask-image: linear-gradient(to right, #000 calc(100% - 2 * var(--ds-unit)), transparent);
+}
+.prose[data-cut], .lines[data-cut] {
+  mask-image: linear-gradient(to bottom, #000 calc(100% - var(--ds-unit)), transparent);
+}
+.entry[data-done] {
+  color: var(--ds-ask-muted);
+  text-decoration: line-through;
+}
+
+.picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+}
+.picture[data-fit="contain"] {
+  box-sizing: border-box;
+  padding: var(--ds-unit);
+  object-fit: contain;
+}
+
+/* A month, a day a column and its weeks sharing the card's middle: days
+   with something on them on the accent's pastel, today in today's red. */
+.month {
+  display: grid;
+  height: 100%;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
+  font-variant-numeric: tabular-nums;
+}
+.day {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  line-height: var(--ds-line);
+}
+.day[data-mark]::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  bottom: 0;
+  width: var(--ds-line);
+  height: var(--ds-line);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent-color, var(--ds-accent-color, currentColor)) 45%, transparent);
+}
+.day[data-today] {
+  color: var(--ds-today-color, var(--ds-danger-color, #e5484d));
+  font-weight: var(--ds-type-weight-bold, 500);
+}
+
+/* The foot: the name, and where it is. */
+.foot {
+  display: grid;
+  grid-template-rows: var(--ds-unit) var(--ds-unit);
+  align-content: end;
+  padding: 0 var(--ds-half) var(--ds-half);
+}
+.title { font-weight: var(--ds-type-weight-bold, 500); }
+.caption {
+  display: flex;
+  align-items: flex-end;
+  gap: calc(4px * var(--sf, 1));
+  color: var(--ds-ask-muted);
+}
+/* A public address: the globe on the sixteen, the words after it. */
+.globe { flex: none; }
+/* An address that copies itself: the pointer says so, and it takes the ink and a hairline underneath. */
+.caption[data-copy] { cursor: copy; }
+.caption[data-copy]:hover .address {
+  color: var(--ds-ask-ink);
+  text-decoration: underline 1px;
+  text-underline-offset: calc(3px * var(--sf, 1));
+}
+
+/* The words, at the display size, under the cards and on the page's column:
+   always one line, running on towards the window's end, and fading over its
+   last squares only if even that is too short. */
+.line, .answer { margin-inline-start: var(--ds-ask-start); }
+.answer { max-width: min(var(--ds-ask-width, calc(32 * var(--ds-unit))), calc(100% - var(--ds-ask-start) - var(--ds-unit))); }
 .line {
-  min-height: calc(2 * var(--ds-unit));
-  font-family: var(--ds-typeface-regular, var(--typeface-regular));
+  max-width: calc(100% - var(--ds-ask-start) - var(--ds-unit));
+  height: calc(2 * var(--ds-unit));
+  overflow: hidden;
   font-size: var(--ds-type-size-display);
   font-weight: var(--ds-type-weight-default, 400);
   line-height: calc(2 * var(--ds-unit));
-  letter-spacing: calc(var(--ds-display-text-tracking, -0.4px) * var(--ds-sf, 1));
-  color: var(--ds-text-color, var(--text-color));
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
+  letter-spacing: calc(var(--ds-display-text-tracking, -0.4px) * var(--sf, 1));
+  white-space: pre;
   animation: ds-ask-rise 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -38,68 +277,28 @@
   display: inline-block;
   width: 0;
   height: var(--ds-type-size-display);
-  margin-inline-start: calc(1px * var(--ds-sf, 1));
-  border-left: calc(2px * var(--ds-sf, 1)) solid var(--accent-color, currentColor);
+  margin-inline-start: calc(1px * var(--sf, 1));
+  border-left: calc(2px * var(--sf, 1)) solid var(--accent-color, currentColor);
   vertical-align: -0.15em;
   animation: ds-ask-caret 1s step-end infinite;
 }
 
 /* The chosen title's rest after the words, muted, as a name finishing itself. */
-.completion { color: var(--ds-text-color-muted, var(--text-color)); }
-
-/* Results share one square per row: icon, title and context in columns. */
-.rows {
-  margin-top: var(--ds-unit);
-  display: grid;
-  width: var(--ds-ask-width, calc(12 * var(--ds-unit)));
-  max-width: 100%;
-  animation: ds-ask-rise 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-.row {
-  display: grid;
-  grid-template-columns: var(--ds-unit) minmax(0, 2fr) minmax(0, 1fr);
-  grid-template-rows: var(--ds-unit);
-  align-items: end;
-  height: var(--ds-unit);
-  padding: 0;
-  border-radius: 0;
-  font-family: var(--ds-typeface-regular, var(--typeface-regular));
-  font-size: var(--ds-type-size-default);
-  line-height: var(--ds-unit);
-  color: var(--ds-text-color, var(--text-color));
-  cursor: pointer;
-}
-.row[aria-selected="true"] {
-  background: color-mix(in srgb, var(--ds-text-color, currentColor) 10%, transparent);
-}
-.icon {
-  grid-row: 1;
-  align-self: end;
-  justify-self: center;
-  color: var(--ds-text-color-muted, var(--text-color));
-}
-.title, .detail {
-  min-width: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-unit)), transparent);
-  padding-inline-end: var(--ds-unit);
-}
-.detail { color: var(--ds-text-color-muted, var(--text-color)); }
+.completion { color: var(--ds-ask-muted); }
 
 /* What an empty Ask is for, after the caret, muted. */
 .placeholder {
-  color: var(--ds-text-color-muted, var(--text-color));
-  margin-inline-start: calc(4px * var(--ds-sf, 1));
+  color: var(--ds-ask-muted);
+  margin-inline-start: calc(4px * var(--sf, 1));
 }
 
 /* Listening: an accent dot breathing in opacity before the words heard,
    which come in italics as Aa's prompt sets them. */
 .dot {
   display: inline-block;
-  width: calc(10px * var(--ds-sf, 1));
-  height: calc(10px * var(--ds-sf, 1));
-  margin-inline-end: calc(8px * var(--ds-sf, 1));
+  width: calc(10px * var(--sf, 1));
+  height: calc(10px * var(--sf, 1));
+  margin-inline-end: calc(8px * var(--sf, 1));
   border-radius: 50%;
   background: var(--accent-color, currentColor);
   vertical-align: 0.1em;
@@ -112,30 +311,33 @@
   animation: ds-ask-thinking 1.2s ease-in-out infinite alternate;
 }
 
-/* The answer, the line under the question: the default size, on the grid. */
+/* The answer stands a square above the words, at the default size, on the grid. */
 .answer {
-  font-family: var(--ds-typeface-regular, var(--typeface-regular));
   font-size: var(--ds-type-size-default);
   line-height: var(--ds-unit);
-  color: var(--ds-text-color, var(--text-color));
   overflow-wrap: anywhere;
+  animation: ds-ask-rise 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .answer:empty { display: none; }
-.answer { animation: ds-ask-rise 240ms cubic-bezier(0.22, 1, 0.36, 1) both; }
-:host([state="failed"]) .answer { color: var(--ds-text-color-muted, var(--text-color)); }
+:host([state="failed"]) .answer { color: var(--ds-ask-muted); }
 
 @keyframes ds-ask-thinking {
   from { opacity: 1; }
   to { opacity: 0.4; }
 }
 @keyframes ds-ask-rise {
-  from { opacity: 0; transform: translateY(calc(var(--ds-unit) * 0.5)); }
+  from { opacity: 0; transform: translateY(var(--ds-half)); }
   to { opacity: 1; transform: translateY(0); }
+}
+@keyframes ds-ask-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 @keyframes ds-ask-caret {
   0%, 49% { opacity: 1; }
   50%, 100% { opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .rows, .line, .caret, .answer, .dot, :host([state="thinking"]) .words { animation: none; }
+  .veil > i, .cards, .line, .caret, .answer, .dot, :host([state="thinking"]) .words { animation: none; }
+  .card { transition: none; }
 }
