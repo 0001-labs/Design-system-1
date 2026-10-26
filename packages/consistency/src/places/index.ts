@@ -7,6 +7,8 @@
  */
 import type { SiteSummary } from '../site-editing';
 import type { SitePlace } from './api';
+import { ConsistencyPlaceBookings } from './bookings';
+import { ConsistencyPlaceGiftCards } from './giftcards';
 
 export { SiteApiError, siteApi, sitePlaces, type SitePlace } from './api';
 
@@ -18,3 +20,7 @@ export const PLACES = new Map<string, PlaceFactory>();
 
 /** The site's places the app can show, in the site's order. */
 export const shownPlaces = (places: readonly SitePlace[]) => places.filter(place => PLACES.has(place.id));
+
+// CPH Raft's places, on the site engine's bookings and gift cards (`/team/api/bookings…`, `/team/api/giftcards…`).
+PLACES.set('bookings', site => Object.assign(new ConsistencyPlaceBookings(), { site }));
+PLACES.set('giftcards', site => Object.assign(new ConsistencyPlaceGiftCards(), { site }));

@@ -1,0 +1,74 @@
+/* A site's places in Consistency's app (Bookings, Gift cards): Design system 1's sheet for the schedule's matrix,
+   and the few lines the places lay out, on whole squares with everything on the lower sixteen. */
+@import "../../../../DS1/1-root/table.css";
+
+.place { display: flex; flex-direction: column; gap: var(--ds-unit); min-width: 0; padding: var(--ds-unit); }
+.place[hidden], .place-schedule[hidden] { display: none; }
+.place-head, .place-tools, .place-line {
+  display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0 var(--ds-unit);
+  min-height: var(--ds-unit); line-height: calc(16px * var(--ds-sf, 1));
+}
+.place-head { min-height: calc(2 * var(--ds-unit)); }
+.place-tools { justify-content: space-between; }
+/* Text tabs stand where a heading would: the run drawn 4px back so the first word starts on the column's edge. */
+.place-tabs { margin-inline-start: calc(-4px * var(--ds-sf, 1)); }
+.place-muted { color: var(--ds-text-color-muted); }
+.place-code { font-family: var(--ds-typeface-mono, var(--typeface-mono)); font-size: calc(13px * var(--ds-sf, 1)); }
+.place-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.place-note { display: block; }
+.place-day + .place-day { margin-top: var(--ds-unit); }
+
+/* A booking's row: its time or nights on four squares, the offer and the guests after the name. */
+.place-booking { --ds-row-padding: 0px; }
+.place-booking__when { flex: 0 0 auto; width: calc(4 * var(--ds-unit)); font-variant-numeric: tabular-nums; }
+.place-booking > .ds-row__name, .place-card > .ds-row__name { flex: 0 1 auto; width: calc(8 * var(--ds-unit)); }
+.place-booking__offer { flex: 0 1 auto; width: calc(8 * var(--ds-unit)); }
+.place-booking__guests, .place-card__expires { flex: 0 1 auto; width: calc(4 * var(--ds-unit)); }
+.place-booking__offer, .place-booking__guests, .place-card__expires { min-width: 0; white-space: nowrap; overflow: hidden; }
+.place-card > ds-tag { flex: 0 1 auto; width: calc(6 * var(--ds-unit)); min-width: 0; }
+.place-card { --ds-row-padding: 0px; }
+.place-card > .place-code { flex: 0 0 auto; width: calc(8 * var(--ds-unit)); }
+
+/* In a drawer: the groups a square apart, a confirmation in place under what it asks about. */
+.place-drawer { display: flex; flex-direction: column; gap: var(--ds-unit); }
+.place-actions { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0 calc(4px * var(--ds-sf, 1)); min-height: var(--ds-unit); }
+.place-confirm { display: flex; flex-direction: column; gap: 0; }
+.place-check { display: inline-flex; align-items: flex-end; gap: calc(4px * var(--ds-sf, 1)); }
+.place-amount, .place-number { width: calc(4 * var(--ds-unit)); }
+.place-number { width: calc(2 * var(--ds-unit)); }
+.place-address { width: calc(10 * var(--ds-unit)); }
+
+/* The schedule: its matrix on the sheet, every cell four squares by one, the offer's name two cells, the ⋯ a square. */
+.place-schedule { display: flex; flex-direction: column; gap: var(--ds-unit); min-width: 0; }
+.place-matrix-scroll > .ds-table[data-sheet].place-matrix,
+.ds-table[data-sheet].place-matrix { width: calc(var(--place-matrix-cells, 11) * var(--ds-table-cell) + var(--ds-table-row)); }
+.ds-table[data-sheet].place-matrix :is(th, td).place-matrix__offer { width: calc(2 * var(--ds-table-cell)); max-width: calc(2 * var(--ds-table-cell)); }
+.ds-table[data-sheet].place-matrix :is(th, td).place-matrix__more { width: var(--ds-table-row); max-width: var(--ds-table-row); padding: 0; border-inline-end: 0; overflow: visible; }
+.place-matrix__name { display: flex; align-items: flex-end; gap: calc(4px * var(--ds-sf, 1)); min-width: 0; }
+.place-matrix__name > .ds-table__words { flex: 1 1 auto; min-width: 0; }
+.ds-table[data-sheet].place-matrix td.place-cell { padding: 0; }
+.place-cell__press {
+  all: unset; box-sizing: border-box; display: flex; align-items: flex-end; width: 100%;
+  height: calc(var(--ds-table-row) - 1px); padding: 0 calc(4px * var(--ds-sf, 1));
+  line-height: var(--ds-type-lineheight-default); cursor: pointer;
+}
+.place-cell__press > .ds-table__words { flex: 1 1 auto; min-width: 0; }
+td[data-numeric] > .place-cell__press { justify-content: flex-end; text-align: end; }
+.place-cell__press:hover { background: var(--ds-fill-hover, var(--ds-fill)); }
+.place-cell__press:focus-visible { box-shadow: inset 0 0 0 2px var(--ds-focus-ring, Highlight); }
+.place-cell__input {
+  box-sizing: border-box; display: block; width: 100%; height: calc(var(--ds-table-row) - 1px); margin: 0;
+  padding: 0 calc(4px * var(--ds-sf, 1)); border: 0; background: var(--ds-paper); color: var(--ds-text-color);
+  font: inherit; font-variant-numeric: tabular-nums; outline: 2px solid var(--ds-focus-ring, Highlight); outline-offset: -2px;
+}
+.place-cell[data-invalid] .place-cell__input, .place-cell__input[aria-invalid="true"] { color: var(--ds-danger-color); outline-color: var(--ds-danger-color); }
+.place-matrix__open ds-switch { display: block; }
+/* Unsaved: a cell, a field or a day list changed since it was saved, on a pale fill of the warning. */
+.place-matrix [data-changed], .place-limits [data-changed] { background-color: color-mix(in srgb, var(--ds-warning-color) 14%, transparent); }
+.place-limit, .place-chips { display: inline-flex; flex-wrap: wrap; align-items: flex-end; gap: 0 calc(4px * var(--ds-sf, 1)); min-height: var(--ds-unit); }
+.place-chips__list { display: inline-flex; flex-wrap: wrap; align-items: flex-end; gap: 0 calc(4px * var(--ds-sf, 1)); }
+/* A closed day: the tag's face, a control high, with the small close after its words. */
+.place-chip {
+  box-sizing: border-box; display: inline-flex; align-items: center; height: var(--ds-control-height, calc(16px * var(--ds-sf, 1)));
+  padding-inline-start: calc(4px * var(--ds-sf, 1)); border-radius: var(--ds-radius); background: var(--ds-fill); white-space: nowrap;
+}
