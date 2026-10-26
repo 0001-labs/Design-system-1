@@ -2,20 +2,24 @@
    measures (no sidebar column and no gap after it) and stands the sidebar over the work through the page's `nav` part,
    so the shared page is unchanged. The work moved past the window during a drag is cut at the app's edge. */
 consistency-home{overflow:clip}
-.home-edge{display:none}
+.home-edge,.home-reveal{display:none}
 @media (min-width:600px){
   /* The sidebar eleven squares wide and the work a square after it (Joachim, 26 October 2026). */
   consistency-home>ds-page{--ds-page-nav:calc(11 * var(--ds-unit));--ds-page-gap:var(--ds-unit)}
   /* One square wide, the full height, centred on where the work begins: its line is the frame's own left edge, thirteen
-     squares in when open. Folded, the edge covers the window's left square too and its line stays on the frame's edge, a
-     square in. A quiet line shows it under the pointer, in focus and in a drag. */
+     squares in when open, a square in when folded. A quiet line shows it under the pointer, in focus and in a drag. */
   .home-edge{display:block;position:fixed;z-index:3;inset-block:0;inset-inline-start:calc(13 * var(--ds-unit) - var(--ds-unit) / 2);width:var(--ds-unit);cursor:col-resize;touch-action:none;outline:none}
   .home-edge::before{content:"";position:absolute;inset-block:var(--ds-unit);inset-inline-start:calc(100% - var(--ds-unit) / 2 - 0.5px);width:1px;background:var(--ds-border-color);opacity:0;transition:opacity 150ms cubic-bezier(0.23,1,0.32,1)}
   .home-edge:hover::before,consistency-home[data-sidebar-moving] .home-edge::before{opacity:1}
   /* Over the shown sidebar the edge keeps its square but draws nothing: the sidebar's own line is the boundary. */
   consistency-home[data-sidebar-peek]:not([data-sidebar-moving])>.home-edge::before{opacity:0}
   .home-edge:focus-visible::before{opacity:1;inset-inline-start:calc(100% - var(--ds-unit) / 2 - 1px);width:2px;background:var(--ds-focus-color, currentColor)}
-  consistency-home[data-sidebar="collapsed"]>.home-edge{inset-inline-start:0;width:calc(1.5 * var(--ds-unit))}
+  consistency-home[data-sidebar="collapsed"]>.home-edge{inset-inline-start:calc(var(--ds-unit) / 2)}
+  /* Folded: a strip 12px wide at the window's edge, above the handle so it stops short of the frame's edge, lit by a faint
+     gradient from the window's edge that brightens a little under the pointer. Its hover shows the sidebar. */
+  consistency-home[data-sidebar="collapsed"]>.home-reveal{display:block;position:fixed;z-index:4;inset-block:0;inset-inline-start:0;width:calc(12px * var(--ds-sf, 1));background:linear-gradient(to right,color-mix(in srgb,var(--ds-text-color) 14%,transparent),transparent);opacity:.6;transition:opacity 150ms cubic-bezier(0.23,1,0.32,1)}
+  consistency-home[data-sidebar="collapsed"]>.home-reveal:hover,consistency-home[data-sidebar="collapsed"][data-sidebar-peek]>.home-reveal{opacity:1}
+  consistency-home[data-sidebar="collapsed"][data-sidebar-moving]>.home-reveal{opacity:0}
   /* Folded: the work stands a square from every side of the window. */
   consistency-home[data-sidebar="collapsed"]>ds-page{--ds-page-nav:0px;--ds-page-gap:0px}
   /* The sidebar over the work, where it stands when open: eleven squares with a square either side, its line facing the work.

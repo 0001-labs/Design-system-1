@@ -79,7 +79,12 @@ try {
   near((await main()).left, 20, 'The folded work begins at');
   await page.waitForTimeout(250);
   { const box = await navBox(); if (box.shown) throw Error('The folded sidebar is still shown: ' + JSON.stringify(box)); }
-  { const box = await edge.boundingBox(); near(box.x, 0, 'The folded edge stands at'); }
+  { const box = await edge.boundingBox(); near(box.x + box.width / 2, 20, 'The folded edge stands at'); }
+  // The strip at the window's edge is 12px wide and lit; the frame's edge beside it can be grabbed without showing the sidebar.
+  { const strip = await page.locator('consistency-home .home-reveal').boundingBox(); near(strip.x, 0, 'The strip stands at'); near(strip.width, 12, 'The strip is wide');
+    if (!(await page.locator('consistency-home .home-reveal').evaluate(element => getComputedStyle(element).backgroundImage)).includes('gradient')) throw Error('The strip is not lit by a gradient'); }
+  await page.mouse.move(700, 450); await page.mouse.move(22, 450); await page.waitForTimeout(300);
+  if (await app.getAttribute('data-sidebar-peek') !== null) throw Error('Hovering the frame edge showed the sidebar');
   if (await page.evaluate(() => localStorage.getItem('consistency-sidebar')) !== 'collapsed') throw Error('The folded sidebar is not kept');
   // The pointer that folded it is still on the edge: nothing is shown until it has left.
   if (await app.getAttribute('data-sidebar-peek') !== null) throw Error('Folding by the edge showed the sidebar at once');
@@ -124,8 +129,11 @@ try {
 
   // Dragging the folded edge to the right opens it again: the shown sidebar stays and the work follows the hand.
   await page.mouse.move(10, 450); await page.waitForFunction(() => document.querySelector('consistency-home').hasAttribute('data-sidebar-peek')); await page.waitForTimeout(250);
+  // Shown from the strip, the sidebar stays while the hand moves on to the frame's edge and grabs it there.
+  await page.mouse.move(22, 450); await page.waitForTimeout(300);
+  if (await app.getAttribute('data-sidebar-peek') === null) throw Error('Moving from the strip to the edge hid the sidebar');
   await page.mouse.down();
-  for (const x of [20, 60, 120, 180, 220]) { await page.mouse.move(x, 450); await page.waitForTimeout(30); }
+  for (const x of [30, 60, 120, 180, 220]) { await page.mouse.move(x, 450); await page.waitForTimeout(30); }
   await page.waitForTimeout(120);
   near((await navBox()).left, 0, 'The shown sidebar during the drag stands at');
   await page.mouse.up(); await settled();
@@ -168,8 +176,8 @@ try {
   // A mouse press without a drag folds or opens it too.
   await page.mouse.click(260, 450); await settled();
   if (await state() !== 'collapsed') throw Error('Pressing the open edge did not fold the sidebar');
-  await page.mouse.move(900, 450); await page.mouse.move(10, 450); await page.waitForTimeout(250);
-  await page.mouse.click(10, 450); await settled();
+  await page.mouse.move(900, 450); await page.mouse.move(22, 450); await page.waitForTimeout(250);
+  await page.mouse.click(22, 450); await settled();
   if (await state() !== 'open') throw Error('Pressing the folded edge did not open the sidebar');
   await context.close();
 

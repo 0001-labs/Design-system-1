@@ -4,9 +4,11 @@ import './sidebar-edge.css';
 /**
  * The edge of Consistency's sidebar (Joachim, 26 October 2026): the boundary between the sidebar and the work is the
  * handle. Dragged towards the left it folds the sidebar away and the work takes the whole window inside a one-square
- * margin, as 0001.dev's page stands; dragged back it opens again. Folded, the window's left square shows the sidebar
- * over the work while the pointer (or focus) is on it, without a backdrop, so the next place can be chosen; it goes
- * away when the pointer leaves or a place is chosen. A finger's press on that square shows it too.
+ * margin, as 0001.dev's page stands; dragged back it opens again. Folded, a strip 12px wide at the window's edge, lit by
+ * a faint gradient, shows the sidebar over the work while the pointer (or focus) is on it, without a backdrop, so the
+ * next place can be chosen; it goes away when the pointer leaves or a place is chosen. The strip stops short of the
+ * frame's edge, so grabbing that edge to drag the sidebar open never shows it (Joachim, 26 October 2026). A finger's
+ * press on the strip or the edge shows it too.
  *
  * Folding never pushes the sidebar out (Joachim, 26 October 2026): it stays where it stands and the work slides over
  * it, the sidebar blurring and fading as it is covered; opening uncovers it the same way. During a drag nothing is
@@ -68,6 +70,8 @@ type Pose = { x: number };
 export class SidebarEdge {
   /** The separator on the sidebar's edge, rendered by the home before its page. */
   readonly handle: HTMLDivElement;
+  /** Folded, the strip at the window's edge whose hover shows the sidebar; rendered by the home before the handle. */
+  readonly reveal: HTMLDivElement;
   private state: SidebarState;
   private pose: Pose = { x: 0 };
   /** The folded sidebar shown over the work stays clear while the work moves (a drag or settle that keeps it shown). */
@@ -93,6 +97,10 @@ export class SidebarEdge {
     handle.setAttribute('aria-valuemin', '0');
     handle.setAttribute('aria-valuemax', '100');
     this.handle = handle;
+    const reveal = document.createElement('div');
+    reveal.className = 'home-reveal';
+    reveal.setAttribute('aria-hidden', 'true');
+    this.reveal = reveal;
   }
 
   /** Open or folded, as the viewer left it. */
@@ -114,9 +122,11 @@ export class SidebarEdge {
       onTap: event => this.tap(event),
     }));
     this.handle.addEventListener('keydown', this.onKey);
-    this.handle.addEventListener('pointerenter', this.onEnter);
     this.handle.addEventListener('pointerleave', this.onHandleLeave);
     this.handle.addEventListener('focus', this.onFocus);
+    this.reveal.addEventListener('pointerenter', this.onEnter);
+    this.reveal.addEventListener('pointerleave', this.onHandleLeave);
+    this.reveal.addEventListener('pointerdown', this.onRevealDown);
     this.host.addEventListener('pointerover', this.onOver);
     this.host.addEventListener('pointerout', this.onOut);
     this.host.addEventListener('focusout', this.onFocusOut);
@@ -128,9 +138,11 @@ export class SidebarEdge {
     this.stop(); clearTimeout(this.leaving);
     this.unbind?.(); this.unbind = null;
     this.handle.removeEventListener('keydown', this.onKey);
-    this.handle.removeEventListener('pointerenter', this.onEnter);
     this.handle.removeEventListener('pointerleave', this.onHandleLeave);
     this.handle.removeEventListener('focus', this.onFocus);
+    this.reveal.removeEventListener('pointerenter', this.onEnter);
+    this.reveal.removeEventListener('pointerleave', this.onHandleLeave);
+    this.reveal.removeEventListener('pointerdown', this.onRevealDown);
     this.host.removeEventListener('pointerover', this.onOver);
     this.host.removeEventListener('pointerout', this.onOut);
     this.host.removeEventListener('focusout', this.onFocusOut);
@@ -151,8 +163,7 @@ export class SidebarEdge {
   chosen() { if (this.shown) this.show(false); }
 
   // The geometry, in px: a square, the sidebar's width (eleven squares) and the gap after it (one), which is how far the work moves.
-  // The edge is one square wide when open and a square and a half folded (it covers the window's left square too).
-  private unit() { return (this.handle.offsetWidth / (this.host.getAttribute('data-sidebar') === 'collapsed' ? 1.5 : 1)) || 20; }
+  private unit() { return this.handle.offsetWidth || 20; }
   private travel() { return 12 * this.unit(); }
   private page() { return this.host.querySelector<HTMLElement>(':scope > ds-page'); }
   private nav() { return this.host.querySelector<HTMLElement>(':scope > ds-page > nav.home-nav'); }
@@ -270,13 +281,13 @@ export class SidebarEdge {
     if (!this.shown) return;
     this.leaving = window.setTimeout(() => {
       const nav = this.nav();
-      if (this.gesture || this.handle.matches(':hover') || nav?.matches(':hover') || nav?.querySelector('[aria-expanded="true"]')) return;
+      if (this.gesture || this.reveal.matches(':hover') || this.handle.matches(':hover') || nav?.matches(':hover') || nav?.querySelector('[aria-expanded="true"]')) return;
       if (this.keyboard && (nav?.contains(document.activeElement) || document.activeElement === this.handle)) return;
       this.show(false);
     }, LEAVE_MS);
   }
 
-  private inside(node: EventTarget | null) { return node instanceof Node && (this.handle.contains(node) || Boolean(this.nav()?.contains(node))); }
+  private inside(node: EventTarget | null) { return node instanceof Node && (this.handle.contains(node) || this.reveal.contains(node) || Boolean(this.nav()?.contains(node))); }
 
   private readonly onKey = (event: KeyboardEvent) => {
     if (event.key !== 'Enter' && event.key !== ' ') return;
@@ -288,6 +299,8 @@ export class SidebarEdge {
     this.show(true);
   };
   private readonly onHandleLeave = () => { this.quiet = false; this.leaveSoon(); };
+  /** A finger on the strip shows the folded sidebar. */
+  private readonly onRevealDown = (event: PointerEvent) => { if (event.pointerType === 'touch') this.show(true); };
   private readonly onFocus = () => { if (this.keyboard) this.show(true); };
   private readonly onOver = (event: PointerEvent) => { if (this.shown && this.inside(event.target)) clearTimeout(this.leaving); };
   private readonly onOut = (event: PointerEvent) => { if (this.shown && this.inside(event.target) && !this.inside(event.relatedTarget)) this.leaveSoon(); };
@@ -295,7 +308,7 @@ export class SidebarEdge {
   /** A press anywhere but the sidebar and its edge puts the shown sidebar away. */
   private readonly onDown = (event: PointerEvent) => {
     this.keyboard = false;
-    if (this.shown && !event.composedPath().some(node => node === this.handle || node === this.nav())) this.show(false);
+    if (this.shown && !event.composedPath().some(node => node === this.handle || node === this.reveal || node === this.nav())) this.show(false);
   };
   private readonly onAnyKey = (event: KeyboardEvent) => {
     this.keyboard = true;

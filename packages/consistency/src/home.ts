@@ -328,7 +328,7 @@ export class ConsistencyHome extends LitElement {
     const open = this.place.page === 'site' ? (this.place as { code: string }).code : '';
     const site = open ? this.sites.find(item => item.code === open) : undefined;
     const drafts = draftWords(current);
-    return html`${this.edge.handle}<ds-page layout="sidebar" fill drawer>
+    return html`${this.edge.reveal}${this.edge.handle}<ds-page layout="sidebar" fill drawer>
       ${site ? this.siteNav(site) : html`<nav slot="nav" id="home-nav" class="home-nav" aria-label="Consistency">
         <div class="home-workspace" aria-label="Workspace">
           <ds-button id="home-workspace" class="home-workspace-name" label=${`Workspace: ${name}`} @click=${() => this.go({ page: 'sites' })}>
