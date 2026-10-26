@@ -612,11 +612,12 @@ if (PRODUCTION) {
   await step("Private hosts", [
     ...[ICON, EDITOR].flatMap((origin) => [
       [
-        `${new URL(origin).hostname} asks to sign in`,
+        // c9y.site is where customers' sites live; its home leads to the app at consistency.site
+        // (services/src/consistency.ts). The icon host keeps its sign-in shell.
+        origin === EDITOR ? "c9y.site's home leads to the app at consistency.site" : `${new URL(origin).hostname} asks to sign in`,
         async () => {
           const answer = await request(`${origin}/`);
-          // c9y.site asks the owner's System sign-in quietly first; the icon host keeps its sign-in shell.
-          expectRedirect(answer, 302, origin === EDITOR ? `${origin}/auth/start?silent=1` : `${origin}/app/signin`);
+          expectRedirect(answer, 302, origin === EDITOR ? "https://consistency.site/" : `${origin}/app/signin`);
           expectPrivate(answer);
           expectHeader(answer, "referrer-policy", /^same-origin$/);
         },

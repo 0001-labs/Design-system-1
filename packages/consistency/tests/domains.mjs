@@ -20,6 +20,7 @@ try {
   const calls = [];
   let checks = 0;
   await page.route('**/api/consistency/profile', route => route.fulfill({ json: { companyName: '0001' } }));
+  await page.route('**/api/consistency/sites', route => route.fulfill({ json: { sites: [{ code: '10VNDG', name: 'CPH Raft', url: 'https://cphraft.c9y.site/' }, { code: '20FLAV', name: 'Flavo', url: 'https://flavo.c9y.site/' }] } }));
   await page.route('**/api/consistency/domains**', async route => {
     const request = route.request(); const path = new URL(request.url()).pathname; calls.push(`${request.method()} ${path}`);
     if (request.method() === 'GET') return route.fulfill({ json: { target: 'connect.c9y.site', ...state } });
@@ -46,8 +47,10 @@ try {
   });
   const base = `http://127.0.0.1:${server.address().port}/private-consistency/home.html`;
   await page.goto(base); await page.locator('consistency-home ds-card').first().waitFor();
-  await page.locator('consistency-home ds-sidebar[label="Settings"]').getByText('Settings', { exact: true }).click();
-  await page.waitForURL('**#settings/domains'); await page.locator('consistency-domains ds-list').first().waitFor();
+  // Settings is the workspace menu's one entry (home.mjs covers the menu itself).
+  await page.locator('#home-workspace').hover();
+  await page.locator('consistency-home ds-select[aria-label="Workspace"] ds-button[menu-item]', { hasText: 'Settings' }).click();
+  await page.locator('consistency-domains ds-list').first().waitFor();
   if (await page.locator('consistency-home ds-card').count()) throw Error('Projects still shown on Domains');
   const flavo = page.locator('consistency-domains ds-list[heading="Flavo"]');
   if (!(await flavo.innerText()).includes('flavo.flowers') || await flavo.getByRole('button', { name: /More for/ }).count()) throw Error('A Worker custom domain must show without actions');
@@ -78,9 +81,9 @@ try {
 
   for (const width of [300, 390, 768, 1440]) { await page.setViewportSize({ width, height: 800 }); await page.waitForTimeout(100); if (await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)) throw Error(`Domains overflows at ${width}`); }
   await page.setViewportSize({ width: 1440, height: 800 });
-  await page.locator('consistency-home ds-sidebar[label="Places"]').getByText('Sites', { exact: true }).click(); await page.locator('consistency-home ds-card').first().waitFor();
+  await page.locator('#home-workspace').click(); await page.locator('consistency-home ds-card').first().waitFor();
 
   state.ready = false;
-  await page.goto(base + '#domains'); await page.reload(); await page.locator('consistency-domains ds-message[text="Connecting domains is not set up yet."]').waitFor();
+  await page.goto(base + '#settings/domains'); await page.reload(); await page.locator('consistency-domains ds-message[text="Connecting domains is not set up yet."]').waitFor();
   console.log('Domains: listing, refused domain, connect with its record, automatic check, disconnect, unset state and viewports passed');
 } finally { await browser.close(); await new Promise(done => server.close(done)); }
