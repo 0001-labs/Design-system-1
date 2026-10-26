@@ -1,0 +1,102 @@
+{
+  "DM Sans": {
+    "ascent": 0.992,
+    "descent": 0.31,
+    "capHeight": 0.7
+  },
+  "Inter": {
+    "ascent": 0.9688,
+    "descent": 0.2412,
+    "capHeight": 0.7275
+  },
+  "JetBrains Mono": {
+    "ascent": 1.02,
+    "descent": 0.3,
+    "capHeight": 0.73
+  },
+  "Lora": {
+    "ascent": 1.006,
+    "descent": 0.274,
+    "capHeight": 0.7
+  },
+  "Manrope": {
+    "ascent": 1.066,
+    "descent": 0.3,
+    "capHeight": 0.72
+  },
+  "Montserrat": {
+    "ascent": 0.968,
+    "descent": 0.251,
+    "capHeight": 0.7
+  },
+  "Noto Sans": {
+    "ascent": 1.069,
+    "descent": 0.293,
+    "capHeight": 0.714
+  },
+  "Noto Sans JP": {
+    "ascent": 1.16,
+    "descent": 0.288,
+    "capHeight": 0.733
+  },
+  "Nunito": {
+    "ascent": 1.011,
+    "descent": 0.353,
+    "capHeight": 0.705
+  },
+  "Open Sans": {
+    "ascent": 1.0688,
+    "descent": 0.293,
+    "capHeight": 0.7139
+  },
+  "Outfit": {
+    "ascent": 1,
+    "descent": 0.26,
+    "capHeight": 0.694
+  },
+  "Playfair Display": {
+    "ascent": 1.082,
+    "descent": 0.251,
+    "capHeight": 0.708
+  },
+  "Poppins": {
+    "ascent": 1.05,
+    "descent": 0.35,
+    "capHeight": 0.698
+  },
+  "Raleway": {
+    "ascent": 0.94,
+    "descent": 0.234,
+    "capHeight": 0.71
+  },
+  "Roboto": {
+    "ascent": 0.9277,
+    "descent": 0.2441,
+    "capHeight": 0.7109
+  },
+  "Rubik": {
+    "ascent": 0.935,
+    "descent": 0.25,
+    "capHeight": 0.7
+  },
+  "Source Sans 3": {
+    "ascent": 1.024,
+    "descent": 0.4,
+    "capHeight": 0.66
+  },
+  "Source Serif 4": {
+    "ascent": 1.036,
+    "descent": 0.335,
+    "capHeight": 0.67
+  },
+  "Urbanist": {
+    "ascent": 0.95,
+    "descent": 0.25,
+    "capHeight": 0.7
+  },
+  "Work Sans": {
+    "ascent": 0.93,
+    "descent": 0.243,
+    "capHeight": 0.66
+  }
+}
