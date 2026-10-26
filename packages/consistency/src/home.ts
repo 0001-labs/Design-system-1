@@ -352,12 +352,12 @@ export class ConsistencyHome extends LitElement {
 
   /**
    * An open site's sidebar, as the workspace's is: its name, which shows the workspace's sites and whose menu goes to
-   * another site, then the site's own address, which shows the site itself, and its places.
+   * another site, then Site, which shows the site itself to edit, and its places.
    */
   private siteNav(site: SiteSummary) {
     const current = this.placeOf(this.place);
     const items = [
-      { id: SITE_ROW, label: site.domain ?? site.address ?? siteHost(site), current: !current },
+      { id: SITE_ROW, label: 'Site', current: !current },
       ...shownPlaces(this.placesFor(site.code)).map(place => ({ id: place.id, label: place.label, current: place.id === current })),
     ];
     const others = this.sites.filter(item => item.code !== site.code);

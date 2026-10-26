@@ -117,18 +117,18 @@ try {
  await page.waitForTimeout(200);
  for(const words of ['Forside','Om os','English'])if(await page.locator('consistency-home nav.home-nav').getByText(words,{exact:true}).count())throw Error('The sidebar still lists the site\'s pages: '+words);
  // No place the app has no element for is shown: with neither of the site's two registered, there is no list at all.
- if((await rowsOf()).join()!=='soendergaarden.c9y.site*')throw Error('Places the app cannot show are listed, or the address is not first: '+(await rowsOf()).join());
+ if((await rowsOf()).join()!=='Site*')throw Error('Places the app cannot show are listed, or Site is not first: '+(await rowsOf()).join());
  // A place the app has an element for is listed under the name, in the site's words; one it has not is left out.
  await page.evaluate(()=>{const home=document.querySelector('consistency-home');home.constructor.places.set('lab',site=>Object.assign(document.createElement('div'),{className:'test-place',textContent:'Lab of '+site.name}));home.requestUpdate();});
  const places=page.locator('consistency-home ds-sidebar.home-places');await places.getByText('Lab',{exact:true}).waitFor();
  if(await places.getByText('Made up').count())throw Error('A place the app has no element for is listed');
  await places.getByText('Lab',{exact:true}).click();await page.locator('consistency-home .home-stage .test-place:not([hidden])').waitFor();same();
  if(await page.locator('consistency-home consistency-site-editor:not([hidden])').count())throw Error('The site\'s canvas still shows beside a place');
- if((await rowsOf()).join()!=='soendergaarden.c9y.site,Lab*')throw Error('The place is not the current row: '+(await rowsOf()).join());
+ if((await rowsOf()).join()!=='Site,Lab*')throw Error('The place is not the current row: '+(await rowsOf()).join());
  if(await page.locator('consistency-home consistency-site-editor').count()!==1)throw Error('Showing a place took the site\'s canvas out of the page');
  if(await page.evaluate(()=>history.state?.place)!=='lab')throw Error('The place is not kept in the history');
  // Pressing the site's address shows the site itself again; the place stays, hidden.
- await places.getByText('soendergaarden.c9y.site',{exact:true}).click();await page.locator('consistency-home consistency-site-editor:not([hidden])').waitFor();same();
+ await places.getByText('Site',{exact:true}).click();await page.locator('consistency-home consistency-site-editor:not([hidden])').waitFor();same();
  if(await page.locator('consistency-home .home-stage .test-place[hidden]').count()!==1)throw Error('Leaving a place took it out of the page');
  await page.goBack();await page.locator('consistency-home .home-stage .test-place:not([hidden])').waitFor();await page.goForward();await page.locator('consistency-home consistency-site-editor:not([hidden])').waitFor();
  if(!(await page.evaluate(()=>localStorage.getItem('consistency-site-places:30SDGA')))?.includes('"lab"'))throw Error('The site\'s places are not kept for the next visit');
@@ -139,7 +139,7 @@ try {
  await page.locator('#home-site').hover();const sitesMenu=page.locator('consistency-home ds-select[aria-label="Sites"]');
  if((await sitesMenu.locator('ds-button[menu-item]').allInnerTexts()).map(t=>t.trim()).join()!=='Flavo,CPH Raft')throw Error('The site menu is not the other sites');
  await sitesMenu.locator('ds-button[menu-item]',{hasText:'CPH Raft'}).click();await page.getByRole('button',{name:'Site: CPH Raft'}).waitFor();same();
- if((await rowsOf()).join()!=='alice-steel-blue.c9y.site*')throw Error('A site without places lists some: '+(await rowsOf()).join());
+ if((await rowsOf()).join()!=='Site*')throw Error('A site without places lists some: '+(await rowsOf()).join());
  await page.mouse.move(700,500);await allSites();
  if(await page.locator('consistency-home .home-title[text="Sites"]').count()!==1)throw Error('The site\'s name does not show Sites');
  // The workspace is renamed where it is shown, in Account.
