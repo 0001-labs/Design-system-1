@@ -71,7 +71,8 @@ try {
  // Back goes to the sites, Forward to the site again.
  await page.goBack();await page.locator('consistency-home ds-card').first().waitFor();same();await page.goForward();await page.locator('consistency-home consistency-site-editor:not([hidden])').waitFor();same();
  await page.evaluate(()=>{document.querySelector('consistency-site-editor').dataset.first='yes';});
- const allSites=async()=>{await page.locator('#home-site').hover();await page.locator('consistency-home ds-select[aria-label="Sites"] ds-button[menu-item]',{hasText:'All sites'}).click();await page.locator('consistency-home ds-card').first().waitFor();await page.mouse.move(700,500);};
+ // Pressing the site's name shows the workspace's sites, as pressing the workspace does.
+ const allSites=async()=>{await page.locator('#home-site').click();await page.locator('consistency-home ds-card').first().waitFor();await page.mouse.move(700,500);};
  await allSites();
  if(await page.locator('consistency-home consistency-site-editor[hidden]').count()!==1)throw Error('Leaving a site took its editor out of the page');
  await page.locator('consistency-home ds-card',{hasText:'CPH Raft'}).click();
@@ -82,17 +83,21 @@ try {
  if(await page.locator('consistency-home ds-sidebar.home-places').count())throw Error('The sidebar still has rows of places');
  for(const width of [300,390,768,1440]){await page.setViewportSize({width,height:800});await page.waitForTimeout(100);if(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth))throw Error(`Home overflows at ${width}`);}
  await page.setViewportSize({width:1440,height:800});
- await page.locator('#home-workspace').hover();const menu=page.locator('consistency-home ds-select[aria-label="Workspace"]');if((await menu.locator('ds-button[menu-item]').allInnerTexts()).map(t=>t.trim()).join()!=='Raft & Co'||await menu.locator('ds-avatar').count())throw Error('The workspace menu is not the other workspaces');
+ // The workspace has no menu: moving to another is Settings → Workspaces, as in Link, every workspace with its avatar and role, this one current.
+ if(await page.locator('consistency-home ds-select[aria-label="Workspace"]').count())throw Error('The workspace still has a menu');
+ const toWorkspace=async name=>{await page.locator('consistency-home ds-sidebar.home-foot').getByText('Settings',{exact:true}).click();await page.getByRole('tab',{name:'Workspaces'}).click();const rows=page.locator('consistency-home ds-list.home-workspaces ds-row');await rows.first().waitFor();return rows.filter({hasText:name});};
+ {await toWorkspace('0001');const rows=await page.locator('consistency-home ds-list.home-workspaces ds-row').evaluateAll(rows=>rows.map(row=>row.querySelector('ds-avatar')?.getAttribute('initial')+':'+row.querySelector('.ds-row__name').textContent+':'+row.querySelector('.ds-row__value').textContent.trim()+':'+(row.getAttribute('current')??'')));
+  if(rows.join()!=='1:0001:Owner:page,R:Raft & Co:Owner:')throw Error('Workspaces: '+rows.join());}
  // Switching shows the other workspace's sites alone, and back again.
- await menu.locator('ds-button[menu-item]',{hasText:'Raft & Co'}).click();await page.getByRole('button',{name:'Workspace: Raft & Co'}).waitFor();await page.locator('consistency-home ds-card[data-site="40RAFT"]').waitFor();same();
+ await (await toWorkspace('Raft & Co')).click();await page.getByRole('button',{name:'Workspace: Raft & Co'}).waitFor();await page.locator('consistency-home ds-card[data-site="40RAFT"]').waitFor();same();
  if(await page.locator('consistency-home ds-card').count()!==1)throw Error('Another workspace\'s sites show beside Raft & Co\'s');
  if(await page.evaluate(()=>localStorage.getItem('consistency-active-workspace'))!=='02RAFT')throw Error('The workspace chosen is not kept');
- await page.mouse.move(700,500);await page.locator('#home-workspace').hover();await menu.locator('ds-button[menu-item]',{hasText:'0001'}).click();await page.getByRole('button',{name:'Workspace: 0001'}).waitFor();await page.locator('consistency-home ds-card[data-site="10VNDG"]').waitFor();
+ await (await toWorkspace('0001')).click();await page.getByRole('button',{name:'Workspace: 0001'}).waitFor();await page.locator('consistency-home ds-card[data-site="10VNDG"]').waitFor();
  await page.mouse.move(700,500);await page.locator('consistency-home ds-sidebar.home-foot').getByText('Settings',{exact:true}).click();await page.locator('consistency-home consistency-domains').waitFor();same();await page.locator('#home-workspace').click();await page.locator('consistency-home ds-card').first().waitFor();if(await page.locator('consistency-home .home-title[text="Sites"]').count()!==1)throw Error('Pressing the workspace does not show Sites');await page.mouse.move(700,500);await page.locator('consistency-home ds-sidebar.home-foot').getByText('Settings',{exact:true}).click();await page.locator('consistency-home consistency-domains').waitFor();same();
  await page.locator('consistency-home consistency-domains').waitFor();
  if(await page.locator('consistency-home .home-title[text="Settings"]').count()!==1)throw Error('The page is not titled Settings');
  const tabs=await page.locator('consistency-home ds-tabs[aria-label="Settings"] [role="tab"]').evaluateAll(tabs=>tabs.map(tab=>tab.textContent.trim()+':'+tab.getAttribute('aria-selected')));
- if(tabs.join()!=='People:false,Domains:true,Account:false')throw Error('Tabs: '+tabs.join());
+ if(tabs.join()!=='Workspaces:false,People:false,Domains:true,Account:false')throw Error('Tabs: '+tabs.join());
  await page.getByRole('tab',{name:'People'}).click();await page.locator('consistency-home consistency-members ds-row',{hasText:'ada@example.com'}).waitFor();same();
  await page.getByRole('tab',{name:'Account'}).click();await page.locator('consistency-home .home-account').waitFor();same();
  if(await page.locator('consistency-home ds-input.home-workspace-field input').inputValue()!=='0001')throw Error('Account does not show the workspace');
@@ -103,23 +108,27 @@ try {
  await page.goto(home+'?open=30SDGA');await page.locator('consistency-home consistency-site-editor:not([hidden])').waitFor();same();
  // An open site's sidebar is the site's: its name at the top, not the workspace, and no rows of its pages.
  await page.getByRole('button',{name:'Site: Søndergården'}).waitFor();
+ if(await page.locator('#home-site ds-avatar[initial="S"]').count()!==1)throw Error('The site\'s name has no avatar, as the workspace\'s has');
+ // The site's own address is the sidebar's first row, current while the site itself is shown.
+ const rowsOf=()=>page.locator('consistency-home ds-sidebar.home-places').evaluate(bar=>[...bar.shadowRoot.querySelectorAll('[data-item]')].map(row=>row.textContent.trim()+(row.getAttribute('aria-current')?'*':'')));
  if(await page.locator('#home-workspace').count())throw Error('The workspace stays in the sidebar of an open site');
  const editor=page.locator('consistency-home consistency-site-editor:not([hidden])');await editor.locator('iframe').waitFor({state:'attached'});
  if(await editor.locator('.consistency-site-bar, ds-select select').count()||await editor.getByText('Open the page').count()||await editor.getByText(/Words save/).count())throw Error('A bar still stands over the site');
  await page.waitForTimeout(200);
  for(const words of ['Forside','Om os','English'])if(await page.locator('consistency-home nav.home-nav').getByText(words,{exact:true}).count())throw Error('The sidebar still lists the site\'s pages: '+words);
  // No place the app has no element for is shown: with neither of the site's two registered, there is no list at all.
- if(await page.locator('consistency-home ds-sidebar.home-places').count())throw Error('Places the app cannot show are listed');
+ if((await rowsOf()).join()!=='soendergaarden.c9y.site*')throw Error('Places the app cannot show are listed, or the address is not first: '+(await rowsOf()).join());
  // A place the app has an element for is listed under the name, in the site's words; one it has not is left out.
  await page.evaluate(()=>{const home=document.querySelector('consistency-home');home.constructor.places.set('lab',site=>Object.assign(document.createElement('div'),{className:'test-place',textContent:'Lab of '+site.name}));home.requestUpdate();});
  const places=page.locator('consistency-home ds-sidebar.home-places');await places.getByText('Lab',{exact:true}).waitFor();
  if(await places.getByText('Made up').count())throw Error('A place the app has no element for is listed');
  await places.getByText('Lab',{exact:true}).click();await page.locator('consistency-home .home-stage .test-place:not([hidden])').waitFor();same();
  if(await page.locator('consistency-home consistency-site-editor:not([hidden])').count())throw Error('The site\'s canvas still shows beside a place');
+ if((await rowsOf()).join()!=='soendergaarden.c9y.site,Lab*')throw Error('The place is not the current row: '+(await rowsOf()).join());
  if(await page.locator('consistency-home consistency-site-editor').count()!==1)throw Error('Showing a place took the site\'s canvas out of the page');
  if(await page.evaluate(()=>history.state?.place)!=='lab')throw Error('The place is not kept in the history');
- // Pressing the site's name shows the site itself again; the place stays, hidden.
- await page.locator('#home-site').click();await page.locator('consistency-home consistency-site-editor:not([hidden])').waitFor();same();
+ // Pressing the site's address shows the site itself again; the place stays, hidden.
+ await places.getByText('soendergaarden.c9y.site',{exact:true}).click();await page.locator('consistency-home consistency-site-editor:not([hidden])').waitFor();same();
  if(await page.locator('consistency-home .home-stage .test-place[hidden]').count()!==1)throw Error('Leaving a place took it out of the page');
  await page.goBack();await page.locator('consistency-home .home-stage .test-place:not([hidden])').waitFor();await page.goForward();await page.locator('consistency-home consistency-site-editor:not([hidden])').waitFor();
  if(!(await page.evaluate(()=>localStorage.getItem('consistency-site-places:30SDGA')))?.includes('"lab"'))throw Error('The site\'s places are not kept for the next visit');
@@ -128,11 +137,11 @@ try {
  await page.locator('consistency-home ds-sidebar.home-places').getByText('Lab',{exact:true}).waitFor({timeout:500});slowPlaces=false;
  await page.mouse.move(700,500);
  await page.locator('#home-site').hover();const sitesMenu=page.locator('consistency-home ds-select[aria-label="Sites"]');
- if((await sitesMenu.locator('ds-button[menu-item]').allInnerTexts()).map(t=>t.trim()).join()!=='Flavo,CPH Raft,All sites')throw Error('The site menu is not the other sites and All sites');
+ if((await sitesMenu.locator('ds-button[menu-item]').allInnerTexts()).map(t=>t.trim()).join()!=='Flavo,CPH Raft')throw Error('The site menu is not the other sites');
  await sitesMenu.locator('ds-button[menu-item]',{hasText:'CPH Raft'}).click();await page.getByRole('button',{name:'Site: CPH Raft'}).waitFor();same();
- if(await page.locator('consistency-home ds-sidebar.home-places').count())throw Error('A site without places lists some');
+ if((await rowsOf()).join()!=='alice-steel-blue.c9y.site*')throw Error('A site without places lists some: '+(await rowsOf()).join());
  await page.mouse.move(700,500);await allSites();
- if(await page.locator('consistency-home .home-title[text="Sites"]').count()!==1)throw Error('All sites does not show Sites');
+ if(await page.locator('consistency-home .home-title[text="Sites"]').count()!==1)throw Error('The site\'s name does not show Sites');
  // The workspace is renamed where it is shown, in Account.
  await page.evaluate(()=>document.querySelector('consistency-home').go({page:'settings',tab:'account'}));
  const field=page.locator('consistency-home ds-input.home-workspace-field input');await field.waitFor();await field.fill('0001 labs');await field.press('Enter');
@@ -143,5 +152,5 @@ try {
  // An older address still opens its place and is taken off.
  await page.goto(home+'#settings/account');await page.locator('consistency-home .home-account').waitFor();same();await page.getByRole('button',{name:'Sign out',exact:true}).click();await page.waitForURL('**/app/signin');
  if(!signedOut)throw Error('Sign out did not end the session');
- console.log('Home workspaces: switching, each one\'s own sites and drafts, People, a site opening in its own workspace; an open site\'s own sidebar of places with no bar over the site, renaming the workspace, Sites as cards only, Settings with Domains and Account tabs, sign out and viewports passed');
+ console.log('Home workspaces: switching, each one\'s own sites and drafts, People, a site opening in its own workspace; an open site\'s own sidebar of places with no bar over the site, renaming the workspace, Sites as cards only, Settings with Workspaces, Domains and Account tabs, the site\'s address as its first row, sign out and viewports passed');
 } finally {await browser.close();await new Promise(resolve=>server.close(resolve));}

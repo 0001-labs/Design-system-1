@@ -48,9 +48,8 @@ try {
   });
   const base = `http://127.0.0.1:${server.address().port}/private-consistency/home.html`;
   await page.goto(base); await page.locator('consistency-home ds-card').first().waitFor();
-  // Settings is the workspace menu's one entry (home.mjs covers the menu itself).
-  await page.locator('#home-workspace').hover();
-  await page.locator('consistency-home ds-select[aria-label="Workspace"] ds-button[menu-item]', { hasText: 'Settings' }).click();
+  // Settings is at the sidebar's foot (home.mjs covers the sidebar itself).
+  await page.locator('consistency-home ds-sidebar.home-foot').getByText('Settings', { exact: true }).click();
   await page.locator('consistency-domains ds-list').first().waitFor();
   if (await page.locator('consistency-home ds-card').count()) throw Error('Projects still shown on Domains');
   const flavo = page.locator('consistency-domains ds-list[heading="Flavo"]');

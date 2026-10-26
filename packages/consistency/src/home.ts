@@ -1,5 +1,6 @@
 import { LitElement, html } from 'lit';
 import { keyed } from 'lit/directives/keyed.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import '../../../DS1/4-page/ds-page';
 import '../../../DS1/3-unit/ds-sidebar';
 import '../../../DS1/3-unit/ds-tabs';
@@ -29,22 +30,25 @@ import './home.css';
 /**
  * Consistency's app, at consistency.site (c9y.site's home leads there): the workspace's sites as cards, each opened
  * here in the editor, and Settings; pressing the workspace shows the sites again. Each client has a workspace of its
- * own (`workspace-choice.ts`): the owner moves between all of them from the workspace's menu, and the people invited
+ * own (`workspace-choice.ts`): the owner moves between all of them in Settings → Workspaces, and the people invited
  * to one see only theirs. The address is consistency.site and
  * nothing more (Joachim, 26 October 2026): where the app stands is its own state, kept in the history so Back and
  * Forward still move between places. Sites are known by their IDv1 codes. A site once opened stays open, hidden
  * while another is shown, so going back to it is instant: no reload and no sign-in again. With a site open, the
- * sidebar is that site's: its name at the top (pressing it shows the site itself; its menu switches to another or
- * to all sites) and the site's places under it, the menus the platform says it has and the app has an element for
- * (`places/`). There is no list of pages: the owner moves between pages by the site's own links.
+ * sidebar is that site's: its name at the top (pressing it shows the workspace's sites; its menu switches to another
+ * site), then the site's own address, which shows the site itself and is current while it is shown, and the site's
+ * places under it, the menus the platform says it has and the app has an element for (`places/`). There is no list of pages: the owner moves between pages by the site's own links.
  */
 
 /** What the app shows: the sites, one site (by its IDv1 code) on its canvas or at one of its places, or Settings at one of its tabs. */
 export type Place = { page: 'sites' } | { page: 'site'; code: string; place?: string } | { page: 'settings'; tab: SettingsTab };
-export type SettingsTab = 'members' | 'domains' | 'account';
-const TABS: SettingsTab[] = ['members', 'domains', 'account'];
+export type SettingsTab = 'workspaces' | 'members' | 'domains' | 'account';
+const TABS: SettingsTab[] = ['workspaces', 'members', 'domains', 'account'];
 const SITE_CODE = /^\d{2}[A-Za-z]{4}$/;
 const PLACE_ID = /^[a-z][a-z0-9-]{0,31}$/;
+/** The sidebar row of the site itself, its address; never a place's id, which has no colon. */
+const SITE_ROW = ':site';
+const ROLE_WORDS: Record<WorkspaceSummary['role'], string> = { owner: 'Owner', admin: 'Admin', editor: 'Editor' };
 /** A place as the history keeps it, or the sites for anything else. */
 export function placeFrom(state: unknown): Place {
   const place = state as Partial<Place> | null;
@@ -64,6 +68,7 @@ export function openingPlace(search: string, hash: string, state: unknown): Plac
   if (open && SITE_CODE.test(open)) return { page: 'site', code: open };
   if (hash === '#domains' || hash === '#settings' || hash === '#settings/domains') return { page: 'settings', tab: 'domains' };
   if (hash === '#settings/account') return { page: 'settings', tab: 'account' };
+  if (hash === '#settings/workspaces') return { page: 'settings', tab: 'workspaces' };
   return placeFrom(state);
 }
 
@@ -318,23 +323,20 @@ export class ConsistencyHome extends LitElement {
     const settings = this.place.page === 'settings';
     const open = this.place.page === 'site' ? (this.place as { code: string }).code : '';
     const site = open ? this.sites.find(item => item.code === open) : undefined;
-    const others = this.workspaces.filter(each => each.code !== this.workspace);
     const drafts = draftWords(current);
     return html`<ds-page layout="sidebar" fill drawer>
       ${site ? this.siteNav(site) : html`<nav slot="nav" class="home-nav" aria-label="Consistency">
         <div class="home-workspace" aria-label="Workspace">
           <ds-button id="home-workspace" class="home-workspace-name" label=${`Workspace: ${name}`} @click=${() => this.go({ page: 'sites' })}>
-            <ds-avatar initial=${workspaceInitial(name)} outlined plain aria-hidden="true"></ds-avatar>${name}<ds-icon type="chevron-down"></ds-icon>
+            <ds-avatar initial=${workspaceInitial(name)} outlined plain aria-hidden="true"></ds-avatar>${name}
           </ds-button>
-          ${others.length ? html`<ds-select for="home-workspace" hover aria-label="Workspace">
-            ${others.map(each => html`<ds-button menu-item data-workspace=${each.code} @click=${() => { this.choose(each.code); this.go({ page: 'sites' }); }}>${each.name}</ds-button>`)}
-          </ds-select>` : ''}
           <ds-button id="home-notifications" icon label="Notifications"><ds-icon type="notifications"></ds-icon></ds-button>
           <ds-select for="home-notifications" aria-label="Notifications" role="dialog">
             <ds-text data-ds-menu-label tone="muted" literal text="No notifications yet"></ds-text>
           </ds-select>
         </div>
-        <!-- The workspace's own Settings at the sidebar's foot: each workspace has its people, domains and account. -->
+        <!-- The workspace's own Settings at the sidebar's foot: each workspace has its people, domains and account, and
+             Workspaces moves to another, as Link's Settings does. -->
         <ds-sidebar class="home-foot" label="Workspace" .items=${[{ id: 'settings', label: 'Settings', current: settings }]}
           @sidebar-activate=${() => this.go({ page: 'settings', tab: 'domains' })}></ds-sidebar>
       </nav>`}
@@ -348,22 +350,28 @@ export class ConsistencyHome extends LitElement {
     ${this.peoplePanel(current)}`;
   }
 
-  /** An open site's sidebar: its name, which shows the site and whose menu goes to another, and its places. */
+  /**
+   * An open site's sidebar, as the workspace's is: its name, which shows the workspace's sites and whose menu goes to
+   * another site, then the site's own address, which shows the site itself, and its places.
+   */
   private siteNav(site: SiteSummary) {
     const current = this.placeOf(this.place);
-    const items = shownPlaces(this.placesFor(site.code)).map(place => ({ id: place.id, label: place.label, current: place.id === current }));
+    const items = [
+      { id: SITE_ROW, label: site.domain ?? site.address ?? siteHost(site), current: !current },
+      ...shownPlaces(this.placesFor(site.code)).map(place => ({ id: place.id, label: place.label, current: place.id === current })),
+    ];
     const others = this.sites.filter(item => item.code !== site.code);
     return html`<nav slot="nav" class="home-nav" aria-label=${site.name}>
       <div class="home-workspace" aria-label="Site">
-        <ds-button id="home-site" class="home-workspace-name" label=${`Site: ${site.name}`} @click=${() => this.go({ page: 'site', code: site.code })}>${site.name}<ds-icon type="chevron-down"></ds-icon></ds-button>
-        <ds-select for="home-site" hover aria-label="Sites">
+        <ds-button id="home-site" class="home-workspace-name" label=${`Site: ${site.name}`} @click=${() => this.go({ page: 'sites' })}>
+          <ds-avatar initial=${workspaceInitial(site.name)} outlined plain aria-hidden="true"></ds-avatar>${site.name}${others.length ? html`<ds-icon type="chevron-down"></ds-icon>` : ''}
+        </ds-button>
+        ${others.length ? html`<ds-select for="home-site" hover aria-label="Sites">
           ${others.map(item => html`<ds-button menu-item @click=${() => this.go({ page: 'site', code: item.code })}>${item.name}</ds-button>`)}
-          ${others.length ? html`<hr>` : ''}
-          <ds-button menu-item @click=${() => this.go({ page: 'sites' })}>All sites</ds-button>
-        </ds-select>
+        </ds-select>` : ''}
       </div>
-      ${items.length ? html`<ds-sidebar class="home-places" label=${site.name} .items=${items}
-        @sidebar-activate=${(event: CustomEvent<{ id: string }>) => this.go({ page: 'site', code: site.code, place: event.detail.id })}></ds-sidebar>` : ''}
+      <ds-sidebar class="home-places" label=${site.name} .items=${items}
+        @sidebar-activate=${(event: CustomEvent<{ id: string }>) => this.go(event.detail.id === SITE_ROW ? { page: 'site', code: site.code } : { page: 'site', code: site.code, place: event.detail.id })}></ds-sidebar>
     </nav>`;
   }
 
@@ -402,16 +410,33 @@ export class ConsistencyHome extends LitElement {
     </ds-overlay>`;
   }
 
-  /** Settings as Money draws it: text tabs under the title, each tab its own address. People is for the workspace's admins and the owner. */
+  /** Every workspace the person may open, each with its avatar, name and role; the one the app is in is current. */
+  private workspaceRows() {
+    return html`<ds-list class="home-workspaces" aria-label="Workspaces">${this.workspaces.map(each => {
+      const here = each.code === this.workspace;
+      const role = ROLE_WORDS[each.role];
+      return html`<ds-row interactive data-workspace=${each.code} current=${ifDefined(here ? 'page' : undefined)} label=${[each.name, role, here ? 'current workspace' : ''].filter(Boolean).join(', ')}
+        @ds-row-press=${() => { if (!here) this.choose(each.code); this.go({ page: 'sites' }); }}>
+        <ds-avatar initial=${workspaceInitial(each.name)} outlined plain aria-hidden="true"></ds-avatar><span class="ds-row__name">${each.name}</span>
+        <span class="ds-row__value">${role}${here ? html`<ds-icon type="check" aria-hidden="true"></ds-icon>` : ''}</span>
+      </ds-row>`;
+    })}</ds-list>`;
+  }
+
+  /**
+   * Settings as Money draws it: text tabs under the title, each tab its own address. Workspaces lists every workspace
+   * the person may open, as Link's Settings does, and pressing one moves to its sites. People is for the workspace's
+   * admins and the owner.
+   */
   private settings(asked: SettingsTab, current: WorkspaceSummary | undefined) {
     const manage = canManage(current);
-    const tabs: { id: SettingsTab; label: string }[] = [...(manage ? [{ id: 'members' as const, label: 'People' }] : []), { id: 'domains', label: 'Domains' }, { id: 'account', label: 'Account' }];
+    const tabs: { id: SettingsTab; label: string }[] = [{ id: 'workspaces', label: 'Workspaces' }, ...(manage ? [{ id: 'members' as const, label: 'People' }] : []), { id: 'domains', label: 'Domains' }, { id: 'account', label: 'Account' }];
     const tab = tabs.some(item => item.id === asked) ? asked : 'domains';
     const name = current?.name ?? '';
     return html`<div class="home-settings">
-      <ds-tabs text class="home-settings-tabs" aria-label="Settings">${tabs.map(item => html`<ds-button control="host" role="tab" ?active=${tab === item.id} aria-selected=${String(tab === item.id)} tabindex=${tab === item.id ? 0 : -1}
+      <ds-tabs text wrap class="home-settings-tabs" aria-label="Settings">${tabs.map(item => html`<ds-button control="host" role="tab" ?active=${tab === item.id} aria-selected=${String(tab === item.id)} tabindex=${tab === item.id ? 0 : -1}
         @click=${() => this.go({ page: 'settings', tab: item.id })}>${item.label}</ds-button>`)}</ds-tabs>
-      ${tab === 'members' ? html`<consistency-members .workspace=${this.workspace}></consistency-members>` : tab === 'domains' ? html`${keyed(this.workspace, html`<consistency-domains></consistency-domains>`)}` : html`<section class="home-account" aria-label="Account">
+      ${tab === 'workspaces' ? this.workspaceRows() : tab === 'members' ? html`<consistency-members .workspace=${this.workspace}></consistency-members>` : tab === 'domains' ? html`${keyed(this.workspace, html`<consistency-domains></consistency-domains>`)}` : html`<section class="home-account" aria-label="Account">
         <ds-list aria-label="Account"><ds-row><span class="ds-row__name">Workspace</span><span class="ds-row__value">
           <ds-input class="home-workspace-field" aria-label="Workspace" maxlength="80" autocomplete="organization" ?disabled=${(this.naming?.busy ?? false) || !manage}
             placeholder="My company" .value=${this.naming?.value ?? name}
