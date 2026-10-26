@@ -988,7 +988,7 @@ export class Calendar extends CalendarBase {
     </div>`;
   }
 
-  private renderDay(day: Day, column: number, inView = sameMonth(day, this.shownMonth), tabDay = this.tabDay, label?: DayLabel) {
+  private renderDay(day: Day, inView = sameMonth(day, this.shownMonth), tabDay = this.tabDay, label?: DayLabel) {
     const outside = !inView;
     if (outside && !this.outsideDays) {
       return html`<div role="gridcell" class="day outside" part="day outside">${label?.weekday || label?.week
@@ -1368,7 +1368,7 @@ export class Calendar extends CalendarBase {
         <div role="row" class="weekdays" part="weekdays">
           ${short.map((name, index) => html`<span role="columnheader" class="weekday" aria-label=${long[index]}>${name}</span>`)}
         </div>
-        ${weeks.map((week, row) => html`<div role="row" class="week" part="week">${week.map((day, column) => this.renderDay(day, column, inView(day), tabDay, this.compact ? undefined : {
+        ${weeks.map((week, row) => html`<div role="row" class="week" part="week">${week.map((day, column) => this.renderDay(day, inView(day), tabDay, this.compact ? undefined : {
           // A full month names its days inside the first week's boxes, at their start, today's weekday in today's red.
           weekday: row === 0 ? inside[column] : undefined,
           today: row === 0 && todayColumn === column,
