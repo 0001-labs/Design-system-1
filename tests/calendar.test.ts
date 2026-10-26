@@ -601,9 +601,9 @@ test("the week view shows one week with every event, and the day view its hours"
   expect(calendar.date).toBe("2026-10-27");
 });
 
-test("a month's frame has a card's rounded corners on its four corner days", () => {
+test("a month's frame is rounded on its four corner days, three cards' corners and at most a square", () => {
   const css = readFileSync(join(import.meta.dirname, "../DS1/3-unit/styles/ds-calendar.css"), "utf8");
-  expect(css).toMatch(/--ds-calendar-radius: var\(--ds-radius-card/);
+  expect(css).toMatch(/--ds-calendar-radius: clamp\(0px, calc\(3 \* var\(--ds-radius-card/);
   for (const corner of ["start-start", "start-end", "end-start", "end-end"]) expect(css).toContain(`border-${corner}-radius: var(--ds-calendar-radius)`);
 });
 
@@ -739,4 +739,24 @@ test("views can be a list with the page's own words, and a name the calendar doe
   await calendar.updateComplete;
   expect(calendar.shownView).toBe("month");
   expect(root.querySelector("ds-button.views")).toBeNull();
+});
+
+test("a full month names its days inside the first week, writes the week's number on its first day and marks today's weekday", async () => {
+  const calendar = await mount<Calendar>(`<ds-calendar month="2026-10" week-start="1" week-numbers today="2026-10-26"></ds-calendar>`);
+  const root = calendar.shadowRoot!;
+  const first = root.querySelector(".week")!;
+  expect([...first.querySelectorAll(".weekday-name")].map(name => name.textContent)).toEqual(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]);
+  expect(root.querySelectorAll(".week + .week .weekday-name")).toHaveLength(0);
+  // The month starts on a Thursday: Monday's box is empty and still names its day and its week.
+  expect(first.querySelector(".day.outside .week-number")!.textContent).toBe("W40");
+  expect(first.querySelector(".weekday-name[data-today]")!.textContent).toBe("Mon");
+  expect(cell(calendar, "2026-10-26").querySelector(".week-number")!.textContent).toBe("W44");
+  // A step back, Today and a step on, in that order.
+  expect([...root.querySelector(".controls")!.children].map(button => button.getAttribute("part"))).toEqual(["previous", "today", "next"]);
+});
+
+test("a week from Sunday takes its Monday's number", async () => {
+  const calendar = await mount<Calendar>(`<ds-calendar month="2026-10" week-start="0" week-numbers></ds-calendar>`);
+  expect(cell(calendar, "2026-10-04").querySelector(".week-number")!.textContent).toBe("W41");
+  expect(calendar.shadowRoot!.querySelector(".weekday-name")!.textContent).toBe("Sun");
 });

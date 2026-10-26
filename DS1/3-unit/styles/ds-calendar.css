@@ -3,7 +3,10 @@
  * one when compact) and, beside its date's square, holds --ds-calendar-lines
  * one-square lines of events and one square to spare. Every line of words
  * stands on the lower sixteen of its square. The boxes are hairlines centred
- * on the grid lines; today is a red disc nine tenths of a square across.
+ * on the grid lines, the month's frame rounded more than a card, as a larger
+ * thing wears a larger curve; a full month names its days inside the first
+ * week's boxes, and writes a week's number on its first day; today is a red
+ * disc nine tenths of a square across, its weekday's name in the same red.
  *
  * A picker is a field's face: one control high at the foot of its square,
  * as wide as its words (it hugs them, as a button does), its words 4px in and the chevron-down icon
@@ -17,10 +20,13 @@
 :host {
   --ds-calendar-day: calc(var(--ds-unit) * var(--ds-calendar-day-squares, 4));
   --ds-calendar-day-height: calc(var(--ds-unit) * (var(--ds-calendar-lines, 2) + 2));
-  /* The month's height under its header, fixed: the weekdays and six weeks. Every view takes it with `fixed`. */
-  --ds-calendar-area: calc(var(--ds-unit) + 6 * var(--ds-calendar-day-height));
+  /* The weekdays' own row over the days: none in a full month, whose first week names them; a square when compact. */
+  --ds-calendar-weekdays: 0px;
+  /* The month's height under its header, fixed: six weeks. Every view takes it with `fixed`. */
+  --ds-calendar-area: calc(var(--ds-calendar-weekdays) + 6 * var(--ds-calendar-day-height));
   --ds-calendar-line: 1px solid var(--ds-border-color);
-  --ds-calendar-radius: var(--ds-radius-card, calc(4px * var(--ds-sf, 1)));
+  /* Three times a card's corner, at most a square: twelve pixels on the base card, none where cards are square. */
+  --ds-calendar-radius: clamp(0px, calc(3 * var(--ds-radius-card, calc(4px * var(--ds-sf, 1)))), var(--ds-unit));
   --ds-calendar-today: var(--ds-red-for-blood);
   --ds-calendar-today-ink: var(--ds-white, #fff);
   --ds-calendar-selected: var(--ds-sharp-blue);
@@ -53,6 +59,7 @@
 :host([hidden]) { display: none !important; }
 /* A compact day is square: one square, or two where the month has room. Its marks grow with it. */
 :host([compact]) {
+  --ds-calendar-weekdays: var(--ds-unit);
   --ds-calendar-day-height: var(--ds-calendar-day);
   --ds-calendar-mark: calc(var(--ds-unit) * (var(--ds-calendar-day-squares, 1) * 0.75 + 0.15));
 }
@@ -84,17 +91,40 @@
   align-items: flex-end;
   gap: 0;
 }
-/* Each arrow is a chevron on its own square, one control high at the square's foot,
- * in the title grey; the pointer fills it with the system's corners and inks it. */
-.nav {
+/* A step back, Today and a step on: a plain split button, the segments a hair apart and one
+ * control high at the square's foot, their words and arrows in the title grey on no ground in
+ * any state; the pointer inks them. */
+.controls { gap: 1px; }
+:is(.nav, .today-button) {
+  appearance: none;
+  box-sizing: border-box;
+  display: inline-flex;
   flex: 0 0 auto;
-  width: var(--ds-unit);
+  align-items: center;
+  justify-content: center;
   height: var(--ds-control-height);
+  margin: 0;
+  padding: 0 calc(5px * var(--ds-sf, 1));
+  border: 0;
   border-radius: var(--ds-radius);
+  background: transparent;
   color: var(--ds-title-color);
+  font: inherit;
+  line-height: var(--ds-control-height);
+  letter-spacing: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
-.nav:hover:not(:disabled) { background: var(--ds-fill); color: var(--ds-text-color); }
+.nav { width: var(--ds-control-height); padding: 0; }
+.nav > ds-icon { --ds-icon-size: 16px; color: inherit; }
+:is(.nav, .today-button):hover:not(:disabled) { color: var(--ds-text-color); }
+:is(.nav, .today-button):focus-visible { outline: 1px solid currentColor; outline-offset: -2px; }
+.nav:disabled { cursor: default; opacity: 0.5; }
 :host(:dir(rtl)) .nav > ds-icon { transform: scaleX(-1); }
+/* A compact month's arrows are chevrons a square wide each, filled under the pointer. */
+:host([compact]) .nav { width: var(--ds-unit); }
+:host([compact]) .nav:hover:not(:disabled) { background: var(--ds-fill); }
 
 /* The title as a plain button, its words alone: pressing it travels up to the months of the year,
  * then to twelve years. One control high at the square's foot, the words on the sixteen where the
@@ -133,7 +163,7 @@
  * height, so nothing below moves between levels. */
 .picks {
   box-sizing: border-box;
-  height: calc(var(--ds-unit) + var(--ds-calendar-weeks, 6) * var(--ds-calendar-day-height));
+  height: calc(var(--ds-calendar-weekdays) + var(--ds-calendar-weeks, 6) * var(--ds-calendar-day-height));
   outline: none;
 }
 .pick-row {
@@ -219,6 +249,15 @@
   white-space: nowrap;
 }
 :host([compact]) .weekday { padding-inline: 0; text-align: center; }
+/* A full month's weekdays are named inside its first week's boxes; the row stays for those who listen. */
+:host(:not([compact])) .weekdays {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
 
 /* A day's box: hairlines on the grid lines, top and start; the last column
  * and the last week close it at the end and the foot. */
@@ -259,7 +298,8 @@
 :host([compact]) .day:focus-visible { outline: none; }
 :host([compact]) .day:focus-visible .date { outline: 2px solid var(--ds-focus-ring); outline-offset: -1px; }
 
-/* The date: on the first square, at the end of a wide day, in the title grey. */
+/* The date: on the first square, at the end of a wide day, in the title grey; before it, at the
+ * day's start, the first week's weekday name and the week's number in the compressed face. */
 .date-line {
   box-sizing: border-box;
   display: flex;
@@ -270,24 +310,31 @@
   padding-inline: var(--ds-calendar-pad);
 }
 .date {
+  margin-inline-start: auto;
   color: var(--ds-title-color);
   font-variant-numeric: tabular-nums;
 }
+.weekday-name,
 .week-number {
-  margin-inline-end: auto;
+  flex: 0 0 auto;
   color: var(--ds-title-color);
-  font-family: var(--ds-typeface-compressed);
+  white-space: nowrap;
 }
+.weekday-name[data-today] { color: var(--ds-calendar-today); }
+.week-number { font-family: var(--ds-typeface-compressed); }
+.day.outside .date-line { justify-content: flex-start; }
 
 /* A compact day: the date centred in its square, in the ink; with events,
  * the empty days fall back to the title grey and the busy ones keep the ink. */
 :host([compact]) .date-line { justify-content: center; padding: 0; }
+:host([compact]) .date { margin-inline-start: 0; }
 :host([compact]) .date { color: var(--ds-text-color); }
 :host([compact][data-events]) .day:not([data-busy]) .date { color: var(--ds-title-color); }
 :host([compact][selectable]) .day[data-day]:not([aria-disabled="true"], [data-today], [data-selected]):hover .date { background: var(--ds-fill); }
 
 /* Today and the selected day: a disc nine tenths of a square, centred on the date's square. */
-.day:is([data-today], [data-selected]) .date-line { align-items: center; padding-inline-end: calc(var(--ds-unit) * 0.05); }
+.day:is([data-today], [data-selected]) .date-line { padding-inline-end: calc(var(--ds-unit) * 0.05); }
+.day:is([data-today], [data-selected]) .date { align-self: center; }
 :host([compact]) .day:is([data-today], [data-selected]) .date-line { padding: 0; }
 .date {
   box-sizing: border-box;
@@ -307,7 +354,8 @@
 .day[aria-disabled="true"] .date { color: var(--ds-title-color); opacity: 0.5; }
 
 /* Heat: the date's mark filled by its step, a picture's corners, inside the day's square; today and the selection draw over it. */
-.day[data-heat]:not([data-today], [data-selected]) .date-line { align-items: center; padding-inline-end: calc(var(--ds-unit) * 0.05); }
+.day[data-heat]:not([data-today], [data-selected]) .date-line { padding-inline-end: calc(var(--ds-unit) * 0.05); }
+.day[data-heat]:not([data-today], [data-selected]) .date { align-self: center; }
 .day[data-heat]:not([data-today], [data-selected]) .date {
   min-width: var(--ds-calendar-mark);
   height: var(--ds-calendar-mark);
@@ -400,16 +448,6 @@
 :host([compact]) .day[data-last]::before { inset-inline-end: 50%; }
 :host([compact]) .day[data-inside] .date-line { align-items: center; padding: 0; }
 :host([compact][selectable]) .day[data-inside]:hover .date { background: transparent; }
-
-/* Today, as words in the title grey beside the arrows. */
-.today-button {
-  height: var(--ds-control-height);
-  padding-inline: calc(4px * var(--ds-sf, 1));
-  border: 0;
-  background: transparent;
-  color: var(--ds-title-color);
-}
-.today-button:hover { background: var(--ds-fill); color: var(--ds-text-color); }
 
 /* In a compact month the pointer's day and the chosen day take squares with the system's corners; today keeps its disc. */
 :host([compact]) .date { border-radius: var(--ds-radius); }
@@ -677,7 +715,7 @@
  * grow to it, the day's hours fill what the untimed events leave, the
  * swimlane's rows fill it under the months and dates and scroll past it, and a
  * page's own view gets it and scrolls inside. */
-:host([fixed]:not([compact])) .grid[data-view="week"] .week .day { height: calc(var(--ds-calendar-area) - var(--ds-unit)); }
+:host([fixed]:not([compact])) .grid[data-view="week"] .week .day { height: var(--ds-calendar-area); }
 :host([fixed]) :is(.swimlane, .own-view, .day-view) { box-sizing: border-box; height: var(--ds-calendar-area); }
 :host([fixed]) .own-view { overflow: auto; }
 :host([fixed]) .day-view { display: flex; flex-direction: column; }

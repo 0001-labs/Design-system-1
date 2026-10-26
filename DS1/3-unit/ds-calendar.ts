@@ -9,7 +9,9 @@
 // with its name written once, and words that do not fit fade out at the end.
 // By default a
 // day is four squares wide and four high (its date on the first square, two
-// lines of events, one square to spare), drawn in hairline boxes. `compact`
+// lines of events, one square to spare), drawn in hairline boxes with a frame
+// rounded more than a card's; the first week names its days inside its boxes,
+// and a step back, Today and a step on are one plain split. `compact`
 // makes a day one square: the small month a year is drawn from. `picker`
 // makes the calendar a field that opens that small month below it, with the
 // first and last day written out where they can be typed, a switch for a
@@ -125,6 +127,9 @@ const daysBetween = (from: Day, to: Day) => Math.round((Date.UTC(+to.slice(0, 4)
 
 /** Detail of `view-change`. */
 export interface CalendarViewDetail { view: CalendarView }
+
+/** What a full month's day writes before its date: its weekday's name (the first week), and its week's number. */
+type DayLabel = { weekday?: string; today?: boolean; week?: number };
 
 export type CalendarLine = { event: CalendarEvent; span: number } | "on" | null;
 
@@ -934,13 +939,13 @@ export class Calendar extends CalendarBase {
         ? [Boolean(min && year - 1 < Number(min.slice(0, 4))), Boolean(max && year + 1 > Number(max.slice(0, 4)))]
         : [Boolean(min && span[0] - 1 < Number(min.slice(0, 4))), Boolean(max && span[0] + 12 > Number(max.slice(0, 4)))];
     const arrow = (which: "previous" | "next") => html`<button
-      class="ds-button ds-button--icon nav"
+      class="nav"
       part=${which}
       type="button"
       aria-label=${this.words(labels[which === "previous" ? 0 : 1])}
       ?disabled=${blocked[which === "previous" ? 0 : 1]}
       @click=${() => this.step(which === "previous" ? -1 : 1)}
-    ><ds-icon type=${which === "previous" ? "chevron-left" : "chevron-right"} size="large" aria-hidden="true"></ds-icon></button>`;
+    ><ds-icon type=${(this.compact ? "chevron-" : "") + (which === "previous" ? "left" : "right")} size=${this.compact ? "large" : nothing} aria-hidden="true"></ds-icon></button>`;
     const title = level === "days"
       ? view === "week"
         ? this.rangeTitle(shownDays[0], shownDays[6])
@@ -975,17 +980,21 @@ export class Calendar extends CalendarBase {
         .value=${view}
         @change=${this.onViewChange}
       ></ds-button>` : nothing}
-      <span class="controls">
-        ${this.noToday || this.squaresPerDay < 2 ? nothing : html`<button class="ds-button today-button" part="today" type="button" @click=${() => this.showToday()}>${this.words("Today")}</button>`}
+      <span class="controls" role="group" aria-label=${this.words("Date")}>
         ${arrow("previous")}
+        ${this.noToday || this.squaresPerDay < 2 ? nothing : html`<button class="today-button" part="today" type="button" @click=${() => this.showToday()}>${this.words("Today")}</button>`}
         ${arrow("next")}
       </span>
     </div>`;
   }
 
-  private renderDay(day: Day, column: number, inView = sameMonth(day, this.shownMonth), tabDay = this.tabDay) {
+  private renderDay(day: Day, column: number, inView = sameMonth(day, this.shownMonth), tabDay = this.tabDay, label?: DayLabel) {
     const outside = !inView;
-    if (outside && !this.outsideDays) return html`<div role="gridcell" class="day outside" part="day outside"></div>`;
+    if (outside && !this.outsideDays) {
+      return html`<div role="gridcell" class="day outside" part="day outside">${label?.weekday || label?.week
+        ? html`<span class="date-line" aria-hidden="true">${this.renderLabel(label)}</span>`
+        : nothing}</div>`;
+    }
     const events = this.eventsOn(day);
     const lines = this.eventLines;
     const isToday = day === this.todayDay;
@@ -1016,7 +1025,7 @@ export class Calendar extends CalendarBase {
       ?data-open=${unfolded}
     >
       <span class="date-line" aria-hidden="true">
-        ${this.weekNumbers && column === 0 && !this.compact ? html`<span class="week-number">${this.words("W{week}", { week: isoWeek(day) })}</span>` : nothing}
+        ${label ? this.renderLabel(label) : nothing}
         <span class="date">${dateNumber(day)}</span>
       </span>
       ${lines > 0 && events.length
@@ -1030,6 +1039,13 @@ export class Calendar extends CalendarBase {
           </span>`
         : nothing}
     </div>`;
+  }
+
+  /** What a day writes before its date: its weekday's name in the first week, and the week's number on its first day. */
+  private renderLabel(label: DayLabel) {
+    return html`${label.weekday ? html`<span class="weekday-name" ?data-today=${label.today}>${label.weekday}</span>` : nothing}${label.week
+      ? html`<span class="week-number">${this.words("W{week}", { week: label.week })}</span>`
+      : nothing}`;
   }
 
   /** A week's days as one title: "Oct 18 – 24, 2026", in the language's own way. */
@@ -1318,6 +1334,10 @@ export class Calendar extends CalendarBase {
         : weekdayNames(first, "short").map(name => (/^\p{Script=Latin}/u.test(name) ? name.replace(/\.$/, "").slice(0, 2) : name))
       : weekdayNames(first, "short");
     const long = weekdayNames(first, "long");
+    // Inside a day's box the name is short where the day is three squares or more, and a letter where it is narrower.
+    const inside = this.squaresPerDay >= 3 ? short : weekdayNames(first, "narrow");
+    const today = this.todayDay;
+    const todayColumn = drawn(today) && weeks.some(week => week.includes(today)) ? (weekdayOf(today) - first + 7) % 7 : -1;
     const swipes = !this.noHeader;
     return html`<div
       class="calendar"
@@ -1348,7 +1368,13 @@ export class Calendar extends CalendarBase {
         <div role="row" class="weekdays" part="weekdays">
           ${short.map((name, index) => html`<span role="columnheader" class="weekday" aria-label=${long[index]}>${name}</span>`)}
         </div>
-        ${weeks.map(week => html`<div role="row" class="week" part="week">${week.map((day, column) => this.renderDay(day, column, inView(day), tabDay))}</div>`)}
+        ${weeks.map((week, row) => html`<div role="row" class="week" part="week">${week.map((day, column) => this.renderDay(day, column, inView(day), tabDay, this.compact ? undefined : {
+          // A full month names its days inside the first week's boxes, at their start, today's weekday in today's red.
+          weekday: row === 0 ? inside[column] : undefined,
+          today: row === 0 && todayColumn === column,
+          // The week's number on its first day, counted from the week's middle so a week from Sunday takes its Monday's.
+          week: this.weekNumbers && column === 0 && this.squaresPerDay >= 3 && week.some(drawn) ? isoWeek(addDays(day, 3)) : undefined,
+        }))}</div>`)}
       </div>`}
       ${this.renderClear()}
     </div>`;

@@ -122,6 +122,7 @@ corners take the current shape; interior joins stay square.
 ```html
 <ds-button split aria-label="View" options="day:Day,week:Week,month:Month" value="week"></ds-button>
 <ds-button split actions aria-label="Date" options="back:@left:Back,today:Today,next:@right:Next"></ds-button>
+<ds-button split actions plain aria-label="Date" options="back:@left:Back,today:Today,next:@right:Next"></ds-button>
 ```
 
 ## Choices and actions
@@ -158,7 +159,7 @@ import { Button } from './design/react/button';
   segments={[{ value: "undo", label: "Undo", icon: "undo" }, { value: "redo", label: "Redo", icon: "redo", disabled: !canRedo }]} />
 ```
 
-Supplying `value` keeps the choice controlled; omitting it selects repeated actions. `compact` keeps a single-character label square and gives longer numeric labels the compressed face. Outside corners follow the shared shape; interior joins stay square. The native segments retain Tab, Enter, Space and disabled-fieldset behavior. This mode groups choices or actions; it does not create a dropdown menu.
+Supplying `value` keeps the choice controlled; omitting it selects repeated actions. `plain` draws the segments' words and icons alone, on no ground in any state, in the muted ink that the pointer and the chosen segment ink, as text tabs do: a calendar's step back, Today and step on. `compact` keeps a single-character label square and gives longer numeric labels the compressed face. Outside corners follow the shared shape; interior joins stay square. The native segments retain Tab, Enter, Space and disabled-fieldset behavior. This mode groups choices or actions; it does not create a dropdown menu.
 
 There is no separate split element: select `button` in Sync 1 and write `<ds-button split>` or `<Button split>`.
 

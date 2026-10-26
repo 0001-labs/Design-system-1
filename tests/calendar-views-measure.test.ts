@@ -37,7 +37,7 @@ test("fixed, the month, the week, the day, the swimlane and a page's own view ar
     }
     return seen;
   });
-  // The header (a square, a square below it), the weekdays and six weeks four squares high: 27 squares.
-  expect(heights.month).toBeCloseTo(27 * 20, 0);
+  // The header (a square, a square below it) and six weeks four squares high, the weekdays named inside the first: 26 squares.
+  expect(heights.month).toBeCloseTo(26 * 20, 0);
   for (const view of ["week", "day", "swimlane", "own"]) expect(heights[view], view).toBeCloseTo(heights.month, 0);
 });
