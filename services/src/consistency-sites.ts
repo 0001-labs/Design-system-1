@@ -2,7 +2,7 @@
  * Consistency's app asking a site, as the owner: `/api/consistency/sites/<code>/…` on the Consistency hosts, answered
  * by the platform's `ConsistencyWorkspace` through the service binding and nothing else.
  *
- * - `api/<route>`: one of the site engine's own routes (`/team/api/<route>`) or Flavo's `business` and `design`, from the
+ * - `api/<route>`: one of the site engine's own routes (`/team/api/<route>`) or Flavo's `business`, from the
  *   allowlist below with the methods each takes, the query string passed on. The platform asks that site's own
  *   object as the owner and checks the same list again. `pages`, `page?path=` and `edit` are the older addresses
  *   of `api/pages`, `api/page` and `api/edit`.
@@ -38,8 +38,9 @@ export const API_ROUTES = [
   allow('giftcards', 'GET', 'POST'), allow(`giftcards/${UUID}`, 'GET'), allow(`giftcards/${UUID}/pdf`, 'GET'), allow(`giftcards/${UUID}/(?:resend|void)`, 'POST'),
   allow('orders', 'GET'), allow('orders/config', 'GET'), allow(`orders/${UUID}`, 'GET'),
   allow(`orders/${UUID}/(?:confirm|cancel|mark-paid|invoice|fulfil)`, 'POST'), allow(`orders/${UUID}/note`, 'PUT'), allow('order-settings', 'GET', 'PUT'),
-  // Flavo's own: its business operations and its homepage design (the platform answers them for Flavo alone).
-  allow('business', 'POST'), allow('design', 'GET', 'PUT'),
+  // Flavo's own: its business operations (the platform answers them for Flavo alone). Its design route went with its
+  // design chooser (26 October 2026: Gallery is its one homepage design).
+  allow('business', 'POST'),
 ] as const;
 
 /** The allowlisted route a path under `api/` names, or null. */

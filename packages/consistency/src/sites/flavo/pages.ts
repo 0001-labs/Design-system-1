@@ -1,97 +1,101 @@
 /**
- * Indhold and Projekter, Flavo's content pages in Consistency's app, ported from the old CMS's page table and editor
- * (`src/components/Cms.ts`, deleted 26 October 2026): Indhold is the site's pages, Projekter those under
- * `/projekter/`, searched by title and address, each with whether it is shown.
+ * Flavo's own pages under the app's shared Pages place (Joachim, 26 October 2026: every page and its address is under
+ * Pages), ported from the old CMS's page table and editor (`src/components/Cms.ts`, deleted 26 October 2026). There
+ * are no Indhold or Projekter menus any more: the content pages and the project pages (under `/projekter/`) of the
+ * business store (`catalogue:pages`) are rows of Pages, beside the pages of the site engine, each with its address.
  *
- * Pressing a page opens it in a non-modal drawer: its title, its words, the order and removal of its pictures and
- * whether it is shown, saved with Gem side; a failed save keeps what was typed and says why, and closing with unsaved
- * changes asks first, in place. A page's address is not changed here. New pictures are not uploaded from the app (the
- * upload ticket is for the site's own origin).
+ * `flavoPageSource` is what the app's Pages place merges in for Flavo (the platform names the source `flavo` on its
+ * Pages place): `list()` the pages, each with its address, its title and whether it is hidden, and `editor(path)` the
+ * element that edits one, kept per page so words typed survive choosing another row. The editor is the page's title,
+ * its words, the order and removal of its pictures and whether it is shown, saved with Gem side; a failed save keeps
+ * what was typed and says why. A page's address is not changed here. New pictures are not uploaded from the app
+ * (the upload ticket is for the site's own origin). A save tells the Pages place (`consistency-page-saved`), which
+ * reads its rows again.
  */
 import { LitElement, html, nothing } from "lit";
-import { changed, failure, mediaUrl, moveItem, pageFields, pagesOf, type ContentPage, type FlavoPlaceContext } from "./core";
-import { KeepCurrent } from "./keep";
+import { changed, failure, mediaUrl, moveItem, pageFields, pageRowsOf, sortedPages, type ContentPage, type FlavoPageRow, type FlavoPlaceContext } from "./core";
 
-interface Editing { saved: ContentPage; data: ContentPage; busy: boolean; error: string; leaving: boolean }
+/** The event the shared Pages place reads its rows again on. */
+export const PAGE_SAVED = "consistency-page-saved";
 
-export class FlavoPlacePages extends LitElement {
-  static properties = { pages: { state: true }, error: { state: true }, search: { state: true }, editing: { state: true } };
+/** What Flavo gives the app's shared Pages place. */
+export interface FlavoPageSource {
+  /** Flavo's pages, each with its address. */
+  list(): Promise<FlavoPageRow[]>;
+  /** The element that edits the page at this address, as last listed; none for an address not listed. */
+  editor(path: string): HTMLElement | null;
+}
+
+export function flavoPageSource(context: FlavoPlaceContext): FlavoPageSource {
+  const pages = new Map<string, ContentPage>();
+  const editors = new Map<string, FlavoPageEditor>();
+  return {
+    async list() {
+      const answer = (await context.transport("catalogue:pages", {})) as ContentPage[];
+      const listed = sortedPages(Array.isArray(answer) ? answer : []);
+      pages.clear();
+      for (const page of listed) pages.set(page.path, page);
+      for (const [path, editor] of editors) {
+        const page = pages.get(path);
+        if (page) editor.adopt(page);
+        else editors.delete(path);
+      }
+      return pageRowsOf(listed);
+    },
+    editor(path) {
+      const page = pages.get(path);
+      if (!page) return null;
+      let editor = editors.get(path);
+      if (!editor) editors.set(path, (editor = Object.assign(new FlavoPageEditor(), { context, page })));
+      return editor;
+    },
+  };
+}
+
+/** One of Flavo's pages, edited in the middle of Pages. */
+export class FlavoPageEditor extends LitElement {
+  static properties = { saved: { state: true }, data: { state: true }, busy: { state: true }, error: { state: true } };
   context!: FlavoPlaceContext;
-  /** Projekter: the pages under `/projekter/`; else Indhold. */
-  projects = false;
-  declare pages: ContentPage[] | null;
+  declare saved: ContentPage;
+  declare data: ContentPage;
+  declare busy: boolean;
   declare error: string;
-  declare search: string;
-  declare editing: Editing | null;
-  private readonly current = new KeepCurrent(this, () => this.read());
 
-  constructor() { super(); this.pages = null; this.error = ""; this.search = ""; this.editing = null; }
+  constructor() { super(); this.busy = false; this.error = ""; }
   protected createRenderRoot() { return this; }
-  private get heading() { return this.projects ? "Projekter" : "Indhold"; }
 
-  private async read(): Promise<boolean> {
-    try {
-      const pages = (await this.context.transport("catalogue:pages", {})) as ContentPage[];
-      this.pages = Array.isArray(pages) ? pages : [];
-      this.error = "";
-      const open = this.editing;
-      const fresh = open && !open.busy && !changed(open.data, open.saved) ? this.pages.find(page => page.path === open.saved.path) : undefined;
-      if (open && fresh) this.editing = { ...open, saved: fresh, data: fresh };
-      return true;
-    } catch (error) {
-      this.error = failure(error);
-      return false;
-    }
+  /** The page to edit, as first listed. */
+  set page(page: ContentPage) { this.saved = page; this.data = page; }
+  get page() { return this.saved; }
+  /** Whether words typed are not saved yet. */
+  get dirty() { return Boolean(this.data) && changed(this.data, this.saved); }
+
+  /** The page as listed again: taken unless words typed are waiting or being saved. */
+  adopt(page: ContentPage) {
+    if (this.busy || this.dirty || !changed(page, this.saved)) return;
+    this.saved = page; this.data = page;
   }
 
-  private set(next: Partial<Editing>) { if (this.editing) this.editing = { ...this.editing, ...next }; }
-  private change(next: Partial<ContentPage>) { if (this.editing) this.set({ data: { ...this.editing.data, ...next }, error: "", leaving: false }); }
-  private closeRequest(event?: Event) {
-    const editing = this.editing;
-    if (editing && changed(editing.data, editing.saved) && !editing.leaving) { event?.preventDefault(); this.set({ leaving: true }); return; }
-    this.editing = null;
-  }
+  private change(next: Partial<ContentPage>) { this.data = { ...this.data, ...next }; this.error = ""; }
 
   private async save() {
-    const editing = this.editing;
-    if (!editing?.data._id || editing.busy) return;
-    if (!editing.data.title.trim()) { this.set({ error: "Skriv en titel." }); return; }
-    this.set({ busy: true, error: "" });
+    const data = this.data;
+    if (!data._id || this.busy) return;
+    if (!data.title.trim()) { this.error = "Skriv en titel."; return; }
+    this.busy = true; this.error = "";
     try {
-      await this.context.transport("catalogue:savePage", { id: editing.data._id, data: pageFields(editing.data) });
-      if (this.editing?.saved.path === editing.saved.path) this.set({ busy: false, saved: editing.data, leaving: false });
+      await this.context.transport("catalogue:savePage", { id: data._id, data: pageFields(data) });
+      this.saved = data;
       this.context.say("Siden er gemt.");
-      void this.current.run();
+      this.dispatchEvent(new CustomEvent(PAGE_SAVED, { detail: { path: data.path }, bubbles: true, composed: true }));
     } catch (error) {
-      if (this.editing?.saved.path === editing.saved.path) this.set({ busy: false, error: failure(error) });
-    }
+      this.error = failure(error);
+    } finally { this.busy = false; }
   }
 
   render() {
-    const shown = this.pages ? pagesOf(this.pages, this.projects, this.search) : [];
-    const count = this.pages ? pagesOf(this.pages, this.projects).length : null;
-    return html`<section class="place flavo-place" aria-label=${this.heading}>
-      <div class="place-head">
-        <ds-text class="place-title" role="heading" aria-level="1" literal size="display" text=${this.heading}></ds-text>
-        ${count === null ? nothing : html`<span class="place-muted">${count}</span>`}
-      </div>
-      <div class="place-tools"><span class="place-filters"><ds-input class="place-search" type="search" aria-label="Søg i indhold" placeholder="Søg i indhold" autocomplete="off"
-        .value=${this.search} @input-change=${(event: CustomEvent<{ value: string }>) => { this.search = event.detail.value; }}></ds-input></span></div>
-      ${this.error ? html`<ds-message role="alert" tone="danger" literal text=${this.error}></ds-message>` : nothing}
-      ${this.pages === null ? (this.error ? nothing : html`<ds-text tone="muted" literal text="Henter sider…"></ds-text>`)
-        : shown.length ? html`<ds-list class="flavo-pages">${shown.map(page => html`<ds-row interactive class="flavo-page" data-page=${page.path} ?open=${this.editing?.saved.path === page.path}
-            @ds-row-press=${() => { this.editing = { saved: page, data: page, busy: false, error: "", leaving: false }; }}>
-            <span class="ds-row__name">${page.title}</span><code class="place-code">${page.path}</code>
-            <ds-tag>${page.published ? "Offentlig" : "Skjult"}</ds-tag></ds-row>`)}</ds-list>`
-          : html`<ds-empty literal heading="Ingen sider fundet."></ds-empty>`}
-      <ds-overlay type="drawer" non-modal .holdScroll=${false} .blockOutside=${false} ?open=${!!this.editing} @ds-close-request=${(event: Event) => this.closeRequest(event)}>
-        <dialog class="place-drawer flavo-drawer" aria-labelledby="flavo-page-title">${this.editing ? this.editor(this.editing) : nothing}</dialog>
-      </ds-overlay>
-    </section>`;
-  }
-
-  private editor(editing: Editing) {
-    const { data } = editing;
+    const data = this.data;
+    if (!data) return nothing;
     const origin = this.context.origin;
     const files = data.imageFiles ?? [];
     const gallery = (urls: string[], key: "images" | "imageFiles", src: (value: string) => string) => html`<div class="flavo-gallery">${urls.map((value, index) => html`<figure class="flavo-gallery__item">
@@ -101,8 +105,9 @@ export class FlavoPlacePages extends LitElement {
         <ds-button icon aria-label="Flyt billede frem" ?disabled=${index === urls.length - 1} @click=${() => this.change({ [key]: moveItem(urls, index, 1) })}>→</ds-button>
         <ds-button icon aria-label="Fjern billede" @click=${() => this.change({ [key]: urls.filter((_, at) => at !== index) })}>×</ds-button>
       </div></figure>`)}</div>`;
-    return html`<div data-ds-overlay="header"><h2 data-ds-overlay="title" id="flavo-page-title">${data.title}</h2>
-        <p data-ds-overlay="description"><a class="ds-link" href=${mediaUrl(origin, data.path)} target="_blank" rel="noreferrer">${data.path}</a></p></div>
+    return html`<div class="flavo-place flavo-page-editor">
+      <div class="place-pages-head"><ds-text class="place-pages-title" literal strong text=${data.title || this.saved.title}></ds-text>
+        <a class="ds-link" href=${mediaUrl(origin, data.path)} target="_blank" rel="noreferrer">${data.path}</a></div>
       <div class="flavo-form">
         <div class="place-field"><ds-text tone="muted" literal text="Titel"></ds-text>
           <ds-input variant="field" aria-label="Titel" .value=${data.title} @input-change=${(event: CustomEvent<{ value: string }>) => this.change({ title: event.detail.value })}></ds-input></div>
@@ -113,15 +118,12 @@ export class FlavoPlacePages extends LitElement {
         <ds-message class="flavo-uploads" tone="neutral" literal text="Nye billeder uploades ikke herfra endnu. Rækkefølgen og fjernede billeder gemmes med Gem side."></ds-message>
         <label class="place-check"><ds-checkbox><input type="checkbox" .checked=${data.published} @change=${(event: Event) => this.change({ published: (event.target as HTMLInputElement).checked })}></ds-checkbox>Vis siden</label>
       </div>
-      ${editing.error ? html`<ds-message role="alert" tone="danger" literal text=${editing.error}></ds-message>` : nothing}
-      ${editing.leaving ? html`<div class="place-confirm" role="group" aria-label="Ændringer, der ikke er gemt">
-          <ds-text wrap literal text="Du har ændringer, der ikke er gemt. Vil du forlade siden?"></ds-text>
-          <div class="place-actions"><ds-button primary danger @click=${() => { this.editing = null; }}>Kassér ændringer</ds-button>
-          <ds-button secondary @click=${() => this.set({ leaving: false })}>Bliv</ds-button></div></div>` : nothing}
-      <div data-ds-overlay="footer" class="place-actions">
-        <ds-button primary data-save ?disabled=${editing.busy || !data._id} @click=${() => void this.save()}>${editing.busy ? "Gemmer…" : "Gem side"}</ds-button>
-        <ds-button secondary @click=${() => this.closeRequest()}>Luk</ds-button>
-      </div>`;
+      ${this.error ? html`<ds-message role="alert" tone="danger" literal text=${this.error}></ds-message>` : nothing}
+      <div class="place-actions">
+        <ds-button primary data-save ?disabled=${this.busy || !data._id || !this.dirty} @click=${() => void this.save()}>${this.busy ? "Gemmer…" : "Gem side"}</ds-button>
+        ${this.dirty && !this.busy ? html`<ds-button secondary @click=${() => { this.data = this.saved; this.error = ""; }}>Fortryd</ds-button>` : nothing}
+      </div>
+    </div>`;
   }
 }
-if (!customElements.get("flavo-place-pages")) customElements.define("flavo-place-pages", FlavoPlacePages);
+if (!customElements.get("flavo-page-editor")) customElements.define("flavo-page-editor", FlavoPageEditor);

@@ -1,5 +1,6 @@
 // An open site's shared places in Consistency's app: Pages (the list, the chosen page's details, its title and
-// description edited in place, a failed save putting the words back, the share image, Edit on the canvas), Emails
+// description edited in place, a failed save putting the words back, the share image, Edit on the canvas, and a site's
+// own pages from the page source its Pages place names, after the site engine's, edited by the source's editor), Emails
 // (Sent and How they look as tabs, the non-modal drawer, the email in a sandboxed frame) and Design (the site's pages
 // read through the gateway's sandboxed document route). Every gateway answer is a stand-in.
 import { createServer } from 'node:http';
@@ -50,7 +51,7 @@ const emails = [
 const browser = await chromium.launch({ headless: true });
 try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
-  const edits = [], asked = [];
+  const edits = [], asked = [], sourced = [];
   let failNext = false;
   await page.route('**/api/consistency/profile', route => route.fulfill({ json: { companyName: '0001' } }));
   // The owner's one workspace, which holds the site (the app shows a workspace's sites only).
@@ -59,7 +60,14 @@ try {
   await page.route(`**/api/consistency/sites/${CODE}/**`, async route => {
     const request = route.request(), url = new URL(request.url()), what = url.pathname.split('/').slice(5).join('/'), path = url.searchParams.get('path');
     asked.push(`${request.method()} ${what}${url.search}`);
-    if (what === 'places') return route.fulfill({ json: { places: [{ id: 'pages', label: 'Pages' }, { id: 'emails', label: 'Emails' }, { id: 'design', label: 'Design' }] } });
+    // Pages names a page source (the only one registered is Flavo's) and one the app does not know, which is left out.
+    if (what === 'places') return route.fulfill({ json: { places: [{ id: 'pages', label: 'Pages', sources: ['flavo', 'nowhere'] }, { id: 'emails', label: 'Emails' }, { id: 'design', label: 'Design' }] } });
+    if (what === 'api/business') {
+      const { operation } = request.postDataJSON();
+      sourced.push(operation);
+      if (operation === 'catalogue:pages') return route.fulfill({ json: { value: [{ _id: 'c1', path: '/om', title: 'Om os', text: 'Hej', images: [], published: false, updatedAt: 1 }] } });
+      return route.fulfill({ status: 400, json: { error: 'unknown-operation' } });
+    }
     if (what === 'pages' || what === 'api/pages') return route.fulfill({ json: { site: 'CPH Raft', pages, images: ['/photos/a.jpg', '/photos/b.jpg', 'https://evil.example/x.jpg'] } });
     if (what === 'page' || what === 'api/page') return route.fulfill({ json: { path, lang: pages.find(each => each.path === path).lang, title: 'CPH Raft', fields: fields(path) } });
     if (what === 'api/detached') return route.fulfill({ json: { edits: [{ id: 9, path: '/gone/', key: 'x', markdown: 'Old **words**', editor: 'jaa90@icloud.com', at: Date.UTC(2026, 9, 1) }] } });
@@ -96,9 +104,10 @@ try {
   await sidebar.getByText('Pages', { exact: true }).click();
   const place = page.locator('consistency-place-pages:not([hidden])');
   const rows = place.locator('.place-pages-list > ds-row');
+  const engine = place.locator('.place-pages-list > ds-row:not([data-source])');
   await rows.nth(1).waitFor();
-  if (await rows.count() !== 2) fail(`Expected two rows, got ${await rows.count()}`);
-  if ((await rows.allInnerTexts()).map(text => text.split('\n')[0].trim()).join() !== 'Forside,Blå Raft') fail('The rows are not the short titles: ' + (await rows.allInnerTexts()).join(' / '));
+  if (await engine.count() !== 2) fail(`Expected two rows, got ${await engine.count()}`);
+  if ((await engine.allInnerTexts()).map(text => text.split('\n')[0].trim()).join() !== 'Forside,Blå Raft') fail('The rows are not the short titles: ' + (await engine.allInnerTexts()).join(' / '));
   if ((await place.locator('ds-tabs[aria-label="Languages"] [role="tab"]').allInnerTexts()).map(text => text.trim()).join() !== 'Dansk,English') fail('The languages are not the tabs');
   if (await rows.first().getAttribute('current') === null) fail('The first page is not chosen');
   const words = key => place.locator(`.place-details__words[data-key="${key}"] [contenteditable]`);
@@ -148,6 +157,27 @@ try {
   if (JSON.stringify(edits.at(-1)) !== JSON.stringify({ path: '/en/blueraft/', key: IMAGE, markdown: '/photos/b.jpg' })) fail('The share image was not saved');
 
   if (process.env.PLACES_SHOT) await page.screenshot({ path: `${process.env.PLACES_SHOT}/pages.png` });
+
+  // The site's own pages, after the site engine's, each with its address: the arrows reach them, and choosing one shows
+  // its source's editor in the middle; its saving reads the rows again, and an engine row brings the details back.
+  const own = place.locator('.place-pages-list > ds-row[data-source="flavo"]');
+  await own.waitFor();
+  if (await rows.count() !== 3 || await own.getAttribute('data-path') !== '/om' || await rows.nth(2).getAttribute('data-source') !== 'flavo') fail('The site\'s own page does not follow the site engine\'s');
+  if (!(await said(own)).includes('/om') || !(await own.innerText()).includes('Skjult')) fail('The site\'s own page lacks its address or that it is hidden');
+  await rows.nth(1).click();
+  await rows.nth(1).press('ArrowDown');
+  const editor = place.locator('.place-pages-page flavo-page-editor');
+  await editor.waitFor();
+  if (await own.getAttribute('current') === null || await rows.nth(1).getAttribute('current') !== null) fail('The arrow did not choose the site\'s own page');
+  if (await place.locator('.place-pages-share .place-share').count()) fail('A share card shows beside the site\'s own page');
+  // A source's editor saying it saved (`consistency-page-saved`; Flavo's save itself is in places-flavo.mjs) reads the rows again.
+  const listed = sourced.filter(each => each === 'catalogue:pages').length;
+  await editor.evaluate(element => element.dispatchEvent(new CustomEvent('consistency-page-saved', { detail: { path: '/om' }, bubbles: true, composed: true })));
+  await page.waitForTimeout(300);
+  if (sourced.filter(each => each === 'catalogue:pages').length <= listed) fail('A save did not read the rows again');
+  await rows.nth(1).click();
+  await place.locator('.place-details').waitFor();
+  if (await editor.count()) fail('The source\'s editor stayed beside the site engine\'s page');
   // Data stays current: coming back to the window reads the pages again; no Reload button anywhere.
   const before = asked.filter(each => each === 'GET api/pages').length;
   await page.evaluate(() => dispatchEvent(new Event('focus')));
@@ -226,5 +256,5 @@ try {
   await page.frameLocator('iframe.place-design__specimen').locator('.ds-button--primary').waitFor();
   if (process.env.PLACES_SHOT) await page.screenshot({ path: `${process.env.PLACES_SHOT}/design.png`, fullPage: true });
   if (await page.getByRole('button', { name: /^(Reload|Refresh)$/ }).count()) fail('A Reload button is shown');
-  console.log('Shared places: Pages list, details, in-place title and description with failure restore, share image drawer, Edit on the canvas; Emails tabs and drawer; Design read from the sandboxed pages passed');
+  console.log('Shared places: Pages list, details, in-place title and description with failure restore, share image drawer, Edit on the canvas, a site's own pages from its page source; Emails tabs and drawer; Design read from the sandboxed pages passed');
 } finally { await browser.close(); await new Promise(done => server.close(done)); }

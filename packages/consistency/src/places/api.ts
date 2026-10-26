@@ -6,8 +6,11 @@
  */
 import { failureWords } from '../site-editing';
 
-/** A site's menu, as the platform's `places` gives it: an id the app knows, and the site's word for it. */
-export interface SitePlace { id: string; label: string }
+/**
+ * A site's menu, as the platform's `places` gives it: an id the app knows, and the site's word for it. Its `sources`
+ * are the page sources Pages merges in beside the site engine's pages (`PAGE_SOURCES` in `pages.ts`).
+ */
+export interface SitePlace { id: string; label: string; sources?: string[] }
 
 /** A refused or failed call: its status, the platform's error code, and the words to show. */
 export class SiteApiError extends Error {
@@ -41,5 +44,6 @@ export function siteApi<T>(code: string, route: string, init: RequestInit & { js
 /** The site's menus, as its current build's config gives them. */
 export async function sitePlaces(code: string): Promise<SitePlace[]> {
   const { places } = await answer<{ places?: unknown }>(`${base(code)}/places`);
-  return Array.isArray(places) ? places.filter((place): place is SitePlace => !!place && typeof place.id === 'string' && typeof place.label === 'string') : [];
+  return Array.isArray(places) ? places.filter((place): place is SitePlace => !!place && typeof place.id === 'string' && typeof place.label === 'string')
+    .map(place => (Array.isArray(place.sources) ? { ...place, sources: place.sources.filter((name: unknown) => typeof name === 'string') } : { id: place.id, label: place.label })) : [];
 }
