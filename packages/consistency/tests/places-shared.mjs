@@ -53,6 +53,8 @@ try {
   const edits = [], asked = [];
   let failNext = false;
   await page.route('**/api/consistency/profile', route => route.fulfill({ json: { companyName: '0001' } }));
+  // The owner's one workspace, which holds the site (the app shows a workspace's sites only).
+  await page.route('**/api/consistency/workspaces', route => route.fulfill({ json: { owner: true, workspaces: [{ code: '01STDO', name: '0001', plan: 'free', role: 'owner', sites: 1, siteCodes: [CODE], limits: { sites: 10, customDomains: true } }] } }));
   await page.route('**/api/consistency/sites', route => route.fulfill({ json: { sites: [{ code: CODE, name: 'CPH Raft', url: 'https://cphraft.c9y.site/' }] } }));
   await page.route(`**/api/consistency/sites/${CODE}/**`, async route => {
     const request = route.request(), url = new URL(request.url()), what = url.pathname.split('/').slice(5).join('/'), path = url.searchParams.get('path');

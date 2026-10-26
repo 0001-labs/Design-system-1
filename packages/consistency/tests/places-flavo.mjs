@@ -47,6 +47,8 @@ try {
   page.on('pageerror', error => errors.push(error.message));
   await page.route('https://flavo.c9y.site/**', route => route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><title>Flavo</title>' }));
   await page.route('**/api/consistency/profile', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ companyName: '0001' }) }));
+  // The owner's one workspace, which holds the site (the app shows a workspace's sites only).
+  await page.route('**/api/consistency/workspaces', route => route.fulfill({ json: { owner: true, workspaces: [{ code: '01STDO', name: '0001', plan: 'free', role: 'owner', sites: 1, siteCodes: ['92KTNN'], limits: { sites: 10, customDomains: true } }] } }));
   await page.route('**/api/consistency/sites', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ sites: [{ code: '92KTNN', name: 'Flavo', url: 'https://flavo.c9y.site/' }] }) }));
   await page.route('**/api/consistency/sites/*/pages', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ pages: [] }) }));
   await page.route('**/api/consistency/sites/*/places', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ places: [
