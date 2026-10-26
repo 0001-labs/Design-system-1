@@ -78,11 +78,12 @@
     }
   },
   "Site engine": {
-    "commit": "69888c64739df53d9b529b59833ecdba2951a50d",
+    "commit": "fa39a85c456efec9ac0bc4f1e3e214fc9c56c738",
     "version": null,
     "owned": ["packages/consistency/src/vendor/site-engine"],
     "files": {
       "packages/consistency/src/vendor/site-engine/README.md": "b142d32c36c2180c989a63e139f4e6e654ce666bcea377fd6dfe42998eb334a9",
+      "packages/consistency/src/vendor/site-engine/bookings-shared.ts": "1e3b0e1556ded579caffac55cd67bba46e76140031a2efb3df446c70dd8ace6d",
       "packages/consistency/src/vendor/site-engine/composition-workspace.css": "167c43fda98601efab91656d9f32f9094e38e8bfb2d9931827fbce3042d66701",
       "packages/consistency/src/vendor/site-engine/composition-workspace.ts": "b0863f81b43c44198269baf276274984e7e5a69f2859095630d40e5a60ed49c2",
       "packages/consistency/src/vendor/site-engine/dom.ts": "42c4cb6c5ad6d8dc0de74aaa958345ead73d0ecac50d8b7472c46439db03b265",

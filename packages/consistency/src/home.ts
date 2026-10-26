@@ -17,6 +17,7 @@ import './domains';
 import { ConsistencySiteEditor } from './site-editor';
 import type { SiteSummary } from './site-editing';
 import { PLACES, shownPlaces, sitePlaces, type SitePlace } from './places/index';
+import { OPEN_PAGE } from './places/pages';
 import type { SidebarItem } from '../../../DS1/3-unit/ds-sidebar';
 import './home.css';
 
@@ -124,7 +125,16 @@ export class ConsistencyHome extends LitElement {
   }
   protected createRenderRoot() { return this; }
 
-  connectedCallback() { super.connectedCallback(); addEventListener('popstate', this.onPop); addEventListener('hashchange', this.onHash); void this.readWorkspace(); void this.readSites(); }
+  /** A place asks to show one of the site's pages on its canvas (Pages' Edit): the canvas is shown, opened on it. */
+  private readonly onOpenPage = (event: Event) => {
+    const path = (event as CustomEvent<{ path?: unknown }>).detail?.path;
+    if (this.place.page !== 'site' || typeof path !== 'string') return;
+    const { code } = this.place;
+    this.go({ page: 'site', code });
+    void this.editors.get(code)?.open(path);
+  };
+
+  connectedCallback() { super.connectedCallback(); addEventListener('popstate', this.onPop); addEventListener('hashchange', this.onHash); this.addEventListener(OPEN_PAGE, this.onOpenPage); void this.readWorkspace(); void this.readSites(); }
 
   /** Goes to a place inside the app, the address unchanged. */
   go(next: Place) { void this.move(next, 'push'); }
@@ -188,7 +198,7 @@ export class ConsistencyHome extends LitElement {
     for (const [code, editor] of this.editors) editor.hidden = code !== current?.code || Boolean(at);
     for (const [each, element] of this.placeElements) element.hidden = each !== key;
   }
-  disconnectedCallback() { super.disconnectedCallback(); removeEventListener('popstate', this.onPop); removeEventListener('hashchange', this.onHash); }
+  disconnectedCallback() { super.disconnectedCallback(); removeEventListener('popstate', this.onPop); removeEventListener('hashchange', this.onHash); this.removeEventListener(OPEN_PAGE, this.onOpenPage); }
 
   /** The company name on the owner's own account (Account in the docs sets it). */
   private async readWorkspace() {
