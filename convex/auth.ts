@@ -11,6 +11,8 @@ import { signInCodeEmail } from "./signIn/emails";
 import { rememberAppleTokenFromProfile } from "./signIn/appleTokens";
 
 const PRODUCT = "Design system 1";
+/** The other names its sign-in goes by: Consistency's app at consistency.site and c9y.site signs people in here. */
+const BRANDS = { consistency: "Consistency" };
 
 /**
  * Sign-in is the shared piece in convex/signIn (copied from /Users/joachim/0001/Sign-in
@@ -26,8 +28,10 @@ const PRODUCT = "Design system 1";
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
   providers: signInProviders({
     product: PRODUCT,
+    brands: BRANDS,
     password: true,
-    async sendCode(ctx, { email, code }) {
+    // The code goes out under the name the screen asked for (Consistency's), from that name, else Design system 1's.
+    async sendCode(ctx, { email, code, product }) {
       const address = normalizeEmail(email);
       if (process.env.DEV_LOGIN_LINKS === "1") {
         await ctx.runMutation(internal.devLinks.record, {
@@ -40,7 +44,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
           return;
         }
       }
-      await sendEmail({ to: address, ...signInCodeEmail({ product: PRODUCT, code }) });
+      await sendEmail({ to: address, ...signInCodeEmail({ product, code }) }, product);
     },
   }),
   callbacks: {

@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vite-plus/test";
 
 import { escapeHref, escapeHtml } from "../convex/lib/escape";
-import { renderMagicLinkEmail } from "../convex/lib/mail";
+import { mailFrom, renderMagicLinkEmail } from "../convex/lib/mail";
+import { brandName } from "../convex/signIn/emailCode";
+import { signInCodeEmail } from "../convex/signIn/emails";
 import {
   base64UrlEncode,
   generateMagicLinkToken,
@@ -157,5 +159,23 @@ describe("renderMagicLinkEmail", () => {
     const email = renderMagicLinkEmail({ url: "javascript:alert(1)", expiresMinutes: 15 });
     expect(email.html).toContain('href="#"');
     expect(email.html).not.toContain("javascript:alert(1)");
+  });
+});
+
+describe("the code email under Consistency's name", () => {
+  it("keeps MAIL_FROM's address and changes only the name", () => {
+    expect(mailFrom()).toMatch(/<.+@.+>$/);
+    const address = /<([^<>]+)>$/.exec(mailFrom())![1];
+    expect(mailFrom("Consistency")).toBe(`Consistency <${address}>`);
+    expect(mailFrom('Con<sis>"tency\r\n')).toBe(`Consistency <${address}>`);
+  });
+
+  it("is Consistency's only when the screen asks for a listed brand", () => {
+    const brands = { consistency: "Consistency" };
+    expect(brandName("Design system 1", brands, "consistency")).toBe("Consistency");
+    for (const other of [undefined, "", "elsewhere", "toString", "__proto__", 1]) expect(brandName("Design system 1", brands, other)).toBe("Design system 1");
+    const mail = signInCodeEmail({ product: "Consistency", code: "123456" });
+    expect(mail.subject).toBe("Your Consistency sign-in code");
+    expect(mail.text).not.toContain("Design system 1");
   });
 });

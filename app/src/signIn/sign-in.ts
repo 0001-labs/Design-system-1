@@ -67,6 +67,18 @@ function element<K extends keyof HTMLElementTagNameMap>(tag: K, attributes: Reco
   return node
 }
 
+/**
+ * Cut words fade over their last square, never an ellipsis: an element whose
+ * words are wider than it is marked `data-cut="end"` and sign-in.css fades it
+ * then; words that fit stay crisp. Measured here, the same way as Design
+ * system 1's cut-fade module, since the screen stands alone in a product.
+ */
+function markCut(node: Element) {
+  if (node.scrollWidth > node.clientWidth + 1) {
+    if (node.getAttribute('data-cut') !== 'end') node.setAttribute('data-cut', 'end')
+  } else if (node.hasAttribute('data-cut')) node.removeAttribute('data-cut')
+}
+
 export class SignInScreen extends HTMLElement {
   private backend: SignInAdapter | null = null
   /** The product's way to the backend. Set before or after the element is on the page: the providers are asked once both hold. */
@@ -100,10 +112,32 @@ export class SignInScreen extends HTMLElement {
   private readonly googleRow = element('div', { class: 'sign-in-row', hidden: true })
   private readonly appleRow = element('div', { class: 'sign-in-row', hidden: true })
   private rendered = false
+  /** Measures the labels and the error when their box changes; `measureCuts()` measures them when their words do. */
+  private cuts: ResizeObserver | null = null
 
   connectedCallback() {
     if (!this.rendered) this.render()
+    if (!this.cuts && typeof ResizeObserver !== 'undefined') {
+      const cuts = new ResizeObserver((entries) => { for (const entry of entries) markCut(entry.target) })
+      for (const node of this.cutWords()) cuts.observe(node)
+      this.cuts = cuts
+    }
+    // Words drawn in a fallback face are narrower or wider once the page's fonts arrive.
+    document.fonts?.ready.then(() => this.measureCuts(), () => {})
     void this.loadProviders()
+  }
+
+  disconnectedCallback() {
+    this.cuts?.disconnect()
+    this.cuts = null
+  }
+
+  private cutWords(): Element[] {
+    return [this.emailLabel, this.secretLabel, this.error]
+  }
+
+  private measureCuts() {
+    for (const node of this.cutWords()) markCut(node)
   }
 
   private render() {
@@ -166,6 +200,7 @@ export class SignInScreen extends HTMLElement {
       this.secretInput.setAttribute('pattern', '[0-9]*')
       this.sendAgainButton.hidden = false
     }
+    this.measureCuts()
   }
 
   private async loadProviders() {
@@ -189,6 +224,7 @@ export class SignInScreen extends HTMLElement {
   private fail(message: string) {
     this.error.textContent = message
     this.error.hidden = false
+    markCut(this.error)
   }
 
   private clearError() {

@@ -23,11 +23,15 @@ export function resendApiKey(): string | undefined {
   return process.env.AUTH_RESEND_KEY ?? process.env.RESEND_API_KEY;
 }
 
-export function mailFrom(): string {
-  return process.env.MAIL_FROM ?? "Design system 1 <login@mail.dsone.dev>";
+/** MAIL_FROM, or its address under another name when one is given (a product the sign-in serves). */
+export function mailFrom(name?: string): string {
+  const from = process.env.MAIL_FROM ?? "Design system 1 <login@mail.dsone.dev>";
+  if (!name) return from;
+  const address = /<([^<>]+)>\s*$/.exec(from)?.[1] ?? from.trim();
+  return `${name.replace(/[<>"\r\n]/g, "").trim()} <${address}>`;
 }
 
-export async function sendEmail(email: Email): Promise<void> {
+export async function sendEmail(email: Email, fromName?: string): Promise<void> {
   const key = resendApiKey();
   if (!key) {
     // The one no-key policy: never silently succeed in a way that looks like
@@ -38,7 +42,7 @@ export async function sendEmail(email: Email): Promise<void> {
   const response = await fetch(RESEND_ENDPOINT, {
     method: "POST",
     headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
-    body: JSON.stringify({ from: mailFrom(), ...email }),
+    body: JSON.stringify({ from: mailFrom(fromName), ...email }),
   });
 
   if (!response.ok) {

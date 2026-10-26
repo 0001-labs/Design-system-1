@@ -26,7 +26,17 @@ export const reserveSend = internalMutation({
   },
 })
 
-export type SendCode = (ctx: ActionCtx, message: { email: string; code: string }) => Promise<void>
+/** `product` is the name the code email carries: the product's own, or the brand the screen asked for (`brandName`). */
+export type SendCode = (ctx: ActionCtx, message: { email: string; code: string; product: string }) => Promise<void>
+
+/**
+ * The name a code request's `brand` stands for: one of the product's own `brands`, by key, else the product's
+ * name. A key is all the screen sends and only a listed one changes the email, so a request can at most pick
+ * another of the product's own names.
+ */
+export function brandName(product: string, brands: Record<string, string> | undefined, brand: unknown): string {
+  return typeof brand === 'string' && brands && Object.prototype.hasOwnProperty.call(brands, brand) ? brands[brand]! : product
+}
 
 /** The code email through Resend, from `AUTH_EMAIL_FROM`: what `EmailCode` sends unless a product hands in its own `send`, and what such a `send` can fall back on. */
 export async function sendCodeWithResend({ product, email, code }: { product: string; email: string; code: string }): Promise<void> {
@@ -51,19 +61,23 @@ export async function sendCodeWithResend({ product, email, code }: { product: st
  * code, so the one-a-minute limit is applied before a code exists: Convex Auth
  * replaces an account's code whenever a new one is made, and a refusal after
  * that would kill the code already in the inbox. Sent through Resend from
- * `AUTH_EMAIL_FROM` unless the product hands in its own `send`.
+ * `AUTH_EMAIL_FROM` unless the product hands in its own `send`. A product that signs people in under more than
+ * one name lists them in `brands`; the screen asks for one with `{ email, brand }` (`signInAdapter`'s `brand`).
  */
-export function EmailCode({ product, send }: { product: string; send?: SendCode }) {
-  const mail = Email({
-    id: `${EMAIL_CODE_PROVIDER_ID}-mail`,
-    maxAge: EMAIL_CODE_MINUTES * 60,
-    generateVerificationToken: async () => sixDigitCode(),
-    async sendVerificationRequest({ identifier, token }: { identifier: string; token: string }, ctx?: ActionCtx) {
-      if (!ctx) throw new Error('Missing email action context')
-      if (send) return send(ctx, { email: identifier, code: token })
-      await sendCodeWithResend({ product, email: identifier, code: token })
-    },
-  })
+export function EmailCode({ product, send, brands }: { product: string; send?: SendCode; brands?: Record<string, string> }) {
+  // One Email provider per name the code goes out under; they are the same provider in all else, so any of them checks the code.
+  const mailAs = (name: string) =>
+    Email({
+      id: `${EMAIL_CODE_PROVIDER_ID}-mail`,
+      maxAge: EMAIL_CODE_MINUTES * 60,
+      generateVerificationToken: async () => sixDigitCode(),
+      async sendVerificationRequest({ identifier, token }: { identifier: string; token: string }, ctx?: ActionCtx) {
+        if (!ctx) throw new Error('Missing email action context')
+        if (send) return send(ctx, { email: identifier, code: token, product: name })
+        await sendCodeWithResend({ product: name, email: identifier, code: token })
+      },
+    })
+  const mail = mailAs(product)
   return ConvexCredentials<DataModel>({
     id: EMAIL_CODE_PROVIDER_ID,
     async authorize(params, ctx) {
@@ -74,7 +88,8 @@ export function EmailCode({ product, send }: { product: string; send?: SendCode 
       if (!(await ctx.runMutation(internal.signIn.emailCode.reserveSend, { email }))) throw new Error('Please wait before requesting another code')
       // The account is this provider's, by address, so the code can be redeemed here; a verified account with the address is the same person.
       const { account } = await createAccount(ctx, { provider: EMAIL_CODE_PROVIDER_ID, account: { id: email }, profile: { email }, shouldLinkViaEmail: true })
-      return await signInViaProvider(ctx, mail, { accountId: account._id, params: { email } })
+      const name = brandName(product, brands, params.brand)
+      return await signInViaProvider(ctx, name === product ? mail : mailAs(name), { accountId: account._id, params: { email } })
     },
     extraProviders: [mail],
   })

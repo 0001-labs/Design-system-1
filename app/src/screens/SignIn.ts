@@ -19,6 +19,7 @@ export class SignIn extends AppElement {
     dashboardOnly: { type: Boolean, attribute: "dashboard-only" },
     privateTitle: { type: String, attribute: "private-title" },
     anyone: { type: Boolean },
+    brand: { type: String },
   };
   declare redirectTo: string | undefined;
   declare fontsOnly: boolean;
@@ -26,6 +27,8 @@ export class SignIn extends AppElement {
   declare privateTitle: string | undefined;
   /** A private product's sign-in open to every address, by the emailed code alone: Consistency's invited people. */
   declare anyone: boolean;
+  /** Which of the backend's brands the emailed code goes out under (`convex/auth.ts`), for another product's sign-in. */
+  declare brand: string | undefined;
   #screen: SignInScreenElement | null = null;
   #mounted: string | null = null;
 
@@ -36,6 +39,7 @@ export class SignIn extends AppElement {
     this.dashboardOnly = false;
     this.privateTitle = undefined;
     this.anyone = false;
+    this.brand = undefined;
   }
 
   /** A private host takes the owner's email alone, without Google or Apple. */
@@ -44,7 +48,7 @@ export class SignIn extends AppElement {
   }
 
   override updated() {
-    const settings = JSON.stringify([this.redirectTo, this.fontsOnly, this.dashboardOnly, this.privateTitle, this.anyone]);
+    const settings = JSON.stringify([this.redirectTo, this.fontsOnly, this.dashboardOnly, this.privateTitle, this.anyone, this.brand]);
     if (settings === this.#mounted && this.#screen?.isConnected) return;
     this.#mounted = settings;
     this.#screen?.remove();
@@ -65,6 +69,7 @@ export class SignIn extends AppElement {
       },
       passwordSignIn: email => query(api.auth.passwordSignIn, { email }),
       redirectTo: () => `${window.location.origin}${window.location.pathname}`,
+      brand: this.brand,
     });
     screen.addEventListener("signed-in", () => {
       navigate(redirectTo && redirectTo.startsWith("/") ? redirectTo : "/libraries", { replace: true });

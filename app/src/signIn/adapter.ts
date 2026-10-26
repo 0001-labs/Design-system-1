@@ -14,12 +14,14 @@ export function signInAdapter(input: {
   passwordSignIn: (email: string) => Promise<boolean>
   /** Where Google or Apple return to: a sign-in page the backend's redirect rules allow. */
   redirectTo: () => string
+  /** Which of the backend's `brands` the code email goes out under, when the screen is not the product's own. */
+  brand?: string
 }): SignInAdapter {
   return {
     providers: input.providers,
     passwordSignIn: input.passwordSignIn,
     async requestCode(email) {
-      await input.signIn('email-code', { email })
+      await input.signIn('email-code', input.brand ? { email, brand: input.brand } : { email })
     },
     async signInWithCode(email, code) {
       await input.signIn('email-code', { email, code })

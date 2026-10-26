@@ -4,6 +4,7 @@ import Apple from '@auth/core/providers/apple'
 import { AppleNative } from './appleNative'
 import { EmailCode, type SendCode } from './emailCode'
 import { OwnerPassword } from './password'
+import { SystemOwner, type SystemOwnerOptions } from './systemOwner'
 import { normalizeEmail } from './social'
 
 export type SignInOptions = {
@@ -13,8 +14,12 @@ export type SignInOptions = {
   password?: boolean | Parameters<typeof OwnerPassword>[0]
   /** The product's own way of sending the code email, instead of Resend from `AUTH_EMAIL_FROM`. */
   sendCode?: SendCode
+  /** Other names the product signs people in under, by the key the screen sends as `brand`: `{ consistency: 'Consistency' }`. The code email carries the one asked for. */
+  brands?: Record<string, string>
   /** Sign in with Apple from the product's own apps; needs `APPLE_NATIVE_CLIENTS`. Off by default. */
   appleNative?: boolean
+  /** One key: the owner's System session signs the owner's account in (`systemOwner.ts`); the product's name in System's `clients` and how it finds its owner account. Off by default. */
+  systemOwner?: SystemOwnerOptions
   /** The product's further providers (a purchase, a hand-off, an invitation). */
   extra?: AuthProviderConfig[]
 }
@@ -29,8 +34,9 @@ export type SignInOptions = {
 export function signInProviders(options: SignInOptions): AuthProviderConfig[] {
   return [
     ...(options.appleNative ? [AppleNative({ defaultName: `${options.product} user` })] : []),
-    EmailCode({ product: options.product, send: options.sendCode }),
+    EmailCode({ product: options.product, send: options.sendCode, brands: options.brands }),
     ...(options.password ? [OwnerPassword(options.password === true ? {} : options.password)] : []),
+    ...(options.systemOwner ? [SystemOwner(options.systemOwner)] : []),
     Google({
       profile(profile) {
         return { id: profile.sub, email: normalizeEmail(profile.email), emailVerified: profile.email_verified === true, name: profile.name }

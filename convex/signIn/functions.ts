@@ -1,19 +1,45 @@
 import { v } from 'convex/values'
-import { internalAction, query } from '../_generated/server'
+import type { Id } from '../_generated/dataModel'
+import { internalAction, internalQuery, query, type QueryCtx } from '../_generated/server'
 import { appleSecretReminder, normalizeEmail, passwordAllowed, signInAvailability } from './social'
+import { EMAIL_CODE_PROVIDER_ID } from './emailCode'
 
 /**
  * The public and scheduled functions a product exports from its own
  * `convex/auth.ts`, so their names stay the product's:
- * `export const { providers, passwordSignIn, remindAppleSecret } = signInFunctions({ … })`.
+ * `export const { providers, passwordSignIn, remindAppleSecret, ownerUser } = signInFunctions({ … })`.
  */
-export function signInFunctions({ product, owner, codeReady }: {
+export function signInFunctions({ product, owner, codeReady, findOwner }: {
   product: string
   owner: string | undefined
   /** Whether the code can be sent, for a product with its own sender; by default the Resend values decide. */
   codeReady?: () => boolean
+  /** The owner's account by address, when a product's own rule should decide; by default the account the address signed in with (password or the code). */
+  findOwner?: (ctx: QueryCtx, email: string) => Promise<Id<'users'> | null>
 }) {
   return {
+    /**
+     * The owner's account for One key (`systemOwner.ts`): the user the first address in
+     * `SIGN_IN_OWNER_EMAIL` has signed in as, with the password or the emailed code, and that
+     * is not anonymous; null refuses the sign-in. Read through Convex Auth's `authAccounts`,
+     * indexed the same in every product, so no users index is assumed. Nothing is made here.
+     */
+    ownerUser: internalQuery({
+      args: {},
+      returns: v.union(v.id('users'), v.null()),
+      handler: async (ctx) => {
+        const address = normalizeEmail((owner ?? '').split(',')[0])
+        if (!address) return null
+        if (findOwner) return findOwner(ctx, address)
+        for (const provider of ['password', EMAIL_CODE_PROVIDER_ID]) {
+          const account = await ctx.db.query('authAccounts').withIndex('providerAndAccountId', (q) => q.eq('provider', provider).eq('providerAccountId', address)).unique()
+          if (!account) continue
+          const user = await ctx.db.get(account.userId)
+          return user && !user.isAnonymous ? user._id : null
+        }
+        return null
+      },
+    }),
     /** Public configuration only; never provider credentials. */
     providers: query({
       args: {},
