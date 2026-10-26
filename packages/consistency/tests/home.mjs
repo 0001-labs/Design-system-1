@@ -50,9 +50,18 @@ try {
  // A connected domain after a globe; otherwise the built-in colour address, never a named c9y.site host.
  const labels=await page.locator('consistency-home ds-card [slot="label"]').evaluateAll(spans=>spans.map(span=>(span.querySelector('ds-icon[type="globe"]')?'globe ':'')+span.textContent.trim()));
  if(labels.join()!=='globe flavo.flowers,alice-steel-blue.c9y.site,soendergaarden.c9y.site')throw Error('The cards label their sites '+labels.join());
- // Each card wears its site's avatar on its foot, and a draft (no domain of its own) the draft mark before its name.
- const marks=await page.locator('consistency-home ds-card').evaluateAll(cards=>cards.map(card=>card.dataset.site+':'+(card.querySelector('ds-avatar[slot="media"]')?.getAttribute('initial')??'')+':'+(card.querySelector('[slot="title"] ds-icon[type="arrange-draft"]')?'draft':'')));
- if(marks.join()!=='20FLAV:F:,10VNDG:C:draft,30SDGA:S:draft')throw Error('Cards: '+marks.join());
+ // Each card wears the workspace's people on its foot (and a plus for the owner), and a draft (no domain of its own) the draft mark before its name.
+ await page.locator('consistency-home ds-card .home-site-people ds-avatar[initial="A"]').first().waitFor();
+ const marks=await page.locator('consistency-home ds-card').evaluateAll(cards=>cards.map(card=>card.dataset.site+':'+[...card.querySelectorAll('.home-site-people ds-avatar')].map(avatar=>avatar.getAttribute('initial')??avatar.getAttribute('icon')).join('')+':'+(card.querySelector('[slot="title"] ds-icon[type="arrange-draft"]')?'draft':'')));
+ if(marks.join()!=='20FLAV:Aplus:,10VNDG:Aplus:draft,30SDGA:Aplus:draft')throw Error('Cards: '+marks.join());
+ // Pressing them opens the people panel at the side, the page still there and no site opened; Close puts it away.
+ await page.locator('consistency-home ds-card[data-site="10VNDG"] .home-site-people').click();
+ const panel=page.locator('consistency-home ds-overlay.home-people dialog[open]');await panel.locator('consistency-members ds-row',{hasText:'ada@example.com'}).waitFor();
+ if(await page.locator('consistency-home consistency-site-editor:not([hidden])').count())throw Error('Pressing the people opened the site');
+ if(!await panel.locator('consistency-members form.members-invite').count())throw Error('The owner cannot invite from the panel');
+ if(await panel.getAttribute('aria-labelledby')!=='home-people-title'||(await page.locator('#home-people-title').innerText()).trim()!=='People in 0001')throw Error('The panel is not named for the workspace');
+ if(process.env.PANEL_SHOT){await page.waitForTimeout(800);await page.screenshot({path:process.env.PANEL_SHOT});}
+ await panel.getByRole('button',{name:'Close'}).click();await panel.waitFor({state:'detached'});if(page.url()!==home)throw Error('The panel changed the address');
  if(process.env.CARD_SHOT)await page.locator('consistency-home ds-card[data-site="10VNDG"]').screenshot({path:process.env.CARD_SHOT});
  const cards=await page.locator('consistency-home ds-card').evaluateAll(cards=>cards.map(card=>card.dataset.site+':'+(card.getAttribute('href')??'')));
  if(cards.join()!=='20FLAV:,10VNDG:,30SDGA:')throw Error('Sites: '+cards.join());

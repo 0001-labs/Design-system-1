@@ -7,13 +7,19 @@ import '../../../DS1/2-core/ds-input';
 import '../../../DS1/2-core/ds-message';
 import '../../../DS1/2-core/ds-tag';
 import '../../../DS1/2-core/ds-icon';
+import '../../../DS1/2-core/ds-avatar';
+import '../../../DS1/2-core/ds-empty';
 
 /**
- * Settings → Members: the people invited to the workspace, for its admins and the owner. An invite is sent by
+ * The people in the workspace, in Settings → Members and in the people panel a site card's avatars open. Everyone
+ * in the workspace sees them; its admins and the owner (`manage`) invite and remove them. An invite is sent by
  * email; the person is in once they sign in at consistency.site with that address. The platform decides who may
- * do what; this page shows what it says.
+ * do what; this shows what it says, and tells the page when the people change (`members-change`).
  */
 export interface Member { email: string; role: 'admin' | 'editor'; status: 'invited' | 'active' }
+/** A person's avatar letter: their address's first letter. */
+export const personInitial = (email: string) => (email.trim()[0] ?? '?').toUpperCase();
+export const MEMBERS_CHANGE = 'members-change';
 
 const MESSAGES: Record<string, string> = {
   'bad-email': 'That is not an email address.',
@@ -24,9 +30,11 @@ const MESSAGES: Record<string, string> = {
 const ROLE_WORDS: Record<Member['role'], string> = { admin: 'Admin', editor: 'Editor' };
 
 export class ConsistencyMembers extends LitElement {
-  static properties = { workspace: { type: String }, members: { state: true }, email: { state: true }, role: { state: true }, error: { state: true }, notice: { state: true }, busy: { state: true } };
+  static properties = { workspace: { type: String }, manage: { type: Boolean }, members: { state: true }, email: { state: true }, role: { state: true }, error: { state: true }, notice: { state: true }, busy: { state: true } };
   /** The workspace's code. */
   declare workspace: string;
+  /** Whether this person may invite and remove people. */
+  declare manage: boolean;
   declare members: Member[] | null;
   declare email: string;
   declare role: Member['role'];
@@ -34,7 +42,7 @@ export class ConsistencyMembers extends LitElement {
   declare notice: string;
   declare busy: boolean;
 
-  constructor() { super(); this.workspace = ''; this.members = null; this.email = ''; this.role = 'editor'; this.error = ''; this.notice = ''; this.busy = false; }
+  constructor() { super(); this.workspace = ''; this.manage = true; this.members = null; this.email = ''; this.role = 'editor'; this.error = ''; this.notice = ''; this.busy = false; }
   protected createRenderRoot() { return this; }
 
   private get api() { return `/api/consistency/workspaces/${this.workspace}/members`; }
@@ -46,7 +54,10 @@ export class ConsistencyMembers extends LitElement {
     const body = response?.ok ? await response.json().catch(() => null) as { members?: Member[] } | null : null;
     if (!Array.isArray(body?.members)) { this.error = 'The members could not be read. Try again.'; return; }
     this.members = body.members;
+    this.changed();
   }
+
+  private changed() { this.dispatchEvent(new CustomEvent(MEMBERS_CHANGE, { bubbles: true, detail: { workspace: this.workspace, members: this.members ?? [] } })); }
 
   private async invite(event: Event) {
     event.preventDefault();
@@ -68,31 +79,33 @@ export class ConsistencyMembers extends LitElement {
     const response = await fetch(`${this.api}/${encodeURIComponent(member.email)}`, { method: 'DELETE' }).catch(() => null);
     if (!response?.ok) { const body = response ? await response.json().catch(() => null) as { error?: string } | null : null; this.error = (body?.error && MESSAGES[body.error]) || `${member.email} could not be removed. Try again.`; return; }
     this.members = (this.members ?? []).filter(each => each.email !== member.email);
+    this.changed();
   }
 
   private row(member: Member) {
     const id = `member-more-${member.email.replace(/[^a-z0-9]/g, '-')}`;
     return html`<ds-row class="member-row" data-status=${member.status}>
+      <ds-avatar class="ds-row__picture" initial=${personInitial(member.email)} outlined ?pending=${member.status === 'invited'} aria-hidden="true"></ds-avatar>
       <span class="ds-row__name">${member.email}</span>
       <span class="ds-row__value">${member.status === 'invited' ? html`<ds-tag>Invited</ds-tag>` : ''}<ds-tag>${ROLE_WORDS[member.role]}</ds-tag>
-        <ds-button id=${id} icon label=${`More for ${member.email}`}><ds-icon type="more"></ds-icon></ds-button>
-        <ds-select for=${id} aria-label=${`Actions for ${member.email}`}><ds-button menu-item role="menuitem" @click=${() => void this.removeMember(member)}>Remove</ds-button></ds-select></span>
+        ${this.manage ? html`<ds-button id=${id} icon label=${`More for ${member.email}`}><ds-icon type="more"></ds-icon></ds-button>
+        <ds-select for=${id} aria-label=${`Actions for ${member.email}`}><ds-button menu-item role="menuitem" @click=${() => void this.removeMember(member)}>Remove</ds-button></ds-select>` : ''}</span>
     </ds-row>`;
   }
 
   render() {
     return html`<section class="members" aria-label="Members">
-      <form class="members-invite" @submit=${(event: Event) => void this.invite(event)}>
+      ${this.manage ? html`<form class="members-invite" @submit=${(event: Event) => void this.invite(event)}>
         <ds-input class="members-email" name="email" aria-label="Email" placeholder="name@example.com" autocomplete="off" spellcheck="false" .value=${this.email}
           @input-change=${(event: CustomEvent<{ value: string }>) => { this.email = event.detail.value; }}></ds-input>
         <ds-select class="members-role" aria-label="Role"><select aria-label="Role" .value=${this.role} @change=${(event: Event) => { this.role = (event.target as HTMLSelectElement).value === 'admin' ? 'admin' : 'editor'; }}>
           <option value="editor" ?selected=${this.role === 'editor'}>Editor</option><option value="admin" ?selected=${this.role === 'admin'}>Admin</option>
         </select></ds-select>
         <ds-button primary @click=${(event: Event) => void this.invite(event)} ?disabled=${this.busy || !this.email.trim()}>Invite</ds-button>
-      </form>
+      </form>` : ''}
       ${this.error ? html`<ds-message role="alert" tone="danger" literal text=${this.error}></ds-message>` : ''}
       ${this.notice ? html`<ds-message role="status" literal text=${this.notice}></ds-message>` : ''}
-      ${this.members?.length ? html`<ds-list aria-label="Members">${this.members.map(member => this.row(member))}</ds-list>` : ''}
+      ${this.members?.length ? html`<ds-list aria-label="Members">${this.members.map(member => this.row(member))}</ds-list>` : this.members ? html`<ds-empty literal heading="No one is invited yet"></ds-empty>` : ''}
     </section>`;
   }
 }

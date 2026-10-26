@@ -50,5 +50,8 @@ consistency-members{display:block;max-width:calc(32 * var(--ds-unit))}
 /* A draft's mark before a site's name on its card, 16px and 4px from the name, with its capitals. */
 .home-site-title{display:flex;align-items:center;gap:calc(4px * var(--ds-sf, 1))}
 .home-site-title ds-icon{flex:none}
-/* The site's avatar on the card's foot, two squares, as a picture stands there. */
-.home-site-avatar{display:block}
+/* The people on the card's foot: a button of their avatars, one control high on the sixteen, pressing only itself. */
+.home-site-people{display:flex;align-items:flex-end;height:var(--ds-unit);margin:0 0 var(--ds-unit);padding:0;border:0;background:none;color:inherit;font:inherit;cursor:pointer;border-radius:var(--ds-radius, 4px)}
+.home-site-people:focus-visible{outline:2px solid var(--ds-focus-color, currentColor);outline-offset:2px}
+/* The people panel's list fills the drawer's column. */
+.home-people consistency-members{max-width:none}

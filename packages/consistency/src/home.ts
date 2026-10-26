@@ -15,7 +15,9 @@ import '../../../DS1/2-core/ds-input';
 import '../../../DS1/2-core/ds-message';
 import '../../../DS1/2-core/ds-empty';
 import './domains';
-import './members';
+import { MEMBERS_CHANGE, personInitial, type Member } from './members';
+import '../../../DS1/3-unit/ds-avatar-group';
+import '../../../DS1/4-page/ds-overlay';
 import { activeWorkspace, canManage, draftWords, readWorkspaces, setActiveWorkspace, storeWorkspaces, storedWorkspaces, workspaceHeaders, type WorkspaceSummary } from './workspace-choice';
 import { ConsistencySiteEditor } from './site-editor';
 import type { SiteSummary } from './site-editing';
@@ -90,12 +92,24 @@ const siteLabel = (site: SiteSummary) => site.domain
   ? html`<span slot="label" class="home-site-domain"><ds-icon type="globe" size="large" role="img" aria-label="Connected domain"></ds-icon>${site.domain}</span>`
   : html`<span slot="label">${site.address ?? siteHost(site)}</span>`;
 
+// Each workspace's people as last read, so the cards' avatars are drawn at once and the platform only confirms them.
+const PEOPLE_KEY = (workspace: string) => `consistency-people:${workspace}`;
+function storedPeople(workspace: string): Member[] {
+  if (!workspace) return [];
+  try {
+    const value = JSON.parse(localStorage.getItem(PEOPLE_KEY(workspace)) ?? '[]') as unknown;
+    return Array.isArray(value) ? value.filter((person): person is Member => !!person && typeof person.email === 'string') : [];
+  } catch { return []; }
+}
+/** How many people a card shows before the rest are a count. */
+const PEOPLE_SHOWN = 3;
+
 /** The avatar's letter: a name's first letter, a number's first figure after its leading zeros (0001 is 1). */
 export function workspaceInitial(name: string): string { return (name.trim().replace(/^0+(?=.)/, '')[0] ?? '?').toUpperCase(); }
 
 /** Consistency's app: a workspace's sites, each in the editor, and Settings. */
 export class ConsistencyHome extends LitElement {
-  static properties = { error: { state: true }, workspaces: { state: true }, workspace: { state: true }, place: { state: true }, sites: { state: true }, naming: { state: true }, unread: { state: true } };
+  static properties = { error: { state: true }, workspaces: { state: true }, workspace: { state: true }, place: { state: true }, sites: { state: true }, naming: { state: true }, unread: { state: true }, people: { state: true }, peopleOpen: { state: true } };
   /** The places the app can show, by id (`places/index.ts`), here too for a place defined outside the app's modules. */
   static readonly places = PLACES;
   declare place: Place;
@@ -107,6 +121,10 @@ export class ConsistencyHome extends LitElement {
   declare sites: SiteSummary[];
   /** True once the workspaces have been read and the person has none: invited nowhere yet. */
   declare unread: boolean;
+  /** The workspace's people, as stored or read. */
+  declare people: Member[];
+  /** Whether the people panel stands at the side. */
+  declare peopleOpen: boolean;
   /** The workspace's name as typed in Account, while it is being saved or has failed. */
   declare naming: { value: string; busy: boolean; error: string } | null;
   /** Every site opened so far, kept alive while hidden. */
@@ -132,6 +150,8 @@ export class ConsistencyHome extends LitElement {
     this.workspace = this.workspaces.some(each => each.code === activeWorkspace()) ? activeWorkspace() : this.workspaces[0]?.code ?? '';
     setActiveWorkspace(this.workspace);
     this.sites = storedSites(this.workspace);
+    this.people = storedPeople(this.workspace);
+    this.peopleOpen = false;
     this.place = openingPlace(location.search, location.hash, history.state);
     // The address stays the app's own: what opened it is kept as history state instead.
     history.replaceState(this.place, '', location.pathname);
@@ -147,7 +167,13 @@ export class ConsistencyHome extends LitElement {
     void this.editors.get(code)?.open(path);
   };
 
-  connectedCallback() { super.connectedCallback(); addEventListener('popstate', this.onPop); addEventListener('hashchange', this.onHash); this.addEventListener(OPEN_PAGE, this.onOpenPage); void this.readWorkspaces(); }
+  /** The people panel or Members read the people again or changed them: the cards follow. */
+  private readonly onMembers = (event: Event) => {
+    const { workspace, members } = (event as CustomEvent<{ workspace: string; members: Member[] }>).detail;
+    if (workspace === this.workspace) this.keepPeople(members);
+  };
+
+  connectedCallback() { super.connectedCallback(); addEventListener('popstate', this.onPop); addEventListener('hashchange', this.onHash); this.addEventListener(OPEN_PAGE, this.onOpenPage); this.addEventListener(MEMBERS_CHANGE, this.onMembers); void this.readWorkspaces(); }
 
   /** Goes to a place inside the app, the address unchanged. */
   go(next: Place) { void this.move(next, 'push'); }
@@ -184,14 +210,31 @@ export class ConsistencyHome extends LitElement {
     setActiveWorkspace(code);
     this.workspace = code;
     this.sites = storedSites(code);
+    this.people = storedPeople(code);
+    this.peopleOpen = false;
     this.naming = null;
     void this.readSites();
+  }
+
+  /** The workspace's people from the platform, for the cards' avatars. */
+  private async readPeople() {
+    const workspace = this.workspace;
+    if (!workspace) return;
+    const response = await fetch(`/api/consistency/workspaces/${workspace}/members`, { cache: 'no-store' }).catch(() => null);
+    const body = response?.ok ? await response.json().catch(() => null) as { members?: Member[] } | null : null;
+    if (Array.isArray(body?.members) && workspace === this.workspace) this.keepPeople(body.members);
+  }
+
+  private keepPeople(members: Member[]) {
+    this.people = members;
+    try { localStorage.setItem(PEOPLE_KEY(this.workspace), JSON.stringify(members)); } catch { /* read again next visit */ }
   }
 
   /** The workspace's sites from the registry: their names and their own addresses. */
   private async readSites() {
     const workspace = this.workspace;
     if (!workspace) { this.sites = []; return; }
+    void this.readPeople();
     const response = await fetch('/api/consistency/sites', { cache: 'no-store', headers: workspaceHeaders() }).catch(() => null);
     const body = response?.ok ? await response.json().catch(() => null) as { sites?: SiteSummary[] } | null : null;
     if (!Array.isArray(body?.sites) || workspace !== this.workspace) return;
@@ -239,7 +282,7 @@ export class ConsistencyHome extends LitElement {
     for (const [code, editor] of this.editors) editor.hidden = code !== current?.code || Boolean(at);
     for (const [each, element] of this.placeElements) element.hidden = each !== key;
   }
-  disconnectedCallback() { super.disconnectedCallback(); removeEventListener('popstate', this.onPop); removeEventListener('hashchange', this.onHash); this.removeEventListener(OPEN_PAGE, this.onOpenPage); }
+  disconnectedCallback() { super.disconnectedCallback(); removeEventListener('popstate', this.onPop); removeEventListener('hashchange', this.onHash); this.removeEventListener(OPEN_PAGE, this.onOpenPage); this.removeEventListener(MEMBERS_CHANGE, this.onMembers); }
 
   /** The workspace the app is in, as last read. */
   private get current(): WorkspaceSummary | undefined { return this.workspaces.find(each => each.code === this.workspace); }
@@ -300,7 +343,8 @@ export class ConsistencyHome extends LitElement {
         ${this.place.page === 'settings' ? this.settings(this.place.tab, current) : open ? (this.sites.some(site => site.code === open) ? '' : html`<ds-empty literal heading="This site is not in your workspace"></ds-empty>`) : this.unread ? html`<ds-empty literal heading="You are not in a workspace yet" text="Ask whoever invited you to Consistency to invite this address."></ds-empty>` : this.siteCards()}
         <div class="home-stage" ?hidden=${!open}></div>
       </div>
-    </ds-page>`;
+    </ds-page>
+    ${this.peoplePanel(current)}`;
   }
 
   /** An open site's sidebar: its name, which shows the site and whose menu goes to another, and its places. */
@@ -324,10 +368,37 @@ export class ConsistencyHome extends LitElement {
 
   /**
    * The workspace's sites as cards, each opening in the editor here: its address, a draft's mark before its name
-   * (a site on its built-in address alone, as Free's are), and its avatar on the card's foot.
+   * (a site on its built-in address alone, as Free's are), and on its foot the people who edit it, the workspace's;
+   * pressing them opens the people panel, never the site.
    */
   private siteCards() {
-    return html`<div class="home-grid">${this.sites.map(site => html`<ds-card interactive data-site=${site.code} width="12" height="8" @ds-card-press=${() => this.go({ page: 'site', code: site.code })}>${siteLabel(site)}<span slot="title" class="home-site-title">${site.domain ? '' : html`<ds-icon type="arrange-draft" size="large" role="img" aria-label="Draft"></ds-icon>`}${site.name}</span><ds-avatar slot="media" class="home-site-avatar" size="large" outlined initial=${workspaceInitial(site.name)} aria-hidden="true"></ds-avatar></ds-card>`)}</div>`;
+    return html`<div class="home-grid">${this.sites.map(site => html`<ds-card interactive data-site=${site.code} width="12" height="8" @ds-card-press=${() => this.go({ page: 'site', code: site.code })}>${siteLabel(site)}<span slot="title" class="home-site-title">${site.domain ? '' : html`<ds-icon type="arrange-draft" size="large" role="img" aria-label="Draft"></ds-icon>`}${site.name}</span>${this.peopleButton()}</ds-card>`)}</div>`;
+  }
+
+  /** The workspace's people as overlapping avatars, the invited ones pending, and a plus for those who may invite. */
+  private peopleButton() {
+    const current = this.current;
+    const manage = canManage(current);
+    const shown = this.people.slice(0, PEOPLE_SHOWN);
+    const rest = this.people.length - shown.length;
+    if (!shown.length && !manage) return '';
+    const stop = (event: Event) => event.stopPropagation();
+    const label = `People in ${current?.name ?? 'the workspace'}`;
+    return html`<button slot="media" type="button" class="home-site-people" aria-label=${label} data-tooltip=${label}
+      @click=${(event: Event) => { stop(event); this.peopleOpen = true; }} @keydown=${stop}>
+      <ds-avatar-group>${shown.map(person => html`<ds-avatar initial=${personInitial(person.email)} outlined ?pending=${person.status === 'invited'}></ds-avatar>`)}${rest > 0 ? html`<ds-avatar initial=${`+${rest}`} outlined></ds-avatar>` : ''}${manage ? html`<ds-avatar icon="plus" outlined></ds-avatar>` : ''}</ds-avatar-group>
+    </button>`;
+  }
+
+  /** The workspace's people in a panel at the side, the page still live beside it; admins and the owner invite more. */
+  private peoplePanel(current: WorkspaceSummary | undefined) {
+    return html`<ds-overlay class="home-people" type="drawer" side="end" non-modal .open=${this.peopleOpen} @ds-close-request=${() => { this.peopleOpen = false; }}>
+      <dialog aria-labelledby="home-people-title">
+        <header data-ds-overlay="header"><span id="home-people-title" data-ds-overlay="title">${current ? `People in ${current.name}` : 'People'}</span></header>
+        <ds-button data-ds-overlay="close" data-ds-overlay-dismiss icon label="Close"><ds-icon type="close"></ds-icon></ds-button>
+        ${this.peopleOpen && current ? html`<consistency-members .workspace=${current.code} .manage=${canManage(current)}></consistency-members>` : ''}
+      </dialog>
+    </ds-overlay>`;
   }
 
   /** Settings as Money draws it: text tabs under the title, each tab its own address. Members is for the workspace's admins and the owner. */
