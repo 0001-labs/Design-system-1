@@ -18,7 +18,7 @@ try {
  let signedOut=false;await page.route('**/api/dashboard/session',async route=>{signedOut=route.request().method()==='DELETE';await route.fulfill({status:204});});
  await page.route('**/app/signin',route=>route.fulfill({status:200,contentType:'text/html',body:'signed out'}));
  await page.route('**/api/consistency/profile',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({companyName:'0001'})}));
- await page.route('**/api/consistency/sites',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({sites:[{code:'20FLAV',name:'Flavo',url:'https://flavo.c9y.site/'},{code:'10VNDG',name:'CPH Raft',url:'https://cphraft.c9y.site/'},{code:'30SDGA',name:'Søndergården',url:'https://soendergaarden.c9y.site/'}]})}));
+ await page.route('**/api/consistency/sites',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({sites:[{code:'20FLAV',name:'Flavo',url:'https://flavo.flowers/',address:'ghost-dew-rose.c9y.site',domain:'flavo.flowers'},{code:'10VNDG',name:'CPH Raft',url:'https://cphraft.c9y.site/',address:'alice-steel-blue.c9y.site'},{code:'30SDGA',name:'Søndergården',url:'https://soendergaarden.c9y.site/'}]})}));
  await page.route('**/api/consistency/sites/*/pages',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({pages:[]})}));
  // Søndergården's pages, in two languages, and their documents, for the site's own sidebar.
  const sdg=[{path:'/',lang:'da',title:'Forside',fields:1,edited:0},{path:'/om/',lang:'da',title:'Om os',fields:1,edited:0},{path:'/en/',lang:'en',title:'Home',fields:1,edited:0}];
@@ -38,6 +38,9 @@ try {
  await page.getByRole('button',{name:'Notifications',exact:true}).waitFor();
  if(await page.locator('consistency-home ds-sidebar').getByText('Projects',{exact:true}).count())throw Error('Projects is still in the sidebar');
  if(process.env.HOME_SHOT)await page.locator('consistency-home nav.home-nav').screenshot({path:process.env.HOME_SHOT});
+ // A connected domain after a globe; otherwise the built-in colour address, never a named c9y.site host.
+ const labels=await page.locator('consistency-home ds-card [slot="label"]').evaluateAll(spans=>spans.map(span=>(span.querySelector('ds-icon[type="globe"]')?'globe ':'')+span.textContent.trim()));
+ if(labels.join()!=='globe flavo.flowers,alice-steel-blue.c9y.site,soendergaarden.c9y.site')throw Error('The cards label their sites '+labels.join());
  const cards=await page.locator('consistency-home ds-card').evaluateAll(cards=>cards.map(card=>card.dataset.site+':'+(card.getAttribute('href')??'')));
  if(cards.join()!=='20FLAV:,10VNDG:,30SDGA:')throw Error('Sites: '+cards.join());
  // The address is the app's and nothing more: a site opens here, by its code, and the address does not change.

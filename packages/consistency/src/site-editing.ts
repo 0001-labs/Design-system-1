@@ -5,8 +5,12 @@
  * are the site engine's fields, saved one by one as the site engine edits.
  */
 
-/** One of the workspace's sites by its IDv1 code (a list's shape), as `/api/consistency/sites` gives it. */
-export interface SiteSummary { code: string; name: string; url: string }
+/**
+ * One of the workspace's sites by its IDv1 code (a list's shape), as `/api/consistency/sites` gives it: `url` the
+ * address its pages are opened on, `address` its built-in colour address under c9y.site, `domain` a domain of its
+ * own connected.
+ */
+export interface SiteSummary { code: string; name: string; url: string; address?: string; domain?: string }
 export interface SitePage { path: string; lang: string; title: string; fields: number; edited: number }
 export interface SiteField { key: string; tag: string; kind: 'text' | 'meta' | 'image'; label: string; markdown: string; built?: string; edited?: boolean }
 export interface PageDetail { path: string; lang: string; title: string; fields: SiteField[] }

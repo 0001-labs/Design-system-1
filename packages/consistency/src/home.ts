@@ -77,6 +77,10 @@ function storedPlaces(code: string): SitePlace[] | undefined {
 
 /** A site's own address, for its card: its host without the editor's path. */
 export const siteHost = (site: SiteSummary) => { try { return new URL(site.url).host; } catch { return ''; } };
+/** A site's card label: a domain of its own after a globe, else its built-in colour address, else its host. */
+const siteLabel = (site: SiteSummary) => site.domain
+  ? html`<span slot="label" class="home-site-domain"><ds-icon type="globe" size="large" role="img" aria-label="Connected domain"></ds-icon>${site.domain}</span>`
+  : html`<span slot="label">${site.address ?? siteHost(site)}</span>`;
 
 // The workspace's name as last read, so the header draws it at once and the profile only confirms it.
 const WORKSPACE_KEY = 'consistency-home-workspace';
@@ -267,7 +271,7 @@ export class ConsistencyHome extends LitElement {
 
   /** The owner's sites as cards, each opening in the editor here. */
   private siteCards() {
-    return html`<div class="home-grid">${this.sites.map(site => html`<ds-card interactive data-site=${site.code} width="12" height="8" @ds-card-press=${() => this.go({ page: 'site', code: site.code })}><span slot="label">${siteHost(site)}</span><span slot="title">${site.name}</span></ds-card>`)}</div>`;
+    return html`<div class="home-grid">${this.sites.map(site => html`<ds-card interactive data-site=${site.code} width="12" height="8" @ds-card-press=${() => this.go({ page: 'site', code: site.code })}>${siteLabel(site)}<span slot="title">${site.name}</span></ds-card>`)}</div>`;
   }
 
   /** Settings as Money draws it: text tabs under the title, each tab its own address. */

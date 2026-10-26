@@ -13,6 +13,8 @@ consistency-home>ds-page{height:100%}
 .home-workspace-name ds-icon{margin-inline-start:calc(4px * var(--ds-sf, 1))}
 .home-bar{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--ds-unit);min-height:var(--ds-unit)}
 .home-grid{display:grid;grid-template-columns:repeat(auto-fill,calc(12 * var(--ds-unit)));gap:var(--ds-unit)}
+/* A connected domain: the globe before it, 16px on the label's sixteen, hugging the words 4px apart. */
+.home-site-domain{display:flex;align-items:center;height:var(--ds-type-lineheight-default, calc(16px * var(--ds-sf, 1)));gap:calc(4px * var(--ds-sf, 1))}
 @media(max-width:600px){.home-grid{grid-template-columns:minmax(0,1fr)}.home-grid>ds-card{width:auto}}
 /* Settings → Domains: a settings column of 32 squares; the connect row on the sixteen; each waiting domain's record under its row. */
 consistency-domains{display:block;max-width:calc(32 * var(--ds-unit))}
