@@ -118,7 +118,7 @@ Items stack edge to edge with no gap, as an Ezo list does. Lists, table rows, ce
 
 ## Tags
 
-`ds-tag` is a noninteractive category or status label: one control high, 4px scaled padding on each side, and the shared small corner. Its width hugs its text without rounding to squares, an intentional exception for compact labels. Use `--ds-tag-accent` for a pale fill and coloured text. App navigation uses Tag; Badge retains its grid-sized geometry.
+`ds-tag` is a noninteractive category or status label: one control high, 4px scaled padding on each side, and the shared small corner. Like a button it stands on the lower sixteen of its square: at the foot of a line, and in a row that stretches it to a square its fill stays a control high at the row's foot, so its words share a baseline with a 16px line of text beside it (since 26 October 2026). Its width hugs its text without rounding to squares, an intentional exception for compact labels. Use `--ds-tag-accent` for a pale fill and coloured text. App navigation uses Tag; Badge retains its grid-sized geometry.
 
 ## Text and prose
 

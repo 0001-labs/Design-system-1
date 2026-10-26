@@ -19,8 +19,11 @@
   --_tag-font-size: calc(var(--_tag-text-size) * var(--ds-sf, 1));
 }
 :host([hidden]) { display: none !important; }
+/* The face stays one control high at the foot of its box, on the lower sixteen,
+   even when a row stretches the tag to a square. */
 .frame {
   display: block;
+  align-self: flex-end;
   box-sizing: border-box;
   max-width: 100%;
   padding-inline: var(--_tag-padding, calc(4px * var(--ds-sf, 1)));
