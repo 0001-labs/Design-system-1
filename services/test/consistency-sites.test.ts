@@ -84,15 +84,22 @@ const write = (method: string, body: string, init: { origin?: string; type?: str
 const id = '0f0e0d0c-0b0a-4908-8706-050403020100';
 
 it('passes on exactly the platform\'s allowlist of a site\'s API, each route by its own methods', async () => {
-  for (const [route, method] of [['me', 'GET'], ['history', 'GET'], ['detached', 'GET'], ['reset', 'POST'], ['emails', 'GET'], ['emails/templates', 'GET'], ['emails/a_b-1', 'GET'], ['bookings', 'GET'], [`bookings/${id}`, 'GET'], [`bookings/${id}/cancel`, 'POST'], ['booking-offers', 'PUT'], ['booking-settings', 'GET'], ['giftcards', 'POST'], [`giftcards/${id}/pdf`, 'GET'], [`giftcards/${id}/void`, 'POST'], [`giftcards/${id}/resend`, 'POST'], ['business', 'POST']])
+  for (const [route, method] of [['me', 'GET'], ['history', 'GET'], ['detached', 'GET'], ['reset', 'POST'], ['emails', 'GET'], ['emails/templates', 'GET'], ['emails/a_b-1', 'GET'], ['bookings', 'GET'], [`bookings/${id}`, 'GET'], [`bookings/${id}/cancel`, 'POST'], ['booking-offers', 'PUT'], ['booking-settings', 'GET'], ['giftcards', 'POST'], [`giftcards/${id}/pdf`, 'GET'], [`giftcards/${id}/void`, 'POST'], [`giftcards/${id}/resend`, 'POST'], ['business', 'POST'],
+    ['orders', 'GET'], ['orders/config', 'GET'], [`orders/${id}`, 'GET'], [`orders/${id}/confirm`, 'POST'], [`orders/${id}/cancel`, 'POST'], [`orders/${id}/mark-paid`, 'POST'],
+    [`orders/${id}/invoice`, 'POST'], [`orders/${id}/fulfil`, 'POST'], [`orders/${id}/note`, 'PUT'], ['order-settings', 'GET'], ['order-settings', 'PUT']])
     expect(apiRoute(route!)?.methods, `${method} ${route}`).toContain(method);
   const { call, workspace } = setup();
-  for (const route of ['editors', 'report', 'code', 'verify', 'sign-out', 'analytics', 'flags', 'pages/', 'bookings/nope', `giftcards/${id}/refund`, 'emails/a/b'])
+  for (const route of ['editors', 'report', 'code', 'verify', 'sign-out', 'analytics', 'flags', 'pages/', 'bookings/nope', `giftcards/${id}/refund`, 'emails/a/b',
+    'orders/Rb42Xq', `orders/${id}/pay`, `orders/${id}/expire`, `orders/${id}/note/x`, 'orders/config/x', 'order-settings/x'])
     expect((await call(`10VNDG/api/${route}`, { headers })).status, route).toBe(404);
   expect((await call('10VNDG/api/pages', write('POST', '{}'))).status).toBe(405);
   expect((await call('10VNDG/api/booking-offers', write('POST', '{}'))).status).toBe(405);
   expect((await call(`10VNDG/api/bookings/${id}`, { method: 'DELETE', headers: { ...headers, origin } })).status).toBe(405);
   expect((await call('10VNDG/api/business', { headers })).status).toBe(405);
+  expect((await call('10VNDG/api/orders', write('POST', '{}'))).status).toBe(405);
+  expect((await call(`10VNDG/api/orders/${id}/confirm`, { headers })).status).toBe(405);
+  expect((await call(`10VNDG/api/orders/${id}/note`, write('POST', '{}'))).status).toBe(405);
+  expect((await call('10VNDG/api/order-settings', write('POST', '{}'))).status).toBe(405);
   expect((await call('10VNDG/places', write('POST', '{}'))).status).toBe(405);
   expect(workspace.fetch).not.toHaveBeenCalled();
 });

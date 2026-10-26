@@ -1,6 +1,6 @@
 /**
  * The places of an open site in Consistency's app: the menus under the site's name in the sidebar (Pages, Emails,
- * Design, Bookings, Gift cards, a site's own), each a Lit element mounted in the work area beside the site's canvas.
+ * Design, Bookings, Gift cards, Orders, a site's own), each a Lit element mounted in the work area beside the site's canvas.
  *
  * The platform says which menus a site has (`sitePlaces`); the app shows only those it has an element for, from
  * this registry by place id. A place's element is made once per site and kept, hidden while another is shown.
@@ -9,6 +9,7 @@ import type { SiteSummary } from '../site-editing';
 import type { SitePlace } from './api';
 import { ConsistencyPlaceBookings } from './bookings';
 import { ConsistencyPlaceGiftCards } from './giftcards';
+import { ConsistencyPlaceOrders } from './orders';
 
 export { SiteApiError, siteApi, sitePlaces, type SitePlace } from './api';
 
@@ -24,3 +25,5 @@ export const shownPlaces = (places: readonly SitePlace[]) => places.filter(place
 // CPH Raft's places, on the site engine's bookings and gift cards (`/team/api/bookings…`, `/team/api/giftcards…`).
 PLACES.set('bookings', site => Object.assign(new ConsistencyPlaceBookings(), { site }));
 PLACES.set('giftcards', site => Object.assign(new ConsistencyPlaceGiftCards(), { site }));
+// Every site's orders, under the site's own word for them (`/team/api/orders…`): the place of a site that takes requests or sales.
+PLACES.set('orders', site => Object.assign(new ConsistencyPlaceOrders(), { site }));
