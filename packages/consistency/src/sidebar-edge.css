@@ -1,0 +1,30 @@
+/* The sidebar's edge (sidebar-edge.ts). The page is DS1's own sidebar layout; folding it only sets the page's own
+   measures (no sidebar column and no gap after it) and stands the sidebar over the work through the page's `nav` part,
+   so the shared page is unchanged. The work moved past the window during a drag is cut at the app's edge. */
+consistency-home{overflow:clip}
+.home-edge{display:none}
+@media (min-width:600px){
+  /* One square wide, the full height, centred on the boundary: the middle of the two squares between the sidebar and
+     the work, or the window's left square when folded. A quiet line shows it under the pointer, in focus and in a drag. */
+  .home-edge{display:block;position:fixed;z-index:3;inset-block:0;inset-inline-start:calc(14 * var(--ds-unit) - var(--ds-unit) / 2);width:var(--ds-unit);cursor:col-resize;touch-action:none;outline:none}
+  .home-edge::before{content:"";position:absolute;inset-block:var(--ds-unit);inset-inline-start:calc(50% - 0.5px);width:1px;background:var(--ds-border-color);opacity:0;transition:opacity 150ms cubic-bezier(0.23,1,0.32,1)}
+  .home-edge:hover::before,consistency-home[data-sidebar-moving] .home-edge::before{opacity:1}
+  /* Over the shown sidebar the edge keeps its square but draws nothing: the sidebar's own line is the boundary. */
+  consistency-home[data-sidebar-peek]:not([data-sidebar-moving])>.home-edge::before{opacity:0}
+  .home-edge:focus-visible::before{opacity:1;inset-inline-start:calc(50% - 1px);width:2px;background:var(--ds-focus-color, currentColor)}
+  consistency-home[data-sidebar="collapsed"]>.home-edge{inset-inline-start:0}
+  /* Folded: the work stands a square from every side of the window. */
+  consistency-home[data-sidebar="collapsed"]>ds-page{--ds-page-nav:0px;--ds-page-gap:0px}
+  /* The sidebar over the work, where it stands when open: twelve squares with a square either side, its line facing the work.
+     Its column takes no pointer, so the work under it stays live while the sidebar is away. */
+  consistency-home[data-sidebar="collapsed"]>ds-page::part(nav){position:fixed;z-index:2;inset-block:0;inset-inline-start:0;width:calc(14 * var(--ds-unit));overflow:visible;pointer-events:none}
+  consistency-home[data-sidebar="collapsed"]>ds-page>nav.home-nav{pointer-events:auto;box-sizing:border-box;width:100%;height:100%;padding:var(--ds-unit) calc(var(--ds-unit) - 1px) var(--ds-unit) var(--ds-unit);background:var(--ds-paper);border-inline-end:1px solid var(--ds-border-color);transform:translateX(-100%);visibility:hidden;transition:transform 160ms cubic-bezier(0.32,0.72,0,1),visibility 0s linear 160ms}
+  consistency-home[data-sidebar="collapsed"][data-sidebar-peek]>ds-page>nav.home-nav{transform:none;visibility:visible;transition:transform 200ms cubic-bezier(0.32,0.72,0,1),visibility 0s}
+  /* A drag or a settle moves everything by its own transform. */
+  consistency-home[data-sidebar-moving]>ds-page{will-change:transform}
+  consistency-home[data-sidebar][data-sidebar-moving]>ds-page>nav.home-nav{visibility:visible;transition:none}
+}
+@media (min-width:600px) and (prefers-reduced-motion:reduce){
+  consistency-home[data-sidebar="collapsed"]>ds-page>nav.home-nav,
+  consistency-home[data-sidebar="collapsed"][data-sidebar-peek]>ds-page>nav.home-nav{transition:none}
+}

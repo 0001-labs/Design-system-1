@@ -24,6 +24,7 @@ import { ConsistencySiteEditor } from './site-editor';
 import type { SiteSummary } from './site-editing';
 import { PLACES, shownPlaces, sitePlaces, type SitePlace } from './places/index';
 import { OPEN_PAGE } from './places/pages';
+import { SidebarEdge } from './sidebar-edge';
 import type { SidebarItem } from '../../../DS1/3-unit/ds-sidebar';
 import './home.css';
 
@@ -132,6 +133,8 @@ export class ConsistencyHome extends LitElement {
   declare peopleOpen: boolean;
   /** The workspace's name as typed in Account, while it is being saved or has failed. */
   declare naming: { value: string; busy: boolean; error: string } | null;
+  /** The sidebar's edge: dragged, it folds the sidebar away and back (`sidebar-edge.ts`). */
+  readonly edge = new SidebarEdge(this);
   /** Every site opened so far, kept alive while hidden. */
   private readonly editors = new Map<string, ConsistencySiteEditor>();
   /** Each site's places, as stored or read, by site code. */
@@ -178,7 +181,7 @@ export class ConsistencyHome extends LitElement {
     if (workspace === this.workspace) this.keepPeople(members);
   };
 
-  connectedCallback() { super.connectedCallback(); addEventListener('popstate', this.onPop); addEventListener('hashchange', this.onHash); this.addEventListener(OPEN_PAGE, this.onOpenPage); this.addEventListener(MEMBERS_CHANGE, this.onMembers); void this.readWorkspaces(); }
+  connectedCallback() { this.edge.connect(); super.connectedCallback(); addEventListener('popstate', this.onPop); addEventListener('hashchange', this.onHash); this.addEventListener(OPEN_PAGE, this.onOpenPage); this.addEventListener(MEMBERS_CHANGE, this.onMembers); void this.readWorkspaces(); }
 
   /** Goes to a place inside the app, the address unchanged. */
   go(next: Place) { void this.move(next, 'push'); }
@@ -191,6 +194,7 @@ export class ConsistencyHome extends LitElement {
     if (leaving && !(await leaving.flush())) { if (record === 'none') history.pushState(current, '', location.pathname); return; }
     if (record === 'push' && JSON.stringify(next) !== JSON.stringify(current)) history.pushState(next, '', location.pathname);
     this.place = next;
+    this.edge.chosen();
   }
 
   /**
@@ -287,7 +291,7 @@ export class ConsistencyHome extends LitElement {
     for (const [code, editor] of this.editors) editor.hidden = code !== current?.code || Boolean(at);
     for (const [each, element] of this.placeElements) element.hidden = each !== key;
   }
-  disconnectedCallback() { super.disconnectedCallback(); removeEventListener('popstate', this.onPop); removeEventListener('hashchange', this.onHash); this.removeEventListener(OPEN_PAGE, this.onOpenPage); this.removeEventListener(MEMBERS_CHANGE, this.onMembers); }
+  disconnectedCallback() { super.disconnectedCallback(); this.edge.disconnect(); removeEventListener('popstate', this.onPop); removeEventListener('hashchange', this.onHash); this.removeEventListener(OPEN_PAGE, this.onOpenPage); this.removeEventListener(MEMBERS_CHANGE, this.onMembers); }
 
   /** The workspace the app is in, as last read. */
   private get current(): WorkspaceSummary | undefined { return this.workspaces.find(each => each.code === this.workspace); }
@@ -324,8 +328,8 @@ export class ConsistencyHome extends LitElement {
     const open = this.place.page === 'site' ? (this.place as { code: string }).code : '';
     const site = open ? this.sites.find(item => item.code === open) : undefined;
     const drafts = draftWords(current);
-    return html`<ds-page layout="sidebar" fill drawer>
-      ${site ? this.siteNav(site) : html`<nav slot="nav" class="home-nav" aria-label="Consistency">
+    return html`${this.edge.handle}<ds-page layout="sidebar" fill drawer>
+      ${site ? this.siteNav(site) : html`<nav slot="nav" id="home-nav" class="home-nav" aria-label="Consistency">
         <div class="home-workspace" aria-label="Workspace">
           <ds-button id="home-workspace" class="home-workspace-name" label=${`Workspace: ${name}`} @click=${() => this.go({ page: 'sites' })}>
             <ds-avatar initial=${workspaceInitial(name)} outlined plain aria-hidden="true"></ds-avatar>${name}
@@ -361,7 +365,7 @@ export class ConsistencyHome extends LitElement {
       ...shownPlaces(this.placesFor(site.code)).map(place => ({ id: place.id, label: place.label, current: place.id === current })),
     ];
     const others = this.sites.filter(item => item.code !== site.code);
-    return html`<nav slot="nav" class="home-nav" aria-label=${site.name}>
+    return html`<nav slot="nav" id="home-nav" class="home-nav" aria-label=${site.name}>
       <div class="home-workspace" aria-label="Site">
         <ds-button id="home-site" class="home-workspace-name" label=${`Site: ${site.name}`} @click=${() => this.go({ page: 'sites' })}>
           <ds-avatar initial=${workspaceInitial(site.name)} outlined plain aria-hidden="true"></ds-avatar>${site.name}${others.length ? html`<ds-icon type="chevron-down"></ds-icon>` : ''}
