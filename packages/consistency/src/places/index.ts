@@ -13,6 +13,7 @@ import { ConsistencyPlacePages } from './pages';
 import { ConsistencyPlaceEmails } from './emails';
 import { ConsistencyPlaceDesign } from './design';
 import { ConsistencyPlaceOrders } from './orders';
+import { flavoPlaces } from './flavo';
 
 export { SiteApiError, siteApi, sitePlaces, type SitePlace } from './api';
 
@@ -33,3 +34,5 @@ PLACES.set('bookings', site => Object.assign(new ConsistencyPlaceBookings(), { s
 PLACES.set('giftcards', site => Object.assign(new ConsistencyPlaceGiftCards(), { site }));
 // Every site's orders, under the site's own word for them (`/team/api/orders…`): the place of a site that takes requests or sales.
 PLACES.set('orders', site => Object.assign(new ConsistencyPlaceOrders(), { site }));
+// Flavo's own places (Produkter, Udlejning, Kunder …), Flavo's `places` export by Sync 1, on its business store.
+for (const [id, make] of flavoPlaces) PLACES.set(id, make);

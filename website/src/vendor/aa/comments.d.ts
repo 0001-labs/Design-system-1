@@ -1,16 +1,3 @@
-/**
- * Comments on ranges of the text, as a person comments on a document: a
- * thread is anchored to a run of the Markdown (`from` and `to`, offsets into
- * the document, and `quote`, the words there), and kept right as the text
- * changes around it. Link's project comments are the model (a thread on a
- * block, replies, resolving and reopening, who wrote what and when, mentions,
- * an orphaned thread when its words are gone); here the anchor is a range of
- * the words rather than a block.
- *
- * Nothing in this file touches the page: the drawing is comments-view.ts, and
- * the storage, the people, the permissions and the notifications are the
- * product's, reached through a `CommentStore`.
- */
 /** Someone who comments: the product's id for them, their name, and the colour they are drawn in (one from the palette by their id otherwise). */
 export type CommentPerson = {
     id: string;

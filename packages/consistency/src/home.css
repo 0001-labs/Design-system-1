@@ -34,7 +34,9 @@ consistency-domains{display:block;max-width:calc(32 * var(--ds-unit))}
 .home-stage>*{flex:1;min-height:0}
 .home-stage>[hidden]{display:none}
 /* An open site's places fill the sidebar under its name and scroll on their own. */
-.home-places{flex:1;min-height:0;overflow:auto}
+/* Under the site's name, a square apart, its menus on whole squares: the sidebar's own half square of room is taken back,
+   and each row is drawn 4px back so its words start on the column's edge, under the name's. */
+.home-places{flex:1;min-height:0;overflow:auto;margin-top:calc(var(--ds-unit) / -2);margin-inline-start:calc(-4px * var(--ds-sf, 1))}
 /* The workspace's name in Account is a field that hugs a name of up to twelve squares. */
 .home-workspace-field{width:calc(12 * var(--ds-unit))}
 /* The plan's draft sites under the title, half a square up so they sit with it. */

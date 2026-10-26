@@ -1,0 +1,45 @@
+/* Flavo's places in Consistency's app, on Design system 1's measures: whole squares, everything on the lower
+   sixteen, the app's own place styles (`places.css` beside them) for the head, tools, rows and drawers. */
+
+/* A product's row: its kind and category on six squares, its quantity on five, its status tag, its price. */
+.flavo-product { --ds-row-padding: 0px; }
+.flavo-product > .ds-row__name, .flavo-member > .ds-row__name, .flavo-page > .ds-row__name { flex: 0 1 auto; width: calc(10 * var(--ds-unit)); min-width: 0; }
+.flavo-product__kind, .flavo-product__category, .flavo-member__company { flex: 0 1 auto; width: calc(6 * var(--ds-unit)); min-width: 0; white-space: nowrap; overflow: hidden; }
+.flavo-product__quantity, .flavo-member__phone { flex: 0 1 auto; width: calc(5 * var(--ds-unit)); min-width: 0; white-space: nowrap; overflow: hidden; font-variant-numeric: tabular-nums; }
+.flavo-member, .flavo-page { --ds-row-padding: 0px; }
+.flavo-page > .place-code { flex: 0 1 auto; width: calc(10 * var(--ds-unit)); min-width: 0; white-space: nowrap; overflow: hidden; }
+
+/* The Notion line under the title, and a form's fields a square apart in a drawer. */
+.flavo-notion { margin-block-end: var(--ds-unit); }
+.flavo-form { display: flex; flex-direction: column; gap: var(--ds-unit); min-width: 0; }
+.flavo-names { display: flex; flex-wrap: wrap; gap: var(--ds-unit); }
+.flavo-names > .place-field { width: calc(8 * var(--ds-unit)); }
+.flavo-place .flavo-form { max-width: calc(16 * var(--ds-unit)); }
+.flavo-link { display: flex; flex-direction: column; gap: 0; margin-block-start: calc(2 * var(--ds-unit)); }
+
+/* Pictures: four squares wide and three high, their buttons under them. */
+.flavo-gallery { display: flex; flex-wrap: wrap; gap: var(--ds-unit); }
+.flavo-gallery__item { margin: 0; width: calc(4 * var(--ds-unit)); }
+.flavo-gallery__item > img, .flavo-media__item > img {
+  display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--ds-radius); background: var(--ds-fill);
+}
+.flavo-media { display: grid; grid-template-columns: repeat(auto-fill, calc(8 * var(--ds-unit))); gap: var(--ds-unit); }
+.flavo-media__item { margin: 0; }
+.flavo-media__item > figcaption { min-height: var(--ds-unit); line-height: calc(16px * var(--ds-sf, 1)); display: flex; align-items: flex-end; overflow: hidden; white-space: nowrap; }
+
+/* Designretning: the three directions as cards twelve squares wide, the preview under them. */
+.flavo-design__choices { display: flex; flex-wrap: wrap; gap: var(--ds-unit); margin-block-end: var(--ds-unit); }
+.flavo-design__card {
+  all: unset; box-sizing: border-box; display: flex; flex-direction: column; width: calc(12 * var(--ds-unit)); cursor: pointer;
+  border-radius: var(--ds-radius); outline: 1px solid var(--ds-line-color, var(--ds-fill)); outline-offset: -1px;
+}
+.flavo-design__card[aria-pressed="true"] { outline: 2px solid var(--ds-accent-color); outline-offset: -2px; }
+.flavo-design__card:focus-visible { box-shadow: 0 0 0 2px var(--ds-focus-ring, Highlight); }
+.flavo-design__image { display: block; height: calc(8 * var(--ds-unit)); overflow: hidden; border-radius: var(--ds-radius) var(--ds-radius) 0 0; }
+.flavo-design__image > img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.flavo-design__words { display: flex; flex-direction: column; padding: 0 calc(4px * var(--ds-sf, 1)) calc(4px * var(--ds-sf, 1)); line-height: calc(16px * var(--ds-sf, 1)); }
+.flavo-design__words > * { display: flex; align-items: flex-end; min-height: var(--ds-unit); }
+.flavo-design__card > ds-tag { margin: 0 calc(4px * var(--ds-sf, 1)) calc(4px * var(--ds-sf, 1)); align-self: flex-start; }
+.flavo-design__stage { margin-block-start: var(--ds-unit); }
+.flavo-design__frame { display: block; width: 100%; height: calc(36 * var(--ds-unit)); border: 0; border-radius: var(--ds-radius); background: var(--ds-fill); }
+.flavo-design__frame--phone { width: calc(20 * var(--ds-unit)); }
