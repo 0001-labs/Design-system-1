@@ -58,16 +58,16 @@ try {
   // Open: the separator stands on the boundary, the two squares between the sidebar and the work.
   if (await state() !== 'open' || await edge.getAttribute('aria-valuenow') !== '100' || await edge.getAttribute('aria-orientation') !== 'vertical') throw Error('The edge does not say the sidebar is open');
   if (await page.evaluate(() => window.firstSidebar) !== 'open') throw Error('The first paint did not know the sidebar');
-  { const box = await edge.boundingBox(); near(box.x + box.width / 2, 280, 'The edge stands at'); near(box.width, 20, 'The edge is wide'); }
+  { const box = await edge.boundingBox(); near(box.x + box.width / 2, 300, 'The edge stands at'); near(box.width, 20, 'The edge is wide'); }
   near((await main()).left, 300, 'The open work begins at');
   await overflow('Open');
 
   // A slow drag to the left: the edge, the sidebar and the work move with the hand, nothing laid out until release.
-  await page.mouse.move(280, 450); await page.mouse.down();
+  await page.mouse.move(300, 450); await page.mouse.down();
   for (const x of [270, 240, 200, 160, 120, 100]) { await page.mouse.move(x, 450); await page.waitForTimeout(30); }
   await page.waitForTimeout(120);
   if (await state() !== 'open' || !(await app.getAttribute('data-sidebar-moving') !== null)) throw Error('The drag committed the layout before release');
-  near((await main()).left, 120, 'The work under the hand stands at');
+  near((await main()).left, 100, 'The work under the hand stands at');
   { const box = await edge.boundingBox(); near(box.x + box.width / 2, 100, 'The edge under the hand stands at'); }
   await page.mouse.up(); await settled();
   if (await state() !== 'collapsed' || await edge.getAttribute('aria-valuenow') !== '0') throw Error('Dragging left past half did not fold the sidebar');
@@ -131,7 +131,7 @@ try {
   { const box = await navBox(); if (!box.shown || box.left !== 20) throw Error('The opened sidebar stands at ' + JSON.stringify(box)); }
 
   // A short, fast flick folds it, though the edge is released nearer the open side.
-  await page.mouse.move(280, 450); await page.mouse.down();
+  await page.mouse.move(300, 450); await page.mouse.down();
   for (const x of [270, 255, 240]) { await page.mouse.move(x, 450); await page.waitForTimeout(8); }
   await page.mouse.up(); await settled();
   if (await state() !== 'collapsed') throw Error('A flick to the left did not fold the sidebar');
@@ -163,7 +163,7 @@ try {
   if (await state() !== 'collapsed') throw Error('ArrowLeft did not fold the sidebar');
   await page.keyboard.press('ArrowRight');
   // A mouse press without a drag folds or opens it too.
-  await page.mouse.click(280, 450); await settled();
+  await page.mouse.click(300, 450); await settled();
   if (await state() !== 'collapsed') throw Error('Pressing the open edge did not fold the sidebar');
   await page.mouse.move(900, 450); await page.mouse.move(10, 450); await page.waitForTimeout(250);
   await page.mouse.click(10, 450); await settled();
@@ -192,7 +192,7 @@ try {
   const still = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
   const calm = await still.newPage(); await routes(calm);
   await calm.goto(home); await calm.locator('consistency-home ds-card').first().waitFor();
-  await calm.mouse.move(280, 450); await calm.mouse.down();
+  await calm.mouse.move(300, 450); await calm.mouse.down();
   for (const x of [260, 200, 120, 60]) { await calm.mouse.move(x, 450); await calm.waitForTimeout(30); }
   await calm.mouse.up();
   if (await calm.locator('consistency-home').getAttribute('data-sidebar') !== 'collapsed' || await calm.locator('consistency-home').getAttribute('data-sidebar-moving') !== null) throw Error('With reduced motion the release did not land at once');

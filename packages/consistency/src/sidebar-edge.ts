@@ -145,7 +145,8 @@ export class SidebarEdge {
   chosen() { if (this.shown) this.show(false); }
 
   // The geometry, in px: a square, the sidebar's width (twelve squares) and the gap after it (two), which is how far the work moves.
-  private unit() { return this.handle.offsetWidth || 20; }
+  // The edge is one square wide when open and a square and a half folded (it covers the window's left square too).
+  private unit() { return (this.handle.offsetWidth / (this.host.getAttribute('data-sidebar') === 'collapsed' ? 1.5 : 1)) || 20; }
   private travel() { return 14 * this.unit(); }
   private page() { return this.host.querySelector<HTMLElement>(':scope > ds-page'); }
   private nav() { return this.host.querySelector<HTMLElement>(':scope > ds-page > nav.home-nav'); }
@@ -172,8 +173,8 @@ export class SidebarEdge {
     const page = this.page(), nav = this.nav();
     if (page) page.style.transform = `translateX(${shift}px)`;
     if (nav) nav.style.transform = `translateX(${pose.nav - shift}px)`;
-    const edge = Math.max(0, pose.x - this.unit() / 2) - (this.state === 'open' ? this.travel() - this.unit() / 2 : 0);
-    this.handle.style.transform = `translateX(${edge}px)`;
+    // The edge's line is the frame's own edge, so it moves exactly as the work does.
+    this.handle.style.transform = `translateX(${shift}px)`;
   }
 
   private begin() {
