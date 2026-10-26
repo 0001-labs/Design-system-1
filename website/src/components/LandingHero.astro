@@ -1,7 +1,7 @@
 ---
 import PaperMaterial from './PaperMaterial.astro';
 // The front of the Design system 1 packaging: squares halving in size row by
-// row, the product's name standing down the fourth column.
+// row, the product's name standing down the red column.
 const C = {
   blue: '#594dff', red: '#c50124', green: '#f2ffcf', apple: '#99ff73', stealth: '#554455',
   soft: '#cdd3fe', sand: '#dbc88f', ochre: '#b69e55', blood: '#de0331', slate: '#1e1e1e',
@@ -17,18 +17,15 @@ interface Props {
 }
 const { embedded = false } = Astro.props;
 
-// Each row is five big squares wide; a row of smaller squares fits more.
-// Three rows of the big squares make the cover as tall as it is wide.
+// The squares halve row by row, so each row has twice as many: 2, 4, 8 and 16
+// across, sixteen squares of the 20px grid wide. Halving falls one small row
+// short of a square, so the last row is drawn twice.
 const rows: { size: number; colors: Color[] }[] = [
-  { size: 80, colors: ['blue', 'red', 'green', 'red', 'green'] },
-  { size: 80, colors: ['blue', 'red', 'green', 'red', 'green'] },
-  { size: 80, colors: ['blue', 'red', 'green', 'red', 'green'] },
-  { size: 40, colors: ['apple', 'stealth', 'soft', 'sand', 'ochre', 'stealth', 'red', 'blood', 'green', 'white'] },
-  { size: 40, colors: ['slate', 'egg', 'sky', 'blood', 'sky', 'blue', 'metal', 'sky', 'pink', 'apple'] },
-  { size: 20, colors: ['egg', 'chartreuse', 'drip', 'tuned', 'grey', 'pink', 'metal', 'blood', 'zenith', 'egg', 'blue', 'blood', 'metal', 'slate', 'blood', 'pink', 'green', 'sky', 'white', 'drip'] },
-  { size: 20, colors: ['tuned', 'every', 'sky', 'stealth', 'drip', 'metal', 'white', 'yellow', 'blue', 'every', 'red', 'black', 'blood', 'slate', 'metal', 'blood', 'apple', 'zenith', 'blue', 'egg'] },
-  { size: 20, colors: ['metal', 'pink', 'zenith', 'stealth', 'sand', 'every', 'white', 'stealth', 'egg', 'black', 'slate', 'blood', 'blood', 'blue', 'blood', 'blood', 'sky', 'chartreuse', 'pink', 'stealth'] },
-  { size: 20, colors: ['metal', 'blue', 'pink', 'stealth', 'blue', 'white', 'zenith', 'stealth', 'white', 'pink', 'sky', 'yellow', 'stealth', 'red', 'white', 'drip', 'blood', 'metal', 'egg', 'blue'] },
+  { size: 160, colors: ['blue', 'red'] },
+  { size: 80, colors: ['green', 'stealth', 'red', 'blood'] },
+  { size: 40, colors: ['apple', 'soft', 'sand', 'ochre', 'sky', 'blood', 'metal', 'green'] },
+  { size: 20, colors: ['egg', 'chartreuse', 'drip', 'tuned', 'grey', 'pink', 'metal', 'blood', 'zenith', 'egg', 'blue', 'slate', 'blood', 'pink', 'sky', 'white'] },
+  { size: 20, colors: ['tuned', 'every', 'sky', 'stealth', 'drip', 'metal', 'white', 'yellow', 'blue', 'every', 'black', 'blood', 'metal', 'apple', 'zenith', 'egg'] },
 ];
 
 let y = 0;
@@ -41,7 +38,7 @@ const tiles = rows.flatMap((row) => {
 
 <div class:list={{ 'landing-hero-frame': embedded }}>
 <section class:list={['landing-hero', { 'landing-hero--embedded': embedded }]} aria-label={embedded ? 'Design system 1' : undefined} aria-labelledby={embedded ? undefined : 'landing-title'}>
-  <svg class="landing-hero-blocks" viewBox="0 0 400 400" preserveAspectRatio="xMinYMin slice" shape-rendering="crispEdges" aria-hidden="true">
+  <svg class="landing-hero-blocks" viewBox="0 0 320 320" preserveAspectRatio="xMinYMin slice" shape-rendering="crispEdges" aria-hidden="true">
     {tiles.map((tile) => <rect x={tile.x} y={tile.y} width={tile.size + 0.5} height={tile.size + 0.5} fill={tile.fill} />)}
   </svg>
   <PaperMaterial />
@@ -60,11 +57,11 @@ const tiles = rows.flatMap((row) => {
 <style>
   .landing-hero {
     /* One unit of the artwork, which always covers the screen from its top left corner. */
-    --hero-scale: max(100vw / 400, 100vh / 400);
-    --hero-scale: max(100vw / 400, 100dvh / 400);
-    --hero-title-column: 280;
-    --hero-title-size: min(12.5vh, 56 * var(--hero-scale));
-    --hero-title-size: min(12.5dvh, 56 * var(--hero-scale));
+    --hero-scale: max(100vw / 320, 100vh / 320);
+    --hero-scale: max(100vw / 320, 100dvh / 320);
+    --hero-title-column: 240;
+    --hero-title-size: min(12.5vh, 45 * var(--hero-scale));
+    --hero-title-size: min(12.5dvh, 45 * var(--hero-scale));
     --hero-edge: clamp(16px, 2.5vw, 40px);
     position: relative;
     height: calc(100vh - var(--site-header-height));
@@ -135,17 +132,17 @@ const tiles = rows.flatMap((row) => {
   .landing-hero-button:hover { background: rgb(255 255 255 / 0.9); color: #1e1e1e; text-decoration: none; }
   .landing-hero-button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 
-  /* In the Overview the whole cover stands in the column, a square of five units each way, above
-     the page's title; the name down its fourth column and short enough to fit; a picture's corners. */
+  /* In the Overview the whole cover stands in the column, a square sixteen grid squares each way,
+     above the page's title; the name down its red column and short enough to fit; a picture's corners. */
   .landing-hero-frame {
     container-type: inline-size;
     margin-block: 0 var(--site-unit, 20px);
   }
   .landing-hero--embedded {
-    --hero-scale: calc(100cqw / 400);
-    --hero-title-column: 280;
-    --hero-title-size: calc(40 * var(--hero-scale));
-    --hero-edge: calc(10 * var(--hero-scale));
+    --hero-scale: calc(100cqw / 320);
+    --hero-title-column: 240;
+    --hero-title-size: calc(32 * var(--hero-scale));
+    --hero-edge: calc(8 * var(--hero-scale));
     height: auto;
     min-height: 0;
     aspect-ratio: 1;
@@ -153,12 +150,12 @@ const tiles = rows.flatMap((row) => {
   }
   .landing-hero--embedded .landing-hero-title { top: var(--hero-edge); }
 
-  /* Upright, the screen shows the first two columns: the name moves to the red one there. */
+  /* Upright, the screen shows less of the cover: the name keeps to the screen. */
   @media (max-aspect-ratio: 1/1) {
     /* The name stops above the words and buttons, which stack there. */
     .landing-hero:not(.landing-hero--embedded) {
-      --hero-title-column: 120;
-      --hero-title-size: min(12.5dvh, 56 * var(--hero-scale), (100dvh - 310px) / 7.2);
+      --hero-title-column: 240;
+      --hero-title-size: min(12.5dvh, 45 * var(--hero-scale), (100dvh - 310px) / 7.2);
     }
     .landing-hero:not(.landing-hero--embedded) .landing-hero-title { left: min(calc(var(--hero-title-column) * var(--hero-scale)), calc(100vw - var(--hero-title-size) * 0.5 - var(--hero-edge))); }
     .landing-hero-actions { display: grid; justify-items: center; }
