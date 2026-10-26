@@ -5,13 +5,13 @@
 // The Overview's title stands under the cover.
 import LandingHero from './LandingHero.astro';
 import { ALL_LAYERS } from '../../../shared/component-directory';
-const { entry } = Astro.locals.starlightRoute;
+const { entry, id } = Astro.locals.starlightRoute;
 const { title } = entry.data;
 const layerColours: Record<string, string> = { yellow: '#eaff00', 'light-green': '#99ff73', 'light-blue': '#ccccff', pink: '#f5aad1' };
 const layer = ALL_LAYERS.find(layer => entry.id === `${layer.number}-${layer.name.toLowerCase()}/overview`);
 ---
 
-{entry.id === 'index' && <LandingHero embedded />}
+{id === '' && <LandingHero embedded />}
 <h1 id="_top" class="ds-text ds-text--display" class:list={{ 'layer-title': layer }}>{layer && <span class="layer-swatch" aria-hidden="true" style={`background:${layerColours[layer.color]}`}></span>}{title}</h1>
 
 <style>
