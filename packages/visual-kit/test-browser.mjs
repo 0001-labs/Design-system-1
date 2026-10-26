@@ -45,6 +45,17 @@ try{
    const battery=page.locator('#phone ds-app-chrome[kind="ios"]').getByRole('img',{name:'Battery 25%',exact:true});
    await battery.waitFor(); assert(await battery.locator('img').evaluateAll(imgs=>imgs.every(img=>img.complete&&img.naturalWidth>0)));
  }
+ // Edge to edge, the page runs under the status bar and the bar's ink follows appearance: black on light, white on dark.
+ for(const [appearance,ink] of [['light','rgb(0, 0, 0)'],['dark','rgb(255, 255, 255)']]) {
+   await page.selectOption('#appearance',appearance);
+   await page.evaluate(()=>{document.querySelector('#phone').edgeToEdge=true;});
+   await page.waitForFunction(a=>document.querySelector('#phone').shadowRoot.querySelector('ds-app-chrome[kind="ios"]')?.getAttribute('appearance')===a,appearance);
+   const status=await page.locator('#phone').evaluate(d=>{const s=d.shadowRoot,wrap=s.querySelector('.status-wrap').getBoundingClientRect(),content=s.querySelector('.content').getBoundingClientRect(),bar=s.querySelector('ds-app-chrome[kind="ios"]').shadowRoot.querySelector('.status');return {under:content.top<=wrap.top+1,ink:getComputedStyle(bar).color,paper:getComputedStyle(bar).backgroundColor};});
+   assert(status.under,'Edge to edge, the page starts under the status bar');
+   assert.equal(status.ink,ink,`Edge to edge, a ${appearance} status bar is ${ink}`);
+   assert.equal(status.paper,'rgba(0, 0, 0, 0)','Edge to edge, the status bar is see-through');
+ }
+ await page.evaluate(()=>{document.querySelector('#phone').edgeToEdge=false;});
  await page.selectOption('#appearance','light');
  await page.evaluate(()=>{const demo=document.createElement('div');demo.id='mobile-reference';demo.style.cssText='position:relative;width:393px;height:852px;background:repeating-linear-gradient(0deg,transparent 0 27px,#ddd 27px 28px),repeating-linear-gradient(90deg,white 0 27px,#ddd 27px 28px);color:black';demo.innerHTML='<ds-app-chrome kind="ios"></ds-app-chrome><ds-app-chrome kind="safari-ios" address="ezo.gs" style="position:absolute;bottom:34px;left:0;right:0"></ds-app-chrome>';document.body.append(demo);});
  await page.locator('#mobile-reference').screenshot({path:'/tmp/visualkit-mobile-reference.png'});

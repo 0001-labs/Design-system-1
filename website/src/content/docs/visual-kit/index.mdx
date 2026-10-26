@@ -101,7 +101,7 @@ Use `ds-app-chrome kind="instagram"` around a video, image or live animation. Th
 </ds-device-bezel>
 ```
 
-Set `username`, `avatar`, `caption`, `verified`, `likes`, `comments`, `reposts` and `shares` from the scene. Counts default empty; `progress` is a fraction from 0 to 1. Slot content fills the viewport. The device’s `edge-to-edge` mode overlays its status bar and omits the separate home strip. Set `interactive` on AppChrome to emit `chrome-action` requests; no social actions happen automatically.
+Set `username`, `avatar`, `caption`, `verified`, `likes`, `comments`, `reposts` and `shares` from the scene. Counts default empty; `progress` is a fraction from 0 to 1. Slot content fills the viewport. The device’s `edge-to-edge` mode runs the slotted page up under its status bar and omits the separate home strip; the status bar’s ink follows `appearance`, black for `light` over a light page and white for `dark` over a dark one or a photograph. Set `interactive` on AppChrome to emit `chrome-action` requests; no social actions happen automatically.
 
 ## App chrome
 

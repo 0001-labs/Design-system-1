@@ -17,7 +17,8 @@ export class DsDeviceBezel extends LitElement {
     .status-wrap { flex:none; }
     :host([edge-to-edge]) .status-wrap { position:absolute; top:0; left:0; right:0; z-index:2; pointer-events:none; }
     :host([edge-to-edge]) .home { display:none; }
-    :host([edge-to-edge]) ds-app-chrome { --chrome-screen:transparent; --chrome-ink:white; background:transparent; }
+    /* Over the page, the status bar's ink follows appearance: black over a light page, white over a dark one. */
+    :host([edge-to-edge]) ds-app-chrome { --chrome-screen:transparent; background:transparent; }
     .scaled-chrome { transform-origin:top left; }
     .device.compact { box-shadow:inset 0 0 0 3px #202124; border-radius:32px; background:#202124; }
     .compact .art { display:none; }
