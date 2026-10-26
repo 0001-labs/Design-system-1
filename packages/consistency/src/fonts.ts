@@ -2,6 +2,9 @@
  * fallback stacks, the same list its landing's libraries wear), loaded as it loaded them, from Google's css2
  * address with display=swap. A page may set a heading face and a text face over its library's; unset, the
  * library's own faces stay. Faces travel as DS1's typeface roles, so every component follows them. */
+import { correctedGoogleFonts } from '../../../DS1/0-face/face-correction';
+import FACE_METRICS from '../../../DS1/0-face/google-face-metrics.json';
+
 const MONOSPACE_FALLBACK_STACK =
   'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace';
 
@@ -62,24 +65,29 @@ export function googleFontsHref(fonts: PageFonts): string | undefined {
   return `https://fonts.googleapis.com/css2?${families.join('&')}&display=swap`;
 }
 
-/** Keeps one stylesheet in the document's head for the faces in use, replacing it when they change. */
+/** Keeps one stylesheet in the document's head for the faces in use, replacing it when they change. It is Google's
+ * css2 answer with each face corrected in its @font-face (DS1's face-correction.ts), so the page's words stand on
+ * the sixteen whatever its faces; should Google's answer not be read, the plain stylesheet is linked instead. */
 export function loadPageFonts(fonts: PageFonts, root: Document = document): void {
   const href = googleFontsHref(fonts);
-  const current = root.head.querySelector<HTMLLinkElement>('link[data-consistency-fonts]');
-  if (current?.getAttribute('href') === href) return;
+  const current = root.head.querySelector<HTMLElement>('[data-consistency-fonts]');
+  if (current?.dataset.consistencyFonts === (href ?? '')) return;
   current?.remove();
   if (!href) return;
   if (!root.head.querySelector('link[data-consistency-fonts-preconnect]')) {
-    for (const origin of ['https://fonts.googleapis.com', 'https://fonts.gstatic.com']) {
-      const preconnect = root.createElement('link');
-      preconnect.rel = 'preconnect'; preconnect.href = origin; preconnect.dataset.consistencyFontsPreconnect = '';
-      if (origin.includes('gstatic')) preconnect.crossOrigin = '';
-      root.head.append(preconnect);
-    }
+    const preconnect = root.createElement('link');
+    preconnect.rel = 'preconnect'; preconnect.href = 'https://fonts.gstatic.com'; preconnect.crossOrigin = ''; preconnect.dataset.consistencyFontsPreconnect = '';
+    root.head.append(preconnect);
   }
-  const link = root.createElement('link');
-  link.rel = 'stylesheet'; link.href = href; link.dataset.consistencyFonts = '';
-  root.head.append(link);
+  const style = root.createElement('style');
+  style.dataset.consistencyFonts = href;
+  root.head.append(style);
+  correctedGoogleFonts(href, FACE_METRICS).then((css) => { style.textContent = css; }, () => {
+    if (!style.isConnected) return;
+    const link = root.createElement('link');
+    link.rel = 'stylesheet'; link.href = href; link.dataset.consistencyFonts = href;
+    style.replaceWith(link);
+  });
 }
 
 /** The faces as the sheet carries them for previews outside the composition: `heading|text`. */

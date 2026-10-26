@@ -53,6 +53,8 @@ const rootModules = {
   sidebar: ['sidebar.ts'],
   /** Cut words fading over their last square on native markup (`startCutFades`, marking `.ds-row__name`, `.ds-menu__item` … `data-cut="end"`). */
   'cut-fade': ['cut-fade.ts'],
+  /** A face Design system 1 did not draw, corrected in its @font-face to stand on the sixteen (faceCorrection, correctFaces, correctedGoogleFonts, readFaceMetrics), with the metrics of the Google faces 0001's products offer. */
+  'face-correction': ['face-correction.ts', 'google-face-metrics.json'],
   /** The theme module (light, dark, system in signals) with the head script it runs and its options' type; needs @lit-labs/signals. */
   theme: ['theme.ts', 'theme-bootstrap.js', 'preference-options.ts'],
 };
@@ -190,7 +192,7 @@ export default {
      * footer.css, document.css, carousel.css, figures.css, progress.css and row.css it imports; `prose`
      * adds the prose sheet (prose.css) and `cjk` Noto Sans for Japanese and Chinese (cjk.css,
      * from Google Fonts), which `styles` may also name; `modules` names page scripts
-     * from 0-face/ (app-banner, carousel, grid (with the owner's constraint panel), constraints (that panel alone), grid-fit, layout-inspector, scaling, theme,
+     * from 0-face/ (app-banner, carousel, face-correction, grid (with the owner's constraint panel), constraints (that panel alone), grid-fit, layout-inspector, scaling, theme,
      * theme-bootstrap, tooltips, tree, header, keys, overlay-swipe, cut-fade), copied with what they import, into 0-face/;
      * `scriptsTo` puts that 0-face/ folder elsewhere, a path from `to`
      * (`"../../src/ds1"` puts the stylesheets in `public/ds1` and the scripts

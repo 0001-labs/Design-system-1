@@ -77,6 +77,15 @@ To put an added face on the same line, give its `@font-face` the same difference
 - **Match the capitals** with `size-adjust`: 0.71 over the face's cap height. It scales the overrides too, so divide them by the same factor.
 - **Correct the face once**, in its `@font-face`. Never move its words with padding, `top` or a transform in each component: every component then sets the face right, and the system's own faces are left alone.
 
+### Correcting a face with the system
+
+`DS1/0-face/face-correction.ts` does the arithmetic, so no product works it out by hand. Take it with Sync 1, `"modules": ["face-correction"]` in the `root` export; it comes with `google-face-metrics.json`, the measured metrics of the Google faces 0001's products offer.
+
+- `correctFaces(css, metrics)` returns a stylesheet of `@font-face` rules, Google's css2 answer for one, with every face corrected in its own rule. Run it where the page is built and write the result into the head, so the first paint is already on the sixteen. A face without metrics stops it rather than stand off the line.
+- `correctedGoogleFonts(href, metrics)` reads a css2 address and corrects it, for a page that chooses its faces while it runs.
+- `faceCorrection(metrics)` gives the four declarations for a rule you write yourself.
+- `readFaceMetrics(file)` reads a TrueType or OpenType file. `node scripts/face-metrics.mjs "Family"` measures a Google face and adds it to the JSON.
+
 ## Small rules
 
 Under the big rules stand the small ones: a sentence each, kept by one component and measured by a test of its own. Each has a code that never changes, so a review can name the rule it finds broken. A component's page lists the rules it keeps.

@@ -116,6 +116,10 @@ Ezo's rule, the one to apply before any other alignment, so text and icons never
 
 Items stack edge to edge with no gap, as an Ezo list does. Lists, table rows, cells and their headers use neutral or transparent backgrounds by default, never automatic accent fills. Colour is opt-in for a meaningful state, not decoration across an entire list or table. Positions snap to the grid: anything a person can move lands on whole squares. Before calling a design done, measure it in the browser (an element's width and height must be whole squares minus the 1px correction) instead of judging by eye.
 
+### A face Design system 1 did not draw
+
+A library's or product's own face stands off the sixteen until its `@font-face` is corrected: capitals 0.71 of the em (`size-adjust`), ascent less descent 0.742 (`ascent-override`, `descent-override`), line gap 0. Never correct it per component with padding or `top`. Use `DS1/0-face/face-correction.ts` (Sync 1 `root` `"modules": ["face-correction"]`): `correctFaces` on Google's css2 answer at build time and written into the head, `correctedGoogleFonts` where faces are chosen at run time, `faceCorrection` for a rule written by hand; the twenty Google faces 0001 offers are measured in `google-face-metrics.json`, and `scripts/face-metrics.mjs "Family"` measures another. Check it as every row: a 14px line of the face on a 16px line box has its baseline 3px above the square's foot and 10px capitals. https://designsystem1.com/1-root/constraints/#a-face-you-add
+
 ## Tags
 
 `ds-tag` is a noninteractive category or status label: one control high, 4px scaled padding on each side, and the shared small corner. Like a button it stands on the lower sixteen of its square: at the foot of a line, and in a row that stretches it to a square its fill stays a control high at the row's foot, so its words share a baseline with a 16px line of text beside it (since 26 October 2026). Its width hugs its text without rounding to squares, an intentional exception for compact labels. Use `--ds-tag-accent` for a pale fill and coloured text. App navigation uses Tag; Badge retains its grid-sized geometry.
