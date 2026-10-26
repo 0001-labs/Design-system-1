@@ -43,8 +43,8 @@
 .place-share__words{display:flex;flex-direction:column;padding:calc(var(--ds-unit) / 2);border-top:1px solid var(--ds-border-color)}
 .place-share__words>ds-text{display:block;min-width:0}
 /* The picker: the site's pictures two to a line in the drawer, half a square apart; the one in use is ringed. */
-.place-drawer[open]{overflow-y:auto}
-.place-drawer [data-ds-overlay="footer"]{margin-top:auto}
+:is(.place-pages,.place-pages-place,.place-emails) .place-drawer[open]{overflow-y:auto}
+:is(.place-pages,.place-pages-place,.place-emails) .place-drawer [data-ds-overlay="footer"]{margin-top:auto}
 .place-picker{display:grid;flex:none;grid-template-columns:repeat(2,minmax(0,1fr));gap:calc(var(--ds-unit) / 2)}
 .place-picker__image{display:block;aspect-ratio:1.91 / 1;margin:0;padding:0;overflow:hidden;border:0;border-radius:var(--ds-radius);background:var(--ds-fill);cursor:pointer}
 .place-picker__image>img{display:block;width:100%;height:100%;object-fit:cover;transition:opacity 120ms ease}
