@@ -27,7 +27,7 @@ try {
  await page.route('**/api/consistency/sites/30SDGA/document?**',route=>route.fulfill({status:200,contentType:'text/html',body:'<!doctype html><title>Søndergården</title><h1>Hej</h1>'}));
  // The sites' places: Søndergården names one the app has an element for and one it has not; the others none.
  let slowPlaces=false;
- await page.route('**/api/consistency/sites/*/places',async route=>{const code=new URL(route.request().url()).pathname.split('/')[4];if(code==='30SDGA'&&slowPlaces)await new Promise(resolve=>setTimeout(resolve,1500));await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({places:code==='30SDGA'?[{id:'pages',label:'Pages'},{id:'made-up',label:'Made up'}]:[]})});});
+ await page.route('**/api/consistency/sites/*/places',async route=>{const code=new URL(route.request().url()).pathname.split('/')[4];if(code==='30SDGA'&&slowPlaces)await new Promise(resolve=>setTimeout(resolve,1500));await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({places:code==='30SDGA'?[{id:'lab',label:'Lab'},{id:'made-up',label:'Made up'}]:[]})});});
  let renamed=null;await page.route('**/api/consistency/profile',async route=>{if(route.request().method()==='PUT'){renamed=route.request().postDataJSON().companyName;await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({companyName:renamed})});}else await route.fallback();});
  const home=`http://127.0.0.1:${server.address().port}/private-consistency/home.html`;
  await page.goto(home);await page.locator('consistency-home ds-card').first().waitFor();
@@ -76,24 +76,24 @@ try {
  if(await editor.locator('.consistency-site-bar, ds-select select').count()||await editor.getByText('Open the page').count()||await editor.getByText(/Words save/).count())throw Error('A bar still stands over the site');
  await page.waitForTimeout(200);
  for(const words of ['Forside','Om os','English'])if(await page.locator('consistency-home nav.home-nav').getByText(words,{exact:true}).count())throw Error('The sidebar still lists the site\'s pages: '+words);
- // No place the app has no element for is shown: with none registered, there is no list at all.
+ // No place the app has no element for is shown: with neither of the site's two registered, there is no list at all.
  if(await page.locator('consistency-home ds-sidebar').count())throw Error('Places the app cannot show are listed');
  // A place the app has an element for is listed under the name, in the site's words; one it has not is left out.
- await page.evaluate(()=>{const home=document.querySelector('consistency-home');home.constructor.places.set('pages',site=>Object.assign(document.createElement('div'),{className:'test-place',textContent:'Pages of '+site.name}));home.requestUpdate();});
- const places=page.locator('consistency-home ds-sidebar.home-places');await places.getByText('Pages',{exact:true}).waitFor();
+ await page.evaluate(()=>{const home=document.querySelector('consistency-home');home.constructor.places.set('lab',site=>Object.assign(document.createElement('div'),{className:'test-place',textContent:'Lab of '+site.name}));home.requestUpdate();});
+ const places=page.locator('consistency-home ds-sidebar.home-places');await places.getByText('Lab',{exact:true}).waitFor();
  if(await places.getByText('Made up').count())throw Error('A place the app has no element for is listed');
- await places.getByText('Pages',{exact:true}).click();await page.locator('consistency-home .home-stage .test-place:not([hidden])').waitFor();same();
+ await places.getByText('Lab',{exact:true}).click();await page.locator('consistency-home .home-stage .test-place:not([hidden])').waitFor();same();
  if(await page.locator('consistency-home consistency-site-editor:not([hidden])').count())throw Error('The site\'s canvas still shows beside a place');
  if(await page.locator('consistency-home consistency-site-editor').count()!==1)throw Error('Showing a place took the site\'s canvas out of the page');
- if(await page.evaluate(()=>history.state?.place)!=='pages')throw Error('The place is not kept in the history');
+ if(await page.evaluate(()=>history.state?.place)!=='lab')throw Error('The place is not kept in the history');
  // Pressing the site's name shows the site itself again; the place stays, hidden.
  await page.locator('#home-site').click();await page.locator('consistency-home consistency-site-editor:not([hidden])').waitFor();same();
  if(await page.locator('consistency-home .home-stage .test-place[hidden]').count()!==1)throw Error('Leaving a place took it out of the page');
  await page.goBack();await page.locator('consistency-home .home-stage .test-place:not([hidden])').waitFor();await page.goForward();await page.locator('consistency-home consistency-site-editor:not([hidden])').waitFor();
- if(!(await page.evaluate(()=>localStorage.getItem('consistency-site-places:30SDGA')))?.includes('"pages"'))throw Error('The site\'s places are not kept for the next visit');
+ if(!(await page.evaluate(()=>localStorage.getItem('consistency-site-places:30SDGA')))?.includes('"lab"'))throw Error('The site\'s places are not kept for the next visit');
  // The next visit draws the places at once from the last, before the platform answers again.
- slowPlaces=true;await page.reload();await page.evaluate(()=>{const home=document.querySelector('consistency-home');home.constructor.places.set('pages',()=>document.createElement('div'));home.requestUpdate();});
- await page.locator('consistency-home ds-sidebar.home-places').getByText('Pages',{exact:true}).waitFor({timeout:500});slowPlaces=false;
+ slowPlaces=true;await page.reload();await page.evaluate(()=>{const home=document.querySelector('consistency-home');home.constructor.places.set('lab',()=>document.createElement('div'));home.requestUpdate();});
+ await page.locator('consistency-home ds-sidebar.home-places').getByText('Lab',{exact:true}).waitFor({timeout:500});slowPlaces=false;
  await page.mouse.move(700,500);
  await page.locator('#home-site').hover();const sitesMenu=page.locator('consistency-home ds-select[aria-label="Sites"]');
  if((await sitesMenu.locator('ds-button[menu-item]').allInnerTexts()).map(t=>t.trim()).join()!=='Flavo,CPH Raft,All sites')throw Error('The site menu is not the other sites and All sites');

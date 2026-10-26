@@ -7,6 +7,9 @@
  */
 import type { SiteSummary } from '../site-editing';
 import type { SitePlace } from './api';
+import { ConsistencyPlacePages } from './pages';
+import { ConsistencyPlaceEmails } from './emails';
+import { ConsistencyPlaceDesign } from './design';
 
 export { SiteApiError, siteApi, sitePlaces, type SitePlace } from './api';
 
@@ -15,6 +18,9 @@ export type PlaceFactory = (site: SiteSummary) => HTMLElement;
 
 /** The places the app has an element for, by id. Each place registers itself here. */
 export const PLACES = new Map<string, PlaceFactory>();
+PLACES.set('pages', site => new ConsistencyPlacePages(site));
+PLACES.set('emails', site => new ConsistencyPlaceEmails(site));
+PLACES.set('design', site => new ConsistencyPlaceDesign(site));
 
 /** The site's places the app can show, in the site's order. */
 export const shownPlaces = (places: readonly SitePlace[]) => places.filter(place => PLACES.has(place.id));
