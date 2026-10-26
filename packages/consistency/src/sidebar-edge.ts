@@ -8,7 +8,9 @@ import './sidebar-edge.css';
  * over the work while the pointer (or focus) is on it, without a backdrop, so the next place can be chosen; it goes
  * away when the pointer leaves or a place is chosen. A finger's press on that square shows it too.
  *
- * During a drag nothing is laid out again: the page and the sidebar move by transform alone, the edge under the hand.
+ * Folding never pushes the sidebar out (Joachim, 26 October 2026): it stays where it stands and the work slides over
+ * it, the sidebar blurring and fading as it is covered; opening uncovers it the same way. During a drag nothing is
+ * laid out again: the work moves by transform alone, the edge under the hand.
  * On release the layout is committed once, open or folded by where the edge is and how fast it was going, and the
  * transforms settle from where they stood to nothing (short and interruptible: a new press takes it from there). The
  * keyboard is immediate. The choice is the viewer's, kept in `localStorage` and drawn on first paint.
@@ -24,6 +26,8 @@ export const FLICK = 0.4;
 export const SETTLE_MS = 240;
 /** DS1's drawer curve: quick to leave, long to rest. */
 const CURVE: [number, number, number, number] = [0.32, 0.72, 0, 1];
+/** How far the covered sidebar blurs, in px at a square of 20px. */
+const BLUR = 6;
 /** How long the shown sidebar waits after the pointer leaves before it goes, in ms. */
 const LEAVE_MS = 200;
 
@@ -58,14 +62,16 @@ export function bezier([x1, y1, x2, y2]: [number, number, number, number]): (t: 
 }
 const ease = bezier(CURVE);
 
-/** What stands where: how far open the work is (`x`, 0 to the travel) and the sidebar's offset from its open place (`nav`). */
-type Pose = { x: number; nav: number };
+/** What stands where: how far open the work is (`x`, 0 to the travel); the sidebar stays and is covered as `x` falls. */
+type Pose = { x: number };
 
 export class SidebarEdge {
   /** The separator on the sidebar's edge, rendered by the home before its page. */
   readonly handle: HTMLDivElement;
   private state: SidebarState;
-  private pose: Pose = { x: 0, nav: 0 };
+  private pose: Pose = { x: 0 };
+  /** The folded sidebar shown over the work stays clear while the work moves (a drag or settle that keeps it shown). */
+  private clear = false;
   /** The layout and pose a pointer gesture started from, and whether the shown sidebar stays while the work follows the hand. */
   private gesture: { from: SidebarState; held: boolean; samples: { t: number; x: number }[] } | null = null;
   private frame = 0;
@@ -144,13 +150,13 @@ export class SidebarEdge {
   /** A place was chosen: a sidebar shown over the work goes. */
   chosen() { if (this.shown) this.show(false); }
 
-  // The geometry, in px: a square, the sidebar's width (twelve squares) and the gap after it (two), which is how far the work moves.
+  // The geometry, in px: a square, the sidebar's width (eleven squares) and the gap after it (one), which is how far the work moves.
   // The edge is one square wide when open and a square and a half folded (it covers the window's left square too).
   private unit() { return (this.handle.offsetWidth / (this.host.getAttribute('data-sidebar') === 'collapsed' ? 1.5 : 1)) || 20; }
-  private travel() { return 14 * this.unit(); }
+  private travel() { return 12 * this.unit(); }
   private page() { return this.host.querySelector<HTMLElement>(':scope > ds-page'); }
   private nav() { return this.host.querySelector<HTMLElement>(':scope > ds-page > nav.home-nav'); }
-  private rest(state: SidebarState, shown = this.shown): Pose { return state === 'open' ? { x: this.travel(), nav: 0 } : { x: 0, nav: shown ? 0 : -this.travel() }; }
+  private rest(state: SidebarState): Pose { return { x: state === 'open' ? this.travel() : 0 }; }
 
   /** The state as attributes, and every transform taken off: the layout alone says where things stand. */
   private draw() {
@@ -159,20 +165,29 @@ export class SidebarEdge {
     this.handle.setAttribute('aria-valuenow', this.state === 'open' ? '100' : '0');
     this.handle.setAttribute('aria-valuetext', this.state === 'open' ? 'Sidebar open' : 'Sidebar folded');
     for (const element of [this.page(), this.nav(), this.handle]) element?.style.removeProperty('transform');
+    this.nav()?.style.removeProperty('opacity');
+    this.nav()?.style.removeProperty('filter');
+    this.clear = false;
     this.pose = this.rest(this.state);
   }
 
   /**
    * Places everything for a pose against the layout committed now: the page moves by how far the work stands from
-   * the layout's own place, the sidebar by the rest of its offset, and the edge stays where the work begins.
+   * the layout's own place, the sidebar is held where it stands and covered (blurred and faded by how far the work
+   * has come over it), and the edge stays where the work begins.
    */
   private place(pose: Pose) {
     this.pose = pose;
     const base = this.state === 'open' ? this.travel() : 0;
     const shift = pose.x - base;
+    const covered = Math.min(1, Math.max(0, 1 - pose.x / this.travel()));
     const page = this.page(), nav = this.nav();
     if (page) page.style.transform = `translateX(${shift}px)`;
-    if (nav) nav.style.transform = `translateX(${pose.nav - shift}px)`;
+    if (nav) {
+      nav.style.transform = shift ? `translateX(${-shift}px)` : '';
+      nav.style.opacity = this.clear ? '1' : String(1 - covered);
+      nav.style.filter = this.clear || !covered ? '' : `blur(${(covered * BLUR * this.unit() / 20).toFixed(2)}px)`;
+    }
     // The edge's line is the frame's own edge, so it moves exactly as the work does.
     this.handle.style.transform = `translateX(${shift}px)`;
   }
@@ -182,6 +197,7 @@ export class SidebarEdge {
     const from = this.state;
     // Folded with the sidebar shown, the sidebar stays and the work follows the hand; otherwise the sidebar comes with it.
     this.gesture = { from, held: from === 'collapsed' && this.shown, samples: [] };
+    this.clear = this.gesture.held;
     this.host.setAttribute('data-sidebar-moving', '');
   }
 
@@ -190,7 +206,7 @@ export class SidebarEdge {
     const now = performance.now();
     gesture.samples.push({ t: now, x });
     while (gesture.samples.length > 2 && now - gesture.samples[0].t > 80) gesture.samples.shift();
-    this.place({ x, nav: gesture.held ? 0 : x - this.travel() });
+    this.place({ x });
   }
 
   private release(cancelled: boolean) {
@@ -214,14 +230,15 @@ export class SidebarEdge {
     this.host.toggleAttribute('data-sidebar-peek', target === 'collapsed' && shown);
     this.handle.setAttribute('aria-valuenow', target === 'open' ? '100' : '0');
     this.handle.setAttribute('aria-valuetext', target === 'open' ? 'Sidebar open' : 'Sidebar folded');
-    const to = this.rest(target, shown);
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches || (from.x === to.x && from.nav === to.nav)) { this.draw(); return; }
+    const to = this.rest(target);
+    this.clear = target === 'collapsed' && shown;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches || from.x === to.x) { this.draw(); return; }
     this.host.setAttribute('data-sidebar-moving', '');
     this.place(from);
     const start = performance.now();
     const step = (now: number) => {
       const progress = ease(Math.min(1, (now - start) / SETTLE_MS));
-      this.place({ x: from.x + (to.x - from.x) * progress, nav: from.nav + (to.nav - from.nav) * progress });
+      this.place({ x: from.x + (to.x - from.x) * progress });
       if (progress < 1) this.frame = requestAnimationFrame(step);
       else { this.frame = 0; this.draw(); }
     };
@@ -244,7 +261,7 @@ export class SidebarEdge {
     clearTimeout(this.leaving);
     if (on && (this.state !== 'collapsed' || this.gesture || this.frame)) return;
     this.host.toggleAttribute('data-sidebar-peek', on);
-    if (this.state === 'collapsed') this.pose = this.rest('collapsed', on);
+    if (this.state === 'collapsed') this.pose = this.rest('collapsed');
   }
 
   /** The shown sidebar goes a moment after the pointer leaves, unless the pointer, a menu of its or the keyboard is still in it. */

@@ -256,5 +256,5 @@ try {
   await page.frameLocator('iframe.place-design__specimen').locator('.ds-button--primary').waitFor();
   if (process.env.PLACES_SHOT) await page.screenshot({ path: `${process.env.PLACES_SHOT}/design.png`, fullPage: true });
   if (await page.getByRole('button', { name: /^(Reload|Refresh)$/ }).count()) fail('A Reload button is shown');
-  console.log('Shared places: Pages list, details, in-place title and description with failure restore, share image drawer, Edit on the canvas, a site's own pages from its page source; Emails tabs and drawer; Design read from the sandboxed pages passed');
+  console.log('Shared places: Pages list, details, in-place title and description with failure restore, share image drawer, Edit on the canvas, a site’s own pages from its page source; Emails tabs and drawer; Design read from the sandboxed pages passed');
 } finally { await browser.close(); await new Promise(done => server.close(done)); }
