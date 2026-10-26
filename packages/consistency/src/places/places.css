@@ -128,6 +128,19 @@ ds-tag[data-tone="success"]{--ds-tag-accent:var(--ds-success-color)}
 .place-card { --ds-row-padding: 0px; }
 .place-card > .place-code { flex: 0 0 auto; width: calc(8 * var(--ds-unit)); }
 
+/* An order's row: its code on four squares in the code face, the customer, its kind and status tags, its day, its total. */
+.place-order { --ds-row-padding: 0px; }
+.place-order > .place-order__code { flex: 0 0 auto; width: calc(4 * var(--ds-unit)); }
+.place-order > .ds-row__name { flex: 0 1 auto; width: calc(8 * var(--ds-unit)); }
+.place-order > .place-order__kind { flex: 0 1 auto; width: calc(4 * var(--ds-unit)); min-width: 0; }
+.place-order > .place-order__status { flex: 0 1 auto; width: calc(6 * var(--ds-unit)); min-width: 0; }
+.place-order__when { flex: 0 1 auto; width: calc(4 * var(--ds-unit)); min-width: 0; white-space: nowrap; overflow: hidden; font-variant-numeric: tabular-nums; }
+/* The status Select hugs its words; the search is eight squares. */
+.place-filters { display: inline-flex; flex-wrap: wrap; align-items: flex-end; gap: 0 calc(4px * var(--ds-sf, 1)); min-height: var(--ds-unit); }
+.place-search { width: calc(8 * var(--ds-unit)); }
+.place-field { display: flex; flex-direction: column; gap: 0; min-width: 0; line-height: calc(16px * var(--ds-sf, 1)); }
+.place-order__note { display: block; width: 100%; }
+
 /* In a drawer: the groups a square apart, a confirmation in place under what it asks about. */
 .place-drawer[open] { display: flex; flex-direction: column; gap: var(--ds-unit); }
 .place-actions { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0 calc(4px * var(--ds-sf, 1)); min-height: var(--ds-unit); }

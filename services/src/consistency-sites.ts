@@ -35,6 +35,8 @@ export const API_ROUTES = [
   allow('bookings', 'GET'), allow(`bookings/${UUID}`, 'GET'), allow(`bookings/${UUID}/cancel`, 'POST'),
   allow('booking-offers', 'GET', 'PUT'), allow('booking-settings', 'GET', 'PUT'),
   allow('giftcards', 'GET', 'POST'), allow(`giftcards/${UUID}`, 'GET'), allow(`giftcards/${UUID}/pdf`, 'GET'), allow(`giftcards/${UUID}/(?:resend|void)`, 'POST'),
+  allow('orders', 'GET'), allow('orders/config', 'GET'), allow(`orders/${UUID}`, 'GET'),
+  allow(`orders/${UUID}/(?:confirm|cancel|mark-paid|invoice|fulfil)`, 'POST'), allow(`orders/${UUID}/note`, 'PUT'), allow('order-settings', 'GET', 'PUT'),
   allow('business', 'POST'),
 ] as const;
 
