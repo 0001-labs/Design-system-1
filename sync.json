@@ -22,6 +22,11 @@
       "workspace": {
         "to": "packages/consistency/src/vendor/site-engine"
       }
+    },
+    "Flavo website": {
+      "places": {
+        "to": "packages/consistency/src/sites/flavo"
+      }
     }
   }
 }
