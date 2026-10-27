@@ -4,20 +4,20 @@ import pageStyles from './consistency-native-page.css?raw';
 export interface NativeBlockBase { id: string; width?: number; hidden?: boolean; locale?: string }
 export interface NativeFlow extends NativeBlockBase {
   kind: 'flow'; role?: 'section' | 'header' | 'nav' | 'footer' | 'main';
-  direction: 'column' | 'row'; gap: number; padding: number; children: NativeBlock[];
+  direction: 'column' | 'row'; mobileDirection?: 'column' | 'row'; gap: number; mobileGap?: number; padding: number; children: NativeBlock[];
   disclosure?: { label: string; open?: boolean };
 }
 export interface NativeGrid extends NativeBlockBase {
-  kind: 'grid'; columns: number; columnGap: number; rowGap: number; children: NativeBlock[];
+  kind: 'grid'; columns: number; mobileColumns?: number; columnGap: number; rowGap: number; children: NativeBlock[];
 }
 export interface NativeContent extends NativeBlockBase {
   kind: 'content'; source: string; gaps?: Record<string, number>; binding?: string;
 }
 export interface NativeImage extends NativeBlockBase {
-  kind: 'image'; src: string; alt: string; height?: number; fit?: 'contain' | 'cover'; href?: string;
+  kind: 'image'; src: string; alt: string; height?: number; mobileHeight?: number; fit?: 'contain' | 'cover'; href?: string;
 }
 export interface NativeLink extends NativeBlockBase {
-  kind: 'link'; text: string; href: string; appearance?: 'plain' | 'primary' | 'secondary'; binding?: string;
+  kind: 'link'; text: string; href: string; appearance?: 'plain' | 'default' | 'primary' | 'secondary'; binding?: string;
 }
 export interface NativeCollection extends NativeBlockBase {
   kind: 'collection'; binding: string; layout: 'grid' | 'gallery';
@@ -92,13 +92,16 @@ export function validateNativePage(value: unknown, context: NativePageContext): 
       if(input.locale!==undefined){base.locale=text(input.locale,20);if(!/^[a-z]{2,3}(?:-[A-Z]{2})?$/.test(base.locale))return invalid();}
       const common=['id','kind','width','hidden','locale']; let block:NativeBlock;
       if(kind==='flow'){
-        keys(input,[...common,'role','direction','gap','padding','children','disclosure']);
+        keys(input,[...common,'role','direction','mobileDirection','gap','mobileGap','padding','children','disclosure']);
         block={...base,kind,direction:choice(input.direction,['column','row']),gap:integer(input.gap),padding:integer(input.padding),children:nodes(input.children,depth+1)};
+        if(input.mobileDirection!==undefined)block.mobileDirection=choice(input.mobileDirection,['column','row']);
+        if(input.mobileGap!==undefined)block.mobileGap=integer(input.mobileGap);
         if(input.role!==undefined)block.role=choice(input.role,['section','header','nav','footer','main'] as const);
         if(input.disclosure!==undefined){const disclosure=record(input.disclosure);keys(disclosure,['label','open']);block.disclosure={label:text(disclosure.label,500)};if(disclosure.open!==undefined)block.disclosure.open=boolean(disclosure.open);}
       }else if(kind==='grid'){
-        keys(input,[...common,'columns','columnGap','rowGap','children']);
+        keys(input,[...common,'columns','mobileColumns','columnGap','rowGap','children']);
         block={...base,kind,columns:integer(input.columns,12,1),columnGap:integer(input.columnGap),rowGap:integer(input.rowGap),children:nodes(input.children,depth+1)};
+        if(input.mobileColumns!==undefined)block.mobileColumns=integer(input.mobileColumns,6,1);
       }else if(kind==='content'){
         keys(input,[...common,'source','gaps','binding']);
         const content=text(input.source,24000),gaps=input.gaps===undefined?undefined:record(input.gaps) as Record<string,number>;
@@ -106,15 +109,16 @@ export function validateNativePage(value: unknown, context: NativePageContext): 
         block={...base,kind,source:content,...(gaps?{gaps:{...gaps}}:{})};
         if(input.binding!==undefined){const binding=text(input.binding,200);if(!context.bindings?.includes(binding))return invalid();block.binding=binding;}
       }else if(kind==='image'){
-        keys(input,[...common,'src','alt','height','fit','href']);
+        keys(input,[...common,'src','alt','height','mobileHeight','fit','href']);
         const src=address(input.src,true);if(src.startsWith('/')&&!context.images.includes(src))return invalid();
         block={...base,kind,src,alt:text(input.alt,1000)};
         if(input.height!==undefined)block.height=integer(input.height,2000,20);
+        if(input.mobileHeight!==undefined)block.mobileHeight=integer(input.mobileHeight,2000,20);
         if(input.fit!==undefined)block.fit=choice(input.fit,['contain','cover'] as const);
         if(input.href!==undefined)block.href=address(input.href);
       }else if(kind==='link'){
         keys(input,[...common,'text','href','appearance','binding']);block={...base,kind,text:text(input.text,1000),href:address(input.href)};
-        if(input.appearance!==undefined)block.appearance=choice(input.appearance,['plain','primary','secondary'] as const);
+        if(input.appearance!==undefined)block.appearance=choice(input.appearance,['plain','default','primary','secondary'] as const);
         if(input.binding!==undefined){const binding=text(input.binding,200);if(!context.bindings?.includes(binding))return invalid();block.binding=binding;}
       }else if(kind==='collection'){
         keys(input,[...common,'binding','layout','columns','featured','columnGap','rowGap','imageHeight','featuredImageHeight','mobileImageHeight','fit']);
@@ -151,7 +155,10 @@ export function nativeBlockStyles(block: NativeBlock): Record<string,string> {
   const styles:Record<string,string>={};
   if(block.width!==undefined){styles.width=measure(block.width);styles.flex='0 1 auto';}
   if(block.kind==='flow')Object.assign(styles,{'--c9y-direction':block.direction,'--c9y-gap':measure(block.gap),'--c9y-padding':measure(block.padding)});
+  if(block.kind==='flow'&&block.mobileDirection)styles['--c9y-mobile-direction']=block.mobileDirection;
+  if(block.kind==='flow'&&block.mobileGap!==undefined)styles['--c9y-mobile-gap']=measure(block.mobileGap);
   if(block.kind==='grid'||block.kind==='collection')Object.assign(styles,{'--c9y-columns':String(block.kind==='collection'?nativeCollectionTracks(block).columns:block.columns),'--c9y-column-gap':measure(block.columnGap),'--c9y-row-gap':measure(block.rowGap)});
+  if(block.kind==='grid'&&block.mobileColumns!==undefined)styles['--c9y-mobile-columns']=String(block.mobileColumns);
   if(block.kind==='collection'){
     const tracks=nativeCollectionTracks(block);Object.assign(styles,{'--c9y-item-span':String(tracks.ordinarySpan),'--c9y-featured-span':String(tracks.featuredSpan),'--c9y-image-height':measure(block.imageHeight),'--c9y-image-fit':block.fit});
     if(block.featuredImageHeight!==undefined)styles['--c9y-featured-image-height']=measure(block.featuredImageHeight);
@@ -159,6 +166,7 @@ export function nativeBlockStyles(block: NativeBlock): Record<string,string> {
   }
   if(block.kind==='image'){
     if(block.height!==undefined)styles['--c9y-image-height']=measure(block.height);
+    if(block.mobileHeight!==undefined)styles['--c9y-mobile-image-height']=measure(block.mobileHeight);
     if(block.fit)styles['--c9y-image-fit']=block.fit;
   }
   return styles;
@@ -177,7 +185,7 @@ export function renderNativeBlock(block: NativeBlock, options: NativePageRenderO
     const image=`<img src="${escape(address(block.src,true))}" alt="${escape(block.alt)}" loading="lazy">`;
     return`<figure ${attrs}>${block.href?`<a href="${escape(address(block.href))}">${image}</a>`:image}</figure>`;
   }
-  if(block.kind==='link')return`<div ${attrs}><a class="${block.appearance&&block.appearance!=='plain'?`ds-button ds-button--${block.appearance}`:'c9y-native-link'}" href="${escape(address(block.href))}">${escape(block.text)}</a></div>`;
+  if(block.kind==='link')return`<div ${attrs}><a class="${block.appearance&&block.appearance!=='plain'?`ds-button${block.appearance==='default'?'':` ds-button--${block.appearance}`}`:'c9y-native-link'}" href="${escape(address(block.href))}">${escape(block.text)}</a></div>`;
   if(block.kind==='runtime')return`<div ${attrs}>${options.runtime?.(block)??''}</div>`;
   return`<div ${attrs}>${(options.collections?.[block.binding]?.items??[]).map((item,index)=>{
     const tag=item.href?'a':'div',link=item.href?` href="${escape(address(item.href))}"`:'';

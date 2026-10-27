@@ -30,4 +30,14 @@ describe('native page boundary',()=>{
     page.blocks.push({id:'japanese',kind:'content',source:'花',locale:'ja'});expect(validateNativePage(page,context).blocks.at(-1)?.locale).toBe('ja');
     page.blocks.push({id:'bad',kind:'image',src:'javascript:alert(1)',alt:''});expect(()=>validateNativePage(page,context)).toThrow();
   });
+  test('keeps responsive measures in the same closed native model',()=>{
+    const page=document();page.blocks.push({id:'work',kind:'grid',columns:2,mobileColumns:2,columnGap:40,rowGap:40,children:[{id:'work-photo',kind:'image',src:'/flowers.png',alt:'',height:500,mobileHeight:280}]});
+    Object.assign(page.blocks[0],{mobileDirection:'row',mobileGap:20});
+    page.blocks.push({id:'cta',kind:'link',text:'Get in touch',href:'/inquiry',appearance:'default'});
+    const checked=validateNativePage(page,context);
+    expect(nativeBlockStyles(checked.blocks[0])).toMatchObject({'--c9y-mobile-direction':'row','--c9y-mobile-gap':'calc(20px * var(--sf,1))'});
+    expect(nativeBlockStyles(checked.blocks[2])).toMatchObject({'--c9y-mobile-columns':'2'});
+    expect(renderNativePage(checked,{images:context.images})).toContain('class="ds-button" href="/inquiry"');
+    const bad=structuredClone(page);Object.assign(bad.blocks[2],{mobileColumns:20});expect(()=>validateNativePage(bad,context)).toThrow();
+  });
 });
