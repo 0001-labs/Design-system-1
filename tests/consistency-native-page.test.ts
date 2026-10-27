@@ -9,6 +9,7 @@ describe('native page boundary',()=>{
     expect(validateNativePage(document(),context)).toEqual(document());
     expect(nativeCollectionTracks(collection)).toEqual({columns:6,ordinarySpan:2,featuredSpan:3});
     expect(nativeBlockStyles(collection)).toMatchObject({'--c9y-columns':'6','--c9y-column-gap':'calc(40px * var(--sf,1))','--c9y-row-gap':'calc(120px * var(--sf,1))'});
+    expect(nativeBlockStyles({id:'logo',kind:'image',src:'/flowers.png',alt:'',width:160})).toMatchObject({width:'calc(160px * var(--sf,1))',flex:'0 1 auto'});
     const items=Array.from({length:5},(_,index)=>({id:String(index),href:`/product/${index}`,title:`Flower ${index}`,image:{src:'/flowers.png',alt:''}}));
     const html=renderNativePage(document(),{collections:{storefront:{items}},images:context.images});
     expect(html.match(/data-featured/g)).toHaveLength(2);

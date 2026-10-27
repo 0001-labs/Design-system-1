@@ -147,7 +147,7 @@ export function nativeCollectionTracks(block: NativeCollection): { columns: numb
 /** Every measure is a model field; neither the editor nor publisher infers layout from arbitrary HTML. */
 export function nativeBlockStyles(block: NativeBlock): Record<string,string> {
   const styles:Record<string,string>={};
-  if(block.width!==undefined)styles.width=measure(block.width);
+  if(block.width!==undefined){styles.width=measure(block.width);styles.flex='0 1 auto';}
   if(block.kind==='flow')Object.assign(styles,{'--c9y-direction':block.direction,'--c9y-gap':measure(block.gap),'--c9y-padding':measure(block.padding)});
   if(block.kind==='grid'||block.kind==='collection')Object.assign(styles,{'--c9y-columns':String(block.kind==='collection'?nativeCollectionTracks(block).columns:block.columns),'--c9y-column-gap':measure(block.columnGap),'--c9y-row-gap':measure(block.rowGap)});
   if(block.kind==='collection'){
