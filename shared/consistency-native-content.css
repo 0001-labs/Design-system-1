@@ -21,6 +21,7 @@
 .c9y-native-table { max-width:100%; overflow:auto; }
 .c9y-native-table > table { display:table; width:100%; table-layout:fixed; }
 .c9y-native-table > table :is(th,td) { height:calc(2 * var(--ds-unit)); }
+.c9y-native-table > table th { font-family:"Inter Arrows",var(--ds-typeface-medium,var(--typeface-medium,inherit)),system-ui,sans-serif; font-weight:var(--ds-type-weight-bold,500); }
 .c9y-native-region .ds-card { max-width:100%; min-height:min-content; }
 .c9y-native-region .ds-card__body { white-space:normal; }
 .c9y-native-carousel { max-width:100%; }
