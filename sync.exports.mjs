@@ -105,6 +105,9 @@ export default {
           `const ${name} = ${JSON.stringify(String(read(posix.normalize(posix.join('shared', path)))))};`);
         return {
           'native-content.ts': source,
+          'native-page.ts': String(read('shared/consistency-native-page.ts'))
+            .replace('./consistency-native-content', './native-content')
+            .replace(/^import pageStyles from '.\/consistency-native-page.css\?raw';$/m, `const pageStyles = ${JSON.stringify(String(read('shared/consistency-native-page.css')))};`),
           'site-design.ts': read('shared/consistency-site-design.ts'),
           'consistency-content.ts': read('shared/consistency-content.ts'),
           'consistency-carousel.ts': read('shared/consistency-carousel.ts'),
