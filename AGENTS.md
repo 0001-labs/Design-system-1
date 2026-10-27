@@ -118,11 +118,11 @@ The private Architecture document records the studio-specific design, delivery a
 ## Distribution
 
 - npm package `@0001-labs/design-system-1` (it was `ds-one` before; that name keeps its old versions and gets no new ones)
-- CDN via jsDelivr: `https://cdn.jsdelivr.net/npm/@0001-labs/design-system-1@alpha/…`
+- CDN via jsDelivr: `https://cdn.jsdelivr.net/npm/@0001-labs/design-system-1@latest/…` (or an exact version)
 
 One command publishes a new version (`scripts/release.mjs`, the same file in Aa, Design system 1, IDv1, Drag and Worktrees):
 
-- `vp run release alpha` — the next preview under the `alpha` tag (`-alpha.N` → `-alpha.N+1`)
+- `vp run release alpha` — a preview under the `alpha` tag, for trying a change before it is released (`-alpha.N` → `-alpha.N+1`)
 - `vp run release patch` / `minor` / `major` — a release under `latest`: fixes, something new, something that breaks (from a preview, patch and minor release its own number, major goes to the next major)
 - `vp run release current` — publishes the version already in `package.json`, for the first release under the new name
 - `--dry-run` after any of them goes through every step without publishing
@@ -135,7 +135,7 @@ The Swift package (`native/apple`) and the Kotlin package (`native/android`) are
 
 ## Black box tests
 
-`vp run e2e:blackbox` (`scripts/e2e-blackbox.mjs`) checks Design system 1 as anyone on the internet meets it, signed out and over HTTP alone: every page in the navigation, the Overview's component directory and the sitemap, the redirects and hosts, every file those pages load, the hosted stylesheet and module from Use with HTML, Play, System CI where `/flags` sends, the owner-only hosts asking to sign in, and the published package: the version npm's `alpha` tag names, with its main entry, `one.css`, `grid.css`, fonts and chunks on jsDelivr. Each step is a contract from the Worker (`services/src/index.ts`, `dashboard.ts`), `website/astro.config.mjs`, `website/public/_headers`, the README and this file's Distribution; when one of those changes, change the step with it. It sends only GETs and HEADs, without credentials, so it is safe against production. It runs against `https://designsystem1.com` by default, `--local` against the docs dev server and `--base http://localhost:8787` against `wrangler dev`; every run is recorded for System → Tests as "Design system 1 black box". Run it after each site deploy and each release.
+`vp run e2e:blackbox` (`scripts/e2e-blackbox.mjs`) checks Design system 1 as anyone on the internet meets it, signed out and over HTTP alone: every page in the navigation, the Overview's component directory and the sitemap, the redirects and hosts, every file those pages load, the hosted stylesheet and module from Use with HTML, Play, System CI where `/flags` sends, the owner-only hosts asking to sign in, and the published package: the stable version npm's `latest` tag names, with its main entry, `one.css`, `grid.css`, fonts and chunks on jsDelivr. Each step is a contract from the Worker (`services/src/index.ts`, `dashboard.ts`), `website/astro.config.mjs`, `website/public/_headers`, the README and this file's Distribution; when one of those changes, change the step with it. It sends only GETs and HEADs, without credentials, so it is safe against production. It runs against `https://designsystem1.com` by default, `--local` against the docs dev server and `--base http://localhost:8787` against `wrangler dev`; every run is recorded for System → Tests as "Design system 1 black box". Run it after each site deploy and each release.
 
 ## Constraints before a release or a deploy
 

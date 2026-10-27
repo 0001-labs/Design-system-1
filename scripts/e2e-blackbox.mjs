@@ -700,9 +700,9 @@ if (PRODUCTION) {
   ]);
 }
 
-// The published package: the version the alpha tag names, and the files the README, Use with
+// The published package: the version the latest tag names, and the files the README, Use with
 // HTML and AGENTS.md's Distribution tell products to load from it.
-const manifest = await request(`${REGISTRY}/alpha`).then(
+const manifest = await request(`${REGISTRY}/latest`).then(
   (response) => ({ response, body: response.status === 200 ? JSON.parse(response.text) : null }),
   (error) => ({ error }),
 );
@@ -715,11 +715,11 @@ const packageFiles = version
   : [];
 await step("Package", [
   [
-    `The alpha tag on npm names a published version`,
+    `The latest tag on npm names a stable version`,
     async () => {
       if (manifest.error) throw manifest.error;
       expectStatus(manifest.response, 200);
-      expect(/^\d+\.\d+\.\d+-alpha\.\d+$/.test(version ?? ""), `alpha is ${version}`);
+      expect(/^\d+\.\d+\.\d+$/.test(version ?? ""), `latest is ${version}`);
       expect(manifest.body.name === PACKAGE, `the tag names ${manifest.body.name}`);
     },
   ],
@@ -744,9 +744,9 @@ await step("Package", [
     (response) => expectHeader(response, "access-control-allow-origin", /^\*$/),
   ),
   [
-    `${CDN}@alpha/DS1/1-root/one.css answers`,
+    `${CDN}@latest/DS1/1-root/one.css answers`,
     async () => {
-      const answer = await request(`${CDN}@alpha/DS1/1-root/one.css`, { method: "HEAD" });
+      const answer = await request(`${CDN}@latest/DS1/1-root/one.css`, { method: "HEAD" });
       expectStatus(answer, 200);
       expectType(answer, "text/css");
     },
