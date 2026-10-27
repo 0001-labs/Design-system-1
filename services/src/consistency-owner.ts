@@ -23,8 +23,10 @@ export const OWNER_COOKIE = '__Host-c9y_owner';
 export const PENDING_COOKIE = '__Host-c9y_pending';
 const SYSTEM = 'https://system.0001.dev';
 /** The System client each origin signs in as; any other origin has no owner sign-in here. */
-const CLIENTS: Record<string, string> = { 'https://c9y.site': 'c9y', 'https://consistency.site': 'c9y-app' };
+const CLIENTS: Record<string, string> = { 'https://c9y.site': 'c9y', 'https://consistency.site': 'c9y-app', 'https://system.consistency.site': 'c9y-system' };
 const PENDING_TTL = 600_000;
+/** A same-origin path to return to after signing in (`/auth/start?next=`); anything else returns to `/`. */
+const returnPath = (value: unknown) => typeof value === 'string' && /^\/(?![/\\])[A-Za-z0-9._~/-]{0,200}$/.test(value) && !value.includes('/..') ? value : undefined;
 const headers = { 'Cache-Control': 'private, no-store', 'Referrer-Policy': 'same-origin' };
 
 const cookie = (name: string, value: string, seconds: number, sameSite: 'Lax' | 'None' = 'Lax') => `${name}=${value}; Path=/; Secure; HttpOnly; SameSite=${sameSite}; Max-Age=${Math.max(0, Math.floor(seconds))}`;
@@ -66,7 +68,7 @@ export async function ownerSignOut(request: Request, env: OwnerEnv): Promise<str
   return cookie(OWNER_COOKIE, '', 0);
 }
 
-interface Pending { state: string; verifier: string; until: number; silent: boolean }
+interface Pending { state: string; verifier: string; until: number; silent: boolean; next?: string }
 
 /** `/auth/start` and `/auth/callback`; null for any other path. */
 export async function ownerRoutes(request: Request, env: OwnerEnv, now = Date.now()): Promise<Response | null> {
@@ -77,7 +79,8 @@ export async function ownerRoutes(request: Request, env: OwnerEnv, now = Date.no
   if (url.pathname === '/auth/start') {
     if (request.method !== 'GET') return plain('Method not allowed', 405);
     const state = hex(), verifier = hex(), silent = url.searchParams.get('silent') === '1';
-    const pending: Pending = { state, verifier, until: now + PENDING_TTL, silent };
+    const next = returnPath(url.searchParams.get('next'));
+    const pending: Pending = { state, verifier, until: now + PENDING_TTL, silent, ...(next ? { next } : {}) };
     return redirect(`${SYSTEM}/auth/authorize?client=${CLIENTS[url.origin]}&state=${state}&challenge=${await proof(verifier)}${silent ? '&prompt=none' : ''}`, cookie(PENDING_COOKIE, encodeURIComponent(JSON.stringify(pending)), PENDING_TTL / 1000, 'None'));
   }
   let pending: Pending | null = null;
@@ -89,7 +92,8 @@ export async function ownerRoutes(request: Request, env: OwnerEnv, now = Date.no
   if (request.method === 'GET') {
     // System's quiet no: ask out loud, once, so the owner signs in to System.
     if (!pending || url.searchParams.get('state') !== pending.state || !url.searchParams.get('error')) return plain('Sign-in expired. Open c9y.site to try again.', 400);
-    return redirect(pending.silent ? '/auth/start' : '/app/signin', cleared);
+    const next = returnPath(pending.next);
+    return redirect(pending.silent ? `/auth/start${next ? `?next=${encodeURIComponent(next)}` : ''}` : '/app/signin', cleared);
   }
   if (request.method !== 'POST' || request.headers.get('Origin') !== SYSTEM) return plain('Invalid origin', 403);
   try {
@@ -100,7 +104,7 @@ export async function ownerRoutes(request: Request, env: OwnerEnv, now = Date.no
     if (form.get('state') !== pending.state) throw new Error('state');
     const result = await identity.redeem(form.get('code') ?? '', pending.verifier);
     if (!result || result.owner !== 'system-owner' || result.expiry * 1000 <= now) throw new Error('refused');
-    return redirect('/', cookie(OWNER_COOKIE, result.token, result.expiry - now / 1000), cleared);
+    return redirect(returnPath(pending.next) ?? '/', cookie(OWNER_COOKIE, result.token, result.expiry - now / 1000), cleared);
   } catch {
     return plain('Sign-in expired. Open c9y.site to try again.', 400);
   }

@@ -2,6 +2,7 @@ import { consistencyAI, type PreviewAIEnv } from "./consistency-ai";
 import { consistencyPreview, isConsistencyHost, type WorkspaceEnv, isPrivatePreviewPath } from "./consistency";
 import { appNavigation } from './app-navigation';
 import { systemSite, SYSTEM_HOST } from "./system-site";
+import { c9ySystemSite, C9Y_SYSTEM_HOST, isC9ySystemPath } from "./c9y-system-site";
 import { WorkerEntrypoint } from "cloudflare:workers";
 import { featureFlags, manageFeatureFlags, setFeatureFlag } from "./flags";
 import { dashboard, sessionRequest, DASHBOARD_HOST, ICON_HOST } from "./dashboard";
@@ -32,6 +33,9 @@ export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
     if (url.hostname === SYSTEM_HOST) return systemSite(request, env);
+    if (url.hostname === C9Y_SYSTEM_HOST) return c9ySystemSite(request, env);
+    // C9Y System's build is the System owner's, on its own host only; never public assets elsewhere.
+    if (isC9ySystemPath(url.pathname)) return new Response("Not found", { status: 404, headers: { "Cache-Control": "private, no-store", "X-Robots-Tag": "noindex, nofollow" } });
     if (/^\/system-(?:data|previews)\//i.test(decodeURIComponent(url.pathname))) return new Response("Not found", { status: 404 });
     if (url.hostname === DASHBOARD_HOST) return new Response('Not found', { status: 404 });
     if (/^\/(?:adoption|architecture)(?:\/|$)/i.test(decodeURIComponent(url.pathname)) || url.pathname === '/app/adoption') {

@@ -1,0 +1,133 @@
+/* C9Y System. Design system 1's square, on the paper with no cards: the views in the work column and the focused
+   node's details in a column of sixteen squares beside it, stacking below it under forty-eight squares. Every row is
+   one square with its words on the lower sixteen; prose that wraps stays on lines of one square. */
+
+:root { --ds-sf: var(--sf, 1); }
+html, body { margin: 0; background: var(--ds-paper); color: var(--ds-text-color); }
+body { font-family: var(--ds-typeface-regular); font-size: var(--ds-type-size-default); }
+#c9y-system { container-type: inline-size; min-width: 0; }
+
+.c9y-system {
+  --u: var(--ds-unit);
+  --line: calc(16px * var(--ds-sf));
+  --four: calc(4px * var(--ds-sf));
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) calc(16 * var(--u));
+  grid-template-areas: "head head" "main detail";
+  column-gap: calc(2 * var(--u));
+  align-items: start;
+  padding: var(--u);
+  line-height: var(--u);
+}
+.c9y-system * { box-sizing: border-box; }
+.c9y-system :where(h1, h2, h3, p, ul, dl, dd) { margin: 0; padding: 0; }
+.c9y-system ul { list-style: none; }
+.c9y-system code { font-family: var(--ds-typeface-mono); font-size: calc(13px * var(--ds-sf)); overflow-wrap: anywhere; }
+
+/* The head: the title on two squares, the count on one, the tabs a square below. */
+.c9y-head { grid-area: head; margin-bottom: calc(2 * var(--u)); }
+.c9y-head h1 { line-height: calc(2 * var(--u)); }
+.c9y-count { padding-top: var(--four); line-height: var(--line); color: var(--ds-text-color-muted); }
+.c9y-tabs { display: flex; margin-top: var(--u); }
+
+.c9y-main { grid-area: main; min-width: 0; }
+.c9y-detail { grid-area: detail; min-width: 0; position: sticky; top: var(--u); max-height: calc(100dvh - 2 * var(--u)); overflow: auto; overscroll-behavior: contain; }
+.c9y-detail[hidden] { display: none; }
+
+@container (max-width: 959px) {
+  .c9y-system { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "main" "detail"; }
+  .c9y-detail { position: static; max-height: none; overflow: visible; margin-top: calc(2 * var(--u)); }
+}
+
+/* Headings and block lines: one square each, the words on the sixteen. */
+.c9y-system h2, .c9y-system h3, .c9y-head h1 + p { font-weight: var(--ds-type-weight-default); }
+.c9y-system h2 { font-size: var(--ds-type-size-default); padding-top: var(--four); line-height: var(--line); font-family: var(--ds-typeface-medium); font-weight: var(--ds-type-weight-bold); }
+.c9y-system h3 { padding-top: var(--four); line-height: var(--line); font-size: var(--ds-type-size-default); color: var(--ds-text-color-muted); }
+
+/* A name a person presses to focus it: the words alone, the focused one underlined. */
+.c9y-link { appearance: none; border: 0; margin: 0; padding: 0; background: none; color: inherit; font: inherit; line-height: inherit; text-align: start; cursor: pointer; }
+.c9y-link:hover, .c9y-link[aria-pressed="true"] { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: calc(3px * var(--ds-sf)); }
+.c9y-system :is(.c9y-link, .c9y-node, a):focus-visible { outline: 2px solid var(--ds-text-color); outline-offset: 0; }
+.c9y-system a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: calc(3px * var(--ds-sf)); }
+.c9y-none { color: var(--ds-text-color-muted); }
+.c9y-kind { color: var(--ds-text-color-muted); white-space: nowrap; }
+
+/* The map: nodes as Ezo items eight squares long, edge to edge under their stack's head, the lines beneath them. It
+   scrolls inside its own frame, never the page. */
+.c9y-map-frame { max-width: 100%; overflow: auto; overscroll-behavior-x: contain; }
+.c9y-map { position: relative; margin: 1px; }
+.c9y-edges { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
+.c9y-edge { fill: none; stroke: var(--ds-text-color); stroke-width: 1px; opacity: .3; }
+.c9y-edge path, .c9y-edge polyline { vector-effect: non-scaling-stroke; }
+.c9y-edge path { shape-rendering: crispEdges; }
+.c9y-edge[data-kind="local"] path { stroke-dasharray: 4 4; }
+.c9y-edge[data-kind="opportunity"] path { stroke-dasharray: 12 4; }
+.c9y-edge[data-kind="unverified"] path { stroke-dasharray: 1 7; }
+.c9y-edge.is-on { opacity: 1; }
+.c9y-edge.is-off { display: none; }
+
+.c9y-stack { position: absolute; width: calc(8 * var(--u)); }
+.c9y-stack-head, .c9y-node {
+  display: flex; justify-content: space-between; align-items: flex-end; gap: var(--four);
+  width: calc(8 * var(--u) - 1px); height: calc(var(--u) - 1px); margin: 0 0 1px;
+  padding: 0 var(--four); line-height: var(--line); outline: 1px solid var(--ds-border-color);
+}
+.c9y-stack-head { background: var(--stack, var(--ds-fill)); color: var(--ds-black); font-family: var(--ds-typeface-medium); font-weight: var(--ds-type-weight-bold); }
+.c9y-stack-head small, .c9y-node small { flex: none; font-size: var(--ds-type-size-small); font-variant-numeric: tabular-nums; }
+.c9y-stack-head small { opacity: .6; }
+.c9y-stack[data-stack="sites"] { --stack: var(--ds-yellow); }
+.c9y-stack[data-stack="block"] { --stack: var(--ds-pink); }
+.c9y-stack[data-stack="runtime"] { --stack: var(--ds-zenith-blue); }
+.c9y-stack[data-stack="place"] { --stack: var(--ds-apple-green); }
+.c9y-stack[data-stack="service"] { --stack: var(--ds-orange); }
+.c9y-node { position: relative; z-index: 1; appearance: none; border: 0; border-radius: 0; background: var(--ds-paper); color: var(--ds-text-color); font: inherit; font-size: var(--ds-type-size-default); text-align: start; cursor: pointer; }
+.c9y-node b { min-width: 0; overflow: hidden; white-space: nowrap; font-weight: inherit; }
+.c9y-node b[data-cut="end"] { mask-image: linear-gradient(to right, #000 calc(100% - var(--u)), transparent); }
+.c9y-node small { color: var(--ds-text-color-muted); }
+.c9y-node:hover { background: var(--ds-fill); }
+.c9y-node[aria-pressed="true"] { z-index: 2; background: var(--ds-fill); outline-color: var(--ds-text-color); }
+.c9y-node[data-faded] { color: var(--ds-text-color-muted); }
+.c9y-node[data-faded] small { opacity: .6; }
+
+/* The key, under the sites: each kind's line and System's words for it. */
+.c9y-key { position: absolute; width: calc(8 * var(--u)); }
+.c9y-key p { display: flex; align-items: flex-end; gap: var(--four); height: var(--u); line-height: var(--line); white-space: nowrap; }
+.c9y-key svg { flex: none; align-self: center; width: calc(2 * var(--u)); height: var(--u); overflow: visible; }
+.c9y-key .c9y-edge { opacity: 1; }
+
+/* Components and sites: a group a heading over its entries, each entry under a hairline, a square apart. */
+.c9y-group + .c9y-group { margin-top: calc(2 * var(--u)); }
+.c9y-entry { padding-top: var(--u); margin-top: var(--u); box-shadow: inset 0 1px var(--ds-border-color); }
+.c9y-entry[data-current] { box-shadow: inset 0 1px var(--ds-text-color); }
+.c9y-entry-head { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0 calc(var(--u) / 2); min-height: var(--u); line-height: var(--line); }
+.c9y-entry-head .c9y-link { font-family: var(--ds-typeface-medium); font-weight: var(--ds-type-weight-bold); }
+.c9y-entry-head code { color: var(--ds-text-color-muted); }
+.c9y-summary { max-width: calc(32 * var(--u)); }
+
+/* Design system 1 presents; Consistency adds. Two columns of twelve squares, the maker's name on its own tag. */
+.c9y-split { display: grid; grid-template-columns: repeat(auto-fill, calc(12 * var(--u))); gap: var(--u) calc(2 * var(--u)); margin: var(--u) 0; }
+.c9y-split section { min-width: 0; }
+.c9y-split li, .c9y-split .c9y-none { padding-top: var(--four); line-height: var(--line); }
+.c9y-system .c9y-by { display: inline-block; margin: var(--four) 0 0; padding: 0 var(--four); border-radius: calc(2px * var(--ds-sf)); font-size: var(--ds-type-size-small); line-height: var(--line); }
+.c9y-presents .c9y-by { background: var(--ds-fill); color: var(--ds-text-color-muted); }
+.c9y-presents li { color: var(--ds-text-color-muted); }
+.c9y-adds .c9y-by { background: var(--ds-yellow); color: var(--ds-black); }
+
+/* Facts: the term in a column of five squares, the value beside it, each line one square. */
+.c9y-facts { display: grid; grid-template-columns: calc(5 * var(--u)) minmax(0, 1fr); column-gap: var(--u); }
+.c9y-facts dt { color: var(--ds-text-color-muted); }
+.c9y-facts dd { min-width: 0; overflow-wrap: anywhere; }
+
+/* The focused node's details. */
+.c9y-system .c9y-detail-body > * + * { margin-top: var(--u); }
+.c9y-detail-body h2 { font-size: var(--ds-type-size-default); }
+.c9y-detail-body .c9y-split { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: var(--u); margin: var(--u) 0; }
+.c9y-relations > li + li { padding-top: var(--u); }
+.c9y-relations > li + li { margin-top: var(--u); box-shadow: inset 0 1px var(--ds-border-color); }
+.c9y-evidence { color: var(--ds-text-color-muted); }
+
+@container (max-width: 599px) {
+  .c9y-facts { grid-template-columns: calc(4 * var(--u)) minmax(0, 1fr); }
+  .c9y-split { grid-template-columns: minmax(0, 1fr); }
+}

@@ -39,6 +39,7 @@ describe("single Worker deployment", () => {
       { pattern: "consistency.site/app/*", zone_name: "consistency.site" },
       { pattern: "consistency.site/private-consistency/*", zone_name: "consistency.site" },
       { pattern: "consistency.site/icons/design-system-1.svg", zone_name: "consistency.site" },
+      { pattern: "system.consistency.site", custom_domain: true },
       { pattern: "fonts.designsystem1.com", custom_domain: true },
       { pattern: "icon.designsystem1.com", custom_domain: true },
       { pattern: "play.designsystem1.com", custom_domain: true },
