@@ -92,6 +92,8 @@
     "test:e2e": "cd e2e && vp exec playwright test",
     "typecheck:all": "cd packages/css-validate && vp exec tsc --noEmit && cd ../../app && vp exec tsc --noEmit && cd ../services && vp exec tsc --noEmit",
     "services:dryrun": "cd services && vp run dryrun",
+    "system:package": "vp run app:build && node scripts/system-site-assets.mjs",
+    "system:deploy": "sync1 guard && vp run system:package && node scripts/system-site-browser.mjs && cd services && vp exec wrangler deploy --config ../wrangler.system.jsonc",
     "system:examples": "vp exec tsx scripts/system-examples.ts",
     "site:build": "vp run docs:build && vp run app:build && vp run app-controls:build && vp run consistency:build && vp run visual-kit:build && vp run system:examples",
     "site:deploy": "sync1 guard && vp run site:build && vp run constraints:site && cd services && vp exec wrangler deploy --config ../wrangler.jsonc",

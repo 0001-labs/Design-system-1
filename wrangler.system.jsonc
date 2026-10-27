@@ -1,0 +1,16 @@
+{
+  "name": "designsystem1-system",
+  "account_id": "ce6189d5ac975158991e207a3c4e1cd5",
+  "main": "./services/src/system-worker.ts",
+  "compatibility_date": "2026-07-24",
+  "workers_dev": false,
+  "observability": { "enabled": true },
+  "assets": {
+    "directory": "./.system-dist",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "run_worker_first": true
+  },
+  "r2_buckets": [{ "binding": "LIBRARIES", "bucket_name": "ds-one-libraries", "preview_bucket_name": "ds-one-libraries-preview" }],
+  "routes": [{ "pattern": "system.designsystem1.com", "custom_domain": true }]
+}

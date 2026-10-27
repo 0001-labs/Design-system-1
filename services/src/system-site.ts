@@ -18,7 +18,7 @@ export async function systemSite(request: Request, env: Env, send: typeof fetch 
   if (request.method === 'GET' || request.method === 'HEAD') {
     if (url.pathname.startsWith('/app/assets/') || url.pathname === '/icons/design-system-1.svg') return env.ASSETS.fetch(request);
   }
-  if (!pages.has(path) && path !== '/api/system/examples' && path !== '/api/system/checks' && !/^\/system-previews\/[a-z0-9-]+\.png$/.test(path)) return new Response('Not found', { status: 404, headers: security });
+  if (!pages.has(path) && path !== '/api/system/examples' && path !== '/api/system/checks' && path !== '/api/system/revision' && !/^\/system-previews\/[a-z0-9-]+\.png$/.test(path)) return new Response('Not found', { status: 404, headers: security });
   const denied = await authorizeReport(sessionRequest(request.clone()), env, send);
   if (denied) {
     if (denied.status === 401 && pages.has(path)) return new Response(null, { status: 302, headers: { ...security, Location: `/app/signin?next=${encodeURIComponent(path)}` } });
@@ -35,7 +35,7 @@ export async function systemSite(request: Request, env: Env, send: typeof fetch 
     catch { return Response.json({ error: 'The example setting could not be saved.' }, { status: 400, headers: security }); }
   }
   if (!['GET', 'HEAD'].includes(request.method)) return new Response(null, { status: 405, headers: { ...security, Allow: 'GET, HEAD' } });
-  url.pathname = path === '/api/system/checks' ? '/system-data/examples.json' : pages.has(path) ? '/app/' : path;
+  url.pathname = path === '/api/system/revision' ? '/system-data/revision.json' : path === '/api/system/checks' ? '/system-data/examples.json' : pages.has(path) ? '/app/' : path;
   const original = await env.ASSETS.fetch(new Request(url, request));
   const response = new Response(original.body, original);
   for (const [name, value] of Object.entries(security)) response.headers.set(name, value);

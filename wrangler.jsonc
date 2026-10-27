@@ -41,7 +41,6 @@
     { "pattern": "consistency.site/app/*", "zone_name": "consistency.site" },
     { "pattern": "consistency.site/private-consistency/*", "zone_name": "consistency.site" },
     { "pattern": "consistency.site/icons/design-system-1.svg", "zone_name": "consistency.site" },
-    { "pattern": "system.designsystem1.com", "custom_domain": true },
     { "pattern": "fonts.designsystem1.com", "custom_domain": true },
     { "pattern": "icon.designsystem1.com", "custom_domain": true },
     // Play: a small site and the pages it makes (website/src/pages/play.astro).

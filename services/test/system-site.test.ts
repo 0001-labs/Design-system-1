@@ -13,7 +13,7 @@ function setup() {
 }
 describe('System site', () => {
   it('gates every page, preview and report before assets or settings can be read', async () => {
-    for (const path of ['/', '/examples', '/constraints', '/architecture', '/adoption', '/api/system/examples', '/api/system/checks', '/system-previews/shop.png']) {
+    for (const path of ['/', '/examples', '/constraints', '/architecture', '/adoption', '/api/system/examples', '/api/system/checks', '/api/system/revision', '/system-previews/shop.png']) {
       const { env, send, assets } = setup();
       const response = await systemSite(new Request(origin + path), env, send);
       expect([401, 302]).toContain(response.status); expect(assets).not.toHaveBeenCalled();
@@ -29,7 +29,7 @@ describe('System site', () => {
   });
   it('serves the verified owner the app and report with private caching', async () => {
     const { env, send, request, assets } = setup();
-    for (const [path, target] of [['/examples', '/app/'], ['/api/system/checks', '/system-data/examples.json']]) {
+    for (const [path, target] of [['/examples', '/app/'], ['/api/system/checks', '/system-data/examples.json'], ['/api/system/revision', '/system-data/revision.json']]) {
       const response = await systemSite(request(path!), env, send);
       expect(response.status).toBe(200); expect(response.headers.get('cache-control')).toBe('private, no-store');
       expect(new URL(assets.mock.lastCall![0]!.url).pathname).toBe(target);
