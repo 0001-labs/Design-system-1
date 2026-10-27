@@ -43,6 +43,8 @@ details.c9y-native-flow{display:block}
 .c9y-native-section{min-width:0;max-width:100%;margin:0}
 .c9y-native-section:not(.ds-header,.ds-footer){display:flex;flex-direction:column;gap:var(--c9y-unit)}
 .c9y-native-section .c9y-native-flow[data-slot="actions"]>.c9y-native-node,.c9y-native-section .c9y-native-flow[data-slot="policies"]>.c9y-native-node,.ds-header .c9y-native-flow[data-direction="row"]>.c9y-native-node,.ds-footer .c9y-native-flow[data-direction="row"]>.c9y-native-node{flex:0 0 auto}
+/* A row of actions or policies wraps rather than widening the page: three medium buttons do not fit a phone. */
+.c9y-native-section .c9y-native-flow[data-slot="actions"],.c9y-native-section .c9y-native-flow[data-slot="policies"]{flex-wrap:wrap}
 /* The column a grid of items stands in (data-measure): reading thirty-two squares, wide sixty-two, full the page. */
 .c9y-native-section[data-measure]{width:100%;max-width:var(--c9y-measure,none);margin-inline:auto}
 /* Words for machines only (a statement's hiddenTitle): kept in the page for search engines and screen readers, not drawn. */
