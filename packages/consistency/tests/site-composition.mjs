@@ -45,6 +45,7 @@ const stored = new Map([['/', initial('/')], ['/about/', initial('/about/')]]);
 const writes = [];
 let failWrites = false;
 let siteScale = 1;
+let importantStyles = false;
 let held = null;
 const holdNextWrite = () => {
   let release, entered;
@@ -53,9 +54,10 @@ const holdNextWrite = () => {
   held = { wait, entered };
   return { seen, release };
 };
+const originalStyle = id => importantStyles && id === 'n2' ? 'padding:20px!important;gap:0!important;width:600px!important;max-width:620px!important;box-sizing:content-box!important' : '';
 const style = (id, state) => {
   const value = state.document.nodes[id] ?? {};
-  return [value.gap === undefined ? '' : `gap:calc(${value.gap}px * var(--sf, 1))`, value.padding === undefined ? '' : `padding:calc(${value.padding}px * var(--sf, 1))`, value.width === undefined ? '' : `width:calc(${value.width}px * var(--sf, 1))`, value.hidden ? 'display:none!important' : ''].filter(Boolean).join(';');
+  return [originalStyle(id), value.gap === undefined ? '' : `gap:calc(${value.gap}px * var(--sf, 1))!important`, value.padding === undefined ? '' : `padding:calc(${value.padding}px * var(--sf, 1))!important`, value.width === undefined ? '' : `width:calc(${value.width}px * var(--sf, 1))!important;max-width:100%!important;box-sizing:border-box!important`, value.hidden ? 'display:none!important' : ''].filter(Boolean).join(';');
 };
 const escape = text => String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const insertionNodes = document => {
@@ -70,10 +72,10 @@ const rendered = path => {
   const state = stored.get(path);
   const added = parent => (state.document.insertions ?? []).filter(item => item.parent === parent).map(item => `<${item.kind === 'heading' ? 'h2' : 'p'} data-c9y-node="${item.id}">${escape(item.text)}</${item.kind === 'heading' ? 'h2' : 'p'}>`).join('');
   const sections = {
-    n2: `<section data-c9y-node="n2" data-c9y-original-style="" style="${style('n2', state)}"><h1 data-cms="0123456789ab">${path === '/' ? 'First section' : 'About the site'}</h1><p>The site's own words and layout.</p><img data-c9y-node="n4" data-c9y-original-style="" style="${style('n4', state)}" alt="Picture" width="200" height="60" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='60'%3E%3Crect width='200' height='60' fill='gold'/%3E%3C/svg%3E">${added('n2')}</section>`,
+    n2: `<section data-c9y-node="n2" data-c9y-original-style="${originalStyle('n2')}" style="${style('n2', state)}"><h1 data-cms="0123456789ab">${path === '/' ? 'First section' : 'About the site'}</h1><p>The site's own words and layout.</p><img data-c9y-node="n4" data-c9y-original-style="" style="${style('n4', state)}" alt="Picture" width="200" height="60" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='60'%3E%3Crect width='200' height='60' fill='gold'/%3E%3C/svg%3E">${added('n2')}</section>`,
     n3: `<section data-c9y-node="n3" data-c9y-original-style="" style="${style('n3', state)}"><h2>Second section</h2><p>A different part of the same page.</p>${added('n3')}</section>`,
   };
-  return `<!doctype html><html data-c9y-composition-base="${escape(state.base)}"><head><title>Fixture site</title><style>:root{--sf:${siteScale}}body{margin:0;font:16px/1.5 sans-serif;color:#171717;background:#fff}nav{padding:20px}main{display:flex;flex-direction:column;gap:20px;padding:20px;box-sizing:border-box}section{display:flex;flex-direction:column;gap:0;box-sizing:border-box;position:relative;min-height:180px;padding:20px;background:#eee}h1,h2,p{margin:0}img{display:block;max-width:100%;object-fit:cover}</style></head><body><nav><a id="page-link" href="${origin}${path === '/' ? '/about/' : '/'}">${path === '/' ? 'About' : 'Home'}</a></nav><main data-c9y-node="n1" data-c9y-original-style="" style="${style('n1', state)}">${(state.document.order.n1 ?? ['n2', 'n3']).map(id => sections[id]).join('')}</main><form action="https://invalid.example/"><button id="send">Send</button></form><script>document.body.dataset.ran='yes'</script></body></html>`;
+  return `<!doctype html><html data-c9y-composition-base="${escape(state.base)}"><head><title>Fixture site</title><style>:root{--sf:${siteScale}}body{margin:0;font:16px/1.5 sans-serif;color:#171717;background:#fff}nav{padding:20px}main{display:flex;flex-direction:column;gap:20px;padding:20px;box-sizing:border-box}section{display:flex;flex-direction:column;gap:0;box-sizing:border-box;position:relative;min-height:180px;padding:20px;background:#eee}h1,h2,p{margin:0}img{display:block;max-width:100%;object-fit:cover}${importantStyles ? `[data-c9y-node="n2"]{${originalStyle('n2')}}` : ''}</style></head><body><nav><a id="page-link" href="${origin}${path === '/' ? '/about/' : '/'}">${path === '/' ? 'About' : 'Home'}</a></nav><main data-c9y-node="n1" data-c9y-original-style="" style="${style('n1', state)}">${(state.document.order.n1 ?? ['n2', 'n3']).map(id => sections[id]).join('')}</main><form action="https://invalid.example/"><button id="send">Send</button></form><script>document.body.dataset.ran='yes'</script></body></html>`;
 };
 
 try {
@@ -321,6 +323,27 @@ try {
     const node = document.querySelector('iframe.consistency-site-frame')?.contentDocument?.querySelector('[data-c9y-node="n2"]');
     return node && Number.parseFloat(node.ownerDocument.defaultView.getComputedStyle(node).paddingLeft) === 200;
   });
+  // Authored inline and stylesheet priorities cannot override the user's chosen geometry.
+  importantStyles = true; siteScale = 1; stored.set('/', initial('/'));
+  await page.reload();
+  await frame.locator('[data-c9y-node="n2"]').waitFor();
+  await select('n2');
+  const importantPadding = await adjust('padding');
+  await saved('n2', 'padding', importantPadding);
+  const importantGap = await adjust('gap');
+  await saved('n2', 'gap', importantGap);
+  const numericWidth = page.getByRole('spinbutton', { name: 'First section width', exact: true });
+  await numericWidth.fill('480'); await numericWidth.press('Enter');
+  await saved('n2', 'width', 480);
+  const geometry = () => frame.locator('[data-c9y-node="n2"]').evaluate(node => {
+    const computed = node.ownerDocument.defaultView.getComputedStyle(node);
+    return { padding: Number.parseFloat(computed.paddingLeft), gap: Number.parseFloat(computed.gap), width: node.getBoundingClientRect().width, maxWidth: computed.maxWidth, boxSizing: computed.boxSizing };
+  });
+  const chosen = await geometry();
+  check(chosen.padding === importantPadding && chosen.gap === importantGap && chosen.width === 480 && chosen.maxWidth === '100%' && chosen.boxSizing === 'border-box', `Authored priorities overrode the edited geometry: ${JSON.stringify(chosen)}`);
+  await page.reload();
+  await frame.locator('[data-c9y-node="n2"]').waitFor();
+  check(JSON.stringify(await geometry()) === JSON.stringify(chosen), 'Authored important styles changed the saved geometry after reopening');
   console.log('Site composition: actual app, sandbox, keyboard/pointer geometry and Escape, reordering, hide/undo/redo, insertion, slow writes, failed-save and conflict recovery, hidden-site shortcuts, device scale and responsive persistence passed');
 } finally {
   await browser.close();
