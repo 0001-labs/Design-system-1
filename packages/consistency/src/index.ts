@@ -253,7 +253,8 @@ export class ConsistencyEditor extends LitElement {
     this.columnSpacing.refresh();
     this.componentNames ??= new ComponentNamesLayer(this, { enabled: () => this.layers.componentNames }); this.componentNames.refresh();
     this.grouping ??= new GroupingLayer(this, () => this.layers.grouping); this.grouping.refresh();
-    if (this.history.value.width !== Math.max(280, this.stageWidth)) this.history.value = { ...this.history.value, width: Math.max(280, this.stageWidth) };
+    const measuredWidth = dimensionValue('width', this.stageWidth);
+    if (this.history.value.width !== measuredWidth) this.history.value = { ...this.history.value, width: measuredWidth };
     this.statSpacing ??= new StatSpacingLayer(this, { enabled: () => this.enabled('gap'), value: id => this.history.value.gaps[id] ?? 0, commit: (id, value) => { this.history.commit({ gaps: { ...this.history.value.gaps, [id]: value } }); this.revision++; } });
     this.statSpacing.refresh();
     this.surfaceContext ??= new SurfaceContextMenu(this, { stats: () => this.history.value.statDesigns, buttons: () => this.history.value.buttonDesigns, commit: (kind, id, patch) => { const field = kind === 'card' ? 'cardDesigns' : kind === 'stat' ? 'statDesigns' : 'buttonDesigns'; this.history.commit({ [field]: { ...this.history.value[field], [id]: { ...this.history.value[field][id], ...patch } } }); this.revision++; } });
