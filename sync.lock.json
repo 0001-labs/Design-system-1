@@ -116,14 +116,14 @@
     }
   },
   "Site engine": {
-    "commit": "fa39a85c456efec9ac0bc4f1e3e214fc9c56c738",
+    "commit": "534ed2c5d026881cb5c012c154d94a45ab8ac604",
     "version": null,
     "owned": ["packages/consistency/src/vendor/site-engine"],
     "files": {
       "packages/consistency/src/vendor/site-engine/README.md": "b142d32c36c2180c989a63e139f4e6e654ce666bcea377fd6dfe42998eb334a9",
       "packages/consistency/src/vendor/site-engine/bookings-shared.ts": "1e3b0e1556ded579caffac55cd67bba46e76140031a2efb3df446c70dd8ace6d",
       "packages/consistency/src/vendor/site-engine/composition-workspace.css": "167c43fda98601efab91656d9f32f9094e38e8bfb2d9931827fbce3042d66701",
-      "packages/consistency/src/vendor/site-engine/composition-workspace.ts": "b0863f81b43c44198269baf276274984e7e5a69f2859095630d40e5a60ed49c2",
+      "packages/consistency/src/vendor/site-engine/composition-workspace.ts": "05ee05cb2702a5215102072ee695b46f0253307741de9d1435a03b2befa9c022",
       "packages/consistency/src/vendor/site-engine/dom.ts": "42c4cb6c5ad6d8dc0de74aaa958345ead73d0ecac50d8b7472c46439db03b265",
       "packages/consistency/src/vendor/site-engine/markdown.ts": "4f39d2a2661dd71f8608320cda6562f7a6ebc22dc127514116d0ec4ab0f4de72",
       "packages/consistency/src/vendor/site-engine/placing.ts": "d2c4bbb206f59a0cb6fca0d4d89f7ccfa6bc097bccbc2b313a013b0045018f22"

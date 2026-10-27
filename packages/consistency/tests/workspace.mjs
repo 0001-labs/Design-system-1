@@ -28,6 +28,18 @@ try {
  });
  await page.goto(base);await page.getByText('Create a page to begin.',{exact:false}).waitFor();
  await page.getByRole('button',{name:'New page',exact:true}).click();await page.locator('.consistency-sheet').waitFor();
+ const geometry=await page.evaluate(()=>{
+   const stage=document.querySelector('.consistency-stage').getBoundingClientRect();
+   const controls=document.querySelector('.consistency-inspector').getBoundingClientRect();
+   const unit=parseFloat(getComputedStyle(document.querySelector('ds-page')).getPropertyValue('--ds-unit'));
+   return {x:stage.x,y:stage.y,width:stage.width,height:stage.height,right:controls.right,unit};
+ });
+ if(geometry.x!==300||geometry.y!==20||geometry.width!==1120||geometry.height!==960||geometry.right>geometry.x)throw Error('Editor must match the product Page viewport: '+JSON.stringify(geometry));
+ await page.locator('.consistency-editor-brand').getByText('Editor',{exact:true}).waitFor();
+ await page.getByRole('button',{name:'Mobile preview',exact:true}).click();
+ await page.locator('.consistency-mobile-preview').waitFor();
+ await page.getByRole('button',{name:'Desktop preview',exact:true}).click();
+ if(process.env.EDITOR_SCREENSHOT)await page.screenshot({path:process.env.EDITOR_SCREENSHOT});
  await page.getByLabel('Page name',{exact:true}).fill('My page');await page.getByRole('status').filter({hasText:/^Saved$/}).waitFor();
  await page.evaluate(()=>{const e=document.querySelector('consistency-editor');e.history.commit({text:'Durable words'});e.revision++;});
  await page.getByRole('status').filter({hasText:/^Saved$/}).waitFor();

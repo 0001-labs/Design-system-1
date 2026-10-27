@@ -1,0 +1,34 @@
+/* The owner editor uses the product's Page: twelve-square navigation, a
+   two-square gap and one square around the canvas. Chrome never scales it. */
+consistency-editor .consistency-workspace{display:block;width:100%;height:100%;padding:0}
+consistency-editor .consistency-inspector{position:static;height:auto;min-height:100%;padding:0;overflow:visible;align-self:stretch}
+consistency-editor .consistency-workspace::part(nav){overflow:auto}
+consistency-editor .consistency-stage{height:100%;min-height:0}
+.consistency-editor-brand{display:flex;align-items:flex-end;gap:calc(4px * var(--sf));min-height:var(--ds-unit);line-height:var(--ds-control-height)}
+.consistency-editor-brand svg{width:var(--ds-control-height);height:var(--ds-control-height);flex:none}
+.consistency-editor-workspace{display:block;height:100dvh;--u:var(--ds-unit)}
+.consistency-editor-nav{display:flex;flex-direction:column;gap:var(--ds-unit);min-width:0}
+.consistency-editor-nav .composition-document-bar{padding:0;border:0;gap:calc(var(--ds-unit) / 2)}
+.consistency-editor-nav .composition-document-bar input{width:100%;box-sizing:border-box}
+.consistency-editor-nav .composition-editor-controls{--u:var(--ds-unit)}
+.consistency-editor-nav .consistency-inspector{position:static;height:auto;padding:0;overflow:visible}
+.consistency-editor-nav .consistency-inspector>h2{padding:0}
+.consistency-editor-nav ds-sidebar{width:100%}
+.consistency-editor-nav ds-sidebar [slot=header]{display:flex;flex-direction:column;align-items:flex-start;gap:var(--ds-unit)}
+.consistency-editor-workspace .composition-work{height:100%;overflow:auto}
+.consistency-editor-workspace .composition-work consistency-editor{height:100%;min-height:0}
+.consistency-embedded{height:100%}
+.consistency-embedded .consistency-workspace{--ds-page-nav:0px;--ds-page-gap:0px}
+.consistency-embedded .consistency-workspace::part(page){padding:0}
+@media(max-width:599px){
+  consistency-editor .consistency-workspace::part(page){height:100%;grid-template-rows:minmax(0,1fr) auto minmax(0,1fr) auto auto}
+  consistency-editor .consistency-workspace::part(nav){min-height:0;overflow:auto}
+  consistency-editor .consistency-workspace::part(main){min-height:0;overflow:auto}
+  .consistency-embedded .consistency-workspace::part(page){grid-template-rows:0 auto minmax(0,1fr) auto auto}
+  .consistency-editor-workspace::part(page){height:100%;grid-template-rows:minmax(0,1fr) auto minmax(0,1fr) auto auto}
+  .consistency-editor-workspace::part(nav),.consistency-editor-workspace::part(main){min-height:0;overflow:auto}
+}
+/* On the narrowest phones, keep readable authored content before outer room. */
+@media(max-width:340px){
+  consistency-editor .consistency-workspace::part(page),.consistency-editor-workspace::part(page){padding-inline:0}
+}
