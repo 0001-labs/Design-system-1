@@ -2,6 +2,7 @@ import { PointerActivity } from './pointer-activity';
 import { ContextActivity } from './context-activity';
 import { beginMarquee, canStartMarquee, paintCompositionSelection } from './marquee';
 import { createSortable, type SortableOptions } from './vendor/drag/sortable';
+import { MovementLedger, type C9yFinding } from './c9y-constraints';
 
 /** Custom elements are constructed in the editor's registered realm, then adopted into a sandbox page. */
 export function createSurfaceElement<K extends keyof HTMLElementTagNameMap>(doc: Document, name: K): HTMLElementTagNameMap[K];
@@ -25,6 +26,8 @@ export class EditorSurface {
     beforeMarquee?: () => void;
     contextChanged?: (active: boolean) => void;
     contextRoot?: HTMLElement;
+    /** A C9Y constraint broke as it was drawn: show it, so whoever edits sees what moved. */
+    constraintBroken?: (finding: C9yFinding) => void;
   }) {
     root.setAttribute('data-editor-surface', '');
     this.pointer = new PointerActivity(root);
@@ -65,7 +68,17 @@ export class EditorSurface {
       drop: { minDuration: 150, maxDuration: 200, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' },
       ...options,
       onDragStart: start => { this.cancelMarquee(); options.onDragStart?.(start); },
+      onMovement: movement => { this.ledger.record(movement); options.onMovement?.(movement); },
     });
   }
+  /** drag.one-movement as it is drawn: the blocks that moved again after release are outlined for a moment. */
+  private ledger = new MovementLedger(finding => {
+    console.warn(`C9Y constraint ${finding.code}: ${finding.message}`, finding.elements);
+    for (const element of finding.elements) {
+      element.setAttribute('data-c9y-broken', finding.code);
+      setTimeout(() => element.removeAttribute('data-c9y-broken'), 2000);
+    }
+    this.options.constraintBroken?.(finding);
+  });
   destroy() { for (const face of this.imageFaces.values()) face.remove(); this.imageFaces.clear(); this.cancelMarquee(); this.pointer.destroy(); this.contexts.destroy(); this.root.removeAttribute('data-editor-surface'); this.root.classList.remove('context-active'); }
 }

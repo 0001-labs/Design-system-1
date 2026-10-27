@@ -160,3 +160,6 @@
 consistency-editor[data-pointer-busy] :is(.consistency-button-action,.consistency-carousel-tools):not([data-keyboard]):not(:focus-within){visibility:hidden;pointer-events:none}
 
 .consistency-selection-face{position:fixed;z-index:20;pointer-events:none;border:0;outline:0;background:color-mix(in srgb,var(--consistency-selection-color,var(--ds-text-color,#171717)) 15%,transparent)}
+
+/* A C9Y constraint broken as drawn (c9y-constraints.ts): the blocks it moved, for a moment. */
+[data-c9y-broken]{outline:2px solid var(--ds-pink,#f0f)!important;outline-offset:-2px}

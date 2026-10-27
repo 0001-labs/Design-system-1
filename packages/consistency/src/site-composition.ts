@@ -11,6 +11,7 @@ import { SiteNativeRegions } from './site-native-regions';
 import { CardSpacingLayer } from './card-spacing';
 import { StatSpacingLayer } from './stat-spacing';
 import { CompositionSettle } from './settle';
+import { blockReorders } from './c9y-constraints';
 import { reorder } from './vendor/drag/util';
 import type { SortableController } from './vendor/drag/sortable';
 import { createPlainEditor, sidePlacement } from '../../../website/src/vendor/aa/aa';
@@ -105,7 +106,7 @@ export class SiteCompositionController {
     this.regions = new SiteNativeRegions(this.state, { enabled: () => this.active() && !this.surface.contextActive, select: () => {}, media: { chooseImage: anchor => this.chooseImage(anchor) }, imageURL: source => source.startsWith('/') && this.images.includes(source) ? new URL(this.frame.src).pathname.replace(/\/document$/, '/files') + source : source, error: message => { this.contentError = message; this.showStatus(); } });
     this.cards = new CardSpacingLayer(this.doc.body, { accept: card => !card.closest('aa-editor'), enabled: () => this.active() && !this.surface.contextActive, consistency: () => false, gaps: id => this.sourceGaps(id), commit: (id,key,value,height) => this.state.patch(id,{height,design:{...this.state.document.nodes[id]?.design,gaps:{...this.state.document.nodes[id]?.design?.gaps,[key]:value}}}) });
     this.stats = new StatSpacingLayer(this.doc.body, { enabled: () => this.active() && !this.surface.contextActive, value: key => { const [,id,part] = key.split(':'); return this.sourceGaps(id)[part] ?? 0; }, commit: (key,value) => { const [,id,part] = key.split(':'); this.state.patch(id,{design:{...this.state.document.nodes[id]?.design,gaps:{...this.state.document.nodes[id]?.design?.gaps,[part]:value}}}); } });
-    this.surface = new EditorSurface(this.doc.body, { selection: () => this.selection, select: selection => this.selectMany(selection), marquee: () => this.active(), reorder: () => this.active(), beforeMarquee: () => this.settle.cancel(), contextRoot: document.body, contextChanged: active => { this.overlay.classList.toggle('context-active', active); this.spacing?.refresh(); this.draw(); } });
+    this.surface = new EditorSurface(this.doc.body, { selection: () => this.selection, select: selection => this.selectMany(selection), marquee: () => this.active(), reorder: () => this.active(), beforeMarquee: () => this.settle.cancel(), contextRoot: document.body, constraintBroken: finding => { this.contentError = `${finding.message} (${finding.code})`; this.showStatus(); }, contextChanged: active => { this.overlay.classList.toggle('context-active', active); this.spacing?.refresh(); this.draw(); } });
     this.spacing = new TextSpacingLayer(this.doc.body, {
       targets: () => this.spacingTargets(), enabled: () => this.active() && !this.surface.contextActive,
       value: (key, fallback) => { const space = this.spaces.get(key); return space ? this.state.document.nodes[space.id]?.[space.property] as number ?? fallback : fallback; },
@@ -298,7 +299,7 @@ export class SiteCompositionController {
     const assigned = new Map<string,string>();
     for (const [id,order] of Object.entries(this.state.document.order)) for (const child of order) assigned.set(child,id);
     for (const [id,node] of next) { node.children = node.children.filter(child => next.has(child) && (!assigned.has(child) || assigned.get(child) === id)); for (const child of node.children) next.get(child)!.parent = id; }
-    for (const node of next.values()) { const siblings = node.parent ? next.get(node.parent)?.children.length ?? 0 : 0; node.capabilities = node.capabilities.filter(cap => cap !== 'reorder'); if (siblings > 1 && (node.capabilities.includes('place') || this.baseNodes.get(node.id)?.capabilities.includes('reorder'))) node.capabilities.push('reorder'); }
+    for (const node of next.values()) { const siblings = node.parent ? next.get(node.parent)?.children.length ?? 0 : 0; node.capabilities = node.capabilities.filter(cap => cap !== 'reorder'); if (blockReorders(node.capabilities, siblings, this.baseNodes.get(node.id)?.capabilities.includes('reorder'))) node.capabilities.push('reorder'); }
     this.nodes.clear(); for (const [id,node] of next) this.nodes.set(id,node);
   }
 
