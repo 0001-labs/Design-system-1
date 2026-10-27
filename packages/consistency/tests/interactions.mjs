@@ -69,7 +69,7 @@ try {
  if(Number(await gap.getAttribute('aria-valuenow'))===original)throw Error('A selected element lost its working spacing handle');
  await page.mouse.up();await page.waitForTimeout(250);
  if(JSON.stringify(await page.locator('consistency-editor').evaluate(e=>[...e.selection]))!==JSON.stringify(selected))throw Error('Spacing a selection cleared the selection');
- await page.locator('.consistency-inspector h2').click();await page.keyboard.press('Meta+z');await page.waitForTimeout(50);
+ await page.locator('.consistency-inspector [role="status"]').click();await page.keyboard.press('Meta+z');await page.waitForTimeout(50);
  if(await page.locator('consistency-editor').evaluate(e=>JSON.stringify(e.history.value))!==before)throw Error('Spacing after selection did not form one undo transaction');
  // A cancelled new marquee restores the previous selection, rather than its empty additive base.
  await page.mouse.move(sheet.x+sheet.width/2,sheet.y+4);await page.mouse.down();
