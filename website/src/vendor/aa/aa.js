@@ -16024,10 +16024,10 @@ function Zp(e, t) {
 		e.key === "Escape" && !y && !W && !C && (e.preventDefault(), oe());
 	}), o || a.append(v), v), G = () => {
 		if (m) return;
-		let e = v?.contains(r.activeElement) ? r.activeElement : null, t = e?.closest("[data-thread]")?.dataset.thread, n = e instanceof HTMLTextAreaElement ? {
-			start: e.selectionStart,
-			end: e.selectionEnd,
-			edit: e.dataset.edit
+		let e = v?.getRootNode()?.activeElement ?? r.activeElement, t = v?.contains(e) ? e : null, n = t?.closest("[data-thread]")?.dataset.thread, i = t instanceof HTMLTextAreaElement ? {
+			start: t.selectionStart,
+			end: t.selectionEnd,
+			edit: t.dataset.edit
 		} : null;
 		if (o) {
 			let e = xe(), t = zr(c), n = r.createElement("div");
@@ -16067,12 +16067,12 @@ function Zp(e, t) {
 			}
 			xe().replaceChildren(f ? be() : ye(e, !0)), K();
 		}
-		if (t) {
-			let e = v?.querySelector(n?.edit ? `[data-edit="${n.edit}"]` : `[data-thread="${t}"] .aa-composer textarea`);
-			if (e && n) {
+		if (n) {
+			let e = v?.querySelector(i?.edit ? `[data-edit="${i.edit}"]` : `[data-thread="${n}"] .aa-composer textarea`);
+			if (e && i) {
 				e.focus({ preventScroll: !0 });
 				try {
-					e.setSelectionRange(n.start, n.end);
+					e.setSelectionRange(i.start, i.end);
 				} catch {}
 			}
 		}
@@ -16098,7 +16098,9 @@ function Zp(e, t) {
 	}, Ce = typeof ResizeObserver > "u" ? null : new ResizeObserver(Se);
 	Ce?.observe(e), i.addEventListener("scroll", Se, !0), i.addEventListener("resize", Se);
 	let we = (t) => {
-		v && !o && t.target instanceof Node && (W && !W.contains(t.target) && ge(), !(v.contains(t.target) || y?.contains(t.target) || W?.contains(t.target)) && (e.contains(t.target) || oe()));
+		if (!v || o || !(t.target instanceof Node)) return;
+		let n = (e) => !!e && t.composedPath().some((t) => t instanceof Node && e.contains(t));
+		W && !n(W) && ge(), !(n(v) || n(y) || n(W) || n(e)) && oe();
 	};
 	r.addEventListener("pointerdown", we, !0);
 	let Te = n.subscribe(k);
