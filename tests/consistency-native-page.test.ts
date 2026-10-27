@@ -40,4 +40,10 @@ describe('native page boundary',()=>{
     expect(renderNativePage(checked,{images:context.images})).toContain('class="ds-button" href="/inquiry"');
     const bad=structuredClone(page);Object.assign(bad.blocks[2],{mobileColumns:20});expect(()=>validateNativePage(bad,context)).toThrow();
   });
+  test('resolves each block own responsive defaults instead of inheriting parent geometry',()=>{
+    expect(nativeBlockStyles({id:'inner',kind:'flow',direction:'row',gap:0,padding:0,children:[]})).toMatchObject({'--c9y-mobile-gap':'calc(0px * var(--sf,1))','--c9y-mobile-direction':'column'});
+    expect(nativeBlockStyles({id:'inner-grid',kind:'grid',columns:3,columnGap:20,rowGap:20,children:[]})).toMatchObject({'--c9y-mobile-columns':'1'});
+    expect(nativeBlockStyles({id:'picture',kind:'image',src:'/flowers.png',alt:''})).toMatchObject({'--c9y-image-height':'auto','--c9y-mobile-image-height':'auto','--c9y-image-fit':'contain'});
+    expect(nativeBlockStyles(collection)).toMatchObject({'--c9y-featured-image-height':'calc(400px * var(--sf,1))','--c9y-mobile-image-height':'calc(400px * var(--sf,1))'});
+  });
 });

@@ -154,20 +154,18 @@ export function nativeCollectionTracks(block: NativeCollection): { columns: numb
 export function nativeBlockStyles(block: NativeBlock): Record<string,string> {
   const styles:Record<string,string>={};
   if(block.width!==undefined){styles.width=measure(block.width);styles.flex='0 1 auto';}
-  if(block.kind==='flow')Object.assign(styles,{'--c9y-direction':block.direction,'--c9y-gap':measure(block.gap),'--c9y-padding':measure(block.padding)});
-  if(block.kind==='flow'&&block.mobileDirection)styles['--c9y-mobile-direction']=block.mobileDirection;
-  if(block.kind==='flow'&&block.mobileGap!==undefined)styles['--c9y-mobile-gap']=measure(block.mobileGap);
+  if(block.kind==='flow')Object.assign(styles,{'--c9y-direction':block.direction,'--c9y-mobile-direction':block.mobileDirection??'column','--c9y-gap':measure(block.gap),'--c9y-mobile-gap':measure(block.mobileGap??block.gap),'--c9y-padding':measure(block.padding)});
   if(block.kind==='grid'||block.kind==='collection')Object.assign(styles,{'--c9y-columns':String(block.kind==='collection'?nativeCollectionTracks(block).columns:block.columns),'--c9y-column-gap':measure(block.columnGap),'--c9y-row-gap':measure(block.rowGap)});
-  if(block.kind==='grid'&&block.mobileColumns!==undefined)styles['--c9y-mobile-columns']=String(block.mobileColumns);
+  if(block.kind==='grid')styles['--c9y-mobile-columns']=String(block.mobileColumns??1);
   if(block.kind==='collection'){
     const tracks=nativeCollectionTracks(block);Object.assign(styles,{'--c9y-item-span':String(tracks.ordinarySpan),'--c9y-featured-span':String(tracks.featuredSpan),'--c9y-image-height':measure(block.imageHeight),'--c9y-image-fit':block.fit});
-    if(block.featuredImageHeight!==undefined)styles['--c9y-featured-image-height']=measure(block.featuredImageHeight);
-    if(block.mobileImageHeight!==undefined)styles['--c9y-mobile-image-height']=measure(block.mobileImageHeight);
+    styles['--c9y-featured-image-height']=measure(block.featuredImageHeight??block.imageHeight);
+    styles['--c9y-mobile-image-height']=measure(block.mobileImageHeight??block.imageHeight);
   }
   if(block.kind==='image'){
-    if(block.height!==undefined)styles['--c9y-image-height']=measure(block.height);
-    if(block.mobileHeight!==undefined)styles['--c9y-mobile-image-height']=measure(block.mobileHeight);
-    if(block.fit)styles['--c9y-image-fit']=block.fit;
+    styles['--c9y-image-height']=block.height===undefined?'auto':measure(block.height);
+    styles['--c9y-mobile-image-height']=block.mobileHeight===undefined?styles['--c9y-image-height']:measure(block.mobileHeight);
+    styles['--c9y-image-fit']=block.fit??'contain';
   }
   return styles;
 }
