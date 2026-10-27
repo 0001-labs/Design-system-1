@@ -11,7 +11,7 @@ export class StatSpacingLayer {
   private settle = new CompositionSettle();
   private active?: HTMLElement;
   constructor(private root: HTMLElement, private state: { enabled: () => boolean; value: (id: string) => number; commit: (id: string, value: number) => void }) {
-    this.observer = new MutationObserver(records => { if (records.some(record => !(record.target instanceof Element ? record.target : record.target.parentElement)?.closest('.consistency-stat-gap,.consistency-card-gap,.consistency-resize-edge'))) this.schedule(); });
+    this.observer = new MutationObserver(records => { if (records.some(record => !(record.target.nodeType === 1 ? record.target as Element : record.target.parentElement)?.closest('.consistency-stat-gap,.consistency-card-gap,.consistency-resize-edge'))) this.schedule(); });
     this.observer.observe(root, { childList: true, subtree: true });
   }
   private schedule() { if (!this.frame) this.frame = requestAnimationFrame(() => { this.frame = 0; this.refresh(); }); }
@@ -22,7 +22,7 @@ export class StatSpacingLayer {
       if (!this.bindings.has(stat)) this.bind(stat);
       for (const handle of this.bindings.get(stat)!.handles) {
         handle.hidden = !this.state.enabled(); handle.tabIndex = this.state.enabled() ? 0 : -1;
-        if (this.active !== stat) { const key = handle.dataset.statGap as 'label' | 'figure', value = this.state.value(statGapId(stat.dataset.selectable!, key)); stat.style.setProperty(`--ds-stat-${key}-gap`, `calc(${value}px * var(--sf))`); this.position(stat, handle, value); }
+        if (this.active !== stat) { const key = handle.dataset.statGap as 'label' | 'figure', value = this.state.value(statGapId(stat.dataset.selectable!, key)); stat.style.setProperty(`--ds-stat-${key}-gap`, `calc(${value}px * var(--sf))`, 'important'); this.position(stat, handle, value); }
       }
     }
   }
@@ -40,7 +40,7 @@ export class StatSpacingLayer {
       const part = stat.shadowRoot?.querySelector<HTMLElement>(`.ds-stat__${key}`); if (!part || part.hidden) continue;
       const id = statGapId(stat.dataset.selectable!, key), handle = stat.ownerDocument.createElement('span'); handle.className = 'consistency-stat-gap'; handle.dataset.statGap = key; handle.contentEditable = 'false'; handle.setAttribute('data-aa-interactive', ''); handle.setAttribute('role', 'slider'); handle.setAttribute('aria-label', `Stat ${key} gap`); handle.setAttribute('aria-orientation', 'vertical'); handle.setAttribute('aria-valuemin', '0'); handle.setAttribute('aria-valuemax', '2000'); stat.append(handle); handles.push(handle);
       let original = 0;
-      const paint = (value: number) => { stat.style.setProperty(`--ds-stat-${key}-gap`, `calc(${value}px * var(--sf))`); for (const other of handles) this.position(stat, other, other === handle ? value : this.state.value(statGapId(stat.dataset.selectable!, other.dataset.statGap as 'label' | 'figure'))); };
+      const paint = (value: number) => { stat.style.setProperty(`--ds-stat-${key}-gap`, `calc(${value}px * var(--sf))`, 'important'); for (const other of handles) this.position(stat, other, other === handle ? value : this.state.value(statGapId(stat.dataset.selectable!, other.dataset.statGap as 'label' | 'figure'))); };
       disposers.push(bindSpacingHandle(handle, () => ({ value: this.state.value(id), min: 0, max: 2000, step: 20, shiftStep: 100, axis: 'vertical', gain: 2 / this.scale(stat), disabled: !this.state.enabled(),
         onPointerStart: () => { (stat.ownerDocument.activeElement as HTMLElement | null)?.blur?.(); },
         onStart: () => { original = this.state.value(id); this.active = stat; this.settle.cancel(); handle.setAttribute('data-spacing-active', ''); stat.setAttribute('data-resizing', ''); },

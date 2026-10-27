@@ -4,9 +4,10 @@ export class ContextActivity {
   private queued = false;
   private destroyed = false;
   private current = false;
-  constructor(private root: HTMLElement, private changed: (active: boolean) => void) {
+  constructor(private root: HTMLElement, private changed: (active: boolean) => void, private contextRoot = root.ownerDocument.body) {
     this.observer = new MutationObserver(this.schedule);
     this.observer.observe(root.ownerDocument.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['hidden', 'open', 'data-open', 'aria-hidden', 'data-tools-dismissed', 'data-pointer-busy'] });
+    if (contextRoot !== root.ownerDocument.body) this.observer.observe(contextRoot, { subtree: true, childList: true, attributes: true, attributeFilter: ['hidden', 'open', 'data-open', 'aria-hidden'] });
     for (const name of ['focusin', 'focusout', 'pointerover', 'pointerout']) root.ownerDocument.addEventListener(name, this.schedule, true);
     this.refresh();
   }
@@ -17,8 +18,9 @@ export class ContextActivity {
   };
   refresh() {
     if (this.destroyed) return;
-    const visible = (node: HTMLElement) => !node.hidden && node.getAttribute('aria-hidden') !== 'true' && getComputedStyle(node).display !== 'none' && getComputedStyle(node).visibility !== 'hidden';
-    const menus = this.root.ownerDocument.querySelectorAll<HTMLElement>('.aa-controls:not([hidden]),.aa-menu:not([hidden]),.aa-sheet[open],ds-context[data-consistency-context][open]');
+    const visible = (node: HTMLElement) => !node.hidden && node.getAttribute('aria-hidden') !== 'true' && node.ownerDocument.defaultView!.getComputedStyle(node).display !== 'none' && node.ownerDocument.defaultView!.getComputedStyle(node).visibility !== 'hidden';
+    const selector = '.aa-controls:not([hidden]),.aa-menu:not([hidden]),.aa-sheet[open],ds-context[data-consistency-context][open]';
+    const menus = [...this.root.ownerDocument.querySelectorAll<HTMLElement>(selector), ...this.contextRoot.querySelectorAll<HTMLElement>(selector)];
     const passiveHover = !this.root.hasAttribute('data-pointer-busy');
     const active = Array.from(menus).some(visible) || !!this.root.querySelector(passiveHover ? '.consistency-button-action[data-open]' : '.consistency-button-action[data-open]:is(:focus-within,[data-keyboard])') || Array.from(this.root.querySelectorAll<HTMLElement>('.consistency-carousel-tools')).some(node => visible(node) && (passiveHover && node.matches(':hover') || node.matches(':focus-within')));
     if (active !== this.current) { this.current = active; this.changed(active); }

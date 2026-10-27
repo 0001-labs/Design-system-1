@@ -1,3 +1,6 @@
+import type { EditorMedia } from './media';
+import { createSurfaceElement } from './editor-surface';
+import { createButtonActionControls } from './button-action';
 import { carouselAtom, readCarousel, type CarouselContent } from './carousel';
 import { applyLibraryTokens } from './libraries';
 import type { Atom } from '../../../website/src/vendor/aa/aa';
@@ -6,14 +9,12 @@ import '../../../DS1/2-core/ds-card';
 import { createPlainEditor } from '../../../website/src/vendor/aa/aa';
 import '../../../DS1/3-unit/ds-context';
 import './elements.css';
-import '../../../DS1/3-unit/ds-select';
-import '../../../DS1/2-core/ds-input';
 import { provideIcons } from '../../../DS1/2-core/ds-icon';
 import cursorIcon from '../../../DS1/x-icon/cursor.svg?raw';
 provideIcons({ cursor: cursorIcon });
 import '../../../DS1/4-page/ds-overlay';
 
-import { readAction, tones, componentDefaults as defaults, readBasicContentElement, writeBasicContentElement, type BasicContentElement } from '../../../shared/consistency-content';
+import { tones, componentDefaults as defaults, readBasicContentElement, writeBasicContentElement, type BasicContentElement } from '../../../shared/consistency-content';
 export type ContentElement = CarouselContent | BasicContentElement;
 export function readContentElement(source: string): ContentElement | null {
   return source.startsWith('```c9y-carousel') ? readCarousel(source) : readBasicContentElement(source);
@@ -38,7 +39,7 @@ function paint(face: HTMLElement, value: Exclude<ContentElement, CarouselContent
   }
 }
 /** Aa owns insertion, selection and undo; only this adapter knows component data. */
-export function contentElementAtoms(canWrite: () => boolean, getHost: () => HTMLElement | null = () => null): Atom[] {
+export function contentElementAtoms(canWrite: () => boolean, getHost: () => HTMLElement | null = () => null, media?: EditorMedia): Atom[] {
   const atoms: Atom[] = (['button', 'card'] as const).map(kind => ({
     name: `consistency-${kind}`, fence: `c9y-${kind}`, match: () => 0,
     insert: { label: kind === 'button' ? 'Button' : 'Card', icon: kind === 'button' ? 'plus' : 'square', source: writeContentElement(defaults[kind]), keywords: kind, preview: (target: HTMLElement, context?: { input: 'pointer' | 'keyboard' }) => {
@@ -49,9 +50,9 @@ export function contentElementAtoms(canWrite: () => boolean, getHost: () => HTML
       if (owner) observer.observe(owner, { attributes: true, attributeFilter: ['data-consistency-library', 'data-consistency-fonts'] });
       target.classList.add('consistency-element-preview');
       const frame = target.ownerDocument.createElement('div'); frame.className = 'consistency-element-preview-stage';
-      const face = target.ownerDocument.createElement(kind === 'button' ? 'ds-button' : 'ds-card');
+      const face = createSurfaceElement(target.ownerDocument, kind === 'button' ? 'ds-button' : 'ds-card');
       paint(face, defaults[kind]); face.inert = true; face.setAttribute('aria-hidden', 'true'); frame.append(face);
-      const cursor = target.ownerDocument.createElement('ds-icon'); cursor.type = 'cursor'; cursor.className = 'consistency-element-preview-cursor'; cursor.setAttribute('aria-hidden', 'true'); frame.append(cursor);
+      const cursor = createSurfaceElement(target.ownerDocument, 'ds-icon'); cursor.type = 'cursor'; cursor.className = 'consistency-element-preview-cursor'; cursor.setAttribute('aria-hidden', 'true'); frame.append(cursor);
       const label = target.ownerDocument.createElement('span'); label.className = 'consistency-element-preview-label'; label.textContent = kind === 'button' ? 'A button from your library' : 'A card from your library';
       const inner = target.ownerDocument.createElement('div'); inner.className = 'consistency-element-preview-inner'; inner.append(frame, label); target.append(inner); target.setAttribute('aria-hidden', 'true');
       // Pointer-only feedback demonstrates the specimen; keyboard browsing stays instant.
@@ -78,7 +79,7 @@ export function contentElementAtoms(canWrite: () => boolean, getHost: () => HTML
       const doc = element.ownerDocument;
       element.classList.add('consistency-content-element', `consistency-content-${kind}`);
       if (kind === 'button') element.setAttribute('data-aa-interactive', '');
-      const face = doc.createElement(kind === 'button' ? 'ds-button' : 'ds-card');
+      const face = createSurfaceElement(doc, kind === 'button' ? 'ds-button' : 'ds-card');
       paint(face, value); element.append(face);
       const editors: ReturnType<typeof createPlainEditor>[] = [];
       const fields = value.kind === 'card' ? ['label', 'title', 'body'] as const : ['label'] as const;
@@ -107,26 +108,12 @@ export function contentElementAtoms(canWrite: () => boolean, getHost: () => HTML
       const blur = (event: FocusEvent) => { if (nodes.some(node => node.contains(event.target as Node))) commit(); };
       element.addEventListener('focusout', blur);
       let actionBar: HTMLElement | undefined;
-      let actionChoice: HTMLSelectElement | undefined;
-      let actionTarget: HTMLElementTagNameMap['ds-input'] | undefined;
+      let actionControls: ReturnType<typeof createButtonActionControls> | undefined;
       if (value.kind === 'button') {
-        actionBar = doc.createElement('div'); actionBar.className = 'consistency-button-action'; actionBar.inert = true; actionBar.setAttribute('aria-hidden', 'true');
+        actionControls = createButtonActionControls(doc, value.action, canWrite, action => { if (value?.kind === 'button') { value = { ...value, action }; commit(); } });
+        actionBar = actionControls.element; actionBar.className = 'consistency-button-action'; actionBar.inert = true; actionBar.setAttribute('aria-hidden', 'true');
         actionBar.setAttribute('role', 'toolbar'); actionBar.setAttribute('aria-label', 'Button action'); actionBar.setAttribute('data-aa-interactive', '');
-        const select = doc.createElement('ds-select'); actionChoice = doc.createElement('select'); actionChoice.setAttribute('aria-label', 'Button action type');
-        for (const [key, label] of [['none', 'No action'], ['link', 'Open a link'], ['page', 'Open a page']]) { const option = doc.createElement('option'); option.value = key; option.textContent = label; actionChoice.append(option); }
-        actionChoice.value = value.action?.kind ?? 'none'; select.append(actionChoice);
-        const field = doc.createElement('ds-input'); actionTarget = field; actionTarget.type = 'text'; actionTarget.setAttribute('aria-label', 'Button destination'); actionTarget.value = value.action?.target ?? '';
-        const updateAction = () => {
-          const kind = actionChoice!.value; actionTarget!.placeholder = kind === 'page' ? '/about' : 'https://example.com'; field.hidden = kind === 'none';
-          if (value?.kind !== 'button') return;
-          const action = readAction({ kind, target: actionTarget!.value.trim() });
-          actionTarget!.setAttribute('aria-invalid', String(kind !== 'none' && !!actionTarget!.value && !action));
-          if (kind !== 'none' && !action) return;
-          value = { ...value, action }; commit();
-        };
-        actionChoice.addEventListener('change', updateAction); actionTarget.addEventListener('change', updateAction);
-        actionTarget.placeholder = value.action?.kind === 'page' ? '/about' : 'https://example.com'; field.hidden = !value.action;
-        actionBar.append(select, field); element.append(actionBar);
+        element.append(actionBar);
       }
       let hover = false, leaveTimer: ReturnType<typeof setTimeout> | undefined;
       const showAction = (keyboard = false) => {
@@ -151,7 +138,7 @@ export function contentElementAtoms(canWrite: () => boolean, getHost: () => HTML
       const pointerLeave = () => { hover = false; leave(); };
       element.addEventListener('focusin', focus); element.addEventListener('focusout', leave);
       element.addEventListener('pointerenter', enter); element.addEventListener('pointermove', enter); element.addEventListener('pointerleave', pointerLeave);
-      const menu = doc.createElement('ds-context');
+      const menu = createSurfaceElement(doc, 'ds-context');
       menu.setAttribute('data-aa-interactive', ''); menu.setAttribute('data-consistency-context', ''); menu.setAttribute('aria-label', `${kind} appearance`);
       const option = (label: string, change: () => void) => {
         const row = doc.createElement('button'); row.type = 'button'; row.setAttribute('role', 'menuitem'); row.textContent = label;
@@ -192,8 +179,8 @@ export function contentElementAtoms(canWrite: () => boolean, getHost: () => HTML
         if (event.key === 'Backspace' || event.key === 'Delete') { event.preventDefault(); event.stopPropagation(); element.dispatchEvent(new CustomEvent('aa-atom-source', { bubbles: true, detail: { source: '' } })); }
       };
       element.addEventListener('contextmenu', context); element.addEventListener('keydown', key);
-      return () => { doc.removeEventListener('pointerdown', dismissAction, true); clearTimeout(leaveTimer); element.removeEventListener('pointerenter', enter); element.removeEventListener('pointermove', enter); element.removeEventListener('pointerleave', pointerLeave); observer.disconnect(); element.removeEventListener('consistency-resize', resize); element.removeEventListener('consistency-card-gap', gap); element.removeEventListener('focusin', focus); element.removeEventListener('focusout', leave); editors.forEach(editor => editor.destroy()); menu.remove(); element.removeEventListener('focusout', blur); element.removeEventListener('contextmenu', context); element.removeEventListener('keydown', key); };
+      return () => { actionControls?.dispose(); doc.removeEventListener('pointerdown', dismissAction, true); clearTimeout(leaveTimer); element.removeEventListener('pointerenter', enter); element.removeEventListener('pointermove', enter); element.removeEventListener('pointerleave', pointerLeave); observer.disconnect(); element.removeEventListener('consistency-resize', resize); element.removeEventListener('consistency-card-gap', gap); element.removeEventListener('focusin', focus); element.removeEventListener('focusout', leave); editors.forEach(editor => editor.destroy()); menu.remove(); element.removeEventListener('focusout', blur); element.removeEventListener('contextmenu', context); element.removeEventListener('keydown', key); };
     },
   }));
-  return [...atoms, carouselAtom(canWrite, getHost)];
+  return [...atoms, carouselAtom(canWrite, getHost, media)];
 }

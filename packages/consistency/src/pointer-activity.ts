@@ -13,7 +13,7 @@ export class PointerActivity {
   private down = (event: PointerEvent) => {
     if (!event.isPrimary || event.button !== 0 || !event.composedPath().includes(this.root)) return;
     // Pressing an existing toolbar is deliberate context interaction, not a canvas gesture.
-    if (event.composedPath().some(node => node instanceof Element && node.matches('.consistency-button-action,.consistency-carousel-tools,.aa-controls,.aa-menu,ds-context'))) { this.clear(); return; }
+    if (event.composedPath().some(node => (node as Element).nodeType === 1 && (node as Element).matches('.consistency-button-action,.consistency-carousel-tools,.aa-controls,.aa-menu,ds-context'))) { this.clear(); return; }
     this.pointers.add(event.pointerId);
     this.root.setAttribute('data-pointer-busy', '');
     this.root.toggleAttribute('data-pointer-additive', event.shiftKey);

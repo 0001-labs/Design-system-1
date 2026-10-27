@@ -1,3 +1,4 @@
+import type { EditorMedia } from './media';
 import { pageAtoms, pageCommands } from './insertions';
 import { contentElementAtoms } from './elements';
 import type { Prompter, PromptAnswer } from '../../../website/src/vendor/aa/aa';
@@ -34,11 +35,12 @@ const MAX_FILE_BYTES = 4 * 1024 * 1024;
 const MAX_BATCH_BYTES = 8 * 1024 * 1024;
 
 /** One stable instance per editor; comments and attachments remain in this tab's draft. */
-export function createPreviewEditorOptions(getHost: () => AaEditorElement | null, onError: (message: string) => void): EditorOptions {
+export function createPreviewEditorOptions(getHost: () => AaEditorElement | null, onError: (message: string) => void, media?: EditorMedia): EditorOptions {
   const comments = memoryCommentStore({ me: { id: 'owner', name: 'Joachim' } });
+  const canWrite = () => { const host = getHost(); return !!host && !(host.editor?.readOnly ?? host.readOnly); };
   return {
     commands: pageCommands, blockCommands: pageCommands,
-    atoms: [imageAtom, diagramAtom, ...pageAtoms(() => !!getHost()?.editor && !getHost()!.editor!.readOnly), ...contentElementAtoms(() => { const editor = getHost()?.editor; return !!editor && !editor.readOnly; }, getHost)], comments, prompt: previewPrompt, correcting: false, toolbar: true, menus: true,
+    atoms: [imageAtom, diagramAtom, ...pageAtoms(canWrite, media), ...contentElementAtoms(canWrite, getHost, media)], comments, prompt: previewPrompt, correcting: false, toolbar: true, menus: true,
     correct: async (text, context) => {
       const answer = await previewPrompt('Correct spelling, grammar and punctuation only. Preserve meaning, Markdown structure and language. Return only the corrected selected text.', { ...context, kind: 'writing', text });
       if (typeof answer === 'string') return answer;
@@ -54,6 +56,7 @@ export function createPreviewEditorOptions(getHost: () => AaEditorElement | null
       return () => { active = false; };
     },
     onFiles: async files => {
+      if (media) { onError('Choose an image from this site using Image in the insert menu.'); return; }
       const host = getHost(), instance = host?.editor;
       if (!host || !instance || instance.readOnly) return;
       const selected = instance.selection();

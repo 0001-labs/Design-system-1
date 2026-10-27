@@ -1,3 +1,5 @@
+import { type EditorMedia, siteImageSource } from './media';
+import { createSurfaceElement } from './editor-surface';
 import type { Atom } from '../../../website/src/vendor/aa/aa';
 import { applyLibraryTokens } from './libraries';
 import '../../../DS1/3-unit/ds-carousel';
@@ -6,44 +8,20 @@ import '../../../DS1/2-core/ds-button';
 import '../../../DS1/2-core/ds-input';
 import '../../../DS1/3-unit/ds-select';
 import './carousel.css';
-export interface CarouselSlide { id: string; src: string; alt: string; fit: 'cover' | 'contain' }
-export interface CarouselContent { kind: 'carousel'; slides: CarouselSlide[]; width?: number; height: number; current?: number }
-export const EMPTY_CAROUSEL: CarouselContent = { kind: 'carousel', slides: [], height: 280 };
+import { EMPTY_CAROUSEL, safeCarouselSource, readCarousel, writeCarousel, type CarouselSlide, type CarouselContent } from '../../../shared/consistency-carousel';
+export { EMPTY_CAROUSEL, safeCarouselSource, readCarousel, writeCarousel, type CarouselSlide, type CarouselContent } from '../../../shared/consistency-carousel';
 const MAX_SLIDES = 12, MAX_FILE = 4 * 1024 * 1024, MAX_BATCH = 8 * 1024 * 1024, MAX_DATA = 16 * 1024 * 1024;
-export function safeCarouselSource(value: unknown): value is string {
-  return typeof value === 'string' && ((value.length <= 4000 && /^https?:\/\/[^\s]+$/i.test(value)) || (value.length <= MAX_FILE * 1.4 && /^data:image\/(?:png|jpe?g|gif|webp|avif|bmp);base64,[a-z\d+/=]+$/i.test(value)));
-}
-export function readCarousel(source: string): CarouselContent | null {
-  if (source.length > MAX_DATA) return null;
-  const match = /^```c9y-carousel\r?\n([\s\S]*)\r?\n```$/.exec(source); if (!match) return null;
-  try {
-    const data = JSON.parse(match[1]);
-    if (!data || !Array.isArray(data.slides) || data.slides.length > MAX_SLIDES) return null;
-    const ids = new Set<string>();
-    const slides: CarouselSlide[] = [];
-    for (const slide of data.slides) {
-      if (!slide || typeof slide.id !== 'string' || !/^[\w-]{1,80}$/.test(slide.id) || ids.has(slide.id) || !safeCarouselSource(slide.src) || typeof slide.alt !== 'string' || slide.alt.length > 500 || !['cover', 'contain'].includes(slide.fit)) return null;
-      ids.add(slide.id); slides.push({ id: slide.id, src: slide.src, alt: slide.alt, fit: slide.fit });
-    }
-    const size = (value: unknown, fallback: number, min: number, max: number) => typeof value === 'number' && Number.isFinite(value) ? Math.min(max, Math.max(min, Math.round(value / 20) * 20)) : fallback;
-    return { kind: 'carousel', slides, height: size(data.height, 280, 160, 1200), ...(data.width === undefined ? {} : { width: size(data.width, 320, 160, 2000) }), ...(typeof data.current === 'number' && Number.isInteger(data.current) ? { current: Math.max(0, Math.min(slides.length - 1, data.current)) } : {}) };
-  } catch { return null; }
-}
-export function writeCarousel(value: CarouselContent): string {
-  const { kind: _, ...fields } = value;
-  return `\`\`\`c9y-carousel\n${JSON.stringify(fields).replaceAll('`', '\\u0060')}\n\`\`\``;
-}
 export function moveCarouselSlide(slides: readonly CarouselSlide[], from: number, to: number): CarouselSlide[] {
   if (from < 0 || from >= slides.length || to < 0 || to >= slides.length) return [...slides];
   const result = [...slides], [slide] = result.splice(from, 1); result.splice(to, 0, slide); return result;
 }
 /** One DS1 carousel, one Aa atom and one source change per edit. No parallel text editor. */
-export function carouselAtom(canWrite: () => boolean, getHost: () => HTMLElement | null): Atom {
+export function carouselAtom(canWrite: () => boolean, getHost: () => HTMLElement | null, media?: EditorMedia): Atom {
  return {
   name: 'consistency-carousel', fence: 'c9y-carousel', match: () => 0,
   insert: { label: 'Carousel', icon: 'image', keywords: 'carousel slides slideshow gallery images', source: writeCarousel(EMPTY_CAROUSEL), preview(target) {
     { const owner = getHost()?.closest<HTMLElement>('[data-consistency-library]'); applyLibraryTokens(target, owner?.dataset.consistencyLibrary ?? 'original', owner?.dataset.consistencyFonts); }
-    const empty = target.ownerDocument.createElement('ds-empty'); empty.literal = true; empty.heading = 'An empty carousel'; empty.text = 'Add your own images.'; target.append(empty);
+    const empty = createSurfaceElement(target.ownerDocument, 'ds-empty'); empty.literal = true; empty.heading = 'An empty carousel'; empty.text = 'Add your own images.'; target.append(empty);
     return () => target.replaceChildren();
   } },
   draw(element, initialSource) {
@@ -52,8 +30,8 @@ export function carouselAtom(canWrite: () => boolean, getHost: () => HTMLElement
     const doc = element.ownerDocument;
     element.classList.add('consistency-content-element', 'consistency-content-carousel'); element.setAttribute('data-aa-interactive', ''); element.setAttribute('role', 'group'); element.setAttribute('aria-label', 'Carousel');
     const frame = doc.createElement('div'); frame.className = 'consistency-carousel-frame';
-    const face = doc.createElement('ds-carousel'); face.literal = true; face.label = 'Your images'; face.buttons = true; face.gap = 0; face.setAttribute('bleed', 'none');
-    const empty = doc.createElement('ds-empty'); empty.literal = true; empty.heading = 'Add your first image'; empty.text = 'Upload an image or add its address.';
+    const face = createSurfaceElement(doc, 'ds-carousel'); face.literal = true; face.label = 'Your images'; face.buttons = true; face.gap = 0; face.setAttribute('bleed', 'none');
+    const empty = createSurfaceElement(doc, 'ds-empty'); empty.literal = true; empty.heading = 'Add your first image'; empty.text = media ? 'Choose an image or add its address.' : 'Upload an image or add its address.';
     frame.append(face, empty); element.append(frame);
     const toolbar = doc.createElement('div'); toolbar.className = 'consistency-carousel-tools'; toolbar.setAttribute('data-aa-interactive', ''); toolbar.setAttribute('role', 'toolbar'); toolbar.setAttribute('aria-label', 'Carousel images'); element.append(toolbar);
     // An outside press wins over :focus-within until a fresh entry or focus.
@@ -68,12 +46,12 @@ export function carouselAtom(canWrite: () => boolean, getHost: () => HTMLElement
     const status = doc.createElement('span'); status.className = 'consistency-carousel-status'; status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite'); toolbar.append(status);
     const actions = doc.createElement('div'); actions.className = 'consistency-carousel-actions'; toolbar.append(actions);
     const button = (label: string, action: () => void) => {
-      const control = doc.createElement('ds-button'); control.textContent = label; control.addEventListener('click', () => { if (canWrite()) action(); }); actions.append(control); return control;
+      const control = createSurfaceElement(doc, 'ds-button'); control.textContent = label; control.addEventListener('click', () => { if (canWrite()) action(); }); actions.append(control); return control;
     };
     const picker = doc.createElement('input'); picker.type = 'file'; picker.accept = 'image/png,image/jpeg,image/gif,image/webp,image/avif,image/bmp'; picker.multiple = true; picker.hidden = true; toolbar.append(picker);
-    const upload = button('Upload images', () => { replacing = false; picker.click(); });
+    const upload = button(media ? 'Choose image' : 'Upload images', () => { replacing = false; void choose(); });
     let replacing = false;
-    const changeFile = button('Change image', () => { replacing = true; picker.click(); });
+    const changeFile = button('Change image', () => { replacing = true; void choose(); });
     const previous = button('Previous', () => select(current - 1));
     const next = button('Next', () => select(current + 1));
     const left = button('Move left', () => move(-1));
@@ -81,20 +59,20 @@ export function carouselAtom(canWrite: () => boolean, getHost: () => HTMLElement
     const remove = button('Remove image', () => {
       const slides = value!.slides.filter((_, index) => index !== current); current = Math.max(0, Math.min(slides.length - 1, current)); update({ ...value!, slides });
     });
-    const field = (label: string, placeholder = '') => { const input = doc.createElement('ds-input'); input.setAttribute('aria-label', label); input.placeholder = placeholder; toolbar.append(input); return input; };
+    const field = (label: string, placeholder = '') => { const input = createSurfaceElement(doc, 'ds-input'); input.setAttribute('aria-label', label); input.placeholder = placeholder; toolbar.append(input); return input; };
     const address = field('Image address', 'https://example.com/image.jpg');
     const add = button('Add address', () => {
-      if (!safeCarouselSource(address.value)) return error('Use an http or https image address.');
+      if (!safeCarouselSource(address.value) || (media && !siteImageSource(address.value))) return error('Use an http or https image address.');
       if (value!.slides.length >= MAX_SLIDES) return error('A carousel holds up to 12 images.');
       current = value!.slides.length; update({ ...value!, slides: [...value!.slides, { id: crypto.randomUUID(), src: address.value.trim(), alt: '', fit: 'cover' }] });
     });
     const changeAddress = button('Change address', () => {
-      if (!safeCarouselSource(address.value)) return error('Use an http or https image address.');
+      if (!safeCarouselSource(address.value) || (media && !siteImageSource(address.value))) return error('Use an http or https image address.');
       updateSlide({ src: address.value.trim() });
     });
     const alternative = field('Image description', 'Describe this image');
     alternative.addEventListener('change', () => { if (canWrite()) updateSlide({ alt: alternative.value.slice(0, 500) }); });
-    const fit = doc.createElement('ds-select'), fitSelect = doc.createElement('select'); fitSelect.setAttribute('aria-label', 'Image fit');
+    const fit = createSurfaceElement(doc, 'ds-select'), fitSelect = doc.createElement('select'); fitSelect.setAttribute('aria-label', 'Image fit');
     for (const [key, label] of [['cover', 'Fill the slide'], ['contain', 'Show the whole image']]) { const option = doc.createElement('option'); option.value = key; option.textContent = label; fitSelect.append(option); }
     fit.append(fitSelect); toolbar.append(fit);
     fitSelect.addEventListener('change', () => { if (canWrite()) updateSlide({ fit: fitSelect.value as 'cover' | 'contain' }); });
@@ -126,7 +104,21 @@ export function carouselAtom(canWrite: () => boolean, getHost: () => HTMLElement
       value = { ...nextValue, current }; source = nextSource; paint();
       element.dispatchEvent(new CustomEvent('aa-atom-source', { bubbles: true, detail: { source } }));
     };
+    const choose = async () => {
+      if (!media) { picker.click(); return; }
+      if (!canWrite() || destroyed) return;
+      const snapshot = source, replace = replacing, index = current;
+      try {
+        const chosen = await media.chooseImage(element);
+        if (!chosen || destroyed || !canWrite() || source !== snapshot) return;
+        if (!siteImageSource(chosen.src)) return error('Choose an image from this site or an http or https address.');
+        const slide: CarouselSlide = { id:crypto.randomUUID(), src:chosen.src, alt:chosen.alt.slice(0,500), fit:'cover' };
+        if (replace && value!.slides[index]) { const slides = [...value!.slides]; slides[index] = { ...slide, id:slides[index].id }; current = index; update({ ...value!, slides }); }
+        else if (value!.slides.length < MAX_SLIDES) { current = value!.slides.length; update({ ...value!, slides:[...value!.slides,slide] }); }
+      } catch { if (!destroyed) error('The image could not be selected. Try again.'); }
+    };
     const files = async () => {
+      if (media) { picker.value = ''; return error('Choose an image from this site.'); }
       const selected = Array.from(picker.files ?? []); picker.value = ''; if (!canWrite() || !selected.length) return;
       if ((replacing ? 1 : value!.slides.length + selected.length) > MAX_SLIDES || (replacing && selected.length !== 1)) return error(replacing ? 'Choose one replacement image.' : 'A carousel holds up to 12 images.');
       if (selected.some(file => file.size > MAX_FILE || !/^image\/(png|jpeg|gif|webp|avif|bmp)$/i.test(file.type)) || selected.reduce((sum, file) => sum + file.size, 0) > MAX_BATCH) return error('Choose image files up to 4 MB each, with no more than 8 MB at once.');

@@ -22,8 +22,8 @@ import type { SiteCompositionSnapshot } from './site-composition-state';
 /** The outlines the editor draws in the framed page: the words that can be edited, and the ones being edited. */
 const FRAME_STYLE = `
 [data-cms-words] { cursor: text; outline: 1px solid transparent; outline-offset: 2px; border-radius: 2px; }
-[data-cms-words]:hover { outline-color: var(--ds-accent-color, Highlight); }
-[data-cms-words][data-cms-open] { outline: 2px solid var(--ds-focus-ring, Highlight); }
+[data-cms-words]:hover { background: color-mix(in srgb, var(--ds-text-color, #171717) 6%, transparent); }
+[data-cms-words][data-cms-open] { outline: none; }
 [data-cms-words][data-cms-open] > .aa-block { outline: none; white-space: pre-wrap; }
 a, button, [role='button'] { cursor: default; }
 `;
@@ -67,7 +67,7 @@ export class ConsistencySiteEditor extends LitElement {
   private composition: SiteCompositionController | null = null;
   private compositionSnapshot: SiteCompositionSnapshot | null = null;
   private images: string[] = [];
-  private readonly beforeUnload = (event: BeforeUnloadEvent) => { if (this.composition?.state.dirty || this.composition?.state.busy || this.editing && (this.editing.saving || this.editing.markdown !== this.editing.field.markdown)) { event.preventDefault(); event.returnValue = ''; } };
+  private readonly beforeUnload = (event: BeforeUnloadEvent) => { if (this.composition?.pending || this.editing && (this.editing.saving || this.editing.markdown !== this.editing.field.markdown)) { event.preventDefault(); event.returnValue = ''; } };
   private editing: Editing | null = null;
   private opening = 0;
   private compositionRetry = 0;
