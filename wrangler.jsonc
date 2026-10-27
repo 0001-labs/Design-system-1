@@ -32,15 +32,10 @@
     { "pattern": "editor.c9y.site", "custom_domain": true },
     { "pattern": "neweditor.c9y.site/*", "zone_name": "c9y.site" },
     { "pattern": "neweditor.c9y.site", "custom_domain": true },
-    // Consistency's app at consistency.site: its front page (the landing for anyone signed out, passed on to the
-    // Pages project) and the app's own addresses. Every other address of consistency.site stays the Pages project's.
-    { "pattern": "consistency.site/", "zone_name": "consistency.site" },
-    { "pattern": "consistency.site/auth/*", "zone_name": "consistency.site" },
-    { "pattern": "consistency.site/api/consistency/*", "zone_name": "consistency.site" },
-    { "pattern": "consistency.site/api/dashboard/*", "zone_name": "consistency.site" },
-    { "pattern": "consistency.site/app/*", "zone_name": "consistency.site" },
-    { "pattern": "consistency.site/private-consistency/*", "zone_name": "consistency.site" },
-    { "pattern": "consistency.site/icons/design-system-1.svg", "zone_name": "consistency.site" },
+    // Consistency at consistency.site, all of it (services/src/consistency.ts): the app for anyone signed in,
+    // the landing (asked of the platform site consistency.c9y.site) for everyone else, the legal pages, and the
+    // film kit Visual's films load, passed on from the legacy Pages build until it is rebuilt elsewhere.
+    { "pattern": "consistency.site/*", "zone_name": "consistency.site" },
     // C9Y System: the System owner's private map of Consistency (services/src/c9y-system-site.ts).
     { "pattern": "system.consistency.site", "custom_domain": true },
     { "pattern": "fonts.designsystem1.com", "custom_domain": true },

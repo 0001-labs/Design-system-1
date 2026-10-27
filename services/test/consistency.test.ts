@@ -212,3 +212,94 @@ it('gates site-draft creation with identity, same-origin JSON, size and captured
  expect(forwarded.headers.get('X-C9y-Workspace')).toBe('01STDO');
  expect(forwarded.headers.get('X-C9y-Draft-Room')).toBeNull();
 });
+
+// consistency.site, off the legacy Pages project: the landing, the legal pages, the film kit, and the way home.
+const site = 'https://consistency.site';
+/** Answers the platform's landing and the legacy kit by their origins; anything else is a Convex identity answer. */
+function upstreams(answer: (url: string, init?: RequestInit) => Response | undefined) {
+  return vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
+    const url = String(input instanceof Request ? input.url : input);
+    return answer(url, init) ?? Response.json({ status: 'success', value: { _id: 'owner', email: 'jaa90@icloud.com', emailVerified: true } });
+  }) as unknown as typeof fetch & ReturnType<typeof vi.fn>;
+}
+it('draws the landing for anyone signed out, asked of the platform without cookies and without its cookies', async () => {
+  const { env, assets } = setup();
+  const send = upstreams(url => url.startsWith('https://consistency.c9y.site/') ? new Response('<!doctype html><html><body>Landing</body></html>', { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Set-Cookie': 'c9y=1; Path=/', 'Cache-Control': 'public, max-age=0' } }) : undefined);
+  const home = await consistencyPreview(new Request(`${site}/?ref=1`, { headers: { cookie: 'tracker=1', Accept: 'text/html' } }), env, send);
+  expect(home.status).toBe(200); expect(await home.text()).toContain('Landing');
+  expect(home.headers.get('set-cookie')).toBeNull(); expect(home.headers.get('content-type')).toBe('text/html; charset=utf-8');
+  expect(send).toHaveBeenCalledTimes(1);
+  const [url, init] = send.mock.calls[0]! as [string, RequestInit];
+  expect(url).toBe('https://consistency.c9y.site/?ref=1'); expect(init.redirect).toBe('manual');
+  expect(Object.keys(init.headers as Record<string, string>)).toEqual(['Accept']); expect((init.headers as Record<string, string>).Accept).toBe('text/html');
+  expect(assets).not.toHaveBeenCalled();
+  // The landing's other addresses are the platform's too, signed in or not, and never the app's.
+  for (const path of ['/index.html', '/icon.svg', '/_landing/style.css', '/sites/flavo.png', '/examples', '/examples/shop/']) {
+    await consistencyPreview(new Request(site + path, { headers }), env, send);
+    expect(send.mock.calls.at(-1)![0]).toBe('https://consistency.c9y.site' + path);
+  }
+  expect(assets).not.toHaveBeenCalled();
+  expect((await consistencyPreview(new Request(`${site}/examples`, { method: 'POST' }), env, send)).status).toBe(405);
+});
+it('brings the landing\'s own redirects back to consistency.site and leaves others alone', async () => {
+  const { env } = setup();
+  const send = upstreams(url => url.includes('/examples?') ? new Response(null, { status: 302, headers: { Location: 'https://consistency.c9y.site/examples/?a=1', 'Set-Cookie': 'x=1' } }) : url.includes('/examples/away') ? new Response(null, { status: 302, headers: { Location: 'https://elsewhere.example/' } }) : undefined);
+  const moved = await consistencyPreview(new Request(`${site}/examples?a=1`), env, send);
+  expect(moved.status).toBe(302); expect(moved.headers.get('location')).toBe('https://consistency.site/examples/?a=1'); expect(moved.headers.get('set-cookie')).toBeNull();
+  expect((await consistencyPreview(new Request(`${site}/examples/away`), env, send)).headers.get('location')).toBe('https://elsewhere.example/');
+});
+it('answers the legal pages itself', async () => {
+  const { env, assets } = setup();
+  const send = upstreams(() => undefined);
+  for (const [path, title] of [['/privacy', 'Privacy Policy'], ['/terms', 'Terms of Use'], ['/cookies', 'Cookie Policy'], ['/acceptable-use', 'Acceptable Use Policy'], ['/tokushoho', '特定商取引法に基づく表記']]) {
+    const page = await consistencyPreview(new Request(site + path), env, send);
+    expect(page.status).toBe(200); expect(page.headers.get('content-type')).toBe('text/html; charset=utf-8'); expect(page.headers.get('cache-control')).toBe('public, max-age=3600');
+    expect(await page.text()).toContain(`<title>${title} · Consistency</title>`);
+  }
+  expect(await (await consistencyPreview(new Request(`${site}/privacy`, { method: 'HEAD' }), env, send)).text()).toBe('');
+  expect((await consistencyPreview(new Request(`${site}/privacy`, { method: 'POST' }), env, send)).status).toBe(405);
+  expect(send).not.toHaveBeenCalled(); expect(assets).not.toHaveBeenCalled();
+});
+it('leads every other address of consistency.site to the front page, and finds nothing there for other methods', async () => {
+  const { env, assets } = setup();
+  const send = upstreams(() => undefined);
+  for (const path of ['/team', '/team/', '/edit', '/edit/home', '/login', '/admin', '/flags', '/api/legacy/sites', '/some-page?x=1', '/app/libraries', '/api/dashboard/other']) {
+    const answer = await consistencyPreview(new Request(site + path, { headers }), env, send);
+    expect([path, answer.status]).toEqual([path, 302]); expect(answer.headers.get('location')).toBe('/');
+  }
+  expect((await consistencyPreview(new Request(`${site}/login`, { method: 'POST', headers }), env, send)).status).toBe(404);
+  expect(send).not.toHaveBeenCalled(); expect(assets).not.toHaveBeenCalled();
+});
+it('passes the film kit on from the legacy build with the kit\'s own headers, for Visual\'s films', async () => {
+  const { env, assets } = setup();
+  const send = upstreams(url => url === 'https://consistency.pages.dev/kit/latest.json' ? Response.json({ revision: 'r1' }, { headers: { 'Set-Cookie': 'x=1' } }) : url === 'https://consistency.pages.dev/kit/r1/kit.js' ? new Response('kit', { headers: { 'Content-Type': 'text/javascript' } }) : url.startsWith('https://consistency.pages.dev/') ? new Response('nope', { status: 404 }) : undefined);
+  const latest = await consistencyPreview(new Request(`${site}/kit/latest.json?v=2`, { headers: { Origin: 'https://visual.example' } }), env, send);
+  expect(latest.status).toBe(200); expect(await latest.json()).toEqual({ revision: 'r1' });
+  expect(latest.headers.get('access-control-allow-origin')).toBe('*'); expect(latest.headers.get('cache-control')).toBe('no-cache'); expect(latest.headers.get('cross-origin-resource-policy')).toBe('cross-origin'); expect(latest.headers.get('set-cookie')).toBeNull();
+  expect(send.mock.calls[0]![0]).toBe('https://consistency.pages.dev/kit/latest.json');
+  const file = await consistencyPreview(new Request(`${site}/kit/r1/kit.js`), env, send);
+  expect(file.status).toBe(200); expect(file.headers.get('cache-control')).toBe('public, max-age=31536000, immutable'); expect(file.headers.get('content-type')).toBe('text/javascript');
+  expect((await consistencyPreview(new Request(`${site}/kit/r1/kit.js`, { method: 'OPTIONS' }), env, send)).status).toBe(204);
+  const missing = await consistencyPreview(new Request(`${site}/kit/r2/kit.js`), env, send);
+  expect(missing.status).toBe(404); expect(missing.headers.get('cache-control')).toBe('no-store');
+  const calls = send.mock.calls.length;
+  for (const path of ['/kit/', '/kit/r1/', '/kit/.env', '/kit/r1/.hidden/kit.js']) expect((await consistencyPreview(new Request(site + path), env, send)).status).toBe(404);
+  expect(send.mock.calls.length).toBe(calls);
+  expect((await consistencyPreview(new Request(`${site}/kit/r1/kit.js`, { method: 'POST' }), env, send)).status).toBe(405);
+  expect(assets).not.toHaveBeenCalled();
+});
+it('keeps the app\'s own addresses on consistency.site as they were', async () => {
+  const { env, assets } = setup();
+  const send = upstreams(() => undefined);
+  const elsewhere = () => send.mock.calls.filter(([url]) => !String(url).startsWith('https://example.convex.cloud/')).length;
+  for (const path of ['/app/signin', '/app/assets/login.js', '/icons/design-system-1.svg']) expect((await consistencyPreview(new Request(site + path), env, send)).status).toBe(200);
+  expect(assets).toHaveBeenCalledTimes(3);
+  // consistency.site asks the owner's System sign-in quietly first (consistency-owner.ts).
+  const gated = await consistencyPreview(new Request(`${site}/private-consistency/index.html`), env, send);
+  expect(gated.status).toBe(302); expect(gated.headers.get('location')).toBe('/auth/start?silent=1');
+  const home = await consistencyPreview(new Request(`${site}/`, { headers }), env, send);
+  expect(home.status).toBe(200); expect(new URL(assets.mock.calls.at(-1)![0].url).pathname).toBe('/private-consistency/home.html');
+  expect((await consistencyPreview(new Request(`${site}/api/consistency/profile`), env, send)).status).toBe(401);
+  expect((await consistencyPreview(new Request(`${site}/api/dashboard/session`, { method: 'POST', headers: { origin: site, authorization: 'Bearer valid-token' } }), env, send)).status).toBe(204);
+  expect(elsewhere()).toBe(0);
+});

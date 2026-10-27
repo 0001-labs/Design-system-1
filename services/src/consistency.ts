@@ -3,6 +3,7 @@ import { dashboard, ownerSessionCookie, sessionRequest } from './dashboard';
 import { authorizeReport, isStudioOwner, signedIn, type ReportsEnv } from './reports';
 import { hasOwnerSignIn, ownerRoutes, ownerSignOut, systemOwner, type OwnerEnv } from './consistency-owner';
 import { personHeaders, sitesApi, type Person } from './consistency-sites';
+import { isLegalPath, legalPage } from './consistency-legal';
 
 export const CONSISTENCY_HOST = 'c9y.site';
 /** The owner's editor lab: the page editor alone, at its root, behind the verified owner session. */
@@ -10,10 +11,20 @@ export const EDITOR_HOST = 'editor.c9y.site';
 /** The lab's first address, which now leads to EDITOR_HOST. */
 const FORMER_EDITOR_HOST = 'neweditor.c9y.site';
 /**
- * Consistency's product address: its app for a signed-in owner, at the front page and the addresses below; every
- * other address of it (the landing, the legacy app's API, admin and pages) is the Pages project's, passed on.
+ * Consistency's product address, all of it this Worker's: its app for anyone signed in, at the front page and the
+ * addresses below; the landing for everyone else; the legal pages; the film kit; and the way to the front page from
+ * every other address (the legacy app's pages among them).
  */
 export const APP_HOST = 'consistency.site';
+/**
+ * Where the landing lives: the platform site `consistency` (Consistency/site), edited there like every platform
+ * site. consistency.site asks it without the visitor's cookies, so what it shows is the published page every
+ * visitor sees.
+ */
+export const LANDING_ORIGIN = 'https://consistency.c9y.site';
+/** The legacy Pages build, which still holds the film kit (`vp run film:kit`, dist/kit) Visual's films load. */
+export const FILM_KIT_ORIGIN = 'https://consistency.pages.dev';
+const FILM_KIT_PREFIX = '/kit/';
 export const isConsistencyHost = (host:string) => [CONSISTENCY_HOST, APP_HOST, EDITOR_HOST, FORMER_EDITOR_HOST].includes(host);
 /** The addresses the app answers on consistency.site, besides its front page. */
 export function isAppPath(path: string): boolean {
@@ -49,8 +60,65 @@ export async function authorizePerson(request: Request, env: ReportsEnv & Worksp
   if (new URL(request.url).hostname !== APP_HOST || identity.emailVerified !== true || !email) return Response.json({ error: 'This is private to the studio owner.' }, { status: 403 });
   return { owner: false, email };
 }
-/** An address of consistency.site that is not the app's, to the Pages project behind it, as it came. */
-const pass = (request: Request) => fetch(request);
+/** The landing's own addresses on consistency.site: its pages (home and examples), its assets and its pictures. */
+export function isLandingPath(path: string): boolean {
+  return path === '/' || path === '/index.html' || path === '/icon.svg' || path.startsWith('/_landing/') || path.startsWith('/sites/') || path === '/examples' || path.startsWith('/examples/');
+}
+/**
+ * The landing, as the platform serves it at LANDING_ORIGIN: asked for with the visitor's Accept alone, never
+ * their cookies, a redirect of its own brought back to consistency.site, and no cookie of the platform's set here.
+ */
+export async function landing(request: Request, send: typeof fetch = fetch): Promise<Response> {
+  if (request.method !== 'GET' && request.method !== 'HEAD') return new Response(null, { status: 405, headers: { Allow: 'GET, HEAD' } });
+  const url = new URL(request.url);
+  const upstream = await send(new URL(url.pathname + url.search, LANDING_ORIGIN).toString(), { method: request.method, headers: { Accept: request.headers.get('Accept') ?? '*/*' }, redirect: 'manual' });
+  const response = new Response(upstream.body, upstream);
+  const location = upstream.headers.get('Location');
+  if (location) {
+    const moved = new URL(location, LANDING_ORIGIN);
+    if (moved.origin === LANDING_ORIGIN) response.headers.set('Location', url.origin + moved.pathname + moved.search);
+  }
+  response.headers.delete('Set-Cookie');
+  return response;
+}
+/** The headers a kit's file goes out with (Film kit's serve.ts): any origin may read it, a revision never changes, latest.json is checked every load. */
+function filmKitHeaders(path: string): Record<string, string> {
+  return { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS', 'Cross-Origin-Resource-Policy': 'cross-origin', 'X-Content-Type-Options': 'nosniff', 'Cache-Control': path.endsWith('/latest.json') ? 'no-cache' : 'public, max-age=31536000, immutable' };
+}
+/**
+ * The film kit at /kit/*, which Visual's films load from consistency.site (Visual/scenes/kits/hosts.js), passed on
+ * from the legacy Pages build at FILM_KIT_ORIGIN with the kit's own headers, until the kit is rebuilt elsewhere.
+ * Nothing in it is private: a kit is the app's own code on made-up records. Asked plainly, so the answer is the
+ * file or nothing.
+ */
+export async function filmKit(request: Request, send: typeof fetch = fetch): Promise<Response> {
+  const url = new URL(request.url);
+  const headers = filmKitHeaders(url.pathname);
+  if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers });
+  if (request.method !== 'GET' && request.method !== 'HEAD') return new Response('Method not allowed', { status: 405, headers });
+  const missing = () => new Response('Not found', { status: 404, headers: { ...headers, 'Cache-Control': 'no-store' } });
+  // No listings and no way out of the folder.
+  if (url.pathname.endsWith('/') || url.pathname.includes('/.') || url.pathname.includes('..')) return missing();
+  const upstream = await send(new URL(url.pathname, FILM_KIT_ORIGIN).toString(), { method: request.method, redirect: 'manual' });
+  if (!upstream.ok) return missing();
+  const response = new Response(upstream.body, upstream);
+  for (const [name, value] of Object.entries(headers)) response.headers.set(name, value);
+  response.headers.delete('Set-Cookie');
+  return response;
+}
+/**
+ * An address of consistency.site that is not the app's: the landing's, a legal page, the film kit, or the way to
+ * the front page (the legacy app's pages, a site's /team and /edit among them). Nothing else is served, so a method
+ * other than GET and HEAD finds nothing there.
+ */
+async function consistencySite(request: Request, send: typeof fetch): Promise<Response> {
+  const url = new URL(request.url);
+  if (isLandingPath(url.pathname)) return landing(request, send);
+  if (isLegalPath(url.pathname)) return legalPage(request);
+  if (url.pathname.startsWith(FILM_KIT_PREFIX)) return filmKit(request, send);
+  if (request.method !== 'GET' && request.method !== 'HEAD') return new Response(null, { status: 404, headers: security });
+  return new Response(null, { status: 302, headers: { Location: '/', 'Cache-Control': 'no-store' } });
+}
 function protect(response: Response): Response {
   const result = new Response(response.body, response);
   for (const [key, value] of Object.entries(security)) result.headers.set(key, value);
@@ -62,7 +130,7 @@ export async function consistencyPreview(request: Request, env: ReportsEnv & Wor
   if (url.hostname === FORMER_EDITOR_HOST) return new Response(null, { status: 301, headers: { ...security, Location: `https://${EDITOR_HOST}${url.pathname}${url.search}` } });
   // c9y.site is where customers' sites live; its home is the app at consistency.site now.
   if (url.hostname === CONSISTENCY_HOST && url.pathname === '/' && ['GET', 'HEAD'].includes(request.method)) return new Response(null, { status: 302, headers: { ...security, Location: `https://${APP_HOST}/` } });
-  if (url.hostname === APP_HOST && url.pathname !== '/' && !isAppPath(url.pathname)) return pass(request);
+  if (url.hostname === APP_HOST && url.pathname !== '/' && !isAppPath(url.pathname)) return consistencySite(request, send);
   const signingIn = await ownerRoutes(request, env);
   if (signingIn) return protect(signingIn);
   // Signing out ends the System session behind the owner's token too, on every Consistency site.
@@ -93,7 +161,7 @@ export async function consistencyPreview(request: Request, env: ReportsEnv & Wor
   const person = await authorizePerson(request, env, send);
   const denied = person instanceof Response ? person : null;
   // Signed out, consistency.site's front page is the landing.
-  if (denied && url.hostname === APP_HOST && url.pathname === '/') return pass(request);
+  if (denied && url.hostname === APP_HOST && url.pathname === '/') return landing(request, send);
   if (denied) {
     // Where the owner signs in through System, ask it quietly first: signed in there, signed in here.
     if (denied.status === 401) return new Response(null, { status: 302, headers: { ...security, Location: hasOwnerSignIn(url) ? '/auth/start?silent=1' : '/app/signin', 'Set-Cookie': '__Host-ds1-dashboard=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0' } });

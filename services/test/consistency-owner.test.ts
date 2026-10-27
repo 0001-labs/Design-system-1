@@ -30,7 +30,8 @@ function setup() {
     revoke: async token => { calls.revoke++; if (tokens.has(token)) tokens.clear(); },
   };
   const assets = vi.fn(async (_request: Request) => new Response('<!doctype html><html><body>Home</body></html>', { headers: { 'Content-Type': 'text/html' } }));
-  const send = vi.fn(async () => new Response(null, { status: 401 }));
+  // The platform's landing answers at its own origin; Convex, asked about a session, says there is none.
+  const send = vi.fn(async (input: string | URL | Request) => String(input instanceof Request ? input.url : input).startsWith('https://consistency.c9y.site/') ? new Response('Landing') : new Response(null, { status: 401 }));
   const env = { REPORTS_OWNER_ID: 'owner', REPORTS_AUTH_URL: 'https://example.convex.cloud', ASSETS: { fetch: assets }, C9Y_IDENTITY: identity } as unknown as ReportsEnv & { ASSETS: Fetcher; C9Y_IDENTITY: OwnerIdentity };
   const visit = (path: string, init: RequestInit = {}) => consistencyPreview(new Request(origin + path, init), env, send);
   const signIn = async () => {
@@ -46,14 +47,11 @@ function setup() {
 }
 
 it('shows a signed-out visitor the landing, and asks System for the app client on sign-in', async () => {
-  const { visit, assets } = setup();
-  const pages = vi.fn(async (_request: Request) => new Response('Landing'));
-  vi.stubGlobal('fetch', pages);
+  const { visit, assets, send } = setup();
   const home = await visit('/');
   expect(await home.text()).toBe('Landing');
-  expect(new URL(pages.mock.calls[0]![0].url).href).toBe(`${origin}/`);
+  expect(send.mock.calls[0]![0]).toBe('https://consistency.c9y.site/');
   expect(await (await visit('/examples/')).text()).toBe('Landing');
-  vi.unstubAllGlobals();
   expect(assets).not.toHaveBeenCalled();
   const start = await visit('/auth/start?silent=1');
   const authorize = new URL(start.headers.get('location')!);
@@ -96,9 +94,7 @@ it('asks System on every request, and a sign-out anywhere ends it here', async (
   await visit('/api/consistency/sites', { headers: { Cookie: owner! } });
   expect(calls.validate - before).toBe(2);
   tokens.clear();
-  vi.stubGlobal('fetch', vi.fn(async () => new Response('Landing')));
   expect(await (await visit('/', { headers: { Cookie: owner! } })).text()).toBe('Landing');
-  vi.unstubAllGlobals();
   expect((await visit('/private-consistency/home.html', { headers: { Cookie: owner! } })).status).toBe(302);
 });
 
