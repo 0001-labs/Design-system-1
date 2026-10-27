@@ -8355,7 +8355,8 @@ function us(e, t) {
 		let i = n.target.closest(".aa-block");
 		i?.getAttribute("data-kind") !== "table" || e.readOnly || t.menus === !1 || (n.preventDefault(), N = Array.from(r.children).indexOf(i), ue(), y.style.left = `${n.clientX}px`, y.style.top = `${n.clientY}px`);
 	}, we = (t) => {
-		if (!(t.target && y.contains(t.target)) && (fe(), !O.hidden && "docked" in O.dataset && cs(O), !y.hidden)) {
+		let n = t.target;
+		if (!(n?.nodeType && y.contains(n)) && (fe(), !O.hidden && "docked" in O.dataset && cs(O), !y.hidden)) {
 			let t = e.activeBlock(), n = t ? r.children[t.index]?.getBoundingClientRect() : null;
 			n && (z(n), te());
 		}
