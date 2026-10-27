@@ -165,6 +165,12 @@ async function open({ width, url }: { width: number; url: string }) {
     // A page that does not settle in time gets a second chance: one slow load among many is not a broken rule.
     await page.goto(url, { waitUntil: 'networkidle', timeout: 30_000 })
       .catch(() => page.goto(url, { waitUntil: 'networkidle', timeout: 60_000 }));
+    if (option('theme')) await page.evaluate(appearance => {
+      document.documentElement.classList.remove('light-theme', 'dark-theme');
+      document.documentElement.classList.add(`${appearance}-theme`);
+      document.documentElement.style.colorScheme = appearance;
+    }, theme);
+
     await page.evaluate(async () => {
       for (let y = 0; y < document.documentElement.scrollHeight; y += innerHeight / 2) {
         scrollTo(0, y);
