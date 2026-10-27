@@ -94,6 +94,26 @@ function moduleGraph(read, entry) {
 
 export default {
   exports: {
+    /** Native page publication: the editor's Aa parser and closed content atoms, without DOM. */
+    'native-content': {
+      files({ read, tree }) {
+        let source = String(read('shared/consistency-native-content.ts'))
+          .replace('../website/src/vendor/aa/parse.js', './aa/parse.js')
+          .replace('../DS1/2-core/generated/icons-immediate', './icons-immediate')
+          .replace('../DS1/2-core/generated/icons-extra', './icons-extra');
+        source = source.replace(/^import (\w+) from '([^']+)\?raw';$/gm, (_, name, path) =>
+          `const ${name} = ${JSON.stringify(String(read(posix.normalize(posix.join('shared', path)))))};`);
+        return {
+          'native-content.ts': source,
+          'consistency-content.ts': read('shared/consistency-content.ts'),
+          'consistency-carousel.ts': read('shared/consistency-carousel.ts'),
+          'icons-immediate.ts': read('DS1/2-core/generated/icons-immediate.ts'),
+          'icons-extra.ts': read('DS1/2-core/generated/icons-extra.ts'),
+          'aa/parse.js': read('website/src/vendor/aa/parse.js'),
+          ...Object.fromEntries([...tree('website/src/vendor/aa', { only: /^[^/]+\.d\.ts$/ })].map(([path, content]) => [`aa/${path}`, content])),
+        };
+      },
+    },
     /** Approved documentation artwork; components are selected separately through components. */
     'device-artwork': {
       files({ read }) {

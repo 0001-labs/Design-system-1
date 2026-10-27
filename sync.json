@@ -9,7 +9,8 @@
       "build": {
         "to": "website/src/vendor/aa",
         "entries": [
-          "diagram"
+          "diagram",
+          "parse"
         ]
       }
     },
