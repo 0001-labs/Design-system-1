@@ -151,6 +151,11 @@ enum DS1SharedWords {
         "End date": "Slutdato",
         "Include time": "Medtag klokkeslæt",
         "Time": "Klokkeslæt",
+        "Day": "Dag",
+        "Week": "Uge",
+        "Month": "Måned",
+        "Swimlane": "Baner",
+        "View": "Visning",
     ]
 
     private static let deWords: [String: String] = [
@@ -283,6 +288,11 @@ enum DS1SharedWords {
         "End date": "Enddatum",
         "Include time": "Uhrzeit hinzufügen",
         "Time": "Uhrzeit",
+        "Day": "Tag",
+        "Week": "Woche",
+        "Month": "Monat",
+        "Swimlane": "Bahnen",
+        "View": "Ansicht",
     ]
 
     private static let enWords: [String: String] = [
@@ -415,6 +425,11 @@ enum DS1SharedWords {
         "End date": "End date",
         "Include time": "Include time",
         "Time": "Time",
+        "Day": "Day",
+        "Week": "Week",
+        "Month": "Month",
+        "Swimlane": "Swimlane",
+        "View": "View",
     ]
 
     private static let esWords: [String: String] = [
@@ -547,6 +562,11 @@ enum DS1SharedWords {
         "End date": "Fecha de fin",
         "Include time": "Incluir hora",
         "Time": "Hora",
+        "Day": "Día",
+        "Week": "Semana",
+        "Month": "Mes",
+        "Swimlane": "Carriles",
+        "View": "Vista",
     ]
 
     private static let fiWords: [String: String] = [
@@ -679,6 +699,11 @@ enum DS1SharedWords {
         "End date": "Päättymispäivä",
         "Include time": "Sisällytä kellonaika",
         "Time": "Kellonaika",
+        "Day": "Päivä",
+        "Week": "Viikko",
+        "Month": "Kuukausi",
+        "Swimlane": "Kaistat",
+        "View": "Näkymä",
     ]
 
     private static let frWords: [String: String] = [
@@ -811,6 +836,11 @@ enum DS1SharedWords {
         "End date": "Date de fin",
         "Include time": "Inclure l’heure",
         "Time": "Heure",
+        "Day": "Jour",
+        "Week": "Semaine",
+        "Month": "Mois",
+        "Swimlane": "Couloirs",
+        "View": "Vue",
     ]
 
     private static let isWords: [String: String] = [
@@ -936,6 +966,11 @@ enum DS1SharedWords {
         "End date": "Lokadagur",
         "Include time": "Taka með tíma",
         "Time": "Tími",
+        "Day": "Dagur",
+        "Week": "Vika",
+        "Month": "Mánuður",
+        "Swimlane": "Brautir",
+        "View": "Yfirlit",
     ]
 
     private static let itWords: [String: String] = [
@@ -1068,6 +1103,11 @@ enum DS1SharedWords {
         "End date": "Data di fine",
         "Include time": "Includi ora",
         "Time": "Ora",
+        "Day": "Giorno",
+        "Week": "Settimana",
+        "Month": "Mese",
+        "Swimlane": "Corsie",
+        "View": "Vista",
     ]
 
     private static let jaWords: [String: String] = [
@@ -1200,6 +1240,11 @@ enum DS1SharedWords {
         "End date": "終了日",
         "Include time": "時刻を含める",
         "Time": "時刻",
+        "Day": "日",
+        "Week": "週",
+        "Month": "月",
+        "Swimlane": "スイムレーン",
+        "View": "表示",
     ]
 
     private static let koWords: [String: String] = [
@@ -1332,6 +1377,11 @@ enum DS1SharedWords {
         "End date": "종료일",
         "Include time": "시간 포함",
         "Time": "시간",
+        "Day": "일",
+        "Week": "주",
+        "Month": "월",
+        "Swimlane": "스윔레인",
+        "View": "보기",
     ]
 
     private static let nbWords: [String: String] = [
@@ -1464,6 +1514,11 @@ enum DS1SharedWords {
         "End date": "Sluttdato",
         "Include time": "Ta med klokkeslett",
         "Time": "Klokkeslett",
+        "Day": "Dag",
+        "Week": "Uke",
+        "Month": "Måned",
+        "Swimlane": "Baner",
+        "View": "Visning",
     ]
 
     private static let ptBRWords: [String: String] = [
@@ -1596,6 +1651,11 @@ enum DS1SharedWords {
         "End date": "Data de término",
         "Include time": "Incluir horário",
         "Time": "Horário",
+        "Day": "Dia",
+        "Week": "Semana",
+        "Month": "Mês",
+        "Swimlane": "Raias",
+        "View": "Visualização",
     ]
 
     private static let ptWords: [String: String] = [
@@ -1728,6 +1788,11 @@ enum DS1SharedWords {
         "End date": "Data de fim",
         "Include time": "Incluir hora",
         "Time": "Hora",
+        "Day": "Dia",
+        "Week": "Semana",
+        "Month": "Mês",
+        "Swimlane": "Raias",
+        "View": "Vista",
     ]
 
     private static let svWords: [String: String] = [
@@ -1860,6 +1925,11 @@ enum DS1SharedWords {
         "End date": "Slutdatum",
         "Include time": "Inkludera tid",
         "Time": "Tid",
+        "Day": "Dag",
+        "Week": "Vecka",
+        "Month": "Månad",
+        "Swimlane": "Banor",
+        "View": "Vy",
     ]
 
     private static let zhWords: [String: String] = [
@@ -1992,6 +2062,11 @@ enum DS1SharedWords {
         "End date": "结束日期",
         "Include time": "包含时间",
         "Time": "时间",
+        "Day": "日",
+        "Week": "周",
+        "Month": "月",
+        "Swimlane": "泳道",
+        "View": "视图",
     ]
 
 }

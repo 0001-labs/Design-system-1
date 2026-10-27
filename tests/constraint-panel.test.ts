@@ -32,7 +32,7 @@ test("cards side by side whose pictures stand on the foot at one level keep ever
 
 test("a picture above the foot, and one lower than the picture beside it, break card.media-level", () => {
   const row = document.createElement("div");
-  row.append(card(0, { left: 20, top: 120, width: 240, height: 240 }), card(300, { left: 320, top: 200, width: 240, height: 200 }));
+  row.append(card(0, { left: 20, top: 120, width: 240, height: 240 }), card(300, { left: 320, top: 200, width: 240, height: 240 }));
   document.body.append(row);
   const found = inspectConstraints().filter(f => f.constraint.code === "card.media-level").map(f => f.message);
   expect(found).toEqual([

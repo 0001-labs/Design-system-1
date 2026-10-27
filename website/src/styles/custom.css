@@ -326,6 +326,12 @@ body.sidebar-open {
 .expressive-code pre {
   overflow: visible;
 }
+/* On a phone a table shares its width among its columns and a wrapped code line starts a square in, so neither
+   widens the page (carousel.sideways-scroll: the content column must never scroll sideways). */
+@media (max-width: 600px) {
+  .sl-markdown-content table { table-layout: fixed; }
+  .expressive-code .frame .ec-line .code { padding-inline-start: var(--grid); text-indent: 0; }
+}
 html:root { --ds-sf: var(--sf, 1); }
 
 /* Root's topics: the names are the links, without an underline. */

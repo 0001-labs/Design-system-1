@@ -10,16 +10,28 @@ import styles from "./styles/ds-avatar.css?inline";
 // the first frame instead of the initial while the deferred icons load.
 provideIcons({ avatar: avatarIcon });
 
+/** The ink that reads on a fill: black on a light one, white on a dark one. */
+const inkOn = (rgb: number[]) => {
+  const linear = rgb.map((n) => (n <= 0.04045 ? n / 12.92 : ((n + 0.055) / 1.055) ** 2.4));
+  const luminance = linear[0] * 0.2126 + linear[1] * 0.7152 + linear[2] * 0.0722;
+  return luminance > 0.22 ? "var(--ds-black)" : "var(--ds-white)";
+};
+
 /** Saved identity colours are hex; their ink must stay legible in either theme. */
 export function avatarInk(color: string): string | undefined {
   const match = /^#([a-f\d]{6}|[a-f\d]{3})$/i.exec(color);
   if (!match) return undefined;
   const hex = match[1].length === 3 ? [...match[1]].map((c) => c + c).join("") : match[1];
-  const rgb = [0, 2, 4]
-    .map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
-    .map((n) => (n <= 0.04045 ? n / 12.92 : ((n + 0.055) / 1.055) ** 2.4));
-  const luminance = rgb[0] * 0.2126 + rgb[1] * 0.7152 + rgb[2] * 0.0722;
-  return luminance > 0.22 ? "var(--ds-black)" : "var(--ds-white)";
+  return inkOn([0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255));
+}
+
+/** The ink on a fill as the browser resolved it (`rgb(253, 187, 45)`), for a `color` given as a variable. */
+export function inkOnResolved(fill: string): string | undefined {
+  const match = /^rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:[,\s/]+([\d.]+%?))?\s*\)/.exec(fill);
+  if (!match) return undefined;
+  // A fill with no colour yet (`rgba(0, 0, 0, 0)`) says nothing about the ink.
+  if (match[4] !== undefined && parseFloat(match[4]) === 0) return undefined;
+  return inkOn([match[1], match[2], match[3]].map((n) => Number(n) / 255));
 }
 
 /**
@@ -86,6 +98,23 @@ export class Avatar extends LitElement {
       this.loaded = false;
       this.failed = false;
       this.style.removeProperty("--ds-avatar-intrinsic-ratio");
+    }
+  }
+  /** A fill named by a variable (`var(--brand-highlight)`) gets its ink once the browser has resolved it. */
+  protected updated() {
+    if (this.ink || this.pending || this.plain || !this.color || avatarInk(this.color)) return;
+    this.resolveInk();
+  }
+  /** Reads the fill as drawn; while the variable is still undefined (its stylesheet on its way), looks again next
+   *  frame, and once more when the page has loaded everything. */
+  private resolveInk(tries = 0) {
+    const frame = this.renderRoot.querySelector<HTMLElement>(".frame");
+    if (!frame || !this.isConnected) return;
+    const ink = inkOnResolved(getComputedStyle(frame).backgroundColor);
+    if (ink) { frame.style.color = ink; return; }
+    if (tries < 60) requestAnimationFrame(() => this.resolveInk(tries + 1));
+    if (tries === 0 && this.ownerDocument.readyState !== "complete") {
+      this.ownerDocument.defaultView?.addEventListener("load", () => this.resolveInk(60), { once: true });
     }
   }
   render() {

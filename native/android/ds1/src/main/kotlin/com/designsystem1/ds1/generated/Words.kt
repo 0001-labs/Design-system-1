@@ -155,6 +155,11 @@ internal object DS1SharedWords {
         "End date" to "Slutdato",
         "Include time" to "Medtag klokkeslæt",
         "Time" to "Klokkeslæt",
+        "Day" to "Dag",
+        "Week" to "Uge",
+        "Month" to "Måned",
+        "Swimlane" to "Baner",
+        "View" to "Visning",
     )
 
     private fun deWords() = mapOf(
@@ -287,6 +292,11 @@ internal object DS1SharedWords {
         "End date" to "Enddatum",
         "Include time" to "Uhrzeit hinzufügen",
         "Time" to "Uhrzeit",
+        "Day" to "Tag",
+        "Week" to "Woche",
+        "Month" to "Monat",
+        "Swimlane" to "Bahnen",
+        "View" to "Ansicht",
     )
 
     private fun enWords() = mapOf(
@@ -419,6 +429,11 @@ internal object DS1SharedWords {
         "End date" to "End date",
         "Include time" to "Include time",
         "Time" to "Time",
+        "Day" to "Day",
+        "Week" to "Week",
+        "Month" to "Month",
+        "Swimlane" to "Swimlane",
+        "View" to "View",
     )
 
     private fun esWords() = mapOf(
@@ -551,6 +566,11 @@ internal object DS1SharedWords {
         "End date" to "Fecha de fin",
         "Include time" to "Incluir hora",
         "Time" to "Hora",
+        "Day" to "Día",
+        "Week" to "Semana",
+        "Month" to "Mes",
+        "Swimlane" to "Carriles",
+        "View" to "Vista",
     )
 
     private fun fiWords() = mapOf(
@@ -683,6 +703,11 @@ internal object DS1SharedWords {
         "End date" to "Päättymispäivä",
         "Include time" to "Sisällytä kellonaika",
         "Time" to "Kellonaika",
+        "Day" to "Päivä",
+        "Week" to "Viikko",
+        "Month" to "Kuukausi",
+        "Swimlane" to "Kaistat",
+        "View" to "Näkymä",
     )
 
     private fun frWords() = mapOf(
@@ -815,6 +840,11 @@ internal object DS1SharedWords {
         "End date" to "Date de fin",
         "Include time" to "Inclure l’heure",
         "Time" to "Heure",
+        "Day" to "Jour",
+        "Week" to "Semaine",
+        "Month" to "Mois",
+        "Swimlane" to "Couloirs",
+        "View" to "Vue",
     )
 
     private fun isWords() = mapOf(
@@ -940,6 +970,11 @@ internal object DS1SharedWords {
         "End date" to "Lokadagur",
         "Include time" to "Taka með tíma",
         "Time" to "Tími",
+        "Day" to "Dagur",
+        "Week" to "Vika",
+        "Month" to "Mánuður",
+        "Swimlane" to "Brautir",
+        "View" to "Yfirlit",
     )
 
     private fun itWords() = mapOf(
@@ -1072,6 +1107,11 @@ internal object DS1SharedWords {
         "End date" to "Data di fine",
         "Include time" to "Includi ora",
         "Time" to "Ora",
+        "Day" to "Giorno",
+        "Week" to "Settimana",
+        "Month" to "Mese",
+        "Swimlane" to "Corsie",
+        "View" to "Vista",
     )
 
     private fun jaWords() = mapOf(
@@ -1204,6 +1244,11 @@ internal object DS1SharedWords {
         "End date" to "終了日",
         "Include time" to "時刻を含める",
         "Time" to "時刻",
+        "Day" to "日",
+        "Week" to "週",
+        "Month" to "月",
+        "Swimlane" to "スイムレーン",
+        "View" to "表示",
     )
 
     private fun koWords() = mapOf(
@@ -1336,6 +1381,11 @@ internal object DS1SharedWords {
         "End date" to "종료일",
         "Include time" to "시간 포함",
         "Time" to "시간",
+        "Day" to "일",
+        "Week" to "주",
+        "Month" to "월",
+        "Swimlane" to "스윔레인",
+        "View" to "보기",
     )
 
     private fun nbWords() = mapOf(
@@ -1468,6 +1518,11 @@ internal object DS1SharedWords {
         "End date" to "Sluttdato",
         "Include time" to "Ta med klokkeslett",
         "Time" to "Klokkeslett",
+        "Day" to "Dag",
+        "Week" to "Uke",
+        "Month" to "Måned",
+        "Swimlane" to "Baner",
+        "View" to "Visning",
     )
 
     private fun ptBRWords() = mapOf(
@@ -1600,6 +1655,11 @@ internal object DS1SharedWords {
         "End date" to "Data de término",
         "Include time" to "Incluir horário",
         "Time" to "Horário",
+        "Day" to "Dia",
+        "Week" to "Semana",
+        "Month" to "Mês",
+        "Swimlane" to "Raias",
+        "View" to "Visualização",
     )
 
     private fun ptWords() = mapOf(
@@ -1732,6 +1792,11 @@ internal object DS1SharedWords {
         "End date" to "Data de fim",
         "Include time" to "Incluir hora",
         "Time" to "Hora",
+        "Day" to "Dia",
+        "Week" to "Semana",
+        "Month" to "Mês",
+        "Swimlane" to "Raias",
+        "View" to "Vista",
     )
 
     private fun svWords() = mapOf(
@@ -1864,6 +1929,11 @@ internal object DS1SharedWords {
         "End date" to "Slutdatum",
         "Include time" to "Inkludera tid",
         "Time" to "Tid",
+        "Day" to "Dag",
+        "Week" to "Vecka",
+        "Month" to "Månad",
+        "Swimlane" to "Banor",
+        "View" to "Vy",
     )
 
     private fun zhWords() = mapOf(
@@ -1996,6 +2066,11 @@ internal object DS1SharedWords {
         "End date" to "结束日期",
         "Include time" to "包含时间",
         "Time" to "时间",
+        "Day" to "日",
+        "Week" to "周",
+        "Month" to "月",
+        "Swimlane" to "泳道",
+        "View" to "视图",
     )
 
 }

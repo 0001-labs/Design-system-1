@@ -4,6 +4,7 @@ description: "Slides side by side that snap sideways, one to a stop, with page d
 ---
 
 import ComponentExample from "../../../components/ComponentExample.astro";
+import ConstraintList from "../../../components/ConstraintList.astro";
 
 A carousel shows one thing several ways in the space of one: tall cards side by side, one in view and the next cut at the edge, or one slide at a time across the whole width. The slides snap sideways, one to a stop, under a finger, a trackpad or the keyboard, and a row of [page dots](/2-core/pagedots/) one square below says which slide you are on and takes you to any other. Previous and next buttons can stand beside the dots.
 
@@ -135,3 +136,7 @@ import { Carousel } from "@0001-labs/design-system-1/DS1/react/carousel";
 ```
 
 `Carousel` renders `ds-carousel` with the slides in the light DOM and the region and its name in the markup, so the server's HTML is already a named region. `label` is shown as given. `dots={false}` leaves the dots out; `slideWidth="auto"`, `bleed`, `loop`, `autoplay` and `free` make it a strip. Register `ds-carousel` in the browser before hydration.
+
+## Constraints it keeps
+
+<ConstraintList component="ds-carousel" />

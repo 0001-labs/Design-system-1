@@ -10,7 +10,7 @@ const kinds = mode === 'windows'
     <h3>{label}</h3>
     {['light', 'dark'].map(appearance => <figure>
       <figcaption>{appearance === 'light' ? 'Light' : 'Dark'}</figcaption>
-      <div class="platform-scroll" tabindex="0" aria-label={`${label}, ${appearance} appearance`}>
+      <div class="platform-fit" aria-label={`${label}, ${appearance} appearance`}>
         {mode === 'windows' ? <ds-window kind={kind} appearance={appearance} label="Room shop" address="shop.example" class="window-example">
           <iframe title={`${label} shop preview, ${appearance}`} src="/examples/layouts/shop/" loading="lazy"></iframe>
         </ds-window> : <div class:list={['chrome-example', { phone: kind === 'ios' || kind === 'safari-ios' }]} data-appearance={appearance}>
@@ -29,9 +29,11 @@ const kinds = mode === 'windows'
   section { margin-block: calc(2 * var(--site-unit)); }
   h3, figcaption { margin: 0 0 var(--site-unit); font: inherit; }
   figure { margin: 0 0 var(--site-unit); min-width: 0; }
-  .platform-scroll { max-width: 100%; overflow-x: auto; border: 1px solid var(--ds-line); }
-  .window-example { min-width: 600px; height: 400px; }
-  .chrome-example { min-width: 600px; background: white; color: black; }
-  .chrome-example.phone { min-width: 393px; }
+  /* Each mockup is as wide as the column and cut at its edge on a narrow screen: nothing scrolls sideways
+     outside a carousel (carousel.sideways-scroll). */
+  .platform-fit { max-width: 100%; min-width: 0; overflow: hidden; border: 1px solid var(--ds-line); }
+  .window-example { width: 100%; height: 400px; }
+  .chrome-example { width: 100%; background: white; color: black; }
+  .chrome-example.phone { max-width: 393px; }
   .chrome-example[data-appearance="dark"] { background: #1c1c1e; color: white; }
 </style>

@@ -45,8 +45,10 @@ export const ISSUE_TRACKER_EXAMPLE: LayoutExample = {
 .issue-actions { flex-wrap:wrap; }
 .issue-search { width:calc(22 * var(--ds-unit)); max-width:100%; }
 .issue-count { color:var(--ds-text-color-muted); font-variant-numeric:tabular-nums; }
-.issue-board { display:grid; grid-template-columns:repeat(4,minmax(calc(26 * var(--ds-unit)),1fr)); gap:calc(2 * var(--ds-unit)); overflow-x:auto; padding:var(--ds-unit) 2px calc(2 * var(--ds-unit)); align-items:start; }
-.issue-column { display:grid; gap:var(--ds-unit); min-width:0; }
+.issue-board { padding:var(--ds-unit) 2px calc(2 * var(--ds-unit)); }
+.issue-list { display:grid; grid-template-columns:minmax(0,1fr); gap:calc(2 * var(--ds-unit)); }
+.issue-column { display:grid; gap:var(--ds-unit); min-width:0; width:min(calc(26 * var(--ds-unit)), calc(100vw - 4 * var(--ds-unit))); }
+.issue-list .issue-column { width:auto; }
 .issue-quarter-head { min-height:calc(4 * var(--ds-unit)); padding-inline:var(--ds-unit); }
 .issue-quarter-head ds-button { margin-left:auto; }
 .issue-card { min-height:calc(12 * var(--ds-unit)); }
@@ -73,7 +75,6 @@ export const ISSUE_TRACKER_EXAMPLE: LayoutExample = {
 .issue-status[data-status="In progress"] { border:2px solid var(--ds-warning-color); background:linear-gradient(90deg,var(--ds-warning-color) 50%,transparent 50%); }
 .issue-status[data-status="Done"] { border:0; background:var(--ds-success-color); }
 .issue-status[data-status="At risk"] { border:0; background:var(--ds-danger-color); }
-.issue-board[data-view="list"] { grid-template-columns:minmax(0,1fr); }
 .issue-board[data-view="list"] .issue-card { min-height:0; }
 .issue-board[data-view="list"] .issue-card-body { min-height:0; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
 .issue-board[data-view="list"] .issue-description { display:none; }
@@ -93,8 +94,6 @@ export const ISSUE_TRACKER_EXAMPLE: LayoutExample = {
 .issue-footer { display:flex; justify-content:space-between; gap:var(--ds-unit); flex-wrap:wrap; padding-top:var(--ds-unit); color:var(--ds-text-color-muted); }
 @media(max-width:600px) {
   .issue-top > ds-text { display:none; }
-  .issue-board { grid-template-columns:repeat(4,minmax(calc(25 * var(--ds-unit)),85%)); scroll-snap-type:x proximity; }
-  .issue-column { scroll-snap-align:start; }
   .issue-board[data-view="list"] .issue-card-body { grid-template-columns:1fr; }
   .issue-board[data-view="list"] .issue-card-foot { justify-content:space-between; }
   .issue-search { width:100%; }
@@ -120,7 +119,7 @@ export const ISSUE_TRACKER_EXAMPLE: LayoutExample = {
       ${select('issue-team', 'Filter by team', ['All teams', ...teams])}</div>
       <div class="issue-actions"><ds-input variant="field" class="issue-search" id="issue-search" type="search" aria-label="Search issues" placeholder="Search issues…"></ds-input>${text('2026', 'tone="muted"')}</div>
     </div>
-    <div class="issue-board" id="issue-board" data-view="board" role="region" aria-label="Quarterly issue board" tabindex="0"></div>
+    <div class="issue-board" id="issue-board" data-view="board"><ds-carousel id="issue-strip" label="Quarters" literal slide-width="auto" buttons no-dots></ds-carousel><div id="issue-list" class="issue-list" hidden></div></div>
     <ds-empty id="issue-empty" heading="No matching issues" text="Try another search or choose All teams." hidden></ds-empty>
     <div class="issue-footer">${text('', 'id="issue-count" role="status" aria-live="polite"')}${text('Example workspace · Changes last until you reload', 'size="small" wrap')}</div>
   </section>
@@ -149,6 +148,8 @@ export const ISSUE_TRACKER_EXAMPLE: LayoutExample = {
 const issues = ${JSON.stringify(issues)};
 const root = document.querySelector('.issue-app');
 const board = document.querySelector('#issue-board');
+const strip = document.querySelector('#issue-strip');
+const list = document.querySelector('#issue-list');
 const editor = document.querySelector('#issue-editor');
 const field = name => document.querySelector('#issue-' + name);
 const escape = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
@@ -158,10 +159,12 @@ function render() {
   const query = field('search').value.trim().toLowerCase();
   const team = field('team').value;
   const matches = issues.filter(issue => (team === 'All teams' || issue.team === team) && (issue.id + ' ' + issue.title + ' ' + issue.description).toLowerCase().includes(query));
-  board.innerHTML = [1,2,3,4].map(quarter => {
+  const columns = [1,2,3,4].map(quarter => {
     const group = matches.filter(issue => issue.quarter === quarter);
     return '<section class="issue-column" aria-label="Quarter ' + quarter + '"><div class="issue-quarter-head"><ds-text literal strong>Q' + quarter + '</ds-text><ds-text literal tone="muted">2026</ds-text><span class="issue-count">' + group.length + '</span><ds-button icon data-quarter="' + quarter + '" label="Add issue to Q' + quarter + '"><ds-icon type="plus"></ds-icon></ds-button></div>' + group.map(issue => '<ds-card interactive class="issue-card" padding="medium" data-id="' + issue.id + '" aria-label="' + escape(issue.id + ': ' + issue.title + ', ' + issue.status) + '"><div class="issue-card-body"><div class="issue-card-top"><ds-icon type="' + issue.glyph + '" aria-hidden="true"></ds-icon><ds-text literal data-tooltip="' + escape(issue.title) + '">' + escape(issue.title) + '</ds-text><span class="issue-indicators"><ds-icon class="issue-health" data-status="' + issue.status + '" type="' + (issue.status === 'Planned' ? 'status' : 'health') + '" role="img" aria-label="' + issue.status + '" data-tooltip="' + issue.status + '"></ds-icon><ds-icon class="issue-milestone" data-status="' + issue.status + '" type="' + (issue.status === 'Planned' ? 'milestone-planned' : 'milestone') + '" aria-hidden="true"></ds-icon><ds-icon type="priority-' + issue.priority.toLowerCase() + '" role="img" aria-label="' + issue.priority + ' priority" data-tooltip="' + issue.priority + ' priority"></ds-icon></span></div><ds-text literal wrap tone="muted" class="issue-description">' + escape(issue.description) + '</ds-text><div class="issue-card-foot"><ds-icon type="project" aria-hidden="true"></ds-icon><ds-text literal tone="muted">' + escape(issue.team) + '</ds-text></div></div></ds-card>').join('') + '</section>';
   }).join('');
+  strip.innerHTML = columns;
+  list.innerHTML = columns;
   field('empty').hidden = matches.length > 0;
   field('count').textContent = matches.length + ' of ' + issues.length + ' issues';
 }
@@ -195,7 +198,7 @@ root.addEventListener('click', event => {
   const button = event.target.closest('ds-button');
   if (!button) return;
   if (button.dataset.page) showPage(button.dataset.page);
-  if (button.dataset.view) { board.dataset.view = button.dataset.view; root.querySelectorAll('[data-view]').forEach(item => { if (item.tagName !== 'DS-BUTTON') return; const active = item === button; item.toggleAttribute('active', active); item.setAttribute('aria-pressed', String(active)); }); }
+  if (button.dataset.view) { board.dataset.view = button.dataset.view; strip.hidden = button.dataset.view !== 'board'; list.hidden = button.dataset.view !== 'list'; root.querySelectorAll('[data-view]').forEach(item => { if (item.tagName !== 'DS-BUTTON') return; const active = item === button; item.toggleAttribute('active', active); item.setAttribute('aria-pressed', String(active)); }); }
   if (button.dataset.quarter) edit(null, Number(button.dataset.quarter));
 });
 board.addEventListener('ds-card-press', event => { const id = event.target.dataset.id; edit(issues.find(issue => issue.id === id)); });
