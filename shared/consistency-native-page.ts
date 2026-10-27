@@ -94,7 +94,7 @@ export function validateNativePage(value: unknown, context: NativePageContext): 
       if(kind==='flow'){
         keys(input,[...common,'role','direction','mobileDirection','gap','mobileGap','padding','children','disclosure']);
         block={...base,kind,direction:choice(input.direction,['column','row']),gap:integer(input.gap),padding:integer(input.padding),children:nodes(input.children,depth+1)};
-        if(input.mobileDirection!==undefined)block.mobileDirection=choice(input.mobileDirection,['column','row']);
+        if(input.mobileDirection!==undefined)block.mobileDirection=choice(input.mobileDirection,['column','row'] as const);
         if(input.mobileGap!==undefined)block.mobileGap=integer(input.mobileGap);
         if(input.role!==undefined)block.role=choice(input.role,['section','header','nav','footer','main'] as const);
         if(input.disclosure!==undefined){const disclosure=record(input.disclosure);keys(disclosure,['label','open']);block.disclosure={label:text(disclosure.label,500)};if(disclosure.open!==undefined)block.disclosure.open=boolean(disclosure.open);}
