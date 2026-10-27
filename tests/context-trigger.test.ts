@@ -50,7 +50,7 @@ test("a right press keeps its row when settling layout moves a neighbour under t
   // Chromium re-hit-tests contextmenu after a pointerdown handler settles a transform.
   const context=new MouseEvent('contextmenu',{button:2,clientX:60,clientY:30,bubbles:true,cancelable:true});
   second.dispatchEvent(context);
-  expect(open).toHaveBeenCalledWith({x:60,y:30},first,press);
+  expect(open).toHaveBeenCalledWith({x:60,y:30},first,expect.any(PointerEvent));
   expect(context.defaultPrevented).toBe(true);
 });
 
@@ -64,4 +64,17 @@ test("a removed pressed row cannot redirect a destructive action to its neighbou
   first.remove();
   second.dispatchEvent(new MouseEvent('contextmenu',{button:2,clientX:60,clientY:30,bubbles:true,cancelable:true}));
   expect(open).not.toHaveBeenCalled();
+});
+
+test("delegated context resolvers retain the initiating gesture's composed path", () => {
+  const host=document.createElement('div');host.innerHTML='<button>First</button><button>Second</button>';document.body.append(host);
+  const first=host.children[0] as HTMLElement,second=host.children[1] as HTMLElement;
+  const open=vi.fn<Parameters<typeof bindContextMenuTrigger>[1]>();
+  bindings.push(bindContextMenuTrigger(host,open,{touch:false,resolve:event=>event.composedPath().find(node=>node instanceof HTMLButtonElement) as HTMLElement ?? null}));
+  const press=new PointerEvent('pointerdown',{pointerType:'mouse',button:2,clientX:60,clientY:30,bubbles:true});
+  first.dispatchEvent(press);
+  // Browser Event.composedPath() becomes empty when dispatch finishes.
+  press.composedPath=()=>[];
+  second.dispatchEvent(new MouseEvent('contextmenu',{button:2,clientX:60,clientY:30,bubbles:true,cancelable:true}));
+  expect(open).toHaveBeenCalledWith({x:60,y:30},first,expect.any(PointerEvent));
 });
