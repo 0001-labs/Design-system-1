@@ -100,8 +100,8 @@
     }
   },
   "Flavo website": {
-    "commit": "c8e106f6b569888ccb2d9aad1612fe8f1b45279a",
-    "version": "0.5.1",
+    "commit": "83f3e5d72a9de709dc8679bea7ba2571dba81196",
+    "version": "0.6.0",
     "owned": ["packages/consistency/src/sites/flavo"],
     "files": {
       "packages/consistency/src/sites/flavo/README.md": "5329adcd56576dea8e3e13b708f5d2a55b0c513bd45d9ac333d318a72cdae4f8",
