@@ -51,6 +51,8 @@ try {
   const toggle = page.getByRole('switch', { name: 'Publish Shop', exact: true });
   await toggle.click(); await page.waitForFunction(() => document.querySelector('[aria-label="Publish Shop"]').getAttribute('aria-checked') === 'false');
   refuse = true; await toggle.click(); await page.locator('[role="alert"]').waitFor(); assert.equal(await toggle.getAttribute('aria-checked'), 'false'); refuse = false; await toggle.click(); await page.waitForFunction(() => document.querySelector('[aria-label="Publish Shop"]').getAttribute('aria-checked') === 'true');
+  assert.equal(await page.locator('.system-examples ds-card').first().evaluate(card => card.getBoundingClientRect().height < 400), true, 'Example cards stay compact');
+  assert.equal(await page.locator('.system-preview').first().evaluate(preview => preview.getBoundingClientRect().width <= preview.closest('ds-card').getBoundingClientRect().width), true, 'Previews fit their cards');
   await page.screenshot({ path: '.reports/system-site/examples.png', fullPage: false });
   assert.deepEqual(await page.evaluate(() => window.measure()), []);
   await page.goto(base + 'fixture?section=Constraints'); await page.locator('#C004').waitFor();
@@ -61,6 +63,11 @@ try {
   assert.equal(await mobile.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
   assert.deepEqual(await mobile.evaluate(() => window.measure()), []);
   await mobile.screenshot({ path: '.reports/system-site/phone.png', fullPage: false });
+  for (const width of [375, 393, 430]) {
+    await mobile.setViewportSize({ width, height: 844 });
+    assert.equal(await mobile.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+    assert.deepEqual(await mobile.evaluate(() => window.measure()), []);
+  }
   await mobile.goto(base + 'fixture?section=Constraints'); await mobile.locator('#C004').waitFor();
   assert.equal(await mobile.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
   assert.deepEqual(errors, []); console.log('System browser acceptance passed.');
