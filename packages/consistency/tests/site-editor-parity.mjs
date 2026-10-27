@@ -217,7 +217,7 @@ try {
   await page.keyboard.press('Escape');
   const canvasContentGeometry = await region.evaluate(element => {
     const columns = [...element.querySelectorAll('.aa-columns .aa-column')];
-    return { tableRatio: element.querySelector('table').getBoundingClientRect().width / element.querySelector('aa-editor').getBoundingClientRect().width, columnStart: columns[1].querySelector('.aa-block').getBoundingClientRect().top - columns[0].querySelector('.aa-block').getBoundingClientRect().top };
+    return { tableRatio: element.querySelector('[data-kind=table]').getBoundingClientRect().width / element.querySelector('aa-editor').getBoundingClientRect().width, columnStart: columns[1].querySelector('.aa-block').getBoundingClientRect().top - columns[0].querySelector('.aa-block').getBoundingClientRect().top };
   });
   const savedNative = structuredClone(regionState());
   const html = await fixture.publicHTML();
@@ -247,11 +247,16 @@ try {
   const publishedPicture = publicRegion.getByRole('img', { name: 'Catalogue picture', exact: true });
   await publishedPicture.scrollIntoViewIfNeeded(); await publishedPicture.evaluate(image => image.decode());
   await published.screenshot({ path: '/tmp/c9y-parity-public-native.png' });
+  await published.setViewportSize({width:390,height:1000});
+  check(!await published.evaluate(() => document.documentElement.scrollWidth > innerWidth), 'Published native content overflows at390');
   await published.close();
   await page.reload(); await region.locator('ds-card').waitFor();
   check(JSON.stringify(regionState()) === JSON.stringify(savedNative), 'Reopening changed the native document');
   check(await region.locator('[aria-label="card title"]').innerText() === 'A saved native title', 'Reopening lost the edited native title');
   await page.screenshot({ path: '/tmp/c9y-parity-site-native.png' });
+  await page.setViewportSize({width:390,height:1000});
+  check(!await page.evaluate(() => document.documentElement.scrollWidth > innerWidth) && !await frame.locator('html').evaluate(element=>element.scrollWidth>element.clientWidth), 'Native canvas content overflows at390');
+  await page.setViewportSize({width:1440,height:1000});
 
   // Adding content opens the actual Aa picker, including the approved native atoms.
   await openSectionMenu(); await page.getByRole('menuitem', { name: 'Add content', exact: true }).click();

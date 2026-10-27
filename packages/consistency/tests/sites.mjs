@@ -35,7 +35,7 @@ const documents = {
     <form action="https://evil.test/"><button id="send">Send</button></form>
     <details><summary><span data-cms="dddddddddddd">A question?</span> <i id="toggle">+</i></summary><p data-cms="aaaaaaaaaaaa">The answer</p></details>
     <img src="x" onerror="document.body.dataset.ran=1"><script>document.body.dataset.ran = 1</script></body></html>`,
-  '/en/': `<!doctype html><html><head><title>CPH Raft</title></head><body><h1 data-cms="eeeeeeeeeeee">Welcome</h1></body></html>`,
+  '/en/': `<!doctype html><html><head><title>CPH Raft</title></head><body><nav><a id="home" href="https://cphraft.c9y.site/">Home</a></nav><h1 data-cms="eeeeeeeeeeee">Welcome</h1></body></html>`,
 };
 const browser = await chromium.launch({ headless: true });
 const fail = message => { throw new Error(message); };
@@ -130,11 +130,11 @@ try {
   await frame.locator('#english').click();
   await frame.locator('h1[data-cms="eeeeeeeeeeee"]').waitFor();
   if (edits.at(-1)?.markdown !== 'Hello there!') fail('Following a link did not save the words first');
-  if (await page.locator('ds-select select').inputValue() !== '/en/') fail('The page picker did not follow');
+  if (await page.locator('consistency-site-editor').evaluate(editor => editor.path) !== '/en/') fail('The editor did not follow the site page');
   if (!asked.includes('GET page?path=%2Fen%2F')) fail('The followed page was not read');
 
-  // The page picker reopens saved words. Typing saves without a Save button, and a slower response keeps later typing.
-  await page.locator('ds-select select').selectOption('/');
+  // The site’s own navigation reopens saved words. Typing saves without a Save button, and a slower response keeps later typing.
+  await frame.locator('#home').click();
   await frame.locator(`h1[data-cms="${H1}"]`).waitFor();
   if (await frame.locator(`h1[data-cms="${H1}"]`).innerText() !== 'Hello there!') fail('Reopening lost the saved heading');
   await frame.locator(`h1[data-cms="${H1}"]`).click();
