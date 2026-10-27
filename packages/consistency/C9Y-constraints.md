@@ -6,6 +6,18 @@ Each rule names the test that holds it. While editing a site, a drag that breaks
 
 ## Rules
 
+### `native.gutters`
+
+Native gallery guides cover only the real whitespace between overlapping tracks or complete rows, including after scrolling; they never cross product content.
+
+Held by `src/native-page-model.test.ts`: “maps two featured and three ordinary gallery items to actual whitespace”.
+
+### `native.publication`
+
+A native page edits the same typed blocks and responsive measures that publication renders, with each block owning its mobile defaults and every saved gesture surviving reopening.
+
+Held by `tests/native-page.mjs`: “Native page: real model/scroll/public geometry”.
+
 ### `drag.one-movement`
 
 While a block is carried, the blocks around it move out of the way once for each change of place, straight to where the dropped order will draw them, and nothing moves again on release.

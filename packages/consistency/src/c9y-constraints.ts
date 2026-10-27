@@ -22,6 +22,16 @@ export type C9yConstraint = {
 
 export const C9Y_CONSTRAINTS: C9yConstraint[] = [
   {
+    code: 'native.gutters',
+    rule: 'Native gallery guides cover only the real whitespace between overlapping tracks or complete rows, including after scrolling; they never cross product content.',
+    check: { file: 'src/native-page-model.test.ts', test: 'maps two featured and three ordinary gallery items to actual whitespace' },
+  },
+  {
+    code: 'native.publication',
+    rule: 'A native page edits the same typed blocks and responsive measures that publication renders, with each block owning its mobile defaults and every saved gesture surviving reopening.',
+    check: { file: 'tests/native-page.mjs', test: 'Native page: real model/scroll/public geometry' },
+  },
+  {
     code: 'drag.one-movement',
     rule: 'While a block is carried, the blocks around it move out of the way once for each change of place, straight to where the dropped order will draw them, and nothing moves again on release.',
     why: 'Someone dragging is rearranging the layout; a page that lands and then corrects itself has guessed wrong in front of them. Drag measures each list\'s flow at lift (sizes, margins, gap, collapsing margins) so the room it makes is the layout the drop commits.',
