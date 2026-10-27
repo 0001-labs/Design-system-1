@@ -17952,13 +17952,19 @@ function cm(e, t = {}) {
 			}
 		}), u && (e.dataset.listening = "", l(q("Listening…")), r.append(a), d = Vp(a, n.defaultView));
 	}, f = (e) => {
-		if (!e.isComposing) {
+		if (!(e.isComposing || e.defaultPrevented)) {
 			if (u) {
 				if (e.key === "Escape") {
 					e.preventDefault(), e.stopPropagation(), u.abort();
 					return;
 				}
 				u.stop();
+			} else if ((/Mac|iPhone|iPad/.test(n.defaultView?.navigator.platform ?? navigator.platform) ? e.metaKey : e.ctrlKey) && !e.altKey && !e.shiftKey && e.key.toLowerCase() === "a") {
+				e.preventDefault(), e.stopPropagation();
+				let t = n.createRange();
+				t.selectNodeContents(r);
+				let i = n.getSelection();
+				i?.removeAllRanges(), i?.addRange(t);
 			} else e.key === " " && i && !s().trim() && !e.metaKey && !e.ctrlKey && !e.altKey && r.isContentEditable && (e.preventDefault(), d());
 		}
 	}, p = () => {
