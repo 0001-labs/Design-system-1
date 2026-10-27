@@ -73,7 +73,9 @@ export function bindContextMenuTrigger(
         return typeof value === "function" ? value.bind(target) : value;
       },
     }) : event;
-    if (gesture !== event && (!(gesture.target instanceof doc.defaultView!.Node) || !trigger.contains(gesture.target))) return;
+    // Adopted controls retain their creating realm’s prototype; ownerDocument
+    // alone cannot choose an instanceof constructor. Containment stays authoritative.
+    if (gesture !== event && (typeof (gesture.target as Node | null)?.nodeType !== "number" || !trigger.contains(gesture.target as Node))) return;
     const control = resolve(gesture); if (!control || !enabled(control)) return;
     cancel();
     if (suppressed === control) { event.preventDefault(); return; }
