@@ -1,5 +1,8 @@
 import { nativeRegionStyles, renderNativeRegion, validateNativeRegion } from './consistency-native-content';
+import { TONES, sectionDefinition, SECTION_KINDS, isSlot, type Tone, type FieldDefinition, type SlotDefinition, type MemberDefinition, type KindDefinition } from './consistency-vocabulary';
 import pageStyles from './consistency-native-page.css?raw';
+import headerStyles from '../DS1/1-root/header.css?raw';
+import footerStyles from '../DS1/1-root/footer.css?raw';
 
 export interface NativeBlockBase { id: string; width?: number; hidden?: boolean; locale?: string }
 export interface NativeFlow extends NativeBlockBase {
@@ -27,7 +30,64 @@ export interface NativeCollection extends NativeBlockBase {
 }
 export type NativeRuntimeProps = Record<string, string | number | boolean | null>;
 export interface NativeRuntime extends NativeBlockBase { kind: 'runtime'; name: string; props: NativeRuntimeProps }
-export type NativeBlock = NativeFlow | NativeGrid | NativeContent | NativeImage | NativeLink | NativeCollection | NativeRuntime;
+export type NativePrimitive = NativeFlow | NativeGrid | NativeContent | NativeImage | NativeLink | NativeCollection | NativeRuntime;
+
+/*
+ * Sections: typed blocks above the primitives. A section has appearance fields in whole squares and
+ * named slots; the renderer expands it to the primitives' markup, so geometry, selection and
+ * publication keep one model. No section carries CSS, HTML or a colour: a tone is a name the site's
+ * library defines. `shared/consistency-vocabulary.ts` holds every field's range and every slot.
+ */
+export type { Tone } from './consistency-vocabulary';
+export type NativeWords = string;
+export interface NativePicture { src: string; alt: string; fit?: 'contain' | 'cover'; href?: string }
+export interface NativeAction { text: string; href: string; appearance?: 'plain' | 'default' | 'primary' | 'secondary' }
+export interface NativeLine { text: string; href?: string }
+export interface NativeLanguage { text: string; href: string; picture?: NativePicture }
+export interface NativeRuntimeSlot { name: string; props: NativeRuntimeProps }
+export interface NativeHero extends NativeBlockBase {
+  kind: 'hero'; height?: number; panel?: 'left' | 'centre' | 'right'; panelTone?: Tone; level?: number; fit?: 'cover' | 'contain';
+  picture: NativePicture; logo?: NativePicture; kicker?: NativeWords; title: NativeWords; text?: NativeWords; actions?: NativeAction[];
+}
+export interface NativeSplit extends NativeBlockBase {
+  kind: 'split'; reverse?: boolean; panelTone?: Tone; ratio?: '1:1' | '2:1'; imageHeight?: number;
+  picture: NativePicture; heading: NativeWords; text?: NativeWords; actions?: NativeAction[];
+}
+export interface NativeStatement extends NativeBlockBase {
+  kind: 'statement'; measure?: 'reading' | 'wide'; panel?: Tone; align?: 'start' | 'centre';
+  heading?: NativeWords; text: NativeWords; actions?: NativeAction[];
+}
+export interface NativePanels extends NativeBlockBase { kind: 'panels'; columns?: number; gap?: number; items: NativeHero[] }
+export interface NativeCardItem { label?: NativeWords; title: NativeWords; text?: NativeWords; picture?: NativePicture; action?: NativeAction }
+export interface NativeCards extends NativeBlockBase {
+  kind: 'cards'; columns?: number; height?: number; tone?: Tone; variant?: 'filled' | 'outlined'; items: NativeCardItem[];
+}
+export interface NativeGallery extends NativeBlockBase {
+  kind: 'gallery'; columns?: number; height?: number; strip?: boolean; fit?: 'cover' | 'contain'; pictures: NativePicture[];
+}
+export interface NativeBentoItem { title: NativeWords; text?: NativeWords; picture?: NativePicture; action?: NativeAction; tone?: Tone }
+export interface NativeBento extends NativeBlockBase { kind: 'bento'; columns?: number; rhythm?: 'even' | 'featured'; height?: number; items: NativeBentoItem[] }
+export interface NativeQuestionItem { question: string; answer: NativeWords }
+export interface NativeQuestions extends NativeBlockBase { kind: 'questions'; open?: 'first' | 'none'; heading?: NativeWords; items: NativeQuestionItem[] }
+export interface NativeFactItem { term: NativeWords; value: NativeWords }
+export interface NativeFacts extends NativeBlockBase { kind: 'facts'; columns?: number; items: NativeFactItem[] }
+export interface NativeListItem { name: string; line?: NativeWords; value?: string; date?: string; href?: string }
+export interface NativeList extends NativeBlockBase { kind: 'list'; dated?: boolean; grouped?: boolean; items?: NativeListItem[]; collection?: string }
+export interface NativeCallToAction extends NativeBlockBase { kind: 'action'; size?: 'medium' | 'large'; align?: 'start' | 'centre'; button: NativeAction }
+export interface NativeHeader extends NativeBlockBase {
+  kind: 'header'; sticky?: boolean; fold?: number;
+  logo: NativePicture; name?: NativeWords; links: NativeAction[]; languages?: NativeLanguage[]; menu?: NativeRuntimeSlot;
+}
+export interface NativeFooterColumn { heading?: string; href?: string; width?: number; lines: NativeLine[] }
+export interface NativeFooter extends NativeBlockBase {
+  kind: 'footer'; columnWidth?: number; line?: boolean;
+  brand?: NativePicture; tagline?: NativeWords; columns: NativeFooterColumn[]; legal?: NativeWords;
+  policies?: NativeAction[]; languages?: NativeLanguage[]; follow?: NativeAction[]; preferences?: NativeRuntimeSlot;
+}
+export type NativeSection = NativeHero | NativeSplit | NativeStatement | NativePanels | NativeCards | NativeGallery | NativeBento | NativeQuestions | NativeFacts | NativeList | NativeCallToAction | NativeHeader | NativeFooter;
+export type NativeBlock = NativePrimitive | NativeSection;
+export const isNativeSection = (block: NativeBlock): block is NativeSection => (SECTION_KINDS as readonly string[]).includes(block.kind);
+
 export interface NativePageDocument {
   schema: 1; kind: 'native-page';
   title?: string; description?: string; lang?: string;
@@ -49,24 +109,32 @@ export interface NativePageRenderOptions {
   runtime?: (block: NativeRuntime) => string;
   collectionAction?: (block: NativeCollection, item: NativeCollectionItem) => string;
   editor?: boolean;
+  /** The page's language, for dates; the document's `lang` when a page is rendered. */
+  lang?: string;
+  /** The address being shown: a link to it is marked `aria-current="page"`, which is never stored. */
+  currentPath?: string;
 }
-export const nativePageStyles = nativeRegionStyles + '\n' + pageStyles;
+const dropImports = (sheet: string) => sheet.replace(/^@import[^;]+;\s*/gm, '');
+export const nativePageStyles = nativeRegionStyles + '\n' + dropImports(headerStyles) + '\n' + dropImports(footerStyles) + '\n' + pageStyles;
 
-const invalid = (): never => { throw new Error('invalid-native-page'); };
-const record = (value: unknown): Record<string, unknown> => value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : invalid();
-function keys(value: Record<string, unknown>, allowed: readonly string[]) { if (Object.keys(value).some(key => !allowed.includes(key))) invalid(); }
-const text = (value: unknown, maximum: number) => typeof value === 'string' && value.length <= maximum && !value.includes('\0') ? value : invalid();
-const integer = (value: unknown, maximum = 2000, minimum = 0) => typeof value === 'number' && Number.isSafeInteger(value) && value >= minimum && value <= maximum ? value : invalid();
-const choice = <T extends string>(value: unknown, choices: readonly T[]): T => typeof value === 'string' && choices.includes(value as T) ? value as T : invalid();
-const boolean = (value: unknown) => typeof value === 'boolean' ? value : invalid();
+/** The error's message stays `invalid-native-page`; `reason` says what was refused, for a person or a model. */
+export interface NativePageRefusal extends Error { reason?: string }
+const invalid = (reason?: string): never => { throw Object.assign(new Error('invalid-native-page'), reason ? { reason } : {}) as NativePageRefusal; };
+const record = (value: unknown, reason?: string): Record<string, unknown> => value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : invalid(reason);
+function keys(value: Record<string, unknown>, allowed: readonly string[], path?: string) { const extra = Object.keys(value).find(key => !allowed.includes(key)); if (extra !== undefined) invalid(path ? `${path}: "${extra}" is not a field or slot of this kind` : undefined); }
+const text = (value: unknown, maximum: number, reason?: string) => typeof value === 'string' && value.length <= maximum && !value.includes('\0') ? value : invalid(reason);
+const integer = (value: unknown, maximum = 2000, minimum = 0, reason?: string) => typeof value === 'number' && Number.isSafeInteger(value) && value >= minimum && value <= maximum ? value : invalid(reason);
+const choice = <T extends string>(value: unknown, choices: readonly T[], reason?: string): T => typeof value === 'string' && choices.includes(value as T) ? value as T : invalid(reason);
+const boolean = (value: unknown, reason?: string) => typeof value === 'boolean' ? value : invalid(reason);
 const escape = (value: string) => value.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
-function address(value: unknown, image = false): string {
-  const source = text(value, 4000);
-  if (!source || /[\u0000-\u0020\u007f\\<>]/.test(source) || source.startsWith('//')) return invalid();
+function address(value: unknown, image = false, reason?: string): string {
+  const source = text(value, 4000, reason);
+  if (!source || /[\u0000- \u007f\\<>]/.test(source) || source.startsWith('//')) return invalid(reason);
   if (/^https?:\/\//i.test(source) || /^\/(?!\/)/.test(source) || !image && (/^(?:mailto:|tel:|#)/i.test(source) || !/^[a-z][a-z0-9+.-]*:/i.test(source))) return source;
-  return invalid();
+  return invalid(reason);
 }
 const measure = (value: number) => `calc(${value}px * var(--sf,1))`;
+const squares = (value: number) => measure(value * 20);
 
 /** Native documents contain only closed blocks. Binding registries belong to the site's trusted code. */
 export function validateNativePage(value: unknown, context: NativePageContext): NativePageDocument {
@@ -79,68 +147,153 @@ export function validateNativePage(value: unknown, context: NativePageContext): 
   if (source.description !== undefined) result.description=text(source.description,2000);
   if (source.lang !== undefined) { result.lang=text(source.lang,20); if(!/^[a-z]{2,3}(?:-[A-Z]{2})?$/.test(result.lang)) return invalid(); }
   const ids=new Set<string>(), ancestors=new Set<unknown>(); let count=0;
+  const common=['id','kind','width','hidden','locale'];
+  const picture=(value:unknown,path:string):NativePicture=>{
+    const input=record(value,`${path}: a picture is { src, alt, fit?, href? }`);keys(input,['src','alt','fit','href'],path);
+    const src=address(input.src,true,`${path}.src: not an image address`);if(src.startsWith('/')&&!context.images.includes(src))return invalid(`${path}.src: "${src}" is not one of the page's images`);
+    const result:NativePicture={src,alt:text(input.alt,1000,`${path}.alt: words of at most 1000 characters`)};
+    if(input.fit!==undefined)result.fit=choice(input.fit,['contain','cover'] as const,`${path}.fit: cover or contain`);
+    if(input.href!==undefined)result.href=address(input.href,false,`${path}.href: not a safe address`);
+    return result;
+  };
+  const action=(value:unknown,path:string):NativeAction=>{
+    const input=record(value,`${path}: an action is { text, href, appearance? }`);keys(input,['text','href','appearance'],path);
+    const result:NativeAction={text:text(input.text,1000,`${path}.text: words of at most 1000 characters`),href:address(input.href,false,`${path}.href: not a safe address`)};
+    if(input.appearance!==undefined)result.appearance=choice(input.appearance,['plain','default','primary','secondary'] as const,`${path}.appearance: plain, default, primary or secondary`);
+    return result;
+  };
+  const runtimeSlot=(value:unknown,path:string):NativeRuntimeSlot=>{
+    const input=record(value,`${path}: a runtime is { name, props }`);keys(input,['name','props'],path);
+    const name=text(input.name,80,`${path}.name`),allowed=context.runtimes[name];if(!allowed)return invalid(`${path}.name: "${name}" is not a registered runtime`);
+    const props=record(input.props,`${path}.props: a record`);keys(props,allowed,`${path}.props`);const clean:NativeRuntimeProps={};
+    for(const[key,item]of Object.entries(props)){
+      if(typeof item==='string')clean[key]=text(item,4000,`${path}.props.${key}`);else if(typeof item==='boolean'||item===null)clean[key]=item;
+      else if(typeof item==='number'&&Number.isFinite(item)&&Math.abs(item)<=1e9)clean[key]=item;else return invalid(`${path}.props.${key}: a string, number, boolean or null`);
+    }
+    return{name,props:clean};
+  };
+  const field=(value:unknown,definition:FieldDefinition,path:string):unknown=>{
+    const range=`${definition.min} to ${definition.max}`;
+    switch(definition.type){
+      case 'squares':{const result=integer(value,definition.max,definition.min,`${path}: ${String(value)} is not a whole number of squares from ${range}`);if(definition.step&&(result-definition.min!)%definition.step)return invalid(`${path}: ${result} is not on the step of ${definition.step} squares from ${definition.min}`);return result;}
+      case 'pixels':case 'integer':return integer(value,definition.max,definition.min,`${path}: ${String(value)} is not a whole number from ${range}`);
+      case 'boolean':return boolean(value,`${path}: true or false`);
+      case 'choice':return choice(value,definition.choices!,`${path}: "${String(value)}" is not one of ${definition.choices!.join(', ')}`);
+      case 'tone':return choice(value,TONES,`${path}: "${String(value)}" is not a tone (${TONES.join(', ')})`);
+      case 'text':return text(value,definition.max??1000,`${path}: words of at most ${definition.max??1000} characters`);
+      case 'date':{const day=text(value,10,`${path}: a day as YYYY-MM-DD`);if(!/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(day)||Number.isNaN(Date.parse(day)))return invalid(`${path}: "${day}" is not a day as YYYY-MM-DD`);return day;}
+      case 'address':return address(value,false,`${path}: not a safe address`);
+      default:return invalid(`${path}: this field cannot be set on a section`);
+    }
+  };
+  const members=(value:unknown,definitions:Record<string,MemberDefinition>,path:string,depth:number):Record<string,unknown>=>{
+    const input=record(value,`${path}: a record`);keys(input,Object.keys(definitions),path);const result:Record<string,unknown>={};
+    for(const[name,definition]of Object.entries(definitions)){
+      const item=input[name];
+      if(item===undefined){if(definition.required)return invalid(`${path}.${name} is required`);continue;}
+      result[name]=isSlot(definition)?slot(item,definition,`${path}.${name}`,depth):field(item,definition,`${path}.${name}`);
+    }
+    return result;
+  };
+  const list=(value:unknown,definition:SlotDefinition,path:string):unknown[]=>{
+    if(!Array.isArray(value))return invalid(`${path}: a list`);
+    if(definition.min!==undefined&&value.length<definition.min)return invalid(`${path}: at least ${definition.min}`);
+    if(value.length>(definition.max??100))return invalid(`${path}: at most ${definition.max??100}`);
+    return value;
+  };
+  const slot=(value:unknown,definition:SlotDefinition,path:string,depth:number):unknown=>{
+    switch(definition.type){
+      case 'words':{const source=text(value,24000,`${path}: Markdown of at most 24000 characters`);try{validateNativeRegion(source,context.images);}catch{return invalid(`${path}: the Markdown has a picture, link or atom the page cannot publish`);}return source;}
+      case 'picture':return picture(value,path);
+      case 'action':return action(value,path);
+      case 'actions':return list(value,definition,path).map((item,index)=>action(item,`${path}[${index}]`));
+      case 'pictures':return list(value,definition,path).map((item,index)=>picture(item,`${path}[${index}]`));
+      case 'links':return list(value,definition,path).map((item,index)=>{const input=record(item,`${path}[${index}]: a line is { text, href? }`);keys(input,['text','href'],`${path}[${index}]`);const line:NativeLine={text:text(input.text,500,`${path}[${index}].text`)};if(input.href!==undefined)line.href=address(input.href,false,`${path}[${index}].href: not a safe address`);return line;});
+      case 'languages':return list(value,definition,path).map((item,index)=>{const input=record(item,`${path}[${index}]: a language is { text, href, picture? }`);keys(input,['text','href','picture'],`${path}[${index}]`);const language:NativeLanguage={text:text(input.text,200,`${path}[${index}].text`),href:address(input.href,false,`${path}[${index}].href: not a safe address`)};if(input.picture!==undefined)language.picture=picture(input.picture,`${path}[${index}].picture`);return language;});
+      case 'runtime':return runtimeSlot(value,path);
+      case 'collection':{const binding=text(value,200,`${path}: a collection's name`);if(!context.collections.includes(binding))return invalid(`${path}: "${binding}" is not a registered collection`);return binding;}
+      case 'items':return list(value,definition,path).map((item,index)=>members(item,definition.item!,`${path}[${index}]`,depth));
+      case 'heroes':return list(value,definition,path).map((item,index)=>{const block=node(item,depth+1);if(block.kind!=='hero')return invalid(`${path}[${index}]: only a hero stands in panels, not a ${block.kind}`);return block;});
+    }
+  };
+  const section=(input:Record<string,unknown>,definition:KindDefinition,base:NativeBlockBase,depth:number):NativeSection=>{
+    const path=`${definition.kind} ${base.id}`;
+    keys(input,[...common,...Object.keys(definition.fields),...Object.keys(definition.slots)],path);
+    const block:Record<string,unknown>={...base,kind:definition.kind};
+    for(const[name,fieldDefinition]of Object.entries(definition.fields))if(input[name]!==undefined)block[name]=field(input[name],fieldDefinition,`${path}.${name}`);
+    for(const[name,slotDefinition]of Object.entries(definition.slots)){
+      if(input[name]===undefined){if(slotDefinition.required)return invalid(`${path}.${name} is required`);continue;}
+      block[name]=slot(input[name],slotDefinition,`${path}.${name}`,depth);
+    }
+    if(definition.oneOf&&definition.oneOf.filter(name=>input[name]!==undefined).length!==1)return invalid(`${path}: exactly one of ${definition.oneOf.join(' or ')}`);
+    return block as unknown as NativeSection;
+  };
+  const node=(value:unknown,depth:number):NativeBlock=>{
+    if(depth>12)return invalid();
+    const input=record(value); if(++count>500||ancestors.has(input))return invalid(); ancestors.add(input);
+    const id=text(input.id,80);if(!/^[a-zA-Z][a-zA-Z0-9_-]{0,79}$/.test(id)||ids.has(id))return invalid(ids.has(id)?`id "${id}" is used twice`:undefined);ids.add(id);
+    const kind=choice(input.kind,['flow','grid','content','image','link','collection','runtime',...SECTION_KINDS] as const,`"${String(input.kind)}" is not a block kind`);
+    const base:NativeBlockBase={id};
+    if(input.width!==undefined)base.width=integer(input.width,10000,20);
+    if(input.hidden!==undefined)base.hidden=boolean(input.hidden);
+    if(input.locale!==undefined){base.locale=text(input.locale,20);if(!/^[a-z]{2,3}(?:-[A-Z]{2})?$/.test(base.locale))return invalid();}
+    let block:NativeBlock;
+    if(kind==='flow'){
+      keys(input,[...common,'role','direction','mobileDirection','gap','mobileGap','padding','children','disclosure']);
+      block={...base,kind,direction:choice(input.direction,['column','row']),gap:integer(input.gap),padding:integer(input.padding),children:nodes(input.children,depth+1)};
+      if(input.mobileDirection!==undefined)block.mobileDirection=choice(input.mobileDirection,['column','row'] as const);
+      if(input.mobileGap!==undefined)block.mobileGap=integer(input.mobileGap);
+      if(input.role!==undefined)block.role=choice(input.role,['section','header','nav','footer','main'] as const);
+      if(input.disclosure!==undefined){const disclosure=record(input.disclosure);keys(disclosure,['label','open']);block.disclosure={label:text(disclosure.label,500)};if(disclosure.open!==undefined)block.disclosure.open=boolean(disclosure.open);}
+    }else if(kind==='grid'){
+      keys(input,[...common,'columns','mobileColumns','columnGap','rowGap','children']);
+      block={...base,kind,columns:integer(input.columns,12,1),columnGap:integer(input.columnGap),rowGap:integer(input.rowGap),children:nodes(input.children,depth+1)};
+      if(input.mobileColumns!==undefined)block.mobileColumns=integer(input.mobileColumns,6,1);
+    }else if(kind==='content'){
+      keys(input,[...common,'source','gaps','binding']);
+      const content=text(input.source,24000),gaps=input.gaps===undefined?undefined:record(input.gaps) as Record<string,number>;
+      validateNativeRegion(content,context.images,gaps,id);
+      block={...base,kind,source:content,...(gaps?{gaps:{...gaps}}:{})};
+      if(input.binding!==undefined){const binding=text(input.binding,200);if(!context.bindings?.includes(binding))return invalid();block.binding=binding;}
+    }else if(kind==='image'){
+      keys(input,[...common,'src','alt','height','mobileHeight','fit','href']);
+      const src=address(input.src,true);if(src.startsWith('/')&&!context.images.includes(src))return invalid();
+      block={...base,kind,src,alt:text(input.alt,1000)};
+      if(input.height!==undefined)block.height=integer(input.height,2000,20);
+      if(input.mobileHeight!==undefined)block.mobileHeight=integer(input.mobileHeight,2000,20);
+      if(input.fit!==undefined)block.fit=choice(input.fit,['contain','cover'] as const);
+      if(input.href!==undefined)block.href=address(input.href);
+    }else if(kind==='link'){
+      keys(input,[...common,'text','href','appearance','binding']);block={...base,kind,text:text(input.text,1000),href:address(input.href)};
+      if(input.appearance!==undefined)block.appearance=choice(input.appearance,['plain','default','primary','secondary'] as const);
+      if(input.binding!==undefined){const binding=text(input.binding,200);if(!context.bindings?.includes(binding))return invalid();block.binding=binding;}
+    }else if(kind==='collection'){
+      keys(input,[...common,'binding','layout','columns','featured','columnGap','rowGap','imageHeight','featuredImageHeight','mobileImageHeight','fit']);
+      const binding=text(input.binding,200);if(!context.collections.includes(binding))return invalid();
+      block={...base,kind,binding,layout:choice(input.layout,['grid','gallery']),columns:integer(input.columns,6,1),featured:integer(input.featured,6),columnGap:integer(input.columnGap),rowGap:integer(input.rowGap),imageHeight:integer(input.imageHeight,2000,20),fit:choice(input.fit,['contain','cover'])};
+      if(input.featuredImageHeight!==undefined)block.featuredImageHeight=integer(input.featuredImageHeight,2000,20);
+      if(input.mobileImageHeight!==undefined)block.mobileImageHeight=integer(input.mobileImageHeight,2000,20);
+    }else if(kind==='runtime'){
+      keys(input,[...common,'name','props']);const name=text(input.name,80),allowed=context.runtimes[name];if(!allowed)return invalid();
+      const props=record(input.props);keys(props,allowed);const clean:NativeRuntimeProps={};
+      for(const[key,value]of Object.entries(props)){
+        if(typeof value==='string')clean[key]=text(value,4000);else if(typeof value==='boolean'||value===null)clean[key]=value;
+        else if(typeof value==='number'&&Number.isFinite(value)&&Math.abs(value)<=1e9)clean[key]=value;else return invalid();
+      }
+      block={...base,kind,name,props:clean};
+    }else{
+      block=section(input,sectionDefinition(kind)!,base,depth);
+    }
+    ancestors.delete(input);return block;
+  };
   const nodes=(values:unknown, depth:number):NativeBlock[]=>{
     if(!Array.isArray(values)||depth>12||ancestors.has(values))return invalid();
     ancestors.add(values);
-    const blocks=values.map(value=>{
-      const input=record(value); if(++count>500||ancestors.has(input))return invalid(); ancestors.add(input);
-      const id=text(input.id,80);if(!/^[a-zA-Z][a-zA-Z0-9_-]{0,79}$/.test(id)||ids.has(id))return invalid();ids.add(id);
-      const kind=choice(input.kind,['flow','grid','content','image','link','collection','runtime'] as const);
-      const base:NativeBlockBase={id};
-      if(input.width!==undefined)base.width=integer(input.width,10000,20);
-      if(input.hidden!==undefined)base.hidden=boolean(input.hidden);
-      if(input.locale!==undefined){base.locale=text(input.locale,20);if(!/^[a-z]{2,3}(?:-[A-Z]{2})?$/.test(base.locale))return invalid();}
-      const common=['id','kind','width','hidden','locale']; let block:NativeBlock;
-      if(kind==='flow'){
-        keys(input,[...common,'role','direction','mobileDirection','gap','mobileGap','padding','children','disclosure']);
-        block={...base,kind,direction:choice(input.direction,['column','row']),gap:integer(input.gap),padding:integer(input.padding),children:nodes(input.children,depth+1)};
-        if(input.mobileDirection!==undefined)block.mobileDirection=choice(input.mobileDirection,['column','row'] as const);
-        if(input.mobileGap!==undefined)block.mobileGap=integer(input.mobileGap);
-        if(input.role!==undefined)block.role=choice(input.role,['section','header','nav','footer','main'] as const);
-        if(input.disclosure!==undefined){const disclosure=record(input.disclosure);keys(disclosure,['label','open']);block.disclosure={label:text(disclosure.label,500)};if(disclosure.open!==undefined)block.disclosure.open=boolean(disclosure.open);}
-      }else if(kind==='grid'){
-        keys(input,[...common,'columns','mobileColumns','columnGap','rowGap','children']);
-        block={...base,kind,columns:integer(input.columns,12,1),columnGap:integer(input.columnGap),rowGap:integer(input.rowGap),children:nodes(input.children,depth+1)};
-        if(input.mobileColumns!==undefined)block.mobileColumns=integer(input.mobileColumns,6,1);
-      }else if(kind==='content'){
-        keys(input,[...common,'source','gaps','binding']);
-        const content=text(input.source,24000),gaps=input.gaps===undefined?undefined:record(input.gaps) as Record<string,number>;
-        validateNativeRegion(content,context.images,gaps,id);
-        block={...base,kind,source:content,...(gaps?{gaps:{...gaps}}:{})};
-        if(input.binding!==undefined){const binding=text(input.binding,200);if(!context.bindings?.includes(binding))return invalid();block.binding=binding;}
-      }else if(kind==='image'){
-        keys(input,[...common,'src','alt','height','mobileHeight','fit','href']);
-        const src=address(input.src,true);if(src.startsWith('/')&&!context.images.includes(src))return invalid();
-        block={...base,kind,src,alt:text(input.alt,1000)};
-        if(input.height!==undefined)block.height=integer(input.height,2000,20);
-        if(input.mobileHeight!==undefined)block.mobileHeight=integer(input.mobileHeight,2000,20);
-        if(input.fit!==undefined)block.fit=choice(input.fit,['contain','cover'] as const);
-        if(input.href!==undefined)block.href=address(input.href);
-      }else if(kind==='link'){
-        keys(input,[...common,'text','href','appearance','binding']);block={...base,kind,text:text(input.text,1000),href:address(input.href)};
-        if(input.appearance!==undefined)block.appearance=choice(input.appearance,['plain','default','primary','secondary'] as const);
-        if(input.binding!==undefined){const binding=text(input.binding,200);if(!context.bindings?.includes(binding))return invalid();block.binding=binding;}
-      }else if(kind==='collection'){
-        keys(input,[...common,'binding','layout','columns','featured','columnGap','rowGap','imageHeight','featuredImageHeight','mobileImageHeight','fit']);
-        const binding=text(input.binding,200);if(!context.collections.includes(binding))return invalid();
-        block={...base,kind,binding,layout:choice(input.layout,['grid','gallery']),columns:integer(input.columns,6,1),featured:integer(input.featured,6),columnGap:integer(input.columnGap),rowGap:integer(input.rowGap),imageHeight:integer(input.imageHeight,2000,20),fit:choice(input.fit,['contain','cover'])};
-        if(input.featuredImageHeight!==undefined)block.featuredImageHeight=integer(input.featuredImageHeight,2000,20);
-        if(input.mobileImageHeight!==undefined)block.mobileImageHeight=integer(input.mobileImageHeight,2000,20);
-      }else{
-        keys(input,[...common,'name','props']);const name=text(input.name,80),allowed=context.runtimes[name];if(!allowed)return invalid();
-        const props=record(input.props);keys(props,allowed);const clean:NativeRuntimeProps={};
-        for(const[key,value]of Object.entries(props)){
-          if(typeof value==='string')clean[key]=text(value,4000);else if(typeof value==='boolean'||value===null)clean[key]=value;
-          else if(typeof value==='number'&&Number.isFinite(value)&&Math.abs(value)<=1e9)clean[key]=value;else return invalid();
-        }
-        block={...base,kind,name,props:clean};
-      }
-      ancestors.delete(input);return block;
-    });
+    const blocks=values.map(value=>node(value,depth));
     ancestors.delete(values);return blocks;
   };
   result.blocks=nodes(source.blocks,0);
-  if(JSON.stringify(result).length>60000)return invalid();
+  if(JSON.stringify(result).length>60000)return invalid('the document is over 60000 characters');
   return result;
 }
 
@@ -149,6 +302,11 @@ export function nativeCollectionTracks(block: NativeCollection): { columns: numb
   const gcd=(a:number,b:number):number=>b?gcd(b,a%b):a;
   const columns=block.columns*block.featured/gcd(block.columns,block.featured);
   return{columns,ordinarySpan:columns/block.columns,featuredSpan:columns/block.featured};
+}
+/** A section field's value, or the vocabulary's default. */
+export function sectionField<T = unknown>(block: NativeSection, name: string): T {
+  const value=(block as unknown as Record<string,unknown>)[name];
+  return (value===undefined?sectionDefinition(block.kind)?.fields[name]?.default:value) as T;
 }
 /** Every measure is a model field; neither the editor nor publisher infers layout from arbitrary HTML. */
 export function nativeBlockStyles(block: NativeBlock): Record<string,string> {
@@ -167,23 +325,66 @@ export function nativeBlockStyles(block: NativeBlock): Record<string,string> {
     styles['--c9y-mobile-image-height']=block.mobileHeight===undefined?styles['--c9y-image-height']:measure(block.mobileHeight);
     styles['--c9y-image-fit']=block.fit??'contain';
   }
+  if(isNativeSection(block))Object.assign(styles,nativeSectionStyles(block));
   return styles;
 }
+/** A section's fields as custom properties, read by consistency-native-page.css; tones travel as `data-tone` names. */
+export function nativeSectionStyles(block: NativeSection): Record<string,string> {
+  const styles:Record<string,string>={};
+  const field=<T,>(name:string)=>sectionField<T>(block,name);
+  if(block.kind==='hero'){styles['--c9y-hero-height']=squares(field<number>('height'));}
+  if(block.kind==='split'){const wide=field<string>('ratio')==='2:1';styles['--c9y-split-columns']=wide?field<boolean>('reverse')?'minmax(0,1fr) minmax(0,2fr)':'minmax(0,2fr) minmax(0,1fr)':'minmax(0,1fr) minmax(0,1fr)';styles['--c9y-split-image-height']=squares(field<number>('imageHeight'));}
+  if(block.kind==='statement')styles['--c9y-statement-width']=squares(field<string>('measure')==='wide'?50:32);
+  if(block.kind==='panels'){styles['--c9y-columns']=String(field<number>('columns'));styles['--c9y-gap']=squares(field<number>('gap'));}
+  if(block.kind==='cards'){styles['--c9y-columns']=String(field<number>('columns'));styles['--c9y-card-height']=squares(field<number>('height'));}
+  if(block.kind==='gallery'){styles['--c9y-columns']=String(field<number>('columns'));styles['--c9y-gallery-height']=squares(field<number>('height'));}
+  if(block.kind==='bento'){styles['--c9y-columns']=String(field<number>('columns'));styles['--c9y-bento-height']=squares(field<number>('height'));}
+  if(block.kind==='facts')styles['--c9y-columns']=String(field<number>('columns'));
+  if(block.kind==='footer'){styles['--ds-footer-column-width']=String(field<number>('columnWidth'));if(!field<boolean>('line'))styles['--ds-footer-line']='transparent';}
+  return styles;
+}
+/** The attributes a section root carries besides its styles: names, never values the stylesheet could not check. */
+export function nativeSectionAttributes(block: NativeSection): Record<string,string> {
+  const field=<T,>(name:string)=>sectionField<T>(block,name);
+  const attrs:Record<string,string>={};
+  if(block.kind==='hero')attrs['data-panel']=field<string>('panel');
+  if(block.kind==='split'&&field<boolean>('reverse'))attrs['data-reverse']='';
+  if(block.kind==='statement'){attrs['data-align']=field<string>('align');if(block.panel)attrs['data-tone']=block.panel;}
+  if(block.kind==='cards'){attrs['data-variant']=field<string>('variant');attrs['data-tone']=field<string>('tone');}
+  if(block.kind==='gallery'&&field<boolean>('strip'))attrs['data-strip']='';
+  if(block.kind==='bento')attrs['data-rhythm']=field<string>('rhythm');
+  if(block.kind==='list'){if(field<boolean>('dated'))attrs['data-dated']='';if(field<boolean>('grouped'))attrs['data-grouped']='';}
+  if(block.kind==='action'){attrs['data-size']=field<string>('size');attrs['data-align']=field<string>('align');}
+  if(block.kind==='header')attrs['data-fold']=String(field<number>('fold'));
+  return attrs;
+}
 const styleText=(styles:Record<string,string>)=>Object.entries(styles).map(([key,value])=>`${key}:${value}`).join(';');
-export function renderNativeBlock(block: NativeBlock, options: NativePageRenderOptions = {}): string {
-  const attrs=`class="c9y-native-node c9y-native-${block.kind}${block.kind==='link'?' c9y-native-region':''}" data-native-block="${escape(block.id)}"${options.editor?` data-c9y-block="${escape(block.id)}" data-c9y-kind="${block.kind}"`:''}${block.hidden?' hidden':''}${block.locale?` data-native-locale="${block.locale}" lang="${block.locale}"`:''} style="${escape(styleText(nativeBlockStyles(block)))}"`;
+const attrText=(attrs:Record<string,string>)=>Object.entries(attrs).map(([key,value])=>value===''?` ${key}`:` ${key}="${escape(value)}"`).join('');
+
+/** Where an expanded primitive stands in its section, so the editor maps presses and handles to fields and slots. */
+export interface NativeMark { slot?: string; item?: number; classes?: string; attrs?: Record<string,string> }
+type Marks = ReadonlyMap<string,NativeMark>;
+const markText=(mark?:NativeMark)=>mark?`${mark.slot!==undefined?` data-slot="${escape(mark.slot)}"`:''}${mark.item!==undefined?` data-item="${mark.item}"`:''}${mark.attrs?attrText(mark.attrs):''}`:'';
+const markClasses=(mark?:NativeMark)=>mark?.classes?` ${mark.classes}`:'';
+const current=(options:NativePageRenderOptions,href:string)=>options.currentPath!==undefined&&href===options.currentPath?' aria-current="page"':'';
+
+export function renderNativeBlock(block: NativeBlock, options: NativePageRenderOptions = {}, mark?: NativeMark): string { return render(block,options,mark); }
+function render(block: NativeBlock, options: NativePageRenderOptions, mark?: NativeMark, marks?: Marks): string {
+  if(isNativeSection(block))return renderNativeSection(block,options,mark);
+  const child=(value:NativeBlock)=>render(value,options,marks?.get(value.id),marks);
+  const attrs=`class="c9y-native-node c9y-native-${block.kind}${block.kind==='link'?' c9y-native-region':''}${markClasses(mark)}" data-native-block="${escape(block.id)}"${options.editor?` data-c9y-block="${escape(block.id)}" data-c9y-kind="${block.kind}"`:''}${block.hidden?' hidden':''}${block.locale?` data-native-locale="${block.locale}" lang="${block.locale}"`:''}${markText(mark)} style="${escape(styleText(nativeBlockStyles(block)))}"`;
   if(block.kind==='flow'){
-    const children=block.children.map(child=>renderNativeBlock(child,options)).join('');
+    const children=block.children.map(child).join('');
     if(block.disclosure)return`<details ${attrs} data-direction="${block.direction}"${block.disclosure.open?' open':''}><summary>${escape(block.disclosure.label)}</summary><div class="c9y-native-disclosure">${children}</div></details>`;
     const tag=block.role??'section';return`<${tag} ${attrs} data-direction="${block.direction}">${children}</${tag}>`;
   }
-  if(block.kind==='grid')return`<div ${attrs}>${block.children.map(child=>renderNativeBlock(child,options)).join('')}</div>`;
+  if(block.kind==='grid')return`<div ${attrs}>${block.children.map(child).join('')}</div>`;
   if(block.kind==='content')return`<div ${attrs}><div class="c9y-native-region">${renderNativeRegion(block.source,{images:options.images,id:block.id,gaps:block.gaps})}</div></div>`;
   if(block.kind==='image'){
     const image=`<img src="${escape(address(block.src,true))}" alt="${escape(block.alt)}" loading="lazy">`;
-    return`<figure ${attrs}>${block.href?`<a href="${escape(address(block.href))}">${image}</a>`:image}</figure>`;
+    return`<figure ${attrs}>${block.href?`<a href="${escape(address(block.href))}"${current(options,block.href)}>${image}</a>`:image}</figure>`;
   }
-  if(block.kind==='link')return`<div ${attrs}><a class="${block.appearance&&block.appearance!=='plain'?`ds-button${block.appearance==='default'?'':` ds-button--${block.appearance}`}`:'ds-link c9y-native-link'}" href="${escape(address(block.href))}">${escape(block.text)}</a></div>`;
+  if(block.kind==='link')return`<div ${attrs}><a class="${block.appearance&&block.appearance!=='plain'?`ds-button${block.appearance==='default'?'':` ds-button--${block.appearance}`}`:'ds-link c9y-native-link'}" href="${escape(address(block.href))}"${current(options,block.href)}>${escape(block.text)}</a></div>`;
   if(block.kind==='runtime')return`<div ${attrs}>${options.runtime?.(block)??''}</div>`;
   return`<div ${attrs}>${(options.collections?.[block.binding]?.items??[]).map((item,index)=>{
     const tag=item.href?'a':'div',link=item.href?` href="${escape(address(item.href))}"`:'';
@@ -192,7 +393,107 @@ export function renderNativeBlock(block: NativeBlock, options: NativePageRenderO
     return`<article class="c9y-native-collection-item" data-item-id="${escape(item.id)}"${block.layout==='gallery'&&index<block.featured?' data-featured':''}>${image}<div class="c9y-native-collection-caption">${title}${item.price?`<span class="c9y-native-collection-price">${escape(item.price)}</span>`:''}${options.collectionAction?.(block,item)??''}</div></article>`;
   }).join('')}</div>`;
 }
+
+/*
+ * Expansion: a section is drawn as the primitives it stands for. The section root carries
+ * `c9y-native-section` and `data-section="<kind>"`; each slot's element `data-slot="<name>"` and, in a
+ * list of items, `data-item="<index>"`; the primitives inside keep their classes, with ids derived as
+ * `<sectionId>.<slot>[.<index>[.<member>]]`, so the editor's geometry code sees stable identities.
+ */
+const sub=(id:string,...parts:(string|number)[])=>[id,...parts].join('.');
+const heading=(source:string,level:number)=>/^\s*#{1,6}\s/.test(source)?source:`${'#'.repeat(level)} ${source}`;
+const wordsBlock=(id:string,source:string):NativeContent=>({id,kind:'content',source});
+const pictureBlock=(id:string,picture:NativePicture,extra:Partial<NativeImage>={}):NativeImage=>({id,kind:'image',src:picture.src,alt:picture.alt,...(picture.fit?{fit:picture.fit}:{}),...(picture.href?{href:picture.href}:{}),...extra});
+const actionBlock=(id:string,action:NativeAction,appearance?:NativeLink['appearance']):NativeLink=>({id,kind:'link',text:action.text,href:action.href,...(action.appearance??appearance?{appearance:action.appearance??appearance}:{})});
+const flowBlock=(id:string,direction:'row'|'column',gap:number,children:NativeBlock[],extra:Partial<NativeFlow>={}):NativeFlow=>({id,kind:'flow',direction,gap,padding:0,children,...extra});
+const runtimeBlock=(id:string,slot:NativeRuntimeSlot):NativeRuntime=>({id,kind:'runtime',name:slot.name,props:slot.props});
+
+/** The primitives a section expands to, with each one's place in the section; the editor and the renderer read the same expansion. */
+export function expandNativeSection(block: NativeSection): { children: NativeBlock[]; marks: ReadonlyMap<string, NativeMark> } {
+  const id=block.id,marks=new Map<string,NativeMark>();
+  const put=<T extends NativeBlock>(value:T,mark:NativeMark):T=>{marks.set(value.id,mark);return value;};
+  const field=<T,>(name:string)=>sectionField<T>(block,name);
+  const at=(slot:string,item?:number)=>item===undefined?sub(id,slot):sub(id,'items',item,slot);
+  const words=(slot:string,source:string|undefined,level?:number,item?:number,classes?:string)=>source===undefined?[]:[put(wordsBlock(at(slot,item),level?heading(source,level):source),{slot,item,classes})];
+  const picture=(slot:string,value:NativePicture|undefined,extra:Partial<NativeImage>={},item?:number,classes?:string)=>value?[put(pictureBlock(at(slot,item),value,extra),{slot,item,classes})]:[];
+  const action=(slot:string,value:NativeAction|undefined,appearance:NativeLink['appearance'],item?:number)=>value?[put(actionBlock(at(slot,item),value,appearance),{slot,item})]:[];
+  const actions=(slot:string,values:NativeAction[]|undefined,appearance:NativeLink['appearance'],item?:number,classes?:string)=>values?.length?[put(flowBlock(at(slot,item),'row',10,values.map((value,index)=>put(actionBlock(sub(at(slot,item),index),value,index?undefined:appearance),{slot,item:index})),{mobileDirection:'row'}),{slot,item,classes})]:[];
+  const panel=(children:NativeBlock[],padding:number)=>put(flowBlock(sub(id,'panel'),'column',20,children,{padding}),{slot:'panel',classes:'c9y-native-toned',attrs:{'data-tone':field<string>('panelTone')}});
+  switch(block.kind){
+    case 'hero':return{marks,children:[
+      ...picture('picture',block.picture,{fit:block.picture.fit??field<'cover'|'contain'>('fit')}),
+      panel([...picture('logo',block.logo,{height:60,fit:'contain'}),...words('kicker',block.kicker),...words('title',block.title,field<number>('level')),...words('text',block.text),...actions('actions',block.actions,'primary')],20),
+    ]};
+    case 'split':return{marks,children:[
+      ...picture('picture',block.picture,{fit:block.picture.fit??'cover'}),
+      panel([...words('heading',block.heading,2),...words('text',block.text),...actions('actions',block.actions,'default')],40),
+    ]};
+    case 'statement':return{marks,children:[...words('heading',block.heading,2),...words('text',block.text),...actions('actions',block.actions,'default')]};
+    case 'panels':return{marks,children:block.items.map((hero,index)=>put(hero,{slot:'items',item:index}))};
+    case 'cards':return{marks,children:block.items.map((item,index)=>put(flowBlock(sub(id,'items',index),'column',10,[
+      ...words('label',item.label,undefined,index),...words('title',item.title,3,index),...words('text',item.text,undefined,index),...action('action',item.action,'plain',index),...picture('picture',item.picture,{fit:'cover'},index),
+    ],{padding:20}),{slot:'items',item:index,classes:`c9y-native-card${field<string>('variant')==='filled'?' c9y-native-toned':''}`}))};
+    case 'gallery':return{marks,children:block.pictures.map((value,index)=>put(pictureBlock(sub(id,'pictures',index),value,{fit:value.fit??field<'cover'|'contain'>('fit')}),{slot:'pictures',item:index}))};
+    case 'bento':return{marks,children:block.items.map((item,index)=>put(flowBlock(sub(id,'items',index),'column',10,[
+      ...picture('picture',item.picture,{fit:'cover'},index),...words('title',item.title,3,index),...words('text',item.text,undefined,index),...action('action',item.action,'plain',index),
+    ]),{slot:'items',item:index,classes:'c9y-native-tile c9y-native-toned',attrs:{'data-tone':item.tone??TONES[6+index%6]!}}))};
+    case 'questions':return{marks,children:[...words('heading',block.heading,2),...block.items.map((item,index)=>put(flowBlock(sub(id,'items',index),'column',20,words('answer',item.answer,undefined,index),{disclosure:{label:item.question,open:field<string>('open')==='first'&&index===0}}),{slot:'items',item:index}))]};
+    case 'facts':return{marks,children:block.items.map((item,index)=>put(flowBlock(sub(id,'items',index),'row',20,[...words('term',item.term,undefined,index),...words('value',item.value,undefined,index)],{mobileDirection:'column'}),{slot:'items',item:index}))};
+    case 'list':return{marks,children:[]};
+    case 'action':return{marks,children:action('button',block.button,'primary')};
+    case 'header':return{marks,children:[
+      put(flowBlock(sub(id,'brand'),'row',4,[...picture('logo',block.logo,{fit:'contain'}),...words('name',block.name)],{mobileDirection:'row'}),{slot:'brand',classes:'ds-header__brand'}),
+      put(flowBlock(sub(id,'links'),'row',20,block.links.map((link,index)=>put(actionBlock(sub(id,'links',index),link,'plain'),{slot:'links',item:index})),{role:'nav',mobileDirection:'row'}),{slot:'links',classes:'ds-header__nav'}),
+      ...(block.languages?.length?[put(flowBlock(sub(id,'languages'),'row',10,block.languages.map((language,index)=>put(language.picture?pictureBlock(sub(id,'languages',index),{...language.picture,alt:language.picture.alt||language.text,href:language.href},{fit:'contain'}):actionBlock(sub(id,'languages',index),language,'plain'),{slot:'languages',item:index})),{mobileDirection:'row'}),{slot:'languages',classes:'ds-header__actions'})]:[]),
+      ...(block.menu?[put(runtimeBlock(sub(id,'menu'),block.menu),{slot:'menu',classes:'ds-header__toggle'})]:[]),
+    ]};
+    case 'footer':return{marks,children:[
+      ...(block.brand||block.tagline?[put(flowBlock(sub(id,'brand'),'column',0,[...picture('mark',block.brand,{fit:'contain'},undefined,'ds-footer__mark'),...words('tagline',block.tagline,undefined,undefined,'ds-footer__tagline')]),{slot:'brand',classes:'ds-footer__brand'})]:[]),
+      ...words('legal',block.legal,undefined,undefined,'ds-footer__legal'),
+      ...(block.policies?.length?[put(flowBlock(sub(id,'policies'),'row',10,block.policies.map((policy,index)=>put(actionBlock(sub(id,'policies',index),policy,'secondary'),{slot:'policies',item:index})),{mobileDirection:'row'}),{slot:'policies',classes:'ds-footer__policies'})]:[]),
+      ...(block.languages??[]).map((language,index)=>put(actionBlock(sub(id,'languages',index),language,'plain'),{slot:'languages',item:index})),
+      ...(block.preferences?[put(runtimeBlock(sub(id,'preferences'),block.preferences),{slot:'preferences'})]:[]),
+    ]};
+  }
+}
+function renderNativeSection(block: NativeSection, options: NativePageRenderOptions, mark?: NativeMark): string {
+  const id=block.id,{children,marks}=expandNativeSection(block);
+  const draw=(value:NativeBlock)=>render(value,options,marks.get(value.id),marks);
+  const field=<T,>(name:string)=>sectionField<T>(block,name);
+  const tag=block.kind==='header'?'header':block.kind==='footer'?'footer':'section';
+  const classes=`c9y-native-node c9y-native-section${block.kind==='header'?` ds-header${field<boolean>('sticky')?' ds-header--sticky':''}`:block.kind==='footer'?' ds-footer':block.kind==='statement'&&block.panel?' c9y-native-toned':''}${markClasses(mark)}`;
+  const attrs=`class="${classes}" data-native-block="${escape(id)}" data-section="${block.kind}"${options.editor?` data-c9y-block="${escape(id)}" data-c9y-kind="${block.kind}"`:''}${block.hidden?' hidden':''}${block.locale?` data-native-locale="${block.locale}" lang="${block.locale}"`:''}${attrText(nativeSectionAttributes(block))}${markText(mark)} style="${escape(styleText(nativeBlockStyles(block)))}"`;
+  const open=(inner:string)=>`<${tag} ${attrs}>${inner}</${tag}>`;
+  if(block.kind==='list')return open(renderList(block,options));
+  if(block.kind==='footer'){
+    const line=(column:number,item:NativeLine,index:number)=>`<li>${item.href?`<a href="${escape(address(item.href))}"${current(options,item.href)} data-native-block="${escape(sub(id,'columns',column,'lines',index))}" data-slot="lines" data-item="${index}">${escape(item.text)}</a>`:`<span data-native-block="${escape(sub(id,'columns',column,'lines',index))}" data-slot="lines" data-item="${index}">${escape(item.text)}</span>`}</li>`;
+    const columns=block.columns.map((column,index)=>`<div class="ds-footer__column" data-native-block="${escape(sub(id,'columns',index))}" data-slot="columns" data-item="${index}"${column.width?` style="--ds-footer-column-width:${column.width}"`:''}>${column.heading!==undefined?`<p class="ds-footer__heading" data-native-block="${escape(sub(id,'columns',index,'heading'))}" data-slot="heading" data-item="${index}">${column.href?`<a href="${escape(address(column.href))}">${escape(column.heading)}</a>`:escape(column.heading)}</p>`:''}<ul class="ds-footer__links" data-native-block="${escape(sub(id,'columns',index,'lines'))}" data-slot="lines" data-item="${index}">${column.lines.map((item,lineIndex)=>line(index,item,lineIndex)).join('')}</ul></div>`).join('');
+    const follow=block.follow?.length?`<div class="ds-footer__column c9y-native-follow" data-native-block="${escape(sub(id,'follow'))}" data-slot="follow"><ul class="ds-footer__links">${block.follow.map((item,index)=>`<li><a href="${escape(address(item.href))}" data-native-block="${escape(sub(id,'follow',index))}" data-slot="follow" data-item="${index}">${escape(item.text)}</a></li>`).join('')}</ul></div>`:'';
+    const brand=children.filter(child=>marks.get(child.id)?.slot==='brand').map(draw).join('');
+    const base=children.filter(child=>['legal','policies'].includes(marks.get(child.id)?.slot??'')).map(draw).join('');
+    const preferences=children.filter(child=>['languages','preferences'].includes(marks.get(child.id)?.slot??'')).map(draw).join('');
+    return open(`${brand}<nav class="ds-footer__columns" data-native-block="${escape(sub(id,'columns'))}" data-slot="columns">${columns}${follow}</nav><div class="ds-footer__base" data-native-block="${escape(sub(id,'base'))}">${base}${preferences?`<div class="ds-footer__preferences" data-native-block="${escape(sub(id,'preferences-row'))}">${preferences}</div>`:''}</div>`);
+  }
+  return open(children.map(draw).join(''));
+}
+function renderList(block: NativeList, options: NativePageRenderOptions): string {
+  const id=block.id,dated=sectionField<boolean>(block,'dated'),grouped=sectionField<boolean>(block,'grouped'),slot=block.collection?'collection':'items';
+  let format:(day:string)=>string=day=>day;
+  try{const formatter=new Intl.DateTimeFormat(options.lang??'en',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'});format=day=>formatter.format(new Date(`${day}T00:00:00Z`));}catch{/* an unknown language keeps the ISO day */}
+  const rows:{index:number;item:NativeListItem}[]=block.collection
+    ?(options.collections?.[block.collection]?.items??[]).map((item,index)=>({index,item:{name:item.title,...(item.href?{href:item.href}:{}),...(item.price?{value:item.price}:{})}}))
+    :(block.items??[]).map((item,index)=>({index,item}));
+  const row=({index,item}:{index:number;item:NativeListItem})=>{
+    const name=item.href?`<a class="ds-link c9y-native-link" href="${escape(address(item.href))}"${current(options,item.href)}>${escape(item.name)}</a>`:`<span>${escape(item.name)}</span>`;
+    return`<div class="c9y-native-node c9y-native-row" data-native-block="${escape(sub(id,slot,index))}" data-slot="${slot}" data-item="${index}"${options.editor?` data-c9y-block="${escape(sub(id,slot,index))}" data-c9y-kind="row"`:''}><div class="c9y-native-row-name" data-native-block="${escape(sub(id,slot,index,'name'))}" data-slot="name" data-item="${index}">${name}</div>${item.line!==undefined?render(wordsBlock(sub(id,slot,index,'line'),item.line),options,{slot:'line',item:index}):''}${item.value!==undefined?`<div class="c9y-native-row-value" data-native-block="${escape(sub(id,slot,index,'value'))}" data-slot="value" data-item="${index}">${escape(item.value)}</div>`:''}${dated&&item.date?`<time class="c9y-native-row-date" datetime="${item.date}" data-native-block="${escape(sub(id,slot,index,'date'))}" data-slot="date" data-item="${index}">${escape(format(item.date))}</time>`:''}</div>`;
+  };
+  if(!grouped)return rows.map(row).join('');
+  const groups=new Map<string,typeof rows>();
+  for(const entry of rows){const year=entry.item.date?.slice(0,4)??'';if(!groups.has(year))groups.set(year,[]);groups.get(year)!.push(entry);}
+  return[...groups.entries()].sort(([a],[b])=>a===''?1:b===''?-1:b.localeCompare(a)).map(([year,entries],index)=>`<div class="c9y-native-group" data-native-block="${escape(sub(id,'groups',index))}" data-group="${escape(year)}">${year?`<div class="c9y-native-group-heading">${escape(year)}</div>`:''}${entries.map(row).join('')}</div>`).join('');
+}
 export function renderNativePage(document: NativePageDocument, options: NativePageRenderOptions = {}): string {
   const styles={'--c9y-page-padding':measure(document.layout.padding),'--c9y-page-gap':measure(document.layout.gap),...(document.layout.maxWidth?{width:measure(document.layout.maxWidth)}:{})};
-  return`<div class="c9y-native-page"${options.editor?' data-c9y-native-root':''} style="${escape(styleText(styles))}">${document.blocks.map(block=>renderNativeBlock(block,options)).join('')}</div>`;
+  const pageOptions:NativePageRenderOptions={...options,lang:options.lang??document.lang};
+  return`<div class="c9y-native-page"${options.editor?' data-c9y-native-root':''} style="${escape(styleText(styles))}">${document.blocks.map(block=>render(block,pageOptions)).join('')}</div>`;
 }

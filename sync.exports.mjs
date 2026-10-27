@@ -107,7 +107,11 @@ export default {
           'native-content.ts': source,
           'native-page.ts': String(read('shared/consistency-native-page.ts'))
             .replace('./consistency-native-content', './native-content')
-            .replace(/^import pageStyles from '.\/consistency-native-page.css\?raw';$/m, `const pageStyles = ${JSON.stringify(String(read('shared/consistency-native-page.css')))};`),
+            .replaceAll('./consistency-vocabulary', './vocabulary')
+            .replace(/^import (\w+) from '([^']+)\?raw';$/gm, (_, name, path) =>
+              `const ${name} = ${JSON.stringify(String(read(posix.normalize(posix.join('shared', path)))))};`),
+          'vocabulary.ts': String(read('shared/consistency-vocabulary.ts')).replace('./consistency-native-page', './native-page'),
+          'vocabulary.json': read('shared/generated/vocabulary.json'),
           'site-design.ts': read('shared/consistency-site-design.ts'),
           'consistency-content.ts': read('shared/consistency-content.ts'),
           'consistency-carousel.ts': read('shared/consistency-carousel.ts'),
