@@ -18,6 +18,7 @@ import { editKey, failureWords, fieldName, firstPage, isPlainField, isWordsField
 import './site-editor.css';
 import { SiteCompositionController } from './site-composition';
 import type { SiteCompositionSnapshot } from './site-composition-state';
+import { NativeSiteController, type NativePageSnapshot } from './native-site';
 
 /** The outlines the editor draws in the framed page: the words that can be edited, and the ones being edited. */
 const FRAME_STYLE = `
@@ -64,8 +65,9 @@ export class ConsistencySiteEditor extends LitElement {
   /** Whether the bar (the page picker, Open the page and the note) stands over the site; Consistency's app has none. */
   picker = true;
   private fields = new Map<string, SiteField>();
-  private composition: SiteCompositionController | null = null;
+  private composition: SiteCompositionController | NativeSiteController | null = null;
   private compositionSnapshot: SiteCompositionSnapshot | null = null;
+  private nativeSnapshot: NativePageSnapshot | null = null;
   private images: string[] = [];
   private readonly beforeUnload = (event: BeforeUnloadEvent) => { if (this.composition?.pending || this.editing && (this.editing.saving || this.editing.markdown !== this.editing.field.markdown)) { event.preventDefault(); event.returnValue = ''; } };
   private editing: Editing | null = null;
@@ -120,12 +122,28 @@ export class ConsistencySiteEditor extends LitElement {
     if (!(await this.flush())) return false;
     const ticket = ++this.opening;
     try {
+      // Native routes need no legacy HTML manifest or field discovery.
+      const native = await request<NativePageSnapshot | {kind:'html';path:string}>(siteAddress.nativePage(this.site.code,path)).catch(error => {
+        if (error instanceof ApiError && (error.status === 404 || error.code === 'not-editable')) return null;
+        throw error;
+      });
+      if (ticket !== this.opening) return false;
+      if (native?.kind === 'native') {
+        if (!(await this.flush()) || ticket !== this.opening) return false;
+        this.composition?.destroy(); this.composition = null;
+        this.compositionSnapshot = null; this.nativeSnapshot = native;
+        this.notice = ''; this.fields.clear(); this.path = native.path; this.problem = '';
+        this.frame.title = `${native.document.title || native.path}, to edit`;
+        this.frame.src = siteAddress.document(this.site.code,native.path);
+        return true;
+      }
       const [page, composition] = await Promise.all([
         request<PageDetail>(siteAddress.page(this.site.code, path)),
         request<SiteCompositionSnapshot>(siteAddress.composition(this.site.code, path)).catch(error => { if (error instanceof ApiError && (error.status === 404 || error.code === 'not-editable')) return null; throw error; }),
       ]);
       if (ticket !== this.opening) return false;
-      this.composition?.destroy(); this.composition = null; this.compositionSnapshot = composition;
+      if (!(await this.flush()) || ticket !== this.opening) return false;
+      this.composition?.destroy(); this.composition = null; this.compositionSnapshot = composition; this.nativeSnapshot = null;
       this.notice = composition?.stale ? 'The page structure changed. Earlier layout edits are kept in history.' : '';
       this.fields = new Map(page.fields.map(field => [field.key, field]));
       this.path = page.path;
@@ -149,14 +167,33 @@ export class ConsistencySiteEditor extends LitElement {
     const doc = this.frame.contentDocument;
     // A page that left for the site's own address cannot be edited from here: back to the page being edited.
     if (!doc || !this.path || !doc.location.pathname.endsWith('/document')) { if (this.path) this.frame.src = siteAddress.document(this.site.code, this.path); return; }
-    const base = doc.documentElement.getAttribute('data-c9y-composition-base');
-    if (base && this.compositionSnapshot && base !== this.compositionSnapshot.base) {
+    const snapshot = this.nativeSnapshot ?? this.compositionSnapshot;
+    const base = doc.documentElement.getAttribute(this.nativeSnapshot ? 'data-c9y-native-base' : 'data-c9y-composition-base');
+    if (base && snapshot && base !== snapshot.base) {
       this.frame.hidden = true;
       if (this.compositionRetry++ < 1) void this.open(this.path, true);
       else this.problem = 'This page is being published. Open it again in a moment.';
       return;
     }
     this.frame.hidden = false;
+    if (this.nativeSnapshot) {
+      const path = this.path;
+      this.composition?.destroy();
+      this.composition = new NativeSiteController(this.frame,this.nativeSnapshot,payload => request<NativePageSnapshot>(siteAddress.nativePage(this.site.code,path), {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}),()=>void this.open(path));
+      const press = (event: MouseEvent) => {
+        const target = event.target as Element;
+        if (event.defaultPrevented || target.closest('aa-editor,[contenteditable],[data-editor-chrome]')) return;
+        const link = target.closest<HTMLAnchorElement>('a[href]');
+        if (!link && target.closest('summary')) return;
+        event.preventDefault();
+        const action = pressAction({inEditing:false,field:false,link:link?{href:new URL(link.getAttribute('href') ?? '',this.origin).href}:null,mod:event.metaKey||event.ctrlKey},{origin:this.origin,paths:(this.pages??[]).map(page=>page.path)});
+        if (action.do === 'go') void this.go(action.path);
+      };
+      const hold = (event: Event) => event.preventDefault();
+      doc.addEventListener('click',press,true);doc.addEventListener('auxclick',hold,true);doc.addEventListener('submit',hold,true);
+      this.detach=()=>{doc.removeEventListener('click',press,true);doc.removeEventListener('auxclick',hold,true);doc.removeEventListener('submit',hold,true);};
+      return;
+    }
     const dark = document.documentElement.classList.contains('dark-theme') || (!document.documentElement.classList.contains('light-theme') && matchMedia('(prefers-color-scheme: dark)').matches);
     // The page's own head script set its theme before; the editor sets it now, as the editor's.
     doc.documentElement.classList.add(dark ? 'dark-theme' : 'light-theme');

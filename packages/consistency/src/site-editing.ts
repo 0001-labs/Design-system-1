@@ -22,6 +22,7 @@ export const siteAddress = {
   document: (site: string, path: string) => `${base(site)}/document?path=${encodeURIComponent(path)}`,
   edit: (site: string) => `${base(site)}/edit`,
   composition: (site: string, path: string) => `${base(site)}/api/composition?path=${encodeURIComponent(path)}`,
+  nativePage: (site: string, path: string) => `${base(site)}/api/native-page?path=${encodeURIComponent(path)}`,
 };
 
 /**

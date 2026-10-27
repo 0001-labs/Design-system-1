@@ -109,6 +109,7 @@ export class ResizingLayer {
 
 export interface ResizeTargetOptions {
   enabled: () => boolean; host: HTMLElement; box: boolean; card?: boolean; carousel?: boolean; name: string;
+  axes?: Array<'width' | 'height'>;
   scale: () => number; size: () => ElementSize; minimumWidth: () => number; minimumHeight: () => number; maxWidth: () => number;
   begin: () => void; end: (cancelled: boolean) => void; paintSize: (size: ElementSize) => void; save: (size: ElementSize) => void;
   cancelSettle: () => void; settle: (update: () => Promise<unknown>) => Promise<unknown>;
@@ -118,7 +119,7 @@ export function bindResizeEdges(target: HTMLElement, options: ResizeTargetOption
   const { host, box, card, carousel, name, scale, size, minimumWidth, minimumHeight, maxWidth, begin, end, paintSize, save } = options;
   let minWidth = minimumWidth();
   const disposers: (() => void)[] = [], edges: HTMLElement[] = [];
-    for (const axis of box ? ['width', 'height'] as const : ['width'] as const) {
+    for (const axis of options.axes ?? (box ? ['width', 'height'] as const : ['width'] as const)) {
       const edge = target.ownerDocument.createElement('span'); edge.className = `consistency-resize-edge consistency-resize-${axis}`; edge.contentEditable = 'false'; edge.setAttribute('data-aa-interactive', ''); edge.setAttribute('role', 'slider'); edge.setAttribute('aria-label', `${name} ${axis}`); edge.setAttribute('aria-orientation', axis === 'width' ? 'horizontal' : 'vertical'); edge.setAttribute('aria-valuemin', carousel ? '160' : '80'); edge.setAttribute('aria-valuemax', carousel && axis === 'height' ? '1200' : '2000'); host.append(edge); edges.push(edge);
             const paint = (value: number) => {
         if (box) paintSize({ ...size(), [axis]: Math.max(value, axis === 'width' ? minimumWidth() : minimumHeight()) });
@@ -141,6 +142,7 @@ export function bindResizeEdges(target: HTMLElement, options: ResizeTargetOption
       })));
       edge.textContent = String(Math.round(size()[axis])); edge.setAttribute('aria-valuenow', String(Math.round(size()[axis])));
     }
+    if (options.axes && !options.axes.includes('width')) return { edges, dispose: () => { disposers.forEach(dispose => dispose()); edges.forEach(edge => edge.remove()); } };
     const corner = target.ownerDocument.createElement('span'); corner.className = 'consistency-resize-edge consistency-resize-corner'; corner.contentEditable = 'false'; corner.setAttribute('data-aa-interactive', ''); corner.setAttribute('role', 'button'); corner.setAttribute('aria-label', `${name} size`); host.append(corner); edges.push(corner);
     let cancelCorner: (() => void) | undefined;
     const cornerDown = (event: PointerEvent) => {
