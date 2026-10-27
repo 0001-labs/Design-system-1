@@ -61,11 +61,31 @@ export function pageGroups(pages: SitePage[]): { lang: string; pages: SitePage[]
 /** The page the editor opens first: the site's root, else its first page. */
 export const firstPage = (pages: SitePage[]) => pages.find(page => page.path === '/')?.path ?? pages[0]?.path ?? null;
 
-/** One of the site's pages a link goes to, as the manifest writes its path; null for anywhere else. */
-export function sitePagePath(href: string, origin: string, paths: Iterable<string>): string | null {
+/**
+ * The origins the site's pages stand on: its `url`, its colour address and its own domain, when present, the bare
+ * hosts taken as https. The platform writes a page's links absolute on the site's first platform host, so once a
+ * domain is connected the links name another address than `url`; a link to any of them is the site's own.
+ */
+export function siteOrigins(site: Pick<SiteSummary, 'url' | 'address' | 'domain'>): string[] {
+  const origins: string[] = [];
+  for (const each of [site.url, site.address, site.domain]) {
+    if (!each) continue;
+    let origin: string;
+    try { origin = new URL(/^[a-z][a-z0-9+.-]*:/i.test(each) ? each : `https://${each}`).origin; } catch { continue; }
+    if (origin !== 'null' && !origins.includes(origin)) origins.push(origin);
+  }
+  return origins;
+}
+
+/**
+ * One of the site's pages a link goes to, as the manifest writes its path; null for anywhere else. `origins` are the
+ * addresses the site stands on (`siteOrigins`), the first the base a relative link is read against.
+ */
+export function sitePagePath(href: string, origins: string | Iterable<string>, paths: Iterable<string>): string | null {
+  const addresses = typeof origins === 'string' ? [origins] : [...origins];
   let url: URL;
-  try { url = new URL(href, origin); } catch { return null; }
-  if (url.origin !== origin) return null;
+  try { url = new URL(href, addresses[0]); } catch { return null; }
+  if (!addresses.includes(url.origin)) return null;
   const known = new Set(paths);
   let decoded = url.pathname;
   try { decoded = decodeURIComponent(url.pathname); } catch { /* read as written */ }
@@ -93,8 +113,8 @@ export type PressAction = { do: 'caret' } | { do: 'edit' } | { do: 'go'; path: s
  * followed, and the editor follows it (Mod+press follows a link that is a field); anything else does nothing,
  * since the page's scripts never run here and a form never sends.
  */
-export function pressAction(press: Press, site: { origin: string; paths: Iterable<string> }): PressAction {
-  const page = press.link ? sitePagePath(press.link.href, site.origin, site.paths) : null;
+export function pressAction(press: Press, site: { origins: string | Iterable<string>; paths: Iterable<string> }): PressAction {
+  const page = press.link ? sitePagePath(press.link.href, site.origins, site.paths) : null;
   if (press.link && press.mod) return page ? { do: 'go', path: page } : { do: 'stop' };
   if (press.inEditing) return { do: 'caret' };
   if (press.field) return { do: 'edit' };

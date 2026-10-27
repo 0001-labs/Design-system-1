@@ -69,11 +69,14 @@ export class TemplateEditor extends HTMLElement {
     for (const element of placed) {
       const id = element.dataset.c9yNode = element.dataset.templateNode ?? 'root';
       const kind = element === doc.body ? 'root' : element.matches('ds-card') ? 'card' : element.matches('ds-button,button,a') ? 'button' : element.matches('ds-stat') ? 'stat' : element.matches('ds-carousel') ? 'carousel' : element.matches('img,ds-image') ? 'image' : element.matches('ds-text,h1,h2,h3,h4,p,span') ? 'text' : 'container';
-      const caps: SiteCompositionNode['capabilities'] = ['width'];
-      if (kind !== 'root') caps.push('marginTop', 'marginBottom', 'hide', 'reorder', 'place');
-      if (kind === 'root' || kind === 'container') caps.push('gap', 'padding', 'insert');
-      if (kind === 'card' || kind === 'carousel' || kind === 'image') caps.push('height');
-      if (kind === 'card' || kind === 'stat' || kind === 'button') caps.push('design');
+      // Capabilities by kind: containers space and take blocks; cards, carousels and images resize; words
+      // keep only their spacing above and below (no resize edges); buttons and stats keep their design.
+      const caps: SiteCompositionNode['capabilities'] = kind === 'root' ? ['gap', 'padding', 'insert']
+        : kind === 'container' ? ['gap', 'padding', 'insert', 'hide', 'reorder', 'place']
+        : kind === 'text' ? ['marginTop', 'marginBottom', 'hide', 'reorder', 'place']
+        : kind === 'card' ? ['width', 'height', 'design', 'hide', 'reorder', 'place']
+        : kind === 'carousel' || kind === 'image' ? ['width', 'height', 'hide', 'reorder', 'place']
+        : ['design', 'hide', 'reorder', 'place'];
       nodes.push({ id, kind, tag: element.localName, parent: element === doc.body ? null : element.parentElement?.closest<HTMLElement>('[data-template-node]')?.dataset.templateNode ?? 'root', children: [], label: element.getAttribute('aria-label') ?? element.textContent?.trim().slice(0, 60) ?? element.localName, capabilities: caps });
     }
     for (const node of nodes) if (node.parent) nodes.find(parent => parent.id === node.parent)?.children.push(node.id);

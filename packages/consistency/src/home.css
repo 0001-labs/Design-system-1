@@ -41,6 +41,8 @@ consistency-domains{display:block;max-width:calc(32 * var(--ds-unit))}
 .home-workspace-field{width:calc(12 * var(--ds-unit))}
 /* The plan's draft sites under the title, half a square up so they sit with it. */
 .home-drafts{margin-top:calc(var(--ds-unit) / -2)}
+/* A failed read, said under the title over the cards from the last visit, in the settings column's 32 squares. */
+.home-problem{display:block;max-width:calc(32 * var(--ds-unit))}
 /* Settings → People: the settings column of 32 squares; the invite row on the sixteen, as Domains' connect row. */
 consistency-members{display:block;max-width:calc(32 * var(--ds-unit))}
 .members{display:flex;flex-direction:column;gap:var(--ds-unit)}

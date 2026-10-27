@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vite-plus/test';
-import { editKey, failureWords, fieldName, firstPage, isPlainField, isWordsField, pageGroups, pressAction, siteAddress, sitePagePath, type SitePage } from './site-editing';
+import { editKey, failureWords, fieldName, firstPage, isPlainField, isWordsField, pageGroups, pressAction, siteAddress, siteOrigins, sitePagePath, type SitePage } from './site-editing';
 
 const page = (path: string, lang: string): SitePage => ({ path, lang, title: path, fields: 1, edited: 0 });
 const origin = 'https://cphraft.c9y.site';
@@ -43,8 +43,23 @@ describe('editing a site in the editor', () => {
     expect(sitePagePath('mailto:hi@example.com', origin, paths)).toBeNull();
   });
 
+  it('knows every address a site stands on, and follows a link on any of them', () => {
+    expect(siteOrigins({ url: 'https://cphraft.c9y.site/team/' })).toEqual(['https://cphraft.c9y.site']);
+    expect(siteOrigins({ url: 'https://cphraft.dk/', address: 'coral.c9y.site', domain: 'cphraft.dk' })).toEqual(['https://cphraft.dk', 'https://coral.c9y.site']);
+    expect(siteOrigins({ url: 'https://coral.c9y.site/', address: 'coral.c9y.site' })).toEqual(['https://coral.c9y.site']);
+    expect(siteOrigins({ url: 'not an address', address: 'coral.c9y.site' })).toEqual(['https://coral.c9y.site']);
+    // The platform writes the framed page's links on the site's first platform host; a connected domain is `url`.
+    const connected = siteOrigins({ url: 'https://cphraft.dk/', address: 'coral.c9y.site', domain: 'cphraft.dk' });
+    expect(sitePagePath('https://coral.c9y.site/en/blueraft/', connected, paths)).toBe('/en/blueraft/');
+    expect(sitePagePath('https://cphraft.dk/en/', connected, paths)).toBe('/en/');
+    expect(sitePagePath('/en/', connected, paths)).toBe('/en/');
+    expect(sitePagePath('https://cphraft.c9y.site/en/', connected, paths)).toBeNull();
+    expect(sitePagePath('https://example.com/en/', connected, paths)).toBeNull();
+    expect(pressAction({ inEditing: false, field: false, link: { href: 'https://coral.c9y.site/en/' }, mod: false }, { origins: connected, paths })).toEqual({ do: 'go', path: '/en/' });
+  });
+
   it('a press edits words, follows the site\'s own links and does nothing else', () => {
-    const site = { origin, paths };
+    const site = { origins: origin, paths };
     const press = (more: Partial<Parameters<typeof pressAction>[0]>) => pressAction({ inEditing: false, field: false, link: null, mod: false, ...more }, site);
     expect(press({ field: true })).toEqual({ do: 'edit' });
     expect(press({ inEditing: true, field: true })).toEqual({ do: 'caret' });

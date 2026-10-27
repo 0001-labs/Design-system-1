@@ -21,10 +21,12 @@ try {
  // Two workspaces: 0001, the owner's own with three sites, and a client's, Raft & Co, with one.
  const limits={sites:2,customDomains:false};
  const workspaces=[{code:'01STDO',name:'0001',plan:'free',role:'owner',sites:3,siteCodes:['10VNDG','20FLAV','30SDGA'],limits},{code:'02RAFT',name:'Raft & Co',plan:'free',role:'owner',sites:1,siteCodes:['40RAFT'],limits}];
- await page.route('**/api/consistency/workspaces',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({owner:true,workspaces})}));
+ // The platform's answers to the workspaces and the sites can be made to fail: 401 for a session that ended, 503 for a platform away.
+ let workspacesStatus=200,sitesStatus=200;
+ await page.route('**/api/consistency/workspaces',route=>route.fulfill(workspacesStatus===200?{status:200,contentType:'application/json',body:JSON.stringify({owner:true,workspaces})}:{status:workspacesStatus}));
  const workspaceSites={'01STDO':[{code:'20FLAV',name:'Flavo',url:'https://flavo.flowers/',address:'ghost-dew-rose.c9y.site',domain:'flavo.flowers'},{code:'10VNDG',name:'CPH Raft',url:'https://cphraft.c9y.site/',address:'alice-steel-blue.c9y.site'},{code:'30SDGA',name:'Søndergården',url:'https://soendergaarden.c9y.site/'}],'02RAFT':[{code:'40RAFT',name:'Raft',url:'https://amber-rose-teal.c9y.site/',address:'amber-rose-teal.c9y.site'}]};
  const asked=[];
- await page.route('**/api/consistency/sites',route=>{const workspace=route.request().headers()['x-c9y-workspace'];asked.push(workspace);route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({workspace,sites:workspaceSites[workspace]??[]})});});
+ await page.route('**/api/consistency/sites',route=>{const workspace=route.request().headers()['x-c9y-workspace'];asked.push(workspace);route.fulfill(sitesStatus===200?{status:200,contentType:'application/json',body:JSON.stringify({workspace,sites:workspaceSites[workspace]??[]})}:{status:sitesStatus});});
  await page.route('**/api/consistency/sites/*/pages',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({pages:[]})}));
  await page.route('**/api/consistency/sites/*/api/composition?**',route=>route.fulfill({json:{path:new URL(route.request().url()).searchParams.get('path'),build:'site-build',base:'page-source',revision:0,document:{schema:1,nodes:{},order:{}},nodes:[]}}));
  // Søndergården's pages, in two languages, and their documents, for the site's own sidebar.
@@ -150,8 +152,24 @@ try {
  // A site of another workspace, asked for by its code, opens in that workspace.
  await page.goto(home+'?open=40RAFT');await page.getByRole('button',{name:'Site: Raft'}).waitFor();same();
  if(await page.evaluate(()=>localStorage.getItem('consistency-active-workspace'))!=='02RAFT')throw Error('Opening a site did not move to its workspace');
+ // A failed read is said under the title, over the cards from the last visit, which stay: the session ended, with Sign in to the gateway's sign-in page.
+ const problem=page.locator('consistency-home .home-problem');
+ const problemIs=async words=>{await problem.waitFor();const seen=[await problem.getAttribute('text'),await problem.getAttribute('tone'),await problem.getAttribute('role')].join('|');if(seen!==words+'|danger|alert')throw Error('The failed read is not said under the title: '+seen);if(await page.locator('consistency-home .home-title[text="Sites"]').count()!==1)throw Error('The failed read is not under the title');if(!await page.locator('consistency-home ds-card[data-site="40RAFT"]').count())throw Error('The cards from the last visit are gone with the failed read');};
+ // Going to the app's address again is a reload, which keeps where the app stood: the sites first, where the message is drawn.
+ const sitesAgain=async()=>{await page.evaluate(()=>document.querySelector('consistency-home').go({page:'sites'}));await page.locator('consistency-home .home-title[text="Sites"]').waitFor();await page.reload();};
+ workspacesStatus=401;await sitesAgain();await problemIs('Your session ended. Sign in again.');
+ if(await problem.locator('ds-button',{hasText:'Sign in'}).getAttribute('href')!=='/app/signin')throw Error('Sign in does not go to the gateway\'s sign-in page');
+ if(await problem.getByRole('button',{name:'Try again'}).count())throw Error('A session that ended offers Try again');
+ // The platform away: Try again reads the workspaces again, and a read that succeeds takes the message off.
+ workspacesStatus=503;await page.reload();await problemIs('Consistency could not be reached. Try again.');
+ if(await problem.locator('ds-button[href]').count())throw Error('A platform away offers Sign in');
+ workspacesStatus=200;await problem.getByRole('button',{name:'Try again'}).click();await problem.waitFor({state:'detached'});await page.locator('consistency-home ds-card[data-site="40RAFT"]').waitFor();
+ // The sites failing on their own say the same, in the same place, and Try again takes it off the same way.
+ sitesStatus=503;await page.reload();await problemIs('Consistency could not be reached. Try again.');
+ sitesStatus=401;await problem.getByRole('button',{name:'Try again'}).click();await page.locator('consistency-home .home-problem[text="Your session ended. Sign in again."]').waitFor();
+ sitesStatus=200;await page.reload();await page.locator('consistency-home ds-card[data-site="40RAFT"]').waitFor();await page.waitForTimeout(200);if(await problem.count())throw Error('A read that succeeded left the message standing');
  // An older address still opens its place and is taken off.
  await page.goto(home+'#settings/account');await page.locator('consistency-home .home-account').waitFor();same();await page.getByRole('button',{name:'Sign out',exact:true}).click();await page.waitForURL('**/app/signin');
  if(!signedOut)throw Error('Sign out did not end the session');
- console.log('Home workspaces: switching, each one\'s own sites and drafts, People, a site opening in its own workspace; an open site\'s own sidebar of places with no bar over the site, renaming the workspace, Sites as cards only, Settings with Workspaces, Domains and Account tabs, the site\'s address as its first row, sign out and viewports passed');
+ console.log('Home workspaces: switching, each one\'s own sites and drafts, People, a site opening in its own workspace; an open site\'s own sidebar of places with no bar over the site, renaming the workspace, Sites as cards only, Settings with Workspaces, Domains and Account tabs, the site\'s address as its first row, a failed read said under the title with Sign in or Try again over the last visit\'s cards, sign out and viewports passed');
 } finally {await browser.close();await new Promise(resolve=>server.close(resolve));}

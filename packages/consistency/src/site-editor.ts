@@ -14,7 +14,7 @@ import '../../../DS1/3-unit/ds-select';
 import { createPlainEditor } from '../../../website/src/vendor/aa/aa';
 import { MARKDOWN_LIMIT, renderMarkdown } from './vendor/site-engine/markdown';
 import { placeBar } from './vendor/site-engine/placing';
-import { editKey, failureWords, fieldName, firstPage, isPlainField, isWordsField, pageGroups, pressAction, siteAddress, type PageDetail, type SiteField, type SitePage, type SiteSummary } from './site-editing';
+import { editKey, failureWords, fieldName, firstPage, isPlainField, isWordsField, pageGroups, pressAction, siteAddress, siteOrigins, type PageDetail, type SiteField, type SitePage, type SiteSummary } from './site-editing';
 import './site-editor.css';
 import { SiteCompositionController } from './site-composition';
 import type { SiteCompositionSnapshot } from './site-composition-state';
@@ -38,6 +38,15 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
   if (!response.ok) throw new ApiError(response.status, body && typeof body === 'object' && 'error' in body && typeof body.error === 'string' ? body.error : undefined);
   return body as T;
 }
+
+/** An answer the platform may not have: a 404 or a site that is not editable here is null; any other failure is still thrown. */
+function optional<T>(answer: PromiseSettledResult<T>): T | null {
+  if (answer.status === 'fulfilled') return answer.value;
+  if (answer.reason instanceof ApiError && (answer.reason.status === 404 || answer.reason.code === 'not-editable')) return null;
+  throw answer.reason;
+}
+/** An answer the page cannot open without: its failure is thrown. */
+function required<T>(answer: PromiseSettledResult<T>): T { if (answer.status === 'fulfilled') return answer.value; throw answer.reason; }
 
 /** A press's place as a caret in a document, where the browser can say. */
 function caretAt(doc: Document, x: number, y: number): Range | null {
@@ -72,6 +81,8 @@ export class ConsistencySiteEditor extends LitElement {
   private readonly beforeUnload = (event: BeforeUnloadEvent) => { if (this.composition?.pending || this.editing && (this.editing.saving || this.editing.markdown !== this.editing.field.markdown)) { event.preventDefault(); event.returnValue = ''; } };
   private editing: Editing | null = null;
   private opening = 0;
+  /** What the site's pages answered last: native, or the site engine's HTML. Set once per editor, since a site is. */
+  private kind: 'native' | 'html' | null = null;
   private compositionRetry = 0;
   private readonly frame = Object.assign(document.createElement('iframe'), { className: 'consistency-site-frame' });
   private detach: (() => void) | null = null;
@@ -103,6 +114,8 @@ export class ConsistencySiteEditor extends LitElement {
   }
 
   private get origin() { return new URL(this.site.url).origin; }
+  /** Every address the site's links may stand on: the platform writes them absolute on its first platform host, whichever the owner opens it by. */
+  private get origins() { return siteOrigins(this.site); }
 
   private async load() {
     try {
@@ -122,13 +135,19 @@ export class ConsistencySiteEditor extends LitElement {
     if (!(await this.flush())) return false;
     const ticket = ++this.opening;
     try {
-      // Native routes need no legacy HTML manifest or field discovery.
-      const native = await request<NativePageSnapshot | {kind:'html';path:string}>(siteAddress.nativePage(this.site.code,path)).catch(error => {
-        if (error instanceof ApiError && (error.status === 404 || error.code === 'not-editable')) return null;
-        throw error;
-      });
+      // Each is a trip to the platform, so they are asked together: the native page, which needs no HTML manifest or
+      // field discovery, and the page and its composition, which a native page has none of. A site that answered
+      // native is asked for the native page alone, and for the other two only when that answer is not a native page.
+      const probe = request<NativePageSnapshot | { kind: 'html'; path: string }>(siteAddress.nativePage(this.site.code, path));
+      const source = () => [request<PageDetail>(siteAddress.page(this.site.code, path)), request<SiteCompositionSnapshot>(siteAddress.composition(this.site.code, path))] as const;
+      let nativeAnswer: PromiseSettledResult<NativePageSnapshot | { kind: 'html'; path: string }>;
+      let sourceAnswers: readonly [PromiseSettledResult<PageDetail>, PromiseSettledResult<SiteCompositionSnapshot>] | null = null;
+      if (this.kind === 'native') [nativeAnswer] = await Promise.allSettled([probe]);
+      else { const answers = await Promise.allSettled([probe, ...source()]); nativeAnswer = answers[0]; sourceAnswers = [answers[1], answers[2]]; }
       if (ticket !== this.opening) return false;
+      const native = optional(nativeAnswer);
       if (native?.kind === 'native') {
+        this.kind = 'native';
         if (!(await this.flush()) || ticket !== this.opening) return false;
         this.composition?.destroy(); this.composition = null;
         this.compositionSnapshot = null; this.nativeSnapshot = native;
@@ -137,11 +156,10 @@ export class ConsistencySiteEditor extends LitElement {
         this.frame.src = siteAddress.document(this.site.code,native.path);
         return true;
       }
-      const [page, composition] = await Promise.all([
-        request<PageDetail>(siteAddress.page(this.site.code, path)),
-        request<SiteCompositionSnapshot>(siteAddress.composition(this.site.code, path)).catch(error => { if (error instanceof ApiError && (error.status === 404 || error.code === 'not-editable')) return null; throw error; }),
-      ]);
-      if (ticket !== this.opening) return false;
+      this.kind = 'html';
+      if (!sourceAnswers) { sourceAnswers = await Promise.allSettled(source()); if (ticket !== this.opening) return false; }
+      const page = required(sourceAnswers[0]);
+      const composition = optional(sourceAnswers[1]);
       if (!(await this.flush()) || ticket !== this.opening) return false;
       this.composition?.destroy(); this.composition = null; this.compositionSnapshot = composition; this.nativeSnapshot = null;
       this.notice = composition?.stale ? 'The page structure changed. Earlier layout edits are kept in history.' : '';
@@ -186,7 +204,7 @@ export class ConsistencySiteEditor extends LitElement {
         const link = target.closest<HTMLAnchorElement>('a[href]');
         if (!link && target.closest('summary')) return;
         event.preventDefault();
-        const action = pressAction({inEditing:false,field:false,link:link?{href:new URL(link.getAttribute('href') ?? '',this.origin).href}:null,mod:event.metaKey||event.ctrlKey},{origin:this.origin,paths:(this.pages??[]).map(page=>page.path)});
+        const action = pressAction({inEditing:false,field:false,link:link?{href:new URL(link.getAttribute('href') ?? '',this.origin).href}:null,mod:event.metaKey||event.ctrlKey},{origins:this.origins,paths:(this.pages??[]).map(page=>page.path)});
         if (action.do === 'go') void this.go(action.path);
       };
       const hold = (event: Event) => event.preventDefault();
@@ -230,7 +248,7 @@ export class ConsistencySiteEditor extends LitElement {
     if (target.closest('[data-c9y-node^="new_"]') && target.closest('[contenteditable]')) return;
     const words = target.closest<HTMLElement>('[data-cms-words]');
     const link = target.closest<HTMLAnchorElement>('a[href]');
-    const action = pressAction({ inEditing: Boolean(this.editing?.host.contains(target)), field: Boolean(words), link: link ? { href: link.href } : null, mod: event.metaKey || event.ctrlKey }, { origin: this.origin, paths: (this.pages ?? []).map(page => page.path) });
+    const action = pressAction({ inEditing: Boolean(this.editing?.host.contains(target)), field: Boolean(words), link: link ? { href: link.href } : null, mod: event.metaKey || event.ctrlKey }, { origins: this.origins, paths: (this.pages ?? []).map(page => page.path) });
     // The frame never goes anywhere on its own; the editor decides. A question's own disclosure still opens, so its answer can be edited.
     if (!(action.do === 'stop' && !link && target.closest('summary'))) event.preventDefault();
     if (action.do === 'go') void this.go(action.path);

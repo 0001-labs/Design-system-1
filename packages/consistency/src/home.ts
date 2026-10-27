@@ -20,7 +20,7 @@ import './domains';
 import { MEMBERS_CHANGE, personInitial, type Member } from './members';
 import '../../../DS1/3-unit/ds-avatar-group';
 import '../../../DS1/4-page/ds-overlay';
-import { activeWorkspace, canManage, draftWords, readWorkspaces, setActiveWorkspace, storeWorkspaces, storedWorkspaces, workspaceHeaders, type WorkspaceSummary } from './workspace-choice';
+import { activeWorkspace, canManage, draftWords, readFailure, readWorkspaces, setActiveWorkspace, storeWorkspaces, storedWorkspaces, workspaceHeaders, type ReadFailure, type WorkspaceSummary } from './workspace-choice';
 import { ConsistencySiteEditor } from './site-editor';
 import type { SiteSummary } from './site-editing';
 import { PLACES, shownPlaces, sitePlaces, type SitePlace } from './places/index';
@@ -118,7 +118,7 @@ export function workspaceInitial(name: string): string { return (name.trim().rep
 
 /** Consistency's app: a workspace's sites, each in the editor, and Settings. */
 export class ConsistencyHome extends LitElement {
-  static properties = { error: { state: true }, workspaces: { state: true }, workspace: { state: true }, place: { state: true }, sites: { state: true }, naming: { state: true }, unread: { state: true }, people: { state: true }, peopleOpen: { state: true }, draftSites: { state: true }, draftProblem: { state: true } };
+  static properties = { error: { state: true }, workspaces: { state: true }, workspace: { state: true }, place: { state: true }, sites: { state: true }, naming: { state: true }, unread: { state: true }, failed: { state: true }, people: { state: true }, peopleOpen: { state: true }, draftSites: { state: true }, draftProblem: { state: true } };
   /** The places the app can show, by id (`places/index.ts`), here too for a place defined outside the app's modules. */
   static readonly places = PLACES;
   declare place: Place;
@@ -134,6 +134,12 @@ export class ConsistencyHome extends LitElement {
   private newSite?: NewSite;
   /** True once the workspaces have been read and the person has none: invited nowhere yet. */
   declare unread: boolean;
+  /**
+   * Why the last read of the workspaces or the sites failed, or '' while the platform answers. The home says so under
+   * its title, over the workspaces and cards drawn from the last visit: they are the last known truth, not the current
+   * one. A read that succeeds takes the message off.
+   */
+  declare failed: ReadFailure | '';
   /** The workspace's people, as stored or read. */
   declare people: Member[];
   /** Whether the people panel stands at the side. */
@@ -160,7 +166,7 @@ export class ConsistencyHome extends LitElement {
     this.go(next);
   };
   constructor() {
-    super(); this.draftSites = []; this.draftProblem = ''; this.error = ''; this.naming = null; this.unread = false;
+    super(); this.draftSites = []; this.draftProblem = ''; this.error = ''; this.naming = null; this.unread = false; this.failed = '';
     this.workspaces = storedWorkspaces();
     this.workspace = this.workspaces.some(each => each.code === activeWorkspace()) ? activeWorkspace() : this.workspaces[0]?.code ?? '';
     setActiveWorkspace(this.workspace);
@@ -207,11 +213,13 @@ export class ConsistencyHome extends LitElement {
 
   /**
    * The workspaces the person may open, then the sites of the one the app is in: the one chosen last, else the one
-   * holding a site asked for by its code, else the first.
+   * holding a site asked for by its code, else the first. A failed read is said under the title (`failed`) and the
+   * sites are not asked for: the same session or platform would fail them too. Try again reads from here.
    */
   private async readWorkspaces() {
     const read = await readWorkspaces();
-    if (!read) { if (this.workspace) void this.readSites(); return; }
+    if ('failed' in read) { this.failed = read.failed; return; }
+    this.failed = '';
     this.workspaces = read.workspaces;
     storeWorkspaces(read.workspaces);
     this.unread = !read.workspaces.length;
@@ -249,7 +257,10 @@ export class ConsistencyHome extends LitElement {
     try { localStorage.setItem(PEOPLE_KEY(this.workspace), JSON.stringify(members)); } catch { /* read again next visit */ }
   }
 
-  /** The workspace's sites from the registry: their names and their own addresses. */
+  /**
+   * The workspace's sites from the registry: their names and their own addresses. A failed read keeps the cards as
+   * last read and says so under the title (`failed`); a read that succeeds takes the message off.
+   */
   private async readSites() {
     const workspace = this.workspace;
     if (!workspace) { this.sites = []; return; }
@@ -257,7 +268,9 @@ export class ConsistencyHome extends LitElement {
     void this.readDraftSites(workspace);
     const response = await fetch('/api/consistency/sites', { cache: 'no-store', headers: workspaceHeaders() }).catch(() => null);
     const body = response?.ok ? await response.json().catch(() => null) as { sites?: SiteSummary[] } | null : null;
-    if (!Array.isArray(body?.sites) || workspace !== this.workspace) return;
+    if (workspace !== this.workspace) return;
+    if (!Array.isArray(body?.sites)) { this.failed = readFailure(response); return; }
+    this.failed = '';
     this.sites = body.sites;
     try { localStorage.setItem(SITES_KEY(workspace), JSON.stringify(this.sites)); } catch { /* read again next visit */ }
   }
@@ -393,11 +406,24 @@ export class ConsistencyHome extends LitElement {
       <div class=${open || drafting ? 'home-main home-main--site' : 'home-main'}>
         ${open || drafting || creating ? '' : html`<ds-text class="home-title" role="heading" aria-level="1" literal size="display" text=${settings ? 'Settings' : 'Sites'}></ds-text>`}
         ${!open && !drafting && !creating && !settings && drafts ? html`<ds-text class="home-drafts" tone="muted" literal text=${drafts}></ds-text>` : ''}
+        ${!open && !drafting && !creating && !settings ? this.readProblem() : ''}
         ${creating ? this.newSiteFlow() : drafting ? '' : this.place.page === 'settings' ? this.settings(this.place.tab, current) : open ? (this.sites.some(site => site.code === open) ? '' : html`<ds-empty literal heading="This site is not in your workspace"></ds-empty>`) : this.unread ? html`<ds-empty literal heading="You are not in a workspace yet" text="Ask whoever invited you to Consistency to invite this address."></ds-empty>` : this.siteCards()}
         <div class="home-stage" ?hidden=${!open && !drafting}></div>
       </div>
     </ds-page>
     ${this.peoplePanel(current)}`;
+  }
+
+  /**
+   * Why the workspaces or the sites could not be read, under the title and over the cards from the last visit: the
+   * session ended, with Sign in leading to the gateway's sign-in page; or the platform could not be reached, with
+   * Try again reading the workspaces again. Nothing while the reads succeed.
+   */
+  private readProblem() {
+    if (!this.failed) return '';
+    return this.failed === 'signed-out'
+      ? html`<ds-message class="home-problem" role="alert" tone="danger" literal text="Your session ended. Sign in again."><ds-button slot="actions" secondary href="/app/signin">Sign in</ds-button></ds-message>`
+      : html`<ds-message class="home-problem" role="alert" tone="danger" literal text="Consistency could not be reached. Try again."><ds-button slot="actions" secondary @click=${() => void this.readWorkspaces()}>Try again</ds-button></ds-message>`;
   }
 
   /**

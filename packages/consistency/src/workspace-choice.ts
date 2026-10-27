@@ -40,11 +40,22 @@ export function storedWorkspaces(): WorkspaceSummary[] {
 }
 export function storeWorkspaces(list: WorkspaceSummary[]) { try { localStorage.setItem(LIST_KEY, JSON.stringify(list)); } catch { /* read again next visit */ } }
 
-/** The workspaces the person may open, or null when they could not be read. */
-export async function readWorkspaces(): Promise<{ owner: boolean; workspaces: WorkspaceSummary[] } | null> {
+/** Why a read failed: the session ended (the platform answered 401 or 403), or the platform could not be reached or answered badly. */
+export type ReadFailure = 'signed-out' | 'unavailable';
+/** The workspaces the person may open, or why they could not be read. */
+export type WorkspacesRead = { owner: boolean; workspaces: WorkspaceSummary[] } | { failed: ReadFailure };
+/** The failure a read ended in: `signed-out` for 401 and 403, `unavailable` for every other answer and for no answer at all. */
+export const readFailure = (response: Response | null): ReadFailure => response?.status === 401 || response?.status === 403 ? 'signed-out' : 'unavailable';
+
+/**
+ * The workspaces the person may open, or `{ failed }` saying why they could not be read: `signed-out` when the
+ * platform answered 401 or 403, `unavailable` for any other failure (another status, a bad body, no answer). The home
+ * says so over the workspaces and cards it drew from the last visit, instead of passing them off as current.
+ */
+export async function readWorkspaces(): Promise<WorkspacesRead> {
   const response = await fetch('/api/consistency/workspaces', { cache: 'no-store' }).catch(() => null);
   const body = response?.ok ? await response.json().catch(() => null) as { owner?: unknown; workspaces?: unknown } | null : null;
-  if (!Array.isArray(body?.workspaces)) return null;
+  if (!Array.isArray(body?.workspaces)) return { failed: readFailure(response) };
   return { owner: body.owner === true, workspaces: body.workspaces.filter(isSummary) };
 }
 

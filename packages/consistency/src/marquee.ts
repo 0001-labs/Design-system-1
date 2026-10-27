@@ -16,7 +16,18 @@ export function isMarqueeContent(element: HTMLElement): boolean {
   return !!element.textContent?.trim() || element.dataset.kind === 'divider' || !!element.querySelector('.aa-atom,img,hr,video,canvas,ds-card,ds-button,table');
 }
 
-/** Keep group identity for commands, but paint only authored component bounds. */
+/** The selectable units of a surface: selectables, and the blocks of an Aa editor. A plain editor's block is its element's own words, not a unit. */
+const SELECTION_UNITS = '[data-selectable], aa-editor .aa-block';
+/** Whether an element holds units of its own, to be painted in its place. */
+function holdsSelectionUnits(element: HTMLElement): boolean {
+  return !!element.querySelector(element.closest('aa-editor') ? '[data-selectable], .aa-block' : SELECTION_UNITS);
+}
+
+/**
+ * Keep group identity for commands, but paint only authored component bounds: a selected element is one
+ * face over its own bounds, unless it holds selectable units (selectable descendants, or the blocks of an Aa
+ * editor), which are painted separately while the container and the space between them stay unfilled.
+ */
 export function paintCompositionSelection(root: HTMLElement, selection: Set<string>): void {
   const elements = Array.from(root.querySelectorAll<HTMLElement>('[data-selectable]'));
   const selected = elements.filter(element => selection.has(element.dataset.selectable!));
@@ -25,8 +36,8 @@ export function paintCompositionSelection(root: HTMLElement, selection: Set<stri
     const active = selection.has(element.dataset.selectable!);
     if (element.hasAttribute(attribute) !== active) element.toggleAttribute(attribute, active);
   }
-  for (const element of root.querySelectorAll<HTMLElement>('[data-selectable], .aa-block')) {
-    const leaf = !element.querySelector('[data-selectable], .aa-block');
+  for (const element of root.querySelectorAll<HTMLElement>(SELECTION_UNITS)) {
+    const leaf = !holdsSelectionUnits(element);
     const active = leaf && isMarqueeContent(element) && selected.some(parent => parent === element || parent.contains(element));
     if (element.hasAttribute('data-selection-face') !== active) element.toggleAttribute('data-selection-face', active);
   }
