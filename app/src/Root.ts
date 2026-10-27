@@ -8,6 +8,7 @@ import { currentLocation, matchRoute, navigate } from "./router";
 import "./AppShell";
 import "./NavigationAuth";
 import "./SystemWorkbench";
+import "./screens/SystemSite";
 import "./screens/AdoptionDashboard";
 import "./screens/BaseEditor";
 import "./screens/ComponentEditor";
@@ -78,6 +79,7 @@ defineElement("ds1-routes", AppRoutes);
 export class AppRoot extends AppElement {
   override render() {
     const { pathname, hostname } = window.location;
+    if (hostname === "system.designsystem1.com") return html`<ds1-system-site></ds1-system-site>`;
     if (["/flags", "/flags/", "/app/flags"].includes(pathname)) return html`<ds1-feature-flags></ds1-feature-flags>`;
     if (pathname === "/app/navigation-auth") return html`<ds1-navigation-auth></ds1-navigation-auth>`;
     if (["c9y.site", "editor.c9y.site"].includes(hostname)) return html`<ds1-private-preview-signin></ds1-private-preview-signin>`;

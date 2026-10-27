@@ -9,7 +9,9 @@ Design system 1 (`/Users/joachim/0001/Design system 1`, source in `DS1/`) is the
 
 ## Design decisions
 
-Cut taglines, helper text and secondary labels. If a screen needs them to make sense, fix the layout.
+Make the interface understandable through its layout, familiar controls and precise labels. Omit instructional filler such as “Choose a prospect”, “Click to edit” and explanations of obvious controls; leave an unselected detail area empty. Keep useful empty states, validation, failures and recovery actions concise and specific.
+
+Edit in place with immediate visual feedback and automatic persistence. Text may debounce briefly; choices apply immediately and leaving a field flushes pending edits. Routine edits have no Save or Apply button and need no “changes save automatically” explanation. Preserve newer typing during writes, serialize updates, retain failed drafts and protect navigation; report failures with a concrete recovery action. Send, publish, purchase and destructive actions remain explicit actions, separate from saving an edit. Verify saving without a click, rapid edits during a slow response, failure recovery and reopening.
 
 Keep data current automatically on entry, after changes and when returning to the page or reconnecting. Never add Reload or Refresh buttons, including icon-only equivalents. Preserve focused fields, unsaved edits and pending writes during background updates; show failures inline and recover reads automatically without replaying writes.
 
