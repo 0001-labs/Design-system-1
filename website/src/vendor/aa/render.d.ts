@@ -20,7 +20,7 @@ export type Decoration = {
 export type AtomDrawer = (name: string, source: string) => HTMLElement;
 /** The atom as its own words, for an editor given nothing better. */
 export declare const drawAtomAsText: AtomDrawer;
-export declare function atomElement(name: string, source: string): HTMLElement;
+export declare function atomElement(name: string, source: string, document?: Document): HTMLElement;
 /** Which part of a block the selection is in, in its own offsets; null when the selection is elsewhere. */
 export type Reveal = {
     from: number;
