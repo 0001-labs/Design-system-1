@@ -66,9 +66,18 @@ try {
  await page.locator('consistency-draft-site consistency-template iframe').waitFor();
  const savedFrame = page.frameLocator('consistency-draft-site consistency-template iframe');
  await savedFrame.getByText('Our first site', { exact: true }).waitFor();
+ if (await page.locator('consistency-draft-site ds-input[label="Site name"]').count()) throw Error('A named site still has a name field over its canvas');
+ if (await page.locator('consistency-draft-site consistency-editor').count()) throw Error('A saved site still mounts the lab workspace');
+ await page.getByRole('button', { name: 'Site: A saved booking site', exact: true }).waitFor();
+ const bounds = await page.locator('consistency-draft-site').evaluate(element => {
+  const stage = element.closest('.home-stage').getBoundingClientRect(), frame = element.querySelector('consistency-template iframe').getBoundingClientRect();
+  return { top: frame.top - stage.top, height: stage.height - frame.height };
+ });
+ if (Math.abs(bounds.top) > 1 || Math.abs(bounds.height) > 1) throw Error('The saved site does not fill the normal editor: '+JSON.stringify(bounds));
+
  const heading = savedFrame.getByRole('textbox', { name: 'Edit Get more from every work trip' }).locator('[contenteditable]');
  await heading.fill('The next version');
- await page.getByRole('button', { name: 'Workspace: Example workspace' }).click();
+ await page.getByRole('button', { name: 'Site: A saved booking site' }).click();
  await page.locator('ds-card[data-draft-site]').click();
  await savedFrame.getByText('The next version', { exact: true }).waitFor();
  await page.reload();
@@ -79,12 +88,12 @@ try {
  // A failed autosave must retain the draft and block navigation.
  refuse = true;
  await savedFrame.getByRole('textbox', { name: 'Edit Get more from every work trip' }).locator('[contenteditable]').fill('Keep this unsaved edit');
- await page.getByRole('button', { name: 'Workspace: Example workspace' }).click();
+ await page.getByRole('button', { name: 'Site: A saved booking site' }).click();
  await page.locator('consistency-draft-site [role="alert"]').waitFor();
  await savedFrame.getByText('Keep this unsaved edit', { exact: true }).waitFor();
  refuse = false;
  await page.locator('consistency-draft-site').getByRole('button', { name: 'Try again', exact: true }).click();
- await page.getByRole('button', { name: 'Workspace: Example workspace' }).click();
+ await page.getByRole('button', { name: 'Site: A saved booking site' }).click();
  await page.getByRole('button', { name: 'Add new site', exact: true }).waitFor();
  console.log('Home: failed autosave keeps the edit, blocks navigation and recovers on retry');
  await page.goto(`http://127.0.0.1:${server.address().port}/private-consistency/`);

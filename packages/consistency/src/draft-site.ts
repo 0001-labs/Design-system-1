@@ -1,6 +1,8 @@
 import { LitElement, html } from 'lit';
 import { ConsistencyEditor } from './index';
 import { DocumentState } from './document-state';
+import { TemplateEditor } from './template-editor';
+import type { Composition } from './model';
 import { SITE_TEMPLATES, templateDocument } from './templates';
 import '../../../DS1/2-core/ds-input';
 import '../../../DS1/3-unit/ds-form';
@@ -21,7 +23,7 @@ export class DraftSiteEditor extends LitElement {
   workspace = '';
   site!: DraftSiteSummary;
   declare problem: string;
-  private editor?: ConsistencyEditor;
+  private editor?: ConsistencyEditor | TemplateEditor;
   private state?: DocumentState<{ name: string; page: Record<string, unknown> }, { build: string; base: string; revision: number; document: { name: string; page: Record<string, unknown> } }>;
   private readonly unload = (event: BeforeUnloadEvent) => { if (this.state?.dirty || this.state?.busy) { event.preventDefault(); event.returnValue = ''; } };
   constructor() { super(); this.problem = ''; }
@@ -37,25 +39,39 @@ export class DraftSiteEditor extends LitElement {
         this.dispatchEvent(new CustomEvent('draft-site-saved', { detail: saved, bubbles: true }));
         return { ...value, revision: saved.revision, document: { name: saved.name, page: saved.document } };
       }, () => this.requestUpdate());
-      this.editor = new ConsistencyEditor(); this.editor.siteMode = true; this.editor.loadDocument(draft.document);
-      this.editor.addEventListener('consistency-change', () => this.state?.commit({ name: this.state.document.name, page: this.editor!.readDocument() }));
+      if ((draft.document.composition as Composition).sections.__authored === '1') {
+        const editor = new TemplateEditor(); editor.template = String(draft.document.example);
+        editor.values = (draft.document.composition as Composition).sections;
+        this.editor = editor;
+        editor.addEventListener('template-change', () => this.changed());
+      } else {
+        const editor = new ConsistencyEditor(); editor.siteMode = true; editor.loadDocument(draft.document);
+        this.editor = editor;
+        editor.addEventListener('consistency-change', () => this.changed());
+      }
       this.requestUpdate();
     } catch (error) { this.problem = (error as Error).message; }
   }
+  private readDocument(): Record<string, unknown> {
+    const page = this.state!.document.page;
+    return this.editor instanceof TemplateEditor
+      ? { ...page, composition: { ...(page.composition as Composition), sections: this.editor.readValues() } }
+      : this.editor?.readDocument() ?? page;
+  }
+  private changed() { if (this.state) this.state.commit({ name: this.state.document.name, page: this.readDocument() }); }
   async flush() { return await this.editor?.flush() !== false && await this.state?.flush() !== false; }
   private async saveCopy() {
     if (!this.state || !this.editor) return;
     try {
-      const saved = await draftSiteApi<DraftSite>(this.workspace, crypto.randomUUID(), { method: 'PUT', body: JSON.stringify({ name: `${this.state.document.name.slice(0, 75)} copy`, document: this.editor.readDocument(), revision: 0 }) });
+      const saved = await draftSiteApi<DraftSite>(this.workspace, crypto.randomUUID(), { method: 'PUT', body: JSON.stringify({ name: `${this.state.document.name.slice(0, 75)} copy`, document: this.readDocument(), revision: 0 }) });
       this.state.discard();
       this.dispatchEvent(new CustomEvent('draft-site-copy', { detail: saved, bubbles: true }));
     } catch (error) { this.problem = (error as Error).message; }
   }
   render() {
-    return html`<div class="draft-site-bar">
-      ${this.state ? html`<ds-input label="Site name" maxlength="80" .value=${this.state.document.name} @change=${(event: Event) => { const value = (event.target as HTMLElement & { value: string }).value.trim(); if (value) this.state!.commit({ ...this.state!.document, name: value }); }}></ds-input><ds-text literal tone="muted" text="Private draft"></ds-text>` : ''}
-      ${this.problem || this.state?.error ? html`<ds-text role="alert" literal tone="danger" wrap .text=${this.problem || this.state!.error}></ds-text><ds-button @click=${() => this.state ? void this.flush() : void this.load()}>Try again</ds-button>${this.state ? html`<ds-button @click=${() => void this.saveCopy()}>Save a copy</ds-button>` : ''}` : ''}
-    </div>${this.editor ?? html`<ds-text literal text="Opening site…"></ds-text>`}`;
+    return html`${this.problem || this.state?.error ? html`<div class="draft-site-error">
+      <ds-text role="alert" literal tone="danger" wrap .text=${this.problem || this.state!.error}></ds-text><ds-button @click=${() => this.state ? void this.flush() : void this.load()}>Try again</ds-button>${this.state ? html`<ds-button @click=${() => void this.saveCopy()}>Save a copy</ds-button>` : ''}
+    </div>` : ''}${this.editor ?? html`<ds-text literal text="Opening site…"></ds-text>`}`;
   }
   disconnectedCallback() { super.disconnectedCallback(); this.state?.destroy(); removeEventListener('beforeunload', this.unload); }
 }

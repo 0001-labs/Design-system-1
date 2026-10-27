@@ -370,10 +370,12 @@ export class ConsistencyHome extends LitElement {
     const open = this.place.page === 'site' ? (this.place as { code: string }).code : '';
     const site = open ? this.sites.find(item => item.code === open) : undefined;
     const drafting = this.place.page === 'draft-site';
+    const draftSite = this.place.page === 'draft-site' ? this.draftSites.find(site => site.id === (this.place as { id: string }).id) : undefined;
+    const activeSite = site ?? draftSite;
     const creating = this.place.page === 'new-site';
     const drafts = draftWords(current ? { ...current, sites: current.sites + this.draftSites.length } : undefined);
     return html`${this.edge.reveal}${this.edge.handle}<ds-page layout="sidebar" fill drawer>
-      ${site ? this.siteNav(site) : html`<nav slot="nav" id="home-nav" class="home-nav" aria-label="Consistency">
+      ${activeSite ? this.siteNav(activeSite) : html`<nav slot="nav" id="home-nav" class="home-nav" aria-label="Consistency">
         <div class="home-workspace" aria-label="Workspace">
           <ds-button id="home-workspace" class="home-workspace-name" label=${`Workspace: ${name}`} @click=${() => this.go({ page: 'sites' })}>
             <ds-avatar initial=${workspaceInitial(name)} outlined plain aria-hidden="true"></ds-avatar>${name}
@@ -402,24 +404,29 @@ export class ConsistencyHome extends LitElement {
    * An open site's sidebar, as the workspace's is: its name, which shows the workspace's sites and whose menu goes to
    * another site, then Site, which shows the site itself to edit, and its places.
    */
-  private siteNav(site: SiteSummary) {
-    const current = this.placeOf(this.place);
+  private siteNav(site: SiteSummary | DraftSiteSummary) {
+    const published = 'code' in site;
+    const current = published ? this.placeOf(this.place) : undefined;
     const items = [
       { id: SITE_ROW, label: 'Site', current: !current },
-      ...shownPlaces(this.placesFor(site.code)).map(place => ({ id: place.id, label: place.label, current: place.id === current })),
+      ...(published ? shownPlaces(this.placesFor(site.code)).map(place => ({ id: place.id, label: place.label, current: place.id === current })) : []),
     ];
-    const others = this.sites.filter(item => item.code !== site.code);
+    const home: Place = published ? { page: 'site', code: site.code } : { page: 'draft-site', id: site.id, workspace: this.workspace };
+    const others: Array<{ name: string; place: Place }> = [
+      ...this.sites.filter(item => !published || item.code !== site.code).map(item => ({ name: item.name, place: { page: 'site' as const, code: item.code } })),
+      ...this.draftSites.filter(item => published || item.id !== site.id).map(item => ({ name: item.name, place: { page: 'draft-site' as const, id: item.id, workspace: this.workspace } })),
+    ];
     return html`<nav slot="nav" id="home-nav" class="home-nav" aria-label=${site.name}>
       <div class="home-workspace" aria-label="Site">
         <ds-button id="home-site" class="home-workspace-name" label=${`Site: ${site.name}`} @click=${() => this.go({ page: 'sites' })}>
           <ds-avatar initial=${workspaceInitial(site.name)} outlined plain aria-hidden="true"></ds-avatar>${site.name}${others.length ? html`<ds-icon type="chevron-down"></ds-icon>` : ''}
         </ds-button>
         ${others.length ? html`<ds-select for="home-site" hover aria-label="Sites">
-          ${others.map(item => html`<ds-button menu-item @click=${() => this.go({ page: 'site', code: item.code })}>${item.name}</ds-button>`)}
+          ${others.map(item => html`<ds-button menu-item @click=${() => this.go(item.place)}>${item.name}</ds-button>`)}
         </ds-select>` : ''}
       </div>
       <ds-sidebar class="home-places" label=${site.name} .items=${items}
-        @sidebar-activate=${(event: CustomEvent<{ id: string }>) => this.go(event.detail.id === SITE_ROW ? { page: 'site', code: site.code } : { page: 'site', code: site.code, place: event.detail.id })}></ds-sidebar>
+        @sidebar-activate=${(event: CustomEvent<{ id: string }>) => this.go(published && event.detail.id !== SITE_ROW ? { page: 'site', code: site.code, place: event.detail.id } : home)}></ds-sidebar>
     </nav>`;
   }
 
