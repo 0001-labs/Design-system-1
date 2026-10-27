@@ -1,3 +1,4 @@
+import { define } from "../0-face/define";
 // ds-table.ts
 // A data table: rows one square high on hairlines, drawn from data with the
 // same rules as a native `<table class="ds-table">` (1-root/table.css). With
@@ -498,7 +499,7 @@ function text(value: unknown): string {
   return typeof value === "number" ? value.toLocaleString() : String(value);
 }
 
-customElements.define("ds-table", DsTable);
+define("ds-table", DsTable);
 
 declare global {
   interface HTMLElementTagNameMap {

@@ -1,6 +1,7 @@
 import { LitElement, html, nothing, unsafeCSS, type PropertyValues } from "lit";
 import { styleMap } from "lit/directives/style-map.js";
 import { keyed } from "lit/directives/keyed.js";
+import { contrastRatio, colorReader, composite, type RGBA } from "../0-face/text-contrast";
 import { define } from "../0-face/define";
 import { provideIcons } from "./ds-icon";
 import { avatarIcon } from "./generated/icon-avatar";
@@ -12,9 +13,11 @@ provideIcons({ avatar: avatarIcon });
 
 /** The ink that reads on a fill: black on a light one, white on a dark one. */
 const inkOn = (rgb: number[]) => {
-  const linear = rgb.map((n) => (n <= 0.04045 ? n / 12.92 : ((n + 0.055) / 1.055) ** 2.4));
-  const luminance = linear[0] * 0.2126 + linear[1] * 0.7152 + linear[2] * 0.0722;
-  return luminance > 0.22 ? "var(--ds-black)" : "var(--ds-white)";
+  const fill = [...rgb, 1] as RGBA;
+  const white: RGBA = [1, 1, 1, 1], black: RGBA = [42 / 255, 42 / 255, 42 / 255, 1];
+  if (contrastRatio(black, fill) >= 4.5) return "var(--ds-black)";
+  if (contrastRatio(white, fill) >= 4.5) return "var(--ds-white)";
+  return "black";
 };
 
 /** Saved identity colours are hex; their ink must stay legible in either theme. */
@@ -93,6 +96,28 @@ export class Avatar extends LitElement {
     this.fit = "cover";
     this.logo = this.mask = this.outlined = this.pending = this.plain = this.loaded = this.failed = false;
   }
+  private inkObserver?: MutationObserver;
+  private inkFrame = 0;
+  private readonly queueInk = () => {
+    const view = this.ownerDocument.defaultView!;
+    if (!this.inkFrame) this.inkFrame = view.requestAnimationFrame(() => { this.inkFrame = 0; this.resolveInk(); });
+  };
+  connectedCallback() {
+    super.connectedCallback();
+    const view = this.ownerDocument.defaultView!;
+    this.inkObserver = new view.MutationObserver(this.queueInk);
+    // Observe only the painted ancestors, never our own shadow's ink writes.
+    for (let parent: Element | null = this; parent; parent = parent.parentElement ?? (parent.getRootNode() as ShadowRoot).host ?? null) {
+      this.inkObserver.observe(parent, { attributes: true, attributeFilter: ['class', 'style', 'data-theme'] });
+    }
+    view.addEventListener('load', this.queueInk, true);
+  }
+  disconnectedCallback() {
+    super.disconnectedCallback(); this.inkObserver?.disconnect();
+    const view = this.ownerDocument.defaultView!;
+    view.cancelAnimationFrame(this.inkFrame); this.inkFrame = 0;
+    view.removeEventListener('load', this.queueInk, true);
+  }
   protected willUpdate(changed: PropertyValues<this>) {
     if (changed.has("src")) {
       this.loaded = false;
@@ -102,7 +127,7 @@ export class Avatar extends LitElement {
   }
   /** A fill named by a variable (`var(--brand-highlight)`) gets its ink once the browser has resolved it. */
   protected updated() {
-    if (this.ink || this.pending || this.plain || !this.color || avatarInk(this.color)) return;
+    if (this.ink || this.pending || this.plain) return;
     this.resolveInk();
   }
   /** Reads the fill as drawn; while the variable is still undefined (its stylesheet on its way), looks again next
@@ -110,9 +135,23 @@ export class Avatar extends LitElement {
   private resolveInk(tries = 0) {
     const frame = this.renderRoot.querySelector<HTMLElement>(".frame");
     if (!frame || !this.isConnected) return;
-    const ink = inkOnResolved(getComputedStyle(frame).backgroundColor);
-    if (ink) { frame.style.color = ink; return; }
-    if (tries < 60) requestAnimationFrame(() => this.resolveInk(tries + 1));
+    if (this.ink || this.pending || this.plain) return;
+    const view = this.ownerDocument.defaultView!;
+    const read = colorReader(this.ownerDocument);
+    let fill = read(view.getComputedStyle(frame).backgroundColor);
+    if (fill && fill[3] > 0) {
+      for (let parent: Element | null = this; parent && fill[3] < 1; parent = parent.parentElement ?? (parent.getRootNode() as ShadowRoot).host ?? null) {
+        const background = read(view.getComputedStyle(parent).backgroundColor);
+        if (background) fill = composite(fill, background);
+      }
+      if (fill[3] < 1) return;
+      const tokens = view.getComputedStyle(this);
+      const black = read(tokens.getPropertyValue('--ds-black').trim()), white = read(tokens.getPropertyValue('--ds-white').trim());
+      const ink = black && contrastRatio(black, fill) >= 4.5 ? 'var(--ds-black)' : white && contrastRatio(white, fill) >= 4.5 ? 'var(--ds-white)' : contrastRatio([0,0,0,1], fill) >= 4.5 ? 'black' : 'white';
+      if (frame.style.color !== ink) frame.style.color = ink;
+      return;
+    }
+    if (tries < 60) this.ownerDocument.defaultView!.requestAnimationFrame(() => this.resolveInk(tries + 1));
     if (tries === 0 && this.ownerDocument.readyState !== "complete") {
       this.ownerDocument.defaultView?.addEventListener("load", () => this.resolveInk(60), { once: true });
     }
@@ -129,7 +168,7 @@ export class Avatar extends LitElement {
         >`;
     return html`<span
       class="frame"
-      style=${styleMap({ backgroundColor: !this.pending && !this.plain ? this.color || undefined : undefined, color: !this.pending ? this.ink || avatarInk(this.color) : undefined })}
+      style=${styleMap({ backgroundColor: !this.pending && !this.plain ? this.color || undefined : undefined, color: !this.pending ? this.ink || (!this.plain ? avatarInk(this.color) : undefined) : undefined })}
       role=${this.label ? "img" : nothing}
       aria-label=${this.label || nothing}
       aria-hidden=${this.label ? nothing : "true"}

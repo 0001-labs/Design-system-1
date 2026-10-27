@@ -397,6 +397,10 @@ The small rules every component keeps, each a sentence with a code that never ch
 
 - `color.text-contrast`: Visible text, including muted labels, placeholders and avatar initials, has at least 4.5:1 contrast against the background it is drawn on. Measure resolved colours through slots and open shadow roots, including transparency and opacity; image backgrounds and effects that cannot be measured need a visual review.
 
+**Avatar** (`ds-avatar`)
+
+- `avatar.initial-contrast`: Avatar initials have at least 4.5:1 contrast against their rendered fill, including after a theme or identity colour changes. Check each initial inside the avatar’s shadow root and in overlapping groups; decorative initials still need to be readable. Explicit ink overrides must pass too.
+
 **Card** (`ds-card`)
 
 - `card.media-level`: A card's picture stands on the card's foot, a square below the words at least, so the pictures of cards side by side stand on one level whatever the words above them. The room a taller card leaves goes above its picture, never below it, so pictures of one height side by side start on one line too; a taller picture starts higher.

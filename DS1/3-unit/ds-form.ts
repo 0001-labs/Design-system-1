@@ -1,3 +1,4 @@
+import { define } from "../0-face/define";
 // ds-form.ts
 // Form component for handling form submissions and validation
 
@@ -338,7 +339,7 @@ export class Form extends LitElement {
   }
 }
 
-customElements.define("ds-form", Form);
+define("ds-form", Form);
 
 declare global {
   interface HTMLElementTagNameMap {

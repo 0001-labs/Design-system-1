@@ -1,3 +1,4 @@
+import { define } from "../0-face/define";
 // ds-container.ts
 // Container component with responsive width constraints
 
@@ -19,7 +20,7 @@ export class Container extends LitElement {
   }
 }
 
-customElements.define("ds-container", Container);
+define("ds-container", Container);
 
 declare global {
   interface HTMLElementTagNameMap {
