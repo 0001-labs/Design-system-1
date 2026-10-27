@@ -1,13 +1,13 @@
 {
   "Aa": {
-    "commit": "be8c58287e61f9a58679b32bbe48f0e8de8bb51c",
+    "commit": "9640561e9f6d108809a771b912512e7aa2000c4c",
     "version": "0.10.0",
     "owned": ["website/src/vendor/aa"],
     "files": {
       "website/src/vendor/aa/README.md": "1f81b66577d7c7674a3acf4f0e25bf541380f7cc259c03c244e9558a06159da7",
       "website/src/vendor/aa/aa.css": "aad2ac4298665a10f07f435241cc491c086b9b1b6dff6c0a2d641c77f1dc6638",
       "website/src/vendor/aa/aa.d.ts": "e867e00711b211669304137592ba42382802a8c2618da4f7971f66907a78c029",
-      "website/src/vendor/aa/aa.js": "77a6dd60963019faba946625bcc8365e7753a3ed2f5ec9b8724573583fe29cec",
+      "website/src/vendor/aa/aa.js": "6eebe50dc2fb6fdd32e95dd9c66e4978f1e7cecc2664906528b28fe67698c58b",
       "website/src/vendor/aa/button-partial.d.ts": "d576194fdc3d5bda54e0e72b5b016ed604ab51dfebb54b5752f467c1266777bd",
       "website/src/vendor/aa/comments-editor.d.ts": "0126819dee58ff74a6f16d6c18598db8259099f6beccd0aefe3e5aee75112d08",
       "website/src/vendor/aa/comments-memory.d.ts": "25906fc3dd1d057a44674f65153ccec59b5400376f7e1e7a8b5a4d767fdfc40b",
@@ -34,7 +34,7 @@
       "website/src/vendor/aa/fonts/inter-arrows.woff2": "7237566e2944e4d1fce01a0c5ae16ae0473fa5da9178449b2da79f685ab0c907",
       "website/src/vendor/aa/history.d.ts": "e351a78aac35ea02f31069df5a53b0fca19624b1da401cf72c0727fbfce6842b",
       "website/src/vendor/aa/icons.d.ts": "092df77a11cd3aa0f86858713c3ed848c7eb4b2d8bb8cb29a1923343d105b96a",
-      "website/src/vendor/aa/index.d.ts": "a8d5c8ccb6968c2467e3811dce496910c73e06321c76ce5458a3f85fe7a5877a",
+      "website/src/vendor/aa/index.d.ts": "48c8867283a604eac75a540372ac7ec38b04457d3152824216a619819fe8545b",
       "website/src/vendor/aa/markdown.d.ts": "7e6c4aefefe65f73ae95ed45d61032bc33422ab730c310350b323f0f91d5436a",
       "website/src/vendor/aa/marker.d.ts": "b15cd5e603bf0aec1217888c748bc1e62b1eacff5decf2b8d084130b396332e4",
       "website/src/vendor/aa/marker.js": "1b9ce71c35eb888e784187933440dbef2389ac4364c60d12d14e789b2d1eaa86",
@@ -42,6 +42,7 @@
       "website/src/vendor/aa/parse.d.ts": "dd78aaa9e2b32eaf1c142fb6d2cfbd76c637ad03733265236c6fcaac7133eb12",
       "website/src/vendor/aa/parse.js": "809ff4b5affcbee2d27862452b82ad23ef55d8f0c438e0d9f8b7070574ae5fd0",
       "website/src/vendor/aa/partials.d.ts": "ef2517ba46bd5d4b34a24da1f3984cefa1be8c66d5b2bbfe59ad7041b7ede5c5",
+      "website/src/vendor/aa/placement.d.ts": "00ad7a5b21012128e166f05e3f00922bafb1c9f9a79421d6c8c249fd019f3293",
       "website/src/vendor/aa/plain.d.ts": "682a3bdd81cd08851ffca5fb737a2263cc8c4ef84679a9208e86e06d782a0551",
       "website/src/vendor/aa/prompt.d.ts": "9285985050574da8dca9c5c08bc2a22f9719ab1413375a5d2ac2cdaa73433959",
       "website/src/vendor/aa/render.d.ts": "f1d2403cded06a2e80ca6dbb0f954f17afd2435ccc4bce818142338149c387c5",
