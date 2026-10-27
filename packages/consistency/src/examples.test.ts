@@ -1,37 +1,20 @@
 // @vitest-environment happy-dom
-import { existsSync, readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
 import { expect, it } from 'vite-plus/test';
 import { EXAMPLE_PAGES, exampleComposition } from './examples';
 import { initialComposition } from './model';
-import { parseBlocks } from '../../../website/src/vendor/aa/aa';
-it('offers the editor introduction, Studio and ten DS1 pages as editable compositions', () => {
- expect(EXAMPLE_PAGES.map(page => page.id)).toEqual(['editor', 'studio', 'shop', 'product', 'planner', 'finance', 'travel', 'booking', 'cafe', 'magazine', 'bike', 'financial']);
+it('offers the editor, Studio and every canonical DS1 page as independent authored compositions', () => {
+ expect(EXAMPLE_PAGES.slice(0, 2).map(page => page.id)).toEqual(['editor', 'studio']);
+ expect(EXAMPLE_PAGES).toHaveLength(32);
  expect(exampleComposition('studio')).toEqual(initialComposition);
  for (const page of EXAMPLE_PAGES.slice(2)) {
-  expect(existsSync(resolve(page.sourcePath))).toBe(true);
-  if (page.id !== 'financial') expect(readFileSync(resolve(page.sourcePath), 'utf8')).toContain(`${page.id}:`);
-  expect(page.sourceUrl).toBe(`https://designsystem1.com/examples/layouts/${page.id}/`);
-  expect(page.composition.order[0]).toBe('intro');
-  if (page.id === 'booking') { expect(page.composition.sections).toEqual({}); continue; }
-  expect(parseBlocks(page.composition.text).length).toBeGreaterThan(1);
-  for (const id of page.composition.order.slice(1)) expect(page.composition.sections[id]).toBeTruthy();
-  const all = page.composition.text + Object.values(page.composition.sections).join('\n');
-  expect(all).not.toMatch(/<script|iframe|data-add=|fetch\(/);
-  expect(all).toContain('```c9y-button');
-  for (const match of all.matchAll(/https:\/\/designsystem1.com\/examples\/images\/([^\s"()]+)/g)) expect(existsSync(resolve('website/public/examples/images', match[1]))).toBe(true);
+  expect(page.composition.sections.__authored).toBe('1');
+  expect(page.composition.order).toEqual(['intro']);
+  expect(page.composition.text).toBe('');
  }
 });
-it('keeps sourced headings in the DS1 example source and independent mutable drafts', () => {
- const source = readFileSync(resolve('website/src/lib/product-examples.ts'), 'utf8');
- for (const heading of ['A room is never really finished.', 'A good week starts here.', 'Nothing between you and the next track.', 'A little closer to the mountains.']) expect(source).toContain(heading);
- for (const [id, heading] of [['travel', 'Slow mornings by still water.'], ['cafe', 'Something warm, something sweet.'], ['magazine', 'Getting there is the point.'], ['bike', 'Hills, flattened.']]) {
-  const page = EXAMPLE_PAGES.find(page => page.id === id)!;
-  expect(readFileSync(resolve(page.sourcePath), 'utf8')).toContain(heading);
-  expect(page.composition.text + Object.values(page.composition.sections).join('\n')).toContain(heading);
- }
+it('keeps independent mutable drafts and the existing introduction fallback', () => {
  const first = exampleComposition('shop'), second = exampleComposition('shop');
- first.sections.collection = 'Changed'; first.order.pop(); first.gaps.example = 100;
- expect(second.sections.collection).toContain('The everyday collection'); expect(second.order).toHaveLength(3); expect(second.gaps.example).toBeUndefined();
+ first.sections.changed = 'Changed'; first.order.pop(); first.gaps.example = 100;
+ expect(second.sections.changed).toBeUndefined(); expect(second.order).toEqual(['intro']); expect(second.gaps.example).toBeUndefined();
  expect(exampleComposition('unknown')).toEqual(exampleComposition('editor'));
 });

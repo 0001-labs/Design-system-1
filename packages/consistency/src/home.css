@@ -57,3 +57,16 @@ consistency-members{display:block;max-width:calc(32 * var(--ds-unit))}
 .home-people consistency-members{max-width:none}
 /* Settings at the sidebar's foot, its row on whole squares as the site's menus are, its words on the column's edge. */
 .home-foot{flex:none;margin-top:auto;margin-bottom:calc(var(--ds-unit) / -2);margin-inline-start:calc(-4px * var(--ds-sf, 1))}
+
+/* Template choices use the same card face and whole-square columns as Sites. */
+consistency-new-site,.new-site{display:flex;flex-direction:column;gap:var(--ds-unit);min-width:0}
+.template-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,calc(16 * var(--ds-unit))),1fr));gap:var(--ds-unit)}
+.template-grid>ds-card{width:auto}
+.template-grid p{margin:var(--ds-unit) 0 0;line-height:var(--ds-unit)}
+.new-site-name,.draft-site-bar{display:flex;flex-wrap:wrap;align-items:flex-end;gap:var(--ds-unit)}
+consistency-draft-site{display:flex;flex-direction:column;gap:var(--ds-unit);min-height:0}
+consistency-draft-site>consistency-editor{flex:1;min-height:0}
+.draft-site-bar{padding-bottom:var(--ds-unit)}
+
+.new-site-name>ds-input{width:calc(16 * var(--ds-unit));max-width:100%}
+.new-site>consistency-editor{isolation:isolate;position:relative;min-width:0}

@@ -76,7 +76,7 @@ export class SiteCompositionController {
   private frameRequest = 0;
   private insertionEditor?: { id: string; editor: ReturnType<typeof createPlainEditor> };
 
-  constructor(private readonly frame: HTMLIFrameElement, snapshot: SiteCompositionSnapshot, save: CompositionSave, private readonly beforeEdit: () => Promise<boolean>, private readonly images: string[] = [], private readonly reopen?: () => void) {
+  constructor(private readonly frame: HTMLIFrameElement, snapshot: SiteCompositionSnapshot, save: CompositionSave, private readonly beforeEdit: () => Promise<boolean>, private readonly images: string[] = [], private readonly reopen?: () => void, private readonly documentChanged?: () => void) {
     this.doc = frame.contentDocument!; this.view = this.doc.defaultView!;
     this.state = new SiteCompositionState(snapshot, save, () => this.changed());
     for (const node of snapshot.nodes) { this.nodes.set(node.id, structuredClone(node)); this.baseNodes.set(node.id, structuredClone(node)); }
@@ -225,7 +225,7 @@ export class SiteCompositionController {
     this.surface.paintSelection();
   }
   private schedule = () => { if (!this.frameRequest && !this.disposed) this.frameRequest = this.view.requestAnimationFrame(() => { this.frameRequest = 0; this.spacing.refresh(); this.regions.refresh(); this.cards.refresh(); this.stats.refresh(); this.draw(); }); };
-  private changed() { if (this.disposed) return; this.syncGraph(); this.syncInsertions(); this.syncGraph(); this.paint(); this.bindSort(); this.bindResizing(); this.spacing.refresh(); this.regions.refresh(); this.cards.refresh(); this.stats.refresh(); this.draw(); this.showStatus(); }
+  private changed() { if (this.disposed) return; this.syncGraph(); this.syncInsertions(); this.syncGraph(); this.paint(); this.bindSort(); this.bindResizing(); this.spacing.refresh(); this.regions.refresh(); this.cards.refresh(); this.stats.refresh(); this.draw(); this.showStatus(); this.documentChanged?.(); }
   private showStatus() {
     this.notice.replaceChildren(); const error=this.state.error || this.contentError; this.notice.hidden = !error;
     if (!error) return;

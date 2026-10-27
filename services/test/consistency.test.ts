@@ -196,3 +196,19 @@ it('keeps a member\'s session at consistency.site and opens the app for them, un
   expect(home.status).toBe(200); expect(await home.text()).not.toContain('data-ds-owner');
   expect(new URL(assets.mock.calls[0]![0].url).pathname).toBe('/private-consistency/home.html');
 });
+
+it('gates site-draft creation with identity, same-origin JSON, size and captured workspace', async () => {
+ const { env, send } = setup();
+ const workspace = { fetch: vi.fn(async (_request: Request) => Response.json({ sites: [] })) };
+ const bound = { ...env, CONSISTENCY_WORKSPACE: workspace } as unknown as Parameters<typeof consistencyPreview>[1];
+ const url = 'https://consistency.site/api/consistency/draft-sites/12345678-1234-4234-8234-123456789abc';
+ const call = (origin: string, body: string) => consistencyPreview(new Request(url, { method: 'PUT', headers: { ...headers, Origin: origin, 'Content-Type': 'application/json', 'X-C9y-Workspace': '01STDO', 'X-C9y-Draft-Room': 'unlimited' }, body }), bound, send);
+ expect((await consistencyPreview(new Request(url), bound, send)).status).toBe(401);
+ expect((await call('https://other.test', '{}')).status).toBe(403);
+ expect((await call('https://consistency.site', 'x'.repeat(800001))).status).toBe(413);
+ expect(workspace.fetch).not.toHaveBeenCalled();
+ expect((await call('https://consistency.site', '{}')).status).toBe(200);
+ const forwarded = workspace.fetch.mock.calls[0]![0] as unknown as Request;
+ expect(forwarded.headers.get('X-C9y-Workspace')).toBe('01STDO');
+ expect(forwarded.headers.get('X-C9y-Draft-Room')).toBeNull();
+});

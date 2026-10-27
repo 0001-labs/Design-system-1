@@ -1,3 +1,5 @@
+import './template-editor';
+import type { TemplateEditor } from './template-editor';
 import './booking';
 import '../../../DS1/4-page/ds-page';
 import { render as renderControls } from 'lit';
@@ -45,6 +47,8 @@ export class ConsistencyEditor extends LitElement {
   static properties = { contextActive: { state: true }, selectedExample: { state: true }, mobilePreview: { state: true }, stageWidth: { state: true }, revision: { state: true }, preview: { state: true }, selected: { state: true }, selectedGap: { state: true }, layers: { state: true }, selection: { state: true }, marquee: { state: true }, editorError: { state: true }, library: { state: true }, fonts: { state: true } };
   /** A workspace can host the same controls in its own navigation column. */
   controlsHost?: HTMLElement;
+  siteMode = false;
+  async flush() { return await this.querySelector<TemplateEditor>('consistency-template')?.flush() ?? true; }
   private surface?: EditorSurface;
   private contextActive = false;
   declare selectedExample: string;
@@ -81,7 +85,7 @@ export class ConsistencyEditor extends LitElement {
   history = new CompositionHistory(exampleComposition(DEFAULT_EXAMPLE));
   private histories = new Map<string, CompositionHistory>([[DEFAULT_EXAMPLE, this.history]]);
   /** Durable document boundary; load before connecting a fresh editor. */
-  readDocument(): Record<string,unknown> { return structuredClone({ schema:1, example:this.selectedExample, library:this.library, fonts:this.fonts, composition:this.history.value }); }
+  readDocument(): Record<string,unknown> { const template = this.querySelector<TemplateEditor>('consistency-template'); if (template) this.history.value = { ...this.history.value, sections: template.readValues() }; return structuredClone({ schema:1, example:this.selectedExample, library:this.library, fonts:this.fonts, composition:this.history.value }); }
   loadDocument(document: Record<string,unknown>) {
     if(this.isConnected) throw new Error('Load a document before mounting the editor.');
     if(document.schema!==1 || !EXAMPLE_PAGES.some(p=>p.id===document.example) || !LIBRARY_PRESETS.some(p=>p.id===document.library)) throw new Error('Unsupported page document.');
@@ -209,6 +213,7 @@ export class ConsistencyEditor extends LitElement {
   }
   private group(id: string) {
     const doc = this.history.value;
+    if (doc.sections.__authored === '1') return id === 'intro' ? html`<consistency-template .template=${this.selectedExample} .values=${doc.sections} @template-change=${(event: CustomEvent<Record<string, string>>) => { this.history.commit({ sections: event.detail }); this.revision++; }}></consistency-template>` : html``;
     if (this.selectedExample === 'booking') return id === 'intro' ? html`<consistency-booking .values=${doc.sections} .library=${this.library} @booking-history=${(event: CustomEvent<'undo' | 'redo'>) => { this.history[event.detail](); this.revision++; }} @booking-change=${(event: CustomEvent<Record<string, string>>) => { this.history.commit({ sections: event.detail }); this.revision++; }}></consistency-booking>` : html``;
     if (this.selectedExample !== 'studio') return html`<div data-sort-group=${id} data-selectable=${'group-' + id} class="consistency-group" @pointerdown=${(event: PointerEvent) => { if (this.layers.reorder && !event.shiftKey && canStartMarquee(event.target as Element)) this.selection = new Set(['group-' + id]); }} aria-label=${id}><section class="consistency-story-section">${this.sectionText(id, `${id} text`)}</section>${this.gap(`section-${id}`)}</div>`;
     const contents: Record<string, unknown> = {
@@ -247,6 +252,7 @@ export class ConsistencyEditor extends LitElement {
     if (this.controlsHost) renderControls(this.renderControls(), this.controlsHost);
     if (changed.has('fonts')) loadPageFonts(this.fonts);
     if (['revision','library','fonts','selectedExample'].some(key=>changed.has(key)&&changed.get(key)!==undefined)) this.dispatchEvent(new CustomEvent('consistency-change',{bubbles:true}));
+    if (this.history.value.sections.__authored === '1') return;
     // Selection and focused measures do not change document geometry or layer bindings.
     if (changed.size && Array.from(changed.keys()).every(key => ['selection', 'marquee', 'selected', 'selectedGap'].includes(String(key)))) { this.paintSelection(); return; }
     this.columnSpacing ??= new ColumnSpacingLayer(this, { enabled: () => this.enabled('gap'), value: (id,fallback) => this.preview[id] ?? this.history.value.gaps[id] ?? fallback, select: id => { this.selected = 'gap'; this.selectedGap = id; }, preview: (id,value) => { this.preview = { ...this.preview, [id]:value }; }, commit: (id,value,pointer) => { if(pointer)this.finishDrag(() => this.commit('gap',value,id)); else this.commit('gap',value,id); }, cancel: () => { this.preview = {}; } });
@@ -365,14 +371,14 @@ export class ConsistencyEditor extends LitElement {
     const doc = this.history.value;
     const requestedWidth = this.canvasWidth();
     const { width, padding } = compositionBounds(requestedWidth, this.value('padding'), this.mobilePreview, 280);
-    return html`<div class="consistency-shell ${this.controlsHost ? 'consistency-embedded' : ''} ${this.mobilePreview ? 'consistency-mobile-preview' : ''} ${this.enabled('gap') ? '' : 'spacing-off'} ${this.enabled('padding') ? '' : 'boundaries-off'} ${this.contextActive ? 'context-active' : ''} ${this.layers.reorder ? 'reorder-on' : ''} ${this.layers.production ? 'production-on' : ''}">
+    return html`<div class="consistency-shell ${this.controlsHost || this.siteMode ? 'consistency-embedded' : ''} ${this.mobilePreview ? 'consistency-mobile-preview' : ''} ${this.enabled('gap') ? '' : 'spacing-off'} ${this.enabled('padding') ? '' : 'boundaries-off'} ${this.contextActive ? 'context-active' : ''} ${this.layers.reorder ? 'reorder-on' : ''} ${this.layers.production ? 'production-on' : ''}">
       <ds-page class="consistency-workspace" layout="sidebar" fill><section class="consistency-stage" aria-label="Editable composition" @pointerdown=${this.startMarquee}>
-        <ds-device-bezel class="consistency-device" .frameless=${!this.mobilePreview} responsive asset-base="/examples/visual-kit/" browser="safari" address="preview.example" time="00:01" .appearance=${this.library==='ink'?'dark':'light'}><div class="consistency-sheet" data-ds-grid-scroll data-ds-surface data-consistency-library=${this.library} data-consistency-fonts=${encodePageFonts(this.fonts)} style=${styleMap({ ...libraryTokens(this.library), ...fontTokens(this.fonts), color: 'var(--ds-text-color)', colorScheme: this.library === 'ink' ? 'dark' : this.library === 'blue' ? 'light' : undefined, width: '100%', padding: this.selectedExample === 'booking' ? '0' : `calc(${padding}px * var(--sf))`, '--composition-padding': `calc(${padding}px * var(--sf))`, '--composition-content-width': `calc(${width - padding * 2}px * var(--sf))`, '--composition-card-width': `calc(${Math.max(READABLE_CARD_MIN, Math.floor((width - padding * 2 - 20) / 40) * 20)}px * var(--sf))` })}>
+        <ds-device-bezel class="consistency-device" .frameless=${!this.mobilePreview} responsive asset-base="/examples/visual-kit/" browser="safari" address="preview.example" time="00:01" .appearance=${this.library==='ink'?'dark':'light'}><div class="consistency-sheet" data-ds-grid-scroll data-ds-surface data-consistency-library=${this.library} data-consistency-fonts=${encodePageFonts(this.fonts)} style=${styleMap({ ...libraryTokens(this.library), ...fontTokens(this.fonts), color: 'var(--ds-text-color)', colorScheme: this.library === 'ink' ? 'dark' : this.library === 'blue' ? 'light' : undefined, width: '100%', padding: doc.sections.__authored === '1' || this.selectedExample === 'booking' ? '0' : `calc(${padding}px * var(--sf))`, '--composition-padding': `calc(${padding}px * var(--sf))`, '--composition-content-width': `calc(${width - padding * 2}px * var(--sf))`, '--composition-card-width': `calc(${Math.max(READABLE_CARD_MIN, Math.floor((width - padding * 2 - 20) / 40) * 20)}px * var(--sf))` })}>
           <div class="consistency-padding">${this.handle('padding', 'Padding')}</div>
           ${repeat(doc.order, id => `${this.selectedExample}:${id}`, id => this.group(id))}
         </div></ds-device-bezel>
         ${this.marquee ? html`<div class="consistency-marquee" aria-hidden="true" style=${styleMap({ left: `${this.marquee.left}px`, top: `${this.marquee.top}px`, width: `${this.marquee.right - this.marquee.left}px`, height: `${this.marquee.bottom - this.marquee.top}px` })}></div>` : ''}
-      </section>${this.controlsHost ? '' : html`<div slot="nav">${this.renderControls()}</div>`}</ds-page>
+      </section>${this.controlsHost || this.siteMode ? '' : html`<div slot="nav">${this.renderControls()}</div>`}</ds-page>
     </div>`;
   }
 }

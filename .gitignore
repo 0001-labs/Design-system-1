@@ -125,3 +125,6 @@ CLAUDE.md
 
 # Independently released private System host.
 .system-dist/
+
+# Built from the canonical documentation examples.
+/packages/consistency/generated/

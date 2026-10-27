@@ -1,3 +1,4 @@
+import { DraftSiteEditor, NewSite, draftSiteApi, type DraftSiteSummary } from './draft-site';
 import { LitElement, html } from 'lit';
 import { keyed } from 'lit/directives/keyed.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
@@ -42,7 +43,7 @@ import './home.css';
  */
 
 /** What the app shows: the sites, one site (by its IDv1 code) on its canvas or at one of its places, or Settings at one of its tabs. */
-export type Place = { page: 'sites' } | { page: 'site'; code: string; place?: string } | { page: 'settings'; tab: SettingsTab };
+export type Place = { page: 'new-site' } | { page: 'draft-site'; id: string; workspace: string } | { page: 'sites' } | { page: 'site'; code: string; place?: string } | { page: 'settings'; tab: SettingsTab };
 export type SettingsTab = 'workspaces' | 'members' | 'domains' | 'account';
 const TABS: SettingsTab[] = ['workspaces', 'members', 'domains', 'account'];
 const SITE_CODE = /^\d{2}[A-Za-z]{4}$/;
@@ -53,6 +54,8 @@ const ROLE_WORDS: Record<WorkspaceSummary['role'], string> = { owner: 'Owner', a
 /** A place as the history keeps it, or the sites for anything else. */
 export function placeFrom(state: unknown): Place {
   const place = state as Partial<Place> | null;
+  if (place?.page === 'new-site') return { page: 'new-site' };
+  if (place?.page === 'draft-site' && /^[0-9a-f-]{36}$/.test((place as { id?: string }).id ?? '') && SITE_CODE.test((place as { workspace?: string }).workspace ?? '')) return place as Place;
   if (place?.page === 'settings') { const tab = (place as { tab?: unknown }).tab; return { page: 'settings', tab: TABS.includes(tab as SettingsTab) ? tab as SettingsTab : 'domains' }; }
   if (place?.page === 'site' && typeof (place as { code?: unknown }).code === 'string' && SITE_CODE.test((place as { code: string }).code)) {
     const at = (place as { place?: unknown }).place;
@@ -115,7 +118,7 @@ export function workspaceInitial(name: string): string { return (name.trim().rep
 
 /** Consistency's app: a workspace's sites, each in the editor, and Settings. */
 export class ConsistencyHome extends LitElement {
-  static properties = { error: { state: true }, workspaces: { state: true }, workspace: { state: true }, place: { state: true }, sites: { state: true }, naming: { state: true }, unread: { state: true }, people: { state: true }, peopleOpen: { state: true } };
+  static properties = { error: { state: true }, workspaces: { state: true }, workspace: { state: true }, place: { state: true }, sites: { state: true }, naming: { state: true }, unread: { state: true }, people: { state: true }, peopleOpen: { state: true }, draftSites: { state: true }, draftProblem: { state: true } };
   /** The places the app can show, by id (`places/index.ts`), here too for a place defined outside the app's modules. */
   static readonly places = PLACES;
   declare place: Place;
@@ -125,6 +128,10 @@ export class ConsistencyHome extends LitElement {
   /** The workspace the app is in, by its code. */
   declare workspace: string;
   declare sites: SiteSummary[];
+  declare draftSites: DraftSiteSummary[];
+  declare draftProblem: string;
+  private readonly draftEditors = new Map<string, DraftSiteEditor>();
+  private newSite?: NewSite;
   /** True once the workspaces have been read and the person has none: invited nowhere yet. */
   declare unread: boolean;
   /** The workspace's people, as stored or read. */
@@ -153,7 +160,7 @@ export class ConsistencyHome extends LitElement {
     this.go(next);
   };
   constructor() {
-    super(); this.error = ''; this.naming = null; this.unread = false;
+    super(); this.draftSites = []; this.draftProblem = ''; this.error = ''; this.naming = null; this.unread = false;
     this.workspaces = storedWorkspaces();
     this.workspace = this.workspaces.some(each => each.code === activeWorkspace()) ? activeWorkspace() : this.workspaces[0]?.code ?? '';
     setActiveWorkspace(this.workspace);
@@ -189,6 +196,7 @@ export class ConsistencyHome extends LitElement {
   /** Moves to a place, first saving a word being edited on the site being left; a failed save stays put. */
   private async move(next: Place, record: 'push' | 'none') {
     const current = this.place;
+    if (current.page === 'draft-site' && await this.draftEditors.get(`${current.workspace}:${current.id}`)?.flush() === false) return;
     // The site's canvas is left for another site, one of its places, or anywhere else.
     const leaving = current.page === 'site' && !this.placeOf(current) && (next.page !== 'site' || next.code !== current.code || this.placeOf(next)) ? this.editors.get(current.code) : undefined;
     if (leaving && !(await leaving.flush())) { if (record === 'none') history.pushState(current, '', location.pathname); return; }
@@ -208,11 +216,13 @@ export class ConsistencyHome extends LitElement {
     storeWorkspaces(read.workspaces);
     this.unread = !read.workspaces.length;
     const asked = this.place.page === 'site' ? (this.place as { code: string }).code : '';
-    const holding = asked ? read.workspaces.find(each => each.siteCodes.includes(asked)) : undefined;
+    const holding = this.place.page === 'draft-site' ? read.workspaces.find(each => each.code === (this.place as { workspace: string }).workspace) : asked ? read.workspaces.find(each => each.siteCodes.includes(asked)) : undefined;
     const next = holding?.code ?? (read.workspaces.some(each => each.code === this.workspace) ? this.workspace : read.workspaces[0]?.code ?? '');
     if (next !== this.workspace) this.choose(next);
     else void this.readSites();
   }
+
+  private async switchWorkspace(code: string) { await this.move({ page: 'sites' }, 'push'); if (this.place.page === 'sites') this.choose(code); }
 
   /** Moves the app into another workspace: its sites as last read at once, confirmed by the registry. */
   private choose(code: string) {
@@ -221,7 +231,7 @@ export class ConsistencyHome extends LitElement {
     this.sites = storedSites(code);
     this.people = storedPeople(code);
     this.peopleOpen = false;
-    this.naming = null;
+    this.naming = null; this.draftSites = []; this.draftProblem = ''; this.newSite = undefined;
     void this.readSites();
   }
 
@@ -244,11 +254,40 @@ export class ConsistencyHome extends LitElement {
     const workspace = this.workspace;
     if (!workspace) { this.sites = []; return; }
     void this.readPeople();
+    void this.readDraftSites(workspace);
     const response = await fetch('/api/consistency/sites', { cache: 'no-store', headers: workspaceHeaders() }).catch(() => null);
     const body = response?.ok ? await response.json().catch(() => null) as { sites?: SiteSummary[] } | null : null;
     if (!Array.isArray(body?.sites) || workspace !== this.workspace) return;
     this.sites = body.sites;
     try { localStorage.setItem(SITES_KEY(workspace), JSON.stringify(this.sites)); } catch { /* read again next visit */ }
+  }
+
+  private async readDraftSites(workspace: string) {
+    try { const body = await draftSiteApi<{ sites: DraftSiteSummary[] }>(workspace); if (workspace === this.workspace) { this.draftSites = body.sites; this.draftProblem = ''; } }
+    catch { if (workspace === this.workspace) this.draftProblem = 'Draft sites could not be read. Try again.'; }
+  }
+  private keepDraft(draft: DraftSiteSummary) { this.draftSites = [draft, ...this.draftSites.filter(site => site.id !== draft.id)]; }
+  private openDraft(draft: DraftSiteSummary) { this.keepDraft(draft); this.go({ page: 'draft-site', id: draft.id, workspace: this.workspace }); }
+  private draftEditor(id: string): DraftSiteEditor | undefined {
+    const key = `${this.workspace}:${id}`;
+    let editor = this.draftEditors.get(key);
+    const site = this.draftSites.find(site => site.id === id);
+    if (!editor && site) {
+      editor = new DraftSiteEditor(); editor.site = site; editor.workspace = this.workspace;
+      editor.addEventListener('draft-site-saved', event => { if (editor!.workspace === this.workspace) this.keepDraft((event as CustomEvent<DraftSiteSummary>).detail); });
+      editor.addEventListener('draft-site-copy', event => { if (editor!.workspace === this.workspace) this.openDraft((event as CustomEvent<DraftSiteSummary>).detail); });
+      this.draftEditors.set(key, editor);
+    }
+    return editor;
+  }
+  private newSiteFlow() {
+    if (!this.newSite) {
+      this.newSite = new NewSite(); this.newSite.workspace = this.workspace;
+      const flow = this.newSite;
+      this.newSite.addEventListener('site-created', event => { if (flow.workspace !== this.workspace) return; this.openDraft((event as CustomEvent<DraftSiteSummary>).detail); this.newSite = undefined; });
+      this.newSite.addEventListener('site-create-close', () => this.go({ page: 'sites' }));
+    }
+    return this.newSite;
   }
 
   /** The editor for a site, made once and kept. */
@@ -288,6 +327,9 @@ export class ConsistencyHome extends LitElement {
     if (current && at && !this.placeElements.has(key)) this.placeElements.set(key, PLACES.get(at)!(current));
     const shown = key ? this.placeElements.get(key) : undefined;
     if (shown && shown.parentElement !== stage) stage.append(shown);
+    const draft = this.place.page === 'draft-site' ? this.draftEditor(this.place.id) : undefined;
+    if (draft && draft.parentElement !== stage) stage.append(draft);
+    for (const editor of this.draftEditors.values()) editor.hidden = editor !== draft;
     for (const [code, editor] of this.editors) editor.hidden = code !== current?.code || Boolean(at);
     for (const [each, element] of this.placeElements) element.hidden = each !== key;
   }
@@ -327,7 +369,9 @@ export class ConsistencyHome extends LitElement {
     const settings = this.place.page === 'settings';
     const open = this.place.page === 'site' ? (this.place as { code: string }).code : '';
     const site = open ? this.sites.find(item => item.code === open) : undefined;
-    const drafts = draftWords(current);
+    const drafting = this.place.page === 'draft-site';
+    const creating = this.place.page === 'new-site';
+    const drafts = draftWords(current ? { ...current, sites: current.sites + this.draftSites.length } : undefined);
     return html`${this.edge.reveal}${this.edge.handle}<ds-page layout="sidebar" fill drawer>
       ${site ? this.siteNav(site) : html`<nav slot="nav" id="home-nav" class="home-nav" aria-label="Consistency">
         <div class="home-workspace" aria-label="Workspace">
@@ -344,11 +388,11 @@ export class ConsistencyHome extends LitElement {
         <ds-sidebar class="home-foot" label="Workspace" .items=${[{ id: 'settings', label: 'Settings', current: settings }]}
           @sidebar-activate=${() => this.go({ page: 'settings', tab: 'domains' })}></ds-sidebar>
       </nav>`}
-      <div class=${open ? 'home-main home-main--site' : 'home-main'}>
-        ${open ? '' : html`<ds-text class="home-title" role="heading" aria-level="1" literal size="display" text=${settings ? 'Settings' : 'Sites'}></ds-text>`}
-        ${!open && !settings && drafts ? html`<ds-text class="home-drafts" tone="muted" literal text=${drafts}></ds-text>` : ''}
-        ${this.place.page === 'settings' ? this.settings(this.place.tab, current) : open ? (this.sites.some(site => site.code === open) ? '' : html`<ds-empty literal heading="This site is not in your workspace"></ds-empty>`) : this.unread ? html`<ds-empty literal heading="You are not in a workspace yet" text="Ask whoever invited you to Consistency to invite this address."></ds-empty>` : this.siteCards()}
-        <div class="home-stage" ?hidden=${!open}></div>
+      <div class=${open || drafting ? 'home-main home-main--site' : 'home-main'}>
+        ${open || drafting || creating ? '' : html`<ds-text class="home-title" role="heading" aria-level="1" literal size="display" text=${settings ? 'Settings' : 'Sites'}></ds-text>`}
+        ${!open && !drafting && !creating && !settings && drafts ? html`<ds-text class="home-drafts" tone="muted" literal text=${drafts}></ds-text>` : ''}
+        ${creating ? this.newSiteFlow() : drafting ? '' : this.place.page === 'settings' ? this.settings(this.place.tab, current) : open ? (this.sites.some(site => site.code === open) ? '' : html`<ds-empty literal heading="This site is not in your workspace"></ds-empty>`) : this.unread ? html`<ds-empty literal heading="You are not in a workspace yet" text="Ask whoever invited you to Consistency to invite this address."></ds-empty>` : this.siteCards()}
+        <div class="home-stage" ?hidden=${!open && !drafting}></div>
       </div>
     </ds-page>
     ${this.peoplePanel(current)}`;
@@ -385,7 +429,10 @@ export class ConsistencyHome extends LitElement {
    * pressing them opens the people panel, never the site.
    */
   private siteCards() {
-    return html`<div class="home-grid">${this.sites.map(site => html`<ds-card interactive data-site=${site.code} width="12" height="8" @ds-card-press=${() => this.go({ page: 'site', code: site.code })}>${siteLabel(site)}<span slot="title" class="home-site-title">${site.domain ? '' : html`<ds-icon type="arrange-draft" size="large" role="img" aria-label="Draft"></ds-icon>`}${site.name}</span>${this.peopleButton()}</ds-card>`)}</div>`;
+    const full = this.current?.limits.sites != null && (this.current.sites + this.draftSites.length) >= this.current.limits.sites;
+    return html`<ds-row><ds-button primary ?disabled=${!canManage(this.current)} @click=${() => this.go({ page: 'new-site' })}>Add new site</ds-button>${full ? html`<ds-text literal tone="muted" wrap text="This workspace has reached its site limit."></ds-text>` : ''}</ds-row>
+    ${this.draftProblem ? html`<ds-row><ds-text literal role="alert" tone="danger" .text=${this.draftProblem}></ds-text><ds-button @click=${() => void this.readDraftSites(this.workspace)}>Try again</ds-button></ds-row>` : ''}
+    <div class="home-grid">${this.draftSites.map(site => html`<ds-card interactive data-draft-site=${site.id} width="12" height="8" @ds-card-press=${() => this.go({ page: 'draft-site', id: site.id, workspace: this.workspace })}><span slot="label">Private draft</span><span slot="title">${site.name}</span></ds-card>`)}${this.sites.map(site => html`<ds-card interactive data-site=${site.code} width="12" height="8" @ds-card-press=${() => this.go({ page: 'site', code: site.code })}>${siteLabel(site)}<span slot="title" class="home-site-title">${site.domain ? '' : html`<ds-icon type="arrange-draft" size="large" role="img" aria-label="Draft"></ds-icon>`}${site.name}</span>${this.peopleButton()}</ds-card>`)}</div>`;
   }
 
   /** The workspace's people as overlapping avatars, the invited ones pending, and a plus for those who may invite. */
@@ -420,7 +467,7 @@ export class ConsistencyHome extends LitElement {
       const here = each.code === this.workspace;
       const role = ROLE_WORDS[each.role];
       return html`<ds-row interactive data-workspace=${each.code} current=${ifDefined(here ? 'page' : undefined)} label=${[each.name, role, here ? 'current workspace' : ''].filter(Boolean).join(', ')}
-        @ds-row-press=${() => { if (!here) this.choose(each.code); this.go({ page: 'sites' }); }}>
+        @ds-row-press=${() => { if (!here) void this.switchWorkspace(each.code); else this.go({ page: 'sites' }); }}>
         <ds-avatar initial=${workspaceInitial(each.name)} outlined plain aria-hidden="true"></ds-avatar><span class="ds-row__name">${each.name}</span>
         <span class="ds-row__value">${role}${here ? html`<ds-icon type="check" aria-hidden="true"></ds-icon>` : ''}</span>
       </ds-row>`;

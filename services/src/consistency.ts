@@ -83,7 +83,7 @@ export async function consistencyPreview(request: Request, env: ReportsEnv & Wor
     return protect(new Response(null, { status: 204, headers: { 'Set-Cookie': session } }));
   }
   if (url.pathname === '/api/dashboard/session' || url.pathname === '/app/signin' || /^\/app\/assets\/[A-Za-z0-9][A-Za-z0-9._-]*$/.test(url.pathname) || url.pathname === '/icons/design-system-1.svg') return protect(await dashboard(request, env, send));
-  if (url.pathname.startsWith('/api/consistency/pages') || url.pathname === '/api/consistency/sites' || url.pathname === '/api/consistency/workspaces' || url.pathname.startsWith('/api/consistency/workspaces/')) return protect(await workspaceApi(request,env,send));
+  if (url.pathname.startsWith('/api/consistency/draft-sites') || url.pathname.startsWith('/api/consistency/pages') || url.pathname === '/api/consistency/sites' || url.pathname === '/api/consistency/workspaces' || url.pathname.startsWith('/api/consistency/workspaces/')) return protect(await workspaceApi(request,env,send));
   // A site's words, edited in the editor as the person asking; its page and files for the editor's sandboxed frame.
   if (url.pathname.startsWith('/api/consistency/sites/')) return protect(await sitesApi(request, env, asking => authorizePerson(asking, env, send)));
   if (url.pathname === '/api/consistency/domains' || url.pathname.startsWith('/api/consistency/domains/')) return protect(await domainsApi(request, env, send));
@@ -158,12 +158,12 @@ async function profileApi(request: Request, env: ReportsEnv, send: typeof fetch)
  * The workspace's own routes: its sites and its composition drafts, and the workspaces themselves (`workspaces`,
  * `workspaces/<code>` to rename, `workspaces/<code>/members[/<address>]`). The platform decides what each person may do.
  */
-const WORKSPACE_ROUTE = /^\/api\/consistency\/(?:sites|workspaces(?:\/\d{2}[A-Za-z]{4}(?:\/members(?:\/[^/]{3,254})?)?)?|pages(?:\/[a-zA-Z0-9][a-zA-Z0-9_-]{0,79})?)$/;
+const WORKSPACE_ROUTE = /^\/api\/consistency\/(?:sites|draft-sites(?:\/[0-9a-f-]{36})?|workspaces(?:\/\d{2}[A-Za-z]{4}(?:\/members(?:\/[^/]{3,254})?)?)?|pages(?:\/[a-zA-Z0-9][a-zA-Z0-9_-]{0,79})?)$/;
 async function workspaceApi(request:Request,env:ReportsEnv & WorkspaceEnv,send:typeof fetch):Promise<Response>{
   const url=new URL(request.url);
   if(!WORKSPACE_ROUTE.test(url.pathname))return Response.json({error:'Not found'},{status:404});
   const person=await authorizePerson(new Request(request.url,{headers:request.headers}),env,send);if(person instanceof Response)return person;
-  const methods=url.pathname.startsWith('/api/consistency/pages/')?['GET','PUT']:/\/members\/[^/]+$/.test(url.pathname)?['DELETE']:url.pathname.endsWith('/members')?['GET','POST']:/\/workspaces\/[^/]+$/.test(url.pathname)?['PUT']:['GET'];
+  const methods=url.pathname.startsWith('/api/consistency/pages/')||url.pathname.startsWith('/api/consistency/draft-sites/')?['GET','PUT']:/\/members\/[^/]+$/.test(url.pathname)?['DELETE']:url.pathname.endsWith('/members')?['GET','POST']:/\/workspaces\/[^/]+$/.test(url.pathname)?['PUT']:['GET'];
   if(!methods.includes(request.method))return Response.json({error:'Method not allowed'},{status:405,headers:{Allow:methods.join(', ')}});
   if(request.method!=='GET'&&request.headers.get('Origin')!==url.origin)return Response.json({error:'Forbidden'},{status:403});
   if((request.method==='PUT'||request.method==='POST')&&request.headers.get('Content-Type')?.split(';')[0]!=='application/json')return Response.json({error:'Forbidden'},{status:403});
