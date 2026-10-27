@@ -16,6 +16,23 @@ Everything is counted in squares of 20 pixels, multiplied by `--sf` on phones an
 
 A piece that fills its squares is drawn one pixel short at its end and foot (`--margin-correction`), so two pieces side by side or one above the other meet on the grid line with a pixel of paper between them. Lines are one pixel. To see the squares behind a page while you build it, lay a [Grid](/4-page/grid/) under it.
 
+## Fault lines
+
+Fault lines are the continuous alignment lines made by related groups of cards and controls across a page. Their outer edges, column boundaries and gaps should continue from one section to the next. Two grids can each use valid spacing yet break those lines: a 20px gap in one and a 10px gap in the next shifts their inner edges.
+
+The `page.fault-lines` check measures actual rendered edges and gaps across separate sections, including open shadow roots. Give grids that share tracks the same `data-ds-fault-lines="filters"` value. Use `data-ds-fault-axis="y"` for horizontal alignment lines through related rows; the default compares columns. Groups are compared at their current track count so coordinated responsive reflow is valid. Different card heights are allowed; hidden content and differences of at most one CSS pixel are ignored.
+
+```html
+<div data-ds-fault-lines="filters" class="view-cards">…</div>
+<section>
+  <div data-ds-fault-lines="filters" class="product-cards">…</div>
+</section>
+```
+
+Unlabelled card/button grids sharing outer edges are also compared, but uncertain relationships are reported for review rather than failing a release. Name a related family to enforce it. Use a different family or `data-ds-fault-lines="off"` for an intentional independent layout, not to hide a genuine fault. A one-column Signal list, for example, need not share the two-column filter grid.
+
+Run the check across the whole page at each viewport, not once at desktop size. The Site inspector and CLI now default to 320, 375, 393, 430, 768, 1024 and 1440px. Add widths immediately before and after the product's breakpoints with `--widths`; no finite sweep proves every possible width. Findings name the viewport and measured drift. The source regression reproduces mismatched 20px/10px card gaps, shifted edges, subpixel rounding and responsive reflow in Chromium and WebKit. Reach uses one family and one gap for its view, Product and Country cards.
+
 ## Nothing collides
 
 Two pieces never stand on the same pixels. Rows stack edge to edge with no gap and no overlap; columns stand whole squares apart; a menu stands half a square from the button that opens it. What a piece draws beyond itself goes only where nothing else is:

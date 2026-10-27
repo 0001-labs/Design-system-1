@@ -1,5 +1,5 @@
 import { measureConstraints, type Constraint, type Finding } from './constraints';
-import { PHONE_WIDTHS, checkSite, findSitePages, inspectInFrame, ruleLine, summarizePages, summarizeRules, type PageResult } from './constraint-site';
+import { VIEWPORT_WIDTHS, checkSite, findSitePages, inspectInFrame, ruleLine, summarizePages, summarizeRules, type PageResult } from './constraint-site';
 
 // appendChild, not append: a Worker project's types redefine append for its HTML rewriter.
 
@@ -276,7 +276,7 @@ export function createConstraintPanel() {
     title.textContent = 'Constraints';
     status.textContent = 'Finding the pages…';
     const pages = await findSitePages();
-    const widths = `${PHONE_WIDTHS.slice(0, -1).join(', ')} and ${PHONE_WIDTHS.at(-1)}px`;
+    const widths = `${VIEWPORT_WIDTHS.slice(0, -1).join(', ')} and ${VIEWPORT_WIDTHS.at(-1)}px`;
     let broken = 0;
     const results = await checkSite({
       pages,

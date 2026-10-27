@@ -20,8 +20,8 @@ import { createServer, type Server } from 'node:http';
 import { extname, join, resolve } from 'node:path';
 import { devices, webkit } from 'playwright';
 
-/** The narrowest phone still sold, the common ones and the widest. */
-const WIDTHS = [320, 375, 393, 430];
+/** Representative phone, tablet and desktop widths; --widths adds breakpoint boundaries. */
+const WIDTHS = [320, 375, 393, 430, 768, 1024, 1440];
 
 const args = process.argv.slice(2);
 const option = (name: string) => {
@@ -154,7 +154,7 @@ const measured: Record<string, number> = {};
 const shown = (url: string) => served ? new URL(new URL(url).pathname, origin).href : url;
 
 async function open({ width, url }: { width: number; url: string }) {
-  const context = await browser.newContext({ ...devices['iPhone 14'], viewport: { width, height: 844 }, screen: { width, height: 844 } });
+  const context = await browser.newContext({ ...(width < 768 ? devices['iPhone 14'] : {}), viewport: { width, height: 844 }, screen: { width, height: 844 } });
   const page = await context.newPage();
   try {
     // A page that does not settle in time gets a second chance: one slow load among many is not a broken rule.
