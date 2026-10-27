@@ -45,3 +45,13 @@ test('each save is a version; stale revisions are refused and an earlier version
   expect((await owner.query(api.base.history, {})).map(row => [row.version, row.restoredFrom])).toEqual([[3, 1], [2, null], [1, null]]);
   expect(await owner.query(api.base.get, {})).toMatchObject({ version: 3, css: css('4px') });
 });
+
+
+test('a live design cannot save a changed foundation through the backend', async () => {
+  const t = convexTest(schema, modules);
+  const owner = await account(t, 'owner@example.com');
+  const invalid = `${TOKENS_START}\n:root { --ds-1: 24px; }\n${TOKENS_END}`;
+  await expect(owner.mutation(api.base.save, { css: invalid, baseRev: 0 })).rejects.toThrow(/shared foundation/);
+  expect(await owner.query(api.base.get, {})).toBeNull();
+  expect(await owner.query(api.base.history, {})).toEqual([]);
+});

@@ -19,3 +19,10 @@ test('values that could reach outside a token are refused', () => {
   expect(baseOverrides(`${TOKENS_START}\n:root { --a: 1px; }`)).toHaveProperty('error');
   expect(baseOverrides(`${TOKENS_START}\nbody { --a: 1px; }\n${TOKENS_END}`)).toHaveProperty('error');
 });
+
+test('live DS1 styling keeps the same foundation as every other design', () => {
+  for (const [name, value] of [['--ds-unit', '24px'], ['--ds-control-height', '32px'], ['--ds-1', '24px'], ['--one-unit', '8px'], ['--ds-control-size', '32px'], ['--ds-row-size', '24px'], ['--ds-text-leading', '12px']]) {
+    expect(baseOverrides(block(`${name}: ${value};`))).toHaveProperty('error', expect.stringContaining('shared foundation'));
+  }
+  expect(baseOverrides(block('--ds-1: 20px; --ds-typeface-regular: Georgia, serif; --ds-paper: #fff;'))).toHaveProperty('overrides');
+});

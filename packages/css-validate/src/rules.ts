@@ -1,4 +1,5 @@
 import * as csstree from "css-tree";
+import { foundationTokenIssue } from "../../../DS1/1-root/foundation";
 
 import {
   ALLOWED_DATA_URL_TYPES,
@@ -409,6 +410,8 @@ function handleDeclaration(node: AnyNode, ctx: RuleContext): void {
   // them never reach the Url/Function visitors. Scan the generated text instead.
   if (property.startsWith("--")) {
     const text = safeGenerate(declaration.value);
+    const foundationIssue = foundationTokenIssue(declaration.property, text);
+    if (foundationIssue) ctx.push({ code: "foundation_constraint", severity: "error", message: foundationIssue, ...position(node) });
     if (/\bexpression\s*\(/i.test(text)) {
       ctx.push({
         code: "disallowed_construct",

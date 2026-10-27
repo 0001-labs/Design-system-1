@@ -7,6 +7,12 @@ description: The exact rules of Design system 1, the 0001 design framework: the 
 
 Design system 1 (`/Users/joachim/0001/Design system 1`, source in `DS1/`) is the framework every 0001 product is drawn on. Products carry a copy or a fork of it (see the 0001 brief), so these rules hold even where the package is not imported. Client sites keep the client's own design unless 0001 is designing for them.
 
+## Foundation and designs
+
+Select the layer before changing a design. **Foundation** owns the constraints every design keeps: the grid, device scale, alignment, readable labels and contrast, accessible behaviour and the canonical constraint catalogue. **DS1** adds the shared colours, fonts and appearance used by 0001 apps. **Other designs** are siblings of DS1: a client's library chooses its own styling on the same foundation. A colour or font choice is not a universal constraint; contrast and corrected font metrics are.
+
+Use shared components in every design. Change a foundation rule in shared source and its checks; change a visual choice in the selected design's tokens. `DS1/1-root/foundation.ts` guards base geometry inputs in live DS1 saves and library validation. Every design still needs rendered constraint checks, including custom fonts and both colour schemes. A custom design pins its own library and does not load `/ds1/base/latest.css`, which carries the live DS1 appearance despite its historical name. DS1's existing combined stylesheets remain the default compatibility entry points.
+
 ## Design decisions
 
 Make the interface understandable through its layout, familiar controls and precise labels. Omit instructional filler such as “Choose a prospect”, “Click to edit” and explanations of obvious controls; leave an unselected detail area empty. Keep useful empty states, validation, failures and recovery actions concise and specific.

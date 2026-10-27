@@ -2,6 +2,9 @@
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+const configIndex = process.argv.indexOf("--config");
+const workerConfig = configIndex >= 0 ? process.argv[configIndex + 1] : "../wrangler.jsonc";
+if (!workerConfig) throw new Error("Name a Worker config after --config.");
 const root = fileURLToPath(new URL("../", import.meta.url));
 const env = readFileSync(new URL("../.env.local", import.meta.url), "utf8");
 const authUrl = /^VITE_CONVEX_URL=["']?([^\s"']+)/m.exec(env)?.[1];
@@ -22,7 +25,7 @@ if (owner?.email?.trim().toLowerCase() !== ownerEmail || typeof owner.emailVerif
 const bindings = { REPORTS_AUTH_URL: authUrl, REPORTS_OWNER_ID: ownerIds[0] };
 if (process.argv.includes("--apply")) {
   try {
-    execFileSync("vp", ["exec", "wrangler", "secret", "bulk", "--config", "../wrangler.jsonc"], {
+    execFileSync("vp", ["exec", "wrangler", "secret", "bulk", "--config", workerConfig], {
       cwd: fileURLToPath(new URL("../services/", import.meta.url)), input: JSON.stringify(bindings), encoding: "utf8", stdio: ["pipe", "pipe", "pipe"],
     });
   } catch { throw new Error("Could not configure Worker report access. No account values have been printed."); }

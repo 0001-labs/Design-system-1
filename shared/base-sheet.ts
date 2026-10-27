@@ -6,6 +6,8 @@
  * `/ds1/base/latest.css`, after each product's own copy, so a product that has never been edited
  * looks exactly as it does today and a token nobody touched is never redeclared.
  */
+import { foundationTokenIssue } from '../DS1/1-root/foundation';
+
 export const TOKENS_START = '/* ds1:tokens:start */';
 export const TOKENS_END = '/* ds1:tokens:end */';
 
@@ -33,6 +35,8 @@ export function baseOverrides(css: string): { overrides: BaseOverride[] } | { er
     const value = declaration.slice(colon + 1).trim();
     if (colon < 0 || !NAME.test(name)) return { error: `"${declaration.trim().slice(0, 40)}" is not a token.` };
     if (!value || value.length > 400 || UNSAFE.test(value)) return { error: `${name} has a value the live sheet cannot carry.` };
+    const issue = foundationTokenIssue(name, value);
+    if (issue) return { error: issue };
     overrides.push([name, value]);
   }
   return { overrides };
