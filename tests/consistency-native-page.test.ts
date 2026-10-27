@@ -26,6 +26,7 @@ describe('native page boundary',()=>{
   test('preserves native disclosures/locales and refuses unsafe URLs',()=>{
     const page=document();page.blocks.push({id:'question',kind:'flow',direction:'column',gap:20,padding:0,locale:'da',disclosure:{label:'Et spørgsmål?'},children:[{id:'answer',kind:'content',source:'Et svar.'}]});
     const html=renderNativePage(validateNativePage(page,context));expect(html).toContain('<details ');expect(html).toContain('<summary>Et spørgsmål?</summary>');expect(html).toContain('data-native-locale="da"');
+    page.blocks.push({id:'japanese',kind:'content',source:'花',locale:'ja'});expect(validateNativePage(page,context).blocks.at(-1)?.locale).toBe('ja');
     page.blocks.push({id:'bad',kind:'image',src:'javascript:alert(1)',alt:''});expect(()=>validateNativePage(page,context)).toThrow();
   });
 });

@@ -1,7 +1,7 @@
 import { nativeRegionStyles, renderNativeRegion, validateNativeRegion } from './consistency-native-content';
 import pageStyles from './consistency-native-page.css?raw';
 
-export interface NativeBlockBase { id: string; width?: number; hidden?: boolean; locale?: 'da' | 'en' }
+export interface NativeBlockBase { id: string; width?: number; hidden?: boolean; locale?: string }
 export interface NativeFlow extends NativeBlockBase {
   kind: 'flow'; role?: 'section' | 'header' | 'nav' | 'footer' | 'main';
   direction: 'column' | 'row'; gap: number; padding: number; children: NativeBlock[];
@@ -89,7 +89,7 @@ export function validateNativePage(value: unknown, context: NativePageContext): 
       const base:NativeBlockBase={id};
       if(input.width!==undefined)base.width=integer(input.width,10000,20);
       if(input.hidden!==undefined)base.hidden=boolean(input.hidden);
-      if(input.locale!==undefined)base.locale=choice(input.locale,['da','en'] as const);
+      if(input.locale!==undefined){base.locale=text(input.locale,20);if(!/^[a-z]{2,3}(?:-[A-Z]{2})?$/.test(base.locale))return invalid();}
       const common=['id','kind','width','hidden','locale']; let block:NativeBlock;
       if(kind==='flow'){
         keys(input,[...common,'role','direction','gap','padding','children','disclosure']);
