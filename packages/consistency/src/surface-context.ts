@@ -3,9 +3,25 @@ import { applyLibraryTokens } from './libraries';
 export type StatDesign = { color?: string };
 export type ButtonDesign = { appearance?: 'plain' | 'primary' | 'secondary' };
 export const SURFACE_TONES = ['', 'sharp-blue', 'apple-green', 'pink', 'orange', 'yellow', 'purple', 'ink'] as const;
+/** Native context chrome is shared by the example document and authored-site adapters. */
+export function createSurfaceContext(label: string, surface?: HTMLElement): Context {
+ const menu = new Context(); menu.setAttribute('data-consistency-context', ''); menu.setAttribute('aria-label', label);
+ applyLibraryTokens(menu, surface?.closest<HTMLElement>('[data-consistency-library]')?.dataset.consistencyLibrary ?? 'original');
+ return menu;
+}
 export function editableSurface(target: Element): HTMLElement | null {
  const surface = target.closest<HTMLElement>('ds-card[data-selectable],ds-stat[data-selectable],ds-button[data-selectable]');
  return surface && surface.closest('.consistency-sheet') && !surface.closest('.aa-atom') ? surface : null;
+}
+/** The canonical appearance choices, shared by every document adapter. */
+export function appendSurfaceOptions(menu: Context, kind: 'card' | 'stat' | 'button', commit: (patch: Record<string, unknown>) => void) {
+  const option = (label: string, patch: Record<string, unknown>) => { const row = document.createElement('button'); row.type = 'button'; row.setAttribute('role', 'menuitem'); row.textContent = label; row.addEventListener('click', () => commit(patch)); menu.append(row); };
+  if (kind === 'card') {
+   option('Filled card', { variant: 'filled' }); option('Outlined card', { variant: 'outlined' });
+   for (const tone of SURFACE_TONES) option(tone ? tone.replaceAll('-', ' ').replace(/^./, value => value.toUpperCase()) : 'Default colour', { tone, variant: 'filled' });
+  } else if (kind === 'stat') {
+   for (const color of SURFACE_TONES) option(color ? `${color.replaceAll('-', ' ').replace(/^./, value => value.toUpperCase())} text` : 'Default text colour', { color });
+  } else { option('Plain button', { appearance: 'plain' }); option('Primary button', { appearance: 'primary' }); option('Secondary button', { appearance: 'secondary' }); }
 }
 /** Rendered sample components own their appearance menu; Aa retains its text menu. */
 export class SurfaceContextMenu {
@@ -35,15 +51,9 @@ export class SurfaceContextMenu {
  private context = (event: MouseEvent) => { if (!(event.target instanceof Element) || event.defaultPrevented) return; const surface = editableSurface(event.target); if (!surface) return; event.preventDefault(); event.stopPropagation(); this.open(surface, event.clientX, event.clientY); };
  private keyboard = (event: KeyboardEvent) => { if (!(event.target instanceof Element) || !(event.key === 'ContextMenu' || event.shiftKey && event.key === 'F10')) return; const surface = editableSurface(event.target); if (!surface) return; event.preventDefault(); event.stopPropagation(); const rect = surface.getBoundingClientRect(); this.open(surface, rect.left, rect.bottom); };
  private open(surface: HTMLElement, x: number, y: number) {
-  this.menu?.remove(); const menu = this.menu = new Context(); const kind = surface.tagName === 'DS-CARD' ? 'card' : surface.tagName === 'DS-STAT' ? 'stat' : 'button';
-  menu.setAttribute('data-consistency-context', ''); menu.setAttribute('aria-label', `${kind[0].toUpperCase() + kind.slice(1)} appearance`); applyLibraryTokens(menu, surface.closest<HTMLElement>('[data-consistency-library]')?.dataset.consistencyLibrary ?? 'original');
-  const option = (label: string, patch: Record<string, unknown>) => { const row = document.createElement('button'); row.type = 'button'; row.setAttribute('role', 'menuitem'); row.textContent = label; row.addEventListener('click', () => this.state.commit(kind, surface.dataset.selectable!, patch)); menu.append(row); };
-  if (kind === 'card') {
-   option('Filled card', { variant: 'filled' }); option('Outlined card', { variant: 'outlined' });
-   for (const tone of SURFACE_TONES) option(tone ? tone.replaceAll('-', ' ').replace(/^./, value => value.toUpperCase()) : 'Default colour', { tone, variant: 'filled' });
-  } else if (kind === 'stat') {
-   for (const color of SURFACE_TONES) option(color ? `${color.replaceAll('-', ' ').replace(/^./, value => value.toUpperCase())} text` : 'Default text colour', { color });
-  } else { option('Plain button', { appearance: 'plain' }); option('Primary button', { appearance: 'primary' }); option('Secondary button', { appearance: 'secondary' }); }
+  this.menu?.remove(); const kind = surface.tagName === 'DS-CARD' ? 'card' : surface.tagName === 'DS-STAT' ? 'stat' : 'button';
+  const menu = this.menu = createSurfaceContext(`${kind[0].toUpperCase() + kind.slice(1)} appearance`, surface);
+  appendSurfaceOptions(menu, kind, patch => this.state.commit(kind, surface.dataset.selectable!, patch));
   (surface.closest('dialog') ?? document.body).append(menu); menu.openOver({ left: x, right: x, top: y, bottom: y, width: 0, height: 0 });
  }
  destroy() { this.root.removeEventListener('contextmenu', this.context); this.root.removeEventListener('keydown', this.keyboard); this.menu?.remove(); }

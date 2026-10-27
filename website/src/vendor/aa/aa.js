@@ -5945,9 +5945,9 @@ var Wa = {
 	let n = Ka(e, t);
 	return n.textContent = t, n;
 };
-function Ka(e, t) {
-	let n = document.createElement("span");
-	return n.className = "aa-atom", n.contentEditable = "false", n.dataset.atom = e, n.dataset.source = t, n;
+function Ka(e, t, n = globalThis.document) {
+	let r = n.createElement("span");
+	return r.className = "aa-atom", r.contentEditable = "false", r.dataset.atom = e, r.dataset.source = t, r;
 }
 var qa = (e) => e.nodeType === 1, Ja = (e) => qa(e) && e.classList.contains("aa-atom");
 function Ya(e, t, n = Ji) {
@@ -5961,7 +5961,11 @@ function Ya(e, t, n = Ji) {
 	return `on:${r.join(",")}`;
 }
 function Xa(e, t, n, r = Ji, i = Ga, a = []) {
-	e.className = "aa-block", e.dataset.kind = t.kind;
+	let o = e.ownerDocument;
+	i === Ga && (i = (e, t) => {
+		let n = Ka(e, t, o);
+		return n.textContent = t, n;
+	}), e.className = "aa-block", e.dataset.kind = t.kind;
 	for (let n of [
 		"spellcheck",
 		"autocorrect",
@@ -5980,89 +5984,91 @@ function Xa(e, t, n, r = Ji, i = Ga, a = []) {
 		$a(e, t, a), Qa(e, a);
 		return;
 	}
-	let o = Hi(t, r);
-	e.toggleAttribute("data-drawn", !!o || t.kind === "columns" || t.kind === "tabs" || t.kind === "toc"), o ? e.dataset.fence = o.name : delete e.dataset.fence;
-	let s = /* @__PURE__ */ new Map();
+	let s = Hi(t, r);
+	e.toggleAttribute("data-drawn", !!s || t.kind === "columns" || t.kind === "tabs" || t.kind === "toc"), s ? e.dataset.fence = s.name : delete e.dataset.fence;
+	let c = /* @__PURE__ */ new Map();
 	for (let t of e.querySelectorAll(".aa-atom")) {
 		let e = `${t.dataset.atom}\u0000${t.dataset.source}`;
-		s.set(e, [...s.get(e) ?? [], t]);
+		c.set(e, [...c.get(e) ?? [], t]);
 	}
-	let c = document.createDocumentFragment(), l = document.createElement("span");
-	l.className = "aa-callout-body";
-	let u = c, d = !1, f = !1;
+	let l = o.createDocumentFragment(), u = o.createElement("span");
+	u.className = "aa-callout-body";
+	let d = l, f = !1, p = !1;
 	for (let e of ca(t, r)) {
-		if (t.kind === "callout" && e.from >= t.source.indexOf("\n") && t.source.includes("\n") && u === c && (c.append(l), u = l), f = e.kind === "break", e.kind === "break") {
-			u.append(document.createElement("br"));
+		if (t.kind === "callout" && e.from >= t.source.indexOf("\n") && t.source.includes("\n") && d === l && (l.append(u), d = u), p = e.kind === "break", e.kind === "break") {
+			d.append(o.createElement("br"));
 			continue;
 		}
 		let r = t.source.slice(e.from, e.to);
 		if (!r) continue;
 		if (e.kind === "atom") {
-			e.group && n && !o && n.from <= e.to && n.to >= e.from ? u.append(document.createTextNode(r)) : u.append(s.get(`${e.atom}\u0000${r}`)?.shift() ?? i(e.atom, r)), d = !0;
+			e.group && n && !s && n.from <= e.to && n.to >= e.from ? d.append(o.createTextNode(r)) : d.append(c.get(`${e.atom}\u0000${r}`)?.shift() ?? i(e.atom, r)), f = !0;
 			continue;
 		}
 		if (e.kind === "syntax") {
-			let e = document.createElement("span");
-			e.className = "aa-syntax", e.setAttribute("data-hidden", ""), e.textContent = r, u.append(e);
+			let e = o.createElement("span");
+			e.className = "aa-syntax", e.setAttribute("data-hidden", ""), e.textContent = r, d.append(e);
 			continue;
 		}
-		d = !0;
-		let p = e.href ? document.createElement("a") : document.createElement("span");
-		p instanceof HTMLAnchorElement && (p.href = e.href, p.className = "aa-link", p.rel = "noopener"), e.bold && p.classList.add("aa-b"), e.italic && p.classList.add("aa-i"), e.strike && p.classList.add("aa-s"), e.underline && p.classList.add("aa-u"), e.color && (p.dataset.color = e.color), e.code && (p.classList.add("aa-c"), p.spellcheck = !1), e.highlight && p.classList.add("aa-highlight"), p.textContent = r, Za(p, e.from, a), u.append(p);
+		f = !0;
+		let m = e.href ? o.createElement("a") : o.createElement("span");
+		e.href && (m.href = e.href, m.className = "aa-link", m.rel = "noopener"), e.bold && m.classList.add("aa-b"), e.italic && m.classList.add("aa-i"), e.strike && m.classList.add("aa-s"), e.underline && m.classList.add("aa-u"), e.color && (m.dataset.color = e.color), e.code && (m.classList.add("aa-c"), m.spellcheck = !1), e.highlight && m.classList.add("aa-highlight"), m.textContent = r, Za(m, e.from, a), d.append(m);
 	}
-	if (!d || f) {
-		let e = document.createElement("br");
-		e.dataset.filler = "", c.append(e);
+	if (!f || p) {
+		let e = o.createElement("br");
+		e.dataset.filler = "", l.append(e);
 	}
-	e.replaceChildren(c), Qa(e, a);
+	e.replaceChildren(l), Qa(e, a);
 }
 function Za(e, t, n) {
-	let r = e.textContent ?? "", i = n.filter((e) => e.from < t + r.length && e.to > t);
-	if (!i.length) return;
-	let a = [.../* @__PURE__ */ new Set([
+	let r = e.ownerDocument, i = e.textContent ?? "", a = n.filter((e) => e.from < t + i.length && e.to > t);
+	if (!a.length) return;
+	let o = [.../* @__PURE__ */ new Set([
 		0,
-		r.length,
-		...i.flatMap((e) => [Math.max(0, e.from - t), Math.min(r.length, e.to - t)])
+		i.length,
+		...a.flatMap((e) => [Math.max(0, e.from - t), Math.min(i.length, e.to - t)])
 	])].sort((e, t) => e - t);
 	e.replaceChildren();
-	for (let n = 1; n < a.length; n++) {
-		let o = a[n - 1], s = a[n], c = document.createElement("span");
-		c.textContent = r.slice(o, s);
-		for (let e of i) if (e.from < t + s && e.to > t + o) {
-			c.classList.add(...e.className.split(/\s+/).filter(Boolean)), e.label && (c.title = e.label);
-			for (let [t, n] of Object.entries(e.attributes ?? {})) c.setAttribute(t, c.hasAttribute(t) ? `${c.getAttribute(t)} ${n}` : n);
+	for (let n = 1; n < o.length; n++) {
+		let s = o[n - 1], c = o[n], l = r.createElement("span");
+		l.textContent = i.slice(s, c);
+		for (let e of a) if (e.from < t + c && e.to > t + s) {
+			l.classList.add(...e.className.split(/\s+/).filter(Boolean)), e.label && (l.title = e.label);
+			for (let [t, n] of Object.entries(e.attributes ?? {})) l.setAttribute(t, l.hasAttribute(t) ? `${l.getAttribute(t)} ${n}` : n);
 		}
-		e.append(c);
+		e.append(l);
 	}
 }
 function Qa(e, t) {
-	for (let n of t.filter((t) => t.from === t.to && t.from >= 0 && t.from <= eo(e).length)) {
-		let t = document.createElement("span");
-		t.className = `${n.className} aa-peer-caret`, t.contentEditable = "false", t.dataset.label = n.label ?? "", n.label && (t.dataset.initial = Kr(n.label)), t.title = n.label ?? "";
-		let r = ro(e, n.from), i = document.createRange();
-		i.setStart(r.node, r.offset), i.collapse(!0), i.insertNode(t);
+	let n = e.ownerDocument;
+	for (let r of t.filter((t) => t.from === t.to && t.from >= 0 && t.from <= eo(e).length)) {
+		let t = n.createElement("span");
+		t.className = `${r.className} aa-peer-caret`, t.contentEditable = "false", t.dataset.label = r.label ?? "", r.label && (t.dataset.initial = Kr(r.label)), t.title = r.label ?? "";
+		let i = ro(e, r.from), a = n.createRange();
+		a.setStart(i.node, i.offset), a.collapse(!0), a.insertNode(t);
 	}
 }
 function $a(e, t, n) {
+	let r = e.ownerDocument;
 	e.contentEditable = "false";
-	let r = Ra(t.source), i = za(t.source), a = document.createDocumentFragment(), o = 0;
-	r.forEach((r, s) => {
-		let c = document.createElement("span");
-		c.className = "aa-table-row", c.style.setProperty("--aa-columns", String(r.length)), r.forEach((r, a) => {
-			let l = document.createElement("span");
-			l.className = "aa-table-cell", l.dataset.cell = `${s}:${a}`, i[a] && (l.dataset.align = i[a]), l.dataset.from = String(r.from), l.dataset.to = String(r.to), l.contentEditable = e.dataset.readonly === "true" ? "false" : "true";
-			let u = document.createElement("span");
-			u.className = "aa-syntax", u.dataset.hidden = "", u.textContent = t.source.slice(o, r.from);
-			let d = document.createElement("span");
-			if (d.textContent = r.text, Za(d, r.from, n), !r.text) {
-				let e = document.createElement("br");
-				e.dataset.filler = "", d.append(e);
+	let i = Ra(t.source), a = za(t.source), o = r.createDocumentFragment(), s = 0;
+	i.forEach((i, c) => {
+		let l = r.createElement("span");
+		l.className = "aa-table-row", l.style.setProperty("--aa-columns", String(i.length)), i.forEach((i, o) => {
+			let u = r.createElement("span");
+			u.className = "aa-table-cell", u.dataset.cell = `${c}:${o}`, a[o] && (u.dataset.align = a[o]), u.dataset.from = String(i.from), u.dataset.to = String(i.to), u.contentEditable = e.dataset.readonly === "true" ? "false" : "true";
+			let d = r.createElement("span");
+			d.className = "aa-syntax", d.dataset.hidden = "", d.textContent = t.source.slice(s, i.from);
+			let f = r.createElement("span");
+			if (f.textContent = i.text, Za(f, i.from, n), !i.text) {
+				let e = r.createElement("br");
+				e.dataset.filler = "", f.append(e);
 			}
-			l.append(u, d), c.append(l), o = r.to;
-		}), a.append(c);
+			u.append(d, f), l.append(u), s = i.to;
+		}), o.append(l);
 	});
-	let s = document.createElement("span");
-	s.className = "aa-syntax", s.dataset.hidden = "", s.textContent = t.source.slice(o), a.append(s), e.replaceChildren(a);
+	let c = r.createElement("span");
+	c.className = "aa-syntax", c.dataset.hidden = "", c.textContent = t.source.slice(s), o.append(c), e.replaceChildren(o);
 }
 function eo(e) {
 	let t = "", n = (e) => {
@@ -6075,6 +6081,7 @@ function to(e) {
 	return !!t && !!t.closest(".aa-syntax[data-hidden]");
 }
 function no(e, t, n) {
+	e.ownerDocument;
 	let r = 0, i = -1, a = (e) => {
 		let o = Array.from(e.childNodes);
 		for (let s = 0; s < o.length; s++) {
@@ -6096,7 +6103,7 @@ function no(e, t, n) {
 	return (t === e || e.contains(t)) && a(e), i < 0 ? r : i;
 }
 function ro(e, t) {
-	if (e.dataset.kind === "table") {
+	if (e.ownerDocument, e.dataset.kind === "table") {
 		let n = Array.from(e.querySelectorAll("[data-cell]")).find((e) => t >= Number(e.dataset.from) && t <= Number(e.dataset.to));
 		if (n?.lastElementChild) return ro(n.lastElementChild, t - Number(n.dataset.from));
 	}
@@ -8348,7 +8355,8 @@ function us(e, t) {
 		let i = n.target.closest(".aa-block");
 		i?.getAttribute("data-kind") !== "table" || e.readOnly || t.menus === !1 || (n.preventDefault(), N = Array.from(r.children).indexOf(i), ue(), y.style.left = `${n.clientX}px`, y.style.top = `${n.clientY}px`);
 	}, we = (t) => {
-		if (!(t.target && y.contains(t.target)) && (fe(), !O.hidden && "docked" in O.dataset && cs(O), !y.hidden)) {
+		let n = t.target;
+		if (!(n?.nodeType && y.contains(n)) && (fe(), !O.hidden && "docked" in O.dataset && cs(O), !y.hidden)) {
 			let t = e.activeBlock(), n = t ? r.children[t.index]?.getBoundingClientRect() : null;
 			n && (z(n), te());
 		}
@@ -16016,10 +16024,10 @@ function Zp(e, t) {
 		e.key === "Escape" && !y && !W && !C && (e.preventDefault(), oe());
 	}), o || a.append(v), v), G = () => {
 		if (m) return;
-		let e = v?.contains(r.activeElement) ? r.activeElement : null, t = e?.closest("[data-thread]")?.dataset.thread, n = e instanceof HTMLTextAreaElement ? {
-			start: e.selectionStart,
-			end: e.selectionEnd,
-			edit: e.dataset.edit
+		let e = v?.getRootNode()?.activeElement ?? r.activeElement, t = v?.contains(e) ? e : null, n = t?.closest("[data-thread]")?.dataset.thread, i = t instanceof HTMLTextAreaElement ? {
+			start: t.selectionStart,
+			end: t.selectionEnd,
+			edit: t.dataset.edit
 		} : null;
 		if (o) {
 			let e = xe(), t = zr(c), n = r.createElement("div");
@@ -16059,12 +16067,12 @@ function Zp(e, t) {
 			}
 			xe().replaceChildren(f ? be() : ye(e, !0)), K();
 		}
-		if (t) {
-			let e = v?.querySelector(n?.edit ? `[data-edit="${n.edit}"]` : `[data-thread="${t}"] .aa-composer textarea`);
-			if (e && n) {
+		if (n) {
+			let e = v?.querySelector(i?.edit ? `[data-edit="${i.edit}"]` : `[data-thread="${n}"] .aa-composer textarea`);
+			if (e && i) {
 				e.focus({ preventScroll: !0 });
 				try {
-					e.setSelectionRange(n.start, n.end);
+					e.setSelectionRange(i.start, i.end);
 				} catch {}
 			}
 		}
@@ -16090,7 +16098,9 @@ function Zp(e, t) {
 	}, Ce = typeof ResizeObserver > "u" ? null : new ResizeObserver(Se);
 	Ce?.observe(e), i.addEventListener("scroll", Se, !0), i.addEventListener("resize", Se);
 	let we = (t) => {
-		v && !o && t.target instanceof Node && (W && !W.contains(t.target) && ge(), !(v.contains(t.target) || y?.contains(t.target) || W?.contains(t.target)) && (e.contains(t.target) || oe()));
+		if (!v || o || !(t.target instanceof Node)) return;
+		let n = (e) => !!e && t.composedPath().some((t) => t instanceof Node && e.contains(t));
+		W && !n(W) && ge(), !(n(v) || n(y) || n(W) || n(e)) && oe();
 	};
 	r.addEventListener("pointerdown", we, !0);
 	let Te = n.subscribe(k);
@@ -16373,8 +16383,8 @@ function am(e, t = {}) {
 		};
 	}
 	let ee = /* @__PURE__ */ new Map(), te = (e, t) => {
-		let n = Ka(e, t), r = x.find((t) => t.name === e);
-		return r?.draw ? ee.set(n, r.draw(n, t)) : n.textContent = t, n.querySelectorAll(".aa-caption").forEach((e) => e.contentEditable = a ? "false" : "true"), n;
+		let r = Ka(e, t, n), i = x.find((t) => t.name === e);
+		return i?.draw ? ee.set(r, i.draw(r, t)) : r.textContent = t, r.querySelectorAll(".aa-caption").forEach((e) => e.contentEditable = a ? "false" : "true"), r;
 	}, D = (t = !1) => {
 		for (let [n, r] of ee) (t || !e.contains(n)) && (ee.delete(n), r?.());
 	}, O = (e, t, n) => {
@@ -17945,13 +17955,19 @@ function cm(e, t = {}) {
 			}
 		}), u && (e.dataset.listening = "", l(q("Listening…")), r.append(a), d = Vp(a, n.defaultView));
 	}, f = (e) => {
-		if (!e.isComposing) {
+		if (!(e.isComposing || e.defaultPrevented)) {
 			if (u) {
 				if (e.key === "Escape") {
 					e.preventDefault(), e.stopPropagation(), u.abort();
 					return;
 				}
 				u.stop();
+			} else if ((/Mac|iPhone|iPad/.test(n.defaultView?.navigator.platform ?? navigator.platform) ? e.metaKey : e.ctrlKey) && !e.altKey && !e.shiftKey && e.key.toLowerCase() === "a") {
+				e.preventDefault(), e.stopPropagation();
+				let t = n.createRange();
+				t.selectNodeContents(r);
+				let i = n.getSelection();
+				i?.removeAllRanges(), i?.addRange(t);
 			} else e.key === " " && i && !s().trim() && !e.metaKey && !e.ctrlKey && !e.altKey && r.isContentEditable && (e.preventDefault(), d());
 		}
 	}, p = () => {

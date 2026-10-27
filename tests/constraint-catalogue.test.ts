@@ -13,3 +13,7 @@ it('never counts absent or visually unmeasurable rules as passed checks', () => 
   expect(exampleScore({ id: 'shop', checks, errors: [] })).toEqual({ passed: 1, total: 3, failed: 1, review: 1 });
   expect(exampleScore({ id: 'shop', checks: [], errors: ['Page did not load'] })).toEqual({ passed: 0, total: 0, failed: 0, review: 0 });
 });
+
+it('keeps the permanent Fault lines identity', () => {
+  expect(CONSTRAINT_CATALOGUE.find(rule => rule.code === 'page.fault-lines')).toMatchObject({id: 'C009', tag: 'Fault lines'});
+});

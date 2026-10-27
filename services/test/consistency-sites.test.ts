@@ -1,6 +1,6 @@
 import { expect, it, vi } from 'vite-plus/test';
 import { consistencyPreview } from '../src/consistency';
-import { BUSINESS_BYTES, DOCUMENT_POLICY, EDIT_BYTES, FILE_POLICY, apiRoute } from '../src/consistency-sites';
+import { BUSINESS_BYTES, DOCUMENT_POLICY, EDIT_BYTES, FILE_POLICY, NATIVE_PAGE_BYTES, apiRoute } from '../src/consistency-sites';
 import type { ReportsEnv } from '../src/reports';
 
 const origin = 'https://editor.c9y.site';
@@ -102,6 +102,29 @@ it('keeps site composition behind the same identity, origin, path and size check
   expect(await workspace.fetch.mock.calls[1]![0].text()).toBe(body);
   expect(workspace.fetch.mock.calls[1]![0].headers.get('X-C9y-Actor')).toBe('owner');
   expect(saved.headers.get('cache-control')).toBe('private, no-store');
+});
+
+it('protects native page documents and forwards only bounded authenticated writes', async () => {
+  const { call, workspace } = setup();
+  const route = '10VNDG/api/native-page?path=%2Fshop';
+  expect((await call(route)).status).toBe(401);
+  expect((await setup('other').call(route, { headers })).status).toBe(403);
+  for (const query of ['', '?path=//evil.test/', '?path=%2Fshop%00'])
+    expect((await call('10VNDG/api/native-page' + query, { headers })).status).toBe(400);
+  expect((await call(route, write('POST', '{}'))).status).toBe(405);
+  expect((await call(route, write('PUT', '{}', { origin: 'https://evil.test' }))).status).toBe(403);
+  expect((await call(route, write('PUT', '{}', { type: 'text/plain' }))).status).toBe(403);
+  expect((await call(route, write('PUT', 'x'.repeat(NATIVE_PAGE_BYTES + 1)))).status).toBe(413);
+  expect(workspace.fetch).not.toHaveBeenCalled();
+  expect(await (await call(route, { headers })).json()).toEqual({ path: '/api/consistency/sites/10VNDG/api/native-page?path=%2Fshop', method: 'GET' });
+  const body = JSON.stringify({ build: 'current', base: 'structure', revision: 4, document: { schema: 1, kind: 'native-page', blocks: [] }, padding: 'x'.repeat(EDIT_BYTES) });
+  const saved = await call(route, write('PUT', body));
+  expect(saved.status).toBe(200);
+  const forwarded = workspace.fetch.mock.calls[1]![0];
+  expect(await forwarded.text()).toBe(body);
+  expect(forwarded.headers.get('X-C9y-Actor')).toBe('owner');
+  expect(saved.headers.get('cache-control')).toBe('private, no-store');
+  expect((await call('10VNDG/api/native-page/history?path=%2Fshop', { headers })).status).toBe(404);
 });
 
 it('passes on exactly the platform\'s allowlist of a site\'s API, each route by its own methods', async () => {

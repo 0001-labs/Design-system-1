@@ -1,0 +1,165 @@
+/* Canonical editor guide and selection skin, shared by the lab and site surfaces. */
+.consistency-gap{position:relative;background:color-mix(in srgb,var(--ds-pink) 24%,transparent)}
+.consistency-gap::before{content:'';position:absolute;inset:0;border-top:1px dashed var(--ds-pink);border-bottom:1px dashed var(--ds-pink);pointer-events:none}
+.consistency-gap .ghost{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2}
+.consistency-shell .ghost{--ds-button-text-color:var(--ds-black);--ds-button-background:var(--ds-yellow)}
+.consistency-shell .ghost button{background:var(--ds-yellow);color:var(--ds-black);border:0;border-radius:calc(2px * var(--sf,1));cursor:ew-resize;touch-action:none;white-space:nowrap}
+.consistency-gap .ghost button{cursor:ns-resize}
+.consistency-shell .ghost button:focus-visible{outline:calc(2px * var(--sf,1)) solid var(--ds-text-color,#171717);outline-offset:calc(2px * var(--sf,1))}
+
+.ghost-surface{position:absolute;inset:0;pointer-events:auto;touch-action:none;cursor:ew-resize;outline:none}
+
+.ghost-surface--width{transform:translateX(50%);border-left:1px solid var(--ds-yellow)}
+
+.ghost-surface--padding{background:color-mix(in srgb,var(--ds-pink) 6%,transparent)}
+
+.ghost-surface--gap{cursor:ns-resize;min-height:calc(20px * var(--sf,1));top:50%;transform:translateY(-50%)}
+
+.ghost-surface:hover,.ghost-surface:focus-visible{background:color-mix(in srgb,var(--ds-pink) 24%,transparent)}
+
+.ghost-surface:focus-visible{outline:1px solid var(--ds-text-color,#171717);outline-offset:1px}
+
+.ghost-measure{position:absolute;pointer-events:none;white-space:nowrap;background:var(--ds-yellow);color:var(--ds-black);font-size:calc(12px * var(--sf,1));line-height:calc(16px * var(--sf,1));padding:0 calc(4px * var(--sf,1));border-radius:calc(2px * var(--sf,1))}
+
+.ghost-surface--width .ghost-measure{right:calc(10px * var(--sf,1));top:calc(-20px * var(--sf,1))}
+
+.ghost-surface--padding .ghost-measure{left:50%;top:50%;transform:translate(-50%,-50%)}
+
+.ghost-surface--gap .ghost-measure{left:50%;top:50%;transform:translate(-50%,-50%)}
+
+.ghost-surface--width{border-left:0;background-image:linear-gradient(to right,transparent calc(50% - .5px),var(--ds-yellow) calc(50% - .5px),var(--ds-yellow) calc(50% + .5px),transparent calc(50% + .5px))}
+
+.ghost-surface--gap{height:max(calc(20px * var(--sf,1)),var(--composition-gap));bottom:auto}
+
+.consistency-marquee{position:fixed;z-index:30;border:0;background:color-mix(in srgb,var(--consistency-selection-color,var(--ds-text-color,#171717)) 15%,transparent);pointer-events:none}
+
+.consistency-shell [data-selected]{outline:none}
+
+.spacing-off .consistency-gap,.spacing-off .ghost-surface--gap{background:none}
+.spacing-off .consistency-gap::before{display:none}
+
+.consistency-gap--horizontal{flex:none;min-height:var(--u);align-self:stretch}
+.consistency-gap--horizontal::before{border:0;border-left:1px dashed var(--ds-pink);border-right:1px dashed var(--ds-pink)}
+
+.consistency-gap--horizontal .ghost-surface--gap{inset:0;min-height:var(--u);height:100%;transform:none;cursor:ew-resize}
+
+.consistency-gap--horizontal .ghost-measure{left:50%;top:50%}
+
+.consistency-gap-name{font-size:calc(12px * var(--sf,1));color:var(--ds-text-color-muted)}
+
+/* Production keeps measurements quiet until hover, keyboard focus or adjustment. */
+.production-on .ghost-surface .ghost-measure{opacity:0}
+
+.production-on .ghost-surface:hover .ghost-measure,
+.production-on .ghost-surface:focus-visible .ghost-measure,
+.production-on .ghost-surface[data-spacing-active] .ghost-measure{opacity:1}
+
+.consistency-inspector p,.consistency-gap-name{line-height:var(--u)}
+
+
+.consistency-tag,.ghost-measure,.consistency-gap-name,.consistency-footer{font-size:var(--ds-type-size-small)}
+
+
+/* Production reveals gap feedback only where the person is working. */
+.production-on .consistency-gap{background:transparent}
+
+.production-on .consistency-gap::before{border-color:transparent}
+
+.ghost-surface--gap .ghost-measure{background:var(--ds-pink)}
+
+.ghost-surface--gap:hover,.ghost-surface--gap:focus-visible{background:transparent}
+
+.consistency-shell.production-on:not(.spacing-off) .consistency-gap:is(:hover,:has(:focus-visible),:has([data-spacing-active])){background:color-mix(in srgb,var(--ds-pink) 24%,transparent)}
+
+.consistency-shell.production-on:not(.spacing-off) .consistency-gap:is(:hover,:has(:focus-visible),:has([data-spacing-active]))::before{border-color:var(--ds-pink)}
+
+.production-on .ghost-surface--width{background-image:none}
+
+.production-on .ghost-surface--padding,
+.production-on .ghost-surface--padding:hover,
+.production-on .ghost-surface--padding:focus-visible,
+.production-on .ghost-surface--width:hover,
+.production-on .ghost-surface--width:focus-visible{background-color:transparent}
+
+.production-on .ghost-surface--padding:is(:hover,:focus-visible,[data-spacing-active]){box-shadow:inset -1px 0 var(--ds-yellow)}
+
+.production-on .ghost-surface--width:is(:hover,:focus-visible,[data-spacing-active]){background-image:linear-gradient(to right,transparent calc(50% - .5px),var(--ds-yellow) calc(50% - .5px),var(--ds-yellow) calc(50% + .5px),transparent calc(50% + .5px))}
+
+/* Editing feedback is a soft blush surface rather than a framed box. */
+.ghost-measure{background:var(--ds-pink)}
+
+.ghost-surface{border-radius:var(--ds-radius)}
+
+.ghost-surface:focus-visible{outline:0;box-shadow:none;background:color-mix(in srgb,var(--ds-pink) 32%,transparent)}
+
+.consistency-gap{border-radius:var(--ds-radius)}
+
+.consistency-gap::before{display:none}
+
+.production-on .ghost-surface--padding:is(:hover,:focus-visible,[data-spacing-active]),
+.production-on .ghost-surface--width:is(:hover,:focus-visible,[data-spacing-active]){background:color-mix(in srgb,var(--ds-pink) 16%,transparent);box-shadow:none}
+
+.production-on .ghost-surface--padding:focus-visible,
+.production-on .ghost-surface--width:focus-visible{box-shadow:none;background:color-mix(in srgb,var(--ds-pink) 32%,transparent)}
+
+/* Zero padding has an edge, not a painted twenty-pixel hit area. */
+.consistency-shell .ghost-surface--padding[aria-valuenow="0"]{background:transparent;box-shadow:none;border-radius:0}
+
+.ghost-surface--padding[aria-valuenow="0"]::before{content:'';position:absolute;inset:0 auto 0 0;width:1px;background:var(--ds-pink);pointer-events:none}
+
+.production-on .ghost-surface--padding[aria-valuenow="0"]::before{opacity:0}
+
+.production-on .ghost-surface--padding[aria-valuenow="0"]:is(:hover,:focus-visible,[data-spacing-active])::before{opacity:1}
+
+.ghost-surface--padding[aria-valuenow="0"] .ghost-measure{left:0;transform:translateY(-50%)}
+
+.production-on .ghost-surface--width .ghost-measure{top:0}
+
+.consistency-projects:has(>ds-card[hidden])>.consistency-gap,
+.consistency-statistics:has(>ds-stat[hidden])>.consistency-gap,
+.consistency-sample-actions:has(>ds-button[hidden])>.consistency-gap{display:none}
+
+/* Empty gaps still have an invisible target from which to pull space open. */
+.consistency-gap--horizontal .ghost-surface--gap[aria-valuenow="0"]{width:var(--u);left:50%;transform:translateX(-50%)}
+
+.consistency-shell .ghost-surface--gap[aria-valuenow="0"]{background:transparent;box-shadow:none}
+
+.ghost-surface--gap[aria-valuenow="0"]::after{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:var(--ds-pink);opacity:0;pointer-events:none}
+
+.consistency-gap--horizontal .ghost-surface--gap[aria-valuenow="0"]::after{left:50%;right:auto;top:0;bottom:0;width:1px;height:auto}
+
+.ghost-surface--gap[aria-valuenow="0"]:is(:hover,:focus-visible,[data-spacing-active])::after{opacity:1}
+
+.consistency-mobile-preview .consistency-projects>.consistency-gap--horizontal{width:100%!important;height:var(--composition-gap)}
+
+.consistency-mobile-preview .consistency-projects>.consistency-gap--horizontal .ghost-surface--gap{width:100%;height:max(var(--u),var(--composition-gap));left:0;top:50%;transform:translateY(-50%);cursor:ns-resize}
+
+.consistency-mobile-preview .consistency-sample-actions>.consistency-gap--horizontal{max-width:var(--u)}
+
+.consistency-mobile-preview .consistency-statistics>.consistency-gap--horizontal{width:100%!important;height:var(--composition-gap)}
+
+.consistency-mobile-preview .consistency-statistics>.consistency-gap{width:100%}
+
+
+/* Measurements belong to the highlighted space, without a separate badge. */
+.consistency-shell .ghost-measure{background:transparent;color:var(--ds-text-color,#171717);padding:0;border:0;border-radius:0}
+
+.consistency-stacked>.consistency-gap{width:100%!important;height:var(--composition-gap)!important;flex:none;align-self:stretch}
+
+.consistency-stacked>.consistency-gap>.ghost-surface--gap{width:100%;height:max(var(--u),var(--composition-gap));left:0;top:50%;transform:translateY(-50%);cursor:ns-resize}
+
+/* Selection rests softly on the authored element, never its empty gaps. */
+:is(.consistency-sheet,[data-editor-surface]) :is([data-composition-selected],[data-selectable][data-selected]:not(.aa-block),[data-selection-face]){position:relative;outline:none!important;box-shadow:none}
+
+:is(.consistency-sheet,[data-editor-surface]) [data-selection-face]::after{content:'';position:absolute;inset:0;z-index:20;pointer-events:none;border:0;outline:0;border-radius:inherit;background:color-mix(in srgb,var(--consistency-selection-color,var(--ds-text-color,#171717)) 15%,transparent)}
+
+.context-active :is(.ghost-surface,.consistency-text-gap,.consistency-column-gap,.consistency-card-gap,.consistency-stat-gap,.consistency-resize-edge){visibility:hidden!important;pointer-events:none!important}
+
+
+/* Crossing an element during a gesture is not a request to edit its action. */
+consistency-editor[data-pointer-busy] :is(.consistency-button-action,.consistency-carousel-tools):not([data-keyboard]):not(:focus-within){visibility:hidden;pointer-events:none}
+
+.consistency-selection-face{position:fixed;z-index:20;pointer-events:none;border:0;outline:0;background:color-mix(in srgb,var(--consistency-selection-color,var(--ds-text-color,#171717)) 15%,transparent)}
+
+/* A C9Y constraint broken as drawn (c9y-constraints.ts): the blocks it moved, for a moment. */
+[data-c9y-broken]{outline:2px solid var(--ds-pink,#f0f)!important;outline-offset:-2px}

@@ -1,20 +1,9 @@
-consistency-editor{display:block;--ds-sf:var(--sf);color:var(--ds-text-color);font-family:var(--ds-typeface-regular);font-size:calc(14px * var(--sf));background:var(--ds-paper);min-height:100dvh}.consistency-shell{--u:calc(20px * var(--sf))}.consistency-shell *{box-sizing:border-box}.consistency-top,.consistency-bar,.consistency-footer{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--u);padding:var(--u);line-height:calc(16px * var(--sf))}.consistency-top{border-bottom:1px solid var(--ds-border-color,#ccc)}.consistency-name,.consistency-actions{display:flex;gap:var(--u);align-items:flex-end}.consistency-name{font-weight:500}.consistency-tag{display:inline-block;background:var(--ds-yellow);color:var(--ds-black);border-radius:calc(2px * var(--sf));padding:0 calc(4px * var(--sf));font-size:calc(12px * var(--sf));line-height:calc(16px * var(--sf));font-weight:400}.consistency-muted{color:var(--ds-text-color-muted)}.consistency-bar{padding-top:0}.consistency-workspace{display:grid;grid-template-columns:minmax(0,1fr) calc(240px * var(--sf));gap:calc(40px * var(--sf));padding:var(--u)}.consistency-stage{min-width:0;min-height:calc(560px * var(--sf));padding:calc(60px * var(--sf)) var(--u) var(--u);overflow:auto;background-image:radial-gradient(var(--ds-border-color,#ccc) .5px,transparent .5px);background-size:var(--u) var(--u)}.consistency-sheet{position:relative;margin:0;min-width:calc(240px * var(--sf));background:var(--ds-paper);outline:1px solid var(--ds-yellow)}.consistency-sheet aa-editor{display:block;min-width:0;overflow-x:auto;line-height:var(--u)}.consistency-sheet aa-editor.consistency-nowrap,.consistency-sheet aa-editor.consistency-nowrap p{white-space:pre}.consistency-sample-actions{display:flex;flex-wrap:wrap;gap:var(--u);min-height:var(--u);align-items:flex-end}.consistency-gap{position:relative;background:color-mix(in srgb,var(--ds-pink) 24%,transparent)}.consistency-gap::before{content:'';position:absolute;inset:0;border-top:1px dashed var(--ds-pink);border-bottom:1px dashed var(--ds-pink);pointer-events:none}.consistency-width{position:absolute;right:0;top:-20px}.consistency-padding{position:absolute;left:calc(var(--composition-padding) / 2);top:calc(20px * var(--sf));transform:translateX(-50%)}.consistency-gap .ghost{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2}.consistency-shell .ghost{--ds-button-text-color:var(--ds-black);--ds-button-background:var(--ds-yellow)}.consistency-shell .ghost button{background:var(--ds-yellow);color:var(--ds-black);border:0;border-radius:calc(2px * var(--sf));cursor:ew-resize;touch-action:none;white-space:nowrap}.consistency-gap .ghost button{cursor:ns-resize}.consistency-shell .ghost button:focus-visible{outline:calc(2px * var(--sf)) solid var(--ds-text-color);outline-offset:calc(2px * var(--sf))}.consistency-hint{margin:calc(40px * var(--sf)) 0 0;color:var(--ds-text-color-muted);text-align:center;line-height:var(--u)}.consistency-inspector h2{margin:0;padding-top:calc(4px * var(--sf));font-size:inherit;line-height:calc(16px * var(--sf));font-weight:500}.consistency-inspector p{line-height:var(--u);margin:var(--u) 0}.consistency-fields{display:flex;flex-direction:column;align-items:flex-start;gap:var(--u);margin:calc(40px * var(--sf)) 0}.consistency-select-label{display:flex;flex-direction:column;gap:0;line-height:var(--u)}.consistency-explainer{border-top:1px solid var(--ds-border-color,#ccc);padding-top:var(--u)}.consistency-footer{color:var(--ds-text-color-muted);font-size:calc(12px * var(--sf))}@media(max-width:760px){.consistency-workspace{grid-template-columns:minmax(0,1fr);gap:var(--u)}.consistency-stage{min-height:calc(400px * var(--sf))}.consistency-fields{flex-direction:row;flex-wrap:wrap;margin:var(--u) 0}.consistency-bar .consistency-muted{display:none}.consistency-top{flex-wrap:wrap}.consistency-sheet{min-width:0}}
+@import "./editor-surface.css";
+consistency-editor{display:block;--ds-sf:var(--sf);color:var(--ds-text-color);font-family:var(--ds-typeface-regular);font-size:calc(14px * var(--sf));background:var(--ds-paper);min-height:100dvh}.consistency-shell{--u:calc(20px * var(--sf))}.consistency-shell *{box-sizing:border-box}.consistency-top,.consistency-bar,.consistency-footer{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--u);padding:var(--u);line-height:calc(16px * var(--sf))}.consistency-top{border-bottom:1px solid var(--ds-border-color,#ccc)}.consistency-name,.consistency-actions{display:flex;gap:var(--u);align-items:flex-end}.consistency-name{font-weight:500}.consistency-tag{display:inline-block;background:var(--ds-yellow);color:var(--ds-black);border-radius:calc(2px * var(--sf));padding:0 calc(4px * var(--sf));font-size:calc(12px * var(--sf));line-height:calc(16px * var(--sf));font-weight:400}.consistency-muted{color:var(--ds-text-color-muted)}.consistency-bar{padding-top:0}.consistency-workspace{display:grid;grid-template-columns:minmax(0,1fr) calc(240px * var(--sf));gap:calc(40px * var(--sf));padding:var(--u)}.consistency-stage{min-width:0;min-height:calc(560px * var(--sf));padding:calc(60px * var(--sf)) var(--u) var(--u);overflow:auto;background-image:radial-gradient(var(--ds-border-color,#ccc) .5px,transparent .5px);background-size:var(--u) var(--u)}.consistency-sheet{position:relative;margin:0;min-width:calc(240px * var(--sf));background:var(--ds-paper);outline:1px solid var(--ds-yellow)}.consistency-sheet aa-editor{display:block;min-width:0;overflow-x:auto;line-height:var(--u)}.consistency-sheet aa-editor.consistency-nowrap,.consistency-sheet aa-editor.consistency-nowrap p{white-space:pre}.consistency-sample-actions{display:flex;flex-wrap:wrap;gap:var(--u);min-height:var(--u);align-items:flex-end}.consistency-width{position:absolute;right:0;top:-20px}.consistency-padding{position:absolute;left:calc(var(--composition-padding) / 2);top:calc(20px * var(--sf));transform:translateX(-50%)}.consistency-hint{margin:calc(40px * var(--sf)) 0 0;color:var(--ds-text-color-muted);text-align:center;line-height:var(--u)}.consistency-inspector h2{margin:0;padding-top:calc(4px * var(--sf));font-size:inherit;line-height:calc(16px * var(--sf));font-weight:500}.consistency-inspector p{line-height:var(--u);margin:var(--u) 0}.consistency-fields{display:flex;flex-direction:column;align-items:flex-start;gap:var(--u);margin:calc(40px * var(--sf)) 0}.consistency-select-label{display:flex;flex-direction:column;gap:0;line-height:var(--u)}.consistency-explainer{border-top:1px solid var(--ds-border-color,#ccc);padding-top:var(--u)}.consistency-footer{color:var(--ds-text-color-muted);font-size:calc(12px * var(--sf))}@media(max-width:760px){.consistency-workspace{grid-template-columns:minmax(0,1fr);gap:var(--u)}.consistency-stage{min-height:calc(400px * var(--sf))}.consistency-fields{flex-direction:row;flex-wrap:wrap;margin:var(--u) 0}.consistency-bar .consistency-muted{display:none}.consistency-top{flex-wrap:wrap}.consistency-sheet{min-width:0}}
 
 /* Measurements explain the surface; the space itself receives the interaction. */
 .consistency-width{inset:0 0 0 auto;top:0;width:calc(20px * var(--sf));pointer-events:none}
 .consistency-padding{inset:0 auto 0 0;top:0;left:0;width:max(calc(20px * var(--sf)),var(--composition-padding));transform:none;pointer-events:none}
-.ghost-surface{position:absolute;inset:0;pointer-events:auto;touch-action:none;cursor:ew-resize;outline:none}
-.ghost-surface--width{transform:translateX(50%);border-left:1px solid var(--ds-yellow)}
-.ghost-surface--padding{background:color-mix(in srgb,var(--ds-pink) 6%,transparent)}
-.ghost-surface--gap{cursor:ns-resize;min-height:calc(20px * var(--sf));top:50%;transform:translateY(-50%)}
-.ghost-surface:hover,.ghost-surface:focus-visible{background:color-mix(in srgb,var(--ds-pink) 24%,transparent)}
-.ghost-surface:focus-visible{outline:1px solid var(--ds-text-color);outline-offset:1px}
-.ghost-measure{position:absolute;pointer-events:none;white-space:nowrap;background:var(--ds-yellow);color:var(--ds-black);font-size:calc(12px * var(--sf));line-height:calc(16px * var(--sf));padding:0 calc(4px * var(--sf));border-radius:calc(2px * var(--sf))}
-.ghost-surface--width .ghost-measure{right:calc(10px * var(--sf));top:calc(-20px * var(--sf))}
-.ghost-surface--padding .ghost-measure{left:50%;top:50%;transform:translate(-50%,-50%)}
-.ghost-surface--gap .ghost-measure{left:50%;top:50%;transform:translate(-50%,-50%)}
-.ghost-surface--width{border-left:0;background-image:linear-gradient(to right,transparent calc(50% - .5px),var(--ds-yellow) calc(50% - .5px),var(--ds-yellow) calc(50% + .5px),transparent calc(50% + .5px))}
-.ghost-surface--gap{height:max(calc(20px * var(--sf)),var(--composition-gap));bottom:auto}
 .consistency-story-section{min-height:0;scroll-margin-top:calc(40px * var(--sf))}
 
 
@@ -25,27 +14,15 @@ consistency-editor{display:block;--ds-sf:var(--sf);color:var(--ds-text-color);fo
 @media(max-width:760px){.consistency-inspector{position:static}.consistency-projects{grid-template-columns:minmax(0,1fr)}}
 .consistency-text-bounds{width:100%;min-width:0;overflow-x:auto}
 .consistency-sheet aa-editor.consistency-nowrap{width:max-content;min-width:100%;overflow:visible}
-.consistency-layers{display:flex;flex-direction:column;gap:var(--u);margin:var(--u) 0 calc(40px * var(--sf))}.consistency-layer-toggle{display:flex;align-items:flex-end;justify-content:space-between;line-height:calc(16px * var(--sf));min-height:var(--u)}
-.consistency-marquee{position:fixed;z-index:30;border:0;background:color-mix(in srgb,var(--ds-text-color) 15%,transparent);pointer-events:none}
-.consistency-shell [data-selected]{outline:none}
-.spacing-off .consistency-gap,.spacing-off .ghost-surface--gap{background:none}.spacing-off .consistency-gap::before{display:none}.boundaries-off .consistency-sheet{outline:0}
-.consistency-gap--horizontal{flex:none;min-height:var(--u);align-self:stretch}.consistency-gap--horizontal::before{border:0;border-left:1px dashed var(--ds-pink);border-right:1px dashed var(--ds-pink)}
-.consistency-gap--horizontal .ghost-surface--gap{inset:0;min-height:var(--u);height:100%;transform:none;cursor:ew-resize}
-.consistency-gap--horizontal .ghost-measure{left:50%;top:50%}
+.consistency-layers{display:flex;flex-direction:column;gap:var(--u);margin:var(--u) 0 calc(40px * var(--sf))}.consistency-layer-toggle{display:flex;align-items:flex-end;justify-content:space-between;line-height:calc(16px * var(--sf));min-height:var(--u)}.boundaries-off .consistency-sheet{outline:0}
 .consistency-projects{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:0}
 .consistency-statistics,.consistency-sample-actions{display:flex;flex-wrap:nowrap;gap:0}
-.consistency-gap-name{font-size:calc(12px * var(--sf));color:var(--ds-text-color-muted)}
 .consistency-group{position:relative;outline:none}.consistency-group:focus-visible{outline:2px solid var(--ds-yellow);outline-offset:calc(4px * var(--sf))}.reorder-on .consistency-group{cursor:grab}.reorder-on aa-editor{cursor:text}.consistency-reorder-actions{display:flex;gap:var(--u);align-items:flex-end}
 /* The first column holds still: changing space moves the midpoint by half the
    size change, rather than redistributing both columns around a fixed centre. */
 .consistency-projects{grid-template-columns:var(--composition-card-width) auto minmax(0,1fr)}
 .consistency-statistics > ds-stat:first-child,.consistency-sample-actions > ds-button{flex:none}
 .consistency-statistics > ds-stat:last-child{min-width:0;flex:1}
-/* Production keeps measurements quiet until hover, keyboard focus or adjustment. */
-.production-on .ghost-surface .ghost-measure{opacity:0}
-.production-on .ghost-surface:hover .ghost-measure,
-.production-on .ghost-surface:focus-visible .ghost-measure,
-.production-on .ghost-surface[data-spacing-active] .ghost-measure{opacity:1}
 
 /* Every resting area starts and ends on the same document grid. Controls keep
    DS1's lower sixteen; their surrounding row supplies the spare four. */
@@ -62,7 +39,6 @@ consistency-editor{display:block;--ds-sf:var(--sf);color:var(--ds-text-color);fo
 .consistency-select-label>ds-select{box-sizing:border-box;min-height:var(--u);padding-top:calc(4px * var(--sf))}
 .consistency-explainer{border-top:0;box-shadow:inset 0 1px var(--ds-border-color,#ccc)}
 .consistency-explainer>.consistency-tag{vertical-align:bottom}
-.consistency-inspector p,.consistency-gap-name{line-height:var(--u)}
 .consistency-element-properties{--ds-overlay-width:calc(16 * var(--ds-unit));font-family:var(--ds-typeface-regular)}
 .consistency-element-fields{display:flex;flex-direction:column;gap:var(--ds-unit);padding:var(--ds-unit)}
 .consistency-element-actions{display:flex;align-items:flex-end;min-height:var(--ds-unit);gap:var(--ds-unit);padding:var(--ds-unit)}
@@ -79,68 +55,24 @@ consistency-editor{display:block;--ds-sf:var(--sf);color:var(--ds-text-color);fo
 .consistency-element-preview-stage ds-button{grid-column:4 / span 6;grid-row:5;align-self:end}
 .consistency-element-preview-stage ds-card{grid-column:2 / span 10;grid-row:2 / span 8}
 .consistency-element-preview-cursor{position:absolute;left:calc(7 * var(--ds-unit));top:calc(4 * var(--ds-unit));width:var(--ds-unit);height:var(--ds-unit);opacity:0;pointer-events:none;color:var(--ds-text-color)}
-
-.consistency-tag,.ghost-measure,.consistency-gap-name,.consistency-footer{font-size:var(--ds-type-size-small)}
-
-/* Production reveals gap feedback only where the person is working. */
-.production-on .consistency-gap{background:transparent}
-.production-on .consistency-gap::before{border-color:transparent}
-.ghost-surface--gap .ghost-measure{background:var(--ds-pink)}
-.ghost-surface--gap:hover,.ghost-surface--gap:focus-visible{background:transparent}
-.consistency-shell.production-on:not(.spacing-off) .consistency-gap:is(:hover,:has(:focus-visible),:has([data-spacing-active])){background:color-mix(in srgb,var(--ds-pink) 24%,transparent)}
-.consistency-shell.production-on:not(.spacing-off) .consistency-gap:is(:hover,:has(:focus-visible),:has([data-spacing-active]))::before{border-color:var(--ds-pink)}
 /* Production is the authored page; boundary tools reveal only a local guide. */
 .production-on .consistency-stage{background-image:none}
 .production-on .consistency-sheet{outline:0}
-.production-on .ghost-surface--width{background-image:none}
-.production-on .ghost-surface--padding,
-.production-on .ghost-surface--padding:hover,
-.production-on .ghost-surface--padding:focus-visible,
-.production-on .ghost-surface--width:hover,
-.production-on .ghost-surface--width:focus-visible{background-color:transparent}
-.production-on .ghost-surface--padding:is(:hover,:focus-visible,[data-spacing-active]){box-shadow:inset -1px 0 var(--ds-yellow)}
-.production-on .ghost-surface--width:is(:hover,:focus-visible,[data-spacing-active]){background-image:linear-gradient(to right,transparent calc(50% - .5px),var(--ds-yellow) calc(50% - .5px),var(--ds-yellow) calc(50% + .5px),transparent calc(50% + .5px))}
-/* Editing feedback is a soft blush surface rather than a framed box. */
-.ghost-measure{background:var(--ds-pink)}
-.ghost-surface{border-radius:var(--ds-radius)}
-.ghost-surface:focus-visible{outline:0;box-shadow:none;background:color-mix(in srgb,var(--ds-pink) 32%,transparent)}
-.consistency-gap{border-radius:var(--ds-radius)}
-.consistency-gap::before{display:none}
-.production-on .ghost-surface--padding:is(:hover,:focus-visible,[data-spacing-active]),
-.production-on .ghost-surface--width:is(:hover,:focus-visible,[data-spacing-active]){background:color-mix(in srgb,var(--ds-pink) 16%,transparent);box-shadow:none}
-.production-on .ghost-surface--padding:focus-visible,
-.production-on .ghost-surface--width:focus-visible{box-shadow:none;background:color-mix(in srgb,var(--ds-pink) 32%,transparent)}
 
 /* The neutral workspace makes the authored page boundary visible without a frame. */
 .consistency-stage{background-color:color-mix(in srgb,var(--ds-paper) 92%,var(--ds-text-color));border-radius:var(--ds-radius)}
 .consistency-sheet{border-radius:var(--ds-radius)}
-/* Zero padding has an edge, not a painted twenty-pixel hit area. */
-.consistency-shell .ghost-surface--padding[aria-valuenow="0"]{background:transparent;box-shadow:none;border-radius:0}
-.ghost-surface--padding[aria-valuenow="0"]::before{content:'';position:absolute;inset:0 auto 0 0;width:1px;background:var(--ds-pink);pointer-events:none}
-.production-on .ghost-surface--padding[aria-valuenow="0"]::before{opacity:0}
-.production-on .ghost-surface--padding[aria-valuenow="0"]:is(:hover,:focus-visible,[data-spacing-active])::before{opacity:1}
 /* A website viewport scrolls its content; it is not a sheet on a desk. */
 .consistency-stage{padding:0;background-color:color-mix(in srgb,var(--ds-paper) 92%,var(--ds-text-color));border-radius:var(--ds-radius)}
 .consistency-sheet{height:max(calc(400px * var(--sf)),round(down,calc(100dvh - 180px * var(--sf)),var(--u)));overflow:auto;overscroll-behavior:contain;scrollbar-width:thin}
 .consistency-hint{display:none}
 .consistency-stage{height:max(calc(400px * var(--sf)),round(down,calc(100dvh - 180px * var(--sf)),var(--u)));align-self:start}
-.ghost-surface--padding[aria-valuenow="0"] .ghost-measure{left:0;transform:translateY(-50%)}
-.production-on .ghost-surface--width .ghost-measure{top:0}
 /* Removing an element also removes the gap that no longer has two neighbours. */
 .consistency-projects:has(>ds-card[hidden]){grid-template-columns:minmax(0,1fr)}
-.consistency-projects:has(>ds-card[hidden])>.consistency-gap,
-.consistency-statistics:has(>ds-stat[hidden])>.consistency-gap,
-.consistency-sample-actions:has(>ds-button[hidden])>.consistency-gap{display:none}
 .consistency-statistics:has(>ds-stat[hidden])>ds-stat:not([hidden]){flex:1;width:auto}
 .consistency-group.consistency-sheet{height:auto;overflow:visible;border-radius:0}
 /* Preview follows the pointer continuously; grid fitting resumes on release. */
 .consistency-shell:has([data-spacing-active],[data-resizing]) .consistency-text-bounds{min-height:0!important}
-/* Empty gaps still have an invisible target from which to pull space open. */
-.consistency-gap--horizontal .ghost-surface--gap[aria-valuenow="0"]{width:var(--u);left:50%;transform:translateX(-50%)}
-.consistency-shell .ghost-surface--gap[aria-valuenow="0"]{background:transparent;box-shadow:none}
-.ghost-surface--gap[aria-valuenow="0"]::after{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:var(--ds-pink);opacity:0;pointer-events:none}
-.consistency-gap--horizontal .ghost-surface--gap[aria-valuenow="0"]::after{left:50%;right:auto;top:0;bottom:0;width:1px;height:auto}
-.ghost-surface--gap[aria-valuenow="0"]:is(:hover,:focus-visible,[data-spacing-active])::after{opacity:1}
 .consistency-text-bounds .consistency-text-gap[aria-valuenow="0"]{height:var(--u)!important;background:transparent}
 /* The website grid belongs to its scrolling content, never the workspace. */
 .consistency-stage{background-image:none}
@@ -150,20 +82,15 @@ consistency-editor{display:block;--ds-sf:var(--sf);color:var(--ds-text-color);fo
    bounds and card sizes stay in document history and return with the wide view. */
 .consistency-mobile-preview .consistency-sheet{max-width:round(down,100%,var(--u));--composition-content-width:calc(380px * var(--sf) - 2 * var(--composition-padding))}
 .consistency-mobile-preview .consistency-projects{display:flex;flex-direction:column;align-items:stretch}
-.consistency-mobile-preview .consistency-projects>.consistency-gap--horizontal{width:100%!important;height:var(--composition-gap)}
-.consistency-mobile-preview .consistency-projects>.consistency-gap--horizontal .ghost-surface--gap{width:100%;height:max(var(--u),var(--composition-gap));left:0;top:50%;transform:translateY(-50%);cursor:ns-resize}
 .consistency-mobile-preview .consistency-sheet ds-card{width:100%!important;max-width:100%;height:auto!important;min-height:var(--ds-card-height,0px);overflow-wrap:anywhere}
 .consistency-mobile-preview .consistency-sheet .consistency-content-card{display:block;max-width:100%}
 .consistency-mobile-preview .consistency-sheet .aa-atom[data-atom="image"]{max-width:100%!important}
 .consistency-mobile-preview .consistency-sheet aa-editor,.consistency-mobile-preview .consistency-sheet .aa-block{max-width:100%;overflow-wrap:anywhere}
 .consistency-mobile-preview .consistency-sample-actions,.consistency-mobile-preview .consistency-statistics{flex-wrap:wrap}
-.consistency-mobile-preview .consistency-sample-actions>.consistency-gap--horizontal{max-width:var(--u)}
 .consistency-mobile-preview .consistency-statistics>ds-stat{width:100%!important;flex:none!important}
-.consistency-mobile-preview .consistency-statistics>.consistency-gap--horizontal{width:100%!important;height:var(--composition-gap)}
 .consistency-mobile-preview .consistency-width{display:none}
 .consistency-mobile-preview .consistency-button-action{max-width:100%;flex-wrap:wrap;white-space:normal}
 @media(max-width:760px){.consistency-top,.consistency-actions{flex-wrap:wrap}.consistency-top{align-items:flex-start}.consistency-actions{gap:var(--u);max-width:100%}.consistency-workspace{padding-inline:var(--u)}.consistency-bar>span:first-child{overflow-wrap:anywhere}.consistency-footer{overflow-wrap:anywhere}}
-.consistency-mobile-preview .consistency-statistics>.consistency-gap{width:100%}
 /* Device emulation uses the website's logical pixels, independently of the
    editor chrome's enlarged touch scale. A narrower host still fits the canvas. */
 .consistency-mobile-preview .consistency-sheet{--sf:1;--ds-sf:1;--u:20px;--ds-unit:20px}
@@ -184,9 +111,6 @@ consistency-editor,.consistency-shell{width:100%;max-width:100%;min-width:0}
 .consistency-top,.consistency-bar,.consistency-footer,.consistency-actions{min-width:0;max-width:100%;flex-wrap:wrap}
 .consistency-inspector,.consistency-inspector label,.consistency-inspector p{min-width:0;max-width:100%;overflow-wrap:anywhere}
 .consistency-inspector ds-select,.consistency-inspector ds-number{max-width:100%}
-
-/* Measurements belong to the highlighted space, without a separate badge. */
-.consistency-shell .ghost-measure{background:transparent;color:var(--ds-text-color);padding:0;border:0;border-radius:0}
 /* Readable content gets a column, never the few pixels left after a gap. */
 .consistency-text-bounds{min-width:calc(200px * var(--sf))}
 .consistency-sheet aa-editor,.consistency-sheet .aa-block{overflow-wrap:break-word;word-break:normal}
@@ -194,15 +118,10 @@ consistency-editor,.consistency-shell{width:100%;max-width:100%;min-width:0}
 .consistency-statistics>ds-stat:first-child,.consistency-statistics>ds-stat:last-child{width:auto;min-width:calc(200px * var(--sf));flex:1 0 calc(200px * var(--sf));--ds-stat-figure-white-space:normal;--ds-stat-figure-overflow-wrap:break-word}
 .consistency-projects:not(.consistency-stacked){grid-template-columns:minmax(calc(240px * var(--sf)),var(--resize-first,var(--composition-card-width))) auto minmax(calc(240px * var(--sf)),var(--resize-last,1fr))}
 .consistency-projects.consistency-stacked,.consistency-statistics.consistency-stacked{display:flex;flex-direction:column;align-items:stretch}
-.consistency-stacked>.consistency-gap{width:100%!important;height:var(--composition-gap)!important;flex:none;align-self:stretch}
-.consistency-stacked>.consistency-gap>.ghost-surface--gap{width:100%;height:max(var(--u),var(--composition-gap));left:0;top:50%;transform:translateY(-50%);cursor:ns-resize}
 .consistency-statistics.consistency-stacked>ds-stat{width:100%;flex:none}
 .consistency-mobile-preview .consistency-sheet{max-width:none;--composition-content-width:calc(100% - 2 * var(--composition-padding))}
 .consistency-mobile-preview .consistency-sheet aa-editor,.consistency-mobile-preview .consistency-sheet .aa-block,.consistency-mobile-preview .consistency-sheet ds-card{overflow-wrap:break-word;word-break:normal}
 .consistency-statistics>ds-stat{--ds-stat-text-overflow-wrap:break-word}
-/* Selection rests softly on the authored element, never its empty gaps. */
-.consistency-sheet :is([data-composition-selected],[data-selectable][data-selected]:not(.aa-block),[data-selection-face]){position:relative;outline:none!important;box-shadow:none}
-.consistency-sheet [data-selection-face]::after{content:'';position:absolute;inset:0;z-index:20;pointer-events:none;border:0;outline:0;border-radius:inherit;background:color-mix(in srgb,var(--ds-text-color) 15%,transparent)}
 
 .consistency-shell :is(.consistency-card-gap,.consistency-stat-gap)[aria-valuenow="0"]{background:linear-gradient(to bottom,transparent calc(50% - .5px),var(--ds-pink) calc(50% - .5px),var(--ds-pink) calc(50% + .5px),transparent calc(50% + .5px))}
 /* Keep the phone website's one-square inner inset without buying that room
@@ -233,11 +152,7 @@ consistency-editor,.consistency-shell{height:100dvh;min-height:0}
 .consistency-sheet .aa-block:has(> .aa-atom[data-atom="image"]){width:fit-content;max-width:100%}
 .consistency-sheet .aa-column .aa-atom[data-atom="image"]:not([data-width]){display:inline-block;width:fit-content;max-width:min(100%,calc(16 * var(--aa-unit)))}
 .consistency-sheet .aa-atom[data-atom="image"]{background:transparent}
-.context-active :is(.ghost-surface,.consistency-text-gap,.consistency-column-gap,.consistency-card-gap,.consistency-stat-gap,.consistency-resize-edge){visibility:hidden!important;pointer-events:none!important}
 .consistency-layer-toggle:has(button:disabled)>span{color:var(--ds-text-color-muted)}
-
-/* Crossing an element during a gesture is not a request to edit its action. */
-consistency-editor[data-pointer-busy] :is(.consistency-button-action,.consistency-carousel-tools):not([data-keyboard]):not(:focus-within){visibility:hidden;pointer-events:none}
 
 /* Keep the current DS1 opaque muted role over tinted surfaces in this editor. */
 consistency-editor{--ds-text-color-muted:light-dark(#5f5f5f,#cacaca);--ds-number-lead-color:var(--ds-text-color-muted)}

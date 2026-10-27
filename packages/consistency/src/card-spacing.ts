@@ -11,17 +11,18 @@ export class CardSpacingLayer {
   private resize = new ResizeObserver(() => this.schedule());
   private schedule() { if (!this.frame) this.frame = requestAnimationFrame(() => { this.frame = 0; this.refresh(); }); }
   private settle = new CompositionSettle();
-  constructor(private root: HTMLElement, private options: { enabled: () => boolean; consistency: () => boolean; gaps: (id: string) => Record<string, number>; commit: (id: string, key: string, value: number, height: number) => void }) {
-    this.observer = new MutationObserver(records => { if (records.some(record => !(record.target instanceof Element ? record.target : record.target.parentElement)?.closest('.consistency-card-gap,.consistency-resize-edge'))) this.refresh(); }); this.observer.observe(root, { childList: true, subtree: true });
+  constructor(private root: HTMLElement, private options: { accept?: (card: HTMLElement) => boolean; enabled: () => boolean; consistency: () => boolean; gaps: (id: string) => Record<string, number>; commit: (id: string, key: string, value: number, height: number) => void }) {
+    this.observer = new MutationObserver(records => { if (records.some(record => !(record.target.nodeType === 1 ? record.target as Element : record.target.parentElement)?.closest('.consistency-card-gap,.consistency-resize-edge'))) this.refresh(); }); this.observer.observe(root, { childList: true, subtree: true });
   }
   refresh() {
     for (const [card, binding] of this.cards) if (!card.isConnected) { binding.dispose(); this.cards.delete(card); }
     for (const card of this.root.querySelectorAll<HTMLElement>('.consistency-sheet ds-card')) {
+      if (this.options.accept && !this.options.accept(card)) continue;
       if (!card.shadowRoot?.querySelector('.ds-card')) { void (card as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete.then(() => this.refresh()); continue; }
       if (!this.cards.has(card)) this.bind(card);
       const atom = card.closest<HTMLElement>('.aa-atom'), value = atom ? readContentElement(atom.dataset.source ?? '') : null;
       const gaps = value?.kind === 'card' ? value.gaps ?? {} : this.options.gaps(card.dataset.selectable ?? '');
-      if (!card.hasAttribute('data-card-spacing-preview')) for (const key of ['label', 'title', 'footer']) card.style.setProperty(`--ds-card-${key}-gap`, `calc(${gaps[key] ?? (key === 'footer' ? 20 : 0)}px * var(--sf))`);
+      if (!card.hasAttribute('data-card-spacing-preview')) for (const key of ['label', 'title', 'footer']) card.style.setProperty(`--ds-card-${key}-gap`, `calc(${gaps[key] ?? (key === 'footer' ? 20 : 0)}px * var(--sf))`, 'important');
       for (const handle of this.cards.get(card)!.handles) { handle.hidden = !this.options.enabled(); handle.tabIndex = this.options.enabled() ? 0 : -1; if (!card.hasAttribute('data-card-spacing-preview')) this.position(card, handle); }
     }
   }
@@ -41,7 +42,7 @@ export class CardSpacingLayer {
       let peers: HTMLElement[] = [], originals: { card: HTMLElement; css: string; height: number }[] = [];
       const paint = (value: number) => {
         // Preview the linked design in one frame, without changing authored content/history.
-        for (const peer of peers) peer.style.setProperty(`--ds-card-${key}-gap`, `calc(${value}px * var(--sf))`);
+        for (const peer of peers) peer.style.setProperty(`--ds-card-${key}-gap`, `calc(${value}px * var(--sf))`, 'important');
         const minimum = Math.max(...peers.map(peer => cardMinimumHeight(peer, this.scale(peer), false)));
         const height = Math.max(minimum, ...originals.map(item => item.height));
         for (const peer of peers) {

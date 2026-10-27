@@ -26,11 +26,11 @@ const rootFonts = ['GT-America-Standard-Regular.woff2', 'GT-America-Standard-Med
 const alwaysFonts = ['Inter-Arrows.woff2', 'Iosevka-Regular.woff2', 'Inter-LICENSE.md', 'Iosevka-LICENSE.md'];
 /** Page scripts in 0-face/, each with the modules it imports. */
 const rootModules = {
-  grid: ['grid.ts', 'layout-inspector.ts', 'grid-fit.ts', 'constraint-panel.ts', 'constraint-site.ts', 'constraints.ts', 'button-label.ts', 'text-contrast.ts', 'word-wrap.ts', 'scaling.ts'],
+  grid: ['grid.ts', 'layout-inspector.ts', 'grid-fit.ts', 'constraint-panel.ts', 'constraint-site.ts', 'constraints.ts', 'fault-lines.ts', 'button-label.ts', 'text-contrast.ts', 'word-wrap.ts', 'scaling.ts'],
   'grid-fit': ['grid-fit.ts'],
   'layout-inspector': ['layout-inspector.ts'],
   /** The constraint checker alone, five presses of C or ?constraints=1, for a product that takes no grid; `grid` brings it too. */
-  constraints: ['constraint-panel.ts', 'constraint-site.ts', 'constraints.ts', 'button-label.ts', 'text-contrast.ts', 'word-wrap.ts', 'scaling.ts'],
+  constraints: ['constraint-panel.ts', 'constraint-site.ts', 'constraints.ts', 'fault-lines.ts', 'button-label.ts', 'text-contrast.ts', 'word-wrap.ts', 'scaling.ts'],
   scaling: ['scaling.ts'],
   /** The classic head script that puts the theme on before the first paint; also a root `modules` choice. */
   'theme-bootstrap': ['theme-bootstrap.js'],
@@ -105,6 +105,9 @@ export default {
           `const ${name} = ${JSON.stringify(String(read(posix.normalize(posix.join('shared', path)))))};`);
         return {
           'native-content.ts': source,
+          'native-page.ts': String(read('shared/consistency-native-page.ts'))
+            .replace('./consistency-native-content', './native-content')
+            .replace(/^import pageStyles from '.\/consistency-native-page.css\?raw';$/m, `const pageStyles = ${JSON.stringify(String(read('shared/consistency-native-page.css')))};`),
           'site-design.ts': read('shared/consistency-site-design.ts'),
           'consistency-content.ts': read('shared/consistency-content.ts'),
           'consistency-carousel.ts': read('shared/consistency-carousel.ts'),

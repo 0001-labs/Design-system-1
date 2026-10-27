@@ -35,7 +35,7 @@ export class ResizingLayer {
   private settle = new CompositionSettle();
 
   constructor(private root: HTMLElement, private options: { enabled: () => boolean; consistency?: () => boolean; size: (key: string) => ElementSize | undefined; commit: (key: string, size: ElementSize) => void }) {
-    this.observer = new MutationObserver(records => { if (records.some(record => !(record.target instanceof Element ? record.target : record.target.parentElement)?.closest('.consistency-resize-edge,.consistency-card-gap'))) this.refresh(); }); this.observer.observe(root, { childList: true, subtree: true });
+    this.observer = new MutationObserver(records => { if (records.some(record => !(record.target.nodeType === 1 ? record.target as Element : record.target.parentElement)?.closest('.consistency-resize-edge,.consistency-card-gap'))) this.refresh(); }); this.observer.observe(root, { childList: true, subtree: true });
   }
   refresh() {
     if (this.active) return;
@@ -77,7 +77,6 @@ export class ResizingLayer {
     let originals: { node: HTMLElement; css: string }[] = [];
     const begin = () => { this.active = true; originals = [...new Set([...(card ? this.peers(target) : [target]), ...(card ? this.peers(target) : [target]).map(peer => peer.parentElement!).filter(Boolean)])].map(node => ({ node, css: node.style.cssText })); for (const peer of card ? this.peers(target) : [target]) peer.setAttribute('data-resizing', ''); };
     const end = (cancelled: boolean) => { if (cancelled) for (const item of originals) item.node.style.cssText = item.css; for (const peer of card ? this.peers(target) : [target]) peer.removeAttribute('data-resizing'); originals = []; this.active = false; };
-    const disposers: (() => void)[] = [], edges: HTMLElement[] = [];
     const size = (): ElementSize => { const rect = target.getBoundingClientRect(); const scale = Number.parseFloat(getComputedStyle(target).getPropertyValue('--sf')) || 1; return { width: rect.width / scale, height: rect.height / scale }; };
     const paintSize = (dimensions: ElementSize) => {
       if (card) {
@@ -98,20 +97,42 @@ export class ResizingLayer {
       else if (atom) { const picture = readPicture(atom.dataset.source ?? ''); atom.dataset.width = String(dimensions.width / 20); atom.style.setProperty('--aa-picture-width', String(dimensions.width / 20)); atom.dispatchEvent(new CustomEvent('aa-atom-source', { bubbles: true, detail: { source: writePicture(picture.alt, picture.src, dimensions.width / 20) } })); }
       else if (target.dataset.selectable) this.options.commit(target.dataset.selectable, dimensions);
     };
-    for (const axis of box ? ['width', 'height'] as const : ['width'] as const) {
-      const edge = target.ownerDocument.createElement('span'); edge.className = `consistency-resize-edge consistency-resize-${axis}`; edge.contentEditable = 'false'; edge.setAttribute('data-aa-interactive', ''); edge.setAttribute('role', 'slider'); edge.setAttribute('aria-label', `${name} ${axis}`); edge.setAttribute('aria-orientation', axis === 'width' ? 'horizontal' : 'vertical'); edge.setAttribute('aria-valuemin', carousel ? '160' : '80'); edge.setAttribute('aria-valuemax', carousel && axis === 'height' ? '1200' : '2000'); target.append(edge); edges.push(edge);
+    this.bindings.set(target, bindResizeEdges(target, {
+      enabled: this.options.enabled, host: target, box, card, carousel, name, scale, size, minimumWidth, minimumHeight, maxWidth,
+      begin, end, paintSize, save, cancelSettle: () => this.settle.cancel(),
+      settle: update => this.settle.run(Array.from(this.root.querySelectorAll<HTMLElement>('.consistency-sheet aa-editor > .aa-block,.consistency-sheet ds-card,.consistency-sheet ds-button,.consistency-sheet ds-stat,.consistency-sheet .consistency-gap,.consistency-sheet .consistency-carousel-frame')), update),
+    }));
+  }
+  destroy() { this.settle.cancel(); this.observer.disconnect(); for (const binding of this.bindings.values()) binding.dispose(); this.bindings.clear(); }
+}
+
+
+export interface ResizeTargetOptions {
+  enabled: () => boolean; host: HTMLElement; box: boolean; card?: boolean; carousel?: boolean; name: string;
+  axes?: Array<'width' | 'height'>;
+  scale: () => number; size: () => ElementSize; minimumWidth: () => number; minimumHeight: () => number; maxWidth: () => number;
+  begin: () => void; end: (cancelled: boolean) => void; paintSize: (size: ElementSize) => void; save: (size: ElementSize) => void;
+  cancelSettle: () => void; settle: (update: () => Promise<unknown>) => Promise<unknown>;
+}
+/** Canonical edge and corner gestures. The adapter supplies only document measures and persistence. */
+export function bindResizeEdges(target: HTMLElement, options: ResizeTargetOptions): { edges: HTMLElement[]; dispose: () => void } {
+  const { host, box, card, carousel, name, scale, size, minimumWidth, minimumHeight, maxWidth, begin, end, paintSize, save } = options;
+  let minWidth = minimumWidth();
+  const disposers: (() => void)[] = [], edges: HTMLElement[] = [];
+    for (const axis of options.axes ?? (box ? ['width', 'height'] as const : ['width'] as const)) {
+      const edge = target.ownerDocument.createElement('span'); edge.className = `consistency-resize-edge consistency-resize-${axis}`; edge.contentEditable = 'false'; edge.setAttribute('data-aa-interactive', ''); edge.setAttribute('role', 'slider'); edge.setAttribute('aria-label', `${name} ${axis}`); edge.setAttribute('aria-orientation', axis === 'width' ? 'horizontal' : 'vertical'); edge.setAttribute('aria-valuemin', carousel ? '160' : '80'); edge.setAttribute('aria-valuemax', carousel && axis === 'height' ? '1200' : '2000'); host.append(edge); edges.push(edge);
             const paint = (value: number) => {
         if (box) paintSize({ ...size(), [axis]: Math.max(value, axis === 'width' ? minimumWidth() : minimumHeight()) });
-        else { target.style.width = `calc(${value}px * var(--sf))`; target.style.maxWidth = 'none'; target.style.height = 'auto'; }
+        else paintSize({ ...size(), width: value });
         edge.textContent = String(Math.round(size()[axis])); edge.setAttribute('aria-valuenow', String(Math.round(size()[axis]))); edge.setAttribute('aria-valuetext', `${Math.round(size()[axis])} pixels`);
       };
-      disposers.push(bindSpacingHandle(edge, () => ({ value: size()[axis], min: box ? axis === 'width' ? minWidth : minimumHeight() : 80, max: axis === 'width' ? maxWidth() : carousel ? 1200 : 2000, step: 20, shiftStep: 100, axis: axis === 'width' ? 'horizontal' : 'vertical', gain: 1 / (Number.parseFloat(getComputedStyle(target).getPropertyValue('--sf')) || 1), disabled: !this.options.enabled(),
+      disposers.push(bindSpacingHandle(edge, () => ({ value: size()[axis], min: box ? axis === 'width' ? minWidth : minimumHeight() : 80, max: axis === 'width' ? maxWidth() : carousel ? 1200 : 2000, step: 20, shiftStep: 100, axis: axis === 'width' ? 'horizontal' : 'vertical', gain: 1 / (Number.parseFloat(getComputedStyle(target).getPropertyValue('--sf')) || 1), disabled: !options.enabled(),
         onPointerStart: () => { (target.ownerDocument.activeElement as HTMLElement | null)?.blur?.(); },
-        onStart: () => { edge.setAttribute('data-resize-active', ''); this.settle.cancel(); if (box) minWidth = minimumWidth(); begin(); },
+        onStart: () => { edge.setAttribute('data-resize-active', ''); options.cancelSettle(); if (box) minWidth = minimumWidth(); begin(); },
         onPreview: paint,
         onCommit: value => {
           const dimensions = { ...size(), [axis]: Math.max(resizeValue(value), box ? axis === 'width' ? minWidth : minimumHeight() : 80) };
-          void this.settle.run(Array.from(this.root.querySelectorAll<HTMLElement>('.consistency-sheet aa-editor > .aa-block, .consistency-sheet ds-card, .consistency-sheet ds-button, .consistency-sheet ds-stat, .consistency-sheet .consistency-gap,.consistency-sheet .consistency-carousel-frame')), async () => {
+          void options.settle(async () => {
           paint(dimensions[axis]); dimensions.height = size().height;
           save(dimensions);
           await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
@@ -121,23 +142,22 @@ export class ResizingLayer {
       })));
       edge.textContent = String(Math.round(size()[axis])); edge.setAttribute('aria-valuenow', String(Math.round(size()[axis])));
     }
-    const corner = target.ownerDocument.createElement('span'); corner.className = 'consistency-resize-edge consistency-resize-corner'; corner.contentEditable = 'false'; corner.setAttribute('data-aa-interactive', ''); corner.setAttribute('role', 'button'); corner.setAttribute('aria-label', `${name} size`); target.append(corner); edges.push(corner);
+    if (options.axes && !options.axes.includes('width')) return { edges, dispose: () => { disposers.forEach(dispose => dispose()); edges.forEach(edge => edge.remove()); } };
+    const corner = target.ownerDocument.createElement('span'); corner.className = 'consistency-resize-edge consistency-resize-corner'; corner.contentEditable = 'false'; corner.setAttribute('data-aa-interactive', ''); corner.setAttribute('role', 'button'); corner.setAttribute('aria-label', `${name} size`); host.append(corner); edges.push(corner);
     let cancelCorner: (() => void) | undefined;
     const cornerDown = (event: PointerEvent) => {
-      if (!this.options.enabled() || event.button !== 0 || !event.isPrimary) return;
-      event.preventDefault(); event.stopPropagation(); (target.ownerDocument.activeElement as HTMLElement | null)?.blur?.(); corner.setAttribute('data-resize-active', ''); this.settle.cancel(); if (box) minWidth = minimumWidth();
+      if (!options.enabled() || event.button !== 0 || !event.isPrimary) return;
+      event.preventDefault(); event.stopPropagation(); (target.ownerDocument.activeElement as HTMLElement | null)?.blur?.(); corner.setAttribute('data-resize-active', ''); options.cancelSettle(); if (box) minWidth = minimumWidth();
       const start = size(); let current = start; let moved = false; const win = target.ownerDocument.defaultView!;
       begin();
-      const move = (next: PointerEvent) => { if (next.pointerId !== event.pointerId) return; if (!this.options.enabled()) return finish(true); const dx = (next.clientX - event.clientX) / scale(), dy = (next.clientY - event.clientY) / scale(); if (!moved && Math.hypot(dx, dy) < 3) return; moved = true; const delta = Math.abs(dx) >= Math.abs(dy) ? dx : dy * start.width / start.height; current = { width: Math.max(box ? minWidth : 80, Math.min(maxWidth(), start.width + (box ? dx : delta))), height: box ? Math.max(minimumHeight(), Math.min(carousel ? 1200 : 2000, start.height + dy)) : start.height }; paintSize(current); current = size(); corner.textContent = `${Math.round(current.width)} × ${Math.round(current.height)}`; };
-      const finish = (cancelled: boolean) => { win.removeEventListener('pointermove', move); win.removeEventListener('pointerup', up); win.removeEventListener('pointercancel', cancel); win.removeEventListener('keydown', escape); win.removeEventListener('blur', cancel); cancelCorner = undefined; corner.removeAttribute('data-resize-active'); if (!moved) { end(false); return; } if (cancelled) { end(true); return; } end(false); void this.settle.run(Array.from(this.root.querySelectorAll<HTMLElement>('.consistency-sheet aa-editor > .aa-block,.consistency-sheet ds-card,.consistency-sheet ds-button,.consistency-sheet ds-stat,.consistency-sheet .consistency-gap,.consistency-sheet .consistency-carousel-frame')), async () => { current = { width: Math.max(box ? minWidth : 80, resizeValue(current.width)), height: resizeValue(current.height) }; paintSize(current); current = size(); save(current); await new Promise<void>(resolve => requestAnimationFrame(() => resolve())); }); };
+      const move = (next: PointerEvent) => { if (next.pointerId !== event.pointerId) return; if (!options.enabled()) return finish(true); const dx = (next.clientX - event.clientX) / scale(), dy = (next.clientY - event.clientY) / scale(); if (!moved && Math.hypot(dx, dy) < 3) return; moved = true; const delta = Math.abs(dx) >= Math.abs(dy) ? dx : dy * start.width / start.height; current = { width: Math.max(box ? minWidth : 80, Math.min(maxWidth(), start.width + (box ? dx : delta))), height: box ? Math.max(minimumHeight(), Math.min(carousel ? 1200 : 2000, start.height + dy)) : start.height }; paintSize(current); current = size(); corner.textContent = `${Math.round(current.width)} × ${Math.round(current.height)}`; };
+      const finish = (cancelled: boolean) => { win.removeEventListener('pointermove', move); win.removeEventListener('pointerup', up); win.removeEventListener('pointercancel', cancel); win.removeEventListener('keydown', escape); win.removeEventListener('blur', cancel); cancelCorner = undefined; corner.removeAttribute('data-resize-active'); if (!moved) { end(false); return; } if (cancelled) { end(true); return; } end(false); void options.settle(async () => { current = { width: Math.max(box ? minWidth : 80, resizeValue(current.width)), height: resizeValue(current.height) }; paintSize(current); current = size(); save(current); await new Promise<void>(resolve => requestAnimationFrame(() => resolve())); }); };
       const up = (next: PointerEvent) => { if (next.pointerId === event.pointerId) finish(false); }; const cancel = () => finish(true); const escape = (key: KeyboardEvent) => { if (key.key === 'Escape') { key.preventDefault(); key.stopPropagation(); finish(true); } };
       win.addEventListener('pointermove', move); win.addEventListener('pointerup', up); win.addEventListener('pointercancel', cancel); win.addEventListener('keydown', escape); win.addEventListener('blur', cancel); cancelCorner = cancel;
     };
-    const cornerKey = (event: KeyboardEvent) => { if (!this.options.enabled() || !['ArrowRight','ArrowLeft','ArrowDown','ArrowUp'].includes(event.key)) return; event.preventDefault(); event.stopPropagation(); const start = size(), delta = (event.key === 'ArrowRight' || event.key === 'ArrowDown' ? 1 : -1) * (event.shiftKey ? 100 : 20); const next = { width: Math.max(box ? minWidth : 80, Math.min(maxWidth(), resizeValue(start.width + delta))), height: box ? resizeValue(start.height + delta) : start.height }; paintSize(next); save(size()); };
+    const cornerKey = (event: KeyboardEvent) => { if (!options.enabled() || !['ArrowRight','ArrowLeft','ArrowDown','ArrowUp'].includes(event.key)) return; event.preventDefault(); event.stopPropagation(); const start = size(), delta = (event.key === 'ArrowRight' || event.key === 'ArrowDown' ? 1 : -1) * (event.shiftKey ? 100 : 20); const next = { width: Math.max(box ? minWidth : 80, Math.min(maxWidth(), resizeValue(start.width + delta))), height: box ? resizeValue(start.height + delta) : start.height }; paintSize(next); save(size()); };
     const measureCorner = () => { const dimensions = size(); corner.textContent = `${Math.round(dimensions.width)} × ${Math.round(dimensions.height)}`; };
     corner.addEventListener('pointerenter', measureCorner); corner.addEventListener('focus', measureCorner);
     corner.addEventListener('pointerdown', cornerDown); corner.addEventListener('keydown', cornerKey); disposers.push(() => { cancelCorner?.(); corner.removeEventListener('pointerenter', measureCorner); corner.removeEventListener('focus', measureCorner); corner.removeEventListener('pointerdown', cornerDown); corner.removeEventListener('keydown', cornerKey); });
-    this.bindings.set(target, { edges, dispose: () => { disposers.forEach(dispose => dispose()); edges.forEach(edge => edge.remove()); target.classList.remove('consistency-resizable'); } });
-  }
-  destroy() { this.settle.cancel(); this.observer.disconnect(); for (const binding of this.bindings.values()) binding.dispose(); this.bindings.clear(); }
+  return { edges, dispose: () => { disposers.forEach(dispose => dispose()); edges.forEach(edge => edge.remove()); } };
 }

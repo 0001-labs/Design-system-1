@@ -7,7 +7,7 @@ export function intersects(a: SelectionRect, b: SelectionRect): boolean {
 }
 /** Selection owns no content, and never starts on editors or their controls. */
 export function canStartMarquee(target: Element): boolean {
-  return !target.closest('aa-editor, ds-card, ds-button, ds-number, ds-select, ds-switch, [role="slider"], [role="button"], [role="menu"], [role="toolbar"], [data-aa-interactive], [data-handle], .consistency-resize-edge, button, input, select, textarea, a, [contenteditable]');
+  return !target.closest('aa-editor, ds-card, ds-button, ds-number, ds-select, ds-switch, [role="slider"], [role="button"], [role="menu"], [role="toolbar"], [data-aa-interactive], [data-handle], .consistency-resize-edge, button, input, select, textarea, a, summary, [contenteditable]');
 }
 /** Empty editor lines and composition chrome are space, not authored elements. */
 export function isMarqueeContent(element: HTMLElement): boolean {
@@ -33,7 +33,7 @@ export function paintCompositionSelection(root: HTMLElement, selection: Set<stri
 }
 
 /** A gesture owns its overlay and geometry cache; the composition changes only at release. */
-export function beginMarquee(root: HTMLElement, event: PointerEvent, previous: Set<string>, commit: (selection: Set<string>) => void): () => void {
+export function beginMarquee(root: HTMLElement, event: PointerEvent, previous: Set<string>, commit: (selection: Set<string>) => void, paint?: (selection: Set<string>) => void): () => void {
   const view = root.ownerDocument.defaultView!;
   const stage = event.currentTarget as HTMLElement;
   const base = event.shiftKey ? new Set(previous) : new Set<string>();
@@ -50,7 +50,7 @@ export function beginMarquee(root: HTMLElement, event: PointerEvent, previous: S
     scrollOwners.push({ element, x: element.scrollLeft, y: element.scrollTop });
   }
   const observed = new WeakSet<Element>();
-  const paintSelection = (selection: Set<string>) => paintCompositionSelection(root, selection);
+  const paintSelection = (selection: Set<string>) => paint ? paint(selection) : paintCompositionSelection(root, selection);
   const draw = () => {
     frame = 0;
     if (ended) return;

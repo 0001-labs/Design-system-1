@@ -1,3 +1,4 @@
+import { faultLineGrids, inspectFaultLines } from './fault-lines';
 import { labelledButtons, inspectButtonLabels } from './button-label';
 import { inspectTextContrast, measureTextContrast } from "./text-contrast";
 import { inspectWordWrap, wordHeaders } from './word-wrap';
@@ -103,6 +104,14 @@ function rows(found: ReturnType<typeof cards>) {
 }
 
 export const constraints: Constraint[] = [
+  {
+    code: 'page.fault-lines',
+    rule: 'Fault lines keep related card and control grids aligned across the whole page, with matching track edges and gaps at every checked viewport width.',
+    why: 'Compare separate sections in the same alignment family; responsive layouts may change together, while unrelated groups and intentional exceptions remain independent.',
+    components: ['ds-page'],
+    check: { file: 'tests/fault-lines.test.ts', test: 'fault lines catch shifted tracks and unequal gaps across sections at each viewport' },
+    measures: ['alignment group', 'alignment groups'], count: root => faultLineGrids(root).length, inspect: inspectFaultLines,
+  },
   {
     code: 'select.hug',
     rule: 'Select and date-picker triggers use hug sizing, never fill sizing or growing to occupy the available row.',

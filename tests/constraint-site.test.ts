@@ -2,7 +2,7 @@
 import { afterEach, expect, test } from "vite-plus/test";
 import { constraints } from "../DS1/0-face/constraints";
 import { askedConstraints, createConstraintPanel } from "../DS1/0-face/constraint-panel";
-import { PHONE_WIDTHS, checkSite, describeElement, ruleLine, sitemapPages, summarizePages, summarizeRules, type PageResult, type SiteFinding } from "../DS1/0-face/constraint-site";
+import { VIEWPORT_WIDTHS, checkSite, describeElement, ruleLine, sitemapPages, summarizePages, summarizeRules, type PageResult, type SiteFinding } from "../DS1/0-face/constraint-site";
 
 afterEach(() => { document.body.replaceChildren(); localStorage.clear(); });
 
@@ -49,11 +49,11 @@ test("the site check opens each page once for every width, three pages at a time
     },
     onResult: () => {},
   });
-  expect(seen.sort()).toEqual(pages.map(url => `${new URL(url).pathname} ${PHONE_WIDTHS.join(",")}`).sort());
+  expect(seen.sort()).toEqual(pages.map(url => `${new URL(url).pathname} ${VIEWPORT_WIDTHS.join(",")}`).sort());
   expect(most).toBe(3);
-  expect(results).toHaveLength(pages.length * PHONE_WIDTHS.length);
+  expect(results).toHaveLength(pages.length * VIEWPORT_WIDTHS.length);
   expect(results.filter(r => r.findings.length)).toEqual([{ url: "https://example.com/de/", width: 320, findings: [broken], measured: { "page.window-width": 10 } }]);
-  expect(results.filter(r => r.error).map(r => `${r.width} ${r.error}`)).toEqual(PHONE_WIDTHS.map(w => `${w} did not load in 30 seconds`));
+  expect(results.filter(r => r.error).map(r => `${r.width} ${r.error}`)).toEqual(VIEWPORT_WIDTHS.map(w => `${w} did not load in 30 seconds`));
   expect(localStorage.getItem("ph-out")).toBeNull();
   expect(localStorage.getItem("kept")).toBe("yes");
 });

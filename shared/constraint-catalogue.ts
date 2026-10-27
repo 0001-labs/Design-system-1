@@ -10,6 +10,7 @@ export const CONSTRAINT_IDENTITIES: Record<string, { id: string; tag: string }> 
   'card.media-corners': { id: 'C006', tag: 'Media corners' },
   'page.window-width': { id: 'C007', tag: 'Window fit' },
   'carousel.sideways-scroll': { id: 'C008', tag: 'Sideways movement' },
+  'page.fault-lines': { id: 'C009', tag: 'Fault lines' },
 };
 export const CONSTRAINT_CATALOGUE = constraints.map(({ code, rule, why, components, check }) => ({
   ...CONSTRAINT_IDENTITIES[code], code, rule, why, components, check,
