@@ -1,0 +1,6 @@
+/* Ask: the sheet with one field, its status on the row below, and the Keep · Discard bar over a landed draft. */
+.consistency-ask dialog { display: flex; flex-direction: column; gap: var(--ds-unit); }
+.consistency-ask ds-input { width: 100%; }
+.consistency-ask-status { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--ds-unit); min-height: var(--ds-unit); line-height: calc(16px * var(--sf, 1)); }
+.consistency-ask-status[hidden] { display: none; }
+.consistency-ask-status ds-text { min-width: 0; }

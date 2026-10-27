@@ -58,7 +58,7 @@ describe('edits a section as one block: slots, items and ranges from the vocabul
     expect(removeSectionItem(removed,'faq',0)).toEqual(removed);
     const added=addSectionItem(document,'tours',['/photos/logo.svg'],newId);
     const items=(added.blocks[0] as NativeCards).items;expect(items).toHaveLength(4);
-    expect(items[3]).toEqual({label:'Label',title:'Title',text:'Text',picture:{src:'/photos/logo.svg',alt:''},action:{text:'Button',href:'/book/green/',appearance:'primary'}});
+    expect(items[3]).toEqual({label:'Label',title:'Title',text:'Text',picture:{src:'/photos/logo.svg',alt:''},action:{text:'Button',href:'/book/green/',appearance:'primary',face:'outlined',size:'medium'}});
     expect(validateNativePage(added,context).blocks[0]).toEqual(added.blocks[0]);
     const panels=addSectionItem(page([example('panels')]),'rafts',context.images,newId);
     const heroes=(panels.blocks[0] as {items:NativeHero[]}).items;expect(heroes).toHaveLength(3);expect(heroes[2]!.id).toMatch(/^fresh_/);expect(heroes[2]!.title).toBe('Title');
@@ -81,7 +81,7 @@ describe('edits a section as one block: slots, items and ranges from the vocabul
       expect(JSON.stringify(block),kind).not.toContain('harbour.jpg","alt":"Three');
       expect(JSON.stringify(block),kind).not.toMatch(/"(?:title|heading|text|answer|term|question|name)":"(?!Title|Heading|Text|Answer|Term|Question|Name|Button|Link|Policy|Follow|Line|Legal line|Tagline|Kicker|Label|Value)/);
     }
-    const hero=newSection('hero',[],newId) as NativeHero;expect(hero.picture.src).toBe(PLACEHOLDER_PICTURE);expect(hero.title).toBe('Title');expect(hero.actions![0]).toEqual({text:'Button',href:'/book/',appearance:'primary'});
+    const hero=newSection('hero',[],newId) as NativeHero;expect(hero.picture.src).toBe(PLACEHOLDER_PICTURE);expect(hero.title).toBe('Title');expect(hero.actions![0]).toEqual({text:'Button',href:'/book/',appearance:'primary',face:'outlined',size:'medium'});
     expect(firstWordsId(hero)).toBe(`${hero.id}.title`);expect(firstWordsId(newSection('cards',[],newId) as NativeCards)).toMatch(/\.items\.0\.label$/);expect(firstWordsId(newSection('gallery',[],newId)!)).toBeUndefined();
     const header=newSection('header',[],newId) as NativeSection&{languages?:unknown;menu?:unknown;links:{text:string}[]};expect(header.languages).toBeUndefined();expect(header.menu).toBeUndefined();expect(header.links.map(link=>link.text)).toEqual(['Link','Link','Link','Link']);
     const panels=newSection('panels',[],newId) as NativeSection&{items:NativeHero[]};expect(new Set(panels.items.map(hero=>hero.id)).size).toBe(2);expect(panels.items[0]!.id).not.toBe(panels.id);
