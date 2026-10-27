@@ -84,6 +84,6 @@ test('with the language runtime, the copy passes the same browser check', () => 
 }, 60_000);
 
 test.each(['browser', 'worker'])('the constraint checker (root module `constraints`) passes a strict type check in a %s project', (name) => {
-  const files = new Map(['constraint-panel.ts', 'constraints.ts'].map((file) => [`0-face/${file}`, read(`DS1/0-face/${file}`)]));
+  const files = new Map(['constraint-panel.ts', 'constraint-site.ts', 'constraints.ts', 'button-label.ts', 'text-contrast.ts', 'word-wrap.ts', 'scaling.ts'].map((file) => [`0-face/${file}`, read(`DS1/0-face/${file}`)]));
   expect(typeCheck(`constraints-${name}`, files, projects[name]!)).toBe('');
 }, 60_000);

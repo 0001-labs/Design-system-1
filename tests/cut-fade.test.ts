@@ -26,7 +26,8 @@ const DS1 = join(import.meta.dirname, "../DS1");
 function files(dir: string, found: string[] = []): string[] {
   for (const name of readdirSync(dir)) {
     const path = join(dir, name);
-    if (name === "generated" || name === "x-icon" || name === "node_modules") continue;
+    // VisualKit draws another platform's chrome, which ends cut words as that platform does.
+    if (name === "generated" || name === "x-icon" || name === "node_modules" || name === "5-visual-kit") continue;
     if (statSync(path).isDirectory()) files(path, found);
     else if (/\.(css|ts)$/.test(name)) found.push(path);
   }

@@ -191,7 +191,7 @@ test('the languages export carries formatting with every module the language run
 
 test('the feedback export carries the module with everything it imports, by its paths in DS1', () => {
   const copy = files('feedback');
-  expect(Object.keys(copy).sort()).toEqual(['0-face/copy-text.ts', '0-face/feedback-overlays.ts', '0-face/feedback-words.ts', '0-face/feedback.ts', '0-face/generated/toast-assets.ts', '0-face/load-toaster.ts', '0-face/toast-queue.ts', '0-face/toaster.ts']);
+  expect(Object.keys(copy).sort()).toEqual(['0-face/copy-text.ts', '0-face/failures.ts', '0-face/feedback-overlays.ts', '0-face/feedback-words.ts', '0-face/feedback.ts', '0-face/generated/toast-assets.ts', '0-face/load-toaster.ts', '0-face/toast-queue.ts', '0-face/toaster.ts']);
   // No Lit, no component, no stylesheet or icon to import with a query, and no language runtime.
   expect(Object.keys(copy).some((file) => /^2-core\/ds-|^3-unit|^4-page/.test(file))).toBe(false);
   expect(Object.values(copy).some((content) => /from\s+["']lit/.test(String(content)))).toBe(false);
