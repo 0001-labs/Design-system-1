@@ -173,7 +173,7 @@ export function nativeBlockStyles(block: NativeBlock): Record<string,string> {
 }
 const styleText=(styles:Record<string,string>)=>Object.entries(styles).map(([key,value])=>`${key}:${value}`).join(';');
 export function renderNativeBlock(block: NativeBlock, options: NativePageRenderOptions = {}): string {
-  const attrs=`class="c9y-native-node c9y-native-${block.kind}" data-native-block="${escape(block.id)}"${options.editor?` data-c9y-block="${escape(block.id)}" data-c9y-kind="${block.kind}"`:''}${block.hidden?' hidden':''}${block.locale?` data-native-locale="${block.locale}" lang="${block.locale}"`:''} style="${escape(styleText(nativeBlockStyles(block)))}"`;
+  const attrs=`class="c9y-native-node c9y-native-${block.kind}${block.kind==='link'?' c9y-native-region':''}" data-native-block="${escape(block.id)}"${options.editor?` data-c9y-block="${escape(block.id)}" data-c9y-kind="${block.kind}"`:''}${block.hidden?' hidden':''}${block.locale?` data-native-locale="${block.locale}" lang="${block.locale}"`:''} style="${escape(styleText(nativeBlockStyles(block)))}"`;
   if(block.kind==='flow'){
     const children=block.children.map(child=>renderNativeBlock(child,options)).join('');
     if(block.disclosure)return`<details ${attrs} data-direction="${block.direction}"${block.disclosure.open?' open':''}><summary>${escape(block.disclosure.label)}</summary><div class="c9y-native-disclosure">${children}</div></details>`;
@@ -185,7 +185,7 @@ export function renderNativeBlock(block: NativeBlock, options: NativePageRenderO
     const image=`<img src="${escape(address(block.src,true))}" alt="${escape(block.alt)}" loading="lazy">`;
     return`<figure ${attrs}>${block.href?`<a href="${escape(address(block.href))}">${image}</a>`:image}</figure>`;
   }
-  if(block.kind==='link')return`<div ${attrs}><a class="${block.appearance&&block.appearance!=='plain'?`ds-button${block.appearance==='default'?'':` ds-button--${block.appearance}`}`:'c9y-native-link'}" href="${escape(address(block.href))}">${escape(block.text)}</a></div>`;
+  if(block.kind==='link')return`<div ${attrs}><a class="${block.appearance&&block.appearance!=='plain'?`ds-button${block.appearance==='default'?'':` ds-button--${block.appearance}`}`:'ds-link c9y-native-link'}" href="${escape(address(block.href))}">${escape(block.text)}</a></div>`;
   if(block.kind==='runtime')return`<div ${attrs}>${options.runtime?.(block)??''}</div>`;
   return`<div ${attrs}>${(options.collections?.[block.binding]?.items??[]).map((item,index)=>{
     const tag=item.href?'a':'div',link=item.href?` href="${escape(address(item.href))}"`:'';
