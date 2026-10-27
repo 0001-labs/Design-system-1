@@ -1,5 +1,6 @@
 import type { C9yComponent, C9yRelation, C9ySite, C9ySystem, Realisation } from './model';
 import { KIND_WORDS, LAYERS, relationsOf, renderMap } from './map';
+import { renderMatrix } from './matrix';
 
 /**
  * C9Y System's page: three views of one catalogue (the map, the components, the sites) and the focused node's
@@ -10,9 +11,10 @@ import { KIND_WORDS, LAYERS, relationsOf, renderMap } from './map';
  * "Presents with" names the DS1 elements it is drawn with, "Adds" the behaviour Consistency gives it.
  */
 
-export type View = 'map' | 'components' | 'sites';
+export type View = 'map' | 'matrix' | 'components' | 'sites';
 const VIEWS: { view: View; title: string }[] = [
   { view: 'map', title: 'Map' },
+  { view: 'matrix', title: 'Matrix' },
   { view: 'components', title: 'Components' },
   { view: 'sites', title: 'Sites' },
 ];
@@ -70,13 +72,13 @@ export function mountC9ySystem(root: HTMLElement, system: C9ySystem): { setView(
 
   const render = () => {
     // Pressing a node redraws the view: the map keeps its scroll and the keyboard keeps its place.
-    const frame = main.querySelector<HTMLElement>('.c9y-map-frame');
+    const frame = main.querySelector<HTMLElement>('.c9y-map-frame, .c9y-matrix-frame');
     const scroll = frame && main.dataset.view === state.view ? [frame.scrollLeft, frame.scrollTop] : null;
     const active = document.activeElement instanceof HTMLElement && root.contains(document.activeElement) ? document.activeElement : null;
     const area = active?.closest('.c9y-main, .c9y-detail, .c9y-head')?.className.split(' ')[0];
     const again = active?.dataset.focus ? `[data-focus="${active.dataset.focus.replace(/["\\]/g, '\\$&')}"]` : active?.dataset.view ? `[data-view="${active.dataset.view}"]` : '';
     paint();
-    const nextFrame = main.querySelector<HTMLElement>('.c9y-map-frame');
+    const nextFrame = main.querySelector<HTMLElement>('.c9y-map-frame, .c9y-matrix-frame');
     if (scroll && nextFrame) [nextFrame.scrollLeft, nextFrame.scrollTop] = scroll;
     if (area && again) (root.querySelector<HTMLElement>(`.${area} ${again}`) ?? root.querySelector<HTMLElement>(again))?.focus({ preventScroll: true });
   };
@@ -89,6 +91,7 @@ export function mountC9ySystem(root: HTMLElement, system: C9ySystem): { setView(
     }
     main.dataset.view = state.view;
     main.innerHTML = state.view === 'map' ? `<div class="c9y-map-frame">${renderMap(system, state.focus)}</div>`
+      : state.view === 'matrix' ? renderMatrix(system, state.focus)
       : state.view === 'components' ? componentsView() : sitesView();
     detail.innerHTML = state.focus ? details(state.focus) : '';
     detail.hidden = !state.focus;

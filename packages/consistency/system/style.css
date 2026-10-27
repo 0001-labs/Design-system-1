@@ -131,3 +131,34 @@ body { font-family: var(--ds-typeface-regular); font-size: var(--ds-type-size-de
   .c9y-facts { grid-template-columns: calc(4 * var(--u)) minmax(0, 1fr); }
   .c9y-split { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* The matrix: a site to a row, a component to a column of one square under its layer's head, one mark a cell. Marks
+   say the kind as the map's lines do: filled shares one copy, outlined is built on its own, dashed is planned and
+   dotted not checked. It scrolls sideways in its own frame, never the page. */
+.c9y-matrix-frame { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; }
+.c9y-matrix { width: auto; table-layout: auto; border-collapse: collapse; font-size: var(--ds-type-size-default); line-height: var(--u); }
+.c9y-matrix th, .c9y-matrix td { padding: 0; height: var(--u); font-weight: inherit; text-align: start; vertical-align: bottom; }
+.c9y-matrix [data-layer="block"] { --tint: var(--ds-pink); }
+.c9y-matrix [data-layer="runtime"] { --tint: var(--ds-zenith-blue); }
+.c9y-matrix [data-layer="place"] { --tint: var(--ds-apple-green); }
+.c9y-matrix [data-layer="service"] { --tint: var(--ds-orange); }
+.c9y-matrix-group { background: var(--tint); color: var(--ds-black); font-family: var(--ds-typeface-medium); padding-inline: var(--four) !important; white-space: nowrap; }
+.c9y-matrix-group + .c9y-matrix-group, .c9y-matrix-column[data-layer] + .c9y-matrix-column:not([data-layer="block"]) { border-inline-start: 1px solid var(--ds-paper); }
+.c9y-matrix-column { width: var(--u); min-width: var(--u); height: calc(7 * var(--u)) !important; }
+.c9y-matrix-column .c9y-link { writing-mode: vertical-rl; transform: rotate(180deg); width: var(--u); max-height: calc(7 * var(--u)); padding-block: var(--four); white-space: nowrap; overflow: hidden; }
+.c9y-matrix-corner, .c9y-matrix-row { width: calc(8 * var(--u)); min-width: calc(8 * var(--u)); padding-inline-end: var(--u) !important; white-space: nowrap; }
+.c9y-matrix-row .c9y-none { margin-inline-start: calc(var(--u) / 2); font-size: var(--ds-type-size-small); }
+.c9y-matrix tbody td, .c9y-matrix tfoot td { width: var(--u); min-width: var(--u); border: 1px solid var(--ds-fill); text-align: center; }
+.c9y-matrix td[data-lit], .c9y-matrix tr[data-current] td, .c9y-matrix-column[data-current] { background: var(--ds-fill); }
+.c9y-matrix-score { min-width: calc(4 * var(--u)); padding-inline-start: var(--u) !important; text-align: end !important; white-space: nowrap; font-variant-numeric: tabular-nums; border: 0 !important; }
+.c9y-matrix-score[data-whole] { font-family: var(--ds-typeface-medium); }
+.c9y-matrix-count { font-size: var(--ds-type-size-small); font-variant-numeric: tabular-nums; }
+.c9y-mark { display: block; box-sizing: border-box; width: calc(12px * var(--ds-sf)); height: calc(12px * var(--ds-sf)); margin: auto; padding: 0; border: 1px solid var(--tint, var(--ds-text-color)); border-radius: 0; background: none; cursor: pointer; }
+[data-kind="shared"] > .c9y-mark { background: var(--tint, var(--ds-text-color)); }
+[data-kind="opportunity"] > .c9y-mark { border-style: dashed; }
+[data-kind="unverified"] > .c9y-mark { border-style: dotted; }
+.c9y-matrix-key { display: flex; flex-wrap: wrap; gap: 0 var(--u); margin: var(--u) 0 0; padding: 0; list-style: none; }
+.c9y-matrix-key li { display: flex; align-items: center; gap: calc(var(--u) / 2); line-height: var(--u); }
+.c9y-matrix-key .c9y-mark { --tint: var(--ds-text-color); margin: 0; cursor: default; }
+.c9y-matrix-corner, .c9y-matrix-row { position: sticky; inset-inline-start: 0; z-index: 1; background: var(--ds-paper); }
+.c9y-matrix tr[data-current] .c9y-matrix-row { background: var(--ds-fill); }

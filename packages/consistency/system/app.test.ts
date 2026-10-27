@@ -78,3 +78,18 @@ test('the sites view lists each site’s components by layer', () => {
   expect(new URLSearchParams(location.search).get('focus')).toBe('c9y-booking');
   expect(root.querySelector('.c9y-detail h2')!.textContent).toBe('Booking');
 });
+
+test('the matrix draws a mark for each relation and says how much of each site is on C9Y', async () => {
+  const { renderMatrix, onC9y } = await import('./matrix');
+  const { C9Y_SYSTEM } = await import('./catalogue');
+  const host = document.createElement('div');
+  host.innerHTML = renderMatrix(C9Y_SYSTEM, '');
+  const used = C9Y_SYSTEM.relations;
+  expect(host.querySelectorAll('tbody td[data-kind]').length).toBe(used.length);
+  expect(host.querySelectorAll('tbody tr').length).toBe(C9Y_SYSTEM.sites.length);
+  expect(host.querySelectorAll('.c9y-matrix-column').length).toBe(C9Y_SYSTEM.components.length);
+  for (const site of C9Y_SYSTEM.sites) {
+    const { shared, of } = onC9y(C9Y_SYSTEM, site.id);
+    expect(host.querySelector(`tbody tr:nth-child(${C9Y_SYSTEM.sites.indexOf(site) + 1}) .c9y-matrix-score`)?.textContent).toBe(`${shared} of ${of}`);
+  }
+});
