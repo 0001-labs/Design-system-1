@@ -8,7 +8,7 @@ export const tones = ['', 'sharp-blue', 'apple-green', 'pink', 'orange', 'yellow
 export function readAction(value: unknown): { kind: 'link' | 'page'; target: string } | undefined {
   if (!value || typeof value !== 'object') return;
   const action = value as Record<string, unknown>;
-  if ((action.kind !== 'link' && action.kind !== 'page') || typeof action.target !== 'string' || action.target.length > 2000) return;
+  if ((action.kind !== 'link' && action.kind !== 'page') || typeof action.target !== 'string' || action.target.length > 2000 || /[\p{Cc}\\]/u.test(action.target)) return;
   if (action.kind === 'page' ? !/^\/(?!\/)/.test(action.target) : !/^https?:\/\//i.test(action.target)) return;
   return { kind: action.kind, target: action.target };
 }
