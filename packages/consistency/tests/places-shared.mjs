@@ -70,6 +70,7 @@ try {
     }
     if (what === 'pages' || what === 'api/pages') return route.fulfill({ json: { site: 'CPH Raft', pages, images: ['/photos/a.jpg', '/photos/b.jpg', 'https://evil.example/x.jpg'] } });
     if (what === 'page' || what === 'api/page') return route.fulfill({ json: { path, lang: pages.find(each => each.path === path).lang, title: 'CPH Raft', fields: fields(path) } });
+    if (what === 'api/composition') return route.fulfill({ json: { path, build: 'site-build', base: 'page-source', revision: 0, document: { schema: 1, nodes: {}, order: {} }, nodes: [] } });
     if (what === 'api/detached') return route.fulfill({ json: { edits: [{ id: 9, path: '/gone/', key: 'x', markdown: 'Old **words**', editor: 'jaa90@icloud.com', at: Date.UTC(2026, 9, 1) }] } });
     if (what === 'api/edit') {
       const body = request.postDataJSON(); edits.push(body);

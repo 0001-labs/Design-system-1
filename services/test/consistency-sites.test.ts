@@ -83,6 +83,27 @@ it('serves only the files a page draws with, each sandboxed', async () => {
 const write = (method: string, body: string, init: { origin?: string; type?: string } = {}) => ({ method, headers: { ...headers, origin: init.origin ?? origin, 'Content-Type': init.type ?? 'application/json' }, body });
 const id = '0f0e0d0c-0b0a-4908-8706-050403020100';
 
+it('keeps site composition behind the same identity, origin, path and size checks', async () => {
+  const { call, workspace } = setup();
+  const route = '10VNDG/api/composition?path=%2Fen%2F';
+  expect((await call(route)).status).toBe(401);
+  expect((await setup('other').call(route, { headers })).status).toBe(403);
+  expect((await call('10VNDG/api/composition', { headers })).status).toBe(400);
+  expect((await call('10VNDG/api/composition?path=//evil.test/', { headers })).status).toBe(400);
+  expect((await call(route, write('POST', '{}'))).status).toBe(405);
+  expect((await call(route, write('PUT', '{}', { origin: 'https://evil.test' }))).status).toBe(403);
+  expect((await call(route, write('PUT', '{}', { type: 'text/plain' }))).status).toBe(403);
+  expect((await call(route, write('PUT', 'x'.repeat(EDIT_BYTES + 1)))).status).toBe(413);
+  expect(workspace.fetch).not.toHaveBeenCalled();
+  expect(await (await call(route, { headers })).json()).toEqual({ path: '/api/consistency/sites/10VNDG/api/composition?path=%2Fen%2F', method: 'GET' });
+  const body = JSON.stringify({ build: 'current', base: 'structure', revision: 4, document: { schema: 1, nodes: {}, order: {} } });
+  const saved = await call(route, write('PUT', body));
+  expect(saved.status).toBe(200);
+  expect(await workspace.fetch.mock.calls[1]![0].text()).toBe(body);
+  expect(workspace.fetch.mock.calls[1]![0].headers.get('X-C9y-Actor')).toBe('owner');
+  expect(saved.headers.get('cache-control')).toBe('private, no-store');
+});
+
 it('passes on exactly the platform\'s allowlist of a site\'s API, each route by its own methods', async () => {
   for (const [route, method] of [['me', 'GET'], ['history', 'GET'], ['detached', 'GET'], ['reset', 'POST'], ['emails', 'GET'], ['emails/templates', 'GET'], ['emails/a_b-1', 'GET'], ['bookings', 'GET'], [`bookings/${id}`, 'GET'], [`bookings/${id}/cancel`, 'POST'], ['booking-offers', 'PUT'], ['booking-settings', 'GET'], ['giftcards', 'POST'], [`giftcards/${id}/pdf`, 'GET'], [`giftcards/${id}/void`, 'POST'], [`giftcards/${id}/resend`, 'POST'], ['business', 'POST'],
     ['orders', 'GET'], ['orders/config', 'GET'], [`orders/${id}`, 'GET'], [`orders/${id}/confirm`, 'POST'], [`orders/${id}/cancel`, 'POST'], [`orders/${id}/mark-paid`, 'POST'],

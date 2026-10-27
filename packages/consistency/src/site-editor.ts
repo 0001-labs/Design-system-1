@@ -1,20 +1,8 @@
 /**
- * A Consistency site, opened in the editor: one of its pages, as its visitors see it, in a frame the work's
- * width, and its words edited where they stand with Aa's plain editor, each save a site engine edit on the live
- * site (through the owner gateway, `/api/consistency/sites/<id>/…`).
- *
- * The frame is the gateway's `document` route on this origin, sandboxed with `allow-same-origin` and nothing
- * else, by the frame and by the page's own policy: the site's scripts never run, and its forms never send, while
- * the editor reaches into the document to make a field editable (the platform's `canvas.ts` says why). A press
- * on a word edits it; a link to one of the site's pages is followed and the editor follows it, saving a word
- * being edited first; Mod+press follows a link that is a word; nothing else happens.
- *
- * Over the word stands Design system 1's context bar with the field's name, Save and Cancel. Escape cancels,
- * Mod+Enter saves, and so does Enter in one line of words. Other copies of the same words show them as typed,
- * drawn by the site engine's own Markdown, and a save puts the HTML the site rendered in every copy.
- *
- * Only words: the page's layout and spacing cannot be published to a site yet, so the composition tools are not
- * here at all, and the page's title, description and share image have no place yet.
+ * The site's authored page stays in a script-free, same-origin sandbox. Aa edits its words in place;
+ * the composition controller supplies direct spacing, sizing, ordering and bounded content insertion.
+ * Both save automatically and drain pending edits before navigation. Layout writes carry the published
+ * build, source fingerprint and revision, so a stale editor cannot overwrite a newer page.
  */
 import { LitElement, html, nothing } from 'lit';
 import '../../../DS1/1-root/context.css';
@@ -23,12 +11,13 @@ import '../../../DS1/2-core/ds-button';
 import '../../../DS1/2-core/ds-empty';
 import '../../../DS1/2-core/ds-message';
 import '../../../DS1/3-unit/ds-select';
-import { toast } from '../../../DS1/0-face/feedback';
 import { createPlainEditor } from '../../../website/src/vendor/aa/aa';
 import { MARKDOWN_LIMIT, renderMarkdown } from './vendor/site-engine/markdown';
 import { placeBar } from './vendor/site-engine/placing';
 import { editKey, failureWords, fieldName, firstPage, isPlainField, isWordsField, pageGroups, pressAction, siteAddress, type PageDetail, type SiteField, type SitePage, type SiteSummary } from './site-editing';
 import './site-editor.css';
+import { SiteCompositionController } from './site-composition';
+import type { SiteCompositionSnapshot } from './site-composition-state';
 
 /** The outlines the editor draws in the framed page: the words that can be edited, and the ones being edited. */
 const FRAME_STYLE = `
@@ -61,27 +50,33 @@ const putBack = (element: Element, name: string, value: string | null) => { if (
 interface Editing {
   field: SiteField; host: HTMLElement; copies: HTMLElement[]; before: string[];
   marks: { classes: string[]; hadClass: boolean; role: string | null; multiline: string | null };
-  plain: ReturnType<typeof createPlainEditor>; markdown: string; bar: HTMLElement; save: HTMLButtonElement; busy: boolean; stop: () => void;
+  plain: ReturnType<typeof createPlainEditor>; markdown: string; bar: HTMLElement; status: HTMLElement; retry: HTMLButtonElement; saving: Promise<boolean> | null; cancelRequested?: boolean; timer?: ReturnType<typeof setTimeout>; stop: () => void;
 }
 
 export class ConsistencySiteEditor extends LitElement {
-  static properties = { pages: { state: true }, path: { state: true }, problem: { state: true }, unsupported: { state: true } };
+  static properties = { pages: { state: true }, path: { state: true }, problem: { state: true }, notice: { state: true }, unsupported: { state: true } };
   declare pages: SitePage[] | null;
   declare path: string | null;
   declare problem: string;
+  declare notice: string;
   declare unsupported: boolean;
   site!: SiteSummary;
   /** Whether the bar (the page picker, Open the page and the note) stands over the site; Consistency's app has none. */
   picker = true;
   private fields = new Map<string, SiteField>();
+  private composition: SiteCompositionController | null = null;
+  private compositionSnapshot: SiteCompositionSnapshot | null = null;
+  private images: string[] = [];
+  private readonly beforeUnload = (event: BeforeUnloadEvent) => { if (this.composition?.state.dirty || this.composition?.state.busy || this.editing && (this.editing.saving || this.editing.markdown !== this.editing.field.markdown)) { event.preventDefault(); event.returnValue = ''; } };
   private editing: Editing | null = null;
   private opening = 0;
+  private compositionRetry = 0;
   private readonly frame = Object.assign(document.createElement('iframe'), { className: 'consistency-site-frame' });
   private detach: (() => void) | null = null;
 
   constructor() {
     super();
-    this.pages = null; this.path = null; this.problem = ''; this.unsupported = false;
+    this.pages = null; this.path = null; this.problem = ''; this.notice = ''; this.unsupported = false;
     // Scripts never run in the page and its forms never send: only the editor reaches into it.
     this.frame.setAttribute('sandbox', 'allow-same-origin');
     this.frame.addEventListener('load', () => this.wire());
@@ -90,11 +85,14 @@ export class ConsistencySiteEditor extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
+    window.addEventListener('beforeunload', this.beforeUnload);
     if (!this.pages && !this.unsupported) void this.load();
   }
   disconnectedCallback() {
     super.disconnectedCallback();
     this.finish(null);
+    this.composition?.destroy(); this.composition = null;
+    window.removeEventListener('beforeunload', this.beforeUnload);
     this.detach?.();
   }
   /** Tells what lists the site's pages beside the editor that they, or the page open, have changed. */
@@ -106,8 +104,8 @@ export class ConsistencySiteEditor extends LitElement {
 
   private async load() {
     try {
-      const { pages } = await request<{ pages: SitePage[] }>(siteAddress.pages(this.site.code));
-      this.pages = pages;
+      const { pages, images } = await request<{ pages: SitePage[]; images?: string[] }>(siteAddress.pages(this.site.code));
+      this.pages = pages; this.images = images ?? [];
       const first = firstPage(pages);
       if (first) await this.open(first);
     } catch (error) {
@@ -117,12 +115,18 @@ export class ConsistencySiteEditor extends LitElement {
   }
 
   /** Opens one of the site's pages, settling the words being edited first. */
-  async open(path: string): Promise<boolean> {
+  async open(path: string, retry = false): Promise<boolean> {
+    if (!retry) this.compositionRetry = 0;
     if (!(await this.flush())) return false;
     const ticket = ++this.opening;
     try {
-      const page = await request<PageDetail>(siteAddress.page(this.site.code, path));
+      const [page, composition] = await Promise.all([
+        request<PageDetail>(siteAddress.page(this.site.code, path)),
+        request<SiteCompositionSnapshot>(siteAddress.composition(this.site.code, path)).catch(error => { if (error instanceof ApiError && (error.status === 404 || error.code === 'not-editable')) return null; throw error; }),
+      ]);
       if (ticket !== this.opening) return false;
+      this.composition?.destroy(); this.composition = null; this.compositionSnapshot = composition;
+      this.notice = composition?.stale ? 'The page structure changed. Earlier layout edits are kept in history.' : '';
       this.fields = new Map(page.fields.map(field => [field.key, field]));
       this.path = page.path;
       this.problem = '';
@@ -136,7 +140,7 @@ export class ConsistencySiteEditor extends LitElement {
   }
 
   /** Settles the words being edited: saved, or unchanged. False while they could not be saved. */
-  flush(): Promise<boolean> { return this.editing ? this.commit() : Promise.resolve(true); }
+  async flush(): Promise<boolean> { if (this.editing && !(await this.commit(true))) return false; return this.composition ? this.composition.flush() : true; }
 
   /** The framed page, made ready to edit once it has loaded. */
   private wire() {
@@ -145,6 +149,14 @@ export class ConsistencySiteEditor extends LitElement {
     const doc = this.frame.contentDocument;
     // A page that left for the site's own address cannot be edited from here: back to the page being edited.
     if (!doc || !this.path || !doc.location.pathname.endsWith('/document')) { if (this.path) this.frame.src = siteAddress.document(this.site.code, this.path); return; }
+    const base = doc.documentElement.getAttribute('data-c9y-composition-base');
+    if (base && this.compositionSnapshot && base !== this.compositionSnapshot.base) {
+      this.frame.hidden = true;
+      if (this.compositionRetry++ < 1) void this.open(this.path, true);
+      else this.problem = 'This page is being published. Open it again in a moment.';
+      return;
+    }
+    this.frame.hidden = false;
     const dark = document.documentElement.classList.contains('dark-theme') || (!document.documentElement.classList.contains('light-theme') && matchMedia('(prefers-color-scheme: dark)').matches);
     // The page's own head script set its theme before; the editor sets it now, as the editor's.
     doc.documentElement.classList.add(dark ? 'dark-theme' : 'light-theme');
@@ -156,6 +168,11 @@ export class ConsistencySiteEditor extends LitElement {
     for (const element of doc.querySelectorAll<HTMLElement>('[data-cms]')) {
       const field = this.fields.get(element.getAttribute('data-cms') ?? '');
       if (field && isWordsField(field)) element.setAttribute('data-cms-words', '');
+    }
+    if (this.compositionSnapshot) {
+      const path = this.path;
+      this.composition?.destroy();
+      this.composition = new SiteCompositionController(this.frame, this.compositionSnapshot, payload => request<SiteCompositionSnapshot>(siteAddress.composition(this.site.code, path), { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }), () => this.editing ? this.commit(true) : Promise.resolve(true), this.compositionSnapshot.images ?? this.images, () => void this.open(path));
     }
     const press = (event: MouseEvent) => this.press(event, doc);
     const key = (event: KeyboardEvent) => this.key(event);
@@ -173,6 +190,7 @@ export class ConsistencySiteEditor extends LitElement {
   private press(event: MouseEvent, doc: Document) {
     const target = event.target instanceof doc.defaultView!.Element ? event.target : (event.target as Node).parentElement;
     if (!target) { event.preventDefault(); return; }
+    if (target.closest('[data-c9y-node^="new_"]') && target.closest('[contenteditable]')) return;
     const words = target.closest<HTMLElement>('[data-cms-words]');
     const link = target.closest<HTMLAnchorElement>('a[href]');
     const action = pressAction({ inEditing: Boolean(this.editing?.host.contains(target)), field: Boolean(words), link: link ? { href: link.href } : null, mod: event.metaKey || event.ctrlKey }, { origin: this.origin, paths: (this.pages ?? []).map(page => page.path) });
@@ -189,8 +207,8 @@ export class ConsistencySiteEditor extends LitElement {
     if (!action) return;
     event.preventDefault();
     event.stopPropagation();
-    if (action === 'cancel') this.finish(null);
-    else void this.commit();
+    if (action === 'cancel') void this.cancelEdit();
+    else void this.commit(true);
   }
 
   private async go(path: string) {
@@ -202,7 +220,7 @@ export class ConsistencySiteEditor extends LitElement {
   private async edit(host: HTMLElement, point: { x: number; y: number }) {
     const field = this.fields.get(host.getAttribute('data-cms') ?? '');
     if (!field || !isWordsField(field) || this.editing?.host === host) return;
-    if (this.editing && !(await this.commit())) return;
+    if (this.editing && !(await this.commit(true))) return;
     const doc = host.ownerDocument, view = doc.defaultView;
     if (!view || !host.isConnected) return;
     const copies = [...doc.querySelectorAll<HTMLElement>(`[data-cms="${CSS.escape(field.key)}"]`)];
@@ -210,8 +228,9 @@ export class ConsistencySiteEditor extends LitElement {
     const marks = { classes: ['aa', 'aa-plain'].filter(name => host.classList.contains(name)), hadClass: host.hasAttribute('class'), role: host.getAttribute('role'), multiline: host.getAttribute('aria-multiline') };
     for (const element of copies) element.setAttribute('data-cms-open', '');
 
-    const save = Object.assign(document.createElement('button'), { type: 'button', textContent: 'Save', disabled: true, onclick: () => void this.commit() });
-    const cancel = Object.assign(document.createElement('button'), { type: 'button', textContent: 'Cancel', onclick: () => this.finish(null) });
+    const status = Object.assign(document.createElement('span'), { className: 'consistency-site-save-status', textContent: '' });
+    status.setAttribute('role', 'status');
+    const retry = Object.assign(document.createElement('button'), { type: 'button', textContent: 'Try again', hidden: true, onclick: () => void this.commit() });
     const label = Object.assign(document.createElement('span'), { className: 'ds-context__label', textContent: fieldName(field) });
     const bar = document.createElement('div');
     bar.className = 'ds-context ds-context--bar consistency-site-bar-over';
@@ -219,8 +238,8 @@ export class ConsistencySiteEditor extends LitElement {
     bar.setAttribute('aria-label', `${fieldName(field)}, being edited`);
     // The bar never takes the focus from the words.
     bar.addEventListener('mousedown', event => event.preventDefault());
-    bar.addEventListener('keydown', event => { if (event.key === 'Escape') this.finish(null); });
-    bar.append(label, save, cancel);
+    bar.addEventListener('keydown', event => { if (event.key === 'Escape') void this.cancelEdit(); });
+    bar.append(label, status, retry);
     document.body.append(bar);
 
     const gap = this.square() / 2;
@@ -234,7 +253,10 @@ export class ConsistencySiteEditor extends LitElement {
       const state = this.editing;
       if (!state || state.host !== host) return;
       state.markdown = markdown;
-      save.disabled = markdown === field.markdown || markdown.length > MARKDOWN_LIMIT;
+      clearTimeout(state.timer);
+      status.textContent = markdown.length > MARKDOWN_LIMIT ? failureWords(413) : markdown === field.markdown ? '' : 'Unsaved';
+      retry.hidden = true;
+      if (markdown !== field.markdown && markdown.length <= MARKDOWN_LIMIT) state.timer = setTimeout(() => void this.commit(), 700);
       const drawn = renderMarkdown(markdown);
       for (const element of copies) if (element !== host) element.innerHTML = drawn;
       place();
@@ -249,7 +271,7 @@ export class ConsistencySiteEditor extends LitElement {
     window.addEventListener('resize', place);
     window.addEventListener('scroll', place, true);
     const stop = () => { watch.disconnect(); doc.removeEventListener('scroll', place, true); window.removeEventListener('resize', place); window.removeEventListener('scroll', place, true); };
-    this.editing = { field, host, copies, before, marks, plain, markdown: field.markdown, bar, save, busy: false, stop };
+    this.editing = { field, host, copies, before, marks, plain, markdown: field.markdown, bar, status, retry, saving: null, stop };
     place();
     plain.focus();
     const selection = view.getSelection();
@@ -262,11 +284,21 @@ export class ConsistencySiteEditor extends LitElement {
     }
   }
 
+  private async cancelEdit() {
+    const state = this.editing;
+    if (!state) return;
+    clearTimeout(state.timer);
+    state.cancelRequested = true;
+    if (state.saving) await state.saving;
+    if (this.editing === state) this.finish(null);
+  }
+
   /** Ends the editing: the editor off the element, and every copy with the site's HTML, or as it was. */
   private finish(drawn: string | null) {
     const state = this.editing;
     if (!state) return;
     this.editing = null;
+    clearTimeout(state.timer);
     state.stop();
     state.bar.remove();
     state.plain.destroy();
@@ -278,28 +310,49 @@ export class ConsistencySiteEditor extends LitElement {
     state.copies.forEach((element, index) => { element.removeAttribute('data-cms-open'); element.innerHTML = drawn ?? state.before[index] ?? element.innerHTML; });
   }
 
-  /** Saves the words being edited as a site engine edit; whether the editing has ended, saved or unchanged. */
-  private async commit(): Promise<boolean> {
+  /** Serializes automatic edits, retaining newer typing and failed drafts. Navigation drains the latest value. */
+  private textDrain: Promise<boolean> | null = null;
+  private async commit(finish = false): Promise<boolean> {
     const state = this.editing;
     if (!state) return true;
-    if (state.busy) return false;
-    const { field, markdown } = state;
-    if (markdown === field.markdown) { this.finish(null); return true; }
-    if (markdown.length > MARKDOWN_LIMIT) { toast.error(failureWords(413)); return false; }
-    state.busy = true; state.save.disabled = true;
-    try {
-      const answer = await request<{ html: string; edit: { markdown: string } }>(siteAddress.edit(this.site.code), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: this.path, key: field.key, markdown }) });
-      field.markdown = answer.edit?.markdown ?? markdown;
-      field.edited = true;
-      if (this.editing === state) this.finish(answer.html);
-      toast('Saved', { duration: 2000 });
-      return true;
-    } catch (error) {
-      toast.error((error as Error).message);
-      state.busy = false; state.save.disabled = false;
-      if (this.editing === state) state.plain.focus();
-      return false;
+    if (!this.textDrain) this.textDrain = this.saveWords().finally(() => { this.textDrain = null; });
+    const saved = await this.textDrain;
+    if (saved && finish && this.editing === state) this.finish(null);
+    return saved;
+  }
+  private async saveWords(): Promise<boolean> {
+    const state = this.editing;
+    if (!state) return true;
+    clearTimeout(state.timer);
+    if (state.saving && !(await state.saving)) return false;
+    if (this.editing !== state) return true;
+    while (state.markdown !== state.field.markdown && !state.cancelRequested) {
+      const markdown = state.markdown;
+      if (markdown.length > MARKDOWN_LIMIT) { state.status.textContent = failureWords(413); return false; }
+      state.status.textContent = 'Saving…'; state.retry.hidden = true;
+      state.saving = (async () => {
+        try {
+          const answer = await request<{ html: string; edit: { markdown: string } }>(siteAddress.edit(this.site.code), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: this.path, key: state.field.key, markdown }) });
+          state.field.markdown = answer.edit?.markdown ?? markdown;
+          state.field.edited = true;
+          // Escape now restores the last accepted value, including while later typing is still unsaved.
+          state.before = state.before.map(() => answer.html);
+          if (this.editing === state) {
+            state.status.textContent = state.markdown === state.field.markdown ? 'Saved' : 'Unsaved';
+            for (const element of state.copies) if (element !== state.host) element.innerHTML = renderMarkdown(state.markdown);
+          }
+          return true;
+        } catch (error) {
+          clearTimeout(state.timer);
+          state.status.textContent = (error as Error).message;
+          state.retry.hidden = false;
+          return false;
+        } finally { state.saving = null; }
+      })();
+      if (!(await state.saving)) return false;
+      if (this.editing !== state) return true;
     }
+    return true;
   }
 
   /** One square of Design system 1 in this window, in pixels. */
@@ -328,8 +381,9 @@ export class ConsistencySiteEditor extends LitElement {
           ${pageGroups(this.pages).map(group => html`<optgroup label=${group.lang}>${group.pages.map(page => html`<option value=${page.path} ?selected=${page.path === this.path} data-details=${page.path}>${page.title || page.path}</option>`)}</optgroup>`)}
         </select></ds-select>` : nothing}
         <ds-button href=${live} blank secondary>Open the page</ds-button>
-        <span class="ds-text ds-text--muted">Words save to the live site. Layout can’t be published yet.</span>
+        <span class="ds-text ds-text--muted">Changes save to the site.</span>
       </div>` : nothing}
+      ${this.notice ? html`<ds-message literal text=${this.notice}></ds-message>` : nothing}
       ${this.problem ? html`<ds-message tone="danger" literal text=${this.problem}></ds-message>` : nothing}
       ${this.pages && !this.pages.length ? html`<ds-empty literal heading="No pages" text="This site has no pages with words to edit yet."></ds-empty>` : nothing}
       <div class="consistency-site-stage" ?hidden=${!this.path}>${this.frame}</div>`;

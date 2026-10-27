@@ -24,6 +24,7 @@ async function routes(page) {
   await page.route('**/api/consistency/sites', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ workspace: '01STDO', sites }) }));
   await page.route('**/api/consistency/sites/*/pages', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ pages: [{ path: '/', lang: 'da', title: 'Forside', fields: 1, edited: 0 }] }) }));
   await page.route('**/api/consistency/sites/*/page?**', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ path: '/', lang: 'da', title: 'CPH Raft', fields: [] }) }));
+  await page.route('**/api/consistency/sites/*/api/composition?**', route => route.fulfill({ json: { path: '/', build: 'site-build', base: 'page-source', revision: 0, document: { schema: 1, nodes: {}, order: {} }, nodes: [] } }));
   await page.route('**/api/consistency/sites/*/document?**', route => route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><title>CPH Raft</title><h1>Hej</h1>' }));
   await page.route('**/api/consistency/sites/*/places', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ places: [] }) }));
   await page.route('**/api/consistency/workspaces/*/members', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ members: [] }) }));

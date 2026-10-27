@@ -32,6 +32,7 @@ const allow = (pattern: string, ...methods: string[]) => ({ pattern: new RegExp(
 export const API_ROUTES = [
   allow('me', 'GET'), allow('pages', 'GET'), allow('page', 'GET'), allow('history', 'GET'), allow('detached', 'GET'),
   allow('edit', 'POST'), allow('reset', 'POST'),
+  allow('composition', 'GET', 'PUT'),
   allow('emails', 'GET'), allow('emails/templates', 'GET'), allow('emails/[\\w-]{1,64}', 'GET'),
   allow('bookings', 'GET'), allow(`bookings/${UUID}`, 'GET'), allow(`bookings/${UUID}/cancel`, 'POST'),
   allow('booking-offers', 'GET', 'PUT'), allow('booking-settings', 'GET', 'PUT'),
@@ -97,7 +98,7 @@ export async function sitesApi(request: Request, env: Gateway, authorize: (reque
   if (!methods.includes(request.method)) return refuse('Method not allowed', 405, { Allow: methods.join(', ') });
   if (url.search.length > QUERY_LIMIT) return refuse('Bad query', 400);
   const page = url.searchParams.get('path');
-  if ((path === 'page' || route === 'document') && !isPagePath(page)) return refuse('Bad path', 400);
+  if ((path === 'page' || path === 'composition' || route === 'document') && !isPagePath(page)) return refuse('Bad path', 400);
   let body: Uint8Array | undefined;
   if (request.method !== 'GET' && request.method !== 'HEAD') {
     if (request.headers.get('Origin') !== url.origin || request.headers.get('Content-Type')?.split(';')[0]?.trim() !== 'application/json') return refuse('Forbidden', 403);

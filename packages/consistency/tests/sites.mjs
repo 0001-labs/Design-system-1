@@ -39,10 +39,20 @@ const documents = {
 };
 const browser = await chromium.launch({ headless: true });
 const fail = message => { throw new Error(message); };
+const eventually = async (test, message) => {
+  const deadline = Date.now() + 10_000;
+  while (!test()) { if (Date.now() > deadline) fail(message); await new Promise(resolve => setTimeout(resolve, 20)); }
+};
+const within = async (promise, message) => {
+  let timer;
+  try { return await Promise.race([promise, new Promise((_resolve, reject) => { timer = setTimeout(() => reject(Error(message)), 10_000); })]); }
+  finally { clearTimeout(timer); }
+};
 try {
   const base = `http://127.0.0.1:${server.address().port}/private-consistency/`;
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
-  const edits = [], asked = [];
+  const edits = [], asked = [], savedWords = new Map();
+  let holdText = null;
   await page.route('**/api/consistency/pages**', route => route.fulfill({ json: { pages: [] } }));
   await page.route('**/api/consistency/sites', route => route.fulfill({ json: { sites: [{ code: '10VNDG', name: 'CPH Raft', url: 'https://cphraft.c9y.site/team/' }, { code: '20FLAV', name: 'Flavo', url: 'https://flavo.c9y.site/team/' }] } }));
   await page.route('**/api/consistency/sites/*/**', async route => {
@@ -52,11 +62,19 @@ try {
     if (what === 'pages') return route.fulfill({ json: { site: 'CPH Raft', pages: [{ path: '/', lang: 'da', title: 'Forside', fields: 4, edited: 0 }, { path: '/en/', lang: 'en', title: 'Home', fields: 1, edited: 0 }], images: [] } });
     const path = url.searchParams.get('path');
     if (what === 'page') return route.fulfill({ json: { path, lang: path === '/' ? 'da' : 'en', title: 'CPH Raft', fields: fields[path] } });
-    if (what === 'document') return route.fulfill({ body: documents[path], headers: { 'content-type': 'text/html; charset=utf-8', 'content-security-policy': POLICY } });
+    if (what === 'api/composition') return route.fulfill({ json: { path, build: 'site-build', base: 'page-source', revision: 0, document: { schema: 1, nodes: {}, order: {} }, nodes: [] } });
+    if (what === 'document') {
+      let body = documents[path];
+      for (const [key, value] of savedWords) body = body.replace(new RegExp(`(<([a-z][a-z0-9]*)[^>]*data-cms="${key}"[^>]*>)[\\s\\S]*?(</\\2>)`, 'g'), (_all, open, _tag, close) => open + value + close);
+      return route.fulfill({ body, headers: { 'content-type': 'text/html; charset=utf-8', 'content-security-policy': POLICY } });
+    }
     if (what === 'files/assets/site.css') return route.fulfill({ body: 'h1{font-size:40px}', headers: { 'content-type': 'text/css' } });
     if (what === 'edit') {
       const body = request.postDataJSON(); edits.push(body);
+      if (holdText) { const gate = holdText; holdText = null; gate.entered(); await gate.wait; }
       const html = body.markdown.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      savedWords.set(body.key, html);
+      for (const field of fields[body.path]) if (field.key === body.key) field.markdown = body.markdown;
       return route.fulfill({ json: { html, edit: { markdown: body.markdown, editor: 'jaa90@icloud.com' } } });
     }
     return route.fulfill({ status: 404, json: { error: 'not-found' } });
@@ -69,7 +87,7 @@ try {
   if (await page.getByRole('button', { name: 'CPH Raft', exact: true }).getAttribute('aria-current') !== 'page') fail('The open site is not marked');
   if (await page.locator('iframe.consistency-site-frame').getAttribute('sandbox') !== 'allow-same-origin') fail('The frame is not sandboxed');
   if (await frame.locator('body').getAttribute('data-ran')) fail('A script of the site ran');
-  if (await page.locator('consistency-editor').count()) fail('The composition tools are on in site mode');
+  if (await page.getByRole('switch').count() || await page.getByLabel('Example page', { exact: true }).count()) fail('The site editor exposes laboratory switches or examples');
 
   // A heading: pressed, typed, Enter saves it as a site engine edit.
   await frame.locator(`h1[data-cms="${H1}"]`).click();
@@ -115,9 +133,26 @@ try {
   if (await page.locator('ds-select select').inputValue() !== '/en/') fail('The page picker did not follow');
   if (!asked.includes('GET page?path=%2Fen%2F')) fail('The followed page was not read');
 
-  // The page picker opens a page; a site that keeps its words elsewhere says so.
+  // The page picker reopens saved words. Typing saves without a Save button, and a slower response keeps later typing.
   await page.locator('ds-select select').selectOption('/');
   await frame.locator(`h1[data-cms="${H1}"]`).waitFor();
+  if (await frame.locator(`h1[data-cms="${H1}"]`).innerText() !== 'Hello there!') fail('Reopening lost the saved heading');
+  await frame.locator(`h1[data-cms="${H1}"]`).click();
+  if (await page.locator('.consistency-site-bar-over').getByRole('button', { name: /^(Save|Cancel)$/ }).count()) fail('Text editing requires a Save or Cancel button');
+  let release, entered;
+  const seen = new Promise(resolve => { entered = resolve; });
+  const wait = new Promise(resolve => { release = resolve; });
+  holdText = { entered, wait };
+  await page.keyboard.press('End'); await page.keyboard.type(' automatic');
+  await within(seen, 'Typing never started an automatic save');
+  await page.keyboard.type(' newer');
+  release();
+  await eventually(() => savedWords.get(H1) === 'Hello there! automatic newer', 'The automatic text save dropped newer typing');
+  if (!(await frame.locator(`h1[data-cms="${H1}"]`).innerText()).includes('automatic newer')) fail('A slower text response replaced newer words on the canvas');
+  await page.keyboard.press('Enter');
+  await page.waitForFunction(() => !document.querySelector('.consistency-site-bar-over'));
+  if (edits.length !== 5) fail(`Expected two serialized automatic text saves, got ${edits.length - 3}`);
+  // A site that keeps its words elsewhere says so.
   await page.getByRole('button', { name: 'Flavo', exact: true }).click();
   await page.getByText('This site keeps its words in its own editor.', { exact: false }).waitFor();
   for (const width of [390, 768, 1440]) {
@@ -125,6 +160,6 @@ try {
     await page.setViewportSize({ width, height: 900 }); await page.waitForTimeout(100);
     if (await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)) fail(`Site mode overflows at ${width}`);
   }
-  if (edits.length !== 3) fail(`Expected three saves, got ${edits.length}`);
-  console.log('Site words: sandboxed page, in-place edits, Enter/Mod+Enter/Escape, copies, links, picker, unsupported site and viewports passed');
+  if (edits.length !== 5) fail(`Expected five saves, got ${edits.length}`);
+  console.log('Site words: sandboxed page, in-place edits, automatic saves with newer typing, Enter/Mod+Enter/Escape, copies, links, reopening, unsupported site and viewports passed');
 } finally { await browser.close(); await new Promise(done => server.close(done)); }

@@ -21,6 +21,7 @@ export const siteAddress = {
   page: (site: string, path: string) => `${base(site)}/page?path=${encodeURIComponent(path)}`,
   document: (site: string, path: string) => `${base(site)}/document?path=${encodeURIComponent(path)}`,
   edit: (site: string) => `${base(site)}/edit`,
+  composition: (site: string, path: string) => `${base(site)}/api/composition?path=${encodeURIComponent(path)}`,
 };
 
 /**
@@ -114,6 +115,9 @@ export function failureWords(status: number, error?: string): string {
   if (status === 401 || status === 403) return 'Your session ended. Sign in again in another tab, then try again.';
   if (error === 'not-editable') return 'This site keeps its words in its own editor.';
   if (error === 'unknown-field' || error === 'unknown-page') return 'The site was published again. Open the page again to edit it.';
+  if (status === 409) return 'This page changed elsewhere. Your edits are still here. Discard these changes to open its latest version.';
+  if (error === 'bad-link') return 'Enter a page path or a complete web, email or phone address.';
+  if (error === 'composition-too-large') return 'This page has too much added content. Remove an addition and try again.';
   if (error === 'bad-image') return 'Choose one of the site’s own pictures.';
   if (status === 413 || error === 'too-long') return 'Too many words for one field.';
   return 'The site could not be reached. Try again.';

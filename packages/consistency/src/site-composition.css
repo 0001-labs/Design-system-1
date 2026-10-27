@@ -1,0 +1,11 @@
+.consistency-composition-overlay { position: fixed; inset: 0; pointer-events: none; z-index: 3; }
+.consistency-composition-overlay[hidden], .consistency-composition-overlay [hidden] { display: none !important; }
+.consistency-composition-bar { position: fixed; pointer-events: auto; display: flex; flex-wrap: wrap; align-items: center; height: auto; }
+.consistency-composition-bar ds-button { --ds-button-padding-inline: calc(4px * var(--sf)); }
+.consistency-composition-bar ds-number { pointer-events: auto; }
+.consistency-composition-status:empty { display: none; }
+.consistency-composition-handle { position: fixed; box-sizing: border-box; pointer-events: auto; touch-action: none; cursor: ew-resize; outline: none; }
+.consistency-composition-handle[data-property="gap"] { cursor: ns-resize; }
+.consistency-composition-handle > span { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); padding-inline: calc(4px * var(--sf)); min-width: var(--ds-unit); line-height: var(--ds-unit); text-align: center; font: inherit; color: var(--ds-text-color); background: var(--ds-paper); border: 1px solid var(--ds-border-color); opacity: 0; pointer-events: none; }
+.consistency-composition-handle:is(:hover,:focus-visible,[data-active]) { background: color-mix(in srgb, var(--ds-pink) 24%, transparent); }
+.consistency-composition-handle:is(:hover,:focus-visible,[data-active]) > span { opacity: 1; }
