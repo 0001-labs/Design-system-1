@@ -23,6 +23,7 @@
   color: var(--ds-ask-ink);
 }
 :host([open]) { display: block; }
+:host([hidden]) { display: none !important; }
 
 /* The progressive blur: six layers, each starting lower than the one before
    and running on to the foot, each blurring what the ones above it already

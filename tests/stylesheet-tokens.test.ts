@@ -74,6 +74,8 @@ describe("Custom properties", () => {
       const text = read(file);
       for (const m of text.matchAll(/var\(\s*(--[\w-]+)\s*,/g)) {
         const name = m[1];
+        // VisualKit draws another platform's chrome, with that platform's own hooks (AGENTS.md, VisualKit).
+        if (at(file).startsWith("5-visual-kit/")) continue;
         if (!declared.has(name) && !name.startsWith("--ds-") && !legacyHooks.has(name))
           stray.push(`${at(file)}:${lineOf(text, m.index)} ${name}`);
       }
@@ -136,6 +138,7 @@ const kinds: { name: string; property: RegExp; allows: (px: number) => boolean }
  */
 const offMeasures: Record<string, string> = {
   "1-root/controls.css height 2": "an indeterminate checkbox's dash",
+  "1-root/guide.css type 12": "a guide figure's caption, kept readable under the picture",
   "1-root/controls.css width 12": "a menu entry's check and chevron marks",
   "1-root/controls.css height 12": "a menu entry's check and chevron marks",
   "1-root/one.css height 9": "the move grip on a column header",
@@ -146,6 +149,11 @@ const offMeasures: Record<string, string> = {
   "2-core/chart/chart.css width 5": "a chart's point marks",
   "2-core/chart/chart.css height 5": "a chart's point marks",
   "2-core/styles/ds-checkbox.css height 2": "an indeterminate checkbox's dash",
+  "2-core/styles/ds-switch.css width 24": "a compact switch's track",
+  "2-core/styles/ds-switch.css height 12": "a compact switch's track",
+  "2-core/styles/ds-switch.css corner 12": "a compact switch's track",
+  "2-core/styles/ds-switch.css width 8": "a compact switch's knob",
+  "2-core/styles/ds-switch.css height 8": "a compact switch's knob",
   "2-core/styles/ds-input.css height 18": "a row input: 2px above an 18px field make up its square",
   "2-core/styles/ds-input.css width 24": "a password field's reveal button",
   "2-core/styles/ds-toast.css width 14": "the page toaster's inline icons",

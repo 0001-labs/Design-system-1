@@ -1,4 +1,4 @@
-/* DS1 — version 0.3.0-alpha.28+sha256:8a0b55ce3acd */
+/* DS1 — version 0.3.0+sha256:8a0b55ce3acd */
 /* Design system 1 component library */
 /* Resolve dimensions where a component is drawn. Inherited calc() values have
  * already used their ancestor's scale. Base tokens stay unscaled and inherit;

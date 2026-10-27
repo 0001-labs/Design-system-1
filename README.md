@@ -9,7 +9,7 @@ Use the Lit web components directly in HTML, with any framework or none. Change 
 ## Start
 
 ```sh
-npm install @0001-labs/design-system-1@alpha
+npm install @0001-labs/design-system-1
 ```
 
 In a project with a CSS-capable bundler:
@@ -35,7 +35,7 @@ For a plain HTML page, load the stylesheet and component module:
 
 The module includes Lit. No package install or build step is needed for this setup.
 
-The package is in alpha. APIs can change between releases.
+The package follows semantic versioning: patch and minor releases keep the API, a major release says what changes.
 
 ## Four layers
 

@@ -94,8 +94,8 @@ test('the pieces scale with the surface: every length is a token, a square count
   const bare = [...section.matchAll(/(?<![\w-])-?\d+(?:\.\d+)?px/g)].map(match => {
     const before = section.slice(Math.max(0, match.index - 40), match.index);
     const after = section.slice(match.index, match.index + 30);
-    return { length: match[0], scaled: /\*\s*var\(--ds-sf\)/.test(after) || /--ds-icon-size(?::|,)\s*$/.test(before) };
+    return { length: match[0], scaled: /\*\s*var\(--ds-sf\)/.test(after) || /--ds-(?:icon|flag)-size(?::|,)\s*$/.test(before) };
   });
-  // Hairlines, the focus ring and its offset, and the 2px between an initial's hairline edges stay as drawn.
-  expect(bare.filter(found => !found.scaled).map(found => found.length).sort()).toEqual(['1px', '1px', '1px', '1px', '2px', '2px']);
+  // Hairlines (a flag's centred on its edge), the focus ring and its offset, and the 2px between an initial's hairline edges stay as drawn.
+  expect(bare.filter(found => !found.scaled).map(found => found.length).sort()).toEqual(['-0.5px', '1px', '1px', '1px', '1px', '1px', '2px', '2px']);
 });

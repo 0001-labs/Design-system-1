@@ -41,7 +41,7 @@ export function faultLineGrids(root: ParentNode): Grid[] {
     const gaps = band.slice(1).map((box,index) => start(box)-end(band[index]!));
     const crossGaps = bands.slice(1).map((row,index) => Math.min(...row.map(crossStart))-Math.max(...bands[index]!.map(crossEnd)));
     const internalDrift = bands.some(row => row.length === band.length && row.slice().sort((a,b)=>start(a)-start(b)).some((box,index)=>!near(start(box),lines[index*2]!) || !near(end(box),lines[index*2+1]!))) || crossGaps.some(gap=>!near(gap,crossGaps[0]!));
-    return [{element, family, axis, lines, gaps, crossGap: crossGaps[0], internalDrift, start: lines[0]!, end: lines.at(-1)!}];
+    return [{element, family, axis, lines, gaps, crossGap: crossGaps[0], internalDrift, start: lines[0]!, end: lines[lines.length - 1]!}];
   });
 }
 

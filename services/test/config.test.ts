@@ -13,7 +13,12 @@ describe("single Worker deployment", () => {
     expect(config.r2_buckets).toEqual([{ binding: "LIBRARIES", bucket_name: "ds-one-libraries", preview_bucket_name: "ds-one-libraries-preview" }]);
   });
   it("keeps public reads independent of database and service bindings", () => {
-    for (const key of ["d1_databases", "kv_namespaces", "durable_objects", "services", "queues", "hyperdrive"]) expect(config[key]).toBeUndefined();
+    for (const key of ["d1_databases", "kv_namespaces", "durable_objects", "queues", "hyperdrive"]) expect(config[key]).toBeUndefined();
+    // Only Consistency's owner-only routes call other Workers: its platform and System's sign-in.
+    expect(config.services).toEqual([
+      { binding: "CONSISTENCY_WORKSPACE", service: "consistency-platform", entrypoint: "ConsistencyWorkspace" },
+      { binding: "C9Y_IDENTITY", service: "0001-system", entrypoint: "ConsistencyIdentity" },
+    ]);
     expect(config.placement).toBeUndefined();
   });
   it("never commits the publish credential", () => {

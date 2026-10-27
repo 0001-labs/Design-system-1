@@ -1,6 +1,6 @@
 /* One square; its four-by-four mark stands on the lower sixteen. */
 :host { display: inline-flex; align-items: flex-end; min-height: var(--ds-unit); gap: calc(var(--ds-unit) - var(--ds-control-height)); color: var(--ds-activity-color, var(--ds-text-color)); }
-:host([hidden]) { display: none; }
+:host([hidden]) { display: none !important; }
 .mark { position: relative; display: block; flex: none; width: var(--ds-control-height); height: var(--ds-control-height); }
 .frame { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); opacity: 0; }
 .frame:first-child { opacity: 1; }

@@ -289,7 +289,7 @@ export function createConstraintPanel() {
     title.textContent = 'Constraints';
     status.textContent = 'Finding the pages…';
     const pages = await findSitePages();
-    const widths = `${VIEWPORT_WIDTHS.slice(0, -1).join(', ')} and ${VIEWPORT_WIDTHS.at(-1)}px`;
+    const widths = `${VIEWPORT_WIDTHS.slice(0, -1).join(', ')} and ${VIEWPORT_WIDTHS[VIEWPORT_WIDTHS.length - 1]}px`;
     let broken = 0;
     const results = await checkSite({
       pages,
