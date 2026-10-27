@@ -17,6 +17,32 @@ beforeAll(async () => {
 }, 60_000);
 afterAll(async () => { await browser?.close(); await server?.close(); });
 
+test("hug button faces occupy their grid width and preserve the row gap", async () => {
+ const tab = await browser.newPage();
+ await tab.goto(url);
+ await tab.waitForFunction(() => document.documentElement.dataset.ready === 'true');
+ for (const mode of ['native', 'host', 'slotted']) {
+  const result = await tab.evaluate(async mode => {
+   const stage = document.getElementById('stage')!;
+   stage.style.cssText = 'display:flex;align-items:flex-end;gap:10px';
+   stage.innerHTML = ['View as', 'Material', 'Present'].map(label => `<ds-button secondary fit control="${mode}">${mode === 'slotted' ? `<button>${label}</button>` : label}</ds-button>`).join('');
+   await Promise.all([...stage.querySelectorAll('ds-button')].map((e: any) => e.updateComplete));
+   await document.fonts.ready;
+   return [...stage.querySelectorAll<HTMLElement>('ds-button')].map(host => {
+    const face = mode === 'host' ? host : mode === 'slotted' ? host.querySelector('button')! : host.shadowRoot!.querySelector<HTMLElement>('[part="control"]')!;
+    const rect = face.getBoundingClientRect();
+    return { hostWidth: host.getBoundingClientRect().width, width: rect.width, left: rect.left, right: rect.right };
+   });
+  }, mode);
+  for (const [index, face] of result.entries()) {
+   expect(face.width).toBeCloseTo(face.hostWidth, 1);
+   expect(face.width % 20).toBeLessThan(1);
+   if (index) expect(face.left - result[index - 1].right).toBeCloseTo(10, 1);
+  }
+ }
+ await tab.close();
+});
+
 test("button labels stay whole without gradients and snap up to the grid", async () => {
  const tab = await browser.newPage();
  await tab.goto(url);

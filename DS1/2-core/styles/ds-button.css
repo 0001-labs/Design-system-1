@@ -46,7 +46,8 @@
 }
 :host([fit]) :is(button, a) {
   flex: 0 0 auto;
-  width: max-content;
+  /* Hug sizing belongs to the host, including its grid rounding. */
+  width: 100%;
   min-width: var(--ds-button-min-width, 0px);
   justify-content: var(--ds-button-align, flex-start);
 }
