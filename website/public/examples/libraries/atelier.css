@@ -246,3 +246,5 @@ ds-calendar {
   --ds-calendar-heat-ink-3: light-dark(#ffffff, #1e1e1e);
   --ds-calendar-heat-ink-4: var(--ds-paper);
 }
+
+ds-button { --ds-typeface-regular: var(--ds-typeface-mono); --ds-typeface-medium: var(--ds-typeface-mono); }

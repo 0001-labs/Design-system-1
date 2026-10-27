@@ -12,7 +12,7 @@ export const LIBRARIES = {
   graphite: { name: 'Graphite', id: 'GRAPHITE_ID', version: 1 },
   voyage: { name: 'Voyage', id: 'VOYAGE_ID', version: 1 },
   studio: { name: 'Studio', id: 'STUDIO_ID', version: 1 },
-  atelier: { name: 'Atelier', id: 'ATELIER_ID', version: 1 },
+  atelier: { name: 'Atelier', id: 'pzjtr1r25rp4b8xv6991', version: 1 },
 } as const;
 
 // Until a library is published in the libraries account, the example loads its draft, written by

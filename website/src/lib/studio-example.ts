@@ -90,7 +90,7 @@ export const STUDIO_EXAMPLE: LayoutExample = {
 <div class="studio" id="top">
   <section class="studio-section">
     <div class="studio-stack"><div class="studio-copy studio-tight">${giant('A design studio with a love of detail.')}</div><div class="studio-copy">${lead('We make websites, visual identities and graphic design for brands that care about quality.')}</div>
-      <div class="studio-actions"><ds-button primary data-size="medium" href="#cases"><span>See our cases</span>${icon('right')}</ds-button></div></div>
+      <div class="studio-actions"><ds-button primary data-size="large" href="#cases"><span>See our cases</span>${icon('right')}</ds-button></div></div>
     ${photo('atelier-hero.jpg', 'Hands turning the pages of a printed proof beside a tablet', '16 / 9', 'loading="eager"')}
   </section>
   <section id="cases" class="studio-section">
@@ -117,7 +117,7 @@ export const STUDIO_EXAMPLE: LayoutExample = {
       <div class="studio-tight">${number('01')}${big('About Mørk &amp; Lund')}${eyebrow('A design studio in Copenhagen')}</div>
       ${lead('Mørk &amp; Lund is a digital design studio built on a love of digital design.')}
       ${paragraph('We work with websites, visual identities and graphic design, with a focus on good craft, a calm process and the small details that make a difference.')}
-      <div class="studio-actions"><ds-button primary data-size="medium" href="#contact"><span>Contact us</span>${icon('right')}</ds-button></div>
+      <div class="studio-actions"><ds-button primary data-size="large" href="#contact"><span>Contact us</span>${icon('right')}</ds-button></div>
     </div>
     ${photo('atelier-studio.jpg', 'A desk by the studio window, with a plant and a laptop', '4 / 5')}
   </section>
@@ -144,7 +144,7 @@ export const STUDIO_EXAMPLE: LayoutExample = {
         <div class="studio-two" style="gap:var(--ds-unit)"><ds-input name="name" label="Name" autocomplete="name"></ds-input><ds-input name="company" label="Company (optional)" autocomplete="organization"></ds-input></div>
         <div class="studio-two" style="gap:var(--ds-unit)"><ds-input name="email" type="email" label="Email" autocomplete="email"></ds-input><ds-input name="phone" type="tel" label="Phone (optional)" autocomplete="tel"></ds-input></div>
         <ds-input name="message" multiline rows="4" label="How can we help?"></ds-input>
-        <div class="studio-actions"><ds-button primary data-size="medium" type="submit" id="studio-send"><span>Send</span>${icon('right')}</ds-button>${text('We reply within a working day.', 'size="small" tone="muted"')}</div>
+        <div class="studio-actions"><ds-button primary data-size="large" type="submit" id="studio-send"><span>Send</span>${icon('right')}</ds-button>${text('We reply within a working day.', 'size="small" tone="muted"')}</div>
         <ds-text id="studio-status" class="studio-status" literal role="status" wrap></ds-text>
       </form>
     </div>

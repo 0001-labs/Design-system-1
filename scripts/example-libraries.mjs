@@ -111,6 +111,8 @@ export const LIBRARIES = {
     chart: ['#594dff', '#ccccff'], chartInk: ['#ffffff', '#1e1e1e'],
     band: ['#0a0a0a', '#fafafa'], bandInk: ['#fafafa', '#18181b'], highlight: ['#fde70c', '#fde70c'],
     corner: '8px', inset: '5px', card: '16px',
+    // Buttons in the code face, as a studio sets its labels apart from its prose; every size, the outlined face too.
+    componentRules: 'ds-button { --ds-typeface-regular: var(--ds-typeface-mono); --ds-typeface-medium: var(--ds-typeface-mono); }',
   },
 };
 
