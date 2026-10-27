@@ -1,3 +1,4 @@
+import { remoteConstraintPages } from './constraint-pages';
 // The constraints on a phone: opens every page of a site, as its sitemap lists them, in WebKit as an
 // iPhone at each phone width, scrolls it through so everything it loads late is drawn, and runs every
 // rule in DS1/0-face/constraints.ts on it, as five presses of C would. Prints what each page breaks,
@@ -5,6 +6,7 @@
 //
 //   vp run constraints:phone https://example.com
 //   vp run constraints:phone https://example.com --widths 320,393 --pages /,/about/
+//   vp run constraints:phone https://example.com --theme dark
 //   vp run constraints:phone --dist website/dist
 //
 // `--dist` checks a built site before it is uploaded: the folder is served here, every page in its
@@ -96,6 +98,8 @@ function builtPages(folder: string, base: string): string[] {
       if (entry.isDirectory() && existsSync(join(layouts, entry.name, 'index.html'))) pages.add(new URL(`/examples/layouts/${entry.name}/`, base).href);
     }
   }
+  const files = join(folder, 'examples/files');
+  if (existsSync(files)) for (const name of readdirSync(files)) if (name.endsWith('.html')) pages.add(new URL(`/examples/files/${name}`, base).href);
   return pages.size ? [...pages] : [new URL('/', base).href];
 }
 
@@ -104,17 +108,7 @@ async function pagesOf(site: string): Promise<string[]> {
   const chosen = option('pages');
   if (chosen) return chosen.split(',').map(path => new URL(path, site).href);
   if (dist) return builtPages(dist, site);
-  const index = await fetch(new URL('/sitemap.xml', site)).catch(() => null);
-  const listed = index?.ok ? locations(await index.text()) : [];
-  const pages: string[] = [];
-  for (const url of listed) {
-    if (new URL(url).host !== new URL(site).host) continue;
-    if (/\.xml$/.test(new URL(url).pathname)) {
-      const part = await fetch(url).catch(() => null);
-      if (part?.ok) pages.push(...locations(await part.text()).filter(page => new URL(page).host === new URL(site).host));
-    } else pages.push(url);
-  }
-  return pages.length ? pages : [new URL('/', site).href];
+  return remoteConstraintPages(site);
 }
 
 // The rules as one script for the page, which puts its inspector on window.
@@ -152,6 +146,8 @@ type Broken = { code: string; message: string; element: string; review: boolean 
 const served = dist ? await serve(dist) : undefined;
 const base = served?.base ?? named!;
 const pages = await pagesOf(base);
+const theme = option('theme') ?? 'light';
+if (theme !== 'light' && theme !== 'dark') throw new Error('Use --theme light or --theme dark.');
 const browser = await webkit.launch();
 const queue = widths.flatMap(width => pages.map(url => ({ width, url })));
 const report: string[] = [];
@@ -163,7 +159,7 @@ const measured: Record<string, number> = {};
 const shown = (url: string) => served ? new URL(new URL(url).pathname, origin).href : url;
 
 async function open({ width, url }: { width: number; url: string }) {
-  const context = await browser.newContext({ ...(width < 768 ? devices['iPhone 14'] : {}), viewport: { width, height: 844 }, screen: { width, height: 844 } });
+  const context = await browser.newContext({ ...(width < 768 ? devices['iPhone 14'] : {}), viewport: { width, height: 844 }, screen: { width, height: 844 }, colorScheme: theme });
   const page = await context.newPage();
   try {
     // A page that does not settle in time gets a second chance: one slow load among many is not a broken rule.
