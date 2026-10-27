@@ -9,8 +9,13 @@
 // Every colour is a palette colour, its pastel, its dark version, or a tint of the paper's own hue
 // for fills and lines, except in a library that stands for a brand of its own (Voyage), as a
 // client's library does. A library with a band (a coloured strip behind a header) also declares
-// --brand-band, --brand-band-ink and --brand-highlight. The run fails when a pair that carries
-// words reads below 4.5:1.
+// --brand-band, --brand-band-ink and --brand-highlight. Every library writes the section tones of
+// Consistency's native pages (shared/consistency-vocabulary.ts TONES) as --c9y-tone-<name> and
+// --c9y-tone-<name>-ink: paper, cream (`cream`, or the fill), dark (the text and the paper turned
+// over), accent, highlight (`highlight`, or the cream), band (`band` and `bandInk`, or the dark tone)
+// and six pastels (`pastels`, or Design system 1's: Sharp blue, Apple green, Orange, Pink, Yellow and
+// Chartreuse, light and dim), each with the ink that reads on it. The run fails when a pair that
+// carries words reads below 4.5:1, a tone included.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -32,6 +37,39 @@ const lum = hex => {
 const contrast = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05); };
 const ld = (light, dark) => `light-dark(${light}, ${dark})`;
 const mono = '"Inter Arrows", "Iosevka", "Iosevka Extended", ui-monospace, "SF Mono", Menlo, monospace';
+
+/** The six pastels a library's bento tiles turn through unless it names its own: palette pastels, light and dim (DS1/1-root/palette.css). */
+export const PASTELS = [
+  ['#ccccff', '#1d1a4c'], // Sharp blue
+  ['#daffcc', '#284c1a'], // Apple green
+  ['#fff2cc', '#4c3f1a'], // Orange
+  ['#fad1e6', '#471f34'], // Pink
+  ['#fbffcc', '#484c1a'], // Yellow
+  ['#f2ffcf', '#3e4c1a'], // Chartreuse
+];
+/** The names of the section tones, as shared/consistency-vocabulary.ts lists them. */
+export const TONES = ['paper', 'cream', 'dark', 'accent', 'highlight', 'band', 'pastel-1', 'pastel-2', 'pastel-3', 'pastel-4', 'pastel-5', 'pastel-6'];
+
+/** The ink that reads on a surface: the library's text where it reaches 4.5:1, else its paper, else the slate or white. */
+const inkOn = (surface, candidates) => candidates.find(ink => contrast(ink, surface) >= 4.5) ?? candidates.reduce((best, ink) => (contrast(ink, surface) > contrast(best, surface) ? ink : best));
+const inkPair = (lib, surface) => [0, 1].map(i => inkOn(surface[i], [lib.text[i], lib.paper[i], '#1e1e1e', '#ffffff']));
+
+/** A library's section tones, each `[surface, ink]` with `[light, dark]` values, by tone name. */
+export function sectionTones(lib) {
+  const cream = lib.cream ?? lib.fill;
+  const highlight = lib.highlight ?? cream;
+  const pastels = lib.pastels ?? PASTELS;
+  if (pastels.length !== 6) throw new Error(`${lib.name}: six pastels, not ${pastels.length}`);
+  return {
+    paper: [lib.paper, lib.text],
+    cream: [cream, inkPair(lib, cream)],
+    dark: [lib.text, lib.paper],
+    accent: [lib.accent, lib.onAccent],
+    highlight: [highlight, inkPair(lib, highlight)],
+    band: lib.band ? [lib.band, lib.bandInk ?? inkPair(lib, lib.band)] : [lib.text, lib.paper],
+    ...Object.fromEntries(pastels.map((pastel, i) => [`pastel-${i + 1}`, [pastel, inkPair(lib, pastel)]])),
+  };
+}
 
 // Each value is [light, dark].
 export const LIBRARIES = {
@@ -170,6 +208,8 @@ export function draft(lib) {
     '  --button-background-color-secondary: var(--ds-fill);',
     ...(lib.typeface ? [`  --typeface-regular: ${lib.typeface};`, `  --typeface-medium: ${lib.typeface};`] : []),
     ...(lib.band ? [`  --brand-band: ${ld(...lib.band)};`, `  --brand-band-ink: ${ld(...lib.bandInk)};`, `  --brand-highlight: ${ld(...lib.highlight)};`] : []),
+    "  /* The section tones of Consistency's native pages: a surface and the ink that reads on it. */",
+    ...Object.entries(sectionTones(lib)).flatMap(([tone, [surface, ink]]) => [`  --c9y-tone-${tone}: ${ld(...surface)};`, `  --c9y-tone-${tone}-ink: ${ld(...ink)};`]),
     '}',
     '',
     "/* The canvas behind the page is the library's paper too, over the paper the theme's head script paints. */",
@@ -241,20 +281,22 @@ export function draft(lib) {
   return `${css.trimEnd()}\n\n${extra}${lib.componentRules ? `\n${lib.componentRules}\n` : ''}`;
 }
 
-/** The pairs that carry words and read below 4.5:1, as "<library> <scheme> <pair>: <ratio>". */
-export function lowContrast() {
+/** One library's pairs that carry words and read below 4.5:1, as "<library> <scheme> <pair>: <ratio>"; the section tones among them. */
+export function lowContrastOf(lib, extra = {}) {
   const low = [];
-  for (const lib of Object.values(LIBRARIES)) {
-    for (const [i, scheme] of ['light', 'dark'].entries()) {
-      const pairs = { text: [lib.text, lib.paper], muted: [lib.muted, lib.paper], 'text on fill': [lib.text, lib.fill], 'on accent': [lib.onAccent, lib.accent], 'input text': [lib.text, lib.input], 'heat ink': [lib.chartInk, lib.chart], ...(lib.band ? { 'on band': [lib.bandInk, lib.band] } : {}) };
-      for (const [what, [a, b]] of Object.entries(pairs)) {
-        const ratio = contrast(a[i], b[i]);
-        if (ratio < 4.5) low.push(`${lib.name} ${scheme} ${what}: ${ratio.toFixed(2)}`);
-      }
+  const tones = Object.fromEntries(Object.entries(sectionTones(lib)).map(([tone, [surface, ink]]) => [`tone ${tone}`, [ink, surface]]));
+  for (const [i, scheme] of ['light', 'dark'].entries()) {
+    const pairs = { text: [lib.text, lib.paper], muted: [lib.muted, lib.paper], 'text on fill': [lib.text, lib.fill], 'on accent': [lib.onAccent, lib.accent], 'input text': [lib.text, lib.input], 'heat ink': [lib.chartInk, lib.chart], ...(lib.band ? { 'on band': [lib.bandInk, lib.band] } : {}), ...tones, ...extra };
+    for (const [what, [a, b]] of Object.entries(pairs)) {
+      const ratio = contrast(a[i], b[i]);
+      if (ratio < 4.5) low.push(`${lib.name} ${scheme} ${what}: ${ratio.toFixed(2)}`);
     }
   }
   return low;
 }
+
+/** The pairs of every example library that read below 4.5:1. */
+export const lowContrast = () => Object.values(LIBRARIES).flatMap(lib => lowContrastOf(lib));
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const out = process.argv[2];

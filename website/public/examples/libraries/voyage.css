@@ -177,6 +177,31 @@
   --brand-band: light-dark(#0b3a8c, #0b2a5e);
   --brand-band-ink: light-dark(#ffffff, #ffffff);
   --brand-highlight: light-dark(#fdbb2d, #fdbb2d);
+  /* The section tones of Consistency's native pages: a surface and the ink that reads on it. */
+  --c9y-tone-paper: light-dark(#ffffff, #141922);
+  --c9y-tone-paper-ink: light-dark(#1a1a1a, #f2f5fa);
+  --c9y-tone-cream: light-dark(#f2f4f7, #1f2733);
+  --c9y-tone-cream-ink: light-dark(#1a1a1a, #f2f5fa);
+  --c9y-tone-dark: light-dark(#1a1a1a, #f2f5fa);
+  --c9y-tone-dark-ink: light-dark(#ffffff, #141922);
+  --c9y-tone-accent: light-dark(#0a6fe0, #4c9bf5);
+  --c9y-tone-accent-ink: light-dark(#ffffff, #0b1a2e);
+  --c9y-tone-highlight: light-dark(#fdbb2d, #fdbb2d);
+  --c9y-tone-highlight-ink: light-dark(#1a1a1a, #141922);
+  --c9y-tone-band: light-dark(#0b3a8c, #0b2a5e);
+  --c9y-tone-band-ink: light-dark(#ffffff, #ffffff);
+  --c9y-tone-pastel-1: light-dark(#ccccff, #1d1a4c);
+  --c9y-tone-pastel-1-ink: light-dark(#1a1a1a, #f2f5fa);
+  --c9y-tone-pastel-2: light-dark(#daffcc, #284c1a);
+  --c9y-tone-pastel-2-ink: light-dark(#1a1a1a, #f2f5fa);
+  --c9y-tone-pastel-3: light-dark(#fff2cc, #4c3f1a);
+  --c9y-tone-pastel-3-ink: light-dark(#1a1a1a, #f2f5fa);
+  --c9y-tone-pastel-4: light-dark(#fad1e6, #471f34);
+  --c9y-tone-pastel-4-ink: light-dark(#1a1a1a, #f2f5fa);
+  --c9y-tone-pastel-5: light-dark(#fbffcc, #484c1a);
+  --c9y-tone-pastel-5-ink: light-dark(#1a1a1a, #f2f5fa);
+  --c9y-tone-pastel-6: light-dark(#f2ffcf, #3e4c1a);
+  --c9y-tone-pastel-6-ink: light-dark(#1a1a1a, #f2f5fa);
 }
 
 /* The canvas behind the page is the library's paper too, over the paper the theme's head script paints. */
