@@ -41,14 +41,14 @@ try {
  await page.locator('.aa-toolbar:not([hidden]) [data-action="bold"]').click();
  if(!(await page.locator('.aa-toolbar:not([hidden])').isVisible())||!(await spacing.isDisabled()))throw Error('Formatting choice unexpectedly dismissed context');
  // A pointer outside closes immediately, with no delayed same-range reopen.
- await page.locator('.consistency-inspector h2').click();
+ await page.locator('.consistency-inspector [role="status"]').click();
  await page.waitForFunction(()=>!document.querySelector('[role="switch"][aria-label="Spacing"]').disabled);
  if(await spacing.getAttribute('aria-checked')!=='true'||await resizing.getAttribute('aria-checked')!=='false')throw Error('Closing context did not restore saved preferences');
  await page.waitForTimeout(80);if(await page.locator('.aa-toolbar:not([hidden])').count())throw Error('Formatting toolbar reopened after outside click');
  const sheet=page.locator('.consistency-sheet'), box=await sheet.boundingBox();await page.mouse.click(box.x+box.width/2,box.y+5,{button:'right'});
  await page.locator('ds-context[data-consistency-context][open]').waitFor();
  await page.waitForFunction(()=>document.querySelector('[role="switch"][aria-label="Spacing"]').disabled);
- await page.locator('.consistency-inspector h2').click();await page.waitForFunction(()=>!document.querySelector('ds-context[data-consistency-context][open]'));
+ await page.locator('.consistency-inspector [role="status"]').click();await page.waitForFunction(()=>!document.querySelector('ds-context[data-consistency-context][open]'));
  await page.waitForFunction(()=>!document.querySelector('[role="switch"][aria-label="Spacing"]').disabled);
  if(await resizing.getAttribute('aria-checked')!=='false')throw Error('Context close changed disabled resize preference');
  console.log('Context: formatting stays open; outside closes; spacing/resize visibly pause and restore saved preferences');

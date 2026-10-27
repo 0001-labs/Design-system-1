@@ -33,17 +33,17 @@ export async function sitePlatformFixture(sources) {
   let fail = false, held = null;
   const read = (path = '/') => store.read(path, 'fixture-build', pages.get(path));
   const publicHTML = async (path = '/') => {
-    const response = await store.render(new Request(origin + path), new Response(sources[path], { headers: { 'content-type': 'text/html' } }));
+    const response = await store.render(new Request(origin + path), new Response(sources[path], { headers: { 'content-type': 'text/html; charset=utf-8' } }));
     return response.text();
   };
   const server = createServer(async (request, response) => {
     const url = new URL(request.url, 'http://localhost');
-    if (url.pathname === '/fixture-public/') { response.setHeader('content-type', 'text/html'); response.end(await publicHTML(url.searchParams.get('path') ?? '/')); return; }
+    if (url.pathname === '/fixture-public/') { response.setHeader('content-type', 'text/html; charset=utf-8'); response.end(await publicHTML(url.searchParams.get('path') ?? '/')); return; }
     if (url.pathname.endsWith(fixturePicture)) { response.setHeader('content-type', 'image/svg+xml'); response.end(picture); return; }
     const pathname = decodeURIComponent(url.pathname);
     const file = resolve(assets, '.' + (pathname.endsWith('/') ? pathname + 'index.html' : pathname));
     if (!file.startsWith(assets)) { response.writeHead(403).end(); return; }
-    try { response.setHeader('content-type', ({ '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css' })[extname(file)] ?? 'application/octet-stream'); response.end(await componentFixture(file)); }
+    try { response.setHeader('content-type', ({ '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css' })[extname(file)] ?? 'application/octet-stream'); response.end(await componentFixture(file)); }
     catch { response.writeHead(404).end(); }
   });
   await new Promise(done => server.listen(0, '127.0.0.1', done));
@@ -68,7 +68,7 @@ export async function sitePlatformFixture(sources) {
         if (what === 'places') return route.fulfill({ json: { places: [] } });
         if (what === 'pages') return route.fulfill({ json: { pages: [...pages.keys()].map(path => ({ path, title: path === '/' ? 'Home' : 'About', lang: 'en', fields: 1, edited: 0 })), images: [...images] } });
         if (what === 'page') return route.fulfill({ json: { path, title: 'Fixture site', lang: 'en', fields: [{ key: '0123456789ab', tag: 'h1', kind: 'text', label: 'h1', markdown: 'Original heading' }] } });
-        if (what === 'document') return route.fulfill({ body: engine.applyComposition(pages.get(path), read(path).document, true), headers: { 'content-type': 'text/html', 'content-security-policy': policy } });
+        if (what === 'document') return route.fulfill({ body: engine.applyComposition(pages.get(path), read(path).document, true), headers: { 'content-type': 'text/html; charset=utf-8', 'content-security-policy': policy } });
         if (what.startsWith('files/')) return route.fulfill({ body: picture, contentType: 'image/svg+xml' });
         if (what === 'api/composition') {
           if (request.method() === 'GET') return route.fulfill({ json: { ...read(path), images: [...images] } });

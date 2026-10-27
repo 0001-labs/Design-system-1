@@ -189,15 +189,15 @@ try {
   check((await picture.getAttribute('src')).includes(`/sites/${fixture.code}/files${fixturePicture}`), 'The editor image bypasses the site files gateway');
   await picture.scrollIntoViewIfNeeded(); await picture.evaluate(image => image.decode());
 
-  const title = region.locator('[aria-label="card title"]');
-  await title.click(); await page.keyboard.press(`${modifier}+A`); await page.keyboard.type('A saved native title'); await page.keyboard.press('Tab');
-  await eventually(() => atomState('card').title === 'A saved native title', 'Native card typing did not replace and persist the complete title');
   await region.locator('ds-card').click({ button: 'right', position: { x: 10, y: 10 } });
   await frame.getByRole('menuitem', { name: 'Pink', exact: true }).click();
   await eventually(() => atomState('card').tone === 'pink', 'The canonical card context did not persist its appearance');
   await frame.locator('#protected-nav').click();
   const editorAppearance = await region.locator('ds-card').evaluate(element => { const style = getComputedStyle(element.shadowRoot.querySelector('.ds-card')); return { fill: style.backgroundColor, borderStyle: style.borderStyle, borderWidth: style.borderWidth }; });
   check(JSON.stringify(editorAppearance) === JSON.stringify(referenceAppearance), `Native canvas card appearance differs: ${JSON.stringify({ referenceAppearance, editorAppearance })}`);
+  const title = region.locator('[aria-label="card title"]');
+  await title.click(); await page.keyboard.press(`${modifier}+A`); await page.keyboard.type('A saved native title'); await page.keyboard.press('Tab');
+  await eventually(() => atomState('card').title === 'A saved native title', 'Native card typing did not replace and persist the complete title');
   await region.getByRole('slider', { name: 'Card width', exact: true }).press('ArrowRight');
   await eventually(() => atomState('card').width === 300, 'Native card edge sizing did not update the typed atom');
   const cardGeometry = await region.locator('ds-card').evaluate(element => ({ width: element.getBoundingClientRect().width, height: element.getBoundingClientRect().height }));
@@ -215,6 +215,10 @@ try {
   await nativeGap.press('ArrowUp');
   await eventually(() => regionState().gaps?.[`${regionId}-text-1`] === 60, 'Native block gap did not persist');
   await page.keyboard.press('Escape');
+  const canvasContentGeometry = await region.evaluate(element => {
+    const columns = [...element.querySelectorAll('.aa-columns .aa-column')];
+    return { tableRatio: element.querySelector('table').getBoundingClientRect().width / element.querySelector('aa-editor').getBoundingClientRect().width, columnStart: columns[1].querySelector('.aa-block').getBoundingClientRect().top - columns[0].querySelector('.aa-block').getBoundingClientRect().top };
+  });
   const savedNative = structuredClone(regionState());
   const html = await fixture.publicHTML();
   check(html.includes('A saved native title') && html.includes('Saved table cell') && html.includes('href="/about/"'), 'Native fields were lost at the public-render boundary');
@@ -226,6 +230,11 @@ try {
   check(await authoredColumns.count() === 1 && (await authoredColumns.innerText()).includes('These are the site’s own words.') && (await authoredColumns.innerText()).includes('Keep its typeface'), 'Publication lost the source-node column placement');
   check((await published.getByText('These are the site’s own words.', { exact: true }).boundingBox()).x > (await published.getByText('Keep its typeface, layout and page structure.', { exact: true }).boundingBox()).x, 'Publication lost the reordered source columns');
   const publicRegion = published.locator('.c9y-native-region');
+  const publicContentGeometry = await publicRegion.evaluate(element => {
+    const columns = [...element.querySelectorAll('.c9y-native-column')];
+    return { tableRatio: element.querySelector('table').getBoundingClientRect().width / element.getBoundingClientRect().width, columnStart: columns[1].querySelector('.c9y-native-block').getBoundingClientRect().top - columns[0].querySelector('.c9y-native-block').getBoundingClientRect().top };
+  });
+  check(Math.abs(publicContentGeometry.tableRatio - canvasContentGeometry.tableRatio) < .01 && Math.abs(publicContentGeometry.columnStart - canvasContentGeometry.columnStart) <= 1, `Published table/column geometry differs: ${JSON.stringify({canvasContentGeometry, publicContentGeometry})}`);
   const publicCard = publicRegion.locator('.ds-card');
   check(Math.abs((await publicCard.boundingBox()).width - cardGeometry.width) <= 1, 'Published card width differs from the editor');
   check(await publicCard.getAttribute('data-tone') === 'pink', 'Published card appearance differs from the chosen context');
