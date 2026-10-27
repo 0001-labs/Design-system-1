@@ -31,7 +31,7 @@ const composition = `<style>
 .trip-field > ds-icon { flex:none; }
 .trip-field-words { display:grid; grid-template-columns:minmax(0,1fr); flex:1; min-width:0; justify-items:start; }
 .trip-field-words > ds-text { line-height:calc(16px * var(--sf, 1)); padding-top:calc(4px * var(--sf, 1)); }
-.trip-field ds-input { width:100%; }
+.trip-field ds-input { width:100%; --ds-input-placeholder-color:#595959; }
 .trip-search > ds-button { align-self:stretch; }
 .trip-search > ds-button { --ds-control-size:56px; }
 .trip-options { display:flex; flex-wrap:wrap; gap:var(--ds-unit); padding-block:var(--ds-unit); }
