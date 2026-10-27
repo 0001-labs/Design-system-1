@@ -133,7 +133,18 @@ export class SiteCompositionController {
   private apply(element: HTMLElement, property: SiteNodeProperty, value: number) { element.style.setProperty(cssProperty(property), `calc(${value}px * var(--sf, 1))`, 'important'); if (property === 'width') { element.style.setProperty('max-width', '100%', 'important'); element.style.setProperty('box-sizing', 'border-box', 'important'); } }
   private selectMany(selection: Set<string>) { this.selection = selection; this.selected = [...selection][0] ?? ''; this.surface?.paintSelection(); }
   private select(id: string) { if (this.selected !== id) { this.sort?.cancel(); this.finishInsertion(); } this.selectMany(new Set(this.nodes.has(id) ? [id] : [])); }
-  private down = (event: PointerEvent) => { if (this.menu?.open) { this.menu.requestClose('outside'); this.menu.remove(); } const target=event.target as Element, field=target.closest<HTMLElement>('[data-cms-words][data-c9y-node]'); if (field && this.selection.has(field.dataset.c9yNode!) && !target.closest('[contenteditable]') && event.isPrimary && event.button===0 && !event.shiftKey && !event.metaKey && !event.ctrlKey && !event.altKey) event.preventDefault(); this.surface.startMarquee(event); };
+  private down = (event: PointerEvent) => {
+    if (this.menu?.open) { this.menu.requestClose('outside'); this.menu.remove(); }
+    const target=event.target as Element, field=target.closest<HTMLElement>('[data-cms-words]');
+    if (field && !event.shiftKey) {
+      // A normal press belongs to the site's text editor. Capturing it for a
+      // marquee would retarget the following click, including protected fields.
+      if (this.selection.has(field.dataset.c9yNode!) && !target.closest('[contenteditable]') && event.isPrimary && event.button===0 && !event.metaKey && !event.ctrlKey && !event.altKey) event.preventDefault();
+      else this.selectMany(new Set());
+      return;
+    }
+    this.surface.startMarquee(event);
+  };
   private click = (event: MouseEvent) => {
     const target = event.target as Element;
     if (event.defaultPrevented || target.closest('[data-editor-chrome],aa-editor,[data-cms-words],a,button,input,textarea,select,[contenteditable]')) return;

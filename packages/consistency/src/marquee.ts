@@ -7,7 +7,7 @@ export function intersects(a: SelectionRect, b: SelectionRect): boolean {
 }
 /** Selection owns no content, and never starts on editors or their controls. */
 export function canStartMarquee(target: Element): boolean {
-  return !target.closest('aa-editor, ds-card, ds-button, ds-number, ds-select, ds-switch, [role="slider"], [role="button"], [role="menu"], [role="toolbar"], [data-aa-interactive], [data-handle], .consistency-resize-edge, button, input, select, textarea, a, [contenteditable]');
+  return !target.closest('aa-editor, ds-card, ds-button, ds-number, ds-select, ds-switch, [role="slider"], [role="button"], [role="menu"], [role="toolbar"], [data-aa-interactive], [data-handle], .consistency-resize-edge, button, input, select, textarea, a, summary, [contenteditable]');
 }
 /** Empty editor lines and composition chrome are space, not authored elements. */
 export function isMarqueeContent(element: HTMLElement): boolean {

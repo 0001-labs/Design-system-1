@@ -47,7 +47,7 @@ export class EditorSurface {
   cancelMarquee() { this.cancelSelection?.(); this.cancelSelection = undefined; }
   startMarquee(event: PointerEvent) {
     const target = event.target as Element;
-    if (event.isPrimary && event.button === 0 && !event.shiftKey && !event.metaKey && !event.ctrlKey && !event.altKey && target.closest('aa-editor,ds-card,ds-button,button,input,textarea,select,a,[contenteditable]') && !target.closest('[role="slider"],.consistency-resize-edge')) {
+    if (event.isPrimary && event.button === 0 && !event.shiftKey && !event.metaKey && !event.ctrlKey && !event.altKey && target.closest('aa-editor,ds-card,ds-button,button,input,textarea,select,a,summary,[contenteditable]') && !target.closest('[role="slider"],.consistency-resize-edge')) {
       this.options.select(new Set()); this.paintSelection();
     }
     if (!this.options.marquee() || this.paused || !event.isPrimary || event.button !== 0 || !canStartMarquee(target) || (this.options.reorder() && !event.shiftKey && target.closest('[data-sort-group]'))) return;

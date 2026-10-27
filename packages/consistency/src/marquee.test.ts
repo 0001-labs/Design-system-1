@@ -8,7 +8,7 @@ test('marquee works in every direction and excludes merely touching edges', () =
  expect(intersects(rect, { left: 100, top: 50, right: 120, bottom: 120 })).toBe(false);
 });
 test('marquee never takes text selection or control drags', () => {
- for (const tag of ['aa-editor', 'ds-card', 'ds-button', 'input']) {
+ for (const tag of ['aa-editor', 'ds-card', 'ds-button', 'input', 'summary']) {
   const el = document.createElement(tag); const child = document.createElement('span'); el.append(child);
   expect(canStartMarquee(child)).toBe(false);
  }
