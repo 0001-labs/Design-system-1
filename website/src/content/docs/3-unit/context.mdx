@@ -105,6 +105,12 @@ row as `detail.trigger` and the point as `detail.point`, and focus returns to
 that row. Give each row its own accessible name. A plain left click stays the
 row's; the click that follows a completed long press is consumed.
 
+A mouse right press stays bound to its initiating row when layout settles
+before the browser dispatches `contextmenu`. Its native composed path is
+retained after dispatch for delegated controls, including controls inside
+shadow roots. If the initiating row is removed, the gesture is cancelled;
+it never opens an action on the row that moved beneath the pointer.
+
 `openAt({ x, y }, control)` opens it from elsewhere (a title's own gesture, a
 shortcut); `trigger-mode` is always `context`. For a gesture on a surface that
 opens something else, `bindContextMenuTrigger` from `DS1/3-unit/context-trigger`
