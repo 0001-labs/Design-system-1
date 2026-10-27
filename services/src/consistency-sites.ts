@@ -21,6 +21,8 @@ export const SITE_ROUTE = /^\/api\/consistency\/sites\/(\d{2}[A-Za-z]{4})\/(page
 const METHODS: Record<string, string[]> = { document: ['GET'], places: ['GET'], files: ['GET', 'HEAD'] };
 /** A write to the site engine (its own limit is 32,000 characters); the JSON around a 10,000-character field fits. */
 export const EDIT_BYTES = 64 * 1024;
+/** A whole native page, including its bounded Markdown blocks and layout. */
+export const NATIVE_PAGE_BYTES = 800_000;
 /** A write to Flavo's business store, its own limit. */
 export const BUSINESS_BYTES = 1_000_000;
 /** The longest query string passed on. */
@@ -33,6 +35,7 @@ export const API_ROUTES = [
   allow('me', 'GET'), allow('pages', 'GET'), allow('page', 'GET'), allow('history', 'GET'), allow('detached', 'GET'),
   allow('edit', 'POST'), allow('reset', 'POST'),
   allow('composition', 'GET', 'PUT'),
+  allow('native-page', 'GET', 'PUT'),
   allow('emails', 'GET'), allow('emails/templates', 'GET'), allow('emails/[\\w-]{1,64}', 'GET'),
   allow('bookings', 'GET'), allow(`bookings/${UUID}`, 'GET'), allow(`bookings/${UUID}/cancel`, 'POST'),
   allow('booking-offers', 'GET', 'PUT'), allow('booking-settings', 'GET', 'PUT'),
@@ -98,11 +101,11 @@ export async function sitesApi(request: Request, env: Gateway, authorize: (reque
   if (!methods.includes(request.method)) return refuse('Method not allowed', 405, { Allow: methods.join(', ') });
   if (url.search.length > QUERY_LIMIT) return refuse('Bad query', 400);
   const page = url.searchParams.get('path');
-  if ((path === 'page' || path === 'composition' || route === 'document') && !isPagePath(page)) return refuse('Bad path', 400);
+  if ((path === 'page' || path === 'composition' || path === 'native-page' || route === 'document') && !isPagePath(page)) return refuse('Bad path', 400);
   let body: Uint8Array | undefined;
   if (request.method !== 'GET' && request.method !== 'HEAD') {
     if (request.headers.get('Origin') !== url.origin || request.headers.get('Content-Type')?.split(';')[0]?.trim() !== 'application/json') return refuse('Forbidden', 403);
-    const read = await bounded(request, path === 'business' ? BUSINESS_BYTES : EDIT_BYTES);
+    const read = await bounded(request, path === 'business' ? BUSINESS_BYTES : path === 'native-page' ? NATIVE_PAGE_BYTES : EDIT_BYTES);
     if (!read) return refuse('Too large', 413);
     body = read;
   }
