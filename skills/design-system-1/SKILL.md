@@ -272,12 +272,14 @@ Every colour is a token from `DS1/1-root/one.css` (Ezo's fork, `client/design/1-
 | `--black` | #2a2a2a | Dark paper and text in light mode |
 | `--slate-dark` | #3c3c3c | Controls on dark paper |
 | `--stealth` | #554455 | |
-| `--base-darker-grey` | #797979 | Muted text |
+| `--base-darker-grey` | #797979 | Lines, marks and disabled controls; never text, at 4.35:1 on white |
 | `--slate-light` | #e6e6e6 | Controls and outlines on light paper |
 | `--light-grey` | #e8e8e8 | |
 | `--grid-color-light` | #1e1e1e2b | The grid's lines |
 
 Text and surfaces go through `light-dark()` tokens (`--text-color`, `--background`, `--icon-color`), so dark mode needs no second set of values.
+
+Muted text, secondary words, captions, periods and prices beside the main figure, is `--ds-text-color-muted` (#5f5f5f on light paper, #cacaca on dark): 5.1:1 on paper and readable as 14px text. Never colour words with the palette grey or a hard-coded `#797979`: the rendered-contrast check (`color.text-contrast`) fails it.
 
 ### How Ezo uses it
 
