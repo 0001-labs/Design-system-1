@@ -105,6 +105,7 @@ export default {
           `const ${name} = ${JSON.stringify(String(read(posix.normalize(posix.join('shared', path)))))};`);
         return {
           'native-content.ts': source,
+          'site-design.ts': read('shared/consistency-site-design.ts'),
           'consistency-content.ts': read('shared/consistency-content.ts'),
           'consistency-carousel.ts': read('shared/consistency-carousel.ts'),
           'icons-immediate.ts': read('DS1/2-core/generated/icons-immediate.ts'),
