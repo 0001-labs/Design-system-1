@@ -182,6 +182,7 @@ public enum DS1IconName: String, CaseIterable, Sendable {
     case h3
     case handle
     case head
+    case health
     case heart
     case help
     case helpAlt = "help-alt"
@@ -214,10 +215,13 @@ public enum DS1IconName: String, CaseIterable, Sendable {
     case loom
     case loop
     case map
+    case material
     case medical
     case mention
     case menu
     case mic
+    case milestone
+    case milestonePlanned = "milestone-planned"
     case minimize
     case minimizeAlt = "minimize-alt"
     case minus
@@ -228,6 +232,7 @@ public enum DS1IconName: String, CaseIterable, Sendable {
     case music
     case musicAlt = "music-alt"
     case navigationCheck = "navigation-check"
+    case network
     case note
     case noteAlt = "note-alt"
     case noteAlt2 = "note-alt-2"
@@ -265,7 +270,12 @@ public enum DS1IconName: String, CaseIterable, Sendable {
     case playAlt = "play-alt"
     case plus
     case postal
+    case prediction
     case present
+    case priorityHigh = "priority-high"
+    case priorityLow = "priority-low"
+    case priorityMedium = "priority-medium"
+    case project
     case quote
     case reaction
     case receipt
@@ -283,6 +293,7 @@ public enum DS1IconName: String, CaseIterable, Sendable {
     case row
     case safari
     case safe
+    case scaling
     case school
     case schoolAlt = "school-alt"
     case sdown

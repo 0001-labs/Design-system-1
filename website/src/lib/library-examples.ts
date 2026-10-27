@@ -23,7 +23,7 @@ const composition = `<style>
 .lib-workspace { --ds-page-nav:calc(10 * var(--ds-unit)); --ds-page-gap:calc(2 * var(--ds-unit)); }
 .lib-workspace-nav { display:grid; grid-template-columns:minmax(0,1fr); gap:calc(2 * var(--ds-unit)); align-content:start; min-width:0; }
 .lib-booking { display:flex; flex-wrap:wrap; align-items:flex-end; gap:calc(var(--ds-unit) / 2); }
-.lib-stay { display:grid; gap:calc(var(--ds-unit) / 2); min-width:0; }
+.lib-stay { display:grid; grid-template-columns:minmax(0,1fr); gap:calc(var(--ds-unit) / 2); min-width:0; }
 .lib-menu { display:grid; grid-template-columns:minmax(0,3fr) minmax(0,2fr); gap:calc(2 * var(--ds-unit)); align-items:start; }
 .lib-dish { box-sizing:border-box; display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:var(--ds-unit); align-items:end; min-height:calc(2 * var(--ds-unit)); padding-bottom:calc(var(--ds-unit) / 2 - 1px); border-bottom:1px solid var(--ds-border-color); }
 .lib-order { --ds-progress-track:var(--ds-paper); display:grid; gap:var(--ds-unit); padding:var(--ds-unit); background:var(--ds-fill); border-radius:var(--ds-radius-card); }

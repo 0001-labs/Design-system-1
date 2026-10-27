@@ -122,7 +122,7 @@ extension DS1Color {
     /// Quieter text. `--ds-text-color-muted`.
     public static let textMuted = DS1Color(light: 0x5f5f5f, dark: 0xcacaca)
     /// Titles and table headers. `--ds-title-color`.
-    public static let title = DS1Color(light: 0x797979, dark: 0x9a9a9a)
+    public static let title = DS1Color(light: 0x6e6e6e, dark: 0x9a9a9a)
     /// Text that reports a failure or warns of a loss. `--ds-danger-color`.
     public static let danger = DS1Color(light: 0xde0331, dark: 0xff5f5f)
     /// Text that asks for care before something goes wrong. `--ds-warning-color`.
@@ -144,7 +144,7 @@ extension DS1Color {
     /// Text in a field. `--ds-input-color`.
     public static let inputText = DS1Color(light: 0x2a2a2a, dark: 0xf5f5f5)
     /// A field’s placeholder. `--ds-input-placeholder-color`.
-    public static let inputPlaceholder = DS1Color(light: 0x797979, dark: 0xababab)
+    public static let inputPlaceholder = DS1Color(light: 0x5f5f5f, dark: 0xcacaca)
 
     /// The palette in its order around the wheel, then the inks, lightest first.
     public static let palette: [DS1PaletteEntry] = [

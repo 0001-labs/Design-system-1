@@ -121,6 +121,8 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
      square after its name to a fifth of a square before the next, ending in
      an arrowhead of two strokes a fifth of a square long at 35 degrees. */
   .layer-name { display: flex; align-items: center; width: calc(var(--diagram-box) + 2 * var(--diagram-unit)); }
+  /* The last name in a row has no arrow after it: as wide as its box, so it never reaches past the diagram. */
+  .layer-group:last-child :is(.layer-name, .layer-summary) { width: var(--diagram-box); }
   .layer-arrow {
     position: relative;
     flex: 1;
@@ -154,7 +156,9 @@ const inCode = (tag: string) => (tag.startsWith('ds-') ? `<${tag}>` : tag);
   @media (max-width: 680px) {
     .layer-diagram { --diagram-box: max(calc(4 * var(--diagram-unit)), round(down, calc((100cqw - 2 * var(--diagram-unit)) / 2), var(--diagram-unit))); grid-template-columns: repeat(2, var(--diagram-box)); row-gap: calc(2 * var(--diagram-unit)); }
     .layer-group:nth-child(2n) .layer-arrow { display: none; }
+    .layer-group:nth-child(2n) :is(.layer-name, .layer-summary) { width: var(--diagram-box); }
   }
   :global(html.mobile) .layer-diagram { --diagram-box: max(calc(4 * var(--diagram-unit)), round(down, calc((100cqw - 2 * var(--diagram-unit)) / 2), var(--diagram-unit))); grid-template-columns: repeat(2, var(--diagram-box)); row-gap: calc(2 * var(--diagram-unit)); }
   :global(html.mobile) .layer-group:nth-child(2n) .layer-arrow { display: none; }
+  :global(html.mobile) .layer-group:nth-child(2n) :is(.layer-name, .layer-summary) { width: var(--diagram-box); }
 </style>

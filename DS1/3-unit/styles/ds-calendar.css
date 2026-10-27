@@ -348,6 +348,9 @@
 .day:not([data-today], [data-selected]) .date { min-width: 0; height: auto; }
 :host([compact]) .day .date { min-width: var(--ds-calendar-mark); height: var(--ds-calendar-mark); }
 .day[data-today] .date { background: var(--ds-calendar-today); color: var(--ds-calendar-today-ink); letter-spacing: 0; }
+/* Today's ink holds in a compact month too, where quiet days take the title colour and the text colour above. */
+:host([compact]) .day[data-today] .date,
+:host([compact][data-events]) .day[data-today]:not([data-busy]) .date { color: var(--ds-calendar-today-ink); }
 /* The selected day, and each end of a range: a square with the system's corners in the selection's blue. */
 .day[data-selected] .date { border-radius: var(--ds-radius); background: var(--ds-calendar-selected); color: var(--ds-calendar-selected-ink); letter-spacing: 0; }
 

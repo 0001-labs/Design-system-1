@@ -142,6 +142,9 @@ export function draft(lib) {
     `  --ds-corner-size: ${lib.corner};`,
     `  --ds-card-corner-size: ${lib.card};`,
     `  --ds-button-inset: ${lib.inset};`,
+    // The base's primary button hooks too, so the library's accent and ink stand over the base's.
+    '  --ds-button-primary-fill: var(--ds-accent-color);',
+    `  --ds-button-primary-text: ${ld(...lib.onAccent)};`,
     ...Object.entries(lib.metrics ?? {}).map(([name, value]) => `  ${name}: ${value};`),
     ...(lib.tracking ? [`  --ds-text-tracking: ${lib.tracking};`] : []),
     // The page's own paper and words, which prose and the page's background read.

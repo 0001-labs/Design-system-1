@@ -357,3 +357,43 @@ test("a drag across the strip never presses the slide it ends on; a plain press 
 test("the sheet holds off snapping while a mouse drags the strip", () => {
   expect(sheet("1-root/carousel.css")).toMatch(/\.ds-carousel__track\[data-dragging\] \{\s*scroll-snap-type: none;/);
 });
+
+// carousel.sideways-scroll in DS1/0-face/constraints.ts
+test("only a carousel scrolls sideways: a plain box that scrolls sideways breaks the rule, a track, a table or a block of code does not", async () => {
+  const { constraints } = await import("../DS1/0-face/constraints");
+  const rule = constraints.find(c => c.code === "carousel.sideways-scroll")!;
+  /** A box as a browser would measure it: how wide it is drawn, and how wide what it holds is. */
+  const box = (html: string, clientWidth: number, scrollWidth: number) => {
+    document.body.insertAdjacentHTML("beforeend", html);
+    const element = document.body.lastElementChild as HTMLElement;
+    const target = element.matches("[data-scroller]") ? element : element.querySelector<HTMLElement>("[data-scroller]")!;
+    Object.defineProperty(target, "clientWidth", { value: clientWidth });
+    Object.defineProperty(target, "scrollWidth", { value: scrollWidth });
+    return target;
+  };
+  // Nothing scrolls sideways: a box whose pieces fit, and one that may scroll but holds no more than its width.
+  box(`<div data-scroller style="overflow-x: auto">fits</div>`, 375, 375);
+  box(`<div data-scroller style="overflow: hidden">cut</div>`, 375, 900);
+  expect(rule.count(document)).toBe(0);
+  expect(rule.inspect(document)).toEqual([]);
+  // By design: a carousel's track, a table in its frame, a block of code and a matrix.
+  box(`<div class="ds-carousel"><ul class="ds-carousel__track" data-scroller style="overflow-x: auto"><li>1</li></ul></div>`, 375, 1200);
+  box(`<ds-carousel><div data-scroller style="overflow-x: auto">strip</div></ds-carousel>`, 375, 1200);
+  box(`<div class="ds-table-scroll" data-scroller style="overflow-x: auto"><table class="ds-table"></table></div>`, 375, 800);
+  box(`<pre data-scroller style="overflow-x: auto">code</pre>`, 375, 600);
+  box(`<ds-matrix><div class="matrix" data-scroller style="overflow-x: auto"></div></ds-matrix>`, 375, 700);
+  expect(rule.count(document)).toBe(5);
+  expect(rule.inspect(document)).toEqual([]);
+  // A plain box scrolling a row of cards sideways is what the rule is for, whether its overflow is auto or scroll.
+  const board = box(`<section><div class="board" data-scroller style="overflow-x: auto"><article>1</article><article>2</article></div></section>`, 375, 1080);
+  const strip = box(`<div data-scroller style="overflow-x: scroll; overflow-y: hidden">pieces</div>`, 320, 640);
+  expect(rule.count(document)).toBe(7);
+  expect(rule.inspect(document)).toEqual([
+    { element: board, message: "It holds 1080px of pieces in 375px and scrolls them sideways; only a carousel does that." },
+    { element: strip, message: "It holds 640px of pieces in 320px and scrolls them sideways; only a carousel does that." },
+  ]);
+  // The carousel's own track is the strip the rule points to: it scrolls sideways and snaps.
+  const track = /\.ds-carousel__track \{([^}]*)\}/.exec(sheet("1-root/carousel.css"))![1]!;
+  expect(track).toContain("overflow-x: auto");
+  expect(track).toContain("scroll-snap-type: x mandatory");
+});

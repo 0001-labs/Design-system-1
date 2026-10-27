@@ -100,6 +100,7 @@
   --ds-paper: light-dark(#ffffff, #141922);
   --ds-text-color: light-dark(#1a1a1a, #f2f5fa);
   --ds-text-color-muted: light-dark(#595959, #a8b3c4);
+  /* 5.1:1 on paper and 4.6:1 on the fill; the palette grey (#797979) reaches only 4.35:1 (color.text-contrast). */
   --ds-title-color: light-dark(#595959, #a8b3c4);
   /* Text that reports a failure or warns of a loss. Red for blood on light
      paper and Tuned red on dark: both palette colours, legible as 14px text. */
@@ -162,6 +163,8 @@
   --ds-corner-size: 4px;
   --ds-card-corner-size: 8px;
   --ds-button-inset: 2.5px;
+  --ds-button-primary-fill: var(--ds-accent-color);
+  --ds-button-primary-text: light-dark(#ffffff, #0b1a2e);
   --background: var(--ds-paper);
   --dialog-background: var(--ds-paper);
   --text-color: var(--ds-text-color);
