@@ -8,7 +8,7 @@ const deferred = <T>() => { let resolve!: (value: T) => void; let reject!: (reas
 it('saves newer native edits with the binding base returned by the preceding save', async () => {
   const first = deferred<DocumentSnapshot<Page>>(), second = deferred<DocumentSnapshot<Page>>();
   const save = vi.fn().mockImplementationOnce(() => first.promise).mockImplementationOnce(() => second.promise);
-  const state = new DocumentState(start(), save, () => {});
+  const state = new DocumentState<Page, DocumentSnapshot<Page>>(start(), save, () => {});
   try {
     state.commit({ ...state.document, blocks: [{ id: 'intro', source: 'After' }] });
     const pending = state.flush();
@@ -30,7 +30,7 @@ it('saves newer native edits with the binding base returned by the preceding sav
 it('retains a whole native draft on a revision conflict and prevents navigation flush', async () => {
   vi.useFakeTimers();
   const save = vi.fn().mockRejectedValue(new Error('Page changed'));
-  const snapshot = start(), state = new DocumentState(snapshot, save, () => {});
+  const snapshot = start(), state = new DocumentState<Page, DocumentSnapshot<Page>>(snapshot, save, () => {});
   try {
     const draft = { ...state.document, gap: 80 };
     state.commit(draft); draft.gap = 120;
@@ -50,7 +50,7 @@ it('retains a whole native draft on a revision conflict and prevents navigation 
 it('releases the save lock when a transport throws before returning a promise', async () => {
   const save = vi.fn().mockImplementationOnce(() => { throw new Error('Unavailable'); })
     .mockImplementation(async value => ({ ...value, revision: 1 }));
-  const state = new DocumentState(start(), save, () => {});
+  const state = new DocumentState<Page, DocumentSnapshot<Page>>(start(), save, () => {});
   try {
     state.commit({ ...state.document, gap: 80 });
     expect(await state.flush()).toBe(false);
