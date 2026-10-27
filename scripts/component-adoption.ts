@@ -19,7 +19,7 @@ export const excluded = /^(?:(?:client|src|web)\/)?(?:design|ds1)\/|^src\/pages\
 export interface AppSpec { code?: string; version?: string; id: string; name: string; directory: string; roots: string[]; manifest?: string; source?: "direct"; group?: "Products" | "Clients"; excludes?: string[]; migration?: "deferred"; migrationReason?: string }
 /** The studio owns product names and scan scope; the reusable scanner owns recognition. */
 /** `ADOPTION_CONFIG` names another configuration file, to try a scope without editing the studio's. */
-export function loadAppSpecs(studio: string, configPath = process.env.ADOPTION_CONFIG ? resolve(process.env.ADOPTION_CONFIG) : join(studio, "0001/server/component-adoption.config.json")): AppSpec[] {
+export function loadAppSpecs(studio: string, configPath = process.env.ADOPTION_CONFIG ? resolve(process.env.ADOPTION_CONFIG) : join(studio, "0001/system/server/component-adoption.config.json")): AppSpec[] {
   const config = JSON.parse(readFileSync(configPath, "utf8")) as { apps: AppSpec[] };
   if (!Array.isArray(config.apps) || !config.apps.length) throw new Error("The studio adoption configuration has no apps.");
   const ids = new Set<string>();
@@ -27,7 +27,7 @@ export function loadAppSpecs(studio: string, configPath = process.env.ADOPTION_C
     if (!app.id || ids.has(app.id) || !app.name || !app.directory || !app.roots?.length || [app.directory, ...app.roots].some(path => path.startsWith("/") || path.split("/").includes(".."))) throw new Error("Invalid or duplicate adoption app scope.");
     ids.add(app.id);
   }
-  const inventoryPath = join(studio, "0001/server/system-inventory.json");
+  const inventoryPath = join(studio, "0001/system/server/system-inventory.json");
   const nodes = existsSync(inventoryPath) ? (JSON.parse(readFileSync(inventoryPath, "utf8")) as { nodes: { id: string; code?: string; version?: string; instructions?: { path: string }[] }[] }).nodes : [];
   return config.apps.map(app => {
     const node = nodes.find(node => node.id === app.id) ?? nodes.find(node => node.instructions?.some(brief => resolve(brief.path) === resolve(studio, app.directory, "AGENTS.md")));
