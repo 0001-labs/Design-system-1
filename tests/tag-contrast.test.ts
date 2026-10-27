@@ -25,6 +25,7 @@ test('tag text clears 4.5:1 across the palette in both themes and row states', a
       await page.setContent(`<style>${css(join(root,'DS1/1-root/component-tokens.css'))}${palette}body{margin:0}section{color-scheme:light;background:white;color:black;padding:20px}.dark{color-scheme:dark;background:#2a2a2a;color:white}.selected{background:light-dark(#ddd,#444)}ds-tag{margin:4px}</style>`+['light','dark'].map(theme=>`<section class="${theme}">${['normal','selected'].map(state=>`<div class="${state}">${accents.map((accent,i)=>`<ds-tag id="${theme}-${state}-${i}" style="${accent?`--ds-tag-accent:var(${accent})`:''}">Prospect</ds-tag>`).join('')}</div>`).join('')}</section>`).join(''));
       await page.addScriptTag({content:bundle});
       await page.evaluate(async()=>{await customElements.whenDefined('ds-tag');await Promise.all(Array.from(document.querySelectorAll('ds-tag')).map(tag=>(tag as any).updateComplete));});
+      expect(await page.evaluate(()=>['light','dark'].every(theme=>{const tag=document.getElementById(theme+'-normal-0')!;return getComputedStyle(tag.shadowRoot!.querySelector('.frame')!).color !== getComputedStyle(tag).color;}))).toBe(true);
       const failures = await page.evaluate(()=>(window as any).TagCheck.inspectConstraints(document).filter((finding:any)=>finding.constraint.code==='color.text-contrast').map((finding:any)=>finding.message));
       expect(failures).toEqual([]);
     } finally {await page.close();}

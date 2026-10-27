@@ -30,7 +30,7 @@
   border-radius: var(--_tag-radius, var(--ds-radius));
   background: var(--ds-tag-background, light-dark(color-mix(in srgb, var(--ds-tag-accent, var(--ds-grey, #7a7a7a)) 28%, white), color-mix(in srgb, var(--ds-tag-accent, var(--ds-grey, #7a7a7a)) 20%, var(--ds-black, #2a2a2a))));
   /* Tint the dark-mode ink: raw grey/accent colours cannot meet 4.5:1 on this fill. */
-  color: var(--ds-tag-color, light-dark(color-mix(in srgb, var(--ds-tag-accent, var(--ds-grey, #7a7a7a)) 45%, black), color-mix(in srgb, var(--ds-tag-accent, var(--ds-grey, #7a7a7a)) 30%, white))));
+  color: var(--ds-tag-color, light-dark(color-mix(in srgb, var(--ds-tag-accent, var(--ds-grey, #7a7a7a)) 45%, black), color-mix(in srgb, var(--ds-tag-accent, var(--ds-grey, #7a7a7a)) 30%, white)));
   font-family: var(--ds-typeface-regular);
   font-feature-settings: var(--ds-font-features);
   font-size: var(--_tag-font-size, var(--ds-type-size-default));
