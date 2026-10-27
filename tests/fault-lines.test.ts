@@ -76,8 +76,9 @@ test("fault line overlays paint reference and actual edges and follow the viewpo
       expect(await overlay.getAttribute('data-lines-only')).toBe('');
       expect(await page.evaluate(()=>document.elementFromPoint(30,100)?.closest('[data-ds-constraint-panel]')===null)).toBe(true);
       await page.locator('#bad').evaluate((el:HTMLElement)=>el.style.gap='20px');
-      await page.setViewportSize({width:430,height:700});
       await page.waitForFunction(()=>document.querySelector('[data-ds-constraint-panel]')!.shadowRoot!.querySelectorAll('[data-fault-actual]').length===0);
+      await page.setViewportSize({width:430,height:700});
+      await page.waitForFunction(()=>document.querySelector('[data-ds-constraint-panel]')!.shadowRoot!.querySelector('svg')!.getAttribute('viewBox')==='0 0 430 700');
       expect(await overlay.locator('svg').getAttribute('viewBox')).toBe('0 0 430 700');
       await page.evaluate(()=>(window as any).panel.hide());
       expect(await overlay.locator('[data-fault-reference]').count()).toBe(0);

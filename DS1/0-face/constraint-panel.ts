@@ -155,6 +155,8 @@ export function createConstraintPanel() {
     }));
   };
   const schedule = () => { if (!frame) frame = requestAnimationFrame(place); };
+  const layoutChanges = new MutationObserver(schedule);
+  const sizeChanges = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(schedule);
 
   const stopSite = () => {
     site?.abort();
@@ -315,6 +317,8 @@ export function createConstraintPanel() {
     panel.hidden = false;
     setLinesOnly(window.innerWidth < 640);
     if (mode === 'site') void runSite(); else run();
+    layoutChanges.observe(document.body, {subtree:true, childList:true, attributes:true, attributeFilter:['style','class','hidden','data-ds-fault-lines','data-ds-fault-axis']});
+    sizeChanges?.observe(document.body);
     window.addEventListener('scroll', schedule, { passive: true, capture: true });
     window.addEventListener('resize', schedule);
   };
@@ -324,6 +328,8 @@ export function createConstraintPanel() {
     if (frame) cancelAnimationFrame(frame);
     frame = 0;
     faultLines.replaceChildren();
+    layoutChanges.disconnect();
+    sizeChanges?.disconnect();
     window.removeEventListener('scroll', schedule, { capture: true });
     window.removeEventListener('resize', schedule);
   };
