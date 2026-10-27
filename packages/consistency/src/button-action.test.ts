@@ -25,3 +25,9 @@ it('respects read-only transitions and disposes change listeners', () => {
   controls.dispose();target.value='https://example.net';target.dispatchEvent(new Event('change'));expect(change).toHaveBeenCalledOnce();
 });
 
+it('keeps a native link destination required without offering an ineffective no-action choice',()=>{
+  const controls=createButtonActionControls(document,{kind:'link',target:'/about'},()=>true,()=>{},{allowNone:false});
+  expect([...controls.element.querySelector('select')!.options].map(option=>option.value)).toEqual(['link','page']);
+  controls.dispose();
+});
+
