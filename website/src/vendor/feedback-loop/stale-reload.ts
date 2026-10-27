@@ -29,7 +29,7 @@ const ONCE_WITHIN = 60_000;
 /** The hashed parts a build writes: Vite's `/assets/`, Astro's `/_astro/`. */
 const ASSET_PATH = /\/(?:assets|_astro)\//;
 
-const STALE_IMPORT_MESSAGE = /Importing a module script failed|Failed to fetch dynamically imported module|error loading dynamically imported module|Unable to preload CSS|Failed to load module script/i;
+const STALE_IMPORT_MESSAGE = /Importing a module script failed|Failed to fetch dynamically imported module|error loading dynamically imported module|Unable to preload CSS|Failed to load module script|is not a valid JavaScript MIME type for module script/i;
 
 /** Whether an error is the browser failing to load a part of the app. */
 export function isStaleImportError(error: unknown): boolean {
