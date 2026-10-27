@@ -16,6 +16,7 @@ import type { TreeNode } from "./ComponentTree";
 import { defaultButtonBox, writeButtonBox, type ButtonBox } from "./lib/buttonBoxModel";
 import { AppElement, defineElement } from "./lib/element";
 import { libraryTokenValues, setLibraryToken } from "./lib/libraryTokens";
+import { FOUNDATION_TOKENS } from "../../DS1/1-root/foundation";
 import { libraryTemplate } from "./lib/libraryTemplate";
 import { button, splitButton } from "./lib/ui";
 import { currentLocation, navigate } from "./router";
@@ -224,7 +225,7 @@ export class SystemWorkbench extends AppElement {
           </section>` : nothing}
           <h2 class="app-panel-label">Tokens</h2>
           <ds-input variant="field" class="system-workbench-filter" type="search" aria-label="Filter tokens" placeholder="Filter tokens" .value=${live(this.search)} @input=${(event: Event) => { this.search = fieldValue(event); }}></ds-input>
-          ${repeat(tokens, name => name, name => html`<label><span>${name}</span><ds-input variant="field" type="text" aria-label=${name} placeholder=${defaults.get(name) ?? "Inherited"} .value=${live(values.get(name) ?? "")}
+          ${repeat(tokens, name => name, name => html`<label><span>${name}${FOUNDATION_TOKENS[name] ? " · Foundation" : ""}</span><ds-input variant="field" type="text" aria-label=${name} ?readonly=${Boolean(FOUNDATION_TOKENS[name])} placeholder=${defaults.get(name) ?? "Inherited"} .value=${live(values.get(name) ?? "")}
             @input=${(event: Event) => this.#setToken(name, fieldValue(event))}></ds-input></label>`)}
         </aside>
       </div>

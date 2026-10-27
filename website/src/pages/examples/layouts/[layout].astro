@@ -16,8 +16,8 @@ const layers = JSON.stringify(Object.fromEntries(Object.entries(TAG_LAYERS).map(
     {sample.library && <script is:inline>window.DS_ONE_PREFERENCES = Object.assign({}, window.DS_ONE_PREFERENCES, { themePaper: false });</script>}
   </head>
   <body data-layout={layout} data-layers={layers}>
-    {/* The live base, then a library: both after Design system 1's stylesheets in the head, so the library's tokens win over both. */}
-    <link rel="stylesheet" href="/ds1/base/latest.css" data-ds1-base />
+    {/* A library and the live DS1 design are siblings on the shared foundation. */}
+    {!sample.library && <link rel="stylesheet" href="/ds1/base/latest.css" data-ds1-base />}
     {sample.library && <link rel="stylesheet" href={sample.library.href} data-library={sample.library.name} />}
     <main id="sample" data-ds-surface></main>
     <div id="layers" aria-hidden="true"></div>

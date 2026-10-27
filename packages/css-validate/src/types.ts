@@ -1,4 +1,5 @@
 export type IssueCode =
+  | "foundation_constraint"
   | "empty"
   | "too_large"
   | "control_characters"
