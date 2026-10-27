@@ -398,8 +398,8 @@ const sites: C9ySite[] = [
   },
 ];
 
-const relation = (site: string, component: string, kind: RelationKind, note: string, evidence: string[] = []): C9yRelation =>
-  ({ id: `${site}-${component}`, source: site, target: component, kind, note, evidence, reviewed: REVIEWED });
+const relation = (site: string, component: string, kind: RelationKind, note: string, evidence: string[] = [], reviewed = REVIEWED): C9yRelation =>
+  ({ id: `${site}-${component}`, source: site, target: component, kind, note, evidence, reviewed });
 
 const COMPOSED = 'Composed use (inserted or stored blocks) lives in the site’s Durable Object and was not read.';
 const PLACES_OF = PLATFORM('worker/owner-api.ts');
@@ -452,12 +452,13 @@ const relations: C9yRelation[] = [
   relation('cph-raft', 'c9y-mail', 'shared', 'Its emails are sent from `emailFrom: CPH Raft` through the engine’s mail.', [RAFT('scripts/site-json.ts')]),
   relation('cph-raft', 'c9y-analytics', 'shared', 'It reports to the Feedback loop as `cph-raft` and does not turn analytics off.', [RAFT('sync.json'), RAFT('AGENTS.md'), RAFT('scripts/site-json.ts')]),
 
-  // Søndergården: a static site whose words are edited.
-  relation('soendergaarden', 'c9y-text', 'shared', 'Its words are marked by the Site engine’s annotate step after the build and edited in the app.', [SDG('sync.json'), SDG('package.json'), SDG('AGENTS.md')]),
-  relation('soendergaarden', 'c9y-page', 'local', `Its pages are its own HTML from \`scripts/build-pages.mjs\`, read with main as the root block. ${COMPOSED}`, [SDG('scripts/build-pages.mjs'), PLATFORM('worker/site-composition.ts')]),
-  relation('soendergaarden', 'c9y-layout', 'local', `Its sections are its own markup, read as containers. ${COMPOSED}`, [SDG('scripts/build-pages.mjs'), PLATFORM('worker/site-composition.ts')]),
-  relation('soendergaarden', 'c9y-image', 'local', 'Its pictures are its own `img` elements, read as image blocks.', [SDG('scripts/build-pages.mjs'), PLATFORM('worker/site-composition.ts')]),
-  relation('soendergaarden', 'c9y-button', 'local', 'It draws its own `ds-button` links (“Alle nyheder” and page buttons), read as button blocks.', [SDG('scripts/build-pages.mjs'), SDG('web/index.html'), PLATFORM('worker/site-composition.ts')]),
+  // Søndergården: committed native page source; stored editor composition is not acceptance evidence.
+  relation('soendergaarden', 'c9y-text', 'shared', 'Its Markdown is declared as native content blocks; the former keyed-field annotation step has been removed.', [SDG('scripts/native.ts'), SDG('sync.json')], '2026-10-28'),
+  relation('soendergaarden', 'c9y-page', 'shared', 'Its build declares NativePageDocument pages, validated and rendered through the shared native page model into its shell. This records source implementation, not live or owner acceptance.', [SDG('scripts/native.ts'), SDG('web/shell.html'), SDG('sync.json')], '2026-10-28'),
+  relation('soendergaarden', 'c9y-layout', 'shared', 'Its header, navigation, main column, footer and newsletter grids are native flow and grid blocks.', [SDG('scripts/native.ts')], '2026-10-28'),
+  relation('soendergaarden', 'c9y-image', 'shared', 'Its logo and pictures are native image blocks validated against the build’s declared images.', [SDG('scripts/native.ts')], '2026-10-28'),
+  relation('soendergaarden', 'c9y-link', 'shared', 'Navigation and document links are native link blocks; PDF links use primary appearance.', [SDG('scripts/native.ts')], '2026-10-28'),
+  relation('soendergaarden', 'c9y-button', 'unverified', `Its source declares native links, not independent button blocks. ${COMPOSED}`, [], '2026-10-28'),
   relation('soendergaarden', 'c9y-region', 'unverified', `Regions exist only as protected or inserted blocks. ${COMPOSED}`),
   relation('soendergaarden', 'c9y-pages', 'shared', 'Every site has Pages (`placesOf`).', [PLACES_OF]),
   relation('soendergaarden', 'c9y-emails', 'shared', 'Every site has Emails (`placesOf`).', [PLACES_OF]),
