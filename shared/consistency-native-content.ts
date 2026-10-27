@@ -21,7 +21,7 @@ const atoms: AtomSyntax[] = [...DEFAULT_ATOMS, { name: 'page-icon', match: (sour
 
 function href(value: string): string {
   if (value.length > 4000 || /[\u0000-\u0020\u007f\\]/.test(value)) return fail();
-  if (/^(?:https?:\/\/|mailto:|tel:)/i.test(value) || /^\/(?!\/)/.test(value) || /^#[^<>]*$/.test(value)) return escape(value);
+  if (/^(?:https?:\/\/|mailto:|tel:)/i.test(value) || /^\/(?!\/)/.test(value) || /^#[^<>]*$/.test(value) || (!!value && !/^[a-z][a-z0-9+.-]*:/i.test(value) && !value.startsWith('//') && !/[<>]/.test(value))) return escape(value);
   return fail();
 }
 function imageSource(value: string, images?: readonly string[]): string {
