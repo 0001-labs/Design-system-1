@@ -3,7 +3,7 @@ export const DOC_EXAMPLES = [
   ['issues', 'Issue tracker'],
   ['settings', 'General settings'], ['shop', 'Shop'], ['planner', 'Planning app'],
   ['finance', 'Finance app'], ['product', 'Product showcase'], ['booking', 'Booking site'],
-  ['canvas', 'Design tool'], ['speaker', 'Speaker launch'], ['bike', 'Bike maker'],
+  ['canvas', 'Design tool'], ['agency', 'Design studio'], ['speaker', 'Speaker launch'], ['bike', 'Bike maker'],
   ['festival', 'Festival'], ['platform', 'Developer platform'], ['magazine', 'Travel magazine'],
   ['travel', 'Travel stays'], ['cafe', 'Café'], ['trails', 'Walking log'], ['console', 'Deploy console'],
   ['sidebar', 'Sidebar'], ['split', 'List and detail'], ['inspector', 'Inspector'],

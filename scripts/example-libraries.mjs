@@ -103,6 +103,15 @@ export const LIBRARIES = {
     band: ['#c5d0dd', '#2b3542'], bandInk: ['#1e1e1e', '#f5f5f5'], highlight: ['#fde70c', '#fde70c'],
     corner: '4px', inset: '2.5px', card: '8px',
   },
+  atelier: {
+    name: 'Atelier', note: 'A design studio: near-white paper, ink buttons with soft corners, big rounded cards and sections that turn over to black.',
+    paper: ['#fafafa', '#0f0f10'], text: ['#18181b', '#fafafa'], muted: ['#5c5c62', '#a6a6ad'],
+    fill: ['#f0f0f1', '#1c1c1f'], hover: ['#e6e6e8', '#26262a'], border: ['#e2e2e5', '#2e2e32'], input: ['#ffffff', '#161618'],
+    accent: ['#18181b', '#fafafa'], onAccent: ['#fafafa', '#18181b'], focus: ['#594dff', '#ccccff'],
+    chart: ['#594dff', '#ccccff'], chartInk: ['#ffffff', '#1e1e1e'],
+    band: ['#0a0a0a', '#fafafa'], bandInk: ['#fafafa', '#18181b'], highlight: ['#fde70c', '#fde70c'],
+    corner: '8px', inset: '5px', card: '16px',
+  },
 };
 
 // Button sizes beyond the one control high: medium two squares, large three. Each face stands on
