@@ -29,7 +29,7 @@ const composition = `<style>
 .lib-order { --ds-progress-track:var(--ds-paper); display:grid; gap:var(--ds-unit); padding:var(--ds-unit); background:var(--ds-fill); border-radius:var(--ds-radius-card); }
 .lib-line { display:flex; justify-content:space-between; align-items:flex-end; gap:var(--ds-unit); min-height:var(--ds-unit); line-height:calc(16px * var(--sf, 1)); }
 .lib-status:empty { display:none; }
-.lib-week { display:grid; grid-template-columns:minmax(0,2fr) minmax(0,1fr); gap:calc(2 * var(--ds-unit)); align-items:start; }
+.lib-week { display:grid; grid-template-columns:minmax(0,2fr) minmax(calc(14 * var(--ds-unit)),1fr); gap:calc(2 * var(--ds-unit)); align-items:start; }
 .lib-services { display:grid; gap:0; }
 .lib-service { display:grid; grid-template-columns:minmax(0,1fr) calc(6 * var(--ds-unit)) auto; gap:var(--ds-unit); align-items:end; min-height:var(--ds-unit); padding-block:calc(var(--ds-unit) / 2) calc(var(--ds-unit) / 2 - 1px); border-bottom:1px solid var(--ds-border-color); line-height:calc(16px * var(--sf, 1)); }
 .lib-service ds-spark { height:var(--ds-unit); }
@@ -188,7 +188,7 @@ renderMenu(); renderOrder();`,
         <div class="lib-three"><ds-stat id="distance" value="42.6" format="number" digits="1" label="Distance, km" caption="7 km more than last week" literal></ds-stat><ds-stat id="climb" value="1180" format="number" label="Climb, m" caption="Mostly on Saturday" literal></ds-stat><ds-stat id="walks" value="4" format="number" label="Walks" caption="Goal: 4 a week" literal></ds-stat></div>
         <section class="lib-week lib-rule">
           <div class="lib-stack"><div class="lib-between">${text('Kilometres a day', 'strong')}${text('13–19 October', 'size="small" tone="muted"')}</div><ds-bars id="days" rows="6" aria-label="Kilometres walked each day this week"></ds-bars></div>
-          <div class="lib-stack">${text('Days out in October', 'strong')}<ds-calendar id="heat" compact heat fixed month="2026-10" label="Walks in October" literal></ds-calendar></div>
+          <div class="lib-stack">${text('Days out in October', 'strong')}<ds-calendar id="heat" compact heat fixed day-width="2" month="2026-10" label="Walks in October" literal></ds-calendar></div>
         </section>
         <section class="lib-stack lib-rule"><div class="lib-between">${heading('Recent walks')}<ds-tag id="walk-count">4 walks</ds-tag></div><ds-table id="walk-table" label="Recent walks"></ds-table></section>
       </div>${footer('Grove')}</ds-page>`,
