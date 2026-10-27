@@ -10,9 +10,10 @@ import appearance from '../DS1/1-root/component-appearance.css?raw';
 import card from '../DS1/1-root/card.css?raw';
 import controls from '../DS1/1-root/controls.css?raw';
 import prose from '../DS1/1-root/prose.css?raw';
+import palette from '../DS1/1-root/palette.css?raw';
 import native from './consistency-native-content.css?raw';
 
-const sheets = [tokens, appearance, metrics, controls, card, prose].map(sheet => sheet.replace(/^@import[^;]+;\s*/gm, '').replace(/:root/g, ':scope'));
+const sheets = [tokens, appearance, metrics, palette, controls, card, prose].map(sheet => sheet.replace(/^@import[^;]+;\s*/gm, '').replace(/:root/g, ':scope'));
 export const nativeRegionStyles = `@scope (.c9y-native-region) { ${sheets.join('\n')} }\n${native}`;
 const escape = (text: string) => text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 const unit = (value: number) => `calc(${value}px * var(--sf, 1))`;
@@ -136,5 +137,5 @@ export function renderNativeRegion(source: string, options: { images?: readonly 
       return `<p>${inline(block)}</p>`;
     }
   };
-  return `<div class="c9y-native-region" data-ds-prose>${render(clean)}</div>`;
+  return `<div class="c9y-native-region"><div data-ds-prose>${render(clean)}</div></div>`;
 }
