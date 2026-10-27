@@ -51,7 +51,8 @@
 .ds-header--sticky {
   position: sticky;
   top: 0;
-  z-index: 1;
+  /* Above a section's own layers (a panel laid over a picture stands at 1), so the header is never covered as the page scrolls. */
+  z-index: 2;
   background: var(--ds-header-paper, var(--background, Canvas));
   box-shadow: inset 0 -1px var(--ds-header-line, transparent);
 }

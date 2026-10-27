@@ -10,7 +10,7 @@ details.c9y-native-flow{display:block}
 .c9y-native-grid,.c9y-native-collection{display:grid;grid-template-columns:repeat(var(--c9y-columns),minmax(0,1fr));column-gap:var(--c9y-column-gap);row-gap:var(--c9y-row-gap);align-items:start}
 .c9y-native-content>aa-editor{display:block;min-width:0}
 .c9y-native-image{display:block}
-.c9y-native-image img{display:block;width:100%;max-width:100%;height:var(--c9y-image-height,auto);object-fit:var(--c9y-image-fit,contain)}
+.c9y-native-image img{display:block;width:100%;max-width:100%;height:var(--c9y-image-height,auto);object-fit:var(--c9y-image-fit,contain);object-position:var(--c9y-image-focus,50% 50%)}
 .c9y-native-collection-item{min-width:0;margin:0;grid-column:span var(--c9y-item-span,1);display:flex;flex-direction:column;gap:var(--c9y-unit)}
 .c9y-native-collection-item[data-featured]{grid-column:span var(--c9y-featured-span,1)}
 .c9y-native-collection-media{display:block;min-width:0;height:var(--c9y-image-height);color:inherit}
@@ -21,52 +21,68 @@ details.c9y-native-flow{display:block}
 .c9y-native-collection-price{white-space:nowrap}
 @media(max-width:700px){.c9y-native-flow,.c9y-native-disclosure{flex-direction:var(--c9y-mobile-direction,column);gap:var(--c9y-mobile-gap,var(--c9y-gap))}.c9y-native-grid{grid-template-columns:repeat(var(--c9y-mobile-columns,1),minmax(0,1fr))}.c9y-native-image img{height:var(--c9y-mobile-image-height,var(--c9y-image-height,auto))}.c9y-native-collection{grid-template-columns:repeat(2,minmax(0,1fr))}.c9y-native-collection-item,.c9y-native-collection-item[data-featured]{grid-column:span 1}.c9y-native-collection .c9y-native-collection-item .c9y-native-collection-media{height:var(--c9y-mobile-image-height,var(--c9y-image-height))}}
 /* Sections expand to the primitives above; these rules draw each kind on the square. The renderer writes
-   measures as custom properties and tones as names: the library defines --c9y-tone-<name> and
-   --c9y-tone-<name>-ink, and until it does each tone falls back to a Design system 1 token. */
+   measures as custom properties and tones as names: the library defines --c9y-tone-<name>,
+   --c9y-tone-<name>-ink and, for a translucent panel, --c9y-tone-<name>-glass; until it does each tone
+   falls back to a Design system 1 token and the glass to the tone at 85% over what is behind it. */
 .c9y-native-page{--c9y-ink:var(--ds-text-color,CanvasText);--c9y-paper:var(--ds-paper,var(--background,Canvas));--c9y-fill:var(--ds-fill,#e6e6e6);--c9y-fill-hover:var(--ds-fill-hover,var(--ds-fill,#e2e2e2));--c9y-accent:var(--ds-accent-color,#99ff73);--c9y-on-accent:var(--ds-button-text-color-on-accent,#2a2a2a);--c9y-radius:var(--ds-radius,calc(4px * var(--sf,1)));--c9y-radius-card:var(--ds-radius-card,calc(4px * var(--sf,1)));--c9y-chevron:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M4.25 6.25L8 10L11.75 6.25' stroke='black'/%3E%3C/svg%3E")}
-[data-tone="paper"]{--c9y-tone:var(--c9y-tone-paper,var(--c9y-paper));--c9y-tone-ink:var(--c9y-tone-paper-ink,var(--c9y-ink))}
-[data-tone="cream"]{--c9y-tone:var(--c9y-tone-cream,var(--c9y-fill));--c9y-tone-ink:var(--c9y-tone-cream-ink,var(--c9y-ink))}
-[data-tone="dark"]{--c9y-tone:var(--c9y-tone-dark,var(--c9y-ink));--c9y-tone-ink:var(--c9y-tone-dark-ink,var(--c9y-paper))}
-[data-tone="accent"]{--c9y-tone:var(--c9y-tone-accent,var(--c9y-accent));--c9y-tone-ink:var(--c9y-tone-accent-ink,var(--c9y-on-accent))}
-[data-tone="highlight"]{--c9y-tone:var(--c9y-tone-highlight,var(--one-yellow-pastel,var(--c9y-fill)));--c9y-tone-ink:var(--c9y-tone-highlight-ink,var(--c9y-ink))}
-[data-tone="band"]{--c9y-tone:var(--c9y-tone-band,var(--c9y-fill-hover));--c9y-tone-ink:var(--c9y-tone-band-ink,var(--c9y-ink))}
-[data-tone="pastel-1"]{--c9y-tone:var(--c9y-tone-pastel-1,var(--one-sharp-blue-pastel,var(--c9y-fill)));--c9y-tone-ink:var(--c9y-tone-pastel-1-ink,var(--c9y-ink))}
-[data-tone="pastel-2"]{--c9y-tone:var(--c9y-tone-pastel-2,var(--one-apple-green-pastel,var(--c9y-fill)));--c9y-tone-ink:var(--c9y-tone-pastel-2-ink,var(--c9y-ink))}
-[data-tone="pastel-3"]{--c9y-tone:var(--c9y-tone-pastel-3,var(--one-orange-pastel,var(--c9y-fill)));--c9y-tone-ink:var(--c9y-tone-pastel-3-ink,var(--c9y-ink))}
-[data-tone="pastel-4"]{--c9y-tone:var(--c9y-tone-pastel-4,var(--one-pink-pastel,var(--c9y-fill)));--c9y-tone-ink:var(--c9y-tone-pastel-4-ink,var(--c9y-ink))}
-[data-tone="pastel-5"]{--c9y-tone:var(--c9y-tone-pastel-5,var(--one-yellow-pastel,var(--c9y-fill)));--c9y-tone-ink:var(--c9y-tone-pastel-5-ink,var(--c9y-ink))}
-[data-tone="pastel-6"]{--c9y-tone:var(--c9y-tone-pastel-6,var(--one-chartreuse-pastel,var(--c9y-fill)));--c9y-tone-ink:var(--c9y-tone-pastel-6-ink,var(--c9y-ink))}
+[data-tone="paper"]{--c9y-tone:var(--c9y-tone-paper,var(--c9y-paper));--c9y-tone-ink:var(--c9y-tone-paper-ink,var(--c9y-ink));--c9y-tone-glass:var(--c9y-tone-paper-glass,color-mix(in srgb,var(--c9y-tone) 85%,transparent))}
+[data-tone="cream"]{--c9y-tone:var(--c9y-tone-cream,var(--c9y-fill));--c9y-tone-ink:var(--c9y-tone-cream-ink,var(--c9y-ink));--c9y-tone-glass:var(--c9y-tone-cream-glass,color-mix(in srgb,var(--c9y-tone) 85%,transparent))}
+[data-tone="dark"]{--c9y-tone:var(--c9y-tone-dark,var(--c9y-ink));--c9y-tone-ink:var(--c9y-tone-dark-ink,var(--c9y-paper));--c9y-tone-glass:var(--c9y-tone-dark-glass,color-mix(in srgb,var(--c9y-tone) 85%,transparent))}
+[data-tone="accent"]{--c9y-tone:var(--c9y-tone-accent,var(--c9y-accent));--c9y-tone-ink:var(--c9y-tone-accent-ink,var(--c9y-on-accent));--c9y-tone-glass:var(--c9y-tone-accent-glass,color-mix(in srgb,var(--c9y-tone) 85%,transparent))}
+[data-tone="highlight"]{--c9y-tone:var(--c9y-tone-highlight,var(--one-yellow-pastel,var(--c9y-fill)));--c9y-tone-ink:var(--c9y-tone-highlight-ink,var(--c9y-ink));--c9y-tone-glass:var(--c9y-tone-highlight-glass,color-mix(in srgb,var(--c9y-tone) 85%,transparent))}
+[data-tone="band"]{--c9y-tone:var(--c9y-tone-band,var(--c9y-fill-hover));--c9y-tone-ink:var(--c9y-tone-band-ink,var(--c9y-ink));--c9y-tone-glass:var(--c9y-tone-band-glass,color-mix(in srgb,var(--c9y-tone) 85%,transparent))}
+[data-tone="pastel-1"]{--c9y-tone:var(--c9y-tone-pastel-1,var(--one-sharp-blue-pastel,var(--c9y-fill)));--c9y-tone-ink:var(--c9y-tone-pastel-1-ink,var(--c9y-ink));--c9y-tone-glass:var(--c9y-tone-pastel-1-glass,color-mix(in srgb,var(--c9y-tone) 85%,transparent))}
+[data-tone="pastel-2"]{--c9y-tone:var(--c9y-tone-pastel-2,var(--one-apple-green-pastel,var(--c9y-fill)));--c9y-tone-ink:var(--c9y-tone-pastel-2-ink,var(--c9y-ink));--c9y-tone-glass:var(--c9y-tone-pastel-2-glass,color-mix(in srgb,var(--c9y-tone) 85%,transparent))}
+[data-tone="pastel-3"]{--c9y-tone:var(--c9y-tone-pastel-3,var(--one-orange-pastel,var(--c9y-fill)));--c9y-tone-ink:var(--c9y-tone-pastel-3-ink,var(--c9y-ink));--c9y-tone-glass:var(--c9y-tone-pastel-3-glass,color-mix(in srgb,var(--c9y-tone) 85%,transparent))}
+[data-tone="pastel-4"]{--c9y-tone:var(--c9y-tone-pastel-4,var(--one-pink-pastel,var(--c9y-fill)));--c9y-tone-ink:var(--c9y-tone-pastel-4-ink,var(--c9y-ink));--c9y-tone-glass:var(--c9y-tone-pastel-4-glass,color-mix(in srgb,var(--c9y-tone) 85%,transparent))}
+[data-tone="pastel-5"]{--c9y-tone:var(--c9y-tone-pastel-5,var(--one-yellow-pastel,var(--c9y-fill)));--c9y-tone-ink:var(--c9y-tone-pastel-5-ink,var(--c9y-ink));--c9y-tone-glass:var(--c9y-tone-pastel-5-glass,color-mix(in srgb,var(--c9y-tone) 85%,transparent))}
+[data-tone="pastel-6"]{--c9y-tone:var(--c9y-tone-pastel-6,var(--one-chartreuse-pastel,var(--c9y-fill)));--c9y-tone-ink:var(--c9y-tone-pastel-6-ink,var(--c9y-ink));--c9y-tone-glass:var(--c9y-tone-pastel-6-glass,color-mix(in srgb,var(--c9y-tone) 85%,transparent))}
 /* A toned surface carries its ink into the words on it, the scoped region tokens included. */
 .c9y-native-toned,.c9y-native-toned .c9y-native-region{--ds-text-color:var(--c9y-tone-ink);--ds-title-color:color-mix(in srgb,var(--c9y-tone-ink) 72%,var(--c9y-tone));--ds-text-color-muted:color-mix(in srgb,var(--c9y-tone-ink) 72%,var(--c9y-tone));--ds-border-color:color-mix(in srgb,var(--c9y-tone-ink) 20%,var(--c9y-tone))}
 .c9y-native-toned{background:var(--c9y-tone);color:var(--c9y-tone-ink)}
 .c9y-native-section{min-width:0;max-width:100%;margin:0}
 .c9y-native-section:not(.ds-header,.ds-footer){display:flex;flex-direction:column;gap:var(--c9y-unit)}
 .c9y-native-section .c9y-native-flow[data-slot="actions"]>.c9y-native-node,.c9y-native-section .c9y-native-flow[data-slot="policies"]>.c9y-native-node,.ds-header .c9y-native-flow[data-direction="row"]>.c9y-native-node,.ds-footer .c9y-native-flow[data-direction="row"]>.c9y-native-node{flex:0 0 auto}
-/* Hero: the photo fills the section, the panel stands over it where the field says. */
+/* The column a grid of items stands in (data-measure): reading thirty-two squares, wide sixty-two, full the page. */
+.c9y-native-section[data-measure]{width:100%;max-width:var(--c9y-measure,none);margin-inline:auto}
+/* Words for machines only (a statement's hiddenTitle): kept in the page for search engines and screen readers, not drawn. */
+.c9y-native-section[data-hidden-title]{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+/* A button's face and size (the library's data-face and data-size), drawn here until the library draws them: one class and one
+   type strong, so a library's `.ds-button[data-face]` rule wins. Outlined is the ink's line around a primary, a hairline around the rest;
+   large is two squares high. */
+.c9y-native-page a:where(.ds-button[data-face="outlined"]){--ds-button-background:transparent;--ds-button-color:var(--ds-text-color,var(--c9y-ink));box-shadow:inset 0 0 0 1px currentColor}
+.c9y-native-page a:where(.ds-button--primary[data-face="outlined"]){box-shadow:inset 0 0 0 calc(3px * var(--sf,1)) currentColor}
+.c9y-native-page a:where(.ds-button[data-face="outlined"]):hover{--ds-button-background:var(--ds-fill-hover,var(--c9y-fill-hover))}
+.c9y-native-page a:where(.ds-button[data-size="large"]){--ds-button-height:calc(2 * var(--c9y-unit));--ds-button-padding:0 var(--c9y-unit)}
+/* Hero: the photo fills the section, the panel stands over it where the field says; translucent, the panel is the tone's glass over the photo.
+   Under a header a flush hero (or panels) takes the page's gap back, a hidden title between them notwithstanding. */
 .c9y-native-section[data-section="hero"]{position:relative;display:grid;grid-template-columns:minmax(0,1fr);align-items:center;justify-items:center;min-height:var(--c9y-hero-height);padding:calc(2 * var(--c9y-unit)) var(--c9y-unit);overflow:hidden}
 [data-section="hero"]>[data-slot="picture"]{position:absolute;inset:0;margin:0;max-width:none}
 [data-section="hero"]>[data-slot="picture"] img{width:100%;height:100%}
-[data-section="hero"]>[data-slot="panel"]{position:relative;z-index:1;width:min(100%,calc(32 * var(--c9y-unit)));border-radius:var(--c9y-radius)}
+[data-section="hero"]>[data-slot="panel"]{position:relative;z-index:1;width:min(100%,var(--c9y-panel-width,calc(24 * var(--c9y-unit))));border-radius:var(--c9y-radius)}
+[data-section="hero"][data-translucent]>[data-slot="panel"]{background:var(--c9y-tone-glass);-webkit-backdrop-filter:blur(calc(2px * var(--sf,1)));backdrop-filter:blur(calc(2px * var(--sf,1)))}
 [data-section="hero"][data-panel="centre"]>[data-slot="panel"]{align-items:center;text-align:center}
 [data-section="hero"][data-panel="centre"] [data-slot="actions"]{justify-content:center}
 [data-section="hero"][data-panel="left"]>[data-slot="panel"]{justify-self:start}
 [data-section="hero"][data-panel="right"]>[data-slot="panel"]{justify-self:end}
 [data-section="hero"] [data-slot="logo"] img{width:auto;max-width:100%;max-height:calc(3 * var(--c9y-unit));margin-inline:inherit}
 [data-section="hero"] [data-slot="kicker"],[data-section="split"] [data-slot="kicker"]{color:var(--ds-text-color-muted)}
-/* Split: the words on a panel laid two squares over the photo's edge. */
+.c9y-native-page>[data-section="header"]+:is([data-section="hero"],[data-section="panels"])[data-room="flush"],.c9y-native-page>[data-section="header"]+:is([hidden],[data-hidden-title])+:is([data-section="hero"],[data-section="panels"])[data-room="flush"]{margin-top:calc(-1 * var(--c9y-page-gap,0px))}
+/* Split: the words on a panel laid `overlap` squares over the photo's edge, the heading centred when the field says. */
 .c9y-native-section[data-section="split"]{display:grid;grid-template-columns:var(--c9y-split-columns);align-items:center;gap:0}
 [data-section="split"]>[data-slot="picture"] img{height:var(--c9y-split-image-height);border-radius:var(--c9y-radius)}
-[data-section="split"]>[data-slot="panel"]{position:relative;z-index:1;margin-inline-start:calc(-2 * var(--c9y-unit));border-radius:var(--c9y-radius)}
+[data-section="split"]>[data-slot="panel"]{position:relative;z-index:1;margin-inline-start:calc(-1 * var(--c9y-split-overlap,calc(2 * var(--c9y-unit))));border-radius:var(--c9y-radius)}
 [data-section="split"][data-reverse]>[data-slot="picture"]{order:2}
-[data-section="split"][data-reverse]>[data-slot="panel"]{margin-inline:0 calc(-2 * var(--c9y-unit))}
-/* Statement: a reading column of thirty-two squares, fifty when wide, on a panel when toned. */
+[data-section="split"][data-reverse]>[data-slot="panel"]{margin-inline:0 calc(-1 * var(--c9y-split-overlap,calc(2 * var(--c9y-unit))))}
+[data-section="split"][data-heading-align="centre"] [data-slot="heading"]{text-align:center}
+/* Statement: a reading column of thirty-two squares, fifty when wide, the page when full, on a panel when toned. */
 .c9y-native-section[data-section="statement"]{width:100%;max-width:var(--c9y-statement-width);margin-inline:auto}
 [data-section="statement"].c9y-native-toned{padding:calc(1.5 * var(--c9y-unit)) calc(2 * var(--c9y-unit)) calc(2 * var(--c9y-unit));border-radius:var(--c9y-radius)}
 [data-section="statement"][data-align="centre"]{align-items:center;text-align:center}
 [data-section="statement"][data-align="centre"] [data-slot="actions"]{justify-content:center}
-/* Panels: heroes side by side, their panels narrower. */
+[data-section="statement"][data-heading-align="centre"]>[data-slot="heading"]{text-align:center}
+/* Panels: heroes side by side, each panel as wide as its hero says. */
 .c9y-native-section[data-section="panels"]{display:grid;grid-template-columns:repeat(var(--c9y-columns),minmax(0,1fr));gap:var(--c9y-gap)}
-[data-section="panels"]>[data-section="hero"]>[data-slot="panel"]{width:min(100%,calc(22 * var(--c9y-unit)))}
 /* Cards: each a card padded one square, its label muted, its picture on its foot, square where it meets the edge. */
 .c9y-native-section[data-section="cards"]{display:grid;grid-template-columns:repeat(var(--c9y-columns),minmax(0,1fr));gap:var(--c9y-unit);align-items:stretch}
 .c9y-native-card{min-height:var(--c9y-card-height);overflow:hidden;border-radius:var(--c9y-radius-card)}
@@ -110,27 +126,47 @@ details.c9y-native-flow{display:block}
 .c9y-native-row-value,.c9y-native-row-date{grid-column:2;grid-row:1;white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--ds-text-color-muted)}
 .c9y-native-group+.c9y-native-group{margin-top:var(--c9y-unit)}
 .c9y-native-group-heading{padding-top:calc(4px * var(--sf,1));line-height:calc(16px * var(--sf,1));color:var(--ds-text-color-muted)}
-/* Action: one button, centred or at the start; large is two squares high. */
+/* Action: one button, centred or at the start; its size is the button's own (data-size above). */
 .c9y-native-section[data-section="action"]{flex-direction:row;justify-content:center}
 [data-section="action"][data-align="start"]{justify-content:flex-start}
 [data-section="action"]>.c9y-native-node{flex:0 0 auto}
-[data-section="action"][data-size="large"] .ds-button{--ds-button-height:calc(2 * var(--c9y-unit));--ds-button-padding:0 var(--c9y-unit)}
-/* Header and footer: Design system 1's own header and footer classes; the fold is chosen in squares. */
-.ds-header [data-slot="logo"] img,.ds-footer [data-slot="mark"] img{width:auto;max-width:100%;height:var(--c9y-unit)}
-.ds-header [data-slot="languages"] img{width:auto;height:var(--ds-control-height,calc(16px * var(--sf,1)))}
+/* Header and footer: Design system 1's own header and footer classes; the fold and the mark's height are chosen in squares.
+   A language with a picture is a flag as the design system draws one: one control high, 3:2, corners a quarter of its height,
+   the fill's hairline on its edge. Links hanging from a line (data-links="line") are two squares high under a hairline of the
+   ink, two pixels under the pointer, the current page four of the accent in the accent's ink. */
+.ds-header [data-slot="logo"] img{width:auto;max-width:100%;height:var(--c9y-logo-height,var(--c9y-unit))}
+.ds-header .ds-header__brand{height:var(--c9y-logo-height,var(--c9y-unit))}
+.ds-footer [data-slot="mark"] img{width:auto;max-width:100%;height:var(--c9y-unit)}
+.ds-header [data-slot="languages"] img{--c9y-flag:var(--ds-control-height,calc(16px * var(--sf,1)));width:calc(1.5 * var(--c9y-flag));height:var(--c9y-flag);object-fit:cover;border-radius:calc(var(--c9y-flag) / 4);outline:1px solid var(--ds-fill,var(--c9y-fill));outline-offset:-0.5px}
 .ds-header .c9y-native-link,.ds-footer .c9y-native-link{display:block;line-height:var(--c9y-unit)}
-.ds-footer .c9y-native-follow{margin-inline-start:auto}
+.ds-header[data-links="line"] .ds-header__nav{gap:calc(var(--c9y-unit) / 2);align-self:start}
+.ds-header[data-links="line"] .ds-header__nav a{display:flex;align-items:flex-end;height:calc(2 * var(--c9y-unit));padding:0 calc(8px * var(--sf,1));text-decoration:none;box-shadow:inset 0 1px currentColor}
+.ds-header[data-links="line"] .ds-header__nav a:hover{box-shadow:inset 0 calc(2px * var(--sf,1)) currentColor}
+.ds-header[data-links="line"] .ds-header__nav a[aria-current]:not([aria-current="false"]){color:var(--ds-accent-color,var(--c9y-accent));box-shadow:inset 0 calc(4px * var(--sf,1)) currentColor}
+/* The footer's follow marks (ds-footer__column--stack): the library's icon in the paper's colour on the round mark; the language being read is on the full line. */
+.ds-footer .c9y-native-follow:not(.ds-footer__column--stack){margin-inline-start:auto}
+.ds-footer .c9y-native-follow .c9y-native-icon{display:flex;width:calc(14px * var(--sf,1));height:calc(14px * var(--sf,1))}
+.ds-footer .c9y-native-follow .c9y-native-icon svg{width:100%;height:100%}
+.ds-footer .c9y-native-link[aria-current]:not([aria-current="false"]){text-decoration-color:currentColor}
 @container (min-width: 400px){.ds-header[data-fold="20"]>:is(.ds-header__nav,.ds-header__actions){display:flex}.ds-header[data-fold="20"]>.ds-header__toggle{display:none}}
 @container (max-width: 799px){.ds-header[data-fold="40"]>:is(.ds-header__nav,.ds-header__actions){display:none}.ds-header[data-fold="40"]>.ds-header__toggle{display:block}}
+@container (max-width: 999px){.ds-header[data-fold="50"]>:is(.ds-header__nav,.ds-header__actions){display:none}.ds-header[data-fold="50"]>.ds-header__toggle{display:block}}
+@container (max-width: 1199px){.ds-header[data-fold="60"]>:is(.ds-header__nav,.ds-header__actions){display:none}.ds-header[data-fold="60"]>.ds-header__toggle{display:block}}
 @media (prefers-reduced-motion: reduce){[data-section="questions"]>details>summary::after{transition:none}}
 @media(max-width:700px){
 .c9y-native-section[data-section="panels"],.c9y-native-section[data-section="cards"],.c9y-native-section[data-section="facts"],.c9y-native-section[data-section="split"]{grid-template-columns:minmax(0,1fr)}
 .c9y-native-section[data-section="gallery"]:not([data-strip]),.c9y-native-section[data-section="bento"]{grid-template-columns:repeat(2,minmax(0,1fr))}
+.c9y-native-section:is([data-measure="wide"],[data-measure="full"]){padding-inline:var(--c9y-unit)}
 [data-rhythm="featured"]>.c9y-native-tile:nth-child(n){grid-column:span 1;grid-row:span 1}
 [data-section="split"]>[data-slot="picture"],[data-section="split"][data-reverse]>[data-slot="picture"]{order:0;grid-row:1}
-[data-section="split"]>[data-slot="panel"],[data-section="split"][data-reverse]>[data-slot="panel"]{grid-row:2;margin:calc(-2 * var(--c9y-unit)) calc(var(--c9y-unit) / 2) 0}
+[data-section="split"]>[data-slot="picture"] img{height:var(--c9y-split-mobile-image-height,var(--c9y-split-image-height))}
+[data-section="split"]>[data-slot="panel"],[data-section="split"][data-reverse]>[data-slot="panel"]{grid-row:2;margin:calc(-1 * var(--c9y-split-overlap,calc(2 * var(--c9y-unit)))) calc(var(--c9y-unit) / 2) 0}
+.c9y-native-section[data-section="hero"]{min-height:var(--c9y-hero-mobile-height,var(--c9y-hero-height))}
 [data-section="hero"]>[data-slot="panel"]{padding-inline:var(--c9y-unit)}
+.c9y-native-card{min-height:var(--c9y-card-mobile-height,var(--c9y-card-height))}
+.c9y-native-section[data-section="bento"]{grid-auto-rows:minmax(var(--c9y-bento-mobile-height,var(--c9y-bento-height)),auto)}
 [data-section="facts"]>.c9y-native-flow{grid-template-columns:minmax(0,1fr)}
 [data-section="statement"].c9y-native-toned{padding:var(--c9y-unit)}
-[data-section="gallery"] img{height:var(--c9y-gallery-height)}
+[data-section="gallery"] img{height:var(--c9y-gallery-mobile-height,var(--c9y-gallery-height))}
+.ds-header [data-slot="logo"] img,.ds-header .ds-header__brand{height:var(--c9y-mobile-logo-height,var(--c9y-logo-height,var(--c9y-unit)))}
 }

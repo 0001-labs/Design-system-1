@@ -1,4 +1,4 @@
-import { nativeRegionStyles, renderNativeRegion, validateNativeRegion } from './consistency-native-content';
+import { nativeIcon, nativeRegionStyles, renderNativeRegion, validateNativeRegion } from './consistency-native-content';
 import { TONES, sectionDefinition, SECTION_KINDS, isSlot, type Tone, type FieldDefinition, type SlotDefinition, type MemberDefinition, type KindDefinition } from './consistency-vocabulary';
 import pageStyles from './consistency-native-page.css?raw';
 import headerStyles from '../DS1/1-root/header.css?raw';
@@ -16,11 +16,15 @@ export interface NativeGrid extends NativeBlockBase {
 export interface NativeContent extends NativeBlockBase {
   kind: 'content'; source: string; gaps?: Record<string, number>; binding?: string;
 }
+/** Where a picture's subject is, as whole percentages from the left and the top; 50 and 50 when absent. */
+export interface NativeFocus { x: number; y: number }
 export interface NativeImage extends NativeBlockBase {
-  kind: 'image'; src: string; alt: string; height?: number; mobileHeight?: number; fit?: 'contain' | 'cover'; href?: string;
+  kind: 'image'; src: string; alt: string; height?: number; mobileHeight?: number; fit?: 'contain' | 'cover'; focus?: NativeFocus; href?: string;
 }
+export type NativeButtonFace = 'filled' | 'outlined';
+export type NativeButtonSize = 'medium' | 'large';
 export interface NativeLink extends NativeBlockBase {
-  kind: 'link'; text: string; href: string; appearance?: 'plain' | 'default' | 'primary' | 'secondary'; binding?: string;
+  kind: 'link'; text: string; href: string; appearance?: 'plain' | 'default' | 'primary' | 'secondary'; face?: NativeButtonFace; size?: NativeButtonSize; binding?: string;
 }
 export interface NativeCollection extends NativeBlockBase {
   kind: 'collection'; binding: string; layout: 'grid' | 'gallery';
@@ -40,42 +44,45 @@ export type NativePrimitive = NativeFlow | NativeGrid | NativeContent | NativeIm
  */
 export type { Tone } from './consistency-vocabulary';
 export type NativeWords = string;
-export interface NativePicture { src: string; alt: string; fit?: 'contain' | 'cover'; href?: string }
-export interface NativeAction { text: string; href: string; appearance?: 'plain' | 'default' | 'primary' | 'secondary' }
+export interface NativePicture { src: string; alt: string; fit?: 'contain' | 'cover'; focus?: NativeFocus; href?: string }
+/** `icon` names one of the library's icons, drawn where the section draws marks (a footer's `follow`). */
+export interface NativeAction { text: string; href: string; appearance?: 'plain' | 'default' | 'primary' | 'secondary'; face?: NativeButtonFace; size?: NativeButtonSize; icon?: string }
 export interface NativeLine { text: string; href?: string }
 export interface NativeLanguage { text: string; href: string; picture?: NativePicture }
 export interface NativeRuntimeSlot { name: string; props: NativeRuntimeProps }
+export type NativeMeasure = 'reading' | 'wide' | 'full';
+export type NativeRoom = 'flush' | 'gap';
 export interface NativeHero extends NativeBlockBase {
-  kind: 'hero'; height?: number; panel?: 'left' | 'centre' | 'right'; panelTone?: Tone; level?: number; fit?: 'cover' | 'contain';
+  kind: 'hero'; height?: number; mobileHeight?: number; fill?: 'fixed' | 'window'; panel?: 'left' | 'centre' | 'right'; panelTone?: Tone; panelWidth?: number; translucent?: boolean; room?: NativeRoom; level?: number; fit?: 'cover' | 'contain';
   picture: NativePicture; logo?: NativePicture; kicker?: NativeWords; title: NativeWords; text?: NativeWords; actions?: NativeAction[];
 }
 export interface NativeSplit extends NativeBlockBase {
-  kind: 'split'; reverse?: boolean; panelTone?: Tone; ratio?: '1:1' | '2:1'; imageHeight?: number;
+  kind: 'split'; reverse?: boolean; panelTone?: Tone; ratio?: '1:1' | '2:1' | '5:6'; imageHeight?: number; mobileImageHeight?: number; overlap?: number; headingAlign?: 'start' | 'centre';
   picture: NativePicture; heading: NativeWords; text?: NativeWords; actions?: NativeAction[];
 }
 export interface NativeStatement extends NativeBlockBase {
-  kind: 'statement'; measure?: 'reading' | 'wide'; panel?: Tone; align?: 'start' | 'centre';
+  kind: 'statement'; measure?: NativeMeasure; panel?: Tone; align?: 'start' | 'centre'; headingAlign?: 'start' | 'centre'; hiddenTitle?: boolean;
   heading?: NativeWords; text: NativeWords; actions?: NativeAction[];
 }
-export interface NativePanels extends NativeBlockBase { kind: 'panels'; columns?: number; gap?: number; items: NativeHero[] }
+export interface NativePanels extends NativeBlockBase { kind: 'panels'; columns?: number; gap?: number; room?: NativeRoom; items: NativeHero[] }
 export interface NativeCardItem { label?: NativeWords; title: NativeWords; text?: NativeWords; picture?: NativePicture; action?: NativeAction }
 export interface NativeCards extends NativeBlockBase {
-  kind: 'cards'; columns?: number; height?: number; tone?: Tone; variant?: 'filled' | 'outlined'; items: NativeCardItem[];
+  kind: 'cards'; columns?: number; measure?: NativeMeasure; height?: number; mobileHeight?: number; tone?: Tone; variant?: 'filled' | 'outlined'; items: NativeCardItem[];
 }
 export interface NativeGallery extends NativeBlockBase {
-  kind: 'gallery'; columns?: number; height?: number; strip?: boolean; fit?: 'cover' | 'contain'; pictures: NativePicture[];
+  kind: 'gallery'; columns?: number; measure?: NativeMeasure; height?: number; mobileHeight?: number; strip?: boolean; fit?: 'cover' | 'contain'; pictures: NativePicture[];
 }
 export interface NativeBentoItem { title: NativeWords; text?: NativeWords; picture?: NativePicture; action?: NativeAction; tone?: Tone }
-export interface NativeBento extends NativeBlockBase { kind: 'bento'; columns?: number; rhythm?: 'even' | 'featured'; height?: number; items: NativeBentoItem[] }
+export interface NativeBento extends NativeBlockBase { kind: 'bento'; columns?: number; measure?: NativeMeasure; rhythm?: 'even' | 'featured'; height?: number; mobileHeight?: number; tones?: Tone[]; titleFace?: 'heading' | 'strong'; items: NativeBentoItem[] }
 export interface NativeQuestionItem { question: string; answer: NativeWords }
-export interface NativeQuestions extends NativeBlockBase { kind: 'questions'; open?: 'first' | 'none'; heading?: NativeWords; items: NativeQuestionItem[] }
+export interface NativeQuestions extends NativeBlockBase { kind: 'questions'; open?: 'first' | 'none'; measure?: NativeMeasure; heading?: NativeWords; items: NativeQuestionItem[] }
 export interface NativeFactItem { term: NativeWords; value: NativeWords }
-export interface NativeFacts extends NativeBlockBase { kind: 'facts'; columns?: number; items: NativeFactItem[] }
+export interface NativeFacts extends NativeBlockBase { kind: 'facts'; columns?: number; measure?: NativeMeasure; items: NativeFactItem[] }
 export interface NativeListItem { name: string; line?: NativeWords; value?: string; date?: string; href?: string }
-export interface NativeList extends NativeBlockBase { kind: 'list'; dated?: boolean; grouped?: boolean; items?: NativeListItem[]; collection?: string }
-export interface NativeCallToAction extends NativeBlockBase { kind: 'action'; size?: 'medium' | 'large'; align?: 'start' | 'centre'; button: NativeAction }
+export interface NativeList extends NativeBlockBase { kind: 'list'; dated?: boolean; grouped?: boolean; measure?: NativeMeasure; items?: NativeListItem[]; collection?: string }
+export interface NativeCallToAction extends NativeBlockBase { kind: 'action'; size?: NativeButtonSize; align?: 'start' | 'centre'; measure?: NativeMeasure; button: NativeAction }
 export interface NativeHeader extends NativeBlockBase {
-  kind: 'header'; sticky?: boolean; fold?: number;
+  kind: 'header'; sticky?: boolean; fold?: number; logoHeight?: number; mobileLogoHeight?: number; linkStyle?: 'plain' | 'line';
   logo: NativePicture; name?: NativeWords; links: NativeAction[]; languages?: NativeLanguage[]; menu?: NativeRuntimeSlot;
 }
 export interface NativeFooterColumn { heading?: string; href?: string; width?: number; lines: NativeLine[] }
@@ -148,18 +155,28 @@ export function validateNativePage(value: unknown, context: NativePageContext): 
   if (source.lang !== undefined) { result.lang=text(source.lang,20); if(!/^[a-z]{2,3}(?:-[A-Z]{2})?$/.test(result.lang)) return invalid(); }
   const ids=new Set<string>(), ancestors=new Set<unknown>(); let count=0;
   const common=['id','kind','width','hidden','locale'];
+  const focus=(value:unknown,path:string):NativeFocus=>{
+    const input=record(value,`${path}: a focus is { x, y }, percentages from 0 to 100`);keys(input,['x','y'],path);
+    return{x:integer(input.x,100,0,`${path}.x: a whole percentage from 0 to 100`),y:integer(input.y,100,0,`${path}.y: a whole percentage from 0 to 100`)};
+  };
   const picture=(value:unknown,path:string):NativePicture=>{
-    const input=record(value,`${path}: a picture is { src, alt, fit?, href? }`);keys(input,['src','alt','fit','href'],path);
+    const input=record(value,`${path}: a picture is { src, alt, fit?, focus?, href? }`);keys(input,['src','alt','fit','focus','href'],path);
     const src=address(input.src,true,`${path}.src: not an image address`);if(src.startsWith('/')&&!context.images.includes(src))return invalid(`${path}.src: "${src}" is not one of the page's images`);
     const result:NativePicture={src,alt:text(input.alt,1000,`${path}.alt: words of at most 1000 characters`)};
     if(input.fit!==undefined)result.fit=choice(input.fit,['contain','cover'] as const,`${path}.fit: cover or contain`);
+    if(input.focus!==undefined)result.focus=focus(input.focus,`${path}.focus`);
     if(input.href!==undefined)result.href=address(input.href,false,`${path}.href: not a safe address`);
     return result;
   };
+  const face=(value:unknown,path:string)=>choice(value,['filled','outlined'] as const,`${path}: filled or outlined`);
+  const size=(value:unknown,path:string)=>choice(value,['medium','large'] as const,`${path}: medium or large`);
   const action=(value:unknown,path:string):NativeAction=>{
-    const input=record(value,`${path}: an action is { text, href, appearance? }`);keys(input,['text','href','appearance'],path);
+    const input=record(value,`${path}: an action is { text, href, appearance?, face?, size?, icon? }`);keys(input,['text','href','appearance','face','size','icon'],path);
     const result:NativeAction={text:text(input.text,1000,`${path}.text: words of at most 1000 characters`),href:address(input.href,false,`${path}.href: not a safe address`)};
     if(input.appearance!==undefined)result.appearance=choice(input.appearance,['plain','default','primary','secondary'] as const,`${path}.appearance: plain, default, primary or secondary`);
+    if(input.face!==undefined)result.face=face(input.face,`${path}.face`);
+    if(input.size!==undefined)result.size=size(input.size,`${path}.size`);
+    if(input.icon!==undefined){const name=text(input.icon,80,`${path}.icon: an icon's name`);if(!nativeIcon(name))return invalid(`${path}.icon: "${name}" is not one of the library's icons`);result.icon=name;}
     return result;
   };
   const runtimeSlot=(value:unknown,path:string):NativeRuntimeSlot=>{
@@ -180,6 +197,7 @@ export function validateNativePage(value: unknown, context: NativePageContext): 
       case 'boolean':return boolean(value,`${path}: true or false`);
       case 'choice':return choice(value,definition.choices!,`${path}: "${String(value)}" is not one of ${definition.choices!.join(', ')}`);
       case 'tone':return choice(value,TONES,`${path}: "${String(value)}" is not a tone (${TONES.join(', ')})`);
+      case 'tones':{if(!Array.isArray(value)||value.length<(definition.min??1)||value.length>(definition.max??TONES.length))return invalid(`${path}: a list of ${definition.min??1} to ${definition.max??TONES.length} tones`);return value.map((item,index)=>choice(item,TONES,`${path}[${index}]: "${String(item)}" is not a tone (${TONES.join(', ')})`));}
       case 'text':return text(value,definition.max??1000,`${path}: words of at most ${definition.max??1000} characters`);
       case 'date':{const day=text(value,10,`${path}: a day as YYYY-MM-DD`);if(!/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(day)||Number.isNaN(Date.parse(day)))return invalid(`${path}: "${day}" is not a day as YYYY-MM-DD`);return day;}
       case 'address':return address(value,false,`${path}: not a safe address`);
@@ -256,16 +274,19 @@ export function validateNativePage(value: unknown, context: NativePageContext): 
       block={...base,kind,source:content,...(gaps?{gaps:{...gaps}}:{})};
       if(input.binding!==undefined){const binding=text(input.binding,200);if(!context.bindings?.includes(binding))return invalid();block.binding=binding;}
     }else if(kind==='image'){
-      keys(input,[...common,'src','alt','height','mobileHeight','fit','href']);
+      keys(input,[...common,'src','alt','height','mobileHeight','fit','focus','href']);
       const src=address(input.src,true);if(src.startsWith('/')&&!context.images.includes(src))return invalid();
       block={...base,kind,src,alt:text(input.alt,1000)};
       if(input.height!==undefined)block.height=integer(input.height,2000,20);
       if(input.mobileHeight!==undefined)block.mobileHeight=integer(input.mobileHeight,2000,20);
       if(input.fit!==undefined)block.fit=choice(input.fit,['contain','cover'] as const);
+      if(input.focus!==undefined)block.focus=focus(input.focus,`image ${id}.focus`);
       if(input.href!==undefined)block.href=address(input.href);
     }else if(kind==='link'){
-      keys(input,[...common,'text','href','appearance','binding']);block={...base,kind,text:text(input.text,1000),href:address(input.href)};
+      keys(input,[...common,'text','href','appearance','face','size','binding']);block={...base,kind,text:text(input.text,1000),href:address(input.href)};
       if(input.appearance!==undefined)block.appearance=choice(input.appearance,['plain','default','primary','secondary'] as const);
+      if(input.face!==undefined)block.face=face(input.face,`link ${id}.face`);
+      if(input.size!==undefined)block.size=size(input.size,`link ${id}.size`);
       if(input.binding!==undefined){const binding=text(input.binding,200);if(!context.bindings?.includes(binding))return invalid();block.binding=binding;}
     }else if(kind==='collection'){
       keys(input,[...common,'binding','layout','columns','featured','columnGap','rowGap','imageHeight','featuredImageHeight','mobileImageHeight','fit']);
@@ -324,22 +345,37 @@ export function nativeBlockStyles(block: NativeBlock): Record<string,string> {
     styles['--c9y-image-height']=block.height===undefined?'auto':measure(block.height);
     styles['--c9y-mobile-image-height']=block.mobileHeight===undefined?styles['--c9y-image-height']:measure(block.mobileHeight);
     styles['--c9y-image-fit']=block.fit??'contain';
+    if(block.focus)styles['--c9y-image-focus']=`${block.focus.x}% ${block.focus.y}%`;
   }
   if(isNativeSection(block))Object.assign(styles,nativeSectionStyles(block));
   return styles;
 }
+/** The sections whose items stand in a column of a chosen measure: reading 32 squares, wide 62, full the page. */
+const MEASURED_KINDS: readonly string[] = ['cards','gallery','bento','questions','facts','list','action'];
+const measureWidth=(value:NativeMeasure)=>value==='reading'?squares(32):value==='wide'?squares(62):'none';
 /** A section's fields as custom properties, read by consistency-native-page.css; tones travel as `data-tone` names. */
 export function nativeSectionStyles(block: NativeSection): Record<string,string> {
   const styles:Record<string,string>={};
   const field=<T,>(name:string)=>sectionField<T>(block,name);
-  if(block.kind==='hero'){styles['--c9y-hero-height']=squares(field<number>('height'));}
-  if(block.kind==='split'){const wide=field<string>('ratio')==='2:1';styles['--c9y-split-columns']=wide?field<boolean>('reverse')?'minmax(0,1fr) minmax(0,2fr)':'minmax(0,2fr) minmax(0,1fr)':'minmax(0,1fr) minmax(0,1fr)';styles['--c9y-split-image-height']=squares(field<number>('imageHeight'));}
-  if(block.kind==='statement')styles['--c9y-statement-width']=squares(field<string>('measure')==='wide'?50:32);
+  const given=<T,>(name:string)=>(block as unknown as Record<string,T|undefined>)[name];
+  if(block.kind==='hero'){
+    const fill=(height:number)=>field<string>('fill')==='window'?`min(${squares(height)},80svh)`:squares(height);
+    styles['--c9y-hero-height']=fill(field<number>('height'));styles['--c9y-hero-mobile-height']=fill(given<number>('mobileHeight')??field<number>('height'));styles['--c9y-panel-width']=squares(field<number>('panelWidth'));
+  }
+  if(block.kind==='split'){
+    const ratio=field<string>('ratio'),reverse=field<boolean>('reverse');
+    const [picture,words]=ratio==='2:1'?[2,1]:ratio==='5:6'?[5,6]:[1,1];
+    styles['--c9y-split-columns']=reverse?`minmax(0,${words}fr) minmax(0,${picture}fr)`:`minmax(0,${picture}fr) minmax(0,${words}fr)`;
+    styles['--c9y-split-image-height']=squares(field<number>('imageHeight'));styles['--c9y-split-mobile-image-height']=squares(given<number>('mobileImageHeight')??field<number>('imageHeight'));styles['--c9y-split-overlap']=squares(field<number>('overlap'));
+  }
+  if(block.kind==='statement'){const measure=field<NativeMeasure>('measure');styles['--c9y-statement-width']=measure==='wide'?squares(50):measure==='reading'?squares(32):'none';}
   if(block.kind==='panels'){styles['--c9y-columns']=String(field<number>('columns'));styles['--c9y-gap']=squares(field<number>('gap'));}
-  if(block.kind==='cards'){styles['--c9y-columns']=String(field<number>('columns'));styles['--c9y-card-height']=squares(field<number>('height'));}
-  if(block.kind==='gallery'){styles['--c9y-columns']=String(field<number>('columns'));styles['--c9y-gallery-height']=squares(field<number>('height'));}
-  if(block.kind==='bento'){styles['--c9y-columns']=String(field<number>('columns'));styles['--c9y-bento-height']=squares(field<number>('height'));}
+  if(block.kind==='cards'){styles['--c9y-columns']=String(field<number>('columns'));styles['--c9y-card-height']=squares(field<number>('height'));styles['--c9y-card-mobile-height']=squares(given<number>('mobileHeight')??field<number>('height'));}
+  if(block.kind==='gallery'){styles['--c9y-columns']=String(field<number>('columns'));styles['--c9y-gallery-height']=squares(field<number>('height'));styles['--c9y-gallery-mobile-height']=squares(given<number>('mobileHeight')??field<number>('height'));}
+  if(block.kind==='bento'){styles['--c9y-columns']=String(field<number>('columns'));styles['--c9y-bento-height']=squares(field<number>('height'));styles['--c9y-bento-mobile-height']=squares(given<number>('mobileHeight')??field<number>('height'));}
   if(block.kind==='facts')styles['--c9y-columns']=String(field<number>('columns'));
+  if(MEASURED_KINDS.includes(block.kind))styles['--c9y-measure']=measureWidth(field<NativeMeasure>('measure'));
+  if(block.kind==='header'){styles['--c9y-logo-height']=squares(field<number>('logoHeight'));styles['--c9y-mobile-logo-height']=squares(given<number>('mobileLogoHeight')??field<number>('logoHeight'));}
   if(block.kind==='footer'){styles['--ds-footer-column-width']=String(field<number>('columnWidth'));if(!field<boolean>('line'))styles['--ds-footer-line']='transparent';}
   return styles;
 }
@@ -347,15 +383,17 @@ export function nativeSectionStyles(block: NativeSection): Record<string,string>
 export function nativeSectionAttributes(block: NativeSection): Record<string,string> {
   const field=<T,>(name:string)=>sectionField<T>(block,name);
   const attrs:Record<string,string>={};
-  if(block.kind==='hero')attrs['data-panel']=field<string>('panel');
-  if(block.kind==='split'&&field<boolean>('reverse'))attrs['data-reverse']='';
-  if(block.kind==='statement'){attrs['data-align']=field<string>('align');if(block.panel)attrs['data-tone']=block.panel;}
+  if(block.kind==='hero'){attrs['data-panel']=field<string>('panel');attrs['data-room']=field<string>('room');if(field<boolean>('translucent'))attrs['data-translucent']='';}
+  if(block.kind==='split'){if(field<boolean>('reverse'))attrs['data-reverse']='';attrs['data-heading-align']=field<string>('headingAlign');}
+  if(block.kind==='statement'){attrs['data-align']=field<string>('align');attrs['data-heading-align']=field<string>('headingAlign');if(block.panel)attrs['data-tone']=block.panel;if(field<boolean>('hiddenTitle'))attrs['data-hidden-title']='';}
+  if(block.kind==='panels')attrs['data-room']=field<string>('room');
   if(block.kind==='cards'){attrs['data-variant']=field<string>('variant');attrs['data-tone']=field<string>('tone');}
   if(block.kind==='gallery'&&field<boolean>('strip'))attrs['data-strip']='';
   if(block.kind==='bento')attrs['data-rhythm']=field<string>('rhythm');
   if(block.kind==='list'){if(field<boolean>('dated'))attrs['data-dated']='';if(field<boolean>('grouped'))attrs['data-grouped']='';}
   if(block.kind==='action'){attrs['data-size']=field<string>('size');attrs['data-align']=field<string>('align');}
-  if(block.kind==='header')attrs['data-fold']=String(field<number>('fold'));
+  if(MEASURED_KINDS.includes(block.kind))attrs['data-measure']=field<string>('measure');
+  if(block.kind==='header'){attrs['data-fold']=String(field<number>('fold'));attrs['data-links']=field<string>('linkStyle');}
   return attrs;
 }
 const styleText=(styles:Record<string,string>)=>Object.entries(styles).map(([key,value])=>`${key}:${value}`).join(';');
@@ -384,7 +422,8 @@ function render(block: NativeBlock, options: NativePageRenderOptions, mark?: Nat
     const image=`<img src="${escape(address(block.src,true))}" alt="${escape(block.alt)}" loading="lazy">`;
     return`<figure ${attrs}>${block.href?`<a href="${escape(address(block.href))}"${current(options,block.href)}>${image}</a>`:image}</figure>`;
   }
-  if(block.kind==='link')return`<div ${attrs}><a class="${block.appearance&&block.appearance!=='plain'?`ds-button${block.appearance==='default'?'':` ds-button--${block.appearance}`}`:'ds-link c9y-native-link'}" href="${escape(address(block.href))}"${current(options,block.href)}>${escape(block.text)}</a></div>`;
+  // A button's face and size travel as the library's `data-face` and `data-size`, written only when the link names them.
+  if(block.kind==='link')return`<div ${attrs}><a class="${block.appearance&&block.appearance!=='plain'?`ds-button${block.appearance==='default'?'':` ds-button--${block.appearance}`}`:'ds-link c9y-native-link'}"${block.face?` data-face="${block.face}"`:''}${block.size?` data-size="${block.size}"`:''} href="${escape(address(block.href))}"${current(options,block.href)}>${escape(block.text)}</a></div>`;
   if(block.kind==='runtime')return`<div ${attrs}>${options.runtime?.(block)??''}</div>`;
   return`<div ${attrs}>${(options.collections?.[block.binding]?.items??[]).map((item,index)=>{
     const tag=item.href?'a':'div',link=item.href?` href="${escape(address(item.href))}"`:'';
@@ -403,8 +442,10 @@ function render(block: NativeBlock, options: NativePageRenderOptions, mark?: Nat
 const sub=(id:string,...parts:(string|number)[])=>[id,...parts].join('.');
 const heading=(source:string,level:number)=>/^\s*#{1,6}\s/.test(source)?source:`${'#'.repeat(level)} ${source}`;
 const wordsBlock=(id:string,source:string):NativeContent=>({id,kind:'content',source});
-const pictureBlock=(id:string,picture:NativePicture,extra:Partial<NativeImage>={}):NativeImage=>({id,kind:'image',src:picture.src,alt:picture.alt,...(picture.fit?{fit:picture.fit}:{}),...(picture.href?{href:picture.href}:{}),...extra});
-const actionBlock=(id:string,action:NativeAction,appearance?:NativeLink['appearance']):NativeLink=>({id,kind:'link',text:action.text,href:action.href,...(action.appearance??appearance?{appearance:action.appearance??appearance}:{})});
+const pictureBlock=(id:string,picture:NativePicture,extra:Partial<NativeImage>={}):NativeImage=>({id,kind:'image',src:picture.src,alt:picture.alt,...(picture.fit?{fit:picture.fit}:{}),...(picture.focus?{focus:picture.focus}:{}),...(picture.href?{href:picture.href}:{}),...extra});
+const actionBlock=(id:string,action:NativeAction,appearance?:NativeLink['appearance']):NativeLink=>({id,kind:'link',text:action.text,href:action.href,...(action.appearance??appearance?{appearance:action.appearance??appearance}:{}),...(action.face?{face:action.face}:{}),...(action.size?{size:action.size}:{})});
+/** A title as a strong line rather than a heading, unless it is already a heading of its own. */
+const strongLine=(source:string)=>/^\s*#{1,6}\s/.test(source)?source:`**${source}**`;
 const flowBlock=(id:string,direction:'row'|'column',gap:number,children:NativeBlock[],extra:Partial<NativeFlow>={}):NativeFlow=>({id,kind:'flow',direction,gap,padding:0,children,...extra});
 const runtimeBlock=(id:string,slot:NativeRuntimeSlot):NativeRuntime=>({id,kind:'runtime',name:slot.name,props:slot.props});
 
@@ -434,13 +475,13 @@ export function expandNativeSection(block: NativeSection): { children: NativeBlo
       ...words('label',item.label,undefined,index),...words('title',item.title,3,index),...words('text',item.text,undefined,index),...action('action',item.action,'plain',index),...picture('picture',item.picture,{fit:'cover'},index),
     ],{padding:20}),{slot:'items',item:index,classes:`c9y-native-card${field<string>('variant')==='filled'?' c9y-native-toned':''}`}))};
     case 'gallery':return{marks,children:block.pictures.map((value,index)=>put(pictureBlock(sub(id,'pictures',index),value,{fit:value.fit??field<'cover'|'contain'>('fit')}),{slot:'pictures',item:index}))};
-    case 'bento':return{marks,children:block.items.map((item,index)=>put(flowBlock(sub(id,'items',index),'column',10,[
-      ...picture('picture',item.picture,{fit:'cover'},index),...words('title',item.title,3,index),...words('text',item.text,undefined,index),...action('action',item.action,'plain',index),
-    ]),{slot:'items',item:index,classes:'c9y-native-tile c9y-native-toned',attrs:{'data-tone':item.tone??TONES[6+index%6]!}}))};
+    case 'bento':{const tones=field<Tone[]>('tones'),strong=field<string>('titleFace')==='strong';return{marks,children:block.items.map((item,index)=>put(flowBlock(sub(id,'items',index),'column',10,[
+      ...picture('picture',item.picture,{fit:'cover'},index),...(strong?words('title',strongLine(item.title),undefined,index):words('title',item.title,3,index)),...words('text',item.text,undefined,index),...action('action',item.action,'plain',index),
+    ]),{slot:'items',item:index,classes:'c9y-native-tile c9y-native-toned',attrs:{'data-tone':item.tone??tones[index%tones.length]!}}))};}
     case 'questions':return{marks,children:[...words('heading',block.heading,2),...block.items.map((item,index)=>put(flowBlock(sub(id,'items',index),'column',20,words('answer',item.answer,undefined,index),{disclosure:{label:item.question,open:field<string>('open')==='first'&&index===0}}),{slot:'items',item:index}))]};
     case 'facts':return{marks,children:block.items.map((item,index)=>put(flowBlock(sub(id,'items',index),'row',20,[...words('term',item.term,undefined,index),...words('value',item.value,undefined,index)],{mobileDirection:'column'}),{slot:'items',item:index}))};
     case 'list':return{marks,children:[]};
-    case 'action':return{marks,children:action('button',block.button,'primary')};
+    case 'action':return{marks,children:action('button',{...block.button,size:block.button.size??field<NativeButtonSize>('size')},'primary')};
     case 'header':return{marks,children:[
       put(flowBlock(sub(id,'brand'),'row',4,[...picture('logo',block.logo,{fit:'contain'}),...words('name',block.name)],{mobileDirection:'row'}),{slot:'brand',classes:'ds-header__brand'}),
       put(flowBlock(sub(id,'links'),'row',20,block.links.map((link,index)=>put(actionBlock(sub(id,'links',index),link,'plain'),{slot:'links',item:index})),{role:'nav',mobileDirection:'row'}),{slot:'links',classes:'ds-header__nav'}),
@@ -468,7 +509,10 @@ function renderNativeSection(block: NativeSection, options: NativePageRenderOpti
   if(block.kind==='footer'){
     const line=(column:number,item:NativeLine,index:number)=>`<li>${item.href?`<a href="${escape(address(item.href))}"${current(options,item.href)} data-native-block="${escape(sub(id,'columns',column,'lines',index))}" data-slot="lines" data-item="${index}">${escape(item.text)}</a>`:`<span data-native-block="${escape(sub(id,'columns',column,'lines',index))}" data-slot="lines" data-item="${index}">${escape(item.text)}</span>`}</li>`;
     const columns=block.columns.map((column,index)=>`<div class="ds-footer__column" data-native-block="${escape(sub(id,'columns',index))}" data-slot="columns" data-item="${index}"${column.width?` style="--ds-footer-column-width:${column.width}"`:''}>${column.heading!==undefined?`<p class="ds-footer__heading" data-native-block="${escape(sub(id,'columns',index,'heading'))}" data-slot="heading" data-item="${index}">${column.href?`<a href="${escape(address(column.href))}">${escape(column.heading)}</a>`:escape(column.heading)}</p>`:''}<ul class="ds-footer__links" data-native-block="${escape(sub(id,'columns',index,'lines'))}" data-slot="lines" data-item="${index}">${column.lines.map((item,lineIndex)=>line(index,item,lineIndex)).join('')}</ul></div>`).join('');
-    const follow=block.follow?.length?`<div class="ds-footer__column c9y-native-follow" data-native-block="${escape(sub(id,'follow'))}" data-slot="follow"><ul class="ds-footer__links">${block.follow.map((item,index)=>`<li><a href="${escape(address(item.href))}" data-native-block="${escape(sub(id,'follow',index))}" data-slot="follow" data-item="${index}">${escape(item.text)}</a></li>`).join('')}</ul></div>`:'';
+    // Follow links with an icon are the design system's stacked column: round marks one control high, each named by its words.
+    const stacked=block.follow?.some(item=>item.icon)??false;
+    const followLink=(item:NativeAction,index:number)=>`<a href="${escape(address(item.href))}"${item.icon?` aria-label="${escape(item.text)}"`:''} data-native-block="${escape(sub(id,'follow',index))}" data-slot="follow" data-item="${index}">${item.icon?`<span class="c9y-native-icon" aria-hidden="true">${nativeIcon(item.icon)??''}</span>`:escape(item.text)}</a>`;
+    const follow=block.follow?.length?`<div class="ds-footer__column c9y-native-follow${stacked?' ds-footer__column--stack':''}" data-native-block="${escape(sub(id,'follow'))}" data-slot="follow"><ul class="${stacked?'ds-footer__icons':'ds-footer__links'}">${block.follow.map((item,index)=>`<li>${followLink(item,index)}</li>`).join('')}</ul></div>`:'';
     const brand=children.filter(child=>marks.get(child.id)?.slot==='brand').map(draw).join('');
     const base=children.filter(child=>['legal','policies'].includes(marks.get(child.id)?.slot??'')).map(draw).join('');
     const preferences=children.filter(child=>['languages','preferences'].includes(marks.get(child.id)?.slot??'')).map(draw).join('');

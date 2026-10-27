@@ -336,6 +336,10 @@
           "default": "contain",
           "meaning": "Whole inside its box, or filling it and cropped"
         },
+        "focus": {
+          "type": "map",
+          "meaning": "`{ x, y }`: where the picture's subject is, as whole percentages from 0 to 100 from the left and the top, kept in view when the picture is cropped; 50 and 50 when absent"
+        },
         "href": {
           "type": "address",
           "meaning": "Where the picture leads when pressed"
@@ -350,7 +354,11 @@
           "alt": "Three green rafts on the canal",
           "height": 400,
           "mobileHeight": 240,
-          "fit": "cover"
+          "fit": "cover",
+          "focus": {
+            "x": 50,
+            "y": 30
+          }
         },
         {
           "id": "logo",
@@ -390,6 +398,24 @@
           "default": "plain",
           "meaning": "Running text, or the default, primary or secondary button"
         },
+        "face": {
+          "type": "choice",
+          "choices": [
+            "filled",
+            "outlined"
+          ],
+          "default": "filled",
+          "meaning": "A button on its fill, or outlined: the ink's line around a primary, a hairline around a secondary (the library's `data-face=\"outlined\"`)"
+        },
+        "size": {
+          "type": "choice",
+          "choices": [
+            "medium",
+            "large"
+          ],
+          "default": "medium",
+          "meaning": "A button one control high, or two squares high (the library's `data-size`)"
+        },
         "binding": {
           "type": "text",
           "max": 200,
@@ -403,7 +429,9 @@
           "kind": "link",
           "text": "Book a raft",
           "href": "/book/",
-          "appearance": "primary"
+          "appearance": "primary",
+          "face": "outlined",
+          "size": "large"
         },
         {
           "id": "read-more",
@@ -566,6 +594,21 @@
           "default": 24,
           "meaning": "The section's height; the picture fills it"
         },
+        "mobileHeight": {
+          "type": "squares",
+          "min": 12,
+          "max": 40,
+          "meaning": "The height on a phone; `height` when absent"
+        },
+        "fill": {
+          "type": "choice",
+          "choices": [
+            "fixed",
+            "window"
+          ],
+          "default": "fixed",
+          "meaning": "The height as given, or no more than four fifths of the window (`min(height, 80svh)`), so a short window still shows what follows"
+        },
         "panel": {
           "type": "choice",
           "choices": [
@@ -580,6 +623,27 @@
           "type": "tone",
           "meaning": "The panel's tone",
           "default": "cream"
+        },
+        "panelWidth": {
+          "type": "squares",
+          "min": 12,
+          "max": 40,
+          "default": 24,
+          "meaning": "The panel's width; narrower than the section on a phone"
+        },
+        "translucent": {
+          "type": "boolean",
+          "default": false,
+          "meaning": "The panel lets the picture through: its tone with alpha and a blur behind it (`--c9y-tone-<tone>-glass` when the library defines it, else the tone at 85%)"
+        },
+        "room": {
+          "type": "choice",
+          "choices": [
+            "flush",
+            "gap"
+          ],
+          "default": "flush",
+          "meaning": "Under a header: flush against it, or the page's gap above it"
         },
         "level": {
           "type": "integer",
@@ -601,7 +665,7 @@
       "slots": {
         "picture": {
           "type": "picture",
-          "meaning": "The photo behind the panel",
+          "meaning": "The photo behind the panel; its `focus` keeps the subject in view when it is cropped",
           "required": true
         },
         "logo": {
@@ -624,7 +688,7 @@
         "actions": {
           "type": "actions",
           "max": 4,
-          "meaning": "Buttons under the words, primary first"
+          "meaning": "Buttons under the words, primary first; each may name its `face` and `size`"
         }
       },
       "examples": [
@@ -632,13 +696,21 @@
           "id": "top",
           "kind": "hero",
           "height": 24,
+          "fill": "window",
           "panel": "centre",
           "panelTone": "cream",
+          "panelWidth": 24,
+          "translucent": true,
+          "room": "flush",
           "level": 1,
           "fit": "cover",
           "picture": {
             "src": "/photos/harbour.jpg",
-            "alt": "Three green rafts on the canal"
+            "alt": "Three green rafts on the canal",
+            "focus": {
+              "x": 50,
+              "y": 30
+            }
           },
           "logo": {
             "src": "/photos/logo.svg",
@@ -650,7 +722,9 @@
             {
               "text": "Book",
               "href": "/book/",
-              "appearance": "primary"
+              "appearance": "primary",
+              "face": "outlined",
+              "size": "medium"
             },
             {
               "text": "Prices",
@@ -663,8 +737,10 @@
           "id": "cabin",
           "kind": "hero",
           "height": 30,
+          "mobileHeight": 20,
           "panel": "left",
           "panelTone": "dark",
+          "room": "gap",
           "picture": {
             "src": "/photos/harbour.jpg",
             "alt": "A floating cabin at dusk",
@@ -701,10 +777,11 @@
           "type": "choice",
           "choices": [
             "1:1",
-            "2:1"
+            "2:1",
+            "5:6"
           ],
           "default": "1:1",
-          "meaning": "The picture's share against the words': equal, or the picture twice as wide"
+          "meaning": "The picture's share against the words': equal, the picture twice as wide, or five to the words' six"
         },
         "imageHeight": {
           "type": "squares",
@@ -712,12 +789,34 @@
           "max": 30,
           "default": 16,
           "meaning": "The picture's height"
+        },
+        "mobileImageHeight": {
+          "type": "squares",
+          "min": 8,
+          "max": 30,
+          "meaning": "The picture's height on a phone; `imageHeight` when absent"
+        },
+        "overlap": {
+          "type": "squares",
+          "min": 0,
+          "max": 4,
+          "default": 2,
+          "meaning": "How far the panel stands over the picture's edge; over its foot on a phone"
+        },
+        "headingAlign": {
+          "type": "choice",
+          "choices": [
+            "start",
+            "centre"
+          ],
+          "default": "start",
+          "meaning": "The heading against the start, or centred"
         }
       },
       "slots": {
         "picture": {
           "type": "picture",
-          "meaning": "The photo",
+          "meaning": "The photo; its `focus` keeps the subject in view when it is cropped",
           "required": true
         },
         "heading": {
@@ -732,7 +831,7 @@
         "actions": {
           "type": "actions",
           "max": 4,
-          "meaning": "Buttons under the words"
+          "meaning": "Buttons under the words; each may name its `face` and `size`"
         }
       },
       "examples": [
@@ -741,6 +840,9 @@
           "kind": "split",
           "ratio": "1:1",
           "imageHeight": 16,
+          "mobileImageHeight": 12,
+          "overlap": 2,
+          "headingAlign": "centre",
           "panelTone": "cream",
           "picture": {
             "src": "/photos/harbour.jpg",
@@ -752,7 +854,8 @@
             {
               "text": "See the raft",
               "href": "/green/",
-              "appearance": "default"
+              "appearance": "default",
+              "face": "outlined"
             }
           ]
         },
@@ -760,12 +863,17 @@
           "id": "blue",
           "kind": "split",
           "reverse": true,
-          "ratio": "2:1",
+          "ratio": "5:6",
           "imageHeight": 20,
+          "overlap": 4,
           "panelTone": "paper",
           "picture": {
             "src": "/photos/harbour.jpg",
-            "alt": "The cabin from the water"
+            "alt": "The cabin from the water",
+            "focus": {
+              "x": 40,
+              "y": 50
+            }
           },
           "heading": "## Blue raft",
           "text": "A cabin of wood and glass on the harbour."
@@ -781,10 +889,11 @@
           "type": "choice",
           "choices": [
             "reading",
-            "wide"
+            "wide",
+            "full"
           ],
           "default": "reading",
-          "meaning": "The column's measure: reading, 32 squares; wide, 50 squares"
+          "meaning": "The column's measure: reading, 32 squares; wide, 50 squares; full, the page"
         },
         "panel": {
           "type": "tone",
@@ -798,6 +907,20 @@
           ],
           "default": "start",
           "meaning": "The words against the start, or centred"
+        },
+        "headingAlign": {
+          "type": "choice",
+          "choices": [
+            "start",
+            "centre"
+          ],
+          "default": "start",
+          "meaning": "The heading alone against the start, or centred"
+        },
+        "hiddenTitle": {
+          "type": "boolean",
+          "default": false,
+          "meaning": "Words for search engines and screen readers alone, such as a page's title said in pictures: kept in the page and read out, not drawn"
         }
       },
       "slots": {
@@ -813,7 +936,7 @@
         "actions": {
           "type": "actions",
           "max": 4,
-          "meaning": "Buttons under the writing"
+          "meaning": "Buttons under the writing; each may name its `face` and `size`"
         }
       },
       "examples": [
@@ -822,6 +945,7 @@
           "kind": "statement",
           "measure": "reading",
           "align": "start",
+          "headingAlign": "centre",
           "heading": "About us",
           "text": "We have sailed the canals since 2016, first with one raft, now with nine."
         },
@@ -842,10 +966,11 @@
           ]
         },
         {
-          "id": "wide",
+          "id": "page-title",
           "kind": "statement",
-          "measure": "wide",
-          "text": "A full line of writing across fifty squares, for a page that reads like a poster."
+          "measure": "full",
+          "hiddenTitle": true,
+          "text": "# Harbour rafts: boat hire and floating glamping"
         }
       ]
     },
@@ -867,6 +992,15 @@
           "max": 4,
           "default": 0,
           "meaning": "Between the heroes"
+        },
+        "room": {
+          "type": "choice",
+          "choices": [
+            "flush",
+            "gap"
+          ],
+          "default": "flush",
+          "meaning": "Under a header: flush against it, or the page's gap above it"
         }
       },
       "slots": {
@@ -884,6 +1018,7 @@
           "kind": "panels",
           "columns": 2,
           "gap": 0,
+          "room": "flush",
           "items": [
             {
               "id": "rafts-green",
@@ -984,12 +1119,28 @@
           "default": 3,
           "meaning": "Cards per row"
         },
+        "measure": {
+          "type": "choice",
+          "choices": [
+            "reading",
+            "wide",
+            "full"
+          ],
+          "default": "full",
+          "meaning": "The column's measure: reading, 32 squares; wide, 62 squares; full, the page; wide and full keep a square from a phone's edges"
+        },
         "height": {
           "type": "squares",
           "min": 6,
           "max": 40,
           "default": 16,
           "meaning": "A card's height; a card grows for longer words"
+        },
+        "mobileHeight": {
+          "type": "squares",
+          "min": 6,
+          "max": 40,
+          "meaning": "A card's height on a phone; `height` when absent"
         },
         "tone": {
           "type": "tone",
@@ -1033,7 +1184,7 @@
             },
             "action": {
               "type": "action",
-              "meaning": "A link at the foot of the words"
+              "meaning": "A link at the foot of the words, with its `face` and `size`; a card whose whole body is a link keeps this"
             }
           }
         }
@@ -1043,7 +1194,9 @@
           "id": "tours",
           "kind": "cards",
           "columns": 3,
+          "measure": "wide",
           "height": 16,
+          "mobileHeight": 12,
           "tone": "cream",
           "variant": "filled",
           "items": [
@@ -1058,7 +1211,9 @@
               "action": {
                 "text": "Book",
                 "href": "/book/green/",
-                "appearance": "primary"
+                "appearance": "primary",
+                "face": "outlined",
+                "size": "medium"
               }
             },
             {
@@ -1127,12 +1282,28 @@
           "default": 3,
           "meaning": "Photos per row; two on a phone"
         },
+        "measure": {
+          "type": "choice",
+          "choices": [
+            "reading",
+            "wide",
+            "full"
+          ],
+          "default": "full",
+          "meaning": "The column's measure: reading, 32 squares; wide, 62 squares; full, the page; wide and full keep a square from a phone's edges"
+        },
         "height": {
           "type": "squares",
           "min": 4,
           "max": 30,
           "default": 8,
           "meaning": "Each photo's height"
+        },
+        "mobileHeight": {
+          "type": "squares",
+          "min": 4,
+          "max": 30,
+          "meaning": "Each photo's height on a phone; `height` when absent"
         },
         "strip": {
           "type": "boolean",
@@ -1155,7 +1326,7 @@
           "required": true,
           "min": 1,
           "max": 24,
-          "meaning": "The photos"
+          "meaning": "The photos; a `focus` keeps a cropped photo's subject in view"
         }
       },
       "examples": [
@@ -1163,12 +1334,18 @@
           "id": "photos",
           "kind": "gallery",
           "columns": 4,
+          "measure": "wide",
           "height": 8,
+          "mobileHeight": 6,
           "fit": "cover",
           "pictures": [
             {
               "src": "/photos/harbour.jpg",
-              "alt": "Three green rafts on the canal"
+              "alt": "Three green rafts on the canal",
+              "focus": {
+                "x": 50,
+                "y": 40
+              }
             },
             {
               "src": "/photos/harbour.jpg",
@@ -1227,6 +1404,16 @@
           "default": 4,
           "meaning": "Columns of tiles; two on a phone"
         },
+        "measure": {
+          "type": "choice",
+          "choices": [
+            "reading",
+            "wide",
+            "full"
+          ],
+          "default": "full",
+          "meaning": "The column's measure: reading, 32 squares; wide, 62 squares; full, the page; wide and full keep a square from a phone's edges"
+        },
         "rhythm": {
           "type": "choice",
           "choices": [
@@ -1242,6 +1429,35 @@
           "max": 20,
           "default": 12,
           "meaning": "A row of tiles' height"
+        },
+        "mobileHeight": {
+          "type": "squares",
+          "min": 6,
+          "max": 20,
+          "meaning": "A row of tiles' height on a phone; `height` when absent"
+        },
+        "tones": {
+          "type": "tones",
+          "min": 1,
+          "max": 12,
+          "default": [
+            "pastel-1",
+            "pastel-2",
+            "pastel-3",
+            "pastel-4",
+            "pastel-5",
+            "pastel-6"
+          ],
+          "meaning": "The tones the tiles turn through, the first tile taking the first; a tile's own `tone` stands instead"
+        },
+        "titleFace": {
+          "type": "choice",
+          "choices": [
+            "heading",
+            "strong"
+          ],
+          "default": "heading",
+          "meaning": "A tile's title as a heading of level 3, or as a line in the medium face"
         }
       },
       "slots": {
@@ -1254,7 +1470,7 @@
           "item": {
             "title": {
               "type": "words",
-              "meaning": "The tile's title; level 3 unless it carries its own #",
+              "meaning": "The tile's title; level 3 unless it carries its own #, or a strong line by `titleFace`",
               "required": true
             },
             "text": {
@@ -1267,11 +1483,11 @@
             },
             "action": {
               "type": "action",
-              "meaning": "A link at the foot"
+              "meaning": "A link at the foot, with its `face` and `size`; a tile whose whole body is a link keeps this"
             },
             "tone": {
               "type": "tone",
-              "meaning": "The tile's pastel; the six pastels in turn when absent"
+              "meaning": "The tile's tone; one of `tones` in turn when absent"
             }
           }
         }
@@ -1281,8 +1497,10 @@
           "id": "facilities",
           "kind": "bento",
           "columns": 4,
+          "measure": "full",
           "rhythm": "featured",
           "height": 12,
+          "mobileHeight": 8,
           "items": [
             {
               "title": "Barbecue",
@@ -1325,6 +1543,11 @@
           "columns": 3,
           "rhythm": "even",
           "height": 8,
+          "tones": [
+            "pastel-2",
+            "highlight"
+          ],
+          "titleFace": "strong",
           "items": [
             {
               "title": "Sail",
@@ -1333,13 +1556,11 @@
             },
             {
               "title": "Stay",
-              "text": "A night on the water.",
-              "tone": "pastel-2"
+              "text": "A night on the water."
             },
             {
               "title": "Celebrate",
               "text": "Birthdays and team days.",
-              "tone": "pastel-3",
               "action": {
                 "text": "Ask us",
                 "href": "/contact/"
@@ -1362,6 +1583,16 @@
           ],
           "default": "none",
           "meaning": "Which answer stands open at first"
+        },
+        "measure": {
+          "type": "choice",
+          "choices": [
+            "reading",
+            "wide",
+            "full"
+          ],
+          "default": "full",
+          "meaning": "The column's measure: reading, 32 squares; wide, 62 squares; full, the page; wide and full keep a square from a phone's edges"
         }
       },
       "slots": {
@@ -1395,6 +1626,7 @@
           "id": "faq",
           "kind": "questions",
           "open": "first",
+          "measure": "reading",
           "heading": "Questions",
           "items": [
             {
@@ -1430,6 +1662,16 @@
           "max": 2,
           "default": 1,
           "meaning": "Columns of pairs"
+        },
+        "measure": {
+          "type": "choice",
+          "choices": [
+            "reading",
+            "wide",
+            "full"
+          ],
+          "default": "full",
+          "meaning": "The column's measure: reading, 32 squares; wide, 62 squares; full, the page; wide and full keep a square from a phone's edges"
         }
       },
       "slots": {
@@ -1458,6 +1700,7 @@
           "id": "contact",
           "kind": "facts",
           "columns": 1,
+          "measure": "reading",
           "items": [
             {
               "term": "Office",
@@ -1512,6 +1755,16 @@
           "type": "boolean",
           "default": false,
           "meaning": "Records stand under their year, newest first"
+        },
+        "measure": {
+          "type": "choice",
+          "choices": [
+            "reading",
+            "wide",
+            "full"
+          ],
+          "default": "full",
+          "meaning": "The column's measure: reading, 32 squares; wide, 62 squares; full, the page; wide and full keep a square from a phone's edges"
         }
       },
       "slots": {
@@ -1561,6 +1814,7 @@
           "kind": "list",
           "dated": true,
           "grouped": true,
+          "measure": "reading",
           "items": [
             {
               "name": "Newsletter May 2026",
@@ -1616,7 +1870,7 @@
             "large"
           ],
           "default": "medium",
-          "meaning": "A button one control high, or two squares high"
+          "meaning": "A button one control high, or two squares high; the button's own `size` stands instead"
         },
         "align": {
           "type": "choice",
@@ -1626,12 +1880,22 @@
           ],
           "default": "centre",
           "meaning": "Against the start, or centred"
+        },
+        "measure": {
+          "type": "choice",
+          "choices": [
+            "reading",
+            "wide",
+            "full"
+          ],
+          "default": "full",
+          "meaning": "The column's measure: reading, 32 squares; wide, 62 squares; full, the page; wide and full keep a square from a phone's edges"
         }
       },
       "slots": {
         "button": {
           "type": "action",
-          "meaning": "The button; primary unless it says otherwise",
+          "meaning": "The button; primary unless it says otherwise, on its fill unless its `face` is outlined",
           "required": true
         }
       },
@@ -1641,10 +1905,12 @@
           "kind": "action",
           "size": "large",
           "align": "centre",
+          "measure": "wide",
           "button": {
             "text": "Book a raft",
             "href": "/book/",
-            "appearance": "primary"
+            "appearance": "primary",
+            "face": "outlined"
           }
         },
         {
@@ -1668,21 +1934,43 @@
         "sticky": {
           "type": "boolean",
           "default": false,
-          "meaning": "Stays at the top of the window as the page scrolls"
+          "meaning": "Stays at the top of the window as the page scrolls, over every section"
         },
         "fold": {
           "type": "squares",
           "min": 20,
-          "max": 40,
+          "max": 60,
           "default": 30,
           "meaning": "Below this width the links and languages fold behind the menu",
           "step": 10
+        },
+        "logoHeight": {
+          "type": "squares",
+          "min": 1,
+          "max": 4,
+          "default": 2,
+          "meaning": "The mark's height"
+        },
+        "mobileLogoHeight": {
+          "type": "squares",
+          "min": 1,
+          "max": 4,
+          "meaning": "The mark's height on a phone; `logoHeight` when absent"
+        },
+        "linkStyle": {
+          "type": "choice",
+          "choices": [
+            "plain",
+            "line"
+          ],
+          "default": "plain",
+          "meaning": "Each link as words on a one-square line, or hanging two squares from a line above it: a hairline of the ink, the current page four pixels of the accent in the accent's ink"
         }
       },
       "slots": {
         "logo": {
           "type": "picture",
-          "meaning": "The mark, one square high, leading home with `href`",
+          "meaning": "The mark, `logoHeight` squares high, leading home with `href`",
           "required": true
         },
         "name": {
@@ -1699,7 +1987,7 @@
         "languages": {
           "type": "languages",
           "max": 8,
-          "meaning": "The other languages' front pages, as words or flags"
+          "meaning": "The other languages' front pages, as words, or as flags one control high where a language has a `picture`"
         },
         "menu": {
           "type": "runtime",
@@ -1711,7 +1999,10 @@
           "id": "site-header",
           "kind": "header",
           "sticky": true,
-          "fold": 30,
+          "fold": 40,
+          "logoHeight": 4,
+          "mobileLogoHeight": 3,
+          "linkStyle": "line",
           "logo": {
             "src": "/photos/logo.svg",
             "alt": "Harbour rafts",
@@ -1850,12 +2141,12 @@
         "languages": {
           "type": "languages",
           "max": 8,
-          "meaning": "The other languages' front pages"
+          "meaning": "This page in every language; the one being read is marked from the address, not stored"
         },
         "follow": {
           "type": "actions",
           "max": 8,
-          "meaning": "Social links, a column at the row's end"
+          "meaning": "Social links, a column at the row's end; with an `icon` each is a round mark one control high in the ink, its words read out"
         },
         "preferences": {
           "type": "runtime",
@@ -1929,11 +2220,13 @@
           "follow": [
             {
               "text": "Instagram",
-              "href": "https://www.instagram.com/example"
+              "href": "https://www.instagram.com/example",
+              "icon": "instagram"
             },
             {
               "text": "Facebook",
-              "href": "https://www.facebook.com/example"
+              "href": "https://www.facebook.com/example",
+              "icon": "facebook"
             }
           ]
         },

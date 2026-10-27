@@ -21,6 +21,7 @@ describe('the vocabulary record', () => {
       if (isSlot(definition)) { if (definition.type === 'items') for (const [name, inner] of Object.entries(definition.item!)) member(inner, `${path}.${name}`); return; }
       if (definition.type === 'choice') { expect(definition.choices!.length, path).toBeGreaterThan(1); if (definition.default !== undefined) expect(definition.choices, path).toContain(definition.default); }
       if (definition.type === 'tone' && definition.default !== undefined) expect(TONES, path).toContain(definition.default);
+      if (definition.type === 'tones') { expect(definition.min, path).toBeDefined(); expect(definition.max, path).toBeDefined(); expect(Array.isArray(definition.default), path).toBe(true); const list = definition.default as readonly string[]; expect(list.length, path).toBeGreaterThanOrEqual(definition.min!); expect(list.length, path).toBeLessThanOrEqual(definition.max!); for (const tone of list) expect(TONES, path).toContain(tone); }
       if (['squares', 'pixels', 'integer'].includes(definition.type)) { expect(definition.min, path).toBeDefined(); expect(definition.max, path).toBeDefined(); if (typeof definition.default === 'number') { expect(definition.default, path).toBeGreaterThanOrEqual(definition.min!); expect(definition.default, path).toBeLessThanOrEqual(definition.max!); } }
     };
     for (const definition of KINDS) {
@@ -57,6 +58,7 @@ describe('the vocabulary record', () => {
         if (field.type === 'squares' || field.type === 'integer' || field.type === 'pixels') bad[name] = field.max! + 1;
         else if (field.type === 'choice') bad[name] = 'nothing-of-the-kind';
         else if (field.type === 'tone') bad[name] = 'mint';
+        else if (field.type === 'tones') bad[name] = ['mint'];
         else if (field.type === 'boolean') bad[name] = 'yes';
         else continue;
         let refusal: { message: string; reason?: string } | undefined;
