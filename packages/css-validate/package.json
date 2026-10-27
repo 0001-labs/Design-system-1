@@ -1,6 +1,6 @@
 {
   "name": "@ds-one/css-validate",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "description": "Publish-time CSS validation for hosted DS1 libraries. Runs unchanged in the browser and in a Cloudflare Worker.",
   "license": "MIT",

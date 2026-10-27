@@ -95,7 +95,7 @@ Design system 1 is a general design system anyone can use. Never name 0001's pro
 
 ## Version
 
-0.3.0
+0.3.1
 
 ## Scripts
 
