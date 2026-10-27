@@ -23,7 +23,7 @@ export interface NativeCollection extends NativeBlockBase {
   kind: 'collection'; binding: string; layout: 'grid' | 'gallery';
   /** Gallery uses this many ordinary cards per row; its first row contains featured cards. */
   columns: number; featured: number; columnGap: number; rowGap: number;
-  imageHeight: number; fit: 'contain' | 'cover';
+  imageHeight: number; featuredImageHeight?: number; mobileImageHeight?: number; fit: 'contain' | 'cover';
 }
 export type NativeRuntimeProps = Record<string, string | number | boolean | null>;
 export interface NativeRuntime extends NativeBlockBase { kind: 'runtime'; name: string; props: NativeRuntimeProps }
@@ -35,7 +35,7 @@ export interface NativePageDocument {
   blocks: NativeBlock[];
 }
 export interface NativeCollectionItem {
-  id: string; href: string; title: string; image?: { src: string; alt: string }; price?: string;
+  id: string; href?: string; title: string; image?: { src: string; alt: string }; price?: string;
 }
 export interface NativeCollectionData { items: NativeCollectionItem[] }
 export interface NativePageContext {
@@ -117,9 +117,11 @@ export function validateNativePage(value: unknown, context: NativePageContext): 
         if(input.appearance!==undefined)block.appearance=choice(input.appearance,['plain','primary','secondary'] as const);
         if(input.binding!==undefined){const binding=text(input.binding,200);if(!context.bindings?.includes(binding))return invalid();block.binding=binding;}
       }else if(kind==='collection'){
-        keys(input,[...common,'binding','layout','columns','featured','columnGap','rowGap','imageHeight','fit']);
+        keys(input,[...common,'binding','layout','columns','featured','columnGap','rowGap','imageHeight','featuredImageHeight','mobileImageHeight','fit']);
         const binding=text(input.binding,200);if(!context.collections.includes(binding))return invalid();
         block={...base,kind,binding,layout:choice(input.layout,['grid','gallery']),columns:integer(input.columns,6,1),featured:integer(input.featured,6),columnGap:integer(input.columnGap),rowGap:integer(input.rowGap),imageHeight:integer(input.imageHeight,2000,20),fit:choice(input.fit,['contain','cover'])};
+        if(input.featuredImageHeight!==undefined)block.featuredImageHeight=integer(input.featuredImageHeight,2000,20);
+        if(input.mobileImageHeight!==undefined)block.mobileImageHeight=integer(input.mobileImageHeight,2000,20);
       }else{
         keys(input,[...common,'name','props']);const name=text(input.name,80),allowed=context.runtimes[name];if(!allowed)return invalid();
         const props=record(input.props);keys(props,allowed);const clean:NativeRuntimeProps={};
@@ -152,6 +154,8 @@ export function nativeBlockStyles(block: NativeBlock): Record<string,string> {
   if(block.kind==='grid'||block.kind==='collection')Object.assign(styles,{'--c9y-columns':String(block.kind==='collection'?nativeCollectionTracks(block).columns:block.columns),'--c9y-column-gap':measure(block.columnGap),'--c9y-row-gap':measure(block.rowGap)});
   if(block.kind==='collection'){
     const tracks=nativeCollectionTracks(block);Object.assign(styles,{'--c9y-item-span':String(tracks.ordinarySpan),'--c9y-featured-span':String(tracks.featuredSpan),'--c9y-image-height':measure(block.imageHeight),'--c9y-image-fit':block.fit});
+    if(block.featuredImageHeight!==undefined)styles['--c9y-featured-image-height']=measure(block.featuredImageHeight);
+    if(block.mobileImageHeight!==undefined)styles['--c9y-mobile-image-height']=measure(block.mobileImageHeight);
   }
   if(block.kind==='image'){
     if(block.height!==undefined)styles['--c9y-image-height']=measure(block.height);
@@ -176,8 +180,10 @@ export function renderNativeBlock(block: NativeBlock, options: NativePageRenderO
   if(block.kind==='link')return`<div ${attrs}><a class="${block.appearance&&block.appearance!=='plain'?`ds-button ds-button--${block.appearance}`:'c9y-native-link'}" href="${escape(address(block.href))}">${escape(block.text)}</a></div>`;
   if(block.kind==='runtime')return`<div ${attrs}>${options.runtime?.(block)??''}</div>`;
   return`<div ${attrs}>${(options.collections?.[block.binding]?.items??[]).map((item,index)=>{
-    const image=item.image?`<a class="c9y-native-collection-media" href="${escape(address(item.href))}"><img src="${escape(address(item.image.src,true))}" alt="${escape(item.image.alt)}" loading="lazy"></a>`:'';
-    return`<article class="c9y-native-collection-item" data-item-id="${escape(item.id)}"${block.layout==='gallery'&&index<block.featured?' data-featured':''}>${image}<div class="c9y-native-collection-caption"><a href="${escape(address(item.href))}">${escape(item.title)}</a>${item.price?`<span class="c9y-native-collection-price">${escape(item.price)}</span>`:''}</div>${options.collectionAction?.(block,item)??''}</article>`;
+    const tag=item.href?'a':'div',link=item.href?` href="${escape(address(item.href))}"`:'';
+    const image=item.image?`<${tag} class="c9y-native-collection-media"${link}><img src="${escape(address(item.image.src,true))}" alt="${escape(item.image.alt)}" loading="lazy"></${tag}>`:'';
+    const title=item.href?`<a${link}>${escape(item.title)}</a>`:`<span>${escape(item.title)}</span>`;
+    return`<article class="c9y-native-collection-item" data-item-id="${escape(item.id)}"${block.layout==='gallery'&&index<block.featured?' data-featured':''}>${image}<div class="c9y-native-collection-caption">${title}${item.price?`<span class="c9y-native-collection-price">${escape(item.price)}</span>`:''}${options.collectionAction?.(block,item)??''}</div></article>`;
   }).join('')}</div>`;
 }
 export function renderNativePage(document: NativePageDocument, options: NativePageRenderOptions = {}): string {
