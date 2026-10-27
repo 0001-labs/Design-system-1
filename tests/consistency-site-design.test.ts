@@ -11,6 +11,8 @@ test('typed source contexts share attributes, class states and logical spacing',
   expect(siteSurfacePatch('card','div',{tone:'pink',variant:'outlined',gaps:{title:40}})).toEqual({attributes:{'data-tone':'pink'},classes:{'ds-card--outlined':true},styles:{'--ds-card-title-gap':'calc(40px * var(--sf, 1))'}});
   expect(siteSurfacePatch('card','ds-card',{variant:'filled'}).attributes).toEqual({variant:'filled'});
   expect(siteSurfacePatch('button','a',{appearance:'plain',action:{kind:'page',target:'/about'}})).toEqual({attributes:{primary:null,secondary:null,href:'/about'},classes:{'ds-button--primary':false,'ds-button--secondary':false},styles:{}});
+  expect(siteSurfacePatch('button','a',{action:null}).attributes).toEqual({href:null});
+  expect(siteSurfacePatch('button','a',{}).attributes).toEqual({});
 });
 
 test('stat colour resolves both schemes without global DS1 tokens', () => {

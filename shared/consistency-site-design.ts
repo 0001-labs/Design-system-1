@@ -2,7 +2,8 @@
 export interface SiteSurfaceDesign {
   tone?: string; variant?: 'filled' | 'outlined'; color?: string;
   appearance?: 'plain' | 'primary' | 'secondary';
-  action?: { kind: 'link' | 'page'; target: string };
+  /** Null clears the authored destination; omission restores the source destination. */
+  action?: { kind: 'link' | 'page'; target: string } | null;
   gaps?: Record<string, number>;
 }
 export interface SiteDesignPatch {
@@ -36,7 +37,7 @@ export function siteSurfacePatch(kind:string,tag:string,design:SiteSurfaceDesign
       patch.attributes[appearance]=design.appearance===appearance?'':null;
       patch.classes[`ds-button--${appearance}`]=design.appearance===appearance;
     }
-    if(design.action)patch.attributes.href=design.action.target;
+    if(design.action!==undefined)patch.attributes.href=design.action?.target ?? null;
   }
   if(kind==='stat'&&design.color){
     const accent=`var(--ds-${design.color}, ${COLORS[design.color] ?? COLORS['sharp-blue']})`;
