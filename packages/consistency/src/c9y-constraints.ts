@@ -32,6 +32,12 @@ export const C9Y_CONSTRAINTS: C9yConstraint[] = [
     check: { file: 'tests/native-page.mjs', test: 'Native page: real model/scroll/public geometry' },
   },
   {
+    code: 'native.sections',
+    rule: 'A section of the vocabulary is one block: selected, moved, hidden, removed and resized whole; its fields are set from its menu inside the vocabulary\'s ranges, its words edited in place in their slots, and its items reordered and removed inside it, never below the kind\'s minimum.',
+    why: 'The renderer expands a section to primitives, so the editor reads the same expansion and never guesses a layout from the HTML; the vocabulary is the one record of what a field may be.',
+    check: { file: 'src/native-page-model.test.ts', test: 'edits a section as one block: slots, items and ranges from the vocabulary' },
+  },
+  {
     code: 'drag.one-movement',
     rule: 'While a block is carried, the blocks around it move out of the way once for each change of place, straight to where the dropped order will draw them, and nothing moves again on release.',
     why: 'Someone dragging is rearranging the layout; a page that lands and then corrects itself has guessed wrong in front of them. Drag measures each list\'s flow at lift (sizes, margins, gap, collapsing margins) so the room it makes is the layout the drop commits.',

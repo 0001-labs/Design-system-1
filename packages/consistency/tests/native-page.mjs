@@ -1,5 +1,5 @@
 import { chromium } from 'playwright';
-import { nativePageFixture } from './native-page-fixture.mjs';
+import { nativePageFixture, nativePicture } from './native-page-fixture.mjs';
 const check=(condition,message)=>{if(!condition)throw Error(message);};
 const eventually=async(test,message)=>{const until=Date.now()+10000;while(!await test()){if(Date.now()>until)throw Error(message);await new Promise(resolve=>setTimeout(resolve,30));}};
 const fixture=await nativePageFixture(),browser=await chromium.launch({headless:true});
@@ -23,7 +23,7 @@ try{
 
  const blocks=async()=>{const all=[];const visit=items=>items.forEach(block=>{all.push(block);if(block.children)visit(block.children);});visit((await fixture.read()).document.blocks);return all;};
  const menu=async action=>{await frame.locator('[data-c9y-block="products"] .c9y-native-collection-media').first().click({button:'right',position:{x:40,y:40}});await page.getByRole('menuitem',{name:action,exact:true}).click();};
- await menu('Add content');await page.keyboard.type('/Card');await frame.locator('.aa-menu button[aria-label="Card"]').click();
+ await menu('Add writing');await page.keyboard.type('/Card');await frame.locator('.aa-menu button[aria-label="Card"]').click();
  await eventually(async()=>(await blocks()).some(block=>block.kind==='content'&&block.source.includes('```c9y-card')),'Native slash menu did not add a card');
  const cardBlock=(await blocks()).find(block=>block.kind==='content'&&block.source.includes('```c9y-card')),cardRegion=frame.locator(`[data-c9y-block="${cardBlock.id}"]`);
  await cardRegion.locator('ds-card').click({button:'right',position:{x:10,y:10}});await frame.getByRole('menuitem',{name:'Pink',exact:true}).click();
@@ -32,7 +32,7 @@ try{
  await eventually(async()=>(await blocks()).find(block=>block.id===cardBlock.id).source.includes('A native card title'),'Native card title did not save');
  const beforeCardWidth=await cardRegion.locator('ds-card').evaluate(element=>element.getBoundingClientRect().width);await cardRegion.getByRole('slider',{name:'Card width',exact:true}).press('ArrowLeft');
  await eventually(async()=>await cardRegion.locator('ds-card').evaluate(element=>element.getBoundingClientRect().width)<beforeCardWidth,'Native card resize did not render');
- await menu('Add content');await page.keyboard.type('/Button');await frame.locator('.aa-menu button[aria-label="Button"]').click();await eventually(async()=>(await blocks()).some(block=>block.kind==='content'&&block.source.includes('```c9y-button')),'Native slash menu did not add a button');
+ await menu('Add writing');await page.keyboard.type('/Button');await frame.locator('.aa-menu button[aria-label="Button"]').click();await eventually(async()=>(await blocks()).some(block=>block.kind==='content'&&block.source.includes('```c9y-button')),'Native slash menu did not add a button');
  // Direct sibling Drag and cancellation use the actual pointer engine inside the script-free frame.
  const pointer=async(from,to,cancel=false)=>{const input=await page.context().newCDPSession(page);await input.send('Input.dispatchMouseEvent',{type:'mouseMoved',...from});await input.send('Input.dispatchMouseEvent',{type:'mousePressed',...from,button:'left',buttons:1,clickCount:1});for(let step=1;step<=12;step++)await input.send('Input.dispatchMouseEvent',{type:'mouseMoved',x:from.x+(to.x-from.x)*step/12,y:from.y+(to.y-from.y)*step/12,buttons:1});if(cancel)await page.keyboard.press('Escape');await input.send('Input.dispatchMouseEvent',{type:'mouseReleased',...to,button:'left',buttons:0,clickCount:1});await input.detach();};
  await frame.locator('[data-c9y-block="story"]').scrollIntoViewIfNeeded();let pictureBox=await frame.locator('[data-c9y-block="picture"]').boundingBox(),wordsBox=await frame.locator('[data-c9y-block="words"]').boundingBox();
@@ -41,6 +41,31 @@ try{
  await eventually(async()=>(await blocks()).find(block=>block.id==='story').children[0].id==='picture','Native pointer reorder did not save');
  await menu('Undo');await eventually(async()=>(await blocks()).find(block=>block.id==='story').children[0].id==='words','Native reorder undo failed');
  const imageWidth=frame.locator('[data-native-resize=picture].consistency-resize-width');await imageWidth.press('ArrowRight');await eventually(async()=>(await blocks()).find(block=>block.id==='picture').width===420,'Native image resize did not save');
+ // Sections are one block each: selected whole, resized on the square inside the kind's range, their words edited in their slots, their fields set from the menu, their items reordered, added and removed inside them, a new one inserted from the vocabulary.
+ const hero=frame.locator('[data-c9y-block="top"]');await hero.scrollIntoViewIfNeeded();await hero.click({position:{x:20,y:20}});
+ check(await hero.getAttribute('data-selected')!==null,'Hero was not selected as one block');check(await hero.locator('[data-selectable]:not(.aa-block)').count()===0,'A hero\'s slots are selectable apart from the hero');
+ const heroHeight=frame.locator('[data-native-resize=top].consistency-resize-height');await heroHeight.press('ArrowDown');await eventually(async()=>(await blocks()).find(block=>block.id==='top').height===23,'Hero height did not save in squares');
+ check(await hero.evaluate(element=>element.getBoundingClientRect().height)===460,'Hero does not draw its saved height');
+ const heroTitle=frame.locator('[data-c9y-block="top.title"] aa-editor>.aa-block').first();await heroTitle.click();await heroTitle.press(`${modifier}+a`);await page.keyboard.type('A new hero title');
+ await eventually(async()=>(await blocks()).find(block=>block.id==='top').title==='A new hero title','Hero title did not save to its slot as plain words');
+ check(await frame.locator('[data-c9y-block="top.title"] aa-editor').evaluate(element=>element.value)==='# A new hero title','Hero title is not drawn as the heading its level says');
+ await hero.click({button:'right',position:{x:20,y:20}});await page.getByRole('menuitemradio',{name:'Dark',exact:true}).click();await eventually(async()=>(await blocks()).find(block=>block.id==='top').panelTone==='dark','Hero panel tone did not save from the menu');
+ check(await page.getByRole('menuitemradio',{name:'Dark',exact:true}).getAttribute('aria-checked')==='true','The menu did not show the chosen tone');await page.keyboard.press('Escape');
+ await eventually(async()=>await frame.locator('[data-c9y-block="top.panel"][data-tone="dark"]').count()===1,'Hero panel was not drawn in its new tone');
+ const cards=frame.locator('[data-c9y-block="tours"]');await cards.scrollIntoViewIfNeeded();const cardsModel=async()=>(await blocks()).find(block=>block.id==='tours');
+ let firstCard=await frame.locator('[data-c9y-block="tours.items.0"]').boundingBox(),secondCard=await frame.locator('[data-c9y-block="tours.items.1"]').boundingBox();
+ await pointer({x:secondCard.x+8,y:secondCard.y+8},{x:firstCard.x+8,y:firstCard.y+8});await eventually(async()=>(await cardsModel()).items[0].title==='Sunset','Cards did not reorder inside their section');
+ await frame.locator('[data-c9y-block="tours.items.1"]').click({position:{x:8,y:8}});await page.keyboard.press('Alt+ArrowUp');await eventually(async()=>(await cardsModel()).items[0].title==='Green raft','Alt+Arrow did not move the card back');
+ await cards.click({button:'right',position:{x:8,y:8}});await page.getByRole('menuitem',{name:'Add card',exact:true}).click();await eventually(async()=>(await cardsModel()).items.length===4,'Add card did not add an item');
+ check((await cardsModel()).items[3].title==='Title'&&(await cardsModel()).items[3].picture.src===nativePicture,'The new card is not the example with placeholder words and the site\'s picture');await frame.locator('[data-c9y-block="tours.items.3"]').waitFor();
+ await frame.locator('[data-c9y-block="tours.items.3"]').click({position:{x:8,y:8}});await page.keyboard.press('Delete');await eventually(async()=>(await cardsModel()).items.length===3,'Delete did not remove the card');
+ await cards.click({button:'right',position:{x:8,y:8}});await page.getByRole('menuitemradio',{name:'Outlined',exact:true}).click();await page.keyboard.press('Escape');await eventually(async()=>(await cardsModel()).variant==='outlined'&&await frame.locator('[data-c9y-block="tours"][data-variant="outlined"]').count()===1,'Cards variant did not save from the menu');
+ await cards.click({button:'right',position:{x:8,y:8}});await page.getByRole('menuitem',{name:'Add section',exact:true}).click();await page.getByRole('menuitem',{name:'Gallery',exact:true}).click();
+ await eventually(async()=>{const list=(await fixture.read()).document.blocks,at=list.findIndex(block=>block.id==='tours');return list[at+1]?.kind==='gallery';},'Gallery was not inserted after the cards');
+ const gallery=(await fixture.read()).document.blocks.find(block=>block.kind==='gallery');check(gallery.pictures.length>0&&gallery.pictures.every(picture=>picture.src===nativePicture),'Gallery pictures are not the site\'s own');
+ check(await frame.locator(`[data-c9y-block="${gallery.id}"][data-selected]`).count()===1,'The inserted gallery is not selected');check(await frame.locator(`[data-c9y-block="${gallery.id}"] img`).count()===gallery.pictures.length,'The inserted gallery is not drawn');
+ await menu('Undo');await eventually(async()=>!(await fixture.read()).document.blocks.some(block=>block.kind==='gallery'),'Undo did not take the gallery back');
+ check(await frame.locator('[data-c9y-block="faq"] details[open]').count()===2,'Questions are not all open to edit');
  // Serialized save acknowledgements never erase later layout edits.
  const gate=fixture.holdNextWrite(),beforeSlow=fixture.writes.length;await column.focus();await column.press('ArrowRight');await gate.seen;await column.press('ArrowRight');gate.release();await eventually(async()=>(await blocks()).find(block=>block.id==='products').columnGap===100,'A slow native save erased the later gesture');check(fixture.writes.length===beforeSlow+2,'Native writes were not serialized');
  fixture.failWrites(true);await row.focus();await row.press('ArrowUp');await page.getByRole('button',{name:'Try again',exact:true}).waitFor();const failedWrites=fixture.writes.length;await page.waitForTimeout(650);check(fixture.writes.length===failedWrites,'Failed native save retried silently');
@@ -51,5 +76,5 @@ try{
  // Native link edits save as structured words; holding the modifier follows the route.
  const about=frame.locator('[data-c9y-block="about"] a');await about.click({modifiers:[modifier]});await frame.locator('[data-c9y-block="about-text"]').waitFor();check(fixture.legacy.length===0,'Native navigation awaited legacy page data');await frame.locator('[data-c9y-block="back"] a').click({modifiers:[modifier]});await frame.locator('[data-c9y-block="products"]').waitFor();
  check(errors.length===0,`Native page runtime errors: ${errors.join('; ')}`);
- console.log('Native page: real model/scroll/public geometry, bound writing, native card/button, pointer/resize/undo, serialized failures/conflicts and native navigation pass');
+ console.log('Native page: real model/scroll/public geometry, bound writing, native card/button, pointer/resize/undo, sections (hero, cards, questions, gallery), serialized failures/conflicts and native navigation pass');
 }catch(error){for(const page of browser.contexts().flatMap(context=>context.pages()))if(page.url().includes('home.html'))await page.screenshot({path:'/tmp/c9y-native-failure.png'}).catch(()=>{});console.error(error);throw error;}finally{await browser.close();await fixture.close();}

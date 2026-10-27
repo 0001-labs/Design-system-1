@@ -1,18 +1,28 @@
 /** Isolated site storage and the actual shared native renderer; no production writes. */
 import { build } from 'esbuild';
 import { createServer } from 'node:http';
-import { mkdtemp, rm, readdir, readFile } from 'node:fs/promises';
+import { mkdtemp, rm, readdir, readFile, mkdir, writeFile } from 'node:fs/promises';
+import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { homedir, tmpdir } from 'node:os';
-import { extname, join, resolve } from 'node:path';
+import { dirname, extname, join, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { componentFixture } from './component-fixture.mjs';
-const assets=fileURLToPath(new URL('../../../website/dist/',import.meta.url));
+import syncExports from '../../../sync.exports.mjs';
+const assets=fileURLToPath(new URL('../../../website/dist/',import.meta.url)),ds1=fileURLToPath(new URL('../../../',import.meta.url));
 const policy="sandbox allow-same-origin; default-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; media-src 'self' https:; frame-ancestors 'self'; form-action 'none'; base-uri 'none'";
 export const nativePicture='/pictures/sample.jpg';
 const picture='<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="400" height="400" fill="#b4c7a8"/><circle cx="200" cy="200" r="120" fill="#e3a687"/></svg>';
+/** The `native-content` export as Sync 1 writes it for the platform, from this checkout: the platform's store is bundled against the renderer it will take, not the copy it last took. */
+async function freshNativeContent(into){
+ const read=rel=>readFileSync(join(ds1,rel));
+ const tree=(rel,{only,skip}={})=>{const map=new Map();for(const file of readdirSync(join(ds1,rel),{recursive:true})){const path=String(file).split(sep).join('/');if(only&&!only.test(path)||skip&&skip.test(path)||!statSync(join(ds1,rel,file)).isFile())continue;map.set(path,readFileSync(join(ds1,rel,file)));}return map;};
+ for(const[path,content]of Object.entries(syncExports.exports['native-content'].files({read,tree,options:{}}))){await mkdir(dirname(join(into,path)),{recursive:true});await writeFile(join(into,path),content);}
+}
 export async function nativePageFixture(){
- const platform=resolve(process.env.C9Y_PLATFORM_ROOT??join(homedir(),'0001/Consistency/platform')),temporary=await mkdtemp(join(tmpdir(),'c9y-native-fixture-')),output=join(temporary,'platform.mjs');
- await build({stdin:{contents:`export * from ${JSON.stringify(join(platform,'worker/site-native.ts'))};export {FakeStorage,teamMigrations} from ${JSON.stringify(join(platform,'tests/fakes.ts'))};export {renderNativePage,nativePageStyles} from ${JSON.stringify(join(platform,'vendor/consistency-content/native-page.ts'))};`,resolveDir:platform,loader:'ts'},outfile:output,bundle:true,platform:'node',format:'esm',logLevel:'silent',banner:{js:'import {createRequire} from "node:module";const require=createRequire(import.meta.url);'}});
+ const platform=resolve(process.env.C9Y_PLATFORM_ROOT??join(homedir(),'0001/Consistency/platform')),temporary=await mkdtemp(join(tmpdir(),'c9y-native-fixture-')),output=join(temporary,'platform.mjs'),vendor=join(temporary,'consistency-content');
+ await freshNativeContent(vendor);
+ const freshVendor={name:'fresh-native-content',setup(build){build.onResolve({filter:/vendor\/consistency-content\//},args=>{const name=args.path.split('vendor/consistency-content/')[1];return{path:join(vendor,extname(name)?name:`${name}.ts`)};});}};
+ await build({stdin:{contents:`export * from ${JSON.stringify(join(platform,'worker/site-native.ts'))};export {FakeStorage,teamMigrations} from ${JSON.stringify(join(platform,'tests/fakes.ts'))};export {renderNativePage,nativePageStyles} from ${JSON.stringify(join(platform,'vendor/consistency-content/native-page.ts'))};`,resolveDir:platform,loader:'ts'},outfile:output,bundle:true,platform:'node',format:'esm',logLevel:'silent',plugins:[freshVendor],banner:{js:'import {createRequire} from "node:module";const require=createRequire(import.meta.url);'}});
  const engine=await import(pathToFileURL(output)),storage=new engine.FakeStorage();for(const name of (await readdir(join(platform,'vendor/site-engine/migrations'))).filter(name=>name.endsWith('.sql')).sort())storage.sql.exec(await readFile(join(platform,'vendor/site-engine/migrations',name),'utf8'));const store=new engine.NativePageStore(storage);
  const definition={document:{schema:1,kind:'native-page',title:'Flowers and objects',lang:'en',layout:{maxWidth:1200,padding:20,gap:40},blocks:[
   {id:'header',kind:'flow',role:'header',direction:'row',mobileDirection:'row',gap:20,padding:0,children:[{id:'logo',kind:'image',src:nativePicture,alt:'Brand',width:160,height:80,fit:'contain'},{id:'about',kind:'link',href:'/about/',text:'About'}]},
@@ -21,6 +31,10 @@ export async function nativePageFixture(){
   {id:'story',kind:'flow',direction:'column',gap:40,mobileGap:20,padding:20,children:[{id:'words',kind:'content',source:'Words below the gallery.'},{id:'picture',kind:'image',src:nativePicture,alt:'Picture',width:400,height:280,mobileHeight:180,fit:'contain'}]},
   {id:'work-images',kind:'grid',columns:2,mobileColumns:2,columnGap:20,rowGap:20,children:[{id:'work-one',kind:'image',src:nativePicture,alt:'Work one',height:500,mobileHeight:280},{id:'work-two',kind:'image',src:nativePicture,alt:'Work two',height:500,mobileHeight:280}]},
   {id:'responsive-outer',kind:'flow',direction:'column',gap:120,mobileGap:60,padding:0,children:[{id:'responsive-inner',kind:'flow',direction:'row',gap:0,padding:0,children:[{id:'nested-words',kind:'content',source:'Nested layout keeps its own zero gap.'}]}]},
+  // Sections of the vocabulary: a hero, cards and questions, each one block with its slots and items.
+  {id:'top',kind:'hero',height:24,panel:'centre',panelTone:'cream',picture:{src:nativePicture,alt:'The harbour'},title:'A hero over the harbour',text:'Words on the panel.',actions:[{text:'Book',href:'/book/',appearance:'primary'}]},
+  {id:'tours',kind:'cards',columns:3,height:12,items:[{label:'1.5 hours',title:'Green raft',text:'For eight.',action:{text:'Book',href:'/book/'}},{label:'3 hours',title:'Sunset',text:'Evening light.'},{label:'Groups',title:'Quiz',text:'Culture and history.'}]},
+  {id:'faq',kind:'questions',open:'first',heading:'Questions',items:[{question:'Do I need a licence?',answer:'No.'},{question:'What if it rains?',answer:'The rafts have a roof.'}]},
   {id:'footer',kind:'flow',role:'footer',direction:'row',gap:20,padding:20,children:[{id:'contact',kind:'link',href:'mailto:hello@example.com',text:'Get in touch'},{id:'cart',kind:'runtime',name:'Cart',props:{}}]},
  ]},bindings:{'home.title':{kind:'team-field',path:'/',key:'native-title',fallback:'# Flowers and objects\n\nCurrent, living catalogue.'}},collections:{products:{items:Array.from({length:5},(_,index)=>({id:`product-${index}`,title:`Object ${index+1}`,image:{src:nativePicture,alt:`Object ${index+1}`},price:`${100+index*10} kr.`}))}},allowedRuntimes:{Cart:[]},images:[nativePicture]};
  const definitions={'/':definition,'/about/':{...definition,document:{...definition.document,title:'About',blocks:[{id:'back',kind:'link',href:'/',text:'Back home'},{id:'about-text',kind:'content',source:'# About our studio'}]},bindings:{}}};

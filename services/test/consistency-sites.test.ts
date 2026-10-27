@@ -1,6 +1,6 @@
 import { expect, it, vi } from 'vite-plus/test';
 import { consistencyPreview } from '../src/consistency';
-import { BUSINESS_BYTES, DOCUMENT_POLICY, EDIT_BYTES, FILE_POLICY, NATIVE_PAGE_BYTES, apiRoute } from '../src/consistency-sites';
+import { BUSINESS_BYTES, DOCUMENT_POLICY, EDIT_BYTES, FACE_HOSTS, FILE_POLICY, NATIVE_PAGE_BYTES, apiRoute } from '../src/consistency-sites';
 import type { ReportsEnv } from '../src/reports';
 
 const origin = 'https://editor.c9y.site';
@@ -63,6 +63,14 @@ it('serves the page sandboxed, with no script source, even opened on its own', a
   expect(page.status).toBe(200);
   expect(page.headers.get('content-security-policy')).toBe(DOCUMENT_POLICY);
   expect(DOCUMENT_POLICY).toMatch(/^sandbox allow-same-origin;/); expect(DOCUMENT_POLICY).not.toMatch(/allow-scripts|script-src/);
+  // A library that pins a Google face draws it in the frame: its stylesheet from one host, its files from the other, and nothing else off this origin.
+  const directive = (policy: string, name: string) => policy.split(';').map(part => part.trim()).find(part => part.startsWith(`${name} `))!;
+  for (const policy of [DOCUMENT_POLICY, FILE_POLICY]) {
+    expect(directive(policy, 'style-src')).toBe(`style-src ${policy === DOCUMENT_POLICY ? "'self' " : ''}'unsafe-inline' ${FACE_HOSTS.styles}`);
+    expect(directive(policy, 'font-src')).toBe(`font-src 'self' data: ${FACE_HOSTS.fonts}`);
+    expect(directive(policy, 'default-src')).toBe("default-src 'none'"); expect(policy).not.toMatch(/script-src|connect-src|allow-scripts/);
+    expect(policy.match(/https:\/\/[\w.-]+/g)).toEqual([FACE_HOSTS.styles, FACE_HOSTS.fonts]);
+  }
   expect(page.headers.get('x-content-type-options')).toBe('nosniff');
   expect(page.headers.get('cache-control')).toBe('private, no-store');
   const wrong = setup('owner', () => new Response('alert(1)', { headers: { 'Content-Type': 'text/javascript' } }));
@@ -133,7 +141,10 @@ it('passes on exactly the platform\'s allowlist of a site\'s API, each route by 
     [`orders/${id}/invoice`, 'POST'], [`orders/${id}/fulfil`, 'POST'], [`orders/${id}/note`, 'PUT'], ['order-settings', 'GET'], ['order-settings', 'PUT']])
     expect(apiRoute(route!)?.methods, `${method} ${route}`).toContain(method);
   const { call, workspace } = setup();
-  for (const route of ['editors', 'report', 'code', 'verify', 'sign-out', 'analytics', 'flags', 'pages/', 'bookings/nope', `giftcards/${id}/refund`, 'emails/a/b',
+  // The site's library, its theme: read, set and taken away, each the platform's own route.
+  for (const method of ['GET', 'PUT', 'DELETE']) expect(apiRoute('library')?.methods, `${method} library`).toContain(method);
+  expect(apiRoute('library')?.methods).not.toContain('POST'); expect(apiRoute('library/x')).toBeNull(); expect(apiRoute('libraries')).toBeNull();
+  for (const route of ['editors', 'report', 'code', 'verify', 'sign-out', 'analytics', 'flags', 'pages/', 'bookings/nope', `giftcards/${id}/refund`, 'emails/a/b', 'library/x', 'libraries',
     'orders/Rb42Xq', `orders/${id}/pay`, `orders/${id}/expire`, `orders/${id}/note/x`, 'orders/config/x', 'order-settings/x', 'design', 'design/x'])
     expect((await call(`10VNDG/api/${route}`, { headers })).status, route).toBe(404);
   expect((await call('10VNDG/api/pages', write('POST', '{}'))).status).toBe(405);
@@ -145,6 +156,7 @@ it('passes on exactly the platform\'s allowlist of a site\'s API, each route by 
   expect((await call(`10VNDG/api/orders/${id}/note`, write('POST', '{}'))).status).toBe(405);
   expect((await call('10VNDG/api/order-settings', write('POST', '{}'))).status).toBe(405);
   expect((await call('10VNDG/api/design', write('PUT', '{}'))).status).toBe(404);
+  expect((await call('10VNDG/api/library', write('POST', '{}'))).status).toBe(405);
   expect((await call('10VNDG/places', write('POST', '{}'))).status).toBe(405);
   expect(workspace.fetch).not.toHaveBeenCalled();
 });
@@ -177,8 +189,14 @@ it('takes a write to the API as same-origin JSON within its bound: the engine\'s
   expect(workspace.fetch).not.toHaveBeenCalled();
   const business = await call('10VNDG/api/business', write('POST', JSON.stringify({ operation: 'catalogue:staffList', args: { pad: 'y'.repeat(EDIT_BYTES) } })));
   expect(await business.json()).toEqual({ path: '/api/consistency/sites/10VNDG/api/business', method: 'POST' });
+  const library = await call('10VNDG/api/library', write('PUT', '{"id":"12ABCD","version":"3"}'));
+  expect(await library.json()).toEqual({ path: '/api/consistency/sites/10VNDG/api/library', method: 'PUT' });
+  expect(await workspace.fetch.mock.calls[1]![0].text()).toBe('{"id":"12ABCD","version":"3"}');
+  const gone = await call('10VNDG/api/library', { method: 'DELETE', headers: { ...headers, origin, 'Content-Type': 'application/json' } });
+  expect(await gone.json()).toEqual({ path: '/api/consistency/sites/10VNDG/api/library', method: 'DELETE' });
+  expect(await (await call('10VNDG/api/library', { headers })).json()).toEqual({ path: '/api/consistency/sites/10VNDG/api/library', method: 'GET' });
   const put = await call('10VNDG/api/booking-settings', write('PUT', '{"who":"owner"}'));
   expect(await put.json()).toEqual({ path: '/api/consistency/sites/10VNDG/api/booking-settings', method: 'PUT' });
-  expect(await workspace.fetch.mock.calls[1]![0].text()).toBe('{"who":"owner"}');
+  expect(await workspace.fetch.mock.calls[4]![0].text()).toBe('{"who":"owner"}');
   expect(put.headers.get('x-content-type-options')).toBe('nosniff');
 });

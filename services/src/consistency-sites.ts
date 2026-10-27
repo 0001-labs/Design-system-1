@@ -36,6 +36,8 @@ export const API_ROUTES = [
   allow('edit', 'POST'), allow('reset', 'POST'),
   allow('composition', 'GET', 'PUT'),
   allow('native-page', 'GET', 'PUT'),
+  // A site's Design system 1 library as its theme: read, pinned or changed, taken away.
+  allow('library', 'GET', 'PUT', 'DELETE'),
   allow('emails', 'GET'), allow('emails/templates', 'GET'), allow('emails/[\\w-]{1,64}', 'GET'),
   allow('bookings', 'GET'), allow(`bookings/${UUID}`, 'GET'), allow(`bookings/${UUID}/cancel`, 'POST'),
   allow('booking-offers', 'GET', 'PUT'), allow('booking-settings', 'GET', 'PUT'),
@@ -50,10 +52,12 @@ export const API_ROUTES = [
 /** The allowlisted route a path under `api/` names, or null. */
 export const apiRoute = (path: string) => API_ROUTES.find(each => each.pattern.test(path)) ?? null;
 
-/** The page in the editor's frame: drawn with its own styles and pictures, never a script, a form, a frame or a plugin. */
-export const DOCUMENT_POLICY = "sandbox allow-same-origin; default-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; media-src 'self' https:; frame-ancestors 'self'; form-action 'none'; base-uri 'none'";
-/** A file the page loads, which could be opened on its own. */
-export const FILE_POLICY = "sandbox; default-src 'none'; style-src 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; frame-ancestors 'self'";
+/** Where a site's library may fetch the Google face it pins: the stylesheet host and the font files' host, nothing else off this origin. */
+export const FACE_HOSTS = { styles: 'https://fonts.googleapis.com', fonts: 'https://fonts.gstatic.com' } as const;
+/** The page in the editor's frame: drawn with its own styles, pictures and faces, never a script, a form, a frame or a plugin. */
+export const DOCUMENT_POLICY = `sandbox allow-same-origin; default-src 'none'; style-src 'self' 'unsafe-inline' ${FACE_HOSTS.styles}; img-src 'self' data: https:; font-src 'self' data: ${FACE_HOSTS.fonts}; media-src 'self' https:; frame-ancestors 'self'; form-action 'none'; base-uri 'none'`;
+/** A file the page loads, which could be opened on its own; a stylesheet may import its library's face. */
+export const FILE_POLICY = `sandbox; default-src 'none'; style-src 'unsafe-inline' ${FACE_HOSTS.styles}; img-src 'self' data:; font-src 'self' data: ${FACE_HOSTS.fonts}; frame-ancestors 'self'`;
 const CANVAS_TYPE = /^(?:text\/css|font\/[\w.+-]+|application\/font-woff|image\/[\w.+-]+|video\/[\w.+-]+)(?:;|$)/i;
 
 interface Gateway { CONSISTENCY_WORKSPACE?: Fetcher }
