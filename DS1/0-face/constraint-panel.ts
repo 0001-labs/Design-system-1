@@ -1,3 +1,4 @@
+import { paintFaultLines } from './fault-lines';
 import { measureConstraints, type Constraint, type Finding } from './constraints';
 import { VIEWPORT_WIDTHS, checkSite, findSitePages, inspectInFrame, ruleLine, summarizePages, summarizeRules, type PageResult } from './constraint-site';
 
@@ -38,7 +39,8 @@ export function createConstraintPanel() {
       --danger: var(--ds-danger-color, light-dark(#de0331, #ff5f5f));
     }
     :host([hidden]) { display: none !important; }
-    .rings { position: absolute; inset: 0; overflow: hidden; }
+    .fault-lines { z-index: 0 !important; }
+    .rings { z-index: 1; position: absolute; inset: 0; overflow: hidden; }
     .frames { position: absolute; width: 0; height: 0; overflow: hidden; }
     .ring {
       position: absolute;
@@ -60,6 +62,7 @@ export function createConstraintPanel() {
       text-align: center;
     }
     aside {
+      z-index: 2;
       position: absolute;
       inset-block: 0;
       inset-inline-end: 0;
@@ -106,14 +109,18 @@ export function createConstraintPanel() {
     .code b { color: var(--danger); font-weight: 400; }
     .rule { color: var(--muted); }
     p { margin: 0; }
+    :host([data-lines-only]) aside { inset-block: 0 auto; width: auto; padding: calc(var(--u) / 2); }
+    :host([data-lines-only]) aside > :not(header), :host([data-lines-only]) header > :not([data-lines], [data-close]) { display: none; }
+    :host([data-lines-only]) header { margin: 0; }
     @media print { :host { display: none !important; } }
-  </style><div class="rings"></div><div class="frames"></div><aside aria-label="Constraints">
-    <header><strong>Constraints</strong><button type="button" data-run>Page</button><button type="button" data-site>Site</button><button type="button" data-close aria-label="Close">Close</button></header>
-    <p data-status aria-live="polite"></p>
+  </style><svg class="fault-lines" aria-hidden="true"></svg><div class="rings"></div><div class="frames"></div><aside aria-label="Constraints">
+    <header><strong>Constraints</strong><button type="button" data-run>Page</button><button type="button" data-site>Site</button><button type="button" data-lines>Lines</button><button type="button" data-close aria-label="Close">Close</button></header>
+    <p data-status aria-live="polite"></p><p class="rule">Fault lines: dashed reference · red drift</p>
     <ol data-findings></ol>
     <section data-rules hidden><h3>Rules</h3><ol></ol></section>
     <section data-pages hidden><h3>Pages</h3><ol></ol></section>
   </aside>`;
+  const faultLines = shadow.querySelector<SVGSVGElement>('.fault-lines')!;
   const rings = shadow.querySelector<HTMLDivElement>('.rings')!;
   const list = shadow.querySelector<HTMLOListElement>('[data-findings]')!;
   const rulesSection = shadow.querySelector<HTMLElement>('[data-rules]')!;
@@ -123,6 +130,9 @@ export function createConstraintPanel() {
   const status = shadow.querySelector<HTMLElement>('[data-status]')!;
   const title = shadow.querySelector('strong')!;
   const frames = shadow.querySelector<HTMLDivElement>('.frames')!;
+  const linesButton = shadow.querySelector<HTMLButtonElement>('[data-lines]')!;
+  const setLinesOnly = (enabled: boolean) => { panel.toggleAttribute('data-lines-only', enabled); linesButton.textContent = enabled ? 'Results' : 'Lines'; };
+  linesButton.addEventListener('click', () => setLinesOnly(!panel.hasAttribute('data-lines-only')));
   const siteButton = shadow.querySelector<HTMLButtonElement>('[data-site]')!;
   let site: AbortController | null = null;
   let findings: (Finding & { constraint: Constraint })[] = [];
@@ -131,6 +141,7 @@ export function createConstraintPanel() {
 
   const place = () => {
     frame = 0;
+    paintFaultLines(document, faultLines);
     rings.replaceChildren(...findings.map(({ element }, index) => {
       const rect = element.getBoundingClientRect();
       const ring = document.createElement('div');
@@ -302,6 +313,7 @@ export function createConstraintPanel() {
   const show = (mode: 'page' | 'site' = 'page') => {
     if (!panel.isConnected) document.body.appendChild(panel);
     panel.hidden = false;
+    setLinesOnly(window.innerWidth < 640);
     if (mode === 'site') void runSite(); else run();
     window.addEventListener('scroll', schedule, { passive: true, capture: true });
     window.addEventListener('resize', schedule);
@@ -309,6 +321,9 @@ export function createConstraintPanel() {
   const hide = () => {
     stopSite();
     panel.hidden = true;
+    if (frame) cancelAnimationFrame(frame);
+    frame = 0;
+    faultLines.replaceChildren();
     window.removeEventListener('scroll', schedule, { capture: true });
     window.removeEventListener('resize', schedule);
   };

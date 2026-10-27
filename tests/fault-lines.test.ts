@@ -6,7 +6,7 @@ let browsers: Browser[];
 let bundle: string;
 beforeAll(async () => {
   browsers = await Promise.all([chromium.launch(), webkit.launch()]);
-  bundle = (await build({entryPoints:[join(import.meta.dirname,'../DS1/0-face/fault-lines.ts')],bundle:true,format:'iife',globalName:'FaultLines',write:false})).outputFiles[0]!.text;
+  bundle = (await build({stdin:{contents:"export * from './fault-lines'; export { createConstraintPanel } from './constraint-panel';",resolveDir:join(import.meta.dirname,'../DS1/0-face'),loader:'ts'},bundle:true,format:'iife',globalName:'FaultLines',write:false})).outputFiles[0]!.text;
 });
 afterAll(async () => { await Promise.all(browsers?.map(browser=>browser.close()) ?? []); });
 
@@ -54,4 +54,34 @@ test("fault lines cross shadow boundaries and report inferred relationships for 
     await page.addScriptTag({content:bundle});
     expect(await page.evaluate(()=>(window as any).FaultLines.inspectFaultLines(document).map((f:any)=>[f.element.id,!!f.review]))).toEqual([['bad',false],['auto-bad',true]]);
   } finally {await page.close();}
+});
+
+
+test("fault line overlays paint reference and actual edges and follow the viewport", async () => {
+  for (const browser of browsers) {
+    const page = await browser.newPage({viewport:{width:1000,height:700}});
+    try {
+      await page.setContent(`<style>body{margin:20px;min-height:1600px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;width:260px;margin-bottom:80px}button{height:40px}#bad{gap:10px}</style><div class="grid" data-ds-fault-lines="cards"><button>A</button><button>B</button></div><div id="bad" class="grid" data-ds-fault-lines="cards"><button>C</button><button>D</button></div>`);
+      await page.addScriptTag({content:bundle});
+      await page.evaluate(()=>{(window as any).panel=(window as any).FaultLines.createConstraintPanel();(window as any).panel.show();});
+      const overlay = page.locator('[data-ds-constraint-panel]');
+      expect(await overlay.locator('[data-fault-reference]').count()).toBe(4);
+      expect(await overlay.locator('[data-fault-actual]').count()).toBe(2);
+      expect(await overlay.locator('[data-fault-gap]').textContent()).toContain('Gap 10px · reference 20px');
+      expect(await overlay.locator('[data-fault-reference]').first().getAttribute('x1')).toBe('20');
+      const before = Number(await overlay.locator('[data-fault-actual]').first().getAttribute('y1'));
+      await page.evaluate(()=>scrollTo(0,50));
+      await page.waitForFunction(y=>Number(document.querySelector('[data-ds-constraint-panel]')!.shadowRoot!.querySelector('[data-fault-actual]')!.getAttribute('y1'))===y-50,before);
+      await overlay.getByRole('button',{name:'Lines',exact:true}).click();
+      expect(await overlay.getAttribute('data-lines-only')).toBe('');
+      expect(await page.evaluate(()=>document.elementFromPoint(30,100)?.closest('[data-ds-constraint-panel]')===null)).toBe(true);
+      await page.locator('#bad').evaluate((el:HTMLElement)=>el.style.gap='20px');
+      await page.setViewportSize({width:430,height:700});
+      await page.waitForFunction(()=>document.querySelector('[data-ds-constraint-panel]')!.shadowRoot!.querySelectorAll('[data-fault-actual]').length===0);
+      expect(await overlay.locator('svg').getAttribute('viewBox')).toBe('0 0 430 700');
+      await page.evaluate(()=>(window as any).panel.hide());
+      expect(await overlay.locator('[data-fault-reference]').count()).toBe(0);
+      expect(await overlay.evaluate(el=>(el as HTMLElement).hidden)).toBe(true);
+    } finally {await page.close();}
+  }
 });

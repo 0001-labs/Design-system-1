@@ -15,8 +15,9 @@
 // It only reads: GETs, without cookies or credentials, so it is safe against production. It needs
 // Playwright's WebKit (`vp exec playwright install webkit`).
 import { build } from 'esbuild';
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { mkdirSync, existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { createServer, type Server } from 'node:http';
+import { createHash } from 'node:crypto';
 import { extname, join, resolve } from 'node:path';
 import { devices, webkit } from 'playwright';
 
@@ -121,6 +122,14 @@ const checker = (await build({
   stdin: {
     contents: `import { measureConstraints } from './constraints.ts';
 import { describeElement } from './constraint-site.ts';
+import { inspectFaultLines, paintFaultLines } from './fault-lines.ts';
+window.__paintFaultLines = () => {
+  inspectFaultLines(document)[0]?.element.scrollIntoView({block:'center', behavior:'instant'});
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('data-ds-fault-overlay', '');
+  document.body.appendChild(svg);
+  paintFaultLines(document, svg);
+};
 window.__inspectConstraints = () => {
   const results = measureConstraints(document);
   return {
@@ -173,6 +182,17 @@ async function open({ width, url }: { width: number; url: string }) {
     for (const [code, count] of Object.entries(result.measured)) measured[code] = (measured[code] ?? 0) + count;
     const found = result.findings.filter(finding => !finding.review);
     const toReview = result.findings.filter(finding => finding.review);
+    if (result.findings.some(finding => finding.code === 'page.fault-lines')) {
+      const folder = resolve(option('artifacts') ?? 'test-results/constraints');
+      mkdirSync(folder, {recursive:true});
+      const pathname = new URL(url).pathname.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '') || 'home';
+      const suffix = createHash('sha256').update(shown(url)).digest('hex').slice(0,8);
+      const screenshot = join(folder, `${width}-${pathname}-${suffix}.png`);
+      await page.evaluate(() => (window as unknown as {__paintFaultLines:()=>void}).__paintFaultLines());
+      await page.screenshot({path:screenshot});
+      console.log(`Fault lines: ${shown(url)} at ${width}px → ${screenshot}`);
+    }
+
     if (found.length) {
       broken += found.length;
       report.push(`${width}px ${shown(url)}`, ...found.map(({ code, message, element }) => `  ${code}  ${element}: ${message}`));

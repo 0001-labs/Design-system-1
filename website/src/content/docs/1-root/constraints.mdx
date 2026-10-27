@@ -18,6 +18,10 @@ A piece that fills its squares is drawn one pixel short at its end and foot (`--
 
 ## Fault lines
 
+Open Constraints (five presses of **C**, or `?constraints=1` for the owner) to draw Fault lines on the page. Dashed blue lines show the reference edges across the viewport; solid red segments show actual edges that drift, with actual and reference gap labels. Choose **Lines** to collapse the results panel and see the page unobstructed; **Results** brings it back. Narrow viewports start in Lines mode. The overlay follows scrolling and resizing, never intercepts clicks, and disappears when Constraints closes.
+
+The CLI saves an annotated viewport screenshot whenever Fault lines finds drift or a review candidate, under `test-results/constraints/` (override with `--artifacts PATH`). Each filename includes its viewport width and page; the screenshot centres the first affected group.
+
 Fault lines are the continuous alignment lines made by related groups of cards and controls across a page. Their outer edges, column boundaries and gaps should continue from one section to the next. Two grids can each use valid spacing yet break those lines: a 20px gap in one and a 10px gap in the next shifts their inner edges.
 
 The `page.fault-lines` check measures actual rendered edges and gaps across separate sections, including open shadow roots. Give grids that share tracks the same `data-ds-fault-lines="filters"` value. Use `data-ds-fault-axis="y"` for horizontal alignment lines through related rows; the default compares columns. Groups are compared at their current track count so coordinated responsive reflow is valid. Different card heights are allowed; hidden content and differences of at most one CSS pixel are ignored.
