@@ -32,7 +32,7 @@ export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
     if (url.hostname === SYSTEM_HOST) return systemSite(request, env);
-    if (url.pathname.startsWith("/system-data/") || url.pathname.startsWith("/system-previews/")) return new Response("Not found", { status: 404 });
+    if (/^\/system-(?:data|previews)\//i.test(decodeURIComponent(url.pathname))) return new Response("Not found", { status: 404 });
     if (url.hostname === DASHBOARD_HOST) return new Response('Not found', { status: 404 });
     if (/^\/(?:adoption|architecture)(?:\/|$)/i.test(decodeURIComponent(url.pathname)) || url.pathname === '/app/adoption') {
       if (url.hostname !== 'designsystem1.com') return new Response('Not found', { status: 404 });
