@@ -85,13 +85,15 @@ export function contentElementAtoms(canWrite: () => boolean, getHost: () => HTML
       const fields = value.kind === 'card' ? ['label', 'title', 'body'] as const : ['label'] as const;
       const nodes = Array.from(face.children) as HTMLElement[];
       const commit = () => {
-        if (!canWrite() || !value) return;
+        if (!canWrite() || !value) return false;
         const next = { ...value };
         fields.forEach((field, index) => { (next as unknown as Record<string, unknown>)[field] = editors[index].value.slice(0, field === 'body' ? 5000 : field === 'title' ? 500 : 200); });
         const nextSource = writeContentElement(next);
-        if (source === nextSource) return;
+        const previous = readContentElement(source);
+        if (previous && writeContentElement(previous) === nextSource) return false;
         value = next; source = nextSource;
         element.dispatchEvent(new CustomEvent('aa-atom-source', { bubbles: true, detail: { source } }));
+        return true;
       };
       fields.forEach((field, index) => {
         const node = nodes[index];
@@ -142,7 +144,7 @@ export function contentElementAtoms(canWrite: () => boolean, getHost: () => HTML
       menu.setAttribute('data-aa-interactive', ''); menu.setAttribute('data-consistency-context', ''); menu.setAttribute('aria-label', `${kind} appearance`);
       const option = (label: string, change: () => void) => {
         const row = doc.createElement('button'); row.type = 'button'; row.setAttribute('role', 'menuitem'); row.textContent = label;
-        row.addEventListener('click', () => { if (!canWrite()) return; commit(); change(); commit(); }); menu.append(row);
+        row.addEventListener('click', () => { if (!canWrite()) return; change(); commit(); }); menu.append(row);
       };
       if (value.kind === 'button') {
         option('Primary button', () => { if (value?.kind === 'button') { value.secondary = false; face.toggleAttribute('primary', true); face.toggleAttribute('secondary', false); } });
@@ -165,7 +167,16 @@ export function contentElementAtoms(canWrite: () => boolean, getHost: () => HTML
       queueMicrotask(() => { const block = element.closest('.aa-block'); if (element.isConnected && block) observer.observe(block, { attributes: true, attributeFilter: ['data-readonly'] }); });
       const context = (event: MouseEvent) => {
         if (!canWrite()) return;
-        event.preventDefault(); event.stopPropagation(); commit();
+        event.preventDefault(); event.stopPropagation();
+        const host = getHost(), index = host ? Array.from(host.querySelectorAll('.aa-atom')).indexOf(element) : -1;
+        commit();
+        // A changed field may redraw its atom. Open the context on that live
+        // replacement, never a menu whose write callback belongs to detached DOM.
+        if (!element.isConnected) {
+          const replacement = index >= 0 ? host?.querySelectorAll('.aa-atom')[index] : null;
+          replacement?.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: event.clientX, clientY: event.clientY }));
+          return;
+        }
         applyLibraryTokens(menu, getHost()?.closest<HTMLElement>('[data-consistency-library]')?.dataset.consistencyLibrary ?? 'original');
         (element.closest('dialog') ?? doc.body).append(menu); menu.openOver({ left: event.clientX, right: event.clientX, top: event.clientY, bottom: event.clientY, width: 0, height: 0 });
       };
