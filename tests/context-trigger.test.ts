@@ -37,3 +37,31 @@ test("a manual menu opens from an external title and leaves its ordinary click a
   menu.requestClose('escape');await menu.updateComplete;expect(document.activeElement).toBe(title);
   const click=new MouseEvent('click',{bubbles:true,cancelable:true});title.dispatchEvent(click);expect(click.defaultPrevented).toBe(false);expect(menu.open).toBe(false);
 });
+
+test("a right press keeps its row when settling layout moves a neighbour under the pointer", () => {
+  const host=document.createElement('div');
+  host.innerHTML='<button id="first">First</button><button id="second">Second</button>';
+  document.body.append(host);
+  const first=host.children[0] as HTMLElement,second=host.children[1] as HTMLElement;
+  const open=vi.fn<Parameters<typeof bindContextMenuTrigger>[1]>();
+  bindings.push(bindContextMenuTrigger(host,open,{touch:false,resolve:event=>(event.target as Element).closest('button')}));
+  const press=new PointerEvent('pointerdown',{pointerType:'mouse',button:2,clientX:60,clientY:30,bubbles:true});
+  first.dispatchEvent(press);
+  // Chromium re-hit-tests contextmenu after a pointerdown handler settles a transform.
+  const context=new MouseEvent('contextmenu',{button:2,clientX:60,clientY:30,bubbles:true,cancelable:true});
+  second.dispatchEvent(context);
+  expect(open).toHaveBeenCalledWith({x:60,y:30},first,press);
+  expect(context.defaultPrevented).toBe(true);
+});
+
+test("a removed pressed row cannot redirect a destructive action to its neighbour", () => {
+  const host=document.createElement('div');
+  host.innerHTML='<button>First</button><button>Second</button>';document.body.append(host);
+  const first=host.children[0] as HTMLElement,second=host.children[1] as HTMLElement;
+  const open=vi.fn<Parameters<typeof bindContextMenuTrigger>[1]>();
+  bindings.push(bindContextMenuTrigger(host,open,{touch:false}));
+  first.dispatchEvent(new PointerEvent('pointerdown',{pointerType:'mouse',button:2,clientX:60,clientY:30,bubbles:true}));
+  first.remove();
+  second.dispatchEvent(new MouseEvent('contextmenu',{button:2,clientX:60,clientY:30,bubbles:true,cancelable:true}));
+  expect(open).not.toHaveBeenCalled();
+});

@@ -29,6 +29,7 @@ export function bindContextMenuTrigger(
   let suppressed: HTMLElement | null = null;
   let release: ReturnType<typeof setTimeout> | undefined;
   let disposed = false;
+  let mousePress: PointerEvent | undefined;
   if (aria) trigger.setAttribute("aria-haspopup", "menu");
   if (selection) trigger.classList.add("ds-context-trigger");
   const enabled = (control: HTMLElement) => control.isConnected &&
@@ -48,6 +49,7 @@ export function bindContextMenuTrigger(
     release = setTimeout(clearSuppression, 1000);
   };
   const cancel = () => {
+    mousePress = undefined;
     clearTimeout(timer); timer = undefined; point = undefined;
     doc.removeEventListener("pointermove", move);
     doc.removeEventListener("pointerup", cancel);
@@ -56,10 +58,16 @@ export function bindContextMenuTrigger(
   };
   const context = (event: MouseEvent) => {
     if (event.defaultPrevented) return;
-    const control = resolve(event); if (!control || !enabled(control)) return;
+    // Settling a transform on pointerdown can move another row beneath the
+    // pointer before Chromium hit-tests contextmenu. Keep the initiating row.
+    const pressed = mousePress;
+    mousePress = undefined;
+    const gesture = pressed && event.button === 2 && Math.hypot(event.clientX - pressed.clientX, event.clientY - pressed.clientY) <= 10 ? pressed : event;
+    if (gesture !== event && (!(gesture.target instanceof Node) || !trigger.contains(gesture.target))) return;
+    const control = resolve(gesture); if (!control || !enabled(control)) return;
     cancel();
     if (suppressed === control) { event.preventDefault(); return; }
-    if (open({ x: event.clientX, y: event.clientY }, control, event) === false) return;
+    if (open({ x: event.clientX, y: event.clientY }, control, gesture) === false) return;
     event.preventDefault();
     if (selection && event.button === 0) arm(control);
   };
@@ -88,6 +96,11 @@ export function bindContextMenuTrigger(
       if (open(at, control, event) !== false) arm(control);
     }, LONG_PRESS);
   };
+  const rememberMouse = (event: PointerEvent) => {
+    mousePress = !event.defaultPrevented && event.pointerType === "mouse" && event.button === 2 ? event : undefined;
+  };
+  trigger.addEventListener("pointerdown", rememberMouse, true);
+  trigger.addEventListener("pointercancel", cancel, true);
   trigger.addEventListener("contextmenu", context);
   trigger.addEventListener("keydown", key);
   trigger.addEventListener("pointerdown", press);
@@ -98,6 +111,8 @@ export function bindContextMenuTrigger(
       trigger.removeEventListener("contextmenu", context);
       trigger.removeEventListener("keydown", key);
       trigger.removeEventListener("pointerdown", press);
+      trigger.removeEventListener("pointerdown", rememberMouse, true);
+      trigger.removeEventListener("pointercancel", cancel, true);
       if (aria) {
         if (previousAria === null) trigger.removeAttribute("aria-haspopup"); else trigger.setAttribute("aria-haspopup", previousAria);
       }
