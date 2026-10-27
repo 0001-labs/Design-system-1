@@ -38,10 +38,7 @@ const ownerRows = ownerLibraryItems([], { pathname: Astro.url.pathname });
       </ds-button>
     : <p class:list={['rail-group', { 'rail-gap': row.gap }]}>{row.name}</p>)}
     <ds-button control="slotted" fit class="rail-entry rail-gap rail-owner">
-      <a href="/adoption/" aria-current={here === '/adoption' ? 'page' : undefined}>Adoption</a>
-    </ds-button>
-    <ds-button control="slotted" fit class="rail-entry rail-owner">
-      <a href="/architecture/" aria-current={here === '/architecture' ? 'page' : undefined}>Architecture</a>
+      <a href="https://system.designsystem1.com/">System</a>
     </ds-button>
     {ownerRows.map(row => (
       <ds-button control="slotted" fit class:list={['rail-entry', 'rail-owner', { 'rail-gap rail-heading': row.depth === 0 }]} data-owner-row={row.id}>

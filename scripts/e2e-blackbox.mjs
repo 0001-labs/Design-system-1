@@ -666,6 +666,14 @@ if (PRODUCTION) {
         expectPrivate(answer);
       },
     ],
+    ...["/", "/adoption", "/architecture", "/examples", "/constraints"].map((path) => [
+      `DS1 System ${path} asks to sign in`,
+      async () => {
+        const answer = await request(`https://system.designsystem1.com${path}`);
+        expectRedirect(answer, 302, `https://system.designsystem1.com/app/signin?next=${encodeURIComponent(path)}`);
+        expectPrivate(answer);
+      },
+    ]),
     ...["/adoption/", "/architecture/"].map((path) => [
       `${path} asks to sign in`,
       async () => {

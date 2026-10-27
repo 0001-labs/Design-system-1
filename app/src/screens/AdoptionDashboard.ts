@@ -16,7 +16,9 @@ import "./SignIn";
 export class OwnerSession implements ReactiveController {
   ready = false;
   error = "";
-  #destination = new URLSearchParams(window.location.search).get("next") === "/private-app/" ? "/private-app/" + (["#keyboard-shortcut", "#spacing-handle", "#loading-indicator"].includes(window.location.hash) ? window.location.hash : "") : "/";
+  #destination = window.location.hostname === "system.designsystem1.com"
+    ? (["/", "/adoption", "/architecture", "/examples", "/constraints"].includes(new URLSearchParams(window.location.search).get("next") ?? "") ? new URLSearchParams(window.location.search).get("next")! : "/")
+    : new URLSearchParams(window.location.search).get("next") === "/private-app/" ? "/private-app/" + (["#keyboard-shortcut", "#spacing-handle", "#loading-indicator"].includes(window.location.hash) ? window.location.hash : "") : "/";
   #token: string | null | undefined = undefined;
   #controller: AbortController | null = null;
 
@@ -49,7 +51,7 @@ export class OwnerSession implements ReactiveController {
           this.ready = true;
           this.host.requestUpdate();
           // Prove the protected HTML route before showing anything after sign-in.
-          if (window.location.pathname !== "/" && window.location.pathname !== "/app/adoption") window.location.replace(this.#destination);
+          if (window.location.hostname === "system.designsystem1.com" ? window.location.pathname.startsWith("/app/") : window.location.pathname !== "/" && window.location.pathname !== "/app/adoption") window.location.replace(this.#destination);
         }
       }).catch(caught => {
         if (controller.signal.aborted) return;

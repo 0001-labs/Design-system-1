@@ -1,6 +1,7 @@
 import { consistencyAI, type PreviewAIEnv } from "./consistency-ai";
 import { consistencyPreview, isConsistencyHost, type WorkspaceEnv, isPrivatePreviewPath } from "./consistency";
 import { appNavigation } from './app-navigation';
+import { systemSite, SYSTEM_HOST } from "./system-site";
 import { WorkerEntrypoint } from "cloudflare:workers";
 import { featureFlags, manageFeatureFlags, setFeatureFlag } from "./flags";
 import { dashboard, sessionRequest, DASHBOARD_HOST, ICON_HOST } from "./dashboard";
@@ -30,6 +31,8 @@ function reportPage(response: Response, path: string): Response {
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    if (url.hostname === SYSTEM_HOST) return systemSite(request, env);
+    if (url.pathname.startsWith("/system-data/") || url.pathname.startsWith("/system-previews/")) return new Response("Not found", { status: 404 });
     if (url.hostname === DASHBOARD_HOST) return new Response('Not found', { status: 404 });
     if (/^\/(?:adoption|architecture)(?:\/|$)/i.test(decodeURIComponent(url.pathname)) || url.pathname === '/app/adoption') {
       if (url.hostname !== 'designsystem1.com') return new Response('Not found', { status: 404 });
