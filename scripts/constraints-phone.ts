@@ -8,6 +8,7 @@ import { remoteConstraintPages } from './constraint-pages';
 //   vp run constraints:phone https://example.com --widths 320,393 --pages /,/about/
 //   vp run constraints:phone https://example.com --theme dark
 //   vp run constraints:phone --dist website/dist
+//   vp run constraints:phone --dist website/dist --workers 1
 //
 // `--dist` checks a built site before it is uploaded: the folder is served here, every page in its
 // sitemap is opened on this machine, and the full-page layout examples under /examples/layouts/,
@@ -39,6 +40,8 @@ if (!named && !dist) {
   process.exit(2);
 }
 const widths = option('widths')?.split(',').map(Number) ?? WIDTHS;
+const workers = Number(args.includes('--workers') ? option('workers') : 6);
+if (!Number.isSafeInteger(workers) || workers < 1 || workers > 6) throw new Error('Use an integer from 1 to 6 for --workers.');
 
 const TYPES: Record<string, string> = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8',
@@ -208,7 +211,7 @@ async function open({ width, url }: { width: number; url: string }) {
   }
 }
 
-await Promise.all(Array.from({ length: 6 }, async () => {
+await Promise.all(Array.from({ length: workers }, async () => {
   for (let next = queue.shift(); next; next = queue.shift()) await open(next);
 }));
 await browser.close();
@@ -217,5 +220,5 @@ served?.server.close();
 console.log(report.join('\n'));
 if (reviews.length) console.log(`\nTo review by eye (not measured, so not counted as broken):\n${reviews.join('\n')}\n`);
 for (const [code, count] of Object.entries(measured)) console.log(`${code}: ${count} measured.`);
-console.log(`${pages.length} pages at ${widths.join(', ')}px${served ? ` from ${dist}` : ''}: ${broken ? `${broken} broken` : 'every rule kept'}.`);
+console.log(`${pages.length} pages at ${widths.join(', ')}px${served ? ` from ${dist}` : ''} with ${workers} workers: ${broken ? `${broken} broken` : 'every rule kept'}.`);
 process.exit(broken ? 1 : 0);
