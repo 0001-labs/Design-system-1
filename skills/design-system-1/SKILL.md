@@ -57,6 +57,10 @@ Text must never render below its DS1 role size, including in interactive compone
 4. Run source and consumer checks, follow each project's release procedure and deployment policy, and verify released assets over HTTP. Browser verification follows the project's brief and the user's request.
 5. Finish with an explicit account of consumers migrated and released, consumers with no applicable usage, intentional exceptions and blocked consumers. Source checks and copied files alone do not establish live adoption. Keep unfinished propagation visible in the work item.
 
+## Previous and Next
+
+For stepping through a list's records, use Money's paired round secondary icon buttons: up chevron for Previous, down chevron for Next, in that order. Each is one square (20px × `--sf`) with a centred 16px icon and a 4px × `--sf` gap. Use `ds-button icon secondary` with `ds-icon` chevrons, accessible labels “Previous” and “Next”, and disabled endpoints. Set the supported button tokens for the square size, zero inset, centred alignment and 50% radius. Preserve pending edits before changing records. This is the record-navigation style; calendar/time navigation retains left/right arrows. Reference: `Money/src/main.ts` (`peekHead`) and `Money/src/style.css` (`.peek-steps`).
+
 ## Sizing modes: fill and hug
 
 Name the modes **fill** and **hug**. Fill occupies the available width; hug sizes to the control’s content. Select triggers and date-picker triggers always use hug, never fill: no full-row stretch, growing flex item, fixed wide variant or width token that expands them. Status tags remain tags when clickable; do not wrap them in a filled select face or add an arrow. Their anchored menu still provides the choices.
