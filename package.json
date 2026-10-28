@@ -1,6 +1,6 @@
 {
   "name": "@0001-labs/design-system-1",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "A component-based design system built with TypeScript and LitElement that provides reusable UI components with built-in theming, internationalization, and accessibility features.",
   "keywords": [
     "components",
