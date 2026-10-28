@@ -16,7 +16,7 @@ import { libraryPin, pinnedFiles, pinnedLibrary } from './scripts/library-pin.mj
 const nativeCssCache=new Map();
 async function nativeInlineSource(path){
  if(!path.endsWith('.css'))return readNativeClientFile(path,'utf8');
- if(!nativeCssCache.has(path))nativeCssCache.set(path,bundleNativeClient({entryPoints:[path],bundle:true,write:false,minify:true,loader:{'.woff2':'dataurl','.woff':'dataurl','.ttf':'dataurl','.svg':'dataurl','.png':'dataurl'},logLevel:'silent'}).then(result=>result.outputFiles[0].text));
+ if(!nativeCssCache.has(path))nativeCssCache.set(path,bundleNativeClient({absWorkingDir:import.meta.dirname,entryPoints:[path],bundle:true,write:false,minify:true,loader:{'.woff2':'dataurl','.woff':'dataurl','.ttf':'dataurl','.svg':'dataurl','.png':'dataurl'},logLevel:'silent'}).then(result=>result.outputFiles[0].text));
  return nativeCssCache.get(path);
 }
 const rootStyles = ['one.css', 'grid.css', 'text.css', 'component-tokens.css', 'component-metrics.css', 'component-appearance.css', 'fonts.css', 'palette.css'];
@@ -106,9 +106,9 @@ export default {
     /** Native page publication: the editor's Aa parser and closed content atoms, without DOM. */
     'native-content': {
       async files({ read, tree }) {
-        const client = await bundleNativeClient({ entryPoints:[resolveNativeClient(import.meta.dirname,'shared/consistency-block-client.ts')],bundle:true,format:'esm',platform:'browser',target:'es2022',minify:true,write:false,outdir:resolveNativeClient(import.meta.dirname,'.reports/native-block-client'),entryNames:'blocks',loader:{'.woff2':'dataurl','.woff':'dataurl','.ttf':'dataurl','.svg':'text','.png':'dataurl'},plugins:[{name:'native-source-text',setup(build){build.onResolve({filter:/\.(?:css|svg)\?(?:inline|raw)$/},args=>({path:resolveNativeClient(args.resolveDir,args.path.replace(/\?(?:inline|raw)$/, '')),namespace:'native-source-text'}));build.onLoad({filter:/.*/,namespace:'native-source-text'},async args=>({contents:await nativeInlineSource(args.path),loader:'text'}));}}] });
+        const client = await bundleNativeClient({ absWorkingDir:import.meta.dirname,entryPoints:[resolveNativeClient(import.meta.dirname,'shared/consistency-block-client.ts')],bundle:true,format:'esm',platform:'browser',target:'es2022',minify:true,write:false,outdir:resolveNativeClient(import.meta.dirname,'.reports/native-block-client'),entryNames:'blocks',loader:{'.woff2':'dataurl','.woff':'dataurl','.ttf':'dataurl','.svg':'text','.png':'dataurl'},plugins:[{name:'native-source-text',setup(build){build.onResolve({filter:/\.(?:css|svg)\?(?:inline|raw)$/},args=>({path:resolveNativeClient(args.resolveDir,args.path.replace(/\?(?:inline|raw)$/, '')),namespace:'native-source-text'}));build.onLoad({filter:/.*/,namespace:'native-source-text'},async args=>({contents:await nativeInlineSource(args.path),loader:'text'}));}}] });
 
-        const importer = await bundleNativeClient({entryPoints:[resolveNativeClient(import.meta.dirname,'shared/consistency-import.ts')],bundle:true,format:'esm',platform:'node',write:false});
+        const importer = await bundleNativeClient({absWorkingDir:import.meta.dirname,entryPoints:[resolveNativeClient(import.meta.dirname,'shared/consistency-import.ts')],bundle:true,format:'esm',platform:'node',write:false});
         let source = String(read('shared/consistency-native-content.ts'))
           .replace('../website/src/vendor/aa/parse.js', './aa/parse.js')
           .replace('../DS1/2-core/generated/icons-immediate', './icons-immediate')
