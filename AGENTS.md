@@ -265,6 +265,10 @@ The approved additions are page content, never the whole DS1 catalogue. Context 
 
 The private editor’s Booking site uses the same native document, trusted presentation definitions and ConsistencyPageEditor as every other template. Run the shared template and native-page acceptance checks after changes.
 
+## Editor loading
+
+The app and lab have separate build entries. Native pages load their DS1 components on demand; fonts are files, and the draft/template catalogue loads only when needed. Hosted pages fetch navigation and the root snapshot concurrently; `native-page?canvas=1` includes the trusted script-free canvas with its snapshot. Mount after DOM and styles are ready, without waiting for pictures. Keep up to four live pages per site in memory and revalidate on revisit, preserving pending edits and revision checks. Hashed application assets are privately cached; canvas assets require authenticated ETag revalidation. HTML and snapshots remain no-store. `packages/consistency/tests/loading.mjs` covers editing before images, combined reads, and retaining the live editor on revisit. No persistent snapshot cache is implemented.
+
 ## Site templates and private drafts
 
 Sites → Add new site opens a searchable picker containing Blank site and every entry in `shared/doc-examples.ts`, including HTML examples and examples hidden from the public listing. `scripts/consistency-templates.ts` prepares trusted authored HTML, initial demo data and pinned library styles at build time; demo scripts never run in the editor. All templates use NativePageDocument, ConsistencyPageEditor and NativeSiteController; the former source-composition editor has been removed. Existing saved Markdown drafts remain readable. New sites are private drafts, stored separately from lab pages and existing hosted sites; creating one does not publish or assign a domain. `draft-site.ts` scopes every request to its captured workspace, autosaves revisions and retains failed/conflicting edits before navigation. Run `packages/consistency/tests/templates.mjs` and the home contract after changes. Public signup and draft publication remain later milestones.
