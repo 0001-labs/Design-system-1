@@ -6,6 +6,16 @@ beforeAll(async () => { site = await startAssets(); });
 afterAll(async () => { await site.dispose(); });
 
 describe("combined website routes", () => {
+  it("upgrades Consistency HTTP requests before private routes or APIs run", async () => {
+    for (const host of ["consistency.site", "c9y.site", "editor.c9y.site", "neweditor.c9y.site"]) {
+      for (const path of ["/", "/auth/start?next=%2F", "/api/consistency/ai", "/private-consistency/index.html"]) {
+        const response = await site.fetch(`http://${host}${path}`, { redirect: "manual" });
+        expect(response.status).toBe(308);
+        expect(response.headers.get("location")).toBe(`https://${host}${path}`);
+        expect(response.headers.get("cache-control")).toBe("no-store");
+      }
+    }
+  });
   it("isolates private preview HTML and assets on every host", async () => {
     const origin = "https://editor.c9y.site";
     for (const path of ["/", "/private-consistency/index.html", "/private-consistency/assets/editor.js"]) {

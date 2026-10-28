@@ -610,6 +610,10 @@ if (PRODUCTION) {
   ]);
 
   await step("Private hosts", [
+    ...["consistency.site", "c9y.site", "editor.c9y.site", "neweditor.c9y.site"].map(host => [
+      `${host} upgrades HTTP with its path and query intact`,
+      async () => expectRedirect(await request(`http://${host}/auth/start?next=%2F`), 308, `https://${host}/auth/start?next=%2F`),
+    ]),
     ...[ICON, EDITOR].flatMap((origin) => [
       [
         // c9y.site is where customers' sites live; its home leads to the app at consistency.site

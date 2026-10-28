@@ -32,6 +32,11 @@ function reportPage(response: Response, path: string): Response {
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    // Upgrade before authentication, APIs or private-path guards handle the request.
+    if (isConsistencyHost(url.hostname) && url.protocol === "http:") {
+      url.protocol = "https:";
+      return new Response(null, { status: 308, headers: { Location: url.href, "Cache-Control": "no-store" } });
+    }
     if (url.hostname === SYSTEM_HOST) return systemSite(request, env);
     if (url.hostname === C9Y_SYSTEM_HOST) return c9ySystemSite(request, env);
     // C9Y System's build is the System owner's, on its own host only; never public assets elsewhere.

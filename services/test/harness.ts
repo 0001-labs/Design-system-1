@@ -68,7 +68,7 @@ async function start(entry: string, bindings: Record<string, string> = {}): Prom
   await mf.ready;
 
   return {
-    fetch: (path, init) => mf.dispatchFetch(path.startsWith("https://") ? path : `https://designsystem1.com${path}`, init) as unknown as Promise<Response>,
+    fetch: (path, init) => mf.dispatchFetch(/^https?:\/\//.test(path) ? path : `https://designsystem1.com${path}`, init) as unknown as Promise<Response>,
     bucket: () => mf.getR2Bucket("LIBRARIES"),
     dispose: () => mf.dispose(),
   };
