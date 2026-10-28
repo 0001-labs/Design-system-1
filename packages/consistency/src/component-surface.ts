@@ -1,4 +1,9 @@
-import '../../../DS1/index';
+const modules=import.meta.glob('../../../DS1/{2-core,3-unit,4-page}/ds-*.ts');
+/** Register only the components present in this page; product controls import their own dependencies. */
+export async function prepareComponents(root:ParentNode){
+ const names=new Set([...root.querySelectorAll('*')].map(element=>element.localName).filter(name=>name.startsWith('ds-')&&!customElements.get(name)));
+ await Promise.all([...names].map(name=>{const key=Object.keys(modules).find(path=>path.endsWith(`/${name}.ts`));return key?modules[key]():undefined;}));
+}
 import { createSurfaceElement } from './editor-surface';
 import type { NativeComponentDefinition } from '../../../shared/consistency-components';
 

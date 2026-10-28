@@ -303,3 +303,12 @@ it('keeps the app\'s own addresses on consistency.site as they were', async () =
   expect((await consistencyPreview(new Request(`${site}/api/dashboard/session`, { method: 'POST', headers: { origin: site, authorization: 'Bearer valid-token' } }), env, send)).status).toBe(204);
   expect(elsewhere()).toBe(0);
 });
+
+it('reuses versioned private static assets while keeping HTML and errors uncached',async()=>{
+ const {env,send,assets}=setup();
+ const result=await consistencyPreview(new Request(origin+'/private-consistency/assets/editor-Ab12cd34.js',{headers}),env,send);
+ expect(result.headers.get('cache-control')).toBe('private, max-age=31536000, immutable');
+ expect(send).toHaveBeenCalledTimes(1);
+ assets.mockImplementation(async()=>new Response('missing',{status:404}));
+ expect((await consistencyPreview(new Request(origin+'/private-consistency/assets/editor-Ab12cd34.js',{headers}),env,send)).headers.get('cache-control')).toBe('private, no-store');
+});

@@ -1,8 +1,12 @@
 import { defineConfig } from 'vite-plus';
 import { resolve } from 'node:path';
-import { readFileSync } from 'node:fs';
-export default defineConfig({ base: '/private-consistency/', plugins: [{ name: 'private-composition-shell', generateBundle() { this.emitFile({ type: 'asset', fileName: 'index.html', source: readFileSync(resolve(import.meta.dirname, 'index.html'), 'utf8') }); this.emitFile({ type: 'asset', fileName: 'home.html', source: readFileSync(resolve(import.meta.dirname, 'home.html'), 'utf8') }); this.emitFile({ type: 'asset', fileName: 'guide/index.html', source: readFileSync(resolve(import.meta.dirname, 'guide.html'), 'utf8') }); } }], build: {
-  outDir: resolve(import.meta.dirname, '../../website/dist/private-consistency'), emptyOutDir: true,
-  lib: { entry: resolve(import.meta.dirname, 'preview.ts'), formats: ['es'], fileName: () => 'consistency.js', cssFileName: 'consistency' },
-  sourcemap: false, rollupOptions: { output: { codeSplitting: false } },
-} });
+export default defineConfig({
+ root: import.meta.dirname,
+ base: '/private-consistency/',
+ plugins: [{name:'private-guide-path',generateBundle(_options,bundle){const guide=bundle['guide.html'];if(guide){delete bundle['guide.html'];guide.fileName='guide/index.html';bundle[guide.fileName]=guide;}}}],
+ build: {
+  outDir: resolve(import.meta.dirname,'../../website/dist/private-consistency'), emptyOutDir:true,
+  assetsInlineLimit:0, sourcemap:false,
+  rollupOptions:{input:{index:resolve(import.meta.dirname,'index.html'),home:resolve(import.meta.dirname,'home.html'),guide:resolve(import.meta.dirname,'guide.html')}},
+ },
+});

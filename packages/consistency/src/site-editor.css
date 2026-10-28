@@ -5,7 +5,9 @@ consistency-site-editor, consistency-page-editor, consistency-workspace-page { d
 consistency-site-editor > ds-message, consistency-site-editor > ds-empty { margin: var(--ds-unit); }
 .consistency-site-stage { flex: 1; min-height: calc(24 * var(--ds-unit)); display: flex; }
 .consistency-site-stage[hidden] { display: none; }
-.consistency-site-frame { box-sizing: border-box; display: block; width: 100%; height: 100%; min-height: inherit; border: 0; background: var(--ds-paper); }
+.consistency-site-frame, .consistency-site-frame-cached { box-sizing: border-box; display: block; width: 100%; height: 100%; min-height: inherit; border: 0; background: var(--ds-paper); }
 /* The bar over the words being edited, placed over the frame from its rectangle and the words'. */
 .consistency-site-bar-over { position: fixed; z-index: 2; top: 0; left: 0; }
 .consistency-site-stage > consistency-page-editor { flex: 1; width: 100%; }
+
+consistency-page-editor[hidden] { display: none; }

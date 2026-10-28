@@ -1,0 +1,32 @@
+import assert from 'node:assert/strict';
+import {chromium} from 'playwright';
+import {nativePageFixture} from './native-page-fixture.mjs';
+const fixture=await nativePageFixture(),browser=await chromium.launch({headless:true});
+let releaseImages;const images=new Promise(resolve=>releaseImages=resolve);
+try{
+ const page=await browser.newPage({viewport:{width:1440,height:1000}}),requests=[],errors=[];
+ page.on('request',request=>requests.push(request.url()));page.on('pageerror',error=>errors.push(error.message));
+ await fixture.route(page);
+ await page.route('**/pictures/sample.jpg',async route=>{await images;await route.fulfill({contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"/>'});});
+ await page.goto(fixture.url,{waitUntil:'domcontentloaded'});
+ const frame=page.frameLocator('.consistency-site-frame');
+ await frame.locator('[data-editor-surface]').waitFor({timeout:10000});
+ assert.equal(await frame.locator('img').first().evaluate(image=>image.complete),false,'Fixture must still have a blocked image');
+ assert.equal(requests.filter(url=>url.includes('/document?')).length,0,'Opening must not fetch a second HTML document');
+ assert.equal(requests.filter(url=>url.includes('/native-page?')).length,1,'Opening reads one snapshot and canvas');
+ const title=frame.locator('[data-c9y-block="intro"] aa-editor>.aa-block').first();
+ await title.click();await title.press(process.platform==='darwin'?'Meta+a':'Control+a');await page.keyboard.type('Editable before pictures');await page.keyboard.press('Tab');
+ await page.waitForFunction(()=>document.querySelector('consistency-site-editor').flush());
+ assert.match(JSON.stringify(await fixture.read()),/Editable before pictures/);
+ releaseImages();
+ await page.locator('consistency-site-editor').evaluate(editor=>{editor.firstCanvas=editor.querySelector('.consistency-site-frame');return editor.open('/about/');});
+ await page.frameLocator('.consistency-site-frame').locator('[data-c9y-block="about-text"]').waitFor();
+ const canvasReads=requests.filter(url=>url.includes('canvas=1')).length;
+ const elapsed=await page.locator('consistency-site-editor').evaluate(async editor=>{const start=performance.now();await editor.open('/');if(editor.querySelector('.consistency-site-frame')!==editor.firstCanvas)throw Error('Revisit replaced its live canvas');return performance.now()-start;});
+ assert.ok(elapsed<100,`Cached navigation waited ${elapsed}ms`);
+ assert.equal(requests.filter(url=>url.includes('canvas=1')).length,canvasReads,'Revisit should only revalidate in the background');
+ await page.waitForTimeout(200);
+ assert.equal(await page.frameLocator('.consistency-site-frame').locator('[data-editor-surface]').count(),1,'Cached controller survived the next render');
+ assert.equal(errors.length,0,errors.join('\n'));
+ console.log(JSON.stringify({editingBeforeImages:true,combinedPageRead:true,cachedRevisitMs:elapsed}));
+}finally{releaseImages();await browser.close();await fixture.close();}

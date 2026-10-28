@@ -117,7 +117,7 @@ export async function sitesApi(request: Request, env: Gateway, authorize: (reque
   // A route of the API takes its whole query; the page routes take the page's path alone.
   const search = route === 'api' && path !== 'page' ? url.search : path === 'page' || route === 'document' ? `?path=${encodeURIComponent(page!)}` : '';
   const target = route === 'api' ? `/api/consistency/sites/${match[1]}/api/${path}` : url.pathname;
-  const answer = await env.CONSISTENCY_WORKSPACE.fetch(new Request(`https://workspace.internal${target}${search}`, { method: request.method, body, headers: personHeaders(person, request, body ? { 'Content-Type': 'application/json' } : {}) }));
+  const answer = await env.CONSISTENCY_WORKSPACE.fetch(new Request(`https://workspace.internal${target}${search}`, { method: request.method, body, headers: personHeaders(person, request, body ? { 'Content-Type': 'application/json' } : request.headers.has('If-None-Match') ? { 'If-None-Match': request.headers.get('If-None-Match')! } : {}) }));
   if (route !== 'document' && route !== 'files') {
     const result = new Response(answer.body, answer);
     result.headers.set('X-Content-Type-Options', 'nosniff');

@@ -61,6 +61,7 @@ try {
  });
  await page.goto(`http://127.0.0.1:${server.address().port}/private-consistency/home.html`);
  await page.getByRole('button', { name: 'Add new site', exact: true }).click();
+ await page.locator('consistency-new-site ds-card[data-template]').first().waitFor();
  if (await page.locator('consistency-new-site ds-card[data-template]').count() !== 30) throw Error('Incomplete template picker');
  await page.getByRole('searchbox', { name: 'Find a template' }).fill('Booking');
  await page.locator('ds-card[data-template="booking"]').click();

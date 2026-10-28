@@ -1,4 +1,5 @@
-import { DraftSiteEditor, NewSite, draftSiteApi, type DraftSiteSummary } from './draft-site';
+import type { DraftSiteEditor, NewSite } from './draft-site';
+import { draftSiteApi, type DraftSiteSummary } from './draft-site-api';
 import { LitElement, html } from 'lit';
 import { keyed } from 'lit/directives/keyed.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
@@ -281,12 +282,17 @@ export class ConsistencyHome extends LitElement {
   }
   private keepDraft(draft: DraftSiteSummary) { this.draftSites = [draft, ...this.draftSites.filter(site => site.id !== draft.id)]; }
   private openDraft(draft: DraftSiteSummary) { this.keepDraft(draft); this.go({ page: 'draft-site', id: draft.id, workspace: this.workspace }); }
+  private draftModule?: typeof import('./draft-site');
+  private draftLoading?: Promise<void>;
+  private loadDraftModule(){return this.draftLoading??=import('./draft-site').then(module=>{this.draftModule=module;this.requestUpdate();},error=>{this.draftLoading=undefined;this.draftProblem=error.message;});}
   private draftEditor(id: string): DraftSiteEditor | undefined {
+    if(!this.draftModule){void this.loadDraftModule();return;}
+
     const key = `${this.workspace}:${id}`;
     let editor = this.draftEditors.get(key);
     const site = this.draftSites.find(site => site.id === id);
     if (!editor && site) {
-      editor = new DraftSiteEditor(); editor.site = site; editor.workspace = this.workspace;
+      editor = new this.draftModule.DraftSiteEditor(); editor.site = site; editor.workspace = this.workspace;
       editor.addEventListener('draft-site-saved', event => { if (editor!.workspace === this.workspace) this.keepDraft((event as CustomEvent<DraftSiteSummary>).detail); });
       editor.addEventListener('draft-site-copy', event => { if (editor!.workspace === this.workspace) this.openDraft((event as CustomEvent<DraftSiteSummary>).detail); });
       this.draftEditors.set(key, editor);
@@ -294,8 +300,10 @@ export class ConsistencyHome extends LitElement {
     return editor;
   }
   private newSiteFlow() {
+    if(!this.draftModule){void this.loadDraftModule();return html`<ds-text literal text="Opening templates…"></ds-text>`;}
+
     if (!this.newSite) {
-      this.newSite = new NewSite(); this.newSite.workspace = this.workspace;
+      this.newSite = new this.draftModule.NewSite(); this.newSite.workspace = this.workspace;
       const flow = this.newSite;
       this.newSite.addEventListener('site-created', event => { if (flow.workspace !== this.workspace) return; this.openDraft((event as CustomEvent<DraftSiteSummary>).detail); this.newSite = undefined; });
       this.newSite.addEventListener('site-create-close', () => this.go({ page: 'sites' }));

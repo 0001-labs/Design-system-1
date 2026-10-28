@@ -119,9 +119,10 @@ async function consistencySite(request: Request, send: typeof fetch): Promise<Re
   if (request.method !== 'GET' && request.method !== 'HEAD') return new Response(null, { status: 404, headers: security });
   return new Response(null, { status: 302, headers: { Location: '/', 'Cache-Control': 'no-store' } });
 }
-function protect(response: Response): Response {
+function protect(response: Response, cache?: string): Response {
   const result = new Response(response.body, response);
   for (const [key, value] of Object.entries(security)) result.headers.set(key, value);
+  if (cache && (response.ok || response.status === 304)) result.headers.set('Cache-Control',cache);
   return result;
 }
 export async function consistencyPreview(request: Request, env: ReportsEnv & WorkspaceEnv & { ASSETS: Fetcher }, send: typeof fetch = fetch): Promise<Response> {
@@ -153,7 +154,7 @@ export async function consistencyPreview(request: Request, env: ReportsEnv & Wor
   if (url.pathname === '/api/dashboard/session' || url.pathname === '/app/signin' || /^\/app\/assets\/[A-Za-z0-9][A-Za-z0-9._-]*$/.test(url.pathname) || url.pathname === '/icons/design-system-1.svg') return protect(await dashboard(request, env, send));
   if (url.pathname.startsWith('/api/consistency/draft-sites') || url.pathname.startsWith('/api/consistency/pages') || url.pathname === '/api/consistency/sites' || url.pathname === '/api/consistency/workspaces' || url.pathname.startsWith('/api/consistency/workspaces/')) return protect(await workspaceApi(request,env,send));
   // A site's words, edited in the editor as the person asking; its page and files for the editor's sandboxed frame.
-  if (url.pathname.startsWith('/api/consistency/sites/')) return protect(await sitesApi(request, env, asking => authorizePerson(asking, env, send)));
+  if (url.pathname.startsWith('/api/consistency/sites/')) return protect(await sitesApi(request, env, asking => authorizePerson(asking, env, send)), /\/files\//.test(url.pathname) ? 'private, no-cache' : undefined);
   if (url.pathname === '/api/consistency/domains' || url.pathname.startsWith('/api/consistency/domains/')) return protect(await domainsApi(request, env, send));
   if (url.pathname === '/api/consistency/profile') return protect(await profileApi(request, env, send));
   if (!['GET', 'HEAD'].includes(request.method)) return new Response(null, { status: 404, headers: security });
@@ -170,16 +171,17 @@ export async function consistencyPreview(request: Request, env: ReportsEnv & Wor
   // c9y.site's home lists the sites; the editor lab opens on the page editor itself.
   if (url.pathname === '/') url.pathname = url.hostname === EDITOR_HOST ? `${prefix}index.html` : `${prefix}home.html`;
   const original = await env.ASSETS.fetch(new Request(url, request));
+  const assetCache = /^\/private-consistency\/assets\/[\w.-]+-[\w-]{8,}\.(?:js|css|woff2?|ttf|json)$/.test(url.pathname) ? 'private, max-age=31536000, immutable' : undefined;
   // This marker enables owner-only diagnostics; it grants no server access. Only
   // trusted built HTML is rewritten, after the authority has validated the owner.
-  if (!(person as Person).owner) return protect(original);
+  if (!(person as Person).owner) return protect(original, assetCache);
   if (request.method === 'GET' && original.ok && original.headers.get('Content-Type')?.split(';')[0]?.trim().toLowerCase() === 'text/html') {
     const html = (await original.text()).replace(/<html(?=[\s>])/i, '<html data-ds-owner');
     const marked = new Response(html, original);
     for (const header of ['Content-Length', 'Content-Encoding', 'ETag']) marked.headers.delete(header);
     return protect(marked);
   }
-  return protect(original);
+  return protect(original, assetCache);
 }
 
 /**
