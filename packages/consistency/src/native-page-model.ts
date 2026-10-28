@@ -6,7 +6,7 @@ export interface NativeEntry { block: NativeBlock; parent: string; index: number
 /** The page's blocks by id, a section counted once: its slots and items are the section's, not blocks of the page. */
 export function nativeEntries(document: NativePageDocument): Map<string, NativeEntry> {
   const entries = new Map<string, NativeEntry>();
-  const visit = (blocks: NativeBlock[], parent: string) => blocks.forEach((block,index) => { entries.set(block.id,{block,parent,index}); if ('children' in block) visit(block.children,block.id); });
+  const visit = (blocks: NativeBlock[], parent: string) => blocks.forEach((block,index) => { if(block.kind==='text'&&block.editable===false)return; entries.set(block.id,{block,parent,index}); if ('children' in block) visit(block.children,block.id); });
   visit(document.blocks,'page'); return entries;
 }
 export function updateNativeBlock(document: NativePageDocument, id: string, update: (block: NativeBlock) => NativeBlock): NativePageDocument {

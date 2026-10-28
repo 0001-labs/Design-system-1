@@ -51,18 +51,8 @@ test('previews outside the composition wear the page’s faces over the library�
  applyLibraryTokens(preview, 'original'); expect(preview.style.getPropertyValue('--ds-typeface-regular')).toBe('');
 });
 
-test('the faces are saved in the page document, set the sheet’s roles and reopen', async () => {
- const editor = new ConsistencyEditor(); document.body.append(editor); await editor.updateComplete;
- const select = editor.querySelector<HTMLSelectElement>('select[aria-label="Heading face"]')!;
- select.value = 'Montserrat'; select.dispatchEvent(new Event('change')); await editor.updateComplete;
- const sheet = editor.querySelector<HTMLElement>('.consistency-sheet')!;
- expect(sheet.style.getPropertyValue('--ds-typeface-medium')).toBe('Montserrat, sans-serif');
- expect(sheet.dataset.consistencyFonts).toBe('Montserrat|');
- expect(document.head.querySelector<HTMLElement>('[data-consistency-fonts]')?.dataset.consistencyFonts).toContain('family=Montserrat:wght@500');
- const saved = editor.readDocument(); expect(saved.fonts).toEqual({ heading: 'Montserrat' });
- editor.remove();
- const reopened = new ConsistencyEditor(); reopened.loadDocument(saved); document.body.append(reopened); await reopened.updateComplete;
- expect(reopened.fonts).toEqual({ heading: 'Montserrat' });
- const older = new ConsistencyEditor(); const { fonts: _, ...withoutFonts } = saved; older.loadDocument(withoutFonts);
- expect(older.fonts).toEqual({});
+test('the faces survive the shared page document boundary and reopening',()=>{
+ const editor=new ConsistencyEditor();const page=editor.readDocument();editor.loadDocument({...page,fonts:{heading:'Montserrat'}});
+ const saved=editor.readDocument(),reopened=new ConsistencyEditor();reopened.loadDocument(saved);
+ expect(saved.fonts).toEqual({heading:'Montserrat'});expect(reopened.readDocument().fonts).toEqual({heading:'Montserrat'});
 });

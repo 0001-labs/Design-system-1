@@ -6,9 +6,21 @@ Each rule names the test that holds it. While editing a site, a drag that breaks
 
 ## Rules
 
+### `native.templates`
+
+Every authored template retains its words and desktop/phone layout through the shared block renderer.
+
+Held by `tests/template-native.mjs`: “content and design preserved through shared blocks”.
+
+### `native.inline-writing`
+
+Words inside a button or menu remain editable through spaces, selection and reopening without activating the component.
+
+Held by `tests/templates.mjs`: “authored page, direct writing, independent draft and reopen passed”.
+
 ### `native.workspace`
 
-New lab pages and blank site drafts use the published page model and editor; spacing survives saving and reopening, and a refused save retains the local document for recovery.
+All lab pages, templates and private site drafts use the published page model and editor; spacing survives saving and reopening, and a refused save retains the local document for recovery.
 
 Held by `tests/workspace-native.mjs`: “Shared workspace editor: native blocks”.
 

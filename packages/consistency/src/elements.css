@@ -24,4 +24,4 @@
 .consistency-element-preview-inner .consistency-element-preview-label{padding-top:calc(var(--ds-unit)/2);font-size:var(--ds-type-size-default);line-height:var(--ds-unit)}
 .consistency-element-preview-inner .consistency-element-preview-cursor{left:55%;top:45%}
 /* Card words always keep one square inside every edge, in all presets. */
-:is(.consistency-sheet,.consistency-element-preview) ds-card{--ds-card-text-inset-min:calc(20px * var(--sf))}
+:is(.consistency-content-element,.consistency-element-preview) ds-card{--ds-card-text-inset-min:calc(20px * var(--sf))}

@@ -178,6 +178,6 @@ consistency-booking .aa-plain > .aa-block { margin:0; padding:0; font:inherit; c
 
 @media(max-width:360px){.consistency-mobile-preview .consistency-stage{padding:0}.consistency-mobile-preview .consistency-device{--ds-device-width:100%}}
 
-/* Site templates use the same sandbox and interaction engine as real pages. */
-consistency-template{display:block;width:100%;height:max(80dvh,calc(30 * var(--ds-unit)));min-width:0}
-consistency-template>iframe{display:block;width:100%;height:100%;border:0;background:var(--ds-paper)}
+consistency-editor{display:flex;height:100%;min-height:0}.consistency-shared-lab{display:flex;flex:1;min-width:0;min-height:0;gap:var(--ds-unit)}.consistency-shared-canvas{display:flex;flex:1;min-width:0;min-height:0}.consistency-shared-canvas>consistency-workspace-page{flex:1}
+
+.consistency-shared-device:not([frameless]){--ds-device-width:min(420px,100%);margin-inline:auto}.consistency-shared-device .consistency-shared-canvas{height:100%;width:100%}

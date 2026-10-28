@@ -3,6 +3,7 @@ import { ConsistencyPageEditor } from './page-editor';
 import { validateWorkspacePage, type WorkspacePage } from '../../../shared/consistency-workspace-page';
 import type { NativePageSnapshot } from './native-site';
 import { libraryTokens } from './libraries';
+import { templatePage } from './templates';
 import { fontTokens, loadPageFonts, readPageFonts } from './fonts';
 
 /** Workspace persistence owns its revision; this host owns no alternative block editor or history. */
@@ -20,7 +21,7 @@ export class WorkspacePageEditor extends LitElement {
   createRenderRoot() { return this; }
   loadDocument(value: unknown) {
     if (this.isConnected) throw new Error('Load the page before mounting its editor.');
-    this.value = validateWorkspacePage(value);
+    this.value = validateWorkspacePage(value);this.setAttribute('example',this.value.example);
   }
   connectedCallback() { super.connectedCallback(); void this.mountPage(); }
   disconnectedCallback() {
@@ -30,9 +31,9 @@ export class WorkspacePageEditor extends LitElement {
   private async mountPage() {
     await this.updateComplete;
     if (!this.isConnected || !this.value) return;
-    const snapshot: NativePageSnapshot = {kind:'native',path:'/',build:'workspace',base:'workspace',revision:0,document:this.value.page,images:[],collections:{}};
+    const snapshot: NativePageSnapshot = {kind:'native',path:'/',build:'workspace',base:'workspace',revision:0,document:this.value.page,images:[],collections:{},components:templatePage(this.value.example)?.components};
     const tokens = {...libraryTokens(this.value.library), ...fontTokens(readPageFonts(this.value.fonts))};
-    const styles = `:root{${Object.entries(tokens).map(([key,value]) => `${key}:${value}`).join(';')}}`;
+    const styles = `${templatePage(this.value.example)?.library??''}\n:root{${Object.entries(tokens).map(([key,value]) => `${key}:${value}`).join(';')}}`;
     this.ready = this.pageEditor.open(snapshot, async value => ({...snapshot,...value,revision:value.revision+1}), {styles});
   }
   readDocument(): Record<string, unknown> {

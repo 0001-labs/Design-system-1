@@ -1,5 +1,6 @@
+import { upgradeComponentTree, componentsReady } from './component-surface';
 import { LitElement, html } from 'lit';
-import { nativePageStyles, renderNativePage, type NativePageDocument } from '../../../shared/consistency-native-page';
+import { nativePageStyles, nativePageRootStyles, renderNativePage, type NativePageDocument } from '../../../shared/consistency-native-page';
 import { NativeSiteController, type NativePageSnapshot, type NativePageSave } from './native-site';
 import baseStyles from '../../../DS1/1-root/one.css?inline';
 import './site-editor.css';
@@ -38,14 +39,18 @@ export class ConsistencyPageEditor extends LitElement {
     if (this.source) { this.frame.removeAttribute('srcdoc'); this.frame.src = this.source; }
     else {
       this.frame.removeAttribute('src');
-      const page = renderNativePage(snapshot.document, { images: snapshot.images, collections: snapshot.collections, editor: true });
-      this.frame.srcdoc = `<!doctype html><html lang="en"><head><meta charset="utf-8"><style>${baseStyles}\n${nativePageStyles}\n${source && 'styles' in source ? source.styles : ''}\nhtml{--sf:1;--ds-sf:1}body{margin:0}</style></head><body>${page}</body></html>`;
+      const page = renderNativePage(snapshot.document, { images: snapshot.images, collections: snapshot.collections, editor: true, components: snapshot.components });
+      this.frame.srcdoc = `<!doctype html><html lang="en"><head><meta charset="utf-8"><style>${baseStyles}\n${nativePageStyles}\n${source && 'styles' in source ? source.styles : ''}\nhtml{--sf:1;--ds-sf:1}body{margin:0;font:14px/20px var(--ds-typeface-regular);color:var(--ds-text-color);background:var(--ds-paper)}.c9y-native-text,.c9y-component-words,.aa-plain,.aa-plain>.aa-block{font:inherit;color:inherit;line-height:inherit;margin:0;padding:0;min-height:0;outline:none;background:none}.c9y-native-text{display:contents}</style></head><body${snapshot.document.layout.mode==='document'?' data-c9y-native-root':''}>${page}</body></html>`;
     }
     this.requestUpdate();
     return this.ready;
   }
-  private mount() {
+  private async mount() {
+    const opening = this.generation;
+    if(this.frame.contentDocument)await componentsReady(upgradeComponentTree(this.frame.contentDocument.body));
+    if(opening!==this.generation)return;
     if (!this.snapshot || !this.save || !this.isConnected) return;
+    if(this.snapshot&&this.frame.contentDocument)for(const[key,value]of Object.entries(nativePageRootStyles(this.snapshot.document)))this.frame.contentDocument.body.style.setProperty(key,value,'important');
     const root = this.frame.contentDocument?.querySelector('[data-c9y-native-root]');
     if (!root) { this.settle?.(false); return; }
     const base = this.frame.contentDocument?.documentElement.getAttribute('data-c9y-native-base');

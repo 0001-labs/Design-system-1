@@ -1,5 +1,5 @@
 import type { SortableMovement } from './vendor/drag/sortable';
-import type { SiteCompositionNode } from './site-composition-state';
+import type { SurfaceNode } from './surface-measures';
 
 // C9Y constraints: every rule the Consistency editor keeps, each a sentence and the test that holds
 // it, and the rules of every block it edits. C9Y-constraints.md is written from this file by
@@ -21,9 +21,11 @@ export type C9yConstraint = {
 };
 
 export const C9Y_CONSTRAINTS: C9yConstraint[] = [
+  {code:'native.templates',rule:'Every authored template retains its words and desktop/phone layout through the shared block renderer.',check:{file:'tests/template-native.mjs',test:'content and design preserved through shared blocks'}},
+  {code:'native.inline-writing',rule:'Words inside a button or menu remain editable through spaces, selection and reopening without activating the component.',check:{file:'tests/templates.mjs',test:'authored page, direct writing, independent draft and reopen passed'}},
   {
     code: 'native.workspace',
-    rule: 'New lab pages and blank site drafts use the published page model and editor; spacing survives saving and reopening, and a refused save retains the local document for recovery.',
+    rule: 'All lab pages, templates and private site drafts use the published page model and editor; spacing survives saving and reopening, and a refused save retains the local document for recovery.',
     check: {file: 'tests/workspace-native.mjs', test: 'Shared workspace editor: native blocks'},
   },
   {
@@ -112,8 +114,8 @@ export const C9Y_CONSTRAINTS: C9yConstraint[] = [
   },
 ];
 
-export type BlockKind = NonNullable<SiteCompositionNode['kind']>;
-export type Capability = SiteCompositionNode['capabilities'][number];
+export type BlockKind = NonNullable<SurfaceNode['kind']>;
+export type Capability = SurfaceNode['capabilities'][number];
 
 /**
  * The capabilities the platform gives a block (Consistency/platform/worker/site-composition.ts,

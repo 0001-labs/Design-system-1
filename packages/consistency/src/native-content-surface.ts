@@ -31,7 +31,7 @@ export class NativeContentSurface {
     element.classList.add('consistency-site-region', 'consistency-sheet', 'consistency-text-bounds', 'production-on');
     element.style.setProperty('--u', 'calc(20px * var(--sf,1))');
     const optionsAa = createPreviewEditorOptions(() => host, options.error, options.media);
-    host.options = { ...optionsAa, atoms: optionsAa.atoms?.filter(atom => atom.name !== 'diagram'), comments: undefined, value: options.read().source, reordering: true, placing: true };
+    host.options = { ...optionsAa, atoms: optionsAa.atoms, comments: undefined, value: options.read().source, reordering: true, placing: true };
     host.value = options.read().source;
     host.addEventListener('input', this.input);
     const stage = element.ownerDocument.createElement('div'); stage.className = 'c9y-native-region consistency-sheet consistency-text-bounds';

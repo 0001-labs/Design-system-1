@@ -16,7 +16,7 @@ const picture='<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400">
 async function freshNativeContent(into){
  const read=rel=>readFileSync(join(ds1,rel));
  const tree=(rel,{only,skip}={})=>{const map=new Map();for(const file of readdirSync(join(ds1,rel),{recursive:true})){const path=String(file).split(sep).join('/');if(only&&!only.test(path)||skip&&skip.test(path)||!statSync(join(ds1,rel,file)).isFile())continue;map.set(path,readFileSync(join(ds1,rel,file)));}return map;};
- for(const[path,content]of Object.entries(syncExports.exports['native-content'].files({read,tree,options:{}}))){await mkdir(dirname(join(into,path)),{recursive:true});await writeFile(join(into,path),content);}
+ for(const[path,content]of Object.entries(await syncExports.exports['native-content'].files({read,tree,options:{}}))){await mkdir(dirname(join(into,path)),{recursive:true});await writeFile(join(into,path),content);}
 }
 export async function nativePageFixture(options={}){
  const platform=resolve(process.env.C9Y_PLATFORM_ROOT??join(homedir(),'0001/Consistency/platform')),temporary=await mkdtemp(join(tmpdir(),'c9y-native-fixture-')),output=join(temporary,'platform.mjs'),vendor=join(temporary,'consistency-content');

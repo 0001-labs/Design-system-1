@@ -19,3 +19,7 @@ test('component documents cannot introduce HTML, CSS, unknown presentations or e
   const candidate=structuredClone(imported.document);Object.assign(candidate.blocks[0],patch);expect(()=>validateNativePage(candidate,context)).toThrow();
  }
 });
+
+test('card geometry changes its shared inner surface instead of adding a second outer inset',()=>{
+ const window=new Window();window.document.body.innerHTML='<ds-card><p>Keep the content</p></ds-card>';const imported=importComponentPage(window.document.body as never,{namespace:'card'});Object.assign(imported.document.blocks[0],{padding:60});const html=renderNativePage(imported.document,{components:imported.components});expect(html).toContain('--ds-card-padding-override:calc(60px');expect(html).not.toContain(';padding:');
+});

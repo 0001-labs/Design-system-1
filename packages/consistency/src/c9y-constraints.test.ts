@@ -4,7 +4,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vite-plus/test';
 import { BLOCKS, C9Y_CONSTRAINTS, MovementLedger, blockCapabilities, blockReorders, constraintsDocument, type BlockKind } from './c9y-constraints';
-import { siteMeasureRange, siteMeasureValue } from './site-composition-state';
+import { siteMeasureRange, siteMeasureValue } from './surface-measures';
 import { createSortable, type SortableMovement } from './vendor/drag/sortable';
 
 const read = (path: string) => readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '..', path), 'utf8');

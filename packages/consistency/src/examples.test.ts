@@ -1,20 +1,7 @@
-// @vitest-environment happy-dom
-import { expect, it } from 'vite-plus/test';
-import { EXAMPLE_PAGES, exampleComposition } from './examples';
-import { initialComposition } from './model';
-it('offers the editor, Studio and every canonical DS1 page as independent authored compositions', () => {
- expect(EXAMPLE_PAGES.slice(0, 2).map(page => page.id)).toEqual(['editor', 'studio']);
- expect(EXAMPLE_PAGES).toHaveLength(32);
- expect(exampleComposition('studio')).toEqual(initialComposition);
- for (const page of EXAMPLE_PAGES.slice(2)) {
-  expect(page.composition.sections.__authored).toBe('1');
-  expect(page.composition.order).toEqual(['intro']);
-  expect(page.composition.text).toBe('');
- }
-});
-it('keeps independent mutable drafts and the existing introduction fallback', () => {
- const first = exampleComposition('shop'), second = exampleComposition('shop');
- first.sections.changed = 'Changed'; first.order.pop(); first.gaps.example = 100;
- expect(second.sections.changed).toBeUndefined(); expect(second.order).toEqual(['intro']); expect(second.gaps.example).toBeUndefined();
- expect(exampleComposition('unknown')).toEqual(exampleComposition('editor'));
+import {expect,test} from 'vite-plus/test';
+import {EXAMPLE_PAGES,exampleDocument} from './examples';
+test('all lab examples seed the common native document and keep independent drafts',()=>{
+ expect(EXAMPLE_PAGES).toHaveLength(32);expect(EXAMPLE_PAGES.slice(0,2).map(page=>page.id)).toEqual(['editor','studio']);
+ for(const example of EXAMPLE_PAGES)expect(exampleDocument(example.id)).toMatchObject({schema:2,page:{kind:'native-page'}});
+ const a=exampleDocument('shop')as any,b=exampleDocument('shop')as any;a.page.blocks.length=0;expect(b.page.blocks.length).toBeGreaterThan(0);expect(exampleDocument('unknown')).toEqual(exampleDocument('editor'));
 });

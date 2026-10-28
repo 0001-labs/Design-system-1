@@ -14,12 +14,14 @@ export const COMPONENT_MEASURES = ['gap','padding','height','marginTop','marginB
 export const COMPONENT_FIELDS = ['text','label','title','figure','caption','placeholder','alt','href','src','poster','value','tone','variant','color','primary','secondary','data-face','data-size','size'] as const;
 export const componentEscape = (value: string) => value.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
 const voidTags = new Set(['area','base','br','col','embed','hr','img','input','link','meta','param','source','track','wbr']);
+/** Typed geometry follows the component's own layout surface. */
+export function componentGeometry(definition:NativeComponentDefinition,styles:Record<string,string>):Record<string,string>{const result={...styles};if(definition.tag==='ds-card'&&result.padding!==undefined){result['--ds-card-padding-override']=result.padding;delete result.padding;}return result;}
 export function componentMarkup(id: string, name: string, children: string, values: Record<string,string>, words: Record<string,string>, styles: Record<string,string>, components: NativeComponents, editor: boolean, hidden = false, design?: SiteSurfaceDesign): string {
   const definition = componentDefinition(name,components);
   if (!definition) throw new Error(`unregistered-component: ${name}`);
   const tag=definition.tag,kind=tag==='ds-card'||definition.attributes.class?.includes('ds-card')?'card':tag==='ds-stat'?'stat':'button';
   const patch=siteSurfacePatch(kind,tag,design??{});
-  styles={...Object.fromEntries(Object.entries(patch.styles).map(([key,value])=>[key,value+'!important'])),...styles};
+  styles=componentGeometry(definition,{...Object.fromEntries(Object.entries(patch.styles).map(([key,value])=>[key,value+'!important'])),...styles});
   const attributes: Record<string,string> = {...definition.attributes,...values,'data-native-block':id,...(editor?{'data-c9y-block':id,'data-c9y-kind':'component'}:{})};
   for(const[key,value]of Object.entries(patch.attributes))if(value===null)delete attributes[key];else attributes[key]=value;
   const classes=new Set((attributes.class??'').split(/\s+/).filter(Boolean));for(const[key,enabled]of Object.entries(patch.classes))if(enabled)classes.add(key);else classes.delete(key);if(classes.size||attributes.class)attributes.class=[...classes].join(' ');

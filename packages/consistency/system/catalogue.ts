@@ -18,20 +18,23 @@ const PLATFORM = (path: string) => `Consistency: platform/${path}`;
 const ENGINE = (path: string) => `Site engine: ${path}`;
 const FLAVO = (path: string) => `Flavo: ${path}`;
 const RAFT = (path: string) => `CPH Raft: ${path}`;
+const PEER=(path:string)=>`Peer: ${path}`;
+const LANDING=(path:string)=>`Consistency landing: ${path}`;
 const SDG = (path: string) => `Søndergården: ${path}`;
 
 const components: C9yComponent[] = [
   // Blocks: edited on a page.
+  {id:'c9y-component',label:'Library component',layer:'block',summary:'A trusted DS1 or site-library presentation with native children, bounded words, values and geometry. The same renderer serves it and the same native editor edits it.',presents:['ds-card','ds-text','ds-page'],adds:['a named library presentation','native child blocks and revisioned words','the shared spacing, selection and context controls'],systems:['Platform native pages'],realisedAs:[{as:'native-block',kind:'component'}],source:[DS1('shared/consistency-components.ts'),DS1('shared/consistency-import.ts'),APP('component-surface.ts'),APP('native-site.ts')],uses:['c9y-layout']},
   {
     id: 'c9y-page',
     label: 'Page',
     layer: 'block',
-    summary: 'The native page document shared by published native sites, new lab pages and blank site drafts. Authored templates and older HTML sites still have a source-composition compatibility path pending lossless import.',
+    summary: 'The native page document shared by published sites, every template, private draft and the editor lab. Earlier documents enter through one-way importers; the shared page editor owns every canvas.',
     presents: ['ds-page'],
     adds: ['the page’s width, padding and gap as whole squares', 'never hidden, placed or moved', 'new blocks inserted into it', 'a native page document validated against the site’s images, bindings and runtimes', 'the page’s tone'],
     systems: ['Site engine compositions', 'Platform native pages'],
     realisedAs: [{ as: 'editor-block', kind: 'root' }, { as: 'engine', part: 'compositions' }],
-    source: [DS1('shared/consistency-native-page.ts'), APP('page-editor.ts'), APP('workspace-page.ts'), APP('workspace-migration.ts'), DS1('shared/consistency-workspace-page.ts'), PLATFORM('worker/workspace-document.ts'), APP('native-site.ts'), APP('site-composition.ts'), PLATFORM('worker/site-composition.ts'), PLATFORM('worker/site-native.ts'), ENGINE('worker/compositions.ts')],
+    source: [DS1('shared/consistency-native-page.ts'), APP('page-editor.ts'), APP('workspace-page.ts'), DS1('shared/consistency-workspace-migration.ts'), DS1('shared/consistency-workspace-page.ts'), PLATFORM('worker/workspace-document.ts'), APP('native-site.ts'), PLATFORM('worker/site-composition.ts'), PLATFORM('worker/site-native.ts'), ENGINE('worker/compositions.ts')],
     uses: ['c9y-layout'],
   },
   {
@@ -42,7 +45,7 @@ const components: C9yComponent[] = [
     presents: ['ds-text'],
     adds: ['words edited in place through Aa', 'heading as a variant: a text block whose source is a Markdown heading (`# …`), inserted as `heading`', 'built words marked with `data-cms` keys by the site engine’s annotate step', 'edits stored append-only and rendered to safe inline HTML by the site engine', 'bound fields on native pages (`team-field`, `catalogue-page`)', 'its own spacing above and below'],
     systems: ['Site engine edits', 'Aa'],
-    realisedAs: [{ as: 'editor-block', kind: 'text' }, { as: 'native-block', kind: 'content' }, { as: 'insertion', kind: 'text' }, { as: 'insertion', kind: 'heading' }, { as: 'engine', part: 'annotate' }],
+    realisedAs: [{ as: 'editor-block', kind: 'text' }, { as: 'native-block', kind: 'content' }, { as: 'native-block', kind: 'text' }, { as: 'insertion', kind: 'text' }, { as: 'insertion', kind: 'heading' }, { as: 'engine', part: 'annotate' }],
     source: [APP('aa.ts'), APP('text-spacing.ts'), DS1('shared/consistency-native-content.ts'), ENGINE('annotate.mjs'), ENGINE('markdown.ts'), ENGINE('worker/rewrite.ts')],
   },
   {
@@ -160,7 +163,7 @@ const components: C9yComponent[] = [
     adds: ['only width, padding and spacing edited', 'protected regions never hidden or moved', 'authored regions run the editor’s Aa adapters'],
     systems: ['Site engine compositions'],
     realisedAs: [{ as: 'editor-block', kind: 'region' }, { as: 'insertion', kind: 'region' }],
-    source: [APP('site-native-regions.ts'), PLATFORM('worker/site-composition.ts')],
+    source: [APP('native-site.ts'), PLATFORM('worker/site-composition.ts')],
   },
   {
     id: 'c9y-runtime-view',
@@ -375,6 +378,8 @@ const components: C9yComponent[] = [
 ];
 
 const sites: C9ySite[] = [
+  {id:'peer',label:'Peer',code:'PEER',codeStatus:'agreed',siteCode:'48ABFR',addresses:['https://deep-dew-cream.c9y.site'],folder:'/Users/joachim/0001/Other projects/Peer',systemNode:'peer',summary:'55 public English/Japanese routes declared as shared native block pages. Marketplace data remains owned by Peer’s existing backend.'},
+  {id:'consistency',label:'Consistency',code:'C9Y',codeStatus:'agreed',siteCode:'98XXBV',addresses:['https://consistency.c9y.site'],folder:'/Users/joachim/0001/Consistency/site',systemNode:'consistency',summary:'The public landing and examples page use the same native blocks and editor as every site.'},
   {
     id: 'tivoli-garden-japan-2027', label: 'Tivoli Garden Youth Guard in Japan 2027',
     siteCode: '26WGEE', addresses: ['https://aqua-azure-brown.c9y.site'],
@@ -424,6 +429,7 @@ const COMPOSED = 'Composed use (inserted or stored blocks) lives in the site’s
 const PLACES_OF = PLATFORM('worker/owner-api.ts');
 
 const relations: C9yRelation[] = [
+  ...['peer','consistency'].flatMap(site=>['c9y-page','c9y-component','c9y-text','c9y-layout','c9y-pages','c9y-site-runtime'].map(component=>relation(site,component,'shared','Canonical native documents are rendered by the shared platform and edited by the same page editor; no source-layout editing adapter.',[site==='peer'?PEER('site/pages.native.json'):LANDING('pages.native.json'),PLATFORM('cli/build-native-html.mjs'),PLATFORM('worker/native.ts')],'2026-10-28'))),
   relation('tivoli-garden-japan-2027', 'c9y-page', 'shared', 'Stored legacy pages are converted to the shared native-page schema; the private draft is available only through the authenticated editor.', [PLATFORM('cli/legacy-blocks.mjs'), PLATFORM('worker/native.ts'), PLATFORM('tests/tivoli-native.test.ts')], '2026-10-28'),
   relation('tivoli-garden-japan-2027', 'c9y-layout', 'shared', 'Columns are grids; spacing boundaries are editable flow gaps. No imported HTML page or separate renderer.', [PLATFORM('cli/legacy-blocks.mjs')], '2026-10-28'),
   relation('tivoli-garden-japan-2027', 'c9y-text', 'shared', 'Every editorial text is Aa Markdown in native content blocks.', [PLATFORM('cli/legacy-blocks.mjs')], '2026-10-28'),
