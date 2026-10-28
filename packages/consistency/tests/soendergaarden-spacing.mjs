@@ -39,9 +39,21 @@ try {
  const initial=Number(await internal.getAttribute('aria-valuenow'));await internal.focus();await internal.press('ArrowUp');
  await until(async()=>{const b=(await main()).children.find(b=>b.id==='home-text');return Object.values(b.gaps??{}).some(value=>value>initial);},'The space inside the writing did not increase');
  check(JSON.stringify((await main()).children.find(b=>b.id==='home-picture'))===pictureBefore,'Spacing changed the image size');
+ // A sticky header stays at the viewport top while the main block scrolls behind it.
+ // Its visual position must not create a page gutter across the remaining writing.
+ const scrolled=frame.locator('[data-spacing-key="home-more-text-1"]');
+ await scrolled.scrollIntoViewIfNeeded();
+ await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+ check(await scrolled.evaluate(element=>{const box=element.getBoundingClientRect();return element.ownerDocument.elementFromPoint(box.left+box.width/2,box.top+box.height/2)?.closest('[data-spacing-key]')===element;}),'Scrolled paragraph gap is intercepted by another handle');
+ const scrolledBefore=Number(await scrolled.getAttribute('aria-valuenow'));
+ await drag(await scrolled.boundingBox(),10);
+ await until(async()=>Number(await scrolled.getAttribute('aria-valuenow'))===scrolledBefore+20,'Scrolled paragraph gap did not follow the pointer');
+ await until(async()=>(await main()).children.find(block=>block.id==='home-more').gaps?.['home-more-text-1']===scrolledBefore+20,'Scrolled paragraph gap did not save');
+ console.log('Scrolled paragraph gaps stay directly draggable');
  const saved=await fixture.read();await input.detach();await page.reload();await frame.locator('[data-c9y-native-root][data-editor-surface]').waitFor();
  await until(async()=>Number(await gap.getAttribute('aria-valuenow'))===before,'Reopened layout lost the saved gap');
  await until(async()=>Number(await internal.getAttribute('aria-valuenow'))===initial+20,'Reopened writing lost the saved gap');
+ await until(async()=>Number(await scrolled.getAttribute('aria-valuenow'))===scrolledBefore+20,'Reopened writing lost the scrolled paragraph gap');
  check(JSON.stringify((await fixture.read()).document)===JSON.stringify(saved.document),'Reopening changed the saved spacing');
  check(errors.length===0,errors.join('\n'));
  console.log('Søndergården front: publication retry, pointer increase/decrease, keyboard decrease, writing gap and reopened document pass');

@@ -12,6 +12,10 @@ describe('native page model',()=>{
     for(const space of spaces)for(const item of items)expect(Math.min(space.box.left+space.box.width,item.right)-Math.max(space.box.left,item.left)>0&&Math.min(space.box.top+space.box.height,item.bottom)-Math.max(space.box.top,item.top)>0).toBe(false);
     expect(nativeGridSpaces(items.map(item=>({...item,top:item.top-180,bottom:item.bottom-180})))).toEqual(spaces.map(space=>({...space,box:{...space.box,top:space.box.top-180}})));
   });
+  it('keeps sticky headers from creating gutters across scrolled content',()=>{
+    const spaces=nativeGridSpaces([box(0,0,1000,60),box(160,-500,680,1400),box(0,920,1000,300)]);
+    expect(spaces).toEqual([{axis:'vertical',box:{left:160,top:900,width:680,height:20}}]);
+  });
   it('does not call overlapping content a gutter',()=>expect(nativeGridSpaces([box(0,0,200,200),box(100,0,200,200)])).toEqual([]));
   it('reorders one typed sibling list without changing bound content',()=>{
     const document:NativePageDocument={schema:1,kind:'native-page',layout:{gap:20,padding:20},blocks:[{id:'main',kind:'flow',direction:'column',gap:20,padding:20,children:[{id:'words',kind:'content',source:'Current title',binding:'home.title'},{id:'cart',kind:'runtime',name:'Cart',props:{}}]}]};

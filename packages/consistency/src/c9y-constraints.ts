@@ -39,6 +39,11 @@ export const C9Y_CONSTRAINTS: C9yConstraint[] = [
     check: { file: 'tests/soendergaarden-spacing.mjs', test: 'Søndergården front: publication retry' },
   },
   {
+    code: 'spacing.sticky-header',
+    rule: 'Scrolling a sticky header over the page never creates a spacing handle across content; paragraph gaps remain directly draggable.',
+    check: { file: 'tests/soendergaarden-spacing.mjs', test: 'Scrolled paragraph gaps stay directly draggable' },
+  },
+  {
     code: 'native.gutters',
     rule: 'Native gallery guides cover only the real whitespace between overlapping tracks or complete rows, including after scrolling; they never cross product content.',
     check: { file: 'src/native-page-model.test.ts', test: 'maps two featured and three ordinary gallery items to actual whitespace' },

@@ -36,6 +36,12 @@ Resize labels never intercept a neighbouring spacing handle; pointer and keyboar
 
 Held by `tests/soendergaarden-spacing.mjs`: “Søndergården front: publication retry”.
 
+### `spacing.sticky-header`
+
+Scrolling a sticky header over the page never creates a spacing handle across content; paragraph gaps remain directly draggable.
+
+Held by `tests/soendergaarden-spacing.mjs`: “Scrolled paragraph gaps stay directly draggable”.
+
 ### `native.gutters`
 
 Native gallery guides cover only the real whitespace between overlapping tracks or complete rows, including after scrolling; they never cross product content.

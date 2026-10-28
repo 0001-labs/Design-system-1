@@ -193,8 +193,12 @@ export function nativeGridSpaces(boxes: readonly Box[]): Array<{axis:'horizontal
     const a=row[index-1],b=row[index],top=Math.max(a.top,b.top),bottom=Math.min(a.bottom,b.bottom),width=b.left-a.right;
     if(width>=0&&bottom>top)spaces.push({axis:'horizontal',box:{left:a.right,top,width,height:bottom-top}});
   }}
+  let occupied:Box[]=[],bottomEdge=-Infinity;
   for(let index=1;index<rows.length;index++){
-    const before=rows[index-1],after=rows[index],top=Math.max(...before.map(box=>box.bottom)),bottom=Math.min(...after.map(box=>box.top));
+    // A sticky or overlapping row can sit inside an earlier, taller row. The occupied
+    // frontier, not the last row's bottom, is the boundary of real whitespace.
+    for(const box of rows[index-1]){if(box.bottom>bottomEdge){bottomEdge=box.bottom;occupied=[box];}else if(box.bottom===bottomEdge)occupied.push(box);}
+    const before=occupied,after=rows[index],top=bottomEdge,bottom=Math.min(...after.map(box=>box.top));
     const left=Math.max(Math.min(...before.map(box=>box.left)),Math.min(...after.map(box=>box.left))),right=Math.min(Math.max(...before.map(box=>box.right)),Math.max(...after.map(box=>box.right)));
     if(bottom>=top&&right>left)spaces.push({axis:'vertical',box:{left,top,width:right-left,height:bottom-top}});
   }
