@@ -13,6 +13,12 @@ import { applePackage } from './scripts/native-apple.mjs';
 import { androidPackage } from './scripts/native-android.mjs';
 import { libraryPin, pinnedFiles, pinnedLibrary } from './scripts/library-pin.mjs';
 
+const nativeCssCache=new Map();
+async function nativeInlineSource(path){
+ if(!path.endsWith('.css'))return readNativeClientFile(path,'utf8');
+ if(!nativeCssCache.has(path))nativeCssCache.set(path,bundleNativeClient({entryPoints:[path],bundle:true,write:false,minify:true,loader:{'.woff2':'dataurl','.woff':'dataurl','.ttf':'dataurl','.svg':'dataurl','.png':'dataurl'},logLevel:'silent'}).then(result=>result.outputFiles[0].text));
+ return nativeCssCache.get(path);
+}
 const rootStyles = ['one.css', 'grid.css', 'text.css', 'component-tokens.css', 'component-metrics.css', 'component-appearance.css', 'fonts.css', 'palette.css'];
 /** one.css and controls.css both import the text classes. */
 const importsText = ['one.css', 'controls.css'];
@@ -100,7 +106,7 @@ export default {
     /** Native page publication: the editor's Aa parser and closed content atoms, without DOM. */
     'native-content': {
       async files({ read, tree }) {
-        const client = await bundleNativeClient({ entryPoints:[resolveNativeClient(import.meta.dirname,'shared/consistency-block-client.ts')],bundle:true,format:'esm',platform:'browser',target:'es2022',minify:true,write:false,outdir:resolveNativeClient(import.meta.dirname,'.reports/native-block-client'),entryNames:'blocks',loader:{'.woff2':'dataurl','.woff':'dataurl','.ttf':'dataurl','.svg':'text','.png':'dataurl'},plugins:[{name:'native-source-text',setup(build){build.onResolve({filter:/\.(?:css|svg)\?(?:inline|raw)$/},args=>({path:resolveNativeClient(args.resolveDir,args.path.replace(/\?(?:inline|raw)$/, '')),namespace:'native-source-text'}));build.onLoad({filter:/.*/,namespace:'native-source-text'},async args=>({contents:await readNativeClientFile(args.path,'utf8'),loader:'text'}));}}] });
+        const client = await bundleNativeClient({ entryPoints:[resolveNativeClient(import.meta.dirname,'shared/consistency-block-client.ts')],bundle:true,format:'esm',platform:'browser',target:'es2022',minify:true,write:false,outdir:resolveNativeClient(import.meta.dirname,'.reports/native-block-client'),entryNames:'blocks',loader:{'.woff2':'dataurl','.woff':'dataurl','.ttf':'dataurl','.svg':'text','.png':'dataurl'},plugins:[{name:'native-source-text',setup(build){build.onResolve({filter:/\.(?:css|svg)\?(?:inline|raw)$/},args=>({path:resolveNativeClient(args.resolveDir,args.path.replace(/\?(?:inline|raw)$/, '')),namespace:'native-source-text'}));build.onLoad({filter:/.*/,namespace:'native-source-text'},async args=>({contents:await nativeInlineSource(args.path),loader:'text'}));}}] });
 
         const importer = await bundleNativeClient({entryPoints:[resolveNativeClient(import.meta.dirname,'shared/consistency-import.ts')],bundle:true,format:'esm',platform:'node',write:false});
         let source = String(read('shared/consistency-native-content.ts'))
