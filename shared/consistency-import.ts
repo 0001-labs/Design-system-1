@@ -9,7 +9,7 @@ export function importComponentPage(body: HTMLElement, options: {namespace:strin
   const id=()=>`node_${serial++}`;
   const ancestors=(node:any,tags:string[])=>{for(let parent=node.parentElement??node.parentNode;parent;parent=parent.parentElement??parent.parentNode)if(tags.includes(('rawTagName'in parent?parent.rawTagName??'':parent.localName??'').toLowerCase()))return true;return false;};
   const convert=(node:Node):NativeBlock[]=>{
-    if(node.nodeType===3){const text=node.textContent??'',key=id();if(text.trim()&&!ancestors(node,['style','script','svg','option','textarea']))textKeys[`template:page:${words++}`]=key;return[{id:key,kind:'text',text,...(ancestors(node,['option','textarea'])?{editable:false}:{})}];}
+    if(node.nodeType===3){const text=node.textContent??'',key=id();if(text.trim()&&!ancestors(node,['style','script','svg','option','textarea']))textKeys[`template:page:${words++}`]=key;return[{id:key,kind:'text',text,...(!text.trim()||ancestors(node,['option','textarea'])?{editable:false}:{})}];}
     if(node.nodeType!==1)return[];
     const element=node as HTMLElement,tag=(element.localName??(element as unknown as {rawTagName:string}).rawTagName).toLowerCase();
     if(['script','iframe','object','embed','base','noscript'].includes(tag))return[];

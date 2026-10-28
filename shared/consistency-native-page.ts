@@ -434,7 +434,7 @@ export function renderNativeBlock(block: NativeBlock, options: NativePageRenderO
 function render(block: NativeBlock, options: NativePageRenderOptions, mark?: NativeMark, marks?: Marks): string {
   if(isNativeSection(block))return renderNativeSection(block,options,mark);
   const child=(value:NativeBlock)=>render(value,options,marks?.get(value.id),marks);
-  if(block.kind==='text')return options.editor&&block.editable!==false&&block.text.trim()?`<span data-native-block="${escape(block.id)}" data-c9y-block="${escape(block.id)}" data-c9y-kind="text" class="c9y-native-text">${escape(block.text)}</span>`:escape(block.text);
+  if(block.kind==='text')return options.editor&&block.editable!==false?`<span data-native-block="${escape(block.id)}" data-c9y-block="${escape(block.id)}" data-c9y-kind="text" class="c9y-native-text">${escape(block.text)}</span>`:escape(block.text);
   if(block.kind==='component')return componentMarkup(block.id,block.name,block.children.map(child).join(''),block.values??{},block.words??{},nativeBlockStyles(block),options.components??{},!!options.editor,block.hidden,block.design);
   const attrs=`class="c9y-native-node c9y-native-${block.kind}${block.kind==='link'?' c9y-native-region':''}${markClasses(mark)}" data-native-block="${escape(block.id)}"${options.editor?` data-c9y-block="${escape(block.id)}" data-c9y-kind="${block.kind}"`:''}${block.hidden?' hidden':''}${block.locale?` data-native-locale="${block.locale}" lang="${block.locale}"`:''}${markText(mark)} style="${escape(styleText(nativeBlockStyles(block)))}"`;
   if(block.kind==='flow'){
