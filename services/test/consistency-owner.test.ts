@@ -95,7 +95,7 @@ it('asks System on every request, and a sign-out anywhere ends it here', async (
   expect(calls.validate - before).toBe(2);
   tokens.clear();
   expect(await (await visit('/', { headers: { Cookie: owner! } })).text()).toBe('Landing');
-  expect((await visit('/private-consistency/home.html', { headers: { Cookie: owner! } })).status).toBe(302);
+  expect((await visit('/private-consistency/assets/editor.js', { headers: { Cookie: owner! } })).status).toBe(302);
 });
 
 it("leads c9y.site's home to the app, and keeps its own sign-in client", async () => {
@@ -114,7 +114,7 @@ it('signing out here revokes the System session behind it', async () => {
   expect(out.status).toBe(204);
   expect(calls.revoke).toBe(1);
   expect(setCookies(out).join('\n')).toMatch(/__Host-c9y_owner=; .*Max-Age=0/);
-  expect((await visit('/private-consistency/home.html', { headers: { Cookie: owner! } })).status).toBe(302);
+  expect((await visit('/private-consistency/assets/editor.js', { headers: { Cookie: owner! } })).status).toBe(302);
 });
 
 it("the editor's AI takes the System owner too, still only from its own origin", async () => {

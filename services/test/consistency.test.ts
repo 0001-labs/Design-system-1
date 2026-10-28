@@ -312,3 +312,18 @@ it('reuses versioned private static assets while keeping HTML and errors uncache
  assets.mockImplementation(async()=>new Response('missing',{status:404}));
  expect((await consistencyPreview(new Request(origin+'/private-consistency/assets/editor-Ab12cd34.js',{headers}),env,send)).headers.get('cache-control')).toBe('private, no-store');
 });
+
+it.each(['/private-consistency/home', '/private-consistency/home/', '/private-consistency/home.html'])('keeps the app at the root instead of %s', async path => {
+  const { env, assets, send } = setup();
+  for (const method of ['GET', 'HEAD']) {
+    for (const cookie of ['', headers.cookie]) {
+      const result = await consistencyPreview(new Request(`https://consistency.site${path}?open=52OFXF`, { method, headers: { cookie } }), env, send);
+      expect(result.status).toBe(308);
+      expect(result.headers.get('location')).toBe('https://consistency.site/?open=52OFXF');
+      expect(result.headers.get('cache-control')).toBe('private, no-store');
+      expect(result.headers.get('set-cookie')).toBeNull();
+    }
+  }
+  expect(assets).not.toHaveBeenCalled();
+  expect(send).not.toHaveBeenCalled();
+});
