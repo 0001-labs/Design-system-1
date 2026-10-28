@@ -1,4 +1,4 @@
-import { AaEditorElement, defineAaEditor } from '../../../website/src/vendor/aa/aa';
+import { AaEditorElement, defineAaEditor, parseBlocks } from '../../../website/src/vendor/aa/aa';
 import { createSurfaceElement } from './editor-surface';
 import { createPreviewEditorOptions } from './aa';
 import { TextSpacingLayer } from './text-spacing';
@@ -31,7 +31,7 @@ export class NativeContentSurface {
     element.classList.add('consistency-site-region', 'consistency-sheet', 'consistency-text-bounds', 'production-on');
     element.style.setProperty('--u', 'calc(20px * var(--sf,1))');
     const optionsAa = createPreviewEditorOptions(() => host, options.error, options.media);
-    host.options = { ...optionsAa, atoms: optionsAa.atoms, comments: undefined, value: options.read().source, reordering: true, placing: true };
+    host.options = { ...optionsAa, atoms: optionsAa.atoms, comments: undefined, value: options.read().source, reordering: parseBlocks(options.read().source).length>1, placing: true };
     host.value = options.read().source;
     host.addEventListener('input', this.input);
     const stage = element.ownerDocument.createElement('div'); stage.className = 'c9y-native-region consistency-sheet consistency-text-bounds';
@@ -60,6 +60,7 @@ export class NativeContentSurface {
   refresh() {
     if (this.host.editor && this.host.editor !== this.historyEditor) { this.historyEditor = this.host.editor; this.host.editor.setHistoryProvider({ undo: this.options.undo, redo: this.options.redo }); }
     const source = this.options.read().source; if (this.host.value !== source) this.host.value = source;
+    if(this.host.editor)this.host.editor.reordering=parseBlocks(source).length>1;
     this.spacing.refresh(); this.columns.refresh(); this.cards.refresh(); this.resizing.refresh(); this.mapImages();
   }
   focus() { this.host.focus(); }
