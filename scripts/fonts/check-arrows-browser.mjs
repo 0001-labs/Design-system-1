@@ -25,5 +25,16 @@ try {
       assert(fonts.every(font => font.isCustomFont && /Inter/.test(font.familyName)), `${sheet} ${selector}: ${JSON.stringify(fonts)}`);
     }
   }
+  // Existing self-hosted installations may forbid data: fonts in their CSP.
+  await page.unroute('**/*');
+  await page.route('**/*', route => route.fulfill(route.request().url().endsWith('.woff2')
+    ? { contentType: 'font/woff2', body: readFileSync(new URL('fonts/Inter-Arrows.woff2', root)) }
+    : { contentType: 'text/html; charset=utf-8', body: `<meta http-equiv="Content-Security-Policy" content="font-src 'self'"><style>${read('inter-arrows.css')}p{font-family:"Inter Arrows",serif}</style><p id="arrow">→</p>` }));
+  await page.goto('http://arrows.test/');
+  await page.evaluate(() => document.fonts.ready);
+  const { root: document } = await cdp.send('DOM.getDocument');
+  const { nodeId } = await cdp.send('DOM.querySelector', { nodeId: document.nodeId, selector: '#arrow' });
+  const { fonts } = await cdp.send('CSS.getPlatformFontsForNode', { nodeId });
+  assert(fonts.some(font => font.isCustomFont && /Inter/.test(font.familyName)), 'Self-only CSP must retain the local font fallback');
   console.log('Inter arrows rendered from all three entry points, offline, with custom typography.');
 } finally { await browser.close(); }
