@@ -64,7 +64,8 @@ function leadingTextEdge(element: Element): number | undefined {
     if (el.matches('[hidden], [aria-hidden="true"], script, style') || style(el).display === 'none' || style(el).visibility === 'hidden') return;
     // Inline code/key/chip faces align by their outside edge; their intentional
     // inset is not a displaced prose column. Text tabs still measure their words.
-    if (el !== element && el.matches('code, kbd, ds-tag, ds-badge')) {
+    if (el !== element && !element.matches('ds-tabs') &&
+      (el.matches('code, kbd, button, input, select, textarea, img, svg') || (el.localName.startsWith('ds-') && el.localName !== 'ds-text'))) {
       const box = el.getBoundingClientRect();
       if (box.width && box.height) return rtl ? box.right : box.left;
     }
