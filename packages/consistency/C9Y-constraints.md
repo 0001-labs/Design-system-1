@@ -10,7 +10,7 @@ Each rule names the test that holds it. While editing a site, a drag that breaks
 
 Resize labels never intercept a neighbouring spacing handle; pointer and keyboard spacing changes persist after reopening.
 
-Held by `tests/soendergaarden-spacing.mjs`: “Søndergården front: pointer increase”.
+Held by `tests/soendergaarden-spacing.mjs`: “Søndergården front: publication retry”.
 
 ### `native.gutters`
 

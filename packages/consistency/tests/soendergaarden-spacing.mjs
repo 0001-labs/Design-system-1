@@ -1,11 +1,14 @@
 import { chromium } from 'playwright';
 import { readFile } from 'node:fs/promises';
+import { homedir } from 'node:os';
+import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { nativePageFixture } from './native-page-fixture.mjs';
-const root = new URL('../../../../Clients/Soendergaarden/', import.meta.url);
+const root = pathToFileURL(resolve(process.env.C9Y_SOENDERGAARDEN_ROOT ?? `${homedir()}/0001/Clients/Soendergaarden`) + '/');
 const build = JSON.parse(await readFile(new URL('dist/native/pages.json',root),'utf8'));
 const home = build.pages['/'];
 const styles = await readFile(new URL('web/src/style.css',root),'utf8');
-const fixture = await nativePageFixture({definition:{document:home.document,images:home.images,bindings:{},collections:{},allowedRuntimes:home.allowedRuntimes},styles});
+const fixture = await nativePageFixture({staleCanvasOnce:true,definition:{document:home.document,images:home.images,bindings:{},collections:{},allowedRuntimes:home.allowedRuntimes},styles});
 const browser = await chromium.launch({headless:true});
 const check=(ok,message)=>{if(!ok)throw new Error(message);};
 const until=async(test,message)=>{const end=Date.now()+8000;while(!await test()){if(Date.now()>end)throw new Error(message);await new Promise(r=>setTimeout(r,40));}};
@@ -41,5 +44,5 @@ try {
  await until(async()=>Number(await internal.getAttribute('aria-valuenow'))===initial+20,'Reopened writing lost the saved gap');
  check(JSON.stringify((await fixture.read()).document)===JSON.stringify(saved.document),'Reopening changed the saved spacing');
  check(errors.length===0,errors.join('\n'));
- console.log('Søndergården front: pointer increase/decrease, keyboard decrease, writing gap and reopened document pass');
+ console.log('Søndergården front: publication retry, pointer increase/decrease, keyboard decrease, writing gap and reopened document pass');
 }finally{await browser.close();await fixture.close();}

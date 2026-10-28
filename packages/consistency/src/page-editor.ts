@@ -64,7 +64,11 @@ export class ConsistencyPageEditor extends LitElement {
   }
   get pending() { return this.controller?.pending ?? false; }
   readDocument(): NativePageDocument { if (!this.snapshot) throw new Error('No page is open.'); return structuredClone(this.controller?.state.document ?? this.snapshot.document); }
-  async flush() { if (!await this.ready) return false; return this.controller ? this.controller.flush() : false; }
+  async flush() {
+    await this.ready;
+    // A rejected canvas has no editable controller or local changes; let the host reopen it.
+    return this.controller ? this.controller.flush() : true;
+  }
   render() { return html`<div class="consistency-site-stage">${this.frame}</div>`; }
 }
 customElements.define('consistency-page-editor', ConsistencyPageEditor);
