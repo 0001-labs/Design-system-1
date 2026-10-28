@@ -215,12 +215,12 @@ const components: C9yComponent[] = [
     id: 'c9y-site-runtime',
     label: 'Site runtime',
     layer: 'runtime',
-    summary: 'A platform runtime a site’s `site.json` names: its own renderer, routes, places, page sources and secrets inside the site’s object (Flavo’s is the one registered).',
+    summary: 'A platform runtime a site’s `site.json` names, inside the site’s object: Flavo’s own renderer and business, or the general native runtime, which draws a site’s declared native pages into its shell and leaves everything else to the Site engine.',
     presents: [],
-    adds: ['server rendering for a site', 'its own API routes with body limits and checks', 'its own places and page sources in the app', 'its own secrets'],
+    adds: ['server rendering for a site', 'native pages from the build’s `native/pages.json`, checked whole as the build is taken', 'its own API routes with body limits and checks', 'its own places and page sources in the app', 'its own secrets'],
     systems: ['Platform runtimes', 'Durable Objects'],
-    realisedAs: [{ as: 'runtime', name: 'flavo' }],
-    source: [PLATFORM('worker/runtime.ts'), PLATFORM('worker/runtimes.ts'), PLATFORM('worker/flavo.ts')],
+    realisedAs: [{ as: 'runtime', name: 'flavo' }, { as: 'runtime', name: 'native' }],
+    source: [PLATFORM('worker/runtime.ts'), PLATFORM('worker/runtimes.ts'), PLATFORM('worker/flavo.ts'), PLATFORM('worker/native.ts'), PLATFORM('worker/native-build.ts')],
   },
   {
     id: 'c9y-site-extension',
@@ -454,7 +454,8 @@ const relations: C9yRelation[] = [
 
   // Søndergården: committed native page source; stored editor composition is not acceptance evidence.
   relation('soendergaarden', 'c9y-text', 'shared', 'Its Markdown is declared as native content blocks; the former keyed-field annotation step has been removed.', [SDG('scripts/native.ts'), SDG('sync.json')], '2026-10-28'),
-  relation('soendergaarden', 'c9y-page', 'shared', 'Its build declares NativePageDocument pages, validated and rendered through the shared native page model into its shell. This records source implementation, not live or owner acceptance.', [SDG('scripts/native.ts'), SDG('web/shell.html'), SDG('sync.json')], '2026-10-28'),
+  relation('soendergaarden', 'c9y-page', 'shared', 'Its build declares NativePageDocument pages, and the platform’s native runtime draws them into its shell, live since 28 October 2026. Owner editing in the app awaits acceptance.', [SDG('scripts/native.ts'), SDG('web/shell.html'), SDG('sync.json'), PLATFORM('worker/native.ts')], '2026-10-28'),
+  relation('soendergaarden', 'c9y-site-runtime', 'shared', 'The platform’s general native runtime serves it (`runtime: native`), the first site on it.', [SDG('scripts/site-json.mjs'), PLATFORM('worker/runtimes.ts')], '2026-10-28'),
   relation('soendergaarden', 'c9y-layout', 'shared', 'Its header, navigation, main column, footer and newsletter grids are native flow and grid blocks.', [SDG('scripts/native.ts')], '2026-10-28'),
   relation('soendergaarden', 'c9y-image', 'shared', 'Its logo and pictures are native image blocks validated against the build’s declared images.', [SDG('scripts/native.ts')], '2026-10-28'),
   relation('soendergaarden', 'c9y-link', 'shared', 'Navigation and document links are native link blocks; PDF links use primary appearance.', [SDG('scripts/native.ts')], '2026-10-28'),
