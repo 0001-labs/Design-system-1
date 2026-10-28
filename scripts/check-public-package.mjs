@@ -3,11 +3,15 @@ import { execFileSync } from 'node:child_process';
 import { mkdtempSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+execFileSync(process.execPath, ['scripts/fonts/embed-arrows.mjs', '--check'], { stdio: 'inherit' });
 const directory = mkdtempSync(join(tmpdir(), 'ds1-package-'));
 try {
   execFileSync('pnpm', ['pack', '--pack-destination', directory], { stdio: 'pipe' });
   const archive = join(directory, readdirSync(directory).find(file => file.endsWith('.tgz')));
   const files = execFileSync('tar', ['-tzf', archive], { encoding: 'utf8' }).trim().split('\n');
+  for (const file of ['fonts.css', 'component-tokens.css', 'inter-arrows.css', 'fonts/Inter-Arrows.woff2', 'fonts/Inter-LICENSE.md']) {
+    if (!files.includes(`package/DS1/1-root/${file}`)) throw new Error(`Missing public typography asset: ${file}`);
+  }
   const internal = /(?:ds-(?:kbd|loading|spacing-handle)|\/react\/(?:kbd|loading|spacing-handle)\.|\/spacing-handle\.|\/kbd\.css|packages\/app|\/app\/src|\/website\/)/;
   const leaked = files.filter(file => internal.test(file) || /packages\/(consistency|visual-kit)|private-consistency|private-assets|bezel-imports/.test(file));
   if (files.some(file => file.endsWith('/one.semantic.css'))) throw new Error('Retired classless stylesheet in public package.');

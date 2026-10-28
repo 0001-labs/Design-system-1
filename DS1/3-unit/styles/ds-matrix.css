@@ -14,7 +14,7 @@
   display: block;
   min-width: 0;
   color: var(--ds-text-color);
-  font-family: var(--ds-typeface-regular);
+  font-family: "Inter Arrows", var(--ds-typeface-regular);
   font-feature-settings: var(--ds-font-features);
   font-size: var(--ds-type-size-default);
   font-weight: var(--ds-type-weight-default);
@@ -50,7 +50,7 @@
   border-inline-end: 1px solid var(--ds-paper);
   background: var(--ds-matrix-colour);
   color: var(--ds-slate);
-  font-family: var(--ds-typeface-medium, var(--ds-typeface-regular));
+  font-family: "Inter Arrows", var(--ds-typeface-medium, var(--ds-typeface-regular));
 }
 .group > span {
   position: absolute;

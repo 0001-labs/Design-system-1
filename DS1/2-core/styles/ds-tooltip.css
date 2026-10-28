@@ -26,7 +26,7 @@
   border-radius: calc(4px * var(--ds-sf, var(--sf, 1)));
   background: var(--ds-tooltip-background, light-dark(var(--ds-black, var(--black)), var(--ds-white, var(--white))));
   color: var(--ds-tooltip-color, light-dark(var(--ds-white, var(--white)), var(--ds-black, var(--black))));
-  font-family: var(--ds-typeface-regular, var(--typeface-regular));
+  font-family: "Inter Arrows", var(--ds-typeface-regular, var(--typeface-regular));
   font-size: calc(14px * var(--ds-sf, var(--sf, 1)));
   line-height: calc(16px * var(--ds-sf, var(--sf, 1)));
   font-weight: 400;

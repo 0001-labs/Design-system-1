@@ -191,7 +191,7 @@ body {
   background: transparent;
   color: var(--button-text-color);
   cursor: pointer;
-  font-family: var(--typeface-regular);
+  font-family: "Inter Arrows", var(--typeface-regular);
   font-size: var(--type-size-default);
   line-height: var(--type-lineheight-default);
   letter-spacing: var(--type-letterspacing-default);
@@ -239,7 +239,7 @@ body {
   padding: 0 calc(2px * var(--sf));
   background: var(--button-background-color-secondary);
   color: var(--button-text-color-secondary);
-  font-family: var(--typeface-regular);
+  font-family: "Inter Arrows", var(--typeface-regular);
   font-size: var(--type-size-default);
   line-height: var(--type-lineheight-default);
   letter-spacing: var(--type-letterspacing-default);

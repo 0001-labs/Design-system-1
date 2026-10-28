@@ -9,7 +9,7 @@ import FontCatalog from '../../../components/FontCatalog.astro';
 
 ## Using the system fonts
 
-`fonts.css` (`DS1/1-root/fonts.css`) holds the faces and the typeface tokens that name them: GT America Standard Regular and Medium, GT America Compressed Regular, the GT Canon trial, Inter Arrows and Iosevka Extended, loaded from `fonts/` beside it. `one.css` imports it, so a page that links `one.css` has them; a page that does not links `fonts.css` on its own. Neither loads anything from another host. Inter Arrows leads every typeface token and supplies the arrows.
+`fonts.css` (`DS1/1-root/fonts.css`) holds the faces and the typeface tokens that name them: GT America Standard Regular and Medium, GT America Compressed Regular, the GT Canon trial, Inter Arrows and Iosevka Extended. Inter Arrows is embedded in the stylesheet; the other faces load from `fonts/` beside it. `one.css` imports it, so a page that links `one.css` has them; a page that does not links `fonts.css` on its own. Neither loads anything from another host. Inter Arrows leads every typeface token and supplies the arrows.
 
 Use `--typeface-regular` for body text, `--typeface-medium` for emphasis, `--typeface-compressed` for narrow display text and `--typeface-mono` for code, which is Iosevka Extended with a system monospace after it. `--typeface-canon` uses the bundled trial face. The component tokens in `component-tokens.css` (`--ds-typeface-regular`, `--ds-typeface-medium`, `--ds-typeface-mono` and the rest) name the same families, so either set of tokens finds the faces `fonts.css` loads. Check the original foundry's licence before using a commercial or trial font in your own work.
 
@@ -22,3 +22,16 @@ The language tokens (`--typeface-regular-jp`, `--typeface-regular-zh-hans`, `--t
 A product that shows Japanese or Chinese and wants Noto Sans everywhere adds `cjk.css` (`DS1/1-root/cjk.css`, Sync 1's `"cjk": true` on `root` or `tokens`). It loads Noto Sans JP, SC and TC from Google Fonts, which cuts each into `unicode-range` slices so a page downloads only the characters it shows, and stops the browser from thickening their one weight (`font-synthesis-weight: none`). Noto Sans is under the SIL Open Font License. A page whose security policy keeps other hosts out leaves `cjk.css` out, or serves Noto Sans itself under the same family names, which the tokens then find.
 
 Olivetti Dot is available here as a specimen; it is not loaded by the system stylesheet. Supernatural has no font asset or typeface token yet.
+
+### Arrows in standalone pages
+
+Inter's 36 supported arrow glyphs are embedded directly in `fonts.css` and `component-tokens.css`. They need no network request or separately copied font file, including when Sync 1 copies tokens alone or disables other fonts. Components keep `"Inter Arrows"` before custom typeface tokens. Characters Inter does not contain still use the remaining font stack.
+
+A standalone HTML file with its own typography can copy or inline `DS1/1-root/inter-arrows.css` from the open-source package, then start every font stack with `"Inter Arrows"`, including headings and code:
+
+```css
+body { font-family: "Inter Arrows", "Your text face", sans-serif; }
+code { font-family: "Inter Arrows", "Your code face", monospace; }
+```
+
+The portable sheet contains only the arrow face and does not change the surrounding typeface. Keep `fonts/Inter-LICENSE.md` with redistributed font assets. `node scripts/fonts/embed-arrows.mjs` regenerates the embedded sheets from the bundled WOFF2; `--check` verifies them. The original outlines were verified against the official Inter 4.1 release.

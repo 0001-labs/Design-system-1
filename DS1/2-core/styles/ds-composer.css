@@ -9,7 +9,7 @@
   padding: calc(4px * var(--ds-sf)) !important;
   border: 1px solid var(--ds-border-color) !important;
   border-radius: calc(4px * var(--ds-sf)) !important;
-  font-family: var(--ds-typeface-regular) !important;
+  font-family: "Inter Arrows", var(--ds-typeface-regular) !important;
   font-size: var(--ds-type-size-default) !important;
   font-weight: var(--ds-type-weight-default) !important;
   line-height: var(--ds-type-lineheight-default) !important;

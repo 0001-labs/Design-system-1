@@ -114,7 +114,7 @@ describe("with a prepared library", () => {
         const drawn = await draw(page, library, scale);
         for (const part of ["primary", "secondary", "field", "menu"] as const) {
           expect(drawn[part].radius, `${part} corners at ${scale}`).toBe(`${8 * scale}px`);
-          expect(drawn[part].font, `${part} type`).toBe("Georgia, serif");
+          expect(drawn[part].font, `${part} type`).toBe('"Inter Arrows", Georgia, serif');
           expect(drawn[part].size, `${part} size at ${scale}`).toBe(`${16 * scale}px`);
         }
         expect(drawn.primary.background).toBe(accent);

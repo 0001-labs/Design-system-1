@@ -232,7 +232,7 @@ export default {
         const files = {};
         const styles = [...(options.styles ?? rootStyles), ...askedSheets(options)];
         for (const file of styles) {
-          if (!rootStyles.includes(file) && !Object.values(writingSheets).includes(file)) throw new Error(`Unknown root stylesheet: ${file}`);
+          if (file !== 'inter-arrows.css' && !rootStyles.includes(file) && !Object.values(writingSheets).includes(file)) throw new Error(`Unknown root stylesheet: ${file}`);
           files[file] = read(`DS1/1-root/${file}`);
         }
         if (options.nativeControls) for (const file of [...controlSheets, 'controls.css']) files[file] = read(`DS1/1-root/${file}`);

@@ -6,7 +6,7 @@
 .frame:first-child { opacity: 1; }
 i { display: block; }
 i.ink { background: currentColor; }
-.words { font-family: var(--ds-typeface-regular); font-size: var(--ds-type-size-default); line-height: var(--ds-type-lineheight-default); color: var(--ds-text-color); }
+.words { font-family: "Inter Arrows", var(--ds-typeface-regular); font-size: var(--ds-type-size-default); line-height: var(--ds-type-lineheight-default); color: var(--ds-text-color); }
 /* Eight held poses, 200ms each. No spinner, percentage or synthetic progress. */
 :host([active]) .frame { animation: ds-activity-pose 1600ms linear infinite; }
 @keyframes ds-activity-pose { 0%, 12.49% { opacity: 1; } 12.5%, 100% { opacity: 0; } }

@@ -39,7 +39,7 @@
   margin: 0;
   padding: var(--ds-unit);
   color: var(--ds-text-color);
-  font-family: var(--ds-typeface-regular);
+  font-family: "Inter Arrows", var(--ds-typeface-regular);
   font-feature-settings: var(--ds-font-features);
   font-size: var(--ds-type-size-default);
   font-weight: var(--ds-type-weight-default);
@@ -68,7 +68,7 @@
   gap: calc(var(--ds-unit) / 2);
   height: var(--ds-unit);
   color: inherit;
-  font-family: var(--ds-typeface-medium);
+  font-family: "Inter Arrows", var(--ds-typeface-medium);
   font-weight: var(--ds-type-weight-bold);
   text-decoration: none;
   white-space: nowrap;
@@ -182,6 +182,6 @@
 }
 .ds-header--app .ds-header__brand {
   min-width: 0;
-  font-family: var(--ds-typeface-regular);
+  font-family: "Inter Arrows", var(--ds-typeface-regular);
   font-weight: var(--ds-type-weight-default);
 }

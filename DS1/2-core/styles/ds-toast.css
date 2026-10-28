@@ -59,7 +59,7 @@ ol[data-x="center"] { left: 50%; transform: translateX(-50%); }
   border-radius: var(--ds-radius);
   background: var(--ds-toast-background);
   color: var(--ds-toast-color);
-  font-family: var(--ds-typeface-regular);
+  font-family: "Inter Arrows", var(--ds-typeface-regular);
   font-feature-settings: var(--ds-font-features);
   font-size: var(--ds-type-size-default);
   line-height: var(--ds-control-height);

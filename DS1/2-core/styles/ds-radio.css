@@ -77,7 +77,7 @@
   align-self: center;
   overflow: hidden;
   padding-inline: calc(4px * var(--ds-sf));
-  font: 400 var(--ds-type-size-default) / var(--ds-type-lineheight-default) var(--ds-typeface-regular);
+  font: 400 var(--ds-type-size-default) / var(--ds-type-lineheight-default) "Inter Arrows", var(--ds-typeface-regular);
   letter-spacing: var(--ds-type-letterspacing-default);
   white-space: nowrap;
   text-align: center;

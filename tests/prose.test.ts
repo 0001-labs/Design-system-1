@@ -30,10 +30,10 @@ test('every rule below the container leaves data-ds-not-prose parts alone', () =
   for (const { selector } of rules.slice(1)) expect(selector, selector).toContain('[data-ds-not-prose] *');
 });
 
-test('it imports no fonts and names only the typeface tokens', () => {
+test('it imports no fonts and protects arrows before the typeface tokens', () => {
   expect([...code.matchAll(/@import\s+([^;]+);/g)].map(match => match[1])).toEqual(['"./component-metrics.css"']);
   expect(code).not.toMatch(/googleapis|@font-face|url\(/);
-  for (const [, family] of code.matchAll(/font-family:\s*([^;]+);/g)) expect(family).toMatch(/^var\(--ds-typeface-(?:regular|medium|mono)\)$/);
+  for (const [, family] of code.matchAll(/font-family:\s*([^;]+);/g)) expect(family).toMatch(/^"Inter Arrows", var\(--ds-typeface-(?:regular|medium|mono)\)$/);
 });
 
 test('every length is a token, a scaled measure or a hairline', () => {
@@ -57,6 +57,6 @@ test('text stands on one-square lines, a title on two, with a square between blo
 
 test('it draws headings, paragraphs, lists, links, quotes, code, rules and tables', () => {
   for (const element of ['h1', 'h2', 'h3', 'ul, ol', 'a', 'blockquote', 'pre', 'hr', 'table', 'th, td']) rule(element);
-  expect(rule('code, kbd, samp, pre')).toContain('font-family: var(--ds-typeface-mono)');
+  expect(rule('code, kbd, samp, pre')).toContain('font-family: "Inter Arrows", var(--ds-typeface-mono)');
   expect(rule(':not(pre) > code, kbd, samp')).toContain('border-radius: var(--ds-radius)');
 });

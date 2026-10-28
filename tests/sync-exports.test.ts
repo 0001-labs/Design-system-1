@@ -213,3 +213,11 @@ test('the flags export copies the flags named, or every one, always with their l
   expect(() => flags({ flags: ['zz'] })).toThrow('Unknown flag: zz');
   expect(() => flags({})).toThrow('Name the flags');
 });
+
+
+test('arrows survive token-only and font-free copies, and export as a standalone sheet', () => {
+  for (const css of [files('tokens')['component-tokens.css'], files('tokens', { bundle: true })['bundle.css'], files('root', { fonts: false })['fonts.css'], files('root', { styles: ['inter-arrows.css'], fonts: false })['inter-arrows.css']]) {
+    expect(String(css)).toContain('data:font/woff2;base64,');
+    expect(String(css)).toContain('font-family: "Inter Arrows"');
+  }
+});

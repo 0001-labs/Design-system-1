@@ -1,4 +1,4 @@
- :host { --ds-chart-ink: var(--text-color, #1e1e1e); --ds-chart-muted: var(--ds-title-color, #6e6e6e); --ds-chart-faint: var(--slate-light, #e6e6e6); --ds-chart-up: var(--apple-green, #99ff73); --ds-chart-down: var(--tuned-red, #ff5f5f); --ds-chart-live: var(--ds-chart-up); --ds-chart-line: var(--ds-chart-faint); --ds-chart-fill: var(--ds-chart-faint); --ds-chart-small: calc(var(--ds-chart-unit, 20px) / 2); font-family: var(--ds-chart-font, var(--typeface-regular, sans-serif)); }
+ :host { --ds-chart-ink: var(--text-color, #1e1e1e); --ds-chart-muted: var(--ds-title-color, #6e6e6e); --ds-chart-faint: var(--slate-light, #e6e6e6); --ds-chart-up: var(--apple-green, #99ff73); --ds-chart-down: var(--tuned-red, #ff5f5f); --ds-chart-live: var(--ds-chart-up); --ds-chart-line: var(--ds-chart-faint); --ds-chart-fill: var(--ds-chart-faint); --ds-chart-small: calc(var(--ds-chart-unit, 20px) / 2); font-family: "Inter Arrows", var(--ds-chart-font, var(--typeface-regular, sans-serif)); }
 :host([hidden]) { display: none !important; }
 * { box-sizing: border-box; }
 :host([data-chart-kind="line"]) {

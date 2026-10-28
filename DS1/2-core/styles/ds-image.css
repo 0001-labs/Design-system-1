@@ -8,7 +8,7 @@ img { display: block; width: 100%; max-width: 100%; }
 figcaption {
   margin-top: calc(var(--ds-unit) / 2);
   color: var(--ds-text-color-muted);
-  font-family: var(--ds-typeface-regular);
+  font-family: "Inter Arrows", var(--ds-typeface-regular);
   font-feature-settings: var(--ds-font-features);
   font-size: var(--ds-type-size-default);
   line-height: var(--ds-row-height);

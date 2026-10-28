@@ -24,10 +24,10 @@ test('no root stylesheet a page always loads fetches from another host', () => {
   }
 });
 
-test('fonts.css holds the one definition of the faces, and one.css imports it', () => {
+test('fonts.css declares the faces, and one.css imports it', () => {
   expect(code('one.css')).toMatch(/^@import "\.\/fonts\.css";$/m);
   expect(code('one.css')).not.toMatch(/@font-face|--typeface-regular:/);
-  for (const { url } of faces('fonts.css')) expect(existsSync(join(rootDir, url!)), url).toBe(true);
+  for (const { url } of faces('fonts.css').filter(({ url }) => !url?.startsWith('data:'))) expect(existsSync(join(rootDir, url!)), url).toBe(true);
 });
 
 test('every typeface token starts with Inter Arrows and then a face fonts.css loads, Iosevka for code', () => {
@@ -73,4 +73,22 @@ test('plain Chinese takes the Simplified face, as the shared words are written; 
   expect(tokens).toMatch(/:root:lang\(zh-Hant\),[\s\S]*?:root:lang\(zh-TW\)[\s\S]*?--ds-typeface-regular: var\(--ds-typeface-regular-zh-hant\);/);
   const fonts = readFileSync(new URL('../DS1/1-root/fonts.css', import.meta.url), 'utf8');
   expect(fonts).toContain('--typeface-regular-zh: var(--typeface-regular-zh-hans);');
+});
+
+
+test('arrow bytes travel inside every typography entry point, with no font request', () => {
+  const bytes = readFileSync(join(rootDir, 'fonts/Inter-Arrows.woff2'));
+  for (const file of ['fonts.css', 'component-tokens.css', 'inter-arrows.css']) {
+    const face = faces(file).find(({ family }) => family === 'Inter Arrows');
+    expect(face?.url, file).toBe(`data:font/woff2;base64,${bytes.toString('base64')}`);
+  }
+});
+
+test('custom typeface tokens cannot displace Inter arrows in component or prose CSS', () => {
+  for (const file of readdirSync(join(rootDir, '..'), { recursive: true }).filter(file => String(file).endsWith('.css'))) {
+    const css = readFileSync(join(rootDir, '..', String(file)), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+    for (const match of css.matchAll(/(?:^|[;{\s])font-family:\s*([^;]+);/g)) {
+      if (match[1]!.includes('var(')) expect(match[1], String(file)).toMatch(/^"Inter Arrows",/);
+    }
+  }
 });

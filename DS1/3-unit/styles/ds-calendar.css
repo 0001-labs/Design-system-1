@@ -49,7 +49,7 @@
   display: inline-block;
   vertical-align: top;
   color: var(--ds-text-color);
-  font-family: var(--ds-typeface-regular);
+  font-family: "Inter Arrows", var(--ds-typeface-regular);
   font-feature-settings: var(--ds-font-features);
   font-size: var(--ds-type-size-default);
   font-weight: var(--ds-type-weight-default);
@@ -80,7 +80,7 @@
   flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
-  font-family: var(--ds-typeface-medium, var(--ds-typeface-regular));
+  font-family: "Inter Arrows", var(--ds-typeface-medium, var(--ds-typeface-regular));
   text-overflow: clip;
   white-space: nowrap;
 }
@@ -144,7 +144,7 @@
   background: transparent;
   color: var(--ds-text-color);
   font: inherit;
-  font-family: var(--ds-typeface-medium, var(--ds-typeface-regular));
+  font-family: "Inter Arrows", var(--ds-typeface-medium, var(--ds-typeface-regular));
   line-height: var(--ds-control-height);
   letter-spacing: inherit;
   cursor: pointer;
@@ -321,7 +321,7 @@
   white-space: nowrap;
 }
 .weekday-name[data-today] { color: var(--ds-calendar-today); }
-.week-number { font-family: var(--ds-typeface-compressed); }
+.week-number { font-family: "Inter Arrows", var(--ds-typeface-compressed); }
 .day.outside .date-line { justify-content: flex-start; }
 
 /* A compact day: the date centred in its square, in the ink; with events,
