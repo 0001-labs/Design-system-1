@@ -24,6 +24,8 @@ The CLI saves an annotated viewport screenshot whenever Fault lines finds drift 
 
 Fault lines are the continuous alignment lines made by related groups of cards and controls across a page. Their outer edges, column boundaries and gaps should continue from one section to the next. Two grids can each use valid spacing yet break those lines: a 20px gap in one and a 10px gap in the next shifts their inner edges.
 
+Headings, paragraphs and text tabs that are direct siblings in a semantic content column (`main`, `article`, `section` or `[data-ds-prose]`) must share their leading visible text edge. The check follows open shadow roots and slots to the words: an intentional negative tab margin is valid only when its inner padding compensates for it. Nested columns are checked independently; centred text and hidden labels are excluded. Use `data-ds-fault-column` for another column container, or `data-ds-fault-lines="off"` for an intentional independent alignment. The overlay marks the expected column and the drifting text edge.
+
 The `page.fault-lines` check measures actual rendered edges and gaps across separate sections, including open shadow roots. Give grids that share tracks the same `data-ds-fault-lines="filters"` value. Use `data-ds-fault-axis="y"` for horizontal alignment lines through related rows; the default compares columns. Groups are compared at their current track count so coordinated responsive reflow is valid. Different card heights are allowed; hidden content and differences of at most one CSS pixel are ignored.
 
 ```html

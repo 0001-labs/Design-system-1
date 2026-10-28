@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<link rel="stylesheet" href="/DS1/1-root/one.css">
+<style>main {margin:20px} h1,p {margin:20px 0} #center {text-align:center} section {padding-inline-start:40px}</style>
+<script type="module">
+import '/DS1/2-core/ds-button.ts';
+import '/DS1/3-unit/ds-tabs.ts';
+await Promise.all([...document.querySelectorAll('ds-button,ds-tabs')].map(el=>el.updateComplete));
+await document.fonts.ready;
+document.documentElement.dataset.ready='true';
+</script></head><body>
+<main><h1>Connections</h1><p>Manage connected apps.</p>
+<ds-tabs id="tabs" text wrap role="navigation"><ds-button href="#first">First</ds-button><ds-button href="#second">Second</ds-button></ds-tabs>
+<p id="center">Intentionally centred</p><p hidden>Hidden</p>
+<section><h2>Independent nested column</h2><p>Aligned within its own inset.</p></section>
+</main></body></html>

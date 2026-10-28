@@ -380,7 +380,7 @@ The small rules every component keeps, each a sentence with a code that never ch
 
 **Page** (`ds-page`)
 
-- `page.fault-lines`: Fault lines keep related card and control grids aligned across the whole page, with matching track edges and gaps at every checked viewport width. Compare separate sections in the same alignment family; responsive layouts may change together, while unrelated groups and intentional exceptions remain independent.
+- `page.fault-lines`: Fault lines keep related card and control grids aligned across the whole page, with matching track edges and gaps. Headings, prose and text tabs in a content column share the leading visible text edge, including labels inside shadow roots and slots, at every checked viewport width. Compare separate sections in the same alignment family; responsive layouts may change together, while unrelated groups and intentional exceptions remain independent.
 - `page.window-width`: A page is never wider than its window: nothing reaches past either edge unless something it stands in cuts it off or scrolls it, so a phone never zooms the page out or slides it sideways. A phone widens a page that is too wide and zooms it out, words and all, so a piece one square too wide spoils every piece on the page; check it at every phone width from 320px up.
 
 **Select** (`ds-select`)

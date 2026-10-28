@@ -2,13 +2,20 @@ import { afterAll, beforeAll, expect, test } from 'vite-plus/test';
 import { build } from 'esbuild';
 import { chromium, webkit, type Browser } from 'playwright';
 import { join } from 'node:path';
+import { createServer, type ViteDevServer } from 'vite';
+import type { AddressInfo } from 'node:net';
+let server: ViteDevServer;
+let base: string;
 let browsers: Browser[];
 let bundle: string;
 beforeAll(async () => {
+  server = await createServer({configFile:false, root:process.cwd(), logLevel:'error', server:{host:'127.0.0.1',port:0}});
+  await server.listen();
+  base = `http://127.0.0.1:${(server.httpServer!.address() as AddressInfo).port}`;
   browsers = await Promise.all([chromium.launch(), webkit.launch()]);
   bundle = (await build({stdin:{contents:"export * from './fault-lines'; export { createConstraintPanel } from './constraint-panel';",resolveDir:join(import.meta.dirname,'../DS1/0-face'),loader:'ts'},bundle:true,format:'iife',globalName:'FaultLines',write:false})).outputFiles[0]!.text;
 });
-afterAll(async () => { await Promise.all(browsers?.map(browser=>browser.close()) ?? []); });
+afterAll(async () => { await server?.close(); await Promise.all(browsers?.map(browser=>browser.close()) ?? []); });
 
 test("fault lines catch shifted tracks and unequal gaps across sections at each viewport", async () => {
   for (const browser of browsers) {
@@ -86,3 +93,36 @@ test("fault line overlays paint reference and actual edges and follow the viewpo
     } finally {await page.close();}
   }
 });
+
+
+test("fault lines enforce visible content edges through real text-tab slots", async () => {
+  for (const browser of browsers) {
+    const page = await browser.newPage();
+    try {
+      await page.goto(`${base}/tests/fixtures/fault-lines-column.html`);
+      await page.waitForFunction(() => document.documentElement.dataset.ready === 'true');
+      await page.addScriptTag({content:bundle});
+      const findings = () => page.evaluate(() => (window as any).FaultLines.inspectFaultLines(document).map((f:any) => f.element.id));
+      for (const width of [320,375,393,430,768,1024,1440]) for (const scale of [1,1.5]) {
+        await page.setViewportSize({width,height:900});
+        await page.evaluate(scale => document.documentElement.style.setProperty('--ds-sf', String(scale)), scale);
+        expect(await findings(), `aligned at ${width}px, scale ${scale}`).toEqual([]);
+        // Reproduce the regression: outer -4px remains, inner padding disappears.
+        await page.locator('#tabs ds-button').evaluateAll(els => els.forEach(el => (el as HTMLElement).style.setProperty('--ds-text-tab-padding','0')));
+        expect(await findings()).toEqual(['tabs']);
+        await page.evaluate(() => {
+          const layer = document.createElementNS('http://www.w3.org/2000/svg','svg');
+          layer.id = 'overlay'; document.body.append(layer);
+          (window as any).FaultLines.paintFaultLines(document, layer);
+        });
+        expect(await page.locator('#overlay [data-fault-actual]').count()).toBe(1);
+        await page.locator('#overlay').evaluate(el => el.remove());
+        await page.locator('#tabs ds-button').evaluateAll(els => els.forEach(el => (el as HTMLElement).style.removeProperty('--ds-text-tab-padding')));
+        expect(await findings()).toEqual([]);
+      }
+      await page.locator('#tabs').evaluate(el => el.setAttribute('data-ds-fault-lines','off'));
+      await page.locator('#tabs ds-button').evaluateAll(els => els.forEach(el => (el as HTMLElement).style.setProperty('--ds-text-tab-padding','0')));
+      expect(await findings()).toEqual([]);
+    } finally { await page.close(); }
+  }
+}, 60_000);
