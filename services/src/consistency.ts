@@ -62,7 +62,7 @@ export async function authorizePerson(request: Request, env: ReportsEnv & Worksp
 }
 /** The landing's own addresses on consistency.site: its pages (home and examples), its assets and its pictures. */
 export function isLandingPath(path: string): boolean {
-  return path === '/' || path === '/index.html' || path === '/icon.svg' || path.startsWith('/_landing/') || path.startsWith('/sites/') || path === '/examples' || path.startsWith('/examples/');
+  return path === '/' || path === '/index.html' || path === '/icon.svg' || path.startsWith('/_landing/') || path === '/_c9y/blocks.js' || path === '/_c9y/blocks.css' || path.startsWith('/sites/') || path === '/examples' || path.startsWith('/examples/');
 }
 /**
  * The landing, as the platform serves it at LANDING_ORIGIN: asked for with the visitor's Accept alone, never

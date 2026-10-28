@@ -234,7 +234,7 @@ it('draws the landing for anyone signed out, asked of the platform without cooki
   expect(Object.keys(init.headers as Record<string, string>)).toEqual(['Accept']); expect((init.headers as Record<string, string>).Accept).toBe('text/html');
   expect(assets).not.toHaveBeenCalled();
   // The landing's other addresses are the platform's too, signed in or not, and never the app's.
-  for (const path of ['/index.html', '/icon.svg', '/_landing/style.css', '/sites/flavo.png', '/examples', '/examples/shop/']) {
+  for (const path of ['/index.html', '/icon.svg', '/_c9y/blocks.js', '/_c9y/blocks.css', '/_landing/style.css', '/sites/flavo.png', '/examples', '/examples/shop/']) {
     await consistencyPreview(new Request(site + path, { headers }), env, send);
     expect(send.mock.calls.at(-1)![0]).toBe('https://consistency.c9y.site' + path);
   }

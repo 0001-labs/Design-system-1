@@ -15,6 +15,9 @@ import { appendKindChooser, appendSectionFields, appendToneList, fieldWords } fr
 import { openAsk, openDraftBar, type AskAnswer } from './ask';
 import { initTooltips } from '../../../DS1/0-face/tooltips';
 import type { SortableController } from './vendor/drag/sortable';
+import componentContextStyles from '../../../DS1/3-unit/styles/context-trigger.css?inline';
+import componentColorStyles from '../../../DS1/2-core/styles/ds-color.css?inline';
+import componentComposerStyles from '../../../DS1/2-core/styles/ds-composer-frame.css?inline';
 import surfaceStyles from './editor-surface.css?inline';
 import spacingStyles from './text-spacing.css?inline';
 import resizeStyles from './resize.css?inline';
@@ -63,7 +66,7 @@ export class NativeSiteController {
     this.doc=frame.contentDocument!;this.view=this.doc.defaultView!;this.root=this.doc.querySelector<HTMLElement>('[data-c9y-native-root]')!;
     if(!this.root)throw new Error('The native page could not be opened.');
     this.state=new DocumentState(snapshot,save,()=>this.changed());
-    this.style=this.doc.createElement('style');this.style.textContent=surfaceStyles+spacingStyles+resizeStyles+aaStyles+elementsStyles+insertionStyles+carouselStyles+columnStyles+cardStyles+`
+    this.style=this.doc.createElement('style');this.style.textContent=componentContextStyles+componentColorStyles+componentComposerStyles+surfaceStyles+spacingStyles+resizeStyles+aaStyles+elementsStyles+insertionStyles+carouselStyles+columnStyles+cardStyles+`
       .consistency-native-guides{position:fixed;inset:0;pointer-events:none;z-index:2147482000;overflow:visible}.consistency-native-guides [hidden]{display:none!important}.consistency-native-guides .ghost-surface,.consistency-native-guides .consistency-resize-edge{pointer-events:auto;position:absolute;min-height:0}.consistency-native-guides .ghost-measure{font-family:var(--ds-typeface-regular);font-size:10px;line-height:20px}.consistency-site-region{position:relative;min-width:0}.c9y-native-content .consistency-sheet{min-width:0}.c9y-native-text.aa-plain,.c9y-native-text>.aa-block{font:inherit;color:inherit;line-height:inherit;margin:0;padding:0;min-height:0;outline:none;background:none}.c9y-native-text.aa-plain{display:inline!important}.c9y-native-text>.aa-block{display:inline!important;white-space:inherit!important;overflow-wrap:inherit!important;line-break:inherit!important}.c9y-native-content aa-editor{display:block}.c9y-native-link .aa-block{display:inline}:where(.c9y-native-page [data-native-block]){position:relative}`;
     this.doc.head.append(this.style);
     this.overlay=this.doc.createElement('div');this.overlay.className='consistency-shell production-on consistency-native-guides';this.overlay.setAttribute('data-editor-chrome','');
