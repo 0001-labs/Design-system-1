@@ -21,6 +21,11 @@ export type C9yConstraint = {
 };
 
 export const C9Y_CONSTRAINTS: C9yConstraint[] = [
+  {
+    code: 'drag.appearance',
+    rule: 'Lifting and carrying an element preserves its appearance, including typography, colours, dimensions and text wrapping; only its position changes.',
+    check: { file: 'tests/drag-appearance.mjs', test: 'Dragged content preserves typography, wrapping and appearance' },
+  },
   {code:'native.templates',rule:'Every authored template retains its words and desktop/phone layout through the shared block renderer.',check:{file:'tests/template-native.mjs',test:'content and design preserved through shared blocks'}},
   {code:'native.inline-writing',rule:'Words inside a button or menu remain editable through spaces, selection and reopening without activating the component.',check:{file:'tests/templates.mjs',test:'authored page, direct writing, independent draft and reopen passed'}},
   {

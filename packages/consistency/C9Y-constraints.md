@@ -6,6 +6,12 @@ Each rule names the test that holds it. While editing a site, a drag that breaks
 
 ## Rules
 
+### `drag.appearance`
+
+Lifting and carrying an element preserves its appearance, including typography, colours, dimensions and text wrapping; only its position changes.
+
+Held by `tests/drag-appearance.mjs`: “Dragged content preserves typography, wrapping and appearance”.
+
 ### `native.templates`
 
 Every authored template retains its words and desktop/phone layout through the shared block renderer.

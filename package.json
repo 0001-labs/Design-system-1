@@ -119,7 +119,7 @@
     "consistency:test:viewport": "vp run consistency:test:shared",
     "visual-kit:build": "node packages/visual-kit/build.mjs",
     "visual-kit:test": "node packages/visual-kit/test-browser.mjs",
-    "consistency:test:shared": "vp run consistency:build && node packages/consistency/tests/template-movement.mjs && node packages/consistency/tests/imported-movement.mjs && node packages/consistency/tests/workspace-native.mjs && node packages/consistency/tests/templates.mjs && node packages/consistency/tests/native-page.mjs && node packages/consistency/tests/soendergaarden-spacing.mjs && node packages/consistency/tests/template-native.mjs",
+    "consistency:test:shared": "vp run consistency:build && node packages/consistency/tests/drag-appearance.mjs && node packages/consistency/tests/template-movement.mjs && node packages/consistency/tests/imported-movement.mjs && node packages/consistency/tests/workspace-native.mjs && node packages/consistency/tests/templates.mjs && node packages/consistency/tests/native-page.mjs && node packages/consistency/tests/soendergaarden-spacing.mjs && node packages/consistency/tests/template-native.mjs",
     "consistency:test:imports": "node packages/consistency/tests/imported-sites.mjs"
   },
   "dependencies": {
