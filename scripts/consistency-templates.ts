@@ -1,4 +1,5 @@
 /** Evaluate repository-authored demo seeds at build time in an isolated DOM. Demo scripts never ship in the editor. */
+import {createHash} from 'node:crypto';
 import { Window } from 'happy-dom';
 import { Script, createContext } from 'node:vm';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
@@ -7,6 +8,8 @@ import { studioMarkup } from '../shared/consistency-studio';
 import { importComponentPage } from '../shared/consistency-import';
 import { SITE_TEMPLATES } from '../packages/consistency/src/template-catalogue';
 const properties = ['items', 'data', 'columns', 'values', 'value', 'figure', 'caption', 'label', 'segments', 'series', 'nodes', 'edges'];
+const previous=JSON.parse(await readFile('shared/consistency-template-pages.json','utf8').catch(()=>'{}'));
+function pinPresentations(id:string,imported:ReturnType<typeof importComponentPage>){const components={...previous[id]?.components},names=new Map<string,string>();for(const[name,definition]of Object.entries(imported.components)){const pin=`${id.replaceAll('-','_')}_${createHash('sha256').update(JSON.stringify(definition)).digest('hex').slice(0,20)}`;components[pin]=definition;names.set(name,pin);}const walk=(blocks:typeof imported.document.blocks)=>{for(const block of blocks){if(block.kind==='component')block.name=names.get(block.name)!;if('children'in block)walk(block.children);}};walk(imported.document.blocks);imported.components=components;return imported;}
 const snapshots: Record<string, unknown> = {};
 const pages: Record<string, unknown> = {};
 for (const template of SITE_TEMPLATES) {
@@ -32,7 +35,7 @@ for (const template of SITE_TEMPLATES) {
     if (Object.keys(data).length) components[element.getAttribute('data-template-node')!] = data;
   });
   const library = template.library ? template.library.href.startsWith('https:') ? await fetch(template.library.href).then(response => { if (!response.ok) throw new Error('Template library unavailable'); return response.text(); }) : await readFile(`website/public${template.library.href}`, 'utf8') : '';
-  const imported=importComponentPage(document.body as never,{namespace:`template_${template.id.replaceAll('-','_')}`,properties:components,origin:'https://designsystem1.com'});
+  const imported=pinPresentations(template.id,importComponentPage(document.body as never,{namespace:`template_${template.id.replaceAll('-','_')}`,properties:components,origin:'https://designsystem1.com'}));
   const bookingKeys:string[]=[];
   if(template.id==='booking'){
     const textIds=new Map<Node,string>();let index=0;const walker=document.createTreeWalker(document.body,window.NodeFilter.SHOW_TEXT);while(walker.nextNode()){const node=walker.currentNode;if(node.textContent?.trim()&&!node.parentElement?.closest('style,script,svg,option,textarea'))textIds.set(node,imported.textKeys[`template:page:${index++}`]);}
@@ -42,7 +45,7 @@ for (const template of SITE_TEMPLATES) {
   snapshots[template.id] = { id: template.id, label: template.label, description: template.description, href: template.href, html: document.body.innerHTML, components, library };
   await window.happyDOM.close();
 }
-const studioWindow=new Window();studioWindow.document.body.innerHTML=studioMarkup;const studio=importComponentPage(studioWindow.document.body as never,{namespace:'studio'});pages.studio={...studio,seed:initialComposition,library:await readFile('packages/consistency/src/style.css','utf8')};await studioWindow.happyDOM.close();
+const studioWindow=new Window();studioWindow.document.body.innerHTML=studioMarkup;const studio=pinPresentations('studio',importComponentPage(studioWindow.document.body as never,{namespace:'studio'}));pages.studio={...studio,seed:initialComposition,library:await readFile('packages/consistency/src/style.css','utf8')};await studioWindow.happyDOM.close();
 await mkdir('packages/consistency/generated', { recursive: true });
 await writeFile('packages/consistency/generated/templates.json', JSON.stringify(snapshots));
 await writeFile('shared/consistency-template-pages.json', JSON.stringify(pages));

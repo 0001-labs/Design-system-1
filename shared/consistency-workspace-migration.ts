@@ -38,8 +38,7 @@ export function migrateWorkspacePage(value:unknown):WorkspacePage {
   for(const[id,design]of Object.entries({...c.statDesigns,...c.buttonDesigns})){const block=nodes.get(studio.sourceIds[id]);if(block?.kind==='component')block.design={...block.design,...design};}
   for(const[key,size]of Object.entries(c.gaps??{})){const block=nodes.get(studio.sourceIds['gap:'+key]);if(block?.kind==='component'){block.gap=size;}else if(key.startsWith('stat:')){const[,id,part]=key.split(':'),stat=nodes.get(studio.sourceIds[id]);if(stat?.kind==='component')stat.design={...stat.design,gaps:{...stat.design?.gaps,[part]:size}};}}
   for(const hidden of c.hidden??[]){const block=nodes.get(studio.sourceIds[hidden]??studio.sourceIds['group-'+hidden]);if(block)block.hidden=true;}
-  const owner=page.blocks.find(block=>'children'in block) as NativeComponent|undefined;
-  const container=owner?.children.find(block=>block.id===studio.sourceIds.sheet) as NativeComponent|undefined;
+  const container=nodes.get(studio.sourceIds.sheet) as NativeComponent|undefined;
   if(container){const groups=new Map(container.children.filter(block=>Object.values(studio.sourceIds).includes(block.id)).map(block=>[block.id,block]));const ordered=(c.order??[]).map(id=>groups.get(studio.sourceIds['group-'+id])).filter((block):block is NativeBlock=>!!block);for(const name of ['intro','work','approach','contact']){const block=groups.get(studio.sourceIds['group-'+name]);if(block&&!ordered.includes(block)){block.hidden=true;ordered.push(block);}}container.children=ordered;}
   if(c.pageTone)page.layout.tone=c.pageTone;
  }else{
