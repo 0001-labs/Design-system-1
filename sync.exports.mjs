@@ -110,6 +110,7 @@ export default {
             .replaceAll('./consistency-vocabulary', './vocabulary')
             .replace(/^import (\w+) from '([^']+)\?raw';$/gm, (_, name, path) =>
               `const ${name} = ${JSON.stringify(String(read(posix.normalize(posix.join('shared', path)))))};`),
+          'workspace-page.ts': String(read('shared/consistency-workspace-page.ts')).replace('./consistency-native-page', './native-page'),
           'vocabulary.ts': String(read('shared/consistency-vocabulary.ts')).replace('./consistency-native-page', './native-page'),
           'vocabulary.json': read('shared/generated/vocabulary.json'),
           'site-design.ts': read('shared/consistency-site-design.ts'),
