@@ -172,3 +172,5 @@ details.c9y-native-flow{display:block}
 [data-section="gallery"] img{height:var(--c9y-gallery-mobile-height,var(--c9y-gallery-height))}
 .ds-header [data-slot="logo"] img,.ds-header .ds-header__brand{height:var(--c9y-mobile-logo-height,var(--c9y-logo-height,var(--c9y-unit)))}
 }
+
+[data-native-nowrap] p,[data-native-nowrap] .aa-block{white-space:pre!important}

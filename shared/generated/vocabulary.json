@@ -22,6 +22,18 @@
       "required": true,
       "meaning": "Unique on the page: a letter, then letters, digits, _ or -, at most 80; never a dot, which derived ids use"
     },
+    "marginTop": {
+      "type": "pixels",
+      "min": 0,
+      "max": 2000,
+      "meaning": "An explicit top margin in logical pixels"
+    },
+    "marginBottom": {
+      "type": "pixels",
+      "min": 0,
+      "max": 2000,
+      "meaning": "An explicit bottom margin in logical pixels"
+    },
     "width": {
       "type": "pixels",
       "min": 20,
@@ -40,6 +52,107 @@
     }
   },
   "kinds": [
+    {
+      "kind": "text",
+      "layer": "primitive",
+      "description": "Literal words in a semantic or DS1 component, edited in place with Aa plain text.",
+      "fields": {
+        "text": {
+          "type": "text",
+          "required": true,
+          "max": 24000,
+          "meaning": "The words, never HTML"
+        },
+        "editable": {
+          "type": "boolean",
+          "default": true,
+          "meaning": "False for native option and textarea contents"
+        }
+      },
+      "slots": {},
+      "examples": [
+        {
+          "id": "words",
+          "kind": "text",
+          "text": "Welcome"
+        }
+      ]
+    },
+    {
+      "kind": "component",
+      "layer": "primitive",
+      "description": "A registered DS1 or semantic presentation, with native child blocks and bounded editable values. Its tag, library CSS and executable implementation belong to the trusted build.",
+      "fields": {
+        "name": {
+          "type": "text",
+          "required": true,
+          "max": 160,
+          "meaning": "A presentation registered by the page library"
+        },
+        "children": {
+          "type": "blocks",
+          "required": true,
+          "meaning": "Native child blocks, retaining source slots and semantic nesting"
+        },
+        "values": {
+          "type": "map",
+          "meaning": "Only fields declared by the presentation; never HTML, CSS or event handlers"
+        },
+        "words": {
+          "type": "map",
+          "meaning": "Literal text slots inside a registered component"
+        },
+        "design": {
+          "type": "map",
+          "meaning": "Closed card, stat and button appearance fields"
+        },
+        "gap": {
+          "type": "pixels",
+          "min": 0,
+          "max": 2000,
+          "meaning": "An explicit gap over the library default"
+        },
+        "padding": {
+          "type": "pixels",
+          "min": 0,
+          "max": 2000,
+          "meaning": "An explicit inset over the library default"
+        },
+        "height": {
+          "type": "pixels",
+          "min": 0,
+          "max": 2000,
+          "meaning": "Height in logical pixels"
+        },
+        "columnGap": {
+          "type": "pixels",
+          "min": 0,
+          "max": 2000,
+          "meaning": "Between columns"
+        },
+        "rowGap": {
+          "type": "pixels",
+          "min": 0,
+          "max": 2000,
+          "meaning": "Between rows"
+        }
+      },
+      "slots": {},
+      "examples": [
+        {
+          "id": "group",
+          "kind": "component",
+          "name": "group",
+          "children": [
+            {
+              "id": "words",
+              "kind": "text",
+              "text": "Welcome"
+            }
+          ]
+        }
+      ]
+    },
     {
       "kind": "flow",
       "layer": "primitive",

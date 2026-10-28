@@ -10,7 +10,7 @@ import type { NativeBlock } from './consistency-native-page';
 
 export const TONES = ['paper', 'cream', 'dark', 'accent', 'highlight', 'band', 'pastel-1', 'pastel-2', 'pastel-3', 'pastel-4', 'pastel-5', 'pastel-6'] as const;
 export type Tone = (typeof TONES)[number];
-export const PRIMITIVE_KINDS = ['flow', 'grid', 'content', 'image', 'link', 'collection', 'runtime'] as const;
+export const PRIMITIVE_KINDS = ['text', 'component', 'flow', 'grid', 'content', 'image', 'link', 'collection', 'runtime'] as const;
 export const SECTION_KINDS = ['hero', 'split', 'statement', 'panels', 'cards', 'gallery', 'bento', 'questions', 'facts', 'list', 'action', 'header', 'footer'] as const;
 export type SectionKind = (typeof SECTION_KINDS)[number];
 
@@ -59,6 +59,8 @@ export interface KindDefinition {
 /** Fields every block carries, whatever its kind. */
 export const COMMON_FIELDS: Record<string, FieldDefinition> = {
   id: { type: 'identifier', required: true, meaning: 'Unique on the page: a letter, then letters, digits, _ or -, at most 80; never a dot, which derived ids use' },
+  marginTop: {type:'pixels',min:0,max:2000,meaning:'An explicit top margin in logical pixels'},
+  marginBottom: {type:'pixels',min:0,max:2000,meaning:'An explicit bottom margin in logical pixels'},
   width: { type: 'pixels', min: 20, max: 10000, meaning: 'A fixed width in pixels (multiplied by the device scale) instead of sharing the row' },
   hidden: { type: 'boolean', default: false, meaning: 'Kept in the document but not drawn' },
   locale: { type: 'text', max: 20, meaning: 'The language of this block when it differs from the page, as `da` or `pt-BR`' },
@@ -81,6 +83,9 @@ const actions = (meaning: string, max = 4, required = false): SlotDefinition => 
 const PICTURE = { src: '/photos/harbour.jpg', alt: 'Three green rafts on the canal' };
 
 export const PRIMITIVES: KindDefinition[] = [
+  {kind:'text',layer:'primitive',description:'Literal words in a semantic or DS1 component, edited in place with Aa plain text.',fields:{text:{type:'text',required:true,max:24000,meaning:'The words, never HTML'},editable:{type:'boolean',default:true,meaning:'False for native option and textarea contents'}},slots:{},examples:[{id:'words',kind:'text',text:'Welcome'}]},
+  {kind:'component',layer:'primitive',description:'A registered DS1 or semantic presentation, with native child blocks and bounded editable values. Its tag, library CSS and executable implementation belong to the trusted build.',fields:{name:{type:'text',required:true,max:160,meaning:'A presentation registered by the page library'},children:{type:'blocks',required:true,meaning:'Native child blocks, retaining source slots and semantic nesting'},values:{type:'map',meaning:'Only fields declared by the presentation; never HTML, CSS or event handlers'},words:{type:'map',meaning:'Literal text slots inside a registered component'},design:{type:'map',meaning:'Closed card, stat and button appearance fields'},gap:{type:'pixels',min:0,max:2000,meaning:'An explicit gap over the library default'},padding:{type:'pixels',min:0,max:2000,meaning:'An explicit inset over the library default'},height:{type:'pixels',min:0,max:2000,meaning:'Height in logical pixels'},columnGap:{type:'pixels',min:0,max:2000,meaning:'Between columns'},rowGap:{type:'pixels',min:0,max:2000,meaning:'Between rows'}},slots:{},examples:[{id:'group',kind:'component',name:'group',children:[{id:'words',kind:'text',text:'Welcome'}]}]},
+
   {
     kind: 'flow', layer: 'primitive',
     description: 'A row or column of blocks with a gap between them and room around them; the layout primitive every section expands to.',

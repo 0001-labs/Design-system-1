@@ -1,3 +1,6 @@
+import { build as bundleNativeClient } from 'esbuild';
+import { readFile as readNativeClientFile } from 'node:fs/promises';
+import { resolve as resolveNativeClient } from 'node:path';
 /**
  * What products copy from Design system 1, with Sync 1 (`sync1`, in
  * /Users/joachim/0001/Sync 1). A product names the exports it takes in its
@@ -96,7 +99,10 @@ export default {
   exports: {
     /** Native page publication: the editor's Aa parser and closed content atoms, without DOM. */
     'native-content': {
-      files({ read, tree }) {
+      async files({ read, tree }) {
+        const client = await bundleNativeClient({ entryPoints:[resolveNativeClient(import.meta.dirname,'shared/consistency-block-client.ts')],bundle:true,format:'esm',platform:'browser',target:'es2022',minify:true,write:false,outdir:resolveNativeClient(import.meta.dirname,'.reports/native-block-client'),entryNames:'blocks',loader:{'.woff2':'dataurl','.woff':'dataurl','.ttf':'dataurl','.svg':'text','.png':'dataurl'},plugins:[{name:'native-source-text',setup(build){build.onResolve({filter:/\.(?:css|svg)\?(?:inline|raw)$/},args=>({path:resolveNativeClient(args.resolveDir,args.path.replace(/\?(?:inline|raw)$/, '')),namespace:'native-source-text'}));build.onLoad({filter:/.*/,namespace:'native-source-text'},async args=>({contents:await readNativeClientFile(args.path,'utf8'),loader:'text'}));}}] });
+
+        const importer = await bundleNativeClient({entryPoints:[resolveNativeClient(import.meta.dirname,'shared/consistency-import.ts')],bundle:true,format:'esm',platform:'node',write:false});
         let source = String(read('shared/consistency-native-content.ts'))
           .replace('../website/src/vendor/aa/parse.js', './aa/parse.js')
           .replace('../DS1/2-core/generated/icons-immediate', './icons-immediate')
@@ -105,12 +111,19 @@ export default {
           `const ${name} = ${JSON.stringify(String(read(posix.normalize(posix.join('shared', path)))))};`);
         return {
           'native-content.ts': source,
+          'import-html.mjs': importer.outputFiles[0].text,
+          'workspace-migration.ts': String(read('shared/consistency-workspace-migration.ts')).replaceAll('./consistency-template-pages.json','./template-pages.json').replaceAll('./consistency-workspace-page','./workspace-page').replaceAll('./consistency-layout-import','./layout-import').replaceAll('./consistency-native-page','./native-page'),
+          'layout-import.ts': String(read('shared/consistency-layout-import.ts')).replaceAll('./consistency-native-page','./native-page'),
+          'native-client.js.txt': client.outputFiles.find(file=>file.path.endsWith('.js'))?.text??'',
+          'native-client.css.txt': client.outputFiles.find(file=>file.path.endsWith('.css'))?.text??'',
+          'components.ts': String(read('shared/consistency-components.ts')).replace('./consistency-site-design','./site-design'),
+          'template-pages.json': read('shared/consistency-template-pages.json'),
           'native-page.ts': String(read('shared/consistency-native-page.ts'))
             .replace('./consistency-native-content', './native-content')
-            .replaceAll('./consistency-vocabulary', './vocabulary')
+            .replaceAll('./consistency-vocabulary', './vocabulary').replaceAll('./consistency-components','./components').replaceAll('./consistency-site-design','./site-design')
             .replace(/^import (\w+) from '([^']+)\?raw';$/gm, (_, name, path) =>
               `const ${name} = ${JSON.stringify(String(read(posix.normalize(posix.join('shared', path)))))};`),
-          'workspace-page.ts': String(read('shared/consistency-workspace-page.ts')).replace('./consistency-native-page', './native-page'),
+          'workspace-page.ts': String(read('shared/consistency-workspace-page.ts')).replace('./consistency-native-page', './native-page').replace('./consistency-template-pages.json','./template-pages.json').replace('./consistency-components','./components'),
           'vocabulary.ts': String(read('shared/consistency-vocabulary.ts')).replace('./consistency-native-page', './native-page'),
           'vocabulary.json': read('shared/generated/vocabulary.json'),
           'site-design.ts': read('shared/consistency-site-design.ts'),

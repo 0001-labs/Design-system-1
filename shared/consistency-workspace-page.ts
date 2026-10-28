@@ -1,3 +1,5 @@
+import templates from './consistency-template-pages.json';
+import type { NativeComponents } from './consistency-components';
 import { validateNativePage, type NativePageDocument } from './consistency-native-page';
 
 /** Host metadata surrounds the same page used by published sites. It never defines blocks. */
@@ -25,7 +27,7 @@ export function validateWorkspacePage(value: unknown): WorkspacePage {
     schema: 2, kind: 'page',
     example: name(input.example, /^[a-z][a-z0-9-]*$/, 80),
     library: name(input.library, /^[a-z][a-z0-9-]*$/, 80),
-    fonts: {}, page: validateNativePage(input.page, { images: [], collections: [], runtimes: {} }),
+    fonts: {}, page: validateNativePage(input.page, { images: [], collections: [], runtimes: {}, components: (templates as unknown as Record<string,{components:NativeComponents}>)[String(input.example)]?.components ?? {} }),
   };
   for (const key of ['heading', 'text'] as const) if (fonts[key] !== undefined) result.fonts[key] = name(fonts[key], /^[A-Za-z][A-Za-z0-9 ]*$/, 80);
   return result;

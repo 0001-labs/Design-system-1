@@ -130,6 +130,7 @@ export function renderNativeRegion(source: string, options: { images?: readonly 
         return `<div class="c9y-native-table"><table>${rows.map((row, rowIndex) => `<${rowIndex ? 'tbody' : 'thead'}><tr>${row.map((cell, index) => `<${rowIndex ? 'td' : 'th'}${alignments[index] ? ` style="text-align:${alignments[index]}"` : ''}>${textInline(cell.text)}</${rowIndex ? 'td' : 'th'}>`).join('')}</tr></${rowIndex ? 'tbody' : 'thead'}>`).join('')}</table></div>`;
       }
       if (block.kind === 'code') {
+        if (/^```diagram(?: wrap)?\r?\n/.test(block.source)) {const lines=block.source.split('\n'),source=lines.slice(1,-1).join('\n');return `<aa-diagram source="${escape(source)}"${lines[0].includes('wrap')?' wrap':''}></aa-diagram>`;}
         const component = readBasicContentElement(block.source);
         if (component?.kind === 'button') {
           const body = escape(component.label), cls = `ds-button ds-button--${component.secondary ? 'secondary' : 'primary'} c9y-native-button`;

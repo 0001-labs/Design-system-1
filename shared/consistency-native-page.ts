@@ -1,10 +1,12 @@
+import { sitePagePatch, type SiteSurfaceDesign } from './consistency-site-design';
+import { COMPONENT_MEASURES, componentDefinition, componentMarkup, type NativeComponents } from './consistency-components';
 import { nativeIcon, nativeRegionStyles, renderNativeRegion, validateNativeRegion } from './consistency-native-content';
 import { TONES, sectionDefinition, SECTION_KINDS, isSlot, type Tone, type FieldDefinition, type SlotDefinition, type MemberDefinition, type KindDefinition } from './consistency-vocabulary';
 import pageStyles from './consistency-native-page.css?raw';
 import headerStyles from '../DS1/1-root/header.css?raw';
 import footerStyles from '../DS1/1-root/footer.css?raw';
 
-export interface NativeBlockBase { id: string; width?: number; hidden?: boolean; locale?: string }
+export interface NativeBlockBase { id: string; width?: number; hidden?: boolean; locale?: string; marginTop?:number; marginBottom?:number }
 export interface NativeFlow extends NativeBlockBase {
   kind: 'flow'; role?: 'section' | 'header' | 'nav' | 'footer' | 'main';
   direction: 'column' | 'row'; mobileDirection?: 'column' | 'row'; gap: number; mobileGap?: number; padding: number; children: NativeBlock[];
@@ -14,7 +16,7 @@ export interface NativeGrid extends NativeBlockBase {
   kind: 'grid'; columns: number; mobileColumns?: number; columnGap: number; rowGap: number; children: NativeBlock[];
 }
 export interface NativeContent extends NativeBlockBase {
-  kind: 'content'; source: string; gaps?: Record<string, number>; binding?: string;
+  kind: 'content'; source: string; wrap?:boolean; gaps?: Record<string, number>; binding?: string;
 }
 /** Where a picture's subject is, as whole percentages from the left and the top; 50 and 50 when absent. */
 export interface NativeFocus { x: number; y: number }
@@ -34,7 +36,9 @@ export interface NativeCollection extends NativeBlockBase {
 }
 export type NativeRuntimeProps = Record<string, string | number | boolean | null>;
 export interface NativeRuntime extends NativeBlockBase { kind: 'runtime'; name: string; props: NativeRuntimeProps }
-export type NativePrimitive = NativeFlow | NativeGrid | NativeContent | NativeImage | NativeLink | NativeCollection | NativeRuntime;
+export interface NativeText extends NativeBlockBase { kind: 'text'; text: string; editable?: boolean }
+export interface NativeComponent extends NativeBlockBase { kind:'component'; name:string; children:NativeBlock[]; values?:Record<string,string>; words?:Record<string,string>; gap?:number; padding?:number; height?:number; marginTop?:number; marginBottom?:number; columnGap?:number; rowGap?:number; design?:SiteSurfaceDesign }
+export type NativePrimitive = NativeText | NativeComponent | NativeFlow | NativeGrid | NativeContent | NativeImage | NativeLink | NativeCollection | NativeRuntime;
 
 /*
  * Sections: typed blocks above the primitives. A section has appearance fields in whole squares and
@@ -98,7 +102,7 @@ export const isNativeSection = (block: NativeBlock): block is NativeSection => (
 export interface NativePageDocument {
   schema: 1; kind: 'native-page';
   title?: string; description?: string; lang?: string;
-  layout: { maxWidth?: number; padding: number; gap: number };
+  layout: { mode?: 'document'; overrides?:('gap'|'padding'|'width')[]; tone?:string; maxWidth?: number; padding: number; gap: number };
   blocks: NativeBlock[];
 }
 export interface NativeCollectionItem {
@@ -107,9 +111,10 @@ export interface NativeCollectionItem {
 export interface NativeCollectionData { items: NativeCollectionItem[] }
 export interface NativePageContext {
   images: readonly string[]; collections: readonly string[];
-  runtimes: Readonly<Record<string, readonly string[]>>; bindings?: readonly string[];
+  components?: NativeComponents; runtimes: Readonly<Record<string, readonly string[]>>; bindings?: readonly string[];
 }
 export interface NativePageRenderOptions {
+  components?: NativeComponents;
   images?: readonly string[];
   collections?: Readonly<Record<string, NativeCollectionData>>;
   /** Trusted site code renders a registered runtime; HTML is never a document field. */
@@ -147,14 +152,17 @@ const squares = (value: number) => measure(value * 20);
 export function validateNativePage(value: unknown, context: NativePageContext): NativePageDocument {
   const source = record(value); keys(source,['schema','kind','title','description','lang','layout','blocks']);
   if (source.schema !== 1 || source.kind !== 'native-page') return invalid();
-  const layout = record(source.layout); keys(layout,['maxWidth','padding','gap']);
+  const layout = record(source.layout); keys(layout,['mode','overrides','tone','maxWidth','padding','gap']);
   const result: NativePageDocument = { schema:1, kind:'native-page', layout:{padding:integer(layout.padding),gap:integer(layout.gap)}, blocks:[] };
+  if (layout.mode !== undefined) { if(layout.mode!=='document')return invalid();result.layout.mode='document'; }
+  if(layout.overrides!==undefined){if(!Array.isArray(layout.overrides)||layout.overrides.some(key=>!['gap','padding','width'].includes(key)))return invalid();result.layout.overrides=[...layout.overrides] as ('gap'|'padding'|'width')[];}
+  if(layout.tone!==undefined)result.layout.tone=choice(layout.tone,['','ink','sharp-blue','apple-green','pink','orange','yellow','purple']);
   if (layout.maxWidth !== undefined) result.layout.maxWidth=integer(layout.maxWidth,10000,200);
   if (source.title !== undefined) result.title=text(source.title,500);
   if (source.description !== undefined) result.description=text(source.description,2000);
   if (source.lang !== undefined) { result.lang=text(source.lang,20); if(!/^[a-z]{2,3}(?:-[A-Z]{2})?$/.test(result.lang)) return invalid(); }
   const ids=new Set<string>(), ancestors=new Set<unknown>(); let count=0;
-  const common=['id','kind','width','hidden','locale'];
+  const common=['id','kind','width','hidden','locale','marginTop','marginBottom'];
   const focus=(value:unknown,path:string):NativeFocus=>{
     const input=record(value,`${path}: a focus is { x, y }, percentages from 0 to 100`);keys(input,['x','y'],path);
     return{x:integer(input.x,100,0,`${path}.x: a whole percentage from 0 to 100`),y:integer(input.y,100,0,`${path}.y: a whole percentage from 0 to 100`)};
@@ -247,16 +255,28 @@ export function validateNativePage(value: unknown, context: NativePageContext): 
     return block as unknown as NativeSection;
   };
   const node=(value:unknown,depth:number):NativeBlock=>{
-    if(depth>12)return invalid();
-    const input=record(value); if(++count>500||ancestors.has(input))return invalid(); ancestors.add(input);
+    if(depth>(context.components?40:12))return invalid();
+    const input=record(value); if(++count>(context.components?6000:500)||ancestors.has(input))return invalid(); ancestors.add(input);
     const id=text(input.id,80);if(!/^[a-zA-Z][a-zA-Z0-9_-]{0,79}$/.test(id)||ids.has(id))return invalid(ids.has(id)?`id "${id}" is used twice`:undefined);ids.add(id);
-    const kind=choice(input.kind,['flow','grid','content','image','link','collection','runtime',...SECTION_KINDS] as const,`"${String(input.kind)}" is not a block kind`);
+    const kind=choice(input.kind,['text','component','flow','grid','content','image','link','collection','runtime',...SECTION_KINDS] as const,`"${String(input.kind)}" is not a block kind`);
     const base:NativeBlockBase={id};
+    for(const key of ['marginTop','marginBottom'] as const)if(input[key]!==undefined)base[key]=integer(input[key]);
     if(input.width!==undefined)base.width=integer(input.width,10000,20);
     if(input.hidden!==undefined)base.hidden=boolean(input.hidden);
     if(input.locale!==undefined){base.locale=text(input.locale,20);if(!/^[a-z]{2,3}(?:-[A-Z]{2})?$/.test(base.locale))return invalid();}
     let block:NativeBlock;
-    if(kind==='flow'){
+    if(kind==='text'){
+      keys(input,[...common,'text','editable']);block={...base,kind,text:text(input.text,24000)};if(input.editable!==undefined)block.editable=boolean(input.editable);
+    }else if(kind==='component'){
+      keys(input,[...common,'name','children','values','words','design',...COMPONENT_MEASURES]);
+      const name=text(input.name,160),definition=componentDefinition(name,context.components);if(!definition)return invalid(`unregistered component: ${name}`);
+      const values:Record<string,string>={},words:Record<string,string>={};
+      if(input.values!==undefined)for(const[key,value]of Object.entries(record(input.values))){if(!definition.fields.includes(key))return invalid();const clean=text(value,4000);if(['href','src','poster'].includes(key)&&clean){address(clean,key!=='href');if(key!=='href'&&clean.startsWith('/')&&!context.images.includes(clean))return invalid();}values[key]=clean;}
+      if(input.words!==undefined)for(const[key,value]of Object.entries(record(input.words))){if(!/^[a-zA-Z0-9_-]+:[0-9]{1,4}$/.test(key))return invalid();words[key]=text(value,24000);}
+      block={...base,kind,name,children:nodes(input.children,depth+1),...(input.values!==undefined?{values}:{}),...(input.words!==undefined?{words}:{})};
+      if(input.design!==undefined){const d=record(input.design);keys(d,['tone','variant','color','appearance','action','gaps']);const design:SiteSurfaceDesign={};for(const key of ['tone','color'] as const)if(d[key]!==undefined)design[key]=choice(d[key],['','ink','sharp-blue','apple-green','pink','orange','yellow','purple']);if(d.variant!==undefined)design.variant=choice(d.variant,['filled','outlined'] as const);if(d.appearance!==undefined)design.appearance=choice(d.appearance,['plain','primary','secondary'] as const);if(d.action!==undefined){if(d.action===null)design.action=null;else{const a=record(d.action);keys(a,['kind','target']);design.action={kind:choice(a.kind,['link','page']),target:address(a.target)};}}if(d.gaps!==undefined){design.gaps={};for(const[key,value]of Object.entries(record(d.gaps))){if(!['label','title','body','footer','figure','media'].includes(key))return invalid();design.gaps[key]=integer(value);}}block.design=design;}
+      for(const key of COMPONENT_MEASURES)if(input[key]!==undefined)block[key]=integer(input[key]);
+    }else if(kind==='flow'){
       keys(input,[...common,'role','direction','mobileDirection','gap','mobileGap','padding','children','disclosure']);
       block={...base,kind,direction:choice(input.direction,['column','row']),gap:integer(input.gap),padding:integer(input.padding),children:nodes(input.children,depth+1)};
       if(input.mobileDirection!==undefined)block.mobileDirection=choice(input.mobileDirection,['column','row'] as const);
@@ -268,10 +288,11 @@ export function validateNativePage(value: unknown, context: NativePageContext): 
       block={...base,kind,columns:integer(input.columns,12,1),columnGap:integer(input.columnGap),rowGap:integer(input.rowGap),children:nodes(input.children,depth+1)};
       if(input.mobileColumns!==undefined)block.mobileColumns=integer(input.mobileColumns,6,1);
     }else if(kind==='content'){
-      keys(input,[...common,'source','gaps','binding']);
+      keys(input,[...common,'source','gaps','binding','wrap']);
       const content=text(input.source,24000),gaps=input.gaps===undefined?undefined:record(input.gaps) as Record<string,number>;
       validateNativeRegion(content,context.images,gaps,id);
       block={...base,kind,source:content,...(gaps?{gaps:{...gaps}}:{})};
+      if(input.wrap!==undefined&&(block.kind==='content'))block.wrap=boolean(input.wrap);
       if(input.binding!==undefined){const binding=text(input.binding,200);if(!context.bindings?.includes(binding))return invalid();block.binding=binding;}
     }else if(kind==='image'){
       keys(input,[...common,'src','alt','height','mobileHeight','fit','focus','href']);
@@ -308,13 +329,13 @@ export function validateNativePage(value: unknown, context: NativePageContext): 
     ancestors.delete(input);return block;
   };
   const nodes=(values:unknown, depth:number):NativeBlock[]=>{
-    if(!Array.isArray(values)||depth>12||ancestors.has(values))return invalid();
+    if(!Array.isArray(values)||depth>(context.components?40:12)||ancestors.has(values))return invalid();
     ancestors.add(values);
     const blocks=values.map(value=>node(value,depth));
     ancestors.delete(values);return blocks;
   };
   result.blocks=nodes(source.blocks,0);
-  if(JSON.stringify(result).length>60000)return invalid('the document is over 60000 characters');
+  if(JSON.stringify(result).length>(context.components?750000:60000))return invalid('the document is over 60000 characters');
   return result;
 }
 
@@ -332,7 +353,10 @@ export function sectionField<T = unknown>(block: NativeSection, name: string): T
 /** Every measure is a model field; neither the editor nor publisher infers layout from arbitrary HTML. */
 export function nativeBlockStyles(block: NativeBlock): Record<string,string> {
   const styles:Record<string,string>={};
+  for(const key of ['marginTop','marginBottom'] as const)if(block[key]!==undefined)styles[key==='marginTop'?'margin-top':'margin-bottom']=measure(block[key]!);
   if(block.width!==undefined){styles.width=measure(block.width);styles.flex='0 1 auto';}
+  if(block.kind==='component'){if(block.padding!==undefined)styles['--c9y-component-padding']=measure(block.padding);if(block.gap!==undefined)styles['--c9y-component-gap']=measure(block.gap);if(block.height!==undefined)for(const key of ['--ds-card-height','--ds-carousel-height'])styles[key]=measure(block.height)+'!important';if(block.width!==undefined)styles['--ds-card-width']=measure(block.width)+'!important';}
+  if(block.kind==='component')for(const key of COMPONENT_MEASURES)if(block[key]!==undefined)styles[key.replace(/[A-Z]/g,letter=>'-'+letter.toLowerCase())]=measure(block[key]!)+'!important';
   if(block.kind==='flow')Object.assign(styles,{'--c9y-direction':block.direction,'--c9y-mobile-direction':block.mobileDirection??'column','--c9y-gap':measure(block.gap),'--c9y-mobile-gap':measure(block.mobileGap??block.gap),'--c9y-padding':measure(block.padding)});
   if(block.kind==='grid'||block.kind==='collection')Object.assign(styles,{'--c9y-columns':String(block.kind==='collection'?nativeCollectionTracks(block).columns:block.columns),'--c9y-column-gap':measure(block.columnGap),'--c9y-row-gap':measure(block.rowGap)});
   if(block.kind==='grid')styles['--c9y-mobile-columns']=String(block.mobileColumns??1);
@@ -410,6 +434,8 @@ export function renderNativeBlock(block: NativeBlock, options: NativePageRenderO
 function render(block: NativeBlock, options: NativePageRenderOptions, mark?: NativeMark, marks?: Marks): string {
   if(isNativeSection(block))return renderNativeSection(block,options,mark);
   const child=(value:NativeBlock)=>render(value,options,marks?.get(value.id),marks);
+  if(block.kind==='text')return options.editor&&block.editable!==false&&block.text.trim()?`<span data-native-block="${escape(block.id)}" data-c9y-block="${escape(block.id)}" data-c9y-kind="text" class="c9y-native-text">${escape(block.text)}</span>`:escape(block.text);
+  if(block.kind==='component')return componentMarkup(block.id,block.name,block.children.map(child).join(''),block.values??{},block.words??{},nativeBlockStyles(block),options.components??{},!!options.editor,block.hidden,block.design);
   const attrs=`class="c9y-native-node c9y-native-${block.kind}${block.kind==='link'?' c9y-native-region':''}${markClasses(mark)}" data-native-block="${escape(block.id)}"${options.editor?` data-c9y-block="${escape(block.id)}" data-c9y-kind="${block.kind}"`:''}${block.hidden?' hidden':''}${block.locale?` data-native-locale="${block.locale}" lang="${block.locale}"`:''}${markText(mark)} style="${escape(styleText(nativeBlockStyles(block)))}"`;
   if(block.kind==='flow'){
     const children=block.children.map(child).join('');
@@ -417,7 +443,7 @@ function render(block: NativeBlock, options: NativePageRenderOptions, mark?: Nat
     const tag=block.role??'section';return`<${tag} ${attrs} data-direction="${block.direction}">${children}</${tag}>`;
   }
   if(block.kind==='grid')return`<div ${attrs}>${block.children.map(child).join('')}</div>`;
-  if(block.kind==='content')return`<div ${attrs}><div class="c9y-native-region">${renderNativeRegion(block.source,{images:options.images,id:block.id,gaps:block.gaps})}</div></div>`;
+  if(block.kind==='content')return`<div ${attrs}${block.wrap===false?' data-native-nowrap':''}><div class="c9y-native-region">${renderNativeRegion(block.source,{images:options.images,id:block.id,gaps:block.gaps})}</div></div>`;
   if(block.kind==='image'){
     const image=`<img src="${escape(address(block.src,true))}" alt="${escape(block.alt)}" loading="lazy">`;
     return`<figure ${attrs}>${block.href?`<a href="${escape(address(block.href))}"${current(options,block.href)}>${image}</a>`:image}</figure>`;
@@ -537,7 +563,11 @@ function renderList(block: NativeList, options: NativePageRenderOptions): string
   return[...groups.entries()].sort(([a],[b])=>a===''?1:b===''?-1:b.localeCompare(a)).map(([year,entries],index)=>`<div class="c9y-native-group" data-native-block="${escape(sub(id,'groups',index))}" data-group="${escape(year)}">${year?`<div class="c9y-native-group-heading">${escape(year)}</div>`:''}${entries.map(row).join('')}</div>`).join('');
 }
 export function renderNativePage(document: NativePageDocument, options: NativePageRenderOptions = {}): string {
+  if(document.layout.mode==='document')return document.blocks.map(block=>renderNativeBlock(block,{...options,lang:document.lang??options.lang})).join('');
   const styles={'--c9y-page-padding':measure(document.layout.padding),'--c9y-page-gap':measure(document.layout.gap),...(document.layout.maxWidth?{width:measure(document.layout.maxWidth)}:{})};
   const pageOptions:NativePageRenderOptions={...options,lang:options.lang??document.lang};
   return`<div class="c9y-native-page"${options.editor?' data-c9y-native-root':''} style="${escape(styleText(styles))}">${document.blocks.map(block=>render(block,pageOptions)).join('')}</div>`;
 }
+
+/** Typed document-root overrides; the authored library owns every unspecified declaration. */
+export function nativePageRootStyles(document:NativePageDocument):Record<string,string>{const styles={...sitePagePatch(document.layout.tone??'').styles};if(document.layout.mode==='document')for(const key of document.layout.overrides??[])styles[key==='width'?'width':key]=measure(key==='width'?document.layout.maxWidth??1000:document.layout[key]);return styles;}
