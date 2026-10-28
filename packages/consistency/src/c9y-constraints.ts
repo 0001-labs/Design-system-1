@@ -22,6 +22,11 @@ export type C9yConstraint = {
 
 export const C9Y_CONSTRAINTS: C9yConstraint[] = [
   {
+    code: 'native.workspace',
+    rule: 'New lab pages and blank site drafts use the published page model and editor; spacing survives saving and reopening, and a refused save retains the local document for recovery.',
+    check: {file: 'tests/workspace-native.mjs', test: 'Shared workspace editor: native blocks'},
+  },
+  {
     code: 'spacing.hit-area',
     rule: 'Resize labels never intercept a neighbouring spacing handle; pointer and keyboard spacing changes persist after reopening.',
     check: { file: 'tests/soendergaarden-spacing.mjs', test: 'Søndergården front: publication retry' },

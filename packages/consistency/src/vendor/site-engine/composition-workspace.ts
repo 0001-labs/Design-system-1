@@ -1,6 +1,6 @@
 import { h } from './dom';
 export interface Draft { id:string; name:string; revision:number; updatedAt:number; document?:Record<string,unknown> }
-export interface EditorAdapter { element:HTMLElement; controls?:HTMLElement; read():Record<string,unknown>; destroy?():void }
+export interface EditorAdapter { element:HTMLElement; controls?:HTMLElement; read():Record<string,unknown>; flush?():Promise<boolean>; destroy?():void }
 /** One of the workspace's sites, from `/api/consistency/sites`, by its IDv1 code. */
 export interface WorkspaceSite { code:string; name:string; url:string }
 /** A site opened in the work: its words saved as it goes; `flush` settles a word being edited before leaving, false to stay. */
@@ -56,7 +56,7 @@ export function compositionWorkspace(root:HTMLElement,options:WorkspaceOptions):
       current={...saved,document};pages=[saved,...pages.filter(p=>p.id!==saved.id)];draw();status.textContent=dirty?'Unsaved':'Saved';return true;
     }catch(error){dirty=true;conflict=(error as {status?:number}).status===409;status.textContent=(error as Error).message;retry.hidden=conflict;copy.hidden=false;return false;}finally{saving=null;if(dirty&&!conflict&&status.textContent==='Unsaved')timer=setTimeout(()=>void save(),100);}})();return saving;
   }
-  async function flush():Promise<boolean>{do {if(!await save())return false;}while(dirty||saving);return true;}
+  async function flush():Promise<boolean>{if(editor?.flush&&!await editor.flush())return false;do {if(!await save())return false;}while(dirty||saving);return true;}
   function mount(draft:Draft){editor?.destroy?.();editor=options.create(draft.document);stage.replaceChildren(editor.element);controls.replaceChildren(...(editor.controls?[editor.controls]:[]));current=draft;title.value=draft.name;dirty=false;conflict=false;retry.hidden=true;copy.hidden=true;status.textContent='Saved';editor.element.addEventListener('consistency-change',changed);draw();}
   let navigating=false;
   async function open(id:string){if(navigating)return;navigating=true;if(!await flush()||!await leaveSite()){navigating=false;return;}try{const draft=await api('/'+encodeURIComponent(id));if(!disposed)mount(draft);}catch(error){status.textContent=(error as Error).message;}finally{navigating=false;}}

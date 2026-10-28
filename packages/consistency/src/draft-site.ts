@@ -1,5 +1,7 @@
 import { LitElement, html } from 'lit';
 import { ConsistencyEditor } from './index';
+import { WorkspacePageEditor } from './workspace-page';
+import { importWritingPage } from './workspace-migration';
 import { DocumentState } from './document-state';
 import { TemplateEditor } from './template-editor';
 import type { Composition } from './model';
@@ -23,7 +25,7 @@ export class DraftSiteEditor extends LitElement {
   workspace = '';
   site!: DraftSiteSummary;
   declare problem: string;
-  private editor?: ConsistencyEditor | TemplateEditor;
+  private editor?: ConsistencyEditor | TemplateEditor | WorkspacePageEditor;
   private state?: DocumentState<{ name: string; page: Record<string, unknown> }, { build: string; base: string; revision: number; document: { name: string; page: Record<string, unknown> } }>;
   private readonly unload = (event: BeforeUnloadEvent) => { if (this.state?.dirty || this.state?.busy) { event.preventDefault(); event.returnValue = ''; } };
   constructor() { super(); this.problem = ''; }
@@ -39,7 +41,11 @@ export class DraftSiteEditor extends LitElement {
         this.dispatchEvent(new CustomEvent('draft-site-saved', { detail: saved, bubbles: true }));
         return { ...value, revision: saved.revision, document: { name: saved.name, page: saved.document } };
       }, () => this.requestUpdate());
-      if ((draft.document.composition as Composition).sections.__authored === '1') {
+      const native = importWritingPage(draft.document);
+      if (native) {
+        const editor = new WorkspacePageEditor(); editor.loadDocument(native); this.editor = editor;
+        editor.addEventListener('consistency-change', () => this.changed());
+      } else if ((draft.document.composition as Composition).sections.__authored === '1') {
         const editor = new TemplateEditor(); editor.template = String(draft.document.example);
         editor.values = (draft.document.composition as Composition).sections;
         this.editor = editor;
@@ -87,12 +93,17 @@ export class NewSite extends LitElement {
   declare busy: boolean;
   declare problem: string;
   private creationId = crypto.randomUUID();
-  private previews = new Map<string, ConsistencyEditor>();
+  private previews = new Map<string, ConsistencyEditor | WorkspacePageEditor>();
   constructor() { super(); this.selected = ''; this.search = ''; this.name = ''; this.busy = false; this.problem = ''; }
   createRenderRoot() { return this; }
   private choose(id: string) {
     this.selected = id; this.problem = ''; this.name = id === 'blank' ? 'Untitled site' : SITE_TEMPLATES.find(template => template.id === id)!.label;
-    if (!this.previews.has(id)) { const editor = new ConsistencyEditor(); editor.siteMode = true; editor.loadDocument(templateDocument(id)); this.previews.set(id, editor); }
+    if (!this.previews.has(id)) {
+      const value = templateDocument(id);
+      const editor = value.schema === 2 ? new WorkspacePageEditor() : new ConsistencyEditor();
+      if (editor instanceof ConsistencyEditor) editor.siteMode = true;
+      editor.loadDocument(value); this.previews.set(id, editor);
+    }
   }
   private async create() {
     if (this.busy || !this.name.trim() || !this.selected) return;

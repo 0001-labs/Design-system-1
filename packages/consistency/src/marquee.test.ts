@@ -38,7 +38,7 @@ test('a selected element is one face unless it holds selectable units', () => {
  root.innerHTML = '<section data-selectable="section"><h2 data-selectable="heading"><span class="aa aa-plain"><div class="aa-block">Café</div></span></h2><p data-selectable="paragraph"><span class="aa aa-plain"><div class="aa-block">Open daily</div></span></p><ds-button data-selectable="button"><span class="aa aa-plain"><div class="aa-block">Book</div></span></ds-button></section>'
   + '<div data-selectable="group-intro"><aa-editor><div class="aa-block" data-selectable="text:intro:0">A paragraph</div><div class="aa-block" data-selectable="text:intro:1"><br></div><div class="aa-block"><div class="aa-columns"><div class="aa-column"><div class="aa-block">Left</div></div></div></div></aa-editor></div>'
   + '<div data-selectable="region"><aa-editor><div class="aa-block">Native words</div><div class="aa-block">More</div></aa-editor></div>';
- const faces = () => [...root.querySelectorAll('[data-selection-face]')].map(e => e.dataset.selectable ?? e.textContent?.trim());
+ const faces = () => [...root.querySelectorAll<HTMLElement>('[data-selection-face]')].map(e => e.dataset.selectable ?? e.textContent?.trim());
  paintCompositionSelection(root, new Set(['heading']));
  expect(faces()).toEqual(['heading']);
  expect(root.querySelector('[data-selectable="heading"]')!.hasAttribute('data-selected')).toBe(true);

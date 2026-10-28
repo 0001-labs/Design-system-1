@@ -16,7 +16,8 @@ try {
  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
  const failures = [];
  page.on('pageerror', error => {failures.push(error.message); console.log('PAGE ERROR',error.stack)}); page.on('console', message => {if(message.type()==='error') console.log('CONSOLE',message.text().slice(0,200))});
- await page.route('**/api/consistency/pages', route => route.fulfill({ json: { pages: [] } }));
+ const compatibility = {id:'compatibility',name:'Stored template',revision:1,updatedAt:1,document:{schema:1,example:'booking',library:'original',fonts:{},composition:{text:'',sections:{__authored:'1'},order:['intro'],gaps:{},hidden:[],width:800,padding:40,gap:20,wrap:true,consistency:true,sizes:{},cardDesigns:{},cardGaps:{},buttonDesigns:{},statDesigns:{}}}};
+ await page.route('**/api/consistency/pages**', route => route.fulfill({ json: new URL(route.request().url()).pathname.endsWith('/pages') ? {pages:[compatibility]} : compatibility }));
  await page.route('**/api/consistency/sites', route => route.fulfill({ json: { sites: [] } }));
  await page.goto(`http://127.0.0.1:${server.address().port}/private-consistency/`);
  const ids = await page.locator('select[aria-label="Example page"] option').evaluateAll(options => options.map(option => option.value).filter(id => !['editor','studio'].includes(id)));
@@ -96,6 +97,24 @@ try {
  await page.getByRole('button', { name: 'Site: A saved booking site' }).click();
  await page.getByRole('button', { name: 'Add new site', exact: true }).waitFor();
  console.log('Home: failed autosave keeps the edit, blocks navigation and recovers on retry');
+ await page.getByRole('button', {name:'Add new site',exact:true}).click();
+ await page.locator('ds-card[data-template="blank"]').click();
+ const blankPreview=page.frameLocator('consistency-new-site consistency-page-editor iframe');
+ await blankPreview.locator('[data-c9y-native-root][data-editor-surface]').waitFor();
+ await blankPreview.getByRole('slider',{name:'Page padding',exact:true}).press('ArrowUp');
+ await page.getByRole('textbox',{name:'Site name',exact:true}).fill('Shared blank');
+ await page.getByRole('button',{name:'Create site',exact:true}).click();
+ const blankFrame=page.frameLocator('consistency-draft-site consistency-page-editor iframe');
+ await blankFrame.locator('[data-c9y-native-root][data-editor-surface]').waitFor();
+ const blank=[...drafts.values()].find(draft=>draft.name==='Shared blank');
+ if(blank?.document.schema!==2||blank.document.page.layout.padding!==60||blank.document.composition)throw Error('Blank creation did not keep canonical blocks and edited geometry');
+ await blankFrame.getByRole('slider',{name:'Page padding',exact:true}).press('ArrowDown');
+ await page.getByRole('button',{name:'Site: Shared blank',exact:true}).click();
+ await page.locator(`ds-card[data-draft-site="${blank.id}"]`).click();
+ await blankFrame.getByRole('slider',{name:'Page padding',exact:true}).waitFor();
+ if(await blankFrame.getByRole('slider',{name:'Page padding',exact:true}).getAttribute('aria-valuenow')!=='40')throw Error('Blank shared spacing did not reopen');
+ console.log('Blank site: shared native editor, changed preview, creation, spacing and reopening passed');
+
  await page.goto(`http://127.0.0.1:${server.address().port}/private-consistency/`);
  await page.setViewportSize({ width: 390, height: 844 });
  await page.locator('select[aria-label="Example page"]').selectOption('booking');

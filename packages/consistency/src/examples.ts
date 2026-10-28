@@ -45,7 +45,7 @@ editorExample.sourceUrl = 'https://editor.c9y.site/';
 export const EXAMPLE_PAGES: readonly ExamplePage[] = [
  editorExample,
  { id: 'studio', label: 'Studio', sourcePath: 'packages/consistency/src/model.ts', sourceUrl: 'https://editor.c9y.site/', composition: structuredClone(initialComposition) },
- ...SITE_TEMPLATES.map(template => ({ id: template.id, label: template.label, sourcePath: 'website/src/lib/layout-examples.ts', sourceUrl: template.href ? `https://designsystem1.com${template.href}` : 'https://consistency.site/', composition: templateDocument(template.id).composition as Composition })),
+ ...SITE_TEMPLATES.map(template => ({ id: template.id, label: template.label, sourcePath: 'website/src/lib/layout-examples.ts', sourceUrl: template.href ? `https://designsystem1.com${template.href}` : 'https://consistency.site/', composition: (templateDocument(template.id).composition ?? { ...structuredClone(initialComposition), text: '# Your site\n\nStart writing.', sections: { __authored: '1' }, order: ['intro'], gaps: {} }) as Composition })),
 ];
 /** Each selected page gets its own mutable draft; the catalogue is a seed. */
 export function exampleComposition(id: string): Composition { return structuredClone((EXAMPLE_PAGES.find(page => page.id === id) ?? EXAMPLE_PAGES[0]).composition); }

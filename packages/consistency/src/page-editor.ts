@@ -15,6 +15,7 @@ export class ConsistencyPageEditor extends LitElement {
   private save?: NativePageSave;
   private source = '';
   private generation = 0;
+  private observedDocument = '';
   private ready: Promise<boolean> = Promise.resolve(false);
   private settle?: (ready: boolean) => void;
   private readonly frame = Object.assign(document.createElement('iframe'), { className: 'consistency-site-frame', title: 'Page to edit' });
@@ -31,7 +32,7 @@ export class ConsistencyPageEditor extends LitElement {
   /** Call after flushing the previous document. A supplied URL is the authenticated, script-free site canvas. */
   open(snapshot: NativePageSnapshot, save: NativePageSave, source?: { url: string } | { styles: string }) {
     this.controller?.destroy(); this.controller = undefined; this.settle?.(false);
-    this.snapshot = structuredClone(snapshot); this.save = save; this.generation++;
+    this.snapshot = structuredClone(snapshot); this.observedDocument = JSON.stringify(snapshot.document); this.save = save; this.generation++;
     this.ready = new Promise(resolve => { this.settle = resolve; });
     this.source = source && 'url' in source ? source.url : '';
     if (this.source) { this.frame.removeAttribute('srcdoc'); this.frame.src = this.source; }
@@ -56,7 +57,12 @@ export class ConsistencyPageEditor extends LitElement {
       if (generation === this.generation) this.snapshot = accepted;
       return accepted;
     }, () => this.dispatchEvent(new CustomEvent('page-reopen', { bubbles: true })), {
-      changed: () => this.dispatchEvent(new CustomEvent('consistency-change', { bubbles: true })),
+      changed: () => {
+        const document = JSON.stringify(this.controller?.state.document ?? this.snapshot?.document);
+        if (document === this.observedDocument) return;
+        this.observedDocument = document;
+        this.dispatchEvent(new CustomEvent('consistency-change', { bubbles: true }));
+      },
       imageURL: this.source ? undefined : source => source,
     });
     this.settle?.(true); this.settle = undefined;

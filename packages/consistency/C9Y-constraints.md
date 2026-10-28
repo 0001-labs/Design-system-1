@@ -6,6 +6,12 @@ Each rule names the test that holds it. While editing a site, a drag that breaks
 
 ## Rules
 
+### `native.workspace`
+
+New lab pages and blank site drafts use the published page model and editor; spacing survives saving and reopening, and a refused save retains the local document for recovery.
+
+Held by `tests/workspace-native.mjs`: “Shared workspace editor: native blocks”.
+
 ### `spacing.hit-area`
 
 Resize labels never intercept a neighbouring spacing handle; pointer and keyboard spacing changes persist after reopening.

@@ -1,5 +1,5 @@
 /* A site opened in the editor: its bar, then its page in a frame to the work's foot. */
-consistency-site-editor, consistency-page-editor { display: flex; flex-direction: column; height: 100%; min-height: 0; min-width: 0; }
+consistency-site-editor, consistency-page-editor, consistency-workspace-page { display: flex; flex-direction: column; height: 100%; min-height: 0; min-width: 0; }
 .consistency-site-bar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--ds-unit); padding: var(--ds-unit); border-bottom: 1px solid var(--ds-border-color); line-height: calc(16px * var(--sf)); }
 .consistency-site-bar > .ds-text { min-width: 0; }
 consistency-site-editor > ds-message, consistency-site-editor > ds-empty { margin: var(--ds-unit); }

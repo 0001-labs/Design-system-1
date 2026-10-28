@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import { validateWorkspacePage } from './consistency-workspace-page';
 const document = () => ({schema: 2, kind: 'page', example: 'editor', library: 'original', fonts: {}, page: {schema: 1, kind: 'native-page', layout: {padding: 40, gap: 20}, blocks: [{id: 'intro', kind: 'content', source: '# Hello'}]}});
 describe('workspace pages use the published page model', () => {
