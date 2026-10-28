@@ -378,7 +378,7 @@ const components: C9yComponent[] = [
 ];
 
 const sites: C9ySite[] = [
-  {id:'peer',label:'Peer',code:'PEER',codeStatus:'agreed',siteCode:'48ABFR',addresses:['https://deep-dew-cream.c9y.site'],folder:'/Users/joachim/0001/Other projects/Peer',systemNode:'peer',summary:'55 public English/Japanese routes declared as shared native block pages. Marketplace data remains owned by Peer’s existing backend.'},
+  {id:'peer',label:'Peer',code:'PEER',codeStatus:'agreed',siteCode:'48ABFR',addresses:['https://deep-dew-cream.c9y.site'],folder:'/Users/joachim/0001/Other projects/Peer',systemNode:'peer',summary:'56 public English/Japanese routes declared as shared native block pages. Marketplace data remains owned by Peer’s existing backend.'},
   {id:'consistency',label:'Consistency',code:'C9Y',codeStatus:'agreed',siteCode:'98XXBV',addresses:['https://consistency.c9y.site'],folder:'/Users/joachim/0001/Consistency/site',systemNode:'consistency',summary:'The public landing and examples page use the same native blocks and editor as every site.'},
   {
     id: 'tivoli-garden-japan-2027', label: 'Tivoli Garden Youth Guard in Japan 2027',
