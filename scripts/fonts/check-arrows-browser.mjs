@@ -29,7 +29,7 @@ try {
   await page.unroute('**/*');
   await page.route('**/*', route => route.fulfill(route.request().url().endsWith('.woff2')
     ? { contentType: 'font/woff2', body: readFileSync(new URL('fonts/Inter-Arrows.woff2', root)) }
-    : { contentType: 'text/html; charset=utf-8', body: `<meta http-equiv="Content-Security-Policy" content="font-src 'self'"><style>${read('inter-arrows.css')}p{font-family:"Inter Arrows",serif}</style><p id="arrow">→</p>` }));
+    : { contentType: 'text/html; charset=utf-8', body: `<meta http-equiv="Content-Security-Policy" content="font-src 'self'"><style>${read('fonts.css')}p{font-family:"Inter Arrows",serif}</style><p id="arrow">→</p>` }));
   await page.goto('http://arrows.test/');
   await page.evaluate(() => document.fonts.ready);
   const { root: document } = await cdp.send('DOM.getDocument');
