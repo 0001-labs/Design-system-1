@@ -53,6 +53,11 @@ export default defineConfig({
     },
   },
   test: {
+    // Browser suites each launch a browser and a Vite server. Unbounded forks
+    // exhaust memory and race Vite's ephemeral-port probes. Release runs keep
+    // the same assertions and timeouts, but give each suite its own turn.
+    maxWorkers: 4,
+    fileParallelism: !process.env.CI,
     // Vitest v4 compatibility: preserve mock call history.
     // Remove after tests no longer rely on calls from setup or earlier tests.
     // https://viteplus.dev/guide/vitest-v5#remove-unneeded-compatibility-settings

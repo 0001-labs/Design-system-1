@@ -257,6 +257,8 @@ document.querySelector('#ticket-count').addEventListener('change', total);
 document.querySelector('#ticket-buy').addEventListener('click', () => { document.querySelector('#ticket-status').textContent = document.querySelector('#ticket-total').label + ' in your basket. Nothing is paid in this demo.'; });
 showDay('friday'); total();`,
   },
+  // Pricing repeats equal tracks. The feature bento intentionally alternates one- and two-column
+  // spans, so equal-track fault-line comparisons do not apply; its other constraints still do.
   platform: {
     name: 'Developer platform', use: 'A developer platform in the Signal library: code type throughout, Egg paper and Drip yellow.', height: 900,
     library: library('signal'),
@@ -274,7 +276,7 @@ showDay('friday'); total();`,
   <div class="site-three site-rule"><ds-stat figure="3.1 s" label="Median deploy" caption="From push to live" literal></ds-stat><ds-stat value="0.9999" format="percent" digits="2" label="Uptime" caption="Over the last year" literal></ds-stat><ds-stat value="40" format="number" label="Regions" caption="And every one of them is close" literal></ds-stat></div>
   <section id="features" class="site-section">
     ${big('Everything after git push.')}
-    <ds-bento>
+    <ds-bento data-ds-fault-lines="off">
       ${card('tone="ink" data-span="2"', { label: 'Previews', title: 'Every branch gets an address.', body: text('Share a link with the people who need to see it. It goes away when the branch does.', 'wrap') })}
       ${card('tone="drip-yellow"', { label: 'Rollbacks', title: 'One click back.', body: text('Every deploy is kept. Go back to any of them in a second.', 'wrap') })}
       ${card('', { label: 'Logs', title: 'Search a week of logs.', body: text('Across every region, as you type.', 'wrap tone="muted"') })}
@@ -292,7 +294,7 @@ showDay('friday'); total();`,
   </section>
   <section id="pricing" class="site-section site-rule">
     <div class="site-between">${big('Pricing')}${choices('Billing', 'billing', ['Monthly', 'Yearly'])}</div>
-    <div class="site-three">
+    <div class="site-three" data-ds-fault-lines="platform-pricing">
       ${card('variant="outlined"', { label: 'Hobby', title: '<span data-price="0">€0</span>', body: `<div class="site-price"><div class="site-list">${check('One project')}${check('Previews')}${check('Community help')}</div><ds-button secondary>Start free</ds-button></div>` })}
       ${card('tone="drip-yellow"', { label: 'Team', title: '<span data-price="20">€20</span>', body: `<div class="site-price"><div class="site-list">${check('Unlimited projects')}${check('Rollbacks and logs')}${check('Help in a day')}</div><ds-button primary>Try it for 14 days</ds-button></div>` })}
       ${card('tone="ink"', { label: 'Company', title: '<span data-price="90">€90</span>', body: `<div class="site-price"><div class="site-list">${check('Single sign-on')}${check('Audit trail')}${check('A person to call')}</div><ds-button secondary>Talk to us</ds-button></div>` })}
