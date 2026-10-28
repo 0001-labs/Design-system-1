@@ -87,7 +87,7 @@ export class NativeSiteController {
   private active(){return !this.disposed&&!this.frame.closest('[hidden]')&&this.frame.getBoundingClientRect().width>0;}
   private enabled(){return this.active()&&!this.surface.contextActive;}
   private scale(element:HTMLElement){return Number.parseFloat(this.view.getComputedStyle(element).getPropertyValue('--sf'))||1;}
-  private select(value:Set<string>){this.selection=value;this.surface?.paintSelection();this.refresh();}
+  private select(value:Set<string>){this.selection=value;this.surface?.paintSelection();if(this.sort&&!this.sort.isDragging())this.bindSort();this.refresh();}
   /*
    * Sections. A section is one block of the page: `nativeEntries` lists it once, and the primitives it
    * expands to are found by their derived ids and edited through the section's fields and slots. A hero
@@ -211,7 +211,7 @@ export class NativeSiteController {
   /** Literal words belong to their visible block. Direction-aware dragging keeps ordinary text selection; layout containers share a drop type so nesting never traps a block. */
   private bindSort(){
     const entries=nativeEntries(this.state.document);
-    const draggable=(id:string)=>{const block=entries.get(id)?.block,element=this.elements.get(id);return !!block&&!!element&&!block.hidden&&block.kind!=='text'&&!(block.kind==='component'&&['inline','contents','none'].includes(this.view.getComputedStyle(element).display));};
+    const draggable=(id:string)=>{const block=entries.get(id)?.block,element=this.elements.get(id);return !!block&&!!element&&!block.hidden&&block.kind!=='text'&&![...this.selection].some(selected=>selected!==id&&this.elements.get(selected)?.contains(element))&&!(block.kind==='component'&&['inline','contents','none'].includes(this.view.getComputedStyle(element).display));};
     const parentOf=(id:string)=>entries.get(id)?.parent??(this.items.has(id)?`items:${this.items.get(id)!.section}`:undefined);
     for(const[id,item]of this.sorts)if(parentOf(id)!==item.parent||this.elements.get(id)!==item.element||entries.has(id)&&!draggable(id)){item.dispose();this.sorts.delete(id);}
     const parents=new Map<string,{element:HTMLElement;axis:'horizontal'|'vertical';type:string;label:string}>([['page',{element:this.root,axis:'vertical',type:'native-block',label:'Page'}]]);
@@ -223,7 +223,7 @@ export class NativeSiteController {
     for(const[id,item]of this.containers)if(!parents.has(id)||parents.get(id)!.axis!==item.axis||parents.get(id)!.element!==item.element){item.dispose();this.containers.delete(id);}
     for(const[id,parent]of parents)if(!this.containers.has(id))this.containers.set(id,{axis:parent.axis,element:parent.element,dispose:this.sort.container({id,type:parent.type,element:parent.element,axis:parent.axis,label:parent.label,isDropDisabled:()=>!!this.carried&&(id===this.carried.id||!!this.elements.get(this.carried.id)?.contains(parent.element))})});
     const canDrag=({target}:{target:Element|null})=>this.enabled()&&!this.root.hasAttribute('data-pointer-additive')&&!!target&&!target.closest('[data-editor-chrome],input,textarea,select,summary');
-    for(const[id,entry]of entries)if(draggable(id)&&!this.sorts.has(id)){const element=this.elements.get(id)!,writing=entry.block.kind==='component'||entry.block.kind==='link'||entry.block.kind==='content';this.sorts.set(id,{parent:entry.parent,element,dispose:this.sort.item({id,type:'native-block',element,label:label(entry.block),canDrag:by=>canDrag(by)&&(writing||!by.target?.closest('aa-editor,[contenteditable],button,a'))&&!(entry.block.kind==='content'&&parseBlocks((nativeEntries(this.state.document).get(id)?.block as NativeContent)?.source??'').length>1&&by.target?.closest('aa-editor')),allowInteractive:writing,...(writing?{text:{hold:()=>400,axis:'y' as const}}:{})})});}
+    for(const[id,entry]of entries)if(draggable(id)&&!this.sorts.has(id)){const element=this.elements.get(id)!,writing=entry.block.kind==='component'||entry.block.kind==='link'||entry.block.kind==='content';this.sorts.set(id,{parent:entry.parent,element,dispose:this.sort.item({id,type:'native-block',element,label:label(entry.block),canDrag:by=>canDrag(by)&&(writing||this.selection.has(id)||!by.target?.closest('aa-editor,[contenteditable],button,a'))&&!(entry.block.kind==='content'&&parseBlocks((nativeEntries(this.state.document).get(id)?.block as NativeContent)?.source??'').length>1&&by.target?.closest('aa-editor')),allowInteractive:true,...(writing?{text:{hold:()=>400,axis:'y' as const}}:{})})});}
     for(const[id,item]of this.items){const element=this.elements.get(id),type=`items:${item.section}`;if(!element||this.sorts.has(id)||!parents.has(type))continue;const section=this.sectionAt(item.section)!;this.sorts.set(id,{parent:type,element,dispose:this.sort.item({id,type,element,label:itemLabel(section.kind),canDrag})});}
   }
   private bindResizers(){
@@ -270,7 +270,7 @@ export class NativeSiteController {
   }
   private schedule=()=>{if(!this.raf)this.raf=this.view.requestAnimationFrame(()=>{this.raf=0;this.refresh();});};
   private down=(event:PointerEvent)=>{if(event.composedPath().some(node=>(node as HTMLElement)?.nodeType===1&&(node as HTMLElement).matches('aa-editor,[contenteditable]')))return;if(this.menu?.open){this.menu.requestClose('outside');this.menu.remove();}this.surface.startMarquee(event);};
-  private click=(event:MouseEvent)=>{const target=event.target as Element;if(target.closest('.c9y-native-text,.c9y-component-words')||event.composedPath().some(node=>(node as Element)?.nodeType===1&&(node as Element).matches('.c9y-component-words'))){if(!event.metaKey&&!event.ctrlKey)event.preventDefault();return;}if(event.defaultPrevented||target.closest('aa-editor,[contenteditable],[data-editor-chrome]'))return;const hit=this.hit(target);if(!hit)return;const follow=event.metaKey||event.ctrlKey;
+  private click=(event:MouseEvent)=>{const target=event.target as Element;if(target.closest('.c9y-native-text,.c9y-component-words')||event.composedPath().some(node=>(node as Element)?.nodeType===1&&(node as Element).matches('.c9y-component-words'))){if(this.selection.size)this.select(new Set());if(!event.metaKey&&!event.ctrlKey)event.preventDefault();return;}if(event.defaultPrevented||target.closest('aa-editor,[contenteditable],[data-editor-chrome]'))return;const hit=this.hit(target);if(!hit)return;const follow=event.metaKey||event.ctrlKey;
     const entries=nativeEntries(this.state.document),block=entries.get(hit.id)?.block;
     if(block?.kind==='link'&&!follow){event.preventDefault();this.editLink(hit);return;}
     if(hit.section&&hit.path&&!follow){const section=this.sectionAt(hit.section),member=section?memberAt(section.kind,hit.path):undefined;
