@@ -37,7 +37,7 @@ export function renderMatrix(system: C9ySystem, focus: string): string {
 
   const rows = system.sites.map(site => {
     const { shared, of } = onC9y(system, site.id);
-    return `<tr${focused(site.id)}><th scope="row" class="c9y-matrix-row">${button(site.id, site.label)}<span class="c9y-none">${escape(site.code)}</span></th>${columns
+    return `<tr${focused(site.id)}><th scope="row" class="c9y-matrix-row">${button(site.id, site.label)}<span class="c9y-none">${escape(site.code ?? site.siteCode)}</span></th>${columns
       .map(({ component, layer }) => cell(pairs.get(`${site.id}.${component.id}`), site.id, component, layer)).join('')}<td class="c9y-matrix-score"${shared === of ? ' data-whole' : ''}>${shared} of ${of}</td></tr>`;
   }).join('');
 

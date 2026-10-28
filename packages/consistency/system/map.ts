@@ -40,7 +40,7 @@ export type MapLayout = { stacks: Stack[]; at: Map<string, { x: number; y: numbe
 export function mapLayout(system: C9ySystem): MapLayout {
   const at = new Map<string, { x: number; y: number }>();
   const stacks: Stack[] = [];
-  const sites: Stack = { key: 'sites', title: 'Sites', x: 0, y: 0, members: system.sites.map(site => ({ id: site.id, label: site.label, aside: site.code })) };
+  const sites: Stack = { key: 'sites', title: 'Sites', x: 0, y: 0, members: system.sites.map(site => ({ id: site.id, label: site.label, aside: site.code ?? site.siteCode })) };
   stacks.push(sites);
   const top = 1 + system.sites.length + GAP;
   LAYERS.forEach(({ layer, title }, index) => {

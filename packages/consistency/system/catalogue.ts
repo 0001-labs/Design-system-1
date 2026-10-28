@@ -376,6 +376,13 @@ const components: C9yComponent[] = [
 
 const sites: C9ySite[] = [
   {
+    id: 'tivoli-garden-japan-2027', label: 'Tivoli Garden Youth Guard in Japan 2027',
+    siteCode: '26WGEE', addresses: ['https://aqua-azure-brown.c9y.site'],
+    folder: '/Users/joachim/0001/Consistency/platform/sites/tivoli-garden-japan-2027',
+    summary: 'Recovered builder pages on the shared native runtime: editable words, pictures, columns and spacing, with a private draft. Original form delivery remains a legacy compatibility dependency.',
+  },
+
+  {
     id: 'flavo',
     label: 'Flavo',
     code: 'FLAV',
@@ -417,6 +424,14 @@ const COMPOSED = 'Composed use (inserted or stored blocks) lives in the site’s
 const PLACES_OF = PLATFORM('worker/owner-api.ts');
 
 const relations: C9yRelation[] = [
+  relation('tivoli-garden-japan-2027', 'c9y-page', 'shared', 'Stored legacy pages are converted to the shared native-page schema; the private draft is available only through the authenticated editor.', [PLATFORM('cli/legacy-blocks.mjs'), PLATFORM('worker/native.ts'), PLATFORM('tests/tivoli-native.test.ts')], '2026-10-28'),
+  relation('tivoli-garden-japan-2027', 'c9y-layout', 'shared', 'Columns are grids; spacing boundaries are editable flow gaps. No imported HTML page or separate renderer.', [PLATFORM('cli/legacy-blocks.mjs')], '2026-10-28'),
+  relation('tivoli-garden-japan-2027', 'c9y-text', 'shared', 'Every editorial text is Aa Markdown in native content blocks.', [PLATFORM('cli/legacy-blocks.mjs')], '2026-10-28'),
+  relation('tivoli-garden-japan-2027', 'c9y-image', 'shared', 'Original images are declared native image blocks.', [PLATFORM('cli/legacy-blocks.mjs')], '2026-10-28'),
+  relation('tivoli-garden-japan-2027', 'c9y-site-runtime', 'shared', 'Uses the same native runtime as Søndergården and CPH Raft.', [PLATFORM('worker/runtimes.ts')], '2026-10-28'),
+  relation('tivoli-garden-japan-2027', 'c9y-runtime-view', 'local', 'Video and the three original forms are trusted runtime islands. Form delivery still uses the original Convex service; their configuration is build-owned.', [PLATFORM('cli/legacy-blocks.mjs'), PLATFORM('sites/tivoli-garden-japan-2027/integrations.html')], '2026-10-28'),
+  relation('tivoli-garden-japan-2027', 'c9y-pages', 'shared', 'The existing Pages API lists both public and private native pages from their current saved documents.', [PLATFORM('worker/native.ts')], '2026-10-28'),
+
   // Flavo: native pages on its own runtime.
   relation('flavo', 'c9y-page', 'shared', 'Every Flavo route is a native page document built from its catalogue and validated by the shared native page model before it is served.', [FLAVO('src/native/pages.ts'), FLAVO('src/native/routes.ts'), FLAVO('sync.json')]),
   relation('flavo', 'c9y-layout', 'shared', 'Its header, navigation, main column, footer and catalogue grids are native flow and grid blocks.', [FLAVO('src/native/pages.ts')]),

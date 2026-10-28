@@ -143,7 +143,7 @@ export function mountC9ySystem(root: HTMLElement, system: C9ySystem): { setView(
     }).join('');
   };
   const siteFacts = (site: C9ySite) => `<dl class="c9y-facts">
-      <dt>Code</dt><dd>${code(site.code)}${site.codeStatus === 'proposed' ? ' <span class="c9y-none">Proposed</span>' : ''}</dd>
+      <dt>Code</dt><dd>${code(site.code ?? site.siteCode)}${site.codeStatus === 'proposed' ? ' <span class="c9y-none">Proposed</span>' : ''}</dd>
       <dt>Site code</dt><dd>${code(site.siteCode)}</dd>
       <dt>Addresses</dt><dd>${addresses(site)}</dd>
       <dt>Folder</dt><dd>${code(site.folder)}</dd>
@@ -151,7 +151,7 @@ export function mountC9ySystem(root: HTMLElement, system: C9ySystem): { setView(
     </dl>`;
 
   const sitesView = () => `<section class="c9y-group"><h2>Sites</h2>${system.sites.map(site => `<article class="c9y-entry" data-site="${escape(site.id)}"${state.focus === site.id ? ' data-current' : ''}>
-      <div class="c9y-entry-head">${focusButton(site.id, site.label)}${code(site.code)}</div>
+      <div class="c9y-entry-head">${focusButton(site.id, site.label)}${code(site.code ?? site.siteCode)}</div>
       <p class="c9y-summary">${escape(site.summary)}</p>${siteFacts(site)}
     </article>`).join('')}</section>`;
 
@@ -167,7 +167,7 @@ export function mountC9ySystem(root: HTMLElement, system: C9ySystem): { setView(
     const site = sites.get(id);
     const head = component
       ? `<h2>${escape(component.label)}</h2><p>${code(component.id)} <span class="c9y-none">${layerWord(component)}</span></p><p>${escape(component.summary)}</p>${split(component)}${facts(component)}`
-      : site ? `<h2>${escape(site.label)}</h2><p>${escape(site.summary)}</p>${siteFacts(site)}<p class="c9y-none">System node ${code(site.systemNode)}</p>` : '';
+      : site ? `<h2>${escape(site.label)}</h2><p>${escape(site.summary)}</p>${siteFacts(site)}${site.systemNode ? `<p class="c9y-none">System node ${code(site.systemNode)}</p>` : ''}` : '';
     const notes = relationNotes(id);
     return `<div class="c9y-detail-body">${head}${notes ? `<h3>Relations</h3><ul class="c9y-relations">${notes}</ul>` : ''}</div>`;
   };

@@ -50,8 +50,8 @@ export type C9ySite = {
   id: string;
   label: string;
   /** Its agreed product code, and whether it is agreed or proposed. */
-  code: string;
-  codeStatus: 'agreed' | 'proposed';
+  code?: string;
+  codeStatus?: 'agreed' | 'proposed';
   /** Its IDv1 site code on the platform. */
   siteCode: string;
   /** Live addresses, first the one people use. */
@@ -59,7 +59,7 @@ export type C9ySite = {
   /** Its folder in the studio, absolute. */
   folder: string;
   /** Its node in 0001's System map. */
-  systemNode: string;
+  systemNode?: string;
   summary: string;
 };
 
