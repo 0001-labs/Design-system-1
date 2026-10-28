@@ -87,7 +87,8 @@ export class NativeSiteController {
   private active(){return !this.disposed&&!this.frame.closest('[hidden]')&&this.frame.getBoundingClientRect().width>0;}
   private enabled(){return this.active()&&!this.surface.contextActive;}
   private scale(element:HTMLElement){return Number.parseFloat(this.view.getComputedStyle(element).getPropertyValue('--sf'))||1;}
-  private select(value:Set<string>){this.selection=value;this.surface?.paintSelection();if(this.sort&&!this.sort.isDragging())this.bindSort();this.refresh();}
+  private groupDrag?:string;
+  private select(value:Set<string>,groupDrag?:string){const previous=this.groupDrag;this.groupDrag=groupDrag;this.selection=value;this.surface?.paintSelection();if(this.sort&&!this.sort.isDragging()&&(previous||groupDrag))this.bindSort();this.refresh();}
   /*
    * Sections. A section is one block of the page: `nativeEntries` lists it once, and the primitives it
    * expands to are found by their derived ids and edited through the section's fields and slots. A hero
@@ -211,7 +212,7 @@ export class NativeSiteController {
   /** Literal words belong to their visible block. Direction-aware dragging keeps ordinary text selection; layout containers share a drop type so nesting never traps a block. */
   private bindSort(){
     const entries=nativeEntries(this.state.document);
-    const draggable=(id:string)=>{const block=entries.get(id)?.block,element=this.elements.get(id);return !!block&&!!element&&!block.hidden&&block.kind!=='text'&&![...this.selection].some(selected=>selected!==id&&this.elements.get(selected)?.contains(element))&&!(block.kind==='component'&&['inline','contents','none'].includes(this.view.getComputedStyle(element).display));};
+    const draggable=(id:string)=>{const block=entries.get(id)?.block,element=this.elements.get(id);return !!block&&!!element&&!block.hidden&&block.kind!=='text'&&!(this.groupDrag&&this.groupDrag!==id&&this.elements.get(this.groupDrag)?.contains(element))&&!(block.kind==='component'&&['inline','contents','none'].includes(this.view.getComputedStyle(element).display));};
     const parentOf=(id:string)=>entries.get(id)?.parent??(this.items.has(id)?`items:${this.items.get(id)!.section}`:undefined);
     for(const[id,item]of this.sorts)if(parentOf(id)!==item.parent||this.elements.get(id)!==item.element||entries.has(id)&&!draggable(id)){item.dispose();this.sorts.delete(id);}
     const parents=new Map<string,{element:HTMLElement;axis:'horizontal'|'vertical';type:string;label:string}>([['page',{element:this.root,axis:'vertical',type:'native-block',label:'Page'}]]);
@@ -222,7 +223,8 @@ export class NativeSiteController {
     }
     for(const[id,item]of this.containers)if(!parents.has(id)||parents.get(id)!.axis!==item.axis||parents.get(id)!.element!==item.element){item.dispose();this.containers.delete(id);}
     for(const[id,parent]of parents)if(!this.containers.has(id))this.containers.set(id,{axis:parent.axis,element:parent.element,dispose:this.sort.container({id,type:parent.type,element:parent.element,axis:parent.axis,label:parent.label,isDropDisabled:()=>!!this.carried&&(id===this.carried.id||!!this.elements.get(this.carried.id)?.contains(parent.element))})});
-    const canDrag=({target}:{target:Element|null})=>this.enabled()&&!this.root.hasAttribute('data-pointer-additive')&&!!target&&!target.closest('[data-editor-chrome],input,textarea,select,summary');
+    // A deliberate canvas press outranks passive hover controls; the controls themselves never start a drag.
+    const canDrag=({target}:{target:Element|null})=>this.active()&&!this.root.hasAttribute('data-pointer-additive')&&!!target&&!target.closest('[data-editor-chrome],.aa-controls,.aa-menu,.aa-sheet,ds-context,input,textarea,select,summary');
     for(const[id,entry]of entries)if(draggable(id)&&!this.sorts.has(id)){const element=this.elements.get(id)!,writing=entry.block.kind==='component'||entry.block.kind==='link'||entry.block.kind==='content';this.sorts.set(id,{parent:entry.parent,element,dispose:this.sort.item({id,type:'native-block',element,label:label(entry.block),canDrag:by=>canDrag(by)&&(writing||this.selection.has(id)||!by.target?.closest('aa-editor,[contenteditable],button,a'))&&!(entry.block.kind==='content'&&parseBlocks((nativeEntries(this.state.document).get(id)?.block as NativeContent)?.source??'').length>1&&by.target?.closest('aa-editor')),allowInteractive:true,...(writing?{text:{hold:()=>400,axis:'y' as const}}:{})})});}
     for(const[id,item]of this.items){const element=this.elements.get(id),type=`items:${item.section}`;if(!element||this.sorts.has(id)||!parents.has(type))continue;const section=this.sectionAt(item.section)!;this.sorts.set(id,{parent:type,element,dispose:this.sort.item({id,type,element,label:itemLabel(section.kind),canDrag})});}
   }
@@ -307,7 +309,7 @@ export class NativeSiteController {
     if(block?.kind==='image')action('Choose image',()=>{void this.chooseImage(this.elements.get(id)!).then(image=>{if(image)this.patch(id,image);});},{keep:true});
     if(block?.kind==='link'){action('Default button',()=>this.patch(id,{appearance:'default'}));appendSurfaceOptions(menu,'button',patch=>this.patch(id,patch));const controls=createButtonActionControls(document,{kind:'link',target:block.href},()=>true,next=>{if(next)this.patch(id,{href:next.target});},{allowNone:false});menu.append(controls.element);this.menuDispose=controls.dispose;}
     if(section){appendSectionFields(menu,()=>this.sectionAt(section.id),patch=>this.updateSection(section.id,value=>({...value,...patch} as NativeSection)));const slot=itemsSlot(section.kind);if(slot){this.rule(menu);action(`Add ${itemLabel(section.kind).toLowerCase()}`,()=>this.state.commit(addSectionItem(this.state.document,section.id,this.state.snapshot.images,uid)),{disabled:sectionItemCount(section)>=(slot.definition.max??100)});}}
-    if(block&&entries.has(id)){this.rule(menu);const parent=entries.get(id)!.parent;if(parent!=='page')action('Select parent',()=>this.select(new Set([parent])));action('Move up',()=>{const entry=nativeEntries(this.state.document).get(id);if(entry)this.moveBy(id,-1);});action('Move down',()=>{const entry=nativeEntries(this.state.document).get(id);if(entry)this.moveBy(id,1);});action(block.hidden?'Show':'Hide',()=>this.patch(id,{hidden:!block.hidden}));if(section)action('Remove',()=>this.remove(id),{danger:true});}
+    if(block&&entries.has(id)){this.rule(menu);const parent=entries.get(id)!.parent;if(parent!=='page')action('Select parent',()=>this.select(new Set([parent]),parent));action('Move up',()=>{const entry=nativeEntries(this.state.document).get(id);if(entry)this.moveBy(id,-1);});action('Move down',()=>{const entry=nativeEntries(this.state.document).get(id);if(entry)this.moveBy(id,1);});action(block.hidden?'Show':'Hide',()=>this.patch(id,{hidden:!block.hidden}));if(section)action('Remove',()=>this.remove(id),{danger:true});}
     for(const[hidden,{block}]of entries)if(block.hidden)action(`Show ${label(block)}`,()=>this.patch(hidden,{hidden:false}));
     if(this.state.canUndo)action('Undo',()=>this.state.undo());if(this.state.canRedo)action('Redo',()=>this.state.redo());
     document.body.append(menu);menu.openOver({left:x,right:x,top:y,bottom:y,width:0,height:0});
