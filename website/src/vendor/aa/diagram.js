@@ -221,6 +221,7 @@ var ee = "<svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" xm
 	"Edit comment": "Redigér kommentar",
 	"Edit link": "Redigér link",
 	Edited: "Redigeret",
+	Internal: "Intern",
 	Editing: "Redigerer",
 	Equation: "Ligning",
 	Find: "Find",
