@@ -3,7 +3,7 @@ import type {NativeBlock,NativeComponent,NativePageDocument} from './consistency
 interface EarlierLayout {schema:1;nodes:Record<string,Record<string,unknown>>;order:Record<string,string[]>;groups?:{id:string;kind:'flow'|'columns'|'column'}[];insertions?:{id:string;parent:string;before?:string;kind:string;text?:string;source?:string;gaps?:Record<string,number>;src?:string;alt?:string;href?:string}[];pageTone?:string}
 export function importEarlierLayout(document:NativePageDocument,sourceIds:Record<string,string>,input:unknown):NativePageDocument {
  const layout=input as EarlierLayout;if(!layout||layout.schema!==1||!layout.nodes||!layout.order)throw Error('invalid-earlier-layout');
- const page=structuredClone(document),nodes=new Map<string,NativeBlock>(),aliases={...sourceIds,root:'page'};
+ const page=structuredClone(document),nodes=new Map<string,NativeBlock>(),aliases:Record<string,string>={...sourceIds,root:'page'};
  const walk=(blocks:NativeBlock[])=>{for(const block of blocks){nodes.set(block.id,block);if('children'in block)walk(block.children);}};walk(page.blocks);
  const id=(value:string)=>{const found=aliases[value]??(nodes.has(value)?value:undefined);if(!found)throw Error(`missing-migration-node: ${value}`);return found;};
  const uid=(value:string)=>`imported_${value.replace(/[^a-zA-Z0-9_-]/g,'_')}`.slice(0,80);

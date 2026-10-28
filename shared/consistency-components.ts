@@ -25,7 +25,7 @@ export function componentMarkup(id: string, name: string, children: string, valu
   const classes=new Set((attributes.class??'').split(/\s+/).filter(Boolean));for(const[key,enabled]of Object.entries(patch.classes))if(enabled)classes.add(key);else classes.delete(key);if(classes.size||attributes.class)attributes.class=[...classes].join(' ');
   if (hidden) attributes.hidden = '';
   if (Object.keys(styles).length) attributes.style = (attributes.style ? attributes.style+';' : '')+Object.entries(styles).map(([key,value])=>`${key}:${value}`).join(';');
-  if (definition.properties || Object.keys(words).length) attributes['data-c9y-component-data'] = JSON.stringify({properties:definition.properties??{},values,words});
+  if (definition.properties || Object.keys(words).length || Object.keys(styles).length) attributes['data-c9y-component-data'] = JSON.stringify({properties:definition.properties??{},values,words,styles});
   const attrs=Object.entries(attributes).filter(([key])=>!editor||!/^on/i.test(key)&&!['srcdoc','autofocus'].includes(key)).map(([key,value])=>` ${key}="${componentEscape(value)}"`).join('');
   if (definition.markup) {
     // These two immutable assets are generated from repository-owned sources, never saved documents.
