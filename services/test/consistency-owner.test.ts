@@ -71,7 +71,7 @@ it("takes System's code by POST from System only, into a host-only owner cookie,
   const home = await visit('/', { headers: { Cookie: owner! } });
   expect(home.status).toBe(200);
   expect(await home.text()).toContain('data-ds-owner');
-  expect(new URL(assets.mock.calls[0]![0].url).pathname).toBe('/private-consistency/home.html');
+  expect(new URL(assets.mock.calls[0]![0].url).pathname).toBe('/private-consistency/home');
   for (const from of ['https://evil.example', origin]) expect((await visit('/auth/callback', { method: 'POST', headers: { Origin: from }, body: 'code=x&state=y' })).status).toBe(403);
 });
 

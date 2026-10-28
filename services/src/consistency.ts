@@ -174,7 +174,7 @@ export async function consistencyPreview(request: Request, env: ReportsEnv & Wor
     return protect(denied);
   }
   // c9y.site's home lists the sites; the editor lab opens on the page editor itself.
-  if (url.pathname === '/') url.pathname = url.hostname === EDITOR_HOST ? `${prefix}index.html` : `${prefix}home.html`;
+  if (url.pathname === '/') url.pathname = url.hostname === EDITOR_HOST ? `${prefix}index.html` : `${prefix}home`;
   const original = await env.ASSETS.fetch(new Request(url, request));
   const assetCache = /^\/private-consistency\/assets\/[\w.-]+-[\w-]{8,}\.(?:js|css|woff2?|ttf|json)$/.test(url.pathname) ? 'private, max-age=31536000, immutable' : undefined;
   // This marker enables owner-only diagnostics; it grants no server access. Only
