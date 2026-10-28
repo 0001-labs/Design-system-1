@@ -128,10 +128,9 @@ function protect(response: Response, cache?: string): Response {
 export async function consistencyPreview(request: Request, env: ReportsEnv & WorkspaceEnv & { ASSETS: Fetcher }, send: typeof fetch = fetch): Promise<Response> {
   const url = new URL(request.url);
   if (!isConsistencyHost(url.hostname) || url.protocol !== 'https:') return new Response(null, { status: 404, headers: security });
-  // The private filename is an internal asset address; the application lives at the root.
-  if (url.hostname === APP_HOST && /^\/private-consistency\/home(?:\.html|\/)?$/.test(url.pathname) && ['GET', 'HEAD'].includes(request.method)) {
-    url.pathname = '/';
-    return new Response(null, { status: 308, headers: { ...security, Location: url.href } });
+  // Retired public address: only the root serves the signed-in home.
+  if (url.hostname === APP_HOST && /^\/private-consistency\/home(?:\.html|\/)?$/.test(url.pathname)) {
+    return new Response(null, { status: 410, headers: security });
   }
   if (url.hostname === FORMER_EDITOR_HOST) return new Response(null, { status: 301, headers: { ...security, Location: `https://${EDITOR_HOST}${url.pathname}${url.search}` } });
   // c9y.site is where customers' sites live; its home is the app at consistency.site now.

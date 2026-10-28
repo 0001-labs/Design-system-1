@@ -611,8 +611,8 @@ if (PRODUCTION) {
 
   await step("Private hosts", [
     ...["/private-consistency/home", "/private-consistency/home/", "/private-consistency/home.html"].map(path => [
-      `Consistency's former home address ${path} leads to its root`,
-      async () => expectRedirect(await request(`https://consistency.site${path}?open=52OFXF`), 308, "https://consistency.site/?open=52OFXF"),
+      `Consistency's former home address ${path} is gone`,
+      async () => expectStatus(await request(`https://consistency.site${path}?open=52OFXF`), 410),
     ]),
     ...["consistency.site", "c9y.site", "editor.c9y.site", "neweditor.c9y.site"].map(host => [
       `${host} upgrades HTTP with its path and query intact`,
