@@ -6,6 +6,12 @@ Each rule names the test that holds it. While editing a site, a drag that breaks
 
 ## Rules
 
+### `spacing.hit-area`
+
+Resize labels never intercept a neighbouring spacing handle; pointer and keyboard spacing changes persist after reopening.
+
+Held by `tests/soendergaarden-spacing.mjs`: “Søndergården front: pointer increase”.
+
 ### `native.gutters`
 
 Native gallery guides cover only the real whitespace between overlapping tracks or complete rows, including after scrolling; they never cross product content.

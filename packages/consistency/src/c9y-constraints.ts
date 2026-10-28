@@ -22,6 +22,11 @@ export type C9yConstraint = {
 
 export const C9Y_CONSTRAINTS: C9yConstraint[] = [
   {
+    code: 'spacing.hit-area',
+    rule: 'Resize labels never intercept a neighbouring spacing handle; pointer and keyboard spacing changes persist after reopening.',
+    check: { file: 'tests/soendergaarden-spacing.mjs', test: 'Søndergården front: pointer increase' },
+  },
+  {
     code: 'native.gutters',
     rule: 'Native gallery guides cover only the real whitespace between overlapping tracks or complete rows, including after scrolling; they never cross product content.',
     check: { file: 'src/native-page-model.test.ts', test: 'maps two featured and three ordinary gallery items to actual whitespace' },

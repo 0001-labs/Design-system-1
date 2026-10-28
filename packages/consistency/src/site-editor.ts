@@ -18,7 +18,8 @@ import { editKey, failureWords, fieldName, firstPage, isPlainField, isWordsField
 import './site-editor.css';
 import { SiteCompositionController } from './site-composition';
 import type { SiteCompositionSnapshot } from './site-composition-state';
-import { NativeSiteController, type NativePageSnapshot } from './native-site';
+import type { NativePageSnapshot } from './native-site';
+import { ConsistencyPageEditor } from './page-editor';
 
 /** The outlines the editor draws in the framed page: the words that can be edited, and the ones being edited. */
 const FRAME_STYLE = `
@@ -74,10 +75,11 @@ export class ConsistencySiteEditor extends LitElement {
   /** Whether the bar (the page picker, Open the page and the note) stands over the site; Consistency's app has none. */
   picker = true;
   private fields = new Map<string, SiteField>();
-  private composition: SiteCompositionController | NativeSiteController | null = null;
+  private composition: SiteCompositionController | ConsistencyPageEditor | null = null;
   private compositionSnapshot: SiteCompositionSnapshot | null = null;
   private nativeSnapshot: NativePageSnapshot | null = null;
   private images: string[] = [];
+  private readonly pageEditor = new ConsistencyPageEditor();
   private readonly beforeUnload = (event: BeforeUnloadEvent) => { if (this.composition?.pending || this.editing && (this.editing.saving || this.editing.markdown !== this.editing.field.markdown)) { event.preventDefault(); event.returnValue = ''; } };
   private editing: Editing | null = null;
   private opening = 0;
@@ -93,6 +95,8 @@ export class ConsistencySiteEditor extends LitElement {
     // Scripts never run in the page and its forms never send: only the editor reaches into it.
     this.frame.setAttribute('sandbox', 'allow-same-origin');
     this.frame.addEventListener('load', () => this.wire());
+    this.pageEditor.addEventListener('page-ready', event => this.wireNative((event as CustomEvent<{frame:HTMLIFrameElement}>).detail.frame));
+    this.pageEditor.addEventListener('page-reopen', () => { if (this.path && this.compositionRetry++ < 1) void this.open(this.path, true); else this.problem = 'This page is being published. Open it again in a moment.'; });
   }
   createRenderRoot() { return this; }
 
@@ -152,8 +156,8 @@ export class ConsistencySiteEditor extends LitElement {
         this.composition?.destroy(); this.composition = null;
         this.compositionSnapshot = null; this.nativeSnapshot = native;
         this.notice = ''; this.fields.clear(); this.path = native.path; this.problem = '';
-        this.frame.title = `${native.document.title || native.path}, to edit`;
-        this.frame.src = siteAddress.document(this.site.code,native.path);
+        this.composition = this.pageEditor;
+        void this.pageEditor.open(native, payload => request<NativePageSnapshot>(siteAddress.nativePage(this.site.code,path), {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}), {url:siteAddress.document(this.site.code,native.path)});
         return true;
       }
       this.kind = 'html';
@@ -194,24 +198,6 @@ export class ConsistencySiteEditor extends LitElement {
       return;
     }
     this.frame.hidden = false;
-    if (this.nativeSnapshot) {
-      const path = this.path;
-      this.composition?.destroy();
-      this.composition = new NativeSiteController(this.frame,this.nativeSnapshot,payload => request<NativePageSnapshot>(siteAddress.nativePage(this.site.code,path), {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}),()=>void this.open(path));
-      const press = (event: MouseEvent) => {
-        const target = event.target as Element;
-        if (event.defaultPrevented || target.closest('aa-editor,[contenteditable],[data-editor-chrome]')) return;
-        const link = target.closest<HTMLAnchorElement>('a[href]');
-        if (!link && target.closest('summary')) return;
-        event.preventDefault();
-        const action = pressAction({inEditing:false,field:false,link:link?{href:new URL(link.getAttribute('href') ?? '',this.origin).href}:null,mod:event.metaKey||event.ctrlKey},{origins:this.origins,paths:(this.pages??[]).map(page=>page.path)});
-        if (action.do === 'go') void this.go(action.path);
-      };
-      const hold = (event: Event) => event.preventDefault();
-      doc.addEventListener('click',press,true);doc.addEventListener('auxclick',hold,true);doc.addEventListener('submit',hold,true);
-      this.detach=()=>{doc.removeEventListener('click',press,true);doc.removeEventListener('auxclick',hold,true);doc.removeEventListener('submit',hold,true);};
-      return;
-    }
     const dark = document.documentElement.classList.contains('dark-theme') || (!document.documentElement.classList.contains('light-theme') && matchMedia('(prefers-color-scheme: dark)').matches);
     // The page's own head script set its theme before; the editor sets it now, as the editor's.
     doc.documentElement.classList.add(dark ? 'dark-theme' : 'light-theme');
@@ -240,6 +226,23 @@ export class ConsistencySiteEditor extends LitElement {
       doc.removeEventListener('click', press, true); doc.removeEventListener('auxclick', hold, true);
       doc.removeEventListener('submit', hold, true); doc.removeEventListener('keydown', key, true);
     };
+  }
+
+  private wireNative(frame: HTMLIFrameElement) {
+    this.detach?.(); this.detach = null;
+    const doc = frame.contentDocument!;
+    const press = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (event.defaultPrevented || target.closest('aa-editor,[contenteditable],[data-editor-chrome]')) return;
+      const link = target.closest<HTMLAnchorElement>('a[href]');
+      if (!link && target.closest('summary')) return;
+      event.preventDefault();
+      const action = pressAction({inEditing:false,field:false,link:link?{href:new URL(link.getAttribute('href') ?? '',this.origin).href}:null,mod:event.metaKey||event.ctrlKey},{origins:this.origins,paths:(this.pages??[]).map(page=>page.path)});
+      if (action.do === 'go') void this.go(action.path);
+    };
+    const hold = (event: Event) => event.preventDefault();
+    doc.addEventListener('click',press,true);doc.addEventListener('auxclick',hold,true);doc.addEventListener('submit',hold,true);
+    this.detach=()=>{doc.removeEventListener('click',press,true);doc.removeEventListener('auxclick',hold,true);doc.removeEventListener('submit',hold,true);};
   }
 
   private press(event: MouseEvent, doc: Document) {
@@ -441,7 +444,7 @@ export class ConsistencySiteEditor extends LitElement {
       ${this.notice ? html`<ds-message literal text=${this.notice}></ds-message>` : nothing}
       ${this.problem ? html`<ds-message tone="danger" literal text=${this.problem}></ds-message>` : nothing}
       ${this.pages && !this.pages.length ? html`<ds-empty literal heading="No pages" text="This site has no pages with words to edit yet."></ds-empty>` : nothing}
-      <div class="consistency-site-stage" ?hidden=${!this.path}>${this.frame}</div>`;
+      <div class="consistency-site-stage" ?hidden=${!this.path}>${this.nativeSnapshot ? this.pageEditor : this.frame}</div>`;
   }
 }
 customElements.define('consistency-site-editor', ConsistencySiteEditor);

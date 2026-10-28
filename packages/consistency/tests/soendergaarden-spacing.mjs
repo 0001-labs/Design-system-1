@@ -1,0 +1,45 @@
+import { chromium } from 'playwright';
+import { readFile } from 'node:fs/promises';
+import { nativePageFixture } from './native-page-fixture.mjs';
+const root = new URL('../../../../Clients/Soendergaarden/', import.meta.url);
+const build = JSON.parse(await readFile(new URL('dist/native/pages.json',root),'utf8'));
+const home = build.pages['/'];
+const styles = await readFile(new URL('web/src/style.css',root),'utf8');
+const fixture = await nativePageFixture({definition:{document:home.document,images:home.images,bindings:{},collections:{},allowedRuntimes:home.allowedRuntimes},styles});
+const browser = await chromium.launch({headless:true});
+const check=(ok,message)=>{if(!ok)throw new Error(message);};
+const until=async(test,message)=>{const end=Date.now()+8000;while(!await test()){if(Date.now()>end)throw new Error(message);await new Promise(r=>setTimeout(r,40));}};
+try {
+ const page=await browser.newPage({viewport:{width:1440,height:1000}});const errors=[];page.on('pageerror',e=>errors.push(e.message));await fixture.route(page);await page.goto(fixture.url);
+ const frame=page.frameLocator('.consistency-site-frame');await frame.locator('[data-c9y-native-root][data-editor-surface]').waitFor();
+ const main=()=>fixture.read().then(x=>x.document.blocks.find(b=>b.id==='site-main'));
+ const gap=frame.locator('[data-spacing-key="site-main:gap:0"]');
+ await gap.scrollIntoViewIfNeeded();
+ const before=(await main()).gap;
+ const pictureBefore=JSON.stringify((await main()).children.find(b=>b.id==='home-picture'));
+ const box=await gap.boundingBox();check(box&&box.width>0&&box.height>0,'The front-page gap has no pointer target');
+ const input=await page.context().newCDPSession(page);
+ const drag=async(box,delta)=>{
+  const x=box.x+box.width/2,y=box.y+box.height/2;
+  await input.send('Input.dispatchMouseEvent',{type:'mouseMoved',x,y});
+  await input.send('Input.dispatchMouseEvent',{type:'mousePressed',x,y,button:'left',buttons:1,clickCount:1});
+  for(let i=1;i<=8;i++)await input.send('Input.dispatchMouseEvent',{type:'mouseMoved',x,y:y+delta*i/8,buttons:1});
+  await input.send('Input.dispatchMouseEvent',{type:'mouseReleased',x,y:y+delta,button:'left',buttons:0,clickCount:1});
+ };
+ await drag(box,20);
+ await until(async()=>(await main()).gap>before,'Dragging the front-page gap did not increase spacing');
+ const increased=(await main()).gap;await drag(await gap.boundingBox(),-10);
+ await until(async()=>(await main()).gap<increased,'Dragging the front-page gap did not decrease spacing');
+ await gap.focus();await gap.press('ArrowDown');await until(async()=>(await main()).gap===before,'Keyboard decrease did not restore the original spacing');
+ const words=frame.locator('[data-c9y-block="home-text"]');
+ const internal=words.locator('[data-spacing-key]').first();check(await internal.count()>0,'The heading-to-writing gap has no spacing handle');
+ const initial=Number(await internal.getAttribute('aria-valuenow'));await internal.focus();await internal.press('ArrowUp');
+ await until(async()=>{const b=(await main()).children.find(b=>b.id==='home-text');return Object.values(b.gaps??{}).some(value=>value>initial);},'The space inside the writing did not increase');
+ check(JSON.stringify((await main()).children.find(b=>b.id==='home-picture'))===pictureBefore,'Spacing changed the image size');
+ const saved=await fixture.read();await input.detach();await page.reload();await frame.locator('[data-c9y-native-root][data-editor-surface]').waitFor();
+ await until(async()=>Number(await gap.getAttribute('aria-valuenow'))===before,'Reopened layout lost the saved gap');
+ await until(async()=>Number(await internal.getAttribute('aria-valuenow'))===initial+20,'Reopened writing lost the saved gap');
+ check(JSON.stringify((await fixture.read()).document)===JSON.stringify(saved.document),'Reopening changed the saved spacing');
+ check(errors.length===0,errors.join('\n'));
+ console.log('Søndergården front: pointer increase/decrease, keyboard decrease, writing gap and reopened document pass');
+}finally{await browser.close();await fixture.close();}

@@ -31,7 +31,7 @@ const components: C9yComponent[] = [
     adds: ['the page’s width, padding and gap as whole squares', 'never hidden, placed or moved', 'new blocks inserted into it', 'a native page document validated against the site’s images, bindings and runtimes', 'the page’s tone'],
     systems: ['Site engine compositions', 'Platform native pages'],
     realisedAs: [{ as: 'editor-block', kind: 'root' }, { as: 'engine', part: 'compositions' }],
-    source: [DS1('shared/consistency-native-page.ts'), APP('site-composition.ts'), PLATFORM('worker/site-composition.ts'), PLATFORM('worker/site-native.ts'), ENGINE('worker/compositions.ts')],
+    source: [DS1('shared/consistency-native-page.ts'), APP('page-editor.ts'), APP('native-site.ts'), APP('site-composition.ts'), PLATFORM('worker/site-composition.ts'), PLATFORM('worker/site-native.ts'), ENGINE('worker/compositions.ts')],
     uses: ['c9y-layout'],
   },
   {

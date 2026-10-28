@@ -121,10 +121,11 @@ export function bindResizeEdges(target: HTMLElement, options: ResizeTargetOption
   const disposers: (() => void)[] = [], edges: HTMLElement[] = [];
     for (const axis of options.axes ?? (box ? ['width', 'height'] as const : ['width'] as const)) {
       const edge = target.ownerDocument.createElement('span'); edge.className = `consistency-resize-edge consistency-resize-${axis}`; edge.contentEditable = 'false'; edge.setAttribute('data-aa-interactive', ''); edge.setAttribute('role', 'slider'); edge.setAttribute('aria-label', `${name} ${axis}`); edge.setAttribute('aria-orientation', axis === 'width' ? 'horizontal' : 'vertical'); edge.setAttribute('aria-valuemin', carousel ? '160' : '80'); edge.setAttribute('aria-valuemax', carousel && axis === 'height' ? '1200' : '2000'); host.append(edge); edges.push(edge);
+      const measure = target.ownerDocument.createElement('span'); measure.style.pointerEvents = 'none'; measure.setAttribute('aria-hidden', 'true'); edge.append(measure);
             const paint = (value: number) => {
         if (box) paintSize({ ...size(), [axis]: Math.max(value, axis === 'width' ? minimumWidth() : minimumHeight()) });
         else paintSize({ ...size(), width: value });
-        edge.textContent = String(Math.round(size()[axis])); edge.setAttribute('aria-valuenow', String(Math.round(size()[axis]))); edge.setAttribute('aria-valuetext', `${Math.round(size()[axis])} pixels`);
+        measure.textContent = String(Math.round(size()[axis])); edge.setAttribute('aria-valuenow', String(Math.round(size()[axis]))); edge.setAttribute('aria-valuetext', `${Math.round(size()[axis])} pixels`);
       };
       disposers.push(bindSpacingHandle(edge, () => ({ value: size()[axis], min: box ? axis === 'width' ? minWidth : minimumHeight() : 80, max: axis === 'width' ? maxWidth() : carousel ? 1200 : 2000, step: 20, shiftStep: 100, axis: axis === 'width' ? 'horizontal' : 'vertical', gain: 1 / (Number.parseFloat(getComputedStyle(target).getPropertyValue('--sf')) || 1), disabled: !options.enabled(),
         onPointerStart: () => { (target.ownerDocument.activeElement as HTMLElement | null)?.blur?.(); },
@@ -140,7 +141,7 @@ export function bindResizeEdges(target: HTMLElement, options: ResizeTargetOption
         },
         onEnd: cancelled => { edge.removeAttribute('data-resize-active'); end(cancelled); },
       })));
-      edge.textContent = String(Math.round(size()[axis])); edge.setAttribute('aria-valuenow', String(Math.round(size()[axis])));
+      measure.textContent = String(Math.round(size()[axis])); edge.setAttribute('aria-valuenow', String(Math.round(size()[axis])));
     }
     if (options.axes && !options.axes.includes('width')) return { edges, dispose: () => { disposers.forEach(dispose => dispose()); edges.forEach(edge => edge.remove()); } };
     const corner = target.ownerDocument.createElement('span'); corner.className = 'consistency-resize-edge consistency-resize-corner'; corner.contentEditable = 'false'; corner.setAttribute('data-aa-interactive', ''); corner.setAttribute('role', 'button'); corner.setAttribute('aria-label', `${name} size`); host.append(corner); edges.push(corner);
