@@ -102,6 +102,19 @@ This prevents:
 - Pinch-to-zoom
 - Ctrl/Cmd + scroll wheel zoom
 
+## Page travel
+
+A page travels the way it is going, and never twice.
+
+On a phone or a tablet a page change inside one document slides the whole page in one view transition: onward in from the right, back out to the right, 240ms on an ease-out curve in `transform` alone. A computer keeps the browser's plain crossfade, however narrow its window, and reduced motion swaps the page in place.
+
+A swipe from the screen's edge is the browser's own animation: Safari slides the page arriving in under the finger. The page never plays a second animation over it. A transition started after the swipe captures the page just left and slides or fades it over the one the swipe has already shown, a flash of where the person came from, which the browser's own Back and Forward buttons never cause.
+
+- **Inside one document**, a `popstate` whose `hasUAVisualTransition` is true draws the route plainly: no `startViewTransition`, neither the slide nor the crossfade, and a transition still running is retired with `skipTransition()` first, so its old snapshot cannot flash either. A route that prepares its data before it is drawn draws plainly too, once prepared.
+- **Between documents** no event reports the swipe ([whatwg/html#10831](https://github.com/whatwg/html/issues/10831)), so the page notes a touch that begins within a square of either edge. A `pageswap` within 1.5 seconds of it, on a `traverse`, skips its transition and leaves the note in session storage; the document arriving skips its `pagereveal` transition on the note and spends it at once (15 seconds at most). A tap at the edge that follows a link is a `push` and still slides.
+
+Back and Forward in the browser's own controls animate nothing themselves, so they keep the page's slide.
+
 ## Integration with Scaling
 
 Device detection and scaling are unified: this module puts the scale on the page with the scaling module's rule, setting `--sf` and `data-mobile` on the root and emitting `scaling-changed`. A computer always uses `--sf: 1`, however narrow its window, while phones and tablets calculate a scaling factor based on the page's width. A page that needs only the scale calls `startScaling()` from the scaling module instead. See [Scaling](/1-root/scaling/) for details.
