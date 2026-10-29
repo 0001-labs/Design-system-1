@@ -21,6 +21,7 @@ export type C9yConstraint = {
 };
 
 export const C9Y_CONSTRAINTS: C9yConstraint[] = [
+  {code:'carousel.imported-row',rule:'Imported carousel tracks keep each authored slide whole and only reorder horizontally, both while carrying and after release.',check:{file:'tests/carousel-imported.mjs',test:'Imported showcase cards stay in one horizontal row'}},
   {code:'emails.templates',rule:'Editable email wording saves automatically with revision checks, keeps newer typing and failed drafts, previews real form placeholders and survives reopening without sending an email.',check:{file:'tests/places-shared.mjs',test:'Enquiry templates save automatically, preserve newer typing and failed drafts, preview fields and reopen'}},
   {code:'carousel.reorder',rule:'Dragging a carousel card by its body or picture reorders the complete card only within its own horizontal row, never moves it vertically or nests it, preserves its contents and saves the order for reopening and publication.',check:{file:'tests/carousel-reorder.mjs',test:'Carousel cards drag horizontally, save and reopen in their new order'}},
   {code:'selection.writing-only',rule:'Browser text selection stays inside the active text editor or input; dragging over the canvas and Select All outside writing never select page text.',check:{file:'tests/text-selection.mjs',test:'Canvas selection stays within active writing'}},
