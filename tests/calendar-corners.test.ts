@@ -4,10 +4,10 @@ import '../DS1/3-unit/ds-calendar';
 import type { Calendar, CalendarEvent } from '../DS1/3-unit/ds-calendar';
 vi.stubGlobal('fetch', vi.fn(async () => new Response('{}')));
 afterEach(() => { document.body.replaceChildren(); });
-async function fixture(events: CalendarEvent[], view = 'month') {
+async function fixture(events: CalendarEvent[], view = 'month', lines = 3) {
   const calendar = document.createElement('ds-calendar') as Calendar;
   calendar.month = '2026-10'; calendar.weekStart = 'monday'; calendar.fixed = true;
-  calendar.outsideDays = true; calendar.lines = 3; calendar.events = events; calendar.view = view;
+  calendar.outsideDays = true; calendar.lines = lines; calendar.events = events; calendar.view = view;
   document.body.append(calendar); await calendar.updateComplete; return calendar;
 }
 const shape = (node: Element) => ['top-start', 'top-end', 'bottom-start', 'bottom-end'].map(corner => node.hasAttribute(`data-round-${corner}`));
@@ -42,4 +42,10 @@ test('Swimlane uses the same exposed-corner rule for stacked bars', async () => 
   const bars = [...calendar.shadowRoot!.querySelectorAll('.swimlane .event')];
   expect(shape(bars[0])).toEqual([true, true, false, false]);
   expect(shape(bars[1])).toEqual([false, false, true, true]);
+});
+
+test('an overflow break stays square and the event resumes without a false rounded start', async () => {
+  const calendar = await fixture([{ title: 'Long', start: '2026-10-05', end: '2026-10-07' }, { title: 'Crowded', start: '2026-10-06' }], 'month', 1);
+  expect(shape(event(calendar, '2026-10-05', 'Long'))).toEqual([true, false, true, false]);
+  expect(shape(event(calendar, '2026-10-07', 'Long'))).toEqual([false, true, false, true]);
 });

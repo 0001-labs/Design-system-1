@@ -24,14 +24,20 @@ for (const [name, engine] of [['Chromium', chromium], ['WebKit', webkit]] as con
       const bars = [...calendar.shadowRoot.querySelectorAll('[data-day="2026-10-05"] .event')] as HTMLElement[];
       const corners = (node: HTMLElement) => { const s = getComputedStyle(node); return [s.borderTopLeftRadius, s.borderTopRightRadius, s.borderBottomLeftRadius, s.borderBottomRightRadius].map(parseFloat); };
       const stacked = bars.map(corners);
+      const grid = calendar.shadowRoot.querySelector('.grid');
+      const frameStyle = getComputedStyle(grid, '::after');
+      const layers = { frame: Number(frameStyle.zIndex), event: Number(getComputedStyle(bars[0]).zIndex), pointer: frameStyle.pointerEvents, inset: frameStyle.top };
       const frame = parseFloat(getComputedStyle(calendar.shadowRoot.querySelector('.weekdays + .week .day:first-child')).borderTopLeftRadius);
       calendar.style.setProperty('--ds-radius', '0px');
       const square = bars.map(corners);
-      return { stacked, square, frame };
+      return { stacked, square, frame, layers };
     });
     expect(result.stacked).toEqual([[4, 4, 0, 0], [0, 0, 4, 4]]);
     expect(result.square).toEqual([[0, 0, 0, 0], [0, 0, 0, 0]]);
     expect(result.frame).toBeGreaterThan(0);
+    expect(result.layers.frame).toBeGreaterThan(result.layers.event);
+    expect(result.layers.pointer).toBe('none');
+    expect(result.layers.inset).toBe('-0.5px');
     await page.close();
   } finally { await browser.close(); }
 }, 30_000);

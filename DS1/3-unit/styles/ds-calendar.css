@@ -276,8 +276,9 @@
   content: "";
   pointer-events: none;
 }
-.day:nth-child(7)::after { border-inline-end: var(--ds-calendar-line); }
-.week:last-child .day::after { border-block-end: var(--ds-calendar-line); }
+/* The outer frame owns these strokes, so translucent lines are painted once. */
+.day:first-child::after { border-inline-start: 0; }
+.weekdays + .week .day::after { border-block-start: 0; }
 /* The month's frame has a card's rounded corners, as a framed table does: the
  * four corner days round their box, its hairlines and whatever fills it. */
 .weekdays + .week .day:first-child,
@@ -695,8 +696,8 @@
   content: "";
   pointer-events: none;
 }
-.swimlane-grid .cell[data-last-column]::after { border-inline-end: var(--ds-calendar-line); }
-.swimlane-grid .cell[data-last-row]::after { border-block-end: var(--ds-calendar-line); }
+.swimlane-grid .cell[data-first-column]::after { border-inline-start: 0; }
+.swimlane-grid .cell[data-first-row]::after { border-block-start: 0; }
 .swimlane-grid .cell[data-first-row][data-first-column]::after { border-start-start-radius: var(--ds-calendar-radius); }
 .swimlane-grid .cell[data-first-row][data-last-column]::after { border-start-end-radius: var(--ds-calendar-radius); }
 .swimlane-grid .cell[data-last-row][data-first-column]::after { border-end-start-radius: var(--ds-calendar-radius); }
@@ -815,4 +816,18 @@
 .month-neighbour > ds-calendar { display: block; }
 @media (prefers-reduced-motion: reduce) {
   .month-track { transition: none !important; }
+}
+
+/* The frame stays above event fills; internal grid lines remain below spanning bars. */
+:host(:not([compact])) .grid,
+.swimlane-grid { position: relative; isolation: isolate; }
+:host(:not([compact])) .grid::after,
+.swimlane-grid::after {
+  content: "";
+  position: absolute;
+  inset: -0.5px;
+  border: var(--ds-calendar-line);
+  border-radius: var(--ds-calendar-radius);
+  z-index: 2;
+  pointer-events: none;
 }

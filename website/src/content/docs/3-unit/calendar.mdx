@@ -220,7 +220,7 @@ A name in the list that the calendar does not draw is the page's own view. Chose
 </script>
 ```
 
-Event fills round only their exposed start and end corners, using the system’s corner radius. Touching bars and vertically stacked events share square seams; staggered stacks keep only their free corners rounded. A continuation clipped by a week, hidden date or the visible timeline remains square, so it does not look like the event ends there. The rule is the same in a month and Swimlane, and follows the chosen square/rounded shape.
+Event fills round only their exposed start and end corners, using the system’s corner radius. Touching bars and vertically stacked events share square seams; staggered stacks keep only their free corners rounded. A continuation clipped by a week, hidden date or the visible timeline remains square, so it does not look like the event ends there. The rule is the same in a month and Swimlane, and follows the chosen square/rounded shape. The outer frame is painted above event fills, while internal day lines remain behind spanning bars; changing this layer does not move the grid or the events.
 
 ## Swimlane
 
