@@ -78,6 +78,7 @@ export class Carousel extends LitElement {
     current: { type: Number, reflect: true },
     buttons: { type: Boolean, reflect: true },
     noDots: { type: Boolean, reflect: true, attribute: "no-dots" },
+    noDrag: { type: Boolean, reflect: true, attribute: "no-drag" },
     end: { type: Boolean, reflect: true },
     // A number of squares, or "auto" for slides of their own width.
     slideWidth: { attribute: "slide-width", reflect: true, converter: {
@@ -101,6 +102,7 @@ export class Carousel extends LitElement {
   declare current: number;
   declare buttons: boolean;
   declare noDots: boolean;
+  declare noDrag: boolean;
   declare end: boolean;
   declare slideWidth: number | string | undefined;
   declare gap: number | undefined;
@@ -132,6 +134,7 @@ export class Carousel extends LitElement {
     this.current = 0;
     this.buttons = false;
     this.noDots = false;
+    this.noDrag = false;
     this.end = false;
     this.bleed = "none";
     this.loop = false;
@@ -169,6 +172,7 @@ export class Carousel extends LitElement {
 
   private startDrag() {
     const track = this.track;
+    if (this.noDrag) { this.undrag?.(); this.undrag = undefined; return; }
     if (track && !this.undrag) this.undrag = dragTrack(track, () => { if (!this.loop) this.move(nearestSlide(track, this.slides, this.index)); });
   }
 
@@ -245,6 +249,7 @@ export class Carousel extends LitElement {
 
   protected updated(changed: PropertyValues<this>) {
     super.updated(changed);
+    if (changed.has("noDrag")) this.startDrag();
     if (this.loop) return;
     if (changed.has("current")) {
       if (this.moving) { this.moving = false; return; }

@@ -397,3 +397,14 @@ test("only a carousel scrolls sideways: a plain box that scrolls sideways breaks
   expect(track).toContain("overflow-x: auto");
   expect(track).toContain("scroll-snap-type: x mandatory");
 });
+
+test('caller-owned dragging disables and releases the native pan handler', async () => {
+  document.body.innerHTML='<ds-carousel no-drag><div>A</div><div>B</div></ds-carousel>';
+  const host=document.querySelector('ds-carousel') as Carousel;await settle(host);
+  const track=host.shadowRoot!.querySelector<HTMLElement>('[part="track"]')!;
+  const pointer=(type:string,x:number)=>track.dispatchEvent(new PointerEvent(type,{pointerId:7,pointerType:'mouse',isPrimary:true,button:0,clientX:x,bubbles:true}));
+  pointer('pointerdown',200);pointer('pointermove',150);expect(track.scrollLeft).toBe(0);
+  host.noDrag=false;await settle(host);pointer('pointerdown',200);pointer('pointermove',150);expect(track.scrollLeft).toBe(50);
+  host.noDrag=true;await settle(host);pointer('pointermove',100);expect(track.scrollLeft).toBe(50);
+  expect(track.hasAttribute('data-dragging')).toBe(false);
+});
