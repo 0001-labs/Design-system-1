@@ -75,7 +75,7 @@ export class ConsistencyPageEditor extends LitElement {
   }
   private async mount() {
     const opening = this.generation;
-    if(this.frame.contentDocument){await prepareComponents(this.frame.contentDocument.body);if(opening!==this.generation)return;await componentsReady(upgradeComponentTree(this.frame.contentDocument.body,this.assetURL));}
+    if(this.frame.contentDocument){await prepareComponents(this.frame.contentDocument.body);if(opening!==this.generation)return;await componentsReady(upgradeComponentTree(this.frame.contentDocument.body,this.assetURL,true));}
     if(opening!==this.generation)return;
     if (!this.snapshot || !this.save || !this.isConnected) return;
     if(this.snapshot&&this.frame.contentDocument)for(const[key,value]of Object.entries(nativePageRootStyles(this.snapshot.document)))this.frame.contentDocument.body.style.setProperty(key,value,'important');

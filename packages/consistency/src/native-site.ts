@@ -126,7 +126,7 @@ export class NativeSiteController {
   private changed(){if(this.disposed)return;this.host.changed?.();if(this.busy||this.writing()){this.status();return;}this.index();this.reconcile();this.paintMeasures();this.bindSort();this.bindResizers();this.refresh();this.status();void this.bindComponentFields();}
   private surfaceFor(element:HTMLElement,id:string,read:()=>NativeContent|{source:string},commit:(value:{source:string;gaps?:Record<string,number>})=>void){let content=this.content.get(id);if(!content){content=new NativeContentSurface(element,id,{read,commit,undo:()=>{const ok=this.state.canUndo;this.state.undo();return ok;},redo:()=>{const ok=this.state.canRedo;this.state.redo();return ok;},enabled:()=>this.enabled(),select:()=>{},media:{chooseImage:anchor=>this.chooseImage(anchor)},imageURL:this.imageURL,error:message=>{this.error=message;this.status();}});this.content.set(id,content);}content.refresh();}
   private forget(id:string){for(const[key,field]of this.componentFields)if(field.block===id){field.editor.destroy();this.componentFields.delete(key);}this.content.get(id)?.destroy();this.content.delete(id);this.resizers.get(id)?.dispose();this.resizers.delete(id);this.resizeTargets.delete(id);this.elements.delete(id);}
-  private render(block:NativeBlock){const template=this.doc.createElement('template');template.innerHTML=renderNativeBlock(block,{images:this.state.snapshot.images,collections:this.state.snapshot.collections,editor:true,components:this.state.snapshot.components});upgradeComponentTree(template.content,this.assetURL);return template.content.firstElementChild as HTMLElement;}
+  private render(block:NativeBlock){const template=this.doc.createElement('template');template.innerHTML=renderNativeBlock(block,{images:this.state.snapshot.images,collections:this.state.snapshot.collections,editor:true,components:this.state.snapshot.components});upgradeComponentTree(template.content,this.assetURL,true);return template.content.firstElementChild as HTMLElement;}
   private reconcile(){
     const present=new Set<string>();this.owners.clear();
     const visit=(blocks:NativeBlock[],parent:HTMLElement)=>{let index=0;for(const block of blocks){if(block.kind==='text'&&block.editable===false)continue;present.add(block.id);let element=this.elements.get(block.id)??this.root.querySelector<HTMLElement>(`[data-c9y-block="${CSS.escape(block.id)}"]`)??undefined;
@@ -176,7 +176,7 @@ export class NativeSiteController {
     if(field.editor.value!==value)field.editor.value=value;
   }
   private async bindComponentFields(){
-    const epoch=++this.componentEpoch,upgraded=upgradeComponentTree(this.root,this.assetURL);await componentsReady(upgraded);if(this.disposed||epoch!==this.componentEpoch)return;
+    const epoch=++this.componentEpoch,upgraded=upgradeComponentTree(this.root,this.assetURL,true);await componentsReady(upgraded);if(this.disposed||epoch!==this.componentEpoch)return;
     for(const[id,{block}]of nativeEntries(this.state.document))if(block.kind==='component'){
       const element=this.elements.get(id),definition=componentDefinition(block.name,this.state.snapshot.components);if(!element||!definition)continue;
       applyComponentValues(element,definition,Object.fromEntries(Object.entries(block.values??{}).map(([key,value])=>[key,['src','poster'].includes(key)?this.imageURL(value):value])));
