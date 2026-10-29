@@ -8,7 +8,7 @@ Each rule names the test that holds it. While editing a site, a drag that breaks
 
 ### `carousel.reorder`
 
-Dragging a carousel card by its body or picture reorders the complete card horizontally, preserves its contents and saves the order for reopening and publication.
+Dragging a carousel card by its body or picture reorders the complete card only within its own horizontal row, never moves it vertically or nests it, preserves its contents and saves the order for reopening and publication.
 
 Held by `tests/carousel-reorder.mjs`: “Carousel cards drag horizontally, save and reopen in their new order”.
 

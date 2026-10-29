@@ -19,6 +19,16 @@ for (const engine of [chromium, webkit]) {
   const x = a.x + a.width / 2, y = a.y + a.height / 2, endX=Math.min(b.x+b.width-5,1340);
   const input = engine === chromium ? await page.context().newCDPSession(page) : null;
   const pointer = async (type, px, py) => input ? input.send('Input.dispatchMouseEvent', { type, x: px, y: py, ...(type === 'mouseMoved' ? { buttons: 1 } : { button: 'left', buttons: type === 'mousePressed' ? 1 : 0, clickCount: 1 }) }) : type === 'mousePressed' ? page.mouse.down() : type === 'mouseReleased' ? page.mouse.up() : page.mouse.move(px, py);
+  // A downward gesture must never carry a slide beneath the strip or make it a page block.
+  await page.mouse.move(x,y);await pointer('mousePressed',x,y);
+  await pointer('mouseMoved',x+40,y);
+  const preview=frame.locator('[data-drag-preview]'),lifted=await preview.boundingBox();
+  for(let step=1;step<=10;step++)await pointer('mouseMoved',x+40+100*step/10,y+300*step/10);
+  const previewBox=await preview.boundingBox();
+  check(Math.abs(previewBox.y-lifted.y)<2,'A carousel card moved vertically while carried: '+JSON.stringify({before:a,preview:previewBox,transform:await preview.evaluate(el=>el.style.transform),active:await frame.locator('html').getAttribute('data-drag-active')}));
+  await pointer('mouseReleased',x+140,y+300);
+  await until(async()=>!await frame.locator('html').getAttribute('data-drag-active'),'The outside drop did not finish');
+  check(await order()==='one,two,three'&&(await fixture.read()).document.blocks.length===1,'A carousel card escaped its horizontal strip');
   await page.mouse.move(x, y); await pointer('mousePressed', x, y);
   for (let step = 1; step <= 12; step++) await pointer('mouseMoved', x + (endX - x) * step / 12, y);
   await pointer('mouseReleased', endX, y);
