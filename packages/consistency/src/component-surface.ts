@@ -8,11 +8,15 @@ import { createSurfaceElement } from './editor-surface';
 import type { NativeComponentDefinition } from '../../../shared/consistency-components';
 
 /** Only DS1's registered implementation runs in the parent realm. Site scripts never run in a canvas. */
-export function upgradeComponentTree(root: ParentNode): HTMLElement[] {
+export function upgradeComponentTree(root: ParentNode, assetURL?: (source: string) => string): HTMLElement[] {
   const elements = [...(root instanceof HTMLElement ? [root] : []), ...root.querySelectorAll<HTMLElement>('*')];
   const upgraded: HTMLElement[] = [];
   for (let element of elements) {
     if (!element.localName.startsWith('ds-') || !customElements.get(element.localName)) continue;
+    if (assetURL) for (const name of ['asset-base','chrome-assets']) {
+      const value=element.getAttribute(name);
+      if(value){const mapped=assetURL(value);if(mapped!==value)element.setAttribute(name,mapped);}
+    }
     // An element already created in the registered realm keeps its Lit state and focused fields.
     if (!customElements.get(element.localName)!.prototype.isPrototypeOf(element)) {
       const replacement = createSurfaceElement(element.ownerDocument,element.localName);

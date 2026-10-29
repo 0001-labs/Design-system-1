@@ -5,6 +5,7 @@ import { NativeSiteController, type NativePageSnapshot, type NativePageSave } fr
 import baseStyles from '../../../DS1/1-root/one.css?inline';
 import './site-editor.css';
 import { CANVAS_SANDBOX, protectCanvasHTML } from '../../../shared/consistency-canvas';
+import { canvasAssetAddress } from './canvas-assets';
 
 /**
  * A host-independent page document editor. The host supplies a
@@ -16,6 +17,9 @@ export class ConsistencyPageEditor extends LitElement {
   private snapshot?: NativePageSnapshot;
   private save?: NativePageSave;
   private source = '';
+  private assetURL = (source:string) => this.source && this.snapshot?.origin
+    ? canvasAssetAddress(source,new URL(this.source,location.href).pathname.replace(/\/document$/,'/files'),new URL(this.snapshot.path,this.snapshot.origin).href)
+    : source;
   private generation = 0;
   private mounting = -1;
   private poll?: ReturnType<typeof setTimeout>;
@@ -71,7 +75,7 @@ export class ConsistencyPageEditor extends LitElement {
   }
   private async mount() {
     const opening = this.generation;
-    if(this.frame.contentDocument){await prepareComponents(this.frame.contentDocument.body);if(opening!==this.generation)return;await componentsReady(upgradeComponentTree(this.frame.contentDocument.body));}
+    if(this.frame.contentDocument){await prepareComponents(this.frame.contentDocument.body);if(opening!==this.generation)return;await componentsReady(upgradeComponentTree(this.frame.contentDocument.body,this.assetURL));}
     if(opening!==this.generation)return;
     if (!this.snapshot || !this.save || !this.isConnected) return;
     if(this.snapshot&&this.frame.contentDocument)for(const[key,value]of Object.entries(nativePageRootStyles(this.snapshot.document)))this.frame.contentDocument.body.style.setProperty(key,value,'important');
@@ -86,6 +90,7 @@ export class ConsistencyPageEditor extends LitElement {
       if (generation === this.generation) this.snapshot = accepted;
       return accepted;
     }, () => this.dispatchEvent(new CustomEvent('page-reopen', { bubbles: true })), {
+      assetURL: this.assetURL,
       changed: () => {
         const document = JSON.stringify(this.controller?.state.document ?? this.snapshot?.document);
         if (document === this.observedDocument) return;

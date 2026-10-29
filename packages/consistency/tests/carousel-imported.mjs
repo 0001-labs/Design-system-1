@@ -18,12 +18,13 @@ for(const engine of [chromium,webkit]){
  try{
   const width=1956,page=await browser.newPage({viewport:{width,height:1342}}),errors=[];page.setDefaultTimeout(10000);page.on('pageerror',error=>errors.push(error.message));
   page.on('console',message=>{if(message.text().startsWith('C9Y constraint'))errors.push(message.text());});
-  await fixture.route(page);await page.goto(fixture.url);
+  await fixture.route(page);await page.route('**/api/consistency/sites/*/files/assets/device/*',async route=>{const name=new URL(route.request().url()).pathname.split('/').at(-1);if(!['iphone-17-pro-max-deep-blue.png','status-wifi.svg','status-battery.svg'].includes(name))return route.fulfill({status:404});await route.fulfill({body:await readFile(resolve(root,'dist-c9y/assets/device',name)),contentType:name.endsWith('.png')?'image/png':'image/svg+xml'});});await page.goto(fixture.url);
   const frame=page.frameLocator('.consistency-site-frame');await frame.locator('[data-editor-surface]').waitFor();
+  await page.waitForFunction(()=>{const doc=document.querySelector('.consistency-site-frame').contentDocument,img=doc.querySelector('ds-device-bezel')?.shadowRoot?.querySelector('.art');return img?.complete&&img.naturalWidth>0;});
   const ids=track.children.filter(block=>block.kind==='component').map(block=>block.id);
   const order=async()=>find((await fixture.read()).document.blocks,track.id).children.filter(block=>block.kind==='component').map(block=>block.id);
   const first=frame.locator(`[data-native-block="${ids[0]}"]`),second=frame.locator(`[data-native-block="${ids[1]}"]`);
-  await first.scrollIntoViewIfNeeded();const a=await first.boundingBox(),b=await second.boundingBox();check(b.x>a.x,'The real showcase is not horizontal: '+JSON.stringify({files,styles:styles.length,a,b,css:await frame.locator('.ds-carousel__track').evaluate(el=>({display:getComputedStyle(el).display,gap:getComputedStyle(el).gap,html:el.outerHTML.slice(0,400)}))}));
+  await first.scrollIntoViewIfNeeded();await first.click({button:'right',position:{x:50,y:50}});for(const name of ['Add writing','Add group','Add section','Ask'])check(await page.getByRole('menuitem',{name,exact:true}).count()===0,`${name} is available inside an imported slide`);await page.keyboard.press('Escape');const a=await first.boundingBox(),b=await second.boundingBox();check(b.x>a.x,'The real showcase is not horizontal: '+JSON.stringify({files,styles:styles.length,a,b,css:await frame.locator('.ds-carousel__track').evaluate(el=>({display:getComputedStyle(el).display,gap:getComputedStyle(el).gap,html:el.outerHTML.slice(0,400)}))}));
   const input=engine===chromium?await page.context().newCDPSession(page):null;
   const pointer=async(type,x,y)=>input?input.send('Input.dispatchMouseEvent',{type,x,y,...(type==='mouseMoved'?{buttons:1}:{button:'left',buttons:type==='mousePressed'?1:0,clickCount:1})}):type==='mousePressed'?page.mouse.down():type==='mouseReleased'?page.mouse.up():page.mouse.move(x,y);
   const x=a.x+Math.min(a.width/2,400),y=a.y+Math.min(a.height/2,300),endY=Math.min(1200,a.y+a.height+80);
