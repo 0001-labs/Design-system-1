@@ -11,6 +11,23 @@ test("saved light and dark identity colours choose stable ink independently of p
   expect(avatarInk("var(--brand)")).toBeUndefined();
 });
 
+test("a masked picture is drawn as soon as it has a source, before its load event", async () => {
+  const avatar = document.createElement("ds-avatar");
+  avatar.mask = true;
+  avatar.plain = true;
+  avatar.src = "data:image/svg+xml;base64,logo";
+  document.body.append(avatar);
+  await avatar.updateComplete;
+  const mask = avatar.shadowRoot!.querySelector<HTMLElement>(".mask");
+  expect(mask).not.toBeNull();
+  expect(mask!.style.maskImage).toContain("data:image/svg+xml;base64,logo");
+  // Its picture failing takes the mask away and returns to the initial.
+  avatar.shadowRoot!.querySelector("img")!.dispatchEvent(new Event("error"));
+  await avatar.updateComplete;
+  expect(avatar.shadowRoot!.querySelector(".mask")).toBeNull();
+  expect(avatar.shadowRoot!.querySelector(".initial")).not.toBeNull();
+});
+
 test("image failure returns to initials and a new source can load without accepting stale events", async () => {
   const avatar = document.createElement("ds-avatar");
   avatar.label = "Example member";

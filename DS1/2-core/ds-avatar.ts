@@ -205,7 +205,14 @@ export class Avatar extends LitElement {
             )
           : nothing
       }
-      ${this.mask && this.loaded && !this.failed ? html`<span class="mask" style=${styleMap({ maskImage: `url(${JSON.stringify(src)})` })}></span>` : nothing}
+      ${
+        // A masked picture is drawn as soon as it has a source: a mask paints
+        // nothing until its image is there, so a logo already on the device (a
+        // data URL) is on the first frame rather than a frame after its load
+        // event, and a header never blinks from blank to logo. A picture that
+        // fails to load leaves the mask and returns to the initial.
+        this.mask && src && !this.failed ? html`<span class="mask" style=${styleMap({ maskImage: `url(${JSON.stringify(src)})` })}></span>` : nothing
+      }
     </span>`;
   }
 }
