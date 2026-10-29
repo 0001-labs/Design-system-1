@@ -15,7 +15,18 @@ export const COMPONENT_FIELDS = ['text','label','title','figure','caption','plac
 export const componentEscape = (value: string) => value.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
 const voidTags = new Set(['area','base','br','col','embed','hr','img','input','link','meta','param','source','track','wbr']);
 /** Typed geometry follows the component's own layout surface. */
-export function componentGeometry(definition:NativeComponentDefinition,styles:Record<string,string>):Record<string,string>{const result={...styles};if(definition.tag==='ds-card'&&result.padding!==undefined){result['--ds-card-padding-override']=result.padding;delete result.padding;}return result;}
+export function componentGeometry(definition:NativeComponentDefinition,styles:Record<string,string>):Record<string,string>{
+  const result={...styles};
+  if(definition.tag==='ds-card'&&result.padding!==undefined){result['--ds-card-padding-override']=result.padding;delete result.padding;}
+  // A content height is a minimum: spacing and writing must be able to make the
+  // page taller. Media keep their explicit crop height. Editor and publication
+  // share this mapping, so reopening never restores a clipping box.
+  if(result.height!==undefined&&['div','section','main','article','aside','nav','header','footer','ds-card','ds-page'].includes(definition.tag)){
+    result['min-height']=result.height;
+    result.height='auto!important';
+  }
+  return result;
+}
 export function componentMarkup(id: string, name: string, children: string, values: Record<string,string>, words: Record<string,string>, styles: Record<string,string>, components: NativeComponents, editor: boolean, hidden = false, design?: SiteSurfaceDesign): string {
   const definition = componentDefinition(name,components);
   if (!definition) throw new Error(`unregistered-component: ${name}`);

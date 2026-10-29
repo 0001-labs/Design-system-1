@@ -163,3 +163,11 @@ consistency-editor[data-pointer-busy] :is(.consistency-button-action,.consistenc
 
 /* A C9Y constraint broken as drawn (c9y-constraints.ts): the blocks it moved, for a moment. */
 [data-c9y-broken]{outline:2px solid var(--ds-pink,#f0f)!important;outline-offset:-2px}
+
+/* Spacing is part of the editing surface even while idle. Zero shows its real
+   centre line, keeping the generous pointer target without inventing space. */
+:is(.consistency-shell,.consistency-native-guides,.consistency-text-bounds):not(.spacing-off) .ghost-surface:is(.ghost-surface--gap,.ghost-surface--padding):not([aria-valuenow="0"]){background:color-mix(in srgb,var(--ds-pink) 24%,transparent)}
+:is(.consistency-shell,.consistency-native-guides,.consistency-text-bounds) .ghost-surface--gap[aria-valuenow="0"]::after{opacity:1}
+.consistency-shell .ghost-surface--padding[aria-valuenow="0"]::before{opacity:1}
+.consistency-native-guides .ghost-surface--padding[aria-valuenow="0"]{background:transparent}
+.consistency-native-guides .ghost-surface--padding[aria-valuenow="0"]::after{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:var(--ds-pink);opacity:1;pointer-events:none}

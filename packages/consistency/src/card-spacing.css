@@ -1,7 +1,7 @@
 .consistency-card-spacing{position:relative}
 .consistency-card-spacing>p:has(+ds-tag){margin-block-end:0}
 .consistency-card-spacing>p+ds-tag{margin-block-start:var(--ds-card-footer-gap, var(--ds-unit))}
-.consistency-card-gap{position:absolute;z-index:3;display:flex;align-items:center;justify-content:center;transform:translateY(-50%);touch-action:none;user-select:none;cursor:ns-resize;opacity:0;color:var(--ds-text-color);background:color-mix(in srgb,var(--ds-pink) 15%,transparent);transition:opacity 220ms ease-out;font-size:var(--ds-type-size-small);line-height:var(--ds-unit)}
+.consistency-card-gap{position:absolute;z-index:3;display:flex;align-items:center;justify-content:center;transform:translateY(-50%);touch-action:none;user-select:none;cursor:ns-resize;opacity:1;color:var(--ds-text-color);background:color-mix(in srgb,var(--ds-pink) 24%,transparent);transition:opacity 220ms ease-out;font-size:var(--ds-type-size-small);line-height:var(--ds-unit)}
 .consistency-card-gap[hidden]{display:none}
 .consistency-card-gap:hover,.consistency-card-gap:focus-visible,.consistency-card-gap[data-spacing-active]{opacity:1;transition-duration:90ms;outline:none}
 

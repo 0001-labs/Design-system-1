@@ -6,6 +6,24 @@ Each rule names the test that holds it. While editing a site, a drag that breaks
 
 ## Rules
 
+### `spacing.always-visible`
+
+Every editable spacer stays pink while idle, with a visible centre line at zero, across all example pages.
+
+Held by `tests/template-spacing.mjs`: “idle pink guides”.
+
+### `spacing.vertical-growth`
+
+Content containers grow vertically when edited spacing needs more room, including after resizing and reopening, instead of clipping their words.
+
+Held by `tests/template-spacing.mjs`: “resized page grows with its spacing after reopening”.
+
+### `navigation.no-nesting`
+
+Following a canvas link never loads an editor inside the editor; local anchors remain in the page and external destinations open separately.
+
+Held by `tests/template-spacing.mjs`: “safe links”.
+
 ### `carousel.imported-row`
 
 Imported carousel tracks keep each authored slide whole and only reorder horizontally, both while carrying and after release.

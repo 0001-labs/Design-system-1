@@ -35,6 +35,10 @@ try{
  await page.getByRole('button',{name:'New page',exact:true}).click();
  const frame=page.frameLocator('consistency-page-editor iframe');
  await frame.locator('[data-c9y-native-root][data-editor-surface]').waitFor({timeout:15000});
+ await page.evaluate(()=>{const doc=document.querySelector('consistency-page-editor iframe').contentDocument;const link=doc.createElement('a');link.href='#canvas-anchor';link.textContent='Canvas anchor';doc.body.prepend(link);const target=doc.createElement('div');target.id='canvas-anchor';doc.body.append(target);});
+ await frame.getByRole('link',{name:'Canvas anchor',exact:true}).click();
+ await page.waitForTimeout(300);
+ check(await frame.locator('[data-c9y-native-root][data-editor-surface]').count()===1,'Following a canvas anchor navigated the frame into another editor');
  const first=[...drafts.values()][0];check(first?.document.schema===2,'New lab pages still save the legacy composition');
  check(!('composition'in first.document),'New page stores a second block model');
  const spacing=frame.locator('[data-spacing-key^="sequence_0:gap:"]').first();

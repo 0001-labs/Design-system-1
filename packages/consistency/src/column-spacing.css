@@ -1,4 +1,4 @@
-.consistency-text-bounds .consistency-column-gap{position:absolute;inset:auto;transform:none;min-height:0;z-index:4;background:transparent;border-radius:var(--ds-radius)}
+.consistency-text-bounds .consistency-column-gap{position:absolute;inset:auto;transform:none;min-height:0;z-index:4;background:color-mix(in srgb,var(--ds-pink) 24%,transparent);border-radius:var(--ds-radius)}
 .consistency-column-gap[data-axis="horizontal"]{cursor:ew-resize}
 .consistency-text-bounds .consistency-column-gap:is(:hover,:focus-visible,[data-spacing-active]){background:color-mix(in srgb,var(--ds-pink) 16%,transparent)}
 .consistency-text-bounds .consistency-column-gap[hidden]{display:none}

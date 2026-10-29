@@ -4,6 +4,7 @@ import { validateWorkspacePage, type WorkspacePage } from '../../../shared/consi
 import type { NativePageSnapshot } from './native-site';
 import { libraryTokens } from './libraries';
 import { templatePage } from './templates';
+import { editableControl } from './control-edit';
 import { fontTokens, loadPageFonts, readPageFonts } from './fonts';
 
 /** Workspace persistence owns its revision; this host owns no alternative block editor or history. */
@@ -11,11 +12,43 @@ export class WorkspacePageEditor extends LitElement {
   private value?: WorkspacePage;
   private readonly pageEditor = new ConsistencyPageEditor();
   private ready: Promise<boolean> = Promise.resolve(false);
+  private detachNavigation?: () => void;
   constructor() {
     super();
     this.pageEditor.addEventListener('page-ready', (event: Event) => {
       const frame = (event as CustomEvent<{frame: HTMLIFrameElement}>).detail.frame;
       if (this.value && frame.contentDocument) loadPageFonts(readPageFonts(this.value.fonts), frame.contentDocument);
+      this.detachNavigation?.();
+      const doc = frame.contentDocument;
+      if (!doc) return;
+      const press = (event: MouseEvent) => {
+        if (event.defaultPrevented) return;
+        const link = event.composedPath().find(node => (node as Element)?.nodeType === 1 && (node as Element).matches('a[href],ds-button[href],ds-link[href]')) as Element | undefined;
+        if (!link) return;
+        // A srcdoc anchor otherwise resolves against the editor URL and loads the shell inside itself.
+        event.preventDefault();
+        const control = editableControl(event.composedPath()[0] as Node, doc.body);
+        if (link.matches('[disabled],[aria-disabled="true"]') || control?.matches('[disabled],[aria-disabled="true"]')) return;
+        if (control?.hasAttribute('data-c9y-control-editing') && !event.metaKey && !event.ctrlKey) return;
+        const href = link.getAttribute('href') ?? '';
+        if (!href.startsWith('#')) {
+          const base = new URL(templatePage(this.value?.example ?? '')?.href ?? '/', 'https://designsystem1.com');
+          let destination: URL;
+          try { destination = new URL(href, base); } catch { return; }
+          if (['https:', 'http:', 'mailto:', 'tel:'].includes(destination.protocol) && destination.origin !== location.origin)
+            window.open(destination.href, '_blank', 'noopener,noreferrer');
+          return;
+        }
+        let id = href.slice(1);
+        try { id = decodeURIComponent(id); } catch { return; }
+        if (id) doc.getElementById(id)?.scrollIntoView();
+        else frame.contentWindow?.scrollTo(0, 0);
+      };
+      const hold = (event: Event) => event.preventDefault();
+      doc.addEventListener('click', press, true);
+      doc.addEventListener('auxclick', hold, true);
+      doc.addEventListener('submit', hold, true);
+      this.detachNavigation = () => { doc.removeEventListener('click', press, true); doc.removeEventListener('auxclick', hold, true); doc.removeEventListener('submit', hold, true); };
     });
   }
   createRenderRoot() { return this; }
@@ -25,6 +58,7 @@ export class WorkspacePageEditor extends LitElement {
   }
   connectedCallback() { super.connectedCallback(); void this.mountPage(); }
   disconnectedCallback() {
+    this.detachNavigation?.();
     if (this.value) this.value = this.readDocument() as unknown as WorkspacePage;
     super.disconnectedCallback();
   }

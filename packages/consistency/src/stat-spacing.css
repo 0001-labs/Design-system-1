@@ -1,5 +1,5 @@
 .consistency-stat-spacing{position:relative}
-.consistency-stat-gap{position:absolute;left:0;width:100%;z-index:3;display:flex;align-items:center;justify-content:center;transform:translateY(-50%);touch-action:none;user-select:none;cursor:ns-resize;opacity:0;color:var(--ds-text-color);background:color-mix(in srgb,var(--ds-pink) 15%,transparent);transition:opacity 220ms ease-out;font-size:var(--ds-type-size-small);line-height:var(--ds-unit)}
+.consistency-stat-gap{position:absolute;left:0;width:100%;z-index:3;display:flex;align-items:center;justify-content:center;transform:translateY(-50%);touch-action:none;user-select:none;cursor:ns-resize;opacity:1;color:var(--ds-text-color);background:color-mix(in srgb,var(--ds-pink) 24%,transparent);transition:opacity 220ms ease-out;font-size:var(--ds-type-size-small);line-height:var(--ds-unit)}
 .consistency-stat-gap[hidden]{display:none}
 .consistency-stat-gap:hover,.consistency-stat-gap:focus-visible,.consistency-stat-gap[data-spacing-active]{opacity:1;transition-duration:90ms;outline:none}
 @media(prefers-reduced-motion:reduce){.consistency-stat-gap{transition:none}}

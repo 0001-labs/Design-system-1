@@ -23,3 +23,14 @@ test('component documents cannot introduce HTML, CSS, unknown presentations or e
 test('card geometry changes its shared inner surface instead of adding a second outer inset',()=>{
  const window=new Window();window.document.body.innerHTML='<ds-card><p>Keep the content</p></ds-card>';const imported=importComponentPage(window.document.body as never,{namespace:'card'});Object.assign(imported.document.blocks[0],{padding:60});const html=renderNativePage(imported.document,{components:imported.components});expect(html).toContain('--ds-card-padding-override:calc(60px');expect(html).not.toContain(';padding:');
 });
+
+test('resized content grows instead of clipping while pictures retain their crop height',()=>{
+ const window=new Window();window.document.body.innerHTML='<section><p>Keep every word</p></section><img src="/photo.jpg" alt="A photo">';
+ const imported=importComponentPage(window.document.body as never,{namespace:'growth'});
+ Object.assign(imported.document.blocks[0],{height:200,gap:400});
+ Object.assign(imported.document.blocks[1],{height:200});
+ window.document.body.innerHTML=renderNativePage(imported.document,{components:imported.components});
+ const section=window.document.querySelector('section')!,image=window.document.querySelector('img')!;
+ expect(section.style.height).toBe('auto');expect(section.style.minHeight).toContain('200px');
+ expect(image.style.height).toContain('200px');expect(image.style.minHeight).toBe('');
+});
