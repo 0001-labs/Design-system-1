@@ -371,7 +371,7 @@
 .day[data-heat="4"]:not([data-today], [data-selected]) .date { background: var(--ds-calendar-heat-4); color: var(--ds-calendar-heat-ink-4); }
 :host([compact]) .day[data-heat]:not([data-today], [data-selected]) .date-line { padding: 0; }
 
-/* Events: one square each, stacked edge to edge on the day's lines, drawn one pixel short. */
+/* Events occupy whole squares, aligned with the day grid. */
 .events {
   display: flex;
   flex-direction: column;
@@ -382,9 +382,9 @@
   display: flex;
   align-items: flex-end;
   gap: var(--ds-calendar-pad);
-  height: calc(var(--ds-unit) - 1px);
-  /* A pixel at the start, so the day's line (and the month's frame) shows beside a bar. */
-  margin: 0.5px 0.5px 0.5px 1px;
+  flex: 0 0 var(--ds-unit);
+  height: var(--ds-unit);
+  margin: 0;
   padding-inline: var(--ds-calendar-pad);
   overflow: hidden;
   white-space: nowrap;
@@ -403,7 +403,7 @@
 .event[data-span] {
   position: relative;
   z-index: 1;
-  width: calc(var(--ds-calendar-event-span) * var(--ds-calendar-day) - 1.5px);
+  width: calc(var(--ds-calendar-event-span) * var(--ds-calendar-day));
 }
 /* A line a bar passes over, or an empty line above another event. */
 .line { flex: 0 0 auto; height: var(--ds-unit); }
