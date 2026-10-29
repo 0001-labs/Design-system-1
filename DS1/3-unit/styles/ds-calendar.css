@@ -394,6 +394,12 @@
   color: var(--ds-calendar-event-ink, var(--ds-text-color));
   cursor: pointer;
 }
+/* Round the silhouette, never the seam between touching event fills. */
+.event { border-radius: 0; }
+.event[data-round-top-start] { border-start-start-radius: var(--ds-calendar-event-radius, var(--ds-radius)); }
+.event[data-round-top-end] { border-start-end-radius: var(--ds-calendar-event-radius, var(--ds-radius)); }
+.event[data-round-bottom-start] { border-end-start-radius: var(--ds-calendar-event-radius, var(--ds-radius)); }
+.event[data-round-bottom-end] { border-end-end-radius: var(--ds-calendar-event-radius, var(--ds-radius)); }
 .event .name { min-width: 0; overflow: hidden; }
 /* A name its bar cuts fades out over the bar's last square, at the end where it is cut. */
 .event .name[data-cut="end"] { mask-image: linear-gradient(to right, #000 calc(100% - var(--ds-unit)), transparent); }

@@ -187,6 +187,28 @@ export function weekLines(
   });
 }
 
+type EventBox = { row: number; from: number; to: number; start?: boolean; end?: boolean };
+type EventCorners = { topStart: boolean; topEnd: boolean; bottomStart: boolean; bottomEnd: boolean };
+
+/** Only exposed corners round: touching event fills share square seams. */
+function eventCorners(boxes: readonly EventBox[]): EventCorners[] {
+  const rows = new Map<number, EventBox[]>();
+  for (const box of boxes) rows.set(box.row, [...(rows.get(box.row) ?? []), box]);
+  return boxes.map(box => {
+    const same = rows.get(box.row) ?? [], above = rows.get(box.row - 1) ?? [], below = rows.get(box.row + 1) ?? [];
+    const left = same.some(other => other !== box && other.to === box.from);
+    const right = same.some(other => other !== box && other.from === box.to);
+    const atStart = (other: EventBox) => other.from <= box.from && other.to > box.from;
+    const atEnd = (other: EventBox) => other.from < box.to && other.to >= box.to;
+    return {
+      topStart: box.start !== false && !left && !above.some(atStart),
+      topEnd: box.end !== false && !right && !above.some(atEnd),
+      bottomStart: box.start !== false && !left && !below.some(atStart),
+      bottomEnd: box.end !== false && !right && !below.some(atEnd),
+    };
+  });
+}
+
 /** One end of a picker's value: its day and, when it has one, its time (`14:30`). */
 export interface CalendarEnd {
   day: Day;
@@ -582,6 +604,7 @@ export class Calendar extends CalendarBase {
 
   /** Each shown day's lines of events, laid out a week at a time in render(). */
   private laidOut = new Map<Day, { lines: CalendarLine[]; hidden: number }>();
+  private lineCorners = new WeakMap<object, EventCorners>();
 
   protected willUpdate(changed: PropertyValues<this>) {
     super.willUpdate(changed);
@@ -1173,6 +1196,9 @@ export class Calendar extends CalendarBase {
     const allowed = this.allowed(day);
     const unfolded = this.unfolded === day;
     const laid = this.laidOut.get(day) ?? { lines: [], hidden: 0 };
+    const expandedCorners = unfolded ? eventCorners(events.map((event, row) => ({
+      row, from: 0, to: 1, start: event.start === day, end: endOf(event) === day,
+    }))) : [];
     const heat = this.heatByDay.get(day);
     const parts = ["day", isToday ? "today" : "", selected ? "selected" : "", heat ? "heat" : ""].filter(Boolean).join(" ");
     return html`<div
@@ -1202,10 +1228,10 @@ export class Calendar extends CalendarBase {
       ${lines > 0 && events.length
         ? html`<span class="events" aria-hidden="true">
             ${unfolded
-              ? events.map(event => this.renderEvent(event, events, 1))
+              ? events.map((event, row) => this.renderEvent(event, events, 1, expandedCorners[row]))
               : laid.lines.map(line => line === null || line === "on"
                 ? html`<span class="line" data-line=${line ?? "empty"}></span>`
-                : this.renderEvent(line.event, events, line.span))}
+                : this.renderEvent(line.event, events, line.span, this.lineCorners.get(line)))}
             ${laid.hidden > 0 && !unfolded ? html`<span class="more" part="more" data-more>+${laid.hidden}</span>` : nothing}
           </span>`
         : nothing}
@@ -1283,6 +1309,11 @@ export class Calendar extends CalendarBase {
     // Fixed, the rows (a square each) fill the month's height under the months and dates, and scroll past it.
     const fit = this.fixed ? Math.max(1, 6 * (this.eventLines + 2) - 1) : 6;
     const rows = this.swimlaneHug ? Math.max(1, bars.length) : Math.max(fit, bars.length + 1);
+    const corners = eventCorners(bars.map(({ event, row, from, to }) => ({
+      row, from, to: to + 1,
+      start: !isDay(event.start) || event.start >= weeks[0],
+      end: !isDay(event.start) || endOf(event) <= addDays(weeks.at(-1)!, step * 7 - 1),
+    })));
     const today = this.todayDay;
     const todayWeek = weeks.findIndex(start => today >= start && today <= addDays(start, step * 7 - 1));
     const months: { column: number; span: number; month: Day }[] = [];
@@ -1331,6 +1362,10 @@ export class Calendar extends CalendarBase {
               class="event"
               part="event"
               data-event=${index}
+              ?data-round-top-start=${corners[index].topStart}
+              ?data-round-top-end=${corners[index].topEnd}
+              ?data-round-bottom-start=${corners[index].bottomStart}
+              ?data-round-bottom-end=${corners[index].bottomEnd}
               ?data-undated=${!isDay(event.start)}
               aria-label=${`${event.title}, ${isDay(event.start) ? range(event) : this.undatedLabel}`}
               style=${`${fill}grid-row: ${row + 1}; grid-column: ${from + 1} / ${to + 2}`}
@@ -1487,12 +1522,16 @@ export class Calendar extends CalendarBase {
   }
 
   /** An event on its line: one bar over `span` days, its name written once. */
-  private renderEvent(event: CalendarEvent, events: readonly CalendarEvent[], span: number) {
+  private renderEvent(event: CalendarEvent, events: readonly CalendarEvent[], span: number, corners?: EventCorners) {
     const fill = event.color ? `--ds-calendar-event-fill: ${event.color}; --ds-calendar-event-ink: var(--ds-slate);` : "";
     return html`<span
       class="event"
       part="event"
       data-event=${events.indexOf(event)}
+      ?data-round-top-start=${corners?.topStart}
+      ?data-round-top-end=${corners?.topEnd}
+      ?data-round-bottom-start=${corners?.bottomStart}
+      ?data-round-bottom-end=${corners?.bottomEnd}
       data-span=${span > 1 ? span : nothing}
       style=${fill || span > 1 ? `${fill}${span > 1 ? ` --ds-calendar-event-span: ${span}` : ""}` : nothing}
     >${event.time ? html`<span class="time">${event.time}</span>` : nothing}<span class="name">${event.title}</span></span>`;
@@ -1517,7 +1556,20 @@ export class Calendar extends CalendarBase {
     const depth = view === "week"
       ? Math.max(this.eventLines, ...weekLines(weeks[0], this.byDay, 99).map(day => day.lines.length))
       : this.eventLines;
-    for (const week of weeks) weekLines(week, this.byDay, depth, drawn).forEach((laid, column) => this.laidOut.set(week[column], laid));
+    this.lineCorners = new WeakMap();
+    for (const week of weeks) {
+      const layout = weekLines(week, this.byDay, depth, drawn);
+      const segments: { line: Exclude<CalendarLine, "on" | null>; box: EventBox }[] = [];
+      layout.forEach((day, column) => day.lines.forEach((line, row) => {
+        if (line && line !== "on") segments.push({ line, box: {
+          row, from: column, to: column + line.span,
+          start: line.event.start === week[column], end: endOf(line.event) === week[column + line.span - 1],
+        } });
+      }));
+      const corners = eventCorners(segments.map(segment => segment.box));
+      segments.forEach((segment, index) => this.lineCorners.set(segment.line, corners[index]));
+      layout.forEach((laid, column) => this.laidOut.set(week[column], laid));
+    }
     const tabDay = view === "week"
       ? [this.focusDay, this.chosen.start, this.todayDay].find(day => day && weeks[0].includes(day)) ?? weeks[0][0]
       : this.tabDay;

@@ -220,6 +220,8 @@ A name in the list that the calendar does not draw is the page's own view. Chose
 </script>
 ```
 
+Event fills round only their exposed start and end corners, using the system’s corner radius. Touching bars and vertically stacked events share square seams; staggered stacks keep only their free corners rounded. A continuation clipped by a week, hidden date or the visible timeline remains square, so it does not look like the event ends there. The rule is the same in a month and Swimlane, and follows the chosen square/rounded shape.
+
 ## Swimlane
 
 Set `swimlane-all` to show every event in one timeline, scaling its columns by whole weeks to cover the full date range. Events without a valid start are shown separately as undated, named by `undated-label`; navigation is hidden in this view. Set `swimlane-hug` to fit the view to its visible event rows, with one empty row when there are none. It overrides the fixed height and internal scrolling for the swimlane only; the month and other views keep `fixed`.
@@ -324,6 +326,7 @@ Properties only: `events`, the days' events; `viewNames`, `Record<string, string
 | --- | --- | --- |
 | `--ds-calendar-today` | `var(--ds-red-for-blood)` | Today's disc. |
 | `--ds-calendar-selected` | `var(--ds-sharp-blue)` | The selected day and a range's ends; the band between is it at 16%. |
+| `--ds-calendar-event-radius` | `var(--ds-radius)` | Exposed event corners; shared edges and continuations stay square. |
 | `--ds-calendar-event-fill` | The fill (Apple green on activity squares) | An event without a colour. |
 | `--ds-calendar-line` | `1px solid var(--ds-border-color)` | A month's lines. |
 | `--ds-calendar-picker-width` | Its words' width | A picker's field. |
