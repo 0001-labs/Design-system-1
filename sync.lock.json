@@ -1,13 +1,13 @@
 {
   "Aa": {
-    "commit": "f39af49bf90267f89063ad112c69b912b4ab5443",
+    "commit": "d27fda4e6bed7713996ffa3407d0180c1a35f61f",
     "version": "0.10.1",
     "owned": ["website/src/vendor/aa"],
     "files": {
       "website/src/vendor/aa/README.md": "1f81b66577d7c7674a3acf4f0e25bf541380f7cc259c03c244e9558a06159da7",
       "website/src/vendor/aa/aa.css": "e062ac495859619309d0f86319c4c6403d17a1cdd4c7d571116413756d04c8c3",
       "website/src/vendor/aa/aa.d.ts": "e867e00711b211669304137592ba42382802a8c2618da4f7971f66907a78c029",
-      "website/src/vendor/aa/aa.js": "e12dadbadc4dfe7ab5c4e77f5a0f5f1b1056039b1936761cf1dc98cf1df179c8",
+      "website/src/vendor/aa/aa.js": "50e631b12721b8cb66da7e39c066d1f884dec772098caaac8ddd5b5163d3179c",
       "website/src/vendor/aa/button-partial.d.ts": "d576194fdc3d5bda54e0e72b5b016ed604ab51dfebb54b5752f467c1266777bd",
       "website/src/vendor/aa/comments-editor.d.ts": "0126819dee58ff74a6f16d6c18598db8259099f6beccd0aefe3e5aee75112d08",
       "website/src/vendor/aa/comments-memory.d.ts": "25906fc3dd1d057a44674f65153ccec59b5400376f7e1e7a8b5a4d767fdfc40b",
@@ -40,7 +40,7 @@
       "website/src/vendor/aa/marker.js": "1b9ce71c35eb888e784187933440dbef2389ac4364c60d12d14e789b2d1eaa86",
       "website/src/vendor/aa/marks.d.ts": "39632e4926927f06970788f8335b3822b175c938ea18530bd5ee5ef26e05de43",
       "website/src/vendor/aa/parse.d.ts": "dd78aaa9e2b32eaf1c142fb6d2cfbd76c637ad03733265236c6fcaac7133eb12",
-      "website/src/vendor/aa/parse.js": "809ff4b5affcbee2d27862452b82ad23ef55d8f0c438e0d9f8b7070574ae5fd0",
+      "website/src/vendor/aa/parse.js": "73524ce35c65fcb63b150607e917738df2ffec73106289c7922cf46103fad729",
       "website/src/vendor/aa/partials.d.ts": "ef2517ba46bd5d4b34a24da1f3984cefa1be8c66d5b2bbfe59ad7041b7ede5c5",
       "website/src/vendor/aa/placement.d.ts": "00ad7a5b21012128e166f05e3f00922bafb1c9f9a79421d6c8c249fd019f3293",
       "website/src/vendor/aa/plain.d.ts": "682a3bdd81cd08851ffca5fb737a2263cc8c4ef84679a9208e86e06d782a0551",
@@ -57,7 +57,7 @@
     }
   },
   "Drag": {
-    "commit": "9a3c94a28d0bfd1bab7394519e7844d7e6cdb955",
+    "commit": "1b9529f031ce4f9d8a29263af784a4934fef6ee5",
     "version": "0.2.0-alpha.0",
     "owned": ["packages/consistency/src/vendor/drag"],
     "files": {
@@ -65,7 +65,7 @@
       "packages/consistency/src/vendor/drag/NOTICE": "9a3ee8064810332a6515ac88b5fbab050a1f58f9c29a89ba702e862d7b9d2985",
       "packages/consistency/src/vendor/drag/README.md": "2f45f76f53ad71dca6d423868d306bb30029a4bbcd8095aeea4087db2d885fb9",
       "packages/consistency/src/vendor/drag/flow.ts": "56053b571ad4de829ac10cb38d39616465a3ddd60d358819ecec47566ad83d75",
-      "packages/consistency/src/vendor/drag/sortable.ts": "9b1fc788476ca605aea0bd4375872bfa6548ed9e67ecd2f9b1b00cd8d8728429",
+      "packages/consistency/src/vendor/drag/sortable.ts": "6a00d0e6a051648df606f4f0b5e4fa2b2c453517f3bc6a23ce2a44880b0f1c67",
       "packages/consistency/src/vendor/drag/types.ts": "7ba2e49e0cd117f292dd6a5c612a82299b3aecd8fbb1043a2d7558d8f7508ccc",
       "packages/consistency/src/vendor/drag/util.ts": "20ea31f691c42d2b127fbb4d9ac565f1abd19323e64fc4ab64fb7c7f42640ba9"
     }

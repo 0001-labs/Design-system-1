@@ -5136,8 +5136,8 @@ function ia(e, t, n, r) {
 function aa(e, t, n, r) {
 	for (let i = t; i < n; i++) {
 		if (e[i] !== r[0]) continue;
-		let a = ra(e, i, r[0], n), o = r.length === 1 ? i : i + a - r.length;
-		if (a >= r.length && !na(e[i - 1]) && o > t && !(r[0] === "_" && ta(e[i + a]))) return o;
+		let a = ra(e, i, r[0], n), o = r.length === 1 ? i : i + a - r.length, s = e[i - 1] === "\n" && !na(e[i - 2]) && (i + a === n || e[i + a] === "\n");
+		if (a >= r.length && (!na(e[i - 1]) || s) && o > t && !(r[0] === "_" && ta(e[i + a]))) return o;
 		i += a - 1;
 	}
 	return -1;
@@ -5182,6 +5182,14 @@ function sa(e, t, n, r, i, a, o) {
 	let s = t, c = t, l = (t) => oa(e, c, t, r, i, a);
 	for (; s < n;) {
 		let t = e[s];
+		if (t === "\n") {
+			l(s), a.push({
+				kind: "break",
+				from: r + s,
+				to: r + s + 1
+			}), c = ++s;
+			continue;
+		}
 		if (t === "`" && !i.code) {
 			let t = 1;
 			for (; e[s + t] === "`";) t++;
@@ -5215,10 +5223,10 @@ function sa(e, t, n, r, i, a, o) {
 			}
 		}
 		if (!i.href && !i.code && o.length) {
-			let t = 0, i = "";
-			for (let r of o) {
-				if (t = r.match(e, s), t && s + t <= n) {
-					i = r.name;
+			let t = 0, i = "", u = e.lastIndexOf("\n", s - 1) + 1, d = e.indexOf("\n", s), f = e.slice(u, d < 0 ? e.length : d);
+			for (let e of o) {
+				if (t = e.match(f, s - u), t && s + t <= n) {
+					i = e.name;
 					break;
 				}
 				t = 0;
@@ -5344,6 +5352,7 @@ function ca(e, t = Ji) {
 		to: e.source.length,
 		group: [0, e.source.length]
 	}];
+	if (e.kind === "paragraph") return sa(e.source, 0, e.source.length, 0, {}, n, t), n;
 	let o = 0;
 	return r.forEach((a, s) => {
 		if (s && n.push({
@@ -5558,18 +5567,31 @@ function ba(e, t, n, r, i = r) {
 		block: a.block,
 		offset: e
 	});
-	return s.slice(a.offset - l, a.offset) === r && s.slice(o.offset, o.offset + u) === i ? {
+	if (s.slice(a.offset - l, a.offset) === r && s.slice(o.offset, o.offset + u) === i) return {
 		blocks: Y(e, d(a.offset - l), d(o.offset + u), c).blocks,
 		anchor: d(a.offset - l),
 		focus: d(o.offset - l)
-	} : c.length > l + u && c.startsWith(r) && c.endsWith(i) ? {
+	};
+	if (c.length > l + u && c.startsWith(r) && c.endsWith(i)) return {
 		blocks: Y(e, a, o, c.slice(l, c.length - u)).blocks,
 		anchor: a,
 		focus: d(o.offset - l - u)
+	};
+	let f = [
+		"**",
+		"*",
+		"~~",
+		"==",
+		"<u>"
+	].includes(r), p = f ? c.match(/^\s*/)?.[0] ?? "" : "", m = f ? c.slice(p.length).match(/\s*$/)?.[0] ?? "" : "", h = c.slice(p.length, c.length - m.length);
+	return c && !h ? {
+		blocks: [...e],
+		anchor: a,
+		focus: o
 	} : {
-		blocks: Y(e, a, o, r + c + i).blocks,
-		anchor: d(a.offset + l),
-		focus: d(a.offset + l + c.length)
+		blocks: Y(e, a, o, p + r + h + i + m).blocks,
+		anchor: d(a.offset + p.length + l),
+		focus: d(a.offset + p.length + l + h.length)
 	};
 }
 var xa = /<span color="[a-z]+">$/, Sa = /<span color="[a-z]+">([\s\S]*?)<\/span>/g;
@@ -7154,7 +7176,27 @@ function Io(e) {
 		let a = n.getComputedStyle(e);
 		for (let e of Array.from(a)) r.style.setProperty(e, a.getPropertyValue(e), "important");
 		r.removeAttribute("contenteditable");
-	}), t.removeAttribute("id"), t.removeAttribute("data-drag-source"), t.style.visibility = "visible";
+	});
+	for (let e of [
+		"inset",
+		"inset-block",
+		"inset-inline",
+		"inset-block-start",
+		"inset-block-end",
+		"inset-inline-start",
+		"inset-inline-end",
+		"top",
+		"right",
+		"bottom",
+		"left",
+		"margin-block",
+		"margin-inline",
+		"margin-block-start",
+		"margin-block-end",
+		"margin-inline-start",
+		"margin-inline-end"
+	]) t.style.removeProperty(e);
+	t.removeAttribute("id"), t.removeAttribute("data-drag-source"), t.style.visibility = "visible";
 	for (let e of t.querySelectorAll("[id]")) e.removeAttribute("id");
 	for (let e of t.querySelectorAll("[data-drag-handle]")) e.removeAttribute("data-drag-handle");
 	return t.removeAttribute("data-drag-handle"), t;
@@ -16220,7 +16262,9 @@ function nm(e, t) {
 	let we = (t) => {
 		if (!v || o || !(t.target instanceof Node)) return;
 		let n = (e) => !!e && t.composedPath().some((t) => t instanceof Node && e.contains(t));
-		W && !n(W) && ge(), !(n(v) || n(y) || n(W) || n(e)) && oe();
+		W && !n(W) && ge();
+		let r = t.composedPath().some((t) => t instanceof Element && t.hasAttribute("data-comment") && e.contains(t));
+		n(v) || n(y) || n(W) || r || oe();
 	};
 	r.addEventListener("pointerdown", we, !0);
 	let Te = n.subscribe(k);
