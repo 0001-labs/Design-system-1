@@ -21,10 +21,10 @@ beforeAll(async () => {
 }, 60_000);
 
 afterAll(async () => {
-  for (const context of contexts) await context.close();
+  await Promise.all(contexts.map(context => context.close()));
   await browser?.close();
   await server?.close();
-});
+}, 60_000);
 
 async function page(options: { scheme?: "light" | "dark"; width?: number; height?: number; reducedMotion?: "reduce" | "no-preference" } = {}): Promise<Page> {
   const context = await browser.newContext({
