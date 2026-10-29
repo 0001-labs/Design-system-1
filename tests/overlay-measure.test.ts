@@ -403,3 +403,29 @@ test("mobile picker and Select centre below their fields with four CSS pixels an
   await expect.poll(async () => { const b = await list.boundingBox(); return b!.x + b!.width; }).toBeLessThanOrEqual(316);
   await tab.keyboard.press("Escape");
 });
+
+test("mobile tabbed sheets keep their bounds, scroll panels and retain accessible dismissal", async () => {
+  const tab = await page({ reducedMotion: "reduce" });
+  await tab.evaluate(() => { const opener = document.createElement("button"); opener.id = "opener"; opener.textContent = "People"; document.body.prepend(opener); opener.focus(); });
+  await open(tab, `<ds-overlay type="detail"><dialog data-ds-overlay-tabbed aria-label="Workspace access"><div data-ds-overlay="header"><div role="tablist"><button role="tab">Invite</button><button role="tab">People</button><button role="tab">Visibility</button></div><button data-ds-overlay="close" data-ds-overlay-dismiss>Close</button></div><div data-ds-overlay="body"><p>Short panel</p></div></dialog></ds-overlay>`);
+  const bounds = () => tab.locator("dialog").boundingBox();
+  const first = await bounds();
+  expect(first!.y + first!.height).toBeCloseTo(812, 0);
+  expect(await tab.locator('[data-ds-overlay="close"]').evaluate(el => getComputedStyle(el).clipPath)).toBe("inset(50%)");
+  expect(await tab.getByRole("dialog", { name: "Workspace access" }).count()).toBe(1);
+  expect(await tab.getByRole("button", { name: "Close", exact: true }).count()).toBe(1);
+  for (const lines of [80, 1, 40, 1, 80, 1]) {
+    await tab.locator('[data-ds-overlay="body"]').evaluate((el, lines) => { el.innerHTML = Array.from({ length: lines }, () => "<p>Panel content</p>").join(""); }, lines);
+    expect((await bounds())!.height).toBeCloseTo(first!.height, 0);
+    if (lines === 80) expect(await tab.locator('[data-ds-overlay="body"]').evaluate(el => el.scrollHeight > el.clientHeight)).toBe(true);
+  }
+  await tab.setViewportSize({ width: 600, height: 400 });
+  await tab.waitForFunction(() => document.querySelector("dialog")!.getBoundingClientRect().height < 400);
+  expect((await bounds())!.height).toBeLessThan(400);
+  await tab.setViewportSize({ width: 1100, height: 812 });
+  await tab.waitForFunction(() => document.querySelector("dialog")?.dataset.dsType === "drawer");
+  expect(await tab.locator('[data-ds-overlay="close"]').evaluate(el => getComputedStyle(el).clipPath)).toBe("none");
+  await tab.keyboard.press("Escape");
+  await tab.waitForFunction(() => !document.querySelector("dialog")?.open);
+  expect(await tab.locator("#opener").evaluate(el => document.activeElement === el)).toBe(true);
+});
