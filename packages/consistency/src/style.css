@@ -181,3 +181,8 @@ consistency-booking .aa-plain > .aa-block { margin:0; padding:0; font:inherit; c
 consistency-editor{display:flex;height:100%;min-height:0}.consistency-shared-lab{display:flex;flex:1;min-width:0;min-height:0;gap:var(--ds-unit)}.consistency-shared-canvas{display:flex;flex:1;min-width:0;min-height:0}.consistency-shared-canvas>consistency-workspace-page{flex:1}
 
 .consistency-shared-device:not([frameless]){--ds-device-width:min(420px,100%);margin-inline:auto}.consistency-shared-device .consistency-shared-canvas{height:100%;width:100%}
+
+/* Imported composition examples are page content. Only the surrounding editor
+   owns a viewport; authored containers must expand with their children. */
+:is(.consistency-shell,.consistency-workspace,.consistency-stage,.consistency-sheet,.consistency-inspector)[data-native-block]{height:auto;min-height:min-content;overflow:visible}
+.consistency-workspace[data-native-block]{grid-template-rows:auto}

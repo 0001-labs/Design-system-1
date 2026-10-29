@@ -74,10 +74,11 @@ try {
      await page.mouse.move(1400,980);
      const growth=await page.locator('#spacing-check iframe').evaluate((iframe,key)=>{
       const doc=iframe.contentDocument,el=doc.querySelector(`[data-native-block="${key.split(':')[0]}"]`)??doc.querySelector('[data-c9y-native-root]');
-      return {height:el.getBoundingClientRect().height,client:el.clientHeight,scroll:el.scrollHeight};
+      const overflow=[];for(let parent=el;parent&&parent!==doc.body;parent=parent.parentElement)if(parent.hasAttribute('data-native-block')&&parent.clientHeight>0&&parent.scrollHeight>parent.clientHeight+2)overflow.push({id:parent.dataset.nativeBlock,height:parent.clientHeight,scroll:parent.scrollHeight});
+      return {height:el.getBoundingClientRect().height,client:el.clientHeight,scroll:el.scrollHeight,overflow};
      },target.key);
      assert.ok(growth.height>=target.height-2,`${label}: increasing vertical spacing shrank its container`);
-     assert.ok(growth.scroll<=growth.client+2,`${label}: edited container clips or scrolls vertically ${JSON.stringify(growth)}`);
+     assert.ok(growth.overflow.length===0&&growth.scroll<=growth.client+2,`${label}: edited container clips or scrolls vertically ${JSON.stringify(growth)}`);
      const saved=await page.locator('#spacing-check consistency-workspace-page').evaluate(host=>host.readDocument());
      await mount(id,width,saved);
      assert.deepEqual(await page.locator('#spacing-check consistency-workspace-page').evaluate(host=>host.readDocument()),saved,`${label}: spacing did not reopen`);
