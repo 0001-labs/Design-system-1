@@ -253,7 +253,9 @@ const openPickers = new Set<Calendar>();
  *   (`views="month swimlane"`). A name the calendar does not draw is the
  *   page's own view: chosen, the calendar keeps its header (the month's title,
  *   the arrows moving a month) and shows what the page puts in its slot of
- *   that name (`<div slot="earnings">`) in place of the days.
+ *   that name (`<div slot="earnings">`) in place of the days. Supply
+ *   `earnings-previous` and `earnings-next` slots to reveal the adjacent
+ *   months during a swipe, with the same data and permissions as the current view.
  * @prop {Record<string, string>} viewNames - The words for each view in the
  *   switch (property only), over the shared Day, Week, Month and Swimlane;
  *   a page's own view is named by its name when left out.
@@ -571,6 +573,7 @@ export class Calendar extends CalendarBase {
 
   protected willUpdate(changed: PropertyValues<this>) {
     super.willUpdate(changed);
+    if (!this.pageCommitting && (changed.has("view") || changed.has("month") || changed.has("level"))) this.resetMonthMotion();
     this.style.setProperty("--ds-calendar-day-squares", String(this.squaresPerDay));
     this.style.setProperty("--ds-calendar-lines", String(this.eventLines));
     // A compact month with events writes the days without any fainter.
@@ -785,7 +788,7 @@ export class Calendar extends CalendarBase {
       part="picks"
       role="grid"
       data-level=${level}
-      ?data-travel=${this.travelled}
+      ?data-travel=${this.travelled && !this.pageCommitting}
       aria-label=${level === "months" ? this.yearName(year) : `${this.yearName(this.yearSpan[0])} – ${this.yearName(this.yearSpan[1])}`}
       style=${`--ds-calendar-pick-columns: ${columns}; --ds-calendar-pick-cell: ${cell}; --ds-calendar-weeks: ${weeks}`}
       @keydown=${this.onPickKey}
@@ -861,10 +864,13 @@ export class Calendar extends CalendarBase {
   private monthFrame?: number;
   private monthTimer?: ReturnType<typeof setTimeout>;
   private monthOffset = 0;
+  private wheelTimer?: ReturnType<typeof setTimeout>;
+  private pageCommitting = false;
 
-  private get mobileMonth() {
-    return this.compact && !this.noHeader && this.level === "days" && this.shownView === "month"
-      && typeof matchMedia === "function" && matchMedia("(max-width: 720px)").matches;
+  private get pagedView() {
+    const slots = new Set(Array.from(this.children, child => child.getAttribute("slot")));
+    return !this.noHeader && this.level === "days" && (this.shownView === "month" || this.shownView === "swimlane"
+      || this.ownView && slots.has(`${this.shownView}-previous`) && slots.has(`${this.shownView}-next`));
   }
 
   private canSwipe(direction: -1 | 1) {
@@ -875,6 +881,7 @@ export class Calendar extends CalendarBase {
   private stopMonthMotion() {
     if (this.monthFrame !== undefined) cancelAnimationFrame(this.monthFrame);
     if (this.monthTimer !== undefined) clearTimeout(this.monthTimer);
+    clearTimeout(this.wheelTimer);
     this.monthFrame = undefined;
     this.monthTimer = undefined;
     this.monthPan = undefined;
@@ -886,6 +893,7 @@ export class Calendar extends CalendarBase {
     if (track) { track.style.transition = "none"; track.style.transform = "translateX(0px)"; }
     this.monthOffset = 0;
     this.swipe = undefined;
+    this.wheel = { dx: 0, at: 0, locked: 0 };
   };
 
   private paintMonth(track: HTMLElement, offset: number) {
@@ -904,11 +912,13 @@ export class Calendar extends CalendarBase {
     const target = allowed ? -direction * (this.rtl ? -1 : 1) * width : 0;
     const complete = async () => {
       this.monthTimer = undefined;
+      this.pageCommitting = true;
       if (allowed) this.swipeTo(direction!);
       await this.updateComplete;
       track.style.transition = "none";
       track.style.transform = "translateX(0px)";
       this.monthOffset = 0;
+      this.pageCommitting = false;
     };
     if (matchMedia("(prefers-reduced-motion: reduce)").matches || !width) {
       void complete();
@@ -920,8 +930,8 @@ export class Calendar extends CalendarBase {
   }
 
   private onSwipeStart = (event: PointerEvent) => {
-    this.swipe = event.pointerType === "mouse" || !event.isPrimary ? undefined : { id: event.pointerId, x: event.clientX, y: event.clientY, at: event.timeStamp };
-    if (!this.swipe || !this.mobileMonth || !(event.target as Element).closest?.(".grid")) return;
+    this.swipe = !event.isPrimary || event.button > 0 || (event.pointerType === "mouse" && !event.composedPath().some(node => node instanceof HTMLElement && node.classList.contains("month-track"))) ? undefined : { id: event.pointerId, x: event.clientX, y: event.clientY, at: event.timeStamp };
+    if (!this.swipe || !this.pagedView || !event.composedPath().some(node => node instanceof HTMLElement && node.classList.contains("month-track"))) return;
     const track = this.renderRoot.querySelector<HTMLElement>(".month-track");
     if (!track) return;
     // An interrupted settling motion is taken over at its current visible position.
@@ -987,16 +997,42 @@ export class Calendar extends CalendarBase {
     if (Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
     event.preventDefault();
     const now = Date.now();
-    if (now < this.wheel.locked) return;
-    if (now - this.wheel.at > 200) this.wheel.dx = 0;
+    if (now < this.wheel.locked) {
+      // Momentum belongs to this gesture until its horizontal stream stops.
+      this.wheel.locked = now + 160;
+      this.wheel.at = now;
+      return;
+    }
+    const track = this.pagedView ? this.renderRoot.querySelector<HTMLElement>(".month-track") : null;
+    const width = track?.getBoundingClientRect().width ?? 0;
+    if (now - this.wheel.at > 200 || this.monthTimer !== undefined) {
+      this.wheel.dx = 0;
+      if (track) {
+        const transform = getComputedStyle(track).transform;
+        const offset = transform && transform !== "none" ? new DOMMatrixReadOnly(transform).m41 : 0;
+        this.stopMonthMotion();
+        track.style.transition = "none";
+        this.wheel.dx = -offset * (this.rtl ? -1 : 1);
+      }
+    }
     this.wheel.at = now;
-    this.wheel.dx += event.deltaX * (this.rtl ? -1 : 1);
-    if (Math.abs(this.wheel.dx) < 60) return;
+    const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? width : 1;
+    this.wheel.dx += event.deltaX * unit * (this.rtl ? -1 : 1);
     const direction = this.wheel.dx > 0 ? 1 : -1;
-    this.wheel = { dx: 0, at: 0, locked: now + 500 };
-    const track = this.mobileMonth ? this.renderRoot.querySelector<HTMLElement>(".month-track") : null;
-    if (track) this.settleMonth(track, track.getBoundingClientRect().width, direction);
-    else this.swipeTo(direction);
+    if (track) {
+      const offset = this.canSwipe(direction) ? Math.max(-width, Math.min(width, -this.wheel.dx * (this.rtl ? -1 : 1))) : 0;
+      this.swipedAt = now;
+      if (!matchMedia("(prefers-reduced-motion: reduce)").matches) this.paintMonth(track, offset);
+      clearTimeout(this.wheelTimer);
+      this.wheelTimer = setTimeout(() => {
+        const commit = Math.abs(this.wheel.dx) >= Math.min(40, width * 0.25);
+        this.wheel = { dx: 0, at: Date.now(), locked: Date.now() + 160 };
+        this.settleMonth(track, width, commit ? direction : undefined);
+      }, 100);
+    } else if (Math.abs(this.wheel.dx) >= 60) {
+      this.wheel = { dx: 0, at: now, locked: now + 500 };
+      if (this.swipeTo(direction)) this.swipedAt = now;
+    }
   };
 
   private onSwipeClick = (event: MouseEvent) => {
@@ -1225,11 +1261,11 @@ export class Calendar extends CalendarBase {
       const end = event.end && isDay(event.end) && event.end > event.start ? event.end : event.start;
       return end === event.start ? dayLabel(event.start) : this.rangeTitle(event.start, end);
     };
-    return this.swipeFrame(html`<div
+    return this.swipeFrame(this.monthTrack(html`<div
         class="swimlane"
         part="swimlane"
         role="group"
-        ?data-travel=${this.travelled}
+        ?data-travel=${this.travelled && !this.pageCommitting}
         aria-label=${this.nameOr(this.monthRangeTitle(weeks))}
         style=${`--ds-calendar-weeks: ${weeks.length}; --ds-calendar-rows: ${rows}; --ds-calendar-fit: ${fit}`}
       >
@@ -1266,7 +1302,7 @@ export class Calendar extends CalendarBase {
             ><span class="name">${event.title}</span></button>`;
           })}
         </div></div>
-      </div>`);
+      </div>`));
   }
 
   /** The first day of each week activity draws: from the week holding the month's first to the one holding its last month's last day. */
@@ -1375,7 +1411,7 @@ export class Calendar extends CalendarBase {
   /** A page's own view: what it puts in the slot named after the view, as wide as the month. */
   private renderOwnView() {
     const view = this.shownView;
-    return this.swipeFrame(html`<div class="own-view" part="own-view" data-view=${view} ?data-travel=${this.travelled}><slot name=${view}></slot></div>`);
+    return this.swipeFrame(this.monthTrack(html`<div class="own-view" part="own-view" data-view=${view} ?data-travel=${this.travelled && !this.pageCommitting}><slot name=${view} @slotchange=${() => this.requestUpdate()}></slot></div>`));
   }
 
   /**
@@ -1483,7 +1519,7 @@ export class Calendar extends CalendarBase {
         part="grid"
         role="grid"
         data-view=${view}
-        ?data-travel=${this.travelled}
+        ?data-travel=${this.travelled && !this.pageCommitting}
         aria-label=${this.nameOr(view === "week" ? this.rangeTitle(weeks[0][0], weeks[0][6]) : monthTitle(month))}
         style=${view === "week" ? `--ds-calendar-lines: ${depth}` : nothing}
         aria-multiselectable=${this.selectable ? "true" : nothing}
@@ -1506,12 +1542,16 @@ export class Calendar extends CalendarBase {
   }
 
   private monthTrack(grid: unknown) {
-    if (!this.compact || this.noHeader || this.level !== "days") return grid;
-    const neighbour = (direction: -1 | 1) => html`<div class=${`month-neighbour ${direction < 0 ? "previous" : "next"}`} inert aria-hidden="true"><ds-calendar
-      compact no-header no-today required .fixed=${this.fixed} .outsideDays=${this.outsideDays}
-      .dayWidth=${this.dayWidth} .weekStart=${this.weekStart} .today=${this.today}
-      .month=${addMonths(this.shownMonth, direction)} .value=${this.value}
-      .selectable=${this.selectable} .events=${this.events}></ds-calendar></div>`;
+    if (!this.pagedView) return grid;
+    const neighbour = (direction: -1 | 1) => html`<div class=${`month-neighbour ${direction < 0 ? "previous" : "next"}`} inert aria-hidden="true">${this.ownView
+      ? html`<div class="own-view"><slot name=${`${this.shownView}-${direction < 0 ? "previous" : "next"}`}></slot></div>`
+      : html`<ds-calendar
+        exportparts="months,dates,swimlane,grid,scroll"
+        no-header no-today required .compact=${this.compact} .fixed=${this.fixed} .outsideDays=${this.outsideDays}
+        .view=${this.shownView} .views=${[this.shownView]} .lines=${this.lines} .weekNumbers=${this.weekNumbers}
+        .dayWidth=${this.dayWidth} .weekStart=${this.weekStart} .today=${this.today}
+        .month=${addMonths(this.shownMonth, direction)} .value=${this.value}
+        .selectable=${this.selectable} .events=${this.events}></ds-calendar>`}</div>`;
     return html`<div class="month-swipe"><div class="month-track">${neighbour(-1)}${grid}${neighbour(1)}</div></div>`;
   }
 

@@ -799,7 +799,7 @@
 /* A small month's neighbours stand ready for direct mobile manipulation.
  * Only the grid travels; its header, controls and outer geometry stay still. */
 .month-swipe { overflow: clip; }
-.month-track { position: relative; }
+.month-track { position: relative; user-select: none; }
 .month-neighbour { position: absolute; top: 0; width: 100%; pointer-events: none; }
 .month-neighbour.previous { left: -100%; }
 .month-neighbour.next { left: 100%; }

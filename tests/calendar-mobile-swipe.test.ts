@@ -62,3 +62,40 @@ test("bounds refuse forward movement and reduced motion changes month without tr
   expect(calendar.month).toBe("2026-11");
   expect(track.style.transition).toBe("none");
 });
+
+for (const view of ['month', 'swimlane', 'earnings']) for (const mobile of [false, true]) {
+  test(`${view} reveals the next page throughout a ${mobile ? 'phone' : 'desktop'} drag`, async () => {
+    const { calendar } = await fixture();
+    vi.stubGlobal('matchMedia', (query: string) => ({ matches: query.includes('reduced-motion') ? false : mobile }));
+    calendar.compact = false; calendar.views = ['month', 'swimlane', 'earnings']; calendar.view = view;
+    calendar.innerHTML = '<div slot="earnings">December</div><div slot="earnings-previous">November</div><div slot="earnings-next">January</div>';
+    await calendar.updateComplete;
+    const track = calendar.shadowRoot!.querySelector<HTMLElement>('.month-track');
+    expect(track).not.toBeNull();
+    vi.spyOn(track!, 'getBoundingClientRect').mockReturnValue({ width: 560 } as DOMRect);
+    vi.useFakeTimers();
+    const pointer = (name: string, x: number) => track!.dispatchEvent(new PointerEvent(name, { pointerId: 1, pointerType: mobile ? 'touch' : 'mouse', isPrimary: true, button: 0, clientX: x, clientY: 50, bubbles: true, composed: true, cancelable: true }));
+    pointer('pointerdown', 300); pointer('pointermove', 200);
+    await vi.advanceTimersByTimeAsync(20);
+    expect(track!.style.transform).toBe('translateX(-100px)');
+    if (view === 'earnings') expect(track!.querySelector('.month-neighbour.next slot')?.getAttribute('name')).toBe('earnings-next');
+    else expect((track!.querySelector('.month-neighbour.next ds-calendar') as Calendar).shownView).toBe(view);
+    pointer('pointerup', 200); await finish(calendar);
+    expect(calendar.month).toBe('2027-01');
+    expect(track!.style.transform).toBe('translateX(0px)');
+  });
+}
+
+test('a desktop trackpad reveals the next page before committing, without taking vertical scrolling', async () => {
+  const { calendar } = await fixture(); calendar.compact = false; await calendar.updateComplete;
+  const surface = calendar.shadowRoot!.querySelector<HTMLElement>('.calendar')!;
+  const track = calendar.shadowRoot!.querySelector<HTMLElement>('.month-track'); expect(track).not.toBeNull();
+  vi.spyOn(track!, 'getBoundingClientRect').mockReturnValue({ width: 560 } as DOMRect);
+  vi.useFakeTimers();
+  const wheel = (x: number, y = 0) => { const event = new WheelEvent('wheel', { deltaX: x, deltaY: y, bubbles: true, cancelable: true }); surface.dispatchEvent(event); return event; };
+  expect(wheel(0, 80).defaultPrevented).toBe(false);
+  expect(wheel(30).defaultPrevented).toBe(true); await vi.advanceTimersByTimeAsync(20);
+  expect(track!.style.transform).toBe('translateX(-30px)'); expect(calendar.month).toBe('2026-12');
+  wheel(40); await vi.advanceTimersByTimeAsync(350); await calendar.updateComplete;
+  expect(calendar.month).toBe('2027-01'); expect(track!.style.transform).toBe('translateX(0px)');
+});
