@@ -9,7 +9,7 @@ for (const engine of [chromium, webkit]) {
  const fixture = await nativePageFixture({ definition }), browser = await engine.launch({ headless: true });
  try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } }); page.setDefaultTimeout(8000);
-  const errors=[];page.on('pageerror',error=>errors.push(error.message));
+  const errors=[];let phase='drop';page.on('pageerror',error=>errors.push(error.message));page.on('console',message=>{if(message.text().startsWith('C9Y constraint'))errors.push(phase+': '+message.text());});
   await fixture.route(page); await page.goto(fixture.url);
   const frame = page.frameLocator('.consistency-site-frame'); await frame.locator('[data-editor-surface]').waitFor();
   const order = async () => (await fixture.read()).document.blocks[0].children.map(block => block.id).join(',');
@@ -25,6 +25,7 @@ for (const engine of [chromium, webkit]) {
 
   await until(async () => await order() === 'two,one,three', 'Dragging a carousel card did not save the new order').catch(async error=>{throw Error(error.message+': '+JSON.stringify((await fixture.read()).document.blocks));});
   await until(async()=>!await frame.locator('html').getAttribute('data-drag-active'),'The drag did not finish');
+  phase='cancel';
   const current=await first.boundingBox();
   const cancelX=current.x+current.width/2,cancelY=current.y+current.height/2,writes=fixture.writes.length;
   await page.mouse.move(cancelX,cancelY);await pointer('mousePressed',cancelX,cancelY);await pointer('mouseMoved',cancelX-80,cancelY);
@@ -32,6 +33,7 @@ for (const engine of [chromium, webkit]) {
   await until(async()=>!await frame.locator('html').getAttribute('data-drag-active'),'Cancelled drag did not finish');
   check(await order()==='two,one,three'&&fixture.writes.length===writes,'Cancelling changed the carousel order');
   await input?.detach();
+  phase='undo';
   await frame.locator('body').click({position:{x:200,y:5}});
   await page.keyboard.press(process.platform==='darwin'?'Meta+Z':'Control+Z');
   await until(async()=>await order()==='one,two,three','Undo did not restore the carousel order');
