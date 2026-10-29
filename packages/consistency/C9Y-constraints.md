@@ -24,6 +24,18 @@ Following a canvas link never loads an editor inside the editor; local anchors r
 
 Held by `tests/template-spacing.mjs`: “safe links”.
 
+### `canvas.component-assets`
+
+Site-owned device artwork and chrome load through the authenticated file gateway in inline and URL canvases, including after reopening.
+
+Held by `tests/carousel-frames.mjs`: “Device frames load through site files and carousel insertion stays unavailable”.
+
+### `carousel.existing-content`
+
+Carousel slides keep their existing editable words, while menus and insertion commands cannot add writing, groups, sections or generated blocks inside them.
+
+Held by `tests/carousel-frames.mjs`: “Device frames load through site files and carousel insertion stays unavailable”.
+
 ### `carousel.imported-row`
 
 Imported carousel tracks keep each authored slide whole and only reorder horizontally, both while carrying and after release.
