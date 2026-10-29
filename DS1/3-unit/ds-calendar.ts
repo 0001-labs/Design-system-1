@@ -1289,7 +1289,7 @@ export class Calendar extends CalendarBase {
     weeks.forEach((start, column) => {
       const month = this.ownerOf(start);
       const last = months.at(-1);
-      if (last && last.month === month) last.span++;
+      if (this.swimlaneAll && step > 1 ? last && last.span < 4 : last && last.month === month) last.span++;
       else months.push({ column, span: 1, month });
     });
     const range = (event: CalendarEvent) => {
