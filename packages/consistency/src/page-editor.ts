@@ -4,6 +4,7 @@ import { nativePageStyles, nativePageRootStyles, renderNativePage, type NativePa
 import { NativeSiteController, type NativePageSnapshot, type NativePageSave } from './native-site';
 import baseStyles from '../../../DS1/1-root/one.css?inline';
 import './site-editor.css';
+import { CANVAS_SANDBOX, protectCanvasHTML } from '../../../shared/consistency-canvas';
 
 /**
  * A host-independent page document editor. The host supplies a
@@ -27,7 +28,7 @@ export class ConsistencyPageEditor extends LitElement {
   private readonly unloading = (event: BeforeUnloadEvent) => { if (this.pending) { event.preventDefault(); event.returnValue = ''; } };
   constructor() {
     super();
-    this.frame.setAttribute('sandbox', 'allow-same-origin');
+    this.frame.setAttribute('sandbox', CANVAS_SANDBOX);
     this.frame.addEventListener('load', () => this.checkReady());
   }
   createRenderRoot() { return this; }
@@ -44,14 +45,12 @@ export class ConsistencyPageEditor extends LitElement {
     this.source = source && 'url' in source ? source.url : '';
     if (source && 'html' in source && source.html) {
       this.frame.removeAttribute('src');
-      // The gateway stripped executable content; the frame retains the same restrictive policy in srcdoc.
-      const policy = "default-src 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; media-src 'self' https:; form-action 'none'; base-uri 'none'";
-      this.frame.srcdoc = source.html.replace(/<head([^>]*)>/i, `<head$1><meta http-equiv="Content-Security-Policy" content="${policy}">`);
+      this.frame.srcdoc = protectCanvasHTML(source.html);
     } else if (this.source) { this.frame.removeAttribute('srcdoc'); this.frame.src = this.source; }
     else {
       this.frame.removeAttribute('src');
       const page = renderNativePage(snapshot.document, { images: snapshot.images, collections: snapshot.collections, editor: true, components: snapshot.components });
-      this.frame.srcdoc = `<!doctype html><html lang="en"><head><meta charset="utf-8"><style>${baseStyles}\n${nativePageStyles}\n${source && 'styles' in source ? source.styles : ''}\nhtml{--sf:1;--ds-sf:1}body{margin:0;font:14px/20px var(--ds-typeface-regular);color:var(--ds-text-color);background:var(--ds-paper)}.c9y-native-text,.c9y-component-words,.aa-plain,.aa-plain>.aa-block{font:inherit;color:inherit;line-height:inherit;margin:0;padding:0;min-height:0;outline:none;background:none}.c9y-native-text{display:contents}</style></head><body${snapshot.document.layout.mode==='document'?' data-c9y-native-root':''}>${page}</body></html>`;
+      this.frame.srcdoc = protectCanvasHTML(`<!doctype html><html lang="en"><head><meta charset="utf-8"><style>${baseStyles}\n${nativePageStyles}\n${source && 'styles' in source ? source.styles : ''}\nhtml{--sf:1;--ds-sf:1}body{margin:0;font:14px/20px var(--ds-typeface-regular);color:var(--ds-text-color);background:var(--ds-paper)}.c9y-native-text,.c9y-component-words,.aa-plain,.aa-plain>.aa-block{font:inherit;color:inherit;line-height:inherit;margin:0;padding:0;min-height:0;outline:none;background:none}.c9y-native-text{display:contents}</style></head><body${snapshot.document.layout.mode==='document'?' data-c9y-native-root':''}>${page}</body></html>`);
     }
     this.requestUpdate();
     this.poll = setTimeout(() => this.checkReady(), 0);

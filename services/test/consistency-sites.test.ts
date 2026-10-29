@@ -62,13 +62,13 @@ it('serves the page sandboxed, with no script source, even opened on its own', a
   const page = await call('10VNDG/document?path=/', { headers });
   expect(page.status).toBe(200);
   expect(page.headers.get('content-security-policy')).toBe(DOCUMENT_POLICY);
-  expect(DOCUMENT_POLICY).toMatch(/^sandbox allow-same-origin;/); expect(DOCUMENT_POLICY).not.toMatch(/allow-scripts|script-src/);
+  expect(DOCUMENT_POLICY).toMatch(/^sandbox allow-same-origin allow-scripts;/); expect(DOCUMENT_POLICY).toContain("script-src 'none'");
   // A library that pins a Google face draws it in the frame: its stylesheet from one host, its files from the other, and nothing else off this origin.
   const directive = (policy: string, name: string) => policy.split(';').map(part => part.trim()).find(part => part.startsWith(`${name} `))!;
   for (const policy of [DOCUMENT_POLICY, FILE_POLICY]) {
     expect(directive(policy, 'style-src')).toBe(`style-src ${policy === DOCUMENT_POLICY ? "'self' " : ''}'unsafe-inline' ${FACE_HOSTS.styles}`);
     expect(directive(policy, 'font-src')).toBe(`font-src 'self' data: ${FACE_HOSTS.fonts}`);
-    expect(directive(policy, 'default-src')).toBe("default-src 'none'"); expect(policy).not.toMatch(/script-src|connect-src|allow-scripts/);
+    expect(directive(policy, 'default-src')).toBe("default-src 'none'"); expect(policy).not.toMatch(/connect-src/); if(policy===FILE_POLICY)expect(policy).not.toMatch(/allow-scripts/);else expect(policy).toContain("script-src 'none'");
     expect(policy.match(/https:\/\/[\w.-]+/g)).toEqual([FACE_HOSTS.styles, FACE_HOSTS.fonts]);
   }
   expect(page.headers.get('x-content-type-options')).toBe('nosniff');

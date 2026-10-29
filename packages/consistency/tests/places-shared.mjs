@@ -20,7 +20,7 @@ await new Promise(done => server.listen(0, '127.0.0.1', done));
 const fail = message => { throw new Error(message); };
 // What a part says, its ds-text and ds-message words (drawn in their shadow) included.
 const said = locator => locator.evaluate(element => `${element.innerText} ${[...element.querySelectorAll('ds-text, ds-message')].map(text => `${text.getAttribute('heading') ?? ''} ${text.getAttribute('text') ?? ''}`).join(' ')}`);
-const POLICY = "sandbox allow-same-origin; default-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; media-src 'self' https:; frame-ancestors 'self'; form-action 'none'; base-uri 'none'";
+const POLICY = "sandbox allow-same-origin allow-scripts; default-src 'none'; script-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; media-src 'self' https:; frame-ancestors 'self'; form-action 'none'; base-uri 'none'";
 const CODE = '10VNDG';
 const TITLE = '111111111111', DESC = '222222222222', IMAGE = '333333333333', H1 = '444444444444';
 const pages = [

@@ -1,4 +1,4 @@
-import { chromium } from 'playwright';
+import { chromium, webkit } from 'playwright';
 import { readFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';
@@ -8,22 +8,26 @@ const root = pathToFileURL(resolve(process.env.C9Y_SOENDERGAARDEN_ROOT ?? `${hom
 const build = JSON.parse(await readFile(new URL('dist/native/pages.json',root),'utf8'));
 const home = build.pages['/'];
 const styles = await readFile(new URL('web/src/style.css',root),'utf8');
-const fixture = await nativePageFixture({staleCanvasOnce:true,definition:{document:home.document,images:home.images,bindings:{},collections:{},allowedRuntimes:home.allowedRuntimes},styles});
-const browser = await chromium.launch({headless:true});
+for(const [engine,omitCanvas] of [[chromium,false],[webkit,false],[webkit,true]]){
+const fixture = await nativePageFixture({staleCanvasOnce:true,omitCanvas,canvasPrefix:`<script>window.__canvasProbe=true;parent.__canvasProbe=true</script><script src="/__canvas-probe.js"></script>`,definition:{document:home.document,images:home.images,bindings:{},collections:{},allowedRuntimes:home.allowedRuntimes},styles});
+const browser = await engine.launch({headless:true});
 const check=(ok,message)=>{if(!ok)throw new Error(message);};
 const until=async(test,message)=>{const end=Date.now()+8000;while(!await test()){if(Date.now()>end)throw new Error(message);await new Promise(r=>setTimeout(r,40));}};
 try {
- const page=await browser.newPage({viewport:{width:1440,height:1000}});const errors=[];page.on('pageerror',e=>errors.push(e.message));await fixture.route(page);await page.goto(fixture.url);
+ const page=await browser.newPage({viewport:{width:1440,height:1000}});const errors=[];page.on('pageerror',e=>errors.push(e.message));await fixture.route(page);await page.route('**/__canvas-probe.js',route=>route.fulfill({contentType:'text/javascript',body:'window.__canvasProbe=true;parent.__canvasProbe=true'}));await page.goto(fixture.url);
  const frame=page.frameLocator('.consistency-site-frame');await frame.locator('[data-c9y-native-root][data-editor-surface]').waitFor();
+ check(await page.evaluate(()=>!window.__canvasProbe&&!document.querySelector('.consistency-site-frame').contentWindow.__canvasProbe),'Site scripts ran in the editor');
+ await page.evaluate(()=>{const doc=document.querySelector('.consistency-site-frame').contentDocument;const probe=doc.createElement('img');probe.setAttribute('onerror','window.__canvasProbe=true;parent.__canvasProbe=true');probe.src='data:image/png,invalid';doc.body.append(probe);});
  const main=()=>fixture.read().then(x=>x.document.blocks.find(b=>b.id==='site-main'));
  const gap=frame.locator('[data-spacing-key="site-main:gap:0"]');
  await gap.scrollIntoViewIfNeeded();
  const before=(await main()).gap;
  const pictureBefore=JSON.stringify((await main()).children.find(b=>b.id==='home-picture'));
  const box=await gap.boundingBox();check(box&&box.width>0&&box.height>0,'The front-page gap has no pointer target');
- const input=await page.context().newCDPSession(page);
+ const input=engine===chromium?await page.context().newCDPSession(page):null;
  const drag=async(box,delta)=>{
   const x=box.x+box.width/2,y=box.y+box.height/2;
+  if(!input){await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x,y+delta,{steps:8});await page.mouse.up();return;}
   await input.send('Input.dispatchMouseEvent',{type:'mouseMoved',x,y});
   await input.send('Input.dispatchMouseEvent',{type:'mousePressed',x,y,button:'left',buttons:1,clickCount:1});
   for(let i=1;i<=8;i++)await input.send('Input.dispatchMouseEvent',{type:'mouseMoved',x,y:y+delta*i/8,buttons:1});
@@ -50,11 +54,15 @@ try {
  await until(async()=>Number(await scrolled.getAttribute('aria-valuenow'))===scrolledBefore+20,'Scrolled paragraph gap did not follow the pointer');
  await until(async()=>(await main()).children.find(block=>block.id==='home-more').gaps?.['home-more-text-1']===scrolledBefore+20,'Scrolled paragraph gap did not save');
  console.log('Scrolled paragraph gaps stay directly draggable');
- const saved=await fixture.read();await input.detach();await page.reload();await frame.locator('[data-c9y-native-root][data-editor-surface]').waitFor();
+ check(await page.evaluate(()=>!window.__canvasProbe&&!document.querySelector('.consistency-site-frame').contentWindow.__canvasProbe),'An executable site attribute ran in the editor');
+ const saved=await fixture.read();await input?.detach();await page.reload();await frame.locator('[data-c9y-native-root][data-editor-surface]').waitFor();
  await until(async()=>Number(await gap.getAttribute('aria-valuenow'))===before,'Reopened layout lost the saved gap');
  await until(async()=>Number(await internal.getAttribute('aria-valuenow'))===initial+20,'Reopened writing lost the saved gap');
  await until(async()=>Number(await scrolled.getAttribute('aria-valuenow'))===scrolledBefore+20,'Reopened writing lost the scrolled paragraph gap');
  check(JSON.stringify((await fixture.read()).document)===JSON.stringify(saved.document),'Reopening changed the saved spacing');
  check(errors.length===0,errors.join('\n'));
+ console.log(engine.name(),omitCanvas?'document URL':'inline canvas');
  console.log('Søndergården front: publication retry, pointer increase/decrease, keyboard decrease, writing gap and reopened document pass');
 }finally{await browser.close();await fixture.close();}
+
+}

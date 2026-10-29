@@ -35,7 +35,7 @@ export const C9Y_CONSTRAINTS: C9yConstraint[] = [
   },
   {
     code: 'spacing.hit-area',
-    rule: 'Resize labels never intercept a neighbouring spacing handle; pointer and keyboard spacing changes persist after reopening.',
+    rule: 'In Chromium and WebKit, resize labels never intercept a neighbouring spacing handle; pointer and keyboard spacing changes persist after reopening.',
     check: { file: 'tests/soendergaarden-spacing.mjs', test: 'Søndergården front: publication retry' },
   },
   {

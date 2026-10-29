@@ -32,7 +32,7 @@ Held by `tests/workspace-native.mjs`: “Shared workspace editor: native blocks�
 
 ### `spacing.hit-area`
 
-Resize labels never intercept a neighbouring spacing handle; pointer and keyboard spacing changes persist after reopening.
+In Chromium and WebKit, resize labels never intercept a neighbouring spacing handle; pointer and keyboard spacing changes persist after reopening.
 
 Held by `tests/soendergaarden-spacing.mjs`: “Søndergården front: publication retry”.
 

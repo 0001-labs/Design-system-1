@@ -23,7 +23,7 @@ try {
   const menu = async (nodeId, action) => { const target = node(nodeId), box = await target.boundingBox(); await target.click({ button: 'right', position: { x: box.width / 2, y: 10 } }); await page.getByRole('menuitem', { name: action, exact: true }).click(); };
   const geometry = () => node(first).evaluate(element => { const style = getComputedStyle(element); return { padding: parseFloat(style.paddingLeft), gap: parseFloat(style.gap), width: element.getBoundingClientRect().width, maxWidth: style.maxWidth, boxSizing: style.boxSizing }; });
   await node(first).waitFor();
-  check(await page.locator('iframe').getAttribute('sandbox') === 'allow-same-origin' && !await frame.locator('body').evaluate(() => window.siteRan), 'The real-site sandbox changed');
+  check(await page.locator('iframe').getAttribute('sandbox') === 'allow-same-origin allow-scripts' && !await frame.locator('body').evaluate(() => window.siteRan), 'The real-site sandbox changed');
   check(!await page.getByRole('switch').count() && !await page.locator('.consistency-composition-bar').count(), 'The app exposed lab controls or a replacement toolbar');
 
   // Chosen styles override authored inline and stylesheet priorities, with preview/public parity.

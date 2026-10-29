@@ -77,7 +77,7 @@ try {
     await input.detach();
   };
 
-  check(await page.locator('iframe.consistency-site-frame').getAttribute('sandbox') === 'allow-same-origin', 'The actual editor loosened the site sandbox');
+  check(await page.locator('iframe.consistency-site-frame').getAttribute('sandbox') === 'allow-same-origin allow-scripts', 'The actual editor loosened the site sandbox');
   check(!await frame.locator('body').evaluate(() => window.siteRan), 'Site scripts ran with app credentials');
   check(!await page.getByRole('switch').count() && !await page.getByLabel('Example page', { exact: true }).count(), 'The site shows lab controls');
   check(!await page.locator('.consistency-composition-bar').count() && !await frame.locator('.consistency-composition-bar').count(), 'The adapter retained its separate numeric toolbar');

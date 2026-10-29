@@ -13,3 +13,9 @@
 .consistency-resize-corner{right:0;bottom:0;width:var(--ds-unit);height:var(--ds-unit);cursor:nwse-resize;z-index:5;white-space:nowrap;direction:rtl}
 
 @media(prefers-reduced-motion:reduce){.consistency-resize-edge{transition:none}}
+
+/* WebKit includes an overflowing line box in its parent's hit area even when the
+   label has pointer-events:none. Keep the line box inside the six-pixel edge. */
+.consistency-resize-edge>span{display:block;pointer-events:none}
+.consistency-resize-height>span{line-height:calc(6px * var(--sf))}
+.consistency-resize-width>span{min-width:0;width:100%}

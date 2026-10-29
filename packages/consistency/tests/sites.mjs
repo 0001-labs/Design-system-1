@@ -14,7 +14,7 @@ const server = createServer(async (request, response) => {
   catch { response.writeHead(404).end(); }
 });
 await new Promise(done => server.listen(0, '127.0.0.1', done));
-const POLICY = "sandbox allow-same-origin; default-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; media-src 'self' https:; frame-ancestors 'self'; form-action 'none'; base-uri 'none'";
+const POLICY = "sandbox allow-same-origin allow-scripts; default-src 'none'; script-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; media-src 'self' https:; frame-ancestors 'self'; form-action 'none'; base-uri 'none'";
 const H1 = '0123456789ab', P = 'abcdef012345', BTN = 'bbbbbbbbbbbb', TITLE = '111111111111';
 const fields = {
   '/': [
@@ -85,7 +85,7 @@ try {
   const frame = page.frameLocator('iframe.consistency-site-frame');
   await frame.locator(`h1[data-cms="${H1}"]`).waitFor();
   if (await page.getByRole('button', { name: 'CPH Raft', exact: true }).getAttribute('aria-current') !== 'page') fail('The open site is not marked');
-  if (await page.locator('iframe.consistency-site-frame').getAttribute('sandbox') !== 'allow-same-origin') fail('The frame is not sandboxed');
+  if (await page.locator('iframe.consistency-site-frame').getAttribute('sandbox') !== 'allow-same-origin allow-scripts') fail('The frame is not sandboxed');
   if (await frame.locator('body').getAttribute('data-ran')) fail('A script of the site ran');
   if (await page.getByRole('switch').count() || await page.getByLabel('Example page', { exact: true }).count()) fail('The site editor exposes laboratory switches or examples');
 

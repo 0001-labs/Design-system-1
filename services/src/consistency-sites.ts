@@ -9,13 +9,16 @@
  * - `GET places`: the menus the app shows for the site, from its current build's config.
  * - `GET document?path=`: the site's page for the editor's frame, and `GET files/<path>` the styles, fonts,
  *   pictures and video it loads. Both are served on this origin, so this answer carries the sandbox: the page is
- *   `sandbox allow-same-origin` with no script source at all, so nothing of the site's runs here with the
+ *   `sandbox allow-same-origin allow-scripts` with `script-src 'none'`, so nothing of the site's runs here with the
  *   owner's cookies even when the address is opened on its own; a file is sandboxed too and only of the types a
  *   page draws with (an SVG opened alone cannot run either).
  *
  * Every route checks who asks first, as the other workspace routes do, and the platform opens the site only for the
  * owner or a member of its workspace; a write is same-origin JSON, bounded.
  */
+import { CANVAS_POLICY, CANVAS_SANDBOX, FACE_HOSTS } from '../../shared/consistency-canvas';
+export { FACE_HOSTS } from '../../shared/consistency-canvas';
+
 // A site by its IDv1 code, a list's shape (`12ABCD`); the platform alone knows its id.
 export const SITE_ROUTE = /^\/api\/consistency\/sites\/(\d{2}[A-Za-z]{4})\/(pages|page|edit|document|places|api\/[\w/-]{1,160}|files\/[^?#]{1,512})$/;
 const METHODS: Record<string, string[]> = { document: ['GET'], places: ['GET'], files: ['GET', 'HEAD'] };
@@ -52,10 +55,8 @@ export const API_ROUTES = [
 /** The allowlisted route a path under `api/` names, or null. */
 export const apiRoute = (path: string) => API_ROUTES.find(each => each.pattern.test(path)) ?? null;
 
-/** Where a site's library may fetch the Google face it pins: the stylesheet host and the font files' host, nothing else off this origin. */
-export const FACE_HOSTS = { styles: 'https://fonts.googleapis.com', fonts: 'https://fonts.gstatic.com' } as const;
 /** The page in the editor's frame: drawn with its own styles, pictures and faces, never a script, a form, a frame or a plugin. */
-export const DOCUMENT_POLICY = `sandbox allow-same-origin; default-src 'none'; style-src 'self' 'unsafe-inline' ${FACE_HOSTS.styles}; img-src 'self' data: https:; font-src 'self' data: ${FACE_HOSTS.fonts}; media-src 'self' https:; frame-ancestors 'self'; form-action 'none'; base-uri 'none'`;
+export const DOCUMENT_POLICY = `sandbox ${CANVAS_SANDBOX}; ${CANVAS_POLICY}; frame-ancestors 'self'`;
 /** A file the page loads, which could be opened on its own; a stylesheet may import its library's face. */
 export const FILE_POLICY = `sandbox; default-src 'none'; style-src 'unsafe-inline' ${FACE_HOSTS.styles}; img-src 'self' data:; font-src 'self' data: ${FACE_HOSTS.fonts}; frame-ancestors 'self'`;
 const CANVAS_TYPE = /^(?:text\/css|font\/[\w.+-]+|application\/font-woff|image\/[\w.+-]+|video\/[\w.+-]+)(?:;|$)/i;
