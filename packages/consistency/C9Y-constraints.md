@@ -6,6 +6,12 @@ Each rule names the test that holds it. While editing a site, a drag that breaks
 
 ## Rules
 
+### `carousel.imported-row`
+
+Imported carousel tracks keep each authored slide whole and only reorder horizontally, both while carrying and after release.
+
+Held by `tests/carousel-imported.mjs`: “Imported showcase cards stay in one horizontal row”.
+
 ### `emails.templates`
 
 Editable email wording saves automatically with revision checks, keeps newer typing and failed drafts, previews real form placeholders and survives reopening without sending an email.
