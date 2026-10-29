@@ -9,7 +9,7 @@ const baseline=JSON.parse(await readFile('packages/consistency/tests/template-ge
 try{
  const page=await browser.newPage({viewport:{width:1440,height:1000}}),errors=[];page.on('pageerror',error=>{errors.push(error.message);console.error(error.stack)});
  await page.route('**/api/consistency/pages',route=>route.fulfill({json:{pages:[]}}));await page.route('**/api/consistency/sites',route=>route.fulfill({json:{sites:[]}}));
- await page.goto(`http://127.0.0.1:${server.address().port}/private-consistency/`);
+ await page.goto(`http://127.0.0.1:${server.address().port}/editor/`);
  for(const width of [1120,390])for(const[id,template]of Object.entries(templates).filter(([id])=>id!=='studio')){
   if(process.env.TEMPLATE_ONLY&&process.env.TEMPLATE_ONLY!==id)continue;
   const key=`${id}:${width}`;

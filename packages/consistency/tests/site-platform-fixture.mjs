@@ -49,7 +49,7 @@ export async function sitePlatformFixture(sources) {
   await new Promise(done => server.listen(0, '127.0.0.1', done));
   const base = `http://127.0.0.1:${server.address().port}`;
   return {
-    base, url: `${base}/private-consistency/home.html?open=${code}`, code, engine, pages, storage, store, writes, read, publicHTML,
+    base, url: `${base}/editor/home.html?open=${code}`, code, engine, pages, storage, store, writes, read, publicHTML,
     failWrites(value) { fail = value; },
     holdNextWrite() {
       let release, entered;

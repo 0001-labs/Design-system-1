@@ -16,7 +16,7 @@ const server = createServer(async (request, response) => {
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 const browser = await chromium.launch({ headless: true });
 try {
- const base=`http://127.0.0.1:${server.address().port}/private-consistency/`;
+ const base=`http://127.0.0.1:${server.address().port}/editor/`;
  for(const width of [300,390,768,1365,1440,1920]) {
   const page=await browser.newPage({viewport:{width,height:1000}});await page.goto(base);await page.waitForSelector('select[aria-label="Example page"]');
   if(await page.locator('select[aria-label="Example page"]').inputValue()!=='editor')throw Error('The editor introduction is not the default');

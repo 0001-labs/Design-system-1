@@ -98,7 +98,7 @@ try {
     return json({ error: 'unknown' }, 404);
   });
 
-  const home = `http://127.0.0.1:${server.address().port}/private-consistency/home.html`;
+  const home = `http://127.0.0.1:${server.address().port}/editor/home.html`;
   await page.goto(home + '?open=10VNDG');
   const places = page.locator('consistency-home ds-sidebar.home-places');
   await places.getByText('Bookings', { exact: true }).waitFor();

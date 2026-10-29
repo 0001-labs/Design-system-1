@@ -18,7 +18,7 @@ const browser = await chromium.launch({ headless: true });
 try {
  for (const width of [300, 390, 768, 1440]) {
   const page = await browser.newPage({ viewport: { width, height: 1000 } });
-  await page.goto(`http://127.0.0.1:${server.address().port}/private-consistency/`);
+  await page.goto(`http://127.0.0.1:${server.address().port}/editor/`);
   await page.locator('select[aria-label="Example page"]').selectOption('booking');
   await page.waitForSelector('consistency-booking .trip-search');
   if (await page.locator('select[aria-label="Library preset"]').inputValue() !== 'voyage') throw Error('Booking did not select Voyage');

@@ -1,5 +1,5 @@
 import { consistencyAI, type PreviewAIEnv } from "./consistency-ai";
-import { consistencyPreview, isConsistencyHost, type WorkspaceEnv, isPrivatePreviewPath } from "./consistency";
+import { consistencyPreview, isConsistencyHost, type WorkspaceEnv, isEditorBuildPath } from "./consistency";
 import { appNavigation } from './app-navigation';
 import { systemSite, SYSTEM_HOST } from "./system-site";
 import { c9ySystemSite, C9Y_SYSTEM_HOST, isC9ySystemPath } from "./c9y-system-site";
@@ -49,7 +49,7 @@ export default {
     }
     if (url.pathname === '/api/consistency/ai') return consistencyAI(request, env);
     // Dispatch before public assets and other APIs: this host has no public app routes.
-    if (isConsistencyHost(url.hostname) || isPrivatePreviewPath(url.pathname)) return consistencyPreview(request, env);
+    if (isConsistencyHost(url.hostname) || isEditorBuildPath(url.pathname)) return consistencyPreview(request, env);
     // Private App HTML and assets revalidate the owner on the two configured hosts.
     if (url.pathname.startsWith('/private-app')) {
       if (![DASHBOARD_HOST, 'designsystem1.com'].includes(url.hostname)) return new Response('Not found', { status: 404, headers: { 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex' } });

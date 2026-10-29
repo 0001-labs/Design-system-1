@@ -24,7 +24,7 @@ try {
    text: [...card.querySelectorAll('[slot="label"],[slot="title"],p,ds-tag')].map(node => node.textContent),
  })));
  for (const inserted of [false, true]) {
-  await page.goto(`http://127.0.0.1:${server.address().port}/private-consistency/`);
+  await page.goto(`http://127.0.0.1:${server.address().port}/editor/`);
   await page.locator('select[aria-label="Example page"]').selectOption('studio');
   await page.waitForSelector('ds-card[data-selectable="bookshop"]');
   if (inserted) await page.locator('consistency-editor').evaluate(async e => {

@@ -40,7 +40,7 @@ try {
  await page.route('**/api/consistency/sites/*/places',async route=>{const code=new URL(route.request().url()).pathname.split('/')[4];if(code==='30SDGA'&&slowPlaces)await new Promise(resolve=>setTimeout(resolve,1500));await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({places:code==='30SDGA'?[{id:'lab',label:'Lab'},{id:'made-up',label:'Made up'}]:[]})});});
  let renamed=null;await page.route('**/api/consistency/workspaces/01STDO',async route=>{renamed=route.request().postDataJSON().name;await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({code:'01STDO',name:renamed})});});
  await page.route('**/api/consistency/workspaces/*/members',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({members:[{email:'ada@example.com',role:'admin',status:'active'}]})}));
- const home=`http://127.0.0.1:${server.address().port}/private-consistency/home.html`;
+ const home=`http://127.0.0.1:${server.address().port}/editor/home.html`;
  await page.goto(home);await page.locator('consistency-home ds-card').first().waitFor();
  if(asked.some(code=>code!=='01STDO'))throw Error('Sites were asked outside the workspace: '+asked.join());
  if(await page.locator('consistency-home .home-drafts').getAttribute('text')!=='3 of 2 draft sites')throw Error('The plan\'s draft sites are not under the title');

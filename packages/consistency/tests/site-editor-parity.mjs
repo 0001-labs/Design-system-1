@@ -26,7 +26,7 @@ const measure = locator => locator.evaluate(element => {
 try {
   // The reference is the same built canonical editor, with its normal production layers.
   const reference = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
-  await reference.goto(fixture.base + '/private-consistency/');
+  await reference.goto(fixture.base + '/editor/');
   await reference.locator('select[aria-label="Example page"]').selectOption('studio');
   const referenceGap = reference.locator('.consistency-text-gap').first();
   await referenceGap.hover(); await reference.waitForTimeout(250);

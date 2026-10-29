@@ -19,7 +19,7 @@ try {
  const compatibility = {id:'compatibility',name:'Stored template',revision:1,updatedAt:1,document:{schema:1,example:'booking',library:'original',fonts:{},composition:{text:'',sections:{__authored:'1'},order:['intro'],gaps:{},hidden:[],width:800,padding:40,gap:20,wrap:true,consistency:true,sizes:{},cardDesigns:{},cardGaps:{},buttonDesigns:{},statDesigns:{}}}};
  await page.route('**/api/consistency/pages**', route => route.fulfill({ json: new URL(route.request().url()).pathname.endsWith('/pages') ? {pages:[compatibility]} : compatibility }));
  await page.route('**/api/consistency/sites', route => route.fulfill({ json: { sites: [] } }));
- await page.goto(`http://127.0.0.1:${server.address().port}/private-consistency/`);
+ await page.goto(`http://127.0.0.1:${server.address().port}/editor/`);
  let ids = await page.locator('select[aria-label="Example page"] option').evaluateAll(options => options.map(option => option.value).filter(id => !['editor','studio'].includes(id)));
  if(process.env.TEMPLATE_ONLY)ids=ids.filter(id=>id===process.env.TEMPLATE_ONLY);
  if (process.env.FLOW_ONLY) ids.length = 0;
@@ -59,7 +59,7 @@ try {
   }
   return route.fulfill({ json: id ? drafts.get(id) : { sites: [...drafts.values()] } });
  });
- await page.goto(`http://127.0.0.1:${server.address().port}/private-consistency/home.html`);
+ await page.goto(`http://127.0.0.1:${server.address().port}/editor/home.html`);
  await page.getByRole('button', { name: 'Add new site', exact: true }).click();
  await page.locator('consistency-new-site ds-card[data-template]').first().waitFor();
  if (await page.locator('consistency-new-site ds-card[data-template]').count() !== 30) throw Error('Incomplete template picker');
@@ -125,7 +125,7 @@ try {
  if(await blankFrame.getByRole('slider',{name:'Page padding',exact:true}).getAttribute('aria-valuenow')!=='40')throw Error('Blank shared spacing did not reopen');
  console.log('Blank site: shared native editor, changed preview, creation, spacing and reopening passed');
 
- await page.goto(`http://127.0.0.1:${server.address().port}/private-consistency/`);
+ await page.goto(`http://127.0.0.1:${server.address().port}/editor/`);
  await page.setViewportSize({ width: 390, height: 844 });
  await page.locator('select[aria-label="Example page"]').selectOption('booking');
  await page.frameLocator('consistency-page-editor iframe').locator('.trip-hero').waitFor();

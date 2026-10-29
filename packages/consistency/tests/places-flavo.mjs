@@ -92,7 +92,7 @@ try {
     return json({ value });
   });
 
-  await page.goto(`http://127.0.0.1:${server.address().port}/private-consistency/home.html?open=92KTNN`);
+  await page.goto(`http://127.0.0.1:${server.address().port}/editor/home.html?open=92KTNN`);
   const sidebar = page.locator('consistency-home ds-sidebar.home-places');
   for (const menu of ['Pages', 'Produkter', 'Udlejning', 'Kunder', 'Medier', 'Flavo team', 'Profil', 'Orders'])
     await sidebar.getByText(menu, { exact: true }).waitFor();

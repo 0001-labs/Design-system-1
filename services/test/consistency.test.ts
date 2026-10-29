@@ -9,7 +9,7 @@ function setup(id = 'owner', verified = true) {
   return { assets, env, send };
 }
 const headers = { cookie: '__Host-ds1-dashboard=valid-token' };
-it.each(['/', '/private-consistency/index.html', '/private-consistency/assets/editor.js'])('gates anonymous files %s', async path => {
+it.each(['/', '/guide/', '/editor/assets/editor.js'])('gates anonymous files %s', async path => {
   const { env, assets, send } = setup();
   const result = await consistencyPreview(new Request(origin + path), env, send);
   expect(result.status).toBe(302); expect(result.headers.get('location')).toBe('/app/signin'); expect(assets).not.toHaveBeenCalled();
@@ -20,22 +20,22 @@ it.each([['other', true], ['owner', false]] as const)('denies unauthorized ident
 });
 it('revalidates owner on every HTML and asset and maps root', async () => {
   const { env, assets, send } = setup();
-  for (const path of ['/', '/private-consistency/assets/editor.js']) {
+  for (const path of ['/', '/editor/assets/editor.js']) {
     const result = await consistencyPreview(new Request(origin + path, { headers }), env, send);
     expect(result.status).toBe(200); expect(result.headers.get('cache-control')).toBe('private, no-store');
   }
-  expect(send).toHaveBeenCalledTimes(2); expect(new URL(assets.mock.calls[0]![0].url).pathname).toBe('/private-consistency/index.html');
+  expect(send).toHaveBeenCalledTimes(2); expect(new URL(assets.mock.calls[0]![0].url).pathname).toBe('/editor/');
 });
 it('opens the app at consistency.site and leads the former editor address to the lab', async () => {
   const { env, assets, send } = setup();
   expect((await consistencyPreview(new Request('https://consistency.site/', { headers }), env, send)).status).toBe(200);
-  expect(new URL(assets.mock.calls[0]![0].url).pathname).toBe('/private-consistency/home');
-  const moved = await consistencyPreview(new Request('https://neweditor.c9y.site/private-consistency/guide/?a=1', { headers }), env, send);
-  expect(moved.status).toBe(301); expect(moved.headers.get('location')).toBe('https://editor.c9y.site/private-consistency/guide/?a=1'); expect(assets).toHaveBeenCalledTimes(1);
+  expect(new URL(assets.mock.calls[0]![0].url).pathname).toBe('/editor/home');
+  const moved = await consistencyPreview(new Request('https://neweditor.c9y.site/guide/?a=1', { headers }), env, send);
+  expect(moved.status).toBe(301); expect(moved.headers.get('location')).toBe('https://editor.c9y.site/guide/?a=1'); expect(assets).toHaveBeenCalledTimes(1);
 });
 it.each(['https://designsystem1.com', 'https://worker.workers.dev', 'https://adoption.designsystem1.com', 'http://editor.c9y.site'])('blocks alternate origin %s', async host => {
   const { env, assets, send } = setup();
-  expect((await consistencyPreview(new Request(host + '/private-consistency/index.html', { headers }), env, send)).status).toBe(404); expect(assets).not.toHaveBeenCalled();
+  expect((await consistencyPreview(new Request(host + '/editor/index.html', { headers }), env, send)).status).toBe(404); expect(assets).not.toHaveBeenCalled();
 });
 it('serves sign-in shell/assets and creates only a same-origin host-only owner session', async () => {
   const { env, assets, send } = setup();
@@ -60,7 +60,7 @@ it('marks only authenticated preview HTML, preserving public shell, assets and H
   const head = await consistencyPreview(new Request(origin, { method: 'HEAD', headers }), env, send);
   expect(await head.text()).toBe(''); expect(head.headers.get('etag')).toBe('old');
   assets.mockImplementation(async () => new Response('const html = "<html>";', { headers: { 'Content-Type': 'text/javascript' } }));
-  const script = await consistencyPreview(new Request(origin + '/private-consistency/assets/editor.js', { headers }), env, send);
+  const script = await consistencyPreview(new Request(origin + '/editor/assets/editor.js', { headers }), env, send);
   expect(await script.text()).toBe('const html = "<html>";');
 });
 
@@ -194,7 +194,7 @@ it('keeps a member\'s session at consistency.site and opens the app for them, un
   assets.mockImplementation(async () => new Response('<!doctype html><html lang="en"></html>', { headers: { 'Content-Type': 'text/html' } }));
   const home = await consistencyPreview(new Request('https://consistency.site/', { headers }), env, send);
   expect(home.status).toBe(200); expect(await home.text()).not.toContain('data-ds-owner');
-  expect(new URL(assets.mock.calls[0]![0].url).pathname).toBe('/private-consistency/home');
+  expect(new URL(assets.mock.calls[0]![0].url).pathname).toBe('/editor/home');
 });
 
 it('gates site-draft creation with identity, same-origin JSON, size and captured workspace', async () => {
@@ -295,10 +295,10 @@ it('keeps the app\'s own addresses on consistency.site as they were', async () =
   for (const path of ['/app/signin', '/app/assets/login.js', '/icons/design-system-1.svg']) expect((await consistencyPreview(new Request(site + path), env, send)).status).toBe(200);
   expect(assets).toHaveBeenCalledTimes(3);
   // consistency.site asks the owner's System sign-in quietly first (consistency-owner.ts).
-  const gated = await consistencyPreview(new Request(`${site}/private-consistency/index.html`), env, send);
+  const gated = await consistencyPreview(new Request(`${site}/guide/`), env, send);
   expect(gated.status).toBe(302); expect(gated.headers.get('location')).toBe('/auth/start?silent=1');
   const home = await consistencyPreview(new Request(`${site}/`, { headers }), env, send);
-  expect(home.status).toBe(200); expect(new URL(assets.mock.calls.at(-1)![0].url).pathname).toBe('/private-consistency/home');
+  expect(home.status).toBe(200); expect(new URL(assets.mock.calls.at(-1)![0].url).pathname).toBe('/editor/home');
   expect((await consistencyPreview(new Request(`${site}/api/consistency/profile`), env, send)).status).toBe(401);
   expect((await consistencyPreview(new Request(`${site}/api/dashboard/session`, { method: 'POST', headers: { origin: site, authorization: 'Bearer valid-token' } }), env, send)).status).toBe(204);
   expect(elsewhere()).toBe(0);
@@ -306,18 +306,18 @@ it('keeps the app\'s own addresses on consistency.site as they were', async () =
 
 it('reuses versioned private static assets while keeping HTML and errors uncached',async()=>{
  const {env,send,assets}=setup();
- const result=await consistencyPreview(new Request(origin+'/private-consistency/assets/editor-Ab12cd34.js',{headers}),env,send);
+ const result=await consistencyPreview(new Request(origin+'/editor/assets/editor-Ab12cd34.js',{headers}),env,send);
  expect(result.headers.get('cache-control')).toBe('private, max-age=31536000, immutable');
  expect(send).toHaveBeenCalledTimes(1);
  assets.mockImplementation(async()=>new Response('missing',{status:404}));
- expect((await consistencyPreview(new Request(origin+'/private-consistency/assets/editor-Ab12cd34.js',{headers}),env,send)).headers.get('cache-control')).toBe('private, no-store');
+ expect((await consistencyPreview(new Request(origin+'/editor/assets/editor-Ab12cd34.js',{headers}),env,send)).headers.get('cache-control')).toBe('private, no-store');
 });
 
-it.each(['/private-consistency/home', '/private-consistency/home/', '/private-consistency/home.html'])('retires the old home address %s', async path => {
+it.each(['/private-consistency', '/private-consistency/', '/private-consistency/index.html', '/private-consistency/home', '/private-consistency/home/', '/private-consistency/home.html', '/private-consistency/guide/', '/private-consistency/assets/editor.js', '/%70rivate-consistency/', '/PRIVATE-CONSISTENCY/'])('retires every old editor address %s', async path => {
   const { env, assets, send } = setup();
-  for (const method of ['GET', 'HEAD', 'POST']) {
+  for (const host of ['consistency.site', 'editor.c9y.site', 'neweditor.c9y.site', 'c9y.site']) for (const method of ['GET', 'HEAD', 'POST']) {
     for (const cookie of ['', headers.cookie]) {
-      const result = await consistencyPreview(new Request(`https://consistency.site${path}?open=52OFXF`, { method, headers: { cookie } }), env, send);
+      const result = await consistencyPreview(new Request(`https://${host}${path}?open=52OFXF`, { method, headers: { cookie } }), env, send);
       expect(result.status).toBe(410);
       expect(result.headers.get('location')).toBeNull();
       expect(result.headers.get('cache-control')).toBe('private, no-store');
@@ -330,9 +330,20 @@ it.each(['/private-consistency/home', '/private-consistency/home/', '/private-co
 
 it('serves the signed-in root without leaking the asset canonical redirect', async () => {
  const {env,assets,send}=setup();
- assets.mockImplementation(async request=>new URL(request.url).pathname.endsWith('.html') ? new Response(null,{status:308,headers:{Location:'/private-consistency/home'}}) : new Response('<html><body>Editor</body></html>',{headers:{'Content-Type':'text/html'}}));
+ assets.mockImplementation(async request=>new URL(request.url).pathname.endsWith('.html') ? new Response(null,{status:308,headers:{Location:'/editor/home'}}) : new Response('<html><body>Editor</body></html>',{headers:{'Content-Type':'text/html'}}));
  const home=await consistencyPreview(new Request('https://consistency.site/?open=26WGEE',{headers}),env,send);
  expect(home.status).toBe(200);
  expect(home.headers.get('location')).toBeNull();
  expect(await home.text()).toContain('Editor');
+});
+
+it('maps the root guide and protects internal build documents', async () => {
+ const {env,send,assets}=setup();
+ const guide=await consistencyPreview(new Request(origin+'/guide/',{headers}),env,send);
+ expect(guide.status).toBe(200);expect(guide.headers.has('location')).toBe(false);
+ expect(new URL(assets.mock.calls[0]![0].url).pathname).toBe('/editor/guide');
+ for(const path of ['/editor/','/editor/home','/editor/index.html']) {
+  const result=await consistencyPreview(new Request(origin+path,{headers}),env,send);
+  expect(result.status).toBe(404);expect(result.headers.has('location')).toBe(false);
+ }
 });

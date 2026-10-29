@@ -95,7 +95,7 @@ try {
     }
     return route.fulfill({ status: 404, json: { error: 'not-found' } });
   });
-  const home = `http://127.0.0.1:${server.address().port}/private-consistency/home.html`;
+  const home = `http://127.0.0.1:${server.address().port}/editor/home.html`;
   await page.goto(home);
   await page.locator('consistency-home ds-card', { hasText: 'CPH Raft' }).click();
   const sidebar = page.locator('consistency-home ds-sidebar.home-places');

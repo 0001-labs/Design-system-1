@@ -19,7 +19,7 @@ try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
   const broken = [];
   page.on('console', message => { if (message.text().startsWith('C9Y constraint')) broken.push(message.text()); });
-  await page.goto(`http://127.0.0.1:${server.address().port}/private-consistency/`); await page.waitForSelector('aa-editor');
+  await page.goto(`http://127.0.0.1:${server.address().port}/editor/`); await page.waitForSelector('aa-editor');
   await page.locator('select[aria-label="Example page"]').selectOption('studio');
   await page.waitForSelector('[data-sort-group]');
   const order = () => page.locator('.consistency-sheet > [data-sort-group]').evaluateAll(groups => groups.map(group => group.dataset.sortGroup));

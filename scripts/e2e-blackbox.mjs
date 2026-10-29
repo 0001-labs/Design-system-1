@@ -610,10 +610,10 @@ if (PRODUCTION) {
   ]);
 
   await step("Private hosts", [
-    ...["/private-consistency/home", "/private-consistency/home/", "/private-consistency/home.html"].map(path => [
-      `Consistency's former home address ${path} is gone`,
-      async () => expectStatus(await request(`https://consistency.site${path}?open=52OFXF`), 410),
-    ]),
+    ...["consistency.site", "editor.c9y.site", "neweditor.c9y.site", "c9y.site"].flatMap(host => ["/private-consistency/", "/private-consistency/home", "/private-consistency/home/", "/private-consistency/home.html", "/private-consistency/guide/", "/private-consistency/assets/editor.js"].map(path => [
+      `${host}${path} is gone without a redirect`,
+      async () => { const answer = await request(`https://${host}${path}?open=52OFXF`); expectStatus(answer, 410); if (answer.headers.has("location")) throw new Error("Retired editor URL redirects"); },
+    ])),
     ...["consistency.site", "c9y.site", "editor.c9y.site", "neweditor.c9y.site"].map(host => [
       `${host} upgrades HTTP with its path and query intact`,
       async () => expectRedirect(await request(`http://${host}/auth/start?next=%2F`), 308, `https://${host}/auth/start?next=%2F`),
@@ -643,7 +643,7 @@ if (PRODUCTION) {
       [`${new URL(origin).hostname} has no other pages`, async () => expectStatus(await request(`${origin}/blackbox-no-such-page`), 404)],
     ]),
     ["Private editor files require a session", async () => {
-      const answer = await request(`${EDITOR}/private-consistency/consistency.js`);
+      const answer = await request(`${EDITOR}/editor/assets/editor.js`);
       // c9y.site asks the owner's System sign-in quietly first (services/src/consistency-owner.ts).
       expectRedirect(answer, 302, `${EDITOR}/auth/start?silent=1`);
       expectPrivate(answer);

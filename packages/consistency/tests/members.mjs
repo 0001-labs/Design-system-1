@@ -28,7 +28,7 @@ try {
   if(route.request().method()==='POST'){const body=route.request().postDataJSON();posted.push(body);if(!members.some(each=>each.email===body.email))members.push({email:body.email,role:body.role,status:'invited'});await route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({email:body.email,role:body.role,status:'invited',sent:true})});return;}
   await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({members})});
  });
- const home=`http://127.0.0.1:${server.address().port}/private-consistency/home.html`;
+ const home=`http://127.0.0.1:${server.address().port}/editor/home.html`;
  await page.goto(home);await page.locator('consistency-home ds-card').first().waitFor();
  await page.mouse.move(700,500);await page.locator('consistency-home ds-sidebar.home-foot').getByText('Settings',{exact:true}).click();
  await page.getByRole('tab',{name:'People'}).click();

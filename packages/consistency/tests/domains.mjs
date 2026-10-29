@@ -46,7 +46,7 @@ try {
     }
     return route.fulfill({ status: 405 });
   });
-  const base = `http://127.0.0.1:${server.address().port}/private-consistency/home.html`;
+  const base = `http://127.0.0.1:${server.address().port}/editor/home.html`;
   await page.goto(base); await page.locator('consistency-home ds-card').first().waitFor();
   // Settings is at the sidebar's foot (home.mjs covers the sidebar itself).
   await page.locator('consistency-home ds-sidebar.home-foot').getByText('Settings', { exact: true }).click();

@@ -24,7 +24,7 @@ try{
   }
   return route.fulfill({json:id?drafts.get(id):{pages:[...drafts.values()]}});
  });
- await page.goto(`http://127.0.0.1:${server.address().port}/private-consistency/`);
+ await page.goto(`http://127.0.0.1:${server.address().port}/editor/`);
  await page.getByRole('button',{name:'New page',exact:true}).click();
  const frame=page.frameLocator('consistency-page-editor iframe');
  await frame.locator('[data-c9y-native-root][data-editor-surface]').waitFor({timeout:15000});

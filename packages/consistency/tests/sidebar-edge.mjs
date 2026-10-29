@@ -30,7 +30,7 @@ async function routes(page) {
   await page.route('**/api/consistency/workspaces/*/members', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ members: [] }) }));
   await page.route('**/api/consistency/domains**', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ domains: [] }) }));
 }
-const home = `http://127.0.0.1:${server.address().port}/private-consistency/home.html`;
+const home = `http://127.0.0.1:${server.address().port}/editor/home.html`;
 try {
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   // On every load, what the app says about the sidebar when its page is first put in, before anything is painted.

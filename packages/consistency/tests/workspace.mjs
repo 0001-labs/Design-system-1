@@ -14,7 +14,7 @@ const server = createServer(async (request, response) => {
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 const browser = await chromium.launch({ headless: true });
 try {
- const base=`http://127.0.0.1:${server.address().port}/private-consistency/`;
+ const base=`http://127.0.0.1:${server.address().port}/editor/`;
  const page=await browser.newPage({viewport:{width:1440,height:1000}});
  const drafts=new Map();let conflict=false;
  await page.route('**/api/consistency/pages**',async route=>{

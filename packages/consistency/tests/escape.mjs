@@ -31,7 +31,7 @@ try {
   await page.locator('.aa-block').click();await page.keyboard.press('End');await page.keyboard.type('!');
   if(await page.evaluate(()=>editor.value)!=='Keep these words!')throw Error('Aa could not resume after dismissal');
  }
- await page.goto(`${base}/private-consistency/`);await page.waitForSelector('aa-editor[data-editor-key="intro"]');
+ await page.goto(`${base}/editor/`);await page.waitForSelector('aa-editor[data-editor-key="intro"]');
  await page.locator('select[aria-label="Example page"]').selectOption('studio');
  const intro=page.locator('aa-editor[data-editor-key="intro"]');
  for(const selected of [false,true]) {

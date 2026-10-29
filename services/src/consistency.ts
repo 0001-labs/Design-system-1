@@ -28,12 +28,12 @@ const FILM_KIT_PREFIX = '/kit/';
 export const isConsistencyHost = (host:string) => [CONSISTENCY_HOST, APP_HOST, EDITOR_HOST, FORMER_EDITOR_HOST].includes(host);
 /** The addresses the app answers on consistency.site, besides its front page. */
 export function isAppPath(path: string): boolean {
-  return /^\/(?:auth|private-consistency)(?:\/|$)/.test(path) || path.startsWith('/api/consistency/') || path === '/api/dashboard/session' || path === '/app/signin' || /^\/app\/assets\//.test(path) || path === '/icons/design-system-1.svg';
+  return /^\/auth(?:\/|$)/.test(path) || path === '/guide/' || path.startsWith('/editor/') || path.startsWith('/api/consistency/') || path === '/api/dashboard/session' || path === '/app/signin' || /^\/app\/assets\//.test(path) || path === '/icons/design-system-1.svg';
 }
 export interface WorkspaceEnv extends OwnerEnv { CONSISTENCY_WORKSPACE?: Fetcher }
-const prefix = '/private-consistency/';
+const prefix = '/editor/';
 /** Normalize only for interception. Assets must never decode a private path on another host. */
-export function isPrivatePreviewPath(path: string): boolean {
+function canonicalEditorPath(path: string): string {
   let decoded = path;
   for (let count = 0; count < 4; count++) {
     try {
@@ -43,7 +43,12 @@ export function isPrivatePreviewPath(path: string): boolean {
     } catch { break; }
   }
   const canonical = new URL(decoded.replace(/\\/g, '/').replace(/^\/+/, '/'), 'https://private.invalid').pathname.toLowerCase();
-  return canonical.startsWith('/private-consistency');
+  return canonical;
+}
+/** Keep retired URLs and internal build files off every other host. */
+export function isEditorBuildPath(path: string): boolean {
+  const canonical = canonicalEditorPath(path);
+  return canonical.startsWith('/private-consistency') || /^\/editor(?:\/|$)/.test(canonical);
 }
 const security = { 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow', 'Referrer-Policy': 'same-origin', 'X-Content-Type-Options': 'nosniff', Vary: 'Cookie, Authorization' };
 /**
@@ -128,8 +133,8 @@ function protect(response: Response, cache?: string): Response {
 export async function consistencyPreview(request: Request, env: ReportsEnv & WorkspaceEnv & { ASSETS: Fetcher }, send: typeof fetch = fetch): Promise<Response> {
   const url = new URL(request.url);
   if (!isConsistencyHost(url.hostname) || url.protocol !== 'https:') return new Response(null, { status: 404, headers: security });
-  // Retired public address: only the root serves the signed-in home.
-  if (url.hostname === APP_HOST && /^\/private-consistency\/home(?:\.html|\/)?$/.test(url.pathname)) {
+  // Retired URLs are gone before sign-in or host routing; none redirect to the root.
+  if (canonicalEditorPath(url.pathname).startsWith('/private-consistency')) {
     return new Response(null, { status: 410, headers: security });
   }
   if (url.hostname === FORMER_EDITOR_HOST) return new Response(null, { status: 301, headers: { ...security, Location: `https://${EDITOR_HOST}${url.pathname}${url.search}` } });
@@ -162,7 +167,7 @@ export async function consistencyPreview(request: Request, env: ReportsEnv & Wor
   if (url.pathname === '/api/consistency/domains' || url.pathname.startsWith('/api/consistency/domains/')) return protect(await domainsApi(request, env, send));
   if (url.pathname === '/api/consistency/profile') return protect(await profileApi(request, env, send));
   if (!['GET', 'HEAD'].includes(request.method)) return new Response(null, { status: 404, headers: security });
-  if (url.pathname !== '/' && !url.pathname.startsWith(prefix)) return new Response(null, { status: 404, headers: security });
+  if (url.pathname !== '/' && url.pathname !== '/guide/' && !/^\/editor\/assets\/[A-Za-z0-9][A-Za-z0-9._-]*$/.test(url.pathname)) return new Response(null, { status: 404, headers: security });
   const person = await authorizePerson(request, env, send);
   const denied = person instanceof Response ? person : null;
   // Signed out, consistency.site's front page is the landing.
@@ -173,9 +178,10 @@ export async function consistencyPreview(request: Request, env: ReportsEnv & Wor
     return protect(denied);
   }
   // c9y.site's home lists the sites; the editor lab opens on the page editor itself.
-  if (url.pathname === '/') url.pathname = url.hostname === EDITOR_HOST ? `${prefix}index.html` : `${prefix}home`;
+  if (url.pathname === '/') url.pathname = url.hostname === EDITOR_HOST ? prefix : `${prefix}home`;
+  else if (url.pathname === '/guide/') url.pathname = `${prefix}guide`;
   const original = await env.ASSETS.fetch(new Request(url, request));
-  const assetCache = /^\/private-consistency\/assets\/[\w.-]+-[\w-]{8,}\.(?:js|css|woff2?|ttf|json)$/.test(url.pathname) ? 'private, max-age=31536000, immutable' : undefined;
+  const assetCache = /^\/editor\/assets\/[\w.-]+-[\w-]{8,}\.(?:js|css|woff2?|ttf|json)$/.test(url.pathname) ? 'private, max-age=31536000, immutable' : undefined;
   // This marker enables owner-only diagnostics; it grants no server access. Only
   // trusted built HTML is rewritten, after the authority has validated the owner.
   if (!(person as Person).owner) return protect(original, assetCache);

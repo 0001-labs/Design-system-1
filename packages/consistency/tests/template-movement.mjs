@@ -7,7 +7,7 @@ const root=resolve('website/dist'),templates=JSON.parse(await readFile('shared/c
 const server=createServer(async(req,res)=>{const path=new URL(req.url,'http://localhost').pathname,file=resolve(root,'.'+(path.endsWith('/')?path+'index.html':path));if(!file.startsWith(root+'/'))return res.writeHead(403).end();try{res.setHeader('content-type',({'.html':'text/html','.js':'text/javascript','.css':'text/css'})[extname(file)]??'application/octet-stream');res.end(await readFile(file));}catch{res.writeHead(404).end();}});
 await new Promise(done=>server.listen(0,'127.0.0.1',done));const browser=await chromium.launch({headless:true});
 try{
- const page=await browser.newPage({viewport:{width:1440,height:1000}});await page.route('**/api/consistency/pages',r=>r.fulfill({json:{pages:[]}}));await page.route('**/api/consistency/sites',r=>r.fulfill({json:{sites:[]}}));await page.goto(`http://127.0.0.1:${server.address().port}/private-consistency/`);
+ const page=await browser.newPage({viewport:{width:1440,height:1000}});await page.route('**/api/consistency/pages',r=>r.fulfill({json:{pages:[]}}));await page.route('**/api/consistency/sites',r=>r.fulfill({json:{sites:[]}}));await page.goto(`http://127.0.0.1:${server.address().port}/editor/`);
  const input=await page.context().newCDPSession(page);
  for(const[id,template]of Object.entries(templates)){
   if(process.env.TEMPLATE_ONLY&&process.env.TEMPLATE_ONLY!==id)continue;

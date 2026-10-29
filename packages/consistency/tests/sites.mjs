@@ -49,7 +49,7 @@ const within = async (promise, message) => {
   finally { clearTimeout(timer); }
 };
 try {
-  const base = `http://127.0.0.1:${server.address().port}/private-consistency/`;
+  const base = `http://127.0.0.1:${server.address().port}/editor/`;
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
   const edits = [], asked = [], savedWords = new Map();
   let holdText = null;

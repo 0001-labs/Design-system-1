@@ -21,7 +21,7 @@ try {
  const base = `http://127.0.0.1:${server.address().port}`;
  const page = await browser.newPage({ viewport:{ width:1440,height:1000 } });
  const failures=[]; page.on('pageerror',error=>failures.push(error.message));
- await page.goto(base+'/private-consistency/'); await page.waitForSelector('aa-editor[data-editor-key="intro"]');
+ await page.goto(base+'/editor/'); await page.waitForSelector('aa-editor[data-editor-key="intro"]');
  await page.locator('select[aria-label="Example page"]').selectOption('studio');
  await page.locator('consistency-editor').evaluate(async element=>{element.history.commit({text:''});element.requestUpdate();await element.updateComplete;});
  const text = page.locator('aa-editor[data-editor-key="intro"]>.aa-block').first(); await text.click(); await page.keyboard.type('/carousel');
