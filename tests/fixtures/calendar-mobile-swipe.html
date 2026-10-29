@@ -1,0 +1,12 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Calendar mobile swipe</title>
+<link rel="stylesheet" href="/DS1/1-root/one.css">
+<style>body { margin: 20px; } main { min-height: 150vh; } h1 { font: inherit; margin: 20px 0; } output { display: block; margin: 20px 0; }</style>
+<main><h1>Mobile month swipe</h1><ds-calendar compact selectable fixed outside-days day-width="2" week-start="monday" month="2026-12" value="2026-12-15/2026-12-18"></ds-calendar><output id="state">December 2026 · selected Dec 15–18</output></main>
+<script type="module">
+import '/DS1/3-unit/ds-calendar.ts';
+const calendar = document.querySelector('ds-calendar');
+const state = document.querySelector('output');
+const show = () => { state.textContent = `${calendar.shownMonth} · ${calendar.value}`; };
+calendar.addEventListener('navigate', show);
+calendar.addEventListener('change', show);
+</script></html>

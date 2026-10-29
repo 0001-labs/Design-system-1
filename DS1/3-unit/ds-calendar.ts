@@ -444,8 +444,15 @@ export class Calendar extends CalendarBase {
     this.browseYear = 0;
   }
 
+  connectedCallback() {
+    super.connectedCallback();
+    window.addEventListener("resize", this.resetMonthMotion);
+  }
+
   disconnectedCallback() {
+    window.removeEventListener("resize", this.resetMonthMotion);
     this.hide(false);
+    this.stopMonthMotion();
     super.disconnectedCallback();
   }
 
@@ -847,18 +854,129 @@ export class Calendar extends CalendarBase {
     return getComputedStyle(this).direction === "rtl";
   }
 
+  private monthPan?: { id: number; x: number; y: number; at: number; offset: number; width: number; horizontal: boolean; track: HTMLElement };
+  private monthFrame?: number;
+  private monthTimer?: ReturnType<typeof setTimeout>;
+  private monthOffset = 0;
+
+  private get mobileMonth() {
+    return this.compact && !this.noHeader && this.level === "days" && this.shownView === "month"
+      && typeof matchMedia === "function" && matchMedia("(max-width: 720px)").matches;
+  }
+
+  private canSwipe(direction: -1 | 1) {
+    const arrow = this.renderRoot.querySelector<HTMLButtonElement>(`.header [part~="${direction < 0 ? "previous" : "next"}"]`);
+    return Boolean(arrow && !arrow.disabled);
+  }
+
+  private stopMonthMotion() {
+    if (this.monthFrame !== undefined) cancelAnimationFrame(this.monthFrame);
+    if (this.monthTimer !== undefined) clearTimeout(this.monthTimer);
+    this.monthFrame = undefined;
+    this.monthTimer = undefined;
+    this.monthPan = undefined;
+  }
+
+  private resetMonthMotion = () => {
+    this.stopMonthMotion();
+    const track = this.renderRoot.querySelector<HTMLElement>(".month-track");
+    if (track) { track.style.transition = "none"; track.style.transform = "translateX(0px)"; }
+    this.monthOffset = 0;
+    this.swipe = undefined;
+  };
+
+  private paintMonth(track: HTMLElement, offset: number) {
+    this.monthOffset = offset;
+    if (this.monthFrame !== undefined) cancelAnimationFrame(this.monthFrame);
+    this.monthFrame = requestAnimationFrame(() => {
+      this.monthFrame = undefined;
+      track.style.transform = `translateX(${this.monthOffset}px)`;
+    });
+  }
+
+  private settleMonth(track: HTMLElement, width: number, direction?: -1 | 1) {
+    if (this.monthFrame !== undefined) cancelAnimationFrame(this.monthFrame);
+    this.monthFrame = undefined;
+    const allowed = direction !== undefined && this.canSwipe(direction);
+    const target = allowed ? -direction * (this.rtl ? -1 : 1) * width : 0;
+    const complete = async () => {
+      this.monthTimer = undefined;
+      if (allowed) this.swipeTo(direction!);
+      await this.updateComplete;
+      track.style.transition = "none";
+      track.style.transform = "translateX(0px)";
+      this.monthOffset = 0;
+    };
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches || !width) {
+      void complete();
+      return;
+    }
+    track.style.transition = "transform 180ms cubic-bezier(0.23, 1, 0.32, 1)";
+    track.style.transform = `translateX(${target}px)`;
+    this.monthTimer = setTimeout(() => void complete(), 180);
+  }
+
   private onSwipeStart = (event: PointerEvent) => {
     this.swipe = event.pointerType === "mouse" || !event.isPrimary ? undefined : { id: event.pointerId, x: event.clientX, y: event.clientY, at: event.timeStamp };
+    if (!this.swipe || !this.mobileMonth || !(event.target as Element).closest?.(".grid")) return;
+    const track = this.renderRoot.querySelector<HTMLElement>(".month-track");
+    if (!track) return;
+    // An interrupted settling motion is taken over at its current visible position.
+    const transform = getComputedStyle(track).transform;
+    const offset = transform && transform !== "none" ? new DOMMatrixReadOnly(transform).m41 : 0;
+    this.stopMonthMotion();
+    track.style.transition = "none";
+    track.style.transform = `translateX(${offset}px)`;
+    this.monthOffset = offset;
+    this.monthPan = { id: event.pointerId, x: event.clientX - offset, y: event.clientY, at: event.timeStamp, offset, width: track.getBoundingClientRect().width, horizontal: false, track };
+  };
+
+  private onSwipeMove = (event: PointerEvent) => {
+    const pan = this.monthPan;
+    if (!pan || pan.id !== event.pointerId) return;
+    const dx = event.clientX - pan.x, dy = event.clientY - pan.y;
+    if (!pan.horizontal) {
+      if (Math.abs(dy) > 8 && Math.abs(dy) >= Math.abs(dx)) {
+        this.monthPan = undefined; this.swipe = undefined;
+        if (pan.offset) this.settleMonth(pan.track, pan.width);
+        return;
+      }
+      if (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(dy) * 2) return;
+      pan.horizontal = true;
+      this.swipedAt = Date.now();
+      try { (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId); } catch { /* A synthetic pointer has no capture. */ }
+    }
+    event.preventDefault();
+    const direction = dx * (this.rtl ? -1 : 1) < 0 ? 1 : -1;
+    const offset = this.canSwipe(direction) ? Math.max(-pan.width, Math.min(pan.width, dx)) : 0;
+    pan.offset = offset;
+    if (!matchMedia("(prefers-reduced-motion: reduce)").matches) this.paintMonth(pan.track, offset);
+  };
+
+  private onSwipeCancel = () => {
+    const pan = this.monthPan;
+    this.monthPan = undefined; this.swipe = undefined;
+    if (pan) this.settleMonth(pan.track, pan.width);
   };
 
   private onSwipeEnd = (event: PointerEvent) => {
+    const pan = this.monthPan;
+    if (pan && event.pointerId === pan.id) {
+      this.monthPan = undefined; this.swipe = undefined;
+      if (!pan.horizontal) return;
+      this.swipedAt = Date.now();
+      const dx = pan.offset * (this.rtl ? -1 : 1);
+      const duration = Math.max(1, event.timeStamp - pan.at);
+      const commit = Math.abs(dx) >= Math.min(40, pan.width * 0.25) || (Math.abs(dx) >= 16 && duration < 250 && Math.abs(dx) / duration > 0.4);
+      this.settleMonth(pan.track, pan.width, commit ? dx < 0 ? 1 : -1 : undefined);
+      return;
+    }
     const swipe = this.swipe;
     this.swipe = undefined;
     if (!swipe || event.pointerId !== swipe.id) return;
     const dx = (event.clientX - swipe.x) * (this.rtl ? -1 : 1);
     const dy = event.clientY - swipe.y;
     if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 2 || event.timeStamp - swipe.at > 800) return;
-    // A day the swipe started on is not pressed by it.
     if (this.swipeTo(dx < 0 ? 1 : -1)) this.swipedAt = Date.now();
   };
 
@@ -873,7 +991,9 @@ export class Calendar extends CalendarBase {
     if (Math.abs(this.wheel.dx) < 60) return;
     const direction = this.wheel.dx > 0 ? 1 : -1;
     this.wheel = { dx: 0, at: 0, locked: now + 500 };
-    this.swipeTo(direction);
+    const track = this.mobileMonth ? this.renderRoot.querySelector<HTMLElement>(".month-track") : null;
+    if (track) this.settleMonth(track, track.getBoundingClientRect().width, direction);
+    else this.swipeTo(direction);
   };
 
   private onSwipeClick = (event: MouseEvent) => {
@@ -1238,8 +1358,9 @@ export class Calendar extends CalendarBase {
       part="calendar"
       ?data-swipe=${swipes}
       @pointerdown=${swipes ? this.onSwipeStart : nothing}
+      @pointermove=${swipes ? this.onSwipeMove : nothing}
       @pointerup=${swipes ? this.onSwipeEnd : nothing}
-      @pointercancel=${() => (this.swipe = undefined)}
+      @pointercancel=${this.onSwipeCancel}
       @wheel=${swipes ? this.onSwipeWheel : nothing}
       @click=${{ handleEvent: this.onSwipeClick, capture: true }}
     >
@@ -1347,13 +1468,14 @@ export class Calendar extends CalendarBase {
       @pointerover=${this.onPointerOver}
       @pointerleave=${() => (this.hoverDay = undefined)}
       @pointerdown=${swipes ? this.onSwipeStart : nothing}
+      @pointermove=${swipes ? this.onSwipeMove : nothing}
       @pointerup=${swipes ? this.onSwipeEnd : nothing}
-      @pointercancel=${() => (this.swipe = undefined)}
+      @pointercancel=${this.onSwipeCancel}
       @wheel=${swipes ? this.onSwipeWheel : nothing}
       @click=${{ handleEvent: this.onSwipeClick, capture: true }}
     >
       ${this.renderHeader()}
-      ${this.level !== "days" && !this.noHeader ? this.renderPicks(weeks.length) : html`<div
+      ${this.level !== "days" && !this.noHeader ? this.renderPicks(weeks.length) : this.monthTrack(html`<div
         class="grid"
         part="grid"
         role="grid"
@@ -1375,9 +1497,19 @@ export class Calendar extends CalendarBase {
           // The week's number on its first day, counted from the week's middle so a week from Sunday takes its Monday's.
           week: this.weekNumbers && column === 0 && this.squaresPerDay >= 3 && week.some(drawn) ? isoWeek(addDays(day, 3)) : undefined,
         }))}</div>`)}
-      </div>`}
+      </div>`)}
       ${this.renderClear()}
     </div>`;
+  }
+
+  private monthTrack(grid: unknown) {
+    if (!this.compact || this.noHeader || this.level !== "days") return grid;
+    const neighbour = (direction: -1 | 1) => html`<div class=${`month-neighbour ${direction < 0 ? "previous" : "next"}`} inert aria-hidden="true"><ds-calendar
+      compact no-header no-today required .fixed=${this.fixed} .outsideDays=${this.outsideDays}
+      .dayWidth=${this.dayWidth} .weekStart=${this.weekStart} .today=${this.today}
+      .month=${addMonths(this.shownMonth, direction)} .value=${this.value}
+      .selectable=${this.selectable} .events=${this.events}></ds-calendar></div>`;
+    return html`<div class="month-swipe"><div class="month-track">${neighbour(-1)}${grid}${neighbour(1)}</div></div>`;
   }
 
   // The picker: a field that opens the small month.

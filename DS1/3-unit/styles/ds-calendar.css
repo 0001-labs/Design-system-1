@@ -795,3 +795,17 @@
   .activity-weekday:not(:empty) { font-size: 0; }
   .activity-weekday:not(:empty)::after { content: attr(data-narrow); font-size: var(--ds-type-size-default); }
 }
+
+/* A small month's neighbours stand ready for direct mobile manipulation.
+ * Only the grid travels; its header, controls and outer geometry stay still. */
+.month-swipe { overflow: clip; }
+.month-track { position: relative; }
+.month-neighbour { position: absolute; top: 0; width: 100%; pointer-events: none; }
+.month-neighbour.previous { left: -100%; }
+.month-neighbour.next { left: 100%; }
+:host(:dir(rtl)) .month-neighbour.previous { left: 100%; }
+:host(:dir(rtl)) .month-neighbour.next { left: -100%; }
+.month-neighbour > ds-calendar { display: block; }
+@media (prefers-reduced-motion: reduce) {
+  .month-track { transition: none !important; }
+}
