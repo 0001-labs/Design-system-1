@@ -296,8 +296,8 @@ try {
   const previewText = await wording.locator('iframe').contentFrame().locator('body').innerText();
   if (!previewText.includes('Final A new website') || !previewText.includes('alex@example.com')) fail('The preview did not draw the live form fields');
   if (await wording.getByRole('button', { name: /^(Save|Apply)$/ }).count()) fail('Email wording has a save ceremony');
-  emailRevision++; emailSource = { ...emailSource, subject: 'Changed in another tab {{name}}' };
   await subject.fill('My conflicting draft {{name}}');
+  emailRevision++; emailSource = { ...emailSource, subject: 'Changed in another tab {{name}}' };
   await wording.getByRole('alert').waitFor();
   if (await subject.inputValue() !== 'My conflicting draft {{name}}' || emailSource.subject !== 'Changed in another tab {{name}}') fail('A conflict replaced the other tab or lost the draft');
   await wording.getByRole('button', { name: 'Use saved version', exact: true }).click();
