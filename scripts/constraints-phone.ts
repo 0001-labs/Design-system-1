@@ -151,7 +151,8 @@ const base = served?.base ?? named!;
 const pages = await pagesOf(base);
 const theme = option('theme') ?? 'light';
 if (theme !== 'light' && theme !== 'dark') throw new Error('Use --theme light or --theme dark.');
-const browser = await webkit.launch();
+// Keep release checks invisible even when Playwright debugging is enabled in the shell.
+const browser = await webkit.launch({ headless: true });
 const queue = widths.flatMap(width => pages.map(url => ({ width, url })));
 const report: string[] = [];
 /** What the rules could not measure and a person must look at: listed, never a failure. */
