@@ -4,6 +4,8 @@ import '../../DS1/1-root/one.css';
 import '../../DS1/1-root/grid.css';
 import '../../website/src/vendor/aa/aa.css';
 import './src/style.css';
+import './src/editor-layout.css';
+import '../../DS1/4-page/ds-page';
 import { ConsistencyEditor } from './src/index';
 import { render } from 'lit';
 import { editorBrand } from './src/editor-brand';
