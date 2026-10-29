@@ -229,3 +229,20 @@ its desktop `anchor` point. Desktop placement and point/context/submenus keep th
 existing rules. Clear on a calendar picker dismisses it and restores its field’s
 focus; applications embedding a standalone month close their own context after
 the clear has saved successfully (a failed save stays open with its error).
+
+### Mobile sheet conventions
+
+At phone widths (up to 768px), sheet close controls marked
+`data-ds-overlay="close"` are visually hidden. They retain their accessible
+button and name for assistive technology. Keep swipe, Escape and the configured
+backdrop/outside dismissal available; do not disable every way to leave a sheet.
+Desktop close controls retain their existing appearance.
+
+For tabs, mark the native dialog `data-ds-overlay-tabbed`, keep the tabs in
+`data-ds-overlay="header"`, and wrap the changing content in
+`data-ds-overlay="body"`. On mobile the sheet occupies a stable bounded height;
+tab contents scroll inside it, even when one panel is short. Its height follows
+the visual viewport, keyboard, rotation and safe areas. Desktop sizing is unchanged.
+A people/access sheet may start with its tabs and use `aria-label` for its
+nonvisual dialog name, without a separate visible title. This pattern does not
+change the labels, permissions or actions of those tabs.
