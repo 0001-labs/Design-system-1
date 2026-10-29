@@ -26,9 +26,9 @@ Held by `tests/template-native.mjs`: “content and design preserved through sha
 
 ### `native.inline-writing`
 
-Words inside a button or menu remain editable through spaces, selection and reopening without activating the component.
+Buttons and links keep their normal press; their hover Edit action edits words in place with spaces, selection, saving and reopening, without a page-wide editing mode.
 
-Held by `tests/templates.mjs`: “authored page, direct writing, independent draft and reopen passed”.
+Held by `tests/control-edit.mjs`: “Hover Edit works for native links, imported links and DS1 buttons”.
 
 ### `native.workspace`
 

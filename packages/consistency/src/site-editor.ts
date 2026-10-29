@@ -6,6 +6,7 @@ import '../../../DS1/2-core/ds-empty';
 import '../../../DS1/2-core/ds-message';
 import '../../../DS1/3-unit/ds-select';
 import {failureWords,firstPage,pageGroups,pressAction,siteAddress,siteOrigins,type SitePage,type SiteSummary} from './site-editing';
+import { editableControl } from './control-edit';
 import type {NativePageSnapshot} from './native-site';
 import {ConsistencyPageEditor} from './page-editor';
 import './site-editor.css';
@@ -76,7 +77,23 @@ export class ConsistencySiteEditor extends LitElement {
  private show(){for(const[key,entry]of this.cache)entry.editor.active=key===this.path;if(this.pageEditor?.canvas.contentDocument?.querySelector('[data-editor-surface]'))this.wire(this.pageEditor.canvas);}
  async flush(){return await this.pageEditor?.flush()??true;}
  private wire(frame:HTMLIFrameElement){this.detach?.();const doc=frame.contentDocument!,origin=new URL(this.site.url).origin;
-  const press=(event:MouseEvent)=>{const target=event.target as Element;if(event.defaultPrevented||target.closest('[data-editor-chrome]')||!event.metaKey&&!event.ctrlKey&&target.closest('aa-editor,[contenteditable]'))return;const link=target.closest<HTMLElement>('a[href],ds-button[href]');if(!link&&target.closest('summary'))return;event.preventDefault();const action=pressAction({inEditing:false,field:false,link:link?{href:new URL(link.getAttribute('href')??'',origin).href}:null,mod:event.metaKey||event.ctrlKey},{origins:siteOrigins(this.site),paths:(this.pages??[]).map(page=>page.path)});if(action.do==='go')void this.open(action.path);};
+  const press=(event:MouseEvent)=>{
+   if(event.defaultPrevented)return;
+   const target=event.composedPath()[0] as HTMLElement,root=doc.querySelector<HTMLElement>('[data-editor-surface]')!;
+   const control=editableControl(target,root);
+   if(control?.hasAttribute('data-c9y-control-editing')&&!event.metaKey&&!event.ctrlKey)return;
+   if(!control)return;
+   const link=event.composedPath().find(node=>(node as Node).nodeType===1&&(node as Element).matches('a[href],ds-button[href],ds-link[href]')) as HTMLElement|undefined;
+   if(!link)return;
+   event.preventDefault();
+   if(link.matches('[disabled],[aria-disabled="true"]')||control.matches('[disabled],[aria-disabled="true"]'))return;
+   let href:URL;try{href=new URL(link.getAttribute('href')??'',origin);}catch{return;}
+   const action=pressAction({inEditing:false,field:false,link:{href:href.href},mod:event.metaKey||event.ctrlKey},{origins:siteOrigins(this.site),paths:(this.pages??[]).map(page=>page.path)});
+   if(action.do==='go'){
+    if(action.path===this.path&&href.hash){let id=href.hash.slice(1);try{id=decodeURIComponent(id);}catch{}doc.getElementById(id)?.scrollIntoView();return;}
+    void this.open(action.path);
+   }else if(['https:','http:','mailto:','tel:'].includes(href.protocol))window.open(href.href,'_blank','noopener,noreferrer');
+  };
   const hold=(event:Event)=>event.preventDefault();doc.addEventListener('click',press,true);doc.addEventListener('auxclick',hold,true);doc.addEventListener('submit',hold,true);this.detach=()=>{doc.removeEventListener('click',press,true);doc.removeEventListener('auxclick',hold,true);doc.removeEventListener('submit',hold,true);};
  }
  render(){const live=this.path?new URL(this.path,this.site.url).href:this.site.url;return html`${this.picker?html`<div class="consistency-site-bar">${this.pages?.length?html`<ds-select><select aria-label="Page" .value=${this.path??''} @change=${(event:Event)=>{const select=event.target as HTMLSelectElement,before=this.path;void this.open(select.value).then(ok=>{if(!ok&&before)select.value=before;});}}>${pageGroups(this.pages).map(group=>html`<optgroup label=${group.lang}>${group.pages.map(page=>html`<option value=${page.path}>${page.title||page.path}</option>`)}</optgroup>`)}</select></ds-select>`:nothing}<ds-button href=${live} blank secondary>Open the page</ds-button></div>`:nothing}${this.problem?html`<ds-message tone="danger" literal .text=${this.problem}></ds-message>`:nothing}${this.pages&&!this.pages.length?html`<ds-empty literal heading="No pages" text="This site has no pages yet."></ds-empty>`:nothing}<div class="consistency-site-stage" ?hidden=${!this.path}></div>`;}

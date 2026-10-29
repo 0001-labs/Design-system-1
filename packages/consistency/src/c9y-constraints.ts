@@ -28,7 +28,7 @@ export const C9Y_CONSTRAINTS: C9yConstraint[] = [
     check: { file: 'tests/drag-appearance.mjs', test: 'Dragged content preserves typography, wrapping and appearance' },
   },
   {code:'native.templates',rule:'Every authored template retains its words and desktop/phone layout through the shared block renderer.',check:{file:'tests/template-native.mjs',test:'content and design preserved through shared blocks'}},
-  {code:'native.inline-writing',rule:'Words inside a button or menu remain editable through spaces, selection and reopening without activating the component.',check:{file:'tests/templates.mjs',test:'authored page, direct writing, independent draft and reopen passed'}},
+  {code:'native.inline-writing',rule:'Buttons and links keep their normal press; their hover Edit action edits words in place with spaces, selection, saving and reopening, without a page-wide editing mode.',check:{file:'tests/control-edit.mjs',test:'Hover Edit works for native links, imported links and DS1 buttons'}},
   {
     code: 'native.workspace',
     rule: 'All lab pages, templates and private site drafts use the published page model and editor; spacing survives saving and reopening, and a refused save retains the local document for recovery.',
