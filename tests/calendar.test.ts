@@ -760,3 +760,35 @@ test("a week from Sunday takes its Monday's number", async () => {
   expect(cell(calendar, "2026-10-04").querySelector(".week-number")!.textContent).toBe("W41");
   expect(calendar.shadowRoot!.querySelector(".weekday-name")!.textContent).toBe("Sun");
 });
+
+test('a fixed calendar can hug every visible swimlane event without clipping rows', async () => {
+  const calendar = await mount<Calendar>(`<ds-calendar fixed swimlane-hug view="swimlane" month="2026-10" views="month swimlane"></ds-calendar>`);
+  calendar.events = Array.from({ length: 30 }, (_, i) => ({ id: String(i), title: `Project ${i}`, start: '2026-10-12' }));
+  await calendar.updateComplete;
+  const swimlane = calendar.shadowRoot!.querySelector<HTMLElement>('.swimlane')!;
+  expect(swimlane.style.getPropertyValue('--ds-calendar-rows')).toBe('30');
+  expect(calendar.shadowRoot!.querySelectorAll('.swimlane-grid .event')).toHaveLength(30);
+  expect(calendar.hasAttribute('swimlane-hug')).toBe(true);
+  calendar.events = calendar.events.slice(0, 3);
+  await calendar.updateComplete;
+  expect(calendar.shadowRoot!.querySelector<HTMLElement>('.swimlane')!.style.getPropertyValue('--ds-calendar-rows')).toBe('3');
+  calendar.events = [];
+  await calendar.updateComplete;
+  expect(calendar.shadowRoot!.querySelector<HTMLElement>('.swimlane')!.style.getPropertyValue('--ds-calendar-rows')).toBe('1');
+});
+
+test('the all-project swimlane fits past and future events and keeps undated work visible', async () => {
+  const calendar = await mount<Calendar>(`<ds-calendar fixed swimlane-hug swimlane-all view="swimlane" month="2026-10" views="month swimlane"></ds-calendar>`);
+  calendar.events = [
+    { id: 'past', title: 'Past project', start: '2025-01-06', end: '2025-02-14' },
+    { id: 'now', title: 'Current project', start: '2026-10-19', end: '2026-11-06' },
+    { id: 'undated', title: 'Undated project', start: '' },
+  ];
+  await calendar.updateComplete;
+  const bars = [...calendar.shadowRoot!.querySelectorAll<HTMLButtonElement>('.swimlane-grid .event')];
+  expect(bars.map(bar => bar.textContent)).toEqual(['Past project', 'Current project', 'Undated project · No date']);
+  expect(calendar.shadowRoot!.querySelector<HTMLElement>('.swimlane')!.style.getPropertyValue('--ds-calendar-rows')).toBe('3');
+  expect(bars[2].getAttribute('aria-label')).toContain('No date');
+  expect(bars[0].style.gridColumn).not.toBe(bars[1].style.gridColumn);
+  expect(calendar.shadowRoot!.querySelector('[part=previous]')).toBeNull();
+});

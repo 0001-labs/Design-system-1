@@ -264,6 +264,9 @@ const openPickers = new Set<Calendar>();
  * @prop {number} lines - Lines of events under a day's date: 2 by default.
  * @prop {boolean} weekNumbers - Write the week's number (`week-numbers`) on
  *   its first day.
+ * @prop {boolean} swimlaneAll - Fit all events into one swimlane, including undated events.
+ * @prop {string} undatedLabel - Words for an undated event in an all-events swimlane.
+ * @prop {boolean} swimlaneHug - Fit the swimlane to its visible event rows, including when fixed.
  * @prop {boolean} fixed - Always draw six weeks, so the month keeps its height,
  *   and every other view stands in that same height (the weekdays and six
  *   weeks): the week's days grow to it, the day's hours fill it, the
@@ -349,6 +352,9 @@ export class Calendar extends CalendarBase {
     viewNames: { attribute: false },
     date: { type: String, reflect: true },
     fixed: { type: Boolean, reflect: true },
+    swimlaneHug: { type: Boolean, reflect: true, attribute: "swimlane-hug" },
+    swimlaneAll: { type: Boolean, reflect: true, attribute: "swimlane-all" },
+    undatedLabel: { type: String, attribute: "undated-label" },
     outsideDays: { type: Boolean, attribute: "outside-days", reflect: true },
     noHeader: { type: Boolean, attribute: "no-header", reflect: true },
     noToday: { type: Boolean, attribute: "no-today", reflect: true },
@@ -388,6 +394,9 @@ export class Calendar extends CalendarBase {
   declare viewNames: Record<string, string> | undefined;
   declare date: string | undefined;
   declare fixed: boolean;
+  declare swimlaneHug: boolean;
+  declare swimlaneAll: boolean;
+  declare undatedLabel: string;
   declare outsideDays: boolean;
   declare noHeader: boolean;
   declare noToday: boolean;
@@ -432,6 +441,9 @@ export class Calendar extends CalendarBase {
     this.view = "month";
     this.views = false;
     this.fixed = false;
+    this.swimlaneHug = false;
+    this.swimlaneAll = false;
+    this.undatedLabel = "No date";
     this.outsideDays = false;
     this.noHeader = false;
     this.noToday = false;
@@ -869,7 +881,7 @@ export class Calendar extends CalendarBase {
 
   private get pagedView() {
     const slots = new Set(Array.from(this.children, child => child.getAttribute("slot")));
-    return !this.noHeader && this.level === "days" && (this.shownView === "month" || this.shownView === "swimlane"
+    return !this.noHeader && this.level === "days" && (this.shownView === "month" || (this.shownView === "swimlane" && !this.swimlaneAll)
       || this.ownView && slots.has(`${this.shownView}-previous`) && slots.has(`${this.shownView}-next`));
   }
 
@@ -1111,7 +1123,7 @@ export class Calendar extends CalendarBase {
         : view === "day"
           ? dayLabel(this.shownDay)
           : view === "swimlane"
-            ? this.monthRangeTitle(this.swimlaneWeeks)
+            ? this.swimlaneTitle
             : this.monthHeading
             ? this.monthHeading(new Date(Number(month.slice(0, 4)), Number(month.slice(5, 7)) - 1, 1), view)
             : monthTitle(month, this.compact ? "short" : "long")
@@ -1120,7 +1132,7 @@ export class Calendar extends CalendarBase {
         : `${this.yearName(span[0])} – ${this.yearName(span[0] + 11)}`;
     const switchable = this.viewChoices.length > 1 && !this.compact && !this.picker;
     return html`<div class="header" part="header" ?data-views=${switchable}>
-      ${level === "years"
+      ${level === "years" || (level === "days" && view === "swimlane" && this.swimlaneAll)
         ? html`<span class="title" id="title" aria-live="polite">${title}</span>`
         : html`<button
             class="title title-button"
@@ -1139,11 +1151,11 @@ export class Calendar extends CalendarBase {
         .value=${view}
         @change=${this.onViewChange}
       ></ds-button>` : nothing}
-      <span class="controls" role="group" aria-label=${this.words("Date")}>
+      ${view === "swimlane" && this.swimlaneAll && level === "days" ? nothing : html`<span class="controls" role="group" aria-label=${this.words("Date")}>
         ${arrow("previous")}
         ${this.noToday || this.squaresPerDay < 2 ? nothing : html`<button class="today-button" part="today" type="button" @click=${() => this.showToday()}>${this.words("Today")}</button>`}
         ${arrow("next")}
-      </span>
+      </span>`}
     </div>`;
   }
 
@@ -1214,17 +1226,32 @@ export class Calendar extends CalendarBase {
     return typeof format.formatRange === "function" ? format.formatRange(at(from), at(to)) : `${format.format(at(from))} – ${format.format(at(to))}`;
   }
 
-  /** The first day of each week a swimlane draws: from the week holding the month's first, a week to each square the month has across. */
-  private get swimlaneWeeks(): Day[] {
-    const first = this.shownMonth;
-    const start = addDays(first, -((weekdayOf(first) - this.firstDay + 7) % 7));
+  /** Scale the all-events view by whole weeks so every dated event fits on the same grid. */
+  private get swimlaneScale(): { start: Day; step: number; count: number } {
     const count = Math.max(4, 7 * this.squaresPerDay);
-    return Array.from({ length: count }, (_, index) => addDays(start, index * 7));
+    const dated = (this.events ?? []).filter(event => isDay(event.start));
+    const first = this.swimlaneAll && dated.length ? dated.reduce((day, event) => event.start < day ? event.start : day, dated[0].start) : this.shownMonth;
+    const start = addDays(first, -((weekdayOf(first) - this.firstDay + 7) % 7));
+    const last = this.swimlaneAll && dated.length ? dated.reduce((day, event) => endOf(event) > day ? endOf(event) : day, start) : addDays(start, count * 7 - 1);
+    return { start, count, step: Math.max(1, Math.ceil((daysBetween(start, last) + 1) / (count * 7))) };
+  }
+
+  private get swimlaneWeeks(): Day[] {
+    const { start, step, count } = this.swimlaneScale;
+    return Array.from({ length: count }, (_, index) => addDays(start, index * step * 7));
   }
 
   /** The month owning most of a week: its Thursday's, counted from the week's first day. */
   private ownerOf(weekStart: Day): Day {
     return startOfMonth(addDays(weekStart, 3));
+  }
+
+  private get swimlaneTitle(): string {
+    const dated = (this.events ?? []).filter(event => isDay(event.start));
+    if (!this.swimlaneAll || !dated.length) return this.monthRangeTitle(this.swimlaneWeeks);
+    const first = dated.reduce((day, event) => event.start < day ? event.start : day, dated[0].start);
+    const last = dated.reduce((day, event) => endOf(event) > day ? endOf(event) : day, endOf(dated[0]));
+    return this.monthRangeTitle([startOfMonth(first), startOfMonth(last)]);
   }
 
   /** The months a swimlane covers as one title: "Oct 2026 – Jan 2027". */
@@ -1244,12 +1271,20 @@ export class Calendar extends CalendarBase {
    */
   private renderSwimlane() {
     const weeks = this.swimlaneWeeks;
-    const bars = swimlaneBars(this.events ?? [], weeks);
+    const { step } = this.swimlaneScale;
+    const all = this.events ?? [];
+    const dated = all.filter(event => isDay(event.start)).sort((a, b) => compareDays(a.start, b.start) || compareDays(endOf(b), endOf(a)));
+    const bars = this.swimlaneAll
+      ? [...dated, ...all.filter(event => !isDay(event.start))].map((event, row) => {
+          const column = (day: Day) => Math.max(0, Math.min(weeks.length - 1, Math.floor(daysBetween(weeks[0], day) / (step * 7))));
+          return isDay(event.start) ? { event, row, from: column(event.start), to: column(endOf(event)) } : { event, row, from: 0, to: weeks.length - 1 };
+        })
+      : swimlaneBars(all, weeks);
     // Fixed, the rows (a square each) fill the month's height under the months and dates, and scroll past it.
     const fit = this.fixed ? Math.max(1, 6 * (this.eventLines + 2) - 1) : 6;
-    const rows = Math.max(fit, bars.length + 1);
+    const rows = this.swimlaneHug ? Math.max(1, bars.length) : Math.max(fit, bars.length + 1);
     const today = this.todayDay;
-    const todayWeek = weeks.findIndex(start => today >= start && today <= addDays(start, 6));
+    const todayWeek = weeks.findIndex(start => today >= start && today <= addDays(start, step * 7 - 1));
     const months: { column: number; span: number; month: Day }[] = [];
     weeks.forEach((start, column) => {
       const month = this.ownerOf(start);
@@ -1266,12 +1301,12 @@ export class Calendar extends CalendarBase {
         part="swimlane"
         role="group"
         ?data-travel=${this.travelled && !this.pageCommitting}
-        aria-label=${this.nameOr(this.monthRangeTitle(weeks))}
+        aria-label=${this.nameOr(this.swimlaneTitle)}
         style=${`--ds-calendar-weeks: ${weeks.length}; --ds-calendar-rows: ${rows}; --ds-calendar-fit: ${fit}`}
       >
         <div class="swimlane-months" part="months" aria-hidden="true">
           ${months.map(({ column, span, month }, index) => html`<span class="swimlane-month" style=${`grid-column: ${column + 1} / span ${span}`}>${
-            index === 0 || month.slice(5, 7) === "01" ? monthTitle(month, "short") : monthName(month, "short")
+            index === 0 || month.slice(0, 4) !== months[index - 1].month.slice(0, 4) ? monthTitle(month, "short") : monthName(month, "short")
           }</span>`)}
         </div>
         <div class="swimlane-dates" part="dates" aria-hidden="true">
@@ -1296,10 +1331,11 @@ export class Calendar extends CalendarBase {
               class="event"
               part="event"
               data-event=${index}
-              aria-label=${`${event.title}, ${range(event)}`}
+              ?data-undated=${!isDay(event.start)}
+              aria-label=${`${event.title}, ${isDay(event.start) ? range(event) : this.undatedLabel}`}
               style=${`${fill}grid-row: ${row + 1}; grid-column: ${from + 1} / ${to + 2}`}
               @click=${() => this.pressEvent(event, event.start)}
-            ><span class="name">${event.title}</span></button>`;
+            ><span class="name">${event.title}${!isDay(event.start) ? ` · ${this.undatedLabel}` : ""}</span></button>`;
           })}
         </div></div>
       </div>`));
@@ -1547,7 +1583,7 @@ export class Calendar extends CalendarBase {
       ? html`<div class="own-view"><slot name=${`${this.shownView}-${direction < 0 ? "previous" : "next"}`}></slot></div>`
       : html`<ds-calendar
         exportparts="months,dates,swimlane,grid,scroll"
-        no-header no-today required .compact=${this.compact} .fixed=${this.fixed} .outsideDays=${this.outsideDays}
+        no-header no-today required .compact=${this.compact} .fixed=${this.fixed} .swimlaneHug=${this.swimlaneHug} .swimlaneAll=${this.swimlaneAll} .undatedLabel=${this.undatedLabel} .outsideDays=${this.outsideDays}
         .view=${this.shownView} .views=${[this.shownView]} .lines=${this.lines} .weekNumbers=${this.weekNumbers}
         .dayWidth=${this.dayWidth} .weekStart=${this.weekStart} .today=${this.today}
         .month=${addMonths(this.shownMonth, direction)} .value=${this.value}

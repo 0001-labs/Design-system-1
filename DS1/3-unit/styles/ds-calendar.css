@@ -706,6 +706,7 @@
   letter-spacing: inherit;
   text-align: start;
 }
+.swimlane-grid .event[data-undated] { background: transparent; color: var(--ds-title); }
 .swimlane-grid .event:hover { background: color-mix(in srgb, var(--ds-calendar-event-fill, var(--ds-fill)) 88%, var(--ds-text-color)); }
 .swimlane-grid .event:focus-visible { outline: 2px solid var(--ds-focus-ring); outline-offset: -2px; }
 
@@ -719,11 +720,11 @@
  * swimlane's rows fill it under the months and dates and scroll past it, and a
  * page's own view gets it and scrolls inside. */
 :host([fixed]:not([compact])) .grid[data-view="week"] .week .day { height: var(--ds-calendar-area); }
-:host([fixed]) :is(.swimlane, .own-view, .day-view) { box-sizing: border-box; height: var(--ds-calendar-area); }
+:host([fixed]) :is(.own-view, .day-view), :host([fixed]:not([swimlane-hug])) .swimlane { box-sizing: border-box; height: var(--ds-calendar-area); }
 :host([fixed]) .own-view { overflow: auto; }
 :host([fixed]) .day-view { display: flex; flex-direction: column; }
 :host([fixed]) .day-view .hours { flex: 1 1 auto; min-height: 0; height: auto; }
-:host([fixed]) .swimlane-scroll {
+:host([fixed]:not([swimlane-hug])) .swimlane-scroll {
   max-height: calc(var(--ds-calendar-fit) * var(--ds-calendar-week));
   overflow-x: hidden;
   overflow-y: auto;
