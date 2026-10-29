@@ -49,8 +49,9 @@ export class ControlEdit {
     root.ownerDocument.addEventListener('focusin', this.over);
     root.ownerDocument.addEventListener('keydown', this.key, true);
     root.ownerDocument.addEventListener('click', this.hide, true);
-    this.resize = new ResizeObserver(() => { if (!this.enabled()) this.hide(); });
+    this.resize = new ResizeObserver(() => { if (!this.enabled()) this.hide(); else this.place(); });
     this.resize.observe(frame);
+    this.resize.observe(this.action);
     // An inline link otherwise inherits Aa's writing surface. WebKit selects its
     // text before a press can follow it; only its Edit action enters that text.
     this.changes = new MutationObserver(this.protectLinks);
@@ -71,11 +72,17 @@ export class ControlEdit {
   private over = (event: Event) => {
     const target = editableControl(event.composedPath()[0] as Node, this.root);
     if (!target || !this.enabled() || target.hasAttribute('data-c9y-control-editing')) { this.leave(); return; }
-    this.keep(); this.target = target; this.action.hidden = false;
-    const box = target.getBoundingClientRect(), frame = this.frame.getBoundingClientRect();
-    const width = this.action.getBoundingClientRect().width || 40;
-    this.action.style.left = `${Math.max(0, Math.min(innerWidth - width, frame.left + box.left))}px`;
-    this.action.style.top = `${Math.max(0, frame.top + box.top >= 22 ? frame.top + box.top - 22 : frame.top + box.bottom + 2)}px`;
+    this.keep();
+    if(this.target!==target){if(this.target)this.resize.unobserve(this.target);this.target=target;this.resize.observe(target);}
+    this.action.hidden = false; this.place();
+  };
+  private place = () => {
+    if(this.action.hidden)return;
+    if(!this.target?.isConnected){this.hide();return;}
+    const box=this.target.getBoundingClientRect(),frame=this.frame.getBoundingClientRect(),action=this.action.getBoundingClientRect();
+    const width=action.width||40,height=action.height||20;
+    this.action.style.left=`${Math.max(0,Math.min(innerWidth-width,frame.left+box.left+(box.width-width)/2))}px`;
+    this.action.style.top=`${Math.max(0,frame.top+box.top-height-2)}px`;
   };
   private activate = (event: Event) => {
     event.preventDefault(); event.stopPropagation();
@@ -88,7 +95,7 @@ export class ControlEdit {
     const target = editableControl(event.composedPath()[0] as Node, this.root);
     if (target && this.enabled()) { event.preventDefault(); event.stopPropagation(); this.hide(); this.edit(target); }
   };
-  hide = () => { this.keep(); this.action.hidden = true; this.target = undefined; };
+  hide = () => { this.keep(); if(this.target)this.resize.unobserve(this.target); this.action.hidden = true; this.target = undefined; };
   destroy() {
     this.hide(); this.action.remove();
     const doc = this.root.ownerDocument;

@@ -17,8 +17,10 @@ try{
  await frame.locator('[data-editor-surface]').waitFor();
  const edit=page.getByRole('button',{name:'Edit',exact:true});
  for(const id of ['plain','button','imported','icon']){
-  await frame.locator(`[data-native-block="${id}"]${id==='plain'?' a':''}`).hover();
+  const target=frame.locator(`[data-native-block="${id}"]${id==='plain'?' a':''}`);await target.hover();
   await edit.waitFor({state:'visible'});
+  await eventually(async()=>{const a=await target.boundingBox(),b=await edit.boundingBox();return a&&b&&Math.abs(a.x+a.width/2-b.x-b.width/2)<1&&b.y+b.height<=a.y;},'Edit is not centred above its control');
+  if(id==='imported'){const style=await target.getAttribute('style');await target.evaluate(element=>{element.style.display='inline-block';element.style.width='240px';});await eventually(async()=>{const a=await target.boundingBox(),b=await edit.boundingBox();return Math.abs(a.x+a.width/2-b.x-b.width/2)<1&&b.y+b.height<=a.y;},'Edit lost its centred position after the link resized');await target.evaluate((element,style)=>style===null?element.removeAttribute('style'):element.setAttribute('style',style),style);}
   if(id==='plain')await page.screenshot({path:'/tmp/c9y-hover-edit.png'});
  }
  // Labels are ordinary links until their own hover action is chosen.

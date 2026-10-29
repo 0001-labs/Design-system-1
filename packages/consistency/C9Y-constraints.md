@@ -6,6 +6,12 @@ Each rule names the test that holds it. While editing a site, a drag that breaks
 
 ## Rules
 
+### `controls.edit-position`
+
+The Edit action stays centred above its control, including after resizing, while pressing the control itself follows its normal action.
+
+Held by `tests/control-edit.mjs`: “Hover Edit works for native links, imported links and DS1 buttons”.
+
 ### `spacing.always-visible`
 
 Every editable spacer stays pink while idle, with a visible centre line at zero, across all example pages.
