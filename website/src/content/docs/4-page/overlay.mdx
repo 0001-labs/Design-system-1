@@ -13,6 +13,7 @@ with one component, `ds-overlay`, and a `type` that says which it is:
 | `modal` (the default) | A question or a task that holds the page | In the centre, 20 squares wide |
 | `sheet` | A phone's first choice for the same | From the foot of the screen, up to 32 squares wide |
 | `drawer` | A panel beside a list, a detail or settings | At the `side` `end` (the default) or `start`, the screen's height, 16 squares wide |
+| `detail` | Responsive details, access or settings | A drawer on desktop; a bottom sheet at widths up to 768px |
 | `popover` | A small panel at a point | At `anchor`, kept inside the visible screen |
 | `screen` | Folded navigation, a document viewer | Over the whole screen |
 
@@ -200,3 +201,17 @@ Configure a floating overlay with `--ds-overlay-inset`, `--ds-overlay-margin`,
 `--ds-overlay-layer`. Transparent media frames may set `--ds-overlay-paper` and
 `--ds-overlay-border`. Use `--ds-overlay-overflow: hidden` when a bounded layout
 provides its own scrolling regions.
+
+### Responsive details
+
+Use `type="detail"` for details that belong beside the work on desktop and rise
+from the bottom on a phone. It follows viewport changes while open, keeps the
+same dialog and focused field, and uses the visible viewport above the keyboard.
+The sheet keeps the shared safe-area padding, scrolling and swipe dismissal.
+For non-modal apps set `nonModal = true`, `holdScroll = false` and
+`blockOutside = false`: the page remains interactive and scrollable at both sizes.
+Keep anchored menus as `popover`, explicit side navigation as `drawer` and
+full-screen documents as `screen`; those do not opt into responsive details.
+
+Link’s people/access panels are the first consumer of this pattern. Other
+consumers retain their chosen types until their own scoped migration.

@@ -248,3 +248,38 @@ test("React passes the type, keeps a sliding sheet on the page until it has slid
   expect(document.querySelector("ds-overlay")).toBeNull();
   act(() => root.unmount());
 });
+
+test("detail follows the viewport without replacing the open dialog or changing non-modal interaction", async () => {
+  let phone = false;
+  vi.stubGlobal("matchMedia", vi.fn(() => ({ matches: phone })));
+  const opener = document.createElement("button");
+  document.body.append(opener); opener.focus();
+  const host = document.createElement("ds-overlay");
+  host.type = "detail";
+  host.nonModal = true;
+  host.innerHTML = '<dialog aria-label="People"><input aria-label="Name"><button data-ds-overlay-dismiss>Close</button></dialog>';
+  document.body.append(host);
+  await host.show();
+  const dialog = host.querySelector("dialog")!, field = host.querySelector("input")!;
+  expect(dialog.dataset.dsType).toBe("drawer");
+  field.focus(); field.value = "Draft";
+  phone = true;
+  window.dispatchEvent(new Event("resize"));
+  expect(dialog.dataset.dsType).toBe("sheet");
+  expect(dialog.dataset.dsEdge).toBe("bottom");
+  expect(dialog.open).toBe(true);
+  expect(document.activeElement).toBe(field);
+  expect(document.documentElement.style.overflow).toBe("");
+  expect(document.body.style.position).toBe("");
+  phone = false;
+  window.dispatchEvent(new Event("resize"));
+  expect(dialog.dataset.dsType).toBe("drawer");
+  expect(field.value).toBe("Draft");
+  host.querySelector("button")!.click();
+  expect(host.open).toBe(false);
+  expect(document.activeElement).toBe(opener);
+  await host.show();
+  expect(host.querySelector("dialog")).toBe(dialog);
+  host.requestClose("escape");
+  vi.unstubAllGlobals();
+});

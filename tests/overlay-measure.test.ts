@@ -14,9 +14,9 @@ let url: string;
 const contexts: BrowserContext[] = [];
 
 beforeAll(async () => {
-  server = await createServer({ configFile: false, root: process.cwd(), logLevel: "error", server: { host: "127.0.0.1", port: 0 } });
+  server = await createServer({ configFile: false, root: process.cwd(), logLevel: "error", optimizeDeps: { entries: ["tests/fixtures/overlay.html"] }, server: { host: "127.0.0.1", port: 0 } });
   await server.listen();
-  browser = await chromium.launch();
+  browser = await chromium.launch({ headless: true });
   url = `http://127.0.0.1:${(server.httpServer!.address() as AddressInfo).port}/tests/fixtures/overlay.html`;
 }, 60_000);
 
@@ -345,4 +345,31 @@ test("a shortcut hint is one control high in its one-square line, set in a face 
       expect(element!.text).toMatch(/^(⇧⌘D|Ctrl\+Shift\+D)$/);
     }
   }
+});
+
+
+test("responsive detail keeps phone geometry, drafts and focus across widths and keyboard resizing", async () => {
+  const tab = await page({ width: 393, reducedMotion: "reduce" });
+  await open(tab, `<button id="opener">People</button><ds-overlay type="detail" non-modal><dialog aria-label="People"><input aria-label="Name" value="Draft"><button data-ds-overlay-dismiss>Close</button>${rows(20)}</dialog></ds-overlay>`, { scale: 1.5 });
+  const dialog = tab.locator("dialog");
+  await expect.poll(() => dialog.getAttribute("data-ds-type")).toBe("sheet");
+  let box = await dialog.boundingBox();
+  expect(box!.x).toBeCloseTo(0, 0);
+  expect(box!.width).toBeCloseTo(393, 0);
+  expect(box!.y + box!.height).toBeCloseTo(812, 0);
+  await tab.getByLabel("Name").focus();
+  await tab.getByLabel("Name").fill("Unfinished name");
+  await tab.setViewportSize({ width: 1100, height: 812 });
+  await expect.poll(() => dialog.getAttribute("data-ds-type")).toBe("drawer");
+  expect(await tab.getByLabel("Name").inputValue()).toBe("Unfinished name");
+  expect(await tab.getByLabel("Name").evaluate(el => el === document.activeElement)).toBe(true);
+  await tab.setViewportSize({ width: 393, height: 450 });
+  await expect.poll(() => dialog.getAttribute("data-ds-type")).toBe("sheet");
+  box = await dialog.boundingBox();
+  expect(box!.y).toBeGreaterThanOrEqual(0);
+  expect(box!.y + box!.height).toBeCloseTo(450, 0);
+  expect(await tab.evaluate(() => document.documentElement.style.overflow)).toBe("");
+  await tab.screenshot({ path: "/tmp/ds1-mobile-detail.png" });
+  await tab.keyboard.press("Escape");
+  expect(await dialog.evaluate(el => (el as HTMLDialogElement).open)).toBe(false);
 });

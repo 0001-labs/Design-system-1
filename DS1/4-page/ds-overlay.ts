@@ -15,11 +15,11 @@ export type { OverlayEdge } from "../0-face/overlay-swipe";
  * foot of the screen, a `drawer` at the end or start of a line, a `popover`
  * at a point (`anchor`), or the whole `screen`.
  */
-export type OverlayType = "modal" | "sheet" | "drawer" | "popover" | "screen";
+export type OverlayType = "modal" | "sheet" | "drawer" | "detail" | "popover" | "screen";
 export type OverlaySide = "end" | "start";
 export type OverlayCloseReason = "escape" | "backdrop" | "outside" | "button" | "native" | "swipe";
 const dialogStyles = `${frameStyles}\n${placementStyles}`;
-const TYPES = new Set<string>(["modal", "sheet", "drawer", "popover", "screen"]);
+const TYPES = new Set<string>(["modal", "sheet", "drawer", "detail", "popover", "screen"]);
 /** A phone's width, as `0-face/grid.ts` reads it. */
 const onPhone = () => typeof matchMedia === "function" && matchMedia("(max-width: 768px)").matches;
 const openDialogs = new WeakMap<Document, Set<Overlay>>();
@@ -78,7 +78,7 @@ function styleRoot(root: Node) {
  * Listen to ds-close-request and preventDefault to control whether it closes.
  * `type` says what it is: a `modal` in the centre (the default; a sheet on a phone), a `sheet`
  * from the foot of the screen, a `drawer` at the `side` `"end"` (the default)
- * or `"start"`, a `popover` at the `anchor` point, or the whole `screen`. A
+ * or `"start"`, a responsive `detail` (drawer on desktop, sheet on phones), a `popover` at the `anchor` point, or the whole `screen`. A
  * sheet and a drawer slide in and out and a finger swipes them away (reason
  * `"swipe"`); a popover is modeless.
  */
@@ -104,7 +104,7 @@ export class Overlay extends LitElement {
   declare holdScroll: boolean;
   declare closeOnEscape: boolean;
   declare closeOnBackdrop: boolean;
-  /** What it is: `"modal"`, `"sheet"`, `"drawer"`, `"popover"` or `"screen"`. */
+  /** What it is: `"modal"`, `"sheet"`, `"drawer"`, `"detail"`, `"popover"` or `"screen"`. */
   declare type: OverlayType;
   /** A drawer's side: `"end"` (the default) or `"start"`. */
   declare side: OverlaySide;
@@ -151,9 +151,10 @@ export class Overlay extends LitElement {
 
   protected updated() { this.syncType(); this.syncOpen(); this.place(); }
 
-  /** Its type as it is drawn: an unknown one is a modal, and a modal on a phone is a sheet (Joachim, 20 October 2026: no modals on a phone at all). */
+  /** Its type as drawn: detail follows the viewport; an unknown one is a modal, and a modal on a phone is a sheet (Joachim, 20 October 2026: no modals on a phone at all). */
   get kind(): OverlayType {
     const type = TYPES.has(this.type) ? this.type : "modal";
+    if (type === "detail") return onPhone() ? "sheet" : "drawer";
     return type === "modal" && onPhone() ? "sheet" : type;
   }
   /** A modeless overlay leaves the page live: a popover always, any other with `non-modal`. */
@@ -188,8 +189,11 @@ export class Overlay extends LitElement {
   place = () => {
     const dialog = this.dialog, view = this.ownerDocument.defaultView;
     if (!dialog || !view) return;
-    if (this.kind !== "popover" || !this.anchor || !dialog.open) return;
+    this.syncType();
     const viewport = view.visualViewport;
+    dialog.style.setProperty("--ds-overlay-viewport-height", `${viewport?.height ?? view.innerHeight}px`);
+    dialog.style.setProperty("--ds-overlay-viewport-bottom", `${Math.max(0, view.innerHeight - (viewport?.height ?? view.innerHeight) - (viewport?.offsetTop ?? 0))}px`);
+    if (this.kind !== "popover" || !this.anchor || !dialog.open) return;
     const left = viewport?.offsetLeft ?? 0, top = viewport?.offsetTop ?? 0;
     const width = viewport?.width ?? view.innerWidth, height = viewport?.height ?? view.innerHeight;
     const margin = parseFloat(view.getComputedStyle(dialog).marginLeft) || 0;

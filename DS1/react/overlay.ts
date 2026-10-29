@@ -57,7 +57,7 @@ export function OverlayContent({ children, portal = true, nonModal = false, clos
   const host = useRef<OverlayElement>(null);
   const [mounted, setMounted] = useState(false);
   // A sheet or drawer stays on the page while it slides out, then leaves.
-  const sliding = type === "sheet" || type === "drawer";
+  const sliding = type === "sheet" || type === "drawer" || type === "detail";
   const [leaving, setLeaving] = useState(false);
   const [wasOpen, setWasOpen] = useState(context.open);
   if (wasOpen !== context.open) {
