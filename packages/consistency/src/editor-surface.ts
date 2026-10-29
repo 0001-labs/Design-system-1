@@ -30,12 +30,32 @@ export class EditorSurface {
     constraintBroken?: (finding: C9yFinding) => void;
   }) {
     root.setAttribute('data-editor-surface', '');
+    root.ownerDocument.addEventListener('selectstart', this.selectText, true);
+    root.ownerDocument.addEventListener('keydown', this.selectAll, true);
     this.pointer = new PointerActivity(root);
     this.contexts = new ContextActivity(root, active => {
       this.paused = active; root.classList.toggle('context-active', active); options.contextChanged?.(active);
     }, options.contextRoot);
   }
   get contextActive() { return this.paused; }
+  private textInput(event: Event) {
+    let element = event.composedPath().find(node => (node as Node).nodeType === 1) as HTMLElement | undefined;
+    // Selection events can be retargeted to a component's host rather than its editable label.
+    while (element?.shadowRoot?.activeElement) element = element.shadowRoot.activeElement as HTMLElement;
+    return !!element && (element.isContentEditable || !!element.closest('input,textarea'));
+  }
+  private onCanvas(event: Event) {
+    const target = event.target as Node;
+    return this.root.contains(target) || target === this.root.ownerDocument.body || target === this.root.ownerDocument.documentElement;
+  }
+  private selectText = (event: Event) => { if (this.onCanvas(event) && !this.textInput(event)) event.preventDefault(); };
+  private selectAll = (event: KeyboardEvent) => {
+    if (!(event.metaKey || event.ctrlKey) || event.altKey || event.key.toLowerCase() !== 'a' || this.textInput(event)) return;
+    if (this.onCanvas(event)) {
+      event.preventDefault();
+      this.root.ownerDocument.getSelection()?.removeAllRanges();
+    }
+  };
   paintSelection(selection = this.options.selection()) {
     paintCompositionSelection(this.root, selection);
     const replaced = new Set(this.root.querySelectorAll<HTMLElement>('img[data-selection-face],video[data-selection-face],canvas[data-selection-face]'));
@@ -80,5 +100,5 @@ export class EditorSurface {
     }
     this.options.constraintBroken?.(finding);
   });
-  destroy() { for (const face of this.imageFaces.values()) face.remove(); this.imageFaces.clear(); this.cancelMarquee(); this.pointer.destroy(); this.contexts.destroy(); this.root.removeAttribute('data-editor-surface'); this.root.classList.remove('context-active'); }
+  destroy() { this.root.ownerDocument.removeEventListener('selectstart', this.selectText, true); this.root.ownerDocument.removeEventListener('keydown', this.selectAll, true); for (const face of this.imageFaces.values()) face.remove(); this.imageFaces.clear(); this.cancelMarquee(); this.pointer.destroy(); this.contexts.destroy(); this.root.removeAttribute('data-editor-surface'); this.root.classList.remove('context-active'); }
 }

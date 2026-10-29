@@ -21,6 +21,7 @@ export type C9yConstraint = {
 };
 
 export const C9Y_CONSTRAINTS: C9yConstraint[] = [
+  {code:'selection.writing-only',rule:'Browser text selection stays inside the active text editor or input; dragging over the canvas and Select All outside writing never select page text.',check:{file:'tests/text-selection.mjs',test:'Canvas selection stays within active writing'}},
   {
     code: 'drag.appearance',
     rule: 'Lifting and carrying an element preserves its appearance, including typography, colours, dimensions and text wrapping; only its position changes.',

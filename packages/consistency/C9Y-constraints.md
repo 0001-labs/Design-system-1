@@ -6,6 +6,12 @@ Each rule names the test that holds it. While editing a site, a drag that breaks
 
 ## Rules
 
+### `selection.writing-only`
+
+Browser text selection stays inside the active text editor or input; dragging over the canvas and Select All outside writing never select page text.
+
+Held by `tests/text-selection.mjs`: “Canvas selection stays within active writing”.
+
 ### `drag.appearance`
 
 Lifting and carrying an element preserves its appearance, including typography, colours, dimensions and text wrapping; only its position changes.
