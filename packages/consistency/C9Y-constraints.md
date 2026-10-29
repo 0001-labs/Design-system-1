@@ -6,6 +6,12 @@ Each rule names the test that holds it. While editing a site, a drag that breaks
 
 ## Rules
 
+### `carousel.reorder`
+
+Dragging a carousel card by its body or picture reorders the complete card horizontally, preserves its contents and saves the order for reopening and publication.
+
+Held by `tests/carousel-reorder.mjs`: “Carousel cards drag horizontally, save and reopen in their new order”.
+
 ### `selection.writing-only`
 
 Browser text selection stays inside the active text editor or input; dragging over the canvas and Select All outside writing never select page text.
