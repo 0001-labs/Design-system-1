@@ -373,3 +373,33 @@ test("responsive detail keeps phone geometry, drafts and focus across widths and
   await tab.keyboard.press("Escape");
   expect(await dialog.evaluate(el => (el as HTMLDialogElement).open)).toBe(false);
 });
+
+
+test("mobile picker and Select centre below their fields with four CSS pixels and stay visible at edges", async () => {
+  const tab = await page({ width: 393, reducedMotion: "reduce" });
+  await tab.evaluate(async () => {
+    document.getElementById("stage")!.innerHTML = '<ds-calendar picker value="2026-10-05" style="position:absolute;left:160px;top:80px"></ds-calendar><ds-select style="position:absolute;left:160px;top:400px"><select aria-label="Size"><option>Small</option><option>Large</option></select></ds-select>';
+    for (const element of document.querySelectorAll<HTMLElement & { updateComplete?: Promise<unknown> }>("ds-calendar,ds-select")) await element.updateComplete;
+  });
+  const picker = tab.locator("ds-calendar").first();
+  await picker.locator(".trigger").click();
+  const panel = picker.locator(".popover");
+  const fieldBox = await picker.locator(".trigger").boundingBox(), panelBox = await panel.boundingBox();
+  expect(panelBox!.y - fieldBox!.y - fieldBox!.height).toBeCloseTo(4, 1);
+  // A long date trigger at this position can push the ideal centre past the edge.
+  expect(panelBox!.x).toBeGreaterThanOrEqual(4);
+  expect(panelBox!.x + panelBox!.width).toBeLessThanOrEqual(389);
+  await tab.screenshot({ path: "/tmp/ds1-mobile-picker.png" });
+  await picker.locator(".clear").click();
+  await expect.poll(() => picker.evaluate(el => (el as HTMLElement & { open: boolean }).open)).toBe(false);
+  expect(await picker.locator(".trigger").evaluate(el => el.getRootNode() instanceof ShadowRoot && (el.getRootNode() as ShadowRoot).activeElement === el)).toBe(true);
+  await tab.locator("ds-select").click();
+  const list = tab.locator("ds-select ds-menu");
+  const selectBox = await tab.locator("ds-select").boundingBox(), listBox = await list.boundingBox();
+  expect(listBox!.y - selectBox!.y - selectBox!.height).toBeCloseTo(4, 1);
+  expect(listBox!.x + listBox!.width / 2).toBeCloseTo(selectBox!.x + selectBox!.width / 2, 1);
+  await tab.screenshot({ path: "/tmp/ds1-mobile-select.png" });
+  await tab.setViewportSize({ width: 320, height: 450 });
+  await expect.poll(async () => { const b = await list.boundingBox(); return b!.x + b!.width; }).toBeLessThanOrEqual(316);
+  await tab.keyboard.press("Escape");
+});

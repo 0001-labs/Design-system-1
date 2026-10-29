@@ -1,3 +1,4 @@
+import { anchoredPanel, mobilePanel, panelViewport } from "../0-face/anchored-panel";
 import { LitElement, css, html, unsafeCSS } from "lit";
 import { define } from "../0-face/define";
 import "../2-core/ds-button";
@@ -94,6 +95,7 @@ export class Overlay extends LitElement {
     type: { type: String, reflect: true },
     side: { type: String, reflect: true },
     anchor: { attribute: false },
+    trigger: { attribute: false },
     returnFocus: { attribute: false },
   };
   static styles = [unsafeCSS(metrics), css`:host { display: contents; } :host([hidden]) { display: none !important; }`];
@@ -110,6 +112,8 @@ export class Overlay extends LitElement {
   declare side: OverlaySide;
   /** A popover's viewport point. */
   declare anchor: { x: number; y: number } | null;
+  /** A field anchoring a small popover; centres below it on mobile. */
+  declare trigger: HTMLElement | null;
   /** Resolve a replacement opener after the product has rendered its closed state. */
   declare returnFocus: (() => HTMLElement | null) | null;
   private dialog: HTMLDialogElement | null = null;
@@ -133,6 +137,7 @@ export class Overlay extends LitElement {
     this.type = "modal";
     this.side = "end";
     this.anchor = null;
+    this.trigger = null;
     this.returnFocus = null;
   }
 
@@ -193,15 +198,28 @@ export class Overlay extends LitElement {
     const viewport = view.visualViewport;
     dialog.style.setProperty("--ds-overlay-viewport-height", `${viewport?.height ?? view.innerHeight}px`);
     dialog.style.setProperty("--ds-overlay-viewport-bottom", `${Math.max(0, view.innerHeight - (viewport?.height ?? view.innerHeight) - (viewport?.offsetTop ?? 0))}px`);
-    if (this.kind !== "popover" || !this.anchor || !dialog.open) return;
+    if (this.kind !== "popover" || (!this.anchor && !this.trigger) || !dialog.open) return;
+    if (this.trigger && mobilePanel(this)) {
+      const bounds = panelViewport(this);
+      dialog.style.setProperty("--ds-overlay-available-width", `${Math.max(0, bounds.width - 8)}px`);
+      const position = anchoredPanel(this.trigger.getBoundingClientRect(), dialog.getBoundingClientRect(), bounds);
+      dialog.style.setProperty("--ds-overlay-available-height", `${position.availableHeight}px`);
+      const placed = anchoredPanel(this.trigger.getBoundingClientRect(), dialog.getBoundingClientRect(), bounds);
+      const margin = parseFloat(view.getComputedStyle(dialog).marginLeft) || 0;
+      dialog.style.setProperty("--ds-overlay-anchor-left", `${placed.left - margin}px`);
+      dialog.style.setProperty("--ds-overlay-anchor-top", `${placed.top - margin}px`);
+      return;
+    }
+    const triggerRect = this.trigger?.getBoundingClientRect();
+    const anchor = this.anchor ?? { x: triggerRect!.left, y: triggerRect!.bottom };
     const left = viewport?.offsetLeft ?? 0, top = viewport?.offsetTop ?? 0;
     const width = viewport?.width ?? view.innerWidth, height = viewport?.height ?? view.innerHeight;
     const margin = parseFloat(view.getComputedStyle(dialog).marginLeft) || 0;
     dialog.style.setProperty("--ds-overlay-available-width", `${Math.max(0, width - 2 * margin)}px`);
     dialog.style.setProperty("--ds-overlay-available-height", `${Math.max(0, height - 2 * margin)}px`);
     const rect = dialog.getBoundingClientRect();
-    dialog.style.setProperty("--ds-overlay-anchor-left", `${Math.max(left, Math.min(this.anchor.x - margin, left + width - rect.width - 2 * margin))}px`);
-    dialog.style.setProperty("--ds-overlay-anchor-top", `${Math.max(top, Math.min(this.anchor.y - margin, top + height - rect.height - 2 * margin))}px`);
+    dialog.style.setProperty("--ds-overlay-anchor-left", `${Math.max(left, Math.min(anchor.x - margin, left + width - rect.width - 2 * margin))}px`);
+    dialog.style.setProperty("--ds-overlay-anchor-top", `${Math.max(top, Math.min(anchor.y - margin, top + height - rect.height - 2 * margin))}px`);
   };
 
   private bindDialog = () => {
@@ -289,6 +307,7 @@ export class Overlay extends LitElement {
       this.sizeObserver = new ResizeObserver(this.place);
       this.sizeObserver.observe(dialog);
     }
+    document.addEventListener("scroll", this.place, true);
     document.defaultView?.addEventListener("resize", this.place);
     document.defaultView?.visualViewport?.addEventListener("resize", this.place);
     document.defaultView?.visualViewport?.addEventListener("scroll", this.place);
@@ -302,6 +321,7 @@ export class Overlay extends LitElement {
   private release() {
     const document = this.ownerDocument;
     this.sizeObserver?.disconnect(); this.sizeObserver = null;
+    document.removeEventListener("scroll", this.place, true);
     document.defaultView?.removeEventListener("resize", this.place);
     document.defaultView?.visualViewport?.removeEventListener("resize", this.place);
     document.defaultView?.visualViewport?.removeEventListener("scroll", this.place);

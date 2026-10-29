@@ -215,3 +215,17 @@ full-screen documents as `screen`; those do not opt into responsive details.
 
 Link’s people/access panels are the first consumer of this pattern. Other
 consumers retain their chosen types until their own scoped migration.
+
+### Small choices on mobile
+
+Select menus and calendar pickers stay anchored to their field on mobile: centred
+horizontally and exactly **4 CSS pixels** below the trigger (the gap does not scale).
+Their rows and widths retain the design grid. At a screen edge they shift inward;
+when below cannot fit and above has more room, they open 4px above instead.
+Otherwise the available height is bounded and the choices scroll inside it.
+Placement follows scroll, resize and the visible keyboard viewport, inside safe areas.
+For a compact calendar in an Overlay popover, pass its field as `trigger` alongside
+its desktop `anchor` point. Desktop placement and point/context/submenus keep their
+existing rules. Clear on a calendar picker dismisses it and restores its field’s
+focus; applications embedding a standalone month close their own context after
+the clear has saved successfully (a failed save stays open with its error).

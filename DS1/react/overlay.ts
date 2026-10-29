@@ -48,11 +48,13 @@ export interface OverlayContentProps extends HTMLAttributes<HTMLDialogElement> {
   type?: OverlayType;
   /** A drawer's side: `"end"` (the default) or `"start"`. */
   side?: OverlaySide;
+  /** A field anchoring a small popover, centred below on mobile. */
+  trigger?: HTMLElement | null;
 }
 
 /** The longest a sliding overlay stays on the page after closing, should its transition never end. */
 const LEAVING = 600;
-export function OverlayContent({ children, portal = true, nonModal = false, closeOnOutside = false, blockOutside = false, holdScroll = false, anchor = null, returnFocus = null, closeLabel = "Close", showClose = true, closeOnEscape = true, closeOnBackdrop = true, flush = false, rotated = false, type = "modal", side = "end", ...props }: OverlayContentProps) {
+export function OverlayContent({ children, portal = true, nonModal = false, closeOnOutside = false, blockOutside = false, holdScroll = false, anchor = null, trigger = null, returnFocus = null, closeLabel = "Close", showClose = true, closeOnEscape = true, closeOnBackdrop = true, flush = false, rotated = false, type = "modal", side = "end", ...props }: OverlayContentProps) {
   const context = useOverlay();
   const host = useRef<OverlayElement>(null);
   const [mounted, setMounted] = useState(false);
@@ -108,6 +110,7 @@ export function OverlayContent({ children, portal = true, nonModal = false, clos
     element.blockOutside = blockOutside;
     element.holdScroll = holdScroll;
     element.anchor = anchor;
+    element.trigger = trigger;
     element.returnFocus = returnFocus;
     element.type = type;
     element.side = side;

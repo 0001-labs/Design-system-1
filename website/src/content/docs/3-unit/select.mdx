@@ -166,3 +166,9 @@ at phone width.
 import ConstraintList from "../../../components/ConstraintList.astro";
 
 <ConstraintList component="ds-select" />
+
+On mobile, an ordinary anchored list centres horizontally on its trigger and
+stands 4 CSS pixels below it. Its rows and width retain their grid measures.
+At an edge the list shifts inside the safe area; if below cannot fit and above
+has more room it opens 4px above, otherwise it scrolls in the available height.
+Context menus, explicit side/top placement and submenus retain their own rules.

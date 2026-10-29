@@ -342,3 +342,9 @@ Set `events` as a property, as with a month. Days without events stay quiet; mor
 import ConstraintList from "../../../components/ConstraintList.astro";
 
 <ConstraintList component="ds-calendar" />
+
+On mobile, the picker’s small month centres on the field, 4 CSS pixels below it.
+It shifts inward at screen edges, opens above when that has more room, and scrolls
+within the visible keyboard viewport when necessary. Clear closes the picker and
+returns focus to the field. A standalone calendar used inside an app-owned context
+still emits its empty value; the app closes that context after saving it.

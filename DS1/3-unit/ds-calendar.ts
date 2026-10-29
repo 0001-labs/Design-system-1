@@ -1,3 +1,4 @@
+import { anchoredPanel, mobilePanel, panelViewport } from "../0-face/anchored-panel";
 // ds-calendar.ts
 // A month on whole squares: seven days across, a week to a row. `view` shows
 // one week instead (every event of each day, nothing folded behind "+N") or one
@@ -634,6 +635,8 @@ export class Calendar extends CalendarBase {
   /** Empties the value, as Clear does, and says so with `change`. */
   clear() {
     if (this.picker) {
+      // Restore focus before the empty value removes the focused Clear button.
+      this.hide();
       this.commit("");
       this.open = false;
       return;
@@ -1558,6 +1561,8 @@ export class Calendar extends CalendarBase {
     this.ownerDocument.addEventListener("pointerdown", this.onOutside, true);
     this.ownerDocument.addEventListener("scroll", this.place, true);
     window.addEventListener("resize", this.place);
+    window.visualViewport?.addEventListener("resize", this.place);
+    window.visualViewport?.addEventListener("scroll", this.place);
     this.dispatchEvent(new CustomEvent("ds-calendar-toggle", { bubbles: true, composed: true, detail: { open: true } }));
     if (this.focusMonth) void this.focusPickerDay();
   }
@@ -1573,6 +1578,8 @@ export class Calendar extends CalendarBase {
     this.ownerDocument.removeEventListener("pointerdown", this.onOutside, true);
     this.ownerDocument.removeEventListener("scroll", this.place, true);
     window.removeEventListener("resize", this.place);
+    window.visualViewport?.removeEventListener("resize", this.place);
+    window.visualViewport?.removeEventListener("scroll", this.place);
     this.open = false;
     if (restore && within) this.trigger?.focus({ preventScroll: true });
     this.dispatchEvent(new CustomEvent("ds-calendar-toggle", { bubbles: true, composed: true, detail: { open: false } }));
@@ -1590,6 +1597,18 @@ export class Calendar extends CalendarBase {
     const panel = this.panel, trigger = this.trigger;
     if (!this.shown || !panel || !trigger) return;
     const rect = trigger.getBoundingClientRect();
+    if (mobilePanel(this)) {
+      const viewport = panelViewport(this);
+      panel.style.maxWidth = `${Math.max(0, viewport.width - 8)}px`;
+      panel.style.maxHeight = "";
+      const position = anchoredPanel(rect, panel.getBoundingClientRect(), viewport);
+      panel.style.maxHeight = `${position.availableHeight}px`;
+      panel.style.overflowY = "auto";
+      const placed = anchoredPanel(rect, panel.getBoundingClientRect(), viewport);
+      panel.style.left = `${placed.left}px`; panel.style.top = `${placed.top}px`;
+      return;
+    }
+    panel.style.maxWidth = ""; panel.style.maxHeight = ""; panel.style.overflowY = "";
     const view = this.ownerDocument.defaultView!;
     const viewport = view.visualViewport;
     const left = viewport?.offsetLeft ?? 0, top = viewport?.offsetTop ?? 0;
