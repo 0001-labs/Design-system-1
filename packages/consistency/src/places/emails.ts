@@ -26,11 +26,11 @@ import '../../../../DS1/2-core/ds-empty';
 import type { SiteSummary } from '../site-editing';
 import { siteApi } from './api';
 import { kept, readWhenShown } from './fresh';
-import { EMAIL_KIND_NAMES, emailDocument, emailsQuery, emailStatusName, kindName, relatedOf, sentAt, sizeName, type EmailDetail, type EmailsView, type EmailSummary, type EmailTemplate } from './emails-view';
+import { emailDocument, emailsQuery, emailStatusName, kindName, relatedOf, sentAt, sizeName, type EmailDetail, type EmailsView, type EmailSummary, type EmailTemplate } from './emails-view';
 import { languagesOf, when, type Language, type PageSummary } from './pages-group';
 import './places.css';
 
-interface ListAnswer { emails?: EmailSummary[]; next?: string | null }
+interface ListAnswer { kinds?: string[]; emails?: EmailSummary[]; next?: string | null }
 interface TemplatesAnswer { lang?: string; from?: string | null; templates?: EmailTemplate[] }
 /** What the drawer shows: a sent email (read whole once opened), or a kind drawn with made up people. */
 type Shown = { kind: 'sent'; summary: EmailSummary; email?: EmailDetail; problem?: string } | { kind: 'look'; template: EmailTemplate; from: string | null };
@@ -39,9 +39,10 @@ const TABS: { view: EmailsView; label: string }[] = [{ view: 'sent', label: 'Sen
 
 export class ConsistencyPlaceEmails extends LitElement {
   static properties = {
-    view: { state: true }, emails: { state: true }, next: { state: true }, problem: { state: true }, kind: { state: true }, words: { state: true },
+    kinds: { state: true }, view: { state: true }, emails: { state: true }, next: { state: true }, problem: { state: true }, kind: { state: true }, words: { state: true },
     languages: { state: true }, chosenLang: { state: true }, templates: { state: true }, from: { state: true }, lookProblem: { state: true }, shown: { state: true },
   };
+  declare kinds: string[];
   declare view: EmailsView;
   declare emails: EmailSummary[] | null;
   declare next: string | null;
@@ -62,7 +63,7 @@ export class ConsistencyPlaceEmails extends LitElement {
   constructor(site?: SiteSummary) {
     super();
     if (site) this.site = site;
-    this.view = 'sent'; this.emails = null; this.next = null; this.problem = ''; this.kind = ''; this.words = '';
+    this.kinds = []; this.view = 'sent'; this.emails = null; this.next = null; this.problem = ''; this.kind = ''; this.words = '';
     this.languages = []; this.chosenLang = null; this.templates = null; this.from = null; this.lookProblem = ''; this.shown = null;
   }
   protected createRenderRoot() { return this; }
@@ -71,7 +72,7 @@ export class ConsistencyPlaceEmails extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    if (!this.emails) { const last = kept.read<ListAnswer>(this.key); if (Array.isArray(last?.emails)) { this.emails = last.emails; this.next = last.next ?? null; } }
+    if (!this.emails) { const last = kept.read<ListAnswer>(this.key); if (Array.isArray(last?.emails)) { this.kinds = last.kinds ?? [...new Set(last.emails.map(email => email.kind))]; this.emails = last.emails; this.next = last.next ?? null; } }
     this.stop = readWhenShown(this, () => void this.read());
     void this.read();
   }
@@ -88,9 +89,10 @@ export class ConsistencyPlaceEmails extends LitElement {
       if (mine !== this.turn) return;
       const emails = Array.isArray(answer.emails) ? answer.emails : [];
       this.emails = after ? [...(this.emails ?? []), ...emails] : emails;
+      this.kinds = answer.kinds ?? [...new Set([...(after ? this.kinds : []), ...emails.map(email => email.kind)])];
       this.next = answer.next ?? null;
       this.problem = '';
-      if (!after && !this.kind && !this.words.trim()) kept.write(this.key, { emails, next: this.next });
+      if (!after && !this.kind && !this.words.trim()) kept.write(this.key, { emails, next: this.next, kinds: this.kinds });
     } catch (error) {
       if (mine === this.turn) this.problem = (error as Error).message;
     }
@@ -156,7 +158,7 @@ export class ConsistencyPlaceEmails extends LitElement {
           .value=${this.words} @input-change=${(event: CustomEvent<{ value: string }>) => this.search(event.detail.value)}></ds-input>
         <ds-select class="place-emails__kind"><select aria-label="Kind" .value=${this.kind} @change=${(event: Event) => { this.kind = (event.target as HTMLSelectElement).value; void this.load(null); }}>
           <option value="" ?selected=${!this.kind}>Every kind</option>
-          ${Object.entries(EMAIL_KIND_NAMES).map(([value, name]) => html`<option value=${value} ?selected=${value === this.kind}>${name}</option>`)}
+          ${this.kinds.map(value => html`<option value=${value} ?selected=${value === this.kind}>${kindName(value)}</option>`)}
         </select></ds-select>
       </div>
       ${this.problem ? html`<ds-message role="alert" tone="danger" literal heading="The emails could not be read" text=${this.problem}></ds-message>` : nothing}
@@ -181,7 +183,7 @@ export class ConsistencyPlaceEmails extends LitElement {
         @click=${() => { this.chosenLang = each.code; this.shown = null; void this.look(); }}>${each.name}</ds-button>`)}</ds-tabs>` : nothing}
       ${this.lookProblem ? html`<ds-message role="alert" tone="danger" literal heading="The emails could not be drawn" text=${this.lookProblem}></ds-message>` : nothing}
       ${this.templates ? html`<ds-list class="place-emails__list" aria-label="How they look">${this.templates.map(template => html`<ds-row interactive class="place-email" label=${kindName(template.kind)}
-        ?current=${this.shown?.kind === 'look' && this.shown.template.kind === template.kind} @click=${() => { this.shown = { kind: 'look', template, from: this.from }; }}>
+        ?current=${this.shown?.kind === 'look' && this.shown.template.kind === template.kind} @click=${() => { this.shown = { kind: 'look', template, from: template.from ?? this.from }; }}>
         <span class="place-email__kind-name">${kindName(template.kind)}</span>
         <span class="ds-row__name place-email__subject place-muted">${template.subject}</span>
       </ds-row>`)}</ds-list>` : nothing}`;

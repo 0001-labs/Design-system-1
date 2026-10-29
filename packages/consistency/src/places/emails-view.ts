@@ -20,10 +20,11 @@ export interface EmailSummary {
 export interface EmailDetail extends EmailSummary { html: string; text: string }
 
 /** A kind drawn with made up data. */
-export interface EmailTemplate { kind: string; to: string; subject: string; text: string; html: string; attachments: EmailAttachment[] }
+export interface EmailTemplate { from?: string; kind: string; to: string; subject: string; text: string; html: string; attachments: EmailAttachment[] }
 
 /** Every kind the site engine sends, in the order the team meets them, with its name. */
 export const EMAIL_KIND_NAMES: Record<string, string> = {
+  'form-inquiry': 'Form enquiry',
   'sign-in-code': 'Sign-in code',
   'booking-confirmation': 'Booking confirmation',
   'booking-team-note': 'Booking note to the team',

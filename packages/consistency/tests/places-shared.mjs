@@ -83,11 +83,11 @@ try {
     if (what.startsWith('files/photos/')) return route.fulfill({ body: Buffer.from('R0lGODlhAQABAAAAACw=', 'base64'), headers: { 'content-type': 'image/gif' } });
     if (what === 'api/emails') {
       const q = url.searchParams.get('q'), kind = url.searchParams.get('kind');
-      return route.fulfill({ json: { emails: emails.filter(email => (!q || email.to.includes(q) || email.subject.includes(q)) && (!kind || email.kind === kind)), next: null } });
+      return route.fulfill({ json: { kinds: ['booking-confirmation', 'gift-card'], emails: emails.filter(email => (!q || email.to.includes(q) || email.subject.includes(q)) && (!kind || email.kind === kind)), next: null } });
     }
     if (what === 'api/emails/templates') {
       const lang = url.searchParams.get('lang');
-      return route.fulfill({ json: { lang, from: 'hej@cphraft.dk', templates: [{ kind: 'booking-confirmation', to: 'ida@example.com', subject: lang === 'en' ? 'Your booking' : 'Din booking', text: 'Hej', html: '<p>Hej</p>', attachments: [] }] } });
+      return route.fulfill({ json: { lang, from: 'hej@cphraft.dk', templates: [{ from: 'Forms <forms@example.com>', kind: 'booking-confirmation', to: 'ida@example.com', subject: lang === 'en' ? 'Your booking' : 'Din booking', text: 'Hej', html: '<p>Hej</p>', attachments: [] }] } });
     }
     if (what.startsWith('api/emails/')) {
       const email = emails.find(each => each.id === what.split('/')[2]);
@@ -101,6 +101,7 @@ try {
   const sidebar = page.locator('consistency-home ds-sidebar.home-places');
   for (const label of ['Pages', 'Emails', 'Design']) await sidebar.getByText(label, { exact: true }).waitFor();
 
+  if (!process.env.EMAILS_ONLY) {
   // Pages: a row per page across its languages, the first chosen, its details in the chosen language.
   await sidebar.getByText('Pages', { exact: true }).click();
   const place = page.locator('consistency-place-pages:not([hidden])');
@@ -202,9 +203,12 @@ try {
   }
   await page.setViewportSize({ width: 1440, height: 1000 });
 
+  }
   // Emails: Sent and How they look as text tabs; the rows, a failed one marked.
   await sidebar.getByText('Emails', { exact: true }).click();
   const mail = page.locator('consistency-place-emails:not([hidden])');
+  await page.waitForFunction(() => document.querySelectorAll('consistency-place-emails select[aria-label=Kind] option').length === 3);
+  if (await mail.locator('select[aria-label=Kind] option[value=sign-in-code]').count()) fail('An unrelated sign-in email was offered');
   const sent = mail.locator('ds-list[aria-label="Sent emails"] > ds-row');
   await sent.nth(1).waitFor();
   if ((await mail.locator('ds-tabs[text][aria-label="Emails"] [role="tab"]').evaluateAll(tabs => tabs.map(tab => tab.textContent.trim() + ':' + tab.getAttribute('aria-selected')))).join() !== 'Sent:true,How they look:false') fail('The tabs are not Sent and How they look');
@@ -236,6 +240,7 @@ try {
   await page.waitForFunction(() => document.querySelector('consistency-place-emails ds-list[aria-label="How they look"] .place-email__subject')?.textContent === 'Your booking');
   await mail.locator('ds-list[aria-label="How they look"] > ds-row').first().click();
   await email.waitFor();
+  if (!(await said(email)).includes('Forms <forms@example.com>')) fail('The template lost its own sender');
   if (process.env.PLACES_SHOT) await page.screenshot({ path: `${process.env.PLACES_SHOT}/emails.png` });
   if (!(await said(email)).includes('Nothing is sent')) fail('A kind does not say it is drawn with made up people');
 
