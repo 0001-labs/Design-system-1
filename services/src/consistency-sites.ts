@@ -41,6 +41,7 @@ export const API_ROUTES = [
   allow('native-page', 'GET', 'PUT'),
   // A site's Design system 1 library as its theme: read, pinned or changed, taken away.
   allow('library', 'GET', 'PUT', 'DELETE'),
+  allow('emails/templates/[a-z][a-z0-9-]{0,63}', 'GET', 'PUT'),
   allow('emails', 'GET'), allow('emails/templates', 'GET'), allow('emails/[\\w-]{1,64}', 'GET'),
   allow('bookings', 'GET'), allow(`bookings/${UUID}`, 'GET'), allow(`bookings/${UUID}/cancel`, 'POST'),
   allow('booking-offers', 'GET', 'PUT'), allow('booking-settings', 'GET', 'PUT'),

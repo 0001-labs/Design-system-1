@@ -20,7 +20,9 @@ export interface EmailSummary {
 export interface EmailDetail extends EmailSummary { html: string; text: string }
 
 /** A kind drawn with made up data. */
-export interface EmailTemplate { from?: string; kind: string; to: string; subject: string; text: string; html: string; attachments: EmailAttachment[] }
+export interface EmailTemplateSource { subject: string; text: string }
+export interface EmailTemplateEditing { build: string; base: string; revision: number; document: EmailTemplateSource; values: Record<string, string> }
+export interface EmailTemplate { editing?: EmailTemplateEditing; from?: string; kind: string; to: string; subject: string; text: string; html: string; attachments: EmailAttachment[] }
 
 /** Every kind the site engine sends, in the order the team meets them, with its name. */
 export const EMAIL_KIND_NAMES: Record<string, string> = {
@@ -93,4 +95,11 @@ export function emailDocument(html: string): string {
     "<style>html{color-scheme:light}body{margin:16px;background:#fff;color:#1d1d1b;font:15px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;overflow-wrap:anywhere}</style>",
     `</head><body>${html}</body></html>`,
   ].join('');
+}
+
+/** Preview uses fictional values, substituted once and escaped as plain text. */
+export function templatePreview(source: EmailTemplateSource, values: Record<string, string>): { subject: string; text: string; html: string } {
+  const fill = (words: string) => words.replace(/{{\s*([a-zA-Z][\w]{0,31})\s*}}/g, (match, key: string) => values[key] ?? match);
+  const text = fill(source.text), subject = fill(source.subject).replace(/[\r\n]+/g, ' ').slice(0, 200);
+  return { subject, text, html: `<pre style="white-space:pre-wrap">${text.replace(/[&<>]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[character]!)}</pre>` };
 }

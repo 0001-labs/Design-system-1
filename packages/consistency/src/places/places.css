@@ -184,3 +184,8 @@ td[data-numeric] > .place-cell__press { justify-content: flex-end; text-align: e
   box-sizing: border-box; display: inline-flex; align-items: center; height: var(--ds-control-height, calc(16px * var(--ds-sf, 1)));
   padding-inline-start: calc(4px * var(--ds-sf, 1)); border-radius: var(--ds-radius); background: var(--ds-fill); white-space: nowrap;
 }
+
+/* Email wording uses the same fields and square rhythm as the rest of the drawer. */
+.place-email-editor{display:flex;flex-direction:column;gap:var(--ds-unit);min-width:0}
+.place-email-editor>ds-input{width:100%;min-width:0}
+.place-email-editor__actions{display:flex;flex-wrap:wrap;gap:var(--ds-unit)}

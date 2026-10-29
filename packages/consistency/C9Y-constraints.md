@@ -6,6 +6,12 @@ Each rule names the test that holds it. While editing a site, a drag that breaks
 
 ## Rules
 
+### `emails.templates`
+
+Editable email wording saves automatically with revision checks, keeps newer typing and failed drafts, previews real form placeholders and survives reopening without sending an email.
+
+Held by `tests/places-shared.mjs`: “Enquiry templates save automatically, preserve newer typing and failed drafts, preview fields and reopen”.
+
 ### `carousel.reorder`
 
 Dragging a carousel card by its body or picture reorders the complete card only within its own horizontal row, never moves it vertically or nests it, preserves its contents and saves the order for reopening and publication.

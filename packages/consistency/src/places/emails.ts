@@ -24,6 +24,7 @@ import '../../../../DS1/2-core/ds-text';
 import '../../../../DS1/2-core/ds-message';
 import '../../../../DS1/2-core/ds-empty';
 import type { SiteSummary } from '../site-editing';
+import { EmailTemplateEditor } from './email-template-editor';
 import { siteApi } from './api';
 import { kept, readWhenShown } from './fresh';
 import { emailDocument, emailsQuery, emailStatusName, kindName, relatedOf, sentAt, sizeName, type EmailDetail, type EmailsView, type EmailSummary, type EmailTemplate } from './emails-view';
@@ -59,6 +60,7 @@ export class ConsistencyPlaceEmails extends LitElement {
   private stop: (() => void) | null = null;
   private turn = 0;
   private typing = 0;
+  private readonly templateEditors = new Map<string, EmailTemplateEditor>();
 
   constructor(site?: SiteSummary) {
     super();
@@ -110,14 +112,16 @@ export class ConsistencyPlaceEmails extends LitElement {
       if ((this.chosenLang ?? this.languages[0]?.code ?? 'en') !== lang) return;
       this.templates = Array.isArray(answer.templates) ? answer.templates : [];
       this.from = answer.from ?? null;
+      if (this.shown?.kind === 'look') { const kind = this.shown.template.kind; const template = this.templates.find(template => template.kind === kind); if (template) this.shown = { kind: 'look', template, from: template.from ?? this.from }; }
       this.lookProblem = '';
     } catch (error) {
       this.lookProblem = (error as Error).message;
     }
   }
 
-  private choose(view: EmailsView) {
+  private async choose(view: EmailsView) {
     if (view === this.view) return;
+    if (!await this.flush()) return;
     this.view = view;
     this.shown = null;
     void this.read();
@@ -132,6 +136,7 @@ export class ConsistencyPlaceEmails extends LitElement {
 
   /** Opens a sent email in the drawer, read whole. */
   private async open(summary: EmailSummary) {
+    if (!await this.flush()) return;
     this.shown = { kind: 'sent', summary };
     try {
       const answer = await siteApi<{ email?: EmailDetail }>(this.site.code, `emails/${encodeURIComponent(summary.id)}`);
@@ -180,15 +185,35 @@ export class ConsistencyPlaceEmails extends LitElement {
     const lang = this.chosenLang ?? this.languages[0]?.code;
     return html`${this.languages.length > 1 ? html`<ds-tabs text class="place-languages" aria-label="Language">${this.languages.map(each => html`<ds-button control="host" role="tab" lang=${each.code}
         ?active=${each.code === lang} aria-selected=${String(each.code === lang)} tabindex=${each.code === lang ? 0 : -1}
-        @click=${() => { this.chosenLang = each.code; this.shown = null; void this.look(); }}>${each.name}</ds-button>`)}</ds-tabs>` : nothing}
+        @click=${async () => { if (!await this.flush()) return; this.chosenLang = each.code; this.shown = null; void this.look(); }}>${each.name}</ds-button>`)}</ds-tabs>` : nothing}
       ${this.lookProblem ? html`<ds-message role="alert" tone="danger" literal heading="The emails could not be drawn" text=${this.lookProblem}></ds-message>` : nothing}
       ${this.templates ? html`<ds-list class="place-emails__list" aria-label="How they look">${this.templates.map(template => html`<ds-row interactive class="place-email" label=${kindName(template.kind)}
-        ?current=${this.shown?.kind === 'look' && this.shown.template.kind === template.kind} @click=${() => { this.shown = { kind: 'look', template, from: template.from ?? this.from }; }}>
+        ?current=${this.shown?.kind === 'look' && this.shown.template.kind === template.kind} @click=${async () => { if (!await this.flush()) return; this.shown = { kind: 'look', template, from: template.from ?? this.from }; }}>
         <span class="place-email__kind-name">${kindName(template.kind)}</span>
         <span class="ds-row__name place-email__subject place-muted">${template.subject}</span>
       </ds-row>`)}</ds-list>` : nothing}`;
   }
 
+  async flush(): Promise<boolean> {
+    const answers = await Promise.all([...this.templateEditors.values()].map(editor => editor.flush()));
+    return answers.every(Boolean);
+  }
+  private async close() { if (await this.flush()) this.shown = null; }
+  private editTemplate(template: EmailTemplate) {
+    const lang = this.chosenLang ?? this.languages[0]?.code ?? 'en', key = `${template.kind}:${lang}`;
+    let editor = this.templateEditors.get(key);
+    if (!editor) {
+      editor = new EmailTemplateEditor(); editor.site = this.site.code; editor.lang = lang; editor.template = template;
+      editor.addEventListener('email-template-saved', (event: Event) => {
+        const saved = (event as CustomEvent<EmailTemplate>).detail;
+        this.templates = this.templates?.map(each => each.kind === saved.kind ? saved : each) ?? null;
+        if (this.shown?.kind === 'look' && this.shown.template.kind === saved.kind) this.shown = { ...this.shown, template: saved };
+      });
+      this.templateEditors.set(key, editor);
+    }
+    editor.refresh(template);
+    return editor;
+  }
   /** The drawer beside the list: one email, drawn as it went, or as its kind looks. */
   private drawer() {
     const shown = this.shown;
@@ -218,14 +243,14 @@ export class ConsistencyPlaceEmails extends LitElement {
     } else if (shown?.kind === 'look') {
       const template = shown.template;
       title = template.subject; description = `${kindName(template.kind)}, drawn with made up people. Nothing is sent.`;
-      body = html`${drawn(template)}${group('Sent', html`${line('To', template.to)}${line('From', shown.from || html`<span class="place-muted">The site's address</span>`)}`)}${attachments(template.attachments)}`;
+      body = html`${template.editing ? this.editTemplate(template) : drawn(template)}${group('Sent', html`${line('To', template.to)}${line('From', shown.from || html`<span class="place-muted">The site's address</span>`)}`)}${attachments(template.attachments)}`;
     }
     return html`<ds-overlay type="drawer" .nonModal=${true} .holdScroll=${false} .blockOutside=${false} .open=${!!shown}
-      @ds-close-request=${(event: Event) => { if (event.target === event.currentTarget) this.shown = null; }}>
+      @ds-close-request=${(event: Event) => { if (event.target === event.currentTarget) { event.preventDefault(); void this.close(); } }}>
       <dialog class="place-drawer place-email-drawer" aria-labelledby="place-email-title">
         <div data-ds-overlay="header"><h2 data-ds-overlay="title" id="place-email-title">${title}</h2><p data-ds-overlay="description">${description}</p></div>
         ${body}
-        <div data-ds-overlay="footer"><ds-button secondary data-ds-overlay-dismiss>Close</ds-button></div>
+        <div data-ds-overlay="footer"><ds-button secondary @click=${() => void this.close()}>Close</ds-button></div>
       </dialog>
     </ds-overlay>`;
   }

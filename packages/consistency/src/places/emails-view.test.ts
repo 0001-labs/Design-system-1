@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vite-plus/test";
-import { EMAIL_KIND_NAMES, emailDocument, emailsQuery, emailStatusName, kindName, relatedOf, sentAt, sizeName } from "./emails-view";
+import { EMAIL_KIND_NAMES, templatePreview, emailDocument, emailsQuery, emailStatusName, kindName, relatedOf, sentAt, sizeName } from "./emails-view";
 
 // Ported from the sites' own editor's tests (team-cms/tests/app-emails.test.ts, deleted 26 October 2026).
 describe("the Emails place's list", () => {
@@ -52,4 +52,8 @@ describe("the document an email is drawn in", () => {
     expect(document).toContain('<base target="_blank">');
     expect(document).not.toMatch(/<script/i);
   });
+});
+
+it('previews editable enquiry fields as text without substituting submitted placeholders again', () => {
+  expect(templatePreview({ subject: 'Hello {{name}}', text: '{{message}}' }, { name: 'Alex', message: '<Hello> {{name}}' })).toEqual({ subject: 'Hello Alex', text: '<Hello> {{name}}', html: '<pre style="white-space:pre-wrap">&lt;Hello&gt; {{name}}</pre>' });
 });

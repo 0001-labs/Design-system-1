@@ -136,6 +136,9 @@ export function failureWords(status: number, error?: string): string {
   if (status === 401 || status === 403) return 'Your session ended. Sign in again in another tab, then try again.';
   if (error === 'not-editable') return 'This site keeps its words in its own editor.';
   if (error === 'unknown-field' || error === 'unknown-page') return 'The site was published again. Open the page again to edit it.';
+  if (error === 'unknown-email-variable' || error === 'bad-email-variable') return 'Use a form field from the list, with both pairs of braces.';
+  if (error === 'bad-email-template') return 'Enter a subject on one line and a message.';
+  if (error === 'stale-email-template') return 'This email changed elsewhere. Your draft is kept. Use the saved version to replace it.';
   if (status === 409) return 'This page changed elsewhere. Your edits are still here. Discard these changes to open its latest version.';
   if (error === 'bad-link') return 'Enter a page path or a complete web, email or phone address.';
   if (error === 'composition-too-large') return 'This page has too much added content. Remove an addition and try again.';

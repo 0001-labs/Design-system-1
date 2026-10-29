@@ -7,7 +7,7 @@ import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { resolve, extname } from 'node:path';
-import { chromium } from 'playwright';
+import { chromium, webkit } from 'playwright';
 const root = fileURLToPath(new URL('../../../website/dist/', import.meta.url));
 const server = createServer(async (request, response) => {
   const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
@@ -48,11 +48,14 @@ const emails = [
   { id: 'e1', at: Date.now() - 60_000, kind: 'booking-confirmation', to: 'ida@example.com', from: 'hej@cphraft.dk', subject: 'Your booking', related: 'b1', status: 'sent', error: null, attachments: [] },
   { id: 'e2', at: Date.now() - 120_000, kind: 'gift-card', to: 'bo@example.com', from: 'hej@cphraft.dk', subject: 'A gift card', related: 'g1', status: 'failed', error: 'The address bounced.', attachments: [{ filename: 'gift.pdf', contentType: 'application/pdf', size: 41_200 }] },
 ];
-const browser = await chromium.launch({ headless: true });
+const browser = await (process.env.PLACES_BROWSER === 'webkit' ? webkit : chromium).launch({ headless: true });
 try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
   const edits = [], asked = [], sourced = [];
-  let failNext = false;
+  let failNext = false, editableEmail = false, failEmailSave = false, delayEmailSave = 0;
+  const emailWrites = [];
+  let emailRevision = 0, emailSource = { subject: 'Enquiry from {{name}}', text: 'From {{email}}\n\n{{message}}' };
+  const emailTemplate = () => ({ kind: 'form-inquiry', from: 'Forms <forms@example.com>', to: 'owner@example.com', subject: emailSource.subject.replace('{{name}}', 'Alex'), text: emailSource.text.replace('{{email}}', 'alex@example.com').replace('{{message}}', 'A new website'), html: '<pre>A new website</pre>', attachments: [], editing: { build: 'email-build', base: 'email-base', revision: emailRevision, document: { ...emailSource }, values: { name: 'Alex', email: 'alex@example.com', message: 'A new website' } } });
   await page.route('**/api/consistency/profile', route => route.fulfill({ json: { companyName: '0001' } }));
   // The owner's one workspace, which holds the site (the app shows a workspace's sites only).
   await page.route('**/api/consistency/workspaces', route => route.fulfill({ json: { owner: true, workspaces: [{ code: '01STDO', name: '0001', plan: 'free', role: 'owner', sites: 1, siteCodes: [CODE], limits: { sites: 10, customDomains: true } }] } }));
@@ -87,7 +90,17 @@ try {
     }
     if (what === 'api/emails/templates') {
       const lang = url.searchParams.get('lang');
+      if (editableEmail) return route.fulfill({ json: { lang, from: 'Forms <forms@example.com>', templates: [emailTemplate()] } });
       return route.fulfill({ json: { lang, from: 'hej@cphraft.dk', templates: [{ from: 'Forms <forms@example.com>', kind: 'booking-confirmation', to: 'ida@example.com', subject: lang === 'en' ? 'Your booking' : 'Din booking', text: 'Hej', html: '<p>Hej</p>', attachments: [] }] } });
+    }
+    if (what === 'api/emails/templates/form-inquiry') {
+      if (request.method() === 'GET') return route.fulfill({ json: { template: emailTemplate() } });
+      const input = request.postDataJSON(); emailWrites.push(input);
+      if (delayEmailSave) await new Promise(done => setTimeout(done, delayEmailSave));
+      if (failEmailSave) return route.fulfill({ status: 503, json: { error: 'unavailable' } });
+      if (input.revision !== emailRevision || input.base !== 'email-base') return route.fulfill({ status: 409, json: { error: 'stale-email-template' } });
+      emailSource = input.document; emailRevision++;
+      return route.fulfill({ json: { template: emailTemplate() } });
     }
     if (what.startsWith('api/emails/')) {
       const email = emails.find(each => each.id === what.split('/')[2]);
@@ -243,6 +256,61 @@ try {
   if (!(await said(email)).includes('Forms <forms@example.com>')) fail('The template lost its own sender');
   if (process.env.PLACES_SHOT) await page.screenshot({ path: `${process.env.PLACES_SHOT}/emails.png` });
   if (!(await said(email)).includes('Nothing is sent')) fail('A kind does not say it is drawn with made up people');
+
+  // Editable enquiry email: automatic persistence, slow responses, failed drafts and reopening.
+  await mail.getByRole('button', { name: 'Close', exact: true }).click();
+  editableEmail = true;
+  await page.evaluate(() => dispatchEvent(new Event('focus')));
+  const enquiry = mail.locator('ds-row[label="Form enquiry"]');
+  await enquiry.waitFor(); await enquiry.click();
+  const wording = mail.locator('consistency-email-template-editor');
+  const subject = wording.getByRole('textbox', { name: 'Email subject' });
+  const message = wording.getByRole('textbox', { name: 'Email message' });
+  await subject.fill('A request from {{name}}');
+  await page.waitForFunction(() => !document.querySelector('consistency-email-template-editor')?.textContent?.includes('could not be saved'));
+  for (let i = 0; i < 50 && emailRevision < 1; i++) await page.waitForTimeout(50);
+  if (emailRevision !== 1 || emailSource.subject !== 'A request from {{name}}') fail('The subject did not save without a button press');
+  delayEmailSave = 500;
+  const beforeSlow = emailWrites.length;
+  await message.fill('First {{message}}');
+  for (let i = 0; i < 50 && emailWrites.length === beforeSlow; i++) await page.waitForTimeout(25);
+  await message.fill('Final {{message}}\nReply to {{email}}');
+  for (let i = 0; i < 80 && emailSource.text !== 'Final {{message}}\nReply to {{email}}'; i++) await page.waitForTimeout(50);
+  if (await message.inputValue() !== 'Final {{message}}\nReply to {{email}}' || emailSource.text !== 'Final {{message}}\nReply to {{email}}') fail('A slow save replaced newer typing');
+  delayEmailSave = 0; failEmailSave = true;
+  await subject.fill('Keep my draft {{name}}');
+  await wording.getByRole('alert').waitFor();
+  await mail.getByRole('button', { name: 'Close', exact: true }).click();
+  if (!await wording.isVisible()) fail('Closing lost a failed draft');
+  await page.keyboard.press('Escape');
+  if (!await wording.isVisible()) fail('Escape lost a failed draft');
+  await sidebar.getByText('Design', { exact: true }).click();
+  if (!await wording.isVisible() || await subject.inputValue() !== 'Keep my draft {{name}}') fail('Navigation lost a failed draft');
+  failEmailSave = false;
+  await wording.getByRole('button', { name: 'Try again', exact: true }).click();
+  for (let i = 0; i < 50 && emailSource.subject !== 'Keep my draft {{name}}'; i++) await page.waitForTimeout(50);
+  if (emailSource.subject !== 'Keep my draft {{name}}') fail('Retry did not save the retained draft');
+  await mail.getByRole('button', { name: 'Close', exact: true }).click();
+  await enquiry.click();
+  if (await subject.inputValue() !== 'Keep my draft {{name}}') fail('Reopening did not retain the saved subject');
+  const previewText = await wording.locator('iframe').contentFrame().locator('body').innerText();
+  if (!previewText.includes('Final A new website') || !previewText.includes('alex@example.com')) fail('The preview did not draw the live form fields');
+  if (await wording.getByRole('button', { name: /^(Save|Apply)$/ }).count()) fail('Email wording has a save ceremony');
+  emailRevision++; emailSource = { ...emailSource, subject: 'Changed in another tab {{name}}' };
+  await subject.fill('My conflicting draft {{name}}');
+  await wording.getByRole('alert').waitFor();
+  if (await subject.inputValue() !== 'My conflicting draft {{name}}' || emailSource.subject !== 'Changed in another tab {{name}}') fail('A conflict replaced the other tab or lost the draft');
+  await wording.getByRole('button', { name: 'Use saved version', exact: true }).click();
+  for (let i = 0; i < 50 && await subject.inputValue() !== 'Changed in another tab {{name}}'; i++) await page.waitForTimeout(50);
+  if (await subject.inputValue() !== 'Changed in another tab {{name}}') fail('Conflict recovery did not show the saved version');
+  await page.keyboard.press('Escape');
+  await enquiry.click();
+  if (await subject.inputValue() !== 'Changed in another tab {{name}}') fail('Conflict recovery did not reopen the current version');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.waitForTimeout(150);
+  if (await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)) fail('The enquiry editor overflows on a phone');
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  console.log('Enquiry templates save automatically, preserve newer typing and failed drafts, preview fields and reopen');
 
   // Design: each page read in turn through the sandboxed document route, its colours counted with their tokens.
   const read = asked.length;

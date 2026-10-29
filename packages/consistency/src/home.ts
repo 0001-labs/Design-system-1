@@ -204,6 +204,11 @@ export class ConsistencyHome extends LitElement {
   private async move(next: Place, record: 'push' | 'none') {
     const current = this.place;
     if (current.page === 'draft-site' && await this.draftEditors.get(`${current.workspace}:${current.id}`)?.flush() === false) return;
+    const oldPlace = current.page === 'site' ? this.placeOf(current) : undefined;
+    if (current.page === 'site' && oldPlace && (next.page !== 'site' || next.code !== current.code || next.place !== current.place)) {
+      const place = this.placeElements.get(`${current.code}:${oldPlace}`) as (HTMLElement & { flush?: () => Promise<boolean> }) | undefined;
+      if (place?.flush && !await place.flush()) { if (record === 'none') history.pushState(current, '', location.pathname); return; }
+    }
     // The site's canvas is left for another site, one of its places, or anywhere else.
     const leaving = current.page === 'site' && !this.placeOf(current) && (next.page !== 'site' || next.code !== current.code || this.placeOf(next)) ? this.editors.get(current.code) : undefined;
     if (leaving && !(await leaving.flush())) { if (record === 'none') history.pushState(current, '', location.pathname); return; }

@@ -116,6 +116,7 @@
     "package:check": "node scripts/check-public-package.mjs",
     "consistency:build": "vp exec tsx scripts/consistency-templates.ts && vp build --config packages/consistency/vite.config.ts",
     "c9y-system:build": "vp build --config packages/consistency/system/vite.config.ts",
+    "consistency:test:emails": "vp run consistency:build && EMAILS_ONLY=1 node packages/consistency/tests/places-shared.mjs && EMAILS_ONLY=1 PLACES_BROWSER=webkit node packages/consistency/tests/places-shared.mjs",
     "consistency:test:controls": "vp run consistency:build && node packages/consistency/tests/control-edit.mjs",
     "consistency:test:viewport": "vp run consistency:test:shared",
     "visual-kit:build": "node packages/visual-kit/build.mjs",
